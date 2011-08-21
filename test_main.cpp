@@ -6,7 +6,6 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <boost/tokenizer.hpp>
 
 #include "misaki.h"
 

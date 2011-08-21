@@ -322,6 +322,12 @@ namespace Misaki {
 
       MakeMove(move);
 
+      // チェックがかかっていれば無視。
+      if (IsAttacked(king_[side], enemy_side)) {
+        UnmakeMove(move);
+        continue;
+      }
+
       // レベルが0で、その手がチェックメイトなら
       // その手を最善手にして返す。
       if ((level == 0) && IsCheckmated()) {
@@ -338,12 +344,6 @@ namespace Misaki {
         }
         ClearMoves(level);
         return best_score_;
-      }
-
-      // チェックがかかっていれば無視。
-      if (IsAttacked(king_[side], enemy_side)) {
-        UnmakeMove(move);
-        continue;
       }
 
       // Futility Pruning。
