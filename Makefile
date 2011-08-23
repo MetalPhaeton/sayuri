@@ -87,3 +87,8 @@ opening_book.o: opening_book.cpp
 
 pgn_parser.o: pgn_parser.cpp
 	g++ ${opts} -c pgn_parser.cpp
+
+# クリーン。
+.PHONY: clean
+clean:
+	rm -f *.o test misaki openingbookmaker
