@@ -91,4 +91,4 @@ pgn_parser.o: pgn_parser.cpp
 # クリーン。
 .PHONY: clean
 clean:
-	rm -f *.o test misaki openingbookmaker
+	git rm *.o test misaki openingbookmaker
