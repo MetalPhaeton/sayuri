@@ -5,6 +5,7 @@
 #include "chess_board.h"
 
 #include <iostream>
+#include <boost/thread.hpp>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "transposition_table.h"
@@ -13,6 +14,9 @@ namespace Misaki {
   // Ponderingする。
   void ChessBoard::Ponder(int depth, TranspositionTable& table,
   const EvalWeights& weights) {
+    // スレッドをロック。
+    boost::mutex::scoped_lock lock(sync_);
+
     // 現在の時間と探索時間を得る。
     start_time_ = std::time(NULL);
     searching_time_ = static_cast<double>(INFINITY);

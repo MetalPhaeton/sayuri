@@ -717,6 +717,9 @@ namespace Misaki {
   // 最善手を得る。
   Move ChessBoard::GetBestMove(double searching_time,
   TranspositionTable& table, const EvalWeights& weights) const {
+    // スレッドのロック。
+    boost::mutex::scoped_lock(sync_);
+
     // コンストを取る。
     ChessBoard* self = const_cast<ChessBoard*>(this);
 

@@ -870,6 +870,8 @@ namespace Misaki {
        *******************/
       // スレッド。
       boost::thread* pondering_thread_ptr_;
+      // 同期オブジェクト。
+      boost::mutex sync_;
       // スレッドの中止フラグ。
       bool stop_pondering_flag_;
       // Ponderingの手を展開するバッファ。
