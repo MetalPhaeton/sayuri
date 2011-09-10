@@ -549,6 +549,9 @@ namespace Misaki {
     // コンストを取る。
     ChessBoard* self = const_cast<ChessBoard*>(this);
 
+    // スレッドをロック。
+    boost::mutex::scoped_lock lock(self->sync_);
+
     // ツリーのレベル。
     const int level = 0;
 
@@ -586,6 +589,9 @@ namespace Misaki {
   }
   // 手を指す。
   bool ChessBoard::TakeMove(const Move& move) {
+    // スレッドをロック。
+    boost::mutex::scoped_lock lock(sync_);
+
     // 手。
     move_t found_move;
     found_move.all_ = 0;
@@ -717,11 +723,11 @@ namespace Misaki {
   // 最善手を得る。
   Move ChessBoard::GetBestMove(double searching_time,
   TranspositionTable& table, const EvalWeights& weights) const {
-    // スレッドのロック。
-    boost::mutex::scoped_lock(sync_);
-
     // コンストを取る。
     ChessBoard* self = const_cast<ChessBoard*>(this);
+
+    // スレッドのロック。
+    boost::mutex::scoped_lock(self->sync_);
 
     // 探索時間を修正する。
     if (searching_time < 1.0) {
@@ -933,6 +939,9 @@ namespace Misaki {
 
     // constを取る。
     ChessBoard* self = const_cast<ChessBoard*>(this);
+
+    // スレッドをロック。
+    boost::mutex::scoped_lock lock(self->sync_);
 
     // 敵のサイド。
     side_t enemy_side = static_cast<side_t>(side ^ 0x3);

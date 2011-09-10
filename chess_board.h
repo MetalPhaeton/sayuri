@@ -142,13 +142,13 @@ namespace Misaki {
       // index: 履歴のインデックス。
       // [戻り値]
       // ゲームのデータ。
-      const GameRecord& GetGameRecord(int index) {
+      const GameRecord& GetGameRecord(int index) const {
         return *(history_[index]);
       }
       // 現在のボードのデータを得る。
       // [戻り値]
       // 現在のゲームのデータ。
-      const GameRecord& GetCurrentGameRecord() {
+      const GameRecord& GetCurrentGameRecord() const {
         return *(history_[current_game_]);
       }
       // ゲームを1つ前に戻す。
@@ -718,6 +718,8 @@ namespace Misaki {
       /****************
        * メンバ変数。 *
        ****************/
+      // 同期オブジェクト。
+      boost::mutex sync_;
       // 駒の配置のビットボードの配列。
       bitboard_t position_[NUM_SIDES][NUM_PIECE_TYPES];
       // 駒の種類の配置。
@@ -870,8 +872,6 @@ namespace Misaki {
        *******************/
       // スレッド。
       boost::thread* pondering_thread_ptr_;
-      // 同期オブジェクト。
-      boost::mutex sync_;
       // スレッドの中止フラグ。
       bool stop_pondering_flag_;
       // Ponderingの手を展開するバッファ。
