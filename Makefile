@@ -1,5 +1,5 @@
 .PHONY: all
-all: test misaki openingbookmaker
+all: test misakichess openingbookmaker
 
 # オブジェクトファイル。
 objs = misaki_debug.o \
@@ -31,7 +31,7 @@ test_main.o: test_main.cpp *.h
 	g++ ${opts} -c test_main.cpp
 
 # チェスアプリの作成。
-misaki: main.o ${objs}
+misakichess: main.o ${objs}
 	g++ ${opts} -o $@ main.o ${objs} ${libs}
 main.o: main.cpp *.h
 	g++ ${opts} -c main.cpp
@@ -91,4 +91,4 @@ pgn_parser.o: pgn_parser.cpp *.h
 # クリーン。
 .PHONY: clean
 clean:
-	git rm *.o test misaki openingbookmaker
+	git rm *.o test misakichess openingbookmaker
