@@ -88,5 +88,9 @@ pgn_parser.o: pgn_parser.cpp *.h
 # クリーン。
 .PHONY: clean
 clean:
-	git rm *.o test libmisaki.a
+	rm *.o test libmisaki.a
+	rm -r misaki
+.PHONY: gitclean
+gitclean:
+	git rm *>o test libmisaki.a
 	git rm -r misaki
