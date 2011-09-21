@@ -189,12 +189,6 @@ namespace Misaki {
   int ChessBoard::Search(int level, int depth, int alpha, int beta,
   bool is_null_move, hash_key_t key, TranspositionTable& table,
   const EvalWeights& weights) {
-    // TEST
-    extern int max_level;
-    if (level > max_level) {
-      max_level = level;
-    }
-
     // 評価値。
     int score = 0;
 

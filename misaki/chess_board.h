@@ -92,12 +92,6 @@ namespace Misaki {
        * テスト用関数。 *
        ******************/
       void Test();
-      void DeleteBoard();
-      int ExamGenMove(int level);
-      bool IsGameOver();
-      void TestCase1();
-      void TestCase2();
-      void TestCase3();
 
       /******************************
        * ChessBoardクラスの初期化。 *
