@@ -94,5 +94,5 @@ clean:
 # Gitのクリーン。
 .PHONY: gitclean
 gitclean:
-	git rm *>o test libmisaki.a
+	git rm *.o test libmisaki.a
 	git rm -r misaki
