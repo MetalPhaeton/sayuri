@@ -31,13 +31,11 @@ test_main.o: test_main.cpp *.h
 	g++ ${opts} -c test_main.cpp
 
 # ライブラリを作成。
-.PHONY: misaki
+direxist=`ls | grep "misaki"`
 misaki: libmisaki.a
-	if [ ! -e misaki ]
-	then
-	mkdir misaki
-	fi
-	mv *.h libmisaki.a misaki/
+	${if ${direxist}, , mkdir misaki}
+	mv libmisaki.a misaki/
+	cp *.h misaki/
 libmisaki.a: ${objs}
 	ar rcs libmisaki.a ${objs}
 
