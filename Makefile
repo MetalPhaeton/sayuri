@@ -1,5 +1,5 @@
 .PHONY: all
-all: test misakichess openingbookmaker
+all: test misaki
 
 # オブジェクトファイル。
 objs = misaki_debug.o \
@@ -21,7 +21,7 @@ objs = misaki_debug.o \
 # 使用するライブラリ。
 libs = -lboost_thread
 
-# オプション。
+# コンパイルオプション。
 opts = -O3
 
 # テスト用アプリの作成。
@@ -30,17 +30,16 @@ test: test_main.o ${objs}
 test_main.o: test_main.cpp *.h
 	g++ ${opts} -c test_main.cpp
 
-# チェスアプリの作成。
-misakichess: main.o ${objs}
-	g++ ${opts} -o $@ main.o ${objs} ${libs}
-main.o: main.cpp *.h
-	g++ ${opts} -c main.cpp
-
-# オープニングブックの作成アプリの作成。
-openingbookmaker: opening_book_maker_main.o ${objs}
-	g++ ${opts} -o $@ opening_book_maker_main.o ${objs} ${libs}
-opening_book_maker_main.o: opening_book_maker_main.cpp *.h
-	g++ ${opts} -c opening_book_maker_main.cpp
+# ライブラリを作成。
+.PHONY: misaki
+misaki: libmisaki.a
+	if [ ! -e misaki ]
+	then
+	mkdir misaki
+	fi
+	mv *.h libmisaki.a misaki/
+libmisaki.a: ${objs}
+	ar rcs libmisaki.a ${objs}
 
 # オブジェクトファイルの作成。
 misaki_debug.o: misaki_debug.cpp *.h
@@ -91,4 +90,5 @@ pgn_parser.o: pgn_parser.cpp *.h
 # クリーン。
 .PHONY: clean
 clean:
-	git rm *.o test misakichess openingbookmaker
+	git rm *.o test
+	git rm -r misaki
