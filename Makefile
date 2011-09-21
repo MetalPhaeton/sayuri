@@ -31,10 +31,10 @@ test_main.o: test_main.cpp *.h
 	g++ ${opts} -c test_main.cpp
 
 # ライブラリを作成。
-direxist=`ls | grep "misaki"`
+direxist = ${shell find -name "misaki"}
 misaki: libmisaki.a
-	${if ${direxist}, , mkdir misaki}
-	mv libmisaki.a misaki/
+	${if ${direxist}, , ${shell mkdir misaki}}
+	cp libmisaki.a misaki/
 	cp *.h misaki/
 libmisaki.a: ${objs}
 	ar rcs libmisaki.a ${objs}
@@ -88,5 +88,5 @@ pgn_parser.o: pgn_parser.cpp *.h
 # クリーン。
 .PHONY: clean
 clean:
-	git rm *.o test
+	git rm *.o test libmisaki.a
 	git rm -r misaki
