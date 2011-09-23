@@ -44,17 +44,7 @@ int main(int argc, char* argv[]) {
 
   Misaki::ChessBoard* board = Misaki::ChessBoard::New();
 
-  Misaki::Move move(Misaki::E2, Misaki::E4);
-  board->TakeMove(move);
-
-  int searching_time = 10;
-  Misaki::TranspositionTable* table = Misaki::TranspositionTable::New();
-  Misaki::EvalWeights weights;
-  Misaki::Move best_move = board->GetBestMove(searching_time, *table, weights);
-
-  board->TakeMove(best_move);
-
-  std::cout << *board;
+  board->Test();
 
   delete board;
 
