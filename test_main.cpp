@@ -29,6 +29,8 @@
 
 #include "misaki_debug.h"
 
+using namespace Misaki;
+
 // テスト用タイトルをプリントする。
 void PrintTitle() {
   std::cout << "************" << std::endl;
@@ -40,11 +42,18 @@ int main(int argc, char* argv[]) {
   // テスト用タイトルをプリント。
   PrintTitle();
 
-  Misaki::Init();
+  Init();
 
-  Misaki::ChessBoard* board = Misaki::ChessBoard::New();
+  ChessBoard* board = ChessBoard::New();
 
-  board->Test();
+  double searching_time = 10.0;
+  TranspositionTable* table = TranspositionTable::New();
+  EvalWeights weights;
+  Move best_move = board->GetBestMove(searching_time, *table, weights);
+
+  board->TakeMove(best_move);
+
+  std::cout << *board;
 
   delete board;
 
