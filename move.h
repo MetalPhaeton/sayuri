@@ -47,6 +47,9 @@ namespace Misaki {
       // promotion: 昇格する駒の位置。デフォルトは昇格しない。
       Move(square_t piece_square, square_t goal_square,
       piece_t promotion=EMPTY);
+      // コピーコンストラクタ。
+      // [引数]
+      // move: コピー元のオブジェクト。
       Move(const Move& move);
       virtual ~Move() {}
       Move& operator=(const Move& move);
