@@ -102,6 +102,8 @@ namespace Misaki {
       /**************
        * アクセサ。 *
        **************/
+      // 同期オブジェクト。
+      boost::mutex& sync() {return sync_;}
       // ハッシュキー。
       hash_key_t key() const {return key_;}
       // レベル。
@@ -131,6 +133,8 @@ namespace Misaki {
       /****************
        * メンバ変数。 *
        ****************/
+      // 同期オブジェクト。
+      boost::mutex sync_;
       // ハッシュキー。
       hash_key_t key_;
       // レベル。

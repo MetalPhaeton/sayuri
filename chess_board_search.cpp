@@ -63,19 +63,24 @@ namespace Misaki {
       // 何もしない。
     }
     if (slot) {
+      slot->sync().lock();
       int upper_bound = slot->upper_bound();
       int lower_bound = slot->lower_bound();
+      if (lower_bound == upper_bound) {
+        slot->sync().unlock();
+        return lower_bound;
+      }
       if (lower_bound >= beta) {
+        slot->sync().unlock();
         return lower_bound;
       }
       if (upper_bound <= alpha) {
+        slot->sync().unlock();
         return upper_bound;
-      }
-      if (lower_bound == upper_bound) {
-        return lower_bound;
       }
       alpha = (lower_bound >= alpha ? lower_bound : alpha);
       beta = (upper_bound <= beta ? upper_bound : beta);
+      slot->sync().unlock();
     }
 
     // Stand Pat。
@@ -162,9 +167,11 @@ namespace Misaki {
         if (score >= beta) {
           // テーブルの更新。
           if (slot) {
+            slot->sync().lock();
             slot->lower_bound(score);
             slot->upper_bound(INFINITE);
             slot->best_move(move);
+            slot->sync().unlock();
           } else {
             table.Add(key, level, depth, side, INFINITE, score, move);
           }
@@ -183,6 +190,7 @@ namespace Misaki {
 
     // テーブルを更新。
     if (slot) {
+      slot->sync().lock();
       if (alpha <= save_alpha) {
         slot->lower_bound(-INFINITE);
         slot->upper_bound(alpha);
@@ -192,6 +200,7 @@ namespace Misaki {
         slot->upper_bound(alpha);
         slot->best_move(candidate_move);
       }
+      slot->sync().unlock();
     } else {
       if (alpha <= save_alpha) {
         table.Add(key, level, depth, side, alpha, -INFINITE, candidate_move);
@@ -218,13 +227,23 @@ namespace Misaki {
       // 何もしない。
     }
     if (slot) {
+      slot->sync().lock();
       int upper_bound = slot->upper_bound();
       int lower_bound = slot->lower_bound();
+      if (lower_bound == upper_bound) {
+        if (level == 0) {
+          best_move_ = slot->best_move();
+          best_score_ = lower_bound;
+        }
+        slot->sync().unlock();
+        return lower_bound;
+      }
       if (lower_bound >= beta) {
         if (level == 0) {
           best_move_ = slot->best_move();
           best_score_ = lower_bound;
         }
+        slot->sync().unlock();
         return lower_bound;
       }
       if (upper_bound <= alpha) {
@@ -232,17 +251,12 @@ namespace Misaki {
           best_move_ = slot->best_move();
           best_score_ = upper_bound;
         }
+        slot->sync().unlock();
         return upper_bound;
-      }
-      if (lower_bound == upper_bound) {
-        if (level == 0) {
-          best_move_ = slot->best_move();
-          best_score_ = lower_bound;
-        }
-        return lower_bound;
       }
       alpha = (lower_bound >= alpha ? lower_bound : alpha);
       beta = (upper_bound <= beta ? upper_bound : beta);
+      slot->sync().unlock();
     }
 
     // depthが0以下ならクイース。
@@ -347,9 +361,11 @@ namespace Misaki {
         best_score_ = SCORE_WIN;
         best_move_ = move;
         if (slot) {
+          slot->sync().lock();
           slot->lower_bound(best_score_);
           slot->upper_bound(best_score_);
           slot->best_move(best_move_);
+          slot->sync().unlock();
         } else {
           table.Add(key, level, depth, side,
           best_score_, best_score_, best_move_);
@@ -389,9 +405,11 @@ namespace Misaki {
           ClearMoves(level);
           // テーブルを更新。
           if (slot) {
+            slot->sync().lock();
             slot->lower_bound(score);
             slot->upper_bound(INFINITE);
             slot->best_move(move);
+            slot->sync().unlock();
           } else {
             table.Add(key, level, depth, side, INFINITE, score, move);
           }
@@ -415,6 +433,7 @@ namespace Misaki {
 
     // テーブルを更新。
     if (slot) {
+      slot->sync().lock();
       if (alpha <= save_alpha) {
         slot->lower_bound(-INFINITE);
         slot->upper_bound(alpha);
@@ -424,6 +443,7 @@ namespace Misaki {
         slot->upper_bound(alpha);
         slot->best_move(candidate_move);
       }
+      slot->sync().unlock();
     } else {
       if (alpha <= save_alpha) {
         table.Add(key, level, depth, side, alpha, -INFINITE, candidate_move);
