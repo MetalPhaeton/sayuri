@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <list>
+#include <boost/thread.hpp>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "chess_board.h"
@@ -39,6 +40,9 @@ namespace Misaki {
   // テーブルに追加する。
   void TranspositionTable::Add(hash_key_t key, int level, int depth,
   side_t to_move, int upper_bound, int lower_bound, move_t best_move) {
+    // ロック。
+    boost::mutex::scoped_lock lock(sync_);
+
     // テーブルに追加。
     int index = GetTableIndex(key);
     table_[index].Add(key, level, depth, to_move, upper_bound, lower_bound,
@@ -74,7 +78,7 @@ namespace Misaki {
    ******************************/
   TranspositionTableSlot&
   TranspositionTableSlotList::GetSameSlot(hash_key_t key, int level,
-  int depth, side_t to_move) throw (bool) {
+  int depth, side_t to_move) throw (bool){
     std::list<TranspositionTableSlot>::iterator itr = slot_list_.begin();
     while (itr != slot_list_.end()) {
       // レベルが大きくなりすぎたらもうない。

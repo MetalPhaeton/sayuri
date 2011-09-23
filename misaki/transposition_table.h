@@ -25,6 +25,7 @@
 
 #include <iostream>
 #include <list>
+#include <boost/thread.hpp>
 #include "chess_def.h"
 #include "chess_util.h"
 
@@ -269,7 +270,10 @@ namespace Misaki {
       // [例外]
       // bool: 見つからなければfalse。
       TranspositionTableSlot& GetSameSlot(hash_key_t key, int level, int depth,
-      side_t to_move) throw (bool) {
+      side_t to_move) throw (bool){
+        // ロック。
+        boost::mutex::scoped_lock lock(sync_);
+
         int index = GetTableIndex(key);
         return table_[index].GetSameSlot(key, level, depth, to_move);
       }
@@ -309,6 +313,8 @@ namespace Misaki {
       /****************
        * メンバ変数。 *
        ****************/
+      // 同期オブジェクト。
+      boost::mutex sync_;
       // ハッシュテーブル。
       TranspositionTableSlotList table_[NUM_LISTS];
       // 現在のスロット数。
