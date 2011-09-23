@@ -40,6 +40,11 @@ namespace Misaki {
       /****************************************
        * コンストラクタとデストラクタと代入。 *
        ****************************************/
+      // コンストラクタ。
+      // [引数]
+      // piece_square: 移動する駒の位置。
+      // goal_square: 移動先の位置。
+      // promotion: 昇格する駒の位置。デフォルトは昇格しない。
       Move(square_t piece_square, square_t goal_square,
       piece_t promotion=EMPTY);
       Move(const Move& move);
