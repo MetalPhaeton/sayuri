@@ -46,14 +46,7 @@ int main(int argc, char* argv[]) {
 
   ChessBoard* board = ChessBoard::New();
 
-  double searching_time = 10.0;
-  TranspositionTable* table = TranspositionTable::New();
-  EvalWeights weights;
-  Move best_move = board->GetBestMove(searching_time, *table, weights);
-
-  board->TakeMove(best_move);
-
-  std::cout << *board;
+  board->Test();
 
   delete board;
 
