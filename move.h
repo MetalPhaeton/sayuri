@@ -52,6 +52,7 @@ namespace Misaki {
       // move: コピー元のオブジェクト。
       Move(const Move& move);
       virtual ~Move() {}
+      // 代入。
       Move& operator=(const Move& move);
 
       /************
