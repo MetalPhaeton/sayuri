@@ -391,6 +391,9 @@ namespace Misaki {
   }
   // ゲームを1つ前に戻す。
   void ChessBoard::StepBack() {
+    // ロック
+    boost::mutex::scoped_lock lock(sync_);
+
     // 一番最初なら何もしない。
     if (current_game_ <= 0) return;
 
@@ -400,6 +403,9 @@ namespace Misaki {
   }
   // ゲームを1つ進める。
   void ChessBoard::StepForward() {
+    // ロック
+    boost::mutex::scoped_lock lock(sync_);
+
     // 一番新しいなら何もしない。
     if (current_game_ >= (history_.size() - 1)) return;
 
