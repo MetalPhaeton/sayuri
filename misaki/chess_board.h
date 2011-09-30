@@ -320,6 +320,10 @@ namespace Misaki {
 
         return position_[side][PAWN] & pawn_shield_mask_[side][king_[side]];
       }
+      // キャスリングしたかどうかを得る。
+      bool HasCastled(side_t side) const {
+        return side == WHITE ? has_white_castled_ : has_black_castled_;
+      }
 
       /************************
        * 局面を評価する関数。 *
@@ -756,7 +760,8 @@ namespace Misaki {
       // アンパッサンできるかどうか。
       bool can_en_passant_;
       // キャスリングをしたかどうか。
-      bool has_castled_;
+      bool has_white_castled_;  // 白。
+      bool has_black_castled_;  // 黒。
       // ゲームの履歴。
       std::vector<GameRecord*> history_;
       // 現在のゲームの履歴の位置。
