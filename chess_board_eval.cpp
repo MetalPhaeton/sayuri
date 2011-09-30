@@ -430,7 +430,7 @@ namespace Misaki {
       white_score += weights.canceled_castling_weight_;
     }
     if ((!(castling_rights_ & BLACK_CASTLING)) && (!has_black_castled_)) {
-      white_score += weights.canceled_castling_weight_;
+      black_score += weights.canceled_castling_weight_;
     }
 
     // 得点にして返す。
