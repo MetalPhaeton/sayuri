@@ -74,6 +74,7 @@ namespace Misaki {
       int early_queen_launched_weight_;  // 早すぎるクイーンの出動の重さ。
       int pawn_shield_weight_;  // ポーンの盾の重さ。
       int early_king_launched_weight_;  // 早すぎるキングの出動の重さ。
+      int canceled_castling_weight_;  // キャスリングの破棄の重さ。
 
       /********************
        * コンストラクタ。 *
@@ -321,7 +322,12 @@ namespace Misaki {
         return position_[side][PAWN] & pawn_shield_mask_[side][king_[side]];
       }
       // キャスリングしたかどうかを得る。
+      // [引数]
+      // side: 調べたいサイド。
+      // [戻り値]
+      // キャスリングしたかどうか。
       bool HasCastled(side_t side) const {
+        if (side == NO_SIDE) return false;
         return side == WHITE ? has_white_castled_ : has_black_castled_;
       }
 
@@ -451,6 +457,13 @@ namespace Misaki {
       // 評価値。
       int EvalEarlyKingLaunched(side_t side, const EvalWeights& weights)
       const;
+      // キャスリングの破棄を評価する。
+      // [引数]
+      // side: 評価したいサイド。
+      // weights: 評価の重さ。
+      // [戻り値]
+      // 評価値。
+      int EvalCanceledCastling(side_t side, const EvalWeights& weights) const;
 
     protected:
       /********************
