@@ -38,15 +38,37 @@ void PrintTitle() {
   std::cout << "************" << std::endl;
 }
 
+ChessBoard* board;
+bool IsGameover() {
+  if (board->IsCheckmated() || board->IsStalemated()) return true;
+  if ((!(board->IsEnoughPieces(WHITE))) && (!(board->IsEnoughPieces(BLACK)))) {
+    return true;
+  }
+  const GameRecord& record = board->GetCurrentGameRecord();
+  if ((record.repetition() > 3) || (record.ply_100() > 100)) return true;
+
+  return false;
+}
 int main(int argc, char* argv[]) {
   // テスト用タイトルをプリント。
   PrintTitle();
 
   Init();
 
-  ChessBoard* board = ChessBoard::New();
+  board = ChessBoard::New();
+  double searching_time = 10.0;
+  TranspositionTable* table;
+  EvalWeights weights;
+  Move move(A1, A1);
 
-  board->Test();
+  while (true) {
+    table = TranspositionTable::New();
+    move = board->GetBestMove(searching_time, *table, weights);
+    delete table;
+    if (!(board->TakeMove(move))) break;
+    std::cout << *board;
+    if (IsGameover()) break;
+  }
 
   delete board;
 
