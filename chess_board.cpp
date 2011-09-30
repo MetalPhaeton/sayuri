@@ -252,6 +252,7 @@ namespace Misaki {
   castling_rights_(ALL_CASTLING),
   en_passant_target_(static_cast<square_t>(0)),
   can_en_passant_(false),
+  has_castled_(false),
   current_game_(0),
   pondering_thread_ptr_(NULL),
   stop_pondering_flag_(true) {
@@ -1055,6 +1056,7 @@ namespace Misaki {
         ReplacePiece(A8, D8);
       }
       can_en_passant_ = false;
+      has_castled_ = true;
     } else if (move.move_type_ == EN_PASSANT) {  // アンパッサンの場合。
       // 取った駒をボーンにする。
       move.captured_piece_ = PAWN;
@@ -1127,6 +1129,7 @@ namespace Misaki {
       } else if (goal_square == C8) {
         ReplacePiece(D8, A8);
       }
+      has_castled_ = false;
     } else if (move.move_type_ == EN_PASSANT) {  // アンパッサンの場合。
       // アンパッサンのターゲットを戻す。
       PutPiece(en_passant_target_, move.captured_piece_, enemy_side);

@@ -755,6 +755,8 @@ namespace Misaki {
       square_t en_passant_target_;
       // アンパッサンできるかどうか。
       bool can_en_passant_;
+      // キャスリングをしたかどうか。
+      bool has_castled_;
       // ゲームの履歴。
       std::vector<GameRecord*> history_;
       // 現在のゲームの履歴の位置。
