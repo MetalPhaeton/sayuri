@@ -68,7 +68,6 @@ namespace Misaki {
       score += EvalRook7th(side, weights);
       score += EvalEarlyQueenLaunched(side, weights);
       score += EvalPawnShield(side, weights);
-      score += EvalEarlyKingLaunched(side, weights);
     }
 
     return score;
@@ -416,28 +415,6 @@ namespace Misaki {
 
     // 得点にして返す。
     int score = (white_count - black_count) * weights.pawn_shield_weight_;
-    return side == WHITE ? score : -score;
-  }
-  // 早すぎるキングの出動を評価する。
-  int ChessBoard::EvalEarlyKingLaunched(side_t side,
-  const EvalWeights& weights) const {
-    // どちらのサイドでもなければ0点。
-    if (side == NO_SIDE) return 0;
-
-    // 各サイドの得点。
-    int white_score = 0;
-    int black_score = 0;
-    if (king_[WHITE] != E1) {
-      white_score = ChessUtil::CountBits(GetNotDevelopedMinorPieces(WHITE))
-      * weights.early_king_launched_weight_;
-    }
-    if (king_[BLACK] != E8) {
-      black_score = ChessUtil::CountBits(GetNotDevelopedMinorPieces(BLACK))
-      * weights.early_king_launched_weight_;
-    }
-
-    // 得点にして返す。
-    int score = white_score - black_score;
     return side == WHITE ? score : -score;
   }
   // キャスリングの破棄を評価する。

@@ -53,7 +53,6 @@ namespace Misaki {
     rook_7th_weight_ = 30;  // 第7ランクのルークの重さ。
     early_queen_launched_weight_ = -30;  // 早すぎるクイーンの出動の重さ。
     pawn_shield_weight_ = 30;  // ポーンの盾の重さ。
-    early_king_launched_weight_ = -50;  // 早すぎるキングの出動の重さ。
     canceled_castling_weight_ = -50;  // キャスリングの破棄の重さ。
   }
 }  // Misaki

@@ -73,7 +73,6 @@ namespace Misaki {
       int rook_7th_weight_;  // 第7ランクのルークの重さ。
       int early_queen_launched_weight_;  // 早すぎるクイーンの出動の重さ。
       int pawn_shield_weight_;  // ポーンの盾の重さ。
-      int early_king_launched_weight_;  // 早すぎるキングの出動の重さ。
       int canceled_castling_weight_;  // キャスリングの破棄の重さ。
 
       /********************
@@ -449,14 +448,6 @@ namespace Misaki {
       // [戻り値]
       // 評価値。
       int EvalPawnShield(side_t side, const EvalWeights& weights) const;
-      // 早すぎるキングの出動を評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalEarlyKingLaunched(side_t side, const EvalWeights& weights)
-      const;
       // キャスリングの破棄を評価する。
       // [引数]
       // side: 評価したいサイド。
