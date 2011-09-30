@@ -29,6 +29,14 @@
 #include "misaki_debug.h"
 
 namespace Misaki {
+  // move_mask_を初期化する。
+  move_t ChessBoard::move_mask_;
+  void ChessBoard::InitMoveMask() {
+    move_mask_.all_ = 0;
+    move_mask_.piece_square_ = static_cast<square_t>(0x3f);
+    move_mask_.goal_square_ = static_cast<square_t>(0x3f);
+    move_mask_.promotion_ = static_cast<piece_t>(0x7);
+  }
   // 駒を取る手を作る。
   int ChessBoard::GenCaptureMove(int level) {
     // 手の数。
@@ -884,7 +892,8 @@ namespace Misaki {
     // SEEする。
     for (; node >= tree_ptr_[level]; node--) {
       if ((best_move.all_ != 0)
-      && ((node->move_.all_ & 0x38fff) == (best_move.all_ & 0x38fff))) {
+      && ((node->move_.all_ & move_mask_.all_)
+      == (best_move.all_ & move_mask_.all_))) {
         node->quick_score_ = INFINITE;
       } else {
         node->quick_score_ = SEE(node->move_);
