@@ -4,12 +4,6 @@ all: test misaki
 # コンパイラ。
 cc = g++
 
-# CPUアーキテクチャ。
-# nativeなら自分のCPU用。
-# i386なら32ビット用。
-# k8なら64ビット用。
-arch = native
-
 # オブジェクトファイル。
 objs = misaki_debug.o chess_def.o chess_util.o chess_board.o \
        chess_board_gen_move.o move.o game_record.o transposition_table.o \
@@ -21,13 +15,13 @@ objs = misaki_debug.o chess_def.o chess_util.o chess_board.o \
 libs = -lboost_thread
 
 # コンパイルオプション。
-opts = -O3
+opts = -O3 -march=native
 
 # テスト用アプリの作成。
 test: test_main.o ${objs}
-	${cc} ${opts} -march=${arch} -o $@ test_main.o ${objs} ${libs}
+	${cc} ${opts} -o $@ test_main.o ${objs} ${libs}
 test_main.o: test_main.cpp *.h
-	${cc} ${opts} -march=${arch} -c test_main.cpp
+	${cc} ${opts} -c test_main.cpp
 
 # ライブラリを作成。
 direxist = ${shell find -name "misaki"}
@@ -40,49 +34,49 @@ libmisaki.a: ${objs}
 
 # オブジェクトファイルの作成。
 misaki_debug.o: misaki_debug.cpp *.h
-	${cc} ${opts} -march=${arch} -c misaki_debug.cpp
+	${cc} ${opts} -c misaki_debug.cpp
 
 chess_def.o: chess_def.cpp *.h
-	${cc} ${opts} -march=${arch} -c chess_def.cpp
+	${cc} ${opts} -c chess_def.cpp
 
 chess_util.o: chess_util.cpp *.h
-	${cc} ${opts} -march=${arch} -c chess_util.cpp
+	${cc} ${opts} -c chess_util.cpp
 
 chess_board.o: chess_board.cpp *.h
-	${cc} ${opts} -march=${arch} -c chess_board.cpp
+	${cc} ${opts} -c chess_board.cpp
 
 chess_board_gen_move.o: chess_board_gen_move.cpp *.h
-	${cc} ${opts} -march=${arch} -c chess_board_gen_move.cpp
+	${cc} ${opts} -c chess_board_gen_move.cpp
 
 move.o: move.cpp *.h
-	${cc} ${opts} -march=${arch} -c move.cpp
+	${cc} ${opts} -c move.cpp
 
 game_record.o: game_record.cpp *.h
-	${cc} ${opts} -march=${arch} -c game_record.cpp
+	${cc} ${opts} -c game_record.cpp
 
 transposition_table.o: transposition_table.cpp *.h
-	${cc} ${opts} -march=${arch} -c transposition_table.cpp
+	${cc} ${opts} -c transposition_table.cpp
 
 chess_board_analyze.o: chess_board_analyze.cpp *.h
-	${cc} ${opts} -march=${arch} -c chess_board_analyze.cpp
+	${cc} ${opts} -c chess_board_analyze.cpp
 
 chess_board_eval.o: chess_board_eval.cpp *.h
-	${cc} ${opts} -march=${arch} -c chess_board_eval.cpp
+	${cc} ${opts} -c chess_board_eval.cpp
 
 chess_board_search.o: chess_board_search.cpp *.h
-	${cc} ${opts} -march=${arch} -c chess_board_search.cpp
+	${cc} ${opts} -c chess_board_search.cpp
 
 chess_board_pondering.o: chess_board_pondering.cpp *.h
-	${cc} ${opts} -march=${arch} -c chess_board_pondering.cpp
+	${cc} ${opts} -c chess_board_pondering.cpp
 
 chess_board_eval_weights.o: chess_board_eval_weights.cpp *.h
-	${cc} ${opts} -march=${arch} -c chess_board_eval_weights.cpp
+	${cc} ${opts} -c chess_board_eval_weights.cpp
 
 opening_book.o: opening_book.cpp *.h
-	${cc} ${opts} -march=${arch} -c opening_book.cpp
+	${cc} ${opts} -c opening_book.cpp
 
 pgn_parser.o: pgn_parser.cpp *.h
-	${cc} ${opts} -march=${arch} -c pgn_parser.cpp
+	${cc} ${opts} -c pgn_parser.cpp
 
 # クリーン。
 .PHONY: clean
