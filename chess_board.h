@@ -262,42 +262,6 @@ namespace Misaki {
       // [戻り値]
       // piecesが攻撃している位置のビットボード。
       bitboard_t GetAttack(bitboard_t pieces) const;
-      // ポーンの配置の価値を得る。
-      // [引数]
-      // side: 価値を得たいサイド。
-      // [戻り値]
-      // 価値。
-      int GetPawnPositionValue(side_t side) const {
-        return GetTableValue(pawn_position_table_, side,
-        position_[side][PAWN]);
-      }
-      // ナイトの配置の価値を得る。
-      // [引数]
-      // side: 価値を得たいサイド。
-      // [戻り値]
-      // 価値。
-      int GetKnightPositionValue(side_t side) const {
-        return GetTableValue(knight_position_table_, side,
-        position_[side][KNIGHT]);
-      }
-      // キングの中盤の配置の価値を得る。
-      // [引数]
-      // side: 価値を得たいサイド。
-      // [戻り値]
-      // 価値。
-      int GetKingPositionMiddleValue(side_t side) const {
-        return GetTableValue(king_position_table_middle_, side,
-        position_[side][KING]);
-      }
-      // キングの終盤の配置の価値を得る。
-      // [引数]
-      // side: 価値を得たいサイド。
-      // [戻り値]
-      // 価値。
-      int GetKingPositionEndingValue(side_t side) const {
-        return GetTableValue(king_position_table_ending_, side,
-        position_[side][KING]);
-      }
       // パスポーンの位置のビットボードを得る。
       // [引数]
       // side: 調べたいサイド。

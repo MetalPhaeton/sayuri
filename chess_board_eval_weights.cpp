@@ -64,6 +64,9 @@ namespace Misaki {
        1,  2,  3,  3,  3,  3,  2,  1,
        0,  1,  2,  2,  2,  2,  1,  0
     };
+    for (int index = 0; index < NUM_SQUARES; index++) {
+      knight_position_table_[index] = knight_position_table[index];
+    }
     // ルークの駒の配置の重要度。
     static const int rook_position_table[NUM_SQUARES] = {
       0, 0, 0, 0, 0, 0, 0, 0,
