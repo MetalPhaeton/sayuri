@@ -53,6 +53,7 @@ namespace Misaki {
     score += EvalMobility(side, weights);
     score += EvalPawnPosition(side, weights);
     score += EvalKnightPosition(side, weights);
+    score += EvalRookPosition(side, weights);
     score += EvalPassPawn(side, weights);
     score += EvalDoublePawn(side, weights);
     score += EvalIsoPawn(side, weights);
@@ -218,10 +219,12 @@ namespace Misaki {
     if (side == NO_SIDE) return 0;
 
     // 白の価値を得る。
-    int white_value = GetPawnPositionValue(WHITE);
+    int white_value = GetTableValue(weights.pawn_position_table_, WHITE,
+    position_[WHITE][PAWN]);
 
     // 黒の価値を得る。
-    int black_value = GetPawnPositionValue(BLACK);
+    int black_value = GetTableValue(weights.pawn_position_table_,BLACK,
+    position_[BLACK][PAWN]);
 
     // 点数を計算して返す。
     int score = (white_value - black_value) * weights.pawn_position_weight_;
@@ -234,13 +237,33 @@ namespace Misaki {
     if (side == NO_SIDE) return 0;
 
     // 白の価値を得る。
-    int white_value = GetKnightPositionValue(WHITE);
+    int white_value = GetTableValue(weights.knight_position_table_, WHITE,
+    position_[WHITE][KNIGHT]);
 
     // 黒の価値を得る。
-    int black_value = GetKnightPositionValue(BLACK);
+    int black_value = GetTableValue(weights.knight_position_table_,BLACK,
+    position_[BLACK][KNIGHT]);
 
     // 点数を計算して返す。
     int score = (white_value - black_value) * weights.knight_position_weight_;
+    return side == WHITE ? score: -score;
+  }
+  // ルークの配置を評価する。
+  int ChessBoard::EvalRookPosition(side_t side, const EvalWeights& weights)
+  const {
+    // サイドがなければ0点。
+    if (side == NO_SIDE) return 0;
+
+    // 白の価値を得る。
+    int white_value = GetTableValue(weights.rook_position_table_, WHITE,
+    position_[WHITE][ROOK]);
+
+    // 黒の価値を得る。
+    int black_value = GetTableValue(weights.rook_position_table_,BLACK,
+    position_[BLACK][ROOK]);
+
+    // 点数を計算して返す。
+    int score = (white_value - black_value) * weights.rook_position_weight_;
     return side == WHITE ? score: -score;
   }
   // キングの中盤の配置を評価する。
@@ -250,10 +273,12 @@ namespace Misaki {
     if (side == NO_SIDE) return 0;
 
     // 白の価値を得る。
-    int white_value = GetKingPositionMiddleValue(WHITE);
+    int white_value = GetTableValue(weights.king_position_middle_table_, WHITE,
+    position_[WHITE][KING]);
 
     // 黒の価値を得る。
-    int black_value = GetKingPositionMiddleValue(BLACK);
+    int black_value = GetTableValue(weights.king_position_middle_table_,BLACK,
+    position_[BLACK][KING]);
 
     // 点数を計算して返す。
     int score = (white_value - black_value)
@@ -267,10 +292,12 @@ namespace Misaki {
     if (side == NO_SIDE) return 0;
 
     // 白の価値を得る。
-    int white_value = GetKingPositionEndingValue(WHITE);
+    int white_value = GetTableValue(weights.king_position_ending_table_, WHITE,
+    position_[WHITE][KING]);
 
     // 黒の価値を得る。
-    int black_value = GetKingPositionEndingValue(BLACK);
+    int black_value = GetTableValue(weights.king_position_ending_table_,BLACK,
+    position_[BLACK][KING]);
 
     // 点数を計算して返す。
     int score = (white_value - black_value)

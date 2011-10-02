@@ -38,9 +38,79 @@ namespace Misaki {
     development_weight_ = 30;  // 展開の重さ。
     attack_around_king_weight_ = 10;  // キングの周囲への攻撃の重さ。
 
+    // 駒の配置の重要度テーブルを初期化。
+    // ポーンの駒の配置の重要度。
+    static const int pawn_position_table[NUM_SQUARES] = {
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      1, 1, 1, 1, 1, 1, 1, 1,
+      2, 2, 2, 2, 2, 2, 2, 2,
+      3, 3, 3, 3, 3, 3, 3, 3,
+      4, 4, 4, 4, 4, 4, 4, 4,
+      5, 5, 5, 5, 5, 5, 5, 5,
+      0, 0, 0, 0, 0, 0, 0, 0
+    };
+    for (int index = 0; index < NUM_SQUARES; index++) {
+      pawn_position_table_[index] = pawn_position_table[index];
+    }
+    // ナイトの駒の配置の重要度。
+    static const int knight_position_table[NUM_SQUARES] = {
+      -3, -2, -1, -1, -1, -1, -2, -3,
+      -2, -1,  0,  0,  0,  0, -1, -2,
+      -1,  0,  1,  1,  1,  1,  0, -1,
+       0,  1,  2,  2,  2,  2,  1,  0,
+       1,  2,  3,  3,  3,  3,  2,  1,
+       2,  3,  4,  4,  4,  4,  3,  2,
+       1,  2,  3,  3,  3,  3,  2,  1,
+       0,  1,  2,  2,  2,  2,  1,  0
+    };
+    // ルークの駒の配置の重要度。
+    static const int rook_position_table[NUM_SQUARES] = {
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1
+    };
+    for (int index = 0; index < NUM_SQUARES; index++) {
+      rook_position_table_[index] = rook_position_table[index];
+    }
+    // キングの中盤の駒の配置の重要度。
+    static const int king_position_middle_table[NUM_SQUARES] = {
+       1,  1,  0, -1, -1,  0,  1,  1,
+       0,  0, -1, -2, -2, -1,  0,  0,
+      -1, -1, -2, -3, -3, -2, -1, -1,
+      -2, -2, -3, -4, -4, -3, -2, -2,
+      -2, -2, -3, -4, -4, -3, -2, -2,
+      -1, -1, -2, -3, -3, -2, -1, -1,
+       0,  0, -1, -2, -2, -1,  0,  0,
+       1,  1,  0, -1, -1,  0,  1,  1
+    };
+    for (int index = 0; index < NUM_SQUARES; index++) {
+      king_position_middle_table_[index] = king_position_middle_table[index];
+    }
+    // キングの終盤の駒の配置の重要度。
+    static const int king_position_ending_table[NUM_SQUARES] = {
+      0, 1, 2, 3, 3, 2, 1, 0,
+      1, 2, 3, 4, 4, 3, 2, 1,
+      2, 3, 4, 5, 5, 4, 3, 2,
+      3, 4, 5, 6, 6, 5, 4, 3,
+      3, 4, 5, 6, 6, 5, 4, 3,
+      2, 3, 4, 5, 5, 4, 3, 2,
+      1, 2, 3, 4, 4, 3, 2, 1,
+      0, 1, 2, 3, 3, 2, 1, 0
+    };
+    for (int index = 0; index < NUM_SQUARES; index++) {
+      king_position_ending_table_[index] = king_position_ending_table[index];
+    }
+
     // 駒の配置の重さ。
     pawn_position_weight_ = 10;  // ポーンの配置の重さ。
     knight_position_weight_ = 20;  // ナイトの配置の重さ。
+    rook_position_weight_ = 30;  // ルークの配置の重さ。
     king_position_middle_weight_ = 50;  // キングの中盤の配置の重さ。
     king_position_ending_weight_ = 10;  // キングの終盤の配置の重さ。
 
