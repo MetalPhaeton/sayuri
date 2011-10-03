@@ -24,9 +24,8 @@ test_main.o: test_main.cpp *.h
 	${cc} ${opts} -c test_main.cpp
 
 # ライブラリを作成。
-direxist = ${shell find -name "misaki"}
 misaki: libmisaki.a
-	${if ${direxist}, , ${shell mkdir misaki}}
+	@if [ ! -e misaki ]; then mkdir misaki; fi
 	cp libmisaki.a misaki/
 	cp *.h misaki/
 libmisaki.a: ${objs}
