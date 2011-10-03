@@ -66,7 +66,6 @@ namespace Misaki {
       score += EvalDevelopment(side, weights);
       score += EvalAttackAroundKing(side, weights);
       score += EvalKingPositionMiddle(side, weights);
-      score += EvalRook7th(side, weights);
       score += EvalEarlyQueenLaunched(side, weights);
       score += EvalPawnShield(side, weights);
     }
@@ -391,21 +390,6 @@ namespace Misaki {
 
     // 得点にして返す。
     int score = white_score - black_score;
-    return side == WHITE ? score : -score;
-  }
-  // 第7ランクのルークを評価する。
-  int ChessBoard::EvalRook7th(side_t side, const EvalWeights& weights) const {
-    // どちらのサイドでもなければ0点。
-    if (side == NO_SIDE) return 0;
-
-    // 各サイドの第7ランクのルークの数を得る。
-    int white_count = ChessUtil::CountBits(position_[WHITE][ROOK]
-    & ChessUtil::RANK[RANK_7]);
-    int black_count = ChessUtil::CountBits(position_[BLACK][ROOK]
-    & ChessUtil::RANK[RANK_2]);
-
-    // 得点にして返す。
-    int score = (white_count - black_count) * weights.rook_7th_weight_;
     return side == WHITE ? score : -score;
   }
   // 早すぎるクイーンの出動を評価する。

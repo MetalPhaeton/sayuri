@@ -123,7 +123,6 @@ namespace Misaki {
     double_pawn_weight_ = -5;  // ダブルポーンの重さ。
     iso_pawn_weight_ = -5;  // 孤立ポーンの重さ。
     bishop_pair_weight_ = 50;  // ビショップペアの重さ。
-    rook_7th_weight_ = 30;  // 第7ランクのルークの重さ。
     early_queen_launched_weight_ = -30;  // 早すぎるクイーンの出動の重さ。
     pawn_shield_weight_ = 30;  // ポーンの盾の重さ。
     canceled_castling_weight_ = -50;  // キャスリングの破棄の重さ。
