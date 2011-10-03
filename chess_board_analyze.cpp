@@ -72,7 +72,7 @@ namespace Misaki {
     return value;
   }
   // 勝つのに十分な駒があるかどうか調べる。
-  bool ChessBoard::IsEnoughPieces(side_t side) const {
+  bool ChessBoard::HasEnoughPieces(side_t side) const {
     // サイドを確認。
     if (side == NO_SIDE) return false;
 

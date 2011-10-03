@@ -45,7 +45,7 @@ namespace Misaki {
     if (IsStalemated()) return SCORE_DRAW;
 
     // 両者に十分な駒がなければ引分。
-    if (!IsEnoughPieces(side) && !IsEnoughPieces(enemy_side))
+    if (!HasEnoughPieces(side) && !HasEnoughPieces(enemy_side))
       return SCORE_DRAW;
 
     // それ以外の評価値。

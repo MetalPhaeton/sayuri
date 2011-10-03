@@ -95,7 +95,7 @@ namespace Misaki {
     side_t enemy_side = static_cast<side_t>(side ^ 0x3);
 
     // お互い十分な駒がなければ評価値を返す。
-    if (!IsEnoughPieces(side) && !IsEnoughPieces(enemy_side)) {
+    if (!HasEnoughPieces(side) && !HasEnoughPieces(enemy_side)) {
       return stand_pat;
     }
 
