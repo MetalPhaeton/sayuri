@@ -811,16 +811,12 @@ namespace Misaki {
 
     // 取り合いの駒の評価。
     int index = 2;
-    piece_t prev_piece;  // 前の駒。
     piece_t current_piece = piece_type;  // 現在調べている駒。
     side_t search_side = enemy_side;  //  現在調べているサイド。
-    int prev_value = 0;  // 前の評価値。
-    int prev_prev_value = 0;  // 前の前の評価値。
     value = value_array[target_type];  // 現在の評価値。
+    piece_t prev_piece;  // 前の駒。
     while (index < MAX_LEVEL) {
       prev_piece = current_piece;
-      prev_prev_value = prev_value;
-      prev_value = value;
       // 現在の取る駒をセットする。
       if (attacker_pieces[search_side][PAWN]) {
         current_piece = PAWN;
@@ -849,19 +845,25 @@ namespace Misaki {
       } else {
         current_piece = EMPTY;
       }
-      // もし現在のこまがなければ価値を返す。
+      // もし現在の駒がなければ価値を返す。
       if (current_piece == EMPTY) {
-        return prev_value;
-      }
-      if (prev_piece == KING) {
-        return prev_prev_value;
+        return value;
       }
       // 現在の評価値をセットする。
+      // (駒を取ったと仮定する。)
       if (search_side == side) {
         value += value_array[prev_piece];
       } else {
         value -= value_array[prev_piece];
       }
+
+      // 自分の手番で評価値がマイナスなら相手有利として返す。
+      // 相手の手番で評価値がプラスなら自分有利として返す。
+      if (((search_side == side) && (value < 0))
+      || ((search_side == enemy_side) && (value > 0))) {
+        return value;
+      }
+
       search_side = static_cast<side_t>(search_side ^ 0x3);
       index++;
     }
