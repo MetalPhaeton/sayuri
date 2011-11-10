@@ -950,8 +950,7 @@ namespace Misaki {
 
     // ポーンを得る。
     attackers |= ChessUtil::GetPawnAttack(target_square,
-    static_cast<side_t>(side ^ 0x3));
-    & position_[side][PAWN];
+    static_cast<side_t>(side ^ 0x3)) & position_[side][PAWN];
 
     // ナイトを得る。
     attackers |= ChessUtil::GetKnightMove(target_square)

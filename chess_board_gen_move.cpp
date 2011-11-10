@@ -787,10 +787,6 @@ namespace Misaki {
     piece_t piece_type = piece_board_[move.piece_square_];
     piece_t target_type = piece_board_[move.goal_square_];
 
-    // 移動先の駒が動かす駒よりも価値が高ければ計算して返す。
-    value = value_array[target_type] - value_array[piece_type];
-    if (value > 0) return value;
-
     // 自分のサイドと敵のサイド。
     side_t side = to_move_;
     side_t enemy_side = static_cast<side_t>(side ^ 0x3);
