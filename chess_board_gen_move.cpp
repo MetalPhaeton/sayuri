@@ -798,11 +798,11 @@ namespace Misaki {
 
     // 攻撃する駒のビットボード。
     bitboard_t attacker_pieces[NUM_SIDES][NUM_PIECE_TYPES];
-    for (int piece_type = PAWN; piece_type < NUM_PIECE_TYPES; piece_type++) {
-      attacker_pieces[side][piece_type] =
-      position_[side][piece_type] & attackers;
-      attacker_pieces[enemy_side][piece_type] =
-      position_[enemy_side][piece_type] & enemy_attackers;
+    for (int piece_type2 = PAWN; piece_type2 < NUM_PIECE_TYPES; piece_type2++) {
+      attacker_pieces[side][piece_type2] =
+      position_[side][piece_type2] & attackers;
+      attacker_pieces[enemy_side][piece_type2] =
+      position_[enemy_side][piece_type2] & enemy_attackers;
     }
 
     // 取り合いの駒の評価。
