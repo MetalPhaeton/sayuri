@@ -46,11 +46,11 @@ ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
 # デバッグ用のコンパイラオプションの設定
 IF(CMAKE_COMPILER_IS_GNUCC)
-    SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")  # デバッグ用のフラグ。
-    SET(CMAKE_C_FLAGS_DEBUG "-O0 -g")  # デバッグ用のフラグ。
-    SET(CMAKE_CXX_FLAGS_PROFILE "-pg")  # プロファイル作成用のフラグ。
-    SET(CMAKE_C_FLAGS_PROFILE "-pg")  # プロファイル作成用のフラグ。
-    SET(CMAKE_LD_FLAGS_PROFILE "-lgmon")  # プロファイル作成用のフラグ。
+    SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
+    SET(CMAKE_C_FLAGS_DEBUG "-O0 -g")
+    SET(CMAKE_CXX_FLAGS_PROFILE "-pg")
+    SET(CMAKE_C_FLAGS_PROFILE "-pg")
+    SET(CMAKE_LD_FLAGS_PROFILE "-lgmon")
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
 # ビルド設定。
