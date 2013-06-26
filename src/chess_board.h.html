@@ -1,0 +1,918 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>~/Documents/Programming/Projects/misaki/src/chess_board.h.html</title>
+<meta name="Generator" content="Vim/7.3">
+<meta name="plugin-version" content="vim7.3_v10">
+<meta name="syntax" content="cpp">
+<meta name="settings" content="number_lines,use_css,pre_wrap,expand_tabs">
+<style type="text/css">
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #000000; background-color: #ffffff; }
+body { font-family: monospace; color: #000000; background-color: #ffffff; }
+.lnr { color: #a52a2a; }
+.Statement { color: #a52a2a; font-weight: bold; }
+.Type { color: #2e8b57; font-weight: bold; }
+.Constant { color: #ff00ff; }
+.PreProc { color: #a020f0; }
+.Comment { color: #0000ff; }
+-->
+</style>
+<style type='text/css'><!--*{font-family:'梅ゴシックO5'}--></style>
+</head>
+<body>
+<pre>
+<span class="lnr">  1 </span><span class="Comment">/*</span><span class="Comment"> chess_board.h: チェスボード。</span>
+<span class="lnr">  2 </span><span class="Comment">   Copyright (c) 2011 Ishibashi Hironori</span>
+<span class="lnr">  3 </span>
+<span class="lnr">  4 </span><span class="Comment">   Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="lnr">  5 </span><span class="Comment">   of this software and associated documentation files (the &quot;Software&quot;), to</span>
+<span class="lnr">  6 </span><span class="Comment">   deal in the Software without restriction, including without limitation the</span>
+<span class="lnr">  7 </span><span class="Comment">   rights to use, copy, modify, merge, publish, distribute, sublicense, and/or</span>
+<span class="lnr">  8 </span><span class="Comment">   sell copies of the Software, and to permit persons to whom the Software is</span>
+<span class="lnr">  9 </span><span class="Comment">   furnished to do so, subject to the following conditions:</span>
+<span class="lnr"> 10 </span>
+<span class="lnr"> 11 </span><span class="Comment">   The above copyright notice and this permission notice shall be included in</span>
+<span class="lnr"> 12 </span><span class="Comment">   all copies or substantial portions of the Software.</span>
+<span class="lnr"> 13 </span>
+<span class="lnr"> 14 </span><span class="Comment">   THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="lnr"> 15 </span><span class="Comment">   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="lnr"> 16 </span><span class="Comment">   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="lnr"> 17 </span><span class="Comment">   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="lnr"> 18 </span><span class="Comment">   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING</span>
+<span class="lnr"> 19 </span><span class="Comment">   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS</span>
+<span class="lnr"> 20 </span><span class="Comment">   IN THE SOFTWARE.</span>
+<span class="lnr"> 21 </span><span class="Comment"> </span><span class="Comment">*/</span>
+<span class="lnr"> 22 </span>
+<span class="lnr"> 23 </span><span class="PreProc">#ifndef CHESS_BOARD_H</span>
+<span class="lnr"> 24 </span><span class="PreProc">#define CHESS_BOARD_H</span>
+<span class="lnr"> 25 </span>
+<span class="lnr"> 26 </span><span class="PreProc">#include </span><span class="Constant">&lt;iostream&gt;</span>
+<span class="lnr"> 27 </span><span class="PreProc">#include </span><span class="Constant">&lt;vector&gt;</span>
+<span class="lnr"> 28 </span><span class="PreProc">#include </span><span class="Constant">&lt;ctime&gt;</span>
+<span class="lnr"> 29 </span><span class="PreProc">#include </span><span class="Constant">&lt;boost/thread.hpp&gt;</span>
+<span class="lnr"> 30 </span><span class="PreProc">#include </span><span class="Constant">&quot;chess_def.h&quot;</span>
+<span class="lnr"> 31 </span><span class="PreProc">#include </span><span class="Constant">&quot;chess_util.h&quot;</span>
+<span class="lnr"> 32 </span><span class="PreProc">#include </span><span class="Constant">&quot;move.h&quot;</span>
+<span class="lnr"> 33 </span><span class="PreProc">#include </span><span class="Constant">&quot;game_record.h&quot;</span>
+<span class="lnr"> 34 </span><span class="PreProc">#include </span><span class="Constant">&quot;transposition_table.h&quot;</span>
+<span class="lnr"> 35 </span>
+<span class="lnr"> 36 </span><span class="Type">namespace</span> Misaki {
+<span class="lnr"> 37 </span>  <span class="Type">class</span> ChessBoard;
+<span class="lnr"> 38 </span>  <span class="Type">struct</span> EvalWeights;
+<span class="lnr"> 39 </span>  <span class="Type">class</span> GameRecord;
+<span class="lnr"> 40 </span>  <span class="Type">class</span> TranspositionTable;
+<span class="lnr"> 41 </span>  <span class="Type">class</span> TranspositionTableSlotList;
+<span class="lnr"> 42 </span>  <span class="Type">class</span> TranspositionTableSlot;
+<span class="lnr"> 43 </span>
+<span class="lnr"> 44 </span>  <span class="Comment">/*</span><span class="Comment">***********************</span>
+<span class="lnr"> 45 </span><span class="Comment">   * 評価の重さの構造体。 *</span>
+<span class="lnr"> 46 </span><span class="Comment">   ***********************</span><span class="Comment">*/</span>
+<span class="lnr"> 47 </span>  <span class="Type">struct</span> EvalWeights {
+<span class="lnr"> 48 </span>    <span class="Statement">public</span>:
+<span class="lnr"> 49 </span>      <span class="Comment">/*</span><span class="Comment">*********************</span>
+<span class="lnr"> 50 </span><span class="Comment">       * 全駒の評価の重さ。 *</span>
+<span class="lnr"> 51 </span><span class="Comment">       *********************</span><span class="Comment">*/</span>
+<span class="lnr"> 52 </span>      <span class="Type">int</span> mobility_weight_;  <span class="Comment">// 機動力の重さ。</span>
+<span class="lnr"> 53 </span>      <span class="Type">int</span> attack_center_weight_;  <span class="Comment">// センター攻撃の重さ。</span>
+<span class="lnr"> 54 </span>      <span class="Type">int</span> development_weight_;  <span class="Comment">// 展開の重さ。</span>
+<span class="lnr"> 55 </span>      <span class="Type">int</span> attack_around_king_weight_;  <span class="Comment">// キングの周囲への攻撃の重さ。</span>
+<span class="lnr"> 56 </span>
+<span class="lnr"> 57 </span>      <span class="Comment">/*</span><span class="Comment">*****************************</span>
+<span class="lnr"> 58 </span><span class="Comment">       * 駒の配置の重要度テーブル。 *</span>
+<span class="lnr"> 59 </span><span class="Comment">       *****************************</span><span class="Comment">*/</span>
+<span class="lnr"> 60 </span>      <span class="Type">int</span> pawn_position_table_[NUM_SQUARES];  <span class="Comment">// ポーンの配置。</span>
+<span class="lnr"> 61 </span>      <span class="Type">int</span> knight_position_table_[NUM_SQUARES];  <span class="Comment">// ナイトの配置。</span>
+<span class="lnr"> 62 </span>      <span class="Type">int</span> rook_position_table_[NUM_SQUARES];  <span class="Comment">// ルークの配置。</span>
+<span class="lnr"> 63 </span>      <span class="Type">int</span> king_position_middle_table_[NUM_SQUARES];  <span class="Comment">// キングの中盤の配置。</span>
+<span class="lnr"> 64 </span>      <span class="Type">int</span> king_position_ending_table_[NUM_SQUARES];  <span class="Comment">// キングの終盤の配置。</span>
+<span class="lnr"> 65 </span>
+<span class="lnr"> 66 </span>      <span class="Comment">/*</span><span class="Comment">*******************</span>
+<span class="lnr"> 67 </span><span class="Comment">       * 駒の配置の重さ。 *</span>
+<span class="lnr"> 68 </span><span class="Comment">       *******************</span><span class="Comment">*/</span>
+<span class="lnr"> 69 </span>      <span class="Type">int</span> pawn_position_weight_;  <span class="Comment">// ポーンの配置の重さ。</span>
+<span class="lnr"> 70 </span>      <span class="Type">int</span> knight_position_weight_;  <span class="Comment">// ナイトの配置の重さ。</span>
+<span class="lnr"> 71 </span>      <span class="Type">int</span> rook_position_weight_;  <span class="Comment">// ルークの配置の重さ。</span>
+<span class="lnr"> 72 </span>      <span class="Type">int</span> king_position_middle_weight_;  <span class="Comment">// キングの中盤の配置の重さ。</span>
+<span class="lnr"> 73 </span>      <span class="Type">int</span> king_position_ending_weight_;  <span class="Comment">// キングの終盤の配置の重さ。</span>
+<span class="lnr"> 74 </span>
+<span class="lnr"> 75 </span>      <span class="Comment">/*</span><span class="Comment">*******************</span>
+<span class="lnr"> 76 </span><span class="Comment">       * それ以外の重さ。 *</span>
+<span class="lnr"> 77 </span><span class="Comment">       *******************</span><span class="Comment">*/</span>
+<span class="lnr"> 78 </span>      <span class="Type">int</span> pass_pawn_weight_;  <span class="Comment">// パスポーンの重さ。</span>
+<span class="lnr"> 79 </span>      <span class="Type">int</span> protected_pass_pawn_weight_;  <span class="Comment">// 守られたパスポーンの重さ。</span>
+<span class="lnr"> 80 </span>      <span class="Type">int</span> double_pawn_weight_;  <span class="Comment">// ダブルポーンの重さ。</span>
+<span class="lnr"> 81 </span>      <span class="Type">int</span> iso_pawn_weight_;  <span class="Comment">// 孤立ポーンの重さ。</span>
+<span class="lnr"> 82 </span>      <span class="Type">int</span> bishop_pair_weight_;  <span class="Comment">// ビショップペアの重さ。</span>
+<span class="lnr"> 83 </span>      <span class="Type">int</span> early_queen_launched_weight_;  <span class="Comment">// 早すぎるクイーンの出動の重さ。</span>
+<span class="lnr"> 84 </span>      <span class="Type">int</span> pawn_shield_weight_;  <span class="Comment">// ポーンの盾の重さ。</span>
+<span class="lnr"> 85 </span>      <span class="Type">int</span> canceled_castling_weight_;  <span class="Comment">// キャスリングの破棄の重さ。</span>
+<span class="lnr"> 86 </span>
+<span class="lnr"> 87 </span>      <span class="Comment">/*</span><span class="Comment">*******************</span>
+<span class="lnr"> 88 </span><span class="Comment">       * コンストラクタ。 *</span>
+<span class="lnr"> 89 </span><span class="Comment">       *******************</span><span class="Comment">*/</span>
+<span class="lnr"> 90 </span>      EvalWeights();
+<span class="lnr"> 91 </span>  };
+<span class="lnr"> 92 </span>
+<span class="lnr"> 93 </span>  <span class="Comment">/*</span><span class="Comment">*************************</span>
+<span class="lnr"> 94 </span><span class="Comment">   * チェスボードのクラス。 *</span>
+<span class="lnr"> 95 </span><span class="Comment">   *************************</span><span class="Comment">*/</span>
+<span class="lnr"> 96 </span>  std::ostream&amp; <span class="Statement">operator</span>&lt;&lt;(std::ostream&amp; stream, <span class="Type">const</span> ChessBoard&amp; board);
+<span class="lnr"> 97 </span>  <span class="Type">class</span> ChessBoard {
+<span class="lnr"> 98 </span>    <span class="Statement">private</span>:
+<span class="lnr"> 99 </span>      <span class="Comment">/*</span><span class="Comment">***************</span>
+<span class="lnr">100 </span><span class="Comment">       * 定数の定義。 *</span>
+<span class="lnr">101 </span><span class="Comment">       ***************</span><span class="Comment">*/</span>
+<span class="lnr">102 </span>      <span class="Type">enum</span> {
+<span class="lnr">103 </span>        INFINITE = <span class="Constant">9999999</span>
+<span class="lnr">104 </span>      };
+<span class="lnr">105 </span>      <span class="Type">enum</span> {
+<span class="lnr">106 </span>        SCORE_WIN = <span class="Constant">1000000</span>,
+<span class="lnr">107 </span>        SCORE_LOSE = -<span class="Constant">1000000</span>,
+<span class="lnr">108 </span>        SCORE_DRAW = <span class="Constant">0</span>,
+<span class="lnr">109 </span>        SCORE_PAWN = <span class="Constant">100</span>,
+<span class="lnr">110 </span>        SCORE_KNIGHT = <span class="Constant">300</span>,
+<span class="lnr">111 </span>        SCORE_BISHOP = <span class="Constant">300</span>,
+<span class="lnr">112 </span>        SCORE_ROOK = <span class="Constant">500</span>,
+<span class="lnr">113 </span>        SCORE_QUEEN = <span class="Constant">900</span>,
+<span class="lnr">114 </span>        SCORE_KING = <span class="Constant">1000000</span>
+<span class="lnr">115 </span>      };
+<span class="lnr">116 </span>
+<span class="lnr">117 </span>    <span class="Statement">public</span>:
+<span class="lnr">118 </span>      <span class="Comment">/*</span><span class="Comment">*****************</span>
+<span class="lnr">119 </span><span class="Comment">       * テスト用関数。 *</span>
+<span class="lnr">120 </span><span class="Comment">       *****************</span><span class="Comment">*/</span>
+<span class="lnr">121 </span>      <span class="Type">void</span> Test();
+<span class="lnr">122 </span>
+<span class="lnr">123 </span>      <span class="Comment">/*</span><span class="Comment">*****************************</span>
+<span class="lnr">124 </span><span class="Comment">       * ChessBoardクラスの初期化。 *</span>
+<span class="lnr">125 </span><span class="Comment">       *****************************</span><span class="Comment">*/</span>
+<span class="lnr">126 </span>      <span class="Type">static</span> <span class="Type">void</span> InitChessBoard() {
+<span class="lnr">127 </span>        <span class="Comment">// key_array_[][][]を初期化する。</span>
+<span class="lnr">128 </span>        InitKeyArray();
+<span class="lnr">129 </span>        <span class="Comment">// pass_pawn_mask_[][]を初期化する。</span>
+<span class="lnr">130 </span>        InitPassPawnMask();
+<span class="lnr">131 </span>        <span class="Comment">// iso_pawn_mask_[]を初期化する。</span>
+<span class="lnr">132 </span>        InitIsoPawnMask();
+<span class="lnr">133 </span>        <span class="Comment">// pawn_shield_mask_[][]を初期化する。</span>
+<span class="lnr">134 </span>        InitPawnShieldMask();
+<span class="lnr">135 </span>        <span class="Comment">// move_maskを初期化する。</span>
+<span class="lnr">136 </span>        InitMoveMask();
+<span class="lnr">137 </span>      }
+<span class="lnr">138 </span>
+<span class="lnr">139 </span>
+<span class="lnr">140 </span>      <span class="Comment">/*</span><span class="Comment">*************************************</span>
+<span class="lnr">141 </span><span class="Comment">       * インスタンスの生成とデストラクタ。 *</span>
+<span class="lnr">142 </span><span class="Comment">       *************************************</span><span class="Comment">*/</span>
+<span class="lnr">143 </span>      <span class="Comment">// インスタンスを生成する。</span>
+<span class="lnr">144 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">145 </span>      <span class="Comment">// インスタンスのポインタ。</span>
+<span class="lnr">146 </span>      <span class="Type">static</span> ChessBoard* New() {
+<span class="lnr">147 </span>        <span class="Statement">return</span> <span class="Statement">new</span> ChessBoard();
+<span class="lnr">148 </span>      }
+<span class="lnr">149 </span>      <span class="Comment">// デストラクタ。</span>
+<span class="lnr">150 </span>      <span class="Type">virtual</span> ~ChessBoard();
+<span class="lnr">151 </span>
+<span class="lnr">152 </span>      <span class="Comment">/*</span><span class="Comment">*********</span>
+<span class="lnr">153 </span><span class="Comment">       * 関数。 *</span>
+<span class="lnr">154 </span><span class="Comment">       *********</span><span class="Comment">*/</span>
+<span class="lnr">155 </span>      <span class="Comment">// 次の手のリストを作る。</span>
+<span class="lnr">156 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">157 </span>      <span class="Comment">// 次の手のリストのポインタ。</span>
+<span class="lnr">158 </span>      MoveList* CreateNextMoveList() <span class="Type">const</span>;
+<span class="lnr">159 </span>      <span class="Comment">// 履歴のサイズを得る。</span>
+<span class="lnr">160 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">161 </span>      <span class="Comment">// 履歴のサイズ。</span>
+<span class="lnr">162 </span>      <span class="Type">int</span> GetHistorySize() <span class="Type">const</span> {<span class="Statement">return</span> history_.size();}
+<span class="lnr">163 </span>      <span class="Comment">// ゲームのデータを得る。</span>
+<span class="lnr">164 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">165 </span>      <span class="Comment">// index: 履歴のインデックス。</span>
+<span class="lnr">166 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">167 </span>      <span class="Comment">// ゲームのデータ。</span>
+<span class="lnr">168 </span>      <span class="Type">const</span> GameRecord&amp; GetGameRecord(<span class="Type">int</span> index) <span class="Type">const</span> {
+<span class="lnr">169 </span>        <span class="Statement">return</span> *(history_[index]);
+<span class="lnr">170 </span>      }
+<span class="lnr">171 </span>      <span class="Comment">// 現在のボードのデータを得る。</span>
+<span class="lnr">172 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">173 </span>      <span class="Comment">// 現在のゲームのデータ。</span>
+<span class="lnr">174 </span>      <span class="Type">const</span> GameRecord&amp; GetCurrentGameRecord() <span class="Type">const</span> {
+<span class="lnr">175 </span>        <span class="Statement">return</span> *(history_[current_game_]);
+<span class="lnr">176 </span>      }
+<span class="lnr">177 </span>      <span class="Comment">// ゲームを1つ前に戻す。</span>
+<span class="lnr">178 </span>      <span class="Type">void</span> StepBack();
+<span class="lnr">179 </span>      <span class="Comment">// ゲームを1つ進める。</span>
+<span class="lnr">180 </span>      <span class="Type">void</span> StepForward();
+<span class="lnr">181 </span>      <span class="Comment">// 手を指す。</span>
+<span class="lnr">182 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">183 </span>      <span class="Comment">// 指す手。</span>
+<span class="lnr">184 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">185 </span>      <span class="Comment">// 指せればtrue。</span>
+<span class="lnr">186 </span>      <span class="Type">bool</span> TakeMove(<span class="Type">const</span> Move&amp; move);
+<span class="lnr">187 </span>      <span class="Comment">// 最善手を得る。</span>
+<span class="lnr">188 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">189 </span>      <span class="Comment">// searching_time: 探索時間。</span>
+<span class="lnr">190 </span>      <span class="Comment">// table[inout]: 使用するトランスポジションテーブル。</span>
+<span class="lnr">191 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">192 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">193 </span>      <span class="Comment">// 最善手。</span>
+<span class="lnr">194 </span>      Move GetBestMove(<span class="Type">double</span> searching_time, TranspositionTable&amp; table,
+<span class="lnr">195 </span>      <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">196 </span>
+<span class="lnr">197 </span>      <span class="Comment">/*</span><span class="Comment">**************</span>
+<span class="lnr">198 </span><span class="Comment">       * Pondering。 *</span>
+<span class="lnr">199 </span><span class="Comment">       **************</span><span class="Comment">*/</span>
+<span class="lnr">200 </span>      <span class="Comment">// Ponderingを開始する。</span>
+<span class="lnr">201 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">202 </span>      <span class="Comment">// depth: Ponderingする深さ。</span>
+<span class="lnr">203 </span>      <span class="Comment">// table[inout]: 使用するトランスポジションテーブル。</span>
+<span class="lnr">204 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">205 </span>      <span class="Type">void</span> StartPondering(<span class="Type">int</span> depth, TranspositionTable&amp; table,
+<span class="lnr">206 </span>      <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">207 </span>      <span class="Comment">// Ponderingを停止する。</span>
+<span class="lnr">208 </span>      <span class="Type">void</span> StopPondering() <span class="Type">const</span>;
+<span class="lnr">209 </span>
+<span class="lnr">210 </span>      <span class="Comment">/*</span><span class="Comment">***********************</span>
+<span class="lnr">211 </span><span class="Comment">       * 局面を分析する関数。 *</span>
+<span class="lnr">212 </span><span class="Comment">       ***********************</span><span class="Comment">*/</span>
+<span class="lnr">213 </span>      <span class="Comment">// キングがチェックされているかどうかチェックする。</span>
+<span class="lnr">214 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">215 </span>      <span class="Comment">// side: チェックされているか調べるサイド。</span>
+<span class="lnr">216 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">217 </span>      <span class="Comment">// キングがチェックされていればtrue。</span>
+<span class="lnr">218 </span>      <span class="Type">bool</span> IsChecked(side_t side) <span class="Type">const</span> {
+<span class="lnr">219 </span>        <span class="Statement">if</span> (side == NO_SIDE) <span class="Statement">return</span> <span class="Constant">false</span>;
+<span class="lnr">220 </span>        <span class="Statement">return</span> IsAttacked(king_[side], <span class="Statement">static_cast</span>&lt;side_t&gt;(side ^ <span class="Constant">0x3</span>));
+<span class="lnr">221 </span>      }
+<span class="lnr">222 </span>      <span class="Comment">// チェックメイトされているかどうか調べる。</span>
+<span class="lnr">223 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">224 </span>      <span class="Comment">// チェックメイトされていればtrue。</span>
+<span class="lnr">225 </span>      <span class="Type">bool</span> IsCheckmated() <span class="Type">const</span> {
+<span class="lnr">226 </span>        <span class="Statement">return</span> IsChecked(to_move_) &amp;&amp; !HasLegalMove(to_move_);
+<span class="lnr">227 </span>      }
+<span class="lnr">228 </span>      <span class="Comment">// ステールメイトかどうか調べる。</span>
+<span class="lnr">229 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">230 </span>      <span class="Comment">// ステールメイトされていればtrue。</span>
+<span class="lnr">231 </span>      <span class="Type">bool</span> IsStalemated() <span class="Type">const</span> {
+<span class="lnr">232 </span>        <span class="Statement">return</span> !IsChecked(to_move_) &amp;&amp; !HasLegalMove(to_move_);
+<span class="lnr">233 </span>      }
+<span class="lnr">234 </span>      <span class="Comment">// 勝つのに十分な駒があるかどうか調べる。</span>
+<span class="lnr">235 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">236 </span>      <span class="Comment">// side: 調べるサイド。</span>
+<span class="lnr">237 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">238 </span>      <span class="Comment">// 十分な駒があればtrue。</span>
+<span class="lnr">239 </span>      <span class="Type">bool</span> HasEnoughPieces(side_t side) <span class="Type">const</span>;
+<span class="lnr">240 </span>      <span class="Comment">// 終盤かどうか判定する。</span>
+<span class="lnr">241 </span>      <span class="Comment">// キングとポーン以外の駒が4個以下なら終盤。</span>
+<span class="lnr">242 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">243 </span>      <span class="Comment">// 終盤ならtrue。</span>
+<span class="lnr">244 </span>      <span class="Type">bool</span> IsEnding() <span class="Type">const</span> {
+<span class="lnr">245 </span>        bitboard_t pieces = blocker0_;
+<span class="lnr">246 </span>        pieces &amp;=
+<span class="lnr">247 </span>        ~(position_[WHITE][KING] | position_[BLACK][KING]
+<span class="lnr">248 </span>        | position_[WHITE][PAWN] | position_[BLACK][PAWN]);
+<span class="lnr">249 </span>        <span class="Statement">return</span> ChessUtil::CountBits(pieces) &lt;= <span class="Constant">4</span>;
+<span class="lnr">250 </span>      }
+<span class="lnr">251 </span>      <span class="Comment">// 動ける位置の数を得る。</span>
+<span class="lnr">252 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">253 </span>      <span class="Comment">// piece_square: 調べたい駒の位置。</span>
+<span class="lnr">254 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">255 </span>      <span class="Comment">// 動ける位置の数。</span>
+<span class="lnr">256 </span>      <span class="Type">int</span> GetMobility(square_t piece_square) <span class="Type">const</span>;
+<span class="lnr">257 </span>      <span class="Comment">// 攻撃している位置のビットボードを得る。</span>
+<span class="lnr">258 </span>      <span class="Comment">// アンパサンは含まない。</span>
+<span class="lnr">259 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">260 </span>      <span class="Comment">// pieces: 調べたい駒のビットボード。</span>
+<span class="lnr">261 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">262 </span>      <span class="Comment">// piecesが攻撃している位置のビットボード。</span>
+<span class="lnr">263 </span>      bitboard_t GetAttack(bitboard_t pieces) <span class="Type">const</span>;
+<span class="lnr">264 </span>      <span class="Comment">// パスポーンの位置のビットボードを得る。</span>
+<span class="lnr">265 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">266 </span>      <span class="Comment">// side: 調べたいサイド。</span>
+<span class="lnr">267 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">268 </span>      <span class="Comment">// パスポーンの位置のビットボード。</span>
+<span class="lnr">269 </span>      bitboard_t GetPassPawns(side_t side) <span class="Type">const</span>;
+<span class="lnr">270 </span>      <span class="Comment">// ダブルポーンの位置のビットボードを得る。</span>
+<span class="lnr">271 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">272 </span>      <span class="Comment">// side: 調べたいサイド。</span>
+<span class="lnr">273 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">274 </span>      <span class="Comment">// ダブルポーンの位置のビットボード。</span>
+<span class="lnr">275 </span>      bitboard_t GetDoublePawns(side_t side) <span class="Type">const</span>;
+<span class="lnr">276 </span>      <span class="Comment">// 孤立ポーンの位置のビットボードを得る。</span>
+<span class="lnr">277 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">278 </span>      <span class="Comment">// side: 調べたいサイド。</span>
+<span class="lnr">279 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">280 </span>      <span class="Comment">// 孤立ポーンの位置のビットボード。</span>
+<span class="lnr">281 </span>      bitboard_t GetIsoPawns(side_t side) <span class="Type">const</span>;
+<span class="lnr">282 </span>      <span class="Comment">// 展開されていないマイナーピースの位置のビットボードを得る。</span>
+<span class="lnr">283 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">284 </span>      <span class="Comment">// side: 調べたいサイド。</span>
+<span class="lnr">285 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">286 </span>      <span class="Comment">// 展開されていないマイナーピースの位置のビットボード。</span>
+<span class="lnr">287 </span>      bitboard_t GetNotDevelopedMinorPieces(side_t side) <span class="Type">const</span>;
+<span class="lnr">288 </span>      <span class="Comment">// キングのポーンの盾の位置のビットボードを得る。</span>
+<span class="lnr">289 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">290 </span>      <span class="Comment">// side: 調べたいサイド。</span>
+<span class="lnr">291 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">292 </span>      <span class="Comment">// ポーンの盾の位置のビットボード。</span>
+<span class="lnr">293 </span>      bitboard_t GetPawnShield(side_t side) <span class="Type">const</span> {
+<span class="lnr">294 </span>        <span class="Statement">if</span> (side == NO_SIDE) <span class="Statement">return</span> <span class="Constant">0</span>;
+<span class="lnr">295 </span>
+<span class="lnr">296 </span>        <span class="Statement">return</span> position_[side][PAWN] &amp; pawn_shield_mask_[side][king_[side]];
+<span class="lnr">297 </span>      }
+<span class="lnr">298 </span>      <span class="Comment">// キャスリングしたかどうかを得る。</span>
+<span class="lnr">299 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">300 </span>      <span class="Comment">// side: 調べたいサイド。</span>
+<span class="lnr">301 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">302 </span>      <span class="Comment">// キャスリングしたかどうか。</span>
+<span class="lnr">303 </span>      <span class="Type">bool</span> HasCastled(side_t side) <span class="Type">const</span> {
+<span class="lnr">304 </span>        <span class="Statement">if</span> (side == NO_SIDE) <span class="Statement">return</span> <span class="Constant">false</span>;
+<span class="lnr">305 </span>        <span class="Statement">return</span> side == WHITE ? has_white_castled_ : has_black_castled_;
+<span class="lnr">306 </span>      }
+<span class="lnr">307 </span>
+<span class="lnr">308 </span>      <span class="Comment">/*</span><span class="Comment">***********************</span>
+<span class="lnr">309 </span><span class="Comment">       * 局面を評価する関数。 *</span>
+<span class="lnr">310 </span><span class="Comment">       ***********************</span><span class="Comment">*/</span>
+<span class="lnr">311 </span>      <span class="Comment">// 全てを評価する。</span>
+<span class="lnr">312 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">313 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">314 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">315 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">316 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">317 </span>      <span class="Type">int</span> EvalAll(side_t side, <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">318 </span>      <span class="Comment">// 機動力を評価する。</span>
+<span class="lnr">319 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">320 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">321 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">322 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">323 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">324 </span>      <span class="Type">int</span> EvalMobility(side_t side, <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">325 </span>      <span class="Comment">// センター攻撃を評価する。</span>
+<span class="lnr">326 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">327 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">328 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">329 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">330 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">331 </span>      <span class="Type">int</span> EvalAttackCenter(side_t side, <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">332 </span>      <span class="Comment">// 展開を評価する。</span>
+<span class="lnr">333 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">334 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">335 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">336 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">337 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">338 </span>      <span class="Type">int</span> EvalDevelopment(side_t side, <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">339 </span>      <span class="Comment">// キングの周囲への攻撃を評価する。</span>
+<span class="lnr">340 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">341 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">342 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">343 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">344 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">345 </span>      <span class="Type">int</span> EvalAttackAroundKing(side_t side, <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">346 </span>      <span class="Comment">// ポーンの配置を評価する。</span>
+<span class="lnr">347 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">348 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">349 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">350 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">351 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">352 </span>      <span class="Type">int</span> EvalPawnPosition(side_t side, <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">353 </span>      <span class="Comment">// ナイトの配置を評価する。</span>
+<span class="lnr">354 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">355 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">356 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">357 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">358 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">359 </span>      <span class="Type">int</span> EvalKnightPosition(side_t side, <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">360 </span>      <span class="Comment">// ルークの配置を評価する。</span>
+<span class="lnr">361 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">362 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">363 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">364 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">365 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">366 </span>      <span class="Type">int</span> EvalRookPosition(side_t side, <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">367 </span>      <span class="Comment">// キングの中盤の配置を評価する。</span>
+<span class="lnr">368 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">369 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">370 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">371 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">372 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">373 </span>      <span class="Type">int</span> EvalKingPositionMiddle(side_t side,
+<span class="lnr">374 </span>      <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">375 </span>      <span class="Comment">// キングの終盤の配置を評価する。</span>
+<span class="lnr">376 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">377 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">378 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">379 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">380 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">381 </span>      <span class="Type">int</span> EvalKingPositionEnding(side_t side,
+<span class="lnr">382 </span>      <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">383 </span>      <span class="Comment">// パスポーンを評価する。</span>
+<span class="lnr">384 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">385 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">386 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">387 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">388 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">389 </span>      <span class="Type">int</span> EvalPassPawn(side_t side, <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">390 </span>      <span class="Comment">// ダブルポーンを評価する。</span>
+<span class="lnr">391 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">392 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">393 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">394 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">395 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">396 </span>      <span class="Type">int</span> EvalDoublePawn(side_t side, <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">397 </span>      <span class="Comment">// 孤立ポーンを評価する。</span>
+<span class="lnr">398 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">399 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">400 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">401 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">402 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">403 </span>      <span class="Type">int</span> EvalIsoPawn(side_t side, <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">404 </span>      <span class="Comment">// ビショップペアを評価する。</span>
+<span class="lnr">405 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">406 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">407 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">408 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">409 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">410 </span>      <span class="Type">int</span> EvalBishopPair(side_t side, <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">411 </span>      <span class="Comment">// 早すぎるクイーンの出動を評価する。</span>
+<span class="lnr">412 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">413 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">414 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">415 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">416 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">417 </span>      <span class="Type">int</span> EvalEarlyQueenLaunched(side_t side, <span class="Type">const</span> EvalWeights&amp; weights)
+<span class="lnr">418 </span>      <span class="Type">const</span>;
+<span class="lnr">419 </span>      <span class="Comment">// ポーンの盾を評価する。</span>
+<span class="lnr">420 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">421 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">422 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">423 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">424 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">425 </span>      <span class="Type">int</span> EvalPawnShield(side_t side, <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">426 </span>      <span class="Comment">// キャスリングの破棄を評価する。</span>
+<span class="lnr">427 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">428 </span>      <span class="Comment">// side: 評価したいサイド。</span>
+<span class="lnr">429 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">430 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">431 </span>      <span class="Comment">// 評価値。</span>
+<span class="lnr">432 </span>      <span class="Type">int</span> EvalCanceledCastling(side_t side, <span class="Type">const</span> EvalWeights&amp; weights) <span class="Type">const</span>;
+<span class="lnr">433 </span>
+<span class="lnr">434 </span>    <span class="Statement">protected</span>:
+<span class="lnr">435 </span>      <span class="Comment">/*</span><span class="Comment">*******************</span>
+<span class="lnr">436 </span><span class="Comment">       * コンストラクタ。 *</span>
+<span class="lnr">437 </span><span class="Comment">       *******************</span><span class="Comment">*/</span>
+<span class="lnr">438 </span>      <span class="Comment">// コンストラクタ。</span>
+<span class="lnr">439 </span>      ChessBoard();
+<span class="lnr">440 </span>
+<span class="lnr">441 </span>      <span class="Comment">/*</span><span class="Comment">*********************************</span>
+<span class="lnr">442 </span><span class="Comment">       * アクセサ。派生クラスのみ公開。 *</span>
+<span class="lnr">443 </span><span class="Comment">       *********************************</span><span class="Comment">*/</span>
+<span class="lnr">444 </span>      <span class="Comment">// 駒の配置のビットボードの配列。</span>
+<span class="lnr">445 </span>      <span class="Type">const</span> bitboard_t (&amp; position() <span class="Type">const</span>)[NUM_SIDES][NUM_PIECE_TYPES] {
+<span class="lnr">446 </span>        <span class="Statement">return</span> position_;
+<span class="lnr">447 </span>      }
+<span class="lnr">448 </span>      <span class="Comment">// 駒の種類の配置。</span>
+<span class="lnr">449 </span>      <span class="Type">const</span> piece_t (&amp; piece_board() <span class="Type">const</span>)[NUM_SQUARES] {
+<span class="lnr">450 </span>        <span class="Statement">return</span> piece_board_;
+<span class="lnr">451 </span>      }
+<span class="lnr">452 </span>      <span class="Comment">// サイドの配置。</span>
+<span class="lnr">453 </span>      <span class="Type">const</span> side_t (&amp; side_board() <span class="Type">const</span>)[NUM_SQUARES] {
+<span class="lnr">454 </span>        <span class="Statement">return</span> side_board_;
+<span class="lnr">455 </span>      }
+<span class="lnr">456 </span>      <span class="Comment">// 各サイドの駒の配置。</span>
+<span class="lnr">457 </span>      <span class="Type">const</span> bitboard_t (&amp; side_pieces() <span class="Type">const</span>)[NUM_SIDES] {
+<span class="lnr">458 </span>        <span class="Statement">return</span> side_pieces_;
+<span class="lnr">459 </span>      }
+<span class="lnr">460 </span>      <span class="Comment">// ブロッカーの配置。</span>
+<span class="lnr">461 </span>      bitboard_t blocker0() <span class="Type">const</span> {<span class="Statement">return</span> blocker0_;}  <span class="Comment">// 0度。</span>
+<span class="lnr">462 </span>      bitboard_t blocker45() <span class="Type">const</span> {<span class="Statement">return</span> blocker45_;}  <span class="Comment">// 45度</span>
+<span class="lnr">463 </span>      bitboard_t blocker90() <span class="Type">const</span> {<span class="Statement">return</span> blocker90_;}  <span class="Comment">// 90度。</span>
+<span class="lnr">464 </span>      bitboard_t blocker135() <span class="Type">const</span> {<span class="Statement">return</span> blocker135_;}  <span class="Comment">// 135度。</span>
+<span class="lnr">465 </span>      <span class="Comment">// キングの位置。</span>
+<span class="lnr">466 </span>      <span class="Type">const</span> square_t (&amp; king() <span class="Type">const</span>)[NUM_SIDES] {
+<span class="lnr">467 </span>        <span class="Statement">return</span> king_;
+<span class="lnr">468 </span>      }
+<span class="lnr">469 </span>      <span class="Comment">// 手番。</span>
+<span class="lnr">470 </span>      side_t to_move() <span class="Type">const</span> {<span class="Statement">return</span> to_move_;}
+<span class="lnr">471 </span>      <span class="Comment">// キャスリングの権利。</span>
+<span class="lnr">472 </span>      castling_t castling_rights() <span class="Type">const</span> {<span class="Statement">return</span> castling_rights_;}
+<span class="lnr">473 </span>      <span class="Comment">// アンパッサンのターゲットの位置。</span>
+<span class="lnr">474 </span>      square_t en_passant_target() <span class="Type">const</span> {<span class="Statement">return</span> en_passant_target_;}
+<span class="lnr">475 </span>      <span class="Comment">// アンパッサンできるかどうか。</span>
+<span class="lnr">476 </span>      <span class="Type">bool</span> can_en_passant() <span class="Type">const</span> {<span class="Statement">return</span> can_en_passant_;}
+<span class="lnr">477 </span>      <span class="Comment">// ゲームの履歴。</span>
+<span class="lnr">478 </span>      <span class="Type">const</span> std::vector&lt;GameRecord*&gt; history() <span class="Type">const</span> {<span class="Statement">return</span> history_;}
+<span class="lnr">479 </span>      <span class="Comment">// 現在のゲームの履歴の位置。</span>
+<span class="lnr">480 </span>      <span class="Type">int</span> current_game() <span class="Type">const</span> {<span class="Statement">return</span> current_game_;}
+<span class="lnr">481 </span>
+<span class="lnr">482 </span>    <span class="Statement">private</span>:
+<span class="lnr">483 </span>      <span class="Comment">/*</span><span class="Comment">*****************</span>
+<span class="lnr">484 </span><span class="Comment">       * コピーの禁止。 *</span>
+<span class="lnr">485 </span><span class="Comment">       *****************</span><span class="Comment">*/</span>
+<span class="lnr">486 </span>      ChessBoard(<span class="Type">const</span> ChessBoard&amp;);  <span class="Comment">// 削除。</span>
+<span class="lnr">487 </span>      ChessBoard&amp; <span class="Statement">operator</span>=(<span class="Type">const</span> ChessBoard&amp;);  <span class="Comment">// 削除。</span>
+<span class="lnr">488 </span>
+<span class="lnr">489 </span>      <span class="Comment">/*</span><span class="Comment">***************</span>
+<span class="lnr">490 </span><span class="Comment">       * 出力演算子。 *</span>
+<span class="lnr">491 </span><span class="Comment">       ***************</span><span class="Comment">*/</span>
+<span class="lnr">492 </span>      <span class="Statement">friend</span> std::ostream&amp; <span class="Statement">operator</span>&lt;&lt;(std::ostream&amp; stream,
+<span class="lnr">493 </span>      <span class="Type">const</span> ChessBoard&amp; board);
+<span class="lnr">494 </span>
+<span class="lnr">495 </span>      <span class="Comment">/*</span><span class="Comment">*******************</span>
+<span class="lnr">496 </span><span class="Comment">       * フレンドクラス。 *</span>
+<span class="lnr">497 </span><span class="Comment">       *******************</span><span class="Comment">*/</span>
+<span class="lnr">498 </span>      <span class="Statement">friend</span> <span class="Type">class</span> GameRecord;
+<span class="lnr">499 </span>
+<span class="lnr">500 </span>      <span class="Comment">/*</span><span class="Comment">***************</span>
+<span class="lnr">501 </span><span class="Comment">       * 駒を動かす。 *</span>
+<span class="lnr">502 </span><span class="Comment">       ***************</span><span class="Comment">*/</span>
+<span class="lnr">503 </span>      <span class="Comment">// 駒を動かす。</span>
+<span class="lnr">504 </span>      <span class="Comment">// 動かす前のキャスリングの権利とアンパッサンは記録される。</span>
+<span class="lnr">505 </span>      <span class="Comment">// 駒を取る場合は取った駒がmoveに記録される。</span>
+<span class="lnr">506 </span>      <span class="Comment">// 動かす駒の位置と移動先の位置が同じ場合はNull Move。</span>
+<span class="lnr">507 </span>      <span class="Comment">// そのmoveはUnmakeMove()で使われる。</span>
+<span class="lnr">508 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">509 </span>      <span class="Comment">// move[inout]: 動かす手。</span>
+<span class="lnr">510 </span>      <span class="Type">void</span> MakeMove(move_t&amp; move);
+<span class="lnr">511 </span>      <span class="Comment">// MakeMove()で動かした駒を元に戻す。</span>
+<span class="lnr">512 </span>      <span class="Comment">// 必ず先にMakeMove()をすること。</span>
+<span class="lnr">513 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">514 </span>      <span class="Comment">// move: MakeMove()で動かした手。</span>
+<span class="lnr">515 </span>      <span class="Type">void</span> UnmakeMove(move_t move);
+<span class="lnr">516 </span>
+<span class="lnr">517 </span>      <span class="Comment">/*</span><span class="Comment">*****************************</span>
+<span class="lnr">518 </span><span class="Comment">       * 候補手をツリーに展開する。 *</span>
+<span class="lnr">519 </span><span class="Comment">       *****************************</span><span class="Comment">*/</span>
+<span class="lnr">520 </span>      <span class="Comment">// 手のマスク。GiveQuickScore()で使う。</span>
+<span class="lnr">521 </span>      <span class="Type">static</span> move_t move_mask_;
+<span class="lnr">522 </span>      <span class="Type">static</span> <span class="Type">void</span> InitMoveMask();
+<span class="lnr">523 </span>      <span class="Comment">// 駒を取る手を展開する。</span>
+<span class="lnr">524 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">525 </span>      <span class="Comment">// level: 展開するツリーのレベル。</span>
+<span class="lnr">526 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">527 </span>      <span class="Comment">// いくつ手を展開できたか。</span>
+<span class="lnr">528 </span>      <span class="Type">int</span> GenCaptureMove(<span class="Type">int</span> level);
+<span class="lnr">529 </span>      <span class="Comment">// 駒を取らない手を展開する。</span>
+<span class="lnr">530 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">531 </span>      <span class="Comment">// level: 展開するツリーのレベル。</span>
+<span class="lnr">532 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">533 </span>      <span class="Comment">// いくつ手を展開できたか。</span>
+<span class="lnr">534 </span>      <span class="Type">int</span> GenNonCaptureMove(<span class="Type">int</span> level);
+<span class="lnr">535 </span>      <span class="Comment">// 全ての手を展開する。</span>
+<span class="lnr">536 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">537 </span>      <span class="Comment">// level: 展開するツリーのレベル。</span>
+<span class="lnr">538 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">539 </span>      <span class="Comment">// いくつ手を展開できたか。</span>
+<span class="lnr">540 </span>      <span class="Type">int</span> GenMove(<span class="Type">int</span> level);
+<span class="lnr">541 </span>      <span class="Comment">// チェックを逃れる手を作る。</span>
+<span class="lnr">542 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">543 </span>      <span class="Comment">// level: 展開するツリーのレベル。</span>
+<span class="lnr">544 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">545 </span>      <span class="Comment">// いくつ手を展開できたか。</span>
+<span class="lnr">546 </span>      <span class="Type">int</span> GenCheckEscapeMove(<span class="Type">int</span> level);
+<span class="lnr">547 </span>      <span class="Comment">// SEE。</span>
+<span class="lnr">548 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">549 </span>      <span class="Comment">// move: どの手について評価したいか。</span>
+<span class="lnr">550 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">551 </span>      <span class="Comment">// 駒の取り合いの簡易評価値。</span>
+<span class="lnr">552 </span>      <span class="Type">int</span> SEE(move_t move);
+<span class="lnr">553 </span>      <span class="Comment">// ノードに簡易点数を付ける。</span>
+<span class="lnr">554 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">555 </span>      <span class="Comment">// key: その局面のハッシュキー。</span>
+<span class="lnr">556 </span>      <span class="Comment">// level: 簡易点数を付けるレベル。</span>
+<span class="lnr">557 </span>      <span class="Comment">// depth: その局面の深さ。</span>
+<span class="lnr">558 </span>      <span class="Comment">// side: その局面のサイド。</span>
+<span class="lnr">559 </span>      <span class="Comment">// table: トランスポジションテーブル。</span>
+<span class="lnr">560 </span>      <span class="Type">void</span> GiveQuickScore(hash_key_t key, <span class="Type">int</span> level, <span class="Type">int</span> depth, side_t side,
+<span class="lnr">561 </span>      TranspositionTable&amp; table);
+<span class="lnr">562 </span>      <span class="Comment">// 簡易点数の高いもの順にポップする。</span>
+<span class="lnr">563 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">564 </span>      <span class="Comment">// level: ポップするレベル。</span>
+<span class="lnr">565 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">566 </span>      <span class="Comment">// ポップした手。</span>
+<span class="lnr">567 </span>      move_t PopBestMove(<span class="Type">int</span> level);
+<span class="lnr">568 </span>
+<span class="lnr">569 </span>      <span class="Comment">/*</span><span class="Comment">*************************</span>
+<span class="lnr">570 </span><span class="Comment">       * 探索に使う関数と変数。 *</span>
+<span class="lnr">571 </span><span class="Comment">       *************************</span><span class="Comment">*/</span>
+<span class="lnr">572 </span>      <span class="Comment">// 最善手。</span>
+<span class="lnr">573 </span>      move_t best_move_;
+<span class="lnr">574 </span>      <span class="Comment">// 探索開始時間。</span>
+<span class="lnr">575 </span>      <span class="Type">time_t</span> start_time_;
+<span class="lnr">576 </span>      <span class="Comment">// 探索時間。</span>
+<span class="lnr">577 </span>      <span class="Type">double</span> searching_time_;
+<span class="lnr">578 </span>      <span class="Comment">// タイムアウトしたかどうか。</span>
+<span class="lnr">579 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">580 </span>      <span class="Comment">// タイムアウトならtrue。</span>
+<span class="lnr">581 </span>      <span class="Type">bool</span> IsTimeOut() <span class="Type">const</span> {
+<span class="lnr">582 </span>        <span class="Statement">if</span> (std::difftime(std::time(<span class="Constant">NULL</span>), start_time_) &gt;= searching_time_) {
+<span class="lnr">583 </span>          <span class="Statement">return</span> <span class="Constant">true</span>;
+<span class="lnr">584 </span>        } <span class="Statement">else</span> {
+<span class="lnr">585 </span>          <span class="Statement">return</span> <span class="Constant">false</span>;
+<span class="lnr">586 </span>        }
+<span class="lnr">587 </span>      }
+<span class="lnr">588 </span>      <span class="Comment">// 最善手のスコア。</span>
+<span class="lnr">589 </span>      <span class="Type">int</span> best_score_;
+<span class="lnr">590 </span>      <span class="Comment">// MCapを得る。</span>
+<span class="lnr">591 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">592 </span>      <span class="Comment">// move: 動かす手。</span>
+<span class="lnr">593 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">594 </span>      <span class="Comment">// MCap。</span>
+<span class="lnr">595 </span>      <span class="Type">int</span> GetMCap(move_t move) <span class="Type">const</span>;
+<span class="lnr">596 </span>      <span class="Comment">// クイース探索。</span>
+<span class="lnr">597 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">598 </span>      <span class="Comment">// level: 探索のレベル。</span>
+<span class="lnr">599 </span>      <span class="Comment">// depth: 探索の深さ。</span>
+<span class="lnr">600 </span>      <span class="Comment">// alpha: アルファ値。</span>
+<span class="lnr">601 </span>      <span class="Comment">// beta: ベータ値。</span>
+<span class="lnr">602 </span>      <span class="Comment">// key: ハッシュキー。</span>
+<span class="lnr">603 </span>      <span class="Comment">// table: トランスポジションテーブル。</span>
+<span class="lnr">604 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">605 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">606 </span>      <span class="Comment">// 探索結果の評価値。</span>
+<span class="lnr">607 </span>      <span class="Type">int</span> Quiesce(<span class="Type">int</span> level, <span class="Type">int</span> depth, <span class="Type">int</span> alpha, <span class="Type">int</span> beta, hash_key_t key,
+<span class="lnr">608 </span>      TranspositionTable&amp; table, <span class="Type">const</span> EvalWeights&amp; weights);
+<span class="lnr">609 </span>      <span class="Comment">// 探索する。</span>
+<span class="lnr">610 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">611 </span>      <span class="Comment">// level: 探索のレベル。</span>
+<span class="lnr">612 </span>      <span class="Comment">// depth: 探索の深さ。</span>
+<span class="lnr">613 </span>      <span class="Comment">// alpha: アルファ値。</span>
+<span class="lnr">614 </span>      <span class="Comment">// beta: ベータ値。</span>
+<span class="lnr">615 </span>      <span class="Comment">// is_null_move: Null Moveの探索かどうか。</span>
+<span class="lnr">616 </span>      <span class="Comment">// key: ハッシュキー。</span>
+<span class="lnr">617 </span>      <span class="Comment">// table: 使用するトランスポジションテーブル。</span>
+<span class="lnr">618 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">619 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">620 </span>      <span class="Comment">// 探索結果の評価値。</span>
+<span class="lnr">621 </span>      <span class="Type">int</span> Search(<span class="Type">int</span> level, <span class="Type">int</span> depth, <span class="Type">int</span> alpha, <span class="Type">int</span> beta,
+<span class="lnr">622 </span>      <span class="Type">bool</span> is_null_move, hash_key_t key,
+<span class="lnr">623 </span>      TranspositionTable&amp; table, <span class="Type">const</span> EvalWeights&amp; weights);
+<span class="lnr">624 </span>
+<span class="lnr">625 </span>      <span class="Comment">/*</span><span class="Comment">*****************************</span>
+<span class="lnr">626 </span><span class="Comment">       * その他のプライベート関数。 *</span>
+<span class="lnr">627 </span><span class="Comment">       *****************************</span><span class="Comment">*/</span>
+<span class="lnr">628 </span>      <span class="Comment">// 駒を置く。（駒の種類piece_typeにEMPTYをおけば、駒を削除できる。）</span>
+<span class="lnr">629 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">630 </span>      <span class="Comment">// square: 置きたい位置。</span>
+<span class="lnr">631 </span>      <span class="Comment">// piece_type: 駒の種類。</span>
+<span class="lnr">632 </span>      <span class="Comment">// side: 置きたい駒のサイド。</span>
+<span class="lnr">633 </span>      <span class="Type">void</span> PutPiece(square_t square, piece_t piece_type, side_t side=NO_SIDE);
+<span class="lnr">634 </span>      <span class="Comment">// 駒の位置を変える。</span>
+<span class="lnr">635 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">636 </span>      <span class="Comment">// piece_square: 移動する駒の位置。</span>
+<span class="lnr">637 </span>      <span class="Comment">// goal_square: 移動先の位置。</span>
+<span class="lnr">638 </span>      <span class="Type">void</span> ReplacePiece(square_t piece_square, square_t goal_square);
+<span class="lnr">639 </span>
+<span class="lnr">640 </span>      <span class="Comment">// ビショップの攻撃筋を作る。</span>
+<span class="lnr">641 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">642 </span>      <span class="Comment">// square: 位置。</span>
+<span class="lnr">643 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">644 </span>      <span class="Comment">// ビショップの攻撃筋。</span>
+<span class="lnr">645 </span>      bitboard_t GetBishopAttack(square_t square) <span class="Type">const</span> {
+<span class="lnr">646 </span>        <span class="Statement">return</span> ChessUtil::GetAttack45(square, blocker45_)
+<span class="lnr">647 </span>        | ChessUtil::GetAttack135(square, blocker135_);
+<span class="lnr">648 </span>      }
+<span class="lnr">649 </span>      <span class="Comment">// ルークの攻撃筋を作る。</span>
+<span class="lnr">650 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">651 </span>      <span class="Comment">// square: 位置。</span>
+<span class="lnr">652 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">653 </span>      <span class="Comment">// ルークの攻撃筋。</span>
+<span class="lnr">654 </span>      bitboard_t GetRookAttack(square_t square) <span class="Type">const</span> {
+<span class="lnr">655 </span>        <span class="Statement">return</span> ChessUtil::GetAttack0(square, blocker0_)
+<span class="lnr">656 </span>        | ChessUtil::GetAttack90(square, blocker90_);
+<span class="lnr">657 </span>      }
+<span class="lnr">658 </span>      <span class="Comment">// クイーンの攻撃筋を作る。</span>
+<span class="lnr">659 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">660 </span>      <span class="Comment">// square: 位置。</span>
+<span class="lnr">661 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">662 </span>      <span class="Comment">// クイーンの攻撃筋。</span>
+<span class="lnr">663 </span>      bitboard_t GetQueenAttack(square_t square) <span class="Type">const</span> {
+<span class="lnr">664 </span>        <span class="Statement">return</span> GetBishopAttack(square) | GetRookAttack(square);
+<span class="lnr">665 </span>      }
+<span class="lnr">666 </span>
+<span class="lnr">667 </span>      <span class="Comment">// キャスリングの権利を更新する。</span>
+<span class="lnr">668 </span>      <span class="Type">void</span> UpdateCastlingRights() {
+<span class="lnr">669 </span>        <span class="Comment">// 白キングがe1にいなければ白のキャスリングの権利を放棄。</span>
+<span class="lnr">670 </span>        <span class="Statement">if</span> (king_[WHITE] != E1) castling_rights_ &amp;= ~WHITE_CASTLING;
+<span class="lnr">671 </span>        <span class="Comment">// 黒キングがe8にいなければ黒のキャスリングの権利を放棄。</span>
+<span class="lnr">672 </span>        <span class="Statement">if</span> (king_[BLACK] != E8) castling_rights_ &amp;= ~BLACK_CASTLING;
+<span class="lnr">673 </span>
+<span class="lnr">674 </span>        <span class="Comment">// 白のルークがh1にいなければ白のショートキャスリングの権利を放棄。</span>
+<span class="lnr">675 </span>        <span class="Statement">if</span> (!(position_[WHITE][ROOK] &amp; ChessUtil::BIT[H1]))
+<span class="lnr">676 </span>          castling_rights_ &amp;= ~WHITE_SHORT_CASTLING;
+<span class="lnr">677 </span>        <span class="Comment">// 白のルークがa1にいなければ白のロングキャスリングの権利を放棄。</span>
+<span class="lnr">678 </span>        <span class="Statement">if</span> (!(position_[WHITE][ROOK] &amp; ChessUtil::BIT[A1]))
+<span class="lnr">679 </span>          castling_rights_ &amp;= ~WHITE_LONG_CASTLING;
+<span class="lnr">680 </span>
+<span class="lnr">681 </span>        <span class="Comment">// 黒のルークがh8にいなければ黒のショートキャスリングの権利を放棄。</span>
+<span class="lnr">682 </span>        <span class="Statement">if</span> (!(position_[BLACK][ROOK] &amp; ChessUtil::BIT[H8]))
+<span class="lnr">683 </span>          castling_rights_ &amp;= ~BLACK_SHORT_CASTLING;
+<span class="lnr">684 </span>        <span class="Comment">// 黒のルークがa8にいなければ黒のロングキャスリングの権利を放棄。</span>
+<span class="lnr">685 </span>        <span class="Statement">if</span> (!(position_[BLACK][ROOK] &amp; ChessUtil::BIT[A8]))
+<span class="lnr">686 </span>          castling_rights_ &amp;= ~BLACK_LONG_CASTLING;
+<span class="lnr">687 </span>      }
+<span class="lnr">688 </span>
+<span class="lnr">689 </span>      <span class="Comment">// その位置が攻撃されているかどうかチェックする。</span>
+<span class="lnr">690 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">691 </span>      <span class="Comment">// square: 調べたい位置。</span>
+<span class="lnr">692 </span>      <span class="Comment">// side: 攻撃側のサイド。</span>
+<span class="lnr">693 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">694 </span>      <span class="Comment">// 攻撃されていればtrue。</span>
+<span class="lnr">695 </span>      <span class="Type">bool</span> IsAttacked(square_t square, side_t side) <span class="Type">const</span>;
+<span class="lnr">696 </span>      <span class="Comment">// マテリアルを得る。</span>
+<span class="lnr">697 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">698 </span>      <span class="Comment">// side: マテリアルを得たいサイド。</span>
+<span class="lnr">699 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">700 </span>      <span class="Comment">// マテリアル。</span>
+<span class="lnr">701 </span>      <span class="Type">int</span> GetMaterial(side_t side) <span class="Type">const</span>;
+<span class="lnr">702 </span>      <span class="Comment">// 合法手があるかどうかチェックする。</span>
+<span class="lnr">703 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">704 </span>      <span class="Comment">// side: 調べたいサイド。</span>
+<span class="lnr">705 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">706 </span>      <span class="Comment">// 合法手があればtrue。</span>
+<span class="lnr">707 </span>      <span class="Type">bool</span> HasLegalMove(side_t side) <span class="Type">const</span>;
+<span class="lnr">708 </span>      <span class="Comment">// その位置を攻撃している駒のビットボードを得る。</span>
+<span class="lnr">709 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">710 </span>      <span class="Comment">// target_square: 攻撃されている位置。</span>
+<span class="lnr">711 </span>      <span class="Comment">// side: 攻撃側のサイド。</span>
+<span class="lnr">712 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">713 </span>      <span class="Comment">// 攻撃している駒のビットボード。</span>
+<span class="lnr">714 </span>      bitboard_t GetAttackers(square_t target_square, side_t side) <span class="Type">const</span>;
+<span class="lnr">715 </span>
+<span class="lnr">716 </span>      <span class="Comment">/*</span><span class="Comment">***************</span>
+<span class="lnr">717 </span><span class="Comment">       * メンバ変数。 *</span>
+<span class="lnr">718 </span><span class="Comment">       ***************</span><span class="Comment">*/</span>
+<span class="lnr">719 </span>      <span class="Comment">// 同期オブジェクト。</span>
+<span class="lnr">720 </span>      boost::mutex sync_;
+<span class="lnr">721 </span>      <span class="Comment">// 駒の配置のビットボードの配列。</span>
+<span class="lnr">722 </span>      bitboard_t position_[NUM_SIDES][NUM_PIECE_TYPES];
+<span class="lnr">723 </span>      <span class="Comment">// 駒の種類の配置。</span>
+<span class="lnr">724 </span>      piece_t piece_board_[NUM_SQUARES];
+<span class="lnr">725 </span>      <span class="Comment">// サイドの配置。</span>
+<span class="lnr">726 </span>      side_t side_board_[NUM_SQUARES];
+<span class="lnr">727 </span>      <span class="Comment">// 各サイドの駒の配置。</span>
+<span class="lnr">728 </span>      bitboard_t side_pieces_[NUM_SIDES];
+<span class="lnr">729 </span>      <span class="Comment">// ブロッカーの配置。</span>
+<span class="lnr">730 </span>      bitboard_t blocker0_;  <span class="Comment">// 角度0度。</span>
+<span class="lnr">731 </span>      bitboard_t blocker45_;  <span class="Comment">// 角度45度。</span>
+<span class="lnr">732 </span>      bitboard_t blocker90_;  <span class="Comment">// 角度90度。</span>
+<span class="lnr">733 </span>      bitboard_t blocker135_;  <span class="Comment">// 角度135度。</span>
+<span class="lnr">734 </span>      <span class="Comment">// キングの位置。</span>
+<span class="lnr">735 </span>      square_t king_[NUM_SIDES];
+<span class="lnr">736 </span>      <span class="Comment">// 手番。</span>
+<span class="lnr">737 </span>      side_t to_move_;
+<span class="lnr">738 </span>      <span class="Comment">// キャスリングの権利。</span>
+<span class="lnr">739 </span>      castling_t castling_rights_;
+<span class="lnr">740 </span>      <span class="Comment">// アンパッサンのターゲットの位置。</span>
+<span class="lnr">741 </span>      square_t en_passant_target_;
+<span class="lnr">742 </span>      <span class="Comment">// アンパッサンできるかどうか。</span>
+<span class="lnr">743 </span>      <span class="Type">bool</span> can_en_passant_;
+<span class="lnr">744 </span>      <span class="Comment">// キャスリングをしたかどうか。</span>
+<span class="lnr">745 </span>      <span class="Type">bool</span> has_white_castled_;  <span class="Comment">// 白。</span>
+<span class="lnr">746 </span>      <span class="Type">bool</span> has_black_castled_;  <span class="Comment">// 黒。</span>
+<span class="lnr">747 </span>      <span class="Comment">// ゲームの履歴。</span>
+<span class="lnr">748 </span>      std::vector&lt;GameRecord*&gt; history_;
+<span class="lnr">749 </span>      <span class="Comment">// 現在のゲームの履歴の位置。</span>
+<span class="lnr">750 </span>      <span class="Type">int</span> current_game_;
+<span class="lnr">751 </span>
+<span class="lnr">752 </span>      <span class="Comment">/*</span><span class="Comment">***************</span>
+<span class="lnr">753 </span><span class="Comment">       * 局面分析用。 *</span>
+<span class="lnr">754 </span><span class="Comment">       ***************</span><span class="Comment">*/</span>
+<span class="lnr">755 </span>      <span class="Comment">// ポーンの配置のテーブル。</span>
+<span class="lnr">756 </span>      <span class="Type">static</span> <span class="Type">const</span> <span class="Type">int</span> pawn_position_table_[NUM_SQUARES];
+<span class="lnr">757 </span>      <span class="Comment">// ナイトの配置のテーブル。</span>
+<span class="lnr">758 </span>      <span class="Type">static</span> <span class="Type">const</span> <span class="Type">int</span> knight_position_table_[NUM_SQUARES];
+<span class="lnr">759 </span>      <span class="Comment">// キングの中盤での配置のテーブル。</span>
+<span class="lnr">760 </span>      <span class="Type">static</span> <span class="Type">const</span> <span class="Type">int</span> king_position_table_middle_[NUM_SQUARES];
+<span class="lnr">761 </span>      <span class="Comment">// キングの終盤での配置のテーブル。</span>
+<span class="lnr">762 </span>      <span class="Type">static</span> <span class="Type">const</span> <span class="Type">int</span> king_position_table_ending_[NUM_SQUARES];
+<span class="lnr">763 </span>      <span class="Comment">// テーブルを計算する。</span>
+<span class="lnr">764 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">765 </span>      <span class="Comment">// table: 計算するテーブル。</span>
+<span class="lnr">766 </span>      <span class="Comment">// side: 計算したいサイド。</span>
+<span class="lnr">767 </span>      <span class="Comment">// bitboard: 位置のビットボード。</span>
+<span class="lnr">768 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">769 </span>      <span class="Comment">// テーブルを計算した結果の値。</span>
+<span class="lnr">770 </span>      <span class="Type">static</span> <span class="Type">int</span> GetTableValue(<span class="Type">const</span> <span class="Type">int</span> (&amp; table)[NUM_SQUARES], side_t side,
+<span class="lnr">771 </span>      bitboard_t bitboard);
+<span class="lnr">772 </span>
+<span class="lnr">773 </span>      <span class="Comment">// パスポーンを判定するときに使用するマスク。</span>
+<span class="lnr">774 </span>      <span class="Type">static</span> bitboard_t pass_pawn_mask_[NUM_SIDES][NUM_SQUARES];
+<span class="lnr">775 </span>      <span class="Comment">// pass_pawn_mask_[][]を初期化する。</span>
+<span class="lnr">776 </span>      <span class="Type">static</span> <span class="Type">void</span> InitPassPawnMask();
+<span class="lnr">777 </span>
+<span class="lnr">778 </span>      <span class="Comment">// 孤立ポーンを判定するときに使用するマスク。</span>
+<span class="lnr">779 </span>      <span class="Type">static</span> bitboard_t iso_pawn_mask_[NUM_SQUARES];
+<span class="lnr">780 </span>      <span class="Comment">// iso_pawn_mask_[]を初期化する。</span>
+<span class="lnr">781 </span>      <span class="Type">static</span> <span class="Type">void</span> InitIsoPawnMask();
+<span class="lnr">782 </span>
+<span class="lnr">783 </span>      <span class="Comment">// ポーン盾の位置のマスク。</span>
+<span class="lnr">784 </span>      <span class="Type">static</span> bitboard_t pawn_shield_mask_[NUM_SIDES][NUM_SQUARES];
+<span class="lnr">785 </span>      <span class="Comment">// pawn_shield_mask_[][]を初期化する。</span>
+<span class="lnr">786 </span>      <span class="Type">static</span> <span class="Type">void</span> InitPawnShieldMask();
+<span class="lnr">787 </span>
+<span class="lnr">788 </span>      <span class="Comment">/*</span><span class="Comment">***********************</span>
+<span class="lnr">789 </span><span class="Comment">       * 手を展開するツリー。 *</span>
+<span class="lnr">790 </span><span class="Comment">       ***********************</span><span class="Comment">*/</span>
+<span class="lnr">791 </span>      <span class="Comment">// ツリーの定数。</span>
+<span class="lnr">792 </span>      <span class="Type">enum</span> {
+<span class="lnr">793 </span>        TREE_SIZE = <span class="Constant">10000</span>,
+<span class="lnr">794 </span>        MAX_LEVEL = <span class="Constant">32</span>
+<span class="lnr">795 </span>      };
+<span class="lnr">796 </span>      <span class="Comment">// ノードの構造体。</span>
+<span class="lnr">797 </span>      <span class="Type">struct</span> Node {
+<span class="lnr">798 </span>        <span class="Statement">public</span>:
+<span class="lnr">799 </span>          move_t move_;
+<span class="lnr">800 </span>          <span class="Type">int</span> quick_score_;
+<span class="lnr">801 </span>      };
+<span class="lnr">802 </span>      <span class="Comment">// ツリー。</span>
+<span class="lnr">803 </span>      Node tree_[TREE_SIZE];
+<span class="lnr">804 </span>      <span class="Comment">// 各レベルのツリーへのポインタ。</span>
+<span class="lnr">805 </span>      Node* tree_ptr_[MAX_LEVEL];
+<span class="lnr">806 </span>      <span class="Comment">// 各レベルのスタックポインタ。</span>
+<span class="lnr">807 </span>      Node* stack_ptr_[MAX_LEVEL];
+<span class="lnr">808 </span>      <span class="Comment">// スタックにプッシュする。</span>
+<span class="lnr">809 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">810 </span>      <span class="Comment">// move: プッシュする手。</span>
+<span class="lnr">811 </span>      <span class="Comment">// level: プッシュするツリーのレベル。</span>
+<span class="lnr">812 </span>      <span class="Type">void</span> PushMove(move_t move, <span class="Type">int</span> level) {
+<span class="lnr">813 </span>        <span class="Statement">if</span> (stack_ptr_[level] &gt;= (&amp;tree_[TREE_SIZE - <span class="Constant">1</span>])) {
+<span class="lnr">814 </span>          <span class="Statement">return</span>;
+<span class="lnr">815 </span>        }
+<span class="lnr">816 </span>        stack_ptr_[level]-&gt;move_ = move;
+<span class="lnr">817 </span>        (stack_ptr_[level])++;
+<span class="lnr">818 </span>      }
+<span class="lnr">819 </span>      <span class="Comment">// スタックからポップする。</span>
+<span class="lnr">820 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">821 </span>      <span class="Comment">// level: ポップするツリーのレベル。</span>
+<span class="lnr">822 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">823 </span>      <span class="Comment">// ポップした手。</span>
+<span class="lnr">824 </span>      move_t PopMove(<span class="Type">int</span> level) {
+<span class="lnr">825 </span>        <span class="Comment">// スタックがないなら無意味な手を返す。</span>
+<span class="lnr">826 </span>        <span class="Statement">if</span> (stack_ptr_[level] == tree_ptr_[level]) {
+<span class="lnr">827 </span>          move_t move;
+<span class="lnr">828 </span>          move.all_ = <span class="Constant">0</span>;
+<span class="lnr">829 </span>          <span class="Statement">return</span> move;
+<span class="lnr">830 </span>        }
+<span class="lnr">831 </span>
+<span class="lnr">832 </span>        (stack_ptr_[level])--;
+<span class="lnr">833 </span>        <span class="Statement">return</span> stack_ptr_[level]-&gt;move_;
+<span class="lnr">834 </span>      }
+<span class="lnr">835 </span>      <span class="Comment">// スタックをクリアする。</span>
+<span class="lnr">836 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">837 </span>      <span class="Comment">// level: クリアするツリーのレベル。</span>
+<span class="lnr">838 </span>      <span class="Type">void</span> ClearMoves(<span class="Type">int</span> level) {
+<span class="lnr">839 </span>        stack_ptr_[level] = tree_ptr_[level];
+<span class="lnr">840 </span>      }
+<span class="lnr">841 </span>
+<span class="lnr">842 </span>      <span class="Comment">/*</span><span class="Comment">*********************</span>
+<span class="lnr">843 </span><span class="Comment">       * ハッシュキー関連。 *</span>
+<span class="lnr">844 </span><span class="Comment">       *********************</span><span class="Comment">*/</span>
+<span class="lnr">845 </span>      <span class="Comment">// ハッシュキーを得るための配列。</span>
+<span class="lnr">846 </span>      <span class="Comment">// 第1インデックスはサイド。</span>
+<span class="lnr">847 </span>      <span class="Comment">// 第2インデックスは駒の種類。</span>
+<span class="lnr">848 </span>      <span class="Comment">// 第3インデックスは駒の位置。</span>
+<span class="lnr">849 </span>      <span class="Comment">// それぞれのインデックスに値を入れると、</span>
+<span class="lnr">850 </span>      <span class="Comment">// そのハッシュキーを得られる。</span>
+<span class="lnr">851 </span>      <span class="Type">static</span> hash_key_t key_array_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
+<span class="lnr">852 </span>      <span class="Comment">// 乱数の種。</span>
+<span class="lnr">853 </span>      <span class="Type">static</span> hash_key_t seed_;
+<span class="lnr">854 </span>      <span class="Comment">// key_array_[][][]を初期化する。</span>
+<span class="lnr">855 </span>      <span class="Type">static</span> <span class="Type">void</span> InitKeyArray();
+<span class="lnr">856 </span>      <span class="Comment">// 64bit乱数を得る。</span>
+<span class="lnr">857 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">858 </span>      <span class="Comment">// 64bit乱数。</span>
+<span class="lnr">859 </span>      <span class="Type">static</span> hash_key_t GetRand() {
+<span class="lnr">860 </span>        seed_ = (seed_ * <span class="Constant">0x5d588b656c078965ULL</span>) + <span class="Constant">0x0000000000269ec3ULL</span>;
+<span class="lnr">861 </span>        <span class="Statement">return</span> seed_;
+<span class="lnr">862 </span>      }
+<span class="lnr">863 </span>      <span class="Comment">// 現在の局面と動かす手から次の局面のハッシュキーを得る。</span>
+<span class="lnr">864 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">865 </span>      <span class="Comment">// current_key: 現在のキー。</span>
+<span class="lnr">866 </span>      <span class="Comment">// move: 次の手。</span>
+<span class="lnr">867 </span>      <span class="Comment">// [戻り値]</span>
+<span class="lnr">868 </span>      <span class="Comment">// 次の局面のハッシュキー。</span>
+<span class="lnr">869 </span>      hash_key_t GetNextKey(hash_key_t current_key, move_t move) <span class="Type">const</span>;
+<span class="lnr">870 </span>
+<span class="lnr">871 </span>      <span class="Comment">/*</span><span class="Comment">******************</span>
+<span class="lnr">872 </span><span class="Comment">       * Pondering関連。 *</span>
+<span class="lnr">873 </span><span class="Comment">       ******************</span><span class="Comment">*/</span>
+<span class="lnr">874 </span>      <span class="Comment">// スレッド。</span>
+<span class="lnr">875 </span>      boost::thread* pondering_thread_ptr_;
+<span class="lnr">876 </span>      <span class="Comment">// スレッドの中止フラグ。</span>
+<span class="lnr">877 </span>      <span class="Type">bool</span> stop_pondering_flag_;
+<span class="lnr">878 </span>      <span class="Comment">// Ponderingの手を展開するバッファ。</span>
+<span class="lnr">879 </span>      move_t pondering_buffer_[<span class="Constant">200</span>];
+<span class="lnr">880 </span>      <span class="Comment">// Ponderingする。</span>
+<span class="lnr">881 </span>      <span class="Comment">// [引数]</span>
+<span class="lnr">882 </span>      <span class="Comment">// depth: Ponderingする深さ。</span>
+<span class="lnr">883 </span>      <span class="Comment">// table[inout]: 使用するトランスポジションテーブル。</span>
+<span class="lnr">884 </span>      <span class="Comment">// weights: 評価の重さ。</span>
+<span class="lnr">885 </span>      <span class="Type">void</span> Ponder(<span class="Type">int</span> depth, TranspositionTable&amp; table,
+<span class="lnr">886 </span>      <span class="Type">const</span> EvalWeights&amp; weights);
+<span class="lnr">887 </span>  };
+<span class="lnr">888 </span>}  <span class="Comment">// Misaki</span>
+<span class="lnr">889 </span>
+<span class="lnr">890 </span><span class="PreProc">#endif</span>
+</pre>
+</body>
+</html>
