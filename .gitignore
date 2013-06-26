@@ -1,2 +1,2 @@
-# build関連は無視する。
-build
+# buildディレクトリは無視する。
+build/
