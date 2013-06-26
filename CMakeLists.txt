@@ -61,7 +61,7 @@ add_custom_command(TARGET misaki POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory
     ${CMAKE_CURRENT_BINARY_DIR}/include/misaki)
 foreach(H_FILE ${HEADERS})
-    ADD_CUSTOM_COMMAND(TARGET misaki POST_BUILD
+    add_custom_command(TARGET misaki POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${H_FILE} ${CMAKE_CURRENT_BINARY_DIR}/include/misaki/)
 endforeach(H_FILE ${HEADERS})
