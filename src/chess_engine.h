@@ -20,8 +20,8 @@
    IN THE SOFTWARE.
  */
 
-#ifndef CHESS_BOARD_H
-#define CHESS_BOARD_H
+#ifndef CHESS_ENGINE_H
+#define CHESS_ENGINE_H
 
 #include <iostream>
 #include <vector>
