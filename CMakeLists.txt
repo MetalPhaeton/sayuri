@@ -56,6 +56,7 @@ set(CMAKE_LD_FLAGS_PROFILE "-lgmon -march=k8")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_executable(sayuri ${SRCS})
 target_link_libraries(sayuri ${Boost_LIBRARIES})
+target_link_libraries(sayuri pthread)
 add_dependencies(sayuri ${HEADERS})
 
 # CPackの設定。
