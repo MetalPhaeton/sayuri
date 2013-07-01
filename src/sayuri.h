@@ -20,8 +20,8 @@
    IN THE SOFTWARE.
  */
 
-#ifndef MISAKI_H
-#define MISAKI_H
+#ifndef SAYURI_H
+#define SAYURI_H
 
 #include <iostream>
 
