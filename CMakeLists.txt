@@ -1,5 +1,5 @@
 # CMakeLists.txt: CMake用設定ファイル。
-# Copyright (c) 2012 Ishibashi Hironori
+# Copyright (c) 2013 Ishibashi Hironori
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -25,7 +25,7 @@ set(CMAKE_CXX_COMPILER g++)
 cmake_minimum_required(VERSION 2.8)
 
 # プロジェクト名。
-project(MISAKI)
+project(SAYURI)
 
 # Boostの確認と設定。
 find_package(Boost COMPONENTS thread REQUIRED)
@@ -42,36 +42,26 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 # リリース用のコンパイラのオプション設定。
-set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -march=native")
-set(CMAKE_C_FLAGSE_RELEASE "-DNDEBUG -O3 -march=native")
+set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -march=k8")
+set(CMAKE_C_FLAGSE_RELEASE "-DNDEBUG -O3 -march=k8")
 
 # デバッグ用のコンパイラオプションの設定
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
-set(CMAKE_C_FLAGS_DEBUG "-O0 -g")
-set(CMAKE_CXX_FLAGS_PROFILE "-pg")
-set(CMAKE_C_FLAGS_PROFILE "-pg")
-set(CMAKE_LD_FLAGS_PROFILE "-lgmon")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -march=k8")
+set(CMAKE_C_FLAGS_DEBUG "-O0 -g -march=k8")
+set(CMAKE_CXX_FLAGS_PROFILE "-pg -march=k8")
+set(CMAKE_C_FLAGS_PROFILE "-pg -march=k8")
+set(CMAKE_LD_FLAGS_PROFILE "-lgmon -march=k8")
 
 # ビルド設定。
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-add_library(misaki STATIC ${SRCS})
-target_link_libraries(misaki ${Boost_LIBRARIES})
-add_dependencies(misaki ${HEADERS})
-add_custom_command(TARGET misaki POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-    ${CMAKE_CURRENT_BINARY_DIR}/include/misaki)
-foreach(H_FILE ${HEADERS})
-    add_custom_command(TARGET misaki POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${H_FILE} ${CMAKE_CURRENT_BINARY_DIR}/include/misaki/)
-endforeach(H_FILE ${HEADERS})
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/include")
+add_executable(sayuri ${SRCS})
+target_link_libraries(sayuri ${Boost_LIBRARIES})
+add_dependencies(sayuri ${HEADERS})
 
 # CPackの設定。
-set(CPACK_PACKAGE_VERSION_MAJOR 1)
-set(CPACK_PACKAGE_VERSION_MINOR 2)
-set(CPACK_PACKAGE_VERSION_PATCH 7)
+set(CPACK_PACKAGE_VERSION_MAJOR 0)
+set(CPACK_PACKAGE_VERSION_MINOR 0)
+set(CPACK_PACKAGE_VERSION_PATCH 0)
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "misaki-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 set(CPACK_SOURCE_IGNORE_FILES "/build/;/.git/;~$;${CPACK_SOURCE_IGNORE_FILES}")
 
