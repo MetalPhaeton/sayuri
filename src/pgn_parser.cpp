@@ -34,7 +34,7 @@
 
 #include "misaki_debug.h"
 
-namespace Misaki {
+namespace Sayuri {
   namespace {
     // トークンに分ける。
     // [引数]
@@ -428,4 +428,4 @@ namespace Misaki {
       }
     }
   }
-}  // Misaki
+}  // namespace Sayuri

@@ -33,7 +33,7 @@
 #include "move.h"
 #include "game_record.h"
 
-namespace Misaki {
+namespace Sayuri {
   /**************************
    * オープニングのクラス。 *
    **************************/
@@ -474,4 +474,4 @@ namespace Misaki {
 
     return move_list;
   }
-}  // Misaki
+}  // namespace Sayuri

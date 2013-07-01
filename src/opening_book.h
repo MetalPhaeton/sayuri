@@ -31,7 +31,7 @@
 #include "move.h"
 #include "game_record.h"
 
-namespace Misaki {
+namespace Sayuri {
   class OpeningBook;
   class Opening;
   class GameRecord;
@@ -239,6 +239,6 @@ namespace Misaki {
        ****************/
       std::vector<Opening> opening_vector_;
   };
-}  // Misaki
+}  // namespace Sayuri
 
 #endif

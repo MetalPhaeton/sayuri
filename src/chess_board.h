@@ -33,7 +33,7 @@
 #include "game_record.h"
 #include "transposition_table.h"
 
-namespace Misaki {
+namespace Sayuri {
   class ChessBoard;
   struct EvalWeights;
   class GameRecord;
@@ -885,6 +885,6 @@ namespace Misaki {
       void Ponder(int depth, TranspositionTable& table,
       const EvalWeights& weights);
   };
-}  // Misaki
+}  // namespace Sayuri
 
 #endif

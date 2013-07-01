@@ -26,7 +26,7 @@
 #include "chess_def.h"
 #include "chess_util.h"
 
-namespace Misaki {
+namespace Sayuri {
   /****************
    * 出力演算子。 *
    ****************/
@@ -120,4 +120,4 @@ namespace Misaki {
     }
     return *this;
   }
-}  // Misaki
+}  // namespace Sayuri

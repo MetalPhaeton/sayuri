@@ -28,7 +28,7 @@
 
 #include "misaki_debug.h"
 
-namespace Misaki {
+namespace Sayuri {
   // move_mask_を初期化する。
   move_t ChessBoard::move_mask_;
   void ChessBoard::InitMoveMask() {
@@ -939,4 +939,4 @@ namespace Misaki {
     // 返る。
     return top_node->move_;
   }
-}  // Misaki
+}  // namespace Sayuri

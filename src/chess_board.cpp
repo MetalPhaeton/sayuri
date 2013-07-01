@@ -34,7 +34,7 @@
 
 #include "misaki_debug.h"
 
-namespace Misaki {
+namespace Sayuri {
   /******************
    * テスト用関数。 *
    ******************/
@@ -1215,4 +1215,4 @@ namespace Misaki {
     // 次の局面のハッシュキーを返す。
     return current_key;
   }
-}  // Misaki
+}  // namespace Sayuri

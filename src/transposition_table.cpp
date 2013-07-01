@@ -29,7 +29,7 @@
 #include "chess_util.h"
 #include "chess_board.h"
 
-namespace Misaki {
+namespace Sayuri {
   /****************************************
    * トランスポジションテーブルのクラス。 *
    ****************************************/
@@ -133,4 +133,4 @@ namespace Misaki {
 
     return *this;
   }
-}  // Misaki
+}  // namespace Sayuri

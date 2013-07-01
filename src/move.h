@@ -27,7 +27,7 @@
 #include <vector>
 #include "chess_def.h"
 
-namespace Misaki {
+namespace Sayuri {
   class Move;
   class MoveList;
 
@@ -178,6 +178,6 @@ namespace Misaki {
       // 手のベクトル。
       std::vector<Move> move_vector_;
   };
-}  // Misaki
+}  // namespace Sayuri
 
 #endif

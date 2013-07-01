@@ -29,7 +29,7 @@
 
 #include "misaki_debug.h"
 
-namespace Misaki {
+namespace Sayuri {
   /********************
    * 探索に使う関数。 *
    ********************/
@@ -455,4 +455,4 @@ namespace Misaki {
     ClearMoves(level);
     return alpha;
   }
-}  // Misaki
+}  // namespace Sayuri

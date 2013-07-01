@@ -28,7 +28,7 @@
 #include "chess_util.h"
 #include "transposition_table.h"
 
-namespace Misaki {
+namespace Sayuri {
   // Ponderingする。
   void ChessBoard::Ponder(int depth, TranspositionTable& table,
   const EvalWeights& weights) {
@@ -108,4 +108,4 @@ namespace Misaki {
       self->pondering_thread_ptr_ = NULL;
     }
   }
-}  // Misaki
+}  // namespace Sayuri

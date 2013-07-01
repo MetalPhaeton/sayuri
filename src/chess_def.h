@@ -25,7 +25,7 @@
 
 #include <stdint.h>
 
-namespace Misaki {
+namespace Sayuri {
   // ビットボードの型。
   typedef uint64_t bitboard_t;
 
@@ -107,6 +107,6 @@ namespace Misaki {
 
   // ハッシュの型。
   typedef uint64_t hash_key_t;
-}  // Misaki
+}  // namespace Sayuri
 
 #endif

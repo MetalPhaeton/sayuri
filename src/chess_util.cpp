@@ -26,7 +26,7 @@
 #include "chess_def.h"
 #include "misaki_debug.h"
 
-namespace Misaki {
+namespace Sayuri {
   /************************
    * ビットボードの配列。 *
    ************************/
@@ -721,4 +721,4 @@ namespace Misaki {
       | GetLeftDownBitboard(point);
     }
   }
-}  // Misaki
+}  // namespace Sayuri

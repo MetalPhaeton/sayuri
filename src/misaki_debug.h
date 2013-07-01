@@ -25,7 +25,7 @@
 
 #include "chess_def.h"
 
-namespace Misaki {
+namespace Sayuri {
   // ビットボードを以下のように出力する。
   // (+)はビットが立っている場所。
   //  +---+---+---+---+---+---+---+---+
@@ -66,6 +66,6 @@ namespace Misaki {
   // [戻り値]
   // 計測した秒数。
   double GetTime();
-}  // Misaki
+}  // namespace Sayuri
 
 #endif

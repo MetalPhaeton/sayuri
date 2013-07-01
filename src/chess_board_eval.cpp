@@ -26,7 +26,7 @@
 #include "chess_def.h"
 #include "chess_util.h"
 
-namespace Misaki {
+namespace Sayuri {
   /************************
    * 局面を評価する関数。 *
    ************************/
@@ -448,4 +448,4 @@ namespace Misaki {
     int score = white_score - black_score;
     return side == WHITE ? score : -score;
   }
-}  // Misaki
+}  // namespace Sayuri

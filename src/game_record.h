@@ -27,7 +27,7 @@
 #include "chess_def.h"
 #include "chess_board.h"
 
-namespace Misaki {
+namespace Sayuri {
   class GameRecord;
   class ChessBoard;  // 相互依存。
 
@@ -151,6 +151,6 @@ namespace Misaki {
       // 局面のハッシュキー。
       hash_key_t key_;
   };
-}  // Misaki
+}  // namespace Sayuri
 
 #endif

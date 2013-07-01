@@ -31,7 +31,7 @@
 #include "chess_board.h"
 #include "move.h"
 
-namespace Misaki {
+namespace Sayuri {
   class PGNMove;
   class PGNMoveList;
   class PGNGameInfo;
@@ -430,6 +430,6 @@ namespace Misaki {
        ****************/
       std::vector<PGNGame*> game_ptr_vector_;
   };
-}  // Misaki
+}  // namespace Sayuri
 
 #endif

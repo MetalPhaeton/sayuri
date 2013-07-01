@@ -29,7 +29,7 @@
 #include "chess_def.h"
 #include "chess_util.h"
 
-namespace Misaki {
+namespace Sayuri {
   class TranspositionTable;
   class TranspositionTableSlotList;
   class TranspositionTableSlot;
@@ -324,6 +324,6 @@ namespace Misaki {
       // 現在のスロット数。
       int num_slots_;
   };
-}  // Misaki
+}  // namespace Sayuri
 
 #endif

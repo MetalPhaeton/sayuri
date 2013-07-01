@@ -28,12 +28,12 @@
 #include "chess_util.h"
 #include "chess_board.h"
 
-namespace Misaki {
+namespace Sayuri {
   // Misakiの初期化。
   inline void Init() {
     ChessUtil::InitChessUtil();
     ChessBoard::InitChessBoard();
   }
-}  // Misaki
+}  // namespace Sayuri
 
 #endif

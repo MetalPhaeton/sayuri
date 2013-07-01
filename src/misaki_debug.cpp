@@ -28,7 +28,7 @@
 #include "chess_def.h"
 #include "chess_util.h"
 
-namespace Misaki {
+namespace Sayuri {
   // ビットボードを出力する。
   void PrintBitboard(bitboard_t bitboard) {
     // 行間のボーダー。
@@ -218,4 +218,4 @@ namespace Misaki {
   double GetTime() {
     return std::difftime(end_time, start_time);
   }
-}  // Misaki
+}  // namespace Sayuri

@@ -26,7 +26,7 @@
 #include <iostream>
 #include "chess_def.h"
 
-namespace Misaki {
+namespace Sayuri {
   /********************************
    * チェスの便利ツールのクラス。 *
    ********************************/
@@ -533,6 +533,6 @@ namespace Misaki {
       // king_move_[]を初期化する。
       static void InitKingMove();
   };
-}  // Misaki
+}  // namespace Sayuri
 
 #endif

@@ -26,7 +26,7 @@
 #include "chess_def.h"
 #include "chess_util.h"
 
-namespace Misaki {
+namespace Sayuri {
   /************************
    * 局面を分析する関数。 *
    ************************/
@@ -433,4 +433,4 @@ namespace Misaki {
       }
     }
   }
-}  // Misaki
+}  // namespace Sayuri

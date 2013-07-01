@@ -26,7 +26,7 @@
 #include "chess_def.h"
 #include "chess_util.h"
 
-namespace Misaki {
+namespace Sayuri {
   /********************************
    * チェスの評価の重みの構造体。 *
    ********************************/
@@ -127,4 +127,4 @@ namespace Misaki {
     pawn_shield_weight_ = 30;  // ポーンの盾の重さ。
     canceled_castling_weight_ = -50;  // キャスリングの破棄の重さ。
   }
-}  // Misaki
+}  // namespace Sayuri

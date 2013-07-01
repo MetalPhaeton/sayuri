@@ -22,7 +22,7 @@
 
 #include "chess_def.h"
 
-namespace Misaki {
+namespace Sayuri {
   // キャスリングのフラグ。
   const castling_t WHITE_SHORT_CASTLING = 1;  // 白のショートキャスリング。
   const castling_t WHITE_LONG_CASTLING = 1 << 1;  // 白のロングキャスリング。
@@ -34,4 +34,4 @@ namespace Misaki {
   BLACK_SHORT_CASTLING | BLACK_LONG_CASTLING;  // 黒の全てのキャスリング。
   const castling_t ALL_CASTLING =
   WHITE_CASTLING | BLACK_CASTLING;  // 両方の全てのキャスリング。
-}  // Misaki
+}  // namespace Sayuri
