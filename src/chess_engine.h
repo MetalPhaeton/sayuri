@@ -1,4 +1,4 @@
-/* chess_board.h: チェスボード。
+/* chess_engine.h: チェスボード。
    Copyright (c) 2011 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy

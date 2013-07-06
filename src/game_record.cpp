@@ -20,7 +20,7 @@
    IN THE SOFTWARE.
  */
 
-#include "chess_board.h"
+#include "chess_engine.h"
 
 #include <iostream>
 #include <sstream>

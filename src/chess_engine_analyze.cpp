@@ -1,4 +1,4 @@
-/* chess_board_analyze.cpp: チェスボード分析用ツール。
+/* chess_engine_analyze.cpp: チェスボード分析用ツール。
    Copyright (c) 2011 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,7 +20,7 @@
    IN THE SOFTWARE.
  */
 
-#include "chess_board.h"
+#include "chess_engine.h"
 
 #include <iostream>
 #include "chess_def.h"

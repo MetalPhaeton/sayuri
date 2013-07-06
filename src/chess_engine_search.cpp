@@ -1,4 +1,4 @@
-/* chess_board_search.cpp: チェスボードの探索に関するもの。
+/* chess_engine_search.cpp: チェスボードの探索に関するもの。
    Copyright (c) 2011 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,7 +20,7 @@
    IN THE SOFTWARE.
  */
 
-#include "chess_board.h"
+#include "chess_engine.h"
 
 #include <iostream>
 #include "chess_def.h"

@@ -32,7 +32,7 @@
 #include "misaki_debug.h"
 #include "chess_def.h"
 #include "chess_util.h"
-#include "chess_board.h"
+#include "chess_engine.h"
 #include "move.h"
 #include "game_record.h"
 #include "transposition_table.h"

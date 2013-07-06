@@ -25,7 +25,7 @@
 
 #include <iostream>
 #include "chess_def.h"
-#include "chess_board.h"
+#include "chess_engine.h"
 
 namespace Sayuri {
   class GameRecord;

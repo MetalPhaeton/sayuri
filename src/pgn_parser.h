@@ -28,7 +28,7 @@
 #include <vector>
 #include "chess_def.h"
 #include "chess_util.h"
-#include "chess_board.h"
+#include "chess_engine.h"
 #include "move.h"
 
 namespace Sayuri {
