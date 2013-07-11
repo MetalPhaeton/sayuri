@@ -49,7 +49,7 @@ namespace Sayuri {
     bitboard_t point = 0x1ULL << 56;  // 調べるビットボードの位置。
     for (int i = 0; i < 8; i++) {
       // 行の文字列の配列を初期化。
-      std::memset(line, '\0', 35);
+      std::memset(line, '\0', sizeof(char) * 35);
       // 行番号を入れる。
       line[0] = line_num--;
       // 行番号の右側の境界を入れる。
@@ -89,10 +89,10 @@ namespace Sayuri {
   // 手を出力する。
   void PrintMove(move_t move) {
     // ファイルとランクの文字の配列。
-    static const char fyle_array[NUM_FYLES] = {
+    constexpr char fyle_array[NUM_FYLES] = {
       'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'
     };
-    static const char rank_array[NUM_RANKS] = {
+    constexpr char rank_array[NUM_RANKS] = {
       '1', '2', '3', '4', '5', '6', '7', '8'
     };
 
@@ -133,6 +133,9 @@ namespace Sayuri {
       case KING:
         std::cout << "King";
         break;
+      default:
+        Test(false);
+        break;
     }
     std::cout << std::endl;
 
@@ -156,6 +159,9 @@ namespace Sayuri {
         break;
       case KING:
         std::cout << "King";
+        break;
+      default:
+        Test(false);
         break;
     }
     std::cout << std::endl;
@@ -200,6 +206,9 @@ namespace Sayuri {
         break;
       case NULL_MOVE:
         std::cout << "Null Move";
+        break;
+      default:
+        Test(false);
         break;
     }
     std::cout << std::endl;
