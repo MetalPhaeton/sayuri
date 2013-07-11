@@ -42,8 +42,8 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 # リリース用のコンパイラのオプション設定。
-set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -O3 -march=k8")
-set(CMAKE_C_FLAGSE_RELEASE "-std=c++11 -O3 -march=k8")
+set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -g -O2 -march=k8")
+set(CMAKE_C_FLAGSE_RELEASE "-std=c++11 -g -O2 -march=k8")
 
 # デバッグ用のコンパイラオプションの設定
 set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -O0 -g -march=k8")
@@ -60,10 +60,7 @@ target_link_libraries(sayuri pthread)
 add_dependencies(sayuri ${HEADERS})
 
 # CPackの設定。
-set(CPACK_PACKAGE_VERSION_MAJOR 0)
-set(CPACK_PACKAGE_VERSION_MINOR 0)
-set(CPACK_PACKAGE_VERSION_PATCH 0)
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "misaki-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "sayuri-13.07_01")
 set(CPACK_SOURCE_IGNORE_FILES "/build/;/.git/;~$;${CPACK_SOURCE_IGNORE_FILES}")
 
 # CPackを実行。
