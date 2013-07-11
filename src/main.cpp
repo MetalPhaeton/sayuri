@@ -1,8 +1,9 @@
 #include <iostream>
-#include <utility>
-#include <cstdlib>
+
+#include "sayuri_debug.h"
+
+using namespace Sayuri;
 
 int main(int argc, char* argv[]) {
-  std::cout << "Hello World!" << std::endl;
-  return 0;
+  return DebugMain(argc, argv);
 }

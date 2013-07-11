@@ -29,6 +29,12 @@
 #include "chess_util.h"
 
 namespace Sayuri {
+  // デバッグ用メイン関数。
+  int DebugMain(int argc, char* argv[]) {
+    std::cout << "Hello" << std::endl;
+    return 0;
+  }
+
   // ビットボードを出力する。
   void PrintBitboard(bitboard_t bitboard) {
     // 行間のボーダー。

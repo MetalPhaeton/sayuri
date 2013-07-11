@@ -20,12 +20,36 @@
    IN THE SOFTWARE.
  */
 
-#ifndef MISAKI_DEBUG_H
-#define MISAKI_DEBUG_H
+#ifndef SAYURI_DEBUG_H
+#define SAYURI_DEBUG_H
+
+#include <iostream>
+#include <stdexcept>
+#include <string>
 
 #include "chess_def.h"
 
 namespace Sayuri {
+  // デバッグ用メイン関数。
+  int DebugMain(int argc, char* argv[]);
+
+  // Sayuriのエラークラス。
+  class SayuriError : public std::logic_error {
+    public:
+      SayuriError(const char* message) : std::logic_error(message) {}
+      SayuriError(const std::string message) : std::logic_error(message) {}
+  };
+
+  // 論理テスト。
+  // [引数]
+  // expr: 条件式。
+  // [例外]
+  // exprがfalseなら例外発生。
+  inline void Test(bool expr) {
+    if(expr) return;
+    throw SayuriError("テストに失敗しました。");
+  }
+
   // ビットボードを以下のように出力する。
   // (+)はビットが立っている場所。
   //  +---+---+---+---+---+---+---+---+
