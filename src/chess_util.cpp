@@ -24,7 +24,7 @@
 
 #include <iostream>
 #include "chess_def.h"
-#include "misaki_debug.h"
+#include "sayuri_debug.h"
 
 namespace Sayuri {
   /************************

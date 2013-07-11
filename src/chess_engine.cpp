@@ -32,7 +32,7 @@
 #include "move.h"
 #include "transposition_table.h"
 
-#include "misaki_debug.h"
+#include "sayuri_debug.h"
 
 namespace Sayuri {
   /******************

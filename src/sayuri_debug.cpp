@@ -1,4 +1,4 @@
-/* misaki_debug.h: Misakiをデバッグする。
+/* sayuri_debug.h: Misakiをデバッグする。
    Copyright (c) 2011 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,7 +20,7 @@
    IN THE SOFTWARE.
  */
 
-#include "misaki_debug.h"
+#include "sayuri_debug.h"
 
 #include <iostream>
 #include <cstring>

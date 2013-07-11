@@ -26,7 +26,7 @@
 #include "chess_def.h"
 #include "chess_util.h"
 
-#include "misaki_debug.h"
+#include "sayuri_debug.h"
 
 namespace Sayuri {
   // move_mask_を初期化する。

@@ -32,7 +32,7 @@
 #include "chess_engine.h"
 #include "move.h"
 
-#include "misaki_debug.h"
+#include "sayuri_debug.h"
 
 namespace Sayuri {
   namespace {

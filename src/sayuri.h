@@ -29,7 +29,7 @@
  * 各ヘッダのインクルード。 *
  ****************************/
 #include "init.h"
-#include "misaki_debug.h"
+#include "sayuri_debug.h"
 #include "chess_def.h"
 #include "chess_util.h"
 #include "chess_engine.h"
