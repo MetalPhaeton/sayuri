@@ -27,7 +27,7 @@
 
 namespace Sayuri {
   // ビットボードの型。
-  using Bitboard = uint64_t;
+  using Bitboard = std::uint64_t;
 
   // マスの型。
   using Square = unsigned int;
@@ -140,9 +140,10 @@ namespace Sayuri {
   constexpr int NUM_RANKS = 8;
   constexpr int NUM_SIDES = 3;
   constexpr int NUM_PIECE_TYPES = 7;
+  constexpr int INFINITE = 9999999;
 
   // キャスリングのフラグの型。
-  using Castling = uint8_t;
+  using Castling = std::uint8_t;
   // 白のショートキャスリング。
   constexpr Castling WHITE_SHORT_CASTLING = 1;
   // 白のロングキャスリング。
@@ -169,7 +170,7 @@ namespace Sayuri {
 
   // 手の型。
   union Move {
-    unsigned int all_ : 31;
+    std::uint32_t all_ : 31;
     struct {
       Square piece_square_ : 6;  // 駒の位置。
       Square goal_square_ : 6;  // 移動先の位置。
@@ -186,7 +187,7 @@ namespace Sayuri {
   };
 
   // ハッシュの型。
-  using HashKey = uint64_t;
+  using HashKey = std::uint64_t;
 }  // namespace Sayuri
 
 #endif

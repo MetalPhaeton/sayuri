@@ -27,6 +27,9 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <random>
+#include <ctime>
+#include <memory>
 
 #include "chess_def.h"
 
@@ -46,10 +49,10 @@ namespace Sayuri {
   // expr: 条件式。
   // [例外]
   // exprがfalseなら例外発生。
-  inline void Assert(bool expr) {
-    if(expr) return;
-    throw SayuriError("アサート失敗。");
-  }
+  void Assert(bool expr);
+
+  // 擬似ハッシュキー生成。
+  HashKey GenPseudoHashKey();
 
   // ビットボードを以下のように出力する。
   // (+)はビットが立っている場所。

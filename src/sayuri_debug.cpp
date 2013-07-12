@@ -24,16 +24,68 @@
 #include "sayuri_debug.h"
 
 #include <iostream>
+#include <utility>
+#include <cstdint>
 #include <cstring>
 #include <ctime>
+#include <memory>
 #include "chess_def.h"
 #include "chess_util.h"
 
+#include "sayuri.h"
+
 namespace Sayuri {
-  // デバッグ用メイン関数。
+  /**************************/
+  /* デバッグ用メイン関数。 */
+  /**************************/
+  // ================================================================
   int DebugMain(int argc, char* argv[]) {
-    std::cout << "Hello" << std::endl;
+    TranspositionTable* table = new TranspositionTable(30000000ULL);
+
+    HashKey pos_key = GenPseudoHashKey();
+    int level = 3;
+    int depth = 5;
+    Side to_move = WHITE;
+    int value = 200;
+    TTValueFlag value_flag = TTValueFlag::EXACT;
+    Move best_move;
+    best_move.piece_square_ = E2;
+    best_move.goal_square_ = E4;
+
+    table->Add(pos_key, level, depth, to_move, value, value_flag, best_move);
+
+    TTEntry* entry_ptr =
+    table->GetFulfiledEntry(pos_key, level, depth, to_move);
+
+    TranspositionTable* table2 = new TranspositionTable(std::move(*table));
+
+    TTEntry* entry_ptr2 =
+    table2->GetFulfiledEntry(pos_key, level, depth, to_move);
+
+    if(entry_ptr == entry_ptr2) {
+      std::cout << "True" << std::endl;
+    } else {
+      std::cout << "False" << std::endl;
+    }
+
+    delete table;
+    delete table2;
     return 0;
+  }
+  // ================================================================
+
+  // アサートする。
+  void Assert(bool expr) {
+    if(expr) return;
+    throw SayuriError("Sayuriエラー: アサート失敗。");
+  }
+
+  // 擬似ハッシュキー生成。
+  HashKey GenPseudoHashKey() {
+    int time = std::time(nullptr);
+    std::mt19937 engine(time);
+    std::uniform_int_distribution<HashKey> dist(0, 0xffffffffffffffffULL);
+    return dist(engine);
   }
 
   // ビットボードを出力する。

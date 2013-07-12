@@ -24,63 +24,65 @@
 #define TRANSPOSITION_TABLE_H
 
 #include <iostream>
-#include <list>
-#include <boost/thread.hpp>
+#include <vector>
+#include <memory>
+#include <cstdint>
 #include "chess_def.h"
 #include "chess_util.h"
 
-namespace Sayuri {
-  class TranspositionTable;
-  class TranspositionTableSlotList;
-  class TranspositionTableSlot;
+#include "sayuri_debug.h"
 
-  /**************************************************
-   * トランスポジションテーブルのスロットのクラス。 *
-   **************************************************/
-  class TranspositionTableSlot {
+namespace Sayuri {
+  /******************/
+  /* 評価値の種類。 */
+  /******************/
+  enum class TTValueFlag {
+    EXACT,  // 正確な評価値。
+    ALPHA,  // アルファ値。
+    BETA  // ベータ値。
+  };
+
+  /********************************************/
+  /* トランスポジションテーブルのエントリー。 */
+  /********************************************/
+  class TTEntry {
     public:
-      /****************************************
-       * コンストラクタとデストラクタと代入。 *
-       ****************************************/
+      /****************************************/
+      /* コンストラクタとデストラクタと代入。 */
+      /****************************************/
       // コンストラクタ。
       // [引数]
-      // key: ハッシュキー。
+      // pos_key: ポジションのハッシュキー。
       // level: レベル。
       // depth: 深さ。
       // to_move: 手番。
-      // upper_bound: 上限。
-      // lower_bound: 下限。
+      // value: 評価値。
+      // value_flag: 評価値の種類。
       // best_move: 最善手。
-      TranspositionTableSlot(HashKey key, int level, int depth,
-      Side to_move, int upper_bound, int lower_bound, Move best_move);
+      TTEntry(HashKey pos_key, int level, int depth,
+      Side to_move, int value, TTValueFlag value_flag, Move best_move);
+      // デフォルトコンストラクタ。
+      TTEntry();
       // コピーコンストラクタ。
-      // [引数]
-      // slot: コピーしたいスロット。
-      TranspositionTableSlot(const TranspositionTableSlot& slot);
+      TTEntry(const TTEntry& entry);
+      // ムーブコンストラクタ。
+      TTEntry(TTEntry&& entry);
       // デストラクタ。
-      virtual ~TranspositionTableSlot() {}
+      virtual ~TTEntry() {}
       // 代入。
-      TranspositionTableSlot& operator=(const TranspositionTableSlot& slot);
+      TTEntry& operator=(const TTEntry& entry);
+      TTEntry& operator=(TTEntry&& entry);
 
-      /************************
-       * ソート用比較演算子。 *
-       ************************/
-      bool operator==(const TranspositionTableSlot& slot) const {
-        return level_ == slot.level_;
-      }
-      bool operator!=(const TranspositionTableSlot& slot) const {
-        return level_ != slot.level_;
-      }
-      bool operator<(const TranspositionTableSlot& slot) const {
-        return level_ < slot.level_;
-      }
-      bool operator>(const TranspositionTableSlot& slot) const {
-        return level_ > slot.level_;
+      /************************/
+      /* ソート用比較演算子。 */
+      /************************/
+      static bool Compare(const TTEntry& first, const TTEntry& second) {
+        return first.level_ < second.level_;
       }
 
-      /**********
-       * 関数。 *
-       **********/
+      /**********/
+      /* 関数。 */
+      /**********/
       // ハッシュキーとレベルと深さと手番から
       // 同じポジションかどうか判定する。
       // [引数]
@@ -90,20 +92,13 @@ namespace Sayuri {
       // to_move: 手番。
       // [戻り値]
       // 同じならtrue。
-      bool Equals(HashKey key, int level, int depth,
-      Side to_move) const {
-        if (level < level_) return false;
-        if (depth > depth_) return false;
-        if (to_move != to_move_) return false;
-        if (key != key_) return false;
-        return true;
-      }
+      bool Fulfil(HashKey key, int level, int depth, Side to_move) const;
 
-      /**************
-       * アクセサ。 *
-       **************/
-      // 同期オブジェクト。
-      boost::mutex& sync() {return sync_;}
+      /**************/
+      /* アクセサ。 */
+      /**************/
+      // データがあるかどうか。
+      bool exists() const {return exists_;}
       // ハッシュキー。
       HashKey key() const {return key_;}
       // レベル。
@@ -112,29 +107,24 @@ namespace Sayuri {
       int depth() const {return depth_;}
       // 手番。
       Side to_move() const {return to_move_;}
-      // 上限。
-      int upper_bound() const {return upper_bound_;}
-      // 下限。
-      int lower_bound() const {return lower_bound_;}
+      // 評価値。
+      int value() const {return value_;}
+      // 評価値の種類。
+      TTValueFlag value_flag() const {return value_flag_;}
       // 最善手。
       Move best_move() const {return best_move_;}
 
-      /******************
-       * ミューテータ。 *
-       ******************/
-      // 上限。
-      void upper_bound(int upper_bound) {upper_bound_ = upper_bound;}
-      // 下限。
-      void lower_bound(int lower_bound) {lower_bound_ = lower_bound;}
-      // 最善手。
-      void best_move(Move best_move) {best_move_ = best_move;}
+      /****************/
+      /* デバッグ用。 */
+      /****************/
+      friend int DebugMain(int, char**);
 
     private:
-      /****************
-       * メンバ変数。 *
-       ****************/
-      // 同期オブジェクト。
-      boost::mutex sync_;
+      /****************/
+      /* メンバ変数。 */
+      /****************/
+      // データがあるかどうか。
+      bool exists_;
       // ハッシュキー。
       HashKey key_;
       // レベル。
@@ -143,186 +133,99 @@ namespace Sayuri {
       int depth_;
       // 手番。
       Side to_move_;
-      // 上限。
-      int upper_bound_;
-      // 下限。
-      int lower_bound_;
+      // 評価値。
+      int value_;
+      // 評価値の種類。
+      TTValueFlag value_flag_;
       // 最善手。
       Move best_move_;
   };
 
-  /********************************************************
-   * トランスポジションテーブルのスロットリストのクラス。 *
-   ********************************************************/
-  class TranspositionTableSlotList {
-    public:
-      /**********************************
-       * コンストラクタとデストラクタ。 *
-       **********************************/
-      TranspositionTableSlotList() {}
-      virtual ~TranspositionTableSlotList() {}
-
-      /**********
-       * 関数。 *
-       **********/
-      // リストのサイズを得る。
-      // [戻り値]
-      // リストのサイズ。
-      int GetSize() const {
-        return slot_list_.size();
-      }
-      // スロットを追加する。
-      // [引数]
-      // key: ハッシュキー。
-      // level: レベル。
-      // depth: 深さ。
-      // to_move: 手番。
-      // upper_bound: 上限。
-      // lower_bound: 下限。
-      // best_move: 最善手。
-      void Add(HashKey key, int level, int depth, Side to_move,
-      int upper_bound, int lower_bound, Move best_move) {
-        slot_list_.push_back(TranspositionTableSlot(key, level, depth,
-        to_move, upper_bound, lower_bound, best_move));
-        slot_list_.sort();
-      }
-      // スロットを削除する。
-      void DeleteOne() {
-        slot_list_.pop_back();
-      }
-      // 最も高いレベルを得る。
-      // [戻り値]
-      // 最も高いレベル。
-      int GetHighestLevel() const {
-        if (!slot_list_.size()) return 0;
-        return slot_list_.back().level();
-      }
-      // 同じポジションのスロットを得る。
-      // [引数]
-      // key: ハッシュキー。
-      // level: レベル。
-      // depth: 深さ。
-      // to_move: 手番。
-      // [戻り値]
-      // 同じポジションのスロット。
-      // [例外]
-      // bool: 見つからなければfalse。
-      TranspositionTableSlot& GetSameSlot(HashKey key, int level, int depth,
-      Side to_move) throw (bool);
-
-    private:
-      /******************
-       * コピーの禁止。 *
-       ******************/
-      TranspositionTableSlotList(const TranspositionTableSlotList&);  // 削除。
-      TranspositionTableSlotList&
-      operator=(const TranspositionTableSlotList&);  // 削除。
-
-      /****************
-       * メンバ変数。 *
-       ****************/
-      // スロットのリスト。
-      std::list<TranspositionTableSlot> slot_list_;
-  };
-
-  /****************************************
-   * トランスポジションテーブルのクラス。 *
-   ****************************************/
+  /****************************************/
+  /* トランスポジションテーブルのクラス。 */
+  /****************************************/
   class TranspositionTable {
-    private:
-      /****************
-       * 定数の定義。 *
-       ****************/
-      enum {
-        MAX_SIZE = 500000,
-        NUM_LISTS = 0x3ffff + 1
-      };
-
     public:
-      /**************************************
-       * インスタンスの生成とデストラクタ。 *
-       **************************************/
-      // インスタンスを生成する。
-      // [戻り値]
-      // トランスポジションテーブルのインスタンス。
-      static TranspositionTable* New() {
-        return new TranspositionTable();
-      }
+      // コンストラクタ。
+      // [引数]
+      // max_bytes: トランスポジションテーブルのサイズ指定。
+      TranspositionTable(std::uint64_t max_bytes);
+      // コピーコンストラクタ。
+      TranspositionTable(const TranspositionTable& table);
+      // ムーブコンストラクタ。
+      TranspositionTable(TranspositionTable&& table);
+      TranspositionTable() = delete;
+
       // デストラクタ。
       virtual ~TranspositionTable() {}
 
-      /**********
-       * 関数。 *
-       **********/
+      /**********/
+      /* 関数。 */
+      /**********/
       // テーブルに追加する。
       // [引数]
       // key: ハッシュキー。
       // level: レベル。
       // depth: 深さ。
       // to_move: 手番。
-      // upper_bound: 上限。
-      // lower_bound: 下限。
+      // value: 評価値。
+      // value_flag: 評価値の種類。
       // best_move: 最善手。
       void Add(HashKey key, int level, int depth, Side to_move,
-      int upper_bound, int lower_bound, Move best_move);
-      // 同じ配置のスロットを得る。
+      int value, TTValueFlag value_flag, Move best_move);
+      // 条件を満たすエントリーを得る。
       // [引数]
-      // key: ハッシュキー。
+      // pos_key: ハッシュキー。
       // level: レベル。
       // depth: 深さ。
       // to_move: 手番。
-      // [例外]
-      // bool: 見つからなければfalse。
-      TranspositionTableSlot& GetSameSlot(HashKey key, int level, int depth,
-      Side to_move) throw (bool){
-        // ロック。
-        boost::mutex::scoped_lock lock(sync_);
-
-        int index = GetTableIndex(key);
-        return table_[index].GetSameSlot(key, level, depth, to_move);
-      }
-      // テーブルのサイズを得る。
       // [戻り値]
-      // テーブルのサイズ。
-      int GetSize() const {return num_slots_;}
+      // 条件を満たすエントリー。
+      // なければnullptr。
+      TTEntry* GetFulfiledEntry(HashKey pos_key, int level, int depth,
+      Side to_move) const;
 
-    protected:
-      /********************
-       * コンストラクタ。 *
-       ********************/
-      TranspositionTable();
+      // 大きさが何バイトか返す。
+      // [戻り値]
+      // サイズをバイト数で返す。
+      std::uint64_t GetSizeBytes() const;
 
-      /**********************************
-       * アクセサ。派生クラスのみ公開。 *
-       **********************************/
-      // テーブル。
-      const TranspositionTableSlotList (& table() const)[NUM_LISTS] {
-        return table_;
-      }
+      // テーブルのサイズを最大値の何パーミルかを得る。
+      // [戻り値]
+      // 最大値中のパーミル。
+      double GetSizePermill() const;
+
+      /****************/
+      /* デバッグ用。 */
+      /****************/
+      friend int DebugMain(int, char**);
 
     private:
-      /******************
-       * コピーの禁止。 *
-       ******************/
-      TranspositionTable(const TranspositionTable&);  // 削除。
-      TranspositionTable& operator=(const TranspositionTable&);  // 削除。
+      /**********/
+      /* 定数。 */
+      /**********/
+      // ハッシュキーのテーブル用マスク。
+      static constexpr HashKey TABLE_KEY_MASK = 0Xffff;
+      // テーブルの大きさ。
+      static constexpr std::uint64_t TABLE_SIZE = TABLE_KEY_MASK + 1;
 
-      /**********************
-       * プライベート関数。 *
-       **********************/
-      int GetTableIndex(HashKey key) const {
-        return key & (NUM_LISTS - 1);
+      /**********************/
+      /* プライベート関数。 */
+      /**********************/
+      // テーブルのインデックスを得る。
+      // [引数]
+      // pos_key: ポジションのハッシュキー。
+      int GetTableIndex(HashKey pos_key) const {
+        return pos_key & (TABLE_KEY_MASK);
       }
 
-      /****************
-       * メンバ変数。 *
-       ****************/
-      // 同期オブジェクト。
-      boost::mutex sync_;
-      // ハッシュテーブル。
-      TranspositionTableSlotList table_[NUM_LISTS];
-      // 現在のスロット数。
-      int num_slots_;
+      /****************/
+      /* メンバ変数。 */
+      /****************/
+      // サイズの上限。
+      std::uint64_t max_bytes_;
+      // エントリーを登録するテーブル。
+      std::unique_ptr<std::vector<TTEntry>[]> entry_table_;
   };
 }  // namespace Sayuri
 

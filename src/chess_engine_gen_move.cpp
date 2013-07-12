@@ -866,38 +866,6 @@ namespace Sayuri {
 
     return value;
   }
-  // ノードに簡易点数を付ける。
-  void ChessEngine::GiveQuickScore(HashKey key, int level, int depth,
-  Side side, TranspositionTable& table) {
-    // 点数を付けるのノード。
-    Node* node = stack_ptr_[level] - 1;
-
-    // スロットがあればスロットの最善手を得る。
-    // 前回の探索は深さが1つ小さいのでdepthを1つ小さくする。
-    depth -= 1;
-    TranspositionTableSlot* slot = NULL;
-    try {
-      slot = &(table.GetSameSlot(key, level, depth, to_move_));
-    } catch (...) {
-      // 何もしない。
-    }
-    Move best_move;
-    best_move.all_ = 0;
-    if (slot) {
-      best_move = slot->best_move();
-    }
-
-    // SEEする。
-    for (; node >= tree_ptr_[level]; node--) {
-      if ((best_move.all_ != 0)
-      && ((node->move_.all_ & move_mask_.all_)
-      == (best_move.all_ & move_mask_.all_))) {
-        node->quick_score_ = INFINITE;
-      } else {
-        node->quick_score_ = SEE(node->move_);
-      }
-    }
-  }
   // 簡易点数の高いもの順にポップする。
   Move ChessEngine::PopBestMove(int level) {
     // もしレベルがマックスを越えていたら無意味な手を返す。。
