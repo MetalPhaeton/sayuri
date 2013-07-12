@@ -1,5 +1,6 @@
-/* chess_util.h: チェスの便利ツール。
-   Copyright (c) 2011 Ishibashi Hironori
+/*
+   chess_util.h: チェスの便利ツール。
+   Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -18,13 +19,17 @@
    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
    IN THE SOFTWARE.
- */
+*/
 
 #ifndef CHESS_UTIL_H
 #define CHESS_UTIL_H
 
 #include <iostream>
+#include "mylib.h"
+
 #include "chess_def.h"
+
+using namespace MyLib;
 
 namespace Sayuri {
   /********************************
@@ -58,21 +63,21 @@ namespace Sayuri {
       /************************
        * ビットボードの配列。 *
        ************************/
-      static const bitboard_t BIT[NUM_SQUARES];  // マスのビットボード。
-      static const bitboard_t FYLE[NUM_FYLES];  // ファイルのビットボード。
-      static const bitboard_t RANK[NUM_RANKS];  // ランクのビットボード。
+      static const Bitboard BIT[NUM_SQUARES];  // マスのビットボード。
+      static const Bitboard FYLE[NUM_FYLES];  // ファイルのビットボード。
+      static const Bitboard RANK[NUM_RANKS];  // ランクのビットボード。
 
       /**********************
        * 回転座標変換配列。 *
        **********************/
       // 変換。
-      static const square_t ROT45[NUM_SQUARES];  //  通常から左に45度。
-      static const square_t ROT90[NUM_SQUARES];  // 通常から左に90度。
-      static const square_t ROT135[NUM_SQUARES];  // 通常から左に135度。
+      static const Square ROT45[NUM_SQUARES];  //  通常から左に45度。
+      static const Square ROT90[NUM_SQUARES];  // 通常から左に90度。
+      static const Square ROT135[NUM_SQUARES];  // 通常から左に135度。
       // 逆変換。
-      static const square_t R_ROT45[NUM_SQUARES];  // 左に45度から通常へ。
-      static const square_t R_ROT90[NUM_SQUARES];  // 左に90度から通常へ。
-      static const square_t R_ROT135[NUM_SQUARES];  // 左に135度から通常へ。
+      static const Square R_ROT45[NUM_SQUARES];  // 左に45度から通常へ。
+      static const Square R_ROT90[NUM_SQUARES];  // 左に90度から通常へ。
+      static const Square R_ROT135[NUM_SQUARES];  // 左に135度から通常へ。
 
       /**************************************
        * 各種方向のビットボードを得る関数。 *
@@ -82,7 +87,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの右。
-      static bitboard_t GetRightBitboard(bitboard_t bitboard) {
+      static Bitboard GetRightBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~FYLE[FYLE_H];
 
@@ -93,7 +98,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの左。
-      static bitboard_t GetLeftBitboard(bitboard_t bitboard) {
+      static Bitboard GetLeftBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~FYLE[FYLE_A];
 
@@ -104,7 +109,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの上。
-      static bitboard_t GetUpBitboard(bitboard_t bitboard) {
+      static Bitboard GetUpBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~RANK[RANK_8];
 
@@ -115,7 +120,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの下。
-      static bitboard_t GetDownBitboard(bitboard_t bitboard) {
+      static Bitboard GetDownBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~RANK[RANK_1];
 
@@ -126,7 +131,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの右上。
-      static bitboard_t GetRightUpBitboard(bitboard_t bitboard) {
+      static Bitboard GetRightUpBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~(RANK[RANK_8] | FYLE[FYLE_H]);
 
@@ -137,7 +142,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの右下。
-      static bitboard_t GetRightDownBitboard(bitboard_t bitboard) {
+      static Bitboard GetRightDownBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~(RANK[RANK_1] | FYLE[FYLE_H]);
 
@@ -148,7 +153,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの左上。
-      static bitboard_t GetLeftUpBitboard(bitboard_t bitboard) {
+      static Bitboard GetLeftUpBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~(RANK[RANK_8] | FYLE[FYLE_A]);
 
@@ -159,7 +164,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの左下。
-      static bitboard_t GetLeftDownBitboard(bitboard_t bitboard) {
+      static Bitboard GetLeftDownBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~(RANK[RANK_1] | FYLE[FYLE_A]);
 
@@ -170,7 +175,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの右右上。
-      static bitboard_t GetRightRightUpBitboard(bitboard_t bitboard) {
+      static Bitboard GetRightRightUpBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~(RANK[RANK_8] | FYLE[FYLE_H] | FYLE[FYLE_G]);
 
@@ -181,7 +186,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの右上上。
-      static bitboard_t GetRightUpUpBitboard(bitboard_t bitboard) {
+      static Bitboard GetRightUpUpBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~(RANK[RANK_8] | RANK[RANK_7] | FYLE[FYLE_H]);
 
@@ -192,7 +197,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの右右下。
-      static bitboard_t GetRightRightDownBitboard(bitboard_t bitboard) {
+      static Bitboard GetRightRightDownBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~(RANK[RANK_1] | FYLE[FYLE_H] | FYLE[FYLE_G]);
 
@@ -203,7 +208,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの右下下。
-      static bitboard_t GetRightDownDownBitboard(bitboard_t bitboard) {
+      static Bitboard GetRightDownDownBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~(RANK[RANK_1] | RANK[RANK_2] | FYLE[FYLE_H]);
 
@@ -214,7 +219,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの左左上。
-      static bitboard_t GetLeftLeftUpBitboard(bitboard_t bitboard) {
+      static Bitboard GetLeftLeftUpBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~(RANK[RANK_8] | FYLE[FYLE_A] | FYLE[FYLE_B]);
 
@@ -225,7 +230,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの左上上。
-      static bitboard_t GetLeftUpUpBitboard(bitboard_t bitboard) {
+      static Bitboard GetLeftUpUpBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~(RANK[RANK_8] | RANK[RANK_7] | FYLE[FYLE_A]);
 
@@ -236,7 +241,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの左左下。
-      static bitboard_t GetLeftLeftDownBitboard(bitboard_t bitboard) {
+      static Bitboard GetLeftLeftDownBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~(RANK[RANK_1] | FYLE[FYLE_A] | FYLE[FYLE_B]);
 
@@ -247,7 +252,7 @@ namespace Sayuri {
       // bitboard: 対象のビットボード。
       // [戻り値]
       // 引数bitboardの左左下。
-      static bitboard_t GetLeftDownDownBitboard(bitboard_t bitboard) {
+      static Bitboard GetLeftDownDownBitboard(Bitboard bitboard) {
         // 移動すると盤外になるマスは削除。
         bitboard &= ~(RANK[RANK_1] | RANK[RANK_2] | FYLE[FYLE_A]);
 
@@ -263,7 +268,7 @@ namespace Sayuri {
       // blocker: 他の駒。0度の座標。
       // [戻り値]
       // 利き筋。
-      static bitboard_t GetAttack0(square_t square, bitboard_t blocker0) {
+      static Bitboard GetAttack0(Square square, Bitboard blocker0) {
         return attack_array0_[square]
         [(blocker0 >> magic_shift_v_[square]) & magic_mask_v_[square]];
       }
@@ -273,7 +278,7 @@ namespace Sayuri {
       // blocker: 他の駒。45度の座標。
       // [戻り値]
       // 利き筋。
-      static bitboard_t GetAttack45(square_t square, bitboard_t blocker45) {
+      static Bitboard GetAttack45(Square square, Bitboard blocker45) {
         return attack_array45_[square]
         [(blocker45 >> magic_shift_d_[ROT45[square]])
         & magic_mask_d_[ROT45[square]]];
@@ -284,7 +289,7 @@ namespace Sayuri {
       // blocker: 他の駒。90度の座標。
       // [戻り値]
       // 利き筋。
-      static bitboard_t GetAttack90(square_t square, bitboard_t blocker90) {
+      static Bitboard GetAttack90(Square square, Bitboard blocker90) {
         return attack_array90_[square]
         [(blocker90 >> magic_shift_v_[ROT90[square]])
         & magic_mask_v_[ROT90[square]]];
@@ -295,7 +300,7 @@ namespace Sayuri {
       // blocker: 他の駒。
       // [戻り値]
       // 利き筋。
-      static bitboard_t GetAttack135(square_t square, bitboard_t blocker135) {
+      static Bitboard GetAttack135(Square square, Bitboard blocker135) {
         return attack_array135_[square]
         [(blocker135 >> magic_shift_d_[ROT135[square]])
         & magic_mask_d_[ROT135[square]]];
@@ -311,7 +316,7 @@ namespace Sayuri {
       // point2: 端点2。
       // [戻り値]
       // point1からpoint2までの直線のビットボード。
-      static bitboard_t GetLine(square_t point1, square_t point2) {
+      static Bitboard GetLine(Square point1, Square point2) {
         return line_[point1][point2];
       }
       // ポーンの通常の動きを得る。
@@ -320,7 +325,7 @@ namespace Sayuri {
       // side: どちらのサイドの動きか。
       // [戻り値]
       // ポーンの通常の動きのビットボード。
-      static bitboard_t GetPawnMove(square_t square, side_t side) {
+      static Bitboard GetPawnMove(Square square, Side side) {
         return pawn_move_[side][square];
       }
       // ポーンの2歩の動きを得る。
@@ -329,7 +334,7 @@ namespace Sayuri {
       // side: どちらのサイドの動きか。
       // [戻り値]
       // ポーンの2歩の動きのビットボード。
-      static bitboard_t GetPawn2StepMove(square_t square, side_t side) {
+      static Bitboard GetPawn2StepMove(Square square, Side side) {
         return pawn_2step_move_[side][square];
       }
       // ポーンの攻撃の筋を得る。
@@ -338,7 +343,7 @@ namespace Sayuri {
       // side: どちらのサイドの動きか。
       // [戻り値]
       // ポーンの攻撃筋のビットボード。
-      static bitboard_t GetPawnAttack(square_t square, side_t side) {
+      static Bitboard GetPawnAttack(Square square, Side side) {
         return pawn_attack_[side][square];
       }
       // ナイトの動きを得る。
@@ -346,7 +351,7 @@ namespace Sayuri {
       // square: 位置。
       // [戻り値]
       // ナイトの動きのビットボード。
-      static bitboard_t GetKnightMove(square_t square) {
+      static Bitboard GetKnightMove(Square square) {
         return knight_move_[square];
       }
       // ビショップの動きを得る。
@@ -354,7 +359,7 @@ namespace Sayuri {
       // square: 位置。
       // [戻り値]
       // ビショップの動きのビットボード。
-      static bitboard_t GetBishopMove(square_t square) {
+      static Bitboard GetBishopMove(Square square) {
         return bishop_move_[square];
       }
       // ルークの動きを得る。
@@ -362,7 +367,7 @@ namespace Sayuri {
       // square: 位置。
       // [戻り値]
       // ルークの動きのビットボード。
-      static bitboard_t GetRookMove(square_t square) {
+      static Bitboard GetRookMove(Square square) {
         return rook_move_[square];
       }
       // クイーンの動きを得る。
@@ -370,7 +375,7 @@ namespace Sayuri {
       // square: 位置。
       // [戻り値]
       // クイーンの動きのビットボード。
-      static bitboard_t GetQueenMove(square_t square) {
+      static Bitboard GetQueenMove(Square square) {
         return bishop_move_[square] | rook_move_[square];
       }
       // キングの動きを得る。
@@ -378,7 +383,7 @@ namespace Sayuri {
       // square: 位置。
       // [戻り値]
       // キングの動きのビットボード。
-      static bitboard_t GetKingMove(square_t square) {
+      static Bitboard GetKingMove(Square square) {
         return king_move_[square];
       }
 
@@ -390,7 +395,7 @@ namespace Sayuri {
       // bitboard: ビットを数えたいビットボード。
       // [戻り値]
       // 立っているビットの個数。
-      static int CountBits(bitboard_t bitboard) {
+      static int CountBits(Bitboard bitboard) {
         return num_bit16_array_[bitboard & 0xffff]
         + num_bit16_array_[(bitboard >> 16) & 0xffff]
         + num_bit16_array_[(bitboard >> 32) & 0xffff]
@@ -401,7 +406,7 @@ namespace Sayuri {
       // bitboard: ゼロを数えたいビットボード。
       // [戻り値]
       // 下位のゼロビットの個数。
-      static int CountZero(bitboard_t bitboard) {
+      static int CountZero(Bitboard bitboard) {
         return CountBits((bitboard & (-bitboard)) - 1);
       }
       // ビットボードからマスの位置を得る。
@@ -409,24 +414,24 @@ namespace Sayuri {
       // bitboard: マスの位置を得たいビットボード。
       // [戻り値]
       // マスの位置。
-      static square_t GetSquare(bitboard_t bitboard) {
-        return static_cast<square_t>(CountZero(bitboard));
+      static Square GetSquare(Bitboard bitboard) {
+        return CountZero(bitboard);
       }
       // マスの位置からファイルを得る。
       // [引数]
       // square: 位置。
       // [戻り値]
       // その位置のファイル。
-      static fyle_t GetFyle(square_t square) {
-        return static_cast<fyle_t>(square & 0x7);
+      static Fyle GetFyle(Square square) {
+        return square & 0x7;
       }
       // マスの位置からランクを得る。
       // [引数]
       // square: 位置。
       // [戻り値]
       // その位置のランク。
-      static rank_t GetRank(square_t square) {
-        return static_cast<rank_t>(square >> 3);
+      static Rank GetRank(Square square) {
+        return square >> 3;
       }
 
     private:
@@ -464,18 +469,18 @@ namespace Sayuri {
       // マジックのシフト。45度と135度用。
       static const int magic_shift_d_[NUM_SQUARES];
       // マジックのマスク。0度と90度用。
-      static const bitboard_t magic_mask_v_[NUM_SQUARES];
+      static const Bitboard magic_mask_v_[NUM_SQUARES];
       // マジックのマスク。45度と135度用。
-      static const bitboard_t magic_mask_d_[NUM_SQUARES];
+      static const Bitboard magic_mask_d_[NUM_SQUARES];
       // 各方向への攻撃の配列。
       enum {
         // ブロッカーのパターン。
         BLOCKER_MAP = 0xff + 1
       };
-      static bitboard_t attack_array0_[NUM_SQUARES][BLOCKER_MAP];  // 0度。
-      static bitboard_t attack_array45_[NUM_SQUARES][BLOCKER_MAP];  // 45度。
-      static bitboard_t attack_array90_[NUM_SQUARES][BLOCKER_MAP];  // 90度。
-      static bitboard_t attack_array135_[NUM_SQUARES][BLOCKER_MAP];  // 135度。
+      static Bitboard attack_array0_[NUM_SQUARES][BLOCKER_MAP];  // 0度。
+      static Bitboard attack_array45_[NUM_SQUARES][BLOCKER_MAP];  // 45度。
+      static Bitboard attack_array90_[NUM_SQUARES][BLOCKER_MAP];  // 90度。
+      static Bitboard attack_array135_[NUM_SQUARES][BLOCKER_MAP];  // 135度。
       // attack_array***_[][]を初期化する。
       static void InitAttackArray();
       // 45度座標のビットボードを通常の座標に戻す。
@@ -483,39 +488,39 @@ namespace Sayuri {
       // bitboard45: 45度座標のビットボード。
       // [戻り値]
       // 通常の座標のビットボード。
-      static bitboard_t Reverse45(bitboard_t bitboard45);
+      static Bitboard Reverse45(Bitboard bitboard45);
       // 90度座標のビットボードを通常の座標に戻す。
       // [引数]
       // bitboard90: 90度座標のビットボード。
       // [戻り値]
       // 通常の座標のビットボード。
-      static bitboard_t Reverse90(bitboard_t bitboard90);
+      static Bitboard Reverse90(Bitboard bitboard90);
       // 135度座標のビットボードを通常の座標に戻す。
       // [引数]
       // bitboard135: 135度座標のビットボード。
       // [戻り値]
       // 通常の座標のビットボード。
-      static bitboard_t Reverse135(bitboard_t bitboard135);
+      static Bitboard Reverse135(Bitboard bitboard135);
 
       /************************
        * ビットボードの配列。 *
        ************************/
       // 直線の入った配列。
-      static bitboard_t line_[NUM_SQUARES][NUM_SQUARES];
+      static Bitboard line_[NUM_SQUARES][NUM_SQUARES];
       // ポーンの通常の動きの配列。
-      static bitboard_t pawn_move_[NUM_SIDES][NUM_SQUARES];
+      static Bitboard pawn_move_[NUM_SIDES][NUM_SQUARES];
       // ポーンの2歩の動きの配列。
-      static bitboard_t pawn_2step_move_[NUM_SIDES][NUM_SQUARES];
+      static Bitboard pawn_2step_move_[NUM_SIDES][NUM_SQUARES];
       // ポーンの攻撃筋の配列。
-      static bitboard_t pawn_attack_[NUM_SIDES][NUM_SQUARES];
+      static Bitboard pawn_attack_[NUM_SIDES][NUM_SQUARES];
       // ナイトの動きの配列。
-      static bitboard_t knight_move_[NUM_SQUARES];
+      static Bitboard knight_move_[NUM_SQUARES];
       // ビショップの動きの配列。
-      static bitboard_t bishop_move_[NUM_SQUARES];
+      static Bitboard bishop_move_[NUM_SQUARES];
       // ルークの動きの配列。
-      static bitboard_t rook_move_[NUM_SQUARES];
+      static Bitboard rook_move_[NUM_SQUARES];
       // キングの動きの配列。
-      static bitboard_t king_move_[NUM_SQUARES];
+      static Bitboard king_move_[NUM_SQUARES];
       // line_[][]を初期化する。
       static void InitLine();
       // pawn_move_[][]を初期化する。

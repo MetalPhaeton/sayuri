@@ -1,5 +1,6 @@
-/* chess_util.cpp: チェスの便利ツール。
-   Copyright (c) 2011 Ishibashi Hironori
+/*
+   chess_util.cpp: チェスの便利ツール。
+   Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -18,7 +19,7 @@
    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
    IN THE SOFTWARE.
- */
+*/
 
 #include "chess_util.h"
 
@@ -31,7 +32,7 @@ namespace Sayuri {
    * ビットボードの配列。 *
    ************************/
   // ビットボードの配列。
-  const bitboard_t ChessUtil::BIT[NUM_SQUARES] = {
+  const Bitboard ChessUtil::BIT[NUM_SQUARES] = {
     0x1ULL, 0x1ULL << 1, 0x1ULL << 2, 0x1ULL << 3,
     0x1ULL << 4, 0x1ULL << 5, 0x1ULL << 6, 0x1ULL << 7,
     0x1ULL << 8, 0x1ULL << 9, 0x1ULL << 10, 0x1ULL << 11,
@@ -50,7 +51,7 @@ namespace Sayuri {
     0x1ULL << 60, 0x1ULL << 61, 0x1ULL << 62, 0x1ULL << 63
   };
   // ファイルのビットボードの配列。
-  const bitboard_t ChessUtil::FYLE[NUM_FYLES] = {
+  const Bitboard ChessUtil::FYLE[NUM_FYLES] = {
     0x0101010101010101ULL,
     0x0101010101010101ULL << 1,
     0x0101010101010101ULL << 2,
@@ -61,7 +62,7 @@ namespace Sayuri {
     0x0101010101010101ULL << 7
   };
   // ランクのビットボードの配列。
-  const bitboard_t ChessUtil::RANK[NUM_RANKS] = {
+  const Bitboard ChessUtil::RANK[NUM_RANKS] = {
     0xffULL,
     0xffULL << (1 * 8),
     0xffULL << (2 * 8),
@@ -76,7 +77,7 @@ namespace Sayuri {
    * 回転座標変換配列。 *
    **********************/
   // 通常から左に45度。
-  const square_t ChessUtil::ROT45[NUM_SQUARES] = {
+  const Square ChessUtil::ROT45[NUM_SQUARES] = {
     E4, F3, H2, C2, G1, D1, B1, A1,
     E5, F4, G3, A3, D2, H1, E1, C1,
     D6, F5, G4, H3, B3, E2, A2, F1,
@@ -87,7 +88,7 @@ namespace Sayuri {
     H8, G8, E8, B8, F7, A7, C6, D5
   };
   // 通常から左に90度。
-  const square_t ChessUtil::ROT90[NUM_SQUARES] = {
+  const Square ChessUtil::ROT90[NUM_SQUARES] = {
     H1, H2, H3, H4, H5, H6, H7, H8,
     G1, G2, G3, G4, G5, G6, G7, G8,
     F1, F2, F3, F4, F5, F6, F7, F8,
@@ -98,7 +99,7 @@ namespace Sayuri {
     A1, A2, A3, A4, A5, A6, A7, A8
   };
   // 通常から左に135度。
-  const square_t ChessUtil::ROT135[NUM_SQUARES] = {
+  const Square ChessUtil::ROT135[NUM_SQUARES] = {
     A1, C1, F1, B2, G2, E3, D4, D5,
     B1, E1, A2, F2, D3, C4, C5, C6,
     D1, H1, E2, C3, B4, B5, B6, A7,
@@ -110,7 +111,7 @@ namespace Sayuri {
   };
   // 逆変換。
   // 左に45度から通常へ。
-  const square_t ChessUtil::R_ROT45[NUM_SQUARES] = {
+  const Square ChessUtil::R_ROT45[NUM_SQUARES] = {
     H1,
     G1, H2,
     F1, G2, H3,
@@ -128,7 +129,7 @@ namespace Sayuri {
     A8
   };
   // 左に90度から通常へ。
-  const square_t ChessUtil::R_ROT90[NUM_SQUARES] = {
+  const Square ChessUtil::R_ROT90[NUM_SQUARES] = {
     A8, A7, A6, A5, A4, A3, A2, A1,
     B8, B7, B6, B5, B4, B3, B2, B1,
     C8, C7, C6, C5, C4, C3, C2, C1,
@@ -139,7 +140,7 @@ namespace Sayuri {
     H8, H7, H6, H5, H4, H3, H2, H1
   };
   // 左に135度から通常へ。
-  const square_t ChessUtil::R_ROT135[NUM_SQUARES] = {
+  const Square ChessUtil::R_ROT135[NUM_SQUARES] = {
     A1,
     A2, B1,
     A3, B2, C1,
@@ -214,7 +215,7 @@ namespace Sayuri {
   };
   // マジックのマスク。
   // 0度と90度用。
-  const bitboard_t ChessUtil::magic_mask_v_[NUM_SQUARES] = {
+  const Bitboard ChessUtil::magic_mask_v_[NUM_SQUARES] = {
     0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
     0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
     0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
@@ -225,7 +226,7 @@ namespace Sayuri {
     0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL
   };
   // 45度と135度用。
-  const bitboard_t ChessUtil::magic_mask_d_[NUM_SQUARES] = {
+  const Bitboard ChessUtil::magic_mask_d_[NUM_SQUARES] = {
     0x1ULL,
     0x3ULL, 0x3ULL,
     0x7ULL, 0x7ULL, 0x7ULL,
@@ -243,20 +244,20 @@ namespace Sayuri {
     0x1ULL
   };
   // 各方向の攻撃の配列。
-  bitboard_t ChessUtil::attack_array0_[NUM_SQUARES][BLOCKER_MAP];  // 0度。
-  bitboard_t ChessUtil::attack_array45_[NUM_SQUARES][BLOCKER_MAP];  // 45度。
-  bitboard_t ChessUtil::attack_array90_[NUM_SQUARES][BLOCKER_MAP];  // 90度。
-  bitboard_t ChessUtil::attack_array135_[NUM_SQUARES][BLOCKER_MAP];  // 135度。
+  Bitboard ChessUtil::attack_array0_[NUM_SQUARES][BLOCKER_MAP];  // 0度。
+  Bitboard ChessUtil::attack_array45_[NUM_SQUARES][BLOCKER_MAP];  // 45度。
+  Bitboard ChessUtil::attack_array90_[NUM_SQUARES][BLOCKER_MAP];  // 90度。
+  Bitboard ChessUtil::attack_array135_[NUM_SQUARES][BLOCKER_MAP];  // 135度。
   // attack_array***_[][]を初期化する。
   void ChessUtil::InitAttackArray() {
     // 位置のビットボード。
-    bitboard_t point;
+    Bitboard point;
 
     // 利き筋を入れるビットボード。
-    bitboard_t attack;
+    Bitboard attack;
 
     // 障害物を入れるビットボード。
-    bitboard_t temp;
+    Bitboard temp;
 
     // 0度のマップを作成。
     for (int square = 0; square < NUM_SQUARES; square++) {
@@ -370,17 +371,17 @@ namespace Sayuri {
     }
   }
   // 45度座標のビットボードを通常の座標に戻す。
-  bitboard_t ChessUtil::Reverse45(bitboard_t bitboard45) {
+  Bitboard ChessUtil::Reverse45(Bitboard bitboard45) {
     // 通常座標のビットボード。
-    bitboard_t bitboard = 0;
+    Bitboard bitboard = 0;
 
     // 45度座標の位置。
-    square_t square45;
+    Square square45;
 
     // 通常座標に変換する。
     for (;bitboard45; bitboard45 &= bitboard45 - 1) {
       // 45度座標の位置を得る。
-      square45 = static_cast<square_t>(CountZero(bitboard45));
+      square45 = CountZero(bitboard45);
       // 変換して追加。
       bitboard |= BIT[R_ROT45[square45]];
     }
@@ -389,17 +390,17 @@ namespace Sayuri {
     return bitboard;
   }
   // 90度座標のビットボードを通常の座標に戻す。
-  bitboard_t ChessUtil::Reverse90(bitboard_t bitboard90) {
+  Bitboard ChessUtil::Reverse90(Bitboard bitboard90) {
     // 通常座標のビットボード。
-    bitboard_t bitboard = 0;
+    Bitboard bitboard = 0;
 
     // 90度座標の位置。
-    square_t square90;
+    Square square90;
 
     // 通常座標に変換する。
     for (;bitboard90; bitboard90 &= bitboard90 - 1) {
       // 90度座標の位置を得る。
-      square90 = static_cast<square_t>(CountZero(bitboard90));
+      square90 = CountZero(bitboard90);
       // 変換して追加。
       bitboard |= BIT[R_ROT90[square90]];
     }
@@ -408,17 +409,17 @@ namespace Sayuri {
     return bitboard;
   }
   // 135度座標のビットボードを通常の座標に戻す。
-  bitboard_t ChessUtil::Reverse135(bitboard_t bitboard135) {
+  Bitboard ChessUtil::Reverse135(Bitboard bitboard135) {
     // 通常座標のビットボード。
-    bitboard_t bitboard = 0;
+    Bitboard bitboard = 0;
 
     // 135度座標の位置。
-    square_t square135;
+    Square square135;
 
     // 通常座標に変換する。
     for (;bitboard135; bitboard135 &= bitboard135 - 1) {
       // 135度座標の位置を得る。
-      square135 = static_cast<square_t>(CountZero(bitboard135));
+      square135 = CountZero(bitboard135);
       // 変換して追加。
       bitboard |= BIT[R_ROT135[square135]];
     }
@@ -431,30 +432,30 @@ namespace Sayuri {
    * ビットボードの配列。 *
    ************************/
   // 直線の入った配列。
-  bitboard_t ChessUtil::line_[NUM_SQUARES][NUM_SQUARES];
+  Bitboard ChessUtil::line_[NUM_SQUARES][NUM_SQUARES];
   // ポーンの通常の動きの配列。
-  bitboard_t ChessUtil::pawn_move_[NUM_SIDES][NUM_SQUARES];
+  Bitboard ChessUtil::pawn_move_[NUM_SIDES][NUM_SQUARES];
   // ポーンの2歩の動きの配列。
-  bitboard_t ChessUtil::pawn_2step_move_[NUM_SIDES][NUM_SQUARES];
+  Bitboard ChessUtil::pawn_2step_move_[NUM_SIDES][NUM_SQUARES];
   // ポーンの攻撃筋の配列。
-  bitboard_t ChessUtil::pawn_attack_[NUM_SIDES][NUM_SQUARES];
+  Bitboard ChessUtil::pawn_attack_[NUM_SIDES][NUM_SQUARES];
   // ナイトの動きの配列。
-  bitboard_t ChessUtil::knight_move_[NUM_SQUARES];
+  Bitboard ChessUtil::knight_move_[NUM_SQUARES];
   // ビショップの動きの配列。
-  bitboard_t ChessUtil::bishop_move_[NUM_SQUARES];
+  Bitboard ChessUtil::bishop_move_[NUM_SQUARES];
   // ルークの動きの配列。
-  bitboard_t ChessUtil::rook_move_[NUM_SQUARES];
+  Bitboard ChessUtil::rook_move_[NUM_SQUARES];
   // キングの動きの配列。
-  bitboard_t ChessUtil::king_move_[NUM_SQUARES];
+  Bitboard ChessUtil::king_move_[NUM_SQUARES];
   // line_[][]を初期化する。
   void ChessUtil::InitLine() {
     // 端点のビットボード。
-    bitboard_t point1;
-    bitboard_t point2;
+    Bitboard point1;
+    Bitboard point2;
     // 端点間のビットボード。
-    bitboard_t between;
+    Bitboard between;
     // 調べるビットボード。
-    bitboard_t temp;
+    Bitboard temp;
 
     // line_を作る。
     for (int square1 = 0; square1 < NUM_SQUARES; square1++) {
@@ -557,7 +558,7 @@ namespace Sayuri {
   // pawn_move_[][]を初期化する。
   void ChessUtil::InitPawnMove() {
     // 位置を入れるビットボード。
-    bitboard_t point;
+    Bitboard point;
 
     // ポーンの動きを作る。
     for (int square = 0; square < NUM_SQUARES; square++) {
@@ -573,7 +574,7 @@ namespace Sayuri {
   // pawn_2step_move_[][]を初期化する。
   void ChessUtil::InitPawn2StepMove() {
     // 位置を入れるビットボード。
-    bitboard_t point;
+    Bitboard point;
 
     // ポーンの2歩の動きを作る。
     for (int square = 0; square < NUM_SQUARES; square++) {
@@ -598,7 +599,7 @@ namespace Sayuri {
   // pawn_attack_[][]を初期化する。
   void ChessUtil::InitPawnAttack() {
     // 位置を入れるビットボード。
-    bitboard_t point;
+    Bitboard point;
 
     // 攻撃筋を入れる。
     for (int square = 0; square < NUM_SQUARES; square++) {
@@ -617,7 +618,7 @@ namespace Sayuri {
   // knight_move_[]を初期化する。
   void ChessUtil::InitKnightMove() {
     // 位置を入れるビットボード。
-    bitboard_t point;
+    Bitboard point;
 
     // 動きを入れる。
     for (int square = 0; square < NUM_SQUARES; square++) {
@@ -636,9 +637,9 @@ namespace Sayuri {
   // bishop_move_[]を初期化する。
   void ChessUtil::InitBishopMove() {
     // 位置を入れるビットボード。
-    bitboard_t point;
+    Bitboard point;
     // 動きを調べるビットボード。
-    bitboard_t temp;
+    Bitboard temp;
 
     // 動きを入れる。
     for (int square = 0; square < NUM_SQUARES; square++) {
@@ -670,9 +671,9 @@ namespace Sayuri {
   // rook_move_[]を初期化する。
   void ChessUtil::InitRookMove() {
     // 位置を入れるビットボード。
-    bitboard_t point;
+    Bitboard point;
     // 動きを調べるビットボード。
-    bitboard_t temp;
+    Bitboard temp;
 
     // 動きを入れる。
     for (int square = 0; square < NUM_SQUARES; square++) {
@@ -704,7 +705,7 @@ namespace Sayuri {
   // king_move_[]を初期化する。
   void ChessUtil::InitKingMove() {
     // 位置のビットボード。
-    bitboard_t point;
+    Bitboard point;
 
     // 動きを入れる。
     for (int square = 0; square < NUM_SQUARES; square++) {

@@ -1,5 +1,5 @@
 /* chess_engine_eval.cpp: チェスボードの静的評価。
-   Copyright (c) 2011 Ishibashi Hironori
+   Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -31,12 +31,12 @@ namespace Sayuri {
    * 局面を評価する関数。 *
    ************************/
   // 全てを評価する。
-  int ChessBoard::EvalAll(side_t side, const EvalWeights& weights) const {
+  int ChessEngine::EvalAll(Side side, const EvalWeights& weights) const {
     //サイドを整理する。
     if (side == NO_SIDE) return 0;
 
     // 相手のサイド。
-    side_t enemy_side = static_cast<side_t>(side ^ 0x3);
+    Side enemy_side = side ^ 0x3;
 
     // チェックメイトされていれば負けの評価。
     if (IsCheckmated()) return SCORE_LOSE;
@@ -73,15 +73,15 @@ namespace Sayuri {
     return score;
   }
   // 機動力を評価する。
-  int ChessBoard::EvalMobility(side_t side, const EvalWeights& weights) const {
+  int ChessEngine::EvalMobility(Side side, const EvalWeights& weights) const {
     // サイドがなければ0点。
     if (side == NO_SIDE) return 0;
 
     // 駒の位置。
-    square_t piece_square;
+    Square piece_square;
 
     // 白のモビリティを得る。
-    bitboard_t white_pieces = side_pieces_[WHITE];
+    Bitboard white_pieces = side_pieces_[WHITE];
     int white_mobility = 0;
     for (; white_pieces; white_pieces &= white_pieces - 1) {
       piece_square = ChessUtil::GetSquare(white_pieces);
@@ -89,7 +89,7 @@ namespace Sayuri {
     }
 
     // 黒のモビリティを得る。
-    bitboard_t black_pieces = side_pieces_[BLACK];
+    Bitboard black_pieces = side_pieces_[BLACK];
     int black_mobility = 0;
     for (; black_pieces; black_pieces &= black_pieces - 1) {
       piece_square = ChessUtil::GetSquare(black_pieces);
@@ -101,29 +101,29 @@ namespace Sayuri {
     return side == WHITE ? score : -score;
   }
   // センター攻撃を評価する。
-  int ChessBoard::EvalAttackCenter(side_t side, const EvalWeights& weights)
+  int ChessEngine::EvalAttackCenter(Side side, const EvalWeights& weights)
   const {
     // サイドがなければ0点。
     if (side == NO_SIDE) return 0;
 
     // 駒の位置。
-    square_t piece_square;
+    Square piece_square;
 
     // ビットボード。
-    bitboard_t bitboard;
+    Bitboard bitboard;
 
     // 各サイドの価値。
     int white_value = 0;
     int black_value = 0;
 
     // 白の大中央を攻撃している駒を得る。
-    bitboard_t white_attackers = GetAttackers(D4, WHITE);
+    Bitboard white_attackers = GetAttackers(D4, WHITE);
     white_attackers |= GetAttackers(D5, WHITE);
     white_attackers |= GetAttackers(E4, WHITE);
     white_attackers |= GetAttackers(E5, WHITE);
 
     // 黒の大中央を攻撃している駒を得る。
-    bitboard_t black_attackers = GetAttackers(D4, BLACK);
+    Bitboard black_attackers = GetAttackers(D4, BLACK);
     black_attackers |= GetAttackers(D5, BLACK);
     black_attackers |= GetAttackers(E4, BLACK);
     black_attackers |= GetAttackers(E5, BLACK);
@@ -177,7 +177,7 @@ namespace Sayuri {
     return side == WHITE ? score : -score;
   }
   // 展開の遅さを評価する。
-  int ChessBoard::EvalDevelopment(side_t side, const EvalWeights& weights)
+  int ChessEngine::EvalDevelopment(Side side, const EvalWeights& weights)
   const {
     // どちらのサイドでもなければ0点。
     if (side == NO_SIDE) return 0;
@@ -191,15 +191,15 @@ namespace Sayuri {
     return side == WHITE ? score : -score;
   }
   // キングの周囲への攻撃を評価する。
-  int ChessBoard::EvalAttackAroundKing(side_t side, const EvalWeights& weights)
+  int ChessEngine::EvalAttackAroundKing(Side side, const EvalWeights& weights)
   const {
     // サイドがなければ0点。
     if (side == NO_SIDE) return 0;
 
     // それぞれのキング周りへの攻撃を得る。
-    bitboard_t white_attack = GetAttack(side_pieces_[WHITE])
+    Bitboard white_attack = GetAttack(side_pieces_[WHITE])
     & ChessUtil::GetKingMove(king_[BLACK]);
-    bitboard_t black_attack = GetAttack(side_pieces_[BLACK])
+    Bitboard black_attack = GetAttack(side_pieces_[BLACK])
     & ChessUtil::GetKingMove(king_[WHITE]);
 
     // 攻撃位置を数える。
@@ -212,7 +212,7 @@ namespace Sayuri {
     return side == WHITE ? score : -score;
   }
   // ポーンの配置を評価する。
-  int ChessBoard::EvalPawnPosition(side_t side, const EvalWeights& weights)
+  int ChessEngine::EvalPawnPosition(Side side, const EvalWeights& weights)
   const {
     // サイドがなければ0点。
     if (side == NO_SIDE) return 0;
@@ -230,7 +230,7 @@ namespace Sayuri {
     return side == WHITE ? score: -score;
   }
   // ナイトの配置を評価する。
-  int ChessBoard::EvalKnightPosition(side_t side, const EvalWeights& weights)
+  int ChessEngine::EvalKnightPosition(Side side, const EvalWeights& weights)
   const {
     // サイドがなければ0点。
     if (side == NO_SIDE) return 0;
@@ -248,7 +248,7 @@ namespace Sayuri {
     return side == WHITE ? score: -score;
   }
   // ルークの配置を評価する。
-  int ChessBoard::EvalRookPosition(side_t side, const EvalWeights& weights)
+  int ChessEngine::EvalRookPosition(Side side, const EvalWeights& weights)
   const {
     // サイドがなければ0点。
     if (side == NO_SIDE) return 0;
@@ -266,7 +266,7 @@ namespace Sayuri {
     return side == WHITE ? score: -score;
   }
   // キングの中盤の配置を評価する。
-  int ChessBoard::EvalKingPositionMiddle(side_t side,
+  int ChessEngine::EvalKingPositionMiddle(Side side,
   const EvalWeights& weights) const {
     // サイドがなければ0点。
     if (side == NO_SIDE) return 0;
@@ -285,7 +285,7 @@ namespace Sayuri {
     return side == WHITE ? score: -score;
   }
   // キングの終盤の配置を評価する。
-  int ChessBoard::EvalKingPositionEnding(side_t side,
+  int ChessEngine::EvalKingPositionEnding(Side side,
   const EvalWeights& weights) const {
     // サイドがなければ0点。
     if (side == NO_SIDE) return 0;
@@ -304,13 +304,13 @@ namespace Sayuri {
     return side == WHITE ? score: -score;
   }
   // パスポーンを評価する。
-  int ChessBoard::EvalPassPawn(side_t side, const EvalWeights& weights) const {
+  int ChessEngine::EvalPassPawn(Side side, const EvalWeights& weights) const {
     // どちらのサイドでもなければ0点。
     if (side == NO_SIDE) return 0;
 
     // 両サイドのパスポーンを得る。
-    bitboard_t white_pass_pawns = GetPassPawns(WHITE);
-    bitboard_t black_pass_pawns = GetPassPawns(BLACK);
+    Bitboard white_pass_pawns = GetPassPawns(WHITE);
+    Bitboard black_pass_pawns = GetPassPawns(BLACK);
 
     // パスポーンを評価値にする。
     int white_score = ChessUtil::CountBits(white_pass_pawns)
@@ -319,7 +319,7 @@ namespace Sayuri {
     * weights.pass_pawn_weight_;
 
     // マス。
-    square_t square;
+    Square square;
 
     // 守られたパスポーンにはボーナス。
     // 白を調べる。
@@ -344,7 +344,7 @@ namespace Sayuri {
     return side == WHITE ? score : -score;
   }
   // ダブルポーンを評価する。
-  int ChessBoard::EvalDoublePawn(side_t side, const EvalWeights& weights)
+  int ChessEngine::EvalDoublePawn(Side side, const EvalWeights& weights)
   const {
     // どちらのサイドでもなければ0点。
     if (side == NO_SIDE) return 0;
@@ -358,7 +358,7 @@ namespace Sayuri {
     return side == WHITE ? score : -score;
   }
   // 孤立ポーンを評価する。
-  int ChessBoard::EvalIsoPawn(side_t side, const EvalWeights& weights) const {
+  int ChessEngine::EvalIsoPawn(Side side, const EvalWeights& weights) const {
     // どちらのサイドでもなければ0点。
     if (side == NO_SIDE) return 0;
 
@@ -371,7 +371,7 @@ namespace Sayuri {
     return side == WHITE ? score : -score;
   }
   // ビショップペアを評価する。
-  int ChessBoard::EvalBishopPair(side_t side, const EvalWeights& weights)
+  int ChessEngine::EvalBishopPair(Side side, const EvalWeights& weights)
   const {
     // どちらのサイドでもなければ0点。
     if (side == NO_SIDE) return 0;
@@ -393,7 +393,7 @@ namespace Sayuri {
     return side == WHITE ? score : -score;
   }
   // 早すぎるクイーンの出動を評価する。
-  int ChessBoard::EvalEarlyQueenLaunched(side_t side,
+  int ChessEngine::EvalEarlyQueenLaunched(Side side,
   const EvalWeights& weights) const {
     // どちらのサイドでもなければ0点。
     if (side == NO_SIDE) return 0;
@@ -415,7 +415,7 @@ namespace Sayuri {
     return side == WHITE ? score : -score;
   }
   // ポーンの盾を評価する。
-  int ChessBoard::EvalPawnShield(side_t side, const EvalWeights& weights)
+  int ChessEngine::EvalPawnShield(Side side, const EvalWeights& weights)
   const {
     // どちらのサイドでもなければ0点。
     if (side == NO_SIDE) return 0;
@@ -429,7 +429,7 @@ namespace Sayuri {
     return side == WHITE ? score : -score;
   }
   // キャスリングの破棄を評価する。
-  int ChessBoard::EvalCanceledCastling(side_t side, const EvalWeights& weights)
+  int ChessEngine::EvalCanceledCastling(Side side, const EvalWeights& weights)
   const {
     // どちらのサイドでもなければ0点。
     if (side == NO_SIDE) return 0;

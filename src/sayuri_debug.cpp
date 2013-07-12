@@ -1,5 +1,6 @@
-/* sayuri_debug.h: Misakiをデバッグする。
-   Copyright (c) 2011 Ishibashi Hironori
+/* 
+   sayuri_debug.h: Sayuriをデバッグする。
+   Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -18,7 +19,7 @@
    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
    IN THE SOFTWARE.
- */
+*/
 
 #include "sayuri_debug.h"
 
@@ -36,7 +37,7 @@ namespace Sayuri {
   }
 
   // ビットボードを出力する。
-  void PrintBitboard(bitboard_t bitboard) {
+  void PrintBitboard(Bitboard bitboard) {
     // 行間のボーダー。
     static const char* border = " +---+---+---+---+---+---+---+---+";
 
@@ -46,7 +47,7 @@ namespace Sayuri {
     char line[35];  // 行の文字列。
     int index;  // 行の文字列のインデックス。
     char line_num = '8';  // 行番号の文字。
-    bitboard_t point = 0x1ULL << 56;  // 調べるビットボードの位置。
+    Bitboard point = 0x1ULL << 56;  // 調べるビットボードの位置。
     for (int i = 0; i < 8; i++) {
       // 行の文字列の配列を初期化。
       std::memset(line, '\0', sizeof(char) * 35);
@@ -87,7 +88,7 @@ namespace Sayuri {
   }
 
   // 手を出力する。
-  void PrintMove(move_t move) {
+  void PrintMove(Move move) {
     // ファイルとランクの文字の配列。
     constexpr char fyle_array[NUM_FYLES] = {
       'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'
@@ -97,8 +98,8 @@ namespace Sayuri {
     };
 
     // ファイルとランク。
-    fyle_t fyle;
-    rank_t rank;
+    Fyle fyle;
+    Rank rank;
 
     // 動かす駒の位置を出力する。
     std::cout << "Piece: ";
@@ -134,7 +135,7 @@ namespace Sayuri {
         std::cout << "King";
         break;
       default:
-        Test(false);
+        Assert(false);
         break;
     }
     std::cout << std::endl;
@@ -161,13 +162,13 @@ namespace Sayuri {
         std::cout << "King";
         break;
       default:
-        Test(false);
+        Assert(false);
         break;
     }
     std::cout << std::endl;
 
     // キャスリングを出力する。
-    castling_t castling = move.last_castling_rights_;
+    Castling castling = move.last_castling_rights_;
     std::cout << "<Last Castling Rights>" << std::endl;
     if (castling & WHITE_SHORT_CASTLING)
       std::cout << "  White Short Castling" << std::endl;
@@ -186,7 +187,7 @@ namespace Sayuri {
     std::cout << std::endl;
 
     // アンパッサンのターゲットを出力する。
-    square_t en_passant_target = move.last_en_passant_target_;
+    Square en_passant_target = move.last_en_passant_target_;
     fyle = ChessUtil::GetFyle(en_passant_target);
     rank = ChessUtil::GetRank(en_passant_target);
     std::cout << "Last En Passant Target: "
@@ -208,7 +209,7 @@ namespace Sayuri {
         std::cout << "Null Move";
         break;
       default:
-        Test(false);
+        Assert(false);
         break;
     }
     std::cout << std::endl;

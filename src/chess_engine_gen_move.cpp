@@ -1,5 +1,5 @@
 /* chess_engine_gen_move.cpp: 手を作る実装。
-   Copyright (c) 2011 Ishibashi Hironori
+   Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -30,15 +30,15 @@
 
 namespace Sayuri {
   // move_mask_を初期化する。
-  move_t ChessBoard::move_mask_;
-  void ChessBoard::InitMoveMask() {
+  Move ChessEngine::move_mask_;
+  void ChessEngine::InitMoveMask() {
     move_mask_.all_ = 0;
-    move_mask_.piece_square_ = static_cast<square_t>(0x3f);
-    move_mask_.goal_square_ = static_cast<square_t>(0x3f);
-    move_mask_.promotion_ = static_cast<piece_t>(0x7);
+    move_mask_.piece_square_ = 0x3f;
+    move_mask_.goal_square_ = 0x3f;
+    move_mask_.promotion_ = 0x7;
   }
   // 駒を取る手を作る。
-  int ChessBoard::GenCaptureMove(int level) {
+  int ChessEngine::GenCaptureMove(int level) {
     // 手の数。
     int move_count = 0;
 
@@ -46,28 +46,28 @@ namespace Sayuri {
     if (level > (MAX_LEVEL - 1)) return move_count;
 
     // 調べる駒。
-    bitboard_t pieces;
+    Bitboard pieces;
     // 攻撃の筋。
-    bitboard_t attack;
+    Bitboard attack;
     // 自分のサイド。
-    side_t side = to_move_;
+    Side side = to_move_;
     // 相手のサイド。
-    side_t enemy_side = static_cast<side_t>(side ^ 0x3);
+    Side enemy_side = side ^ 0x3;
 
     // 移動する駒の位置。
-    square_t piece_square;
+    Square piece_square;
     // 移動先の位置。
-    square_t goal_square;
+    Square goal_square;
 
     // 手。
-    move_t move;
+    Move move;
 
     // ポーンの手を作る。
     pieces = position_[side][PAWN];
     attack = 0;
     // アンパッサン。
-    square_t en_passant_square = static_cast<square_t>
-    (side == WHITE ? en_passant_target_ + 8 : en_passant_target_ - 8);
+    Square en_passant_square = side == WHITE ? en_passant_target_ + 8
+    : en_passant_target_ - 8;
     for (; pieces; pieces &= pieces - 1) {
       piece_square = ChessUtil::GetSquare(pieces);
       // 攻撃の筋を入れる。
@@ -76,8 +76,8 @@ namespace Sayuri {
       // アンパッサンならアンパッサンの攻撃を追加。
       if (can_en_passant_) {
         if ((side == WHITE) && (side_board_[en_passant_target_] == BLACK)) {
-          rank_t target_rank = ChessUtil::GetRank(en_passant_target_);
-          rank_t attacker_rank = ChessUtil::GetRank(piece_square);
+          Rank target_rank = ChessUtil::GetRank(en_passant_target_);
+          Rank attacker_rank = ChessUtil::GetRank(piece_square);
           if (target_rank == attacker_rank) {
             if ((piece_square == (en_passant_target_ - 1))
             || (piece_square == (en_passant_target_ + 1))) {
@@ -86,8 +86,8 @@ namespace Sayuri {
           }
         }
         if ((side == BLACK) && (side_board_[en_passant_target_] == WHITE)) {
-          rank_t target_rank = ChessUtil::GetRank(en_passant_target_);
-          rank_t attacker_rank = ChessUtil::GetRank(piece_square);
+          Rank target_rank = ChessUtil::GetRank(en_passant_target_);
+          Rank attacker_rank = ChessUtil::GetRank(piece_square);
           if (target_rank == attacker_rank) {
             if ((piece_square == (en_passant_target_ - 1))
             || (piece_square == (en_passant_target_ + 1))) {
@@ -246,7 +246,7 @@ namespace Sayuri {
     return move_count;
   }
   // 駒を取らない手を展開する。
-  int ChessBoard::GenNonCaptureMove(int level) {
+  int ChessEngine::GenNonCaptureMove(int level) {
     // 手の数。
     int move_count = 0;
 
@@ -254,21 +254,21 @@ namespace Sayuri {
     if (level > (MAX_LEVEL - 1)) return move_count;
 
     // 調べる駒。
-    bitboard_t pieces;
+    Bitboard pieces;
     // 移動する位置。
-    bitboard_t move_bitboard;
+    Bitboard move_bitboard;
     // 自分のサイド。
-    side_t side = to_move_;
+    Side side = to_move_;
     // 相手のサイド。
-    side_t enemy_side = static_cast<side_t>(side ^ 0x3);
+    Side enemy_side = side ^ 0x3;
 
     // 移動する駒の位置。
-    square_t piece_square;
+    Square piece_square;
     // 移動先の位置。
-    square_t goal_square;
+    Square goal_square;
 
     // 手。
-    move_t move;
+    Move move;
 
     // ポーンの手を作る。
     pieces = position_[side][PAWN];
@@ -474,7 +474,7 @@ namespace Sayuri {
     return move_count;
   }
   // 全ての手を展開する。
-  int ChessBoard::GenMove(int level) {
+  int ChessEngine::GenMove(int level) {
     int count = 0;
 
     count += GenNonCaptureMove(level);
@@ -482,7 +482,7 @@ namespace Sayuri {
 
     return count;
   }
-  int ChessBoard::GenCheckEscapeMove(int level) {
+  int ChessEngine::GenCheckEscapeMove(int level) {
     // 手の数。
     int move_count = 0;
 
@@ -490,28 +490,28 @@ namespace Sayuri {
     if (level > (MAX_LEVEL - 1)) return move_count;
 
     // 調べる駒。
-    bitboard_t pieces;
+    Bitboard pieces;
     // 手のビットボード。
-    bitboard_t move_bitboard;
+    Bitboard move_bitboard;
     // 自分のサイド。
-    side_t side = to_move_;
+    Side side = to_move_;
     // 相手のサイド。
-    side_t enemy_side = static_cast<side_t>(side ^ 0x3);
+    Side enemy_side = side ^ 0x3;
 
     // 移動する駒の位置。
-    square_t piece_square;
+    Square piece_square;
     // 移動先の位置。
-    square_t goal_square;
+    Square goal_square;
 
     // 手。
-    move_t move;
+    Move move;
 
     // ポーンの手を作る。
     pieces = position_[side][PAWN];
     move_bitboard = 0;
     // アンパッサン。
-    square_t en_passant_square = static_cast<square_t>
-    (side == WHITE ? en_passant_target_ + 8 : en_passant_target_ - 8);
+    Square en_passant_square = 
+    side == WHITE ? en_passant_target_ + 8 : en_passant_target_ - 8;
     for (; pieces; pieces &= pieces - 1) {
       piece_square = ChessUtil::GetSquare(pieces);
       // 通常の動きを入れる。
@@ -526,8 +526,8 @@ namespace Sayuri {
       // アンパッサンならアンパッサンの攻撃を追加。
       if (can_en_passant_) {
         if ((side == WHITE) && (side_board_[en_passant_target_] == BLACK)) {
-          rank_t target_rank = ChessUtil::GetRank(en_passant_target_);
-          rank_t move_bitboarder_rank = ChessUtil::GetRank(piece_square);
+          Rank target_rank = ChessUtil::GetRank(en_passant_target_);
+          Rank move_bitboarder_rank = ChessUtil::GetRank(piece_square);
           if (target_rank == move_bitboarder_rank) {
             if ((piece_square == (en_passant_target_ - 1))
             || (piece_square == (en_passant_target_ + 1))) {
@@ -536,8 +536,8 @@ namespace Sayuri {
           }
         }
         if ((side == BLACK) && (side_board_[en_passant_target_] == WHITE)) {
-          rank_t target_rank = ChessUtil::GetRank(en_passant_target_);
-          rank_t move_bitboarder_rank = ChessUtil::GetRank(piece_square);
+          Rank target_rank = ChessUtil::GetRank(en_passant_target_);
+          Rank move_bitboarder_rank = ChessUtil::GetRank(piece_square);
           if (target_rank == move_bitboarder_rank) {
             if ((piece_square == (en_passant_target_ - 1))
             || (piece_square == (en_passant_target_ + 1))) {
@@ -768,7 +768,7 @@ namespace Sayuri {
     return move_count;
   }
   // SEE。
-  int ChessBoard::SEE(move_t move) {
+  int ChessEngine::SEE(Move move) {
     // 価値の配列。
     static const int value_array[NUM_PIECE_TYPES] = {
       0,
@@ -784,33 +784,33 @@ namespace Sayuri {
     int value;
 
     // 動かす駒と移動先の位置の駒の種類を得る。
-    piece_t piece_type = piece_board_[move.piece_square_];
-    piece_t target_type = piece_board_[move.goal_square_];
+    Piece Pieceype = piece_board_[move.piece_square_];
+    Piece target_type = piece_board_[move.goal_square_];
 
     // 自分のサイドと敵のサイド。
-    side_t side = to_move_;
-    side_t enemy_side = static_cast<side_t>(side ^ 0x3);
+    Side side = to_move_;
+    Side enemy_side = side ^ 0x3;
 
     // 攻撃する駒の、各サイドのビットボード。
-    bitboard_t attackers = GetAttackers(move.goal_square_, side)
+    Bitboard attackers = GetAttackers(move.goal_square_, side)
     & ~ChessUtil::BIT[move.piece_square_];
-    bitboard_t enemy_attackers = GetAttackers(move.goal_square_, enemy_side);
+    Bitboard enemy_attackers = GetAttackers(move.goal_square_, enemy_side);
 
     // 攻撃する駒のビットボード。
-    bitboard_t attacker_pieces[NUM_SIDES][NUM_PIECE_TYPES];
-    for (int piece_type2 = PAWN; piece_type2 < NUM_PIECE_TYPES; piece_type2++) {
-      attacker_pieces[side][piece_type2] =
-      position_[side][piece_type2] & attackers;
-      attacker_pieces[enemy_side][piece_type2] =
-      position_[enemy_side][piece_type2] & enemy_attackers;
+    Bitboard attacker_pieces[NUM_SIDES][NUM_PIECE_TYPES];
+    for (int Pieceype2 = PAWN; Pieceype2 < NUM_PIECE_TYPES; Pieceype2++) {
+      attacker_pieces[side][Pieceype2] =
+      position_[side][Pieceype2] & attackers;
+      attacker_pieces[enemy_side][Pieceype2] =
+      position_[enemy_side][Pieceype2] & enemy_attackers;
     }
 
     // 取り合いの駒の評価。
     int index = 2;
-    piece_t current_piece = piece_type;  // 現在調べている駒。
-    side_t search_side = enemy_side;  //  現在調べているサイド。
+    Piece current_piece = Pieceype;  // 現在調べている駒。
+    Side search_side = enemy_side;  //  現在調べているサイド。
     value = value_array[target_type];  // 現在の評価値。
-    piece_t prev_piece;  // 前の駒。
+    Piece prev_piece;  // 前の駒。
     while (index < MAX_LEVEL) {
       prev_piece = current_piece;
       // 現在の取る駒をセットする。
@@ -860,15 +860,15 @@ namespace Sayuri {
         return value;
       }
 
-      search_side = static_cast<side_t>(search_side ^ 0x3);
+      search_side = search_side ^ 0x3;
       index++;
     }
 
     return value;
   }
   // ノードに簡易点数を付ける。
-  void ChessBoard::GiveQuickScore(hash_key_t key, int level, int depth,
-  side_t side, TranspositionTable& table) {
+  void ChessEngine::GiveQuickScore(HashKey key, int level, int depth,
+  Side side, TranspositionTable& table) {
     // 点数を付けるのノード。
     Node* node = stack_ptr_[level] - 1;
 
@@ -881,7 +881,7 @@ namespace Sayuri {
     } catch (...) {
       // 何もしない。
     }
-    move_t best_move;
+    Move best_move;
     best_move.all_ = 0;
     if (slot) {
       best_move = slot->best_move();
@@ -899,17 +899,17 @@ namespace Sayuri {
     }
   }
   // 簡易点数の高いもの順にポップする。
-  move_t ChessBoard::PopBestMove(int level) {
+  Move ChessEngine::PopBestMove(int level) {
     // もしレベルがマックスを越えていたら無意味な手を返す。。
     if (level > (MAX_LEVEL - 1)) {
-      move_t move;
+      Move move;
       move.all_ = 0;
       return move;
     }
 
     // もし手がなければ無意味な手を返す。。
     if (stack_ptr_[level] == tree_ptr_[level]) {
-      move_t move;
+      Move move;
       move.all_ = 0;
       return move;
     }

@@ -1,5 +1,5 @@
 /* transposition_table.h: トランスポジションテーブル。
-   Copyright (c) 2011 Ishibashi Hironori
+   Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -51,8 +51,8 @@ namespace Sayuri {
       // upper_bound: 上限。
       // lower_bound: 下限。
       // best_move: 最善手。
-      TranspositionTableSlot(hash_key_t key, int level, int depth,
-      side_t to_move, int upper_bound, int lower_bound, move_t best_move);
+      TranspositionTableSlot(HashKey key, int level, int depth,
+      Side to_move, int upper_bound, int lower_bound, Move best_move);
       // コピーコンストラクタ。
       // [引数]
       // slot: コピーしたいスロット。
@@ -90,8 +90,8 @@ namespace Sayuri {
       // to_move: 手番。
       // [戻り値]
       // 同じならtrue。
-      bool Equals(hash_key_t key, int level, int depth,
-      side_t to_move) const {
+      bool Equals(HashKey key, int level, int depth,
+      Side to_move) const {
         if (level < level_) return false;
         if (depth > depth_) return false;
         if (to_move != to_move_) return false;
@@ -105,19 +105,19 @@ namespace Sayuri {
       // 同期オブジェクト。
       boost::mutex& sync() {return sync_;}
       // ハッシュキー。
-      hash_key_t key() const {return key_;}
+      HashKey key() const {return key_;}
       // レベル。
       int level() const {return level_;}
       // 深さ。
       int depth() const {return depth_;}
       // 手番。
-      side_t to_move() const {return to_move_;}
+      Side to_move() const {return to_move_;}
       // 上限。
       int upper_bound() const {return upper_bound_;}
       // 下限。
       int lower_bound() const {return lower_bound_;}
       // 最善手。
-      move_t best_move() const {return best_move_;}
+      Move best_move() const {return best_move_;}
 
       /******************
        * ミューテータ。 *
@@ -127,7 +127,7 @@ namespace Sayuri {
       // 下限。
       void lower_bound(int lower_bound) {lower_bound_ = lower_bound;}
       // 最善手。
-      void best_move(move_t best_move) {best_move_ = best_move;}
+      void best_move(Move best_move) {best_move_ = best_move;}
 
     private:
       /****************
@@ -136,19 +136,19 @@ namespace Sayuri {
       // 同期オブジェクト。
       boost::mutex sync_;
       // ハッシュキー。
-      hash_key_t key_;
+      HashKey key_;
       // レベル。
       int level_;
       // 深さ。
       int depth_;
       // 手番。
-      side_t to_move_;
+      Side to_move_;
       // 上限。
       int upper_bound_;
       // 下限。
       int lower_bound_;
       // 最善手。
-      move_t best_move_;
+      Move best_move_;
   };
 
   /********************************************************
@@ -180,8 +180,8 @@ namespace Sayuri {
       // upper_bound: 上限。
       // lower_bound: 下限。
       // best_move: 最善手。
-      void Add(hash_key_t key, int level, int depth, side_t to_move,
-      int upper_bound, int lower_bound, move_t best_move) {
+      void Add(HashKey key, int level, int depth, Side to_move,
+      int upper_bound, int lower_bound, Move best_move) {
         slot_list_.push_back(TranspositionTableSlot(key, level, depth,
         to_move, upper_bound, lower_bound, best_move));
         slot_list_.sort();
@@ -207,8 +207,8 @@ namespace Sayuri {
       // 同じポジションのスロット。
       // [例外]
       // bool: 見つからなければfalse。
-      TranspositionTableSlot& GetSameSlot(hash_key_t key, int level, int depth,
-      side_t to_move) throw (bool);
+      TranspositionTableSlot& GetSameSlot(HashKey key, int level, int depth,
+      Side to_move) throw (bool);
 
     private:
       /******************
@@ -263,8 +263,8 @@ namespace Sayuri {
       // upper_bound: 上限。
       // lower_bound: 下限。
       // best_move: 最善手。
-      void Add(hash_key_t key, int level, int depth, side_t to_move,
-      int upper_bound, int lower_bound, move_t best_move);
+      void Add(HashKey key, int level, int depth, Side to_move,
+      int upper_bound, int lower_bound, Move best_move);
       // 同じ配置のスロットを得る。
       // [引数]
       // key: ハッシュキー。
@@ -273,8 +273,8 @@ namespace Sayuri {
       // to_move: 手番。
       // [例外]
       // bool: 見つからなければfalse。
-      TranspositionTableSlot& GetSameSlot(hash_key_t key, int level, int depth,
-      side_t to_move) throw (bool){
+      TranspositionTableSlot& GetSameSlot(HashKey key, int level, int depth,
+      Side to_move) throw (bool){
         // ロック。
         boost::mutex::scoped_lock lock(sync_);
 
@@ -310,7 +310,7 @@ namespace Sayuri {
       /**********************
        * プライベート関数。 *
        **********************/
-      int GetTableIndex(hash_key_t key) const {
+      int GetTableIndex(HashKey key) const {
         return key & (NUM_LISTS - 1);
       }
 

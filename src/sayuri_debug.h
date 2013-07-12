@@ -1,5 +1,6 @@
-/* sayuri_debug.h: Misakiをデバッグする。
-   Copyright (c) 2011 Ishibashi Hironori
+/*
+   sayuri_debug.h: Misakiをデバッグする。
+   Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -18,7 +19,7 @@
    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
    IN THE SOFTWARE.
- */
+*/
 
 #ifndef SAYURI_DEBUG_H
 #define SAYURI_DEBUG_H
@@ -45,9 +46,9 @@ namespace Sayuri {
   // expr: 条件式。
   // [例外]
   // exprがfalseなら例外発生。
-  inline void Test(bool expr) {
+  inline void Assert(bool expr) {
     if(expr) return;
-    throw SayuriError("テストに失敗しました。");
+    throw SayuriError("アサート失敗。");
   }
 
   // ビットボードを以下のように出力する。
@@ -72,12 +73,12 @@ namespace Sayuri {
   //    a   b   c   d   e   f   g   h
   // [引数]
   // bitboard: 出力するビットボード。
-  void PrintBitboard(bitboard_t bitboard);
+  void PrintBitboard(Bitboard bitboard);
 
   // 手を出力する。
   // [引数]
   // move: 出力する手。
-  void PrintMove(move_t move);
+  void PrintMove(Move move);
 
   /**********************
    * ストップウォッチ。 *

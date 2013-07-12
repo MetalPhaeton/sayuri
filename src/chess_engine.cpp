@@ -1,5 +1,5 @@
 /* chess_engine.cpp: チェスボードの基本的な実装。
-   Copyright (c) 2011 Ishibashi Hironori
+   Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -38,19 +38,19 @@ namespace Sayuri {
   /******************
    * テスト用関数。 *
    ******************/
-  void ChessBoard::Test() {
+  void ChessEngine::Test() {
   }
 
   /********************************
    * チェスボード用の出力演算子。 *
    ********************************/
-  std::ostream& operator<<(std::ostream& stream, const ChessBoard& board) {
+  std::ostream& operator<<(std::ostream& stream, const ChessEngine& board) {
     // 駒の配置の文字列の配列。
     // 白のポーンなら"-P-"、黒のポーンなら"<P>"、空白なら"   "。
     char piece_strings[NUM_SQUARES][4];
 
     // 駒の配置を配列に入れる。
-    bitboard_t point = 1ULL;
+    Bitboard point = 1ULL;
     for (int index = 0; index < NUM_SQUARES; index++) {
       // 終端文字を入れる。
       piece_strings[index][3] = '\0';
@@ -101,8 +101,8 @@ namespace Sayuri {
     };
 
     // ファイルとランクを入れる変数。
-    fyle_t fyle;
-    rank_t rank;
+    Fyle fyle;
+    Rank rank;
 
     // 手番を文字列ストリームに入れる。
     std::ostringstream to_move_stream;
@@ -247,10 +247,10 @@ namespace Sayuri {
    * コンストラクタとデストラクタ。 *
    **********************************/
   // コンストラクタ。
-  ChessBoard::ChessBoard() :
+  ChessEngine::ChessEngine() :
   to_move_(WHITE),
   castling_rights_(ALL_CASTLING),
-  en_passant_target_(static_cast<square_t>(0)),
+  en_passant_target_(0),
   can_en_passant_(false),
   has_white_castled_(false),
   has_black_castled_(false),
@@ -259,8 +259,8 @@ namespace Sayuri {
   stop_pondering_flag_(true) {
     // 駒の配置を作る。
     // どちらでもない。
-    for (int piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
-      position_[NO_SIDE][piece_type] = 0;
+    for (int Pieceype = 0; Pieceype < NUM_PIECE_TYPES; Pieceype++) {
+      position_[NO_SIDE][Pieceype] = 0;
     }
     // 白の駒。
     position_[WHITE][EMPTY] = 0;
@@ -293,8 +293,8 @@ namespace Sayuri {
     blocker45_ = 0;
     blocker90_ = 0;
     blocker135_ = 0;
-    square_t square;
-    for (bitboard_t copy = blocker0_; copy; copy &= copy - 1) {
+    Square square;
+    for (Bitboard copy = blocker0_; copy; copy &= copy - 1) {
       square = ChessUtil::GetSquare(copy);
 
       blocker45_ |= ChessUtil::BIT[ChessUtil::ROT45[square]];
@@ -303,7 +303,7 @@ namespace Sayuri {
     }
 
     // 駒の種類とサイドの配置を作る。
-    bitboard_t point = 1ULL;
+    Bitboard point = 1ULL;
     for (int index = 0; index < NUM_SQUARES; index++) {
       // サイドの配置。
       if (side_pieces_[WHITE] & point) side_board_[index] = WHITE;
@@ -345,259 +345,29 @@ namespace Sayuri {
     stack_ptr_[0] = tree_ptr_[0];
 
     // 現在の局面のハッシュキーを作る。
-    hash_key_t key = 0;
+    HashKey key = 0;
     for (int square = 0; square < NUM_SQUARES; square++) {
       key ^= key_array_[side_board_[square]][piece_board_[square]][square];
     }
-
-    // ゲームの履歴に1局目を入れる。
-    move_t last_move;
-    last_move.all_ = 0;
-    history_.push_back(new GameRecord(*this, 0, 0, 1, last_move, key));
   }
   // デストラクタ。
-  ChessBoard::~ChessBoard() {
-    // ゲームの履歴を解放する。
-    for (int index = 0; index < history_.size(); index++) {
-      delete history_[index];
-    }
+  ChessEngine::~ChessEngine() {
   }
 
   /********************
    * パブリック関数。 *
    ********************/
-  // 次の手のリストを作る。
-  MoveList* ChessBoard::CreateNextMoveList() const {
-    // コンストを取る。
-    ChessBoard* self = const_cast<ChessBoard*>(this);
-
-    // スレッドをロック。
-    boost::mutex::scoped_lock lock(self->sync_);
-
-    // ツリーのレベル。
-    const int level = 0;
-
-    // 手をツリーに展開する。
-    self->GenCheckEscapeMove(level);
-
-    // ツリーに展開された手を手のリストに入れる。
-    MoveList* move_list = MoveList::New();
-    move_t move;
-    while (stack_ptr_[level] != tree_ptr_[level]) {
-      move = self->PopMove(level);
-      move_list->Add(move.piece_square_, move.goal_square_, move.promotion_);
-    }
-
-    self->ClearMoves(level);
-    return move_list;
-  }
-  // ゲームを1つ前に戻す。
-  void ChessBoard::StepBack() {
-    // ロック
-    boost::mutex::scoped_lock lock(sync_);
-
-    // 一番最初なら何もしない。
-    if (current_game_ <= 0) return;
-
-    // ゲームを1つ戻す。
-    UnmakeMove(history_[current_game_]->last_move_);
-    current_game_--;
-  }
-  // ゲームを1つ進める。
-  void ChessBoard::StepForward() {
-    // ロック
-    boost::mutex::scoped_lock lock(sync_);
-
-    // 一番新しいなら何もしない。
-    if (current_game_ >= (history_.size() - 1)) return;
-
-    //ゲームを1つ進める。
-    MakeMove(history_[current_game_ + 1]->last_move_);
-    current_game_++;
-  }
-  // 手を指す。
-  bool ChessBoard::TakeMove(const Move& move) {
-    // スレッドをロック。
-    boost::mutex::scoped_lock lock(sync_);
-
-    // 手。
-    move_t found_move;
-    found_move.all_ = 0;
-
-    // 手を展開するツリーのレベル。
-    const int level = 0;
-
-    // ツリーに手を展開する。
-    int move_count = GenCheckEscapeMove(level);
-    if (!move_count) return false;
-
-    // 合法手を入手する。
-    square_t piece_square;
-    square_t goal_square;
-    piece_t promotion;
-    piece_t piece_type;
-    move_t search_move;
-    while (stack_ptr_[level] != tree_ptr_[level]) {
-      search_move = PopMove(level);
-      piece_square = search_move.piece_square_;
-      goal_square = search_move.goal_square_;
-      promotion = search_move.promotion_;
-      // 移動前と移動後の位置が一致した場合。
-      if ((piece_square == move.piece_square())
-      && (goal_square == move.goal_square())) {
-        // 動かす駒の種類を得る。
-        piece_type = piece_board_[piece_square];
-        // 昇格かどうか。
-        if ((to_move_ == WHITE) && (piece_type == PAWN)
-        && ((goal_square >= A8) && (goal_square <= H8))) {  // 白の昇格。
-          // 昇格設定されているかどうか。
-          if (move.promotion()) {  // 昇格が設定されている場合。
-            // 昇格と調べている手が一致しているかどうか。
-            if (promotion == move.promotion()) {
-              found_move = search_move;
-              ClearMoves(level);
-              break;
-            }
-          } else {  // 昇格が設定されていない場合。
-            found_move = search_move;
-            // クイーンに昇格させる。
-            found_move.promotion_ = QUEEN;
-            ClearMoves(level);
-            break;
-          }
-        } else if ((to_move_ == BLACK) && (piece_type == PAWN)
-        && ((goal_square >= A1) && (goal_square <= H1))) {  // 黒の昇格。
-          // 昇格が設定されているかどうか。
-          if (move.promotion()) {  // 昇格が設定されている場合。
-            // 昇格と調べている手が一致しているかどうか。
-            if (promotion == move.promotion()) {
-              found_move = search_move;
-              ClearMoves(level);
-              break;
-            }
-          } else {  // 昇格が設定されていない場合。
-            found_move = search_move;
-            // クイーンに昇格させる。
-            found_move.promotion_ = QUEEN;
-            ClearMoves(level);
-            break;
-          }
-        } else {  // 昇格以外の手。
-          found_move = search_move;
-          ClearMoves(level);
-          break;
-        }
-      } 
-    }
-
-    // 見つからなければfalseを返す。
-    ClearMoves(level);
-    if (found_move.all_ == 0) return false;
-
-    // 味方のサイドと敵のサイド。
-    side_t side = to_move_;
-    side_t enemy_side = static_cast<side_t>(side ^ 0x3);
-
-    // 動かす前にハッシュキーを作る。
-    hash_key_t key = GetNextKey(history_[current_game_]->key_, found_move);
-
-    // 手を指す。ついでに動かす駒と取った駒の種類を得る。
-    piece_type = piece_board_[found_move.goal_square_];
-    MakeMove(found_move);
-    // キングがチェックされていればfalse。
-    if (IsAttacked(king_[side], enemy_side)) {
-      UnmakeMove(found_move);
-      return false;
-    }
-    piece_t captured_piece = found_move.captured_piece_;
-
-    // 自分より新しい履歴を消す。
-    if (current_game_ < (history_.size() - 1)) {
-      std::vector<GameRecord*>::iterator itr = history_.begin();
-      itr += current_game_ + 1;
-      for (int index = current_game_ + 1; index < history_.size(); index++) {
-        delete history_[index];
-      }
-      history_.erase(itr, history_.end());
-    }
-
-    // 手数を作る。
-    int ply = history_[current_game_]->ply_ + 1;
-
-    // 動いた駒がポーンでない、かつ駒を取らないなら50手ルールを加算する。
-    int ply_100 = 0;
-    if ((piece_type != PAWN) && (!captured_piece)) {
-      ply_100 = history_[current_game_]->ply_100_ + 1;
-    }
-
-    // 繰り返しを計算する。
-    int repetition = 1;
-    for (int index = current_game_ - 1; index >= 0; index--) {
-      if (history_[index]->EqualsPosition(*this)) {
-        repetition = history_[index]->repetition_ + 1;
-        break;
-      }
-    }
-
-    // ゲームのデータを履歴に登録。
-    history_.push_back(new GameRecord(*this,
-    ply, ply_100, repetition, found_move, key));
-
-    // 現在のゲームを加算。
-    current_game_++;
-
-    return true;
-  }
-  // 最善手を得る。
-  Move ChessBoard::GetBestMove(double searching_time,
-  TranspositionTable& table, const EvalWeights& weights) const {
-    // コンストを取る。
-    ChessBoard* self = const_cast<ChessBoard*>(this);
-
-    // スレッドのロック。
-    boost::mutex::scoped_lock(self->sync_);
-
-    // 探索時間を修正する。
-    if (searching_time < 1.0) {
-      searching_time = 1.0;
-    }
-
-    // 現在の時間と探索時間を得る。
-    self->start_time_ = std::time(NULL);
-    self->searching_time_ = searching_time;
-
-    // 探索に必要な変数。
-    int alpha = -INFINITE;  // アルファ値。
-    int beta = INFINITE;  // ベータ値。
-    const int level = 0;  // 現在のレベル。
-
-    // ハッシュキー。
-    hash_key_t key = history_[current_game_]->key_;
-
-    // 探索する。
-    self->best_move_.all_ = 0;
-    self->best_score_ = -INFINITE;
-    int score;
-    for (int i_depth = 1; i_depth <= (MAX_LEVEL - 1); i_depth++) {
-      score = self->Search(level, i_depth, alpha, beta, false, key,
-      table, weights);
-    }
-
-    // 最善手を手にする。
-    return Move(best_move_.piece_square_, best_move_.goal_square_,
-    best_move_.promotion_);
-  }
 
   /******************************
    * その他のプライベート関数。 *
    ******************************/
-  // 駒を置く。（駒の種類piece_typeにEMPTYをおけば、駒を削除できる。）
-  void ChessBoard::PutPiece(square_t square, piece_t piece_type, side_t side) {
+  // 駒を置く。（駒の種類PieceypeにEMPTYをおけば、駒を削除できる。）
+  void ChessEngine::PutPiece(Square square, Piece Pieceype, Side side) {
     // 置く位置の現在の駒の種類を入手する。
-    piece_t placed_piece = piece_board_[square];
+    Piece placed_piece = piece_board_[square];
 
     // 置く位置の現在の駒のサイドを得る。
-    side_t placed_side = side_board_[square];
+    Side placed_side = side_board_[square];
 
     // 置く位置のメンバを消す。
     if (placed_piece) {
@@ -607,7 +377,7 @@ namespace Sayuri {
 
     // 置く駒がEMPTYか置くサイドがNO_SIDEなら
     // その位置のメンバを消して返る。
-    if ((!piece_type) || (!side)) {
+    if ((!Pieceype) || (!side)) {
       piece_board_[square] = EMPTY;
       side_board_[square] = NO_SIDE;
       if (placed_piece) {
@@ -620,12 +390,12 @@ namespace Sayuri {
     }
 
     // 置く位置の駒の種類を書き変える。
-    piece_board_[square] = piece_type;
+    piece_board_[square] = Pieceype;
     // 置く位置のサイドを書き変える。
     side_board_[square] = side;
 
     // 置く位置のビットボードをセットする。
-    position_[side][piece_type] |= ChessUtil::BIT[square];
+    position_[side][Pieceype] |= ChessUtil::BIT[square];
     side_pieces_[side] |= ChessUtil::BIT[square];
     blocker0_ |= ChessUtil::BIT[square];
     blocker45_ |= ChessUtil::BIT[ChessUtil::ROT45[square]];
@@ -633,30 +403,30 @@ namespace Sayuri {
     blocker135_ |= ChessUtil::BIT[ChessUtil::ROT135[square]];
 
     // キングの位置を更新する。
-    if (piece_type == KING) {
+    if (Pieceype == KING) {
       king_[side] = square;
     }
   }
   // 駒の位置を変える。
-  void ChessBoard::ReplacePiece(square_t piece_square, square_t goal_square) {
+  void ChessEngine::ReplacePiece(Square piece_square, Square goal_square) {
     // 移動する位置と移動先の位置が同じなら何もしない。
     if (piece_square == goal_square) return;
 
     // 移動する位置の駒の種類を得る。空なら何もしない。
-    piece_t piece_type = piece_board_[piece_square];
-    if (!piece_type) return;
+    Piece Pieceype = piece_board_[piece_square];
+    if (!Pieceype) return;
     // 移動する駒のサイドを得る。
-    side_t side = side_board_[piece_square];
+    Side side = side_board_[piece_square];
 
     // 移動先の駒の種類を得る。
-    piece_t placed_piece_type = piece_board_[goal_square];
+    Piece placed_Pieceype = piece_board_[goal_square];
     // 移動先の駒のサイドを得る。
-    side_t placed_side = side_board_[goal_square];
+    Side placed_side = side_board_[goal_square];
 
     // 移動する駒のメンバを消す。
     piece_board_[piece_square] = EMPTY;
     side_board_[piece_square] = NO_SIDE;
-    position_[side][piece_type] &= ~ChessUtil::BIT[piece_square];
+    position_[side][Pieceype] &= ~ChessUtil::BIT[piece_square];
     side_pieces_[side] &= ~ChessUtil::BIT[piece_square];
     blocker0_ &= ~ChessUtil::BIT[piece_square];
     blocker45_ &= ~ChessUtil::BIT[ChessUtil::ROT45[piece_square]];
@@ -664,18 +434,18 @@ namespace Sayuri {
     blocker135_ &= ~ChessUtil::BIT[ChessUtil::ROT135[piece_square]];
 
     // 移動先の駒を消す。
-    if (placed_piece_type) {
-      position_[placed_side][placed_piece_type] &=
+    if (placed_Pieceype) {
+      position_[placed_side][placed_Pieceype] &=
       ~ChessUtil::BIT[goal_square];
       side_pieces_[placed_side] &= ~ChessUtil::BIT[goal_square];
     }
 
     // 移動先の駒をセットする。
-    piece_board_[goal_square] = piece_type;
+    piece_board_[goal_square] = Pieceype;
     side_board_[goal_square] = side;
-    position_[side][piece_type] |= ChessUtil::BIT[goal_square];
+    position_[side][Pieceype] |= ChessUtil::BIT[goal_square];
     side_pieces_[side] |= ChessUtil::BIT[goal_square];
-    if (!placed_piece_type) {
+    if (!placed_Pieceype) {
       blocker0_ |= ChessUtil::BIT[goal_square];
       blocker45_ |= ChessUtil::BIT[ChessUtil::ROT45[goal_square]];
       blocker90_ |= ChessUtil::BIT[ChessUtil::ROT90[goal_square]];
@@ -683,21 +453,21 @@ namespace Sayuri {
     }
 
     // キングの位置を更新する。
-    if (piece_type == KING) {
+    if (Pieceype == KING) {
       king_[side] = goal_square;
     }
   }
 
   // 攻撃されているかどうか調べる。
-  bool ChessBoard::IsAttacked(square_t square, side_t side) const {
+  bool ChessEngine::IsAttacked(Square square, Side side) const {
     // NO_SIDEならfalse。
     if (side == NO_SIDE) return false;
 
     // 攻撃。
-    bitboard_t attack;
+    Bitboard attack;
 
     // ポーンに攻撃されているかどうか調べる。
-    attack = ChessUtil::GetPawnAttack(square, static_cast<side_t>(side ^ 0x3));
+    attack = ChessUtil::GetPawnAttack(square, side ^ 0x3);
     if (attack & position_[side][PAWN]) return true;
 
     // ナイトに攻撃されているかどうか調べる。
@@ -722,7 +492,7 @@ namespace Sayuri {
     return false;
   }
   // マテリアルを得る。
-  int ChessBoard::GetMaterial(side_t side) const {
+  int ChessEngine::GetMaterial(Side side) const {
     // サイドを確認する。
     if (side == NO_SIDE) return 0;
 
@@ -761,33 +531,33 @@ namespace Sayuri {
     return side == WHITE ? material : -material;
   }
   // 合法手があるかどうかチェックする。
-  bool ChessBoard::HasLegalMove(side_t side) const {
+  bool ChessEngine::HasLegalMove(Side side) const {
     // サイドがどちらでもなければfalse。
     if (side == NO_SIDE) return false;
 
     // constを取る。
-    ChessBoard* self = const_cast<ChessBoard*>(this);
+    ChessEngine* self = const_cast<ChessEngine*>(this);
 
     // スレッドをロック。
     boost::mutex::scoped_lock lock(self->sync_);
 
     // 敵のサイド。
-    side_t enemy_side = static_cast<side_t>(side ^ 0x3);
+    Side enemy_side = side ^ 0x3;
 
     // 自分の駒。
-    bitboard_t pieces = side_pieces_[side];
+    Bitboard pieces = side_pieces_[side];
 
     // それぞれの駒を調べてみる。
-    move_t move;  // 手。
-    square_t piece_square;  // 駒の位置。
-    square_t goal_square;  // 移動先の位置。
-    piece_t piece_type;  // 駒の種類。
-    bitboard_t move_bitboard;  // 動ける位置のビットボード。
-    side_t save_to_move;  // 手番を保存。
+    Move move;  // 手。
+    Square piece_square;  // 駒の位置。
+    Square goal_square;  // 移動先の位置。
+    Piece Pieceype;  // 駒の種類。
+    Bitboard move_bitboard;  // 動ける位置のビットボード。
+    Side save_to_move;  // 手番を保存。
     for (; pieces; pieces &= pieces - 1) {
       piece_square = ChessUtil::GetSquare(pieces);
-      piece_type = piece_board_[piece_square];
-      switch (piece_type) {
+      Pieceype = piece_board_[piece_square];
+      switch (Pieceype) {
         case PAWN:  // ポーンの場合。
           // 通常の動き。
           move_bitboard = ChessUtil::GetPawnMove(piece_square, side)
@@ -804,8 +574,8 @@ namespace Sayuri {
           if (can_en_passant_) {
             if ((side == WHITE)
             && (side_board_[en_passant_target_] == BLACK)) {
-              rank_t target_rank = ChessUtil::GetRank(en_passant_target_);
-              rank_t attacker_rank = ChessUtil::GetRank(piece_square);
+              Rank target_rank = ChessUtil::GetRank(en_passant_target_);
+              Rank attacker_rank = ChessUtil::GetRank(piece_square);
               if (target_rank == attacker_rank) {
                 if ((piece_square == (en_passant_target_ - 1))
                 || (piece_square == (en_passant_target_ + 1))) {
@@ -814,8 +584,8 @@ namespace Sayuri {
               }
             } else if ((side == BLACK)
             && (side_board_[en_passant_target_] == WHITE)){
-              rank_t target_rank = ChessUtil::GetRank(en_passant_target_);
-              rank_t attacker_rank = ChessUtil::GetRank(piece_square);
+              Rank target_rank = ChessUtil::GetRank(en_passant_target_);
+              Rank attacker_rank = ChessUtil::GetRank(piece_square);
               if (target_rank == attacker_rank) {
                 if ((piece_square == (en_passant_target_ - 1))
                 || (piece_square == (en_passant_target_ + 1))) {
@@ -902,12 +672,12 @@ namespace Sayuri {
         if (goal_square == king_[enemy_side]) continue;
 
         // アンパッサンやキャスリングの手の種類を追加する。
-        if ((can_en_passant_) && (piece_type == PAWN)) {  // アンパッサン。
+        if ((can_en_passant_) && (Pieceype == PAWN)) {  // アンパッサン。
           if (((side == WHITE) && (goal_square == en_passant_target_ + 8))
           || ((side == BLACK) && (goal_square == en_passant_target_ - 8))) {
             move.move_type_ = EN_PASSANT;
           }
-        } else if (piece_type == KING) {  // キャスリング。
+        } else if (Pieceype == KING) {  // キャスリング。
           if (side == WHITE) {  // 白のキャスリング。
             if (((piece_square == E1) && (goal_square == G1))
             || ((piece_square == E1) && (goal_square == C1))) {
@@ -940,17 +710,17 @@ namespace Sayuri {
     return false;
   }
   // 攻撃している駒のビットボードを得る。
-  bitboard_t ChessBoard::GetAttackers(square_t target_square, side_t side)
+  Bitboard ChessEngine::GetAttackers(Square target_square, Side side)
   const {
     // サイドがなければ空を返す。
     if (side == NO_SIDE) return 0;
 
     // 攻撃している駒のビットボード。
-    bitboard_t attackers = 0;
+    Bitboard attackers = 0;
 
     // ポーンを得る。
-    attackers |= ChessUtil::GetPawnAttack(target_square,
-    static_cast<side_t>(side ^ 0x3)) & position_[side][PAWN];
+    attackers |= ChessUtil::GetPawnAttack(target_square, side ^ 0x3)
+    & position_[side][PAWN];
 
     // ナイトを得る。
     attackers |= ChessUtil::GetKnightMove(target_square)
@@ -961,16 +731,16 @@ namespace Sayuri {
     & position_[side][KING];
 
     // ブロッカー。
-    bitboard_t blocker;
+    Bitboard blocker;
 
     // ラインアタッカー。（ビショップ、ルーク、クイーン。）
-    bitboard_t line_attackers;
+    Bitboard line_attackers;
 
     // 攻撃駒の位置。
-    square_t attacker_square;
+    Square attacker_square;
 
     // ライン。
-    bitboard_t line;
+    Bitboard line;
 
     // ビショップ、クイーンの斜めのラインから
     // 攻撃している駒を得る。（X-Rayを含む。）
@@ -1013,12 +783,12 @@ namespace Sayuri {
    * 駒を動かす。 *
    ****************/
   // 駒を動かす。
-  void ChessBoard::MakeMove(move_t& move) {
+  void ChessEngine::MakeMove(Move& move) {
     // 動かす側のサイドを得る。
-    side_t side = to_move_;
+    Side side = to_move_;
 
     // 手番を反転させる。
-    to_move_ = static_cast<side_t>(to_move_ ^ 0x3);
+    to_move_ = to_move_ ^ 0x3;
 
     // 動かす前のキャスリングの権利とアンパッサンを記録する。
     move.last_castling_rights_ = castling_rights_;
@@ -1032,8 +802,8 @@ namespace Sayuri {
     }
 
     // 移動前と移動後の位置を得る。
-    square_t piece_square = move.piece_square_;
-    square_t goal_square = move.goal_square_;
+    Square piece_square = move.piece_square_;
+    Square goal_square = move.goal_square_;
     // 移動前と移動後が同じならNull Move。
     if (piece_square == goal_square) {
       move.move_type_ = NULL_MOVE;
@@ -1074,7 +844,7 @@ namespace Sayuri {
       // 駒を動かす。
       ReplacePiece(piece_square, goal_square);
       // 駒を昇格させるなら、駒を昇格させる。
-      piece_t promotion = move.promotion_;
+      Piece promotion = move.promotion_;
       if (promotion) {
         PutPiece(goal_square, promotion, side);
       }
@@ -1095,12 +865,12 @@ namespace Sayuri {
     UpdateCastlingRights();
   }
   // 手を元に戻す。
-  void ChessBoard::UnmakeMove(move_t move) {
+  void ChessEngine::UnmakeMove(Move move) {
     // 相手のサイドを得る。
-    side_t enemy_side = to_move_;
+    Side enemy_side = to_move_;
 
     // 手番を反転させる。
-    to_move_ = static_cast<side_t>(to_move_ ^ 0x3);
+    to_move_ ^=  0x3;
 
     // 動かす前のキャスリングの権利とアンパッサンを復元する。
     castling_rights_ = move.last_castling_rights_;
@@ -1113,8 +883,8 @@ namespace Sayuri {
     }
 
     // 移動前と移動後の位置を得る。
-    square_t piece_square = move.piece_square_;
-    square_t goal_square = move.goal_square_;
+    Square piece_square = move.piece_square_;
+    Square goal_square = move.goal_square_;
 
     // 駒の位置を戻す。
     ReplacePiece(goal_square, piece_square);
@@ -1153,54 +923,54 @@ namespace Sayuri {
    * ハッシュキー関連。 *
    **********************/
   // ハッシュキーの配列。
-  hash_key_t ChessBoard::key_array_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
+  HashKey ChessEngine::key_array_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
   // 乱数の種。
-  uint64_t ChessBoard::seed_;
+  uint64_t ChessEngine::seed_;
   // key_array_[][][]を初期化する。
-  void ChessBoard::InitKeyArray()
+  void ChessEngine::InitKeyArray()
   {
     // 乱数の種を初期化。
     seed_ = 1;
 
     // キーの配列を初期化。
     for (int side = 0; side < NUM_SIDES; side++) {
-      for (int piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      for (int Pieceype = 0; Pieceype < NUM_PIECE_TYPES; Pieceype++) {
         for (int square = 0; square < NUM_SQUARES; square++) {
-          if ((side == NO_SIDE) || (piece_type == EMPTY)) {
-            key_array_[side][piece_type][square] = 0;
+          if ((side == NO_SIDE) || (Pieceype == EMPTY)) {
+            key_array_[side][Pieceype][square] = 0;
           } else {
-            key_array_[side][piece_type][square] = GetRand();
+            key_array_[side][Pieceype][square] = GetRand();
           }
         }
       }
     }
   }
   // 次の局面のハッシュキーを得る。
-  hash_key_t ChessBoard::GetNextKey(hash_key_t current_key, move_t move) const {
+  HashKey ChessEngine::GetNextKey(HashKey current_key, Move move) const {
     // 駒の位置の種類とサイドを得る。
-    piece_t piece_type = piece_board_[move.piece_square_];
-    side_t piece_side = side_board_[move.piece_square_];
+    Piece Pieceype = piece_board_[move.piece_square_];
+    Side piece_side = side_board_[move.piece_square_];
 
     // 移動する位置の駒の種類とサイドを得る。
-    piece_t goal_type = piece_board_[move.goal_square_];
-    side_t goal_side = side_board_[move.goal_square_];
+    Piece goal_type = piece_board_[move.goal_square_];
+    Side goal_side = side_board_[move.goal_square_];
 
     // 移動する駒の移動元のハッシュキーを得る。
-    hash_key_t piece_key =
-    key_array_[piece_side][piece_type][move.piece_square_];
+    HashKey piece_key =
+    key_array_[piece_side][Pieceype][move.piece_square_];
 
     // 移動する位置のハッシュキーを得る。
-    hash_key_t goal_key =
+    HashKey goal_key =
     key_array_[goal_side][goal_type][move.goal_square_];
 
     // 移動する駒の移動先のハッシュキーを得る。
-    hash_key_t move_key;
+    HashKey move_key;
     if (move.promotion_) {
       move_key =
       key_array_[piece_side][move.promotion_][move.goal_square_];
     } else {
       move_key =
-      key_array_[piece_side][piece_type][move.goal_square_];
+      key_array_[piece_side][Pieceype][move.goal_square_];
     }
 
     // 移動する駒の移動元のハッシュキーを削除する。

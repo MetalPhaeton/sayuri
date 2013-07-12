@@ -1,5 +1,5 @@
 /* transposition_table.h: トランスポジションテーブル。
-   Copyright (c) 2011 Ishibashi Hironori
+   Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -38,8 +38,8 @@ namespace Sayuri {
   num_slots_(0) {
   }
   // テーブルに追加する。
-  void TranspositionTable::Add(hash_key_t key, int level, int depth,
-  side_t to_move, int upper_bound, int lower_bound, move_t best_move) {
+  void TranspositionTable::Add(HashKey key, int level, int depth,
+  Side to_move, int upper_bound, int lower_bound, Move best_move) {
     // ロック。
     boost::mutex::scoped_lock lock(sync_);
 
@@ -77,8 +77,8 @@ namespace Sayuri {
    * スロットのリストのクラス。 *
    ******************************/
   TranspositionTableSlot&
-  TranspositionTableSlotList::GetSameSlot(hash_key_t key, int level,
-  int depth, side_t to_move) throw (bool){
+  TranspositionTableSlotList::GetSameSlot(HashKey key, int level,
+  int depth, Side to_move) throw (bool){
     std::list<TranspositionTableSlot>::iterator itr = slot_list_.begin();
     while (itr != slot_list_.end()) {
       // レベルが大きくなりすぎたらもうない。
@@ -98,9 +98,9 @@ namespace Sayuri {
    * スロットのクラス。 *
    **********************/
   // コンストラクタ。
-  TranspositionTableSlot::TranspositionTableSlot(hash_key_t key, int level,
-  int depth, side_t to_move, int upper_bound, int lower_bound,
-  move_t best_move) :
+  TranspositionTableSlot::TranspositionTableSlot(HashKey key, int level,
+  int depth, Side to_move, int upper_bound, int lower_bound,
+  Move best_move) :
   key_(key),
   level_(level),
   depth_(depth),

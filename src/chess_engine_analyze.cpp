@@ -1,5 +1,5 @@
 /* chess_engine_analyze.cpp: チェスボード分析用ツール。
-   Copyright (c) 2011 Ishibashi Hironori
+   Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -31,14 +31,14 @@ namespace Sayuri {
    * 局面を分析する関数。 *
    ************************/
   // テーブルを計算する関数。
-  int ChessBoard::GetTableValue(const int (& table)[NUM_SQUARES],
-  side_t side, bitboard_t bitboard) {
+  int ChessEngine::GetTableValue(const int (& table)[NUM_SQUARES],
+  Side side, Bitboard bitboard) {
     // どちらのサイドでもなければ0点。
     if (side == NO_SIDE) return 0;
 
     // ボードを鏡対象に上下反転させる配列。
     // <配列>[flip[<位置>]]と使うと上下が反転する。
-    static const square_t flip[NUM_SQUARES] = {
+    static const Square flip[NUM_SQUARES] = {
       A8, B8, C8, D8, E8, F8, G8, H8,
       A7, B7, C7, D7, E7, F7, G7, H7,
       A6, B6, C6, D6, E6, F6, G6, H6,
@@ -50,7 +50,7 @@ namespace Sayuri {
     };
 
     // 位置。
-    square_t square;
+    Square square;
 
     // 値。
     int value = 0;
@@ -72,7 +72,7 @@ namespace Sayuri {
     return value;
   }
   // 勝つのに十分な駒があるかどうか調べる。
-  bool ChessBoard::HasEnoughPieces(side_t side) const {
+  bool ChessEngine::HasEnoughPieces(Side side) const {
     // サイドを確認。
     if (side == NO_SIDE) return false;
 
@@ -100,20 +100,20 @@ namespace Sayuri {
     return false;
   }
   // 動ける位置の数を得る。
-  int ChessBoard::GetMobility(square_t piece_square) const {
+  int ChessEngine::GetMobility(Square piece_square) const {
     // 駒の種類を得る。
-    piece_t piece_type = piece_board_[piece_square];
+    Piece Pieceype = piece_board_[piece_square];
 
     // 駒のサイドと敵のサイドを得る。
-    side_t side = side_board_[piece_square];
-    side_t enemy_side = static_cast<side_t>(side ^ 0x3);
+    Side side = side_board_[piece_square];
+    Side enemy_side = side ^ 0x3;
 
     // 駒がなければ0を返す。
-    if (!piece_type) return 0;
+    if (!Pieceype) return 0;
 
     // 利き筋を入れる。
-    bitboard_t move_bitboard;
-    switch (piece_type) {
+    Bitboard move_bitboard;
+    switch (Pieceype) {
       case PAWN:
         // 通常の動き。
         move_bitboard = ChessUtil::GetPawnMove(piece_square, side) & ~blocker0_;
@@ -128,8 +128,8 @@ namespace Sayuri {
         // アンパッサン。
         if (can_en_passant_) {
           if (side_board_[en_passant_target_] != side) {
-            rank_t attacker_rank = ChessUtil::GetRank(piece_square);
-            rank_t target_rank = ChessUtil::GetRank(en_passant_target_);
+            Rank attacker_rank = ChessUtil::GetRank(piece_square);
+            Rank target_rank = ChessUtil::GetRank(en_passant_target_);
             if (attacker_rank == target_rank) {
               if ((piece_square == (en_passant_target_ + 1))
               || (piece_square == (en_passant_target_ - 1))) {
@@ -213,23 +213,23 @@ namespace Sayuri {
     return ChessUtil::CountBits(move_bitboard);
   }
   // 攻撃している位置のビットボードを得る。
-  bitboard_t ChessBoard::GetAttack(bitboard_t pieces) const {
+  Bitboard ChessEngine::GetAttack(Bitboard pieces) const {
     // 駒を整理。
     pieces &= blocker0_;
 
     // 攻撃位置。
-    bitboard_t attack = 0;
+    Bitboard attack = 0;
 
     // 駒を1つずつ調べていく。
-    square_t piece_square;
-    piece_t piece_type;
-    side_t side;
+    Square piece_square;
+    Piece Pieceype;
+    Side side;
     for (; pieces; pieces &= pieces - 1) {
       piece_square = ChessUtil::GetSquare(pieces);
-      piece_type = piece_board_[piece_square];
+      Pieceype = piece_board_[piece_square];
       side = side_board_[piece_square];
       // 駒の種類によって分岐。
-      switch (piece_type) {
+      switch (Pieceype) {
         case PAWN:
           attack |= ChessUtil::GetPawnAttack(piece_square, side);
           break;
@@ -254,20 +254,20 @@ namespace Sayuri {
     return attack;
   }
   // パスポーンの位置のビットボードを得る。
-  bitboard_t ChessBoard::GetPassPawns(side_t side) const {
+  Bitboard ChessEngine::GetPassPawns(Side side) const {
     // どちらのサイドでもなければ空のビットボードを返す。
     if (side == NO_SIDE) return 0;
 
     // 相手のサイドを得る。
-    side_t enemy_side = static_cast<side_t>(side ^ 0x3);
+    Side enemy_side = side ^ 0x3;
 
     // ポーンのビットボード。
-    bitboard_t pawns = position_[side][PAWN];
+    Bitboard pawns = position_[side][PAWN];
 
     // パスポーンの位置のビットボード。
-    bitboard_t pass_pawns = 0;
+    Bitboard pass_pawns = 0;
 
-    square_t square;
+    Square square;
     for (; pawns; pawns &= pawns - 1) {
       square = ChessUtil::GetSquare(pawns);
 
@@ -280,12 +280,12 @@ namespace Sayuri {
     return pass_pawns;
   }
   // ダブルポーンの位置のビットボードを得る。
-  bitboard_t ChessBoard::GetDoublePawns(side_t side) const {
+  Bitboard ChessEngine::GetDoublePawns(Side side) const {
     // どちらのサイドでもなければ空を返す。
     if (side == NO_SIDE) return 0;
 
     // ダブルポーンを得る。
-    bitboard_t double_pawns = 0;
+    Bitboard double_pawns = 0;
     for (int fyle = 0; fyle < NUM_FYLES; fyle++) {
       if (ChessUtil::CountBits(position_[side][PAWN] & ChessUtil::FYLE[fyle])
       >= 2) {
@@ -296,18 +296,18 @@ namespace Sayuri {
     return double_pawns;
   }
   // 孤立ポーンの位置のビットボードを得る。
-  bitboard_t ChessBoard::GetIsoPawns(side_t side) const {
+  Bitboard ChessEngine::GetIsoPawns(Side side) const {
     // サイドがどちらでもないなら空を返す。
     if (side == NO_SIDE) return 0;
 
     // ポーンのビットボード。
-    bitboard_t pawns = position_[side][PAWN];
+    Bitboard pawns = position_[side][PAWN];
 
     // 孤立ポーン。
-    bitboard_t iso_pawns = 0;
+    Bitboard iso_pawns = 0;
 
     // 孤立ポーンを調べる。
-    square_t square;
+    Square square;
     for (; pawns; pawns &= pawns - 1) {
       square = ChessUtil::GetSquare(pawns);
       if (!(position_[side][PAWN] & iso_pawn_mask_[square])) {
@@ -318,12 +318,12 @@ namespace Sayuri {
     return iso_pawns;
   }
   // 展開されていないマイナーピースの位置のビットボードを得る。
-  bitboard_t ChessBoard::GetNotDevelopedMinorPieces(side_t side) const {
+  Bitboard ChessEngine::GetNotDevelopedMinorPieces(Side side) const {
     // どちらのサイドでもなければ空を返す。
     if (side == NO_SIDE) return 0;
 
     // 展開されていないマイナーピースを得る。
-    bitboard_t pieces;
+    Bitboard pieces;
     if (side == WHITE) {
       pieces = (position_[WHITE][KNIGHT] & (B1 | G1))
       | (position_[WHITE][BISHOP] & (C1 | F1));
@@ -336,12 +336,12 @@ namespace Sayuri {
   }
 
   // パスポーンを判定するときに使用するマスク。
-  bitboard_t ChessBoard::pass_pawn_mask_[NUM_SIDES][NUM_SQUARES];
+  Bitboard ChessEngine::pass_pawn_mask_[NUM_SIDES][NUM_SQUARES];
   // pass_pawn_mask_[][]を初期化する。
-  void ChessBoard::InitPassPawnMask() {
-    bitboard_t mask;  // マスク。
-    fyle_t fyle;  // その位置のファイル。
-    bitboard_t bitboard;  // 自分より手前のビットボード。
+  void ChessEngine::InitPassPawnMask() {
+    Bitboard mask;  // マスク。
+    Fyle fyle;  // その位置のファイル。
+    Bitboard bitboard;  // 自分より手前のビットボード。
     // マスクを作って初期化する。
     for (int side = 0; side < NUM_SIDES; side++) {
       for (int square = 0; square < NUM_SQUARES; square++) {
@@ -350,7 +350,7 @@ namespace Sayuri {
           pass_pawn_mask_[side][square] = 0;
         } else {
           // 自分のファイルと隣のファイルのマスクを作る。
-          fyle = ChessUtil::GetFyle(static_cast<square_t>(square));
+          fyle = ChessUtil::GetFyle(square);
           mask |= ChessUtil::FYLE[fyle];
           if (fyle == FYLE_A) {  // aファイルのときはbファイルが隣り。
             mask |= ChessUtil::FYLE[fyle + 1];
@@ -364,13 +364,11 @@ namespace Sayuri {
           // 自分の位置より手前のランクは消す。
           if (side == WHITE) {
             bitboard = (ChessUtil::BIT[square] - 1)
-            | ChessUtil::RANK[ChessUtil::GetRank(static_cast<square_t>
-            (square))];
+            | ChessUtil::RANK[ChessUtil::GetRank(square)];
             mask &= ~bitboard;
           } else {
             bitboard = ~(ChessUtil::BIT[square] - 1)
-            | ChessUtil::RANK[ChessUtil::GetRank(static_cast<square_t>
-            (square))];
+            | ChessUtil::RANK[ChessUtil::GetRank(square)];
             mask &= ~bitboard;
           }
 
@@ -382,12 +380,12 @@ namespace Sayuri {
   }
 
   // 孤立ポーンを判定するときに使用するマスク。
-  bitboard_t ChessBoard::iso_pawn_mask_[NUM_SQUARES];
+  Bitboard ChessEngine::iso_pawn_mask_[NUM_SQUARES];
   // iso_pawn_mask_[]を初期化する。
-  void ChessBoard::InitIsoPawnMask() {
-    fyle_t fyle;
+  void ChessEngine::InitIsoPawnMask() {
+    Fyle fyle;
     for (int square = 0; square < NUM_SQUARES; square++) {
-      fyle = ChessUtil::GetFyle(static_cast<square_t>(square));
+      fyle = ChessUtil::GetFyle(square);
       if (fyle == FYLE_A) {
         iso_pawn_mask_[square] = ChessUtil::FYLE[fyle + 1];
       } else if (fyle == FYLE_H) {
@@ -400,9 +398,9 @@ namespace Sayuri {
   }
 
   // ポーンの盾の位置のマスク。
-  bitboard_t ChessBoard::pawn_shield_mask_[NUM_SIDES][NUM_SQUARES];
+  Bitboard ChessEngine::pawn_shield_mask_[NUM_SIDES][NUM_SQUARES];
   // pawn_shield_mask_[][]を初期化する。
-  void ChessBoard::InitPawnShieldMask() {
+  void ChessEngine::InitPawnShieldMask() {
     for (int side = 0; side < NUM_SIDES; side++) {
       for (int square = 0; square < NUM_SQUARES; square++) {
         if (side == NO_SIDE) {  // どちらのサイドでもなければ空。

@@ -1,5 +1,5 @@
 /* chess_def.h: チェスの定数の定義。
-   Copyright (c) 2011 Ishibashi Hironori
+   Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -23,90 +23,170 @@
 #ifndef CHESS_DEF_H
 #define CHESS_DEF_H
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace Sayuri {
   // ビットボードの型。
-  typedef uint64_t bitboard_t;
+  using Bitboard = uint64_t;
 
   // マスの型。
-  enum square_t {
-    A1, B1, C1, D1, E1, F1, G1, H1,
-    A2, B2, C2, D2, E2, F2, G2, H2,
-    A3, B3, C3, D3, E3, F3, G3, H3,
-    A4, B4, C4, D4, E4, F4, G4, H4,
-    A5, B5, C5, D5, E5, F5, G5, H5,
-    A6, B6, C6, D6, E6, F6, G6, H6,
-    A7, B7, C7, D7, E7, F7, G7, H7,
-    A8, B8, C8, D8, E8, F8, G8, H8
-  };
+  using Square = unsigned int;
+  constexpr Square A1 = 0;
+  constexpr Square A2 = 1;
+  constexpr Square A3 = 2;
+  constexpr Square A4 = 3;
+  constexpr Square A5 = 4;
+  constexpr Square A6 = 5;
+  constexpr Square A7 = 6;
+  constexpr Square A8 = 7;
+  constexpr Square B1 = 8;
+  constexpr Square B2 = 9;
+  constexpr Square B3 = 10;
+  constexpr Square B4 = 11;
+  constexpr Square B5 = 12;
+  constexpr Square B6 = 13;
+  constexpr Square B7 = 14;
+  constexpr Square B8 = 15;
+  constexpr Square C1 = 16;
+  constexpr Square C2 = 17;
+  constexpr Square C3 = 18;
+  constexpr Square C4 = 19;
+  constexpr Square C5 = 20;
+  constexpr Square C6 = 21;
+  constexpr Square C7 = 22;
+  constexpr Square C8 = 23;
+  constexpr Square D1 = 24;
+  constexpr Square D2 = 25;
+  constexpr Square D3 = 26;
+  constexpr Square D4 = 27;
+  constexpr Square D5 = 28;
+  constexpr Square D6 = 29;
+  constexpr Square D7 = 30;
+  constexpr Square D8 = 31;
+  constexpr Square E1 = 32;
+  constexpr Square E2 = 33;
+  constexpr Square E3 = 34;
+  constexpr Square E4 = 35;
+  constexpr Square E5 = 36;
+  constexpr Square E6 = 37;
+  constexpr Square E7 = 38;
+  constexpr Square E8 = 39;
+  constexpr Square F1 = 40;
+  constexpr Square F2 = 41;
+  constexpr Square F3 = 42;
+  constexpr Square F4 = 43;
+  constexpr Square F5 = 44;
+  constexpr Square F6 = 45;
+  constexpr Square F7 = 46;
+  constexpr Square F8 = 47;
+  constexpr Square G1 = 48;
+  constexpr Square G2 = 49;
+  constexpr Square G3 = 50;
+  constexpr Square G4 = 51;
+  constexpr Square G5 = 52;
+  constexpr Square G6 = 53;
+  constexpr Square G7 = 54;
+  constexpr Square G8 = 55;
+  constexpr Square H1 = 56;
+  constexpr Square H2 = 57;
+  constexpr Square H3 = 58;
+  constexpr Square H4 = 59;
+  constexpr Square H5 = 60;
+  constexpr Square H6 = 61;
+  constexpr Square H7 = 62;
+  constexpr Square H8 = 63;
 
   // ファイルの型。
-  enum fyle_t {
-    FYLE_A, FYLE_B, FYLE_C, FYLE_D, FYLE_E, FYLE_F, FYLE_G, FYLE_H
-  };
+  using Fyle = unsigned int;
+  constexpr Fyle FYLE_A = 0;
+  constexpr Fyle FYLE_B = 1;
+  constexpr Fyle FYLE_C = 2;
+  constexpr Fyle FYLE_D = 3;
+  constexpr Fyle FYLE_E = 4;
+  constexpr Fyle FYLE_F = 5;
+  constexpr Fyle FYLE_G = 6;
+  constexpr Fyle FYLE_H = 7;
 
   // ランクの型。
-  enum rank_t {
-    RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8
-  };
+  using Rank = unsigned int;
+  constexpr Rank RANK_1 = 0;
+  constexpr Rank RANK_2 = 1;
+  constexpr Rank RANK_3 = 2;
+  constexpr Rank RANK_4 = 3;
+  constexpr Rank RANK_5 = 4;
+  constexpr Rank RANK_6 = 5;
+  constexpr Rank RANK_7 = 6;
+  constexpr Rank RANK_8 = 7;
 
   // サイドの型。
-  enum side_t {
-    NO_SIDE, WHITE, BLACK
-  };
+  using Side = unsigned int;
+  constexpr Side NO_SIDE = 0;
+  constexpr Side WHITE = 1;
+  constexpr Side BLACK = 2;
 
   // 駒の型。
-  enum piece_t {
-    EMPTY, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING
-  };
+  using Piece = unsigned int;
+  constexpr Piece EMPTY = 0;
+  constexpr Piece PAWN = 1;
+  constexpr Piece KNIGHT = 2;
+  constexpr Piece BISHOP = 3;
+  constexpr Piece ROOK = 4;
+  constexpr Piece QUEEN = 5;
+  constexpr Piece KING = 6;
 
   // 数の定義。
-  enum {
-    NUM_SQUARES = 64,
-    NUM_FYLES = 8,
-    NUM_RANKS = 8,
-    NUM_SIDES = 3,
-    NUM_PIECE_TYPES = 7
-  };
+  constexpr int NUM_SQUARES = 64;
+  constexpr int NUM_FYLES = 8;
+  constexpr int NUM_RANKS = 8;
+  constexpr int NUM_SIDES = 3;
+  constexpr int NUM_PIECE_TYPES = 7;
 
   // キャスリングのフラグの型。
-  typedef uint8_t castling_t;
-  // それぞれのキャスリングのフラグ。
-  extern const castling_t WHITE_SHORT_CASTLING;  // 白のショートキャスリング。
-  extern const castling_t WHITE_LONG_CASTLING;  // 白のロングキャスリング。
-  extern const castling_t BLACK_SHORT_CASTLING;  // 黒のショートキャスリング。
-  extern const castling_t BLACK_LONG_CASTLING;  // 黒のロングキャスリング。
-  extern const castling_t WHITE_CASTLING;  // 白の全てのキャスリング。
-  extern const castling_t BLACK_CASTLING;  // 黒の全てのキャスリング。
-  extern const castling_t ALL_CASTLING;  // 両方の全てのキャスリング。
+  using Castling = uint8_t;
+  // 白のショートキャスリング。
+  constexpr Castling WHITE_SHORT_CASTLING = 1;
+  // 白のロングキャスリング。
+  constexpr Castling WHITE_LONG_CASTLING = 1 << 1;
+  // 黒のショートキャスリング。
+  constexpr Castling BLACK_SHORT_CASTLING = 1 << 2;
+  // 黒のロングキャスリング。
+  constexpr Castling BLACK_LONG_CASTLING = 1 << 3;
+  // 白のキャスリング。
+  constexpr Castling WHITE_CASTLING =
+  WHITE_SHORT_CASTLING | WHITE_LONG_CASTLING;
+  // 黒のキャスリング。
+  constexpr Castling BLACK_CASTLING =
+  BLACK_SHORT_CASTLING | BLACK_LONG_CASTLING;
+  // 全キャスリング。
+  constexpr Castling ALL_CASTLING = WHITE_CASTLING | BLACK_CASTLING;
+
+  // 手の種類の定数。
+  using MoveType = unsigned int;
+  constexpr MoveType NULL_MOVE = 0;
+  constexpr MoveType NORMAL = 1;
+  constexpr MoveType CASTLING = 2;
+  constexpr MoveType EN_PASSANT = 3;
 
   // 手の型。
-  union move_t {
-    uint32_t all_;
+  union Move {
+    unsigned int all_ : 31;
     struct {
-      square_t piece_square_ : 6;  // 駒の位置。
-      square_t goal_square_ : 6;  // 移動先の位置。
-      piece_t captured_piece_ : 3;  // 取った駒の種類。
-      piece_t promotion_ : 3;  // 昇格する駒の種類。
-      castling_t last_castling_rights_ : 4;  // 動かす前のキャスリングのフラグ。
+      Square piece_square_ : 6;  // 駒の位置。
+      Square goal_square_ : 6;  // 移動先の位置。
+      Piece captured_piece_ : 3;  // 取った駒の種類。
+      Piece promotion_ : 3;  // 昇格する駒の種類。
+      // 動かす前のキャスリングのフラグ。
+      Castling last_castling_rights_ : 4;
       // 動かす前のアンパッサンできるかどうか。
       bool last_can_en_passant_ : 1;
       // 動かす前のアンパッサンのターゲットの位置。
-      square_t last_en_passant_target_ : 6;
-      unsigned int move_type_ : 2;  // 手の種類。
+      Square last_en_passant_target_ : 6;
+      MoveType move_type_ : 2;  // 手の種類。
     };
-  };
-  // 手の種類の定数。
-  enum {
-    NORMAL,  // 通常の動き。取る手も含む。
-    CASTLING,  // キャスリング。
-    EN_PASSANT,  // アンパッサン。
-    NULL_MOVE  // Null Move。
   };
 
   // ハッシュの型。
-  typedef uint64_t hash_key_t;
+  using HashKey = uint64_t;
 }  // namespace Sayuri
 
 #endif

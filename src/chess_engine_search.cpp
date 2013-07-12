@@ -1,5 +1,5 @@
 /* chess_engine_search.cpp: チェスボードの探索に関するもの。
-   Copyright (c) 2011 Ishibashi Hironori
+   Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -34,7 +34,7 @@ namespace Sayuri {
    * 探索に使う関数。 *
    ********************/
   // MCapを得る。
-  int ChessBoard::GetMCap(move_t move) const {
+  int ChessEngine::GetMCap(Move move) const {
     if (move.move_type_ == EN_PASSANT) return SCORE_PAWN;
 
     static const int score_array[NUM_PIECE_TYPES] = {
@@ -50,8 +50,8 @@ namespace Sayuri {
     return score_array[piece_board_[move.goal_square_]];
   }
   // クイース探索。
-  int ChessBoard::Quiesce(int level, int depth, int alpha, int beta,
-  hash_key_t key, TranspositionTable& table, const EvalWeights& weights) {
+  int ChessEngine::Quiesce(int level, int depth, int alpha, int beta,
+  HashKey key, TranspositionTable& table, const EvalWeights& weights) {
     // 評価値。
     int score = 0;
 
@@ -91,8 +91,8 @@ namespace Sayuri {
     if (stand_pat > alpha) alpha = stand_pat;
 
     // 自分のサイドと敵のサイド。
-    side_t side = to_move_;
-    side_t enemy_side = static_cast<side_t>(side ^ 0x3);
+    Side side = to_move_;
+    Side enemy_side = side ^ 0x3;
 
     // お互い十分な駒がなければ評価値を返す。
     if (!HasEnoughPieces(side) && !HasEnoughPieces(enemy_side)) {
@@ -125,11 +125,11 @@ namespace Sayuri {
     // アルファベータでクイースする。
     int save_alpha = alpha;  // アルファ値をセーブする。
     score = SCORE_DRAW;  // 評価値。ステールメイトの評価で初期化する。
-    move_t move;  // 手。
+    Move move;  // 手。
     move.all_ = 0;
-    move_t candidate_move;  // このノードの最善手。
+    Move candidate_move;  // このノードの最善手。
     candidate_move.all_ = 0;
-    hash_key_t next_key;
+    HashKey next_key;
     int m_cap;
     int material = GetMaterial(side);
     while (stack_ptr_[level] != tree_ptr_[level]) {
@@ -213,8 +213,8 @@ namespace Sayuri {
     return alpha;
   }
   // 探索する。
-  int ChessBoard::Search(int level, int depth, int alpha, int beta,
-  bool is_null_move, hash_key_t key, TranspositionTable& table,
+  int ChessEngine::Search(int level, int depth, int alpha, int beta,
+  bool is_null_move, HashKey key, TranspositionTable& table,
   const EvalWeights& weights) {
     // 評価値。
     int score = 0;
@@ -266,8 +266,8 @@ namespace Sayuri {
     }
 
     // このノードのサイドと、その敵のサイド。
-    side_t side = to_move_;
-    side_t enemy_side = static_cast<side_t>(side ^ 0x3);
+    Side side = to_move_;
+    Side enemy_side = side ^ 0x3;
 
     // 合法手がなければ評価を返す。
     if (!HasLegalMove(side)) {
@@ -300,7 +300,7 @@ namespace Sayuri {
     if ((level != 0) && !is_null_move && (move_count > 1) && (depth > 3)
     && !is_check && (material >= SCORE_ROOK)) {
       // Null Moveを準備。
-      move_t null_move;
+      Move null_move;
       null_move.all_ = 0;
       null_move.move_type_ = NULL_MOVE;
 
@@ -324,13 +324,13 @@ namespace Sayuri {
     // PVSearch。
     int save_alpha = alpha;  // アルファ値をセーブする。
     score = SCORE_DRAW;  // 評価値。ステールメイトの評価で初期化する。
-    move_t move;  // 手。
+    Move move;  // 手。
     move.all_ = 0;
-    move_t candidate_move;  // 最善手。
+    Move candidate_move;  // 最善手。
     candidate_move.all_ = 0;
     int m_cap;  // MCap。
     bool full_search = true;  // 全探索するフラグ。
-    hash_key_t next_key;  // 次の局面のハッシュキー。
+    HashKey next_key;  // 次の局面のハッシュキー。
     while (stack_ptr_[level] != tree_ptr_[level]) {
       // タイムアウトなら探索を止める。
       if (IsTimeOut()) {
