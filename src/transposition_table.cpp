@@ -212,6 +212,10 @@ namespace Sayuri {
 
     return *this;
   }
+  // ソート用比較関数。
+  static bool TTEntry::Compare(const TTEntry& first, const TTEntry& second) {
+    return first.level_ < second.level_;
+  }
   // 該当するならtrue。
   bool TTEntry::Fulfil(HashKey key, int level, int depth, Side to_move) const {
     if(!exists_) return false;

@@ -76,9 +76,7 @@ namespace Sayuri {
       /************************/
       /* ソート用比較演算子。 */
       /************************/
-      static bool Compare(const TTEntry& first, const TTEntry& second) {
-        return first.level_ < second.level_;
-      }
+      static bool Compare(const TTEntry& first, const TTEntry& second);
 
       /**********/
       /* 関数。 */
