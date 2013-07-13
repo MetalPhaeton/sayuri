@@ -267,13 +267,13 @@ namespace Sayuri {
         attack = 0;
         // 右側を作る。
         temp = point;
-        while (temp = GetRightBitboard(temp)) {
+        while ((temp = GetRightBitboard(temp))) {
           attack |= temp;
           if (temp & map) break;
         }
         // 左側を作る。
         temp = point;
-        while (temp = GetLeftBitboard(temp)) {
+        while ((temp = GetLeftBitboard(temp))) {
           attack |= temp;
           if (temp & map) break;
         }
@@ -293,13 +293,13 @@ namespace Sayuri {
         attack = 0;
         // 右側を作る。
         temp = point;
-        while (temp = GetRightBitboard(temp)) {
+        while ((temp = GetRightBitboard(temp))) {
           attack |= temp;
           if (temp & map) break;
         }
         // 左側を作る。
         temp = point;
-        while (temp = GetLeftBitboard(temp)) {
+        while ((temp = GetLeftBitboard(temp))) {
           attack |= temp;
           if (temp & map) break;
         }
@@ -321,13 +321,13 @@ namespace Sayuri {
         attack = 0;
         // 右側を作る。
         temp = point;
-        while (temp = GetRightBitboard(temp)) {
+        while ((temp = GetRightBitboard(temp))) {
           attack |= temp;
           if (temp & map) break;
         }
         // 左側を作る。
         temp = point;
-        while (temp = GetLeftBitboard(temp)) {
+        while ((temp = GetLeftBitboard(temp))) {
           attack |= temp;
           if (temp & map) break;
         }
@@ -349,13 +349,13 @@ namespace Sayuri {
         attack = 0;
         // 右側を作る。
         temp = point;
-        while (temp = GetRightBitboard(temp)) {
+        while ((temp = GetRightBitboard(temp))) {
           attack |= temp;
           if (temp & map) break;
         }
         // 左側を作る。
         temp = point;
-        while (temp = GetLeftBitboard(temp)) {
+        while ((temp = GetLeftBitboard(temp))) {
           attack |= temp;
           if (temp & map) break;
         }
@@ -467,7 +467,7 @@ namespace Sayuri {
         // 右から調べていく。
         temp = point1;
         between = 0;
-        while (temp = GetRightBitboard(temp)) {
+        while ((temp = GetRightBitboard(temp))) {
           between |= temp;
           // 端点に達したらline_に直線を入れる。
           if (temp & point2) {
@@ -478,7 +478,7 @@ namespace Sayuri {
         // 左から調べていく。
         temp = point1;
         between = 0;
-        while (temp = GetLeftBitboard(temp)) {
+        while ((temp = GetLeftBitboard(temp))) {
           between |= temp;
           // 端点に達したらline_に直線を入れる。
           if (temp & point2) {
@@ -489,7 +489,7 @@ namespace Sayuri {
         // 上から調べていく。
         temp = point1;
         between = 0;
-        while (temp = GetUpBitboard(temp)) {
+        while ((temp = GetUpBitboard(temp))) {
           between |= temp;
           // 端点に達したらline_に直線を入れる。
           if (temp & point2) {
@@ -500,7 +500,7 @@ namespace Sayuri {
         // 下から調べていく。
         temp = point1;
         between = 0;
-        while (temp = GetDownBitboard(temp)) {
+        while ((temp = GetDownBitboard(temp))) {
           between |= temp;
           // 端点に達したらline_に直線を入れる。
           if (temp & point2) {
@@ -511,7 +511,7 @@ namespace Sayuri {
         // 右上から調べていく。
         temp = point1;
         between = 0;
-        while (temp = GetRightUpBitboard(temp)) {
+        while ((temp = GetRightUpBitboard(temp))) {
           between |= temp;
           // 端点に達したらline_に直線を入れる。
           if (temp & point2) {
@@ -522,7 +522,7 @@ namespace Sayuri {
         // 右下から調べていく。
         temp = point1;
         between = 0;
-        while (temp = GetRightDownBitboard(temp)) {
+        while ((temp = GetRightDownBitboard(temp))) {
           between |= temp;
           // 端点に達したらline_に直線を入れる。
           if (temp & point2) {
@@ -533,7 +533,7 @@ namespace Sayuri {
         // 左上から調べていく。
         temp = point1;
         between = 0;
-        while (temp = GetLeftUpBitboard(temp)) {
+        while ((temp = GetLeftUpBitboard(temp))) {
           between |= temp;
           // 端点に達したらline_に直線を入れる。
           if (temp & point2) {
@@ -544,7 +544,7 @@ namespace Sayuri {
         // 左下から調べていく。
         temp = point1;
         between = 0;
-        while (temp = GetLeftDownBitboard(temp)) {
+        while ((temp = GetLeftDownBitboard(temp))) {
           between |= temp;
           // 端点に達したらline_に直線を入れる。
           if (temp & point2) {
@@ -648,22 +648,22 @@ namespace Sayuri {
 
       // 右上の動きを入れる。
       temp = point;
-      while (temp = GetRightUpBitboard(temp)) {
+      while ((temp = GetRightUpBitboard(temp))) {
         bishop_move_[square] |= temp;
       }
       // 右下の動きを入れる。
       temp = point;
-      while (temp = GetRightDownBitboard(temp)) {
+      while ((temp = GetRightDownBitboard(temp))) {
         bishop_move_[square] |= temp;
       }
       // 左上の動きを入れる。
       temp = point;
-      while (temp = GetLeftUpBitboard(temp)) {
+      while ((temp = GetLeftUpBitboard(temp))) {
         bishop_move_[square] |= temp;
       }
       // 左下の動きを入れる。
       temp = point;
-      while (temp = GetLeftDownBitboard(temp)) {
+      while ((temp = GetLeftDownBitboard(temp))) {
         bishop_move_[square] |= temp;
       }
     }
@@ -682,22 +682,22 @@ namespace Sayuri {
 
       // 右の動きを入れる。
       temp = point;
-      while (temp = GetRightBitboard(temp)) {
+      while ((temp = GetRightBitboard(temp))) {
         rook_move_[square] |= temp;
       }
       // 左の動きを入れる。
       temp = point;
-      while (temp = GetLeftBitboard(temp)) {
+      while ((temp = GetLeftBitboard(temp))) {
         rook_move_[square] |= temp;
       }
       // 上の動きを入れる。
       temp = point;
-      while (temp = GetUpBitboard(temp)) {
+      while ((temp = GetUpBitboard(temp))) {
         rook_move_[square] |= temp;
       }
       // 下の動きを入れる。
       temp = point;
-      while (temp = GetDownBitboard(temp)) {
+      while ((temp = GetDownBitboard(temp))) {
         rook_move_[square] |= temp;
       }
     }

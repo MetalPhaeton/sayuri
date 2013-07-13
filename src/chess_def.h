@@ -30,7 +30,7 @@ namespace Sayuri {
   using Bitboard = std::uint64_t;
 
   // マスの型。
-  using Square = unsigned int;
+  using Square = int;
   constexpr Square A1 = 0;
   constexpr Square A2 = 1;
   constexpr Square A3 = 2;
@@ -97,7 +97,7 @@ namespace Sayuri {
   constexpr Square H8 = 63;
 
   // ファイルの型。
-  using Fyle = unsigned int;
+  using Fyle = int;
   constexpr Fyle FYLE_A = 0;
   constexpr Fyle FYLE_B = 1;
   constexpr Fyle FYLE_C = 2;
@@ -108,7 +108,7 @@ namespace Sayuri {
   constexpr Fyle FYLE_H = 7;
 
   // ランクの型。
-  using Rank = unsigned int;
+  using Rank = int;
   constexpr Rank RANK_1 = 0;
   constexpr Rank RANK_2 = 1;
   constexpr Rank RANK_3 = 2;
@@ -119,13 +119,13 @@ namespace Sayuri {
   constexpr Rank RANK_8 = 7;
 
   // サイドの型。
-  using Side = unsigned int;
+  using Side = int;
   constexpr Side NO_SIDE = 0;
   constexpr Side WHITE = 1;
   constexpr Side BLACK = 2;
 
   // 駒の型。
-  using Piece = unsigned int;
+  using Piece = int;
   constexpr Piece EMPTY = 0;
   constexpr Piece PAWN = 1;
   constexpr Piece KNIGHT = 2;
@@ -162,7 +162,7 @@ namespace Sayuri {
   constexpr Castling ALL_CASTLING = WHITE_CASTLING | BLACK_CASTLING;
 
   // 手の種類の定数。
-  using MoveType = unsigned int;
+  using MoveType = int;
   constexpr MoveType NULL_MOVE = 0;
   constexpr MoveType NORMAL = 1;
   constexpr MoveType CASTLING = 2;
@@ -172,17 +172,17 @@ namespace Sayuri {
   union Move {
     std::uint32_t all_ : 31;
     struct {
-      Square piece_square_ : 6;  // 駒の位置。
-      Square goal_square_ : 6;  // 移動先の位置。
-      Piece captured_piece_ : 3;  // 取った駒の種類。
-      Piece promotion_ : 3;  // 昇格する駒の種類。
+      unsigned int piece_square_ : 6;  // 駒の位置。
+      unsigned int goal_square_ : 6;  // 移動先の位置。
+      unsigned int captured_piece_ : 3;  // 取った駒の種類。
+      unsigned int promotion_ : 3;  // 昇格する駒の種類。
       // 動かす前のキャスリングのフラグ。
-      Castling last_castling_rights_ : 4;
+      unsigned int last_castling_rights_ : 4;
       // 動かす前のアンパッサンできるかどうか。
       bool last_can_en_passant_ : 1;
       // 動かす前のアンパッサンのターゲットの位置。
-      Square last_en_passant_target_ : 6;
-      MoveType move_type_ : 2;  // 手の種類。
+      unsigned int last_en_passant_target_ : 6;
+      unsigned int move_type_ : 2;  // 手の種類。
     };
   };
 

@@ -46,8 +46,10 @@ set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -w -g -O2 -march=k8")
 set(CMAKE_C_FLAGSE_RELEASE "-std=c++11 -w -g -O2 -march=k8")
 
 # デバッグ用のコンパイラオプションの設定
-set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -w -O0 -g -march=k8")
-set(CMAKE_C_FLAGS_DEBUG "-std=c++11 -w -O0 -g -march=k8")
+set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -Wall -O0 -g -march=k8")
+set(CMAKE_C_FLAGS_DEBUG "-std=c++11 -Wall -O0 -g -march=k8")
+
+# プロファイル用オプションの設定。
 set(CMAKE_CXX_FLAGS_PROFILE "-std=c++11 -w -pg -march=k8")
 set(CMAKE_C_FLAGS_PROFILE "-std=c++11 -w -pg -march=k8")
 set(CMAKE_LD_FLAGS_PROFILE "-std=c++11 -w -lgmon -march=k8")

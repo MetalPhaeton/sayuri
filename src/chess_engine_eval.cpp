@@ -106,12 +106,6 @@ namespace Sayuri {
     // サイドがなければ0点。
     if (side == NO_SIDE) return 0;
 
-    // 駒の位置。
-    Square piece_square;
-
-    // ビットボード。
-    Bitboard bitboard;
-
     // 各サイドの価値。
     int white_value = 0;
     int black_value = 0;

@@ -63,7 +63,7 @@ namespace Sayuri {
     Assert(num_entries > 0ULL);
 
     // 配列をリサイズ。
-    for (int i = 0; i < TABLE_SIZE; i++) {
+    for (std::uint64_t i = 0; i < TABLE_SIZE; i++) {
       entry_table_[i].resize(num_entries);
     }
   }
@@ -72,9 +72,9 @@ namespace Sayuri {
   max_bytes_(table.max_bytes_),
   entry_table_(new std::vector<TTEntry>[TABLE_SIZE]) {
     // テーブルをコピー。
-    for (int i = 0; i < TABLE_SIZE; i++) {
+    for (std::uint64_t i = 0; i < TABLE_SIZE; i++) {
       entry_table_[i].resize(table.entry_table_[i].size());
-      for (int j = 0; j < table.entry_table_[i].size(); j++) {
+      for (unsigned int j = 0; j < table.entry_table_[i].size(); j++) {
         entry_table_[i][j] = table.entry_table_[i][j];
       }
     }
@@ -127,7 +127,7 @@ namespace Sayuri {
     bytes += sizeof(std::vector<TTEntry>) * TABLE_SIZE;
 
     // TTEntryのサイズ。
-    for (int i = 0; i < TABLE_SIZE; i++) {
+    for (std::uint64_t i = 0; i < TABLE_SIZE; i++) {
       bytes += sizeof(TTEntry) * entry_table_[i].size();
     }
 
@@ -213,7 +213,7 @@ namespace Sayuri {
     return *this;
   }
   // ソート用比較関数。
-  static bool TTEntry::Compare(const TTEntry& first, const TTEntry& second) {
+  bool TTEntry::Compare(const TTEntry& first, const TTEntry& second) {
     return first.level_ < second.level_;
   }
   // 該当するならtrue。
