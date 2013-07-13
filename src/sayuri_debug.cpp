@@ -62,7 +62,7 @@ namespace Sayuri {
     TTEntry* entry_ptr2 =
     table2->GetFulfiledEntry(pos_key, level, depth, to_move);
 
-    if(entry_ptr == entry_ptr2) {
+    if (entry_ptr == entry_ptr2) {
       std::cout << "True" << std::endl;
     } else {
       std::cout << "False" << std::endl;
@@ -76,7 +76,7 @@ namespace Sayuri {
 
   // アサートする。
   void Assert(bool expr) {
-    if(expr) return;
+    if (expr) return;
     throw SayuriError("Sayuriエラー: アサート失敗。");
   }
 

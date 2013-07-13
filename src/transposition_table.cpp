@@ -44,7 +44,7 @@ namespace Sayuri {
     std::uint64_t mini_size = sizeof(TTEntry) * TABLE_SIZE;
     mini_size += sizeof(std::vector<TTEntry>) * TABLE_SIZE;
     mini_size += sizeof(TranspositionTable);
-    if(max_bytes < mini_size) {
+    if (max_bytes < mini_size) {
       max_bytes = mini_size;
     }
 
@@ -56,14 +56,14 @@ namespace Sayuri {
 
     // 一つのテーブルにつきいくつのエントリーを用意するか決める。
     num_entries /= TABLE_SIZE;
-    if(num_entries <= 0ULL) {
+    if (num_entries <= 0ULL) {
       num_entries = 1;
     }
 
     Assert(num_entries > 0ULL);
 
     // 配列をリサイズ。
-    for(int i = 0; i < TABLE_SIZE; i++) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
       entry_table_[i].resize(num_entries);
     }
   }
@@ -72,9 +72,9 @@ namespace Sayuri {
   max_bytes_(table.max_bytes_),
   entry_table_(new std::vector<TTEntry>[TABLE_SIZE]) {
     // テーブルをコピー。
-    for(int i = 0; i < TABLE_SIZE; i++) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
       entry_table_[i].resize(table.entry_table_[i].size());
-      for(int j = 0; j < table.entry_table_[i].size(); j++) {
+      for (int j = 0; j < table.entry_table_[i].size(); j++) {
         entry_table_[i][j] = table.entry_table_[i][j];
       }
     }
@@ -90,8 +90,8 @@ namespace Sayuri {
   Side to_move, int value, TTValueFlag value_flag, Move best_move) {
     // テーブルに追加。
     int index = GetTableIndex(pos_key);
-    for(auto& entry : entry_table_[index]) {
-      if(!(entry.exists())) {
+    for (auto& entry : entry_table_[index]) {
+      if (!(entry.exists())) {
         entry = TTEntry(pos_key, level, depth, to_move,
         value, value_flag, best_move);
         break;
@@ -109,10 +109,10 @@ namespace Sayuri {
     int index = GetTableIndex(pos_key);
 
     TTEntry* entry_ptr = nullptr;
-    for(auto& entry : entry_table_[index]) {
-      if(!(entry.exists())) return nullptr;  // エントリーがない。
+    for (auto& entry : entry_table_[index]) {
+      if (!(entry.exists())) return nullptr;  // エントリーがない。
 
-      if(entry.Fulfil(pos_key, level, depth, to_move)) {
+      if (entry.Fulfil(pos_key, level, depth, to_move)) {
         entry_ptr = &entry;  // エントリーが見つかった。
         break;
       }
@@ -127,7 +127,7 @@ namespace Sayuri {
     bytes += sizeof(std::vector<TTEntry>) * TABLE_SIZE;
 
     // TTEntryのサイズ。
-    for(int i = 0; i < TABLE_SIZE; i++) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
       bytes += sizeof(TTEntry) * entry_table_[i].size();
     }
 
@@ -218,11 +218,11 @@ namespace Sayuri {
   }
   // 該当するならtrue。
   bool TTEntry::Fulfil(HashKey key, int level, int depth, Side to_move) const {
-    if(!exists_) return false;
-    if(level < level_) return false;
-    if(depth > depth_) return false;
-    if(to_move != to_move_) return false;
-    if(key != key_) return false;
+    if (!exists_) return false;
+    if (level < level_) return false;
+    if (depth > depth_) return false;
+    if (to_move != to_move_) return false;
+    if (key != key_) return false;
     return true;
   }
 }  // namespace Sayuri
