@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
+#include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
 
@@ -37,10 +38,10 @@ namespace Sayuri {
   /****************************************/
   // static定数。
   constexpr HashKey TranspositionTable::TABLE_KEY_MASK;
-  constexpr int TranspositionTable::TABLE_SIZE;
+  constexpr std::size_t TranspositionTable::TABLE_SIZE;
 
   // コンストラクタ。
-  TranspositionTable::TranspositionTable(int max_bytes) :
+  TranspositionTable::TranspositionTable(std::size_t max_bytes) :
   max_bytes_(max_bytes),
   entry_table_(new std::vector<TTEntry>[TABLE_SIZE]) {
     // 大きさを整える。
@@ -55,7 +56,7 @@ namespace Sayuri {
     + (sizeof(std::vector<TTEntry>) * TABLE_SIZE);
 
     // エントリーをいくつ作るか計算する。
-    int num_entries = max_bytes / sizeof(TTEntry);
+    std::size_t num_entries = max_bytes / sizeof(TTEntry);
 
     // 一つのテーブルにつきいくつのエントリーを用意するか決める。
     num_entries /= TABLE_SIZE;
@@ -64,7 +65,7 @@ namespace Sayuri {
     }
 
     // 配列をリサイズ。
-    for (int i = 0; i < TABLE_SIZE; i++) {
+    for (std::size_t i = 0; i < TABLE_SIZE; i++) {
       entry_table_[i].resize(num_entries);
     }
   }
@@ -73,7 +74,7 @@ namespace Sayuri {
   max_bytes_(table.max_bytes_),
   entry_table_(new std::vector<TTEntry>[TABLE_SIZE]) {
     // テーブルをコピー。
-    for (int i = 0; i < TABLE_SIZE; i++) {
+    for (std::size_t i = 0; i < TABLE_SIZE; i++) {
       entry_table_[i].resize(table.entry_table_[i].size());
       for (unsigned int j = 0; j < table.entry_table_[i].size(); j++) {
         entry_table_[i][j] = table.entry_table_[i][j];
@@ -122,13 +123,13 @@ namespace Sayuri {
     return entry_ptr;
   }
   //　テーブルのサイズのバイト数を返す。
-  int TranspositionTable::GetSizeBytes() const {
+  std::size_t TranspositionTable::GetSizeBytes() const {
     // テーブル自身の大きさ。
-    int bytes = sizeof(TranspositionTable);
+    std::size_t bytes = sizeof(TranspositionTable);
     bytes += sizeof(std::vector<TTEntry>) * TABLE_SIZE;
 
     // TTEntryのサイズ。
-    for (int i = 0; i < TABLE_SIZE; i++) {
+    for (std::size_t i = 0; i < TABLE_SIZE; i++) {
       bytes += sizeof(TTEntry) * entry_table_[i].size();
     }
 

@@ -26,6 +26,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
 
@@ -36,8 +37,8 @@ namespace Sayuri {
   /* 定数。 */
   /**********/
   // テーブルの最大容量と最小容量。
-  constexpr int TT_MAX_SIZE_BYTES = 500 * 1024 * 1024;
-  constexpr int TT_MIN_SIZE_BYTES = 5 * 1024 * 1024;
+  constexpr std::size_t TT_MAX_SIZE_BYTES = 500 * 1024 * 1024;
+  constexpr std::size_t TT_MIN_SIZE_BYTES = 5 * 1024 * 1024;
   // 評価値の種類。TTEntry::value_flag。
   enum class TTValueFlag {
     EXACT,  // 正確な評価値。
@@ -153,13 +154,13 @@ namespace Sayuri {
       // ハッシュキーのテーブル用マスク。
       static constexpr HashKey TABLE_KEY_MASK = 0XffffULL;
       // テーブルの大きさ。
-      static constexpr int TABLE_SIZE = TABLE_KEY_MASK + 1;
+      static constexpr std::size_t TABLE_SIZE = TABLE_KEY_MASK + 1;
 
     public:
       // コンストラクタ。
       // [引数]
       // max_bytes: トランスポジションテーブルのサイズ指定。
-      TranspositionTable(int max_bytes);
+      TranspositionTable(std::size_t max_bytes);
       // コピーコンストラクタ。
       TranspositionTable(const TranspositionTable& table);
       // ムーブコンストラクタ。
@@ -198,7 +199,7 @@ namespace Sayuri {
       // 大きさが何バイトか返す。
       // [戻り値]
       // サイズをバイト数で返す。
-      int GetSizeBytes() const;
+      std::size_t GetSizeBytes() const;
 
       // テーブルのサイズを最大値の何パーミルかを得る。
       // [戻り値]
