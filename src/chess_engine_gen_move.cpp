@@ -69,36 +69,36 @@ namespace Sayuri {
     Square en_passant_square = side == WHITE ? en_passant_target_ + 8
     : en_passant_target_ - 8;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 攻撃の筋を入れる。
-      attack = ChessUtil::GetPawnAttack(piece_square, side)
+      attack = Util::GetPawnAttack(piece_square, side)
       & side_pieces_[enemy_side];
       // アンパッサンならアンパッサンの攻撃を追加。
       if (can_en_passant_) {
         if ((side == WHITE) && (side_board_[en_passant_target_] == BLACK)) {
-          Rank target_rank = ChessUtil::GetRank(en_passant_target_);
-          Rank attacker_rank = ChessUtil::GetRank(piece_square);
+          Rank target_rank = Util::GetRank(en_passant_target_);
+          Rank attacker_rank = Util::GetRank(piece_square);
           if (target_rank == attacker_rank) {
             if ((piece_square == (en_passant_target_ - 1))
             || (piece_square == (en_passant_target_ + 1))) {
-              attack |= ChessUtil::BIT[en_passant_square];
+              attack |= Util::BIT[en_passant_square];
             }
           }
         }
         if ((side == BLACK) && (side_board_[en_passant_target_] == WHITE)) {
-          Rank target_rank = ChessUtil::GetRank(en_passant_target_);
-          Rank attacker_rank = ChessUtil::GetRank(piece_square);
+          Rank target_rank = Util::GetRank(en_passant_target_);
+          Rank attacker_rank = Util::GetRank(piece_square);
           if (target_rank == attacker_rank) {
             if ((piece_square == (en_passant_target_ - 1))
             || (piece_square == (en_passant_target_ + 1))) {
-              attack |= ChessUtil::BIT[en_passant_square];
+              attack |= Util::BIT[en_passant_square];
             }
           }
         }
       }
       for (; attack; attack &= attack - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(attack);
+        goal_square = Util::GetSquare(attack);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -150,13 +150,13 @@ namespace Sayuri {
     pieces = position_[side][KNIGHT];
     attack = 0;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 攻撃の筋を入れる。
-      attack = ChessUtil::GetKnightMove(piece_square)
+      attack = Util::GetKnightMove(piece_square)
       & side_pieces_[enemy_side];
       for (; attack; attack &= attack - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(attack);
+        goal_square = Util::GetSquare(attack);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -170,12 +170,12 @@ namespace Sayuri {
     pieces = position_[side][BISHOP];
     attack = 0;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 攻撃の筋を入れる。
       attack = GetBishopAttack(piece_square) & side_pieces_[enemy_side];
       for (; attack; attack &= attack - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(attack);
+        goal_square = Util::GetSquare(attack);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -189,12 +189,12 @@ namespace Sayuri {
     pieces = position_[side][ROOK];
     attack = 0;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 攻撃の筋を作る。
       attack = GetRookAttack(piece_square) & side_pieces_[enemy_side];
       for (; attack; attack &= attack - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(attack);
+        goal_square = Util::GetSquare(attack);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -208,12 +208,12 @@ namespace Sayuri {
     pieces = position_[side][QUEEN];
     attack = 0;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 攻撃の筋を作る。
       attack = GetQueenAttack(piece_square) & side_pieces_[enemy_side];
       for (; attack; attack &= attack - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(attack);
+        goal_square = Util::GetSquare(attack);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -224,10 +224,10 @@ namespace Sayuri {
     }
 
     // キングの手を作る。
-    attack = ChessUtil::GetKingMove(king_[side]) & side_pieces_[enemy_side];
+    attack = Util::GetKingMove(king_[side]) & side_pieces_[enemy_side];
     for (; attack; attack &= attack - 1) {
       move.all_ = 0;
-      goal_square = ChessUtil::GetSquare(attack);
+      goal_square = Util::GetSquare(attack);
       // 手を作る。
       move.piece_square_ = king_[side];
       move.goal_square_ = goal_square;
@@ -274,17 +274,17 @@ namespace Sayuri {
     pieces = position_[side][PAWN];
     move_bitboard = 0;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 動かすビットボードを得る。
-      move_bitboard = ChessUtil::GetPawnMove(piece_square, side) & ~blocker0_;
+      move_bitboard = Util::GetPawnMove(piece_square, side) & ~blocker0_;
       // 動かすビットボードがあれば2歩の動きのビットボードを得る。
       if (move_bitboard) {
         move_bitboard |=
-        ChessUtil::GetPawn2StepMove(piece_square, side) & ~blocker0_;
+        Util::GetPawn2StepMove(piece_square, side) & ~blocker0_;
       }
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(move_bitboard);
+        goal_square = Util::GetSquare(move_bitboard);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -332,12 +332,12 @@ namespace Sayuri {
     pieces = position_[side][KNIGHT];
     move_bitboard = 0;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 動きを作る。
-      move_bitboard = ChessUtil::GetKnightMove(piece_square) & ~blocker0_;
+      move_bitboard = Util::GetKnightMove(piece_square) & ~blocker0_;
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(move_bitboard);
+        goal_square = Util::GetSquare(move_bitboard);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -351,12 +351,12 @@ namespace Sayuri {
     pieces = position_[side][BISHOP];
     move_bitboard = 0;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 攻撃の筋を入れる。
       move_bitboard = GetBishopAttack(piece_square) & ~blocker0_;
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(move_bitboard);
+        goal_square = Util::GetSquare(move_bitboard);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -370,12 +370,12 @@ namespace Sayuri {
     pieces = position_[side][ROOK];
     move_bitboard = 0;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 攻撃の筋を作る。
       move_bitboard = GetRookAttack(piece_square) & ~blocker0_;
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(move_bitboard);
+        goal_square = Util::GetSquare(move_bitboard);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -389,12 +389,12 @@ namespace Sayuri {
     pieces = position_[side][QUEEN];
     move_bitboard = 0;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 攻撃の筋を作る。
       move_bitboard = GetQueenAttack(piece_square) & ~blocker0_;
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(move_bitboard);
+        goal_square = Util::GetSquare(move_bitboard);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -405,7 +405,7 @@ namespace Sayuri {
     }
 
     // キングの手を作る。
-    move_bitboard = ChessUtil::GetKingMove(king_[side]) & ~blocker0_;
+    move_bitboard = Util::GetKingMove(king_[side]) & ~blocker0_;
     // キャスリングの動きを作る。
     if (side == WHITE) {
       if (castling_rights_ & WHITE_SHORT_CASTLING) {
@@ -413,7 +413,7 @@ namespace Sayuri {
         && !IsAttacked(F1, enemy_side)
         && !IsAttacked(G1, enemy_side)) {
           if (!piece_board_[F1] && !piece_board_[G1]) {
-            move_bitboard |= ChessUtil::BIT[G1];
+            move_bitboard |= Util::BIT[G1];
           }
         }
       }
@@ -422,7 +422,7 @@ namespace Sayuri {
         && !IsAttacked(D1, enemy_side)
         && !IsAttacked(C1, enemy_side)) {
           if (!piece_board_[D1] && !piece_board_[C1] && !piece_board_[B1]) {
-            move_bitboard |= ChessUtil::BIT[C1];
+            move_bitboard |= Util::BIT[C1];
           }
         }
       }
@@ -432,7 +432,7 @@ namespace Sayuri {
         && !IsAttacked(F8, enemy_side)
         && !IsAttacked(G8, enemy_side)) {
           if (!piece_board_[F8] && !piece_board_[G8]) {
-            move_bitboard |= ChessUtil::BIT[G8];
+            move_bitboard |= Util::BIT[G8];
           }
         }
       }
@@ -441,14 +441,14 @@ namespace Sayuri {
         && !IsAttacked(D8, enemy_side)
         && !IsAttacked(C8, enemy_side)) {
           if (!piece_board_[D8] && !piece_board_[C8] && !piece_board_[B8]) {
-            move_bitboard |= ChessUtil::BIT[C8];
+            move_bitboard |= Util::BIT[C8];
           }
         }
       }
     }
     for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
       move.all_ = 0;
-      goal_square = ChessUtil::GetSquare(move_bitboard);
+      goal_square = Util::GetSquare(move_bitboard);
       // 手を作る。
       move.piece_square_ = king_[side];
       move.goal_square_ = goal_square;
@@ -513,42 +513,42 @@ namespace Sayuri {
     Square en_passant_square = 
     side == WHITE ? en_passant_target_ + 8 : en_passant_target_ - 8;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 通常の動きを入れる。
-      move_bitboard = ChessUtil::GetPawnMove(piece_square, side) & ~blocker0_;
+      move_bitboard = Util::GetPawnMove(piece_square, side) & ~blocker0_;
       if (move_bitboard) {
-        move_bitboard |= ChessUtil::GetPawn2StepMove(piece_square, side)
+        move_bitboard |= Util::GetPawn2StepMove(piece_square, side)
         & ~blocker0_;
       }
       // 攻撃の筋を入れる。
-      move_bitboard |= ChessUtil::GetPawnAttack(piece_square, side)
+      move_bitboard |= Util::GetPawnAttack(piece_square, side)
       & side_pieces_[enemy_side];
       // アンパッサンならアンパッサンの攻撃を追加。
       if (can_en_passant_) {
         if ((side == WHITE) && (side_board_[en_passant_target_] == BLACK)) {
-          Rank target_rank = ChessUtil::GetRank(en_passant_target_);
-          Rank move_bitboarder_rank = ChessUtil::GetRank(piece_square);
+          Rank target_rank = Util::GetRank(en_passant_target_);
+          Rank move_bitboarder_rank = Util::GetRank(piece_square);
           if (target_rank == move_bitboarder_rank) {
             if ((piece_square == (en_passant_target_ - 1))
             || (piece_square == (en_passant_target_ + 1))) {
-              move_bitboard |= ChessUtil::BIT[en_passant_square];
+              move_bitboard |= Util::BIT[en_passant_square];
             }
           }
         }
         if ((side == BLACK) && (side_board_[en_passant_target_] == WHITE)) {
-          Rank target_rank = ChessUtil::GetRank(en_passant_target_);
-          Rank move_bitboarder_rank = ChessUtil::GetRank(piece_square);
+          Rank target_rank = Util::GetRank(en_passant_target_);
+          Rank move_bitboarder_rank = Util::GetRank(piece_square);
           if (target_rank == move_bitboarder_rank) {
             if ((piece_square == (en_passant_target_ - 1))
             || (piece_square == (en_passant_target_ + 1))) {
-              move_bitboard |= ChessUtil::BIT[en_passant_square];
+              move_bitboard |= Util::BIT[en_passant_square];
             }
           }
         }
       }
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(move_bitboard);
+        goal_square = Util::GetSquare(move_bitboard);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -605,13 +605,13 @@ namespace Sayuri {
     pieces = position_[side][KNIGHT];
     move_bitboard = 0;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 動きを入れる。
-      move_bitboard = ChessUtil::GetKnightMove(piece_square)
+      move_bitboard = Util::GetKnightMove(piece_square)
       & ~side_pieces_[side];
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(move_bitboard);
+        goal_square = Util::GetSquare(move_bitboard);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -629,12 +629,12 @@ namespace Sayuri {
     pieces = position_[side][BISHOP];
     move_bitboard = 0;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 動きを入れる。
       move_bitboard = GetBishopAttack(piece_square) & ~side_pieces_[side];
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(move_bitboard);
+        goal_square = Util::GetSquare(move_bitboard);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -652,12 +652,12 @@ namespace Sayuri {
     pieces = position_[side][ROOK];
     move_bitboard = 0;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 動きを作る。
       move_bitboard = GetRookAttack(piece_square) & ~side_pieces_[side];
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(move_bitboard);
+        goal_square = Util::GetSquare(move_bitboard);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -675,12 +675,12 @@ namespace Sayuri {
     pieces = position_[side][QUEEN];
     move_bitboard = 0;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       // 動きを作る。
       move_bitboard = GetQueenAttack(piece_square) & ~side_pieces_[side];
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
         move.all_ = 0;
-        goal_square = ChessUtil::GetSquare(move_bitboard);
+        goal_square = Util::GetSquare(move_bitboard);
         // 手を作る。
         move.piece_square_ = piece_square;
         move.goal_square_ = goal_square;
@@ -695,7 +695,7 @@ namespace Sayuri {
     }
 
     // キングの手を作る。
-    move_bitboard = ChessUtil::GetKingMove(king_[side]) & ~side_pieces_[side];
+    move_bitboard = Util::GetKingMove(king_[side]) & ~side_pieces_[side];
     // キャスリングの動きを作る。
     if (side == WHITE) {
       if (castling_rights_ & WHITE_SHORT_CASTLING) {
@@ -703,7 +703,7 @@ namespace Sayuri {
         && !IsAttacked(F1, enemy_side)
         && !IsAttacked(G1, enemy_side)) {
           if (!piece_board_[F1] && !piece_board_[G1]) {
-            move_bitboard |= ChessUtil::BIT[G1];
+            move_bitboard |= Util::BIT[G1];
           }
         }
       }
@@ -712,7 +712,7 @@ namespace Sayuri {
         && !IsAttacked(D1, enemy_side)
         && !IsAttacked(C1, enemy_side)) {
           if (!piece_board_[D1] && !piece_board_[C1] && !piece_board_[B1]) {
-            move_bitboard |= ChessUtil::BIT[C1];
+            move_bitboard |= Util::BIT[C1];
           }
         }
       }
@@ -722,7 +722,7 @@ namespace Sayuri {
         && !IsAttacked(F8, enemy_side)
         && !IsAttacked(G8, enemy_side)) {
           if (!piece_board_[F8] && !piece_board_[G8]) {
-            move_bitboard |= ChessUtil::BIT[G8];
+            move_bitboard |= Util::BIT[G8];
           }
         }
       }
@@ -731,14 +731,14 @@ namespace Sayuri {
         && !IsAttacked(D8, enemy_side)
         && !IsAttacked(C8, enemy_side)) {
           if (!piece_board_[D8] && !piece_board_[C8] && !piece_board_[B8]) {
-            move_bitboard |= ChessUtil::BIT[C8];
+            move_bitboard |= Util::BIT[C8];
           }
         }
       }
     }
     for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
       move.all_ = 0;
-      goal_square = ChessUtil::GetSquare(move_bitboard);
+      goal_square = Util::GetSquare(move_bitboard);
       // 手を作る。
       move.piece_square_ = king_[side];
       move.goal_square_ = goal_square;
@@ -793,7 +793,7 @@ namespace Sayuri {
 
     // 攻撃する駒の、各サイドのビットボード。
     Bitboard attackers = GetAttackers(move.goal_square_, side)
-    & ~ChessUtil::BIT[move.piece_square_];
+    & ~Util::BIT[move.piece_square_];
     Bitboard enemy_attackers = GetAttackers(move.goal_square_, enemy_side);
 
     // 攻撃する駒のビットボード。

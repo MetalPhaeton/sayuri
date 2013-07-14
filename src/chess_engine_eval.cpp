@@ -84,7 +84,7 @@ namespace Sayuri {
     Bitboard white_pieces = side_pieces_[WHITE];
     int white_mobility = 0;
     for (; white_pieces; white_pieces &= white_pieces - 1) {
-      piece_square = ChessUtil::GetSquare(white_pieces);
+      piece_square = Util::GetSquare(white_pieces);
       white_mobility += GetMobility(piece_square);
     }
 
@@ -92,7 +92,7 @@ namespace Sayuri {
     Bitboard black_pieces = side_pieces_[BLACK];
     int black_mobility = 0;
     for (; black_pieces; black_pieces &= black_pieces - 1) {
-      piece_square = ChessUtil::GetSquare(black_pieces);
+      piece_square = Util::GetSquare(black_pieces);
       black_mobility += GetMobility(piece_square);
     }
 
@@ -123,8 +123,8 @@ namespace Sayuri {
     black_attackers |= GetAttackers(E5, BLACK);
 
     // 各サイドの価値を計算する。
-    white_value += ChessUtil::CountBits(white_attackers) * 2;
-    black_value += ChessUtil::CountBits(black_attackers) * 2;
+    white_value += Util::CountBits(white_attackers) * 2;
+    black_value += Util::CountBits(black_attackers) * 2;
 
     // 白の小中央を攻撃している駒を得る。
     white_attackers = GetAttackers(C3, WHITE);
@@ -163,8 +163,8 @@ namespace Sayuri {
     black_attackers |= GetAttackers(F6, BLACK);
 
     // 各サイドの価値を計算する。
-    white_value += ChessUtil::CountBits(white_attackers);
-    black_value += ChessUtil::CountBits(black_attackers);
+    white_value += Util::CountBits(white_attackers);
+    black_value += Util::CountBits(black_attackers);
 
     // 評価値を計算して返す。
     int score = (white_value - black_value) * weights.attack_center_weight_;
@@ -177,8 +177,8 @@ namespace Sayuri {
     if (side == NO_SIDE) return 0;
 
     // 各サイドの展開できていないマイナーピースの数。
-    int white_count = ChessUtil::CountBits(GetNotDevelopedMinorPieces(WHITE));
-    int black_count = ChessUtil::CountBits(GetNotDevelopedMinorPieces(BLACK));
+    int white_count = Util::CountBits(GetNotDevelopedMinorPieces(WHITE));
+    int black_count = Util::CountBits(GetNotDevelopedMinorPieces(BLACK));
 
     // 評価値にして返す。
     int score = (white_count - black_count) * -weights.development_weight_;
@@ -192,13 +192,13 @@ namespace Sayuri {
 
     // それぞれのキング周りへの攻撃を得る。
     Bitboard white_attack = GetAttack(side_pieces_[WHITE])
-    & ChessUtil::GetKingMove(king_[BLACK]);
+    & Util::GetKingMove(king_[BLACK]);
     Bitboard black_attack = GetAttack(side_pieces_[BLACK])
-    & ChessUtil::GetKingMove(king_[WHITE]);
+    & Util::GetKingMove(king_[WHITE]);
 
     // 攻撃位置を数える。
-    int white_attack_count = ChessUtil::CountBits(white_attack);
-    int black_attack_count = ChessUtil::CountBits(black_attack);
+    int white_attack_count = Util::CountBits(white_attack);
+    int black_attack_count = Util::CountBits(black_attack);
 
     // 点数にして返す。
     int score = (white_attack_count - black_attack_count)
@@ -307,9 +307,9 @@ namespace Sayuri {
     Bitboard black_pass_pawns = GetPassPawns(BLACK);
 
     // パスポーンを評価値にする。
-    int white_score = ChessUtil::CountBits(white_pass_pawns)
+    int white_score = Util::CountBits(white_pass_pawns)
     * weights.pass_pawn_weight_;
-    int black_score = ChessUtil::CountBits(black_pass_pawns)
+    int black_score = Util::CountBits(black_pass_pawns)
     * weights.pass_pawn_weight_;
 
     // マス。
@@ -318,17 +318,17 @@ namespace Sayuri {
     // 守られたパスポーンにはボーナス。
     // 白を調べる。
     for (; white_pass_pawns; white_pass_pawns &= white_pass_pawns - 1) {
-      square = ChessUtil::GetSquare(white_pass_pawns);
+      square = Util::GetSquare(white_pass_pawns);
       // 守られていればボーナスを追加。
-      if (position_[WHITE][PAWN] & ChessUtil::GetPawnAttack(square, BLACK)) {
+      if (position_[WHITE][PAWN] & Util::GetPawnAttack(square, BLACK)) {
         white_score += weights.protected_pass_pawn_weight_;
       }
     }
     // 黒を調べる。
     for (; black_pass_pawns; black_pass_pawns &= black_pass_pawns - 1) {
-      square = ChessUtil::GetSquare(black_pass_pawns);
+      square = Util::GetSquare(black_pass_pawns);
       // 守られていればボーナスを追加。
-      if (position_[WHITE][PAWN] & ChessUtil::GetPawnAttack(square, WHITE)) {
+      if (position_[WHITE][PAWN] & Util::GetPawnAttack(square, WHITE)) {
         black_score += weights.protected_pass_pawn_weight_;
       }
     }
@@ -344,8 +344,8 @@ namespace Sayuri {
     if (side == NO_SIDE) return 0;
 
     // 各サイドのダブルポーンの数を得る。
-    int white_count = ChessUtil::CountBits(GetDoublePawns(WHITE));
-    int black_count = ChessUtil::CountBits(GetDoublePawns(BLACK));
+    int white_count = Util::CountBits(GetDoublePawns(WHITE));
+    int black_count = Util::CountBits(GetDoublePawns(BLACK));
 
     // 得点にして返す。
     int score = (white_count - black_count) * weights.double_pawn_weight_;
@@ -357,8 +357,8 @@ namespace Sayuri {
     if (side == NO_SIDE) return 0;
 
     // 各サイドの孤立ポーンの数を得る。
-    int white_count = ChessUtil::CountBits(GetIsoPawns(WHITE));
-    int black_count = ChessUtil::CountBits(GetIsoPawns(BLACK));
+    int white_count = Util::CountBits(GetIsoPawns(WHITE));
+    int black_count = Util::CountBits(GetIsoPawns(BLACK));
 
     // 得点にして返す。
     int score = (white_count - black_count) * weights.iso_pawn_weight_;
@@ -375,10 +375,10 @@ namespace Sayuri {
     int black_score = 0;
 
     // ビショップが2個以上所有していればボーナス。
-    if (ChessUtil::CountBits(position_[WHITE][BISHOP]) >= 2) {
+    if (Util::CountBits(position_[WHITE][BISHOP]) >= 2) {
       white_score += weights.bishop_pair_weight_;
     }
-    if (ChessUtil::CountBits(position_[BLACK][BISHOP]) >= 2) {
+    if (Util::CountBits(position_[BLACK][BISHOP]) >= 2) {
       black_score += weights.bishop_pair_weight_;
     }
 
@@ -396,11 +396,11 @@ namespace Sayuri {
     int white_score = 0;
     int black_score = 0;
     if (!(position_[WHITE][QUEEN] & D1)) {
-      white_score = ChessUtil::CountBits(GetNotDevelopedMinorPieces(WHITE))
+      white_score = Util::CountBits(GetNotDevelopedMinorPieces(WHITE))
       * weights.early_queen_launched_weight_;
     }
     if (!(position_[BLACK][QUEEN] & D8)) {
-      black_score = ChessUtil::CountBits(GetNotDevelopedMinorPieces(BLACK))
+      black_score = Util::CountBits(GetNotDevelopedMinorPieces(BLACK))
       * weights.early_queen_launched_weight_;
     }
 
@@ -415,8 +415,8 @@ namespace Sayuri {
     if (side == NO_SIDE) return 0;
 
     // 各サイドのポーンの盾の数を得る。
-    int white_count = ChessUtil::CountBits(GetPawnShield(WHITE));
-    int black_count = ChessUtil::CountBits(GetPawnShield(BLACK));
+    int white_count = Util::CountBits(GetPawnShield(WHITE));
+    int black_count = Util::CountBits(GetPawnShield(BLACK));
 
     // 得点にして返す。
     int score = (white_count - black_count) * weights.pawn_shield_weight_;

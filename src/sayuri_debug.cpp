@@ -40,7 +40,7 @@ namespace Sayuri {
   /**************************/
   // ================================================================
   int DebugMain(int argc, char* argv[]) {
-    TranspositionTable* table = new TranspositionTable(30000000ULL);
+    TranspositionTable* table = new TranspositionTable(1);
 
     HashKey pos_key = GenPseudoHashKey();
     int level = 3;
@@ -54,12 +54,12 @@ namespace Sayuri {
 
     table->Add(pos_key, level, depth, to_move, value, value_flag, best_move);
 
-    TTEntry* entry_ptr =
+    const TTEntry* entry_ptr =
     table->GetFulfiledEntry(pos_key, level, depth, to_move);
 
     TranspositionTable* table2 = new TranspositionTable(std::move(*table));
 
-    TTEntry* entry_ptr2 =
+    const TTEntry* entry_ptr2 =
     table2->GetFulfiledEntry(pos_key, level, depth, to_move);
 
     if (entry_ptr == entry_ptr2) {
@@ -155,14 +155,14 @@ namespace Sayuri {
 
     // 動かす駒の位置を出力する。
     std::cout << "Piece: ";
-    fyle = ChessUtil::GetFyle(move.piece_square_);
-    rank = ChessUtil::GetRank(move.piece_square_);
+    fyle = Util::GetFyle(move.piece_square_);
+    rank = Util::GetRank(move.piece_square_);
     std::cout << fyle_array[fyle] << rank_array[rank] << std::endl;
 
     // 移動先の位置を出力する。
     std::cout << "Goal: ";
-    fyle = ChessUtil::GetFyle(move.goal_square_);
-    rank = ChessUtil::GetRank(move.goal_square_);
+    fyle = Util::GetFyle(move.goal_square_);
+    rank = Util::GetRank(move.goal_square_);
     std::cout << fyle_array[fyle] << rank_array[rank] << std::endl;
 
     // 取った駒の種類を出力する。
@@ -240,8 +240,8 @@ namespace Sayuri {
 
     // アンパッサンのターゲットを出力する。
     Square en_passant_target = move.last_en_passant_target_;
-    fyle = ChessUtil::GetFyle(en_passant_target);
-    rank = ChessUtil::GetRank(en_passant_target);
+    fyle = Util::GetFyle(en_passant_target);
+    rank = Util::GetRank(en_passant_target);
     std::cout << "Last En Passant Target: "
     << fyle_array[fyle] << rank_array[rank] << std::endl;
 

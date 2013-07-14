@@ -26,7 +26,6 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
-#include <cstdint>
 #include "chess_def.h"
 #include "chess_util.h"
 
@@ -36,34 +35,36 @@ namespace Sayuri {
   /****************************************/
   /* トランスポジションテーブルのクラス。 */
   /****************************************/
+  // static定数。
+  constexpr HashKey TranspositionTable::TABLE_KEY_MASK;
+  constexpr int TranspositionTable::TABLE_SIZE;
+
   // コンストラクタ。
-  TranspositionTable::TranspositionTable(std::uint64_t max_bytes) :
+  TranspositionTable::TranspositionTable(int max_bytes) :
   max_bytes_(max_bytes),
   entry_table_(new std::vector<TTEntry>[TABLE_SIZE]) {
-    // 必要最小限のサイズを得る。
-    std::uint64_t mini_size = sizeof(TTEntry) * TABLE_SIZE;
-    mini_size += sizeof(std::vector<TTEntry>) * TABLE_SIZE;
-    mini_size += sizeof(TranspositionTable);
-    if (max_bytes < mini_size) {
-      max_bytes = mini_size;
+    // 大きさを整える。
+    if (max_bytes > TT_MAX_SIZE_BYTES) {
+      max_bytes = TT_MAX_SIZE_BYTES;
+    } else if (max_bytes < TT_MIN_SIZE_BYTES) {
+      max_bytes = TT_MIN_SIZE_BYTES;
     }
 
     // テーブル自体のサイズを引く。
-    max_bytes -= sizeof(TranspositionTable);
+    max_bytes -= sizeof(TranspositionTable)
+    + (sizeof(std::vector<TTEntry>) * TABLE_SIZE);
 
     // エントリーをいくつ作るか計算する。
-    std::uint64_t num_entries = max_bytes / sizeof(TTEntry);
+    int num_entries = max_bytes / sizeof(TTEntry);
 
     // 一つのテーブルにつきいくつのエントリーを用意するか決める。
     num_entries /= TABLE_SIZE;
-    if (num_entries <= 0ULL) {
+    if (num_entries <= 0) {
       num_entries = 1;
     }
 
-    Assert(num_entries > 0ULL);
-
     // 配列をリサイズ。
-    for (std::uint64_t i = 0; i < TABLE_SIZE; i++) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
       entry_table_[i].resize(num_entries);
     }
   }
@@ -72,7 +73,7 @@ namespace Sayuri {
   max_bytes_(table.max_bytes_),
   entry_table_(new std::vector<TTEntry>[TABLE_SIZE]) {
     // テーブルをコピー。
-    for (std::uint64_t i = 0; i < TABLE_SIZE; i++) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
       entry_table_[i].resize(table.entry_table_[i].size());
       for (unsigned int j = 0; j < table.entry_table_[i].size(); j++) {
         entry_table_[i][j] = table.entry_table_[i][j];
@@ -103,8 +104,8 @@ namespace Sayuri {
     &TTEntry::Compare);
   }
   // 該当するTTEntryを返す。
-  TTEntry* TranspositionTable::GetFulfiledEntry(HashKey pos_key, int level,
-  int depth, Side to_move) const {
+  const TTEntry* TranspositionTable::GetFulfiledEntry(HashKey pos_key,
+  int level, int depth, Side to_move) const {
     // テーブルのインデックスを得る。
     int index = GetTableIndex(pos_key);
 
@@ -121,13 +122,13 @@ namespace Sayuri {
     return entry_ptr;
   }
   //　テーブルのサイズのバイト数を返す。
-  std::uint64_t TranspositionTable::GetSizeBytes() const {
+  int TranspositionTable::GetSizeBytes() const {
     // テーブル自身の大きさ。
-    std::uint64_t bytes = sizeof(TranspositionTable);
+    int bytes = sizeof(TranspositionTable);
     bytes += sizeof(std::vector<TTEntry>) * TABLE_SIZE;
 
     // TTEntryのサイズ。
-    for (std::uint64_t i = 0; i < TABLE_SIZE; i++) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
       bytes += sizeof(TTEntry) * entry_table_[i].size();
     }
 

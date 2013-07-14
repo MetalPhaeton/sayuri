@@ -26,16 +26,19 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-#include <cstdint>
 #include "chess_def.h"
 #include "chess_util.h"
 
 #include "sayuri_debug.h"
 
 namespace Sayuri {
-  /******************/
-  /* 評価値の種類。 */
-  /******************/
+  /**********/
+  /* 定数。 */
+  /**********/
+  // テーブルの最大容量と最小容量。
+  constexpr int TT_MAX_SIZE_BYTES = 500 * 1024 * 1024;
+  constexpr int TT_MIN_SIZE_BYTES = 5 * 1024 * 1024;
+  // 評価値の種類。TTEntry::value_flag。
   enum class TTValueFlag {
     EXACT,  // 正確な評価値。
     ALPHA,  // アルファ値。
@@ -143,11 +146,20 @@ namespace Sayuri {
   /* トランスポジションテーブルのクラス。 */
   /****************************************/
   class TranspositionTable {
+    private:
+      /**********/
+      /* 定数。 */
+      /**********/
+      // ハッシュキーのテーブル用マスク。
+      static constexpr HashKey TABLE_KEY_MASK = 0XffffULL;
+      // テーブルの大きさ。
+      static constexpr int TABLE_SIZE = TABLE_KEY_MASK + 1;
+
     public:
       // コンストラクタ。
       // [引数]
       // max_bytes: トランスポジションテーブルのサイズ指定。
-      TranspositionTable(std::uint64_t max_bytes);
+      TranspositionTable(int max_bytes);
       // コピーコンストラクタ。
       TranspositionTable(const TranspositionTable& table);
       // ムーブコンストラクタ。
@@ -180,13 +192,13 @@ namespace Sayuri {
       // [戻り値]
       // 条件を満たすエントリー。
       // なければnullptr。
-      TTEntry* GetFulfiledEntry(HashKey pos_key, int level, int depth,
+      const TTEntry* GetFulfiledEntry(HashKey pos_key, int level, int depth,
       Side to_move) const;
 
       // 大きさが何バイトか返す。
       // [戻り値]
       // サイズをバイト数で返す。
-      std::uint64_t GetSizeBytes() const;
+      int GetSizeBytes() const;
 
       // テーブルのサイズを最大値の何パーミルかを得る。
       // [戻り値]
@@ -199,14 +211,6 @@ namespace Sayuri {
       friend int DebugMain(int, char**);
 
     private:
-      /**********/
-      /* 定数。 */
-      /**********/
-      // ハッシュキーのテーブル用マスク。
-      static constexpr HashKey TABLE_KEY_MASK = 0Xffff;
-      // テーブルの大きさ。
-      static constexpr std::uint64_t TABLE_SIZE = TABLE_KEY_MASK + 1;
-
       /**********************/
       /* プライベート関数。 */
       /**********************/
@@ -221,7 +225,7 @@ namespace Sayuri {
       /* メンバ変数。 */
       /****************/
       // サイズの上限。
-      std::uint64_t max_bytes_;
+      int max_bytes_;
       // エントリーを登録するテーブル。
       std::unique_ptr<std::vector<TTEntry>[]> entry_table_;
   };

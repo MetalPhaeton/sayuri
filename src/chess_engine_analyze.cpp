@@ -58,12 +58,12 @@ namespace Sayuri {
     // 配列を足す。
     if (side == WHITE) {
       for (; bitboard; bitboard &= bitboard - 1) {
-        square = ChessUtil::GetSquare(bitboard);
+        square = Util::GetSquare(bitboard);
         value += table[square];
       }
     } else {
       for (; bitboard; bitboard &= bitboard - 1) {
-        square = ChessUtil::GetSquare(bitboard);
+        square = Util::GetSquare(bitboard);
         value += table[flip[square]];
       }
     }
@@ -86,13 +86,13 @@ namespace Sayuri {
     if (position_[side][QUEEN]) return true;
 
     // ビショップが2つあれば大丈夫。
-    if (ChessUtil::CountBits(position_[side][BISHOP]) >= 2) return true;
+    if (Util::CountBits(position_[side][BISHOP]) >= 2) return true;
 
     // ナイトが2つあれば大丈夫。
-    if (ChessUtil::CountBits(position_[side][KNIGHT]) >= 2) return true;
+    if (Util::CountBits(position_[side][KNIGHT]) >= 2) return true;
 
     // ナイトとビショップの合計が2つあれば大丈夫。
-    if (ChessUtil::CountBits(position_[side][KNIGHT]
+    if (Util::CountBits(position_[side][KNIGHT]
     | position_[side][BISHOP]) >= 2)
       return true;
 
@@ -116,33 +116,33 @@ namespace Sayuri {
     switch (Pieceype) {
       case PAWN:
         // 通常の動き。
-        move_bitboard = ChessUtil::GetPawnMove(piece_square, side) & ~blocker0_;
+        move_bitboard = Util::GetPawnMove(piece_square, side) & ~blocker0_;
         // 2歩の動き。
         if (move_bitboard) {
-          move_bitboard |= ChessUtil::GetPawn2StepMove(piece_square, side)
+          move_bitboard |= Util::GetPawn2StepMove(piece_square, side)
           & ~blocker0_;
         }
         // 攻撃。
-        move_bitboard |= ChessUtil::GetPawnAttack(piece_square, side)
+        move_bitboard |= Util::GetPawnAttack(piece_square, side)
         & side_pieces_[enemy_side];
         // アンパッサン。
         if (can_en_passant_) {
           if (side_board_[en_passant_target_] != side) {
-            Rank attacker_rank = ChessUtil::GetRank(piece_square);
-            Rank target_rank = ChessUtil::GetRank(en_passant_target_);
+            Rank attacker_rank = Util::GetRank(piece_square);
+            Rank target_rank = Util::GetRank(en_passant_target_);
             if (attacker_rank == target_rank) {
               if ((piece_square == (en_passant_target_ + 1))
               || (piece_square == (en_passant_target_ - 1))) {
                 move_bitboard |= (side == WHITE ?
-                ChessUtil::BIT[en_passant_target_ + 8]
-                : ChessUtil::BIT[en_passant_target_ - 8]);
+                Util::BIT[en_passant_target_ + 8]
+                : Util::BIT[en_passant_target_ - 8]);
               }
             }
           }
         }
         break;
       case KNIGHT:
-        move_bitboard = ChessUtil::GetKnightMove(piece_square)
+        move_bitboard = Util::GetKnightMove(piece_square)
         & ~side_pieces_[side];
         break;
       case BISHOP:
@@ -158,7 +158,7 @@ namespace Sayuri {
         & ~side_pieces_[side];
         break;
       case KING:
-        move_bitboard = ChessUtil::GetKingMove(piece_square)
+        move_bitboard = Util::GetKingMove(piece_square)
         & ~side_pieces_[side];
         // キャスリング。
         if ((side == WHITE) && (piece_square == E1)) {  // 白。
@@ -168,7 +168,7 @@ namespace Sayuri {
             && !IsAttacked(F1, enemy_side)
             && !IsAttacked(G1, enemy_side)) {
               if (!piece_board_[F1] && !piece_board_[G1]) {
-                move_bitboard |= ChessUtil::BIT[G1];
+                move_bitboard |= Util::BIT[G1];
               }
             }
           }
@@ -179,7 +179,7 @@ namespace Sayuri {
             && !IsAttacked(C1, enemy_side)) {
               if (!piece_board_[D1] && !piece_board_[C1]
               && !piece_board_[B1]) {
-                move_bitboard |= ChessUtil::BIT[C1];
+                move_bitboard |= Util::BIT[C1];
               }
             }
           }
@@ -190,7 +190,7 @@ namespace Sayuri {
             && !IsAttacked(F8, enemy_side)
             && !IsAttacked(G8, enemy_side)) {
               if (!piece_board_[F8] && !piece_board_[G8]) {
-                move_bitboard |= ChessUtil::BIT[G8];
+                move_bitboard |= Util::BIT[G8];
               }
             }
           }
@@ -201,7 +201,7 @@ namespace Sayuri {
             && !IsAttacked(C8, enemy_side)) {
               if (!piece_board_[D8] && !piece_board_[C8]
               && !piece_board_[B8]) {
-                move_bitboard |= ChessUtil::BIT[C8];
+                move_bitboard |= Util::BIT[C8];
               }
             }
           }
@@ -210,7 +210,7 @@ namespace Sayuri {
     }
 
     // ビットの数を数えて返す。
-    return ChessUtil::CountBits(move_bitboard);
+    return Util::CountBits(move_bitboard);
   }
   // 攻撃している位置のビットボードを得る。
   Bitboard ChessEngine::GetAttack(Bitboard pieces) const {
@@ -225,16 +225,16 @@ namespace Sayuri {
     Piece Pieceype;
     Side side;
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = ChessUtil::GetSquare(pieces);
+      piece_square = Util::GetSquare(pieces);
       Pieceype = piece_board_[piece_square];
       side = side_board_[piece_square];
       // 駒の種類によって分岐。
       switch (Pieceype) {
         case PAWN:
-          attack |= ChessUtil::GetPawnAttack(piece_square, side);
+          attack |= Util::GetPawnAttack(piece_square, side);
           break;
         case KNIGHT:
-          attack |= ChessUtil::GetKnightMove(piece_square);
+          attack |= Util::GetKnightMove(piece_square);
           break;
         case BISHOP:
           attack |= GetBishopAttack(piece_square);
@@ -246,7 +246,7 @@ namespace Sayuri {
           attack |= GetQueenAttack(piece_square);
           break;
         case KING:
-          attack |= ChessUtil::GetKingMove(piece_square);
+          attack |= Util::GetKingMove(piece_square);
           break;
       }
     }
@@ -269,11 +269,11 @@ namespace Sayuri {
 
     Square square;
     for (; pawns; pawns &= pawns - 1) {
-      square = ChessUtil::GetSquare(pawns);
+      square = Util::GetSquare(pawns);
 
       // 敵のポーンが判定内にいなければパスポーン。
       if (!(position_[enemy_side][PAWN] & pass_pawn_mask_[side][square])) {
-        pass_pawns |= ChessUtil::BIT[square];
+        pass_pawns |= Util::BIT[square];
       }
     }
 
@@ -287,9 +287,9 @@ namespace Sayuri {
     // ダブルポーンを得る。
     Bitboard double_pawns = 0;
     for (int fyle = 0; fyle < NUM_FYLES; fyle++) {
-      if (ChessUtil::CountBits(position_[side][PAWN] & ChessUtil::FYLE[fyle])
+      if (Util::CountBits(position_[side][PAWN] & Util::FYLE[fyle])
       >= 2) {
-        double_pawns |= position_[side][PAWN] & ChessUtil::FYLE[fyle];
+        double_pawns |= position_[side][PAWN] & Util::FYLE[fyle];
       }
     }
 
@@ -309,9 +309,9 @@ namespace Sayuri {
     // 孤立ポーンを調べる。
     Square square;
     for (; pawns; pawns &= pawns - 1) {
-      square = ChessUtil::GetSquare(pawns);
+      square = Util::GetSquare(pawns);
       if (!(position_[side][PAWN] & iso_pawn_mask_[square])) {
-        iso_pawns |= ChessUtil::BIT[square];
+        iso_pawns |= Util::BIT[square];
       }
     }
 
@@ -350,25 +350,25 @@ namespace Sayuri {
           pass_pawn_mask_[side][square] = 0;
         } else {
           // 自分のファイルと隣のファイルのマスクを作る。
-          fyle = ChessUtil::GetFyle(square);
-          mask |= ChessUtil::FYLE[fyle];
+          fyle = Util::GetFyle(square);
+          mask |= Util::FYLE[fyle];
           if (fyle == FYLE_A) {  // aファイルのときはbファイルが隣り。
-            mask |= ChessUtil::FYLE[fyle + 1];
+            mask |= Util::FYLE[fyle + 1];
           } else if (fyle == FYLE_H) {  // hファイルのときはgファイルが隣り。
-            mask |= ChessUtil::FYLE[fyle - 1];
+            mask |= Util::FYLE[fyle - 1];
           } else {  // それ以外のときは両隣。
-            mask |= ChessUtil::FYLE[fyle + 1];
-            mask |= ChessUtil::FYLE[fyle - 1];
+            mask |= Util::FYLE[fyle + 1];
+            mask |= Util::FYLE[fyle - 1];
           }
 
           // 自分の位置より手前のランクは消す。
           if (side == WHITE) {
-            bitboard = (ChessUtil::BIT[square] - 1)
-            | ChessUtil::RANK[ChessUtil::GetRank(square)];
+            bitboard = (Util::BIT[square] - 1)
+            | Util::RANK[Util::GetRank(square)];
             mask &= ~bitboard;
           } else {
-            bitboard = ~(ChessUtil::BIT[square] - 1)
-            | ChessUtil::RANK[ChessUtil::GetRank(square)];
+            bitboard = ~(Util::BIT[square] - 1)
+            | Util::RANK[Util::GetRank(square)];
             mask &= ~bitboard;
           }
 
@@ -385,14 +385,14 @@ namespace Sayuri {
   void ChessEngine::InitIsoPawnMask() {
     Fyle fyle;
     for (int square = 0; square < NUM_SQUARES; square++) {
-      fyle = ChessUtil::GetFyle(square);
+      fyle = Util::GetFyle(square);
       if (fyle == FYLE_A) {
-        iso_pawn_mask_[square] = ChessUtil::FYLE[fyle + 1];
+        iso_pawn_mask_[square] = Util::FYLE[fyle + 1];
       } else if (fyle == FYLE_H) {
-        iso_pawn_mask_[square] = ChessUtil::FYLE[fyle - 1];
+        iso_pawn_mask_[square] = Util::FYLE[fyle - 1];
       } else {
         iso_pawn_mask_[square] =
-        ChessUtil::FYLE[fyle + 1] | ChessUtil::FYLE[fyle - 1];
+        Util::FYLE[fyle + 1] | Util::FYLE[fyle - 1];
       }
     }
   }
@@ -411,19 +411,19 @@ namespace Sayuri {
           if ((side == WHITE)
           && ((square == A1) || (square == B1) || (square == C1))) {
             pawn_shield_mask_[side][square] =
-            ChessUtil::BIT[A2] | ChessUtil::BIT[B2] | ChessUtil::BIT[C2];
+            Util::BIT[A2] | Util::BIT[B2] | Util::BIT[C2];
           } else if ((side == WHITE)
           && ((square == F1) || (square == G1) || (square == H1))) {
             pawn_shield_mask_[side][square] =
-            ChessUtil::BIT[F2] | ChessUtil::BIT[G2] | ChessUtil::BIT[H2];
+            Util::BIT[F2] | Util::BIT[G2] | Util::BIT[H2];
           } else if ((side == BLACK)
           && ((square == A8) || (square == B8) || (square == C8))) {
             pawn_shield_mask_[side][square] =
-            ChessUtil::BIT[A7] | ChessUtil::BIT[B7] | ChessUtil::BIT[C7];
+            Util::BIT[A7] | Util::BIT[B7] | Util::BIT[C7];
           } else if ((side == BLACK)
           && ((square == F8) || (square == G8) || (square == H8))) {
             pawn_shield_mask_[side][square] =
-            ChessUtil::BIT[F7] | ChessUtil::BIT[G7] | ChessUtil::BIT[H7];
+            Util::BIT[F7] | Util::BIT[G7] | Util::BIT[H7];
           } else {  // キングサイドでもクイーンサイドでもない。
             pawn_shield_mask_[side][square] = 0;
           }

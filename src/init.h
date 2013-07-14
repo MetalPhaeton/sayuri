@@ -31,7 +31,7 @@
 namespace Sayuri {
   // Misakiの初期化。
   inline void Init() {
-    ChessUtil::InitChessUtil();
+    Util::InitUtil();
     ChessEngine::InitChessEngine();
   }
 }  // namespace Sayuri

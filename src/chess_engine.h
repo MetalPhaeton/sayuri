@@ -208,7 +208,7 @@ namespace Sayuri {
         Bitboard pieces = blocker0_;
         pieces &= ~(position_[WHITE][KING] | position_[BLACK][KING]
         | position_[WHITE][PAWN] | position_[BLACK][PAWN]);
-        return ChessUtil::CountBits(pieces) <= 4;
+        return Util::CountBits(pieces) <= 4;
       } 
       // 動ける位置の数を得る。
       // [引数]
@@ -599,8 +599,8 @@ namespace Sayuri {
       // [戻り値]
       // ビショップの攻撃筋。
       Bitboard GetBishopAttack(Square square) const {
-        return ChessUtil::GetAttack45(square, blocker45_)
-        | ChessUtil::GetAttack135(square, blocker135_);
+        return Util::GetAttack45(square, blocker45_)
+        | Util::GetAttack135(square, blocker135_);
       }
       // ルークの攻撃筋を作る。
       // [引数]
@@ -608,8 +608,8 @@ namespace Sayuri {
       // [戻り値]
       // ルークの攻撃筋。
       Bitboard GetRookAttack(Square square) const {
-        return ChessUtil::GetAttack0(square, blocker0_)
-        | ChessUtil::GetAttack90(square, blocker90_);
+        return Util::GetAttack0(square, blocker0_)
+        | Util::GetAttack90(square, blocker90_);
       }
       // クイーンの攻撃筋を作る。
       // [引数]
@@ -630,17 +630,17 @@ namespace Sayuri {
         if (king_[BLACK] != E8) castling_rights_ &= ~BLACK_CASTLING;
 
         // 白のルークがh1にいなければ白のショートキャスリングの権利を放棄。
-        if (!(position_[WHITE][ROOK] & ChessUtil::BIT[H1]))
+        if (!(position_[WHITE][ROOK] & Util::BIT[H1]))
           castling_rights_ &= ~WHITE_SHORT_CASTLING;
         // 白のルークがa1にいなければ白のロングキャスリングの権利を放棄。
-        if (!(position_[WHITE][ROOK] & ChessUtil::BIT[A1]))
+        if (!(position_[WHITE][ROOK] & Util::BIT[A1]))
           castling_rights_ &= ~WHITE_LONG_CASTLING;
 
         // 黒のルークがh8にいなければ黒のショートキャスリングの権利を放棄。
-        if (!(position_[BLACK][ROOK] & ChessUtil::BIT[H8]))
+        if (!(position_[BLACK][ROOK] & Util::BIT[H8]))
           castling_rights_ &= ~BLACK_SHORT_CASTLING;
         // 黒のルークがa8にいなければ黒のロングキャスリングの権利を放棄。
-        if (!(position_[BLACK][ROOK] & ChessUtil::BIT[A8]))
+        if (!(position_[BLACK][ROOK] & Util::BIT[A8]))
           castling_rights_ &= ~BLACK_LONG_CASTLING;
       }
 
