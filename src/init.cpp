@@ -1,4 +1,4 @@
-/* init.h: Misakiの初期化。
+/* init.cpp: Misakiの初期化。
    Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,8 +20,7 @@
    IN THE SOFTWARE.
  */
 
-#ifndef INIT_H
-#define INIT_H
+#include "init.h"
 
 #include <iostream>
 
@@ -30,7 +29,8 @@
 
 namespace Sayuri {
   // Misakiの初期化。
-  extern void Init();
+  void Init() {
+    Util::InitUtil();
+    ChessEngine::InitChessEngine();
+  }
 }  // namespace Sayuri
-
-#endif

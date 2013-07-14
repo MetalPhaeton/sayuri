@@ -31,7 +31,7 @@
 #include <ctime>
 #include <memory>
 
-#include "chess_def.h"
+#include "sayuri.h"
 
 namespace Sayuri {
   // デバッグ用メイン関数。

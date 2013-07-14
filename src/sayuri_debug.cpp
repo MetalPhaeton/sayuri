@@ -29,8 +29,6 @@
 #include <cstring>
 #include <ctime>
 #include <memory>
-#include "chess_def.h"
-#include "chess_util.h"
 
 #include "sayuri.h"
 
@@ -40,6 +38,10 @@ namespace Sayuri {
   /**************************/
   // ================================================================
   int DebugMain(int argc, char* argv[]) {
+    // 初期化。======================================================
+    Init();
+    // ==============================================================
+
     TranspositionTable* table = new TranspositionTable(1);
 
     HashKey pos_key = GenPseudoHashKey();
