@@ -61,7 +61,7 @@ namespace Sayuri {
       /* ビットボードの配列。 */
       /************************/
       // マスのビットボード。
-      static constexpr Bitboard BIT[NUM_SQUARES] = {
+      static constexpr Bitboard BIT[NUM_SQUARES] {
         0x1ULL, 0x1ULL << 1, 0x1ULL << 2, 0x1ULL << 3,
         0x1ULL << 4, 0x1ULL << 5, 0x1ULL << 6, 0x1ULL << 7,
         0x1ULL << 8, 0x1ULL << 9, 0x1ULL << 10, 0x1ULL << 11,
@@ -80,7 +80,7 @@ namespace Sayuri {
         0x1ULL << 60, 0x1ULL << 61, 0x1ULL << 62, 0x1ULL << 63
       };
       // ファイルのビットボード。
-      static constexpr Bitboard FYLE[NUM_FYLES] = {
+      static constexpr Bitboard FYLE[NUM_FYLES] {
         0x0101010101010101ULL,
         0x0101010101010101ULL << 1,
         0x0101010101010101ULL << 2,
@@ -91,7 +91,7 @@ namespace Sayuri {
         0x0101010101010101ULL << 7
       };
       // ランクのビットボード。
-      static constexpr Bitboard RANK[NUM_RANKS] = {
+      static constexpr Bitboard RANK[NUM_RANKS] {
         0xffULL,
         0xffULL << (1 * 8),
         0xffULL << (2 * 8),
@@ -107,7 +107,7 @@ namespace Sayuri {
       /**********************/
       // 変換。
       //  通常から左に45度。
-      static constexpr Square ROT45[NUM_SQUARES] = {
+      static constexpr Square ROT45[NUM_SQUARES] {
         E4, F3, H2, C2, G1, D1, B1, A1,
         E5, F4, G3, A3, D2, H1, E1, C1,
         D6, F5, G4, H3, B3, E2, A2, F1,
@@ -118,7 +118,7 @@ namespace Sayuri {
         H8, G8, E8, B8, F7, A7, C6, D5
       };
       // 通常から左に90度。
-      static constexpr Square ROT90[NUM_SQUARES] = {
+      static constexpr Square ROT90[NUM_SQUARES] {
         H1, H2, H3, H4, H5, H6, H7, H8,
         G1, G2, G3, G4, G5, G6, G7, G8,
         F1, F2, F3, F4, F5, F6, F7, F8,
@@ -129,7 +129,7 @@ namespace Sayuri {
         A1, A2, A3, A4, A5, A6, A7, A8
       };
       // 通常から左に135度。
-      static constexpr Square ROT135[NUM_SQUARES] = {
+      static constexpr Square ROT135[NUM_SQUARES] {
         A1, C1, F1, B2, G2, E3, D4, D5,
         B1, E1, A2, F2, D3, C4, C5, C6,
         D1, H1, E2, C3, B4, B5, B6, A7,
@@ -141,7 +141,7 @@ namespace Sayuri {
       };
       // 逆変換。
       // 左に45度から通常へ。
-      static constexpr Square R_ROT45[NUM_SQUARES] = {
+      static constexpr Square R_ROT45[NUM_SQUARES] {
         H1,
         G1, H2,
         F1, G2, H3,
@@ -159,7 +159,7 @@ namespace Sayuri {
         A8
       };
       // 左に90度から通常へ。
-      static constexpr Square R_ROT90[NUM_SQUARES] = {
+      static constexpr Square R_ROT90[NUM_SQUARES] {
         A8, A7, A6, A5, A4, A3, A2, A1,
         B8, B7, B6, B5, B4, B3, B2, B1,
         C8, C7, C6, C5, C4, C3, C2, C1,
@@ -170,7 +170,7 @@ namespace Sayuri {
         H8, H7, H6, H5, H4, H3, H2, H1
       };
       // 左に135度から通常へ。
-      static constexpr Square R_ROT135[NUM_SQUARES] = {
+      static constexpr Square R_ROT135[NUM_SQUARES] {
         A1,
         A2, B1,
         A3, B2, C1,
@@ -569,7 +569,7 @@ namespace Sayuri {
       /* マジック。 */
       /**************/
       // マジックのシフト。0度と90度用。
-      static constexpr int magic_shift_v_[NUM_SQUARES] = {
+      static constexpr int magic_shift_v_[NUM_SQUARES] {
         0, 0, 0, 0, 0, 0, 0, 0,
         8, 8, 8, 8, 8, 8, 8, 8,
         16, 16, 16, 16, 16, 16, 16, 16,
@@ -580,7 +580,7 @@ namespace Sayuri {
         56, 56, 56, 56, 56, 56, 56, 56
       };
       // マジックのシフト。45度と135度用。
-      static constexpr int magic_shift_d_[NUM_SQUARES] = {
+      static constexpr int magic_shift_d_[NUM_SQUARES] {
         0,
         1, 1,
         3, 3, 3,
@@ -598,7 +598,7 @@ namespace Sayuri {
         63
       };
       // マジックのマスク。0度と90度用。
-      static constexpr Bitboard magic_mask_v_[NUM_SQUARES] = {
+      static constexpr Bitboard magic_mask_v_[NUM_SQUARES] {
         0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
         0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
         0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
@@ -609,7 +609,7 @@ namespace Sayuri {
         0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL
       };
       // マジックのマスク。45度と135度用。
-      static constexpr Bitboard magic_mask_d_[NUM_SQUARES] = {
+      static constexpr Bitboard magic_mask_d_[NUM_SQUARES] {
         0x1ULL,
         0x3ULL, 0x3ULL,
         0x7ULL, 0x7ULL, 0x7ULL,
