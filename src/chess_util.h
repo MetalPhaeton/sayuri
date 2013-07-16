@@ -379,7 +379,7 @@ namespace Sayuri {
       // 利き筋。
       static Bitboard GetAttack0(Square square, Bitboard blocker0) {
         return attack_array0_[square]
-        [(blocker0 >> magic_shift_v_[square]) & magic_mask_v_[square]];
+        [(blocker0 >> MAGIC_SHIFT_V[square]) & MAGIC_MASK_V[square]];
       }
       // 45度の利き筋を得る。
       // [引数]
@@ -389,8 +389,8 @@ namespace Sayuri {
       // 利き筋。
       static Bitboard GetAttack45(Square square, Bitboard blocker45) {
         return attack_array45_[square]
-        [(blocker45 >> magic_shift_d_[ROT45[square]])
-        & magic_mask_d_[ROT45[square]]];
+        [(blocker45 >> MAGIC_SHIFT_D[ROT45[square]])
+        & MAGIC_MASK_D[ROT45[square]]];
       }
       // 90度の利き筋を得る。
       // [引数]
@@ -400,8 +400,8 @@ namespace Sayuri {
       // 利き筋。
       static Bitboard GetAttack90(Square square, Bitboard blocker90) {
         return attack_array90_[square]
-        [(blocker90 >> magic_shift_v_[ROT90[square]])
-        & magic_mask_v_[ROT90[square]]];
+        [(blocker90 >> MAGIC_SHIFT_V[ROT90[square]])
+        & MAGIC_MASK_V[ROT90[square]]];
       }
       // 135度の利き筋を得る。
       // [引数]
@@ -411,8 +411,8 @@ namespace Sayuri {
       // 利き筋。
       static Bitboard GetAttack135(Square square, Bitboard blocker135) {
         return attack_array135_[square]
-        [(blocker135 >> magic_shift_d_[ROT135[square]])
-        & magic_mask_d_[ROT135[square]]];
+        [(blocker135 >> MAGIC_SHIFT_D[ROT135[square]])
+        & MAGIC_MASK_D[ROT135[square]]];
       }
 
       /**************************/
@@ -569,7 +569,7 @@ namespace Sayuri {
       /* マジック。 */
       /**************/
       // マジックのシフト。0度と90度用。
-      static constexpr int magic_shift_v_[NUM_SQUARES] {
+      static constexpr int MAGIC_SHIFT_V[NUM_SQUARES] {
         0, 0, 0, 0, 0, 0, 0, 0,
         8, 8, 8, 8, 8, 8, 8, 8,
         16, 16, 16, 16, 16, 16, 16, 16,
@@ -580,7 +580,7 @@ namespace Sayuri {
         56, 56, 56, 56, 56, 56, 56, 56
       };
       // マジックのシフト。45度と135度用。
-      static constexpr int magic_shift_d_[NUM_SQUARES] {
+      static constexpr int MAGIC_SHIFT_D[NUM_SQUARES] {
         0,
         1, 1,
         3, 3, 3,
@@ -598,7 +598,7 @@ namespace Sayuri {
         63
       };
       // マジックのマスク。0度と90度用。
-      static constexpr Bitboard magic_mask_v_[NUM_SQUARES] {
+      static constexpr Bitboard MAGIC_MASK_V[NUM_SQUARES] {
         0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
         0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
         0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
@@ -609,7 +609,7 @@ namespace Sayuri {
         0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL
       };
       // マジックのマスク。45度と135度用。
-      static constexpr Bitboard magic_mask_d_[NUM_SQUARES] {
+      static constexpr Bitboard MAGIC_MASK_D[NUM_SQUARES] {
         0x1ULL,
         0x3ULL, 0x3ULL,
         0x7ULL, 0x7ULL, 0x7ULL,

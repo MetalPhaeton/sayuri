@@ -52,10 +52,10 @@ namespace Sayuri {
   constexpr Square Util::R_ROT90[NUM_SQUARES];
   constexpr Square Util::R_ROT135[NUM_SQUARES];
   constexpr int Util::BIT16_PATTERN;
-  constexpr int Util::magic_shift_v_[NUM_SQUARES];
-  constexpr int Util::magic_shift_d_[NUM_SQUARES];
-  constexpr Bitboard Util::magic_mask_v_[NUM_SQUARES];
-  constexpr Bitboard Util::magic_mask_d_[NUM_SQUARES];
+  constexpr int Util::MAGIC_SHIFT_V[NUM_SQUARES];
+  constexpr int Util::MAGIC_SHIFT_D[NUM_SQUARES];
+  constexpr Bitboard Util::MAGIC_MASK_V[NUM_SQUARES];
+  constexpr Bitboard Util::MAGIC_MASK_D[NUM_SQUARES];
   constexpr int Util::BLOCKER_MAP;
 
   /**********************************/
@@ -100,7 +100,7 @@ namespace Sayuri {
     // 0度のマップを作成。
     for (int square = 0; square < NUM_SQUARES; square++) {
       point = BIT[square];
-      point >>= magic_shift_v_[square];
+      point >>= MAGIC_SHIFT_V[square];
       for (int map = 0; map < BLOCKER_MAP; map++) {
         attack = 0;
         // 右側を作る。
@@ -116,9 +116,9 @@ namespace Sayuri {
           if (temp & map) break;
         }
         // 利き筋をマスクする。
-        attack &= magic_mask_v_[square];
+        attack &= MAGIC_MASK_V[square];
         // 利き筋をシフトする。
-        attack <<= magic_shift_v_[square];
+        attack <<= MAGIC_SHIFT_V[square];
         // 利き筋をマップに入れる。
         attack_array0_[square][map] = attack;
       }
@@ -126,7 +126,7 @@ namespace Sayuri {
     // 45度のマップを作成。
     for (int square = 0; square < NUM_SQUARES; square++) {
       point = BIT[ROT45[square]];
-      point >>= magic_shift_d_[ROT45[square]];
+      point >>= MAGIC_SHIFT_D[ROT45[square]];
       for (int map = 0; map < BLOCKER_MAP; map++) {
         attack = 0;
         // 右側を作る。
@@ -142,9 +142,9 @@ namespace Sayuri {
           if (temp & map) break;
         }
         // 利き筋をマスクする。
-        attack &= magic_mask_d_[ROT45[square]];
+        attack &= MAGIC_MASK_D[ROT45[square]];
         // 利き筋をシフトする。
-        attack <<= magic_shift_d_[ROT45[square]];
+        attack <<= MAGIC_SHIFT_D[ROT45[square]];
         // 利き筋を通常の座標にする。
         attack = Reverse45(attack);
         // 利き筋をマップに入れる。
@@ -154,7 +154,7 @@ namespace Sayuri {
     // 90度のマップを作成。
     for (int square = 0; square < NUM_SQUARES; square++) {
       point = BIT[ROT90[square]];
-      point >>= magic_shift_v_[ROT90[square]];
+      point >>= MAGIC_SHIFT_V[ROT90[square]];
       for (int map = 0; map < BLOCKER_MAP; map++) {
         attack = 0;
         // 右側を作る。
@@ -170,9 +170,9 @@ namespace Sayuri {
           if (temp & map) break;
         }
         // 利き筋をマスクする。
-        attack &= magic_mask_v_[ROT90[square]];
+        attack &= MAGIC_MASK_V[ROT90[square]];
         // 利き筋をシフトする。
-        attack <<= magic_shift_v_[ROT90[square]];
+        attack <<= MAGIC_SHIFT_V[ROT90[square]];
         // 利き筋を通常の座標にする。
         attack = Reverse90(attack);
         // 利き筋をマップに入れる。
@@ -182,7 +182,7 @@ namespace Sayuri {
     // 135度のマップを作成。
     for (int square = 0; square < NUM_SQUARES; square++) {
       point = BIT[ROT135[square]];
-      point >>= magic_shift_d_[ROT135[square]];
+      point >>= MAGIC_SHIFT_D[ROT135[square]];
       for (int map = 0; map < BLOCKER_MAP; map++) {
         attack = 0;
         // 右側を作る。
@@ -198,9 +198,9 @@ namespace Sayuri {
           if (temp & map) break;
         }
         // 利き筋をマスクする。
-        attack &= magic_mask_d_[ROT135[square]];
+        attack &= MAGIC_MASK_D[ROT135[square]];
         // 利き筋をシフトする。
-        attack <<= magic_shift_d_[ROT135[square]];
+        attack <<= MAGIC_SHIFT_D[ROT135[square]];
         // 利き筋を通常の座標にする。
         attack = Reverse135(attack);
         // 利き筋をマップに入れる。
