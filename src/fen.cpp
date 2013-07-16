@@ -53,15 +53,22 @@ namespace Sayuri {
       ParsePosition(fen_tokens[index_position]);
       ParseToMove(fen_tokens[index_to_move]);
       ParseCastlingRights(fen_tokens[index_castling_rights]);
-      ParseEnPassant(fen_tokens[index_en_passant]);
-      if (fen_tokens.size() > static_cast<size_t>(index_ply_100)) {
-        ParsePly100(fen_tokens[index_ply_100]);
-        if (fen_tokens.size() > static_cast<size_t>(index_ply)) {
-          ParsePly(fen_tokens[index_ply], fen_tokens[index_to_move]);
+      if (fen_tokens.size() > static_cast<size_t>(index_en_passant)) {
+        ParseEnPassant(fen_tokens[index_en_passant]);
+        if (fen_tokens.size() > static_cast<size_t>(index_ply_100)) {
+          ParsePly100(fen_tokens[index_ply_100]);
+          if (fen_tokens.size() > static_cast<size_t>(index_ply)) {
+            ParsePly(fen_tokens[index_ply], fen_tokens[index_to_move]);
+          } else {
+            ply_ = 1;
+          }
         } else {
+          ply_100_ = 0;
           ply_ = 1;
         }
       } else {
+        en_passant_square_ = 0;
+        can_en_passant_ = false;
         ply_100_ = 0;
         ply_ = 1;
       }

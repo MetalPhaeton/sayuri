@@ -42,7 +42,7 @@ namespace Sayuri {
     // 初期化。------------------------------------------------------
     Init();
     // --------------------------------------------------------------
-    std::string fen_str("rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq d3");
+    std::string fen_str("rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq");
     Fen fen(fen_str);
     PrintPosition(fen.position_);
 
