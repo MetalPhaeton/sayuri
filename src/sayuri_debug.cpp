@@ -26,9 +26,10 @@
 #include <iostream>
 #include <utility>
 #include <cstdint>
-#include <cstring>
 #include <ctime>
 #include <memory>
+#include <string>
+#include <sstream>
 
 #include "sayuri.h"
 
@@ -38,40 +39,13 @@ namespace Sayuri {
   /**************************/
   // ================================================================
   int DebugMain(int argc, char* argv[]) {
-    // 初期化。======================================================
+    // 初期化。------------------------------------------------------
     Init();
-    // ==============================================================
+    // --------------------------------------------------------------
+    std::string fen_str("rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq d3");
+    Fen fen(fen_str);
+    PrintPosition(fen.position_);
 
-    TranspositionTable* table = new TranspositionTable(1);
-
-    HashKey pos_key = GenPseudoHashKey();
-    int level = 3;
-    int depth = 5;
-    Side to_move = WHITE;
-    int value = 200;
-    TTValueFlag value_flag = TTValueFlag::EXACT;
-    Move best_move;
-    best_move.piece_square_ = E2;
-    best_move.goal_square_ = E4;
-
-    table->Add(pos_key, level, depth, to_move, value, value_flag, best_move);
-
-    const TTEntry* entry_ptr =
-    table->GetFulfiledEntry(pos_key, level, depth, to_move);
-
-    TranspositionTable* table2 = new TranspositionTable(std::move(*table));
-
-    const TTEntry* entry_ptr2 =
-    table2->GetFulfiledEntry(pos_key, level, depth, to_move);
-
-    if (entry_ptr == entry_ptr2) {
-      std::cout << "True" << std::endl;
-    } else {
-      std::cout << "False" << std::endl;
-    }
-
-    delete table;
-    delete table2;
     return 0;
   }
   // ================================================================
@@ -92,53 +66,40 @@ namespace Sayuri {
 
   // ビットボードを出力する。
   void PrintBitboard(Bitboard bitboard) {
-    // 行間のボーダー。
-    static const char* border = " +---+---+---+---+---+---+---+---+";
+    // 出力する文字列ストリーム。
+    std::ostringstream osstream;
 
-    //一番上のボーダーを出力。 
-    std::cout << border << std::endl;
+    // 上下のボーダー。
+    std::string border(" +-----------------+");
 
-    char line[35];  // 行の文字列。
-    int index;  // 行の文字列のインデックス。
-    char line_num = '8';  // 行番号の文字。
-    Bitboard point = 0x1ULL << 56;  // 調べるビットボードの位置。
-    for (int i = 0; i < 8; i++) {
-      // 行の文字列の配列を初期化。
-      std::memset(line, '\0', sizeof(char) * 35);
-      // 行番号を入れる。
-      line[0] = line_num--;
-      // 行番号の右側の境界を入れる。
-      line[1] = '|';
-      // 行の文字列のインデックスを初期化。
-      index = 2;
-      // ビットを調べて文字列に文字を入れる。
-      for (int j = 0; j < 8; j++) {
-        // ビットが立っている場合、文字を入れる。なければ空白。
-        if (bitboard & point) {
-          line[index++] = '(';
-          line[index++] = '+';
-          line[index++] = ')';
-          line[index++] = '|';
+    // 上のボーダーをストリームへ。
+    osstream << border << std::endl;
+
+    // ビットボードを出力。
+    Bitboard bit = 0x1ULL << (8 * 7);  // 初期位置a8へシフト。
+    char c = '8';  // ランクの文字。
+    for (int i = 0; i < NUM_RANKS; i++) {
+      osstream << c << "| ";
+      for (int j = 0; j < NUM_FYLES; j++) {
+        if (bitboard & bit) {
+          osstream << "@ ";
         } else {
-          line[index++] = ' ';
-          line[index++] = ' ';
-          line[index++] = ' ';
-          line[index++] = '|';
+          osstream << ". ";
         }
-        if (j != 7) point <<= 1;
+        if (j < 7) bit <<= 1;
       }
-
-      // 一つ下のランクに落とす。
-      point >>= 15;
-
-      // 行を出力。
-      std::cout << line << std::endl;
-      // ボーダーを出力。
-      std::cout << border << std::endl;
+      // 一つ下のランクへ。
+      bit >>= (7 + 8);
+      osstream << "|" << std::endl;
+      c--;
     }
 
-    // 最後の行のファイル名を出力。
-    std::cout << "   a   b   c   d   e   f   g   h" << std::endl;
+    // 下部分を書く。
+    osstream << border << std::endl;
+    osstream << "   a b c d e f g h" << std::endl;
+
+    // 標準出力に出力。
+    std::cout << osstream.str();
   }
 
   // 手を出力する。
@@ -267,6 +228,67 @@ namespace Sayuri {
         break;
     }
     std::cout << std::endl;
+  }
+
+  //駒の配置を出力する。
+  void PrintPosition(Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]) {
+    // 出力する文字列ストリーム。
+    std::ostringstream osstream;
+
+    // 上下のボーダー。
+    std::string border(" +-----------------+");
+
+    // 上のボーダーをストリームへ。
+    osstream << border << std::endl;
+
+    // 駒の配置を出力。
+    Bitboard bit = 0x1ULL << (8 * 7);  // 初期位置a8へシフト。
+    char c = '8';  // ランクの文字。
+    for (int i = 0; i < NUM_RANKS; i++) {
+      osstream << c << "| ";
+      for (int j = 0; j < NUM_FYLES; j++) {
+        if (position[WHITE][PAWN] & bit) {
+          osstream << "P ";
+        } else if (position[WHITE][KNIGHT] & bit) {
+          osstream << "N ";
+        } else if (position[WHITE][BISHOP] & bit) {
+          osstream << "B ";
+        } else if (position[WHITE][ROOK] & bit) {
+          osstream << "R ";
+        } else if (position[WHITE][QUEEN] & bit) {
+          osstream << "Q ";
+        } else if (position[WHITE][KING] & bit) {
+          osstream << "K ";
+        } else if (position[BLACK][PAWN] & bit) {
+          osstream << "p ";
+        } else if (position[BLACK][KNIGHT] & bit) {
+          osstream << "n ";
+        } else if (position[BLACK][BISHOP] & bit) {
+          osstream << "b ";
+        } else if (position[BLACK][ROOK] & bit) {
+          osstream << "r ";
+        } else if (position[BLACK][QUEEN] & bit) {
+          osstream << "q ";
+        } else if (position[BLACK][KING] & bit) {
+          osstream << "k ";
+        } else {
+          osstream << ". ";
+        }
+
+        if (j < 7) bit <<= 1;
+      }
+      // 一つ下のランクへ。
+      bit >>= (7 + 8);
+      osstream << "|" << std::endl;
+      c--;
+    }
+
+    // 下部分を書く。
+    osstream << border << std::endl;
+    osstream << "   a b c d e f g h" << std::endl;
+
+    // 標準出力に出力。
+    std::cout << osstream.str();
   }
 
   /**********************

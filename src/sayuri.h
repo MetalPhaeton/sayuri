@@ -38,5 +38,6 @@
 #include "transposition_table.h"
 #include "opening_book.h"
 #include "pgn_parser.h"
+#include "fen.h"
 
 #endif

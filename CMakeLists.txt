@@ -62,7 +62,7 @@ target_link_libraries(sayuri pthread)
 add_dependencies(sayuri ${HEADERS})
 
 # CPackの設定。
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "sayuri-13.07_01")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "sayuri-0000-00-00")
 set(CPACK_SOURCE_IGNORE_FILES "/build/;/.git/;~$;${CPACK_SOURCE_IGNORE_FILES}")
 
 # CPackを実行。
