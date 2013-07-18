@@ -40,7 +40,7 @@ namespace Sayuri {
   ChessEngine::MoveMaker::MoveMaker(ChessEngine* engine_ptr) :
   engine_ptr_(engine_ptr) {
     // スタックのポインターをセット。
-    first_ = last_ = current_ = move_stack_;
+    begin_ = last_ = current_ = move_stack_;
     end_ = &(move_stack_[MAX_SLOTS]);
   }
   // コピーコンストラクタ。
@@ -48,8 +48,8 @@ namespace Sayuri {
   engine_ptr_(maker.engine_ptr_) {
     for (int i; i <= MAX_SLOTS; i++) {
       move_stack_[i] = maker.move_stack_[i];
-      if (maker.first_ == &(maker.move_stack_[i])) {
-        first_ = &(move_stack_[i]);
+      if (maker.begin_ == &(maker.move_stack_[i])) {
+        begin_ = &(move_stack_[i]);
       }
       if (maker.last_ == &(maker.move_stack_[i])) {
         last_ = &(move_stack_[i]);
@@ -64,8 +64,8 @@ namespace Sayuri {
   engine_ptr_(maker.engine_ptr_) {
     for (int i; i <= MAX_SLOTS; i++) {
       move_stack_[i] = maker.move_stack_[i];
-      if (maker.first_ == &(maker.move_stack_[i])) {
-        first_ = &(move_stack_[i]);
+      if (maker.begin_ == &(maker.move_stack_[i])) {
+        begin_ = &(move_stack_[i]);
       }
       if (maker.last_ == &(maker.move_stack_[i])) {
         last_ = &(move_stack_[i]);
@@ -81,8 +81,8 @@ namespace Sayuri {
     engine_ptr_ = maker.engine_ptr_;
     for (int i; i <= MAX_SLOTS; i++) {
       move_stack_[i] = maker.move_stack_[i];
-      if (maker.first_ == &(maker.move_stack_[i])) {
-        first_ = &(move_stack_[i]);
+      if (maker.begin_ == &(maker.move_stack_[i])) {
+        begin_ = &(move_stack_[i]);
       }
       if (maker.last_ == &(maker.move_stack_[i])) {
         last_ = &(move_stack_[i]);
@@ -99,8 +99,8 @@ namespace Sayuri {
     engine_ptr_ = maker.engine_ptr_;
     for (int i; i <= MAX_SLOTS; i++) {
       move_stack_[i] = maker.move_stack_[i];
-      if (maker.first_ == &(maker.move_stack_[i])) {
-        first_ = &(move_stack_[i]);
+      if (maker.begin_ == &(maker.move_stack_[i])) {
+        begin_ = &(move_stack_[i]);
       }
       if (maker.last_ == &(maker.move_stack_[i])) {
         last_ = &(move_stack_[i]);
@@ -164,10 +164,11 @@ namespace Sayuri {
 
   // 手をスタックに展開する。
   template<ChessEngine::GenMoveType Type>
-  void ChessEngine::MoveMaker::GenMoves() {
+  void ChessEngine::MoveMaker::GenMoves(int depth, int level,
+  const TranspositionTable& table) {
     // スタックのポインタを設定。
-    // MoveSlot* start = last_;
-    // MoveSlot* end = last_;
+    MoveSlot* begin = last_;
+    MoveSlot* end = last_;
 
     // サイド。
     Side side = engine_ptr_->to_move_;
@@ -237,7 +238,7 @@ namespace Sayuri {
           // スタックに登録。
           last_->move_.all_ = move.all_;
           last_++;
-          // end = last_;
+          end = last_;
         }
       }
     }
@@ -321,13 +322,13 @@ namespace Sayuri {
             move.promotion_ = piece_type;
             last_->move_.all_ = move.all_;
             last_++;
-            // end = last_;
+            end = last_;
           }
         } else {
           // 昇格しない場合。
           last_->move_.all_ = move.all_;
           last_++;
-          // end = last_;
+          end = last_;
         }
       }
     }
@@ -403,18 +404,125 @@ namespace Sayuri {
 
       last_->move_.all_ = move.all_;
       last_++;
-      // end = last_;
+      end = last_;
     }
 
     // 得点をつける。
-    // TODO: score<Type>(start, end);
+    ScoreMoves<Type>(begin, end, depth, level, table);
   }
   // テンプレートの実体化。
   template void ChessEngine::MoveMaker::GenMoves
-  <ChessEngine::GenMoveType::NON_CAPTURE>();
+  <ChessEngine::GenMoveType::NON_CAPTURE>(int depth, int level,
+  const TranspositionTable& table);
   template void ChessEngine::MoveMaker::GenMoves
-  <ChessEngine::GenMoveType::CAPTURE>();
+  <ChessEngine::GenMoveType::CAPTURE>(int depth, int level,
+  const TranspositionTable& table);
   template void ChessEngine::MoveMaker::GenMoves
-  <ChessEngine::GenMoveType::LEGAL>();
+  <ChessEngine::GenMoveType::LEGAL>(int depth, int level,
+  const TranspositionTable& table);
+
+  // 展開した候補手に得点をつける。
+  template<ChessEngine::GenMoveType Type>
+  void ChessEngine::MoveMaker::ScoreMoves
+  (ChessEngine::MoveMaker::MoveSlot* begin,
+   ChessEngine::MoveMaker::MoveSlot* end,
+   int depth, int level,
+   const TranspositionTable& table) {
+  }
+  // テンプレートの実体化。
+  template void ChessEngine::MoveMaker::ScoreMoves
+  <ChessEngine::GenMoveType::NON_CAPTURE>
+  (ChessEngine::MoveMaker::MoveSlot* begin,
+   ChessEngine::MoveMaker::MoveSlot* end, int depth, int level,
+   const TranspositionTable& table);
+  template void ChessEngine::MoveMaker::ScoreMoves
+  <ChessEngine::GenMoveType::CAPTURE>
+  (ChessEngine::MoveMaker::MoveSlot* begin,
+   ChessEngine::MoveMaker::MoveSlot* end, int depth, int level,
+   const TranspositionTable& table);
+  template void ChessEngine::MoveMaker::ScoreMoves
+  <ChessEngine::GenMoveType::LEGAL>
+  (ChessEngine::MoveMaker::MoveSlot* begin,
+   ChessEngine::MoveMaker::MoveSlot* end,int depth, int level,
+   const TranspositionTable& table);
+
   // SEE。
+  int ChessEngine::MoveMaker::SEE(Move move, Side side) {
+    int value = 0;
+
+    if (move.all_) {
+      // 取る駒の価値を得る。
+      int capture_value = MATERIAL[engine_ptr_->piece_board_[move.to_]];
+
+      engine_ptr_->MakeMove(move);
+
+      // 違法な手なら計算しない。
+      if (!(engine_ptr_->IsAttacked(engine_ptr_->king_[side], side ^ 0x3))) {
+        // 再帰して次の局面の評価値を得る。
+        Move next_move = GetSmallestAttackerMove(move.to_, side ^ 0x3);
+        value = capture_value - SEE(next_move, side ^ 0x3);
+      }
+
+      engine_ptr_->UnmakeMove(move);
+    }
+
+    return value;
+  }
+
+  // 最小の攻撃駒の攻撃の手を得る。
+  Move ChessEngine::MoveMaker::GetSmallestAttackerMove(Square target,
+  Side side) const {
+    // 変数。
+    Bitboard attack;
+    Move move;
+
+    // キングがターゲットの時はなし。
+    if (target == engine_ptr_->king_[side]) {
+      move.all_ = 0;
+      return move;
+    }
+
+    // 価値の低いものから調べる。
+    for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+      switch (piece_type) {
+        case PAWN:
+          attack = Util::GetPawnAttack(target, side ^ 0x3);
+          attack &= engine_ptr_->position_[side][PAWN];
+          break;
+        case KNIGHT:
+          attack = Util::GetKnightMove(target);
+          attack &= engine_ptr_->position_[side][KNIGHT];
+          break;
+        case BISHOP:
+          attack = engine_ptr_->GetBishopAttack(target);
+          attack &= engine_ptr_->position_[side][BISHOP];
+          break;
+        case ROOK:
+          attack = engine_ptr_->GetRookAttack(target);
+          attack &= engine_ptr_->position_[side][ROOK];
+          break;
+        case QUEEN:
+          attack = engine_ptr_->GetQueenAttack(target);
+          attack &= engine_ptr_->position_[side][QUEEN];
+          break;
+        case KING:
+          attack = Util::GetKingMove(target);
+          attack &= engine_ptr_->position_[side][KING];
+          break;
+        default:
+          Assert(false);
+          break;
+      }
+      if (attack) {
+        move.all_ = 0;
+        move.from_ = Util::GetSquare(attack);
+        move.to_  = target;
+        move.move_type_ = NORMAL;
+        return move;
+      }
+    }
+
+    move.all_ = 0;
+    return move;
+  }
 }  // namespace Sayuri

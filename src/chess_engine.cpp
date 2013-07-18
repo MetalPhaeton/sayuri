@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <random>
 #include <ctime>
 #include "chess_def.h"
 #include "chess_util.h"
@@ -37,6 +38,11 @@
 #include "sayuri_error.h"
 
 namespace Sayuri {
+  /****************/
+  /* static定数。 */
+  /****************/
+  constexpr int ChessEngine::MAX_PLY;
+
   /**********************************
    * コンストラクタとデストラクタ。 *
    **********************************/
@@ -231,15 +237,13 @@ namespace Sayuri {
     }
   }
   // 駒の位置を入れ替える。
-  void ChessEngine::SwapPieces(Square square1, Square square2) {
+  void ChessEngine::ReplacePiece(Square from, Square to) {
     // 移動する位置と移動先の位置が同じなら何もしない。
-    if (square1 == square2) return;
+    if (from == to) return;
 
-    // 入れ替え。
-    Piece temp_piece = piece_board_[square1];
-    Side temp_side = side_board_[square1];
-    PutPiece(square1, piece_board_[square2], side_board_[square2]);
-    PutPiece(square2, temp_piece, temp_side);
+    // 移動。
+    PutPiece(to, piece_board_[from], side_board_[from]);
+    PutPiece(from, EMPTY, NO_SIDE);
   }
 
   // 攻撃されているかどうか調べる。
@@ -282,33 +286,15 @@ namespace Sayuri {
 
     // 白のマテリアル。
     int white_material = 0;
-    white_material += SCORE_PAWN
-    * Util::CountBits(position_[WHITE][PAWN]);
-    white_material += SCORE_KNIGHT
-    * Util::CountBits(position_[WHITE][KNIGHT]);
-    white_material += SCORE_BISHOP
-    * Util::CountBits(position_[WHITE][BISHOP]);
-    white_material += SCORE_ROOK
-    * Util::CountBits(position_[WHITE][ROOK]);
-    white_material += SCORE_QUEEN
-    * Util::CountBits(position_[WHITE][QUEEN]);
-    white_material += SCORE_KING
-    * Util::CountBits(position_[WHITE][KING]);
-
     // 黒のマテリアル。
     int black_material = 0;
-    black_material += SCORE_PAWN
-    * Util::CountBits(position_[BLACK][PAWN]);
-    black_material += SCORE_KNIGHT
-    * Util::CountBits(position_[BLACK][KNIGHT]);
-    black_material += SCORE_BISHOP
-    * Util::CountBits(position_[BLACK][BISHOP]);
-    black_material += SCORE_ROOK
-    * Util::CountBits(position_[BLACK][ROOK]);
-    black_material += SCORE_QUEEN
-    * Util::CountBits(position_[BLACK][QUEEN]);
-    black_material += SCORE_KING
-    * Util::CountBits(position_[BLACK][KING]);
+    for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+      white_material += MATERIAL[piece_type]
+      * Util::CountBits(position_[WHITE][piece_type]);
+
+      black_material += MATERIAL[piece_type]
+      * Util::CountBits(position_[BLACK][piece_type]);
+    }
 
     // マテリアルを計算して返す。
     int material = white_material - black_material;
@@ -618,23 +604,23 @@ namespace Sayuri {
     // 手の種類によって分岐する。
     if (move.move_type_ == CASTLING) {  // キャスリングの場合。
       // キングを動かす。
-      SwapPieces(from, to);
+      ReplacePiece(from, to);
       // ルークを動かす。
       if (to == G1) {
-        SwapPieces(H1, F1);
+        ReplacePiece(H1, F1);
       } else if (to == C1) {
-        SwapPieces(A1, D1);
+        ReplacePiece(A1, D1);
       } else if (to == G8) {
-        SwapPieces(H8, F8);
+        ReplacePiece(H8, F8);
       } else if (to == C8) {
-        SwapPieces(A8, D8);
+        ReplacePiece(A8, D8);
       }
       can_en_passant_ = false;
     } else if (move.move_type_ == EN_PASSANT) {  // アンパッサンの場合。
       // 取った駒をボーンにする。
       move.captured_piece_ = PAWN;
       // 動かす。
-      SwapPieces(from, to);
+      ReplacePiece(from, to);
       // アンパッサンのターゲットを消す。
       Square en_passant_target =
       side == WHITE ? en_passant_square_ - 8 : en_passant_square_ + 8;
@@ -645,7 +631,7 @@ namespace Sayuri {
       // 取る駒を登録する。
       move.captured_piece_ = piece_board_[to];
       // 駒を動かす。
-      SwapPieces(from, to);
+      ReplacePiece(from, to);
       // 駒を昇格させるなら、駒を昇格させる。
       Piece promotion = move.promotion_;
       if (promotion) {
@@ -690,19 +676,19 @@ namespace Sayuri {
     Square to = move.to_;
 
     // 駒の位置を戻す。
-    SwapPieces(to, from);
+    ReplacePiece(to, from);
 
     // 手の種類で分岐する。
     if (move.move_type_ == CASTLING) {  // キャスリングの場合。
       // ルークを戻す。
       if (to == G1) {
-        SwapPieces(F1, H1);
+        ReplacePiece(F1, H1);
       } else if (to == C1) {
-        SwapPieces(D1, A1);
+        ReplacePiece(D1, A1);
       } else if (to == G8) {
-        SwapPieces(F8, H8);
+        ReplacePiece(F8, H8);
       } else if (to == C8) {
-        SwapPieces(D8, A8);
+        ReplacePiece(D8, A8);
       }
     } else if (move.move_type_ == EN_PASSANT) {  // アンパッサンの場合。
       // アンパッサンのターゲットを戻す。
@@ -726,26 +712,37 @@ namespace Sayuri {
    **********************/
   // ハッシュキーの配列。
   HashKey ChessEngine::key_array_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
-  // 乱数の種。
-  uint64_t ChessEngine::seed_;
   // key_array_[][][]を初期化する。
   void ChessEngine::InitKeyArray()
   {
-    // 乱数の種を初期化。
-    seed_ = 1;
+    // メルセンヌツイスターの準備。
+    std::mt19937 engine(std::time(nullptr));
+    std::uniform_int_distribution<HashKey> dist(0ULL, 0xffffffffffffffffULL);
 
     // キーの配列を初期化。
     for (int side = 0; side < NUM_SIDES; side++) {
       for (int piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
         for (int square = 0; square < NUM_SQUARES; square++) {
           if ((side == NO_SIDE) || (piece_type == EMPTY)) {
-            key_array_[side][piece_type][square] = 0;
+            key_array_[side][piece_type][square] = 0ULL;
           } else {
-            key_array_[side][piece_type][square] = GetRand();
+            key_array_[side][piece_type][square] = dist(engine);
           }
         }
       }
     }
+  }
+  // 現在の局面のハッシュキーを計算する。
+  HashKey ChessEngine::GetCurrentKey() const {
+    HashKey key = 0ULL;
+    for (Side side = 0; side < NUM_SIDES; side++) {
+      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+        for (Square square = 0; square < NUM_SQUARES; square++) {
+          key ^= key_array_[side][piece_type][square];
+        }
+      }
+    }
+    return key;
   }
   // 次の局面のハッシュキーを得る。
   HashKey ChessEngine::GetNextKey(HashKey current_key, Move move) const {
@@ -754,16 +751,16 @@ namespace Sayuri {
     Side piece_side = side_board_[move.from_];
 
     // 移動する位置の駒の種類とサイドを得る。
-    Piece goal_type = piece_board_[move.to_];
-    Side goal_side = side_board_[move.to_];
+    Piece to_type = piece_board_[move.to_];
+    Side to_side = side_board_[move.to_];
 
     // 移動する駒の移動元のハッシュキーを得る。
-    HashKey piece_key =
+    HashKey from_key =
     key_array_[piece_side][piece_type][move.from_];
 
     // 移動する位置のハッシュキーを得る。
-    HashKey goal_key =
-    key_array_[goal_side][goal_type][move.to_];
+    HashKey to_key =
+    key_array_[to_side][to_type][move.to_];
 
     // 移動する駒の移動先のハッシュキーを得る。
     HashKey move_key;
@@ -776,15 +773,21 @@ namespace Sayuri {
     }
 
     // 移動する駒の移動元のハッシュキーを削除する。
-    current_key ^= piece_key;
+    current_key ^= from_key;
 
     // 移動する位置のハッシュキーを削除する。
-    current_key ^= goal_key;
+    current_key ^= to_key;
 
     // 移動する駒の移動先のハッシュキーを追加する。
     current_key ^= move_key;
 
     // 次の局面のハッシュキーを返す。
     return current_key;
+  }
+
+  // 探索用情報スタックのスロットのコンストラクタ。
+  ChessEngine::SearchSlot::SearchSlot() :
+  current_key_(0ULL) {
+    killer_.all_ = 0;
   }
 }  // namespace Sayuri

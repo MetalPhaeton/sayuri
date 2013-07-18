@@ -1,5 +1,5 @@
 /*
-   chess_engine_test.cpp: チェスボードのテスト用実装ファイル。
+   chess_engine_test.cpp: チェスボードのテスト用プログラム。
 
    The MIT License (MIT)
 
@@ -42,25 +42,21 @@ namespace Sayuri {
   extern void PrintMove(Move move);
 
   void ChessEngine::Test() {
-    std::string fen_str = "4k3/8/8/8/8/8/1p6/2N1K3 b -";
+    std::string fen_str = "6qk/8/2p5/3B4/2P5/4N3/8/7K b -";
     Fen fen(fen_str);
 
     LoadFen(fen);
     PrintPosition(position_);
 
     MoveMaker maker(this);
-    maker.GenMoves<GenMoveType::LEGAL>();
+    Move move;
+    move.all_ = 0;
+    move.from_ = C6;
+    move.to_ = D5;
+    move.move_type_ = NORMAL;
 
-    MoveMaker::MoveSlot* pt = maker.first_;
-    while (pt < maker.last_) {
-      std::cout << "----------------------------------------" << std::endl;
-      std::cout << std::endl;
-      PrintMove(pt->move_);
-      std::cout << std::endl;
-      std::cout << "----------------------------------------" << std::endl;
-      pt++;
-    }
-
+    int value = maker.SEE(move, BLACK);
     PrintPosition(position_);
+    std::cout << "value is " << value << std::endl;
   }
 }  // namespace Sayuri

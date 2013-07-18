@@ -100,6 +100,9 @@ namespace Sayuri {
         CAPTURE,
         LEGAL
       };
+      // 最大探索手数。
+      static constexpr int MAX_PLY = 100;
+
     public:
       /******************/
       /* テスト用関数。 */
@@ -423,7 +426,7 @@ namespace Sayuri {
           /* 定数など。 */
           /**************/
           // 最大スロット数。
-          static constexpr int MAX_SLOTS = 80;
+          static constexpr int MAX_SLOTS = 200;
 
         public:
           /********************/
@@ -443,7 +446,12 @@ namespace Sayuri {
           // スタックに候補手を展開する関数。
           // (注)TypeがNON_CAPTURE、CAPTUREの場合、
           // 自らチェックされる手も作る。
-          template<GenMoveType Type> void GenMoves();
+          // [引数]
+          // depth: 手を展開するノードの深さ。
+          // level: 手を展開するノードのレベル。
+          // table: トランスポジションテーブル。
+          template<GenMoveType Type> void GenMoves(int depth, int level,
+          const TranspositionTable& table);
 
         private:
           /**********************/
@@ -453,15 +461,26 @@ namespace Sayuri {
           // [引数]
           // start: 点数をつける最初のスロットのポインタ。
           // end: 点数をつける最後のスロットの次のポインタ。
+          // depth: 手を展開するノードの深さ。
+          // level: 現在のノードのレベル。
+          // table: トランスポジションテーブル。
           template<GenMoveType Type>
-          void ScoreMoves(MoveSlot* start, MoveSlot* end);
+          void ScoreMoves(MoveSlot* start, MoveSlot* end, int depth,
+          int level, const TranspositionTable& table);
           // SEE。
+          // [引数]
+          // move: 探したい手。
+          // side: 手番。
+          // [戻り値]
+          // 評価値。
           int SEE(Move move, Side side);
           // キャスリングできるかどうか判定。
           template<Castling Which> bool CanCastling() const;
+          // 最小価値の攻撃駒の動きを得る。
+          Move GetSmallestAttackerMove(Square target, Side side) const;
 
           /****************/
-          /* メンバ定数。 */
+          /* メンバ変数。 */
           /****************/
           // 親のチェスエンジン。
           ChessEngine* engine_ptr_;
@@ -469,7 +488,7 @@ namespace Sayuri {
           // 展開されるスタック。
           MoveSlot move_stack_[MAX_SLOTS + 1];
           // スタックのポインタ。
-          MoveSlot* first_;
+          MoveSlot* begin_;
           MoveSlot* last_;
           MoveSlot* current_;
           MoveSlot* end_;
@@ -523,11 +542,12 @@ namespace Sayuri {
       // piece_type: 駒の種類。
       // side: 置きたい駒のサイド。
       void PutPiece(Square square, Piece piece_type, Side side=NO_SIDE);
-      // 駒の位置を入れ替える。
+      // 駒の位置を変える。
+      // (注)移動先の駒は上書きされる。
       // [引数]
-      // square1: 入れ替えたい駒。
-      // square2: 入れ替えたい駒。
-      void SwapPieces(Square piece_square, Square goal_square);
+      // from: 変えたい駒の位置。
+      // to: 移動先。
+      void ReplacePiece(Square from, Square to);
 
       // ビショップの攻撃筋を作る。
       // [引数]
@@ -618,6 +638,18 @@ namespace Sayuri {
       int ply_100_;
       // 現在の手数。
       int ply_;
+      // ヒストリー。history_[from][to]。
+      int history_[NUM_SQUARES][NUM_SQUARES];
+      // 探索情報用スタック。
+      struct SearchSlot {
+        // ハッシュキー。
+        HashKey current_key_;
+        // キラームーブ。
+        Move killer_;
+
+        SearchSlot();
+      };
+      SearchSlot search_stack_[MAX_PLY + 1];
 
       /****************/
       /* 局面分析用。 */
@@ -666,17 +698,13 @@ namespace Sayuri {
       // それぞれのインデックスに値を入れると、
       // そのハッシュキーを得られる。
       static HashKey key_array_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
-      // 乱数の種。
-      static HashKey seed_;
       // key_array_[][][]を初期化する。
       static void InitKeyArray();
-      // 64bit乱数を得る。
+      // 現在の局面のハッシュキーを計算する。
+      // (注)計算に時間がかかる。
       // [戻り値]
-      // 64bit乱数。
-      static HashKey GetRand() {
-        seed_ = (seed_ * 0x5d588b656c078965ULL) + 0x0000000000269ec3ULL;
-        return seed_;
-      }
+      // 現在の局面のハッシュキー。
+      HashKey GetCurrentKey() const;
       // 現在の局面と動かす手から次の局面のハッシュキーを得る。
       // [引数]
       // current_key: 現在のキー。

@@ -197,12 +197,9 @@ namespace Sayuri {
   constexpr int SCORE_WIN = 1000000;
   constexpr int SCORE_LOSE = -SCORE_WIN;
   constexpr int SCORE_DRAW = 0;
-  constexpr int SCORE_PAWN = 100;
-  constexpr int SCORE_KNIGHT = 300;
-  constexpr int SCORE_BISHOP = 300;
-  constexpr int SCORE_ROOK = 500;
-  constexpr int SCORE_QUEEN = 900;
-  constexpr int SCORE_KING = SCORE_WIN;
+  constexpr int MATERIAL[NUM_PIECE_TYPES] {
+    0, 100, 300, 300, 500, 900, SCORE_WIN
+  };
 }  // namespace Sayuri
 
 #endif
