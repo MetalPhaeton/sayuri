@@ -527,7 +527,7 @@ namespace Sayuri {
       // [引数]
       // square1: 入れ替えたい駒。
       // square2: 入れ替えたい駒。
-      void SwapPiece(Square piece_square, Square goal_square);
+      void SwapPieces(Square piece_square, Square goal_square);
 
       // ビショップの攻撃筋を作る。
       // [引数]

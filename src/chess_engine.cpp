@@ -231,7 +231,7 @@ namespace Sayuri {
     }
   }
   // 駒の位置を入れ替える。
-  void ChessEngine::SwapPiece(Square square1, Square square2) {
+  void ChessEngine::SwapPieces(Square square1, Square square2) {
     // 移動する位置と移動先の位置が同じなら何もしない。
     if (square1 == square2) return;
 
@@ -618,23 +618,23 @@ namespace Sayuri {
     // 手の種類によって分岐する。
     if (move.move_type_ == CASTLING) {  // キャスリングの場合。
       // キングを動かす。
-      SwapPiece(from, to);
+      SwapPieces(from, to);
       // ルークを動かす。
       if (to == G1) {
-        SwapPiece(H1, F1);
+        SwapPieces(H1, F1);
       } else if (to == C1) {
-        SwapPiece(A1, D1);
+        SwapPieces(A1, D1);
       } else if (to == G8) {
-        SwapPiece(H8, F8);
+        SwapPieces(H8, F8);
       } else if (to == C8) {
-        SwapPiece(A8, D8);
+        SwapPieces(A8, D8);
       }
       can_en_passant_ = false;
     } else if (move.move_type_ == EN_PASSANT) {  // アンパッサンの場合。
       // 取った駒をボーンにする。
       move.captured_piece_ = PAWN;
       // 動かす。
-      SwapPiece(from, to);
+      SwapPieces(from, to);
       // アンパッサンのターゲットを消す。
       Square en_passant_target =
       side == WHITE ? en_passant_square_ - 8 : en_passant_square_ + 8;
@@ -645,7 +645,7 @@ namespace Sayuri {
       // 取る駒を登録する。
       move.captured_piece_ = piece_board_[to];
       // 駒を動かす。
-      SwapPiece(from, to);
+      SwapPieces(from, to);
       // 駒を昇格させるなら、駒を昇格させる。
       Piece promotion = move.promotion_;
       if (promotion) {
@@ -690,19 +690,19 @@ namespace Sayuri {
     Square to = move.to_;
 
     // 駒の位置を戻す。
-    SwapPiece(to, from);
+    SwapPieces(to, from);
 
     // 手の種類で分岐する。
     if (move.move_type_ == CASTLING) {  // キャスリングの場合。
       // ルークを戻す。
       if (to == G1) {
-        SwapPiece(F1, H1);
+        SwapPieces(F1, H1);
       } else if (to == C1) {
-        SwapPiece(D1, A1);
+        SwapPieces(D1, A1);
       } else if (to == G8) {
-        SwapPiece(F8, H8);
+        SwapPieces(F8, H8);
       } else if (to == C8) {
-        SwapPiece(D8, A8);
+        SwapPieces(D8, A8);
       }
     } else if (move.move_type_ == EN_PASSANT) {  // アンパッサンの場合。
       // アンパッサンのターゲットを戻す。
