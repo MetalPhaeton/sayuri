@@ -1,5 +1,8 @@
 /* 
-   sayuri_debug.h: Sayuriをデバッグする。
+   sayuri_debug.cpp: Sayuriをデバッグする。
+
+   The MIT License (MIT)
+
    Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -42,19 +45,13 @@ namespace Sayuri {
     // 初期化。------------------------------------------------------
     Init();
     // --------------------------------------------------------------
-    std::string fen_str("rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq");
-    Fen fen(fen_str);
-    PrintPosition(fen.position_);
+    ChessEngine* engine = new ChessEngine();
+    engine->Test();
+    delete engine;
 
     return 0;
   }
   // ================================================================
-
-  // アサートする。
-  void Assert(bool expr) {
-    if (expr) return;
-    throw SayuriError("Sayuriエラー: アサート失敗。");
-  }
 
   // 擬似ハッシュキー生成。
   HashKey GenPseudoHashKey() {
@@ -117,20 +114,23 @@ namespace Sayuri {
     Rank rank;
 
     // 動かす駒の位置を出力する。
-    std::cout << "Piece: ";
-    fyle = Util::GetFyle(move.piece_square_);
-    rank = Util::GetRank(move.piece_square_);
+    std::cout << "From: ";
+    fyle = Util::GetFyle(move.from_);
+    rank = Util::GetRank(move.from_);
     std::cout << fyle_array[fyle] << rank_array[rank] << std::endl;
 
     // 移動先の位置を出力する。
-    std::cout << "Goal: ";
-    fyle = Util::GetFyle(move.goal_square_);
-    rank = Util::GetRank(move.goal_square_);
+    std::cout << "To: ";
+    fyle = Util::GetFyle(move.to_);
+    rank = Util::GetRank(move.to_);
     std::cout << fyle_array[fyle] << rank_array[rank] << std::endl;
 
     // 取った駒の種類を出力する。
     std::cout << "Captured Piece: ";
     switch (move.captured_piece_) {
+      case EMPTY:
+        std::cout << "None";
+        break;
       case PAWN:
         std::cout << "Pawn";
         break;
@@ -158,6 +158,9 @@ namespace Sayuri {
     // 昇格する駒の種類を出力する。
     std::cout << "Promotion: ";
     switch (move.promotion_) {
+      case EMPTY:
+        std::cout << "None";
+        break;
       case PAWN:
         std::cout << "Pawn";
         break;
@@ -184,15 +187,16 @@ namespace Sayuri {
 
     // キャスリングを出力する。
     Castling castling = move.last_castling_rights_;
-    std::cout << "<Last Castling Rights>" << std::endl;
+    std::cout << "Last Castling Rights: ";
     if (castling & WHITE_SHORT_CASTLING)
-      std::cout << "  White Short Castling" << std::endl;
+      std::cout << "K";
     if (castling & WHITE_LONG_CASTLING)
-      std::cout << "  White Long Castling" << std::endl;
+      std::cout << "Q";
     if (castling & BLACK_SHORT_CASTLING)
-      std::cout << "  Black Short Castling" << std::endl;
+      std::cout << "k";
     if (castling & BLACK_LONG_CASTLING)
-      std::cout << "  Black Long Castling" << std::endl;
+      std::cout << "q";
+    std::cout << std::endl;
 
     // アンパッサンできるかどうかを出力する。
     bool can_en_passant = move.last_can_en_passant_;
@@ -202,10 +206,10 @@ namespace Sayuri {
     std::cout << std::endl;
 
     // アンパッサンのターゲットを出力する。
-    Square en_passant_target = move.last_en_passant_target_;
-    fyle = Util::GetFyle(en_passant_target);
-    rank = Util::GetRank(en_passant_target);
-    std::cout << "Last En Passant Target: "
+    Square en_passant_square = move.last_en_passant_square_;
+    fyle = Util::GetFyle(en_passant_square);
+    rank = Util::GetRank(en_passant_square);
+    std::cout << "Last En Passant Square: "
     << fyle_array[fyle] << rank_array[rank] << std::endl;
 
     // 手の種類を出力する。

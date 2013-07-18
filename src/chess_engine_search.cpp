@@ -27,7 +27,5 @@
 #include "chess_util.h"
 #include "transposition_table.h"
 
-#include "sayuri_debug.h"
-
 namespace Sayuri {
 }  // namespace Sayuri

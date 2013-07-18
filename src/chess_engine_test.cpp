@@ -1,5 +1,5 @@
 /*
-   init.h: Sayuriの初期化。
+   chess_engine_test.cpp: チェスボードのテスト用実装ファイル。
 
    The MIT License (MIT)
 
@@ -24,17 +24,43 @@
    IN THE SOFTWARE.
 */
 
-#ifndef INIT_H
-#define INIT_H
-
-#include <iostream>
-
-#include "chess_util.h"
 #include "chess_engine.h"
 
-namespace Sayuri {
-  // Misakiの初期化。
-  extern void Init();
-}  // namespace Sayuri
+#include <iostream>
+#include <string>
+#include "chess_def.h"
+#include "chess_util.h"
+#include "sayuri_error.h"
+#include "fen.h"
 
-#endif
+namespace Sayuri {
+  /******************/
+  /* テスト用関数。 */
+  /******************/
+  extern void PrintBitboard(Bitboard bitboard);
+  extern void PrintPosition(Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]);
+  extern void PrintMove(Move move);
+
+  void ChessEngine::Test() {
+    std::string fen_str = "4k3/8/8/8/8/8/1p6/2N1K3 b -";
+    Fen fen(fen_str);
+
+    LoadFen(fen);
+    PrintPosition(position_);
+
+    MoveMaker maker(this);
+    maker.GenMoves<GenMoveType::LEGAL>();
+
+    MoveMaker::MoveSlot* pt = maker.first_;
+    while (pt < maker.last_) {
+      std::cout << "----------------------------------------" << std::endl;
+      std::cout << std::endl;
+      PrintMove(pt->move_);
+      std::cout << std::endl;
+      std::cout << "----------------------------------------" << std::endl;
+      pt++;
+    }
+
+    PrintPosition(position_);
+  }
+}  // namespace Sayuri

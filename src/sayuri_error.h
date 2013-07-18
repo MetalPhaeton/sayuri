@@ -1,5 +1,4 @@
-/*
-   init.h: Sayuriの初期化。
+/* sayuri_error.h: Sayuriのエラーのヘッダ。
 
    The MIT License (MIT)
 
@@ -22,19 +21,28 @@
    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
    IN THE SOFTWARE.
-*/
-
-#ifndef INIT_H
-#define INIT_H
+ */
+#ifndef SAYURI_ERROR_H
+#define SAYURI_ERROR_H
 
 #include <iostream>
-
-#include "chess_util.h"
-#include "chess_engine.h"
+#include <stdexcept>
+#include <string>
 
 namespace Sayuri {
-  // Misakiの初期化。
-  extern void Init();
+  // Sayuriのエラークラス。
+  class SayuriError : public std::logic_error {
+    public:
+      SayuriError(const char* message) : std::logic_error(message) {}
+      SayuriError(const std::string message) : std::logic_error(message) {}
+  };
+
+  // 論理テスト。
+  // [引数]
+  // expr: 条件式。
+  // [例外]
+  // exprがfalseなら例外発生。
+  void Assert(bool expr);
 }  // namespace Sayuri
 
 #endif

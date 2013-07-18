@@ -1,5 +1,8 @@
 /* 
    fen.h: fenパーサのヘッダファイル。
+
+   The MIT License (MIT)
+
    Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,8 +30,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
-#include "sayuri_debug.h"
+#include "chess_def.h"
 
 namespace Sayuri {
   /*********************/
@@ -49,6 +51,7 @@ namespace Sayuri {
       Fen(Fen&& fen);
       Fen& operator=(const Fen& fen);
       Fen& operator=(Fen&& fen);
+      virtual ~Fen() {}
 
       /**************/
       /* アクセサ。 */
@@ -58,7 +61,7 @@ namespace Sayuri {
         return position_;
       }
       // 手番。
-      Side to_move() const {return to_move_;};
+      Side to_move() const {return to_move_;}
       // キャスリングの権利。
       Castling castling_rights() const {return castling_rights_;}
       // アンパッサンの位置。
@@ -69,11 +72,6 @@ namespace Sayuri {
       int ply_100() const {return ply_100_;}
       // 現在の手数。
       int ply() const {return ply_;}
-
-      /****************/
-      /* デバッグ用。 */
-      /****************/
-      friend int DebugMain(int argc, char* argv[]);
 
     private:
       /************/

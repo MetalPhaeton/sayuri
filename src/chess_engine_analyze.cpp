@@ -102,18 +102,18 @@ namespace Sayuri {
   // 動ける位置の数を得る。
   int ChessEngine::GetMobility(Square piece_square) const {
     // 駒の種類を得る。
-    Piece Pieceype = piece_board_[piece_square];
+    Piece piece_type = piece_board_[piece_square];
 
     // 駒のサイドと敵のサイドを得る。
     Side side = side_board_[piece_square];
     Side enemy_side = side ^ 0x3;
 
     // 駒がなければ0を返す。
-    if (!Pieceype) return 0;
+    if (!piece_type) return 0;
 
     // 利き筋を入れる。
     Bitboard move_bitboard;
-    switch (Pieceype) {
+    switch (piece_type) {
       case PAWN:
         // 通常の動き。
         move_bitboard = Util::GetPawnMove(piece_square, side) & ~blocker0_;
@@ -222,14 +222,14 @@ namespace Sayuri {
 
     // 駒を1つずつ調べていく。
     Square piece_square;
-    Piece Pieceype;
+    Piece piece_type;
     Side side;
     for (; pieces; pieces &= pieces - 1) {
       piece_square = Util::GetSquare(pieces);
-      Pieceype = piece_board_[piece_square];
+      piece_type = piece_board_[piece_square];
       side = side_board_[piece_square];
       // 駒の種類によって分岐。
-      switch (Pieceype) {
+      switch (piece_type) {
         case PAWN:
           attack |= Util::GetPawnAttack(piece_square, side);
           break;

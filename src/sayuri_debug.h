@@ -1,5 +1,8 @@
 /*
    sayuri_debug.h: Misakiをデバッグする。
+
+   The MIT License (MIT)
+
    Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -36,20 +39,6 @@
 namespace Sayuri {
   // デバッグ用メイン関数。
   int DebugMain(int argc, char* argv[]);
-
-  // Sayuriのエラークラス。
-  class SayuriError : public std::logic_error {
-    public:
-      SayuriError(const char* message) : std::logic_error(message) {}
-      SayuriError(const std::string message) : std::logic_error(message) {}
-  };
-
-  // 論理テスト。
-  // [引数]
-  // expr: 条件式。
-  // [例外]
-  // exprがfalseなら例外発生。
-  void Assert(bool expr);
 
   // 擬似ハッシュキー生成。
   HashKey GenPseudoHashKey();

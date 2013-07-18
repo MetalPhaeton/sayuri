@@ -1,4 +1,8 @@
-/* chess_def.h: チェスの定数の定義。
+/*
+   chess_def.h: チェスの定数の定義。
+
+   The MIT License (MIT)
+
    Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +22,7 @@
    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
    IN THE SOFTWARE.
- */
+*/
 
 #ifndef CHESS_DEF_H
 #define CHESS_DEF_H
@@ -172,22 +176,33 @@ namespace Sayuri {
   union Move {
     std::uint32_t all_ : 31;
     struct {
-      unsigned int piece_square_ : 6;  // 駒の位置。
-      unsigned int goal_square_ : 6;  // 移動先の位置。
+      unsigned int from_ : 6;  // 駒の位置。
+      unsigned int to_ : 6;  // 移動先の位置。
       unsigned int captured_piece_ : 3;  // 取った駒の種類。
       unsigned int promotion_ : 3;  // 昇格する駒の種類。
       // 動かす前のキャスリングのフラグ。
       unsigned int last_castling_rights_ : 4;
       // 動かす前のアンパッサンできるかどうか。
       bool last_can_en_passant_ : 1;
-      // 動かす前のアンパッサンのターゲットの位置。
-      unsigned int last_en_passant_target_ : 6;
+      // 動かす前のアンパッサンの位置。
+      unsigned int last_en_passant_square_ : 6;
       unsigned int move_type_ : 2;  // 手の種類。
     };
   };
 
   // ハッシュの型。
   using HashKey = std::uint64_t;
+
+  // 評価値の定義。
+  constexpr int SCORE_WIN = 1000000;
+  constexpr int SCORE_LOSE = -SCORE_WIN;
+  constexpr int SCORE_DRAW = 0;
+  constexpr int SCORE_PAWN = 100;
+  constexpr int SCORE_KNIGHT = 300;
+  constexpr int SCORE_BISHOP = 300;
+  constexpr int SCORE_ROOK = 500;
+  constexpr int SCORE_QUEEN = 900;
+  constexpr int SCORE_KING = SCORE_WIN;
 }  // namespace Sayuri
 
 #endif

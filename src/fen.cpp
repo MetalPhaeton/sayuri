@@ -28,10 +28,11 @@
 #include <vector>
 #include <algorithm>
 #include <cstddef>
+#include "chess_def.h"
+#include "chess_util.h"
+#include "sayuri_error.h"
 
 #include "mylib.h"
-
-#include "sayuri_debug.h"
 
 namespace Sayuri {
   /********************/

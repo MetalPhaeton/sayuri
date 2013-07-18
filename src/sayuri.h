@@ -29,15 +29,14 @@
  * 各ヘッダのインクルード。 *
  ****************************/
 #include "init.h"
-#include "sayuri_debug.h"
 #include "chess_def.h"
 #include "chess_util.h"
+#include "fen.h"
+#include "transposition_table.h"
 #include "chess_engine.h"
 #include "move.h"
 #include "game_record.h"
-#include "transposition_table.h"
 #include "opening_book.h"
 #include "pgn_parser.h"
-#include "fen.h"
 
 #endif

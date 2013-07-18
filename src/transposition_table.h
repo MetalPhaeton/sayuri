@@ -1,4 +1,8 @@
-/* transposition_table.h: トランスポジションテーブル。
+/*
+   transposition_table.h: トランスポジションテーブル。
+
+   The MIT License (MIT)
+
    Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +22,7 @@
    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
    IN THE SOFTWARE.
- */
+*/
 
 #ifndef TRANSPOSITION_TABLE_H
 #define TRANSPOSITION_TABLE_H
@@ -29,8 +33,7 @@
 #include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
-
-#include "sayuri_debug.h"
+#include "sayuri_error.h"
 
 namespace Sayuri {
   /**********/
@@ -115,11 +118,6 @@ namespace Sayuri {
       TTValueFlag value_flag() const {return value_flag_;}
       // 最善手。
       Move best_move() const {return best_move_;}
-
-      /****************/
-      /* デバッグ用。 */
-      /****************/
-      friend int DebugMain(int, char**);
 
     private:
       /****************/

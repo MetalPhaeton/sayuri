@@ -1,4 +1,8 @@
-/* transposition_table.h: トランスポジションテーブル。
+/*
+   transposition_table.h: トランスポジションテーブル。
+
+   The MIT License (MIT)
+
    Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +22,7 @@
    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
    IN THE SOFTWARE.
- */
+*/
 
 #include "transposition_table.h"
 
@@ -29,8 +33,6 @@
 #include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
-
-#include "sayuri_debug.h"
 
 namespace Sayuri {
   /****************************************/

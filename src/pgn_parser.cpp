@@ -26,7 +26,5 @@
 #include "chess_def.h"
 #include "chess_util.h"
 
-#include "sayuri_debug.h"
-
 namespace Sayuri {
 }  // namespace Sayuri

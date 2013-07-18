@@ -1,5 +1,8 @@
 /*
    chess_def.cpp: チェスの定数の定義。
+
+   The MIT License (MIT)
+
    Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy

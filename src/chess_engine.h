@@ -1,4 +1,7 @@
 /* chess_engine.h: チェスボード。
+
+   The MIT License (MIT)
+
    Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,54 +29,51 @@
 #include <iostream>
 #include <vector>
 #include <ctime>
-#include <boost/thread.hpp>
 #include "chess_def.h"
 #include "chess_util.h"
-#include "move.h"
-#include "game_record.h"
 #include "transposition_table.h"
+#include "fen.h"
 
 namespace Sayuri {
   class ChessEngine;
   struct EvalWeights;
   class TranspositionTable;
-  class TranspositionTableSlotList;
-  class TranspositionTableSlot;
+  class TTEntry;
 
-  /************************
-   * 評価の重さの構造体。 *
-   ************************/
+  /************************/
+  /* 評価の重さの構造体。 */
+  /************************/
   struct EvalWeights {
     public:
-      /**********************
-       * 全駒の評価の重さ。 *
-       **********************/
+      /**********************/
+      /* 全駒の評価の重さ。 */
+      /**********************/
       int mobility_weight_;  // 機動力の重さ。
       int attack_center_weight_;  // センター攻撃の重さ。
       int development_weight_;  // 展開の重さ。
       int attack_around_king_weight_;  // キングの周囲への攻撃の重さ。
 
-      /******************************
-       * 駒の配置の重要度テーブル。 *
-       ******************************/
+      /******************************/
+      /* 駒の配置の重要度テーブル。 */
+      /******************************/
       int pawn_position_table_[NUM_SQUARES];  // ポーンの配置。
       int knight_position_table_[NUM_SQUARES];  // ナイトの配置。
       int rook_position_table_[NUM_SQUARES];  // ルークの配置。
       int king_position_middle_table_[NUM_SQUARES];  // キングの中盤の配置。
       int king_position_ending_table_[NUM_SQUARES];  // キングの終盤の配置。
 
-      /********************
-       * 駒の配置の重さ。 *
-       ********************/
+      /********************/
+      /* 駒の配置の重さ。 */
+      /********************/
       int pawn_position_weight_;  // ポーンの配置の重さ。
       int knight_position_weight_;  // ナイトの配置の重さ。
       int rook_position_weight_;  // ルークの配置の重さ。
       int king_position_middle_weight_;  // キングの中盤の配置の重さ。
       int king_position_ending_weight_;  // キングの終盤の配置の重さ。
 
-      /********************
-       * それ以外の重さ。 *
-       ********************/
+      /********************/
+      /* それ以外の重さ。 */
+      /********************/
       int pass_pawn_weight_;  // パスポーンの重さ。
       int protected_pass_pawn_weight_;  // 守られたパスポーンの重さ。
       int double_pawn_weight_;  // ダブルポーンの重さ。
@@ -83,45 +83,32 @@ namespace Sayuri {
       int pawn_shield_weight_;  // ポーンの盾の重さ。
       int canceled_castling_weight_;  // キャスリングの破棄の重さ。
 
-      /********************
-       * コンストラクタ。 *
-       ********************/
+      /********************/
+      /* コンストラクタ。 */
+      /********************/
       EvalWeights();
   };
 
-  /**************************
-   * チェスボードのクラス。 *
-   **************************/
-  std::ostream& operator<<(std::ostream& stream, const ChessEngine& board);
+  /****************************/
+  /* チェスエンジンのクラス。 */
+  /****************************/
   class ChessEngine {
     private:
-      /****************
-       * 定数の定義。 *
-       ****************/
-      enum {
-        INFINITE = 9999999
+      // 作成する手の種類。
+      enum class GenMoveType {
+        NON_CAPTURE,
+        CAPTURE,
+        LEGAL
       };
-      enum {
-        SCORE_WIN = 1000000,
-        SCORE_LOSE = -1000000,
-        SCORE_DRAW = 0,
-        SCORE_PAWN = 100,
-        SCORE_KNIGHT = 300,
-        SCORE_BISHOP = 300,
-        SCORE_ROOK = 500,
-        SCORE_QUEEN = 900,
-        SCORE_KING = 1000000
-      };
-
     public:
-      /******************
-       * テスト用関数。 *
-       ******************/
+      /******************/
+      /* テスト用関数。 */
+      /******************/
       void Test();
 
-      /******************************
-       * ChessEngineクラスの初期化。 *
-       ******************************/
+      /*******************************/
+      /* ChessEngineクラスの初期化。 */
+      /*******************************/
       static void InitChessEngine() {
         // key_array_[][][]を初期化する。
         InitKeyArray();
@@ -131,55 +118,36 @@ namespace Sayuri {
         InitIsoPawnMask();
         // pawn_shield_mask_[][]を初期化する。
         InitPawnShieldMask();
-        // move_maskを初期化する。
-        InitMoveMask();
       }
 
 
-      /**************************************
-       * インスタンスの生成とデストラクタ。 *
-       **************************************/
-      // インスタンスを生成する。
-      // [戻り値]
-      // インスタンスのポインタ。
-      static ChessEngine* New() {
-        return new ChessEngine();
-      }
-      // デストラクタ。
+      /********************/
+      /* コンストラクタ。 */
+      /********************/
+      ChessEngine();
+      ChessEngine(const ChessEngine& engine);
+      ChessEngine(ChessEngine&& engine);
+      ChessEngine& operator=(const ChessEngine& engine);
+      ChessEngine& operator=(ChessEngine&& engine);
       virtual ~ChessEngine();
 
-      /**********
-       * 関数。 *
-       **********/
-      // ゲームを1つ前に戻す。
-      void StepBack();
-      // ゲームを1つ進める。
-      void StepForward();
-
-      /***************
-       * Pondering。 *
-       ***************/
-      // Ponderingを開始する。
+      /********************/
+      /* パブリック関数。 */
+      /********************/
+      // FENを読み込む。
       // [引数]
-      // depth: Ponderingする深さ。
-      // table[inout]: 使用するトランスポジションテーブル。
-      // weights: 評価の重さ。
-      void StartPondering(int depth, TranspositionTable& table,
-      const EvalWeights& weights) const;
-      // Ponderingを停止する。
-      void StopPondering() const;
+      // fen: 読み込むFenオブジェクト。
+      void LoadFen(const Fen& fen);
 
-      /************************
-       * 局面を分析する関数。 *
-       ************************/
+      /************************/
+      /* 局面を分析する関数。 */
+      /************************/
       // キングがチェックされているかどうかチェックする。
       // [引数]
       // side: チェックされているか調べるサイド。
       // [戻り値]
       // キングがチェックされていればtrue。
       bool IsChecked(Side side) const {
-        if (side == NO_SIDE) return false;
-
         return IsAttacked(king_[side], side ^ 0x3);
       }
       // チェックメイトされているかどうか調べる。
@@ -253,24 +221,13 @@ namespace Sayuri {
       // [戻り値]
       // ポーンの盾の位置のビットボード。
       Bitboard GetPawnShield(Side side) const {
-        if (side == NO_SIDE) return 0;
-
         return position_[side][PAWN]
         & pawn_shield_mask_[side][king_[side]];
       }
-      // キャスリングしたかどうかを得る。
-      // [引数]
-      // side: 調べたいサイド。
-      // [戻り値]
-      // キャスリングしたかどうか。
-      bool HasCastled(Side side) const {
-        if (side == NO_SIDE) return false;
-        return side == WHITE ? has_white_castled_ : has_black_castled_;
-      }
 
-      /************************
-       * 局面を評価する関数。 *
-       ************************/
+      /************************/
+      /* 局面を評価する関数。 */
+      /************************/
       // 全てを評価する。
       // [引数]
       // side: 評価したいサイド。
@@ -394,16 +351,9 @@ namespace Sayuri {
       // 評価値。
       int EvalCanceledCastling(Side side, const EvalWeights& weights) const;
 
-    protected:
-      /********************
-       * コンストラクタ。 *
-       ********************/
-      // コンストラクタ。
-      ChessEngine();
-
-      /**********************************
-       * アクセサ。派生クラスのみ公開。 *
-       **********************************/
+      /**************/
+      /* アクセサ。 */
+      /**************/
       // 駒の配置のビットボードの配列。
       const Bitboard (& position() const)[NUM_SIDES][NUM_PIECE_TYPES] {
         return position_;
@@ -437,25 +387,11 @@ namespace Sayuri {
       Square en_passant_target() const {return en_passant_target_;}
       // アンパッサンできるかどうか。
       bool can_en_passant() const {return can_en_passant_;}
-      // 現在のゲームの履歴の位置。
-      int current_game() const {return current_game_;}
 
     private:
-      /******************
-       * コピーの禁止。 *
-       ******************/
-      ChessEngine(const ChessEngine&);  // 削除。
-      ChessEngine& operator=(const ChessEngine&);  // 削除。
-
-      /****************
-       * 出力演算子。 *
-       ****************/
-      friend std::ostream& operator<<(std::ostream& stream,
-      const ChessEngine& board);
-
-      /****************
-       * 駒を動かす。 *
-       ****************/
+      /****************/
+      /* 駒を動かす。 */
+      /****************/
       // 駒を動かす。
       // 動かす前のキャスリングの権利とアンパッサンは記録される。
       // 駒を取る場合は取った駒がmoveに記録される。
@@ -470,79 +406,79 @@ namespace Sayuri {
       // move: MakeMove()で動かした手。
       void UnmakeMove(Move move);
 
-      /******************************
-       * 候補手をツリーに展開する。 *
-       ******************************/
-      // 手のマスク。GiveQuickScore()で使う。
-      static Move move_mask_;
-      static void InitMoveMask();
-      // 駒を取る手を展開する。
-      // [引数]
-      // level: 展開するツリーのレベル。
-      // [戻り値]
-      // いくつ手を展開できたか。
-      int GenCaptureMove(int level);
-      // 駒を取らない手を展開する。
-      // [引数]
-      // level: 展開するツリーのレベル。
-      // [戻り値]
-      // いくつ手を展開できたか。
-      int GenNonCaptureMove(int level);
-      // 全ての手を展開する。
-      // [引数]
-      // level: 展開するツリーのレベル。
-      // [戻り値]
-      // いくつ手を展開できたか。
-      int GenMove(int level);
-      // チェックを逃れる手を作る。
-      // [引数]
-      // level: 展開するツリーのレベル。
-      // [戻り値]
-      // いくつ手を展開できたか。
-      int GenCheckEscapeMove(int level);
-      // SEE。
-      // [引数]
-      // move: どの手について評価したいか。
-      // [戻り値]
-      // 駒の取り合いの簡易評価値。
-      int SEE(Move move);
-      // ノードに簡易点数を付ける。
-      // [引数]
-      // key: その局面のハッシュキー。
-      // level: 簡易点数を付けるレベル。
-      // depth: その局面の深さ。
-      // side: その局面のサイド。
-      // table: トランスポジションテーブル。
-      void GiveQuickScore(HashKey key, int level, int depth, Side side,
-      TranspositionTable& table);
-      // 簡易点数の高いもの順にポップする。
-      // [引数]
-      // level: ポップするレベル。
-      // [戻り値]
-      // ポップした手。
-      Move PopBestMove(int level);
+      /************************/
+      /* 手を展開するクラス。 */
+      /************************/
+      class MoveMaker {
+        // Test
+        friend class ChessEngine;
+        private:
+          // 手の構造体。
+          struct MoveSlot {
+            Move move_;
+            int score_;
+          };
 
-      /**************************
-       * 探索に使う関数と変数。 *
-       **************************/
-      // 最善手。
-      Move best_move_;
-      // 探索開始時間。
-      time_t start_time_;
-      // 探索時間。
-      double searching_time_;
-      // タイムアウトしたかどうか。
-      // [戻り値]
-      // タイムアウトならtrue。
-      bool IsTimeOut() const {
-        if (std::difftime(std::time(NULL), start_time_) >= searching_time_) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-      // 最善手のスコア。
-      int best_score_;
+          /**************/
+          /* 定数など。 */
+          /**************/
+          // 最大スロット数。
+          static constexpr int MAX_SLOTS = 80;
+
+        public:
+          /********************/
+          /* コンストラクタ。 */
+          /********************/
+          MoveMaker(ChessEngine* engine_ptr);
+          MoveMaker() = delete;
+          MoveMaker(const MoveMaker& maker);
+          MoveMaker(MoveMaker&& maker);
+          MoveMaker& operator=(const MoveMaker& maker);
+          MoveMaker& operator=(MoveMaker&& maker);
+          ~MoveMaker() {}
+
+          /********************/
+          /* パブリック関数。 */
+          /********************/
+          // スタックに候補手を展開する関数。
+          // (注)TypeがNON_CAPTURE、CAPTUREの場合、
+          // 自らチェックされる手も作る。
+          template<GenMoveType Type> void GenMoves();
+
+        private:
+          /**********************/
+          /* プライベート関数。 */
+          /**********************/
+          // 手に点数をつける関数。
+          // [引数]
+          // start: 点数をつける最初のスロットのポインタ。
+          // end: 点数をつける最後のスロットの次のポインタ。
+          template<GenMoveType Type>
+          void ScoreMoves(MoveSlot* start, MoveSlot* end);
+          // SEE。
+          int SEE(Move move, Side side);
+          // キャスリングできるかどうか判定。
+          template<Castling Which> bool CanCastling() const;
+
+          /****************/
+          /* メンバ定数。 */
+          /****************/
+          // 親のチェスエンジン。
+          ChessEngine* engine_ptr_;
+
+          // 展開されるスタック。
+          MoveSlot move_stack_[MAX_SLOTS + 1];
+          // スタックのポインタ。
+          MoveSlot* first_;
+          MoveSlot* last_;
+          MoveSlot* current_;
+          MoveSlot* end_;
+      };
+      friend class MoveMaker;
+
+      /**************************/
+      /* 探索に使う関数と変数。 */
+      /**************************/
       // MCapを得る。
       // [引数]
       // move: 動かす手。
@@ -578,20 +514,20 @@ namespace Sayuri {
       bool is_null_move, HashKey key,
       TranspositionTable& table, const EvalWeights& weights);
 
-      /******************************
-       * その他のプライベート関数。 *
-       ******************************/
-      // 駒を置く。（駒の種類PieceypeにEMPTYをおけば、駒を削除できる。）
+      /******************************/
+      /* その他のプライベート関数。 */
+      /******************************/
+      // 駒を置く。（駒の種類piece_typeにEMPTYをおけば、駒を削除できる。）
       // [引数]
       // square: 置きたい位置。
-      // Pieceype: 駒の種類。
+      // piece_type: 駒の種類。
       // side: 置きたい駒のサイド。
-      void PutPiece(Square square, Piece Pieceype, Side side=NO_SIDE);
+      void PutPiece(Square square, Piece piece_type, Side side=NO_SIDE);
       // 駒の位置を変える。
-      // [引数]
+      // [
       // piece_square: 移動する駒の位置。
       // goal_square: 移動先の位置。
-      void ReplacePiece(Square piece_square, Square goal_square);
+      void SwitchPlace(Square piece_square, Square goal_square);
 
       // ビショップの攻撃筋を作る。
       // [引数]
@@ -621,28 +557,7 @@ namespace Sayuri {
       }
 
       // キャスリングの権利を更新する。
-      void UpdateCastlingRights() {
-        // 白キングがe1にいなければ白のキャスリングの権利を放棄。
-        if (king_[WHITE] != E1)
-          castling_rights_ &= ~WHITE_CASTLING;
-
-        // 黒キングがe8にいなければ黒のキャスリングの権利を放棄。
-        if (king_[BLACK] != E8) castling_rights_ &= ~BLACK_CASTLING;
-
-        // 白のルークがh1にいなければ白のショートキャスリングの権利を放棄。
-        if (!(position_[WHITE][ROOK] & Util::BIT[H1]))
-          castling_rights_ &= ~WHITE_SHORT_CASTLING;
-        // 白のルークがa1にいなければ白のロングキャスリングの権利を放棄。
-        if (!(position_[WHITE][ROOK] & Util::BIT[A1]))
-          castling_rights_ &= ~WHITE_LONG_CASTLING;
-
-        // 黒のルークがh8にいなければ黒のショートキャスリングの権利を放棄。
-        if (!(position_[BLACK][ROOK] & Util::BIT[H8]))
-          castling_rights_ &= ~BLACK_SHORT_CASTLING;
-        // 黒のルークがa8にいなければ黒のロングキャスリングの権利を放棄。
-        if (!(position_[BLACK][ROOK] & Util::BIT[A8]))
-          castling_rights_ &= ~BLACK_LONG_CASTLING;
-      }
+      void UpdateCastlingRights();
 
       // その位置が攻撃されているかどうかチェックする。
       // [引数]
@@ -671,11 +586,9 @@ namespace Sayuri {
       // 攻撃している駒のビットボード。
       Bitboard GetAttackers(Square target_square, Side side) const;
 
-      /****************
-       * メンバ変数。 *
-       ****************/
-      // 同期オブジェクト。
-      boost::mutex sync_;
+      /****************/
+      /* メンバ変数。 */
+      /****************/
       // 駒の配置のビットボードの配列。
       Bitboard position_[NUM_SIDES][NUM_PIECE_TYPES];
       // 駒の種類の配置。
@@ -697,17 +610,18 @@ namespace Sayuri {
       Castling castling_rights_;
       // アンパッサンのターゲットの位置。
       Square en_passant_target_;
+      // アンパッサンの位置。
+      Square en_passant_square_;
       // アンパッサンできるかどうか。
       bool can_en_passant_;
-      // キャスリングをしたかどうか。
-      bool has_white_castled_;  // 白。
-      bool has_black_castled_;  // 黒。
-      // 現在のゲームの履歴の位置。
-      int current_game_;
+      // 50手ルール。
+      int ply_100_;
+      // 現在の手数。
+      int ply_;
 
-      /****************
-       * 局面分析用。 *
-       ****************/
+      /****************/
+      /* 局面分析用。 */
+      /****************/
       // ポーンの配置のテーブル。
       static const int pawn_position_table_[NUM_SQUARES];
       // ナイトの配置のテーブル。
@@ -741,63 +655,10 @@ namespace Sayuri {
       // pawn_shield_mask_[][]を初期化する。
       static void InitPawnShieldMask();
 
-      /************************
-       * 手を展開するツリー。 *
-       ************************/
-      // ツリーの定数。
-      enum {
-        TREE_SIZE = 10000,
-        MAX_LEVEL = 32
-      };
-      // ノードの構造体。
-      struct Node {
-        public:
-          Move move_;
-          int quick_score_;
-      };
-      // ツリー。
-      Node tree_[TREE_SIZE];
-      // 各レベルのツリーへのポインタ。
-      Node* tree_ptr_[MAX_LEVEL];
-      // 各レベルのスタックポインタ。
-      Node* stack_ptr_[MAX_LEVEL];
-      // スタックにプッシュする。
-      // [引数]
-      // move: プッシュする手。
-      // level: プッシュするツリーのレベル。
-      void PushMove(Move move, int level) {
-        if (stack_ptr_[level] >= (&tree_[TREE_SIZE - 1])) {
-          return;
-        }
-        stack_ptr_[level]->move_ = move;
-        (stack_ptr_[level])++;
-      }
-      // スタックからポップする。
-      // [引数]
-      // level: ポップするツリーのレベル。
-      // [戻り値]
-      // ポップした手。
-      Move PopMove(int level) {
-        // スタックがないなら無意味な手を返す。
-        if (stack_ptr_[level] == tree_ptr_[level]) {
-          Move move;
-          move.all_ = 0;
-          return move;
-        }
 
-        (stack_ptr_[level])--;
-        return stack_ptr_[level]->move_;
-      }
-      // スタックをクリアする。
-      // [引数]
-      // level: クリアするツリーのレベル。
-      void ClearMoves(int level) {
-        stack_ptr_[level] = tree_ptr_[level];
-      }
-
-      /**********************
-       * ハッシュキー関連。 *
-       **********************/
+      /**********************/
+      /* ハッシュキー関連。 */
+      /**********************/
       // ハッシュキーを得るための配列。
       // 第1インデックスはサイド。
       // 第2インデックスは駒の種類。
@@ -823,23 +684,6 @@ namespace Sayuri {
       // [戻り値]
       // 次の局面のハッシュキー。
       HashKey GetNextKey(HashKey current_key, Move move) const;
-
-      /*******************
-       * Pondering関連。 *
-       *******************/
-      // スレッド。
-      boost::thread* pondering_thread_ptr_;
-      // スレッドの中止フラグ。
-      bool stop_pondering_flag_;
-      // Ponderingの手を展開するバッファ。
-      Move pondering_buffer_[200];
-      // Ponderingする。
-      // [引数]
-      // depth: Ponderingする深さ。
-      // table[inout]: 使用するトランスポジションテーブル。
-      // weights: 評価の重さ。
-      void Ponder(int depth, TranspositionTable& table,
-      const EvalWeights& weights);
   };
 }  // namespace Sayuri
 

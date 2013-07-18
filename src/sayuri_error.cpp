@@ -1,5 +1,4 @@
-/*
-   init.h: Sayuriの初期化。
+/* sayuri_error.cpp: Sayuriのエラーの実装ファイル。
 
    The MIT License (MIT)
 
@@ -22,19 +21,13 @@
    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
    IN THE SOFTWARE.
-*/
-
-#ifndef INIT_H
-#define INIT_H
-
-#include <iostream>
-
-#include "chess_util.h"
-#include "chess_engine.h"
+ */
+#include "sayuri_error.h"
 
 namespace Sayuri {
-  // Misakiの初期化。
-  extern void Init();
+  // アサートする。
+  void Assert(bool expr) {
+    if (expr) return;
+    throw SayuriError("Sayuriエラー: アサート失敗。");
+  }
 }  // namespace Sayuri
-
-#endif

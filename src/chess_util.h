@@ -1,5 +1,8 @@
 /*
    chess_util.h: チェスの便利ツール。
+
+   The MIT License (MIT)
+
    Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy

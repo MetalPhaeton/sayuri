@@ -1,5 +1,8 @@
 /*
    chess_util.cpp: チェスの便利ツール。
+
+   The MIT License (MIT)
+
    Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,7 +28,6 @@
 
 #include <iostream>
 #include "chess_def.h"
-#include "sayuri_debug.h"
 
 namespace Sayuri {
   namespace {

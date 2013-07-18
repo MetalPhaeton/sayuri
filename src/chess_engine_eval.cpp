@@ -58,7 +58,6 @@ namespace Sayuri {
     score += EvalDoublePawn(side, weights);
     score += EvalIsoPawn(side, weights);
     score += EvalBishopPair(side, weights);
-    score += EvalCanceledCastling(side, weights);
     if (IsEnding()) {  // 終盤の場合。
       score += EvalKingPositionEnding(side, weights);
     } else {  // 序中盤の場合。
@@ -420,26 +419,6 @@ namespace Sayuri {
 
     // 得点にして返す。
     int score = (white_count - black_count) * weights.pawn_shield_weight_;
-    return side == WHITE ? score : -score;
-  }
-  // キャスリングの破棄を評価する。
-  int ChessEngine::EvalCanceledCastling(Side side, const EvalWeights& weights)
-  const {
-    // どちらのサイドでもなければ0点。
-    if (side == NO_SIDE) return 0;
-
-    // 各サイドの得点。
-    int white_score = 0;
-    int black_score = 0;
-    if ((!(castling_rights_ & WHITE_CASTLING)) && (!has_white_castled_)) {
-      white_score += weights.canceled_castling_weight_;
-    }
-    if ((!(castling_rights_ & BLACK_CASTLING)) && (!has_black_castled_)) {
-      black_score += weights.canceled_castling_weight_;
-    }
-
-    // 得点にして返す。
-    int score = white_score - black_score;
     return side == WHITE ? score : -score;
   }
 }  // namespace Sayuri
