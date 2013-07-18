@@ -523,11 +523,11 @@ namespace Sayuri {
       // piece_type: 駒の種類。
       // side: 置きたい駒のサイド。
       void PutPiece(Square square, Piece piece_type, Side side=NO_SIDE);
-      // 駒の位置を変える。
-      // [
-      // piece_square: 移動する駒の位置。
-      // goal_square: 移動先の位置。
-      void SwitchPlace(Square piece_square, Square goal_square);
+      // 駒の位置を入れ替える。
+      // [引数]
+      // square1: 入れ替えたい駒。
+      // square2: 入れ替えたい駒。
+      void SwapPiece(Square piece_square, Square goal_square);
 
       // ビショップの攻撃筋を作る。
       // [引数]
