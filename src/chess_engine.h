@@ -94,11 +94,16 @@ namespace Sayuri {
   /****************************/
   class ChessEngine {
     private:
+      // 探索するノードの種類。
+      enum class NodeType {
+        PV,  // PVノードやAllノード。
+        CUT  // Cutノード。
+      };
       // 作成する手の種類。
       enum class GenMoveType {
-        NON_CAPTURE,
-        CAPTURE,
-        LEGAL
+        NON_CAPTURE,  // 駒を取らない手。
+        CAPTURE,  // 駒をとる手。
+        LEGAL  // 合法手。
       };
       // 最大探索手数。
       static constexpr int MAX_PLY = 100;
@@ -412,6 +417,7 @@ namespace Sayuri {
       /************************/
       /* 手を展開するクラス。 */
       /************************/
+      template<NodeType NType>
       class MoveMaker {
         // Test
         friend class ChessEngine;
@@ -450,7 +456,7 @@ namespace Sayuri {
           // depth: 手を展開するノードの深さ。
           // level: 手を展開するノードのレベル。
           // table: トランスポジションテーブル。
-          template<GenMoveType Type> void GenMoves(int depth, int level,
+          template<GenMoveType GType> void GenMoves(int depth, int level,
           const TranspositionTable& table);
 
         private:
@@ -464,7 +470,7 @@ namespace Sayuri {
           // depth: 手を展開するノードの深さ。
           // level: 現在のノードのレベル。
           // table: トランスポジションテーブル。
-          template<GenMoveType Type>
+          template<GenMoveType GType>
           void ScoreMoves(MoveSlot* start, MoveSlot* end, int depth,
           int level, const TranspositionTable& table);
           // SEE。
@@ -493,7 +499,8 @@ namespace Sayuri {
           MoveSlot* current_;
           MoveSlot* end_;
       };
-      friend class MoveMaker;
+      friend class MoveMaker<NodeType::PV>;
+      friend class MoveMaker<NodeType::CUT>;
 
       /**************************/
       /* 探索に使う関数と変数。 */

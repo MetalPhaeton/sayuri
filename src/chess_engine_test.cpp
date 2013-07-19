@@ -42,21 +42,5 @@ namespace Sayuri {
   extern void PrintMove(Move move);
 
   void ChessEngine::Test() {
-    std::string fen_str = "6qk/8/2p5/3B4/2P5/4N3/8/7K b -";
-    Fen fen(fen_str);
-
-    LoadFen(fen);
-    PrintPosition(position_);
-
-    MoveMaker maker(this);
-    Move move;
-    move.all_ = 0;
-    move.from_ = C6;
-    move.to_ = D5;
-    move.move_type_ = NORMAL;
-
-    int value = maker.SEE(move, BLACK);
-    PrintPosition(position_);
-    std::cout << "value is " << value << std::endl;
   }
 }  // namespace Sayuri
