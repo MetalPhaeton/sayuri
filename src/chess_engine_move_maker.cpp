@@ -27,34 +27,27 @@
 #include "chess_engine.h"
 
 #include <iostream>
+#include <cstddef>
 
 namespace Sayuri {
   /****************/
   /* static定数。 */
   /****************/
-  template<ChessEngine::NodeType NType>
-  constexpr int ChessEngine::MoveMaker<NType>::MAX_SLOTS;
+  constexpr int ChessEngine::MoveMaker::MAX_SLOTS;
 
   /********************/
   /* コンストラクタ。 */
   /********************/
   //コンストラクタ。
-  template<ChessEngine::NodeType NType>
-  ChessEngine::MoveMaker<NType>::MoveMaker(ChessEngine* engine_ptr) :
+  ChessEngine::MoveMaker::MoveMaker(ChessEngine* engine_ptr) :
   engine_ptr_(engine_ptr) {
     // スタックのポインターをセット。
     begin_ = last_ = current_ = move_stack_;
     end_ = &(move_stack_[MAX_SLOTS]);
   }
-  // 実体化。
-  template ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::MoveMaker
-  (ChessEngine* engine_ptr);
-  template ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::MoveMaker
-  (ChessEngine* engine_ptr);
 
   // コピーコンストラクタ。
-  template<ChessEngine::NodeType NType>
-  ChessEngine::MoveMaker<NType>::MoveMaker(const MoveMaker& maker) :
+  ChessEngine::MoveMaker::MoveMaker(const MoveMaker& maker) :
   engine_ptr_(maker.engine_ptr_) {
     for (int i; i <= MAX_SLOTS; i++) {
       move_stack_[i] = maker.move_stack_[i];
@@ -69,15 +62,9 @@ namespace Sayuri {
       }
     }
   }
-  // 実体化。
-  template ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::MoveMaker
-  (const MoveMaker& maker);
-  template ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::MoveMaker
-  (const MoveMaker& maker);
 
   // ムーブコンストラクタ。
-  template<ChessEngine::NodeType NType>
-  ChessEngine::MoveMaker<NType>::MoveMaker(MoveMaker&& maker) :
+  ChessEngine::MoveMaker::MoveMaker(MoveMaker&& maker) :
   engine_ptr_(maker.engine_ptr_) {
     for (int i; i <= MAX_SLOTS; i++) {
       move_stack_[i] = maker.move_stack_[i];
@@ -92,15 +79,9 @@ namespace Sayuri {
       }
     }
   }
-  // 実体化。
-  template ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::MoveMaker
-  (MoveMaker&& maker);
-  template ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::MoveMaker
-  (MoveMaker&& maker);
 
   // コピー代入。
-  template<ChessEngine::NodeType NType>
-  ChessEngine::MoveMaker<NType>& ChessEngine::MoveMaker<NType>::operator=
+  ChessEngine::MoveMaker& ChessEngine::MoveMaker::operator=
   (const MoveMaker& maker) {
     engine_ptr_ = maker.engine_ptr_;
     for (int i; i <= MAX_SLOTS; i++) {
@@ -117,17 +98,9 @@ namespace Sayuri {
     }
     return *this;
   }
-  // 実体化。
-  template ChessEngine::MoveMaker<ChessEngine::NodeType::PV>& 
-  ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::operator=
-  (const MoveMaker& maker);
-  template ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>& 
-  ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::operator=
-  (const MoveMaker& maker);
 
   // ムーブ代入。
-  template<ChessEngine::NodeType NType>
-  ChessEngine::MoveMaker<NType>& ChessEngine::MoveMaker<NType>::operator=
+  ChessEngine::MoveMaker& ChessEngine::MoveMaker::operator=
   (MoveMaker&& maker) {
     engine_ptr_ = maker.engine_ptr_;
     for (int i; i <= MAX_SLOTS; i++) {
@@ -144,21 +117,13 @@ namespace Sayuri {
     }
     return *this;
   }
-  // 実体化。
-  template ChessEngine::MoveMaker<ChessEngine::NodeType::PV>& 
-  ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::operator=
-  (MoveMaker&& maker);
-  template ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>& 
-  ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::operator=
-  (MoveMaker&& maker);
 
   /******************/
   /* その他の関数。 */
   /******************/
   // キャスリングできるかどうか。
-  template<ChessEngine::NodeType NType>
   template<Castling Which>
-  bool ChessEngine::MoveMaker<NType>::CanCastling() const {
+  bool ChessEngine::MoveMaker::CanCastling() const {
     if (!(engine_ptr_->castling_rights_ & Which)) return false;
 
     if (Which == WHITE_SHORT_CASTLING) {
@@ -194,27 +159,18 @@ namespace Sayuri {
     return true;
   }
   // 実体化。
-  template bool ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::CanCastling
+  template bool ChessEngine::MoveMaker::CanCastling
   <WHITE_SHORT_CASTLING>() const;
-  template bool ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::CanCastling
+  template bool ChessEngine::MoveMaker::CanCastling
   <WHITE_LONG_CASTLING>() const;
-  template bool ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::CanCastling
+  template bool ChessEngine::MoveMaker::CanCastling
   <BLACK_SHORT_CASTLING>() const;
-  template bool ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::CanCastling
-  <BLACK_LONG_CASTLING>() const;
-  template bool ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::CanCastling
-  <WHITE_SHORT_CASTLING>() const;
-  template bool ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::CanCastling
-  <WHITE_LONG_CASTLING>() const;
-  template bool ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::CanCastling
-  <BLACK_SHORT_CASTLING>() const;
-  template bool ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::CanCastling
+  template bool ChessEngine::MoveMaker::CanCastling
   <BLACK_LONG_CASTLING>() const;
 
   // 手をスタックに展開する。
-  template<ChessEngine::NodeType NType>
   template<ChessEngine::GenMoveType GType>
-  void ChessEngine::MoveMaker<NType>::GenMoves(int depth, int level,
+  void ChessEngine::MoveMaker::GenMoves(int depth, int level,
   const TranspositionTable& table) {
     // スタックのポインタを設定。
     MoveSlot* begin = last_;
@@ -286,7 +242,7 @@ namespace Sayuri {
           }
 
           // スタックに登録。
-          last_->move_.all_ = move.all_;
+          last_->move_ = move;
           last_++;
           end = last_;
         }
@@ -370,13 +326,13 @@ namespace Sayuri {
           // 昇格を設定。
           for (Piece piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
             move.promotion_ = piece_type;
-            last_->move_.all_ = move.all_;
+            last_->move_ = move;
             last_++;
             end = last_;
           }
         } else {
           // 昇格しない場合。
-          last_->move_.all_ = move.all_;
+          last_->move_ = move;
           last_++;
           end = last_;
         }
@@ -452,7 +408,7 @@ namespace Sayuri {
         engine_ptr_->UnmakeMove(move);
       }
 
-      last_->move_.all_ = move.all_;
+      last_->move_ = move;
       last_++;
       end = last_;
     }
@@ -461,69 +417,141 @@ namespace Sayuri {
     ScoreMoves<GType>(begin, end, depth, level, table);
   }
   // 実体化。
-  template void ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::GenMoves
+  template void ChessEngine::MoveMaker::GenMoves
   <ChessEngine::GenMoveType::NON_CAPTURE>(int depth, int level,
   const TranspositionTable& table);
-  template void ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::GenMoves
+  template void ChessEngine::MoveMaker::GenMoves
   <ChessEngine::GenMoveType::CAPTURE>(int depth, int level,
   const TranspositionTable& table);
-  template void ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::GenMoves
-  <ChessEngine::GenMoveType::LEGAL>(int depth, int level,
-  const TranspositionTable& table);
-  template void ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::GenMoves
-  <ChessEngine::GenMoveType::NON_CAPTURE>(int depth, int level,
-  const TranspositionTable& table);
-  template void ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::GenMoves
-  <ChessEngine::GenMoveType::CAPTURE>(int depth, int level,
-  const TranspositionTable& table);
-  template void ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::GenMoves
+  template void ChessEngine::MoveMaker::GenMoves
   <ChessEngine::GenMoveType::LEGAL>(int depth, int level,
   const TranspositionTable& table);
 
+  // 展開した手の数を返す。
+  std::size_t ChessEngine::MoveMaker::GetSize() const {
+    std::size_t size = 0;
+    for (MoveSlot* ptr = begin_; ptr < last_; ptr++) {
+      size++;
+    }
+    return size;
+  }
+
+  // 次の手を返す。
+  Move ChessEngine::MoveMaker::PickMove() {
+    // なければ無意味な手を返す。
+    if (begin_ == last_) {
+      Move move;
+      move.all_ = 0;
+      return move;
+    }
+    // とりあえず最後の手を取り出す。
+    MoveSlot slot = *last_;
+
+    // 一番高い手を探し、スワップ。
+    MoveSlot temp;
+    for (MoveSlot* ptr = begin_; ptr < last_; ptr++) {
+      if (ptr->score_ > slot.score_) {
+        temp = *ptr;
+        *ptr = slot;
+        slot = temp;
+      }
+    }
+
+    return slot.move_;
+  }
+
   // 展開した候補手に得点をつける。
-  template<ChessEngine::NodeType NType>
   template<ChessEngine::GenMoveType GType>
-  void ChessEngine::MoveMaker<NType>::ScoreMoves
-  (ChessEngine::MoveMaker<NType>::MoveSlot* begin,
-   ChessEngine::MoveMaker<NType>::MoveSlot* end,
-   int depth, int level,
-   const TranspositionTable& table) {
+  void ChessEngine::MoveMaker::ScoreMoves
+  (ChessEngine::MoveMaker::MoveSlot* begin,
+   ChessEngine::MoveMaker::MoveSlot* end,
+   int depth, int level, const TranspositionTable& table) {
+    if (begin == end) return;
+
+    // 評価値の定義。
+    // 前回の繰り返しでトランスポジションテーブルに記録された最善手の点数。
+    constexpr int TABLE_MOVE_SCORE = INFINITE;
+    // IIDで得た最善手の点数。
+    constexpr int IID_MOVE_SCORE = TABLE_MOVE_SCORE - 1;
+    // キラームーブの点数。
+    constexpr int KILLER_MOVE_SCORE = IID_MOVE_SCORE - 1;
+
+    // トランスポジションテーブルから前回の繰り返しの最善手を得る。
+    const TTEntry* entry_ptr =
+    table.GetFulfiledEntry(engine_ptr_->search_stack_[level].current_pos_key_,
+    depth - 1, level, engine_ptr_->to_move_);
+    Move prev_best;
+    if (entry_ptr && entry_ptr->value_flag() == TTValueFlag::EXACT) {
+      prev_best = entry_ptr->best_move();
+    } else {
+      prev_best.all_ = 0;
+    }
+
+    // IIDムーブを得る。
+    Move iid_move;
+    iid_move = engine_ptr_->search_stack_[level].iid_move_;
+
+    // キラームーブを得る。
+    Move killer;
+    killer = engine_ptr_->search_stack_[level].killer_;
+
+    for (MoveSlot* ptr = begin; ptr < end; ptr++) {
+      // 各候補手のタイプに分ける。
+      if (GType == GenMoveType::NON_CAPTURE) {
+        // ヒストリーを使って点数をつけていく。
+        ptr->score_ = engine_ptr_->history_[ptr->move_.from_][ptr->move_.to_];
+      } else if (GType == GenMoveType::CAPTURE) {
+        Side side = engine_ptr_->to_move_;
+        // SEEで点数をつけていく。
+        // 現在チェックされていれば、<取る駒> - <自分の駒>。
+        if (!(engine_ptr_->IsAttacked(engine_ptr_->king_[side], side ^ 0x3))) {
+          ptr->score_ = SEE(ptr->move_, side);
+        } else {
+          ptr->score_ = MATERIAL[engine_ptr_->piece_board_[ptr->move_.to_]]
+          - MATERIAL[engine_ptr_->piece_board_[ptr->move_.from_]];
+        }
+      } else {
+        // 合法手は0点。
+        ptr->score_ = 0;
+      }
+
+      // 特殊な手の点数をつける。
+      if (GType != GenMoveType::LEGAL) {
+        if ((ptr->move_.to_ == prev_best.to_)
+        && (ptr->move_.from_ == prev_best.from_)) {
+          // 前回の最善手。
+          ptr->score_ = TABLE_MOVE_SCORE;
+        } else if ((ptr->move_.to_ == iid_move.to_)
+        && (ptr->move_.from_ == iid_move.from_)) {
+          // IIDムーブ。
+          ptr->score_ = IID_MOVE_SCORE;
+        } else if ((ptr->move_.to_ == killer.to_)
+        && (ptr->move_.from_ == killer.from_)){
+          // キラームーブ。
+          ptr->score_ = KILLER_MOVE_SCORE;
+        }
+      }
+    }
   }
   // 実体化。
-  template void ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::ScoreMoves
+  template void ChessEngine::MoveMaker::ScoreMoves
   <ChessEngine::GenMoveType::NON_CAPTURE>
-  (ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::MoveSlot* begin,
-   ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::MoveSlot* end,
+  (ChessEngine::MoveMaker::MoveSlot* begin,
+   ChessEngine::MoveMaker::MoveSlot* end,
    int depth, int level, const TranspositionTable& table);
-  template void ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::ScoreMoves
+  template void ChessEngine::MoveMaker::ScoreMoves
   <ChessEngine::GenMoveType::CAPTURE>
-  (ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::MoveSlot* begin,
-   ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::MoveSlot* end,
+  (ChessEngine::MoveMaker::MoveSlot* begin,
+   ChessEngine::MoveMaker::MoveSlot* end,
    int depth, int level, const TranspositionTable& table);
-  template void ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::ScoreMoves
+  template void ChessEngine::MoveMaker::ScoreMoves
   <ChessEngine::GenMoveType::LEGAL>
-  (ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::MoveSlot* begin,
-   ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::MoveSlot* end,
-   int depth, int level, const TranspositionTable& table);
-  template void ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::ScoreMoves
-  <ChessEngine::GenMoveType::NON_CAPTURE>
-  (ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::MoveSlot* begin,
-   ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::MoveSlot* end,
-   int depth, int level, const TranspositionTable& table);
-  template void ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::ScoreMoves
-  <ChessEngine::GenMoveType::CAPTURE>
-  (ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::MoveSlot* begin,
-   ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::MoveSlot* end,
-   int depth, int level, const TranspositionTable& table);
-  template void ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::ScoreMoves
-  <ChessEngine::GenMoveType::LEGAL>
-  (ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::MoveSlot* begin,
-   ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::MoveSlot* end,
+  (ChessEngine::MoveMaker::MoveSlot* begin,
+   ChessEngine::MoveMaker::MoveSlot* end,
    int depth, int level, const TranspositionTable& table);
 
   // SEE。
-  template<ChessEngine::NodeType NType>
-  int ChessEngine::MoveMaker<NType>::SEE(Move move, Side side) {
+  int ChessEngine::MoveMaker::SEE(Move move, Side side) {
     int value = 0;
 
     if (move.all_) {
@@ -544,15 +572,9 @@ namespace Sayuri {
 
     return value;
   }
-  // 実体化。
-  template int ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::SEE
-  (Move move, Side side);
-  template int ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::SEE
-  (Move move, Side side);
 
   // 最小の攻撃駒の攻撃の手を得る。
-  template<ChessEngine::NodeType NType>
-  Move ChessEngine::MoveMaker<NType>::GetSmallestAttackerMove(Square target,
+  Move ChessEngine::MoveMaker::GetSmallestAttackerMove(Square target,
   Side side) const {
     // 変数。
     Bitboard attack;
@@ -607,9 +629,4 @@ namespace Sayuri {
     move.all_ = 0;
     return move;
   }
-  // 実体化。
-  template Move ChessEngine::MoveMaker<ChessEngine::NodeType::PV>::
-  GetSmallestAttackerMove(Square target, Side side) const;
-  template Move ChessEngine::MoveMaker<ChessEngine::NodeType::CUT>::
-  GetSmallestAttackerMove(Square target, Side side) const;
 }  // namespace Sayuri

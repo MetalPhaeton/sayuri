@@ -60,13 +60,13 @@ namespace Sayuri {
       // コンストラクタ。
       // [引数]
       // pos_key: ポジションのハッシュキー。
-      // level: レベル。
       // depth: 深さ。
+      // level: レベル。
       // to_move: 手番。
       // value: 評価値。
       // value_flag: 評価値の種類。
       // best_move: 最善手。
-      TTEntry(HashKey pos_key, int level, int depth,
+      TTEntry(HashKey pos_key, int depth, int level,
       Side to_move, int value, TTValueFlag value_flag, Move best_move);
       // デフォルトコンストラクタ。
       TTEntry();
@@ -92,12 +92,12 @@ namespace Sayuri {
       // 同じポジションかどうか判定する。
       // [引数]
       // key: ハッシュキー。
-      // level: レベル。
       // depth: 深さ。
+      // level: レベル。
       // to_move: 手番。
       // [戻り値]
       // 同じならtrue。
-      bool Fulfil(HashKey key, int level, int depth, Side to_move) const;
+      bool Fulfil(HashKey key, int depth, int level, Side to_move) const;
 
       /**************/
       /* アクセサ。 */
@@ -106,10 +106,10 @@ namespace Sayuri {
       bool exists() const {return exists_;}
       // ハッシュキー。
       HashKey key() const {return key_;}
-      // レベル。
-      int level() const {return level_;}
       // 深さ。
       int depth() const {return depth_;}
+      // レベル。
+      int level() const {return level_;}
       // 手番。
       Side to_move() const {return to_move_;}
       // 評価値。
@@ -127,10 +127,10 @@ namespace Sayuri {
       bool exists_;
       // ハッシュキー。
       HashKey key_;
-      // レベル。
-      int level_;
       // 深さ。
       int depth_;
+      // レベル。
+      int level_;
       // 手番。
       Side to_move_;
       // 評価値。
@@ -174,24 +174,24 @@ namespace Sayuri {
       // テーブルに追加する。
       // [引数]
       // key: ハッシュキー。
-      // level: レベル。
       // depth: 深さ。
+      // level: レベル。
       // to_move: 手番。
       // value: 評価値。
       // value_flag: 評価値の種類。
       // best_move: 最善手。
-      void Add(HashKey key, int level, int depth, Side to_move,
+      void Add(HashKey key, int depth, int level, Side to_move,
       int value, TTValueFlag value_flag, Move best_move);
       // 条件を満たすエントリーを得る。
       // [引数]
       // pos_key: ハッシュキー。
-      // level: レベル。
       // depth: 深さ。
+      // level: レベル。
       // to_move: 手番。
       // [戻り値]
       // 条件を満たすエントリー。
       // なければnullptr。
-      const TTEntry* GetFulfiledEntry(HashKey pos_key, int level, int depth,
+      const TTEntry* GetFulfiledEntry(HashKey pos_key, int depth, int level,
       Side to_move) const;
 
       // 大きさが何バイトか返す。

@@ -784,10 +784,4 @@ namespace Sayuri {
     // 次の局面のハッシュキーを返す。
     return current_key;
   }
-
-  // 探索用情報スタックのスロットのコンストラクタ。
-  ChessEngine::SearchSlot::SearchSlot() :
-  current_key_(0ULL) {
-    killer_.all_ = 0;
-  }
 }  // namespace Sayuri

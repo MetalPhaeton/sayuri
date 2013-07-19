@@ -28,6 +28,8 @@
 
 #include <iostream>
 #include <string>
+#include <cstddef>
+#include <memory>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "sayuri_error.h"
@@ -42,5 +44,49 @@ namespace Sayuri {
   extern void PrintMove(Move move);
 
   void ChessEngine::Test() {
+    std::string fen_str = "6qk/8/2p5/3B4/2P5/4N3/8/7K b -";
+
+    Fen fen(fen_str);
+    LoadFen(fen);
+
+    HashKey pos_key = GetCurrentKey();
+    int depth = 3;
+    int level = 3;
+    search_stack_[level].current_pos_key_ = pos_key;
+    Move best_move;
+    best_move.from_ = C6;
+    best_move.to_ = D5;
+    best_move.move_type_ = NORMAL;
+
+    std::size_t bytes = 50000000;
+    std::unique_ptr<TranspositionTable> table(new TranspositionTable(bytes));
+    table->Add(pos_key, depth - 1, level, to_move_,
+    SCORE_WIN, TTValueFlag::EXACT, best_move);
+
+    MoveMaker maker(this);
+    maker.GenMoves<GenMoveType::CAPTURE>(depth, level, *table);
+    maker.GenMoves<GenMoveType::NON_CAPTURE>(depth, level, *table);
+    std::cout << "Move Size: " << maker.GetSize() << std::endl;
+
+    PrintPosition(position_);
+
+    MoveMaker::MoveSlot* ptr = maker.begin_;
+    while (ptr < maker.last_) {
+      std::cout << "----------------------------------------" << std::endl;
+      std::cout << std::endl;
+      PrintMove(ptr->move_);
+      std::cout << "Score: " << ptr->score_ << std::endl;
+      std::cout << std::endl;
+      std::cout << "----------------------------------------" << std::endl;
+      ptr++;
+    }
+
+    Move first_move = maker.PickMove();
+    std::cout << "First Move is " << std::endl;
+    std::cout << "========================================" << std::endl;
+    std::cout << std::endl;
+    PrintMove(first_move);
+    std::cout << std::endl;
+    std::cout << "========================================" << std::endl;
   }
 }  // namespace Sayuri

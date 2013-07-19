@@ -1,5 +1,5 @@
 /*
-   transposition_table.h: トランスポジションテーブル。
+   transposition_table.cpp: トランスポジションテーブル。
 
    The MIT License (MIT)
 
@@ -90,13 +90,13 @@ namespace Sayuri {
   }
 
   // テーブルに追加する。
-  void TranspositionTable::Add(HashKey pos_key, int level, int depth,
+  void TranspositionTable::Add(HashKey pos_key, int depth, int level,
   Side to_move, int value, TTValueFlag value_flag, Move best_move) {
     // テーブルに追加。
     int index = GetTableIndex(pos_key);
     for (auto& entry : entry_table_[index]) {
       if (!(entry.exists())) {
-        entry = TTEntry(pos_key, level, depth, to_move,
+        entry = TTEntry(pos_key, depth, level, to_move,
         value, value_flag, best_move);
         break;
       }
@@ -108,7 +108,7 @@ namespace Sayuri {
   }
   // 該当するTTEntryを返す。
   const TTEntry* TranspositionTable::GetFulfiledEntry(HashKey pos_key,
-  int level, int depth, Side to_move) const {
+  int depth, int level, Side to_move) const {
     // テーブルのインデックスを得る。
     int index = GetTableIndex(pos_key);
 
@@ -116,7 +116,7 @@ namespace Sayuri {
     for (auto& entry : entry_table_[index]) {
       if (!(entry.exists())) return nullptr;  // エントリーがない。
 
-      if (entry.Fulfil(pos_key, level, depth, to_move)) {
+      if (entry.Fulfil(pos_key, depth, level, to_move)) {
         entry_ptr = &entry;  // エントリーが見つかった。
         break;
       }
@@ -147,12 +147,12 @@ namespace Sayuri {
   /* エントリーのクラス。 */
   /************************/
   // コンストラクタ。
-  TTEntry::TTEntry(HashKey key, int level, int depth, Side to_move,
+  TTEntry::TTEntry(HashKey key, int depth, int level, Side to_move,
   int value, TTValueFlag value_flag, Move best_move) :
   exists_(true),
   key_(key),
-  level_(level),
   depth_(depth),
+  level_(level),
   to_move_(to_move),
   value_(value),
   value_flag_(value_flag),
@@ -162,8 +162,8 @@ namespace Sayuri {
   TTEntry::TTEntry() :
   exists_(false),
   key_(0ULL),
-  level_(INFINITE),
   depth_(-INFINITE),
+  level_(INFINITE),
   to_move_(NO_SIDE),
   value_(0),
   value_flag_(TTValueFlag::ALPHA) {
@@ -172,8 +172,8 @@ namespace Sayuri {
   TTEntry::TTEntry(const TTEntry& entry) :
   exists_(entry.exists_),
   key_(entry.key_),
-  level_(entry.level_),
   depth_(entry.depth_),
+  level_(entry.level_),
   to_move_(entry.to_move_),
   value_(entry.value_),
   value_flag_(entry.value_flag_),
@@ -183,8 +183,8 @@ namespace Sayuri {
   TTEntry::TTEntry(TTEntry&& entry) :
   exists_(entry.exists_),
   key_(entry.key_),
-  level_(entry.level_),
   depth_(entry.depth_),
+  level_(entry.level_),
   to_move_(entry.to_move_),
   value_(entry.value_),
   value_flag_(entry.value_flag_),
@@ -194,8 +194,8 @@ namespace Sayuri {
   TTEntry& TTEntry::operator=(const TTEntry& entry) {
     exists_ = entry.exists_;
     key_ = entry.key_;
-    level_ = entry.level_;
     depth_ = entry.depth_;
+    level_ = entry.level_;
     to_move_ = entry.to_move_;
     value_ = entry.value_;
     value_flag_ = entry.value_flag_;
@@ -207,8 +207,8 @@ namespace Sayuri {
   TTEntry& TTEntry::operator=(TTEntry&& entry) {
     exists_ = entry.exists_;
     key_ = entry.key_;
-    level_ = entry.level_;
     depth_ = entry.depth_;
+    level_ = entry.level_;
     to_move_ = entry.to_move_;
     value_ = entry.value_;
     value_flag_ = entry.value_flag_;
@@ -221,10 +221,10 @@ namespace Sayuri {
     return first.level_ < second.level_;
   }
   // 該当するならtrue。
-  bool TTEntry::Fulfil(HashKey key, int level, int depth, Side to_move) const {
+  bool TTEntry::Fulfil(HashKey key, int depth, int level, Side to_move) const {
     if (!exists_) return false;
-    if (level < level_) return false;
     if (depth > depth_) return false;
+    if (level < level_) return false;
     if (to_move != to_move_) return false;
     if (key != key_) return false;
     return true;

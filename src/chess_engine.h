@@ -29,6 +29,7 @@
 #include <iostream>
 #include <vector>
 #include <ctime>
+#include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "transposition_table.h"
@@ -397,27 +398,9 @@ namespace Sayuri {
       bool can_en_passant() const {return can_en_passant_;}
 
     private:
-      /****************/
-      /* 駒を動かす。 */
-      /****************/
-      // 駒を動かす。
-      // 動かす前のキャスリングの権利とアンパッサンは記録される。
-      // 駒を取る場合は取った駒がmoveに記録される。
-      // 動かす駒の位置と移動先の位置が同じ場合はNull Move。
-      // そのmoveはUnmakeMove()で使われる。
-      // [引数]
-      // move[inout]: 動かす手。
-      void MakeMove(Move& move);
-      // MakeMove()で動かした駒を元に戻す。
-      // 必ず先にMakeMove()をすること。
-      // [引数]
-      // move: MakeMove()で動かした手。
-      void UnmakeMove(Move move);
-
       /************************/
       /* 手を展開するクラス。 */
       /************************/
-      template<NodeType NType>
       class MoveMaker {
         // Test
         friend class ChessEngine;
@@ -426,6 +409,8 @@ namespace Sayuri {
           struct MoveSlot {
             Move move_;
             int score_;
+
+            MoveSlot() : score_(0) {move_.all_ = 0;}
           };
 
           /**************/
@@ -458,20 +443,30 @@ namespace Sayuri {
           // table: トランスポジションテーブル。
           template<GenMoveType GType> void GenMoves(int depth, int level,
           const TranspositionTable& table);
+          // 展開できた手の数を返す。
+          // [戻り値]
+          // 展開できたての数。
+          std::size_t GetSize() const;
+          // 次の手を取り出す。
+          // [戻り値]
+          // 次の手。
+          // もしなければmove.all_が0の手を返す。
+          Move PickMove();
 
         private:
           /**********************/
           /* プライベート関数。 */
           /**********************/
           // 手に点数をつける関数。
+          // GTypeがLEGALの場合は点数を付けない。
           // [引数]
-          // start: 点数をつける最初のスロットのポインタ。
+          // begin: 点数をつける最初のスロットのポインタ。
           // end: 点数をつける最後のスロットの次のポインタ。
           // depth: 手を展開するノードの深さ。
           // level: 現在のノードのレベル。
           // table: トランスポジションテーブル。
           template<GenMoveType GType>
-          void ScoreMoves(MoveSlot* start, MoveSlot* end, int depth,
+          void ScoreMoves(MoveSlot* begin, MoveSlot* end, int depth,
           int level, const TranspositionTable& table);
           // SEE。
           // [引数]
@@ -499,8 +494,66 @@ namespace Sayuri {
           MoveSlot* current_;
           MoveSlot* end_;
       };
-      friend class MoveMaker<NodeType::PV>;
-      friend class MoveMaker<NodeType::CUT>;
+      friend class MoveMaker;
+
+      /********************/
+      /* PVラインクラス。 */
+      /********************/
+      class PVLine {
+        public:
+          /********************/
+          /* コンストラクタ。 */
+          /********************/
+          PVLine();
+          PVLine(const PVLine& pv_line);
+          PVLine(PVLine&& pv_line);
+          PVLine& operator=(const PVLine& pv_line);
+          PVLine& operator=(PVLine&& pv_line);
+          virtual ~PVLine() {}
+
+          /********************/
+          /* パブリック関数。 */
+          /********************/
+          // 最初の要素に手を登録する。
+          // [引数]
+          // move: セットする手。
+          void SetFirst(Move move);
+          // PVLineを2番目以降の要素にコピーする。
+          // [引数]
+          // pv_line: コピーするライン。
+          void Insert(const PVLine& pv_line);
+
+          /**************/
+          /* アクセサ。 */
+          /**************/
+          // 長さ。
+          std::size_t length() const {return length_;}
+          // ライン。
+          const Move (& line() const)[MAX_PLY + 1] {return line_;}
+        private:
+          /****************/
+          /* メンバ変数。 */
+          /****************/
+          std::size_t length_;
+          Move line_[MAX_PLY + 1];
+      };
+
+      /****************/
+      /* 駒を動かす。 */
+      /****************/
+      // 駒を動かす。
+      // 動かす前のキャスリングの権利とアンパッサンは記録される。
+      // 駒を取る場合は取った駒がmoveに記録される。
+      // 動かす駒の位置と移動先の位置が同じ場合はNull Move。
+      // そのmoveはUnmakeMove()で使われる。
+      // [引数]
+      // move[inout]: 動かす手。
+      void MakeMove(Move& move);
+      // MakeMove()で動かした駒を元に戻す。
+      // 必ず先にMakeMove()をすること。
+      // [引数]
+      // move: MakeMove()で動かした手。
+      void UnmakeMove(Move move);
 
       /**************************/
       /* 探索に使う関数と変数。 */
@@ -649,12 +702,21 @@ namespace Sayuri {
       int history_[NUM_SQUARES][NUM_SQUARES];
       // 探索情報用スタック。
       struct SearchSlot {
-        // ハッシュキー。
-        HashKey current_key_;
+        // 現在の手。何を指されて今のノードになったのか。
+        Move current_move_;
+        // 現在の局面のハッシュキー。
+        HashKey current_pos_key_;
+        // IIDによる最善手。
+        Move iid_move_;
         // キラームーブ。
         Move killer_;
 
-        SearchSlot();
+        SearchSlot() :
+        current_pos_key_(0ULL) {
+          current_move_.all_ = 0;
+          iid_move_.all_ = 0;
+          killer_.all_ = 0;
+        }
       };
       SearchSlot search_stack_[MAX_PLY + 1];
 
