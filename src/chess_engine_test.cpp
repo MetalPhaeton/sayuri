@@ -32,7 +32,7 @@
 #include <memory>
 #include "chess_def.h"
 #include "chess_util.h"
-#include "sayuri_error.h"
+#include "error.h"
 #include "fen.h"
 
 namespace Sayuri {

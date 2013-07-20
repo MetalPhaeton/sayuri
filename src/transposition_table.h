@@ -33,7 +33,7 @@
 #include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
-#include "sayuri_error.h"
+#include "error.h"
 
 namespace Sayuri {
   /********************************************/

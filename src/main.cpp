@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "sayuri_debug.h"
+#include "debug.h"
 
 using namespace Sayuri;
 

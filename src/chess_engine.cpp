@@ -36,7 +36,7 @@
 #include "transposition_table.h"
 #include "fen.h"
 #include "move_maker.h"
-#include "sayuri_error.h"
+#include "error.h"
 
 namespace Sayuri {
   /**********************************
