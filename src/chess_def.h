@@ -147,7 +147,7 @@ namespace Sayuri {
   constexpr int NUM_RANKS = 8;
   constexpr int NUM_SIDES = 3;
   constexpr int NUM_PIECE_TYPES = 7;
-  constexpr int INFINITE = 9999999;
+  constexpr int MAX_VALUE = 9999999;
 
   // キャスリングのフラグの型。
   using Castling = std::uint8_t;

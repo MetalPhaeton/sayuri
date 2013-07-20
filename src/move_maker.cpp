@@ -426,7 +426,7 @@ namespace Sayuri {
 
     // 評価値の定義。
     // 前回の繰り返しでトランスポジションテーブルに記録された最善手の点数。
-    constexpr int TABLE_MOVE_SCORE = INFINITE;
+    constexpr int TABLE_MOVE_SCORE = MAX_VALUE;
     // IIDで得た最善手の点数。
     constexpr int IID_MOVE_SCORE = TABLE_MOVE_SCORE - 1;
     // キラームーブの点数。

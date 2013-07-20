@@ -162,8 +162,8 @@ namespace Sayuri {
   TTEntry::TTEntry() :
   exists_(false),
   key_(0ULL),
-  depth_(-INFINITE),
-  level_(INFINITE),
+  depth_(-MAX_VALUE),
+  level_(MAX_VALUE),
   to_move_(NO_SIDE),
   value_(0),
   value_flag_(TTValueFlag::ALPHA) {
