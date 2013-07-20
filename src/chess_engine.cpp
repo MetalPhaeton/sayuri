@@ -298,178 +298,153 @@ namespace Sayuri {
   }
   // 合法手があるかどうかチェックする。
   bool ChessEngine::HasLegalMove(Side side) const {
-    // サイドがどちらでもなければfalse。
-    if (side == NO_SIDE) return false;
-
-    // constを取る。
+    // 一時的にちょこっと変更するのでconstを取る。
     ChessEngine* self = const_cast<ChessEngine*>(this);
 
     // 敵のサイド。
     Side enemy_side = side ^ 0x3;
+    // 変数。
+    Square from;  // 基点。
+    Move move;  // 候補手。
 
-    // 自分の駒。
-    Bitboard pieces = side_pieces_[side];
+    // ナイト、ビショップ、ルーク、クイーンの候補手を調べる。
+    Bitboard pieces = 0ULL;
+    Bitboard move_bitboard = 0ULL;
+    for (int piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
+      pieces = self->position_[side][piece_type];
 
-    // それぞれの駒を調べてみる。
-    Move move;  // 手。
-    Square from;  // 駒の位置。
-    Square to;  // 移動先の位置。
-    Piece piece_type;  // 駒の種類。
-    Bitboard move_bitboard;  // 動ける位置のビットボード。
-    Side save_to_move;  // 手番を保存。
-    for (; pieces; pieces &= pieces - 1) {
-      from = Util::GetSquare(pieces);
-      piece_type = piece_board_[from];
-      switch (piece_type) {
-        case PAWN:  // ポーンの場合。
-          // 通常の動き。
-          move_bitboard = Util::GetPawnMove(from, side)
-          & ~blocker0_;
-          // 2歩の動き。
-          if (move_bitboard) {
-            move_bitboard |= Util::GetPawn2StepMove(from, side)
-            & ~blocker0_;
-          }
-          // 攻撃の動き。
-          move_bitboard |= Util::GetPawnAttack(from, side)
-          & side_pieces_[enemy_side];
-          // アンパッサンの動き。
-          if (can_en_passant_) {
-            if ((side == WHITE)
-            && (side_board_[en_passant_target_] == BLACK)) {
-              Rank target_rank = Util::GetRank(en_passant_target_);
-              Rank attacker_rank = Util::GetRank(from);
-              if (target_rank == attacker_rank) {
-                if ((from == (en_passant_target_ - 1))
-                || (from == (en_passant_target_ + 1))) {
-                  move_bitboard |= Util::BIT[en_passant_target_ + 8];
-                }
-              }
-            } else if ((side == BLACK)
-            && (side_board_[en_passant_target_] == WHITE)){
-              Rank target_rank = Util::GetRank(en_passant_target_);
-              Rank attacker_rank = Util::GetRank(from);
-              if (target_rank == attacker_rank) {
-                if ((from == (en_passant_target_ - 1))
-                || (from == (en_passant_target_ + 1))) {
-                  move_bitboard |= Util::BIT[en_passant_target_ - 8];
-                }
-              }
-            }
-          }
-          break;
-        case KNIGHT:  // ナイトの場合。
-          move_bitboard = Util::GetKnightMove(from)
-          & ~side_pieces_[side];
-          break;
-        case BISHOP:  // ビショップの場合。
-          move_bitboard = GetBishopAttack(from)
-          & ~side_pieces_[side];
-          break;
-        case ROOK:  // ルークの場合。
-          move_bitboard = GetRookAttack(from)
-          & ~side_pieces_[side];
-          break;
-        case QUEEN:  // クイーンの場合。
-          move_bitboard = GetQueenAttack(from)
-          & ~side_pieces_[side];
-          break;
-        case KING:  // キングの場合。
-          move_bitboard = Util::GetKingMove(from)
-          & ~side_pieces_[side];
-          // キャスリングの動き。
-          // 白のショートキャスリング。
-          if ((side == WHITE) && (castling_rights_ & WHITE_SHORT_CASTLING)) {
-            if (!IsAttacked(E1, enemy_side)
-            && !IsAttacked(F1, enemy_side)
-            && !IsAttacked(G1, enemy_side)) {
-              if (!piece_board_[F1] && !piece_board_[G1]) {
-                move_bitboard |= Util::BIT[G1];
-              }
-            }
-          }
-          // 白のロングキャスリング。
-          if ((side == WHITE) && (castling_rights_ & WHITE_LONG_CASTLING)) {
-            if (!IsAttacked(E1, enemy_side)
-            && !IsAttacked(D1, enemy_side)
-            && !IsAttacked(C1, enemy_side)) {
-              if (!piece_board_[D1] && !piece_board_[C1]
-              && !piece_board_[B1]) {
-                move_bitboard |= Util::BIT[C1];
-              }
-            }
-          }
-          // 黒のショートキャスリング。
-          if ((side == BLACK) && (castling_rights_ & BLACK_SHORT_CASTLING)) {
-            if (!IsAttacked(E8, enemy_side)
-            && !IsAttacked(F8, enemy_side)
-            && !IsAttacked(G8, enemy_side)) {
-              if (!piece_board_[F8] && !piece_board_[G8]) {
-                move_bitboard |= Util::BIT[G8];
-              }
-            }
-          } // 黒のロングキャスリング。
-          if ((side == BLACK) && (castling_rights_ & BLACK_LONG_CASTLING)) {
-            if (!IsAttacked(E8, enemy_side)
-            && !IsAttacked(D8, enemy_side)
-            && !IsAttacked(C8, enemy_side)) {
-              if (!piece_board_[D8] && !piece_board_[C8]
-              && !piece_board_[B8]) {
-                move_bitboard |= Util::BIT[C8];
-              }
-            }
-          }
-          break;
-      }
+      for (; pieces; pieces &= pieces - 1) {
+        from = Util::GetSquare(pieces);
 
-      // それぞれの動きを調べる。
-      for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
-        to = Util::GetSquare(move_bitboard);
-        move.all_ = 0;
-
-        // 手を作る。
-        move.from_ = from;
-        move.to_ = to;
-
-        // キングを取る手は無視する。
-        if (to == king_[enemy_side]) continue;
-
-        // アンパッサンやキャスリングの手の種類を追加する。
-        if ((can_en_passant_) && (piece_type == PAWN)) {  // アンパッサン。
-          if (((side == WHITE) && (to == en_passant_target_ + 8))
-          || ((side == BLACK) && (to == en_passant_target_ - 8))) {
-            move.move_type_ = EN_PASSANT;
-          }
-        } else if (piece_type == KING) {  // キャスリング。
-          if (side == WHITE) {  // 白のキャスリング。
-            if (((from == E1) && (to == G1))
-            || ((from == E1) && (to == C1))) {
-              move.move_type_ = CASTLING;
-            }
-          } else {  // 黒のキャスリング。
-            if (((from == E8) && (to == G8))
-            || ((from == E8) && (to == C8))) {
-              move.move_type_ = CASTLING;
-            }
-          }
+        // 各ピースの動き。
+        switch (piece_type) {
+          case KNIGHT:
+            move_bitboard = Util::GetKnightMove(from);
+            break;
+          case BISHOP:
+            move_bitboard = self->GetBishopAttack(from);
+            break;
+          case ROOK:
+            move_bitboard = self->GetRookAttack(from);
+            break;
+          case QUEEN:
+            move_bitboard = self->GetQueenAttack(from);
+            break;
+          default:
+            Assert(false);
+            break;
         }
 
-        // 動かしてみる。
-        // 動けるならtrueを返す。
-        save_to_move = self->to_move_;
-        self->to_move_ = side;
-        self->MakeMove(move);
-        if (!IsAttacked(king_[side], enemy_side)) {
+        // 見方の駒は取れない。
+        move_bitboard &= ~(self->side_pieces_[side]);
+
+        for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
+          move.all_ = 0;
+          // 手を作る。
+          move.from_ = from;
+          move.to_ = Util::GetSquare(move_bitboard);
+          move.move_type_ = NORMAL;
+
+          // 動かしてみて、合法手かどうか調べる。
+          self->MakeMove(move);
+          if (!(self->IsAttacked(self->king_[side], enemy_side))) {
+            self->UnmakeMove(move);
+            return true;
+          }
           self->UnmakeMove(move);
-          self->to_move_ = save_to_move;
-          return true;
         }
-        self->UnmakeMove(move);
-        self->to_move_ = save_to_move;
       }
     }
 
-    // 動けなかったのでfalse。
+    // ポーンの動きを作る。
+    pieces = self->position_[side][PAWN];
+    move_bitboard = 0ULL;
+    for (; pieces; pieces &= pieces - 1) {
+      from = Util::GetSquare(pieces);
+
+      // ポーンの一歩の動き。
+      move_bitboard = Util::GetPawnMove(from, side) & ~(self->blocker0_);
+      if (move_bitboard) {
+        if (((side == WHITE) && (Util::GetRank(from) == RANK_2))
+        || ((side == BLACK) && (Util::GetRank(from) == RANK_7))) {
+          // ポーンの2歩の動き。
+          move_bitboard |= Util::GetPawn2StepMove(from, side)
+          & ~(self->blocker0_);
+        }
+      }
+      // 駒を取る動き。
+      move_bitboard |= Util::GetPawnAttack(from, side)
+      & self->side_pieces_[enemy_side];
+      if (self->can_en_passant_) {
+        move_bitboard |= Util::BIT[self->en_passant_square_]
+        & Util::GetPawnAttack(from, side);
+      }
+
+      for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
+        move.all_ = 0;
+        // 手を作る。
+        move.from_ = from;
+        move.to_ = Util::GetSquare(move_bitboard);
+        if (self->can_en_passant_ && (move.to_ == self->en_passant_square_)) {
+          move.move_type_ = EN_PASSANT;
+        } else {
+          move.move_type_ = NORMAL;
+        }
+
+        // 動かしてみて、合法手かどうか調べる。
+        self->MakeMove(move);
+        if (!(self->IsAttacked(self->king_[side], enemy_side))) {
+          self->UnmakeMove(move);
+          return true;
+        }
+        self->UnmakeMove(move);
+      }
+    }
+
+    // キングの動きを作る。
+    from = king_[side];
+    move_bitboard = Util::GetKingMove(from) & ~(self->side_pieces_[side]);
+    // キャスリングの動きを追加。
+    if (side == WHITE) {
+      if (self->CanCastling<WHITE_SHORT_CASTLING>()) {
+        move_bitboard |= Util::BIT[G1];
+      }
+      if (self->CanCastling<WHITE_LONG_CASTLING>()) {
+        move_bitboard |= Util::BIT[C1];
+      }
+    } else {
+      if (self->CanCastling<BLACK_SHORT_CASTLING>()) {
+        move_bitboard |= Util::BIT[G8];
+      }
+      if (self->CanCastling<BLACK_LONG_CASTLING>()) {
+        move_bitboard |= Util::BIT[C8];
+      }
+    }
+    for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
+      move.all_ = 0;
+      move.from_ = from;
+      move.to_ = Util::GetSquare(move_bitboard);
+
+      // キャスリングを設定。
+      if (((side == WHITE) && (from == E1)
+      && ((move.to_ == G1) || (move.to_ == C1)))
+      || ((side == BLACK) && (from == E8)
+      && ((move.to_ == G8) || (move.to_ == C8)))) {
+        move.move_type_ = CASTLING;
+      } else {
+        move.move_type_ = NORMAL;
+      }
+
+      // 動かしてみて、合法手かどうか調べる。
+      self->MakeMove(move);
+      if (!(self->IsAttacked(self->king_[side], enemy_side))) {
+        self->UnmakeMove(move);
+        return true;
+      }
+      self->UnmakeMove(move);
+    }
+
+    // 合法手がない。
     return false;
   }
   // 攻撃している駒のビットボードを得る。

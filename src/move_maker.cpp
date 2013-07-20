@@ -211,7 +211,7 @@ namespace Sayuri {
     for (; pieces; pieces &= pieces - 1) {
       from = Util::GetSquare(pieces);
 
-      if (GType == GenMoveType::NON_CAPTURE) {  // ノンキャプチャームーブ。
+      if (GType == GenMoveType::NON_CAPTURE) {
         // ポーンの一歩の動き。
         move_bitboard = Util::GetPawnMove(from, side)
         & ~(engine_ptr_->blocker0_);
@@ -223,7 +223,7 @@ namespace Sayuri {
             & ~(engine_ptr_->blocker0_);
           }
         }
-      } else if (GType == GenMoveType::CAPTURE) {  // キャプチャームーブ。
+      } else if (GType == GenMoveType::CAPTURE) {
         move_bitboard = Util::GetPawnAttack(from, side)
         & engine_ptr_->side_pieces_[enemy_side];
         // アンパッサンがある場合。
@@ -231,7 +231,7 @@ namespace Sayuri {
           move_bitboard |= Util::BIT[engine_ptr_->en_passant_square_]
           & Util::GetPawnAttack(from, side);
         }
-      } else {  // 合法手。
+      } else { 
         // ポーンの一歩の動き。
         move_bitboard = Util::GetPawnMove(from, side)
         & ~(engine_ptr_->blocker0_);
@@ -245,7 +245,7 @@ namespace Sayuri {
         }
         // 駒を取る動き。
         move_bitboard |= Util::GetPawnAttack(from, side)
-        & engine_ptr_->blocker0_;
+        & engine_ptr_->side_pieces_[enemy_side];
         if (engine_ptr_->can_en_passant_) {
           move_bitboard |= Util::BIT[engine_ptr_->en_passant_square_]
           & Util::GetPawnAttack(from, side);
