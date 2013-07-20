@@ -1,5 +1,5 @@
 /*
-   chess_engine_pv_line.cpp: PVのラインを格納するクラスの実装。
+   _pv_line.cpp: PVのラインを格納するクラスの実装。
 
    The MIT License (MIT)
 
@@ -24,63 +24,66 @@
    IN THE SOFTWARE.
 */
 
-#include "chess_engine.h"
+#include "pv_line.h"
 
 #include <iostream>
 #include <cstddef>
+#include "chess_def.h"
 
 namespace Sayuri {
   /********************/
   /* コンストラクタ。 */
   /********************/
   // コンストラクタ。
-  ChessEngine::PVLine::PVLine() : length_(0) {}
+  PVLine::PVLine() : length_(0) {}
 
   // コピーコンストラクタ。
-  ChessEngine::PVLine::PVLine(const PVLine& pv_line) :
+  PVLine::PVLine(const PVLine& pv_line) :
   length_(pv_line.length_) {
     for (std::size_t i = 0; i < length_; i++) {
-      line_[i] = pv_line.line_;
+      line_[i] = pv_line.line_[i];
     }
   }
 
   // ムーブコンストラクタ。
-  ChessEngine::PVLine::PVLine(PVLine&& pv_line) :
+  PVLine::PVLine(PVLine&& pv_line) :
   length_(pv_line.length_) {
     for (std::size_t i = 0; i < length_; i++) {
-      line_[i] = pv_line.line_;
+      line_[i] = pv_line.line_[i];
     }
   }
 
   // コピー代入。
-  ChessEngine::PVLine& ChessEngine::PVLine::operator=(const PVLine& pv_lien) {
+  PVLine& PVLine::operator=(const PVLine& pv_line) {
     length_ = pv_line.length_;
     for (std::size_t i = 0; i < length_; i++) {
-      line_[i] = pv_line.line_;
+      line_[i] = pv_line.line_[i];
     }
+    return *this;
   }
 
   // ムーブ代入。
-  ChessEngine::PVLine& ChessEngine::PVLine::operator=(PVLine&& pv_lien) {
+  PVLine& PVLine::operator=(PVLine&& pv_line) {
     length_ = pv_line.length_;
     for (std::size_t i = 0; i < length_; i++) {
-      line_[i] = pv_line.line_;
+      line_[i] = pv_line.line_[i];
     }
+    return *this;
   }
 
   /********************/
   /* パブリック関数。 */
   /********************/
   // 最初の要素に手をセットする。
-  void ChessEngine::PVLine::SetFirst(Move move) {
+  void PVLine::SetFirst(Move move) {
     line_[0] = move;
-    if (length <= 0) length = 1;
+    if (length_ <= 0) length_ = 1;
   }
 
   // PVラインを2番目以降の要素にコピーする。
-  void ChessEngine::PVLine::Insert(const PVLine& pv_line) {
+  void PVLine::Insert(const PVLine& pv_line) {
     length_ = pv_line.length_ + 1;
-    for (std::size_t i = 1, i < length_; i++) {
+    for (std::size_t i = 1; i < length_; i++) {
       line_[i] = pv_line.line_[i - 1];
     }
   }

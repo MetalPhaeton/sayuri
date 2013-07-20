@@ -35,14 +35,10 @@
 #include "move.h"
 #include "transposition_table.h"
 #include "fen.h"
+#include "move_maker.h"
 #include "sayuri_error.h"
 
 namespace Sayuri {
-  /****************/
-  /* static定数。 */
-  /****************/
-  constexpr int ChessEngine::MAX_PLY;
-
   /**********************************
    * コンストラクタとデストラクタ。 *
    **********************************/
@@ -545,6 +541,49 @@ namespace Sayuri {
 
     return attackers;
   }
+
+  // キャスリングできるかどうか。
+  template<Castling Which>
+  bool ChessEngine::CanCastling() const {
+    if (!(castling_rights_ & Which)) return false;
+
+    if (Which == WHITE_SHORT_CASTLING) {
+      if (IsAttacked(E1, BLACK)) return false;
+      if (IsAttacked(F1, BLACK)) return false;
+      if (IsAttacked(G1, BLACK)) return false;
+      if (piece_board_[F1]) return false;
+      if (piece_board_[G1]) return false;
+    } else if (Which == WHITE_LONG_CASTLING) {
+      if (IsAttacked(E1, BLACK)) return false;
+      if (IsAttacked(D1, BLACK)) return false;
+      if (IsAttacked(C1, BLACK)) return false;
+      if (piece_board_[D1]) return false;
+      if (piece_board_[C1]) return false;
+      if (piece_board_[B1]) return false;
+    } else if (Which == BLACK_SHORT_CASTLING) {
+      if (IsAttacked(E8, WHITE)) return false;
+      if (IsAttacked(F8, WHITE)) return false;
+      if (IsAttacked(G8, WHITE)) return false;
+      if (piece_board_[F8]) return false;
+      if (piece_board_[G8]) return false;
+    } else if (Which == BLACK_LONG_CASTLING){
+      if (IsAttacked(E8, WHITE)) return false;
+      if (IsAttacked(D8, WHITE)) return false;
+      if (IsAttacked(C8, WHITE)) return false;
+      if (piece_board_[D8]) return false;
+      if (piece_board_[C8]) return false;
+      if (piece_board_[B8]) return false;
+    } else {
+      Assert(false);
+    }
+
+    return true;
+  }
+  // 実体化。
+  template bool ChessEngine::CanCastling<WHITE_SHORT_CASTLING>() const;
+  template bool ChessEngine::CanCastling<WHITE_LONG_CASTLING>() const;
+  template bool ChessEngine::CanCastling<BLACK_SHORT_CASTLING>() const;
+  template bool ChessEngine::CanCastling<BLACK_LONG_CASTLING>() const;
 
   // キャスリングの権利を更新する。
   void ChessEngine::UpdateCastlingRights() {

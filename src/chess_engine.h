@@ -34,12 +34,12 @@
 #include "chess_util.h"
 #include "transposition_table.h"
 #include "fen.h"
+#include "move_maker.h"
 
 namespace Sayuri {
+  class MoveMaker;
   class ChessEngine;
   struct EvalWeights;
-  class TranspositionTable;
-  class TTEntry;
 
   /************************/
   /* 評価の重さの構造体。 */
@@ -94,21 +94,6 @@ namespace Sayuri {
   /* チェスエンジンのクラス。 */
   /****************************/
   class ChessEngine {
-    private:
-      // 探索するノードの種類。
-      enum class NodeType {
-        PV,  // PVノードやAllノード。
-        CUT  // Cutノード。
-      };
-      // 作成する手の種類。
-      enum class GenMoveType {
-        NON_CAPTURE,  // 駒を取らない手。
-        CAPTURE,  // 駒をとる手。
-        LEGAL  // 合法手。
-      };
-      // 最大探索手数。
-      static constexpr int MAX_PLY = 100;
-
     public:
       /******************/
       /* テスト用関数。 */
@@ -398,145 +383,8 @@ namespace Sayuri {
       bool can_en_passant() const {return can_en_passant_;}
 
     private:
-      /************************/
-      /* 手を展開するクラス。 */
-      /************************/
-      class MoveMaker {
-        // Test
-        friend class ChessEngine;
-        private:
-          // 手の構造体。
-          struct MoveSlot {
-            Move move_;
-            int score_;
-
-            MoveSlot() : score_(0) {move_.all_ = 0;}
-          };
-
-          /**************/
-          /* 定数など。 */
-          /**************/
-          // 最大スロット数。
-          static constexpr int MAX_SLOTS = 200;
-
-        public:
-          /********************/
-          /* コンストラクタ。 */
-          /********************/
-          MoveMaker(ChessEngine* engine_ptr);
-          MoveMaker() = delete;
-          MoveMaker(const MoveMaker& maker);
-          MoveMaker(MoveMaker&& maker);
-          MoveMaker& operator=(const MoveMaker& maker);
-          MoveMaker& operator=(MoveMaker&& maker);
-          ~MoveMaker() {}
-
-          /********************/
-          /* パブリック関数。 */
-          /********************/
-          // スタックに候補手を展開する関数。
-          // (注)TypeがNON_CAPTURE、CAPTUREの場合、
-          // 自らチェックされる手も作る。
-          // [引数]
-          // depth: 手を展開するノードの深さ。
-          // level: 手を展開するノードのレベル。
-          // table: トランスポジションテーブル。
-          template<GenMoveType GType> void GenMoves(int depth, int level,
-          const TranspositionTable& table);
-          // 展開できた手の数を返す。
-          // [戻り値]
-          // 展開できたての数。
-          std::size_t GetSize() const;
-          // 次の手を取り出す。
-          // [戻り値]
-          // 次の手。
-          // もしなければmove.all_が0の手を返す。
-          Move PickMove();
-
-        private:
-          /**********************/
-          /* プライベート関数。 */
-          /**********************/
-          // 手に点数をつける関数。
-          // GTypeがLEGALの場合は点数を付けない。
-          // [引数]
-          // begin: 点数をつける最初のスロットのポインタ。
-          // end: 点数をつける最後のスロットの次のポインタ。
-          // depth: 手を展開するノードの深さ。
-          // level: 現在のノードのレベル。
-          // table: トランスポジションテーブル。
-          template<GenMoveType GType>
-          void ScoreMoves(MoveSlot* begin, MoveSlot* end, int depth,
-          int level, const TranspositionTable& table);
-          // SEE。
-          // [引数]
-          // move: 探したい手。
-          // side: 手番。
-          // [戻り値]
-          // 評価値。
-          int SEE(Move move, Side side);
-          // キャスリングできるかどうか判定。
-          template<Castling Which> bool CanCastling() const;
-          // 最小価値の攻撃駒の動きを得る。
-          Move GetSmallestAttackerMove(Square target, Side side) const;
-
-          /****************/
-          /* メンバ変数。 */
-          /****************/
-          // 親のチェスエンジン。
-          ChessEngine* engine_ptr_;
-
-          // 展開されるスタック。
-          MoveSlot move_stack_[MAX_SLOTS + 1];
-          // スタックのポインタ。
-          MoveSlot* begin_;
-          MoveSlot* last_;
-          MoveSlot* current_;
-          MoveSlot* end_;
-      };
       friend class MoveMaker;
 
-      /********************/
-      /* PVラインクラス。 */
-      /********************/
-      class PVLine {
-        public:
-          /********************/
-          /* コンストラクタ。 */
-          /********************/
-          PVLine();
-          PVLine(const PVLine& pv_line);
-          PVLine(PVLine&& pv_line);
-          PVLine& operator=(const PVLine& pv_line);
-          PVLine& operator=(PVLine&& pv_line);
-          virtual ~PVLine() {}
-
-          /********************/
-          /* パブリック関数。 */
-          /********************/
-          // 最初の要素に手を登録する。
-          // [引数]
-          // move: セットする手。
-          void SetFirst(Move move);
-          // PVLineを2番目以降の要素にコピーする。
-          // [引数]
-          // pv_line: コピーするライン。
-          void Insert(const PVLine& pv_line);
-
-          /**************/
-          /* アクセサ。 */
-          /**************/
-          // 長さ。
-          std::size_t length() const {return length_;}
-          // ライン。
-          const Move (& line() const)[MAX_PLY + 1] {return line_;}
-        private:
-          /****************/
-          /* メンバ変数。 */
-          /****************/
-          std::size_t length_;
-          Move line_[MAX_PLY + 1];
-      };
 
       /****************/
       /* 駒を動かす。 */
@@ -635,6 +483,9 @@ namespace Sayuri {
       Bitboard GetQueenAttack(Square square) const {
         return GetBishopAttack(square) | GetRookAttack(square);
       }
+
+      // キャスリングできるかどうか判定。
+      template<Castling Which> bool CanCastling() const;
 
       // キャスリングの権利を更新する。
       void UpdateCastlingRights();

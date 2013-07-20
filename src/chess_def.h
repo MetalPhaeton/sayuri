@@ -30,6 +30,9 @@
 #include <cstdint>
 
 namespace Sayuri {
+  /**********/
+  /* 基本。 */
+  /**********/
   // ビットボードの型。
   using Bitboard = std::uint64_t;
 
@@ -199,6 +202,39 @@ namespace Sayuri {
   constexpr int SCORE_DRAW = 0;
   constexpr int MATERIAL[NUM_PIECE_TYPES] {
     0, 100, 300, 300, 500, 900, SCORE_WIN
+  };
+
+  /*****************************/
+  /* Transposition Table関連。 */
+  /*****************************/
+  // テーブルの最大容量と最小容量。
+  constexpr std::size_t TT_MAX_SIZE_BYTES = 250 * 1024 * 1024;
+  constexpr std::size_t TT_MIN_SIZE_BYTES = 5 * 1024 * 1024;
+
+  // 評価値の種類。TTEntry::value_flag。
+  enum class TTValueFlag {
+    EXACT,  // 正確な評価値。
+    ALPHA,  // アルファ値。
+    BETA  // ベータ値。
+  };
+
+  /**********************/
+  /* 探索エンジン関連。 */
+  /**********************/
+  // 最大探索手数。
+  static constexpr int MAX_PLY = 100;
+
+  // 探索するノードの種類。
+  enum class NodeType {
+    PV,  // PVノードやAllノード。
+    CUT  // Cutノード。
+  };
+
+  // 候補手の種類。
+  enum class GenMoveType {
+    NON_CAPTURE,  // 駒を取らない手。
+    CAPTURE,  // 駒をとる手。
+    LEGAL  // 合法手。
   };
 }  // namespace Sayuri
 
