@@ -1,4 +1,4 @@
-/* sayuri_error.h: Sayuriのエラーのヘッダ。
+/* error.h: Sayuriのエラーのヘッダ。
 
    The MIT License (MIT)
 

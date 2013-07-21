@@ -35,7 +35,7 @@ namespace Sayuri {
   /****************/
   /* static定数。 */
   /****************/
-  constexpr int MoveMaker::MAX_SLOTS;
+  constexpr std::size_t MoveMaker::MAX_SLOTS;
 
   /********************/
   /* コンストラクタ。 */
@@ -51,7 +51,7 @@ namespace Sayuri {
   // コピーコンストラクタ。
   MoveMaker::MoveMaker(const MoveMaker& maker) :
   engine_ptr_(maker.engine_ptr_) {
-    for (int i; i <= MAX_SLOTS; i++) {
+    for (std::size_t i; i <= MAX_SLOTS; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
         begin_ = &(move_stack_[i]);
@@ -68,7 +68,7 @@ namespace Sayuri {
   // ムーブコンストラクタ。
   MoveMaker::MoveMaker(MoveMaker&& maker) :
   engine_ptr_(maker.engine_ptr_) {
-    for (int i; i <= MAX_SLOTS; i++) {
+    for (std::size_t i; i <= MAX_SLOTS; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
         begin_ = &(move_stack_[i]);
@@ -86,7 +86,7 @@ namespace Sayuri {
   MoveMaker& MoveMaker::operator=
   (const MoveMaker& maker) {
     engine_ptr_ = maker.engine_ptr_;
-    for (int i; i <= MAX_SLOTS; i++) {
+    for (std::size_t i; i <= MAX_SLOTS; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
         begin_ = &(move_stack_[i]);
@@ -105,7 +105,7 @@ namespace Sayuri {
   MoveMaker& MoveMaker::operator=
   (MoveMaker&& maker) {
     engine_ptr_ = maker.engine_ptr_;
-    for (int i; i <= MAX_SLOTS; i++) {
+    for (std::size_t i; i <= MAX_SLOTS; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
         begin_ = &(move_stack_[i]);
@@ -129,8 +129,8 @@ namespace Sayuri {
   void MoveMaker::GenMoves(int depth, int level,
   const TranspositionTable& table) {
     // スタックのポインタを設定。
-    MoveSlot* begin = last_;
-    MoveSlot* end = last_;
+    MoveSlot* gen_begin = last_;
+    MoveSlot* gen_end = last_;
 
     // サイド。
     Side side = engine_ptr_->to_move_;
@@ -198,9 +198,10 @@ namespace Sayuri {
           }
 
           // スタックに登録。
-          last_->move_ = move;
-          last_++;
-          end = last_;
+          if (last_ < end_) {
+            last_->move_ = move;
+            last_++;
+          }
         }
       }
     }
@@ -282,15 +283,17 @@ namespace Sayuri {
           // 昇格を設定。
           for (Piece piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
             move.promotion_ = piece_type;
-            last_->move_ = move;
-            last_++;
-            end = last_;
+            if (last_ < end_) {
+              last_->move_ = move;
+              last_++;
+            }
           }
         } else {
           // 昇格しない場合。
-          last_->move_ = move;
-          last_++;
-          end = last_;
+          if (last_ < end_) {
+            last_->move_ = move;
+            last_++;
+          }
         }
       }
     }
@@ -364,13 +367,15 @@ namespace Sayuri {
         engine_ptr_->UnmakeMove(move);
       }
 
-      last_->move_ = move;
-      last_++;
-      end = last_;
+      if (last_ < end_) {
+        last_->move_ = move;
+        last_++;
+      }
     }
 
     // 得点をつける。
-    ScoreMoves<GType>(begin, end, depth, level, table);
+    gen_end = last_;
+    ScoreMoves<GType>(gen_begin, gen_end, depth, level, table);
   }
   // 実体化。
   template void MoveMaker::GenMoves

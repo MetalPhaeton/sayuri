@@ -1,5 +1,5 @@
 /* 
-   sayuri_debug.cpp: Sayuriをデバッグする。
+   debug.cpp: Sayuriをデバッグする。
 
    The MIT License (MIT)
 
@@ -24,7 +24,7 @@
    IN THE SOFTWARE.
 */
 
-#include "sayuri_debug.h"
+#include "debug.h"
 
 #include <iostream>
 #include <utility>

@@ -27,6 +27,7 @@
 #include "chess_util.h"
 
 #include <iostream>
+#include <cstddef>
 #include "chess_def.h"
 
 namespace Sayuri {
@@ -53,9 +54,8 @@ namespace Sayuri {
   constexpr Square Util::R_ROT45[NUM_SQUARES];
   constexpr Square Util::R_ROT90[NUM_SQUARES];
   constexpr Square Util::R_ROT135[NUM_SQUARES];
-  constexpr int Util::BIT16_PATTERN;
-  constexpr int Util::MAGIC_SHIFT_V[NUM_SQUARES];
-  constexpr int Util::MAGIC_SHIFT_D[NUM_SQUARES];
+  constexpr std::size_t Util::MAGIC_SHIFT_V[NUM_SQUARES];
+  constexpr std::size_t Util::MAGIC_SHIFT_D[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK_V[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK_D[NUM_SQUARES];
   constexpr int Util::BLOCKER_MAP;
@@ -65,7 +65,7 @@ namespace Sayuri {
   /**********************************/
   // 16ビットのビットの個数が入った配列。
   // 引数には16ビットのパターンを入れる。
-  int Util::num_bit16_array_[BIT16_PATTERN];
+  int Util::num_bit16_array_[0xffff + 1];
   // num_bit16_array_[]を初期化する。
   void Util::InitNumBit16Array() {
     unsigned int index;
@@ -84,10 +84,10 @@ namespace Sayuri {
   // 0度と90度用。
   // 45度と135度用。
   // 各方向の攻撃の配列。
-  Bitboard Util::attack_array0_[NUM_SQUARES][BLOCKER_MAP];  // 0度。
-  Bitboard Util::attack_array45_[NUM_SQUARES][BLOCKER_MAP];  // 45度。
-  Bitboard Util::attack_array90_[NUM_SQUARES][BLOCKER_MAP];  // 90度。
-  Bitboard Util::attack_array135_[NUM_SQUARES][BLOCKER_MAP];  // 135度。
+  Bitboard Util::attack_array0_[NUM_SQUARES][BLOCKER_MAP + 1];  // 0度。
+  Bitboard Util::attack_array45_[NUM_SQUARES][BLOCKER_MAP + 1];  // 45度。
+  Bitboard Util::attack_array90_[NUM_SQUARES][BLOCKER_MAP + 1];  // 90度。
+  Bitboard Util::attack_array135_[NUM_SQUARES][BLOCKER_MAP + 1];  // 135度。
   // attack_array***_[][]を初期化する。
   void Util::InitAttackArray() {
     // 位置のビットボード。
@@ -103,7 +103,7 @@ namespace Sayuri {
     for (int square = 0; square < NUM_SQUARES; square++) {
       point = BIT[square];
       point >>= MAGIC_SHIFT_V[square];
-      for (int map = 0; map < BLOCKER_MAP; map++) {
+      for (int map = 0; map <= BLOCKER_MAP; map++) {
         attack = 0;
         // 右側を作る。
         temp = point;
@@ -129,7 +129,7 @@ namespace Sayuri {
     for (int square = 0; square < NUM_SQUARES; square++) {
       point = BIT[ROT45[square]];
       point >>= MAGIC_SHIFT_D[ROT45[square]];
-      for (int map = 0; map < BLOCKER_MAP; map++) {
+      for (int map = 0; map <= BLOCKER_MAP; map++) {
         attack = 0;
         // 右側を作る。
         temp = point;
@@ -157,7 +157,7 @@ namespace Sayuri {
     for (int square = 0; square < NUM_SQUARES; square++) {
       point = BIT[ROT90[square]];
       point >>= MAGIC_SHIFT_V[ROT90[square]];
-      for (int map = 0; map < BLOCKER_MAP; map++) {
+      for (int map = 0; map <= BLOCKER_MAP; map++) {
         attack = 0;
         // 右側を作る。
         temp = point;
@@ -185,7 +185,7 @@ namespace Sayuri {
     for (int square = 0; square < NUM_SQUARES; square++) {
       point = BIT[ROT135[square]];
       point >>= MAGIC_SHIFT_D[ROT135[square]];
-      for (int map = 0; map < BLOCKER_MAP; map++) {
+      for (int map = 0; map <= BLOCKER_MAP; map++) {
         attack = 0;
         // 右側を作る。
         temp = point;

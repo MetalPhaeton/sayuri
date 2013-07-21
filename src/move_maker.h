@@ -51,7 +51,7 @@ namespace Sayuri {
       /* 定数など。 */
       /**************/
       // 最大スロット数。
-      static constexpr int MAX_SLOTS = 200;
+      static constexpr std::size_t MAX_SLOTS = 200;
 
     public:
       /********************/

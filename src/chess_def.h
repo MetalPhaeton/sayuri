@@ -28,6 +28,7 @@
 #define CHESS_DEF_H
 
 #include <cstdint>
+#include <cstddef>
 
 namespace Sayuri {
   /**********/
@@ -222,7 +223,7 @@ namespace Sayuri {
   /* 探索エンジン関連。 */
   /**********************/
   // 最大探索手数。
-  static constexpr int MAX_PLY = 100;
+  static constexpr std::size_t MAX_PLY = 100;
 
   // 探索するノードの種類。
   enum class NodeType {

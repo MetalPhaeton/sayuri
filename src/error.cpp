@@ -1,4 +1,4 @@
-/* sayuri_error.cpp: Sayuriのエラーの実装ファイル。
+/* error.cpp: Sayuriのエラーの実装ファイル。
 
    The MIT License (MIT)
 
@@ -22,7 +22,7 @@
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
    IN THE SOFTWARE.
  */
-#include "sayuri_error.h"
+#include "error.h"
 
 namespace Sayuri {
   // アサートする。

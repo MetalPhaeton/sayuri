@@ -62,13 +62,13 @@ namespace Sayuri {
       // 長さ。
       std::size_t length() const {return length_;}
       // ライン。
-      const Move (& line() const)[MAX_PLY + 1] {return line_;}
+      const Move (& line() const)[MAX_PLY] {return line_;}
     private:
       /****************/
       /* メンバ変数。 */
       /****************/
       std::size_t length_;
-      Move line_[MAX_PLY + 1];
+      Move line_[MAX_PLY];
   };
 }  // namespace_Sayuri
 

@@ -28,6 +28,7 @@
 #define CHESS_UTIL_H
 
 #include <iostream>
+#include <cstddef>
 
 #include "chess_def.h"
 
@@ -561,10 +562,9 @@ namespace Sayuri {
       /**********************************/
       /* ビットを数えるときに使うもの。 */
       /**********************************/
-      static constexpr int BIT16_PATTERN = 0xffff + 1;
       // 16ビットのビットの個数が入った配列。
       // 引数には16ビットのパターンを入れる。
-      static int num_bit16_array_[BIT16_PATTERN];
+      static int num_bit16_array_[0xffff + 1];
       // num_bit16_array_[]を初期化する。
       static void InitNumBit16Array();
 
@@ -572,7 +572,7 @@ namespace Sayuri {
       /* マジック。 */
       /**************/
       // マジックのシフト。0度と90度用。
-      static constexpr int MAGIC_SHIFT_V[NUM_SQUARES] {
+      static constexpr std::size_t MAGIC_SHIFT_V[NUM_SQUARES] {
         0, 0, 0, 0, 0, 0, 0, 0,
         8, 8, 8, 8, 8, 8, 8, 8,
         16, 16, 16, 16, 16, 16, 16, 16,
@@ -583,7 +583,7 @@ namespace Sayuri {
         56, 56, 56, 56, 56, 56, 56, 56
       };
       // マジックのシフト。45度と135度用。
-      static constexpr int MAGIC_SHIFT_D[NUM_SQUARES] {
+      static constexpr std::size_t MAGIC_SHIFT_D[NUM_SQUARES] {
         0,
         1, 1,
         3, 3, 3,
@@ -631,15 +631,15 @@ namespace Sayuri {
       };
       // 各方向への攻撃の配列。
       // ブロッカーのパターン。
-      static constexpr int BLOCKER_MAP = 0xff + 1;
+      static constexpr int BLOCKER_MAP = 0xff;
       // 0度。
-      static Bitboard attack_array0_[NUM_SQUARES][BLOCKER_MAP];
+      static Bitboard attack_array0_[NUM_SQUARES][BLOCKER_MAP + 1];
       // 45度。
-      static Bitboard attack_array45_[NUM_SQUARES][BLOCKER_MAP];
+      static Bitboard attack_array45_[NUM_SQUARES][BLOCKER_MAP + 1];
       // 90度。
-      static Bitboard attack_array90_[NUM_SQUARES][BLOCKER_MAP];
+      static Bitboard attack_array90_[NUM_SQUARES][BLOCKER_MAP + 1];
       // 135度。
-      static Bitboard attack_array135_[NUM_SQUARES][BLOCKER_MAP];
+      static Bitboard attack_array135_[NUM_SQUARES][BLOCKER_MAP + 1];
       // attack_array***_[][]を初期化する。
       static void InitAttackArray();
       // 45度座標のビットボードを通常の座標に戻す。
