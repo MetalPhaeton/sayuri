@@ -29,66 +29,16 @@
 #include <iostream>
 #include <vector>
 #include <ctime>
-#include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "transposition_table.h"
 #include "fen.h"
 #include "move_maker.h"
+#include "evaluator.h"
 
 namespace Sayuri {
   class MoveMaker;
-  class ChessEngine;
-  struct EvalWeights;
-
-  /************************/
-  /* 評価の重さの構造体。 */
-  /************************/
-  struct EvalWeights {
-    public:
-      /**********************/
-      /* 全駒の評価の重さ。 */
-      /**********************/
-      int mobility_weight_;  // 機動力の重さ。
-      int attack_center_weight_;  // センター攻撃の重さ。
-      int development_weight_;  // 展開の重さ。
-      int attack_around_king_weight_;  // キングの周囲への攻撃の重さ。
-
-      /******************************/
-      /* 駒の配置の重要度テーブル。 */
-      /******************************/
-      int pawn_position_table_[NUM_SQUARES];  // ポーンの配置。
-      int knight_position_table_[NUM_SQUARES];  // ナイトの配置。
-      int rook_position_table_[NUM_SQUARES];  // ルークの配置。
-      int king_position_middle_table_[NUM_SQUARES];  // キングの中盤の配置。
-      int king_position_ending_table_[NUM_SQUARES];  // キングの終盤の配置。
-
-      /********************/
-      /* 駒の配置の重さ。 */
-      /********************/
-      int pawn_position_weight_;  // ポーンの配置の重さ。
-      int knight_position_weight_;  // ナイトの配置の重さ。
-      int rook_position_weight_;  // ルークの配置の重さ。
-      int king_position_middle_weight_;  // キングの中盤の配置の重さ。
-      int king_position_ending_weight_;  // キングの終盤の配置の重さ。
-
-      /********************/
-      /* それ以外の重さ。 */
-      /********************/
-      int pass_pawn_weight_;  // パスポーンの重さ。
-      int protected_pass_pawn_weight_;  // 守られたパスポーンの重さ。
-      int double_pawn_weight_;  // ダブルポーンの重さ。
-      int iso_pawn_weight_;  // 孤立ポーンの重さ。
-      int bishop_pair_weight_;  // ビショップペアの重さ。
-      int early_queen_launched_weight_;  // 早すぎるクイーンの出動の重さ。
-      int pawn_shield_weight_;  // ポーンの盾の重さ。
-      int canceled_castling_weight_;  // キャスリングの破棄の重さ。
-
-      /********************/
-      /* コンストラクタ。 */
-      /********************/
-      EvalWeights();
-  };
+  class Evaluator;
 
   /****************************/
   /* チェスエンジンのクラス。 */
@@ -104,14 +54,8 @@ namespace Sayuri {
       /* ChessEngineクラスの初期化。 */
       /*******************************/
       static void InitChessEngine() {
-        // key_array_[][][]を初期化する。
-        InitKeyArray();
-        // pass_pawn_mask_[][]を初期化する。
-        InitPassPawnMask();
-        // iso_pawn_mask_[]を初期化する。
-        InitIsoPawnMask();
-        // pawn_shield_mask_[][]を初期化する。
-        InitPawnShieldMask();
+        // key_table_[][][]を初期化する。
+        InitKeyTable();
       }
 
 
@@ -133,257 +77,15 @@ namespace Sayuri {
       // fen: 読み込むFenオブジェクト。
       void LoadFen(const Fen& fen);
 
-      /************************/
-      /* 局面を分析する関数。 */
-      /************************/
-      // キングがチェックされているかどうかチェックする。
-      // [引数]
-      // side: チェックされているか調べるサイド。
-      // [戻り値]
-      // キングがチェックされていればtrue。
-      bool IsChecked(Side side) const {
-        return IsAttacked(king_[side], side ^ 0x3);
-      }
-      // チェックメイトされているかどうか調べる。
-      // [戻り値]
-      // チェックメイトされていればtrue。
-      bool IsCheckmated() const {
-        return IsChecked(to_move_) && !HasLegalMove(to_move_);
-      }
-      // ステールメイトかどうか調べる。
-      // [戻り値]
-      // ステールメイトされていればtrue。
-      bool IsStalemated() const {
-        return !IsChecked(to_move_) && !HasLegalMove(to_move_);
-      }
-      // 勝つのに十分な駒があるかどうか調べる。
-      // [引数]
-      // side: 調べるサイド。
-      // [戻り値]
-      // 十分な駒があればtrue。
-      bool HasEnoughPieces(Side side) const;
-      // 終盤かどうか判定する。
-      // キングとポーン以外の駒が4個以下なら終盤。
-      // [戻り値]
-      // 終盤ならtrue。
-      bool IsEnding() const {
-        Bitboard pieces = blocker0_;
-        pieces &= ~(position_[WHITE][KING] | position_[BLACK][KING]
-        | position_[WHITE][PAWN] | position_[BLACK][PAWN]);
-        return Util::CountBits(pieces) <= 4;
-      } 
-      // 動ける位置の数を得る。
-      // [引数]
-      // piece_square: 調べたい駒の位置。
-      // [戻り値]
-      // 動ける位置の数。
-      int GetMobility(Square piece_square) const;
-      // 攻撃している位置のビットボードを得る。
-      // アンパサンは含まない。
-      // [引数]
-      // pieces: 調べたい駒のビットボード。
-      // [戻り値]
-      // piecesが攻撃している位置のビットボード。
-      Bitboard GetAttack(Bitboard pieces) const;
-      // パスポーンの位置のビットボードを得る。
-      // [引数]
-      // side: 調べたいサイド。
-      // [戻り値]
-      // パスポーンの位置のビットボード。
-      Bitboard GetPassPawns(Side side) const;
-      // ダブルポーンの位置のビットボードを得る。
-      // [引数]
-      // side: 調べたいサイド。
-      // [戻り値]
-      // ダブルポーンの位置のビットボード。
-      Bitboard GetDoublePawns(Side side) const;
-      // 孤立ポーンの位置のビットボードを得る。
-      // [引数]
-      // side: 調べたいサイド。
-      // [戻り値]
-      // 孤立ポーンの位置のビットボード。
-      Bitboard GetIsoPawns(Side side) const;
-      // 展開されていないマイナーピースの位置のビットボードを得る。
-      // [引数]
-      // side: 調べたいサイド。
-      // [戻り値]
-      // 展開されていないマイナーピースの位置のビットボード。
-      Bitboard GetNotDevelopedMinorPieces(Side side) const;
-      // キングのポーンの盾の位置のビットボードを得る。
-      // [引数]
-      // side: 調べたいサイド。
-      // [戻り値]
-      // ポーンの盾の位置のビットボード。
-      Bitboard GetPawnShield(Side side) const {
-        return position_[side][PAWN]
-        & pawn_shield_mask_[side][king_[side]];
-      }
-
-      /************************/
-      /* 局面を評価する関数。 */
-      /************************/
-      // 全てを評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalAll(Side side, const EvalWeights& weights) const;
-      // 機動力を評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalMobility(Side side, const EvalWeights& weights) const;
-      // センター攻撃を評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalAttackCenter(Side side, const EvalWeights& weights) const;
-      // 展開を評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalDevelopment(Side side, const EvalWeights& weights) const;
-      // キングの周囲への攻撃を評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalAttackAroundKing(Side side, const EvalWeights& weights) const;
-      // ポーンの配置を評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalPawnPosition(Side side, const EvalWeights& weights) const;
-      // ナイトの配置を評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalKnightPosition(Side side, const EvalWeights& weights) const;
-      // ルークの配置を評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalRookPosition(Side side, const EvalWeights& weights) const;
-      // キングの中盤の配置を評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalKingPositionMiddle(Side side,
-      const EvalWeights& weights) const;
-      // キングの終盤の配置を評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalKingPositionEnding(Side side,
-      const EvalWeights& weights) const;
-      // パスポーンを評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalPassPawn(Side side, const EvalWeights& weights) const;
-      // ダブルポーンを評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalDoublePawn(Side side, const EvalWeights& weights) const;
-      // 孤立ポーンを評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalIsoPawn(Side side, const EvalWeights& weights) const;
-      // ビショップペアを評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalBishopPair(Side side, const EvalWeights& weights) const;
-      // 早すぎるクイーンの出動を評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalEarlyQueenLaunched(Side side, const EvalWeights& weights)
-      const;
-      // ポーンの盾を評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalPawnShield(Side side, const EvalWeights& weights) const;
-      // キャスリングの破棄を評価する。
-      // [引数]
-      // side: 評価したいサイド。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 評価値。
-      int EvalCanceledCastling(Side side, const EvalWeights& weights) const;
-
-      /**************/
-      /* アクセサ。 */
-      /**************/
-      // 駒の配置のビットボードの配列。
-      const Bitboard (& position() const)[NUM_SIDES][NUM_PIECE_TYPES] {
-        return position_;
-      }
-      // 駒の種類の配置。
-      const Piece (& piece_board() const)[NUM_SQUARES] {
-        return piece_board_;
-      }
-      // サイドの配置。
-      const Side (& side_board() const)[NUM_SQUARES] {
-        return side_board_;
-      }
-      // 各サイドの駒の配置。
-      const Bitboard (& side_pieces() const)[NUM_SIDES] {
-        return side_pieces_;
-      }
-      // ブロッカーの配置。
-      Bitboard blocker0() const {return blocker0_;}  // 0度。
-      Bitboard blocker45() const {return blocker45_;}  // 45度
-      Bitboard blocker90() const {return blocker90_;}  // 90度。
-      Bitboard blocker135() const {return blocker135_;}  // 135度。
-      // キングの位置。
-      const Square (& king() const)[NUM_SIDES] {
-        return king_;
-      }
-      // 手番。
-      Side to_move() const {return to_move_;}
-      // キャスリングの権利。
-      Castling castling_rights() const {return castling_rights_;}
-      // アンパッサンのターゲットの位置。
-      Square en_passant_target() const {return en_passant_target_;}
-      // アンパッサンできるかどうか。
-      bool can_en_passant() const {return can_en_passant_;}
+      // 新しいゲームの準備をする。
+      void SetNewGame();
 
     private:
+      /**************/
+      /* フレンド。 */
+      /**************/
       friend class MoveMaker;
+      friend class Evaluator;
 
 
       /****************/
@@ -402,44 +104,6 @@ namespace Sayuri {
       // [引数]
       // move: MakeMove()で動かした手。
       void UnmakeMove(Move move);
-
-      /**************************/
-      /* 探索に使う関数と変数。 */
-      /**************************/
-      // MCapを得る。
-      // [引数]
-      // move: 動かす手。
-      // [戻り値]
-      // MCap。
-      int GetMCap(Move move) const;
-      // クイース探索。
-      // [引数]
-      // level: 探索のレベル。
-      // depth: 探索の深さ。
-      // alpha: アルファ値。
-      // beta: ベータ値。
-      // key: ハッシュキー。
-      // table: トランスポジションテーブル。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 探索結果の評価値。
-      int Quiesce(int level, int depth, int alpha, int beta, HashKey key,
-      TranspositionTable& table, const EvalWeights& weights);
-      // 探索する。
-      // [引数]
-      // level: 探索のレベル。
-      // depth: 探索の深さ。
-      // alpha: アルファ値。
-      // beta: ベータ値。
-      // is_null_move: Null Moveの探索かどうか。
-      // key: ハッシュキー。
-      // table: 使用するトランスポジションテーブル。
-      // weights: 評価の重さ。
-      // [戻り値]
-      // 探索結果の評価値。
-      int Search(int level, int depth, int alpha, int beta,
-      bool is_null_move, HashKey key,
-      TranspositionTable& table, const EvalWeights& weights);
 
       /******************************/
       /* その他のプライベート関数。 */
@@ -463,8 +127,8 @@ namespace Sayuri {
       // [戻り値]
       // ビショップの攻撃筋。
       Bitboard GetBishopAttack(Square square) const {
-        return Util::GetAttack45(square, blocker45_)
-        | Util::GetAttack135(square, blocker135_);
+        return Util::GetAttack45(square, blocker_45_)
+        | Util::GetAttack135(square, blocker_135_);
       }
       // ルークの攻撃筋を作る。
       // [引数]
@@ -472,8 +136,8 @@ namespace Sayuri {
       // [戻り値]
       // ルークの攻撃筋。
       Bitboard GetRookAttack(Square square) const {
-        return Util::GetAttack0(square, blocker0_)
-        | Util::GetAttack90(square, blocker90_);
+        return Util::GetAttack0(square, blocker_0_)
+        | Util::GetAttack90(square, blocker_90_);
       }
       // クイーンの攻撃筋を作る。
       // [引数]
@@ -485,7 +149,7 @@ namespace Sayuri {
       }
 
       // キャスリングできるかどうか判定。
-      template<Castling Which> bool CanCastling() const;
+      template<Castling Flag> bool CanCastling() const;
 
       // キャスリングの権利を更新する。
       void UpdateCastlingRights();
@@ -508,7 +172,7 @@ namespace Sayuri {
       // side: 調べたいサイド。
       // [戻り値]
       // 合法手があればtrue。
-      bool HasLegalMove(Side side) const;
+      bool HasLegalMove(Side side);
       // その位置を攻撃している駒のビットボードを得る。
       // [引数]
       // target_square: 攻撃されている位置。
@@ -529,18 +193,16 @@ namespace Sayuri {
       // 各サイドの駒の配置。
       Bitboard side_pieces_[NUM_SIDES];
       // ブロッカーの配置。
-      Bitboard blocker0_;  // 角度0度。
-      Bitboard blocker45_;  // 角度45度。
-      Bitboard blocker90_;  // 角度90度。
-      Bitboard blocker135_;  // 角度135度。
+      Bitboard blocker_0_;  // 角度0度。
+      Bitboard blocker_45_;  // 角度45度。
+      Bitboard blocker_90_;  // 角度90度。
+      Bitboard blocker_135_;  // 角度135度。
       // キングの位置。
       Square king_[NUM_SIDES];
       // 手番。
       Side to_move_;
       // キャスリングの権利。
       Castling castling_rights_;
-      // アンパッサンのターゲットの位置。
-      Square en_passant_target_;
       // アンパッサンの位置。
       Square en_passant_square_;
       // アンパッサンできるかどうか。
@@ -549,10 +211,12 @@ namespace Sayuri {
       int ply_100_;
       // 現在の手数。
       int ply_;
+      // キャスリングしたかどうか。
+      bool has_castled_[NUM_SIDES];
       // ヒストリー。history_[from][to]。
       int history_[NUM_SQUARES][NUM_SQUARES];
       // 探索情報用スタック。
-      struct SearchSlot {
+      struct SearchInfoSlot {
         // 現在の手。何を指されて今のノードになったのか。
         Move current_move_;
         // 現在の局面のハッシュキー。
@@ -562,51 +226,14 @@ namespace Sayuri {
         // キラームーブ。
         Move killer_;
 
-        SearchSlot() :
+        SearchInfoSlot() :
         current_pos_key_(0ULL) {
           current_move_.all_ = 0;
           iid_move_.all_ = 0;
           killer_.all_ = 0;
         }
       };
-      SearchSlot search_stack_[MAX_PLY + 1];
-
-      /****************/
-      /* 局面分析用。 */
-      /****************/
-      // ポーンの配置のテーブル。
-      static const int pawn_position_table_[NUM_SQUARES];
-      // ナイトの配置のテーブル。
-      static const int knight_position_table_[NUM_SQUARES];
-      // キングの中盤での配置のテーブル。
-      static const int king_position_table_middle_[NUM_SQUARES];
-      // キングの終盤での配置のテーブル。
-      static const int king_position_table_ending_[NUM_SQUARES];
-      // テーブルを計算する。
-      // [引数]
-      // table: 計算するテーブル。
-      // side: 計算したいサイド。
-      // bitboard: 位置のビットボード。
-      // [戻り値]
-      // テーブルを計算した結果の値。
-      static int GetTableValue(const int (& table)[NUM_SQUARES], Side side,
-      Bitboard bitboard);
-
-      // パスポーンを判定するときに使用するマスク。
-      static Bitboard pass_pawn_mask_[NUM_SIDES][NUM_SQUARES];
-      // pass_pawn_mask_[][]を初期化する。
-      static void InitPassPawnMask();
-
-      // 孤立ポーンを判定するときに使用するマスク。
-      static Bitboard iso_pawn_mask_[NUM_SQUARES];
-      // iso_pawn_mask_[]を初期化する。
-      static void InitIsoPawnMask();
-
-      // ポーン盾の位置のマスク。
-      static Bitboard pawn_shield_mask_[NUM_SIDES][NUM_SQUARES];
-      // pawn_shield_mask_[][]を初期化する。
-      static void InitPawnShieldMask();
-
+      SearchInfoSlot search_info_stack_[MAX_PLY];
 
       /**********************/
       /* ハッシュキー関連。 */
@@ -617,9 +244,9 @@ namespace Sayuri {
       // 第3インデックスは駒の位置。
       // それぞれのインデックスに値を入れると、
       // そのハッシュキーを得られる。
-      static HashKey key_array_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
-      // key_array_[][][]を初期化する。
-      static void InitKeyArray();
+      static HashKey key_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
+      // key_table_[][][]を初期化する。
+      static void InitKeyTable();
       // 現在の局面のハッシュキーを計算する。
       // (注)計算に時間がかかる。
       // [戻り値]

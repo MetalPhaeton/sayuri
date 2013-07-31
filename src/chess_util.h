@@ -28,7 +28,6 @@
 #define CHESS_UTIL_H
 
 #include <iostream>
-#include <cstddef>
 
 #include "chess_def.h"
 
@@ -42,9 +41,9 @@ namespace Sayuri {
       /* Utilクラスの初期化。 */
       /************************/
       static void InitUtil() {
-        // num_bit16_array_[]を初期化する。
+        // num_bit16_table_[]を初期化する。
         InitNumBit16Array();
-        // attack_array***_[][]を初期化する。
+        // attack_table_***_[][]を初期化する。
         InitAttackArray();
         // pawn_move_[][]を初期化する。
         InitPawnMove();
@@ -382,7 +381,7 @@ namespace Sayuri {
       // [戻り値]
       // 利き筋。
       static Bitboard GetAttack0(Square square, Bitboard blocker0) {
-        return attack_array0_[square]
+        return attack_table_0_[square]
         [(blocker0 >> MAGIC_SHIFT_V[square]) & MAGIC_MASK_V[square]];
       }
       // 45度の利き筋を得る。
@@ -392,7 +391,7 @@ namespace Sayuri {
       // [戻り値]
       // 利き筋。
       static Bitboard GetAttack45(Square square, Bitboard blocker45) {
-        return attack_array45_[square]
+        return attack_table_45_[square]
         [(blocker45 >> MAGIC_SHIFT_D[ROT45[square]])
         & MAGIC_MASK_D[ROT45[square]]];
       }
@@ -403,7 +402,7 @@ namespace Sayuri {
       // [戻り値]
       // 利き筋。
       static Bitboard GetAttack90(Square square, Bitboard blocker90) {
-        return attack_array90_[square]
+        return attack_table_90_[square]
         [(blocker90 >> MAGIC_SHIFT_V[ROT90[square]])
         & MAGIC_MASK_V[ROT90[square]]];
       }
@@ -414,7 +413,7 @@ namespace Sayuri {
       // [戻り値]
       // 利き筋。
       static Bitboard GetAttack135(Square square, Bitboard blocker135) {
-        return attack_array135_[square]
+        return attack_table_135_[square]
         [(blocker135 >> MAGIC_SHIFT_D[ROT135[square]])
         & MAGIC_MASK_D[ROT135[square]]];
       }
@@ -509,10 +508,10 @@ namespace Sayuri {
       // [戻り値]
       // 立っているビットの個数。
       static int CountBits(Bitboard bitboard) {
-        return num_bit16_array_[bitboard & 0xffff]
-        + num_bit16_array_[(bitboard >> 16) & 0xffff]
-        + num_bit16_array_[(bitboard >> 32) & 0xffff]
-        + num_bit16_array_[(bitboard >> 48) & 0xffff];
+        return num_bit16_table_[bitboard & 0xffff]
+        + num_bit16_table_[(bitboard >> 16) & 0xffff]
+        + num_bit16_table_[(bitboard >> 32) & 0xffff]
+        + num_bit16_table_[(bitboard >> 48) & 0xffff];
       }
       // 下位のゼロビットの個数を数える。
       // [引数]
@@ -564,15 +563,15 @@ namespace Sayuri {
       /**********************************/
       // 16ビットのビットの個数が入った配列。
       // 引数には16ビットのパターンを入れる。
-      static int num_bit16_array_[0xffff + 1];
-      // num_bit16_array_[]を初期化する。
+      static int num_bit16_table_[0xffff + 1];
+      // num_bit16_table_[]を初期化する。
       static void InitNumBit16Array();
 
       /**************/
       /* マジック。 */
       /**************/
       // マジックのシフト。0度と90度用。
-      static constexpr std::size_t MAGIC_SHIFT_V[NUM_SQUARES] {
+      static constexpr int MAGIC_SHIFT_V[NUM_SQUARES] {
         0, 0, 0, 0, 0, 0, 0, 0,
         8, 8, 8, 8, 8, 8, 8, 8,
         16, 16, 16, 16, 16, 16, 16, 16,
@@ -583,7 +582,7 @@ namespace Sayuri {
         56, 56, 56, 56, 56, 56, 56, 56
       };
       // マジックのシフト。45度と135度用。
-      static constexpr std::size_t MAGIC_SHIFT_D[NUM_SQUARES] {
+      static constexpr int MAGIC_SHIFT_D[NUM_SQUARES] {
         0,
         1, 1,
         3, 3, 3,
@@ -633,14 +632,14 @@ namespace Sayuri {
       // ブロッカーのパターン。
       static constexpr int BLOCKER_MAP = 0xff;
       // 0度。
-      static Bitboard attack_array0_[NUM_SQUARES][BLOCKER_MAP + 1];
+      static Bitboard attack_table_0_[NUM_SQUARES][BLOCKER_MAP + 1];
       // 45度。
-      static Bitboard attack_array45_[NUM_SQUARES][BLOCKER_MAP + 1];
+      static Bitboard attack_table_45_[NUM_SQUARES][BLOCKER_MAP + 1];
       // 90度。
-      static Bitboard attack_array90_[NUM_SQUARES][BLOCKER_MAP + 1];
+      static Bitboard attack_table_90_[NUM_SQUARES][BLOCKER_MAP + 1];
       // 135度。
-      static Bitboard attack_array135_[NUM_SQUARES][BLOCKER_MAP + 1];
-      // attack_array***_[][]を初期化する。
+      static Bitboard attack_table_135_[NUM_SQUARES][BLOCKER_MAP + 1];
+      // attack_table_***_[][]を初期化する。
       static void InitAttackArray();
       // 45度座標のビットボードを通常の座標に戻す。
       // [引数]

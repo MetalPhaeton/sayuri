@@ -83,7 +83,8 @@ namespace Sayuri {
   // PVラインを2番目以降の要素にコピーする。
   void PVLine::Insert(const PVLine& pv_line) {
     length_ = pv_line.length_ + 1;
-    if (length_ > MAX_PLY) length_ = MAX_PLY;
+    if (length_ > static_cast<std::size_t>(MAX_PLY))
+      length_ = MAX_PLY;
 
     for (std::size_t i = 1; i < length_; i++) {
       line_[i] = pv_line.line_[i - 1];

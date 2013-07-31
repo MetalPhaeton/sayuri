@@ -75,7 +75,7 @@ namespace Sayuri {
       // depth: 手を展開するノードの深さ。
       // level: 手を展開するノードのレベル。
       // table: トランスポジションテーブル。
-      template<GenMoveType GType> void GenMoves(int depth, int level,
+      template<GenMoveType Type> void GenMoves(int depth, int level,
       const TranspositionTable& table);
       // 展開できた手の数を返す。
       // [戻り値]
@@ -92,14 +92,14 @@ namespace Sayuri {
       /* プライベート関数。 */
       /**********************/
       // 手に点数をつける関数。
-      // GTypeがLEGALの場合は点数を付けない。
+      // TypeがLEGALの場合は点数を付けない。
       // [引数]
       // begin: 点数をつける最初のスロットのポインタ。
       // end: 点数をつける最後のスロットの次のポインタ。
       // depth: 手を展開するノードの深さ。
       // level: 現在のノードのレベル。
       // table: トランスポジションテーブル。
-      template<GenMoveType GType>
+      template<GenMoveType Type>
       void ScoreMoves(MoveSlot* begin, MoveSlot* end, int depth,
       int level, const TranspositionTable& table);
       // SEE。

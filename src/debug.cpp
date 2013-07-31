@@ -102,10 +102,10 @@ namespace Sayuri {
   // 手を出力する。
   void PrintMove(Move move) {
     // ファイルとランクの文字の配列。
-    constexpr char fyle_array[NUM_FYLES] = {
+    constexpr char fyle_table[NUM_FYLES] = {
       'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'
     };
-    constexpr char rank_array[NUM_RANKS] = {
+    constexpr char rank_table[NUM_RANKS] = {
       '1', '2', '3', '4', '5', '6', '7', '8'
     };
 
@@ -117,13 +117,13 @@ namespace Sayuri {
     std::cout << "From: ";
     fyle = Util::GetFyle(move.from_);
     rank = Util::GetRank(move.from_);
-    std::cout << fyle_array[fyle] << rank_array[rank] << std::endl;
+    std::cout << fyle_table[fyle] << rank_table[rank] << std::endl;
 
     // 移動先の位置を出力する。
     std::cout << "To: ";
     fyle = Util::GetFyle(move.to_);
     rank = Util::GetRank(move.to_);
-    std::cout << fyle_array[fyle] << rank_array[rank] << std::endl;
+    std::cout << fyle_table[fyle] << rank_table[rank] << std::endl;
 
     // 取った駒の種類を出力する。
     std::cout << "Captured Piece: ";
@@ -150,7 +150,7 @@ namespace Sayuri {
         std::cout << "King";
         break;
       default:
-        Assert(false);
+        throw SayuriError("駒の種類が不正です。");
         break;
     }
     std::cout << std::endl;
@@ -180,7 +180,7 @@ namespace Sayuri {
         std::cout << "King";
         break;
       default:
-        Assert(false);
+        throw SayuriError("駒の種類が不正です。");
         break;
     }
     std::cout << std::endl;
@@ -210,7 +210,7 @@ namespace Sayuri {
     fyle = Util::GetFyle(en_passant_square);
     rank = Util::GetRank(en_passant_square);
     std::cout << "Last En Passant Square: "
-    << fyle_array[fyle] << rank_array[rank] << std::endl;
+    << fyle_table[fyle] << rank_table[rank] << std::endl;
 
     // 手の種類を出力する。
     std::cout << "Move Type: ";
@@ -228,7 +228,7 @@ namespace Sayuri {
         std::cout << "Null Move";
         break;
       default:
-        Assert(false);
+        throw SayuriError("手の種類が不正です。");
         break;
     }
     std::cout << std::endl;

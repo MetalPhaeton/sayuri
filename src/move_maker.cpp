@@ -125,7 +125,7 @@ namespace Sayuri {
   /******************/
 
   // 手をスタックに展開する。
-  template<GenMoveType GType>
+  template<GenMoveType Type>
   void MoveMaker::GenMoves(int depth, int level,
   const TranspositionTable& table) {
     // スタックのポインタを設定。
@@ -164,14 +164,14 @@ namespace Sayuri {
             move_bitboard = engine_ptr_->GetQueenAttack(from);
             break;
           default:
-            Assert(false);
+            throw SayuriError("駒の種類が不正です。");
             break;
         }
 
         // 展開するタイプによって候補手を選り分ける。。
-        if (GType == GenMoveType::NON_CAPTURE) {
-          move_bitboard &= ~(engine_ptr_->blocker0_);
-        } else if (GType == GenMoveType::CAPTURE) {
+        if (Type == GenMoveType::NON_CAPTURE) {
+          move_bitboard &= ~(engine_ptr_->blocker_0_);
+        } else if (Type == GenMoveType::CAPTURE) {
           move_bitboard &= engine_ptr_->side_pieces_[enemy_side];
         } else {
           move_bitboard &= ~(engine_ptr_->side_pieces_[side]);
@@ -187,7 +187,7 @@ namespace Sayuri {
           // タイプが合法手の場合、
           // その手を指した後、自分のキングが攻撃されているか調べる。
           // 攻撃されていれば違法。
-          if (GType == GenMoveType::LEGAL) {
+          if (Type == GenMoveType::LEGAL) {
             engine_ptr_->MakeMove(move);
             if (engine_ptr_->IsAttacked(engine_ptr_->king_[side],
             enemy_side)) {
@@ -212,19 +212,19 @@ namespace Sayuri {
     for (; pieces; pieces &= pieces - 1) {
       from = Util::GetSquare(pieces);
 
-      if (GType == GenMoveType::NON_CAPTURE) {
+      if (Type == GenMoveType::NON_CAPTURE) {
         // ポーンの一歩の動き。
         move_bitboard = Util::GetPawnMove(from, side)
-        & ~(engine_ptr_->blocker0_);
+        & ~(engine_ptr_->blocker_0_);
         if (move_bitboard) {
           if (((side == WHITE) && (Util::GetRank(from) == RANK_2))
           || ((side == BLACK) && (Util::GetRank(from) == RANK_7))) {
             // ポーンの2歩の動き。
             move_bitboard |= Util::GetPawn2StepMove(from, side)
-            & ~(engine_ptr_->blocker0_);
+            & ~(engine_ptr_->blocker_0_);
           }
         }
-      } else if (GType == GenMoveType::CAPTURE) {
+      } else if (Type == GenMoveType::CAPTURE) {
         move_bitboard = Util::GetPawnAttack(from, side)
         & engine_ptr_->side_pieces_[enemy_side];
         // アンパッサンがある場合。
@@ -235,13 +235,13 @@ namespace Sayuri {
       } else { 
         // ポーンの一歩の動き。
         move_bitboard = Util::GetPawnMove(from, side)
-        & ~(engine_ptr_->blocker0_);
+        & ~(engine_ptr_->blocker_0_);
         if (move_bitboard) {
           if (((side == WHITE) && (Util::GetRank(from) == RANK_2))
           || ((side == BLACK) && (Util::GetRank(from) == RANK_7))) {
             // ポーンの2歩の動き。
             move_bitboard |= Util::GetPawn2StepMove(from, side)
-            & ~(engine_ptr_->blocker0_);
+            & ~(engine_ptr_->blocker_0_);
           }
         }
         // 駒を取る動き。
@@ -268,7 +268,7 @@ namespace Sayuri {
         // タイプが合法手の場合、
         // その手を指した後、自分のキングが攻撃されているか調べる。
         // 攻撃されていれば違法。
-        if (GType == GenMoveType::LEGAL) {
+        if (Type == GenMoveType::LEGAL) {
           engine_ptr_->MakeMove(move);
           if (engine_ptr_->IsAttacked(engine_ptr_->king_[side],
           enemy_side)) {
@@ -301,8 +301,8 @@ namespace Sayuri {
     // キングの動きを作る。
     from = engine_ptr_->king_[side];
     move_bitboard = Util::GetKingMove(from);
-    if (GType == GenMoveType::NON_CAPTURE) {
-      move_bitboard &= ~(engine_ptr_->blocker0_);
+    if (Type == GenMoveType::NON_CAPTURE) {
+      move_bitboard &= ~(engine_ptr_->blocker_0_);
       // キャスリングの動きを追加。
       if (side == WHITE) {
         if (engine_ptr_->CanCastling<WHITE_SHORT_CASTLING>()) {
@@ -319,7 +319,7 @@ namespace Sayuri {
           move_bitboard |= Util::BIT[C8];
         }
       }
-    } else if (GType == GenMoveType::CAPTURE) {
+    } else if (Type == GenMoveType::CAPTURE) {
       move_bitboard &= engine_ptr_->side_pieces_[enemy_side];
     } else {
       move_bitboard &= ~(engine_ptr_->side_pieces_[side]);
@@ -358,7 +358,7 @@ namespace Sayuri {
       // タイプが合法手の場合、
       // その手を指した後、自分のキングが攻撃されているか調べる。
       // 攻撃されていれば違法。
-      if (GType == GenMoveType::LEGAL) {
+      if (Type == GenMoveType::LEGAL) {
         engine_ptr_->MakeMove(move);
         if (engine_ptr_->IsAttacked(engine_ptr_->king_[side], enemy_side)) {
           engine_ptr_->UnmakeMove(move);
@@ -375,7 +375,7 @@ namespace Sayuri {
 
     // 得点をつける。
     gen_end = last_;
-    ScoreMoves<GType>(gen_begin, gen_end, depth, level, table);
+    ScoreMoves<Type>(gen_begin, gen_end, depth, level, table);
   }
   // 実体化。
   template void MoveMaker::GenMoves
@@ -422,11 +422,10 @@ namespace Sayuri {
   }
 
   // 展開した候補手に得点をつける。
-  template<GenMoveType GType>
-  void MoveMaker::ScoreMoves
-  (MoveMaker::MoveSlot* begin,
-   MoveMaker::MoveSlot* end,
-   int depth, int level, const TranspositionTable& table) {
+  template<GenMoveType Type>
+  void MoveMaker::ScoreMoves (MoveMaker::MoveSlot* begin,
+  MoveMaker::MoveSlot* end, int depth, int level,
+   const TranspositionTable& table) {
     if (begin == end) return;
 
     // 評価値の定義。
@@ -438,8 +437,8 @@ namespace Sayuri {
     constexpr int KILLER_MOVE_SCORE = IID_MOVE_SCORE - 1;
 
     // トランスポジションテーブルから前回の繰り返しの最善手を得る。
-    const TTEntry* entry_ptr =
-    table.GetFulfiledEntry(engine_ptr_->search_stack_[level].current_pos_key_,
+    const TTEntry* entry_ptr = table.GetFulfiledEntry
+    (engine_ptr_->search_info_stack_[level].current_pos_key_,
     depth - 1, level, engine_ptr_->to_move_);
     Move prev_best;
     if (entry_ptr && entry_ptr->value_flag() == TTValueFlag::EXACT) {
@@ -449,35 +448,14 @@ namespace Sayuri {
     }
 
     // IIDムーブを得る。
-    Move iid_move;
-    iid_move = engine_ptr_->search_stack_[level].iid_move_;
+    Move iid_move = engine_ptr_->search_info_stack_[level].iid_move_;
 
     // キラームーブを得る。
-    Move killer;
-    killer = engine_ptr_->search_stack_[level].killer_;
+    Move killer = engine_ptr_->search_info_stack_[level].killer_;
 
     for (MoveSlot* ptr = begin; ptr < end; ptr++) {
-      // 各候補手のタイプに分ける。
-      if (GType == GenMoveType::NON_CAPTURE) {
-        // ヒストリーを使って点数をつけていく。
-        ptr->score_ = engine_ptr_->history_[ptr->move_.from_][ptr->move_.to_];
-      } else if (GType == GenMoveType::CAPTURE) {
-        Side side = engine_ptr_->to_move_;
-        // SEEで点数をつけていく。
-        // 現在チェックされていれば、<取る駒> - <自分の駒>。
-        if (!(engine_ptr_->IsAttacked(engine_ptr_->king_[side], side ^ 0x3))) {
-          ptr->score_ = SEE(ptr->move_, side);
-        } else {
-          ptr->score_ = MATERIAL[engine_ptr_->piece_board_[ptr->move_.to_]]
-          - MATERIAL[engine_ptr_->piece_board_[ptr->move_.from_]];
-        }
-      } else {
-        // 合法手は0点。
-        ptr->score_ = 0;
-      }
-
       // 特殊な手の点数をつける。
-      if (GType != GenMoveType::LEGAL) {
+      if (Type != GenMoveType::LEGAL) {
         if ((ptr->move_.to_ == prev_best.to_)
         && (ptr->move_.from_ == prev_best.from_)) {
           // 前回の最善手。
@@ -490,6 +468,27 @@ namespace Sayuri {
         && (ptr->move_.from_ == killer.from_)){
           // キラームーブ。
           ptr->score_ = KILLER_MOVE_SCORE;
+        } else {
+          // その他の手を各候補手のタイプに分ける。
+          if (Type == GenMoveType::NON_CAPTURE) {
+            // ヒストリーを使って点数をつけていく。
+            ptr->score_ =
+            engine_ptr_->history_[ptr->move_.from_][ptr->move_.to_];
+          } else if (Type == GenMoveType::CAPTURE) {
+            Side side = engine_ptr_->to_move_;
+            // SEEで点数をつけていく。
+            // 現在チェックされていれば、<取る駒> - <自分の駒>。
+            if (!(engine_ptr_->IsAttacked
+            (engine_ptr_->king_[side], side ^ 0x3))) {
+              ptr->score_ = SEE(ptr->move_, side);
+            } else {
+              ptr->score_ = MATERIAL[engine_ptr_->piece_board_[ptr->move_.to_]]
+              - MATERIAL[engine_ptr_->piece_board_[ptr->move_.from_]];
+            }
+          } else {
+            // 合法手は0点。
+            ptr->score_ = 0;
+          }
         }
       }
     }
@@ -512,6 +511,17 @@ namespace Sayuri {
     if (move.all_) {
       // 取る駒の価値を得る。
       int capture_value = MATERIAL[engine_ptr_->piece_board_[move.to_]];
+
+      // ポーンの昇格。
+      if (engine_ptr_->piece_board_[move.from_] == PAWN) {
+        if (((side == WHITE) && (Util::GetRank(move.to_) == RANK_8))
+        || ((side == BLACK) && (Util::GetRank(move.to_) == RANK_1))) {
+          // ボーナス。
+          capture_value += MATERIAL[QUEEN] - MATERIAL[PAWN];
+          // 昇格。
+          move.promotion_ = QUEEN;
+        }
+      }
 
       engine_ptr_->MakeMove(move);
 
@@ -569,7 +579,7 @@ namespace Sayuri {
           attack &= engine_ptr_->position_[side][KING];
           break;
         default:
-          Assert(false);
+          throw SayuriError("駒の種類が不正です。");
           break;
       }
       if (attack) {

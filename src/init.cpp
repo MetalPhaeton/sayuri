@@ -30,11 +30,13 @@
 
 #include "chess_util.h"
 #include "chess_engine.h"
+#include "evaluator.h"
 
 namespace Sayuri {
   // Misakiの初期化。
   void Init() {
     Util::InitUtil();
     ChessEngine::InitChessEngine();
+    Evaluator::InitEvaluator();
   }
 }  // namespace Sayuri

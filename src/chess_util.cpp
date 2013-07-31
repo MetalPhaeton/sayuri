@@ -27,7 +27,6 @@
 #include "chess_util.h"
 
 #include <iostream>
-#include <cstddef>
 #include "chess_def.h"
 
 namespace Sayuri {
@@ -54,8 +53,8 @@ namespace Sayuri {
   constexpr Square Util::R_ROT45[NUM_SQUARES];
   constexpr Square Util::R_ROT90[NUM_SQUARES];
   constexpr Square Util::R_ROT135[NUM_SQUARES];
-  constexpr std::size_t Util::MAGIC_SHIFT_V[NUM_SQUARES];
-  constexpr std::size_t Util::MAGIC_SHIFT_D[NUM_SQUARES];
+  constexpr int Util::MAGIC_SHIFT_V[NUM_SQUARES];
+  constexpr int Util::MAGIC_SHIFT_D[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK_V[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK_D[NUM_SQUARES];
   constexpr int Util::BLOCKER_MAP;
@@ -65,12 +64,12 @@ namespace Sayuri {
   /**********************************/
   // 16ビットのビットの個数が入った配列。
   // 引数には16ビットのパターンを入れる。
-  int Util::num_bit16_array_[0xffff + 1];
-  // num_bit16_array_[]を初期化する。
+  int Util::num_bit16_table_[0xffff + 1];
+  // num_bit16_table_[]を初期化する。
   void Util::InitNumBit16Array() {
     unsigned int index;
     for (index = 0; index <= 0xffff; index++) {
-      num_bit16_array_[index] = GetNumBits(index);
+      num_bit16_table_[index] = GetNumBits(index);
     }
   }
 
@@ -84,11 +83,11 @@ namespace Sayuri {
   // 0度と90度用。
   // 45度と135度用。
   // 各方向の攻撃の配列。
-  Bitboard Util::attack_array0_[NUM_SQUARES][BLOCKER_MAP + 1];  // 0度。
-  Bitboard Util::attack_array45_[NUM_SQUARES][BLOCKER_MAP + 1];  // 45度。
-  Bitboard Util::attack_array90_[NUM_SQUARES][BLOCKER_MAP + 1];  // 90度。
-  Bitboard Util::attack_array135_[NUM_SQUARES][BLOCKER_MAP + 1];  // 135度。
-  // attack_array***_[][]を初期化する。
+  Bitboard Util::attack_table_0_[NUM_SQUARES][BLOCKER_MAP + 1];  // 0度。
+  Bitboard Util::attack_table_45_[NUM_SQUARES][BLOCKER_MAP + 1];  // 45度。
+  Bitboard Util::attack_table_90_[NUM_SQUARES][BLOCKER_MAP + 1];  // 90度。
+  Bitboard Util::attack_table_135_[NUM_SQUARES][BLOCKER_MAP + 1];  // 135度。
+  // attack_table_***_[][]を初期化する。
   void Util::InitAttackArray() {
     // 位置のビットボード。
     Bitboard point;
@@ -122,7 +121,7 @@ namespace Sayuri {
         // 利き筋をシフトする。
         attack <<= MAGIC_SHIFT_V[square];
         // 利き筋をマップに入れる。
-        attack_array0_[square][map] = attack;
+        attack_table_0_[square][map] = attack;
       }
     }
     // 45度のマップを作成。
@@ -150,7 +149,7 @@ namespace Sayuri {
         // 利き筋を通常の座標にする。
         attack = Reverse45(attack);
         // 利き筋をマップに入れる。
-        attack_array45_[square][map] = attack;
+        attack_table_45_[square][map] = attack;
       }
     }
     // 90度のマップを作成。
@@ -178,7 +177,7 @@ namespace Sayuri {
         // 利き筋を通常の座標にする。
         attack = Reverse90(attack);
         // 利き筋をマップに入れる。
-        attack_array90_[square][map] = attack;
+        attack_table_90_[square][map] = attack;
       }
     }
     // 135度のマップを作成。
@@ -206,7 +205,7 @@ namespace Sayuri {
         // 利き筋を通常の座標にする。
         attack = Reverse135(attack);
         // 利き筋をマップに入れる。
-        attack_array135_[square][map] = attack;
+        attack_table_135_[square][map] = attack;
       }
     }
   }

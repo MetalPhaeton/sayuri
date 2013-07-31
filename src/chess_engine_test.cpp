@@ -44,15 +44,16 @@ namespace Sayuri {
   extern void PrintMove(Move move);
 
   void ChessEngine::Test() {
-    std::string fen_str = "rnbqkbnr/pp2pppp/3p4/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3";
-
+    std::string fen_str = "r3k2r/5ppp/8/8/8/8/5PPP/5RK1 w kq";
     Fen fen(fen_str);
     LoadFen(fen);
 
-    if (IsCheckmated()) {
-      std::cout << "checkmate: True" << std::endl;
-    } else {
-      std::cout << "checkmate: False" << std::endl;
-    }
+    has_castled_[WHITE] = true;
+    has_castled_[BLACK] = false;
+    Evaluator eval(this);
+    int value = eval.EvalCastling();
+
+    PrintPosition(position_);
+    std::cout << "Value: " << value << std::endl;
   }
 }  // namespace Sayuri
