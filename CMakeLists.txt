@@ -27,11 +27,6 @@ cmake_minimum_required(VERSION 2.8)
 # プロジェクト名。
 project(SAYURI)
 
-# Boostの確認と設定。
-find_package(Boost COMPONENTS thread REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-link_directories(${Boost_LIBRARY_DIRS})
-
 # ソースとヘッダファイルのリスト。
 file(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
@@ -57,12 +52,11 @@ set(CMAKE_LD_FLAGS_PROFILE "-std=c++11 -w -lgmon -march=k8")
 # ビルド設定。
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_executable(sayuri ${SRCS})
-target_link_libraries(sayuri ${Boost_LIBRARIES})
 target_link_libraries(sayuri pthread)
 add_dependencies(sayuri ${HEADERS})
 
 # CPackの設定。
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "sayuri-0000-00-00")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "sayuri.0000.00.00")
 set(CPACK_SOURCE_IGNORE_FILES "/build/;/.git/;~$;${CPACK_SOURCE_IGNORE_FILES}")
 
 # CPackを実行。
