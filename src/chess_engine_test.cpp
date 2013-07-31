@@ -44,16 +44,39 @@ namespace Sayuri {
   extern void PrintMove(Move move);
 
   void ChessEngine::Test() {
-    std::string fen_str = "r3k2r/5ppp/8/8/8/8/5PPP/5RK1 w kq";
+    std::string fen_str = "8/p7/3p1k2/P2P1p1p/5K2/1R4PP/1p3P2/r7 b -";
     Fen fen(fen_str);
     LoadFen(fen);
 
-    has_castled_[WHITE] = true;
-    has_castled_[BLACK] = false;
     Evaluator eval(this);
-    int value = eval.EvalCastling();
+    int value = eval.Evaluate();
 
     PrintPosition(position_);
+    std::cout << "Phase: " << eval.GetPhase() << std::endl;
     std::cout << "Value: " << value << std::endl;
+    PrintEvaluator(eval);
+  }
+
+  // 各評価値をプリント。
+  void ChessEngine::PrintEvaluator(Evaluator& eval) {
+    std::cout << "----------------------------------------" << std::endl;
+    std::cout << "Material: " << GetMaterial(to_move_) << std::endl;
+    std::cout << "EvalMobility: " << eval.EvalMobility() << std::endl;
+    std::cout << "EvalAttackCenter: " << eval.EvalAttackCenter() << std::endl;
+    std::cout << "EvalDevelopment: " << eval.EvalDevelopment() << std::endl;
+    std::cout << "EvalAttackAroundKing: " << eval.EvalAttackAroundKing() << std::endl;
+    std::cout << "EvalPawnPosition: " << eval.EvalPawnPosition() << std::endl;
+    std::cout << "EvalKnightPosition: " << eval.EvalKnightPosition() << std::endl;
+    std::cout << "EvalRookPosition: " << eval.EvalRookPosition() << std::endl;
+    std::cout << "EvalKingPositionMiddle: " << eval.EvalKingPositionMiddle() << std::endl;
+    std::cout << "EvalKingPositionEnding: " << eval.EvalKingPositionEnding() << std::endl;
+    std::cout << "EvalPassPawn: " << eval.EvalPassPawn() << std::endl;
+    std::cout << "EvalDoublePawn: " << eval.EvalDoublePawn() << std::endl;
+    std::cout << "EvalIsoPawn: " << eval.EvalIsoPawn() << std::endl;
+    std::cout << "EvalBishopPair: " << eval.EvalBishopPair() << std::endl;
+    std::cout << "EvalEarlyQueenLaunched: " << eval.EvalEarlyQueenLaunched() << std::endl;
+    std::cout << "EvalPawnShield: " << eval.EvalPawnShield() << std::endl;
+    std::cout << "EvalCastling: " << eval.EvalCastling() << std::endl;
+    std::cout << "----------------------------------------" << std::endl;
   }
 }  // namespace Sayuri

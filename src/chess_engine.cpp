@@ -32,7 +32,6 @@
 #include <ctime>
 #include "chess_def.h"
 #include "chess_util.h"
-#include "move.h"
 #include "transposition_table.h"
 #include "fen.h"
 #include "move_maker.h"

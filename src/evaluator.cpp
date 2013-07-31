@@ -113,6 +113,53 @@ namespace Sayuri {
     InitPawnShieldMask();
   }
 
+  // 評価値を返す。
+  int Evaluator::Evaluate() {
+    // サイド。
+    Side side = engine_ptr_->to_move_;
+    Side enemy_side = side ^ 0x3;
+
+    // 合法手がないとき。
+    if (!(engine_ptr_->HasLegalMove(side))) {
+      if (engine_ptr_->IsAttacked(engine_ptr_->king_[side], enemy_side)) {
+        // チェックメイトされていれば負け。
+        return SCORE_LOSE;
+      } else {
+        // ステールメイトは引き分け。
+        return SCORE_DRAW;
+      }
+    }
+
+    double phase = GetPhase();
+
+    // 全フェース用評価値。
+    int all_score = engine_ptr_->GetMaterial(side)
+    + EvalPawnPosition()
+    + EvalPassPawn()
+    + EvalDoublePawn()
+    + EvalBishopPair();
+
+    // 中盤用評価値。
+    int middle_score = static_cast<int>(phase
+    * (EvalMobility()
+    + EvalAttackCenter()
+    + EvalDevelopment()
+    + EvalAttackAroundKing()
+    + EvalKnightPosition()
+    + EvalRookPosition()
+    + EvalKingPositionMiddle()
+    + EvalIsoPawn()
+    + EvalEarlyQueenLaunched()
+    + EvalPawnShield()
+    + EvalCastling()));
+
+    // 終盤用評価値。
+    int ending_score = static_cast<int>((1.0 - phase)
+    * EvalKingPositionEnding());
+
+    return all_score + middle_score + ending_score;
+  }
+
   /****************************/
   /* 局面評価に使用する関数。 */
   /****************************/
@@ -275,6 +322,26 @@ namespace Sayuri {
     }
 
     return iso_pawns;
+  }
+
+  // 進行状況を得る。
+  double Evaluator::GetPhase() {
+    // xの最大値。駒の数。
+    constexpr double max_pieces = 14.0;
+    // yの最大値。進行状況。
+    constexpr double max_phase = 1.0;
+
+    // キングとポーン以外の駒で進行状況を考える。
+    double num_pieces = static_cast<double>(Util::CountBits
+    (engine_ptr_->blocker_0_ & ~(engine_ptr_->position_[WHITE][PAWN]
+    | engine_ptr_->position_[BLACK][PAWN]
+    | engine_ptr_->position_[WHITE][KING]
+    | engine_ptr_->position_[BLACK][KING])));
+
+    if (num_pieces > max_pieces) num_pieces = max_pieces;
+
+    // 一次関数にして返す。
+    return (max_phase / max_pieces) * num_pieces;
   }
 
   /************************/
@@ -494,7 +561,7 @@ namespace Sayuri {
           break;
       }
       num_enemy_attacks += Util::CountBits(attacks
-      & Util::GetKingMove(engine_ptr_->king_[enemy_side]));
+      & Util::GetKingMove(engine_ptr_->king_[side]));
     }
 
     return WEIGHT_ATTACK_AROUND_KING * (num_my_attacks - num_enemy_attacks);

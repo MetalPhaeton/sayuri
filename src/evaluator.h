@@ -138,11 +138,11 @@ namespace Sayuri {
       // ポーンの配置の重さ。
       static constexpr int WEIGHT_PAWN_POSITION = 10;
       // ナイトの配置の重さ。
-      static constexpr int WEIGHT_KNIGHT_POSITION = 20;
+      static constexpr int WEIGHT_KNIGHT_POSITION = 10;
       // ルークの配置の重さ。
       static constexpr int WEIGHT_ROOK_POSITION = 30;
       // キングの中盤の配置の重さ。
-      static constexpr int WEIGHT_KING_POSITION_MIDDLE = 50;
+      static constexpr int WEIGHT_KING_POSITION_MIDDLE = 30;
       // キングの終盤の配置の重さ。
       static constexpr int WEIGHT_KING_POSITION_ENDING = 10;
 
@@ -169,10 +169,6 @@ namespace Sayuri {
       /************************/
       /* 局面を評価する関数。 */
       /************************/
-      // 全てを評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalAll();
       // 機動力を評価する。
       // [戻り値]
       // 評価値。
@@ -270,6 +266,11 @@ namespace Sayuri {
       // [戻り値]
       // 孤立ポーンの位置のビットボード。
       Bitboard GetIsoPawns(Side side);
+      // 局面の進行状況を得る。
+      // [戻り値]
+      // 進行状況。0.0以上、1.0以下。
+      // 値が小さいほどエンディングに近い。
+      double GetPhase();
 
       /****************/
       /* 局面分析用。 */

@@ -49,6 +49,7 @@ namespace Sayuri {
       /* テスト用関数。 */
       /******************/
       void Test();
+      void PrintEvaluator(Evaluator& eval);
 
       /*******************************/
       /* ChessEngineクラスの初期化。 */

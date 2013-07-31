@@ -34,9 +34,8 @@
 #include "fen.h"
 #include "transposition_table.h"
 #include "chess_engine.h"
-#include "move.h"
-#include "game_record.h"
-#include "opening_book.h"
-#include "pgn_parser.h"
+#include "move_maker.h"
+#include "pv_line.h"
+#include "evaluator.h"
 
 #endif
