@@ -44,39 +44,39 @@ namespace Sayuri {
   extern void PrintMove(Move move);
 
   void ChessEngine::Test() {
-    std::string fen_str = "8/p7/3p1k2/P2P1p1p/5K2/1R4PP/1p3P2/r7 b -";
+    std::string fen_str = "rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq";
     Fen fen(fen_str);
     LoadFen(fen);
 
     Evaluator eval(this);
-    int value = eval.Evaluate();
 
     PrintPosition(position_);
     std::cout << "Phase: " << eval.GetPhase() << std::endl;
-    std::cout << "Value: " << value << std::endl;
+    std::cout << "Advantage: " << eval.Evaluate() << std::endl;
     PrintEvaluator(eval);
   }
 
-  // 各評価値をプリント。
+  // 評価値をプリント。改造版。
   void ChessEngine::PrintEvaluator(Evaluator& eval) {
     std::cout << "----------------------------------------" << std::endl;
-    std::cout << "Material: " << GetMaterial(to_move_) << std::endl;
-    std::cout << "EvalMobility: " << eval.EvalMobility() << std::endl;
-    std::cout << "EvalAttackCenter: " << eval.EvalAttackCenter() << std::endl;
-    std::cout << "EvalDevelopment: " << eval.EvalDevelopment() << std::endl;
-    std::cout << "EvalAttackAroundKing: " << eval.EvalAttackAroundKing() << std::endl;
-    std::cout << "EvalPawnPosition: " << eval.EvalPawnPosition() << std::endl;
-    std::cout << "EvalKnightPosition: " << eval.EvalKnightPosition() << std::endl;
-    std::cout << "EvalRookPosition: " << eval.EvalRookPosition() << std::endl;
-    std::cout << "EvalKingPositionMiddle: " << eval.EvalKingPositionMiddle() << std::endl;
-    std::cout << "EvalKingPositionEnding: " << eval.EvalKingPositionEnding() << std::endl;
-    std::cout << "EvalPassPawn: " << eval.EvalPassPawn() << std::endl;
-    std::cout << "EvalDoublePawn: " << eval.EvalDoublePawn() << std::endl;
-    std::cout << "EvalIsoPawn: " << eval.EvalIsoPawn() << std::endl;
-    std::cout << "EvalBishopPair: " << eval.EvalBishopPair() << std::endl;
-    std::cout << "EvalEarlyQueenLaunched: " << eval.EvalEarlyQueenLaunched() << std::endl;
-    std::cout << "EvalPawnShield: " << eval.EvalPawnShield() << std::endl;
-    std::cout << "EvalCastling: " << eval.EvalCastling() << std::endl;
+    std::cout << "material_value: " << eval.material_value_ << std::endl;
+    std::cout << "mobility_value: " << eval.mobility_value_ << std::endl;
+    std::cout << "center_control_value: " << eval.center_control_value_ << std::endl;
+    std::cout << "development_value: " << eval.development_value_ << std::endl;
+    std::cout << "attack_around_king_value: " << eval.attack_around_king_value_ << std::endl;
+    std::cout << "pawn_position_value: " << eval.pawn_position_value_ << std::endl;
+    std::cout << "knight_position_value: " << eval.knight_position_value_ << std::endl;
+    std::cout << "rook_position_value: " << eval.rook_position_value_ << std::endl;
+    std::cout << "king_position_middle_value: " << eval.king_position_middle_value_ << std::endl;
+    std::cout << "king_position_ending_value: " << eval.king_position_ending_value_ << std::endl;
+    std::cout << "pass_pawn_value: " << eval.pass_pawn_value_ << std::endl;
+    std::cout << "protected_pass_pawn_value: " << eval.protected_pass_pawn_value_ << std::endl;
+    std::cout << "double_pawn_value: " << eval.double_pawn_value_ << std::endl;
+    std::cout << "iso_pawn_value: " << eval.iso_pawn_value_ << std::endl;
+    std::cout << "bishop_pair_value: " << eval.bishop_pair_value_ << std::endl;
+    std::cout << "early_queen_launched_value: " << eval.early_queen_launched_value_ << std::endl;
+    std::cout << "pawn_shield_value: " << eval.pawn_shield_value_ << std::endl;
+    std::cout << "castling_value: " << eval.castling_value_ << std::endl;
     std::cout << "----------------------------------------" << std::endl;
   }
 }  // namespace Sayuri

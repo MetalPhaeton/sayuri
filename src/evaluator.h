@@ -124,7 +124,7 @@ namespace Sayuri {
       // 機動力の重さ。
       static constexpr int WEIGHT_MOBILITY = 2;
       // センター攻撃の重さ。
-      static constexpr int WEIGHT_ATTACK_CENTER = 5;
+      static constexpr int WEIGHT_CENTER_CONTROL = 5;
       // スウィートセンター攻撃の重さ。
       static constexpr int WEIGHT_ATTACK_SWEET_CENTER = 5;
       // 展開の重さ。
@@ -158,7 +158,7 @@ namespace Sayuri {
       // 孤立ポーンの重さ。
       static constexpr int WEIGHT_ISO_PAWN = -5;
       // ビショップペアの重さ。
-      static constexpr int WEIGHT_BISHOP_PAIR = 50;
+      static constexpr int WEIGHT_BISHOP_PAIR = 25;
       // 早すぎるクイーンの出動の重さ。
       static constexpr int WEIGHT_EARLY_QUEEN_LAUNCHED = -30;
       // ポーンの盾の重さ。
@@ -167,72 +167,58 @@ namespace Sayuri {
       static constexpr int WEIGHT_CASTLING = 50;
 
       /************************/
-      /* 局面を評価する関数。 */
+      /* 価値を計算する関数。 */
       /************************/
-      // 機動力を評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalMobility();
-      // センター攻撃を評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalAttackCenter();
-      // 展開を評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalDevelopment();
-      // キングの周囲への攻撃を評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalAttackAroundKing();
-      // ポーンの配置を評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalPawnPosition();
-      // ナイトの配置を評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalKnightPosition();
-      // ルークの配置を評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalRookPosition();
-      // キングの中盤の配置を評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalKingPositionMiddle();
-      // キングの終盤の配置を評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalKingPositionEnding();
-      // パスポーンを評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalPassPawn();
-      // ダブルポーンを評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalDoublePawn();
-      // 孤立ポーンを評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalIsoPawn();
-      // ビショップペアを評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalBishopPair();
-      // 早すぎるクイーンの出動を評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalEarlyQueenLaunched();
-      // ポーンの盾を評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalPawnShield();
-      // キャスリングの評価する。
-      // [戻り値]
-      // 評価値。
-      int EvalCastling();
+      // 価値の変数。
+      int material_value_;  // マテリアル。
+      int mobility_value_;  // 駒の動きやすさ。
+      int center_control_value_;  // センター支配。
+      int sweet_center_control_value_;  // センター支配。
+      int development_value_;  // 駒の展開。
+      int attack_around_king_value_;  // キング周辺への攻撃。
+      int pawn_position_value_;  // ポーンの配置。
+      int knight_position_value_;  // ナイトの配置。
+      int rook_position_value_;  // ルークの配置。
+      int king_position_middle_value_;  // キングの中盤の配置。
+      int king_position_ending_value_;  // キングの終盤の配置。
+      int pass_pawn_value_;  // パスポーン。
+      int protected_pass_pawn_value_;  // 守られたパスポーン。
+      int double_pawn_value_;  // ダブルポーン。
+      int iso_pawn_value_;  // 孤立ポーン。
+      int bishop_pair_value_;  // ビショップペア。
+      int early_queen_launched_value_;  // 早すぎるクイーンの始動。
+      int pawn_shield_value_;  // ポーンの盾。
+      int castling_value_;  // キャスリング。
+      // ポーンの価値を計算する。
+      // [引数]
+      // piece_square: 駒の位置。
+      // piece_side: 駒のサイド。
+      void CalPawnValue(Square piece_square, Side piece_side);
+      // ナイトの価値を計算する。
+      // [引数]
+      // piece_square: 駒の位置。
+      // piece_side: 駒のサイド。
+      void CalKnightValue(Square piece_square, Side piece_side);
+      // ビショップの価値を計算する。
+      // [引数]
+      // piece_square: 駒の位置。
+      // piece_side: 駒のサイド。
+      void CalBishopValue(Square piece_square, Side piece_side);
+      // ルークの価値を計算する。
+      // [引数]
+      // piece_square: 駒の位置。
+      // piece_side: 駒のサイド。
+      void CalRookValue(Square piece_square, Side piece_side);
+      // クイーンの価値を計算する。
+      // [引数]
+      // piece_square: 駒の位置。
+      // piece_side: 駒のサイド。
+      void CalQueenValue(Square piece_square, Side piece_side);
+      // キングの価値を計算する。
+      // [引数]
+      // piece_square: 駒の位置。
+      // piece_side: 駒のサイド。
+      void CalKingValue(Square piece_square, Side piece_side);
 
       /****************************/
       /* 局面評価に使用する関数。 */
@@ -242,30 +228,6 @@ namespace Sayuri {
       // [戻り値]
       // 十分な駒があればtrue。
       bool HasEnoughPieces(Side side);
-      // 動ける位置の数を得る。
-      // [引数]
-      // piece_square: 調べたい駒の位置。
-      // [戻り値]
-      // 動ける位置の数。
-      int GetMobility(Square piece_square);
-      // パスポーンの位置のビットボードを得る。
-      // [引数]
-      // side: 調べたいサイド。
-      // [戻り値]
-      // パスポーンの位置のビットボード。
-      Bitboard GetPassPawns(Side side);
-      // ダブルポーンの位置のビットボードを得る。
-      // [引数]
-      // side: 調べたいサイド。
-      // [戻り値]
-      // ダブルポーンの位置のビットボード。
-      Bitboard GetDoublePawns(Side side);
-      // 孤立ポーンの位置のビットボードを得る。
-      // [引数]
-      // side: 調べたいサイド。
-      // [戻り値]
-      // 孤立ポーンの位置のビットボード。
-      Bitboard GetIsoPawns(Side side);
       // 局面の進行状況を得る。
       // [戻り値]
       // 進行状況。0.0以上、1.0以下。
@@ -275,16 +237,6 @@ namespace Sayuri {
       /****************/
       /* 局面分析用。 */
       /****************/
-      // テーブルを計算する。
-      // [引数]
-      // table: 計算するテーブル。
-      // side: 計算したいサイド。
-      // bitboard: 位置のビットボード。
-      // [戻り値]
-      // テーブルを計算した結果の値。
-      static int GetTableValue(const int (& table)[NUM_SQUARES], Side side,
-      Bitboard bitboard);
-
       // 駒の初期位置。
       static Bitboard start_position_[NUM_SIDES][NUM_PIECE_TYPES];
       // 駒の初期位置を初期化。

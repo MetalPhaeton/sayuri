@@ -50,6 +50,7 @@ namespace Sayuri {
       /******************/
       void Test();
       void PrintEvaluator(Evaluator& eval);
+      void PrintEvaluator2(Evaluator& eval);
 
       /*******************************/
       /* ChessEngineクラスの初期化。 */
