@@ -35,9 +35,6 @@ namespace Sayuri {
   class ChessEngine;
 
   class MoveMaker {
-    // Test
-    friend class ChessEngine;
-
     private:
       // 手の構造体。
       struct MoveSlot {
@@ -88,6 +85,11 @@ namespace Sayuri {
       Move PickMove();
 
     private:
+      /**************/
+      /* テスト用。 */
+      /**************/
+      friend class ChessEngine;
+
       /**********************/
       /* プライベート関数。 */
       /**********************/

@@ -57,7 +57,9 @@ namespace Sayuri {
       int Evaluate2();
 
     private:
-      // デバッグ用。
+      /**************/
+      /* テスト用。 */
+      /**************/
       friend class ChessEngine;
 
       /******************************/
