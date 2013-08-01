@@ -44,12 +44,11 @@ namespace Sayuri {
   extern void PrintMove(Move move);
 
   void ChessEngine::Test() {
-    std::string fen_str = "rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq";
+    std::string fen_str = "8/p7/3p1k2/P2P1p1p/5K2/1R4PP/1p3P2/r7 b -";
     Fen fen(fen_str);
     LoadFen(fen);
 
     Evaluator eval(this);
-
     PrintPosition(position_);
     std::cout << "Phase: " << eval.GetPhase() << std::endl;
     std::cout << "Advantage: " << eval.Evaluate() << std::endl;
@@ -64,9 +63,11 @@ namespace Sayuri {
     std::cout << "center_control_value: " << eval.center_control_value_ << std::endl;
     std::cout << "development_value: " << eval.development_value_ << std::endl;
     std::cout << "attack_around_king_value: " << eval.attack_around_king_value_ << std::endl;
-    std::cout << "pawn_position_value: " << eval.pawn_position_value_ << std::endl;
-    std::cout << "knight_position_value: " << eval.knight_position_value_ << std::endl;
-    std::cout << "rook_position_value: " << eval.rook_position_value_ << std::endl;
+    std::cout << "position_value[PAWN]: " << eval.position_value_[PAWN] << std::endl;
+    std::cout << "position_value[KNIGHT]: " << eval.position_value_[KNIGHT] << std::endl;
+    std::cout << "position_value[BISHOP]: " << eval.position_value_[BISHOP] << std::endl;
+    std::cout << "position_value[ROOK]: " << eval.position_value_[ROOK] << std::endl;
+    std::cout << "position_value[QUEEN]: " << eval.position_value_[QUEEN] << std::endl;
     std::cout << "king_position_middle_value: " << eval.king_position_middle_value_ << std::endl;
     std::cout << "king_position_ending_value: " << eval.king_position_ending_value_ << std::endl;
     std::cout << "pass_pawn_value: " << eval.pass_pawn_value_ << std::endl;

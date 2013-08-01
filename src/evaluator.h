@@ -54,6 +54,7 @@ namespace Sayuri {
       // [戻り値]
       // 評価値。
       int Evaluate();
+      int Evaluate2();
 
     private:
       // デバッグ用。
@@ -62,40 +63,80 @@ namespace Sayuri {
       /******************************/
       /* 駒の配置の重要度テーブル。 */
       /******************************/
-      // ポーンの配置の重要度。
-      static constexpr int PAWN_POSITION_TABLE[NUM_SQUARES] {
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        1, 1, 1, 1, 1, 1, 1, 1,
-        2, 2, 2, 2, 2, 2, 2, 2,
-        3, 3, 3, 3, 3, 3, 3, 3,
-        4, 4, 4, 4, 4, 4, 4, 4,
-        5, 5, 5, 5, 5, 5, 5, 5,
-        6, 6, 6, 6, 6, 6, 6, 6
+      // 各駒の配置の価値。
+      static constexpr int POSITION_TABLE[NUM_PIECE_TYPES][NUM_SQUARES] {
+        {
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0
+        },
+        {
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          1, 1, 1, 1, 1, 1, 1, 1,
+          2, 2, 2, 2, 2, 2, 2, 2,
+          3, 3, 3, 3, 3, 3, 3, 3,
+          4, 4, 4, 4, 4, 4, 4, 4,
+          5, 5, 5, 5, 5, 5, 5, 5,
+          6, 6, 6, 6, 6, 6, 6, 6
+        },
+        {
+          -3, -2, -1, -1, -1, -1, -2, -3,
+          -2, -1,  0,  0,  0,  0, -1, -2,
+          -1,  0,  1,  1,  1,  1,  0, -1,
+           0,  1,  2,  2,  2,  2,  1,  0,
+           1,  2,  3,  3,  3,  3,  2,  1,
+           2,  3,  4,  4,  4,  4,  3,  2,
+           1,  2,  3,  3,  3,  3,  2,  1,
+           0,  1,  2,  2,  2,  2,  1,  0
+        },
+        {
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0
+        },
+        {
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          1, 1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1, 1
+        },
+        {
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0
+        },
+        {
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0
+        }
       };
-      // ナイトの駒の配置の重要度。
-      static constexpr int KNIGHT_POSITION_TABLE[NUM_SQUARES] {
-        -3, -2, -1, -1, -1, -1, -2, -3,
-        -2, -1,  0,  0,  0,  0, -1, -2,
-        -1,  0,  1,  1,  1,  1,  0, -1,
-         0,  1,  2,  2,  2,  2,  1,  0,
-         1,  2,  3,  3,  3,  3,  2,  1,
-         2,  3,  4,  4,  4,  4,  3,  2,
-         1,  2,  3,  3,  3,  3,  2,  1,
-         0,  1,  2,  2,  2,  2,  1,  0
-      };
-      // ルークの駒の配置の重要度。
-      static constexpr int ROOK_POSITION_TABLE[NUM_SQUARES] {
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1
-      };
-      // キングの中盤の駒の配置の重要度。
+      // キングの中盤の駒の配置の価値。
       static constexpr int KING_POSITION_MIDDLE_TABLE[NUM_SQUARES] {
          1,  1,  0, -1, -1,  0,  1,  1,
          0,  0, -1, -2, -2, -1,  0,  0,
@@ -106,7 +147,7 @@ namespace Sayuri {
          0,  0, -1, -2, -2, -1,  0,  0,
          1,  1,  0, -1, -1,  0,  1,  1
       };
-      // キングの終盤の駒の配置の重要度。
+      // キングの終盤の駒の配置の価値。
       static constexpr int KING_POSITION_ENDING_TABLE[NUM_SQUARES] {
         0, 1, 2, 3, 3, 2, 1, 0,
         1, 2, 3, 4, 4, 3, 2, 1,
@@ -139,8 +180,12 @@ namespace Sayuri {
       static constexpr int WEIGHT_PAWN_POSITION = 10;
       // ナイトの配置の重さ。
       static constexpr int WEIGHT_KNIGHT_POSITION = 10;
+      // ビショップの配置の重さ。
+      static constexpr int WEIGHT_BISHOP_POSITION = 0;
       // ルークの配置の重さ。
       static constexpr int WEIGHT_ROOK_POSITION = 30;
+      // クイーンの配置の重さ。
+      static constexpr int WEIGHT_QUEEN_POSITION = 0;
       // キングの中盤の配置の重さ。
       static constexpr int WEIGHT_KING_POSITION_MIDDLE = 30;
       // キングの終盤の配置の重さ。
@@ -176,9 +221,7 @@ namespace Sayuri {
       int sweet_center_control_value_;  // センター支配。
       int development_value_;  // 駒の展開。
       int attack_around_king_value_;  // キング周辺への攻撃。
-      int pawn_position_value_;  // ポーンの配置。
-      int knight_position_value_;  // ナイトの配置。
-      int rook_position_value_;  // ルークの配置。
+      int position_value_[NUM_PIECE_TYPES];  // 各駒の配置。
       int king_position_middle_value_;  // キングの中盤の配置。
       int king_position_ending_value_;  // キングの終盤の配置。
       int pass_pawn_value_;  // パスポーン。
@@ -189,36 +232,13 @@ namespace Sayuri {
       int early_queen_launched_value_;  // 早すぎるクイーンの始動。
       int pawn_shield_value_;  // ポーンの盾。
       int castling_value_;  // キャスリング。
-      // ポーンの価値を計算する。
+      // 各駒での価値を計算する。
       // [引数]
+      // <Type>: 計算したい駒。
       // piece_square: 駒の位置。
       // piece_side: 駒のサイド。
-      void CalPawnValue(Square piece_square, Side piece_side);
-      // ナイトの価値を計算する。
-      // [引数]
-      // piece_square: 駒の位置。
-      // piece_side: 駒のサイド。
-      void CalKnightValue(Square piece_square, Side piece_side);
-      // ビショップの価値を計算する。
-      // [引数]
-      // piece_square: 駒の位置。
-      // piece_side: 駒のサイド。
-      void CalBishopValue(Square piece_square, Side piece_side);
-      // ルークの価値を計算する。
-      // [引数]
-      // piece_square: 駒の位置。
-      // piece_side: 駒のサイド。
-      void CalRookValue(Square piece_square, Side piece_side);
-      // クイーンの価値を計算する。
-      // [引数]
-      // piece_square: 駒の位置。
-      // piece_side: 駒のサイド。
-      void CalQueenValue(Square piece_square, Side piece_side);
-      // キングの価値を計算する。
-      // [引数]
-      // piece_square: 駒の位置。
-      // piece_side: 駒のサイド。
-      void CalKingValue(Square piece_square, Side piece_side);
+      template<Piece Type>
+      void CalValue(Square piece_square, Side piece_side);
 
       /****************************/
       /* 局面評価に使用する関数。 */
