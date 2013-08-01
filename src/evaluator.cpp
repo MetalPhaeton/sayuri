@@ -275,6 +275,8 @@ namespace Sayuri {
     constexpr double MAX_PIECES = 14.0;
     // yの最大値。進行状況。
     constexpr double MAX_PHASE = 1.0;
+    // 係数。
+    constexpr double MODULUS = MAX_PHASE / MAX_PIECES;
 
     // キングとポーン以外の駒で進行状況を考える。
     double num_pieces = static_cast<double>(Util::CountBits
@@ -286,7 +288,7 @@ namespace Sayuri {
     if (num_pieces > MAX_PIECES) num_pieces = MAX_PIECES;
 
     // 一次関数にして返す。
-    return (MAX_PHASE / MAX_PIECES) * num_pieces;
+    return MODULUS * num_pieces;
   }
 
   /************************/
