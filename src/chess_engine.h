@@ -35,6 +35,7 @@
 #include "transposition_table.h"
 #include "fen.h"
 #include "move_maker.h"
+#include "pv_line.h"
 #include "evaluator.h"
 
 namespace Sayuri {
@@ -82,6 +83,12 @@ namespace Sayuri {
       // 新しいゲームの準備をする。
       void SetNewGame();
 
+      /****************/
+      /* static関数。 */
+      /****************/
+      // 思考開始する。
+      static void GoThinking(ChessEngine& engine);
+
     private:
       /**************/
       /* フレンド。 */
@@ -106,6 +113,24 @@ namespace Sayuri {
       // [引数]
       // move: MakeMove()で動かした手。
       void UnmakeMove(Move move);
+
+      /******************/
+      /* 探索エンジン。 */
+      /******************/
+      // 最大探索数。
+      std::size_t max_nodes_;
+      // 探索したノード数。
+      volatile std::size_t num_searched_nodes_;
+      // クイース探索。
+      // [引数]
+      // pos_key: 現在のハッシュキー。
+      // depth: 現在の深さ。
+      // level: 現在のレベル。
+      // alpha: アルファ値。
+      // beta: ベータ値。
+      // table: トランスポジションテーブル。
+      int Quiesce(HashKey pos_key, int depth, int level,
+      int alpha, int beta, TranspositionTable& table);
 
       /******************************/
       /* その他のプライベート関数。 */

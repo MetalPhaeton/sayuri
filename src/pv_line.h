@@ -32,6 +32,46 @@
 #include "chess_def.h"
 
 namespace Sayuri {
+  class PVLine;
+
+  // PVLineのスロット。
+  class PVSlot {
+    public:
+      /********************/
+      /* コンストラクタ。 */
+      /********************/
+      // コンストラクタ。
+      PVSlot();
+      PVSlot(const PVSlot& slot);
+      PVSlot(PVSlot&& slot);
+      PVSlot& operator=(const PVSlot& slot);
+      PVSlot& operator=(PVSlot&& slot);
+      virtual ~PVSlot() {}
+
+      /**************/
+      /* アクセサ。 */
+      /**************/
+      // 手。
+      Move move() const {return move_;}
+      // チェックメイトされたか。
+      bool has_checkmated() const {return has_checkmated_;}
+
+    private:
+      /**************/
+      /* フレンド。 */
+      /**************/
+      friend class PVLine;
+
+      /****************/
+      /* メンバ変数。 */
+      /****************/
+      // 手。
+      Move move_;
+      // チェックメイトされたか。
+      bool has_checkmated_;
+  };
+
+  // PVライン。
   class PVLine {
     public:
       /********************/
@@ -50,11 +90,13 @@ namespace Sayuri {
       // 最初の要素に手を登録する。
       // [引数]
       // move: セットする手。
-      void SetFirst(Move move);
+      PVLine& operator=(Move move);
       // PVLineを2番目以降の要素にコピーする。
       // [引数]
       // pv_line: コピーするライン。
-      void Insert(const PVLine& pv_line);
+      PVLine& operator+=(const PVLine& pv_line);
+      // 最初の要素にチェックメイトされたことを記録する。
+      void MarkCheckmated();
 
       /**************/
       /* アクセサ。 */
@@ -62,13 +104,13 @@ namespace Sayuri {
       // 長さ。
       std::size_t length() const {return length_;}
       // ライン。
-      const Move (& line() const)[MAX_PLY] {return line_;}
+      const PVSlot (& line() const)[MAX_PLY + 1] {return line_;}
     private:
       /****************/
       /* メンバ変数。 */
       /****************/
       std::size_t length_;
-      Move line_[MAX_PLY];
+      PVSlot line_[MAX_PLY + 1];
   };
 }  // namespace_Sayuri
 

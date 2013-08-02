@@ -170,11 +170,11 @@ namespace Sayuri {
 
         // 展開するタイプによって候補手を選り分ける。。
         if (Type == GenMoveType::NON_CAPTURE) {
+          // キャプチャーじゃない手。
           move_bitboard &= ~(engine_ptr_->blocker_0_);
-        } else if (Type == GenMoveType::CAPTURE) {
-          move_bitboard &= engine_ptr_->side_pieces_[enemy_side];
         } else {
-          move_bitboard &= ~(engine_ptr_->side_pieces_[side]);
+          // キャプチャーの手。
+          move_bitboard &= engine_ptr_->side_pieces_[enemy_side];
         }
 
         for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
@@ -200,6 +200,7 @@ namespace Sayuri {
       from = Util::GetSquare(pieces);
 
       if (Type == GenMoveType::NON_CAPTURE) {
+        // キャプチャーじゃない手。
         // ポーンの一歩の動き。
         move_bitboard = Util::GetPawnMove(from, side)
         & ~(engine_ptr_->blocker_0_);
@@ -211,7 +212,8 @@ namespace Sayuri {
             & ~(engine_ptr_->blocker_0_);
           }
         }
-      } else if (Type == GenMoveType::CAPTURE) {
+      } else {
+        // キャプチャーの手。
         move_bitboard = Util::GetPawnAttack(from, side)
         & engine_ptr_->side_pieces_[enemy_side];
         // アンパッサンがある場合。
@@ -219,26 +221,7 @@ namespace Sayuri {
           move_bitboard |= Util::BIT[engine_ptr_->en_passant_square_]
           & Util::GetPawnAttack(from, side);
         }
-      } else { 
-        // ポーンの一歩の動き。
-        move_bitboard = Util::GetPawnMove(from, side)
-        & ~(engine_ptr_->blocker_0_);
-        if (move_bitboard) {
-          if (((side == WHITE) && (Util::GetRank(from) == RANK_2))
-          || ((side == BLACK) && (Util::GetRank(from) == RANK_7))) {
-            // ポーンの2歩の動き。
-            move_bitboard |= Util::GetPawn2StepMove(from, side)
-            & ~(engine_ptr_->blocker_0_);
-          }
-        }
-        // 駒を取る動き。
-        move_bitboard |= Util::GetPawnAttack(from, side)
-        & engine_ptr_->side_pieces_[enemy_side];
-        if (engine_ptr_->can_en_passant_) {
-          move_bitboard |= Util::BIT[engine_ptr_->en_passant_square_]
-          & Util::GetPawnAttack(from, side);
-        }
-      }
+      } 
 
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
         move.all_ = 0;
@@ -276,6 +259,7 @@ namespace Sayuri {
     from = engine_ptr_->king_[side];
     move_bitboard = Util::GetKingMove(from);
     if (Type == GenMoveType::NON_CAPTURE) {
+      // キャプチャーじゃない手。
       move_bitboard &= ~(engine_ptr_->blocker_0_);
       // キャスリングの動きを追加。
       if (side == WHITE) {
@@ -293,26 +277,9 @@ namespace Sayuri {
           move_bitboard |= Util::BIT[C8];
         }
       }
-    } else if (Type == GenMoveType::CAPTURE) {
-      move_bitboard &= engine_ptr_->side_pieces_[enemy_side];
     } else {
-      move_bitboard &= ~(engine_ptr_->side_pieces_[side]);
-      // キャスリングの動きを追加。
-      if (side == WHITE) {
-        if (engine_ptr_->CanCastling<WHITE_SHORT_CASTLING>()) {
-          move_bitboard |= Util::BIT[G1];
-        }
-        if (engine_ptr_->CanCastling<WHITE_LONG_CASTLING>()) {
-          move_bitboard |= Util::BIT[C1];
-        }
-      } else {
-        if (engine_ptr_->CanCastling<BLACK_SHORT_CASTLING>()) {
-          move_bitboard |= Util::BIT[G8];
-        }
-        if (engine_ptr_->CanCastling<BLACK_LONG_CASTLING>()) {
-          move_bitboard |= Util::BIT[C8];
-        }
-      }
+      // キャプチャーの手。
+      move_bitboard &= engine_ptr_->side_pieces_[enemy_side];
     }
     for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
       move.all_ = 0;
@@ -347,7 +314,7 @@ namespace Sayuri {
   <GenMoveType::CAPTURE>(HashKey pos_key, int depth, int level,
   const TranspositionTable& table);
   template<>
-  void MoveMaker::GenMoves<GenMoveType::LEGAL>(HashKey pos_key,
+  void MoveMaker::GenMoves<GenMoveType::ALL>(HashKey pos_key,
   int depth, int level, const TranspositionTable& table) {
     GenMoves<GenMoveType::NON_CAPTURE>(pos_key, depth, level, table);
     GenMoves<GenMoveType::CAPTURE>(pos_key, depth, level, table);
@@ -357,33 +324,24 @@ namespace Sayuri {
   Move MoveMaker::PickMove() {
     MoveSlot slot;
     slot.move_.all_ = 0;
+
+    // 手がなければ何もしない。
+    if (last_ <= begin_) {
+      return slot.move_;
+    }
+
+    // とりあえず最後の手をポップ。
+    last_--;
+    slot = *last_;
+
+    // 一番高い手を探し、スワップ。
     MoveSlot temp;
-    Side side = engine_ptr_->to_move_;
-    Side enemy_side = side ^ 0x3;
-    while (last_ > begin_) {
-      // とりあえず最後の手をポップ。
-      last_--;
-      slot = *last_;
-
-      // 一番高い手を探し、スワップ。
-      for (MoveSlot* ptr = begin_; ptr < last_; ptr++) {
-        if (ptr->score_ > slot.score_) {
-          temp = *ptr;
-          *ptr = slot;
-          slot = temp;
-        }
+    for (MoveSlot* ptr = begin_; ptr < last_; ptr++) {
+      if (ptr->score_ > slot.score_) {
+        temp = *ptr;
+        *ptr = slot;
+        slot = temp;
       }
-
-      // 合法手かどうか調べる。
-      // 合法手ならループを抜ける。
-      engine_ptr_->MakeMove(slot.move_);
-      if (!(engine_ptr_->IsAttacked(engine_ptr_->king_[side], enemy_side))) {
-        engine_ptr_->UnmakeMove(slot.move_);
-        break;
-      }
-      engine_ptr_->UnmakeMove(slot.move_);
-
-      slot.move_.all_ = 0;
     }
 
     return slot.move_;

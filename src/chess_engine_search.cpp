@@ -36,4 +36,60 @@
 #include "error.h"
 
 namespace Sayuri {
+  // クイース探索。
+  int ChessEngine::Quiesce(HashKey pos_key, int depth, int level,
+  int alpha, int beta, TranspositionTable& table) {
+    // ノード数を加算。
+    num_searched_nodes_++;
+
+    // stand_pad。
+    Evaluator eval(this);
+    int stand_pad = eval.Evaluate();
+
+    // アルファ値、ベータ値を調べる。
+    if (stand_pad >= beta) return beta;
+    if (stand_pad > alpha) alpha = stand_pad;
+
+    // 探索できる限界を超えているか。
+    // 超えていればこれ以上探索しない。
+    if ((level >= MAX_PLY) || (num_searched_nodes_ >= max_nodes_)) {
+      return alpha;
+    }
+
+    // サイド。
+    Side side = to_move_;
+    Side enemy_side = side ^ 0x3;
+
+    // 候補手を作る。
+    MoveMaker maker(this);
+    if (IsAttacked(king_[side], enemy_side)) {
+      maker.GenMoves<GenMoveType::ALL>(pos_key, depth, level, table);
+    } else {
+      maker.GenMoves<GenMoveType::CAPTURE>(pos_key, depth, level, table);
+    }
+
+    // 探索する。
+    int score;
+    for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
+      MakeMove(move);
+
+      // 合法手かどうか調べる。
+      if (IsAttacked(king_[side], enemy_side)) {
+        UnmakeMove(move);
+        continue;
+      }
+
+      // 次の手を探索。
+      score = -Quiesce(GetNextKey(pos_key, move),
+      depth - 1, level + 1, -beta, -alpha, table);
+
+      UnmakeMove(move);
+
+      // アルファ値、ベータ値を調べる。
+      if (score >= beta) return beta;
+      if (score > alpha) alpha = score;
+    }
+
+    return alpha;
+  }
 }  // namespace Sayuri

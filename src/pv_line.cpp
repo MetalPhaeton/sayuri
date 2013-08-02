@@ -1,5 +1,5 @@
 /*
-   _pv_line.cpp: PVのラインを格納するクラスの実装。
+   pv_line.cpp: PVのラインを格納するクラスの実装。
 
    The MIT License (MIT)
 
@@ -31,6 +31,9 @@
 #include "chess_def.h"
 
 namespace Sayuri {
+  /**********/
+  /* PVLine */
+  /**********/
   /********************/
   /* コンストラクタ。 */
   /********************/
@@ -75,19 +78,64 @@ namespace Sayuri {
   /* パブリック関数。 */
   /********************/
   // 最初の要素に手をセットする。
-  void PVLine::SetFirst(Move move) {
-    line_[0] = move;
-    if (length_ <= 0) length_ = 1;
+  PVLine& PVLine::operator=(Move move) {
+    line_[0].move_ = move;
+    length_ = 1;
+
+    return *this;
   }
 
   // PVラインを2番目以降の要素にコピーする。
-  void PVLine::Insert(const PVLine& pv_line) {
+  PVLine& PVLine::operator+=(const PVLine& pv_line) {
     length_ = pv_line.length_ + 1;
-    if (length_ > static_cast<std::size_t>(MAX_PLY))
-      length_ = MAX_PLY;
+    if (length_ > static_cast<std::size_t>(MAX_PLY + 1))
+      length_ = MAX_PLY + 1;
 
     for (std::size_t i = 1; i < length_; i++) {
       line_[i] = pv_line.line_[i - 1];
     }
+
+    return *this;
+  }
+
+  // 最初の要素にチェックメイトされたことを記録する。
+  void PVLine::MarkCheckmated() {
+    line_[0].has_checkmated_ = true;
+    length_ = 1;
+  }
+
+  /**********/
+  /* PVSlot */
+  /**********/
+  /********************/
+  /* コンストラクタ。 */
+  /********************/
+  // コンストラクタ。
+  PVSlot::PVSlot() : has_checkmated_(false) {
+    move_.all_ = 0;
+  }
+
+  // コピーコンストラクタ。
+  PVSlot::PVSlot(const PVSlot& slot) : has_checkmated_(slot.has_checkmated_) {
+    move_ = slot.move_;
+  }
+
+  // ムーブコンストラクタ。
+  PVSlot::PVSlot(PVSlot&& slot) : has_checkmated_(slot.has_checkmated_) {
+    move_ = slot.move_;
+  }
+
+  // コピー代入。
+  PVSlot& PVSlot::operator=(const PVSlot& slot) {
+    has_checkmated_ = slot.has_checkmated_;
+    move_ = slot.move_;
+    return *this;
+  }
+
+  // コピー代入。
+  PVSlot& PVSlot::operator=(PVSlot&& slot) {
+    has_checkmated_ = slot.has_checkmated_;
+    move_ = slot.move_;
+    return *this;
   }
 }  // namespace Sayuri

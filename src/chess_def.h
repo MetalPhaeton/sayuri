@@ -235,7 +235,7 @@ namespace Sayuri {
   enum class GenMoveType {
     NON_CAPTURE,  // 駒を取らない手。
     CAPTURE,  // 駒をとる手。
-    LEGAL  // 合法手。
+    ALL  // 両方。
   };
 }  // namespace Sayuri
 
