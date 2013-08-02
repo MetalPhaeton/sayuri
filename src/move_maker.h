@@ -41,7 +41,7 @@ namespace Sayuri {
         Move move_;
         int score_;
 
-        MoveSlot() : score_(0) {move_.all_ = 0;}
+        MoveSlot() : score_(-MAX_VALUE) {move_.all_ = 0;}
       };
 
       /**************/
@@ -66,7 +66,6 @@ namespace Sayuri {
       /* パブリック関数。 */
       /********************/
       // スタックに候補手を展開する関数。
-      // (注)TypeがNON_CAPTURE、CAPTUREの場合、
       // 自らチェックされる手も作る。
       // [引数]
       // pos_key: 現在の局面のハッシュキー。
@@ -75,10 +74,6 @@ namespace Sayuri {
       // table: トランスポジションテーブル。
       template<GenMoveType Type> void GenMoves(HashKey pos_key,
       int depth, int level, const TranspositionTable& table);
-      // 展開できた手の数を返す。
-      // [戻り値]
-      // 展開できたての数。
-      std::size_t GetSize() const;
       // 次の手を取り出す。
       // [戻り値]
       // 次の手。

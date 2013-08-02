@@ -1,4 +1,8 @@
-/* chess_engine_search.cpp: チェスボードの探索に関するもの。
+/* 
+   chess_engine_search.cpp: 探索の実装ファイル。
+
+   The MIT License (MIT)
+
    Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +22,7 @@
    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
    IN THE SOFTWARE.
- */
+*/
 
 #include "chess_engine.h"
 
@@ -26,6 +30,10 @@
 #include "chess_def.h"
 #include "chess_util.h"
 #include "transposition_table.h"
+#include "move_maker.h"
+#include "pv_line.h"
+#include "evaluator.h"
+#include "error.h"
 
 namespace Sayuri {
 }  // namespace Sayuri

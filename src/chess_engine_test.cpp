@@ -44,15 +44,25 @@ namespace Sayuri {
   extern void PrintMove(Move move);
 
   void ChessEngine::Test() {
-    std::string fen_str = "8/p7/3p1k2/P2P1p1p/5K2/1R4PP/1p3P2/r7 b -";
+    std::string fen_str = "rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq";
     Fen fen(fen_str);
     LoadFen(fen);
 
-    Evaluator eval(this);
+    ReplacePiece(D2, D3);
+
+    MoveMaker maker(this);
+    std::unique_ptr<TranspositionTable>
+    table(new TranspositionTable(10000000));
+
+    maker.GenMoves<GenMoveType::LEGAL>(GetCurrentKey(), 3, 3, *(table.get()));
     PrintPosition(position_);
-    std::cout << "Phase: " << eval.GetPhase() << std::endl;
-    std::cout << "Advantage: " << eval.Evaluate() << std::endl;
-    PrintEvaluator(eval);
+    std::cout << "----------------------------------------" << std::endl;
+    PrintMove(maker.PickMove());
+    std::cout << "----------------------------------------" << std::endl;
+    PrintMove(maker.PickMove());
+    std::cout << "----------------------------------------" << std::endl;
+    PrintMove(maker.PickMove());
+    std::cout << "----------------------------------------" << std::endl;
   }
 
   // 評価値をプリント。改造版。

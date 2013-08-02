@@ -184,19 +184,6 @@ namespace Sayuri {
           move.to_ = Util::GetSquare(move_bitboard);
           move.move_type_ = NORMAL;
 
-          // タイプが合法手の場合、
-          // その手を指した後、自分のキングが攻撃されているか調べる。
-          // 攻撃されていれば違法。
-          if (Type == GenMoveType::LEGAL) {
-            engine_ptr_->MakeMove(move);
-            if (engine_ptr_->IsAttacked(engine_ptr_->king_[side],
-            enemy_side)) {
-              engine_ptr_->UnmakeMove(move);
-              continue;
-            }
-            engine_ptr_->UnmakeMove(move);
-          }
-
           // スタックに登録。
           if (last_ < end_) {
             last_->move_ = move;
@@ -263,19 +250,6 @@ namespace Sayuri {
           move.move_type_ = EN_PASSANT;
         } else {
           move.move_type_ = NORMAL;
-        }
-
-        // タイプが合法手の場合、
-        // その手を指した後、自分のキングが攻撃されているか調べる。
-        // 攻撃されていれば違法。
-        if (Type == GenMoveType::LEGAL) {
-          engine_ptr_->MakeMove(move);
-          if (engine_ptr_->IsAttacked(engine_ptr_->king_[side],
-          enemy_side)) {
-            engine_ptr_->UnmakeMove(move);
-            continue;
-          }
-          engine_ptr_->UnmakeMove(move);
         }
 
         if (((side == WHITE) && (Util::GetRank(move.to_) == RANK_8))
@@ -355,18 +329,6 @@ namespace Sayuri {
         move.move_type_ = NORMAL;
       }
 
-      // タイプが合法手の場合、
-      // その手を指した後、自分のキングが攻撃されているか調べる。
-      // 攻撃されていれば違法。
-      if (Type == GenMoveType::LEGAL) {
-        engine_ptr_->MakeMove(move);
-        if (engine_ptr_->IsAttacked(engine_ptr_->king_[side], enemy_side)) {
-          engine_ptr_->UnmakeMove(move);
-          continue;
-        }
-        engine_ptr_->UnmakeMove(move);
-      }
-
       if (last_ < end_) {
         last_->move_ = move;
         last_++;
@@ -384,38 +346,44 @@ namespace Sayuri {
   template void MoveMaker::GenMoves
   <GenMoveType::CAPTURE>(HashKey pos_key, int depth, int level,
   const TranspositionTable& table);
-  template void MoveMaker::GenMoves
-  <GenMoveType::LEGAL>(HashKey pos_key, int depth, int level,
-  const TranspositionTable& table);
-
-  // 展開した手の数を返す。
-  std::size_t MoveMaker::GetSize() const {
-    std::size_t size = 0;
-    for (MoveSlot* ptr = begin_; ptr < last_; ptr++) {
-      size++;
-    }
-    return size;
+  template<>
+  void MoveMaker::GenMoves<GenMoveType::LEGAL>(HashKey pos_key,
+  int depth, int level, const TranspositionTable& table) {
+    GenMoves<GenMoveType::NON_CAPTURE>(pos_key, depth, level, table);
+    GenMoves<GenMoveType::CAPTURE>(pos_key, depth, level, table);
   }
 
   // 次の手を返す。
   Move MoveMaker::PickMove() {
-    // なければ無意味な手を返す。
-    if (begin_ == last_) {
-      Move move;
-      move.all_ = 0;
-      return move;
-    }
-    // とりあえず最後の手を取り出す。
-    MoveSlot slot = *last_;
-
-    // 一番高い手を探し、スワップ。
+    MoveSlot slot;
+    slot.move_.all_ = 0;
     MoveSlot temp;
-    for (MoveSlot* ptr = begin_; ptr < last_; ptr++) {
-      if (ptr->score_ > slot.score_) {
-        temp = *ptr;
-        *ptr = slot;
-        slot = temp;
+    Side side = engine_ptr_->to_move_;
+    Side enemy_side = side ^ 0x3;
+    while (last_ > begin_) {
+      // とりあえず最後の手をポップ。
+      last_--;
+      slot = *last_;
+
+      // 一番高い手を探し、スワップ。
+      for (MoveSlot* ptr = begin_; ptr < last_; ptr++) {
+        if (ptr->score_ > slot.score_) {
+          temp = *ptr;
+          *ptr = slot;
+          slot = temp;
+        }
       }
+
+      // 合法手かどうか調べる。
+      // 合法手ならループを抜ける。
+      engine_ptr_->MakeMove(slot.move_);
+      if (!(engine_ptr_->IsAttacked(engine_ptr_->king_[side], enemy_side))) {
+        engine_ptr_->UnmakeMove(slot.move_);
+        break;
+      }
+      engine_ptr_->UnmakeMove(slot.move_);
+
+      slot.move_.all_ = 0;
     }
 
     return slot.move_;
@@ -454,39 +422,34 @@ namespace Sayuri {
 
     for (MoveSlot* ptr = begin; ptr < end; ptr++) {
       // 特殊な手の点数をつける。
-      if (Type != GenMoveType::LEGAL) {
-        if ((ptr->move_.to_ == prev_best.to_)
-        && (ptr->move_.from_ == prev_best.from_)) {
-          // 前回の最善手。
-          ptr->score_ = TABLE_MOVE_SCORE;
-        } else if ((ptr->move_.to_ == iid_move.to_)
-        && (ptr->move_.from_ == iid_move.from_)) {
-          // IIDムーブ。
-          ptr->score_ = IID_MOVE_SCORE;
-        } else if ((ptr->move_.to_ == killer.to_)
-        && (ptr->move_.from_ == killer.from_)){
-          // キラームーブ。
-          ptr->score_ = KILLER_MOVE_SCORE;
-        } else {
-          // その他の手を各候補手のタイプに分ける。
-          if (Type == GenMoveType::NON_CAPTURE) {
-            // ヒストリーを使って点数をつけていく。
-            ptr->score_ =
-            engine_ptr_->history_[ptr->move_.from_][ptr->move_.to_];
-          } else if (Type == GenMoveType::CAPTURE) {
-            Side side = engine_ptr_->to_move_;
-            // SEEで点数をつけていく。
-            // 現在チェックされていれば、<取る駒> - <自分の駒>。
-            if (!(engine_ptr_->IsAttacked
-            (engine_ptr_->king_[side], side ^ 0x3))) {
-              ptr->score_ = SEE(ptr->move_, side);
-            } else {
-              ptr->score_ = MATERIAL[engine_ptr_->piece_board_[ptr->move_.to_]]
-              - MATERIAL[engine_ptr_->piece_board_[ptr->move_.from_]];
-            }
+      if ((ptr->move_.to_ == prev_best.to_)
+      && (ptr->move_.from_ == prev_best.from_)) {
+        // 前回の最善手。
+        ptr->score_ = TABLE_MOVE_SCORE;
+      } else if ((ptr->move_.to_ == iid_move.to_)
+      && (ptr->move_.from_ == iid_move.from_)) {
+        // IIDムーブ。
+        ptr->score_ = IID_MOVE_SCORE;
+      } else if ((ptr->move_.to_ == killer.to_)
+      && (ptr->move_.from_ == killer.from_)){
+        // キラームーブ。
+        ptr->score_ = KILLER_MOVE_SCORE;
+      } else {
+        // その他の手を各候補手のタイプに分ける。
+        if (Type == GenMoveType::NON_CAPTURE) {
+          // ヒストリーを使って点数をつけていく。
+          ptr->score_ =
+          engine_ptr_->history_[ptr->move_.from_][ptr->move_.to_];
+        } else if (Type == GenMoveType::CAPTURE) {
+          Side side = engine_ptr_->to_move_;
+          // SEEで点数をつけていく。
+          // 現在チェックされていれば、<取る駒> - <自分の駒>。
+          if (!(engine_ptr_->IsAttacked
+          (engine_ptr_->king_[side], side ^ 0x3))) {
+            ptr->score_ = SEE(ptr->move_, side);
           } else {
-            // 合法手は0点。
-            ptr->score_ = 0;
+            ptr->score_ = MATERIAL[engine_ptr_->piece_board_[ptr->move_.to_]]
+            - MATERIAL[engine_ptr_->piece_board_[ptr->move_.from_]];
           }
         }
       }
@@ -497,9 +460,6 @@ namespace Sayuri {
   (MoveMaker::MoveSlot* begin, MoveMaker::MoveSlot* end,
   HashKey pos_key, int depth, int level, const TranspositionTable& table);
   template void MoveMaker::ScoreMoves <GenMoveType::CAPTURE>
-  (MoveMaker::MoveSlot* begin, MoveMaker::MoveSlot* end,
-  HashKey pos_key, int depth, int level, const TranspositionTable& table);
-  template void MoveMaker::ScoreMoves <GenMoveType::LEGAL>
   (MoveMaker::MoveSlot* begin, MoveMaker::MoveSlot* end,
   HashKey pos_key, int depth, int level, const TranspositionTable& table);
 
