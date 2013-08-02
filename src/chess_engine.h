@@ -216,25 +216,10 @@ namespace Sayuri {
       bool has_castled_[NUM_SIDES];
       // ヒストリー。history_[from][to]。
       int history_[NUM_SQUARES][NUM_SQUARES];
-      // 探索情報用スタック。
-      struct SearchInfoSlot {
-        // 現在の手。何を指されて今のノードになったのか。
-        Move current_move_;
-        // 現在の局面のハッシュキー。
-        HashKey current_pos_key_;
-        // IIDによる最善手。
-        Move iid_move_;
-        // キラームーブ。
-        Move killer_;
-
-        SearchInfoSlot() :
-        current_pos_key_(0ULL) {
-          current_move_.all_ = 0;
-          iid_move_.all_ = 0;
-          killer_.all_ = 0;
-        }
-      };
-      SearchInfoSlot search_info_stack_[MAX_PLY];
+      // IIDでの最善手スタック。
+      Move iid_stack_[MAX_PLY];
+      // キラームーブスタック。
+      Move killer_stack_[MAX_PLY];
 
       /**********************/
       /* ハッシュキー関連。 */

@@ -109,9 +109,13 @@ namespace Sayuri {
       }
     }
 
-    // 探索情報法スタックのコピー。
+    // iid_stack_のコピー。
     for (int i = 0; i < MAX_PLY; i++) {
-      search_info_stack_[i] = engine.search_info_stack_[i];
+      iid_stack_[i] = engine.iid_stack_[i];
+    }
+    // killer_stack_のコピー。
+    for (int i = 0; i < MAX_PLY; i++) {
+      killer_stack_[i] = engine.killer_stack_[i];
     }
   }
 
@@ -178,9 +182,13 @@ namespace Sayuri {
       }
     }
 
-    // 探索情報法スタックのコピー。
+    // iid_stack_のコピー。
     for (int i = 0; i < MAX_PLY; i++) {
-      search_info_stack_[i] = engine.search_info_stack_[i];
+      iid_stack_[i] = engine.iid_stack_[i];
+    }
+    // killer_stack_のコピー。
+    for (int i = 0; i < MAX_PLY; i++) {
+      killer_stack_[i] = engine.killer_stack_[i];
     }
   }
 
@@ -247,9 +255,13 @@ namespace Sayuri {
       }
     }
 
-    // 探索情報法スタックのコピー。
+    // iid_stack_のコピー。
     for (int i = 0; i < MAX_PLY; i++) {
-      search_info_stack_[i] = engine.search_info_stack_[i];
+      iid_stack_[i] = engine.iid_stack_[i];
+    }
+    // killer_stack_のコピー。
+    for (int i = 0; i < MAX_PLY; i++) {
+      killer_stack_[i] = engine.killer_stack_[i];
     }
 
     return *this;
@@ -318,9 +330,13 @@ namespace Sayuri {
       }
     }
 
-    // 探索情報法スタックのコピー。
+    // iid_stack_のコピー。
     for (int i = 0; i < MAX_PLY; i++) {
-      search_info_stack_[i] = engine.search_info_stack_[i];
+      iid_stack_[i] = engine.iid_stack_[i];
+    }
+    // killer_stack_のコピー。
+    for (int i = 0; i < MAX_PLY; i++) {
+      killer_stack_[i] = engine.killer_stack_[i];
     }
 
     return *this;
@@ -482,12 +498,13 @@ namespace Sayuri {
       }
     }
 
-    // 探索情報用スタックを初期化。
+    // iid_stack_の初期化。
     for (int i = 0; i < MAX_PLY; i++) {
-      search_info_stack_[i].current_move_.all_ = 0;
-      search_info_stack_[i].current_pos_key_ = 0ULL;
-      search_info_stack_[i].iid_move_.all_ = 0;
-      search_info_stack_[i].killer_.all_ = 0;
+      iid_stack_[i].all_ = 0;
+    }
+    // killer_stack_の初期化。
+    for (int i = 0; i < MAX_PLY; i++) {
+      killer_stack_[i].all_ = 0;
     }
   }
 

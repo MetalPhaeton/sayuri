@@ -126,7 +126,7 @@ namespace Sayuri {
 
   // 手をスタックに展開する。
   template<GenMoveType Type>
-  void MoveMaker::GenMoves(int depth, int level,
+  void MoveMaker::GenMoves(HashKey pos_key, int depth, int level,
   const TranspositionTable& table) {
     // スタックのポインタを設定。
     MoveSlot* gen_begin = last_;
@@ -375,17 +375,17 @@ namespace Sayuri {
 
     // 得点をつける。
     gen_end = last_;
-    ScoreMoves<Type>(gen_begin, gen_end, depth, level, table);
+    ScoreMoves<Type>(gen_begin, gen_end, pos_key, depth, level, table);
   }
   // 実体化。
   template void MoveMaker::GenMoves
-  <GenMoveType::NON_CAPTURE>(int depth, int level,
+  <GenMoveType::NON_CAPTURE>(HashKey pos_key, int depth, int level,
   const TranspositionTable& table);
   template void MoveMaker::GenMoves
-  <GenMoveType::CAPTURE>(int depth, int level,
+  <GenMoveType::CAPTURE>(HashKey pos_key, int depth, int level,
   const TranspositionTable& table);
   template void MoveMaker::GenMoves
-  <GenMoveType::LEGAL>(int depth, int level,
+  <GenMoveType::LEGAL>(HashKey pos_key, int depth, int level,
   const TranspositionTable& table);
 
   // 展開した手の数を返す。
@@ -424,7 +424,7 @@ namespace Sayuri {
   // 展開した候補手に得点をつける。
   template<GenMoveType Type>
   void MoveMaker::ScoreMoves (MoveMaker::MoveSlot* begin,
-  MoveMaker::MoveSlot* end, int depth, int level,
+  MoveMaker::MoveSlot* end, HashKey pos_key, int depth, int level,
    const TranspositionTable& table) {
     if (begin == end) return;
 
@@ -438,8 +438,7 @@ namespace Sayuri {
 
     // トランスポジションテーブルから前回の繰り返しの最善手を得る。
     const TTEntry* entry_ptr = table.GetFulfiledEntry
-    (engine_ptr_->search_info_stack_[level].current_pos_key_,
-    depth - 1, level, engine_ptr_->to_move_);
+    (pos_key, depth - 1, level, engine_ptr_->to_move_);
     Move prev_best;
     if (entry_ptr && entry_ptr->value_flag() == TTValueFlag::EXACT) {
       prev_best = entry_ptr->best_move();
@@ -448,10 +447,10 @@ namespace Sayuri {
     }
 
     // IIDムーブを得る。
-    Move iid_move = engine_ptr_->search_info_stack_[level].iid_move_;
+    Move iid_move = engine_ptr_->iid_stack_[level];
 
     // キラームーブを得る。
-    Move killer = engine_ptr_->search_info_stack_[level].killer_;
+    Move killer = engine_ptr_->killer_stack_[level];
 
     for (MoveSlot* ptr = begin; ptr < end; ptr++) {
       // 特殊な手の点数をつける。
@@ -496,13 +495,13 @@ namespace Sayuri {
   // 実体化。
   template void MoveMaker::ScoreMoves <GenMoveType::NON_CAPTURE>
   (MoveMaker::MoveSlot* begin, MoveMaker::MoveSlot* end,
-   int depth, int level, const TranspositionTable& table);
+  HashKey pos_key, int depth, int level, const TranspositionTable& table);
   template void MoveMaker::ScoreMoves <GenMoveType::CAPTURE>
   (MoveMaker::MoveSlot* begin, MoveMaker::MoveSlot* end,
-   int depth, int level, const TranspositionTable& table);
+  HashKey pos_key, int depth, int level, const TranspositionTable& table);
   template void MoveMaker::ScoreMoves <GenMoveType::LEGAL>
   (MoveMaker::MoveSlot* begin, MoveMaker::MoveSlot* end,
-   int depth, int level, const TranspositionTable& table);
+  HashKey pos_key, int depth, int level, const TranspositionTable& table);
 
   // SEE。
   int MoveMaker::SEE(Move move, Side side) {

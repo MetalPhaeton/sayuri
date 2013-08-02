@@ -69,11 +69,12 @@ namespace Sayuri {
       // (注)TypeがNON_CAPTURE、CAPTUREの場合、
       // 自らチェックされる手も作る。
       // [引数]
+      // pos_key: 現在の局面のハッシュキー。
       // depth: 手を展開するノードの深さ。
       // level: 手を展開するノードのレベル。
       // table: トランスポジションテーブル。
-      template<GenMoveType Type> void GenMoves(int depth, int level,
-      const TranspositionTable& table);
+      template<GenMoveType Type> void GenMoves(HashKey pos_key,
+      int depth, int level, const TranspositionTable& table);
       // 展開できた手の数を返す。
       // [戻り値]
       // 展開できたての数。
@@ -98,12 +99,13 @@ namespace Sayuri {
       // [引数]
       // begin: 点数をつける最初のスロットのポインタ。
       // end: 点数をつける最後のスロットの次のポインタ。
+      // pos_key: 現在の局面のハッシュキー。
       // depth: 手を展開するノードの深さ。
       // level: 現在のノードのレベル。
       // table: トランスポジションテーブル。
       template<GenMoveType Type>
-      void ScoreMoves(MoveSlot* begin, MoveSlot* end, int depth,
-      int level, const TranspositionTable& table);
+      void ScoreMoves(MoveSlot* begin, MoveSlot* end, HashKey pos_key,
+      int depth, int level, const TranspositionTable& table);
       // SEE。
       // [引数]
       // move: 探したい手。
