@@ -28,11 +28,6 @@
 #define SAYURI_DEBUG_H
 
 #include <iostream>
-#include <stdexcept>
-#include <string>
-#include <random>
-#include <ctime>
-#include <memory>
 
 #include "sayuri.h"
 
@@ -93,7 +88,7 @@ namespace Sayuri {
   // ストップウォッチで計測した秒数を得る。
   // [戻り値]
   // 計測した秒数。
-  double GetTime();
+  int GetTime();
 }  // namespace Sayuri
 
 #endif

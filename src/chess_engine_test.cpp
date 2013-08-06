@@ -42,6 +42,9 @@ namespace Sayuri {
   extern void PrintBitboard(Bitboard bitboard);
   extern void PrintPosition(Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]);
   extern void PrintMove(Move move);
+  extern void Start();
+  extern void Stop();
+  extern int GetTime();
 
   void ChessEngine::Test() {
     std::string fen_str = "2kr2nr/2p3pp/pp1bbp2/2p5/P3P3/1NN1BP2/1PP3PP/R2R2K1 w - -";
@@ -50,21 +53,37 @@ namespace Sayuri {
 
     PrintPosition(position_);
 
-    HashKey pos_key = GetCurrentKey();
-    int depth = 3;
-    int level = 3;
-    int alpha = -MAX_VALUE;
-    int beta = MAX_VALUE;
-    std::unique_ptr<TranspositionTable>
-    table(new TranspositionTable(10000000));
+    table_size(100000000);
 
-    max_nodes_ = static_cast<std::size_t>(-1);
-    num_searched_nodes_ = 0;
-    int score =
-    Quiesce(pos_key, depth, level, alpha, beta, *(table.get()));
-    std::cout << "Score: " << score << std::endl;
-    std::cout << "Max Nodes: " << max_nodes_ << std::endl;
-    std::cout << "Num of Nodes: " << num_searched_nodes_ << std::endl; 
+    std::size_t nodes = MAX_NODES;
+    int depth = 8;
+    Chrono::milliseconds thinking_time(1000000);
+    SetStopper(nodes, depth, thinking_time, false);
+
+    quiesce_nodes = 0;
+
+    // 探索。
+    Start();
+    PVLine pv_line;
+    SearchRoot(pv_line);
+    Stop();
+
+    std::cout << "----------------------------------------" << std::endl;
+    for (std::size_t i = 0; i < pv_line.length(); i++) {
+      if (pv_line.line()[i].has_checkmated()) {
+        std::cout << "Checkmate!!" << std::endl;
+        continue;
+      }
+      PrintMove(pv_line.line()[i].move());
+    std::cout << "----------------------------------------" << std::endl;
+    }
+    std::cout << "Score: " << pv_line.score() << std::endl;
+    std::cout << "Time: " << GetTime() << std::endl;
+    std::cout << "Num Nodes: " << searched_nodes_ << std::endl;
+    std::cout << "Nodes / Second: "
+    << searched_nodes_ / (GetTime() / 1000.0) << std::endl;
+    std::cout << "Searched Level: " << searched_level_ << std::endl;
+    std::cout << "PVLine Length: " << pv_line.length() << std::endl;
   }
 
   // 評価値をプリント。改造版。

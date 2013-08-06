@@ -89,18 +89,16 @@ namespace Sayuri {
       /**********************/
       /* プライベート関数。 */
       /**********************/
-      // 手に点数をつける関数。
-      // TypeがLEGALの場合は点数を付けない。
+      // 手に点数をつける。
       // [引数]
-      // begin: 点数をつける最初のスロットのポインタ。
-      // end: 点数をつける最後のスロットの次のポインタ。
-      // pos_key: 現在の局面のハッシュキー。
-      // depth: 手を展開するノードの深さ。
-      // level: 現在のノードのレベル。
-      // table: トランスポジションテーブル。
+      // ptr: 点数をつけるスロットのポインタ。
+      // best_move: 最善手と予測される手。
+      // iid_move: IIDで得た手。
+      // killer: キラームーブ。
+      // side: 手のサイド。
       template<GenMoveType Type>
-      void ScoreMoves(MoveSlot* begin, MoveSlot* end, HashKey pos_key,
-      int depth, int level, const TranspositionTable& table);
+      void ScoreMove(MoveSlot* ptr,
+      Move best_move, Move iid_move, Move killer, Side side);
       // SEE。
       // [引数]
       // move: 探したい手。

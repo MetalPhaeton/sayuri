@@ -90,11 +90,11 @@ namespace Sayuri {
       // 最初の要素に手を登録する。
       // [引数]
       // move: セットする手。
-      PVLine& operator=(Move move);
+      void SetMove(Move move);
       // PVLineを2番目以降の要素にコピーする。
       // [引数]
       // pv_line: コピーするライン。
-      PVLine& operator+=(const PVLine& pv_line);
+      void Insert(const PVLine& pv_line);
       // 最初の要素にチェックメイトされたことを記録する。
       void MarkCheckmated();
 
@@ -104,13 +104,31 @@ namespace Sayuri {
       // 長さ。
       std::size_t length() const {return length_;}
       // ライン。
-      const PVSlot (& line() const)[MAX_PLY + 1] {return line_;}
+      const PVSlot (& line() const)[MAX_PLYS + 1] {return line_;}
+      // 評価値。
+      int score() const {return score_;}
+
+      /******************/
+      /* ミューテータ。 */
+      /******************/
+      // 評価値。
+      void score(int score) {score_ = score;}
+
+      /**********************/
+      /* ソート用比較関数。 */
+      /**********************/
+      static bool Compare(const PVLine& first, const PVLine& second);
+
     private:
       /****************/
       /* メンバ変数。 */
       /****************/
+      // 長さ。
       std::size_t length_;
-      PVSlot line_[MAX_PLY + 1];
+      // ライン。
+      PVSlot line_[MAX_PLYS + 1];
+      // 評価値。
+      int score_;
   };
 }  // namespace_Sayuri
 

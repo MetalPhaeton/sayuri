@@ -29,7 +29,6 @@
 
 #include <iostream>
 #include <vector>
-#include <ctime>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "transposition_table.h"
@@ -83,11 +82,28 @@ namespace Sayuri {
       // 新しいゲームの準備をする。
       void SetNewGame();
 
+      // 探索のストップ条件を設定する。
+      // [引数]
+      // max_nodes: 最大探索ノード数。
+      // max_depth: 最大探索深さ。
+      // thinking_time: 思考時間。
+      // infinite_thinking: 無限に思考するかどうか。
+      void SetStopper(std::size_t max_nodes, int max_depth,
+      Chrono::milliseconds thinking_time, bool infinite_thinking);
+
+      // 探索を終了させる。
+      void StopThinking();
+
       /****************/
       /* static関数。 */
       /****************/
       // 思考開始する。
       static void GoThinking(ChessEngine& engine);
+
+      /******************/
+      /* ミューテータ。 */
+      /******************/
+      void table_size(std::size_t size) {table_size_ = size;}
 
     private:
       /**************/
@@ -117,10 +133,44 @@ namespace Sayuri {
       /******************/
       /* 探索エンジン。 */
       /******************/
-      // 最大探索数。
-      std::size_t max_nodes_;
       // 探索したノード数。
-      volatile std::size_t num_searched_nodes_;
+      volatile std::size_t searched_nodes_;
+      // 探索開始時間。
+      TimePoint start_time_;
+      // 探索したレベル。
+      volatile int searched_level_;
+      // ヌルサーチ中。
+      bool is_null_searching_;
+      // トランスポジションテーブルの大きさ。
+      std::size_t table_size_;
+      // ヒストリーの最大値。
+      int history_max_;
+      // ストップ条件構造体。
+      struct Stopper {
+        // 何が何でも探索を中断。
+        bool stop_now_;
+
+        // 最大探索ノード数。
+        std::size_t max_nodes_;
+
+        // 最大探索深さ。
+        int max_depth_;
+
+        // 思考時間。
+        Chrono::milliseconds thinking_time_;
+
+        // 無限に考える。
+        bool infinite_thinking_;
+
+        // コンストラクタ。
+        Stopper() :
+        stop_now_(false),
+        max_nodes_(MAX_NODES),
+        max_depth_(MAX_PLYS),
+        thinking_time_(Chrono::milliseconds(600000)),
+        infinite_thinking_(false) {}
+      };
+      Stopper stopper_;
       // クイース探索。
       // [引数]
       // pos_key: 現在のハッシュキー。
@@ -129,8 +179,40 @@ namespace Sayuri {
       // alpha: アルファ値。
       // beta: ベータ値。
       // table: トランスポジションテーブル。
+      // [戻り値]
+      // 評価値。
       int Quiesce(HashKey pos_key, int depth, int level,
       int alpha, int beta, TranspositionTable& table);
+      // 探索する。
+      // [引数]
+      // <Type>: ノードの種類。
+      // pos_key: 現在のハッシュキー。
+      // depth: 現在の深さ。
+      // level: 現在のレベル。
+      // alpha: アルファ値。
+      // beta: ベータ値。
+      // table: トランスポジションテーブル。
+      // pv_line: PVラインが格納される。
+      // [戻り値]
+      // 評価値。
+      template<NodeType Type>
+      int Search(HashKey pos_key, int depth, int level, int alpha, int beta,
+      TranspositionTable& table, PVLine& pv_line);
+      // 探索のルート。
+      // [引数]
+      // pv_line: 探索結果がここに入る。
+      void SearchRoot(PVLine& pv_line);
+      // Futility Pruningのマージンを計算する。
+      // [引数]
+      // move: 指し手。
+      // depth: 現在の深さ。
+      // [戻り値]
+      // マージン。
+      int GetMargin(Move move, int depth);
+      // 探索を中断しなければいけないかどうか。
+      // [戻り値]
+      // 探索を中断しなければいけないときはtrue。
+      bool ShouldBeStopped();
 
       /******************************/
       /* その他のプライベート関数。 */
@@ -240,12 +322,12 @@ namespace Sayuri {
       int ply_;
       // キャスリングしたかどうか。
       bool has_castled_[NUM_SIDES];
-      // ヒストリー。history_[from][to]。
-      int history_[NUM_SQUARES][NUM_SQUARES];
+      // ヒストリー。history_[side][from][to]。
+      int history_[NUM_SIDES][NUM_SQUARES][NUM_SQUARES];
       // IIDでの最善手スタック。
-      Move iid_stack_[MAX_PLY];
+      Move iid_stack_[MAX_PLYS];
       // キラームーブスタック。
-      Move killer_stack_[MAX_PLY];
+      Move killer_stack_[MAX_PLYS];
 
       /**********************/
       /* ハッシュキー関連。 */

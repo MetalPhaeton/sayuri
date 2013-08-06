@@ -54,7 +54,6 @@ namespace Sayuri {
       // [戻り値]
       // 評価値。
       int Evaluate();
-      int Evaluate2();
 
     private:
       /**************/
@@ -80,12 +79,12 @@ namespace Sayuri {
         {
           0, 0, 0, 0, 0, 0, 0, 0,
           0, 0, 0, 0, 0, 0, 0, 0,
-          1, 1, 1, 1, 1, 1, 1, 1,
-          2, 2, 2, 2, 2, 2, 2, 2,
-          3, 3, 3, 3, 3, 3, 3, 3,
-          4, 4, 4, 4, 4, 4, 4, 4,
-          5, 5, 5, 5, 5, 5, 5, 5,
-          6, 6, 6, 6, 6, 6, 6, 6
+          1, 2, 3, 4, 4, 3, 2, 1,
+          2, 3, 4, 5, 5, 4, 3, 2,
+          3, 4, 5, 6, 6, 5, 4, 3,
+          4, 5, 6, 7, 7, 6, 5, 4,
+          5, 6, 7, 8, 8, 7, 6, 5,
+          6, 7, 8, 9, 9, 8, 7, 6
         },
         {
           -3, -2, -1, -1, -1, -1, -2, -3,
@@ -98,14 +97,14 @@ namespace Sayuri {
            0,  1,  2,  2,  2,  2,  1,  0
         },
         {
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0
+          -2, -1, -1, -1, -1, -1, -1, -2,
+          -1,  0,  0,  0,  0,  0,  0, -1,
+          -1,  1,  2,  2,  2,  2,  1, -1,
+          -1,  0,  1,  2,  2,  1,  0, -1,
+          -1,  0,  1,  2,  2,  1,  0, -1,
+          -1,  0,  1,  2,  2,  1,  0, -1,
+          -1,  0,  0,  0,  0,  0,  0, -1,
+          -2, -1, -1, -1, -1, -1, -1, -2
         },
         {
           0, 0, 0, 0, 0, 0, 0, 0,
@@ -118,14 +117,14 @@ namespace Sayuri {
           1, 1, 1, 1, 1, 1, 1, 1
         },
         {
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0
+          -3, -2, -2, -1, -1, -2, -2, -3,
+          -2,  0,  0,  0,  0,  0,  0, -2,
+          -2,  0,  1,  1,  1,  1,  0, -2,
+          -1,  0,  1,  2,  2,  1,  0, -1,
+          -1,  0,  1,  2,  2,  1,  0, -1,
+          -2,  0,  1,  1,  1,  1,  0, -2,
+          -2,  0,  0,  0,  0,  0,  0, -2,
+          -3, -2, -2, -1, -1, -2, -2, -3
         },
         {
           0, 0, 0, 0, 0, 0, 0, 0,
@@ -172,6 +171,8 @@ namespace Sayuri {
       static constexpr int WEIGHT_ATTACK_SWEET_CENTER = 5;
       // 展開の重さ。
       static constexpr int WEIGHT_DEVELOPMENT = 30;
+      // 敵を攻撃している重さ。
+      static constexpr int WEIGHT_ATTACK_ENEMY = 10;
       // キングの周囲への攻撃の重さ。
       static constexpr int WEIGHT_ATTACK_AROUND_KING = 10;
 
@@ -183,11 +184,11 @@ namespace Sayuri {
       // ナイトの配置の重さ。
       static constexpr int WEIGHT_KNIGHT_POSITION = 10;
       // ビショップの配置の重さ。
-      static constexpr int WEIGHT_BISHOP_POSITION = 0;
+      static constexpr int WEIGHT_BISHOP_POSITION = 20;
       // ルークの配置の重さ。
       static constexpr int WEIGHT_ROOK_POSITION = 30;
       // クイーンの配置の重さ。
-      static constexpr int WEIGHT_QUEEN_POSITION = 0;
+      static constexpr int WEIGHT_QUEEN_POSITION = 20;
       // キングの中盤の配置の重さ。
       static constexpr int WEIGHT_KING_POSITION_MIDDLE = 30;
       // キングの終盤の配置の重さ。
@@ -222,6 +223,7 @@ namespace Sayuri {
       int center_control_value_;  // センター支配。
       int sweet_center_control_value_;  // センター支配。
       int development_value_;  // 駒の展開。
+      int attack_enemy_value_;  // 敵を攻撃。
       int attack_around_king_value_;  // キング周辺への攻撃。
       int position_value_[NUM_PIECE_TYPES];  // 各駒の配置。
       int king_position_middle_value_;  // キングの中盤の配置。

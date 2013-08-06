@@ -39,6 +39,7 @@ namespace Sayuri {
   constexpr int Evaluator::WEIGHT_MOBILITY;
   constexpr int Evaluator::WEIGHT_CENTER_CONTROL;
   constexpr int Evaluator::WEIGHT_DEVELOPMENT;
+  constexpr int Evaluator::WEIGHT_ATTACK_ENEMY;
   constexpr int Evaluator::WEIGHT_ATTACK_AROUND_KING;
   constexpr int Evaluator::WEIGHT_PAWN_POSITION;
   constexpr int Evaluator::WEIGHT_KNIGHT_POSITION;
@@ -137,6 +138,7 @@ namespace Sayuri {
     center_control_value_ = 0;
     sweet_center_control_value_ = 0;
     development_value_ = 0;
+    attack_enemy_value_ = 0;
     attack_around_king_value_ = 0;
     for (int i = 0; i < NUM_PIECE_TYPES; i++) {
       position_value_[i] = 0;
@@ -170,6 +172,17 @@ namespace Sayuri {
     // 十分な駒がない場合は引き分け。
     if (!HasEnoughPieces(side) && !HasEnoughPieces(enemy_side)) {
       return SCORE_DRAW;
+    }
+
+    // 全体計算。
+    // マテリアル。
+    material_value_ = engine_ptr_->GetMaterial(side);
+    // ビショップペア。
+    if (Util::CountBits(engine_ptr_->position_[side][BISHOP]) >= 2) {
+      bishop_pair_value_ += 1;
+    }
+    if (Util::CountBits(engine_ptr_->position_[enemy_side][BISHOP]) >= 2) {
+      bishop_pair_value_ -= 1;
     }
 
     // 各駒毎に価値を計算する。
@@ -219,6 +232,7 @@ namespace Sayuri {
     int middle_score = (WEIGHT_MOBILITY * mobility_value_)
     + (WEIGHT_CENTER_CONTROL * center_control_value_)
     + (WEIGHT_DEVELOPMENT * development_value_)
+    + (WEIGHT_ATTACK_ENEMY * attack_enemy_value_)
     + (WEIGHT_ATTACK_AROUND_KING * attack_around_king_value_)
     + (WEIGHT_KNIGHT_POSITION * position_value_[KNIGHT])
     + (WEIGHT_BISHOP_POSITION * position_value_[BISHOP])
@@ -270,14 +284,8 @@ namespace Sayuri {
   }
 
   // 進行状況を得る。
+  // フェーズは放物線で進む。
   double Evaluator::GetPhase() {
-    // xの最大値。駒の数。
-    constexpr double MAX_PIECES = 14.0;
-    // yの最大値。進行状況。
-    constexpr double MAX_PHASE = 1.0;
-    // 係数。
-    constexpr double MODULUS = MAX_PHASE / MAX_PIECES;
-
     // キングとポーン以外の駒で進行状況を考える。
     double num_pieces = static_cast<double>(Util::CountBits
     (engine_ptr_->blocker_0_ & ~(engine_ptr_->position_[WHITE][PAWN]
@@ -285,10 +293,12 @@ namespace Sayuri {
     | engine_ptr_->position_[WHITE][KING]
     | engine_ptr_->position_[BLACK][KING])));
 
-    if (num_pieces > MAX_PIECES) num_pieces = MAX_PIECES;
+    // 放物線の準備。
+    num_pieces = num_pieces > 14.0 ? 14.0 : num_pieces;
+    constexpr double MODULUS = -(1.0 / 196.0);
+    double square = (num_pieces - 14.0) * (num_pieces - 14.0);
 
-    // 一次関数にして返す。
-    return MODULUS * num_pieces;
+    return MODULUS * square + 1.0;
   }
 
   /************************/
@@ -303,10 +313,6 @@ namespace Sayuri {
     // スコアと符号。自分の駒ならプラス。敵の駒ならマイナス。
     int score;
     int sign = piece_side == engine_ptr_->to_move_ ? 1 : -1;
-
-    // マテリアルを計算。
-    score = MATERIAL[Type];
-    material_value_ += sign * score;
 
     // 利き筋を作る。
     Bitboard attacks = 0ULL;
@@ -403,6 +409,17 @@ namespace Sayuri {
       development_value_ += sign * score;
     }
 
+    // 敵への攻撃を計算。
+    if (Type == PAWN) {
+      score = Util::CountBits(attacks
+      & (engine_ptr_->side_pieces_[enemy_piece_side]
+      | Util::BIT[engine_ptr_->en_passant_square_]));
+    } else if (Type != KING) {
+      score = Util::CountBits(attacks
+      & engine_ptr_->side_pieces_[enemy_piece_side]);
+    }
+    attack_enemy_value_ = sign * score;
+
     // 敵キング周辺への攻撃を計算。
     if (Type != KING) {
       score = Util::CountBits(attacks
@@ -469,15 +486,6 @@ namespace Sayuri {
         score += 1;
       }
       iso_pawn_value_ += sign * score;
-    }
-
-    // ビショップペアを計算。
-    if (Type == BISHOP) {
-      score = 0;
-      if (Util::CountBits(engine_ptr_->position_[piece_side][BISHOP]) >= 2) {
-        score += 1;
-      }
-      bishop_pair_value_ += sign * score;
     }
 
     // クイーンの早過ぎる始動を計算。

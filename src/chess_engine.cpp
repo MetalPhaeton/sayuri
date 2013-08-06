@@ -29,7 +29,6 @@
 #include <iostream>
 #include <sstream>
 #include <random>
-#include <ctime>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "transposition_table.h"
@@ -103,18 +102,20 @@ namespace Sayuri {
     }
 
     // ヒストリーのコピー。
-    for (int i = 0; i < NUM_SQUARES; i++) {
+    for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
-        history_[i][j] = engine.history_[i][j];
+        for (int k = 0; k < NUM_SQUARES; k++) {
+          history_[i][j][k] = engine.history_[i][j][k];
+        }
       }
     }
 
     // iid_stack_のコピー。
-    for (int i = 0; i < MAX_PLY; i++) {
+    for (int i = 0; i < MAX_PLYS; i++) {
       iid_stack_[i] = engine.iid_stack_[i];
     }
     // killer_stack_のコピー。
-    for (int i = 0; i < MAX_PLY; i++) {
+    for (int i = 0; i < MAX_PLYS; i++) {
       killer_stack_[i] = engine.killer_stack_[i];
     }
   }
@@ -176,18 +177,20 @@ namespace Sayuri {
     }
 
     // ヒストリーのコピー。
-    for (int i = 0; i < NUM_SQUARES; i++) {
+    for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
-        history_[i][j] = engine.history_[i][j];
+        for (int k = 0; k < NUM_SQUARES; k++) {
+          history_[i][j][k] = engine.history_[i][j][k];
+        }
       }
     }
 
     // iid_stack_のコピー。
-    for (int i = 0; i < MAX_PLY; i++) {
+    for (int i = 0; i < MAX_PLYS; i++) {
       iid_stack_[i] = engine.iid_stack_[i];
     }
     // killer_stack_のコピー。
-    for (int i = 0; i < MAX_PLY; i++) {
+    for (int i = 0; i < MAX_PLYS; i++) {
       killer_stack_[i] = engine.killer_stack_[i];
     }
   }
@@ -249,18 +252,20 @@ namespace Sayuri {
     }
 
     // ヒストリーのコピー。
-    for (int i = 0; i < NUM_SQUARES; i++) {
+    for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
-        history_[i][j] = engine.history_[i][j];
+        for (int k = 0; k < NUM_SQUARES; k++) {
+          history_[i][j][k] = engine.history_[i][j][k];
+        }
       }
     }
 
     // iid_stack_のコピー。
-    for (int i = 0; i < MAX_PLY; i++) {
+    for (int i = 0; i < MAX_PLYS; i++) {
       iid_stack_[i] = engine.iid_stack_[i];
     }
     // killer_stack_のコピー。
-    for (int i = 0; i < MAX_PLY; i++) {
+    for (int i = 0; i < MAX_PLYS; i++) {
       killer_stack_[i] = engine.killer_stack_[i];
     }
 
@@ -324,18 +329,20 @@ namespace Sayuri {
     }
 
     // ヒストリーのコピー。
-    for (int i = 0; i < NUM_SQUARES; i++) {
+    for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
-        history_[i][j] = engine.history_[i][j];
+        for (int k = 0; k < NUM_SQUARES; k++) {
+          history_[i][j][k] = engine.history_[i][j][k];
+        }
       }
     }
 
     // iid_stack_のコピー。
-    for (int i = 0; i < MAX_PLY; i++) {
+    for (int i = 0; i < MAX_PLYS; i++) {
       iid_stack_[i] = engine.iid_stack_[i];
     }
     // killer_stack_のコピー。
-    for (int i = 0; i < MAX_PLY; i++) {
+    for (int i = 0; i < MAX_PLYS; i++) {
       killer_stack_[i] = engine.killer_stack_[i];
     }
 
@@ -491,19 +498,21 @@ namespace Sayuri {
       has_castled_[i] = false;
     }
 
-    // ヒストリーを0に初期化。
-    for (int i = 0; i < NUM_SQUARES; i++) {
+    // ヒストリーの初期化。
+    for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
-        history_[i][j] = 0;
+        for (int k = 0; k < NUM_SQUARES; k++) {
+          history_[i][j][k] = 0;
+        }
       }
     }
 
     // iid_stack_の初期化。
-    for (int i = 0; i < MAX_PLY; i++) {
+    for (int i = 0; i < MAX_PLYS; i++) {
       iid_stack_[i].all_ = 0;
     }
     // killer_stack_の初期化。
-    for (int i = 0; i < MAX_PLY; i++) {
+    for (int i = 0; i < MAX_PLYS; i++) {
       killer_stack_[i].all_ = 0;
     }
   }
@@ -608,19 +617,14 @@ namespace Sayuri {
     // 相手のサイド。
     Side enemy_side = side ^ 0x3;
 
-    // 白のマテリアル。
-    int my_material = 0;
-    // 黒のマテリアル。
-    int enemy_material = 0;
-    for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
-      my_material += MATERIAL[piece_type]
-      * Util::CountBits(position_[side][piece_type]);
-
-      enemy_material += MATERIAL[piece_type]
-      * Util::CountBits(position_[enemy_side][piece_type]);
+    int material = 0;
+    for (Piece piece_type = PAWN; piece_type <= QUEEN; piece_type++) {
+      material += MATERIAL[piece_type]
+      * (Util::CountBits(position_[side][piece_type])
+      - Util::CountBits(position_[enemy_side][piece_type]));
     }
 
-    return my_material - enemy_material;
+    return material;
   }
 
   // 合法手があるかどうかチェックする。
@@ -1061,10 +1065,9 @@ namespace Sayuri {
   // ハッシュキーの配列。
   HashKey ChessEngine::key_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
   // key_table_[][][]を初期化する。
-  void ChessEngine::InitKeyTable()
-  {
+  void ChessEngine::InitKeyTable() {
     // メルセンヌツイスターの準備。
-    std::mt19937 engine(std::time(nullptr));
+    std::mt19937 engine(SysClock::to_time_t (SysClock::now()));
     std::uniform_int_distribution<HashKey> dist(0ULL, 0xffffffffffffffffULL);
 
     // キーの配列を初期化。

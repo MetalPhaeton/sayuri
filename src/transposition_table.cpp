@@ -71,6 +71,7 @@ namespace Sayuri {
       entry_table_[i].resize(num_entries);
     }
   }
+
   // コピーコンストラクタ。
   TranspositionTable::TranspositionTable(const TranspositionTable& table) :
   max_bytes_(table.max_bytes_),
@@ -83,6 +84,7 @@ namespace Sayuri {
       }
     }
   }
+
   // ムーブコンストラクタ。
   TranspositionTable::TranspositionTable( TranspositionTable&& table) :
   max_bytes_(table.max_bytes_){
@@ -90,13 +92,13 @@ namespace Sayuri {
   }
 
   // テーブルに追加する。
-  void TranspositionTable::Add(HashKey pos_key, int depth, int level,
+  void TranspositionTable::Add(HashKey pos_key, int depth,
   Side to_move, int value, TTValueFlag value_flag, Move best_move) {
     // テーブルに追加。
     int index = GetTableIndex(pos_key);
     for (auto& entry : entry_table_[index]) {
-      if (!(entry.exists())) {
-        entry = TTEntry(pos_key, depth, level, to_move,
+      if (!(entry.exists_)) {
+        entry = TTEntry(pos_key, depth, to_move,
         value, value_flag, best_move);
         break;
       }
@@ -106,17 +108,18 @@ namespace Sayuri {
     std::sort(entry_table_[index].begin(), entry_table_[index].end(),
     &TTEntry::Compare);
   }
+
   // 該当するTTEntryを返す。
-  const TTEntry* TranspositionTable::GetFulfiledEntry(HashKey pos_key,
-  int depth, int level, Side to_move) const {
+  TTEntry* TranspositionTable::GetFulfiledEntry(HashKey pos_key,
+  int depth, Side to_move) const {
     // テーブルのインデックスを得る。
     int index = GetTableIndex(pos_key);
 
     TTEntry* entry_ptr = nullptr;
     for (auto& entry : entry_table_[index]) {
-      if (!(entry.exists())) return nullptr;  // エントリーがない。
+      if (!(entry.exists_)) return nullptr;  // エントリーがない。
 
-      if (entry.Fulfil(pos_key, depth, level, to_move)) {
+      if (entry.Fulfil(pos_key, depth, to_move)) {
         entry_ptr = &entry;  // エントリーが見つかった。
         break;
       }
@@ -124,6 +127,7 @@ namespace Sayuri {
     }
     return entry_ptr;
   }
+
   //　テーブルのサイズのバイト数を返す。
   std::size_t TranspositionTable::GetSizeBytes() const {
     // テーブル自身の大きさ。
@@ -131,71 +135,115 @@ namespace Sayuri {
     bytes += sizeof(std::vector<TTEntry>) * TABLE_SIZE;
 
     // TTEntryのサイズ。
-    for (std::size_t i = 0; i < TABLE_SIZE; i++) {
-      bytes += sizeof(TTEntry) * entry_table_[i].size();
-    }
+    bytes += sizeof(TTEntry) * entry_table_[0].size() * TABLE_SIZE;
 
     return bytes;
   }
+
+  // テーブルのパーミル。
   double TranspositionTable::GetSizePermill() const {
     double max = static_cast<double>(max_bytes_);
     double size = static_cast<double>(GetSizeBytes());
     return (size / max) * 1000;
   }
 
+  // エントリーのパーミル。
+  double TranspositionTable::GetEntryPermill() const {
+    double max = static_cast<double>(TABLE_SIZE * entry_table_[0].size());
+    double num_entry = 0.0;
+    for (std::size_t i = 0; i < TABLE_SIZE; i++) {
+      for (auto& entry : entry_table_[i]) {
+        if (entry.exists_) {
+          num_entry += 1.0;
+        } else {
+          break;
+        }
+      }
+    }
+
+    return (num_entry / max) * 1000.0;
+  }
+
+  // エントリーの種類ごとの比率データ。
+  template<TTValueFlag Type>
+  double TranspositionTable::GetRatioPermill() const {
+    double num_all = 0.0;
+    double num_entry = 0.0;
+    for (std::size_t i = 0; i < TABLE_SIZE; i++) {
+      for (auto& entry : entry_table_[i]) {
+        if (entry.exists_) {
+          num_all += 1.0;
+          if (entry.value_flag_ == Type) {
+            num_entry += 1.0;
+          }
+        } else {
+          break;
+        }
+      }
+    }
+
+    return (num_entry / num_all) * 1000.0;
+  }
+  // 実体化。
+  template
+  double TranspositionTable::GetRatioPermill<TTValueFlag::EXACT>() const;
+  template
+  double TranspositionTable::GetRatioPermill<TTValueFlag::ALPHA>() const;
+  template
+  double TranspositionTable::GetRatioPermill<TTValueFlag::BETA>() const;
+
   /************************/
   /* エントリーのクラス。 */
   /************************/
   // コンストラクタ。
-  TTEntry::TTEntry(HashKey key, int depth, int level, Side to_move,
+  TTEntry::TTEntry(HashKey key, int depth, Side to_move,
   int value, TTValueFlag value_flag, Move best_move) :
   exists_(true),
   key_(key),
   depth_(depth),
-  level_(level),
   to_move_(to_move),
   value_(value),
   value_flag_(value_flag),
   best_move_(best_move) {
   }
+
   // デフォルトコンストラクタ。
   TTEntry::TTEntry() :
   exists_(false),
   key_(0ULL),
   depth_(-MAX_VALUE),
-  level_(MAX_VALUE),
   to_move_(NO_SIDE),
   value_(0),
   value_flag_(TTValueFlag::ALPHA) {
   }
+
   // コピーコンストラクタ。
   TTEntry::TTEntry(const TTEntry& entry) :
   exists_(entry.exists_),
   key_(entry.key_),
   depth_(entry.depth_),
-  level_(entry.level_),
   to_move_(entry.to_move_),
   value_(entry.value_),
   value_flag_(entry.value_flag_),
   best_move_(entry.best_move_) {
   }
+
   // ムーブコンストラクタ。
   TTEntry::TTEntry(TTEntry&& entry) :
   exists_(entry.exists_),
   key_(entry.key_),
   depth_(entry.depth_),
-  level_(entry.level_),
   to_move_(entry.to_move_),
   value_(entry.value_),
   value_flag_(entry.value_flag_),
   best_move_(entry.best_move_) {
   }
+
   // コピー代入。
   TTEntry& TTEntry::operator=(const TTEntry& entry) {
     exists_ = entry.exists_;
     key_ = entry.key_;
     depth_ = entry.depth_;
-    level_ = entry.level_;
     to_move_ = entry.to_move_;
     value_ = entry.value_;
     value_flag_ = entry.value_flag_;
@@ -203,12 +251,12 @@ namespace Sayuri {
 
     return *this;
   }
+
   // ムーブ代入。
   TTEntry& TTEntry::operator=(TTEntry&& entry) {
     exists_ = entry.exists_;
     key_ = entry.key_;
     depth_ = entry.depth_;
-    level_ = entry.level_;
     to_move_ = entry.to_move_;
     value_ = entry.value_;
     value_flag_ = entry.value_flag_;
@@ -216,17 +264,18 @@ namespace Sayuri {
 
     return *this;
   }
-  // ソート用比較関数。
-  bool TTEntry::Compare(const TTEntry& first, const TTEntry& second) {
-    return first.level_ < second.level_;
-  }
+
   // 該当するならtrue。
-  bool TTEntry::Fulfil(HashKey key, int depth, int level, Side to_move) const {
+  bool TTEntry::Fulfil(HashKey key, int depth, Side to_move) const {
     if (!exists_) return false;
     if (depth > depth_) return false;
-    if (level < level_) return false;
     if (to_move != to_move_) return false;
     if (key != key_) return false;
     return true;
+  }
+
+  // ソート用比較関数。
+  bool TTEntry::Compare(const TTEntry& first, const TTEntry& second) {
+    return first.depth_ > second.depth_;
   }
 }  // namespace Sayuri

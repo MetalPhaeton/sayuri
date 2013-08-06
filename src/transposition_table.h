@@ -36,6 +36,8 @@
 #include "error.h"
 
 namespace Sayuri {
+  class TranspositionTable;
+
   /********************************************/
   /* トランスポジションテーブルのエントリー。 */
   /********************************************/
@@ -47,13 +49,12 @@ namespace Sayuri {
       // コンストラクタ。
       // [引数]
       // pos_key: ポジションのハッシュキー。
-      // depth: 深さ。
-      // level: レベル。
+      // depth: 探索の深さ。
       // to_move: 手番。
       // value: 評価値。
       // value_flag: 評価値の種類。
       // best_move: 最善手。
-      TTEntry(HashKey pos_key, int depth, int level,
+      TTEntry(HashKey pos_key, int depth,
       Side to_move, int value, TTValueFlag value_flag, Move best_move);
       // デフォルトコンストラクタ。
       TTEntry();
@@ -67,11 +68,6 @@ namespace Sayuri {
       TTEntry& operator=(const TTEntry& entry);
       TTEntry& operator=(TTEntry&& entry);
 
-      /************************/
-      /* ソート用比較演算子。 */
-      /************************/
-      static bool Compare(const TTEntry& first, const TTEntry& second);
-
       /**********/
       /* 関数。 */
       /**********/
@@ -79,12 +75,21 @@ namespace Sayuri {
       // 同じポジションかどうか判定する。
       // [引数]
       // key: ハッシュキー。
-      // depth: 深さ。
-      // level: レベル。
+      // depth: 探索の深さ。
       // to_move: 手番。
       // [戻り値]
       // 同じならtrue。
-      bool Fulfil(HashKey key, int depth, int level, Side to_move) const;
+      bool Fulfil(HashKey key, int depth, Side to_move) const;
+      // エントリーをアップデートする。
+      // [引数]
+      // value: 評価値。
+      // value_flag: 評価値の種類。
+      // best_move: 最善手。
+      void Update(int value, TTValueFlag value_flag, Move best_move) {
+        value_ = value;
+        value_flag_ = value_flag;
+        best_move_ = best_move;
+      }
 
       /**************/
       /* アクセサ。 */
@@ -95,8 +100,6 @@ namespace Sayuri {
       HashKey key() const {return key_;}
       // 深さ。
       int depth() const {return depth_;}
-      // レベル。
-      int level() const {return level_;}
       // 手番。
       Side to_move() const {return to_move_;}
       // 評価値。
@@ -106,7 +109,17 @@ namespace Sayuri {
       // 最善手。
       Move best_move() const {return best_move_;}
 
+      /**********************/
+      /* ソート用比較関数。 */
+      /**********************/
+      static bool Compare(const TTEntry& first, const TTEntry& second);
+
     private:
+      /**************/
+      /* フレンド。 */
+      /**************/
+      friend class TranspositionTable;
+
       /****************/
       /* メンバ変数。 */
       /****************/
@@ -114,10 +127,8 @@ namespace Sayuri {
       bool exists_;
       // ハッシュキー。
       HashKey key_;
-      // 深さ。
+      // 探索のレベル。
       int depth_;
-      // レベル。
-      int level_;
       // 手番。
       Side to_move_;
       // 評価値。
@@ -161,24 +172,22 @@ namespace Sayuri {
       // テーブルに追加する。
       // [引数]
       // key: ハッシュキー。
-      // depth: 深さ。
-      // level: レベル。
+      // depth: 探索の深さ。
       // to_move: 手番。
       // value: 評価値。
       // value_flag: 評価値の種類。
       // best_move: 最善手。
-      void Add(HashKey key, int depth, int level, Side to_move,
+      void Add(HashKey key, int depth, Side to_move,
       int value, TTValueFlag value_flag, Move best_move);
       // 条件を満たすエントリーを得る。
       // [引数]
       // pos_key: ハッシュキー。
-      // depth: 深さ。
-      // level: レベル。
+      // depth: 探索の深さ。
       // to_move: 手番。
       // [戻り値]
       // 条件を満たすエントリー。
       // なければnullptr。
-      const TTEntry* GetFulfiledEntry(HashKey pos_key, int depth, int level,
+      TTEntry* GetFulfiledEntry(HashKey pos_key, int depth,
       Side to_move) const;
 
       // 大きさが何バイトか返す。
@@ -190,6 +199,19 @@ namespace Sayuri {
       // [戻り値]
       // 最大値中のパーミル。
       double GetSizePermill() const;
+
+      // 含まれているエントリーの数を全体の何パーミルかを返す。
+      // [戻り値]
+      // エントリーのパーミル。
+      double GetEntryPermill() const;
+
+      // エントリーの種類ごとの比率データ。
+      // [引数]
+      // <Type>: 調べたい種類。
+      // [戻り値]
+      // 調べたい種類の比率データ。パーミル。
+      template<TTValueFlag Type>
+      double GetRatioPermill() const;
 
     private:
       /**************/

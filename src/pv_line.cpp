@@ -38,11 +38,11 @@ namespace Sayuri {
   /* コンストラクタ。 */
   /********************/
   // コンストラクタ。
-  PVLine::PVLine() : length_(0) {}
+  PVLine::PVLine() : length_(0), score_(0) {}
 
   // コピーコンストラクタ。
   PVLine::PVLine(const PVLine& pv_line) :
-  length_(pv_line.length_) {
+  length_(pv_line.length_), score_(pv_line.score_) {
     for (std::size_t i = 0; i < length_; i++) {
       line_[i] = pv_line.line_[i];
     }
@@ -50,7 +50,7 @@ namespace Sayuri {
 
   // ムーブコンストラクタ。
   PVLine::PVLine(PVLine&& pv_line) :
-  length_(pv_line.length_) {
+  length_(pv_line.length_), score_(pv_line.score_) {
     for (std::size_t i = 0; i < length_; i++) {
       line_[i] = pv_line.line_[i];
     }
@@ -59,6 +59,7 @@ namespace Sayuri {
   // コピー代入。
   PVLine& PVLine::operator=(const PVLine& pv_line) {
     length_ = pv_line.length_;
+    score_ = pv_line.score_;
     for (std::size_t i = 0; i < length_; i++) {
       line_[i] = pv_line.line_[i];
     }
@@ -68,6 +69,7 @@ namespace Sayuri {
   // ムーブ代入。
   PVLine& PVLine::operator=(PVLine&& pv_line) {
     length_ = pv_line.length_;
+    score_ = pv_line.score_;
     for (std::size_t i = 0; i < length_; i++) {
       line_[i] = pv_line.line_[i];
     }
@@ -78,30 +80,31 @@ namespace Sayuri {
   /* パブリック関数。 */
   /********************/
   // 最初の要素に手をセットする。
-  PVLine& PVLine::operator=(Move move) {
+  void PVLine::SetMove(Move move) {
     line_[0].move_ = move;
     length_ = 1;
-
-    return *this;
   }
 
   // PVラインを2番目以降の要素にコピーする。
-  PVLine& PVLine::operator+=(const PVLine& pv_line) {
+  void PVLine::Insert(const PVLine& pv_line) {
     length_ = pv_line.length_ + 1;
-    if (length_ > static_cast<std::size_t>(MAX_PLY + 1))
-      length_ = MAX_PLY + 1;
+    if (length_ > static_cast<std::size_t>(MAX_PLYS + 1))
+      length_ = MAX_PLYS + 1;
 
     for (std::size_t i = 1; i < length_; i++) {
       line_[i] = pv_line.line_[i - 1];
     }
-
-    return *this;
   }
 
   // 最初の要素にチェックメイトされたことを記録する。
   void PVLine::MarkCheckmated() {
     line_[0].has_checkmated_ = true;
     length_ = 1;
+  }
+
+  // ソート用比較関数。
+  bool PVLine::Compare(const PVLine& first, const PVLine& second) {
+    return first.score_ > second.score_;
   }
 
   /**********/

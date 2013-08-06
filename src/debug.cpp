@@ -29,10 +29,10 @@
 #include <iostream>
 #include <utility>
 #include <cstdint>
-#include <ctime>
 #include <memory>
 #include <string>
 #include <sstream>
+#include <random>
 
 #include "sayuri.h"
 
@@ -55,8 +55,7 @@ namespace Sayuri {
 
   // 擬似ハッシュキー生成。
   HashKey GenPseudoHashKey() {
-    int time = std::time(nullptr);
-    std::mt19937 engine(time);
+    std::mt19937 engine(SysClock::to_time_t(SysClock::now()));
     std::uniform_int_distribution<HashKey> dist(0, 0xffffffffffffffffULL);
     return dist(engine);
   }
@@ -299,19 +298,20 @@ namespace Sayuri {
    * ストップウォッチ。 *
    **********************/
   namespace {
-    std::time_t start_time = 0;  // スタートタイム。
-    std::time_t end_time = 0;  // ストップタイム。
+    TimePoint start_point;
+    TimePoint end_point;
   }
   // ストップウォッチをスタートする。
   void Start() {
-    std::time(&start_time);
+    start_point = SysClock::now();
   }
   // ストップウォッチをストップする。
   void Stop() {
-    std::time(&end_time);
+    end_point = SysClock::now();
   }
   // ストップウォッチで計測した秒数を得る。
-  double GetTime() {
-    return std::difftime(end_time, start_time);
+  int GetTime() {
+    return Chrono::duration_cast<Chrono::milliseconds>
+    (end_point - start_point).count();
   }
 }  // namespace Sayuri
