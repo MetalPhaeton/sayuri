@@ -83,9 +83,9 @@ namespace Sayuri {
     };
   }  // namespace
 
-  /********************/
-  /* コンストラクタ。 */
-  /********************/
+  /**************************/
+  /* コンストラクタと代入。 */
+  /**************************/
   // コンストラクタ。
   Evaluator::Evaluator(ChessEngine* engine_ptr)
   : engine_ptr_(engine_ptr) {

@@ -1,4 +1,8 @@
-/* misaki.h: Misakiライブラリの全ヘッダファイル。
+/* 
+   sayuri.h: sayuriの全ヘッダファイル。
+
+   The MIT License (MIT)
+
    Copyright (c) 2013 Ishibashi Hironori
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,7 +22,7 @@
    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
    IN THE SOFTWARE.
- */
+*/
 
 #ifndef SAYURI_H
 #define SAYURI_H
@@ -37,5 +41,6 @@
 #include "move_maker.h"
 #include "pv_line.h"
 #include "evaluator.h"
+#include "uci_shell.h"
 
 #endif

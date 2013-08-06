@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <vector>
+#include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "transposition_table.h"
@@ -61,9 +62,9 @@ namespace Sayuri {
       }
 
 
-      /********************/
-      /* コンストラクタ。 */
-      /********************/
+      /**************************/
+      /* コンストラクタと代入。 */
+      /**************************/
       ChessEngine();
       ChessEngine(const ChessEngine& engine);
       ChessEngine(ChessEngine&& engine);
@@ -84,26 +85,42 @@ namespace Sayuri {
 
       // 探索のストップ条件を設定する。
       // [引数]
-      // max_nodes: 最大探索ノード数。
       // max_depth: 最大探索深さ。
+      // max_nodes: 最大探索ノード数。
       // thinking_time: 思考時間。
       // infinite_thinking: 無限に思考するかどうか。
-      void SetStopper(std::size_t max_nodes, int max_depth,
+      void SetStopper(int max_depth, std::size_t max_nodes,
       Chrono::milliseconds thinking_time, bool infinite_thinking);
 
-      // 探索を終了させる。
-      void StopThinking();
+      // 思考を始める。
+      // [引数]
+      // pv_line: 最善手が格納される。
+      // moves_to_search_ptr: 探索する候補手。nullptrなら全ての手を探索する。
+      void Calculate(PVLine& pv_line,
+      std::vector<Move>* moves_to_search_ptr);
 
-      /****************/
-      /* static関数。 */
-      /****************/
-      // 思考開始する。
-      static void GoThinking(ChessEngine& engine);
+      // 探索を終了させる。
+      void StopCalculation();
+
+      // 手を指す。
+      // [引数]
+      // move: 動かす手。
+      void PlayMove(Move move);
+      // 1手戻す。
+      void UndoMove();
+
+      /**************/
+      /* アクセサ。 */
+      /**************/
+      // 駒の配置を得る。
+      const Bitboard (& position() const)[NUM_SIDES][NUM_PIECE_TYPES] {
+        return position_;
+      }
 
       /******************/
       /* ミューテータ。 */
       /******************/
-      void table_size(std::size_t size) {table_size_ = size;}
+      void table_size(std::size_t table_size) {table_size_ = table_size;}
 
     private:
       /**************/
@@ -133,44 +150,6 @@ namespace Sayuri {
       /******************/
       /* 探索エンジン。 */
       /******************/
-      // 探索したノード数。
-      volatile std::size_t searched_nodes_;
-      // 探索開始時間。
-      TimePoint start_time_;
-      // 探索したレベル。
-      volatile int searched_level_;
-      // ヌルサーチ中。
-      bool is_null_searching_;
-      // トランスポジションテーブルの大きさ。
-      std::size_t table_size_;
-      // ヒストリーの最大値。
-      int history_max_;
-      // ストップ条件構造体。
-      struct Stopper {
-        // 何が何でも探索を中断。
-        bool stop_now_;
-
-        // 最大探索ノード数。
-        std::size_t max_nodes_;
-
-        // 最大探索深さ。
-        int max_depth_;
-
-        // 思考時間。
-        Chrono::milliseconds thinking_time_;
-
-        // 無限に考える。
-        bool infinite_thinking_;
-
-        // コンストラクタ。
-        Stopper() :
-        stop_now_(false),
-        max_nodes_(MAX_NODES),
-        max_depth_(MAX_PLYS),
-        thinking_time_(Chrono::milliseconds(600000)),
-        infinite_thinking_(false) {}
-      };
-      Stopper stopper_;
       // クイース探索。
       // [引数]
       // pos_key: 現在のハッシュキー。
@@ -201,7 +180,9 @@ namespace Sayuri {
       // 探索のルート。
       // [引数]
       // pv_line: 探索結果がここに入る。
-      void SearchRoot(PVLine& pv_line);
+      // moves_to_search_ptr: 探索する候補手。nullptrなら全ての手を探索する。
+      void SearchRoot(PVLine& pv_line,
+      std::vector<Move>* moves_to_search_ptr);
       // Futility Pruningのマージンを計算する。
       // [引数]
       // move: 指し手。
@@ -290,6 +271,11 @@ namespace Sayuri {
       // 攻撃している駒のビットボード。
       Bitboard GetAttackers(Square target_square, Side side) const;
 
+      // 情報を送る。
+      // [引数]
+      // table: サイズを図るためのテーブル。
+      void SendOtherInfo(const TranspositionTable& table) const;
+
       /****************/
       /* メンバ変数。 */
       /****************/
@@ -328,6 +314,48 @@ namespace Sayuri {
       Move iid_stack_[MAX_PLYS];
       // キラームーブスタック。
       Move killer_stack_[MAX_PLYS];
+      // 探索したノード数。
+      std::size_t searched_nodes_;
+      // 探索開始時間。
+      TimePoint start_time_;
+      // 探索したレベル。
+      int searched_level_;
+      // ヌルサーチ中。
+      bool is_null_searching_;
+      // ヒストリーの最大値。
+      int history_max_;
+      // ストップ条件構造体。
+      struct Stopper {
+        // 何が何でも探索を中断。
+        bool stop_now_;
+
+        // 最大探索ノード数。
+        std::size_t max_nodes_;
+
+        // 最大探索深さ。
+        int max_depth_;
+
+        // 思考時間。
+        int thinking_time_;
+
+        // 無限に考える。
+        bool infinite_thinking_;
+
+        // コンストラクタ。
+        Stopper() :
+        stop_now_(false),
+        max_nodes_(MAX_NODES),
+        max_depth_(MAX_PLYS),
+        thinking_time_(3600000),
+        infinite_thinking_(false) {}
+      };
+      volatile Stopper stopper_;
+      // 指し手の履歴。
+      std::vector<Move> move_history_;
+      // 50手ルールの履歴。
+      std::vector<int> ply_100_history_;
+      // トランスポジションテーブルのサイズ。
+      std::size_t table_size_;
 
       /**********************/
       /* ハッシュキー関連。 */

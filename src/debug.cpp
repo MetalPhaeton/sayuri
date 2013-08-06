@@ -29,12 +29,19 @@
 #include <iostream>
 #include <utility>
 #include <cstdint>
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <sstream>
 #include <random>
-
-#include "sayuri.h"
+#include <vector>
+#include "chess_def.h"
+#include "chess_util.h"
+#include "init.h"
+#include "error.h"
+#include "chess_engine.h"
+#include "uci_shell.h"
+#include "pv_line.h"
 
 namespace Sayuri {
   /**************************/
@@ -45,9 +52,22 @@ namespace Sayuri {
     // 初期化。------------------------------------------------------
     Init();
     // --------------------------------------------------------------
-    ChessEngine* engine = new ChessEngine();
-    engine->Test();
-    delete engine;
+
+    std::unique_ptr<ChessEngine> engine_ptr(new ChessEngine());
+    int depth = MAX_PLYS;
+    std::size_t nodes = MAX_NODES;
+    Chrono::milliseconds time(10000);
+    bool infinite = false;
+    engine_ptr->SetStopper(depth, nodes, time, infinite);
+
+    Fen fen(std::string("r1b1kbnr/1pp2ppp/p1pq4/4p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 w kq -"));
+    engine_ptr->LoadFen(fen);
+
+    PVLine pv_line;
+    std::size_t table_size = 50 * 1024 * 1024;
+    engine_ptr->table_size(table_size);
+    engine_ptr->Calculate(pv_line, nullptr);
+    PrintPosition(engine_ptr->position());
 
     return 0;
   }
@@ -234,7 +254,7 @@ namespace Sayuri {
   }
 
   //駒の配置を出力する。
-  void PrintPosition(Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]) {
+  void PrintPosition(const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]) {
     // 出力する文字列ストリーム。
     std::ostringstream osstream;
 

@@ -35,9 +35,9 @@ namespace Sayuri {
 
   class Evaluator {
     public:
-      /********************/
-      /* コンストラクタ。 */
-      /********************/
+      /**************************/
+      /* コンストラクタと代入。 */
+      /**************************/
       Evaluator(ChessEngine* engine_ptr);
       Evaluator() = delete;
       Evaluator(const Evaluator& eval);

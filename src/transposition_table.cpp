@@ -140,41 +140,37 @@ namespace Sayuri {
     return bytes;
   }
 
-  // テーブルのパーミル。
-  double TranspositionTable::GetSizePermill() const {
-    double max = static_cast<double>(max_bytes_);
-    double size = static_cast<double>(GetSizeBytes());
-    return (size / max) * 1000;
-  }
-
   // エントリーのパーミル。
-  double TranspositionTable::GetEntryPermill() const {
-    double max = static_cast<double>(TABLE_SIZE * entry_table_[0].size());
-    double num_entry = 0.0;
+  int TranspositionTable::GetEntryPermill() const {
+    // 全エントリーの数。
+    int num_all = TABLE_SIZE * entry_table_[0].size();
+
+    // 記録されているエントリーの数。
+    int num_entries = 0;
     for (std::size_t i = 0; i < TABLE_SIZE; i++) {
       for (auto& entry : entry_table_[i]) {
         if (entry.exists_) {
-          num_entry += 1.0;
+          num_entries++;
         } else {
           break;
         }
       }
     }
 
-    return (num_entry / max) * 1000.0;
+    return (num_entries * 1000) / num_all;
   }
 
   // エントリーの種類ごとの比率データ。
   template<TTValueFlag Type>
-  double TranspositionTable::GetRatioPermill() const {
-    double num_all = 0.0;
-    double num_entry = 0.0;
+  int TranspositionTable::GetRatioPermill() const {
+    int num_all = 0;
+    int num_entry = 0;
     for (std::size_t i = 0; i < TABLE_SIZE; i++) {
       for (auto& entry : entry_table_[i]) {
         if (entry.exists_) {
-          num_all += 1.0;
+          num_all += 1;
           if (entry.value_flag_ == Type) {
-            num_entry += 1.0;
+            num_entry += 1;
           }
         } else {
           break;
@@ -182,15 +178,15 @@ namespace Sayuri {
       }
     }
 
-    return (num_entry / num_all) * 1000.0;
+    return (num_entry * 1000) / num_all;
   }
   // 実体化。
   template
-  double TranspositionTable::GetRatioPermill<TTValueFlag::EXACT>() const;
+  int TranspositionTable::GetRatioPermill<TTValueFlag::EXACT>() const;
   template
-  double TranspositionTable::GetRatioPermill<TTValueFlag::ALPHA>() const;
+  int TranspositionTable::GetRatioPermill<TTValueFlag::ALPHA>() const;
   template
-  double TranspositionTable::GetRatioPermill<TTValueFlag::BETA>() const;
+  int TranspositionTable::GetRatioPermill<TTValueFlag::BETA>() const;
 
   /************************/
   /* エントリーのクラス。 */

@@ -29,19 +29,22 @@
 #include <iostream>
 #include <sstream>
 #include <random>
+#include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "transposition_table.h"
 #include "fen.h"
 #include "move_maker.h"
 #include "error.h"
+#include "uci_shell.h"
 
 namespace Sayuri {
-  /**********************************
-   * コンストラクタとデストラクタ。 *
-   **********************************/
+  /**************************/
+  /* コンストラクタと代入。 */
+  /***************************/
   // コンストラクタ。
-  ChessEngine::ChessEngine() {
+  ChessEngine::ChessEngine():
+  table_size_(TT_MIN_SIZE_BYTES) {
     SetNewGame();
   }
 
@@ -118,6 +121,15 @@ namespace Sayuri {
     for (int i = 0; i < MAX_PLYS; i++) {
       killer_stack_[i] = engine.killer_stack_[i];
     }
+
+    // 指し手の履歴をコピー。
+    move_history_ = engine.move_history_;
+
+    // 50手ルールの履歴をコピー。
+    ply_100_history_ = engine.ply_100_history_;
+
+    // トランスポジションテーブルのサイズ。
+    table_size_ = engine.table_size_;
   }
 
   // ムーブコンストラクタ。
@@ -193,6 +205,15 @@ namespace Sayuri {
     for (int i = 0; i < MAX_PLYS; i++) {
       killer_stack_[i] = engine.killer_stack_[i];
     }
+
+    // 指し手の履歴をムーブ。
+    move_history_ = std::move(engine.move_history_);
+
+    // 50手ルールの履歴をコピー。
+    ply_100_history_ = std::move(engine.ply_100_history_);
+
+    // トランスポジションテーブルのサイズ。
+    table_size_ = engine.table_size_;
   }
 
   // コピー代入。
@@ -268,6 +289,15 @@ namespace Sayuri {
     for (int i = 0; i < MAX_PLYS; i++) {
       killer_stack_[i] = engine.killer_stack_[i];
     }
+
+    // 指し手の履歴をコピー。
+    move_history_ = engine.move_history_;
+
+    // 50手ルールの履歴をコピー。
+    ply_100_history_ = engine.ply_100_history_;
+
+    // トランスポジションテーブルのサイズ。
+    table_size_ = engine.table_size_;
 
     return *this;
   }
@@ -345,6 +375,15 @@ namespace Sayuri {
     for (int i = 0; i < MAX_PLYS; i++) {
       killer_stack_[i] = engine.killer_stack_[i];
     }
+
+    // 指し手の履歴をムーブ。
+    move_history_ = std::move(engine.move_history_);
+
+    // 50手ルールの履歴をコピー。
+    ply_100_history_ = std::move(engine.ply_100_history_);
+
+    // トランスポジションテーブルのサイズ。
+    table_size_ = engine.table_size_;
 
     return *this;
   }
@@ -506,6 +545,7 @@ namespace Sayuri {
         }
       }
     }
+    history_max_ = 1;
 
     // iid_stack_の初期化。
     for (int i = 0; i < MAX_PLYS; i++) {
@@ -514,6 +554,85 @@ namespace Sayuri {
     // killer_stack_の初期化。
     for (int i = 0; i < MAX_PLYS; i++) {
       killer_stack_[i].all_ = 0;
+    }
+
+    // 手の履歴を削除。
+    move_history_.clear();
+
+    // 50手ルールの履歴を削除。
+    ply_100_history_.clear();
+  }
+
+  // 思考を始める。
+  void ChessEngine::Calculate(PVLine& pv_line,
+  std::vector<Move>* moves_to_search_ptr) {
+    SearchRoot(pv_line, moves_to_search_ptr);
+  }
+
+  // 思考を停止する。
+  void ChessEngine::StopCalculation() {
+    stopper_.stop_now_ = true;
+  }
+
+  // 手を指す。
+  void ChessEngine::PlayMove(Move move) {
+    // 合法手かどうか調べる。
+    // 手を展開する。
+    MoveMaker maker(this);
+    HashKey temp_key = 0ULL;
+    std::unique_ptr<TranspositionTable> temp_table
+    (new TranspositionTable(TT_MIN_SIZE_BYTES));
+    maker.GenMoves<GenMoveType::ALL>(temp_key, 0, 0, *(temp_table.get()));
+    // 合法手かどうか調べる。
+    bool is_legal = false;
+    Side side = to_move_;
+    Side enemy_side = side ^ 0x3;
+    for (Move temp_move = maker.PickMove(); temp_move.all_;
+    temp_move = maker.PickMove()) {
+      MakeMove(temp_move);
+      // temp_moveが合法手かどうか調べる。
+      if (IsAttacked(king_[side], enemy_side)) {
+        UnmakeMove(temp_move);
+        continue;
+      }
+      // temp_moveと同じ手かどうか調べる。
+      if ((move.to_ == temp_move.to_) && (move.from_ == temp_move.from_)
+      && (move.promotion_ == temp_move.promotion_)) {
+        UnmakeMove(temp_move);
+        move = temp_move;
+        is_legal = true;
+        break;
+      }
+      UnmakeMove(temp_move);
+    }
+
+    if (is_legal) {
+      ply_++;
+      if ((piece_board_[move.from_] == PAWN)
+      || (piece_board_[move.to_] != EMPTY)) {
+        ply_100_ = 0;
+      } else {
+        ply_100_++;
+      }
+      move_history_.push_back(move);
+      ply_100_history_.push_back(ply_100_);
+      MakeMove(move);
+    } else {
+      throw SayuriError("合法手ではありません。");
+    }
+  }
+
+  // 手を戻す。
+  void ChessEngine::UndoMove() {
+    if (move_history_.begin() < move_history_.end()) {
+      ply_--;
+      Move move = move_history_.back();
+      ply_100_ = ply_100_history_.back();
+      move_history_.pop_back();
+      ply_100_history_.pop_back();
+      UnmakeMove(move);
+    } else {
+      throw SayuriError("手を戻すことができません。");
     }
   }
 
@@ -1134,5 +1253,21 @@ namespace Sayuri {
 
     // 次の局面のハッシュキーを返す。
     return current_key;
+  }
+
+  // 情報を送る。
+  void ChessEngine::SendOtherInfo(const TranspositionTable& table) const {
+    // 時間。
+    Chrono::milliseconds time = Chrono::duration_cast<Chrono::milliseconds>
+    (SysClock::now() - start_time_);
+
+    // トランスポジションテーブルの使用量。
+    int hashfull = table.GetEntryPermill();
+
+    // Node Per Seconds。
+    int nps = searched_nodes_ / (time.count() / 1000);
+
+    // 標準出力に送る。
+    UCIShell::SendOtherInfo(time, hashfull, nps);
   }
 }  // namespace Sayuri

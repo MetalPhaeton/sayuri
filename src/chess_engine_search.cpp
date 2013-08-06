@@ -30,6 +30,7 @@
 #include <vector>
 #include <algorithm>
 #include <utility>
+#include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "transposition_table.h"
@@ -37,6 +38,7 @@
 #include "pv_line.h"
 #include "evaluator.h"
 #include "error.h"
+#include "uci_shell.h"
 
 namespace Sayuri {
   // クイース探索。
@@ -367,38 +369,9 @@ namespace Sayuri {
   int depth, int level, int alpha, int beta,
   TranspositionTable& table, PVLine& pv_line);
 
-  namespace {
-    // 手を文字列にする。
-    std::string BeMoveToString(Move move) {
-      char str[6];
-      str[0] = static_cast<char>(Util::GetFyle(move.from_) + 'a');
-      str[1] = static_cast<char>(Util::GetRank(move.from_) + '1');
-      str[2] = static_cast<char>(Util::GetFyle(move.to_) + 'a');
-      str[3] = static_cast<char>(Util::GetRank(move.to_) + '1');
-      switch (move.promotion_) {
-        case KNIGHT:
-          str[4] = 'n';
-          break;
-        case BISHOP:
-          str[4] = 'b';
-          break;
-        case ROOK:
-          str[4] = 'r';
-          break;
-        case QUEEN:
-          str[4] = 'q';
-          break;
-        default:
-          str[4] = '\0';
-          break;
-      }
-      str[5] = '\0';
-      return std::string(str);
-    }
-  }
-
   // 探索のルート。
-  void ChessEngine::SearchRoot(PVLine& pv_line) {
+  void ChessEngine::SearchRoot(PVLine& pv_line,
+  std::vector<Move>* moves_to_search_ptr) {
     // 初期化。
     searched_nodes_ = 0;
     searched_level_ = 0;
@@ -418,16 +391,19 @@ namespace Sayuri {
       }
     }
     history_max_ = 1;
+    stopper_.stop_now_ = false;
 
     // 使う変数。
     HashKey pos_key = GetCurrentKey();
     int level = 0;
     int alpha = -MAX_VALUE;
     int beta = MAX_VALUE;
-    std::unique_ptr<TranspositionTable>
-    table_ptr(new TranspositionTable(table_size_));
+    std::unique_ptr<TranspositionTable> table_ptr
+    (new TranspositionTable(table_size_));
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
+    TimePoint now = SysClock::now();
+    TimePoint next_send_info_time = now + Chrono::milliseconds(1000);
 
     // ゲーム終了した場合。
     if (!HasLegalMove(side)) {
@@ -466,12 +442,25 @@ namespace Sayuri {
         alpha -= delta;
       }
 
+      // ノードを加算。
+      searched_nodes_++;
+
+      // 標準出力に深さ情報を送る。
+      UCIShell::SendDepthInfo(depth);
+
       // 手を作る。
       maker.GenMoves<GenMoveType::ALL>(pos_key, depth, level,
       *(table_ptr.get()));
 
       for (Move move = maker.PickMove(); move.all_;
       move = maker.PickMove()) {
+        // 情報を送る。
+        now = SysClock::now();
+        if (now > next_send_info_time) {
+          SendOtherInfo(*(table_ptr.get()));
+          next_send_info_time = SysClock::now() + Chrono::milliseconds(1000);
+        }
+
         // 探索したレベルをリセット。
         searched_level_ = 0;
 
@@ -484,6 +473,26 @@ namespace Sayuri {
         if (IsAttacked(king_[side], enemy_side)) {
           UnmakeMove(move);
           continue;
+        }
+
+        // 探索すべき手が指定されていれば、今の手がその手かどうか調べる。
+        if (moves_to_search_ptr) {
+          bool hit = false;
+          for (auto& move_2 : *(moves_to_search_ptr)) {
+            if ((move_2.to_ == move.to_)
+            && (move_2.from_ == move.from_)
+            && (move_2.promotion_ == move.promotion_)) {
+              // 探索すべき手だった。
+              hit = true;
+              break;
+            }
+          }
+          if (!hit) {
+            // 探索すべき手ではなかった。
+            // 次の手へ。
+            UnmakeMove(move);
+            continue;
+          }
         }
 
         // PVSearch。
@@ -577,6 +586,19 @@ namespace Sayuri {
             entry_ptr->Update(score, TTValueFlag::EXACT, move);
           }
 
+          // 標準出力にPV情報を送る。
+          TimePoint now = SysClock::now();
+          Chrono::milliseconds time =
+          Chrono::duration_cast<Chrono::milliseconds>(now - start_time_);
+          UCIShell::SendPVInfo(depth, searched_level_, score, time,
+          searched_nodes_, pv_line);
+
+          // チェックメイトならもう探索しない。
+          if (pv_line.line()[pv_line.length() - 1].has_checkmated()) {
+            stopper_.stop_now_ = true;
+            break;
+          }
+
           alpha = score;
         }
       }
@@ -605,11 +627,11 @@ namespace Sayuri {
   }
 
   // ストップ条件を設定する。
-  void ChessEngine::SetStopper(std::size_t max_nodes, int max_depth,
+  void ChessEngine::SetStopper(int max_depth, std::size_t max_nodes,
   Chrono::milliseconds thinking_time, bool infinite_thinking) {
-    stopper_.max_nodes_ = max_nodes <= MAX_NODES ? max_nodes : MAX_NODES;
     stopper_.max_depth_ = max_depth <= MAX_PLYS ? max_depth : MAX_PLYS;
-    stopper_.thinking_time_ = thinking_time;
+    stopper_.max_nodes_ = max_nodes <= MAX_NODES ? max_nodes : MAX_NODES;
+    stopper_.thinking_time_ = thinking_time.count();
     stopper_.infinite_thinking_ = infinite_thinking;
   }
 
@@ -621,9 +643,9 @@ namespace Sayuri {
       stopper_.stop_now_ = true;
       return true;
     }
-    TimePoint now_time = SysClock::now();
-    if ((now_time - start_time_)
-    >= stopper_.thinking_time_) {
+    TimePoint now = SysClock::now();
+    if ((Chrono::duration_cast<Chrono::milliseconds>
+    (now - start_time_)).count() >= stopper_.thinking_time_) {
       stopper_.stop_now_ = true;
       return true;
     }

@@ -28,8 +28,9 @@
 #define SAYURI_DEBUG_H
 
 #include <iostream>
-
-#include "sayuri.h"
+#include "chess_def.h"
+#include "chess_util.h"
+#include "error.h"
 
 namespace Sayuri {
   // デバッグ用メイン関数。
@@ -76,7 +77,7 @@ namespace Sayuri {
   //    a b c d e f g h 
   // [引数]
   // 駒の配置のビットボード。
-  void PrintPosition(Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]);
+  void PrintPosition(const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]);
 
   /**********************
    * ストップウォッチ。 *

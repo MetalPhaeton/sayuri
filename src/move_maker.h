@@ -51,9 +51,9 @@ namespace Sayuri {
       static constexpr std::size_t MAX_SLOTS = 200;
 
     public:
-      /********************/
-      /* コンストラクタ。 */
-      /********************/
+      /**************************/
+      /* コンストラクタと代入。 */
+      /**************************/
       MoveMaker(ChessEngine* engine_ptr);
       MoveMaker() = delete;
       MoveMaker(const MoveMaker& maker);

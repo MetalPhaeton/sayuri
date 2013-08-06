@@ -43,9 +43,9 @@ namespace Sayuri {
   /********************************************/
   class TTEntry {
     public:
-      /****************************************/
-      /* コンストラクタとデストラクタと代入。 */
-      /****************************************/
+      /**************************/
+      /* コンストラクタと代入。 */
+      /**************************/
       // コンストラクタ。
       // [引数]
       // pos_key: ポジションのハッシュキー。
@@ -162,7 +162,6 @@ namespace Sayuri {
       // ムーブコンストラクタ。
       TranspositionTable(TranspositionTable&& table);
       TranspositionTable() = delete;
-
       // デストラクタ。
       virtual ~TranspositionTable() {}
 
@@ -195,15 +194,10 @@ namespace Sayuri {
       // サイズをバイト数で返す。
       std::size_t GetSizeBytes() const;
 
-      // テーブルのサイズを最大値の何パーミルかを得る。
-      // [戻り値]
-      // 最大値中のパーミル。
-      double GetSizePermill() const;
-
-      // 含まれているエントリーの数を全体の何パーミルかを返す。
+      // 含まれているエントリーのサイズを全体の何パーミルかを返す。
       // [戻り値]
       // エントリーのパーミル。
-      double GetEntryPermill() const;
+      int GetEntryPermill() const;
 
       // エントリーの種類ごとの比率データ。
       // [引数]
@@ -211,7 +205,7 @@ namespace Sayuri {
       // [戻り値]
       // 調べたい種類の比率データ。パーミル。
       template<TTValueFlag Type>
-      double GetRatioPermill() const;
+      int GetRatioPermill() const;
 
     private:
       /**************/
