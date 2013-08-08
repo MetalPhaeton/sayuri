@@ -76,7 +76,7 @@ namespace Sayuri {
       // num_nodes: 探索したノード数。
       // hashfull: トランスポジションテーブルの使用量。
       static void SendOtherInfo(Chrono::milliseconds time,
-      int num_nodes, int hashfull);
+      std::size_t num_nodes, int hashfull);
 
     private:
       /****************/

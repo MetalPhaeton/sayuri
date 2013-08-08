@@ -60,13 +60,14 @@ namespace Sayuri {
     bool infinite = false;
     engine_ptr->SetStopper(depth, nodes, time, infinite);
 
-    Fen fen(std::string("r1b1kbnr/1pp2ppp/p1pq4/4p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 w kq -"));
+    Fen fen(std::string("r1b1kbnr/1pp2ppp/p1pq4/4p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 0 1"));
     engine_ptr->LoadFen(fen);
 
     std::size_t table_size = 50 * 1024 * 1024;
     engine_ptr->table_size(table_size);
     PVLine pv_line = engine_ptr->Calculate(nullptr);
 
+    /*
     std::cout << "----------------------------------------" << std::endl;
     for (std::size_t i = 0; i < pv_line.length(); i++) {
       std::cout << std::endl;
@@ -78,6 +79,7 @@ namespace Sayuri {
       std::cout << std::endl;
       std::cout << "----------------------------------------" << std::endl;
     }
+    */
 
     return 0;
   }

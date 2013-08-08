@@ -132,10 +132,12 @@ namespace Sayuri {
 
   // その他の情報を標準出力に送る。
   void UCIShell::SendOtherInfo(Chrono::milliseconds time,
-  int num_nodes, int hashfull) {
-    std::cout << "info time " << time.count();
+  std::size_t num_nodes, int hashfull) {
+    int time_2 = time.count();
+    if (time_2 <= 0) time_2 = 1;
+    std::cout << "info time " << time_2;
     std::cout << " nodes " << num_nodes;
     std::cout << " hashfull " << hashfull;
-    std::cout << " nps " << num_nodes / (time.count() / 1000) << std::endl;
+    std::cout << " nps " << (num_nodes * 1000) / time_2 << std::endl;
   }
 }  // namespace Sayuri

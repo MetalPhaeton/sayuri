@@ -55,23 +55,28 @@ namespace Sayuri {
       searched_level_ = level;
     }
 
+    // サイドと得点。
+    Side side = to_move_;
+    Side enemy_side = side ^ 0x3;
+    int score;
+
     // stand_pad。
     Evaluator eval(this);
     int stand_pad = eval.Evaluate();
 
     // アルファ値、ベータ値を調べる。
-    if (stand_pad >= beta) return beta;
-    if (stand_pad > alpha) alpha = stand_pad;
+    if (stand_pad >= beta) {
+      return beta;
+    }
+    if (stand_pad > alpha) {
+      alpha = stand_pad;
+    }
 
     // 探索できる限界を超えているか。
     // 超えていればこれ以上探索しない。
     if (level >= MAX_PLYS) {
       return alpha;
     }
-
-    // サイド。
-    Side side = to_move_;
-    Side enemy_side = side ^ 0x3;
 
     // 候補手を作る。
     // 駒を取る手だけ。
@@ -86,7 +91,6 @@ namespace Sayuri {
     int material = GetMaterial(side);
 
     // 探索する。
-    int score;
     int margin;
     for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
       // マージン。
@@ -113,8 +117,13 @@ namespace Sayuri {
       UnmakeMove(move);
 
       // アルファ値、ベータ値を調べる。
-      if (score > alpha) alpha = score;
-      if (score >= beta) return beta;
+      if (score > alpha) {
+        alpha = score;
+      }
+      if (score >= beta) {
+        alpha = beta;
+        break;
+      }
     }
 
     return alpha;
@@ -140,6 +149,24 @@ namespace Sayuri {
     Side enemy_side = side ^ 0x3;
     int score;
     bool is_checked = IsAttacked(king_[side], enemy_side);
+
+    // ゲーム終了した場合。
+    if (!HasLegalMove(side)) {
+      if (is_checked) {
+        // チェックメイト。
+        pv_line.MarkCheckmated();
+        score = SCORE_LOSE;
+        if (score >= beta) return beta;
+        if (score <= alpha) return alpha;
+        return score;
+      } else {
+        // ステールメイト。
+        score = SCORE_DRAW;
+        if (score >= beta) return beta;
+        if (score <= alpha) return alpha;
+        return score;
+      }
+    }
 
     // トランスポジションテーブルを調べる。
     TTEntry* entry_ptr =
@@ -167,26 +194,9 @@ namespace Sayuri {
     }
 
     // 深さが0ならクイース。
-    if (depth <= 0) {
+    // 限界探索数を超えていてもクイース。
+    if ((depth <= 0) || (level >= MAX_PLYS)) {
       return Quiesce(pos_key, depth, level, alpha, beta, table);
-    }
-
-    // ゲーム終了した場合。
-    if (!HasLegalMove(side)) {
-      if (is_checked) {
-        // チェックメイト。
-        pv_line.MarkCheckmated();
-        score = SCORE_LOSE;
-        if (score >= beta) return beta;
-        if (score <= alpha) return alpha;
-        return score;
-      } else {
-        // ステールメイト。
-        score = SCORE_DRAW;
-        if (score >= beta) return beta;
-        if (score <= alpha) return alpha;
-        return score;
-      }
     }
 
     // PVノードの時はIID、そうじゃないノードならNull Move Reduction。
@@ -216,7 +226,7 @@ namespace Sayuri {
         MakeMove(null_move);
 
         // Null Move Search。
-        int red = depth > 6 ? 4 : 3;
+        int red = (depth / 2) + 1;
         score = -Search<NodeType::NON_PV>(pos_key, depth - red - 1, level + 1,
         -(beta), -(beta - 1), table, temp_line);
 
@@ -244,8 +254,8 @@ namespace Sayuri {
 
     // ループ。
     TTValueFlag value_flag = TTValueFlag::ALPHA;
-    bool is_searching_pv = true;
     HashKey next_key;
+    bool is_searching_pv = true;
     PVLine next_line;
     int margin;
     int num_searched_moves = 0;
@@ -275,7 +285,7 @@ namespace Sayuri {
       // 探索。
       // Late Move Reduction。
       if ((depth >= 3) && (num_searched_moves >= 4)) {
-        int red = 1;
+        int red = depth / 3;
         if (!is_checked && (Type == NodeType::NON_PV)) {
           // History Puruning。
           if (!move.captured_piece_
@@ -286,6 +296,7 @@ namespace Sayuri {
         score = -Search<NodeType::NON_PV>(next_key, depth - red - 1,
         level + 1, -(alpha + 1), -alpha, table, next_line);
       } else {
+        // PVSearchをするためにalphaより大きくしておく。
         score = alpha + 1;
       }
       if (score > alpha) {
@@ -552,9 +563,10 @@ namespace Sayuri {
           // PV発見後。
           // Late move Reduction。
           if ((depth >= 3) && (num_searched_moves >= 4)) {
+            int red = depth / 3;
             // ゼロウィンドウ探索。
-            score = -Search<NodeType::NON_PV>(next_key, depth - 2, level + 1,
-            -(alpha + 1), -alpha, *(table_ptr.get()), next_line);
+            score = -Search<NodeType::NON_PV>(next_key, depth - red - 1,
+            level + 1, -(alpha + 1), -alpha, *(table_ptr.get()), next_line);
           } else {
             // 普通に探索するためにscoreをalphaより大きくしておく。
             score = alpha + 1;
