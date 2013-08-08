@@ -63,11 +63,21 @@ namespace Sayuri {
     Fen fen(std::string("r1b1kbnr/1pp2ppp/p1pq4/4p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 w kq -"));
     engine_ptr->LoadFen(fen);
 
-    PVLine pv_line;
     std::size_t table_size = 50 * 1024 * 1024;
     engine_ptr->table_size(table_size);
-    engine_ptr->Calculate(pv_line, nullptr);
-    PrintPosition(engine_ptr->position());
+    PVLine pv_line = engine_ptr->Calculate(nullptr);
+
+    std::cout << "----------------------------------------" << std::endl;
+    for (std::size_t i = 0; i < pv_line.length(); i++) {
+      std::cout << std::endl;
+      if (pv_line.line()[i].has_checkmated()) {
+        std::cout << "Checkmated!" << std::endl;
+      } else {
+        PrintMove(pv_line.line()[i].move());
+      }
+      std::cout << std::endl;
+      std::cout << "----------------------------------------" << std::endl;
+    }
 
     return 0;
   }

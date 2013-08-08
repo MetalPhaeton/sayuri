@@ -30,6 +30,7 @@
 #include <sstream>
 #include <random>
 #include <cstddef>
+#include <utility>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "transposition_table.h"
@@ -564,9 +565,8 @@ namespace Sayuri {
   }
 
   // 思考を始める。
-  void ChessEngine::Calculate(PVLine& pv_line,
-  std::vector<Move>* moves_to_search_ptr) {
-    SearchRoot(pv_line, moves_to_search_ptr);
+  PVLine ChessEngine::Calculate(std::vector<Move>* moves_to_search_ptr) {
+    return std::move(SearchRoot(moves_to_search_ptr));
   }
 
   // 思考を停止する。
@@ -1253,21 +1253,5 @@ namespace Sayuri {
 
     // 次の局面のハッシュキーを返す。
     return current_key;
-  }
-
-  // 情報を送る。
-  void ChessEngine::SendOtherInfo(const TranspositionTable& table) const {
-    // 時間。
-    Chrono::milliseconds time = Chrono::duration_cast<Chrono::milliseconds>
-    (SysClock::now() - start_time_);
-
-    // トランスポジションテーブルの使用量。
-    int hashfull = table.GetEntryPermill();
-
-    // Node Per Seconds。
-    int nps = searched_nodes_ / (time.count() / 1000);
-
-    // 標準出力に送る。
-    UCIShell::SendOtherInfo(time, hashfull, nps);
   }
 }  // namespace Sayuri

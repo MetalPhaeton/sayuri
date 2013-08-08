@@ -135,7 +135,7 @@ namespace Sayuri {
     return *this;
   }
 
-  // コピー代入。
+  // ムーブ代入。
   PVSlot& PVSlot::operator=(PVSlot&& slot) {
     has_checkmated_ = slot.has_checkmated_;
     move_ = slot.move_;

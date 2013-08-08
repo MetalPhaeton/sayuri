@@ -65,13 +65,18 @@ namespace Sayuri {
       // [引数]
       // depth: 基本の深さ。
       static void SendDepthInfo(int depth);
+      // 現在探索している手の情報を標準出力に送る。
+      // [引数]
+      // move: 現在探索している手。
+      // move_num: 手の番号。
+      static void SendCurrentMoveInfo(Move move, int move_num);
       // その他の情報を標準出力に送る。
       // [引数]
       // time: 時間。
+      // num_nodes: 探索したノード数。
       // hashfull: トランスポジションテーブルの使用量。
-      // nps: Node Per Seconds。
       static void SendOtherInfo(Chrono::milliseconds time,
-      int hashfull, int nps);
+      int num_nodes, int hashfull);
 
     private:
       /****************/

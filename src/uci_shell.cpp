@@ -97,11 +97,45 @@ namespace Sayuri {
     std::cout << "info depth " << depth << std::endl;
   }
 
+  // 現在探索している手の情報を標準出力に送る。
+  void UCIShell::SendCurrentMoveInfo(Move move, int move_num) {
+    // 手の情報を送る。
+    std::cout << "info currmove ";
+    char str[6];
+    str[0] = Util::GetFyle(move.from_) + 'a';
+    str[1] = Util::GetRank(move.from_) + '1';
+    str[2] = Util::GetFyle(move.to_) + 'a';
+    str[3] = Util::GetRank(move.to_) + '1';
+    switch (move.promotion_) {
+      case KNIGHT:
+        str[4] = 'n';
+        break;
+      case BISHOP:
+        str[4] = 'b';
+        break;
+      case ROOK:
+        str[4] = 'r';
+        break;
+      case QUEEN:
+        str[4] = 'q';
+        break;
+      default:
+        str[4] = '\0';
+        break;
+    }
+    str[5] = '\0';
+    std::cout << str;
+
+    // 手の番号を送る。
+    std::cout << " currmovenumber " << move_num << std::endl;
+  }
+
   // その他の情報を標準出力に送る。
   void UCIShell::SendOtherInfo(Chrono::milliseconds time,
-  int hashfull, int nps) {
+  int num_nodes, int hashfull) {
     std::cout << "info time " << time.count();
+    std::cout << " nodes " << num_nodes;
     std::cout << " hashfull " << hashfull;
-    std::cout << " nps " << nps << std::endl;
+    std::cout << " nps " << num_nodes / (time.count() / 1000) << std::endl;
   }
 }  // namespace Sayuri

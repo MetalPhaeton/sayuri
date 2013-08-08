@@ -94,10 +94,10 @@ namespace Sayuri {
 
       // 思考を始める。
       // [引数]
-      // pv_line: 最善手が格納される。
       // moves_to_search_ptr: 探索する候補手。nullptrなら全ての手を探索する。
-      void Calculate(PVLine& pv_line,
-      std::vector<Move>* moves_to_search_ptr);
+      // [戻り値]
+      // PVライン。
+      PVLine Calculate(std::vector<Move>* moves_to_search_ptr);
 
       // 探索を終了させる。
       void StopCalculation();
@@ -179,10 +179,10 @@ namespace Sayuri {
       TranspositionTable& table, PVLine& pv_line);
       // 探索のルート。
       // [引数]
-      // pv_line: 探索結果がここに入る。
       // moves_to_search_ptr: 探索する候補手。nullptrなら全ての手を探索する。
-      void SearchRoot(PVLine& pv_line,
-      std::vector<Move>* moves_to_search_ptr);
+      // [戻り値]
+      // PVライン。
+      PVLine SearchRoot(std::vector<Move>* moves_to_search_ptr);
       // Futility Pruningのマージンを計算する。
       // [引数]
       // move: 指し手。
@@ -270,11 +270,6 @@ namespace Sayuri {
       // [戻り値]
       // 攻撃している駒のビットボード。
       Bitboard GetAttackers(Square target_square, Side side) const;
-
-      // 情報を送る。
-      // [引数]
-      // table: サイズを図るためのテーブル。
-      void SendOtherInfo(const TranspositionTable& table) const;
 
       /****************/
       /* メンバ変数。 */

@@ -370,8 +370,7 @@ namespace Sayuri {
   TranspositionTable& table, PVLine& pv_line);
 
   // 探索のルート。
-  void ChessEngine::SearchRoot(PVLine& pv_line,
-  std::vector<Move>* moves_to_search_ptr) {
+  PVLine ChessEngine::SearchRoot(std::vector<Move>* moves_to_search_ptr) {
     // 初期化。
     searched_nodes_ = 0;
     searched_level_ = 0;
@@ -402,8 +401,13 @@ namespace Sayuri {
     (new TranspositionTable(table_size_));
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
+    PVLine pv_line;
+    PVLine cur_line;
+    PVLine next_line;
     TimePoint now = SysClock::now();
     TimePoint next_send_info_time = now + Chrono::milliseconds(1000);
+    std::vector<Move> move_vec;
+    int move_num;
 
     // ゲーム終了した場合。
     if (!HasLegalMove(side)) {
@@ -411,17 +415,16 @@ namespace Sayuri {
         // チェックメイト。
         pv_line.MarkCheckmated();
         pv_line.score(SCORE_LOSE);
-        return;
+        return std::move(pv_line);
       } else {
         // ステールメイト。
-        return;
+        return std::move(pv_line);
       }
     }
 
     // Iterative Deepening。
     HashKey next_key;
     int score;
-    PVLine next_line;
     bool is_searching_pv;
     MoveMaker maker(this);
     TTEntry* entry_ptr = nullptr;
@@ -433,6 +436,7 @@ namespace Sayuri {
       entry_ptr = nullptr;
       delta = 15;
       num_searched_moves = 0;
+      move_num = 0;
 
       if (depth < 5) {
         alpha = -MAX_VALUE;
@@ -457,8 +461,11 @@ namespace Sayuri {
         // 情報を送る。
         now = SysClock::now();
         if (now > next_send_info_time) {
-          SendOtherInfo(*(table_ptr.get()));
-          next_send_info_time = SysClock::now() + Chrono::milliseconds(1000);
+          UCIShell::SendOtherInfo
+          (Chrono::duration_cast<Chrono::milliseconds>(now - start_time_),
+          searched_nodes_, table_ptr->GetEntryPermill());
+
+          next_send_info_time = now + Chrono::milliseconds(1000);
         }
 
         // 探索したレベルをリセット。
@@ -492,6 +499,26 @@ namespace Sayuri {
             // 次の手へ。
             UnmakeMove(move);
             continue;
+          }
+        }
+
+        // 現在探索している手の情報を送る。
+        if (depth <= 1) {
+          // 最初の探索。
+          UCIShell::SendCurrentMoveInfo(move, move_num);
+          move_vec.push_back(move);
+          move_num++;
+        } else {
+          // 2回目以降の探索。
+          move_num = 0;
+          for (auto& move_2 : move_vec) {
+            if ((move.from_ == move_2.from_)
+            && (move.to_ == move_2.to_)
+            && (move.promotion_ == move_2.promotion_)) {
+              UCIShell::SendCurrentMoveInfo(move, move_num);
+              break;
+            }
+            move_num++;
           }
         }
 
@@ -572,9 +599,9 @@ namespace Sayuri {
           is_searching_pv = false;
 
           // PVラインにセット。
-          pv_line.SetMove(move);
-          pv_line.Insert(next_line);
-          pv_line.score(score);
+          cur_line.SetMove(move);
+          cur_line.Insert(next_line);
+          cur_line.score(score);
 
           // トランスポジションテーブルに登録。
           if (!entry_ptr) {
@@ -591,10 +618,10 @@ namespace Sayuri {
           Chrono::milliseconds time =
           Chrono::duration_cast<Chrono::milliseconds>(now - start_time_);
           UCIShell::SendPVInfo(depth, searched_level_, score, time,
-          searched_nodes_, pv_line);
+          searched_nodes_, cur_line);
 
           // チェックメイトならもう探索しない。
-          if (pv_line.line()[pv_line.length() - 1].has_checkmated()) {
+          if (cur_line.line()[cur_line.length() - 1].has_checkmated()) {
             stopper_.stop_now_ = true;
             break;
           }
@@ -605,7 +632,12 @@ namespace Sayuri {
 
       // ストップがかかっていたらループを抜ける。
       if (ShouldBeStopped()) break;
+
+      // PVラインをセット。
+      pv_line = cur_line;
     }
+
+    return std::move(pv_line);
   }
 
   // Futility Pruningのマージンを計算する。
