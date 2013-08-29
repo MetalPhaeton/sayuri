@@ -78,7 +78,26 @@ namespace Sayuri {
       static void SendOtherInfo(Chrono::milliseconds time,
       std::size_t num_nodes, int hashfull);
 
+      // インプット用スレッド。
+      // [引数]
+      // shell: UCIシェル。
+      static void ThreadUCIInput(UCIShell& shell);
+      // 思考用スレッド。
+      // [引数]
+      // shell: UCIシェル。
+      static void ThreadGoThinking(UCIShell& shell);
+
     private:
+      /*********************/
+      /* UCIコマンド関数。 */
+      /*********************/
+      // uciコマンド。
+      void DoUCI();
+      // isreadyコマンド。
+      void DoIsReady();
+      // quitコマンド。
+      void DoQuit();
+
       /****************/
       /* メンバ変数。 */
       /****************/

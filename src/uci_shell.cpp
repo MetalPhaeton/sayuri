@@ -33,6 +33,36 @@
 #include "error.h"
 
 namespace Sayuri {
+  /**************************/
+  /* コンストラクタと代入。 */
+  /**************************/
+  // コンストラクタ。
+  UCIShell::UCIShell(ChessEngine* engine_ptr) :
+  engine_ptr_(engine_ptr) {
+  }
+
+  // コピーコンストラクタ。
+  UCIShell::UCIShell(const UCIShell& shell) :
+  engine_ptr_(shell.engine_ptr_) {
+  }
+
+  // ムーブコンストラクタ。
+  UCIShell::UCIShell(UCIShell&& shell) :
+  engine_ptr_(shell.engine_ptr_) {
+  }
+
+  // コピー代入。
+  UCIShell& UCIShell::operator=(const UCIShell& shell) {
+    engine_ptr_ = shell.engine_ptr_;
+    return *this;
+  }
+
+  // ムーブ代入。
+  UCIShell& UCIShell::operator=(UCIShell&& shell) {
+    engine_ptr_ = shell.engine_ptr_;
+    return *this;
+  }
+
   /****************/
   /* static関数。 */
   /****************/
