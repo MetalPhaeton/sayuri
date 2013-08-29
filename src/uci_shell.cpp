@@ -27,12 +27,38 @@
 #include "uci_shell.h"
 
 #include <iostream>
+#include <string>
+#include <vector>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "pv_line.h"
 #include "error.h"
 
+#include "mylib.h"  // テスト用。
+
 namespace Sayuri {
+  /**************/
+  /* テスト用。 */
+  /**************/
+  // =================================================================
+  extern void PrintPosition
+  (const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]);
+  void UCIShell::Test() {
+    std::string command = "position fen ";
+    command +=
+    "4k3/8/8/8/8/8/1p6/2N1K3 b - - 1 1";
+    command += " moves b2c1q e1f2";
+
+    std::cout << "Command: " << command << std::endl;
+
+    std::vector<std::string> argv =
+    MyLib::Split(command, std::string(" ") , std::string(""));
+
+    CommandPosition(argv);
+    PrintPosition(engine_ptr_->position());
+  }
+  // =================================================================
+
   /**************************/
   /* コンストラクタと代入。 */
   /**************************/
@@ -169,5 +195,141 @@ namespace Sayuri {
     std::cout << " nodes " << num_nodes;
     std::cout << " hashfull " << hashfull;
     std::cout << " nps " << (num_nodes * 1000) / time_2 << std::endl;
+  }
+
+  /*********************/
+  /* UCIコマンド関数。 */
+  /*********************/
+  // uciコマンド。
+  void UCIShell::CommandUCI() {
+    // IDを表示。
+    std::cout << "id name " << ID_NAME << std::endl;
+    std::cout << "id author " << ID_AUTHOR << std::endl;
+
+    // TODO: 変更可能オプションの表示。
+
+    std::cout << "uciok" << std::endl;
+  }
+  // isreadyコマンド。
+  void UCIShell::CommandIsReady() {
+    // TODO: パラメータの変更。
+
+    std::cout << "readyok" << std::endl;
+  }
+  // quitコマンド。
+  void UCIShell::CommandQuit() {
+  }
+  // positionコマンド。
+  void UCIShell::CommandPosition(std::vector<std::string>& argv) {
+    // コマンドをパース。
+    int i = 0;
+    int len = argv.size();
+
+    // ポジションコマンドがあるかどうか。
+    while (i < len) {
+      if (argv[i] == "position") {
+        i++;
+        break;
+      }
+      i++;
+    }
+    if (i >= len) return;
+
+    // 駒の配置をパース。
+    while (i < len) {
+      if (argv[i] == "startpos") {
+        engine_ptr_->LoadFen(Fen(std::string
+        ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")));
+        i++;
+        break;
+      } else if (argv[i] == "fen") {
+        i++;
+        if (i >= len) return;
+        // FENを合体。
+        std::string fen_str = "";
+        while (i < len) {
+          if (argv[i] == "moves") {
+            i--;
+            break;
+          }
+          fen_str += argv[i] + " ";
+          i++;
+        }
+
+        engine_ptr_->LoadFen(Fen(fen_str));
+        i++;
+        break;
+      }
+      i++;
+    }
+    if (i >= len) return;
+
+    // 手サブコマンドをパース。
+    while (i < len) {
+      if (argv[i] == "moves") {
+        i++;
+        break;
+      }
+      i++;
+    }
+    if (i >= len) return;
+
+    // 手をパース。
+    Move move;
+    while (i < len) {
+      move.all_ = 0;
+
+      // fromをパース。
+      if ((argv[i][0] < 'a') || (argv[i][0] > 'h')) {
+        i++;
+        continue;
+      }
+      int fyle = argv[i][0] - 'a';
+      move.from_ |= fyle;
+      if ((argv[i][1] < '1') || (argv[i][1] > '8')) {
+        i++;
+        continue;
+      }
+      int rank = argv[i][1] - '1';
+      move.from_ |= (rank << 3);
+
+      // toをパース。
+      if ((argv[i][2] < 'a') || (argv[i][2] > 'h')) {
+        i++;
+        continue;
+      }
+      fyle = argv[i][2] - 'a';
+      move.to_ |= fyle;
+      if ((argv[i][3] < '1') || (argv[i][3] > '8')) {
+        i++;
+        continue;
+      }
+      rank = argv[i][3] - '1';
+      move.to_ |= (rank << 3);
+
+      // 昇格をパース。
+      if (argv[i].size() >= 5) {
+        switch (argv[i][4]) {
+          case 'n':
+            move.promotion_ = KNIGHT;
+            break;
+          case 'b':
+            move.promotion_ = BISHOP;
+            break;
+          case 'r':
+            move.promotion_ = ROOK;
+            break;
+          case 'q':
+            move.promotion_ = QUEEN;
+            break;
+          default:
+            break;
+        }
+      }
+
+      // 手を指す。
+      engine_ptr_->PlayMove(move);
+      i++;
+    }
   }
 }  // namespace Sayuri

@@ -53,35 +53,11 @@ namespace Sayuri {
     // 初期化。------------------------------------------------------
     Init();
     // --------------------------------------------------------------
+
+    // UCIShellのテスト。
     std::unique_ptr<ChessEngine> engine_ptr(new ChessEngine());
-    int depth = 11;
-    std::size_t nodes = MAX_NODES;
-    Chrono::milliseconds time(100000);
-    bool infinite = false;
-    engine_ptr->SetStopper(depth, nodes, time, infinite);
-
-    Fen fen(std::string("r1b1kbnr/1pp2ppp/p1pq4/4p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 0 1"));
-    engine_ptr->LoadFen(fen);
-
-    std::size_t table_size = 50 * 1024 * 1024;
-    std::unique_ptr<TranspositionTable> table
-    (new TranspositionTable(table_size));
-
-    MoveMaker maker(engine_ptr.get());
-    maker.GenMoves<GenMoveType::ALL>(0ULL, 0, 0, *table);
-    std::vector<Move> moves_vec;
-    int i = 0;
-    for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
-      if ((i % 2) == 0) {
-        moves_vec.push_back(move);
-      }
-      i++;
-    }
-
-    Start();
-    engine_ptr->Calculate(*table, &moves_vec);
-    Stop();
-    std::cout << "Time: " << GetTime() << std::endl;
+    std::unique_ptr<UCIShell> shell_ptr(new UCIShell(engine_ptr.get()));
+    shell_ptr->Test();
 
     return 0;
   }

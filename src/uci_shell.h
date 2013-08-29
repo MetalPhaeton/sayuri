@@ -28,6 +28,8 @@
 #define UCI_SHELL_H
 
 #include <iostream>
+#include <string>
+#include <vector>
 #include <cstddef>
 #include "chess_def.h"
 #include "chess_engine.h"
@@ -37,6 +39,11 @@ namespace Sayuri {
   // UCIのインターフェス。
   class UCIShell {
     public:
+      /**************/
+      /* テスト用。 */
+      /**************/
+      void Test();
+
       /**************************/
       /* コンストラクタと代入。 */
       /**************************/
@@ -92,11 +99,15 @@ namespace Sayuri {
       /* UCIコマンド関数。 */
       /*********************/
       // uciコマンド。
-      void DoUCI();
+      void CommandUCI();
       // isreadyコマンド。
-      void DoIsReady();
+      void CommandIsReady();
       // quitコマンド。
-      void DoQuit();
+      void CommandQuit();
+      // positionコマンド。
+      // [引数]
+      // argv: コマンド引数。argv[0]はコマンド名。
+      void CommandPosition(std::vector<std::string>& argv);
 
       /****************/
       /* メンバ変数。 */
