@@ -44,18 +44,14 @@ namespace Sayuri {
 
   // コンストラクタ。
   TranspositionTable::TranspositionTable(std::size_t max_bytes) :
-  max_bytes_(max_bytes),
   entry_table_(new std::vector<TTEntry>[TABLE_SIZE]) {
     // 大きさを整える。
-    if (max_bytes > TT_MAX_SIZE_BYTES) {
-      max_bytes = TT_MAX_SIZE_BYTES;
-    } else if (max_bytes < TT_MIN_SIZE_BYTES) {
-      max_bytes = TT_MIN_SIZE_BYTES;
+    if (max_bytes > GetMaxSize()) {
+      max_bytes = GetMaxSize();
+    } else if (max_bytes < GetMinSize()) {
+      max_bytes = GetMinSize();
     }
-
-    // テーブル自体のサイズを引く。
-    max_bytes -= sizeof(TranspositionTable)
-    + (sizeof(std::vector<TTEntry>) * TABLE_SIZE);
+    max_bytes_ = max_bytes;
 
     // エントリーをいくつ作るか計算する。
     std::size_t num_entries = max_bytes / sizeof(TTEntry);
@@ -130,18 +126,14 @@ namespace Sayuri {
 
   //　テーブルのサイズのバイト数を返す。
   std::size_t TranspositionTable::GetSizeBytes() const {
-    // テーブル自身の大きさ。
-    std::size_t bytes = sizeof(TranspositionTable);
-    bytes += sizeof(std::vector<TTEntry>) * TABLE_SIZE;
-
     // TTEntryのサイズ。
-    bytes += sizeof(TTEntry) * entry_table_[0].size() * TABLE_SIZE;
+    std::size_t bytes = sizeof(TTEntry) * entry_table_[0].size() * TABLE_SIZE;
 
     return bytes;
   }
 
   // エントリーのパーミル。
-  int TranspositionTable::GetEntryPermill() const {
+  int TranspositionTable::GetUsedPermill() const {
     // 全エントリーの数。
     int num_all = TABLE_SIZE * entry_table_[0].size();
 
@@ -187,6 +179,19 @@ namespace Sayuri {
   int TranspositionTable::GetRatioPermill<TTValueFlag::ALPHA>() const;
   template
   int TranspositionTable::GetRatioPermill<TTValueFlag::BETA>() const;
+
+  /****************/
+  /* static関数。 */
+  /****************/
+  // テーブルの最小サイズを得る。
+  std::size_t TranspositionTable::GetMinSize() {
+    return sizeof(TTEntry) * TABLE_SIZE;
+  }
+
+  // テーブルの最大サイズを得る。
+  std::size_t TranspositionTable::GetMaxSize() {
+    return sizeof(TTEntry) * TABLE_SIZE * 100;
+  }
 
   /************************/
   /* エントリーのクラス。 */

@@ -196,6 +196,8 @@ namespace Sayuri {
     // 深さが0ならクイース。
     // 限界探索数を超えていてもクイース。
     if ((depth <= 0) || (level >= MAX_PLYS)) {
+      // クイース探索ノードに移行するため、ノード数を減らしておく。
+      searched_nodes_--;
       return Quiesce(pos_key, depth, level, alpha, beta, table);
     }
 
@@ -236,6 +238,8 @@ namespace Sayuri {
         if (score >= beta) {
           depth -= 4;
           if (depth <= 0) {
+            // クイース探索ノードに移行するため、ノード数を減らしておく。
+            searched_nodes_--;
             return Quiesce(pos_key, depth, level, alpha, beta, table);
           }
         }
@@ -289,7 +293,7 @@ namespace Sayuri {
         if (!is_checked && (Type == NodeType::NON_PV)) {
           // History Puruning。
           if (!move.captured_piece_
-          && (history_[side][move.from_][move.to_] < (history_max_ * 0.5))) {
+          && (history_[side][move.from_][move.to_] < (history_max_ / 2))) {
             red++;
           }
         }
@@ -381,7 +385,8 @@ namespace Sayuri {
   TranspositionTable& table, PVLine& pv_line);
 
   // 探索のルート。
-  PVLine ChessEngine::SearchRoot(std::vector<Move>* moves_to_search_ptr) {
+  PVLine ChessEngine::SearchRoot(TranspositionTable& table,
+  std::vector<Move>* moves_to_search_ptr) {
     // 初期化。
     searched_nodes_ = 0;
     searched_level_ = 0;
@@ -408,8 +413,6 @@ namespace Sayuri {
     int level = 0;
     int alpha = -MAX_VALUE;
     int beta = MAX_VALUE;
-    std::unique_ptr<TranspositionTable> table_ptr
-    (new TranspositionTable(table_size_));
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
     PVLine pv_line;
@@ -464,8 +467,7 @@ namespace Sayuri {
       UCIShell::SendDepthInfo(depth);
 
       // 手を作る。
-      maker.GenMoves<GenMoveType::ALL>(pos_key, depth, level,
-      *(table_ptr.get()));
+      maker.GenMoves<GenMoveType::ALL>(pos_key, depth, level, table);
 
       for (Move move = maker.PickMove(); move.all_;
       move = maker.PickMove()) {
@@ -474,7 +476,7 @@ namespace Sayuri {
         if (now > next_send_info_time) {
           UCIShell::SendOtherInfo
           (Chrono::duration_cast<Chrono::milliseconds>(now - start_time_),
-          searched_nodes_, table_ptr->GetEntryPermill());
+          searched_nodes_, table.GetUsedPermill());
 
           next_send_info_time = now + Chrono::milliseconds(1000);
         }
@@ -541,7 +543,7 @@ namespace Sayuri {
 
             // フルでPVを探索。
             score = -Search<NodeType::PV>(next_key, depth - 1, level + 1,
-            -beta, -alpha, *(table_ptr.get()), next_line);
+            -beta, -alpha, table, next_line);
             // アルファ値、ベータ値を調べる。
             if (score >= beta) {
               // 探索失敗。
@@ -566,7 +568,7 @@ namespace Sayuri {
             int red = depth / 3;
             // ゼロウィンドウ探索。
             score = -Search<NodeType::NON_PV>(next_key, depth - red - 1,
-            level + 1, -(alpha + 1), -alpha, *(table_ptr.get()), next_line);
+            level + 1, -(alpha + 1), -alpha, table, next_line);
           } else {
             // 普通に探索するためにscoreをalphaより大きくしておく。
             score = alpha + 1;
@@ -576,7 +578,7 @@ namespace Sayuri {
           if (score > alpha) {
             // ゼロウィンドウ探索。
             score = -Search<NodeType::NON_PV>(next_key, depth - 1, level + 1,
-            -(alpha + 1), -alpha, *(table_ptr.get()), next_line);
+            -(alpha + 1), -alpha, table, next_line);
             if (score > alpha) {
               while (true) {
                 // 探索終了。
@@ -584,7 +586,7 @@ namespace Sayuri {
 
                 // フルウィンドウで再探索。
                 score = -Search<NodeType::PV>(next_key, depth - 1, level + 1,
-                -beta, -alpha, *(table_ptr.get()), next_line);
+                -beta, -alpha, table, next_line);
                 // アルファ値、ベータ値を調べる。
                 if (score >= beta) {
                   // 探索失敗。
@@ -617,10 +619,10 @@ namespace Sayuri {
 
           // トランスポジションテーブルに登録。
           if (!entry_ptr) {
-            table_ptr->Add(pos_key, depth, side, score,
+            table.Add(pos_key, depth, side, score,
             TTValueFlag::EXACT, move);
 
-            entry_ptr = table_ptr->GetFulfiledEntry(pos_key, depth, side);
+            entry_ptr = table.GetFulfiledEntry(pos_key, depth, side);
           } else {
             entry_ptr->Update(score, TTValueFlag::EXACT, move);
           }
@@ -632,12 +634,6 @@ namespace Sayuri {
           UCIShell::SendPVInfo(depth, searched_level_, score, time,
           searched_nodes_, cur_line);
 
-          // チェックメイトならもう探索しない。
-          if (cur_line.line()[cur_line.length() - 1].has_checkmated()) {
-            stopper_.stop_now_ = true;
-            break;
-          }
-
           alpha = score;
         }
       }
@@ -647,6 +643,11 @@ namespace Sayuri {
 
       // PVラインをセット。
       pv_line = cur_line;
+      // チェックメイトならもう探索しない。
+      if (pv_line.line()[pv_line.length() - 1].has_checkmated()) {
+        stopper_.stop_now_ = true;
+        break;
+      }
     }
 
     return std::move(pv_line);

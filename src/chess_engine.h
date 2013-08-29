@@ -94,10 +94,12 @@ namespace Sayuri {
 
       // 思考を始める。
       // [引数]
+      // table: 使用するトランスポジションテーブル。
       // moves_to_search_ptr: 探索する候補手。nullptrなら全ての手を探索する。
       // [戻り値]
       // PVライン。
-      PVLine Calculate(std::vector<Move>* moves_to_search_ptr);
+      PVLine Calculate(TranspositionTable& table,
+      std::vector<Move>* moves_to_search_ptr);
 
       // 探索を終了させる。
       void StopCalculation();
@@ -116,11 +118,6 @@ namespace Sayuri {
       const Bitboard (& position() const)[NUM_SIDES][NUM_PIECE_TYPES] {
         return position_;
       }
-
-      /******************/
-      /* ミューテータ。 */
-      /******************/
-      void table_size(std::size_t table_size) {table_size_ = table_size;}
 
     private:
       /**************/
@@ -179,10 +176,12 @@ namespace Sayuri {
       TranspositionTable& table, PVLine& pv_line);
       // 探索のルート。
       // [引数]
+      // table: 使用するトランスポジションテーブル。
       // moves_to_search_ptr: 探索する候補手。nullptrなら全ての手を探索する。
       // [戻り値]
       // PVライン。
-      PVLine SearchRoot(std::vector<Move>* moves_to_search_ptr);
+      PVLine SearchRoot(TranspositionTable& table,
+      std::vector<Move>* moves_to_search_ptr);
       // Futility Pruningのマージンを計算する。
       // [引数]
       // move: 指し手。
@@ -349,8 +348,6 @@ namespace Sayuri {
       std::vector<Move> move_history_;
       // 50手ルールの履歴。
       std::vector<int> ply_100_history_;
-      // トランスポジションテーブルのサイズ。
-      std::size_t table_size_;
 
       /**********************/
       /* ハッシュキー関連。 */

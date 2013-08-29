@@ -209,10 +209,6 @@ namespace Sayuri {
   /*****************************/
   /* Transposition Table関連。 */
   /*****************************/
-  // テーブルの最大容量と最小容量。
-  constexpr std::size_t TT_MAX_SIZE_BYTES = 250 * 1024 * 1024;
-  constexpr std::size_t TT_MIN_SIZE_BYTES = 5 * 1024 * 1024;
-
   // 評価値の種類。TTEntry::value_flag。
   enum class TTValueFlag {
     EXACT,  // 正確な評価値。

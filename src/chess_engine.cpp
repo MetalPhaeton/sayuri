@@ -44,8 +44,7 @@ namespace Sayuri {
   /* コンストラクタと代入。 */
   /***************************/
   // コンストラクタ。
-  ChessEngine::ChessEngine():
-  table_size_(TT_MIN_SIZE_BYTES) {
+  ChessEngine::ChessEngine() {
     SetNewGame();
   }
 
@@ -128,9 +127,6 @@ namespace Sayuri {
 
     // 50手ルールの履歴をコピー。
     ply_100_history_ = engine.ply_100_history_;
-
-    // トランスポジションテーブルのサイズ。
-    table_size_ = engine.table_size_;
   }
 
   // ムーブコンストラクタ。
@@ -212,9 +208,6 @@ namespace Sayuri {
 
     // 50手ルールの履歴をコピー。
     ply_100_history_ = std::move(engine.ply_100_history_);
-
-    // トランスポジションテーブルのサイズ。
-    table_size_ = engine.table_size_;
   }
 
   // コピー代入。
@@ -296,9 +289,6 @@ namespace Sayuri {
 
     // 50手ルールの履歴をコピー。
     ply_100_history_ = engine.ply_100_history_;
-
-    // トランスポジションテーブルのサイズ。
-    table_size_ = engine.table_size_;
 
     return *this;
   }
@@ -382,9 +372,6 @@ namespace Sayuri {
 
     // 50手ルールの履歴をコピー。
     ply_100_history_ = std::move(engine.ply_100_history_);
-
-    // トランスポジションテーブルのサイズ。
-    table_size_ = engine.table_size_;
 
     return *this;
   }
@@ -565,8 +552,9 @@ namespace Sayuri {
   }
 
   // 思考を始める。
-  PVLine ChessEngine::Calculate(std::vector<Move>* moves_to_search_ptr) {
-    return std::move(SearchRoot(moves_to_search_ptr));
+  PVLine ChessEngine::Calculate(TranspositionTable& table,
+  std::vector<Move>* moves_to_search_ptr) {
+    return std::move(SearchRoot(table, moves_to_search_ptr));
   }
 
   // 思考を停止する。
@@ -581,7 +569,7 @@ namespace Sayuri {
     MoveMaker maker(this);
     HashKey temp_key = 0ULL;
     std::unique_ptr<TranspositionTable> temp_table
-    (new TranspositionTable(TT_MIN_SIZE_BYTES));
+    (new TranspositionTable(0));
     maker.GenMoves<GenMoveType::ALL>(temp_key, 0, 0, *(temp_table.get()));
     // 合法手かどうか調べる。
     bool is_legal = false;

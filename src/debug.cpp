@@ -35,6 +35,7 @@
 #include <sstream>
 #include <random>
 #include <vector>
+#include <thread>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "init.h"
@@ -52,11 +53,10 @@ namespace Sayuri {
     // 初期化。------------------------------------------------------
     Init();
     // --------------------------------------------------------------
-
     std::unique_ptr<ChessEngine> engine_ptr(new ChessEngine());
-    int depth = MAX_PLYS;
+    int depth = 11;
     std::size_t nodes = MAX_NODES;
-    Chrono::milliseconds time(10000);
+    Chrono::milliseconds time(100000);
     bool infinite = false;
     engine_ptr->SetStopper(depth, nodes, time, infinite);
 
@@ -64,22 +64,24 @@ namespace Sayuri {
     engine_ptr->LoadFen(fen);
 
     std::size_t table_size = 50 * 1024 * 1024;
-    engine_ptr->table_size(table_size);
-    PVLine pv_line = engine_ptr->Calculate(nullptr);
+    std::unique_ptr<TranspositionTable> table
+    (new TranspositionTable(table_size));
 
-    /*
-    std::cout << "----------------------------------------" << std::endl;
-    for (std::size_t i = 0; i < pv_line.length(); i++) {
-      std::cout << std::endl;
-      if (pv_line.line()[i].has_checkmated()) {
-        std::cout << "Checkmated!" << std::endl;
-      } else {
-        PrintMove(pv_line.line()[i].move());
+    MoveMaker maker(engine_ptr.get());
+    maker.GenMoves<GenMoveType::ALL>(0ULL, 0, 0, *table);
+    std::vector<Move> moves_vec;
+    int i = 0;
+    for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
+      if ((i % 2) == 0) {
+        moves_vec.push_back(move);
       }
-      std::cout << std::endl;
-      std::cout << "----------------------------------------" << std::endl;
+      i++;
     }
-    */
+
+    Start();
+    engine_ptr->Calculate(*table, &moves_vec);
+    Stop();
+    std::cout << "Time: " << GetTime() << std::endl;
 
     return 0;
   }

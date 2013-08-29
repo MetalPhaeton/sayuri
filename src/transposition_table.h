@@ -194,10 +194,10 @@ namespace Sayuri {
       // サイズをバイト数で返す。
       std::size_t GetSizeBytes() const;
 
-      // 含まれているエントリーのサイズを全体の何パーミルかを返す。
+      // 使用されているエントリーのサイズを全体の何パーミルかを返す。
       // [戻り値]
       // エントリーのパーミル。
-      int GetEntryPermill() const;
+      int GetUsedPermill() const;
 
       // エントリーの種類ごとの比率データ。
       // [引数]
@@ -206,6 +206,19 @@ namespace Sayuri {
       // 調べたい種類の比率データ。パーミル。
       template<TTValueFlag Type>
       int GetRatioPermill() const;
+
+      /****************/
+      /* static関数。 */
+      /****************/
+      // テーブルの最小サイズを得る。
+      // [戻り値]
+      // 最小サイズ。
+      static std::size_t GetMinSize();
+
+      // テーブルの最大サイズを得る。
+      // [戻り値]
+      // 最大サイズ。
+      static std::size_t GetMaxSize();
 
     private:
       /**************/
