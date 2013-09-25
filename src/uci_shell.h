@@ -31,6 +31,8 @@
 #include <string>
 #include <vector>
 #include <cstddef>
+#include <thread>
+#include <memory>
 #include "chess_def.h"
 #include "chess_engine.h"
 #include "pv_line.h"
@@ -92,7 +94,7 @@ namespace Sayuri {
       // 思考用スレッド。
       // [引数]
       // shell: UCIシェル。
-      static void ThreadGoThinking(UCIShell& shell);
+      static void ThreadThinking(UCIShell& shell);
 
     private:
       /*********************/
@@ -108,12 +110,39 @@ namespace Sayuri {
       // [引数]
       // argv: コマンド引数。argv[0]はコマンド名。
       void CommandPosition(std::vector<std::string>& argv);
+      // goコマンド。
+      // [引数]
+      // argv: コマンド引数。argv[0]はコマンド名。
+      void CommandGo(std::vector<std::string>& argv);
+
+      /**************/
+      /* 便利関数。 */
+      /**************/
+      // 手を文字に変換する。
+      // [引数]
+      // move: 変換する手。
+      // [戻り値]
+      // 手の文字列。
+      static std::string TransMoveToString(Move move);
+      // 文字列を手に変換する。
+      // [引数]
+      // move_str: 変換する文字列。
+      // [戻り値]
+      // 変換された手。
+      static Move TransStringToMove(std::string move_str);
 
       /****************/
       /* メンバ変数。 */
       /****************/
       // チェスエンジン。
       ChessEngine* engine_ptr_;
+      // スレッド。
+      std::unique_ptr<std::thread> thread_ptr_;
+      // 思考すべき候補手のベクトル。
+      std::unique_ptr<std::vector<Move>> moves_to_search_ptr_;
+
+      // オプション。トランスポジションテーブルのサイズ。
+      std::size_t table_size_;
   };
 }  // namespace Sayuri
 

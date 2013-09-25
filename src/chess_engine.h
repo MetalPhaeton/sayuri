@@ -92,6 +92,11 @@ namespace Sayuri {
       void SetStopper(int max_depth, std::size_t max_nodes,
       Chrono::milliseconds thinking_time, bool infinite_thinking);
 
+      // 思考の無限時間フラグをセットする。
+      // [引数]
+      // enable: trueは有効。falseは無効。
+      void EnableInfiniteThinking(bool enable);
+
       // 思考を始める。
       // [引数]
       // table: 使用するトランスポジションテーブル。
@@ -118,6 +123,8 @@ namespace Sayuri {
       const Bitboard (& position() const)[NUM_SIDES][NUM_PIECE_TYPES] {
         return position_;
       }
+      // 手番を得る。
+      const Side to_move() const {return to_move_;}
 
     private:
       /**************/
@@ -308,6 +315,8 @@ namespace Sayuri {
       Move iid_stack_[MAX_PLYS];
       // キラームーブスタック。
       Move killer_stack_[MAX_PLYS];
+      // 現在のIterative Deepeningの深さ。
+      int i_depth_;
       // 探索したノード数。
       std::size_t searched_nodes_;
       // 探索開始時間。

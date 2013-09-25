@@ -29,6 +29,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <thread>
+#include <chrono>
+#include <sstream>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "pv_line.h"
@@ -44,18 +47,23 @@ namespace Sayuri {
   extern void PrintPosition
   (const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]);
   void UCIShell::Test() {
-    std::string command = "position fen ";
-    command +=
-    "4k3/8/8/8/8/8/1p6/2N1K3 b - - 1 1";
-    command += " moves b2c1q e1f2";
-
+    // positionコマンド。
+    std::string command = "position startpos";
     std::cout << "Command: " << command << std::endl;
 
     std::vector<std::string> argv =
-    MyLib::Split(command, std::string(" ") , std::string(""));
+    MyLib::Split(command, std::string(" "), std::string(""));
 
     CommandPosition(argv);
     PrintPosition(engine_ptr_->position());
+
+    // goコマンド。
+    command = "go mate 2";
+    argv = MyLib::Split(command, std::string(" "), std::string(""));
+    CommandGo(argv);
+    // std::this_thread::sleep_for(Chrono::milliseconds(30000));
+    // engine_ptr_->StopCalculation();
+    thread_ptr_->join();
   }
   // =================================================================
 
@@ -115,35 +123,10 @@ namespace Sayuri {
     std::cout << " nodes " << num_nodes;
     // PVラインを送る。
     std::cout << " pv";
-    Move move;
-    char str[6];
     for (std::size_t i = 0; i < pv_line.length(); i++) {
       if (pv_line.line()[i].has_checkmated()) break;
 
-      move = pv_line.line()[i].move();
-      str[0] = Util::GetFyle(move.from_) + 'a';
-      str[1] = Util::GetRank(move.from_) + '1';
-      str[2] = Util::GetFyle(move.to_) + 'a';
-      str[3] = Util::GetRank(move.to_) + '1';
-      switch (move.promotion_) {
-        case KNIGHT:
-          str[4] = 'n';
-          break;
-        case BISHOP:
-          str[4] = 'b';
-          break;
-        case ROOK:
-          str[4] = 'r';
-          break;
-        case QUEEN:
-          str[4] = 'q';
-          break;
-        default:
-          str[4] = '\0';
-          break;
-      }
-      str[5] = '\0';
-      std::cout << " " << str;
+      std::cout << " " << TransMoveToString(pv_line.line()[i].move());
     }
     std::cout << std::endl;
   }
@@ -156,31 +139,7 @@ namespace Sayuri {
   // 現在探索している手の情報を標準出力に送る。
   void UCIShell::SendCurrentMoveInfo(Move move, int move_num) {
     // 手の情報を送る。
-    std::cout << "info currmove ";
-    char str[6];
-    str[0] = Util::GetFyle(move.from_) + 'a';
-    str[1] = Util::GetRank(move.from_) + '1';
-    str[2] = Util::GetFyle(move.to_) + 'a';
-    str[3] = Util::GetRank(move.to_) + '1';
-    switch (move.promotion_) {
-      case KNIGHT:
-        str[4] = 'n';
-        break;
-      case BISHOP:
-        str[4] = 'b';
-        break;
-      case ROOK:
-        str[4] = 'r';
-        break;
-      case QUEEN:
-        str[4] = 'q';
-        break;
-      default:
-        str[4] = '\0';
-        break;
-    }
-    str[5] = '\0';
-    std::cout << str;
+    std::cout << "info currmove " << TransMoveToString(move);
 
     // 手の番号を送る。
     std::cout << " currmovenumber " << move_num << std::endl;
@@ -195,6 +154,33 @@ namespace Sayuri {
     std::cout << " nodes " << num_nodes;
     std::cout << " hashfull " << hashfull;
     std::cout << " nps " << (num_nodes * 1000) / time_2 << std::endl;
+  }
+
+  // 思考スレッド。
+  void UCIShell::ThreadThinking(UCIShell& shell) {
+    // 思考準備。
+    std::unique_ptr<TranspositionTable> table_ptr(new TranspositionTable
+    (shell.table_size_));
+
+    // 思考開始。
+    PVLine pv_line = shell.engine_ptr_->Calculate
+    (*(table_ptr.get()), shell.moves_to_search_ptr_.get());
+
+    // 最善手を表示。
+    std::cout << "bestmove ";
+    if ((pv_line.length() > 0)
+    && (!(pv_line.line()[0].has_checkmated()))) {
+      std::string move_str = TransMoveToString(pv_line.line()[0].move());
+      std::cout << move_str;
+
+      // 2手目があるならponderで表示。
+      if ((pv_line.length() >= 2)
+      && (!(pv_line.line()[1].has_checkmated()))) {
+        move_str = TransMoveToString(pv_line.line()[1].move());
+        std::cout << " ponder " << move_str;
+      }
+    }
+    std::cout << std::endl;
   }
 
   /*********************/
@@ -218,118 +204,266 @@ namespace Sayuri {
   }
   // quitコマンド。
   void UCIShell::CommandQuit() {
+    // TODO: プログラムの終了。
   }
   // positionコマンド。
   void UCIShell::CommandPosition(std::vector<std::string>& argv) {
     // コマンドをパース。
-    int i = 0;
-    int len = argv.size();
+    std::vector<std::string>::iterator itr = argv.begin();
+    std::vector<std::string>::iterator end_itr = argv.end();
 
     // ポジションコマンドがあるかどうか。
-    while (i < len) {
-      if (argv[i] == "position") {
-        i++;
+    while (itr < end_itr) {
+      if (*itr == "position") {
+        itr++;
         break;
       }
-      i++;
+      itr++;
     }
-    if (i >= len) return;
 
     // 駒の配置をパース。
-    while (i < len) {
-      if (argv[i] == "startpos") {
+    while (itr < end_itr) {
+      if (*itr == "startpos") {
         engine_ptr_->LoadFen(Fen(std::string
         ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")));
-        i++;
+        itr++;
         break;
-      } else if (argv[i] == "fen") {
-        i++;
-        if (i >= len) return;
+      } else if (*itr == "fen") {
+        itr++;
+        if (itr >= end_itr) return;
         // FENを合体。
         std::string fen_str = "";
-        while (i < len) {
-          if (argv[i] == "moves") {
-            i--;
+        while (itr < end_itr) {
+          if (*itr == "moves") {
+            itr--;
             break;
           }
-          fen_str += argv[i] + " ";
-          i++;
+          fen_str += *itr + " ";
+          itr++;
         }
 
         engine_ptr_->LoadFen(Fen(fen_str));
-        i++;
+        itr++;
         break;
       }
-      i++;
+      itr++;
     }
-    if (i >= len) return;
 
     // 手サブコマンドをパース。
-    while (i < len) {
-      if (argv[i] == "moves") {
-        i++;
+    while (itr < end_itr) {
+      if (*itr == "moves") {
+        itr++;
         break;
       }
-      i++;
+      itr++;
     }
-    if (i >= len) return;
 
     // 手をパース。
     Move move;
-    while (i < len) {
-      move.all_ = 0;
+    while (itr < end_itr) {
+      move = TransStringToMove(*itr);
+      // 手を指す。
+      if (move.all_) {
+        engine_ptr_->PlayMove(move);
+      }
+      itr++;
+    }
+  }
 
-      // fromをパース。
-      if ((argv[i][0] < 'a') || (argv[i][0] > 'h')) {
-        i++;
-        continue;
-      }
-      int fyle = argv[i][0] - 'a';
-      move.from_ |= fyle;
-      if ((argv[i][1] < '1') || (argv[i][1] > '8')) {
-        i++;
-        continue;
-      }
-      int rank = argv[i][1] - '1';
-      move.from_ |= (rank << 3);
+  // goコマンド。
+  void UCIShell::CommandGo(std::vector<std::string>& argv) {
+    // 準備。
+    std::vector<std::string>::iterator itr = argv.begin();
+    std::vector<std::string>::iterator end_itr = argv.end();
+    int max_depth = MAX_PLYS;
+    std::size_t max_nodes = MAX_NODES;
+    Chrono::milliseconds thinking_time(60000);
+    bool infinite_thinking = false;
 
-      // toをパース。
-      if ((argv[i][2] < 'a') || (argv[i][2] > 'h')) {
-        i++;
-        continue;
+    // goトークンまで流す。
+    while (itr < end_itr) {
+      if (*itr == "go") {
+        itr++;
+        break;
       }
-      fyle = argv[i][2] - 'a';
-      move.to_ |= fyle;
-      if ((argv[i][3] < '1') || (argv[i][3] > '8')) {
-        i++;
-        continue;
-      }
-      rank = argv[i][3] - '1';
-      move.to_ |= (rank << 3);
+      itr++;
+    }
 
-      // 昇格をパース。
-      if (argv[i].size() >= 5) {
-        switch (argv[i][4]) {
-          case 'n':
-            move.promotion_ = KNIGHT;
+    // サブコマンドをパース。
+    Move move;
+    Chrono::milliseconds time_control(0);
+    while (itr < end_itr) {
+      if (*itr == "searchmoves") {
+        // searchmovesコマンド。
+        itr++;
+        // 手をベクトルに格納していく。
+        while (itr < end_itr) {
+          move = TransStringToMove(*itr);
+          if (move.all_) {
+            moves_to_search_ptr_->push_back(move);
+            itr++;
+          } else {
+            itr--;
             break;
-          case 'b':
-            move.promotion_ = BISHOP;
-            break;
-          case 'r':
-            move.promotion_ = ROOK;
-            break;
-          case 'q':
-            move.promotion_ = QUEEN;
-            break;
-          default:
-            break;
+          }
+        }
+      } else if ((*itr == "ponder") || (*itr == "infinite")) {
+        // ポンダリングモードで探索する。
+        infinite_thinking = true;
+      } else if ((*itr == "wtime") && (engine_ptr_->to_move() == WHITE)) {
+        // 白の持ち時間。エンジンが白番の場合。
+        itr++;
+        try {
+          time_control = Chrono::milliseconds(std::stoull(*itr));
+          if (time_control.count() > 180000) {
+            thinking_time = Chrono::milliseconds(120000);
+          } else {
+            thinking_time = time_control / 2;
+          }
+        } catch (...) {
+          itr--;
+        }
+      } else if ((*itr == "btime") && (engine_ptr_->to_move() == BLACK)) {
+        // 黒の持ち時間。エンジンが黒番の場合。
+        itr++;
+        try {
+          time_control = Chrono::milliseconds(std::stoull(*itr));
+          if (time_control.count() > 180000) {
+            thinking_time = Chrono::milliseconds(120000);
+          } else {
+            thinking_time = time_control / 2;
+          }
+        } catch (...) {
+          itr--;
+        }
+      } else if (*itr == "depth") {
+        // 深さの指定。
+        itr++;
+        try {
+          max_depth = std::stoi(*itr);
+        } catch (...) {
+          itr--;
+        }
+      } else if (*itr == "nodes") {
+        // 探索するノード数の指定。
+        itr++;
+        try {
+          max_nodes = std::stoull(*itr);
+        } catch (...) {
+          itr--;
+        }
+      } else if (*itr == "movetime") {
+        // 探索時間の指定。
+        itr++;
+        try {
+          thinking_time = Chrono::milliseconds(std::stoull(*itr));
+        } catch (...) {
+          itr--;
+        }
+      } else if (*itr == "mate") {
+        // メイトを探す。
+        itr++;
+        try {
+          max_depth = (std::stoi(*itr) * 2) - 1;
+        } catch (...) {
+          itr--;
         }
       }
-
-      // 手を指す。
-      engine_ptr_->PlayMove(move);
-      i++;
+      itr++;
     }
+
+    // 別スレッドで思考開始。
+    engine_ptr_->SetStopper(max_depth, max_nodes, thinking_time,
+    infinite_thinking);
+    thread_ptr_.reset(new std::thread(UCIShell::ThreadThinking,
+    std::ref(*this)));
+  }
+
+  /**************/
+  /* 便利関数。 */
+  /**************/
+  // 手を文字列に変換。
+  std::string UCIShell::TransMoveToString(Move move) {
+    // 文字列ストリーム。
+    std::ostringstream oss;
+
+    // ストリームに流しこむ。
+    oss << static_cast<char>(Util::GetFyle(move.from_) + 'a');
+    oss << static_cast<char>(Util::GetRank(move.from_) + '1');
+    oss << static_cast<char>(Util::GetFyle(move.to_) + 'a');
+    oss << static_cast<char>(Util::GetRank(move.to_) + '1');
+    switch (move.promotion_) {
+      case KNIGHT:
+        oss << 'n';
+        break;
+      case BISHOP:
+        oss << 'b';
+        break;
+      case ROOK:
+        oss << 'r';
+        break;
+      case QUEEN:
+        oss << 'q';
+        break;
+      default:
+        break;
+    }
+
+    return oss.str();
+  }
+
+  // 文字列を手に変換。
+  Move UCIShell::TransStringToMove(std::string move_str) {
+    Move move, null_move;
+    move.all_ = 0;
+    null_move.all_ = 0;
+
+    if (move_str.size() < 4) return null_move;
+
+    // fromをパース。
+    if ((move_str[0] < 'a') || (move_str[0] > 'h')) {
+      return null_move;
+    }
+    int fyle = move_str[0] - 'a';
+    move.from_ |= fyle;
+    if ((move_str[1] < '1') || (move_str[1] > '8')) {
+      return null_move;
+    }
+    int rank = move_str[1] - '1';
+    move.from_ |= (rank << 3);
+
+    // toをパース。
+    if ((move_str[2] < 'a') || (move_str[2] > 'h')) {
+      return null_move;
+    }
+    fyle = move_str[2] - 'a';
+    move.to_ |= fyle;
+    if ((move_str[3] < '1') || (move_str[3] > '8')) {
+      return null_move;
+    }
+    rank = move_str[3] - '1';
+    move.to_ |= (rank << 3);
+
+    // 昇格をパース。
+    if (move_str.size() >= 5) {
+      switch (move_str[4]) {
+        case 'n':
+          move.promotion_ = KNIGHT;
+          break;
+        case 'b':
+          move.promotion_ = BISHOP;
+          break;
+        case 'r':
+          move.promotion_ = ROOK;
+          break;
+        case 'q':
+          move.promotion_ = QUEEN;
+          break;
+        default:
+          break;
+      }
+    }
+
+    return move;
   }
 }  // namespace Sayuri
