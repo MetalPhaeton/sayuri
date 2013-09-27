@@ -63,7 +63,7 @@ namespace Sayuri {
     CommandGo(argv);
     // std::this_thread::sleep_for(Chrono::milliseconds(30000));
     // engine_ptr_->StopCalculation();
-    thread_ptr_->join();
+    thinking_thread_.join();
   }
   // =================================================================
 
@@ -272,6 +272,12 @@ namespace Sayuri {
 
   // goコマンド。
   void UCIShell::CommandGo(std::vector<std::string>& argv) {
+    // スレッドが実行中なら中止する。
+    if (thinking_thread_.joinable()) {
+      engine_ptr_->StopCalculation();
+      thinking_thread_.join();
+    }
+
     // 準備。
     std::vector<std::string>::iterator itr = argv.begin();
     std::vector<std::string>::iterator end_itr = argv.end();
@@ -375,8 +381,7 @@ namespace Sayuri {
     // 別スレッドで思考開始。
     engine_ptr_->SetStopper(max_depth, max_nodes, thinking_time,
     infinite_thinking);
-    thread_ptr_.reset(new std::thread(UCIShell::ThreadThinking,
-    std::ref(*this)));
+    thinking_thread_ = std::thread(UCIShell::ThreadThinking, std::ref(*this));
   }
 
   /**************/

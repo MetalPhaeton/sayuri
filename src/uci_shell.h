@@ -137,7 +137,7 @@ namespace Sayuri {
       // チェスエンジン。
       ChessEngine* engine_ptr_;
       // スレッド。
-      std::unique_ptr<std::thread> thread_ptr_;
+      std::thread thinking_thread_;
       // 思考すべき候補手のベクトル。
       std::unique_ptr<std::vector<Move>> moves_to_search_ptr_;
 
