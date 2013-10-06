@@ -46,6 +46,9 @@ namespace Sayuri {
   // =================================================================
   extern void PrintPosition
   (const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]);
+  extern void Start();
+  extern void Stop();
+  extern int GetTime();
   void UCIShell::Test() {
     // positionコマンド。
     std::string command = "position startpos";
@@ -58,12 +61,15 @@ namespace Sayuri {
     PrintPosition(engine_ptr_->position());
 
     // goコマンド。
-    command = "go mate 2";
+    command = "go depth 12";
     argv = MyLib::Split(command, std::string(" "), std::string(""));
+    Start();
     CommandGo(argv);
     // std::this_thread::sleep_for(Chrono::milliseconds(30000));
     // engine_ptr_->StopCalculation();
     thinking_thread_.join();
+    Stop();
+    std::cout << "Thinking Time: " << GetTime() << std::endl;
   }
   // =================================================================
 
