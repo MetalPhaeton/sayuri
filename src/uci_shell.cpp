@@ -381,7 +381,7 @@ namespace Sayuri {
     // 別スレッドで思考開始。
     engine_ptr_->SetStopper(max_depth, max_nodes, thinking_time,
     infinite_thinking);
-    thinking_thread_ = std::thread(UCIShell::ThreadThinking, std::ref(*this));
+    thinking_thread_ = std::thread(ThreadThinking, std::ref(*this));
   }
 
   /**************/
