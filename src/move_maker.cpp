@@ -134,8 +134,6 @@ namespace Sayuri {
     Move prev_best;
     if (entry_ptr && entry_ptr->value_flag() == TTValueFlag::EXACT) {
       prev_best = entry_ptr->best_move();
-    } else {
-      prev_best.all_ = 0;
     }
 
     // IIDムーブを得る。
@@ -335,7 +333,6 @@ namespace Sayuri {
   // 次の手を返す。
   Move MoveMaker::PickMove() {
     MoveSlot slot;
-    slot.move_.all_ = 0;
 
     // 手がなければ何もしない。
     if (last_ <= begin_) {
@@ -468,7 +465,6 @@ namespace Sayuri {
 
     // キングがターゲットの時はなし。
     if (target == engine_ptr_->king_[side]) {
-      move.all_ = 0;
       return move;
     }
 

@@ -115,7 +115,6 @@ namespace Sayuri {
   /**************************/
   // コンストラクタ。
   PVSlot::PVSlot() : has_checkmated_(false) {
-    move_.all_ = 0;
   }
 
   // コピーコンストラクタ。

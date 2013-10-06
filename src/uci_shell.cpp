@@ -426,8 +426,6 @@ namespace Sayuri {
   // 文字列を手に変換。
   Move UCIShell::TransStringToMove(std::string move_str) {
     Move move, null_move;
-    move.all_ = 0;
-    null_move.all_ = 0;
 
     if (move_str.size() < 4) return null_move;
 

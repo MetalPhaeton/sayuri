@@ -222,7 +222,6 @@ namespace Sayuri {
       if (!is_null_searching_ && !is_checked && (depth >= 4)) {
         // Null Move Reduction。
         Move null_move;
-        null_move.all_ = 0;
         null_move.move_type_ = NULL_MOVE;  // Null Move。
 
         is_null_searching_ = true;
@@ -394,7 +393,6 @@ namespace Sayuri {
     is_null_searching_ = false;
     start_time_ = SysClock::now();
     Move null;
-    null.all_ = 0;
     for (int i = 0; i < MAX_PLYS; i++) {
       iid_stack_[i] = null;
       killer_stack_[i] = null;

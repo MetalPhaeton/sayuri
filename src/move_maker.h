@@ -41,7 +41,7 @@ namespace Sayuri {
         Move move_;
         int score_;
 
-        MoveSlot() : score_(-MAX_VALUE) {move_.all_ = 0;}
+        MoveSlot() : score_(-MAX_VALUE) {}
       };
 
       /**************/

@@ -199,6 +199,7 @@ namespace Sayuri {
       unsigned int last_en_passant_square_ : 6;
       unsigned int move_type_ : 2;  // 手の種類。
     };
+    Move() : all_(0) {}
   };
 
   // ハッシュの型。
