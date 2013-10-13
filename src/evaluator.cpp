@@ -155,12 +155,12 @@ namespace Sayuri {
     castling_value_ = 0;
 
     // サイド。
-    Side side = engine_ptr_->to_move_;
+    Side side = engine_ptr_->to_move();
     Side enemy_side = side ^ 0x3;
 
     // 合法手がないとき。
     if (!(engine_ptr_->HasLegalMove(side))) {
-      if (engine_ptr_->IsAttacked(engine_ptr_->king_[side], enemy_side)) {
+      if (engine_ptr_->IsAttacked(engine_ptr_->king()[side], enemy_side)) {
         // チェックメイトされていれば負け。
         return SCORE_LOSE;
       } else {
@@ -178,21 +178,21 @@ namespace Sayuri {
     // マテリアル。
     material_value_ = engine_ptr_->GetMaterial(side);
     // ビショップペア。
-    if (Util::CountBits(engine_ptr_->position_[side][BISHOP]) >= 2) {
+    if (Util::CountBits(engine_ptr_->position()[side][BISHOP]) >= 2) {
       bishop_pair_value_ += 1;
     }
-    if (Util::CountBits(engine_ptr_->position_[enemy_side][BISHOP]) >= 2) {
+    if (Util::CountBits(engine_ptr_->position()[enemy_side][BISHOP]) >= 2) {
       bishop_pair_value_ -= 1;
     }
 
     // 各駒毎に価値を計算する。
     Square piece_square;
     Side piece_side;
-    Bitboard pieces = engine_ptr_->blocker_0_;
+    Bitboard pieces = engine_ptr_->blocker_0();
     for (; pieces; pieces &= pieces - 1) {
       piece_square = Util::GetSquare(pieces);
-      piece_side = engine_ptr_->side_board_[piece_square];
-      switch (engine_ptr_->piece_board_[piece_square]) {
+      piece_side = engine_ptr_->side_board()[piece_square];
+      switch (engine_ptr_->piece_board()[piece_square]) {
         case PAWN:
           CalValue<PAWN>(piece_square, piece_side);
           break;
@@ -258,25 +258,25 @@ namespace Sayuri {
   // 勝つのに十分な駒があるかどうか調べる。
   bool Evaluator::HasEnoughPieces(Side side) {
     // ポーンがあれば大丈夫。
-    if (engine_ptr_->position_[side][PAWN]) return true;
+    if (engine_ptr_->position()[side][PAWN]) return true;
 
     // ルークがあれば大丈夫。
-    if (engine_ptr_->position_[side][ROOK]) return true;
+    if (engine_ptr_->position()[side][ROOK]) return true;
 
     // クイーンがあれば大丈夫。
-    if (engine_ptr_->position_[side][QUEEN]) return true;
+    if (engine_ptr_->position()[side][QUEEN]) return true;
 
     // ビショップが2つあれば大丈夫。
-    if (Util::CountBits(engine_ptr_->position_[side][BISHOP]) >= 2)
+    if (Util::CountBits(engine_ptr_->position()[side][BISHOP]) >= 2)
       return true;
 
     // ナイトが2つあれば大丈夫。
-    if (Util::CountBits(engine_ptr_->position_[side][KNIGHT]) >= 2)
+    if (Util::CountBits(engine_ptr_->position()[side][KNIGHT]) >= 2)
       return true;
 
     // ナイトとビショップの合計が2つあれば大丈夫。
-    if (Util::CountBits(engine_ptr_->position_[side][KNIGHT]
-    | engine_ptr_->position_[side][BISHOP]) >= 2)
+    if (Util::CountBits(engine_ptr_->position()[side][KNIGHT]
+    | engine_ptr_->position()[side][BISHOP]) >= 2)
       return true;
 
     // それ以外はダメ。
@@ -288,10 +288,10 @@ namespace Sayuri {
   double Evaluator::GetPhase() {
     // キングとポーン以外の駒で進行状況を考える。
     double num_pieces = static_cast<double>(Util::CountBits
-    (engine_ptr_->blocker_0_ & ~(engine_ptr_->position_[WHITE][PAWN]
-    | engine_ptr_->position_[BLACK][PAWN]
-    | engine_ptr_->position_[WHITE][KING]
-    | engine_ptr_->position_[BLACK][KING])));
+    (engine_ptr_->blocker_0() & ~(engine_ptr_->position()[WHITE][PAWN]
+    | engine_ptr_->position()[BLACK][PAWN]
+    | engine_ptr_->position()[WHITE][KING]
+    | engine_ptr_->position()[BLACK][KING])));
 
     // 放物線の準備。
     num_pieces = num_pieces > 14.0 ? 14.0 : num_pieces;
@@ -312,7 +312,7 @@ namespace Sayuri {
 
     // スコアと符号。自分の駒ならプラス。敵の駒ならマイナス。
     int score;
-    int sign = piece_side == engine_ptr_->to_move_ ? 1 : -1;
+    int sign = piece_side == engine_ptr_->to_move() ? 1 : -1;
 
     // 利き筋を作る。
     Bitboard attacks = 0ULL;
@@ -322,7 +322,7 @@ namespace Sayuri {
       case PAWN:
         // 通常の動き。
         pawn_moves = Util::GetPawnMove(piece_square, piece_side)
-        & ~(engine_ptr_->blocker_0_);
+        & ~(engine_ptr_->blocker_0());
         // 2歩の動き。
         if (pawn_moves) {
           if (((piece_side == WHITE)
@@ -331,15 +331,15 @@ namespace Sayuri {
           && (Util::GetRank(piece_square) == RANK_7))) {
             // ポーンの2歩の動き。
             pawn_moves |= Util::GetPawn2StepMove(piece_square, piece_side)
-            & ~(engine_ptr_->blocker_0_);
+            & ~(engine_ptr_->blocker_0());
           }
         }
         // 攻撃。
         attacks = Util::GetPawnAttack(piece_square, piece_side)
-        & engine_ptr_->side_pieces_[enemy_piece_side];
+        & engine_ptr_->side_pieces()[enemy_piece_side];
         // アンパッサン。
-        if (engine_ptr_->can_en_passant_) {
-          attacks |= Util::BIT[engine_ptr_->en_passant_square_]
+        if (engine_ptr_->can_en_passant()) {
+          attacks |= Util::BIT[engine_ptr_->en_passant_square()]
           & Util::GetPawnAttack(piece_square, piece_side);
         }
         break;
@@ -385,10 +385,10 @@ namespace Sayuri {
       score = Util::CountBits(pawn_moves | attacks);
     } else if (Type == KING) {
       score = Util::CountBits(castling_moves
-      | (attacks & ~(engine_ptr_->side_pieces_[piece_side])));
+      | (attacks & ~(engine_ptr_->side_pieces()[piece_side])));
     } else {
       score = Util::CountBits(attacks
-      & ~(engine_ptr_->side_pieces_[piece_side]));
+      & ~(engine_ptr_->side_pieces()[piece_side]));
     }
     mobility_value_ += sign * score;
 
@@ -412,18 +412,18 @@ namespace Sayuri {
     // 敵への攻撃を計算。
     if (Type == PAWN) {
       score = Util::CountBits(attacks
-      & (engine_ptr_->side_pieces_[enemy_piece_side]
-      | Util::BIT[engine_ptr_->en_passant_square_]));
+      & (engine_ptr_->side_pieces()[enemy_piece_side]
+      | Util::BIT[engine_ptr_->en_passant_square()]));
     } else if (Type != KING) {
       score = Util::CountBits(attacks
-      & engine_ptr_->side_pieces_[enemy_piece_side]);
+      & engine_ptr_->side_pieces()[enemy_piece_side]);
     }
     attack_enemy_value_ = sign * score;
 
     // 敵キング周辺への攻撃を計算。
     if (Type != KING) {
       score = Util::CountBits(attacks
-      & Util::GetKingMove(engine_ptr_->king_[enemy_piece_side]));
+      & Util::GetKingMove(engine_ptr_->king()[enemy_piece_side]));
       attack_around_king_value_ += sign * score;
     }
 
@@ -458,11 +458,11 @@ namespace Sayuri {
       // パスポーンを計算。
       score = 0;
       int score_2 = 0;
-      if (!(engine_ptr_->position_[enemy_piece_side][PAWN]
+      if (!(engine_ptr_->position()[enemy_piece_side][PAWN]
       & pass_pawn_mask_[piece_side][piece_square])) {
         score += 1;
         // 守られたパスポーン。
-        if (engine_ptr_->position_[piece_side][PAWN]
+        if (engine_ptr_->position()[piece_side][PAWN]
         & Util::GetPawnAttack(piece_square, enemy_piece_side)) {
           score_2 += 1;
         }
@@ -473,7 +473,7 @@ namespace Sayuri {
       // ダブルポーンを計算。
       int fyle = Util::GetFyle(piece_square);
       score = 0;
-      if (Util::CountBits(engine_ptr_->position_[piece_side][PAWN]
+      if (Util::CountBits(engine_ptr_->position()[piece_side][PAWN]
       & Util::FYLE[fyle]) >= 2) {
         score += 1;
       }
@@ -481,7 +481,7 @@ namespace Sayuri {
 
       // 孤立ポーンを計算。
       score = 0;
-      if (!(engine_ptr_->position_[piece_side][PAWN]
+      if (!(engine_ptr_->position()[piece_side][PAWN]
       & iso_pawn_mask_[piece_square])) {
         score += 1;
       }
@@ -492,9 +492,9 @@ namespace Sayuri {
     if (Type == QUEEN) {
       score = 0;
       if (Util::BIT[piece_square] & ~(start_position_[piece_side][QUEEN])) {
-        score += Util::CountBits(engine_ptr_->position_[piece_side][KNIGHT]
+        score += Util::CountBits(engine_ptr_->position()[piece_side][KNIGHT]
         & start_position_[piece_side][KNIGHT]);
-        score += Util::CountBits(engine_ptr_->position_[piece_side][BISHOP]
+        score += Util::CountBits(engine_ptr_->position()[piece_side][BISHOP]
         & start_position_[piece_side][BISHOP]);
       }
       early_queen_launched_value_ += sign * score;
@@ -503,7 +503,7 @@ namespace Sayuri {
     // ポーンシールドとキャスリングを計算。
     if (Type == KING) {
       // ポーンの盾を計算する。
-      score = Util::CountBits(engine_ptr_->position_[piece_side][PAWN]
+      score = Util::CountBits(engine_ptr_->position()[piece_side][PAWN]
       & pawn_shield_mask_[piece_side][piece_square]);
       pawn_shield_value_ += sign * score;
 
@@ -511,11 +511,11 @@ namespace Sayuri {
       score = 1;  // キャスリングはまだだが、放棄していない。
       Castling rights_mask =
       piece_side == WHITE ? WHITE_CASTLING : BLACK_CASTLING;
-      if (engine_ptr_->has_castled_[piece_side]) {
+      if (engine_ptr_->has_castled()[piece_side]) {
         // キャスリングした。
         score = 2;
       } else {
-        if (!(engine_ptr_->castling_rights_ & rights_mask)) {
+        if (!(engine_ptr_->castling_rights() & rights_mask)) {
           // キャスリングの権利を放棄した。
           score = 0;
         }

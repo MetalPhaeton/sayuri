@@ -200,6 +200,18 @@ namespace Sayuri {
       unsigned int move_type_ : 2;  // 手の種類。
     };
     Move() : all_(0) {}
+    bool operator==(const Move move) {
+      if (move.from_ != from_) return false;
+      if (move.to_ != to_) return false;
+      if (move.promotion_ != promotion_) return false;
+      return true;
+    }
+    bool operator!=(const Move move) {
+      if (move.from_ != from_) return true;
+      if (move.to_ != to_) return true;
+      if (move.promotion_ != promotion_) return true;
+      return false;
+    }
   };
 
   // ハッシュの型。

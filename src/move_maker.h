@@ -32,8 +32,6 @@
 #include "chess_engine.h"
 
 namespace Sayuri {
-  class ChessEngine;
-
   class MoveMaker {
     private:
       // 手の構造体。

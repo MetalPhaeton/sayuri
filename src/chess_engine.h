@@ -34,14 +34,9 @@
 #include "chess_util.h"
 #include "transposition_table.h"
 #include "fen.h"
-#include "move_maker.h"
 #include "pv_line.h"
-#include "evaluator.h"
 
 namespace Sayuri {
-  class MoveMaker;
-  class Evaluator;
-
   /****************************/
   /* チェスエンジンのクラス。 */
   /****************************/
@@ -51,7 +46,6 @@ namespace Sayuri {
       /* テスト用関数。 */
       /******************/
       void Test();
-      void PrintEvaluator(Evaluator& eval);
 
       /*******************************/
       /* ChessEngineクラスの初期化。 */
@@ -60,7 +54,6 @@ namespace Sayuri {
         // key_table_[][][]を初期化する。
         InitKeyTable();
       }
-
 
       /**************************/
       /* コンストラクタと代入。 */
@@ -116,27 +109,36 @@ namespace Sayuri {
       // 1手戻す。
       void UndoMove();
 
-      /**************/
-      /* アクセサ。 */
-      /**************/
-      // 駒の配置を得る。
-      const Bitboard (& position() const)[NUM_SIDES][NUM_PIECE_TYPES] {
-        return position_;
+      // ビショップの攻撃筋を作る。
+      // [引数]
+      // square: 位置。
+      // [戻り値]
+      // ビショップの攻撃筋。
+      Bitboard GetBishopAttack(Square square) const {
+        return Util::GetAttack45(square, blocker_45_)
+        | Util::GetAttack135(square, blocker_135_);
       }
-      // 手番を得る。
-      const Side to_move() const {return to_move_;}
+      // ルークの攻撃筋を作る。
+      // [引数]
+      // square: 位置。
+      // [戻り値]
+      // ルークの攻撃筋。
+      Bitboard GetRookAttack(Square square) const {
+        return Util::GetAttack0(square, blocker_0_)
+        | Util::GetAttack90(square, blocker_90_);
+      }
+      // クイーンの攻撃筋を作る。
+      // [引数]
+      // square: 位置。
+      // [戻り値]
+      // クイーンの攻撃筋。
+      Bitboard GetQueenAttack(Square square) const {
+        return GetBishopAttack(square) | GetRookAttack(square);
+      }
 
-    private:
-      /**************/
-      /* フレンド。 */
-      /**************/
-      friend class MoveMaker;
-      friend class Evaluator;
+      // キャスリングできるかどうか判定。
+      template<Castling Flag> bool CanCastling() const;
 
-
-      /****************/
-      /* 駒を動かす。 */
-      /****************/
       // 駒を動かす。
       // 動かす前のキャスリングの権利とアンパッサンは記録される。
       // 駒を取る場合は取った駒がmoveに記録される。
@@ -145,12 +147,104 @@ namespace Sayuri {
       // [引数]
       // move[inout]: 動かす手。
       void MakeMove(Move& move);
+
       // MakeMove()で動かした駒を元に戻す。
       // 必ず先にMakeMove()をすること。
       // [引数]
       // move: MakeMove()で動かした手。
       void UnmakeMove(Move move);
 
+      // その位置が攻撃されているかどうかチェックする。
+      // [引数]
+      // square: 調べたい位置。
+      // side: 攻撃側のサイド。
+      // [戻り値]
+      // 攻撃されていればtrue。
+      bool IsAttacked(Square square, Side side) const;
+
+      // マテリアルを得る。
+      // [引数]
+      // side: マテリアルを得たいサイド。
+      // [戻り値]
+      // マテリアル。
+      int GetMaterial(Side side) const;
+
+      // 合法手があるかどうかチェックする。
+      // [引数]
+      // side: 調べたいサイド。
+      // [戻り値]
+      // 合法手があればtrue。
+      bool HasLegalMove(Side side);
+
+      // 現在の局面のハッシュキーを計算する。
+      // (注)計算に時間がかかる。
+      // [戻り値]
+      // 現在の局面のハッシュキー。
+      HashKey GetCurrentKey() const;
+
+      // 現在の局面と動かす手から次の局面のハッシュキーを得る。
+      // [引数]
+      // current_key: 現在のキー。
+      // move: 次の手。
+      // [戻り値]
+      // 次の局面のハッシュキー。
+      HashKey GetNextKey(HashKey current_key, Move move) const;
+
+      /**************/
+      /* アクセサ。 */
+      /**************/
+      // 駒の配置。
+      const Bitboard (& position() const)[NUM_SIDES][NUM_PIECE_TYPES] {
+        return position_;
+      }
+      // 駒の種類の配置。
+      const Piece (& piece_board() const)[NUM_SQUARES] {
+        return piece_board_;
+      }
+      // サイドの配置。
+      const Side (& side_board() const)[NUM_SQUARES] {
+        return side_board_;
+      }
+      // 各サイドの駒の配置。
+      const Bitboard (& side_pieces() const)[NUM_SIDES] {
+        return side_pieces_;
+      }
+      // ブロッカーの配置。角度0度。
+      Bitboard blocker_0() const {return blocker_0_;}
+      // ブロッカーの配置。角度45度。
+      Bitboard blocker_45() const {return blocker_45_;}
+      // ブロッカーの配置。角度90度。
+      Bitboard blocker_90() const {return blocker_90_;}
+      // ブロッカーの配置。角度135度。
+      Bitboard blocker_135() const {return blocker_135_;}
+      // キングの位置。
+      const Square (& king() const)[NUM_SIDES] {return king_;}
+      // 手番。
+      Side to_move() const {return to_move_;}
+      // キャスリングの権利。
+      Castling castling_rights() const {return castling_rights_;}
+      // アンパッサンの位置。
+      Square en_passant_square() const {return en_passant_square_;}
+      // アンパッサンできるかどうか。
+      bool can_en_passant() const {return can_en_passant_;}
+      // 50手ルール。
+      int ply_100() const {return ply_100_;}
+      // 現在の手数。
+      int ply() const {return ply_;}
+      // キャスリングしたかどうか。
+      const bool (& has_castled() const)[NUM_SIDES] {return has_castled_;}
+      // ヒストリー。history()[side][from][to]。
+      const int (& history() const)[NUM_SIDES][NUM_SQUARES][NUM_SQUARES] {
+        return history_;
+      }
+      // ヒストリーの最大値。
+      int history_max() const {return history_max_;}
+      // IIDでの最善手スタック。
+      const Move (& iid_stack() const)[MAX_PLYS] {return iid_stack_;}
+      // キラームーブスタック。
+      const Move (& killer_stack() const)[MAX_PLYS] {return killer_stack_;}
+
+    private:
       /******************/
       /* 探索エンジン。 */
       /******************/
@@ -217,65 +311,8 @@ namespace Sayuri {
       // to: 移動先。
       void ReplacePiece(Square from, Square to);
 
-      // ビショップの攻撃筋を作る。
-      // [引数]
-      // square: 位置。
-      // [戻り値]
-      // ビショップの攻撃筋。
-      Bitboard GetBishopAttack(Square square) const {
-        return Util::GetAttack45(square, blocker_45_)
-        | Util::GetAttack135(square, blocker_135_);
-      }
-      // ルークの攻撃筋を作る。
-      // [引数]
-      // square: 位置。
-      // [戻り値]
-      // ルークの攻撃筋。
-      Bitboard GetRookAttack(Square square) const {
-        return Util::GetAttack0(square, blocker_0_)
-        | Util::GetAttack90(square, blocker_90_);
-      }
-      // クイーンの攻撃筋を作る。
-      // [引数]
-      // square: 位置。
-      // [戻り値]
-      // クイーンの攻撃筋。
-      Bitboard GetQueenAttack(Square square) const {
-        return GetBishopAttack(square) | GetRookAttack(square);
-      }
-
-      // キャスリングできるかどうか判定。
-      template<Castling Flag> bool CanCastling() const;
-
       // キャスリングの権利を更新する。
       void UpdateCastlingRights();
-
-      // その位置が攻撃されているかどうかチェックする。
-      // [引数]
-      // square: 調べたい位置。
-      // side: 攻撃側のサイド。
-      // [戻り値]
-      // 攻撃されていればtrue。
-      bool IsAttacked(Square square, Side side) const;
-      // マテリアルを得る。
-      // [引数]
-      // side: マテリアルを得たいサイド。
-      // [戻り値]
-      // マテリアル。
-      int GetMaterial(Side side) const;
-      // 合法手があるかどうかチェックする。
-      // [引数]
-      // side: 調べたいサイド。
-      // [戻り値]
-      // 合法手があればtrue。
-      bool HasLegalMove(Side side);
-      // その位置を攻撃している駒のビットボードを得る。
-      // [引数]
-      // target_square: 攻撃されている位置。
-      // side: 攻撃側のサイド。
-      // [戻り値]
-      // 攻撃している駒のビットボード。
-      Bitboard GetAttackers(Square target_square, Side side) const;
 
       /****************/
       /* メンバ変数。 */
@@ -311,6 +348,8 @@ namespace Sayuri {
       bool has_castled_[NUM_SIDES];
       // ヒストリー。history_[side][from][to]。
       int history_[NUM_SIDES][NUM_SQUARES][NUM_SQUARES];
+      // ヒストリーの最大値。
+      int history_max_;
       // IIDでの最善手スタック。
       Move iid_stack_[MAX_PLYS];
       // キラームーブスタック。
@@ -325,8 +364,6 @@ namespace Sayuri {
       int searched_level_;
       // ヌルサーチ中。
       bool is_null_searching_;
-      // ヒストリーの最大値。
-      int history_max_;
       // ストップ条件構造体。
       struct Stopper {
         // 何が何でも探索を中断。
@@ -370,18 +407,6 @@ namespace Sayuri {
       static HashKey key_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
       // key_table_[][][]を初期化する。
       static void InitKeyTable();
-      // 現在の局面のハッシュキーを計算する。
-      // (注)計算に時間がかかる。
-      // [戻り値]
-      // 現在の局面のハッシュキー。
-      HashKey GetCurrentKey() const;
-      // 現在の局面と動かす手から次の局面のハッシュキーを得る。
-      // [引数]
-      // current_key: 現在のキー。
-      // move: 次の手。
-      // [戻り値]
-      // 次の局面のハッシュキー。
-      HashKey GetNextKey(HashKey current_key, Move move) const;
   };
 }  // namespace Sayuri
 

@@ -55,14 +55,14 @@ namespace Sayuri {
     std::cout << "Command: " << command << std::endl;
 
     std::vector<std::string> argv =
-    MyLib::Split(command, std::string(" "), std::string(""));
+    MyLib::Split(command, " ", "");
 
     CommandPosition(argv);
     PrintPosition(engine_ptr_->position());
 
     // goコマンド。
     command = "go depth 12";
-    argv = MyLib::Split(command, std::string(" "), std::string(""));
+    argv = MyLib::Split(command, " ", "");
     Start();
     CommandGo(argv);
     // std::this_thread::sleep_for(Chrono::milliseconds(30000));

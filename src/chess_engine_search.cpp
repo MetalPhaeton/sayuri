@@ -502,9 +502,7 @@ namespace Sayuri {
         if (moves_to_search_ptr) {
           bool hit = false;
           for (auto& move_2 : *(moves_to_search_ptr)) {
-            if ((move_2.to_ == move.to_)
-            && (move_2.from_ == move.from_)
-            && (move_2.promotion_ == move.promotion_)) {
+            if (move_2 == move) {
               // 探索すべき手だった。
               hit = true;
               break;
@@ -528,9 +526,7 @@ namespace Sayuri {
           // 2回目以降の探索。
           move_num = 0;
           for (auto& move_2 : move_vec) {
-            if ((move.from_ == move_2.from_)
-            && (move.to_ == move_2.to_)
-            && (move.promotion_ == move_2.promotion_)) {
+            if (move_2 == move) {
               UCIShell::SendCurrentMoveInfo(move, move_num);
               break;
             }

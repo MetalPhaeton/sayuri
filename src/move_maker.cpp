@@ -130,20 +130,20 @@ namespace Sayuri {
   const TranspositionTable& table) {
     // トランスポジションテーブルから前回の繰り返しの最善手を得る。
     TTEntry* entry_ptr = table.GetFulfiledEntry
-    (pos_key, depth - 1, engine_ptr_->to_move_);
+    (pos_key, depth - 1, engine_ptr_->to_move());
     Move prev_best;
     if (entry_ptr && entry_ptr->value_flag() == TTValueFlag::EXACT) {
       prev_best = entry_ptr->best_move();
     }
 
     // IIDムーブを得る。
-    Move iid_move = engine_ptr_->iid_stack_[level];
+    Move iid_move = engine_ptr_->iid_stack()[level];
 
     // キラームーブを得る。
-    Move killer = engine_ptr_->killer_stack_[level];
+    Move killer = engine_ptr_->killer_stack()[level];
 
     // サイド。
-    Side side = engine_ptr_->to_move_;
+    Side side = engine_ptr_->to_move();
     Side enemy_side = side ^ 0x3;
 
     // 変数。
@@ -154,7 +154,7 @@ namespace Sayuri {
     Bitboard pieces = 0ULL;
     Bitboard move_bitboard = 0ULL;
     for (int piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
-      pieces = engine_ptr_->position_[side][piece_type];
+      pieces = engine_ptr_->position()[side][piece_type];
 
       for (; pieces; pieces &= pieces - 1) {
         from = Util::GetSquare(pieces);
@@ -181,10 +181,10 @@ namespace Sayuri {
         // 展開するタイプによって候補手を選り分ける。。
         if (Type == GenMoveType::NON_CAPTURE) {
           // キャプチャーじゃない手。
-          move_bitboard &= ~(engine_ptr_->blocker_0_);
+          move_bitboard &= ~(engine_ptr_->blocker_0());
         } else {
           // キャプチャーの手。
-          move_bitboard &= engine_ptr_->side_pieces_[enemy_side];
+          move_bitboard &= engine_ptr_->side_pieces()[enemy_side];
         }
 
         for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
@@ -205,7 +205,7 @@ namespace Sayuri {
     }
 
     // ポーンの動きを作る。
-    pieces = engine_ptr_->position_[side][PAWN];
+    pieces = engine_ptr_->position()[side][PAWN];
     move_bitboard = 0ULL;
     for (; pieces; pieces &= pieces - 1) {
       from = Util::GetSquare(pieces);
@@ -214,22 +214,22 @@ namespace Sayuri {
         // キャプチャーじゃない手。
         // ポーンの一歩の動き。
         move_bitboard = Util::GetPawnMove(from, side)
-        & ~(engine_ptr_->blocker_0_);
+        & ~(engine_ptr_->blocker_0());
         if (move_bitboard) {
           if (((side == WHITE) && (Util::GetRank(from) == RANK_2))
           || ((side == BLACK) && (Util::GetRank(from) == RANK_7))) {
             // ポーンの2歩の動き。
             move_bitboard |= Util::GetPawn2StepMove(from, side)
-            & ~(engine_ptr_->blocker_0_);
+            & ~(engine_ptr_->blocker_0());
           }
         }
       } else {
         // キャプチャーの手。
         move_bitboard = Util::GetPawnAttack(from, side)
-        & engine_ptr_->side_pieces_[enemy_side];
+        & engine_ptr_->side_pieces()[enemy_side];
         // アンパッサンがある場合。
-        if (engine_ptr_->can_en_passant_) {
-          move_bitboard |= Util::BIT[engine_ptr_->en_passant_square_]
+        if (engine_ptr_->can_en_passant()) {
+          move_bitboard |= Util::BIT[engine_ptr_->en_passant_square()]
           & Util::GetPawnAttack(from, side);
         }
       } 
@@ -239,8 +239,8 @@ namespace Sayuri {
         // 手を作る。
         move.from_ = from;
         move.to_ = Util::GetSquare(move_bitboard);
-        if (engine_ptr_->can_en_passant_
-        && (move.to_ == engine_ptr_->en_passant_square_)) {
+        if (engine_ptr_->can_en_passant()
+        && (move.to_ == engine_ptr_->en_passant_square())) {
           move.move_type_ = EN_PASSANT;
         } else {
           move.move_type_ = NORMAL;
@@ -269,11 +269,11 @@ namespace Sayuri {
     }
 
     // キングの動きを作る。
-    from = engine_ptr_->king_[side];
+    from = engine_ptr_->king()[side];
     move_bitboard = Util::GetKingMove(from);
     if (Type == GenMoveType::NON_CAPTURE) {
       // キャプチャーじゃない手。
-      move_bitboard &= ~(engine_ptr_->blocker_0_);
+      move_bitboard &= ~(engine_ptr_->blocker_0());
       // キャスリングの動きを追加。
       if (side == WHITE) {
         if (engine_ptr_->CanCastling<WHITE_SHORT_CASTLING>()) {
@@ -292,7 +292,7 @@ namespace Sayuri {
       }
     } else {
       // キャプチャーの手。
-      move_bitboard &= engine_ptr_->side_pieces_[enemy_side];
+      move_bitboard &= engine_ptr_->side_pieces()[enemy_side];
     }
     for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
       move.all_ = 0;
@@ -369,19 +369,13 @@ namespace Sayuri {
     constexpr int KILLER_MOVE_SCORE = IID_MOVE_SCORE - 1;
 
     // 特殊な手の点数をつける。
-    if ((ptr->move_.to_ == best_move.to_)
-    && (ptr->move_.from_ == best_move.from_)
-    && (ptr->move_.promotion_ == best_move.promotion_)) {
+    if (ptr->move_ == best_move) {
       // 前回の最善手。
       ptr->score_ = BEST_MOVE_SCORE;
-    } else if ((ptr->move_.to_ == iid_move.to_)
-    && (ptr->move_.from_ == iid_move.from_)
-    && (ptr->move_.promotion_ == iid_move.promotion_)) {
+    } else if (ptr->move_ == iid_move) {
       // IIDムーブ。
       ptr->score_ = IID_MOVE_SCORE;
-    } else if ((ptr->move_.to_ == killer.to_)
-    && (ptr->move_.from_ == killer.from_)
-    && (ptr->move_.promotion_ == killer.promotion_)){
+    } else if (ptr->move_ == killer){
       // キラームーブ。
       ptr->score_ = KILLER_MOVE_SCORE;
     } else {
@@ -390,22 +384,22 @@ namespace Sayuri {
         // ヒストリーを使って点数をつけていく。
         // ヒストリーをセンチポーンに換算。
         ptr->score_ =
-        ((engine_ptr_->history_[side][ptr->move_.from_][ptr->move_.to_]
-        * MATERIAL[PAWN]) / engine_ptr_->history_max_);
+        ((engine_ptr_->history()[side][ptr->move_.from_][ptr->move_.to_]
+        * MATERIAL[PAWN]) / engine_ptr_->history_max());
         // 昇格の得点を加算。
         if (ptr->move_.promotion_) {
           ptr->score_ += MATERIAL[ptr->move_.promotion_] - MATERIAL[PAWN];
         }
       } else if (Type == GenMoveType::CAPTURE) {
-        Side side = engine_ptr_->to_move_;
+        Side side = engine_ptr_->to_move();
         // SEEで点数をつけていく。
         // 現在チェックされていれば、<取る駒> - <自分の駒>。
         if (!(engine_ptr_->IsAttacked
-        (engine_ptr_->king_[side], side ^ 0x3))) {
+        (engine_ptr_->king()[side], side ^ 0x3))) {
           ptr->score_ = SEE(ptr->move_, side);
         } else {
-          ptr->score_ = MATERIAL[engine_ptr_->piece_board_[ptr->move_.to_]]
-          - MATERIAL[engine_ptr_->piece_board_[ptr->move_.from_]];
+          ptr->score_ = MATERIAL[engine_ptr_->piece_board()[ptr->move_.to_]]
+          - MATERIAL[engine_ptr_->piece_board()[ptr->move_.from_]];
           // 昇格の得点を加算。
           if (ptr->move_.promotion_) {
             ptr->score_ += MATERIAL[ptr->move_.promotion_] - MATERIAL[PAWN];
@@ -428,10 +422,10 @@ namespace Sayuri {
 
     if (move.all_) {
       // 取る駒の価値を得る。
-      int capture_value = MATERIAL[engine_ptr_->piece_board_[move.to_]];
+      int capture_value = MATERIAL[engine_ptr_->piece_board()[move.to_]];
 
       // ポーンの昇格。
-      if (engine_ptr_->piece_board_[move.from_] == PAWN) {
+      if (engine_ptr_->piece_board()[move.from_] == PAWN) {
         if (((side == WHITE) && (Util::GetRank(move.to_) == RANK_8))
         || ((side == BLACK) && (Util::GetRank(move.to_) == RANK_1))) {
           // ボーナス。
@@ -444,7 +438,7 @@ namespace Sayuri {
       engine_ptr_->MakeMove(move);
 
       // 違法な手なら計算しない。
-      if (!(engine_ptr_->IsAttacked(engine_ptr_->king_[side], side ^ 0x3))) {
+      if (!(engine_ptr_->IsAttacked(engine_ptr_->king()[side], side ^ 0x3))) {
         // 再帰して次の局面の評価値を得る。
         Move next_move = GetSmallestAttackerMove(move.to_, side ^ 0x3);
         value = capture_value - SEE(next_move, side ^ 0x3);
@@ -464,7 +458,7 @@ namespace Sayuri {
     Move move;
 
     // キングがターゲットの時はなし。
-    if (target == engine_ptr_->king_[side]) {
+    if (target == engine_ptr_->king()[side]) {
       return move;
     }
 
@@ -473,27 +467,27 @@ namespace Sayuri {
       switch (piece_type) {
         case PAWN:
           attack = Util::GetPawnAttack(target, side ^ 0x3);
-          attack &= engine_ptr_->position_[side][PAWN];
+          attack &= engine_ptr_->position()[side][PAWN];
           break;
         case KNIGHT:
           attack = Util::GetKnightMove(target);
-          attack &= engine_ptr_->position_[side][KNIGHT];
+          attack &= engine_ptr_->position()[side][KNIGHT];
           break;
         case BISHOP:
           attack = engine_ptr_->GetBishopAttack(target);
-          attack &= engine_ptr_->position_[side][BISHOP];
+          attack &= engine_ptr_->position()[side][BISHOP];
           break;
         case ROOK:
           attack = engine_ptr_->GetRookAttack(target);
-          attack &= engine_ptr_->position_[side][ROOK];
+          attack &= engine_ptr_->position()[side][ROOK];
           break;
         case QUEEN:
           attack = engine_ptr_->GetQueenAttack(target);
-          attack &= engine_ptr_->position_[side][QUEEN];
+          attack &= engine_ptr_->position()[side][QUEEN];
           break;
         case KING:
           attack = Util::GetKingMove(target);
-          attack &= engine_ptr_->position_[side][KING];
+          attack &= engine_ptr_->position()[side][KING];
           break;
         default:
           throw SayuriError("駒の種類が不正です。");
