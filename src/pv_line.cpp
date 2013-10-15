@@ -81,7 +81,7 @@ namespace Sayuri {
   /********************/
   // 最初の要素に手をセットする。
   void PVLine::SetMove(Move move) {
-    line_[0].move_ = move;
+    line_[0].move(move);
     length_ = 1;
   }
 
@@ -98,7 +98,7 @@ namespace Sayuri {
 
   // 最初の要素にチェックメイトされたことを記録する。
   void PVLine::MarkCheckmated() {
-    line_[0].has_checkmated_ = true;
+    line_[0].has_checkmated(true);
     length_ = 1;
   }
 

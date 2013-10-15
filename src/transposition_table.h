@@ -115,11 +115,6 @@ namespace Sayuri {
       static bool Compare(const TTEntry& first, const TTEntry& second);
 
     private:
-      /**************/
-      /* フレンド。 */
-      /**************/
-      friend class TranspositionTable;
-
       /****************/
       /* メンバ変数。 */
       /****************/
@@ -221,11 +216,6 @@ namespace Sayuri {
       static std::size_t GetMaxSize();
 
     private:
-      /**************/
-      /* テスト用。 */
-      /**************/
-      friend int DebugMain(int, char**);
-
       /**********************/
       /* プライベート関数。 */
       /**********************/

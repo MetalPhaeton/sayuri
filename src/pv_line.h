@@ -56,12 +56,17 @@ namespace Sayuri {
       // チェックメイトされたか。
       bool has_checkmated() const {return has_checkmated_;}
 
-    private:
-      /**************/
-      /* フレンド。 */
-      /**************/
-      friend class PVLine;
+      /******************/
+      /* ミューテータ。 */
+      /******************/
+      // 手。
+      void move(Move& move) {move_ = move;}
+      // チェックメイトされたか。
+      void has_checkmated(bool has_checkmated) {
+        has_checkmated_ = has_checkmated;
+      }
 
+    private:
       /****************/
       /* メンバ変数。 */
       /****************/

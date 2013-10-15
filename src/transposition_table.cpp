@@ -90,19 +90,18 @@ namespace Sayuri {
   // テーブルに追加する。
   void TranspositionTable::Add(HashKey pos_key, int depth,
   Side to_move, int value, TTValueFlag value_flag, Move best_move) {
-    // テーブルに追加。
+    // テーブルのインデックスを得る。
     int index = GetTableIndex(pos_key);
-    for (auto& entry : entry_table_[index]) {
-      if (!(entry.exists_)) {
-        entry = TTEntry(pos_key, depth, to_move,
-        value, value_flag, best_move);
-        break;
-      }
-    }
 
-    // ソート。
-    std::sort(entry_table_[index].begin(), entry_table_[index].end(),
-    &TTEntry::Compare);
+    // 最後のエントリーのdepthを比べ、追加する側が大きければ追加。
+    if (depth > entry_table_[index].back().depth()) {
+      entry_table_[index].back() = TTEntry(pos_key, depth, to_move,
+      value, value_flag, best_move);
+
+      // ソート。
+      std::sort(entry_table_[index].begin(), entry_table_[index].end(),
+      &TTEntry::Compare);
+    }
   }
 
   // 該当するTTEntryを返す。
@@ -113,7 +112,7 @@ namespace Sayuri {
 
     TTEntry* entry_ptr = nullptr;
     for (auto& entry : entry_table_[index]) {
-      if (!(entry.exists_)) return nullptr;  // エントリーがない。
+      if (!(entry.exists())) return nullptr;  // エントリーがない。
 
       if (entry.Fulfil(pos_key, depth, to_move)) {
         entry_ptr = &entry;  // エントリーが見つかった。
@@ -141,7 +140,7 @@ namespace Sayuri {
     int num_entries = 0;
     for (std::size_t i = 0; i < TABLE_SIZE; i++) {
       for (auto& entry : entry_table_[i]) {
-        if (entry.exists_) {
+        if (entry.exists()) {
           num_entries++;
         } else {
           break;
@@ -159,9 +158,9 @@ namespace Sayuri {
     int num_entry = 0;
     for (std::size_t i = 0; i < TABLE_SIZE; i++) {
       for (auto& entry : entry_table_[i]) {
-        if (entry.exists_) {
+        if (entry.exists()) {
           num_all += 1;
-          if (entry.value_flag_ == Type) {
+          if (entry.value_flag() == Type) {
             num_entry += 1;
           }
         } else {

@@ -79,11 +79,6 @@ namespace Sayuri {
       Move PickMove();
 
     private:
-      /**************/
-      /* テスト用。 */
-      /**************/
-      friend class ChessEngine;
-
       /**********************/
       /* プライベート関数。 */
       /**********************/
