@@ -63,6 +63,7 @@ namespace Sayuri {
     // goコマンド。
     command = "go depth 12";
     argv = MyLib::Split(command, " ", "");
+    table_size_ = 64 * 1024 * 1024;
     Start();
     CommandGo(argv);
     // std::this_thread::sleep_for(Chrono::milliseconds(30000));
