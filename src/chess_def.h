@@ -199,7 +199,20 @@ namespace Sayuri {
       unsigned int last_en_passant_square_ : 6;
       unsigned int move_type_ : 2;  // 手の種類。
     };
+    // コンストラクタと代入。
     Move() : all_(0) {}
+    Move(const Move& move) {all_ = move.all_;}
+    Move(Move&& move) {all_ = move.all_;}
+    Move& operator=(const Move& move) {
+      all_ = move.all_;
+      return *this;
+    }
+    Move& operator=(Move&& move) {
+      all_ = move.all_;
+      return *this;
+    }
+    ~Move() {}
+    // 比較演算子。
     bool operator==(const Move move) {
       if (move.from_ != from_) return false;
       if (move.to_ != to_) return false;

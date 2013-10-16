@@ -66,12 +66,11 @@ namespace Sayuri {
       // スタックに候補手を展開する関数。
       // (注)自らチェックされる手も作る。
       // [引数]
-      // pos_key: 現在の局面のハッシュキー。
-      // depth: 手を展開するノードの深さ。
-      // level: 手を展開するノードのレベル。
-      // table: トランスポジションテーブル。
-      template<GenMoveType Type> void GenMoves(HashKey pos_key,
-      int depth, int level, const TranspositionTable& table);
+      // tt_best_move: TTに登録された前回の繰り返しの最善手。
+      // iid_move: IIDによる最善手。
+      // killer: キラームーブ。
+      template<GenMoveType Type> void GenMoves(Move tt_best_move,
+      Move iid_move, Move killer);
       // 次の手を取り出す。
       // [戻り値]
       // 次の手。
@@ -85,13 +84,13 @@ namespace Sayuri {
       // 手に点数をつける。
       // [引数]
       // ptr: 点数をつけるスロットのポインタ。
-      // best_move: 最善手と予測される手。
+      // tt_best_move: TTに登録された前回の繰り返しの最善手。
       // iid_move: IIDで得た手。
       // killer: キラームーブ。
       // side: 手のサイド。
       template<GenMoveType Type>
       void ScoreMove(MoveSlot* ptr,
-      Move best_move, Move iid_move, Move killer, Side side);
+      Move tt_best_move, Move iid_move, Move killer, Side side);
       // SEE。
       // [引数]
       // move: 探したい手。

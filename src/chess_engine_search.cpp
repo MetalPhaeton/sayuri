@@ -81,10 +81,13 @@ namespace Sayuri {
     // 候補手を作る。
     // 駒を取る手だけ。
     MoveMaker maker(this);
+    Move tt_best_move;
     if (IsAttacked(king_[side], enemy_side)) {
-      maker.GenMoves<GenMoveType::ALL>(pos_key, depth, level, table);
+      maker.GenMoves<GenMoveType::ALL>(tt_best_move, iid_stack_[level],
+      killer_stack_[level]);
     } else {
-      maker.GenMoves<GenMoveType::CAPTURE>(pos_key, depth, level, table);
+      maker.GenMoves<GenMoveType::CAPTURE>(tt_best_move, iid_stack_[level],
+      killer_stack_[level]);
     }
 
     // マテリアルを得る。
@@ -201,14 +204,20 @@ namespace Sayuri {
       return Quiesce(pos_key, depth, level, alpha, beta, table);
     }
 
+    // 前回の繰り返しの最善手を得る。
+    TTEntry* prev_entry = table.GetFulfiledEntry(pos_key, depth - 1, side);
+    Move tt_best_move;
+    if (prev_entry && (prev_entry->value_flag() == TTValueFlag::EXACT)) {
+      tt_best_move = prev_entry->best_move();
+    }
+
     // PVノードの時はIID、そうじゃないノードならNull Move Reduction。
     PVLine temp_line;
     int reduction;
     if (Type == NodeType::PV) {
       // 前回の繰り返しの最善手があればIIDしない。
-      TTEntry* temp_entry = table.GetFulfiledEntry(pos_key, depth - 1, side);
-      if (temp_entry && (temp_entry->value_flag() == TTValueFlag::EXACT)) {
-        iid_stack_[level] = temp_entry->best_move();
+      if (tt_best_move.all_) {
+        iid_stack_[level] = tt_best_move;
       } else {
         if (depth >= 5) {
           // Internal Iterative Deepening。
@@ -251,7 +260,8 @@ namespace Sayuri {
     /**************/
     // 手を作る。
     MoveMaker maker(this);
-    maker.GenMoves<GenMoveType::ALL>(pos_key, depth, level, table);
+    maker.GenMoves<GenMoveType::ALL>(tt_best_move, iid_stack_[level],
+    killer_stack_[level]);
 
     // マテリアルを得る。
     int material = GetMaterial(side);
@@ -441,6 +451,8 @@ namespace Sayuri {
     bool is_searching_pv;
     MoveMaker maker(this);
     TTEntry* entry_ptr = nullptr;
+    TTEntry* prev_entry = nullptr;
+    Move tt_best_move;
     int delta = 15;
     int num_searched_moves;
     int reduction;
@@ -469,8 +481,17 @@ namespace Sayuri {
       // 標準出力に深さ情報を送る。
       UCIShell::SendDepthInfo(i_depth_);
 
+      // 前回の繰り返しの最善手を得る。
+      prev_entry = table.GetFulfiledEntry(pos_key, i_depth_ - 1, side);
+      if (prev_entry && (prev_entry->value_flag() == TTValueFlag::EXACT)) {
+        tt_best_move = prev_entry->best_move();
+      } else {
+        tt_best_move.all_ = 0;
+      }
+
       // 手を作る。
-      maker.GenMoves<GenMoveType::ALL>(pos_key, i_depth_, level, table);
+      maker.GenMoves<GenMoveType::ALL>(tt_best_move, iid_stack_[level],
+      killer_stack_[level]);
 
       for (Move move = maker.PickMove(); move.all_;
       move = maker.PickMove()) {

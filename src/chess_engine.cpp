@@ -206,7 +206,7 @@ namespace Sayuri {
     // 指し手の履歴をムーブ。
     move_history_ = std::move(engine.move_history_);
 
-    // 50手ルールの履歴をコピー。
+    // 50手ルールの履歴をムーブ。
     ply_100_history_ = std::move(engine.ply_100_history_);
   }
 
@@ -370,7 +370,7 @@ namespace Sayuri {
     // 指し手の履歴をムーブ。
     move_history_ = std::move(engine.move_history_);
 
-    // 50手ルールの履歴をコピー。
+    // 50手ルールの履歴をムーブ。
     ply_100_history_ = std::move(engine.ply_100_history_);
 
     return *this;
@@ -567,10 +567,7 @@ namespace Sayuri {
     // 合法手かどうか調べる。
     // 手を展開する。
     MoveMaker maker(this);
-    HashKey temp_key = 0ULL;
-    std::unique_ptr<TranspositionTable> temp_table
-    (new TranspositionTable(0));
-    maker.GenMoves<GenMoveType::ALL>(temp_key, 0, 0, *(temp_table.get()));
+    maker.GenMoves<GenMoveType::ALL>(Move(), Move(), Move());
     // 合法手かどうか調べる。
     bool is_legal = false;
     Side side = to_move_;
