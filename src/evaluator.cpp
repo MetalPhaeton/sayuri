@@ -224,26 +224,28 @@ namespace Sayuri {
     // フェーズ毎に得点を足し算する。
     // 全フェーズ。
     int whole_score = material_value_
-    + (WEIGHT_PAWN_POSITION * position_value_[PAWN])
-    + (WEIGHT_PASS_PAWN * pass_pawn_value_)
-    + (WEIGHT_DOUBLE_PAWN * double_pawn_value_)
-    + (WEIGHT_BISHOP_PAIR * bishop_pair_value_);
-    // 中盤。
-    int middle_score = (WEIGHT_MOBILITY * mobility_value_)
-    + (WEIGHT_CENTER_CONTROL * center_control_value_)
-    + (WEIGHT_DEVELOPMENT * development_value_)
+    + (WEIGHT_MOBILITY * mobility_value_)
     + (WEIGHT_ATTACK_ENEMY * attack_enemy_value_)
     + (WEIGHT_ATTACK_AROUND_KING * attack_around_king_value_)
+    + (WEIGHT_PAWN_POSITION * position_value_[PAWN])
+    + (WEIGHT_PASS_PAWN * pass_pawn_value_)
+    + (WEIGHT_PROTECTED_PASS_PAWN * protected_pass_pawn_value_)
+    + (WEIGHT_DOUBLE_PAWN * double_pawn_value_)
+    + (WEIGHT_BISHOP_PAIR * bishop_pair_value_);
+
+    // 中盤。
+    int middle_score = (WEIGHT_CENTER_CONTROL * center_control_value_)
+    + (WEIGHT_DEVELOPMENT * development_value_)
     + (WEIGHT_KNIGHT_POSITION * position_value_[KNIGHT])
     + (WEIGHT_BISHOP_POSITION * position_value_[BISHOP])
     + (WEIGHT_ROOK_POSITION * position_value_[ROOK])
     + (WEIGHT_QUEEN_POSITION * position_value_[QUEEN])
     + (WEIGHT_KING_POSITION_MIDDLE * king_position_middle_value_)
-    + (WEIGHT_PROTECTED_PASS_PAWN * protected_pass_pawn_value_)
     + (WEIGHT_ISO_PAWN * iso_pawn_value_)
     + (WEIGHT_EARLY_QUEEN_LAUNCHED * early_queen_launched_value_)
     + (WEIGHT_PAWN_SHIELD * pawn_shield_value_)
     + (WEIGHT_CASTLING * castling_value_);
+
     // 終盤。
     int ending_score =
     (WEIGHT_KING_POSITION_ENDING * king_position_ending_value_);
