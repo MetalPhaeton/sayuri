@@ -27,7 +27,6 @@
 #include "init.h"
 
 #include <iostream>
-
 #include "chess_util.h"
 #include "chess_engine.h"
 #include "evaluator.h"

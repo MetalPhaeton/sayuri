@@ -38,6 +38,7 @@
 #include "chess_util.h"
 #include "pv_line.h"
 #include "error.h"
+#include "mylib.h"
 
 namespace Sayuri {
   /**************************/

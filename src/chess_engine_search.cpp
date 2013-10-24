@@ -664,11 +664,6 @@ namespace Sayuri {
 
       // PVラインをセット。
       pv_line = cur_line;
-      // チェックメイトならもう探索しない。
-      if (pv_line.line()[pv_line.length() - 1].has_checkmated()) {
-        stopper_.stop_now_ = true;
-        break;
-      }
     }
 
     // 探索終了したけど、まだ思考を止めてはいけない場合、関数を終了しない。

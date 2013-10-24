@@ -28,7 +28,6 @@
 #define INIT_H
 
 #include <iostream>
-
 #include "chess_util.h"
 #include "chess_engine.h"
 

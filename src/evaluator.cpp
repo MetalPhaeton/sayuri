@@ -284,21 +284,18 @@ namespace Sayuri {
   }
 
   // 進行状況を得る。
-  // フェーズは放物線で進む。
+  // フェーズは一次関数で計算。
   double Evaluator::GetPhase() {
-    // キングとポーン以外の駒で進行状況を考える。
+    constexpr double MODULUS = 1.0 / 14.0;
+
     double num_pieces = static_cast<double>(Util::CountBits
     (engine_ptr_->blocker_0() & ~(engine_ptr_->position()[WHITE][PAWN]
     | engine_ptr_->position()[BLACK][PAWN]
     | engine_ptr_->position()[WHITE][KING]
     | engine_ptr_->position()[BLACK][KING])));
+    if (num_pieces > 14.0) num_pieces = 14.0;
 
-    // 放物線の準備。
-    num_pieces = num_pieces > 14.0 ? 14.0 : num_pieces;
-    constexpr double MODULUS = -(1.0 / 196.0);
-    double square = (num_pieces - 14.0) * (num_pieces - 14.0);
-
-    return MODULUS * square + 1.0;
+    return MODULUS * num_pieces;
   }
 
   /************************/

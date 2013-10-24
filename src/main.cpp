@@ -1,4 +1,5 @@
 #include <iostream>
+#include "init.h"
 #include "chess_engine.h"
 #include "uci_shell.h"
 
