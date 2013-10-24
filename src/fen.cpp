@@ -44,22 +44,22 @@ namespace Sayuri {
     std::vector<std::string> fen_tokens = MyLib::Split(fen_str, " ", "");
 
     try {
-      // パース。
+      // FENを解析。
       constexpr int index_position = 0;
       constexpr int index_to_move = 1;
       constexpr int index_castling_rights = 2;
       constexpr int index_en_passant = 3;
       constexpr int index_ply_100 = 4;
       constexpr int index_ply = 5;
-      ParsePosition(fen_tokens[index_position]);
-      ParseToMove(fen_tokens[index_to_move]);
-      ParseCastlingRights(fen_tokens[index_castling_rights]);
+      EvalPosition(fen_tokens[index_position]);
+      EvalToMove(fen_tokens[index_to_move]);
+      EvalCastlingRights(fen_tokens[index_castling_rights]);
       if (fen_tokens.size() > static_cast<size_t>(index_en_passant)) {
-        ParseEnPassant(fen_tokens[index_en_passant]);
+        EvalEnPassant(fen_tokens[index_en_passant]);
         if (fen_tokens.size() > static_cast<size_t>(index_ply_100)) {
-          ParsePly100(fen_tokens[index_ply_100]);
+          EvalPly100(fen_tokens[index_ply_100]);
           if (fen_tokens.size() > static_cast<size_t>(index_ply)) {
-            ParsePly(fen_tokens[index_ply], fen_tokens[index_to_move]);
+            EvalPly(fen_tokens[index_ply], fen_tokens[index_to_move]);
           } else {
             ply_ = 1;
           }
@@ -76,7 +76,7 @@ namespace Sayuri {
     } catch (SayuriError error) {
       throw error;
     } catch (...) {
-      throw SayuriError("FENをパース出来ません。");
+      throw SayuriError("FENを解析できません。");
     }
 
   }
@@ -177,8 +177,8 @@ namespace Sayuri {
   /************/
   /* パーサ。 */
   /************/
-  // 駒の配置をパースする。
-  void Fen::ParsePosition(const std::string& position_str) {
+  // 駒の配置トークンを評価する。
+  void Fen::EvalPosition(const std::string& position_str) {
     // 駒の配置を初期化。
     for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_PIECE_TYPES; j++) {
@@ -196,7 +196,7 @@ namespace Sayuri {
     for (auto& a : position_vec) {
       for (auto& b : a) {
 
-        // 文字をパース。
+        // 文字を解析。
         switch (b) {
           case '1':
           case '2':
@@ -245,18 +245,19 @@ namespace Sayuri {
             position_[BLACK][KING] |= Util::BIT[square];
             break;
           default:
-            throw SayuriError("FENをパース出来ません。");
+            throw SayuriError("FENを解析できません。");
             break;
         }
         square++;
         if (square > 64) {
-          throw SayuriError("FENをパース出来ません。");
+          throw SayuriError("FENを解析できません。");
         }
       }
     }
   }
-  // 手番をパースする。
-  void Fen::ParseToMove(const std::string& to_move_str) {
+
+  // 手番トークンを評価する。
+  void Fen::EvalToMove(const std::string& to_move_str) {
     switch (to_move_str[0]) {
       case 'w':
         to_move_ = WHITE;
@@ -265,12 +266,13 @@ namespace Sayuri {
         to_move_ = BLACK;
         break;
       default:
-        throw SayuriError("FENをパース出来ません。");
+        throw SayuriError("FENを解析できません。");
         break;
     }
   }
-  // キャスリングの権利をパースする。
-  void Fen::ParseCastlingRights(const std::string& castling_rights_str) {
+
+  // キャスリングの権利トークンを評価する。
+  void Fen::EvalCastlingRights(const std::string& castling_rights_str) {
     castling_rights_ = 0;
 
     if (castling_rights_str[0] == '-') return;
@@ -290,13 +292,14 @@ namespace Sayuri {
           castling_rights_ |= BLACK_LONG_CASTLING;
           break;
         default:
-          throw SayuriError("FENをパース出来ません。");
+          throw SayuriError("FENを解析できません。");
           break;
       }
     }
   }
-  // アンパッサンをパースする。
-  void Fen::ParseEnPassant(const std::string& en_passant_str) {
+
+  // アンパッサントークンを評価する。
+  void Fen::EvalEnPassant(const std::string& en_passant_str) {
     // アンパッサンがない。
     if (en_passant_str[0] == '-') {
       can_en_passant_ = false;
@@ -306,33 +309,34 @@ namespace Sayuri {
 
     // アンパッサンがある。
     can_en_passant_ = true;
-    // ファイルからパース。
+    // ファイルから評価。
     Bitboard fyle = 0ULL;
     int index = en_passant_str[0] - 'a';
     if ((index < 0) || (index > 7)) {
-      throw SayuriError("FENをパース出来ません。");
+      throw SayuriError("FENを解析できません。");
     }
     fyle = Util::FYLE[index];
-    // ランクをパース。
+    // ランクを評価。
     Bitboard rank = 0ULL;
     index = (en_passant_str[1] - '0') - 1;
     if ((index < 0) || (index > 7)) {
-      throw SayuriError("FENをパース出来ません。");
+      throw SayuriError("FENを解析できません。");
     }
     rank |= Util::RANK[index];
 
     en_passant_square_ = Util::GetSquare(fyle & rank);
   }
-  // 50手ルールをパースする。
-  void Fen::ParsePly100(const std::string& ply_100_str) {
+
+  // 50手ルールトークンを評価する。
+  void Fen::EvalPly100(const std::string& ply_100_str) {
     try {
       ply_100_ = std::stoi(ply_100_str);
     } catch (...) {
-      throw SayuriError("FENをパース出来ません。");
+      throw SayuriError("FENを解析できません。");
     }
   }
   // 手数をバースする。
-  void Fen::ParsePly(const std::string& ply_str,
+  void Fen::EvalPly(const std::string& ply_str,
   const std::string& to_move_str) {
     try {
       ply_ = std::stoi(ply_str) * 2;
@@ -340,7 +344,7 @@ namespace Sayuri {
         ply_ -= 1;
       }
     } catch (...) {
-      throw SayuriError("FENをパース出来ません。");
+      throw SayuriError("FENを解析できません。");
     }
   }
 }  // namespace Sayuri

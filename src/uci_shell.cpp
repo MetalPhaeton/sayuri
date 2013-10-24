@@ -29,9 +29,11 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <iterator>
 #include <thread>
 #include <chrono>
 #include <sstream>
+#include <utility>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "pv_line.h"
@@ -51,7 +53,7 @@ namespace Sayuri {
   extern int GetTime();
   void UCIShell::Test() {
     // positionコマンド。
-    std::string command = "position startpos";
+    std::string command = "position fen 2kr2nr/2p3pp/pp1bbp2/2p5/P3P3/1NN1BP2/1PP3PP/R2R2K1 w - -";
     std::cout << "Command: " << command << std::endl;
 
     std::vector<std::string> argv =
@@ -61,7 +63,7 @@ namespace Sayuri {
     PrintPosition(engine_ptr_->position());
 
     // goコマンド。
-    command = "go depth 12";
+    command = "go depth 7 searchmoves d1d6 e3c5";
     argv = MyLib::Split(command, " ", "");
     table_size_ = 64 * 1024 * 1024;
     Start();
@@ -215,174 +217,183 @@ namespace Sayuri {
   }
   // positionコマンド。
   void UCIShell::CommandPosition(std::vector<std::string>& argv) {
-    // コマンドをパース。
-    std::vector<std::string>::iterator itr = argv.begin();
-    std::vector<std::string>::iterator end_itr = argv.end();
+    // サブコマンド。
+    std::vector<std::string> sub_commands;
+    sub_commands.push_back("startpos");
+    sub_commands.push_back("fen");
+    sub_commands.push_back("moves");
 
-    // ポジションコマンドがあるかどうか。
-    while (itr < end_itr) {
-      if (*itr == "position") {
-        itr++;
-        break;
-      }
-      itr++;
-    }
+    // パーサ。
+    CommandParser parser(sub_commands, argv);
 
-    // 駒の配置をパース。
-    while (itr < end_itr) {
-      if (*itr == "startpos") {
+    Word word;
+    std::string fen_str = "";
+    Move move;
+    while (parser.HasNext()) {
+      word = parser.Get();
+
+      if (word.str_ == "startpos") {
+        // startposコマンド。
         engine_ptr_->LoadFen(Fen(std::string
         ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")));
-        itr++;
-        break;
-      } else if (*itr == "fen") {
-        itr++;
-        if (itr >= end_itr) return;
+      } else if (word.str_ == "fen") {
+        // fenコマンド。
         // FENを合体。
-        std::string fen_str = "";
-        while (itr < end_itr) {
-          if (*itr == "moves") {
-            itr--;
-            break;
-          }
-          fen_str += *itr + " ";
-          itr++;
+        fen_str = "";
+        while (!(parser.IsDelim())) {
+          fen_str += parser.Get().str_ + " ";
         }
-
+        // エンジンにロード。
         engine_ptr_->LoadFen(Fen(fen_str));
-        itr++;
-        break;
+      } else if (word.str_ == "moves") {
+        // moveコマンド。
+        while (!(parser.IsDelim())) {
+          move = TransStringToMove(parser.Get().str_);
+          // 手を指す。
+          if (move.all_) {
+            engine_ptr_->PlayMove(move);
+          }
+        }
       }
-      itr++;
-    }
 
-    // 手サブコマンドをパース。
-    while (itr < end_itr) {
-      if (*itr == "moves") {
-        itr++;
-        break;
-      }
-      itr++;
-    }
-
-    // 手をパース。
-    Move move;
-    while (itr < end_itr) {
-      move = TransStringToMove(*itr);
-      // 手を指す。
-      if (move.all_) {
-        engine_ptr_->PlayMove(move);
-      }
-      itr++;
+      parser.JumpToNextKeyword();
     }
   }
 
   // goコマンド。
   void UCIShell::CommandGo(std::vector<std::string>& argv) {
-    // スレッドが実行中なら中止する。
-    if (thinking_thread_.joinable()) {
-      engine_ptr_->StopCalculation();
-      thinking_thread_.join();
-    }
+    // サブコマンドの配列。
+    std::vector<std::string> sub_commands;
+    sub_commands.push_back("searchmoves");
+    sub_commands.push_back("ponder");
+    sub_commands.push_back("wtime");
+    sub_commands.push_back("btime");
+    sub_commands.push_back("winc");
+    sub_commands.push_back("binc");
+    sub_commands.push_back("movestogo");
+    sub_commands.push_back("depth");
+    sub_commands.push_back("nodes");
+    sub_commands.push_back("mate");
+    sub_commands.push_back("movetime");
+    sub_commands.push_back("infinite");
+
+    // パース。
+    CommandParser parser(sub_commands, argv);
 
     // 準備。
-    std::vector<std::string>::iterator itr = argv.begin();
-    std::vector<std::string>::iterator end_itr = argv.end();
     int max_depth = MAX_PLYS;
     std::size_t max_nodes = MAX_NODES;
     Chrono::milliseconds thinking_time(60000);
     bool infinite_thinking = false;
+    moves_to_search_ptr_.reset(nullptr);
 
-    // goトークンまで流す。
-    while (itr < end_itr) {
-      if (*itr == "go") {
-        itr++;
-        break;
-      }
-      itr++;
-    }
-
-    // サブコマンドをパース。
+    // サブコマンドを解析。
+    Word word;
     Move move;
     Chrono::milliseconds time_control(0);
-    while (itr < end_itr) {
-      if (*itr == "searchmoves") {
+    while (parser.HasNext()) {
+      word = parser.Get();
+
+      if (word.str_ == "searchmoves") {
+        if (parser.IsDelim()) continue;
+
         // searchmovesコマンド。
-        itr++;
-        // 手をベクトルに格納していく。
-        while (itr < end_itr) {
-          move = TransStringToMove(*itr);
+        while (!(parser.IsDelim())) {
+          move = TransStringToMove(parser.Get().str_);
           if (move.all_) {
+            if (moves_to_search_ptr_ == nullptr) {
+              moves_to_search_ptr_.reset(new std::vector<Move>());
+            }
             moves_to_search_ptr_->push_back(move);
-            itr++;
           } else {
-            itr--;
             break;
           }
         }
-      } else if ((*itr == "ponder") || (*itr == "infinite")) {
-        // ポンダリングモードで探索する。
+      } else if (word.str_ == "ponder") {
+        // ponderコマンド。
         infinite_thinking = true;
-      } else if ((*itr == "wtime") && (engine_ptr_->to_move() == WHITE)) {
-        // 白の持ち時間。エンジンが白番の場合。
-        itr++;
-        try {
-          time_control = Chrono::milliseconds(std::stoull(*itr));
-          if (time_control.count() > 180000) {
-            thinking_time = Chrono::milliseconds(120000);
-          } else {
-            thinking_time = time_control / 2;
+      } else if (word.str_ == "wtime") {
+        // wtimeコマンド。
+        // 3分以上あるなら2分考える。3分未満なら持ち時間の半分考える。
+        if (!(parser.IsDelim())) {
+          if (engine_ptr_->to_move() == WHITE) {
+            try {
+              time_control =
+              Chrono::milliseconds(std::stoull(parser.Get().str_));
+              if (time_control.count() >= 180000) {
+                thinking_time = Chrono::milliseconds(120000);
+              } else {
+                thinking_time = time_control / 2;
+              }
+            } catch (...) {
+              // 無視。
+            }
           }
-        } catch (...) {
-          itr--;
         }
-      } else if ((*itr == "btime") && (engine_ptr_->to_move() == BLACK)) {
-        // 黒の持ち時間。エンジンが黒番の場合。
-        itr++;
-        try {
-          time_control = Chrono::milliseconds(std::stoull(*itr));
-          if (time_control.count() > 180000) {
-            thinking_time = Chrono::milliseconds(120000);
-          } else {
-            thinking_time = time_control / 2;
+      } else if (word.str_ == "btime") {
+        // btimeコマンド。
+        // 3分以上あるなら2分考える。3分未満なら持ち時間の半分考える。
+        if (!(parser.IsDelim())) {
+          if (engine_ptr_->to_move() == BLACK) {
+            try {
+              time_control =
+              Chrono::milliseconds(std::stoull(parser.Get().str_));
+              if (time_control.count() >= 180000) {
+                thinking_time = Chrono::milliseconds(120000);
+              } else {
+                thinking_time = time_control / 2;
+              }
+            } catch (...) {
+              // 無視。
+            }
           }
-        } catch (...) {
-          itr--;
         }
-      } else if (*itr == "depth") {
-        // 深さの指定。
-        itr++;
-        try {
-          max_depth = std::stoi(*itr);
-        } catch (...) {
-          itr--;
+      } else if (word.str_ == "depth") {
+        // depthコマンド。
+        if (!(parser.IsDelim())) {
+          try {
+            max_depth = std::stoi(parser.Get().str_);
+            if (max_depth > MAX_PLYS) max_depth = MAX_PLYS;
+          } catch (...) {
+            // 無視。
+          }
         }
-      } else if (*itr == "nodes") {
-        // 探索するノード数の指定。
-        itr++;
-        try {
-          max_nodes = std::stoull(*itr);
-        } catch (...) {
-          itr--;
+      } else if (word.str_ == "nodes") {
+        // nodesコマンド。
+        if (!(parser.IsDelim())) {
+          try {
+            max_nodes = std::stoull(parser.Get().str_);
+            if (max_nodes > MAX_NODES) max_nodes = MAX_NODES;
+          } catch (...) {
+            // 無視。
+          }
         }
-      } else if (*itr == "movetime") {
-        // 探索時間の指定。
-        itr++;
-        try {
-          thinking_time = Chrono::milliseconds(std::stoull(*itr));
-        } catch (...) {
-          itr--;
+      } else if (word.str_ == "mate") {
+        // mateコマンド。
+        if (!(parser.IsDelim())) {
+          try {
+            max_depth = (std::stoi(parser.Get().str_) * 2) - 1;
+            if (max_depth > MAX_PLYS) max_depth = MAX_PLYS;
+          } catch (...) {
+            // 無視。
+          }
         }
-      } else if (*itr == "mate") {
-        // メイトを探す。
-        itr++;
-        try {
-          max_depth = (std::stoi(*itr) * 2) - 1;
-        } catch (...) {
-          itr--;
+      } else if (word.str_ == "movetime") {
+        // movetimeコマンド。
+        if (!(parser.IsDelim())) {
+          try {
+            thinking_time =
+            Chrono::milliseconds(std::stoull(parser.Get().str_));
+          } catch (...) {
+            // 無視。
+          }
         }
+      } else if (word.str_ == "infinite") {
+        // infiniteコマンド。
+        infinite_thinking = true;
       }
-      itr++;
+
+      parser.JumpToNextKeyword();
     }
 
     // 別スレッドで思考開始。
@@ -475,5 +486,103 @@ namespace Sayuri {
     }
 
     return move;
+  }
+
+  /*************************/
+  /* UCIコマンドのパーサ。 */
+  /*************************/
+  // コンストラクタ。
+  UCIShell::CommandParser::CommandParser
+  (const std::vector<std::string>& keywords,
+  const std::vector<std::string>& argv) {
+    // 構文解析。
+    bool is_keyword;
+    for (auto& a : argv) {
+      is_keyword = false;
+
+      // キーワードかどうか調べる。
+      for (auto& b : keywords) {
+        if (a == b) {
+          is_keyword = true;
+          break;
+        }
+      }
+
+      // 構文リストに入れる。
+      if (is_keyword) {
+        syntax_vector_.push_back(Word {"", WordType::DELIM});
+        syntax_vector_.push_back(Word {a, WordType::KEYWORD});
+      } else {
+        syntax_vector_.push_back(Word {a, WordType::PARAM});
+      }
+    }
+
+    // 最後に区切りを入れる。
+    syntax_vector_.push_back(Word {"", WordType::DELIM});
+
+    // イテレータをセット。
+    itr_ = syntax_vector_.begin();
+  }
+
+  // コピーコンストラクタ。
+  UCIShell::CommandParser::CommandParser(const CommandParser& parser) {
+    syntax_vector_ = parser.syntax_vector_;
+    itr_ = syntax_vector_.begin()
+    + std::distance(parser.syntax_vector_.begin(), parser.itr_);
+  }
+
+  // ムーブコンストラクタ。
+  UCIShell::CommandParser::CommandParser(CommandParser&& parser) {
+    syntax_vector_ = std::move(parser.syntax_vector_);
+    itr_ = std::move(parser.itr_);
+  }
+
+  // コピー代入。
+  UCIShell::CommandParser&
+  UCIShell::CommandParser::operator=(const CommandParser& parser) {
+    syntax_vector_ = parser.syntax_vector_;
+    itr_ = syntax_vector_.begin()
+    + std::distance(parser.syntax_vector_.begin(), parser.itr_);
+    return *this;
+  }
+
+  // ムーブ代入。
+  UCIShell::CommandParser&
+  UCIShell::CommandParser::operator=(CommandParser&& parser) {
+    syntax_vector_ = std::move(parser.syntax_vector_);
+    itr_ = std::move(parser.itr_);
+    return *this;
+  }
+
+  // 単語を得る。
+  const UCIShell::Word& UCIShell::CommandParser::Get() {
+    itr_++;
+    return *(itr_ - 1);
+  }
+
+  // 単語があるかどうか。
+  bool UCIShell::CommandParser::HasNext() const {
+    return itr_ < syntax_vector_.end();
+  }
+
+  // 区切りかどうか。
+  bool UCIShell::CommandParser::IsDelim() const {
+    return itr_->type_ == WordType::DELIM;
+  }
+
+  // 次のキーワードへジャンプ。
+  void UCIShell::CommandParser::JumpToNextKeyword() {
+    itr_++;
+    while (itr_ < syntax_vector_.end()) {
+      if (itr_->type_ == WordType::KEYWORD) {
+        return;
+      }
+      itr_++;
+    }
+  }
+
+  // 冒頭にリセット。
+  void UCIShell::CommandParser::Reset() {
+    itr_ = syntax_vector_.begin();
   }
 }  // namespace Sayuri

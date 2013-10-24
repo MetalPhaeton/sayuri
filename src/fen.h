@@ -77,18 +77,18 @@ namespace Sayuri {
       /************/
       /* パーサ。 */
       /************/
-      // 駒の配置をパースする。
-      void ParsePosition(const std::string& position_str);
-      // 手番をパースする。
-      void ParseToMove(const std::string& to_move_str);
-      // キャスリングの権利をパースする。
-      void ParseCastlingRights(const std::string& castling_rights_str);
-      // アンパッサンをパースする。
-      void ParseEnPassant(const std::string& en_passant_str);
-      // 50手ルールをパースする。
-      void ParsePly100(const std::string& ply_100_str);
-      // 手数をパースする。
-      void ParsePly(const std::string& ply_str,
+      // 駒の配置トークンを評価する。
+      void EvalPosition(const std::string& position_str);
+      // 手番トークンを評価する。
+      void EvalToMove(const std::string& to_move_str);
+      // キャスリングの権利トークンを評価する。
+      void EvalCastlingRights(const std::string& castling_rights_str);
+      // アンパッサントークンを評価する。
+      void EvalEnPassant(const std::string& en_passant_str);
+      // 50手ルールトークンを評価する。
+      void EvalPly100(const std::string& ply_100_str);
+      // 手数トークンを評価する。
+      void EvalPly(const std::string& ply_str,
       const std::string& to_move_str);
 
       /****************/

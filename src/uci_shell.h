@@ -115,6 +115,64 @@ namespace Sayuri {
       // argv: コマンド引数。argv[0]はコマンド名。
       void CommandGo(std::vector<std::string>& argv);
 
+      /*************************/
+      /* UCIコマンドのパーサ。 */
+      /*************************/
+      // 単語の種類。
+      enum class WordType {
+        KEYWORD,  // キーワード。
+        PARAM,  // 引数。
+        DELIM  // 区切り。
+      };
+      // コマンドの単語。
+      struct Word {
+        std::string str_;  //単語の文字列。
+        WordType type_;  // 単語の種類。
+
+        Word& operator=(const Word& word) {
+          str_ = word.str_;
+          type_ = word.type_;
+          return *this;
+        }
+      };
+      // パーサ。
+      class CommandParser {
+        public:
+          /**************************/
+          /* コンストラクタと代入。 */
+          /**************************/
+          // [引数]
+          // keywords: キーワードの配列。
+          // argv: コマンドの引数リスト。
+          CommandParser(const std::vector<std::string>& keywords,
+          const std::vector<std::string>& argv);
+          CommandParser() = delete;
+          CommandParser(const CommandParser& parser);
+          CommandParser(CommandParser&& parser);
+          CommandParser& operator=(const CommandParser& parser);
+          CommandParser& operator=(CommandParser&& parser);
+
+          /********************/
+          /* パブリック関数。 */
+          /********************/
+          // 単語を得る。
+          const Word& Get();
+          // 単語があるかどうか。
+          bool HasNext() const;
+          // 区切りかどうか。
+          bool IsDelim() const;
+          // 次のキーワードへジャンプ。
+          void JumpToNextKeyword();
+          // 冒頭にリセット。
+          void Reset();
+
+        private:
+          // 構文リスト。
+          std::vector<Word> syntax_vector_;
+          // 構文リストのイテレータ。
+          std::vector<Word>::const_iterator itr_;
+      };
+
       /**************/
       /* 便利関数。 */
       /**************/
