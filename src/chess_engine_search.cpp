@@ -685,7 +685,7 @@ namespace Sayuri {
     }
 
     // ポジションの評価の最大値。
-    margin += depth <= 1 ? 200 : 400;
+    margin += depth <= 1 ? 300 : 400;
 
     return margin;
   }

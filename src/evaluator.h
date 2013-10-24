@@ -100,14 +100,14 @@ namespace Sayuri {
           -2, -1, -1, -1, -1, -1, -1, -2
         },
         {
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0,
-          1, 1, 1, 1, 1, 1, 1, 1,
-          1, 1, 1, 1, 1, 1, 1, 1
+          0, 1, 2, 3, 3, 2, 1, 0,
+          0, 1, 2, 3, 3, 2, 1, 0,
+          0, 1, 2, 3, 3, 2, 1, 0,
+          0, 1, 2, 3, 3, 2, 1, 0,
+          0, 1, 2, 3, 3, 2, 1, 0,
+          0, 1, 2, 3, 3, 2, 1, 0,
+          4, 4, 4, 4, 4, 4, 4, 4,
+          4, 4, 4, 4, 4, 4, 4, 4
         },
         {
           -3, -2, -2, -1, -1, -2, -2, -3,
@@ -179,7 +179,7 @@ namespace Sayuri {
       // ビショップの配置の重さ。
       static constexpr int WEIGHT_BISHOP_POSITION = 20;
       // ルークの配置の重さ。
-      static constexpr int WEIGHT_ROOK_POSITION = 30;
+      static constexpr int WEIGHT_ROOK_POSITION = 20;
       // クイーンの配置の重さ。
       static constexpr int WEIGHT_QUEEN_POSITION = 20;
       // キングの中盤の配置の重さ。
@@ -195,11 +195,11 @@ namespace Sayuri {
       // 守られたパスポーンの重さ。
       static constexpr int WEIGHT_PROTECTED_PASS_PAWN = 20;
       // ダブルポーンの重さ。
-      static constexpr int WEIGHT_DOUBLE_PAWN = -5;
+      static constexpr int WEIGHT_DOUBLE_PAWN = -20;
       // 孤立ポーンの重さ。
-      static constexpr int WEIGHT_ISO_PAWN = -5;
+      static constexpr int WEIGHT_ISO_PAWN = -30;
       // ビショップペアの重さ。
-      static constexpr int WEIGHT_BISHOP_PAIR = 25;
+      static constexpr int WEIGHT_BISHOP_PAIR = 20;
       // 早すぎるクイーンの出動の重さ。
       static constexpr int WEIGHT_EARLY_QUEEN_LAUNCHED = -30;
       // ポーンの盾の重さ。
