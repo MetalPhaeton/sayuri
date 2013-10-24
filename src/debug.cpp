@@ -50,15 +50,6 @@ namespace Sayuri {
   /**************************/
   // ================================================================
   int DebugMain(int argc, char* argv[]) {
-    // 初期化。------------------------------------------------------
-    Init();
-    // --------------------------------------------------------------
-
-    // UCIShellのテスト。
-    std::unique_ptr<ChessEngine> engine_ptr(new ChessEngine());
-    std::unique_ptr<UCIShell> shell_ptr(new UCIShell(engine_ptr.get()));
-    shell_ptr->Test();
-
     return 0;
   }
   // ================================================================

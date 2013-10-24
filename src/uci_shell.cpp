@@ -39,43 +39,7 @@
 #include "pv_line.h"
 #include "error.h"
 
-#include "mylib.h"  // テスト用。
-
 namespace Sayuri {
-  /**************/
-  /* テスト用。 */
-  /**************/
-  // =================================================================
-  extern void PrintPosition
-  (const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]);
-  extern void Start();
-  extern void Stop();
-  extern int GetTime();
-  void UCIShell::Test() {
-    // positionコマンド。
-    std::string command = "position fen 2kr2nr/2p3pp/pp1bbp2/2p5/P3P3/1NN1BP2/1PP3PP/R2R2K1 w - -";
-    std::cout << "Command: " << command << std::endl;
-
-    std::vector<std::string> argv =
-    MyLib::Split(command, " ", "");
-
-    CommandPosition(argv);
-    PrintPosition(engine_ptr_->position());
-
-    // goコマンド。
-    command = "go depth 7 searchmoves d1d6 e3c5";
-    argv = MyLib::Split(command, " ", "");
-    table_size_ = 64 * 1024 * 1024;
-    Start();
-    CommandGo(argv);
-    // std::this_thread::sleep_for(Chrono::milliseconds(30000));
-    // engine_ptr_->StopCalculation();
-    thinking_thread_.join();
-    Stop();
-    std::cout << "Thinking Time: " << GetTime() << std::endl;
-  }
-  // =================================================================
-
   /**************************/
   /* コンストラクタと代入。 */
   /**************************/
@@ -104,6 +68,57 @@ namespace Sayuri {
   UCIShell& UCIShell::operator=(UCIShell&& shell) {
     engine_ptr_ = shell.engine_ptr_;
     return *this;
+  }
+
+  /********************/
+  /* パブリック関数。 */
+  /********************/
+  // エンジンを実行する。
+  void UCIShell::Run() {
+    // コマンド。
+    std::vector<std::string> commands;
+    commands.push_back("uci");
+    commands.push_back("isready");
+    commands.push_back("setoption");
+    commands.push_back("ucinewgame");
+    commands.push_back("position");
+    commands.push_back("go");
+    commands.push_back("stop");
+    commands.push_back("ponderhit");
+    commands.push_back("quit");
+
+    // メインループ。
+    std::vector<std::string> argv;
+    CommandParser parser(commands, argv);
+    std::string input;
+    Word word;
+    while (true) {
+      std::getline(std::cin, input);
+      argv = MyLib::Split(input, " ", "");
+      parser = CommandParser(commands, argv);
+      parser.JumpToNextKeyword();
+      word = parser.Get();
+      if (word.str_ == "uci") {
+        CommandUCI();
+      } else if (word.str_ == "isready") {
+        CommandIsReady();
+      } else if (word.str_ == "setoption") {
+        CommandSetOption(argv);
+      } else if (word.str_ == "ucinewgame") {
+        CommandUCINewGame();
+      } else if (word.str_ == "position") {
+        CommandPosition(argv);
+      } else if (word.str_ == "go") {
+        CommandGo(argv);
+      } else if (word.str_ == "stop") {
+        CommandStop();
+      } else if (word.str_ == "ponderhit") {
+        CommandPonderHit();
+      } else if (word.str_ == "quit") {
+        CommandStop();
+        break;
+      }
+    }
   }
 
   /****************/
@@ -201,22 +216,86 @@ namespace Sayuri {
     std::cout << "id name " << ID_NAME << std::endl;
     std::cout << "id author " << ID_AUTHOR << std::endl;
 
-    // TODO: 変更可能オプションの表示。
+    // 変更可能オプションの表示。
+    // トランスポジションテーブルのサイズの変更。
+    std::cout << "option name Hash type spin default 64 min "
+    << (TranspositionTable::GetMinSize() / (1024 * 1024)) << " max "
+    << (TranspositionTable::GetMaxSize() / (1024 * 1024)) << std::endl;
+    // ポンダリングできるかどうか。
+    std::cout << "option name Ponder type check default true" << std::endl;
 
     std::cout << "uciok" << std::endl;
   }
+
   // isreadyコマンド。
   void UCIShell::CommandIsReady() {
-    // TODO: パラメータの変更。
-
     std::cout << "readyok" << std::endl;
   }
-  // quitコマンド。
-  void UCIShell::CommandQuit() {
-    // TODO: プログラムの終了。
+
+  // setoptionコマンド。
+  void UCIShell::CommandSetOption(const std::vector<std::string>& argv) {
+    // 全部小文字にしておく。
+    std::vector<std::string> argv2 = argv;
+    constexpr char DELTA = 'A' - 'a';
+    for (auto& a : argv2) {
+      for (auto& b : a) {
+        if ((b >= 'A') && (b <= 'Z')) {
+          b -= DELTA;
+        }
+      }
+    }
+
+    // サブコマンド。
+    std::vector<std::string> sub_commands;
+    sub_commands.push_back("name");
+    sub_commands.push_back("value");
+
+    // パーサ。
+    CommandParser parser(sub_commands, argv2);
+
+    Word word;
+    while (parser.HasNext()) {
+      word = parser.Get();
+
+      if (word.str_ == "name") {
+        // nameコマンド。
+        while (!(parser.IsDelim())) {
+          word = parser.Get();
+          if (word.str_ == "hash") {
+            // ハッシュ値の変更の場合。
+            parser.JumpToNextKeyword();
+            while (parser.HasNext()) {
+              word = parser.Get();
+              if (word.str_ == "value") {
+                try {
+                  table_size_ = std::stoull(parser.Get().str_) * 1024 * 1024;
+                } catch (...) {
+                  // 無視。
+                }
+                break;
+              }
+
+              parser.JumpToNextKeyword();
+            }
+            break;
+          } else if (word.str_ == "ponder") {
+            // ポンダリングの設定の場合。
+            break;
+          }
+        }
+      }
+
+      parser.JumpToNextKeyword();
+    }
   }
+
+  // ucinewgameコマンド。
+  void UCIShell::CommandUCINewGame() {
+    engine_ptr_->SetNewGame();
+  }
+
   // positionコマンド。
-  void UCIShell::CommandPosition(std::vector<std::string>& argv) {
+  void UCIShell::CommandPosition(const std::vector<std::string>& argv) {
     // サブコマンド。
     std::vector<std::string> sub_commands;
     sub_commands.push_back("startpos");
@@ -261,7 +340,13 @@ namespace Sayuri {
   }
 
   // goコマンド。
-  void UCIShell::CommandGo(std::vector<std::string>& argv) {
+  void UCIShell::CommandGo(const std::vector<std::string>& argv) {
+    // 思考スレッドを終了させる。
+    if (thinking_thread_.joinable()) {
+      engine_ptr_->StopCalculation();
+      thinking_thread_.join();
+    }
+
     // サブコマンドの配列。
     std::vector<std::string> sub_commands;
     sub_commands.push_back("searchmoves");
@@ -400,6 +485,20 @@ namespace Sayuri {
     engine_ptr_->SetStopper(max_depth, max_nodes, thinking_time,
     infinite_thinking);
     thinking_thread_ = std::thread(ThreadThinking, std::ref(*this));
+  }
+
+  // stopコマンド。
+  void UCIShell::CommandStop() {
+    // 思考スレッドを終了させる。
+    if (thinking_thread_.joinable()) {
+      engine_ptr_->StopCalculation();
+      thinking_thread_.join();
+    }
+  }
+
+  // ponderhitコマンド。
+  void UCIShell::CommandPonderHit() {
+    engine_ptr_->EnableInfiniteThinking(false);
   }
 
   /**************/

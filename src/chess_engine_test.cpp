@@ -47,7 +47,4 @@ namespace Sayuri {
   extern void Start();
   extern void Stop();
   extern int GetTime();
-
-  void ChessEngine::Test() {
-  }
 }  // namespace Sayuri

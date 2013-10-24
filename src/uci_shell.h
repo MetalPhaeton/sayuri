@@ -41,11 +41,6 @@ namespace Sayuri {
   // UCIのインターフェス。
   class UCIShell {
     public:
-      /**************/
-      /* テスト用。 */
-      /**************/
-      void Test();
-
       /**************************/
       /* コンストラクタと代入。 */
       /**************************/
@@ -56,6 +51,12 @@ namespace Sayuri {
       UCIShell(UCIShell&& shell);
       UCIShell& operator=(const UCIShell& shell);
       UCIShell& operator=(UCIShell&& shell);
+
+      /********************/
+      /* パブリック関数。 */
+      /********************/
+      // エンジンを実行する。
+      void Run();
 
       /****************/
       /* static関数。 */
@@ -104,16 +105,24 @@ namespace Sayuri {
       void CommandUCI();
       // isreadyコマンド。
       void CommandIsReady();
-      // quitコマンド。
-      void CommandQuit();
+      // setoptionコマンド。
+      // [引数]
+      // argv: コマンド引数。argv[0]はコマンド名。
+      void CommandSetOption(const std::vector<std::string>& argv);
+      // ucinewgameコマンド。
+      void CommandUCINewGame();
       // positionコマンド。
       // [引数]
       // argv: コマンド引数。argv[0]はコマンド名。
-      void CommandPosition(std::vector<std::string>& argv);
+      void CommandPosition(const std::vector<std::string>& argv);
       // goコマンド。
       // [引数]
       // argv: コマンド引数。argv[0]はコマンド名。
-      void CommandGo(std::vector<std::string>& argv);
+      void CommandGo(const std::vector<std::string>& argv);
+      // stopコマンド。
+      void CommandStop();
+      // ponderhitコマンド。
+      void CommandPonderHit();
 
       /*************************/
       /* UCIコマンドのパーサ。 */
