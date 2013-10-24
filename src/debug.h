@@ -37,6 +37,8 @@ namespace Sayuri {
   int DebugMain(int argc, char* argv[]);
 
   // 擬似ハッシュキー生成。
+  // [戻り値]
+  // ランダムに生成されたハッシュキー。
   HashKey GenPseudoHashKey();
 
   // ビットボードを以下のように出力する。
