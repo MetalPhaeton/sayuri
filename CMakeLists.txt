@@ -61,7 +61,7 @@ add_dependencies(sayuri ${HEADERS})
 
 # CPackの設定。
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "sayuri-${VERSION}")
-set(CPACK_SOURCE_IGNORE_FILES "/build/;/.git/;~$;${CPACK_SOURCE_IGNORE_FILES}")
+set(CPACK_SOURCE_IGNORE_FILES "/build/;/\\.git/;/\\.gitignore;~$;${CPACK_SOURCE_IGNORE_FILES}")
 
 # CPackを実行。
 include(CPack)
