@@ -47,7 +47,7 @@ CMakeでMakefileを作った後以下のコマンドを実行してください�
     $ make dist
 
 これで以下の3つの配布用パッケージが出来上がります。
-    sayuri.xxxx.xx.xx.tar.Z
-    sayuri.xxxx.xx.xx.tar.bz2
-    sayuri.xxxx.xx.xx.tar.gz
+    sayuri-xxxx.xx.xx.tar.Z
+    sayuri-xxxx.xx.xx.tar.bz2
+    sayuri-xxxx.xx.xx.tar.gz
 (注)'xxxx.xx.xx'にはバージョン番号が入る。
