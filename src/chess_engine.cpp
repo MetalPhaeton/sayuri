@@ -801,14 +801,8 @@ namespace Sayuri {
 
   // 攻撃されているかどうか調べる。
   bool ChessEngine::IsAttacked(Square square, Side side) const {
-    // NO_SIDEならfalse。
-    if (side == NO_SIDE) return false;
-
-    // 攻撃。
-    Bitboard attack;
-
     // ポーンに攻撃されているかどうか調べる。
-    attack = Util::GetPawnAttack(square, side ^ 0x3);
+    Bitboard attack = Util::GetPawnAttack(square, side ^ 0x3);
     if (attack & position_[side][PAWN]) return true;
 
     // ナイトに攻撃されているかどうか調べる。
@@ -835,8 +829,6 @@ namespace Sayuri {
 
   // マテリアルを得る。
   int ChessEngine::GetMaterial(Side side) const {
-    Assert((side == WHITE) || (side == BLACK));
-
     // 相手のサイド。
     Side enemy_side = side ^ 0x3;
 

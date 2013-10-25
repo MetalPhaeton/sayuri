@@ -36,13 +36,6 @@ namespace Sayuri {
       SayuriError(const char* message) : std::logic_error(message) {}
       SayuriError(const std::string message) : std::logic_error(message) {}
   };
-
-  // 論理テスト。
-  // [引数]
-  // expr: 条件式。
-  // [例外]
-  // exprがfalseなら例外発生。
-  void Assert(bool expr);
 }  // namespace Sayuri
 
 #endif

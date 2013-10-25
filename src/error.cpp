@@ -25,9 +25,4 @@
 #include "error.h"
 
 namespace Sayuri {
-  // アサートする。
-  void Assert(bool expr) {
-    if (expr) return;
-    throw SayuriError("Sayuriエラー: アサート失敗。");
-  }
 }  // namespace Sayuri
