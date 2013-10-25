@@ -29,7 +29,6 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <utility>
 #include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
@@ -150,24 +149,6 @@ namespace Sayuri {
     Side enemy_side = side ^ 0x3;
     bool is_checked = IsAttacked(king_[side], enemy_side);
 
-    // ゲーム終了した場合。
-    if (!HasLegalMove(side)) {
-      if (is_checked) {
-        // チェックメイト。
-        pv_line.MarkCheckmated();
-        int score = SCORE_LOSE;
-        if (score >= beta) return beta;
-        if (score <= alpha) return alpha;
-        return score;
-      } else {
-        // ステールメイト。
-        int score = SCORE_DRAW;
-        if (score >= beta) return beta;
-        if (score <= alpha) return alpha;
-        return score;
-      }
-    }
-
     // トランスポジションテーブルを調べる。
     TTEntry* entry_ptr =
     table.GetFulfiledEntry(pos_key, depth, side);
@@ -260,19 +241,28 @@ namespace Sayuri {
     maker.GenMoves<GenMoveType::ALL>(tt_best_move, iid_stack_[level],
     killer_stack_[level]);
 
-    // マテリアルを得る。
-    int material = GetMaterial(side);
+    // Futility Pruningの準備。
+    bool do_futility_pruning = false;
+    int material;
+    if (depth <= 2) {
+      material = GetMaterial(side);
+      do_futility_pruning = true;
+    }
 
     // ループ。
     TTValueFlag value_flag = TTValueFlag::ALPHA;
     bool is_searching_pv = true;
     int num_searched_moves = 0;
+    bool has_legal_move = false;
     for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
       // 次のハッシュキー。
       HashKey next_key = GetNextKey(pos_key, move);
 
       // マージン。
-      int margin = GetMargin(move, depth);
+      int margin;
+      if (do_futility_pruning) {
+        margin = GetMargin(move, depth);
+      }
 
       MakeMove(move);
 
@@ -282,8 +272,11 @@ namespace Sayuri {
         continue;
       }
 
+      // 合法手があったのでフラグを立てる。
+      has_legal_move = true;
+
       // Futility Pruning。
-      if (depth <= 2) {
+      if (do_futility_pruning) {
         if ((material + margin) <= alpha) {
           UnmakeMove(move);
           continue;
@@ -371,6 +364,24 @@ namespace Sayuri {
       }
     }
 
+    // このノードでゲーム終了だった場合。
+    if (!has_legal_move) {
+      if (is_checked) {
+        // チェックメイト。
+        pv_line.MarkCheckmated();
+        int score = SCORE_LOSE;
+        if (score >= beta) return beta;
+        if (score <= alpha) return alpha;
+        return score;
+      } else {
+        // ステールメイト。
+        int score = SCORE_DRAW;
+        if (score >= beta) return beta;
+        if (score <= alpha) return alpha;
+        return score;
+      }
+    }
+
     // トランスポジションテーブルに登録。
     if (!entry_ptr) {
       table.Add(pos_key, depth, side, alpha, value_flag,
@@ -412,7 +423,7 @@ namespace Sayuri {
     history_max_ = 1;
     stopper_.stop_now_ = false;
 
-    // 使う変数。
+    // Iterative Deepening。
     HashKey pos_key = GetCurrentKey();
     int level = 0;
     int alpha = -MAX_VALUE;
@@ -420,26 +431,10 @@ namespace Sayuri {
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
     PVLine pv_line;
-    PVLine cur_line;
     TimePoint now = SysClock::now();
     TimePoint next_send_info_time = now + Chrono::milliseconds(1000);
     std::vector<Move> move_vec;
     MoveMaker maker(this);
-
-    // ゲーム終了した場合。
-    if (!HasLegalMove(side)) {
-      if (IsAttacked(king_[side], enemy_side)) {
-        // チェックメイト。
-        pv_line.MarkCheckmated();
-        pv_line.score(SCORE_LOSE);
-        return std::move(pv_line);
-      } else {
-        // ステールメイト。
-        return std::move(pv_line);
-      }
-    }
-
-    // Iterative Deepening。
     for (i_depth_ = 1; i_depth_ <= MAX_PLYS; i_depth_++) {
       // 探索終了。
       if (ShouldBeStopped()) break;
@@ -623,9 +618,9 @@ namespace Sayuri {
           is_searching_pv = false;
 
           // PVラインにセット。
-          cur_line.SetMove(move);
-          cur_line.Insert(next_line);
-          cur_line.score(score);
+          pv_line.SetMove(move);
+          pv_line.Insert(next_line);
+          pv_line.score(score);
 
           // トランスポジションテーブルに登録。
           if (!entry_ptr) {
@@ -642,7 +637,7 @@ namespace Sayuri {
           Chrono::milliseconds time =
           Chrono::duration_cast<Chrono::milliseconds>(now - start_time_);
           UCIShell::SendPVInfo(i_depth_, searched_level_, score, time,
-          searched_nodes_, cur_line);
+          searched_nodes_, pv_line);
 
           alpha = score;
         }
@@ -650,15 +645,12 @@ namespace Sayuri {
 
       // ストップがかかっていたらループを抜ける。
       if (ShouldBeStopped()) break;
-
-      // PVラインをセット。
-      pv_line = cur_line;
     }
 
     // 探索終了したけど、まだ思考を止めてはいけない場合、関数を終了しない。
     while (!ShouldBeStopped()) continue;
 
-    return std::move(pv_line);
+    return pv_line;
   }
 
   // Futility Pruningのマージンを計算する。

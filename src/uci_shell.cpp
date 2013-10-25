@@ -390,16 +390,16 @@ namespace Sayuri {
         infinite_thinking = true;
       } else if (word.str_ == "wtime") {
         // wtimeコマンド。
-        // 3分以上あるなら2分考える。3分未満なら持ち時間の半分考える。
+        // 5分以上あるなら1分考える。5分未満なら持ち時間の5分の1。
         if (!(parser.IsDelim())) {
           if (engine_ptr_->to_move() == WHITE) {
             try {
               Chrono::milliseconds time_control =
               Chrono::milliseconds(std::stoull(parser.Get().str_));
-              if (time_control.count() >= 180000) {
-                thinking_time = Chrono::milliseconds(120000);
+              if (time_control.count() >= 300000) {
+                thinking_time = Chrono::milliseconds(60000);
               } else {
-                thinking_time = time_control / 2;
+                thinking_time = time_control / 5;
               }
             } catch (...) {
               // 無視。
@@ -408,16 +408,16 @@ namespace Sayuri {
         }
       } else if (word.str_ == "btime") {
         // btimeコマンド。
-        // 3分以上あるなら2分考える。3分未満なら持ち時間の半分考える。
+        // 5分以上あるなら1分考える。5分未満なら持ち時間の5分の1。
         if (!(parser.IsDelim())) {
           if (engine_ptr_->to_move() == BLACK) {
             try {
               Chrono::milliseconds time_control =
               Chrono::milliseconds(std::stoull(parser.Get().str_));
-              if (time_control.count() >= 180000) {
-                thinking_time = Chrono::milliseconds(120000);
+              if (time_control.count() >= 300000) {
+                thinking_time = Chrono::milliseconds(60000);
               } else {
-                thinking_time = time_control / 2;
+                thinking_time = time_control / 5;
               }
             } catch (...) {
               // 無視。

@@ -158,17 +158,6 @@ namespace Sayuri {
     Side side = engine_ptr_->to_move();
     Side enemy_side = side ^ 0x3;
 
-    // 合法手がないとき。
-    if (!(engine_ptr_->HasLegalMove(side))) {
-      if (engine_ptr_->IsAttacked(engine_ptr_->king()[side], enemy_side)) {
-        // チェックメイトされていれば負け。
-        return SCORE_LOSE;
-      } else {
-        // ステールメイトは引き分け。
-        return SCORE_DRAW;
-      }
-    }
-
     // 十分な駒がない場合は引き分け。
     if (!HasEnoughPieces(side) && !HasEnoughPieces(enemy_side)) {
       return SCORE_DRAW;

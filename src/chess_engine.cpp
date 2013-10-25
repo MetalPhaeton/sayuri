@@ -688,10 +688,8 @@ namespace Sayuri {
     }
 
     // 移動前と移動後の位置を得る。
-    Square from = move.from_;
-    Square to = move.to_;
     // 移動前と移動後が同じならNull Move。
-    if (from == to) {
+    if (move.from_ == move.to_) {
       move.move_type_ = NULL_MOVE;
       can_en_passant_ = false;
       return;
@@ -700,15 +698,15 @@ namespace Sayuri {
     // 手の種類によって分岐する。
     if (move.move_type_ == CASTLING) {  // キャスリングの場合。
       // キングを動かす。
-      ReplacePiece(from, to);
+      ReplacePiece(move.from_, move.to_);
       // ルークを動かす。
-      if (to == G1) {
+      if (move.to_ == G1) {
         ReplacePiece(H1, F1);
-      } else if (to == C1) {
+      } else if (move.to_ == C1) {
         ReplacePiece(A1, D1);
-      } else if (to == G8) {
+      } else if (move.to_ == G8) {
         ReplacePiece(H8, F8);
-      } else if (to == C8) {
+      } else if (move.to_ == C8) {
         ReplacePiece(A8, D8);
       }
       has_castled_[side] = true;
@@ -717,7 +715,7 @@ namespace Sayuri {
       // 取った駒をボーンにする。
       move.captured_piece_ = PAWN;
       // 動かす。
-      ReplacePiece(from, to);
+      ReplacePiece(move.from_, move.to_);
       // アンパッサンのターゲットを消す。
       Square en_passant_target =
       side == WHITE ? en_passant_square_ - 8 : en_passant_square_ + 8;
@@ -726,20 +724,19 @@ namespace Sayuri {
       can_en_passant_ = false;
     } else {  // それ以外の場合。
       // 取る駒を登録する。
-      move.captured_piece_ = piece_board_[to];
+      move.captured_piece_ = piece_board_[move.to_];
       // 駒を動かす。
-      ReplacePiece(from, to);
+      ReplacePiece(move.from_, move.to_);
       // 駒を昇格させるなら、駒を昇格させる。
-      Piece promotion = move.promotion_;
-      if (promotion) {
-        PutPiece(to, promotion, side);
+      if (move.promotion_) {
+        PutPiece(move.to_, move.promotion_, side);
       }
       // ポーンの2歩の動きの場合はアンパッサンできるようにする。
-      if (piece_board_[to] == PAWN) {
-        if (((side == WHITE) && ((from + 16) == to))
-        || ((side == BLACK) && ((from - 16) == to))) {
+      if (piece_board_[move.to_] == PAWN) {
+        if (((side == WHITE) && ((move.from_ + 16) == move.to_))
+        || ((side == BLACK) && ((move.from_ - 16) == move.to_))) {
           can_en_passant_ = true;
-          en_passant_square_ = side == WHITE ? to - 8 : to + 8;
+          en_passant_square_ = side == WHITE ? move.to_ - 8 : move.to_ + 8;
         } else {
           can_en_passant_ = false;
         }
@@ -769,23 +766,19 @@ namespace Sayuri {
       return;
     }
 
-    // 移動前と移動後の位置を得る。
-    Square from = move.from_;
-    Square to = move.to_;
-
     // 駒の位置を戻す。
-    ReplacePiece(to, from);
+    ReplacePiece(move.to_, move.from_);
 
     // 手の種類で分岐する。
     if (move.move_type_ == CASTLING) {  // キャスリングの場合。
       // ルークを戻す。
-      if (to == G1) {
+      if (move.to_ == G1) {
         ReplacePiece(F1, H1);
-      } else if (to == C1) {
+      } else if (move.to_ == C1) {
         ReplacePiece(D1, A1);
-      } else if (to == G8) {
+      } else if (move.to_ == G8) {
         ReplacePiece(F8, H8);
-      } else if (to == C8) {
+      } else if (move.to_ == C8) {
         ReplacePiece(D8, A8);
       }
       has_castled_[to_move_] = false;
@@ -797,11 +790,11 @@ namespace Sayuri {
     } else {  // それ以外の場合。
       // 取った駒を戻す。
       if (move.captured_piece_) {
-        PutPiece(to, move.captured_piece_, enemy_side);
+        PutPiece(move.to_, move.captured_piece_, enemy_side);
       }
       // 昇格ならポーンに戻す。
       if (move.promotion_) {
-        PutPiece(from, PAWN, to_move_);
+        PutPiece(move.from_, PAWN, to_move_);
       }
     }
   }
@@ -857,6 +850,7 @@ namespace Sayuri {
     return material;
   }
 
+  /*
   // 合法手があるかどうかチェックする。
   bool ChessEngine::HasLegalMove(Side side) {
     // 敵のサイド。
@@ -1000,6 +994,7 @@ namespace Sayuri {
     // 合法手がない。
     return false;
   }
+  */
 
   // 現在の局面のハッシュキーを計算する。
   HashKey ChessEngine::GetCurrentKey() const {

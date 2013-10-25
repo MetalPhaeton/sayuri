@@ -164,12 +164,14 @@ namespace Sayuri {
       // マテリアル。
       int GetMaterial(Side side) const;
 
+      /*
       // 合法手があるかどうかチェックする。
       // [引数]
       // side: 調べたいサイド。
       // [戻り値]
       // 合法手があればtrue。
       bool HasLegalMove(Side side);
+      */
 
       // 現在の局面のハッシュキーを計算する。
       // (注)計算に時間がかかる。
