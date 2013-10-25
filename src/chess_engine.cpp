@@ -534,11 +534,11 @@ namespace Sayuri {
 
     // iid_stack_の初期化。
     for (int i = 0; i < MAX_PLYS; i++) {
-      iid_stack_[i].all_ = 0;
+      iid_stack_[i] = Move();
     }
     // killer_stack_の初期化。
     for (int i = 0; i < MAX_PLYS; i++) {
-      killer_stack_[i].all_ = 0;
+      killer_stack_[i] = Move();
     }
 
     // 手の履歴を削除。
