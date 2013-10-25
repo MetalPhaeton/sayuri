@@ -456,6 +456,7 @@ namespace Sayuri {
     int delta = 15;
     int num_searched_moves;
     int reduction;
+    bool hit;
     for (i_depth_ = 1; i_depth_ <= MAX_PLYS; i_depth_++) {
       // 探索終了。
       if (ShouldBeStopped()) break;
@@ -521,7 +522,7 @@ namespace Sayuri {
 
         // 探索すべき手が指定されていれば、今の手がその手かどうか調べる。
         if (moves_to_search_ptr) {
-          bool hit = false;
+          hit = false;
           for (auto& move_2 : *(moves_to_search_ptr)) {
             if (move_2 == move) {
               // 探索すべき手だった。
