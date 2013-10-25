@@ -425,7 +425,7 @@ namespace Sayuri {
       position_[NO_SIDE][piece_type] = 0;
     }
     // 白の駒。
-    position_[WHITE][EMPTY] = 0;
+    position_[WHITE][EMPTY] = 0ULL;
     position_[WHITE][PAWN] = Util::RANK[RANK_2];
     position_[WHITE][KNIGHT] = Util::BIT[B1] | Util::BIT[G1];
     position_[WHITE][BISHOP] = Util::BIT[C1] | Util::BIT[F1];
@@ -433,7 +433,7 @@ namespace Sayuri {
     position_[WHITE][QUEEN] = Util::BIT[D1];
     position_[WHITE][KING] = Util::BIT[E1];
     // 黒の駒。
-    position_[BLACK][EMPTY] = 0;
+    position_[BLACK][EMPTY] = 0ULL;
     position_[BLACK][PAWN] = Util::RANK[RANK_7];
     position_[BLACK][KNIGHT] = Util::BIT[B8] | Util::BIT[G8];
     position_[BLACK][BISHOP] = Util::BIT[C8] | Util::BIT[F8];
@@ -452,9 +452,9 @@ namespace Sayuri {
 
     // ブロッカーのビットボードを作る。
     blocker_0_ = side_pieces_[WHITE] | side_pieces_[BLACK];
-    blocker_45_ = 0;
-    blocker_90_ = 0;
-    blocker_135_ = 0;
+    blocker_45_ = 0ULL;
+    blocker_90_ = 0ULL;
+    blocker_135_ = 0ULL;
     for (Bitboard copy = blocker_0_; copy; copy &= copy - 1) {
       Square square = Util::GetSquare(copy);
 
