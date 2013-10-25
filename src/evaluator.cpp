@@ -186,12 +186,10 @@ namespace Sayuri {
     }
 
     // 各駒毎に価値を計算する。
-    Square piece_square;
-    Side piece_side;
     Bitboard pieces = engine_ptr_->blocker_0();
     for (; pieces; pieces &= pieces - 1) {
-      piece_square = Util::GetSquare(pieces);
-      piece_side = engine_ptr_->side_board()[piece_square];
+      Square piece_square = Util::GetSquare(pieces);
+      Side piece_side = engine_ptr_->side_board()[piece_square];
       switch (engine_ptr_->piece_board()[piece_square]) {
         case PAWN:
           CalValue<PAWN>(piece_square, piece_side);
@@ -576,18 +574,15 @@ namespace Sayuri {
 
   // pass_pawn_mask_[][]を初期化する。
   void Evaluator::InitPassPawnMask() {
-    Bitboard mask;  // マスク。
-    Fyle fyle;  // その位置のファイル。
-    Bitboard bitboard;  // 自分より手前のビットボード。
     // マスクを作って初期化する。
     for (int side = 0; side < NUM_SIDES; side++) {
       for (int square = 0; square < NUM_SQUARES; square++) {
-        mask = 0;
+        Bitboard mask = 0ULL;
         if (side == NO_SIDE) {  // どちらのサイドでもなければ0。
           pass_pawn_mask_[side][square] = 0;
         } else {
           // 自分のファイルと隣のファイルのマスクを作る。
-          fyle = Util::GetFyle(square);
+          Fyle fyle = Util::GetFyle(square);
           mask |= Util::FYLE[fyle];
           if (fyle == FYLE_A) {  // aファイルのときはbファイルが隣り。
             mask |= Util::FYLE[fyle + 1];
@@ -600,13 +595,13 @@ namespace Sayuri {
 
           // 自分の位置より手前のランクは消す。
           if (side == WHITE) {
-            bitboard = (Util::BIT[square] - 1)
+            Bitboard temp = (Util::BIT[square] - 1)
             | Util::RANK[Util::GetRank(square)];
-            mask &= ~bitboard;
+            mask &= ~temp;
           } else {
-            bitboard = ~(Util::BIT[square] - 1)
+            Bitboard temp = ~(Util::BIT[square] - 1)
             | Util::RANK[Util::GetRank(square)];
-            mask &= ~bitboard;
+            mask &= ~temp;
           }
 
           // マスクをセット。
@@ -618,9 +613,8 @@ namespace Sayuri {
 
   // iso_pawn_mask_[]を初期化する。
   void Evaluator::InitIsoPawnMask() {
-    Fyle fyle;
     for (int square = 0; square < NUM_SQUARES; square++) {
-      fyle = Util::GetFyle(square);
+      Fyle fyle = Util::GetFyle(square);
       if (fyle == FYLE_A) {
         iso_pawn_mask_[square] = Util::FYLE[fyle + 1];
       } else if (fyle == FYLE_H) {
@@ -637,7 +631,7 @@ namespace Sayuri {
     for (int side = 0; side < NUM_SIDES; side++) {
       for (int square = 0; square < NUM_SQUARES; square++) {
         if (side == NO_SIDE) {  // どちらのサイドでもなければ空。
-          pawn_shield_mask_[side][square] = 0;
+          pawn_shield_mask_[side][square] = 0ULL;
         } else {
           // 第1ランクのキングサイドとクイーンサイドのとき
           // ポーンの盾の位置を記録する。

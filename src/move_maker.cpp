@@ -131,20 +131,15 @@ namespace Sayuri {
     Side side = engine_ptr_->to_move();
     Side enemy_side = side ^ 0x3;
 
-    // 変数。
-    Square from;  // 基点。
-    Move move;  // 候補手。
-
     // ナイト、ビショップ、ルーク、クイーンの候補手を作る。
-    Bitboard pieces = 0ULL;
-    Bitboard move_bitboard = 0ULL;
     for (int piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
-      pieces = engine_ptr_->position()[side][piece_type];
+      Bitboard pieces = engine_ptr_->position()[side][piece_type];
 
       for (; pieces; pieces &= pieces - 1) {
-        from = Util::GetSquare(pieces);
+        Square from = Util::GetSquare(pieces);
 
         // 各ピースの動き。
+        Bitboard move_bitboard;
         switch (piece_type) {
           case KNIGHT:
             move_bitboard = Util::GetKnightMove(from);
@@ -173,8 +168,8 @@ namespace Sayuri {
         }
 
         for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
-          move.all_ = 0;
           // 手を作る。
+          Move move;
           move.from_ = from;
           move.to_ = Util::GetSquare(move_bitboard);
           move.move_type_ = NORMAL;
@@ -190,11 +185,11 @@ namespace Sayuri {
     }
 
     // ポーンの動きを作る。
-    pieces = engine_ptr_->position()[side][PAWN];
-    move_bitboard = 0ULL;
+    Bitboard pieces = engine_ptr_->position()[side][PAWN];
     for (; pieces; pieces &= pieces - 1) {
-      from = Util::GetSquare(pieces);
+      Square from = Util::GetSquare(pieces);
 
+      Bitboard move_bitboard = 0ULL;
       if (Type == GenMoveType::NON_CAPTURE) {
         // キャプチャーじゃない手。
         // ポーンの一歩の動き。
@@ -220,8 +215,8 @@ namespace Sayuri {
       } 
 
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
-        move.all_ = 0;
         // 手を作る。
+        Move move;
         move.from_ = from;
         move.to_ = Util::GetSquare(move_bitboard);
         if (engine_ptr_->can_en_passant()
@@ -254,8 +249,8 @@ namespace Sayuri {
     }
 
     // キングの動きを作る。
-    from = engine_ptr_->king()[side];
-    move_bitboard = Util::GetKingMove(from);
+    Square from = engine_ptr_->king()[side];
+    Bitboard move_bitboard = Util::GetKingMove(from);
     if (Type == GenMoveType::NON_CAPTURE) {
       // キャプチャーじゃない手。
       move_bitboard &= ~(engine_ptr_->blocker_0());
@@ -280,7 +275,7 @@ namespace Sayuri {
       move_bitboard &= engine_ptr_->side_pieces()[enemy_side];
     }
     for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
-      move.all_ = 0;
+      Move move;
       move.from_ = from;
       move.to_ = Util::GetSquare(move_bitboard);
 
@@ -327,10 +322,9 @@ namespace Sayuri {
     slot = *last_;
 
     // 一番高い手を探し、スワップ。
-    MoveSlot temp;
     for (MoveSlot* ptr = begin_; ptr < last_; ptr++) {
       if (ptr->score_ > slot.score_) {
-        temp = *ptr;
+        MoveSlot temp = *ptr;
         *ptr = slot;
         slot = temp;
       }
@@ -436,17 +430,14 @@ namespace Sayuri {
   // 最小の攻撃駒の攻撃の手を得る。
   Move MoveMaker::GetSmallestAttackerMove(Square target,
   Side side) const {
-    // 変数。
-    Bitboard attack;
-    Move move;
-
     // キングがターゲットの時はなし。
     if (target == engine_ptr_->king()[side]) {
-      return move;
+      return Move();
     }
 
     // 価値の低いものから調べる。
     for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+      Bitboard attack;
       switch (piece_type) {
         case PAWN:
           attack = Util::GetPawnAttack(target, side ^ 0x3);
@@ -477,7 +468,7 @@ namespace Sayuri {
           break;
       }
       if (attack) {
-        move.all_ = 0;
+        Move move;
         move.from_ = Util::GetSquare(attack);
         move.to_  = target;
         move.move_type_ = NORMAL;
@@ -485,7 +476,6 @@ namespace Sayuri {
       }
     }
 
-    move.all_ = 0;
-    return move;
+    return Move();
   }
 }  // namespace Sayuri

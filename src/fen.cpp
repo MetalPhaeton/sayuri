@@ -175,7 +175,7 @@ namespace Sayuri {
   }
 
   /************/
-  /* パーサ。 */
+  /* 評価器。 */
   /************/
   // 駒の配置トークンを評価する。
   void Fen::EvalPosition(const std::string& position_str) {

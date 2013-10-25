@@ -397,14 +397,12 @@ namespace Sayuri {
           
 
     // 配置をする。
-    Bitboard bb;
-    Square square;
     for (Side side = 0; side < NUM_SIDES; side++) {
       for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
         // 駒をセット。
-        bb = fen.position()[side][piece_type];
+        Bitboard bb = fen.position()[side][piece_type];
         for (; bb; bb &= bb - 1) {
-          square = Util::GetSquare(bb);
+          Square square = Util::GetSquare(bb);
           PutPiece(square, piece_type, side);
         }
       }
@@ -457,9 +455,8 @@ namespace Sayuri {
     blocker_45_ = 0;
     blocker_90_ = 0;
     blocker_135_ = 0;
-    Square square;
     for (Bitboard copy = blocker_0_; copy; copy &= copy - 1) {
-      square = Util::GetSquare(copy);
+      Square square = Util::GetSquare(copy);
 
       blocker_45_ |= Util::BIT[Util::ROT45[square]];
       blocker_90_ |= Util::BIT[Util::ROT90[square]];
@@ -864,20 +861,16 @@ namespace Sayuri {
   bool ChessEngine::HasLegalMove(Side side) {
     // 敵のサイド。
     Side enemy_side = side ^ 0x3;
-    // 変数。
-    Square from;  // 基点。
-    Move move;  // 候補手。
 
     // ナイト、ビショップ、ルーク、クイーンの候補手を調べる。
-    Bitboard pieces = 0ULL;
-    Bitboard move_bitboard = 0ULL;
     for (int piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
-      pieces = position_[side][piece_type];
+      Bitboard pieces = position_[side][piece_type];
 
       for (; pieces; pieces &= pieces - 1) {
-        from = Util::GetSquare(pieces);
+        Square from = Util::GetSquare(pieces);
 
         // 各ピースの動き。
+        Bitboard move_bitboard = 0ULL;
         switch (piece_type) {
           case KNIGHT:
             move_bitboard = Util::GetKnightMove(from);
@@ -900,8 +893,8 @@ namespace Sayuri {
         move_bitboard &= ~(side_pieces_[side]);
 
         for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
-          move.all_ = 0;
           // 手を作る。
+          Move move;
           move.from_ = from;
           move.to_ = Util::GetSquare(move_bitboard);
           move.move_type_ = NORMAL;
@@ -918,13 +911,12 @@ namespace Sayuri {
     }
 
     // ポーンの動きを作る。
-    pieces = position_[side][PAWN];
-    move_bitboard = 0ULL;
+    Bitboard pieces = position_[side][PAWN];
     for (; pieces; pieces &= pieces - 1) {
-      from = Util::GetSquare(pieces);
+      Square from = Util::GetSquare(pieces);
 
       // ポーンの一歩の動き。
-      move_bitboard = Util::GetPawnMove(from, side) & ~(blocker_0_);
+      Bitboard move_bitboard = Util::GetPawnMove(from, side) & ~(blocker_0_);
       if (move_bitboard) {
         if (((side == WHITE) && (Util::GetRank(from) == RANK_2))
         || ((side == BLACK) && (Util::GetRank(from) == RANK_7))) {
@@ -942,8 +934,8 @@ namespace Sayuri {
       }
 
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
-        move.all_ = 0;
         // 手を作る。
+        Move move;
         move.from_ = from;
         move.to_ = Util::GetSquare(move_bitboard);
         if (can_en_passant_ && (move.to_ == en_passant_square_)) {
@@ -963,8 +955,8 @@ namespace Sayuri {
     }
 
     // キングの動きを作る。
-    from = king_[side];
-    move_bitboard = Util::GetKingMove(from) & ~(side_pieces_[side]);
+    Square from = king_[side];
+    Bitboard move_bitboard = Util::GetKingMove(from) & ~(side_pieces_[side]);
     // キャスリングの動きを追加。
     if (side == WHITE) {
       if (CanCastling<WHITE_SHORT_CASTLING>()) {
@@ -982,7 +974,7 @@ namespace Sayuri {
       }
     }
     for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
-      move.all_ = 0;
+      Move move;
       move.from_ = from;
       move.to_ = Util::GetSquare(move_bitboard);
 

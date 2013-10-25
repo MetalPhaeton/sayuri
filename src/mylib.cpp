@@ -40,11 +40,9 @@ namespace MyLib {
 
     // 一文字づつ処理する。
     std::vector<char> c_vec;  // その他の文字を格納する。
-    bool is_delim;
-    bool is_delim_left;
     for (char& str_c : str) {
       // 区切り文字か検査。
-      is_delim = false;
+      bool is_delim = false;
       for (char& delim_c : delim) {
         if (str_c == delim_c) {
           is_delim = true;
@@ -53,7 +51,7 @@ namespace MyLib {
       }
 
       // 残す区切り文字か検査。
-      is_delim_left = false;
+      bool is_delim_left = false;
       for (char& delim_left_c : delim_left) {
         if (str_c == delim_left_c) {
           is_delim_left = true;

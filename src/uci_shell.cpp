@@ -89,16 +89,13 @@ namespace Sayuri {
     commands.push_back("quit");
 
     // メインループ。
-    std::vector<std::string> argv;
-    CommandParser parser(commands, argv);
-    std::string input;
-    Word word;
     while (true) {
+      std::string input;
       std::getline(std::cin, input);
-      argv = MyLib::Split(input, " ", "");
-      parser = CommandParser(commands, argv);
+      std::vector<std::string> argv = MyLib::Split(input, " ", "");
+      CommandParser parser(commands, argv);
       parser.JumpToNextKeyword();
-      word = parser.Get();
+      Word word = parser.Get();
       if (word.str_ == "uci") {
         CommandUCI();
       } else if (word.str_ == "isready") {
@@ -254,9 +251,8 @@ namespace Sayuri {
     // パーサ。
     CommandParser parser(sub_commands, argv2);
 
-    Word word;
     while (parser.HasNext()) {
-      word = parser.Get();
+      Word word = parser.Get();
 
       if (word.str_ == "name") {
         // nameコマンド。
@@ -306,11 +302,8 @@ namespace Sayuri {
     // パーサ。
     CommandParser parser(sub_commands, argv);
 
-    Word word;
-    std::string fen_str = "";
-    Move move;
     while (parser.HasNext()) {
-      word = parser.Get();
+      Word word = parser.Get();
 
       if (word.str_ == "startpos") {
         // startposコマンド。
@@ -319,7 +312,7 @@ namespace Sayuri {
       } else if (word.str_ == "fen") {
         // fenコマンド。
         // FENを合体。
-        fen_str = "";
+        std::string fen_str = "";
         while (!(parser.IsDelim())) {
           fen_str += parser.Get().str_ + " ";
         }
@@ -328,7 +321,7 @@ namespace Sayuri {
       } else if (word.str_ == "moves") {
         // moveコマンド。
         while (!(parser.IsDelim())) {
-          move = TransStringToMove(parser.Get().str_);
+          Move move = TransStringToMove(parser.Get().str_);
           // 手を指す。
           if (move.all_) {
             engine_ptr_->PlayMove(move);
@@ -374,18 +367,15 @@ namespace Sayuri {
     moves_to_search_ptr_.reset(nullptr);
 
     // サブコマンドを解析。
-    Word word;
-    Move move;
-    Chrono::milliseconds time_control(0);
     while (parser.HasNext()) {
-      word = parser.Get();
+      Word word = parser.Get();
 
       if (word.str_ == "searchmoves") {
         if (parser.IsDelim()) continue;
 
         // searchmovesコマンド。
         while (!(parser.IsDelim())) {
-          move = TransStringToMove(parser.Get().str_);
+          Move move = TransStringToMove(parser.Get().str_);
           if (move.all_) {
             if (moves_to_search_ptr_ == nullptr) {
               moves_to_search_ptr_.reset(new std::vector<Move>());
@@ -404,7 +394,7 @@ namespace Sayuri {
         if (!(parser.IsDelim())) {
           if (engine_ptr_->to_move() == WHITE) {
             try {
-              time_control =
+              Chrono::milliseconds time_control =
               Chrono::milliseconds(std::stoull(parser.Get().str_));
               if (time_control.count() >= 180000) {
                 thinking_time = Chrono::milliseconds(120000);
@@ -422,7 +412,7 @@ namespace Sayuri {
         if (!(parser.IsDelim())) {
           if (engine_ptr_->to_move() == BLACK) {
             try {
-              time_control =
+              Chrono::milliseconds time_control =
               Chrono::milliseconds(std::stoull(parser.Get().str_));
               if (time_control.count() >= 180000) {
                 thinking_time = Chrono::milliseconds(120000);
@@ -596,9 +586,8 @@ namespace Sayuri {
   (const std::vector<std::string>& keywords,
   const std::vector<std::string>& argv) {
     // 構文解析。
-    bool is_keyword;
     for (auto& a : argv) {
-      is_keyword = false;
+      bool is_keyword = false;
 
       // キーワードかどうか調べる。
       for (auto& b : keywords) {

@@ -55,10 +55,9 @@ namespace Sayuri {
       searched_level_ = level;
     }
 
-    // サイドと得点。
+    // サイド。
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
-    int score;
 
     // stand_pad。
     Evaluator eval(this);
@@ -94,10 +93,9 @@ namespace Sayuri {
     int material = GetMaterial(side);
 
     // 探索する。
-    int margin;
     for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
       // マージン。
-      margin = GetMargin(move, depth);
+      int margin = GetMargin(move, depth);
 
       MakeMove(move);
 
@@ -114,7 +112,7 @@ namespace Sayuri {
       }
 
       // 次の手を探索。
-      score = -Quiesce(GetNextKey(pos_key, move), depth - 1, level + 1,
+      int score = -Quiesce(GetNextKey(pos_key, move), depth - 1, level + 1,
       -beta, -alpha, table);
 
       UnmakeMove(move);
@@ -147,10 +145,9 @@ namespace Sayuri {
       searched_level_ = level;
     }
 
-    // サイドとスコアとチェックされているか。
+    // サイドとチェックされているか。
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
-    int score;
     bool is_checked = IsAttacked(king_[side], enemy_side);
 
     // ゲーム終了した場合。
@@ -158,13 +155,13 @@ namespace Sayuri {
       if (is_checked) {
         // チェックメイト。
         pv_line.MarkCheckmated();
-        score = SCORE_LOSE;
+        int score = SCORE_LOSE;
         if (score >= beta) return beta;
         if (score <= alpha) return alpha;
         return score;
       } else {
         // ステールメイト。
-        score = SCORE_DRAW;
+        int score = SCORE_DRAW;
         if (score >= beta) return beta;
         if (score <= alpha) return alpha;
         return score;
@@ -175,7 +172,7 @@ namespace Sayuri {
     TTEntry* entry_ptr =
     table.GetFulfiledEntry(pos_key, depth, side);
     if (entry_ptr) {
-      score = entry_ptr->value();
+      int score = entry_ptr->value();
       if (entry_ptr->value_flag() == TTValueFlag::EXACT) {
         // エントリーが正確な値。
         if (score >= beta) return beta;
@@ -212,8 +209,6 @@ namespace Sayuri {
     }
 
     // PVノードの時はIID、そうじゃないノードならNull Move Reduction。
-    PVLine temp_line;
-    int reduction;
     if (Type == NodeType::PV) {
       // 前回の繰り返しの最善手があればIIDしない。
       if (tt_best_move.all_) {
@@ -221,8 +216,9 @@ namespace Sayuri {
       } else {
         if (depth >= 5) {
           // Internal Iterative Deepening。
-          score = Search<NodeType::PV>(pos_key, depth - 3, level, alpha, beta,
-          table, temp_line);
+          PVLine temp_line;
+          int score = Search<NodeType::PV>
+          (pos_key, depth - 3, level, alpha, beta, table, temp_line);
 
           iid_stack_[level] = temp_line.line()[0].move();
         }
@@ -237,8 +233,9 @@ namespace Sayuri {
         MakeMove(null_move);
 
         // Null Move Search。
-        reduction = (depth / 2) + 1;
-        score = -Search<NodeType::NON_PV>(pos_key, depth - reduction - 1,
+        int reduction = (depth / 2) + 1;
+        PVLine temp_line;
+        int score = -Search<NodeType::NON_PV>(pos_key, depth - reduction - 1,
         level + 1, -(beta), -(beta - 1), table, temp_line);
 
         UnmakeMove(null_move);
@@ -268,17 +265,14 @@ namespace Sayuri {
 
     // ループ。
     TTValueFlag value_flag = TTValueFlag::ALPHA;
-    HashKey next_key;
     bool is_searching_pv = true;
-    PVLine next_line;
-    int margin;
     int num_searched_moves = 0;
     for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
       // 次のハッシュキー。
-      next_key = GetNextKey(pos_key, move);
+      HashKey next_key = GetNextKey(pos_key, move);
 
       // マージン。
-      margin = GetMargin(move, depth);
+      int margin = GetMargin(move, depth);
 
       MakeMove(move);
 
@@ -298,8 +292,10 @@ namespace Sayuri {
 
       // 探索。
       // Late Move Reduction。
+      int score;
+      PVLine next_line;
       if ((depth >= 3) && (num_searched_moves >= 4)) {
-        reduction = depth / 3;
+        int reduction = depth / 3;
         if (!is_checked && (Type == NodeType::NON_PV)) {
           // History Puruning。
           if (!move.captured_piece_
@@ -402,10 +398,9 @@ namespace Sayuri {
     searched_level_ = 0;
     is_null_searching_ = false;
     start_time_ = SysClock::now();
-    Move null;
     for (int i = 0; i < MAX_PLYS; i++) {
-      iid_stack_[i] = null;
-      killer_stack_[i] = null;
+      iid_stack_[i] = Move();
+      killer_stack_[i] = Move();
     }
     for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
@@ -426,11 +421,10 @@ namespace Sayuri {
     Side enemy_side = side ^ 0x3;
     PVLine pv_line;
     PVLine cur_line;
-    PVLine next_line;
     TimePoint now = SysClock::now();
     TimePoint next_send_info_time = now + Chrono::milliseconds(1000);
     std::vector<Move> move_vec;
-    int move_num;
+    MoveMaker maker(this);
 
     // ゲーム終了した場合。
     if (!HasLegalMove(side)) {
@@ -446,28 +440,13 @@ namespace Sayuri {
     }
 
     // Iterative Deepening。
-    HashKey next_key;
-    int score;
-    bool is_searching_pv;
-    MoveMaker maker(this);
-    TTEntry* entry_ptr = nullptr;
-    TTEntry* prev_entry = nullptr;
-    Move tt_best_move;
-    int delta = 15;
-    int num_searched_moves;
-    int reduction;
-    bool hit;
     for (i_depth_ = 1; i_depth_ <= MAX_PLYS; i_depth_++) {
       // 探索終了。
       if (ShouldBeStopped()) break;
 
       // 準備。
-      is_searching_pv = true;
-      entry_ptr = nullptr;
-      delta = 15;
-      num_searched_moves = 0;
-      move_num = 0;
-
+      int delta = 15;
+      // 探索窓の設定。
       if (i_depth_ < 5) {
         alpha = -MAX_VALUE;
         beta = MAX_VALUE;
@@ -475,6 +454,9 @@ namespace Sayuri {
         beta = alpha + delta;
         alpha -= delta;
       }
+      bool is_searching_pv = true;
+      TTEntry* entry_ptr = nullptr;
+
 
       // ノードを加算。
       searched_nodes_++;
@@ -483,17 +465,20 @@ namespace Sayuri {
       UCIShell::SendDepthInfo(i_depth_);
 
       // 前回の繰り返しの最善手を得る。
-      prev_entry = table.GetFulfiledEntry(pos_key, i_depth_ - 1, side);
+      TTEntry* prev_entry =
+      table.GetFulfiledEntry(pos_key, i_depth_ - 1, side);
+      Move tt_best_move;
       if (prev_entry && (prev_entry->value_flag() == TTValueFlag::EXACT)) {
         tt_best_move = prev_entry->best_move();
-      } else {
-        tt_best_move.all_ = 0;
       }
 
       // 手を作る。
       maker.GenMoves<GenMoveType::ALL>(tt_best_move, iid_stack_[level],
       killer_stack_[level]);
 
+      // 手を探索。
+      int num_searched_moves = 0;
+      int move_num = 0;
       for (Move move = maker.PickMove(); move.all_;
       move = maker.PickMove()) {
         // 情報を送る。
@@ -510,7 +495,7 @@ namespace Sayuri {
         searched_level_ = 0;
 
         // 次のハッシュキー。
-        next_key = GetNextKey(pos_key, move);
+        HashKey next_key = GetNextKey(pos_key, move);
 
         MakeMove(move);
 
@@ -522,7 +507,7 @@ namespace Sayuri {
 
         // 探索すべき手が指定されていれば、今の手がその手かどうか調べる。
         if (moves_to_search_ptr) {
-          hit = false;
+          bool hit = false;
           for (auto& move_2 : *(moves_to_search_ptr)) {
             if (move_2 == move) {
               // 探索すべき手だった。
@@ -557,14 +542,17 @@ namespace Sayuri {
         }
 
         // PVSearch。
+        int score;
+        PVLine next_line;
         if (is_searching_pv) {
           while (true) {
             // 探索終了。
             if (ShouldBeStopped()) break;
 
             // フルでPVを探索。
-            score = -Search<NodeType::PV>(next_key, i_depth_ - 1, level + 1,
-            -beta, -alpha, table, next_line);
+            score = -Search<NodeType::PV>
+            (next_key, i_depth_ - 1, level + 1, -beta, -alpha,
+            table, next_line);
             // アルファ値、ベータ値を調べる。
             if (score >= beta) {
               // 探索失敗。
@@ -586,7 +574,7 @@ namespace Sayuri {
           // PV発見後。
           // Late move Reduction。
           if ((i_depth_ >= 3) && (num_searched_moves >= 4)) {
-            reduction = i_depth_ / 3;
+            int reduction = i_depth_ / 3;
             // ゼロウィンドウ探索。
             score = -Search<NodeType::NON_PV>(next_key,
             i_depth_ - reduction - 1, level + 1, -(alpha + 1),
