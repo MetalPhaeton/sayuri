@@ -40,7 +40,6 @@ namespace Sayuri {
   constexpr int Evaluator::WEIGHT_CENTER_CONTROL;
   constexpr int Evaluator::WEIGHT_DEVELOPMENT;
   constexpr int Evaluator::WEIGHT_ATTACK_ENEMY;
-  constexpr int Evaluator::WEIGHT_ATTACK_AROUND_KING;
   constexpr int Evaluator::WEIGHT_PAWN_POSITION;
   constexpr int Evaluator::WEIGHT_KNIGHT_POSITION;
   constexpr int Evaluator::WEIGHT_ROOK_POSITION;
@@ -139,7 +138,6 @@ namespace Sayuri {
     sweet_center_control_value_ = 0;
     development_value_ = 0;
     attack_enemy_value_ = 0;
-    attack_around_king_value_ = 0;
     for (int i = 0; i < NUM_PIECE_TYPES; i++) {
       position_value_[i] = 0;
     }
@@ -213,7 +211,6 @@ namespace Sayuri {
     int whole_score = material_value_
     + (WEIGHT_MOBILITY * mobility_value_)
     + (WEIGHT_ATTACK_ENEMY * attack_enemy_value_)
-    + (WEIGHT_ATTACK_AROUND_KING * attack_around_king_value_)
     + (WEIGHT_PAWN_POSITION * position_value_[PAWN])
     + (WEIGHT_PASS_PAWN * pass_pawn_value_)
     + (WEIGHT_PROTECTED_PASS_PAWN * protected_pass_pawn_value_)
@@ -234,8 +231,8 @@ namespace Sayuri {
     + (WEIGHT_CASTLING * castling_value_);
 
     // 終盤。
-    int ending_score =
-    (WEIGHT_KING_POSITION_ENDING * king_position_ending_value_);
+    int ending_score = (WEIGHT_PAWN_POSITION * position_value_[PAWN])
+    + (WEIGHT_KING_POSITION_ENDING * king_position_ending_value_);
 
     return whole_score +
     static_cast<int>((middle_game * middle_score) + (ending * ending_score));
@@ -245,7 +242,7 @@ namespace Sayuri {
   /* 局面評価に使用する関数。 */
   /****************************/
   // 勝つのに十分な駒があるかどうか調べる。
-  bool Evaluator::HasEnoughPieces(Side side) {
+  bool Evaluator::HasEnoughPieces(Side side) const {
     // ポーンがあれば大丈夫。
     if (engine_ptr_->position()[side][PAWN]) return true;
 
@@ -274,7 +271,7 @@ namespace Sayuri {
 
   // 進行状況を得る。
   // フェーズは一次関数で計算。
-  double Evaluator::GetPhase() {
+  double Evaluator::GetPhase() const {
     constexpr double MODULUS = 1.0 / 14.0;
 
     double num_pieces = static_cast<double>(Util::CountBits
@@ -404,14 +401,7 @@ namespace Sayuri {
       score = Util::CountBits(attacks
       & engine_ptr_->side_pieces()[enemy_piece_side]);
     }
-    attack_enemy_value_ = sign * score;
-
-    // 敵キング周辺への攻撃を計算。
-    if (Type != KING) {
-      score = Util::CountBits(attacks
-      & Util::GetKingMove(engine_ptr_->king()[enemy_piece_side]));
-      attack_around_king_value_ += sign * score;
-    }
+    attack_enemy_value_ += sign * score;
 
     // 駒の配置を計算。
     if (Type == KING) {

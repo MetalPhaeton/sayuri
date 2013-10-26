@@ -59,7 +59,7 @@ namespace Sayuri {
       /******************************/
       // 各駒の配置の価値。
       static constexpr int POSITION_TABLE[NUM_PIECE_TYPES][NUM_SQUARES] {
-        {
+        {  // 何もなし。
           0, 0, 0, 0, 0, 0, 0, 0,
           0, 0, 0, 0, 0, 0, 0, 0,
           0, 0, 0, 0, 0, 0, 0, 0,
@@ -69,7 +69,7 @@ namespace Sayuri {
           0, 0, 0, 0, 0, 0, 0, 0,
           0, 0, 0, 0, 0, 0, 0, 0
         },
-        {
+        {  // ポーン。
           0, 0, 0, 0, 0, 0, 0, 0,
           0, 0, 0, 0, 0, 0, 0, 0,
           1, 2, 3, 4, 4, 3, 2, 1,
@@ -79,7 +79,7 @@ namespace Sayuri {
           5, 6, 7, 8, 8, 7, 6, 5,
           6, 7, 8, 9, 9, 8, 7, 6
         },
-        {
+        {  // ナイト。
           -3, -2, -1, -1, -1, -1, -2, -3,
           -2, -1,  0,  0,  0,  0, -1, -2,
           -1,  0,  1,  1,  1,  1,  0, -1,
@@ -89,17 +89,17 @@ namespace Sayuri {
            1,  2,  3,  3,  3,  3,  2,  1,
            0,  1,  2,  2,  2,  2,  1,  0
         },
-        {
-          -2, -1, -1, -1, -1, -1, -1, -2,
-          -1,  0,  0,  0,  0,  0,  0, -1,
-          -1,  1,  2,  2,  2,  2,  1, -1,
-          -1,  0,  1,  2,  2,  1,  0, -1,
-          -1,  0,  1,  2,  2,  1,  0, -1,
-          -1,  0,  1,  2,  2,  1,  0, -1,
-          -1,  0,  0,  0,  0,  0,  0, -1,
-          -2, -1, -1, -1, -1, -1, -1, -2
+        {  // ビショップ。
+          0, 0, 0, 0, 0, 0, 0, 0,
+          0, 3, 0, 2, 2, 0, 3, 0,
+          0, 1, 1, 1, 1, 1, 1, 0,
+          0, 0, 3, 2, 2, 3, 0, 0,
+          0, 3, 2, 3, 3, 2, 3, 0,
+          1, 2, 2, 2, 2, 2, 2, 1,
+          0, 1, 1, 1, 1, 1, 1, 0,
+          0, 0, 0, 0, 0, 0, 0, 0
         },
-        {
+        {  // ルーク。
           0, 1, 2, 3, 3, 2, 1, 0,
           0, 1, 2, 3, 3, 2, 1, 0,
           0, 1, 2, 3, 3, 2, 1, 0,
@@ -109,7 +109,7 @@ namespace Sayuri {
           4, 4, 4, 4, 4, 4, 4, 4,
           4, 4, 4, 4, 4, 4, 4, 4
         },
-        {
+        {  // クイーン。
           -3, -2, -2, -1, -1, -2, -2, -3,
           -2,  0,  0,  0,  0,  0,  0, -2,
           -2,  0,  1,  1,  1,  1,  0, -2,
@@ -119,7 +119,7 @@ namespace Sayuri {
           -2,  0,  0,  0,  0,  0,  0, -2,
           -3, -2, -2, -1, -1, -2, -2, -3
         },
-        {
+        {  // キング。
           0, 0, 0, 0, 0, 0, 0, 0,
           0, 0, 0, 0, 0, 0, 0, 0,
           0, 0, 0, 0, 0, 0, 0, 0,
@@ -157,31 +157,29 @@ namespace Sayuri {
       /* 全駒の評価の重さ。 */
       /**********************/
       // 機動力の重さ。
-      static constexpr int WEIGHT_MOBILITY = 2;
+      static constexpr int WEIGHT_MOBILITY = 5;
       // センター攻撃の重さ。
       static constexpr int WEIGHT_CENTER_CONTROL = 5;
       // スウィートセンター攻撃の重さ。
       static constexpr int WEIGHT_ATTACK_SWEET_CENTER = 5;
       // 展開の重さ。
-      static constexpr int WEIGHT_DEVELOPMENT = 30;
+      static constexpr int WEIGHT_DEVELOPMENT = 10;
       // 敵を攻撃している重さ。
       static constexpr int WEIGHT_ATTACK_ENEMY = 10;
-      // キングの周囲への攻撃の重さ。
-      static constexpr int WEIGHT_ATTACK_AROUND_KING = 10;
 
       /********************/
       /* 駒の配置の重さ。 */
       /********************/
-      // ポーンの配置の重さ。
-      static constexpr int WEIGHT_PAWN_POSITION = 10;
+      // ポーンの配置の重さ。終盤は2倍になる。
+      static constexpr int WEIGHT_PAWN_POSITION = 5;
       // ナイトの配置の重さ。
       static constexpr int WEIGHT_KNIGHT_POSITION = 10;
       // ビショップの配置の重さ。
-      static constexpr int WEIGHT_BISHOP_POSITION = 20;
+      static constexpr int WEIGHT_BISHOP_POSITION = 10;
       // ルークの配置の重さ。
-      static constexpr int WEIGHT_ROOK_POSITION = 20;
+      static constexpr int WEIGHT_ROOK_POSITION = 5;
       // クイーンの配置の重さ。
-      static constexpr int WEIGHT_QUEEN_POSITION = 20;
+      static constexpr int WEIGHT_QUEEN_POSITION = 10;
       // キングの中盤の配置の重さ。
       static constexpr int WEIGHT_KING_POSITION_MIDDLE = 30;
       // キングの終盤の配置の重さ。
@@ -191,9 +189,9 @@ namespace Sayuri {
       /* それ以外の重さ。 */
       /********************/
       // パスポーンの重さ。
-      static constexpr int WEIGHT_PASS_PAWN = 50;
+      static constexpr int WEIGHT_PASS_PAWN = 20;
       // 守られたパスポーンの重さ。
-      static constexpr int WEIGHT_PROTECTED_PASS_PAWN = 20;
+      static constexpr int WEIGHT_PROTECTED_PASS_PAWN = 10;
       // ダブルポーンの重さ。
       static constexpr int WEIGHT_DOUBLE_PAWN = -20;
       // 孤立ポーンの重さ。
@@ -203,32 +201,13 @@ namespace Sayuri {
       // 早すぎるクイーンの出動の重さ。
       static constexpr int WEIGHT_EARLY_QUEEN_LAUNCHED = -30;
       // ポーンの盾の重さ。
-      static constexpr int WEIGHT_PAWN_SHIELD = 30;
+      static constexpr int WEIGHT_PAWN_SHIELD = 10;
       // キャスリングの重さ。
       static constexpr int WEIGHT_CASTLING = 50;
 
       /************************/
       /* 価値を計算する関数。 */
       /************************/
-      // 価値の変数。
-      int material_value_;  // マテリアル。
-      int mobility_value_;  // 駒の動きやすさ。
-      int center_control_value_;  // センター支配。
-      int sweet_center_control_value_;  // センター支配。
-      int development_value_;  // 駒の展開。
-      int attack_enemy_value_;  // 敵を攻撃。
-      int attack_around_king_value_;  // キング周辺への攻撃。
-      int position_value_[NUM_PIECE_TYPES];  // 各駒の配置。
-      int king_position_middle_value_;  // キングの中盤の配置。
-      int king_position_ending_value_;  // キングの終盤の配置。
-      int pass_pawn_value_;  // パスポーン。
-      int protected_pass_pawn_value_;  // 守られたパスポーン。
-      int double_pawn_value_;  // ダブルポーン。
-      int iso_pawn_value_;  // 孤立ポーン。
-      int bishop_pair_value_;  // ビショップペア。
-      int early_queen_launched_value_;  // 早すぎるクイーンの始動。
-      int pawn_shield_value_;  // ポーンの盾。
-      int castling_value_;  // キャスリング。
       // 各駒での価値を計算する。
       // [引数]
       // <Type>: 計算したい駒。
@@ -244,12 +223,12 @@ namespace Sayuri {
       // side: 調べるサイド。
       // [戻り値]
       // 十分な駒があればtrue。
-      bool HasEnoughPieces(Side side);
+      bool HasEnoughPieces(Side side) const;
       // 局面の進行状況を得る。
       // [戻り値]
       // 進行状況。0.0以上、1.0以下。
       // 値が小さいほどエンディングに近い。
-      double GetPhase();
+      double GetPhase() const;
 
       /****************/
       /* 局面分析用。 */
@@ -285,6 +264,24 @@ namespace Sayuri {
       /****************/
       // 使用するチェスエンジン。
       ChessEngine* engine_ptr_;
+      // 価値の変数。
+      int material_value_;  // マテリアル。
+      int mobility_value_;  // 駒の動きやすさ。
+      int center_control_value_;  // センター支配。
+      int sweet_center_control_value_;  // センター支配。
+      int development_value_;  // 駒の展開。
+      int attack_enemy_value_;  // 敵を攻撃。
+      int position_value_[NUM_PIECE_TYPES];  // 各駒の配置。
+      int king_position_middle_value_;  // キングの中盤の配置。
+      int king_position_ending_value_;  // キングの終盤の配置。
+      int pass_pawn_value_;  // パスポーン。
+      int protected_pass_pawn_value_;  // 守られたパスポーン。
+      int double_pawn_value_;  // ダブルポーン。
+      int iso_pawn_value_;  // 孤立ポーン。
+      int bishop_pair_value_;  // ビショップペア。
+      int early_queen_launched_value_;  // 早すぎるクイーンの始動。
+      int pawn_shield_value_;  // ポーンの盾。
+      int castling_value_;  // キャスリング。
   };
 }  // namespace Sayuri
 
