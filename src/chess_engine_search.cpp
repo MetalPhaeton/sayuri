@@ -143,19 +143,6 @@ namespace Sayuri {
       searched_level_ = level;
     }
 
-    // 3回繰り返しルールを調べる。
-    if (CountSamePosition(pos_key) >= 2) {
-      int score = SCORE_DRAW;
-      if (score < alpha) return alpha;
-      if (score > beta) return beta;
-      return score;
-    } else {
-      if (board_history_stack_ptr_ < board_history_stack_end_) {
-        *board_history_stack_ptr_ = pos_key;
-        board_history_stack_ptr_++;
-      }
-    }
-
     // サイドとチェックされているか。
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
@@ -168,9 +155,6 @@ namespace Sayuri {
       int score = entry_ptr->value();
       if (entry_ptr->value_flag() == TTValueFlag::EXACT) {
         // エントリーが正確な値。
-        if (board_history_stack_ptr_ > board_history_stack_begin_) {
-          board_history_stack_ptr_--;
-        }
         if (score >= beta) return beta;
         if (score <= alpha) return alpha;
         return score;
@@ -178,9 +162,6 @@ namespace Sayuri {
         // エントリーがアルファ値。
         // アルファ値以下が確定。
         if (score <= alpha) {
-          if (board_history_stack_ptr_ > board_history_stack_begin_) {
-            board_history_stack_ptr_--;
-          }
           return alpha;
         }
         // ベータ値を下げられる。
@@ -189,9 +170,6 @@ namespace Sayuri {
         // エントリーがベータ値。
         // ベータ値以上が確定。
         if (score >= beta) {
-          if (board_history_stack_ptr_ > board_history_stack_begin_) {
-            board_history_stack_ptr_--;
-          }
           return beta;
         }
         // アルファ値を上げられる。
@@ -204,9 +182,6 @@ namespace Sayuri {
     if ((depth <= 0) || (level >= MAX_PLYS)) {
       // クイース探索ノードに移行するため、ノード数を減らしておく。
       searched_nodes_--;
-      if (board_history_stack_ptr_ > board_history_stack_begin_) {
-        board_history_stack_ptr_--;
-      }
       return Quiesce(depth, level, alpha, beta, table);
     }
 
@@ -225,26 +200,16 @@ namespace Sayuri {
       } else {
         if (depth >= 5) {
           // Internal Iterative Deepening。
-          if (board_history_stack_ptr_ > board_history_stack_begin_) {
-            board_history_stack_ptr_--;
-          }
           PVLine temp_line;
           Search<NodeType::PV> (pos_key, depth - 3, level, alpha, beta,
           table, temp_line);
 
           iid_stack_[level] = temp_line.line()[0].move();
-          if (board_history_stack_ptr_ < board_history_stack_end_) {
-            *board_history_stack_ptr_ = pos_key;
-            board_history_stack_ptr_++;
-          }
         }
       }
     } else {
       if (!is_null_searching_ && !is_checked && (depth >= 4)) {
         // Null Move Reduction。
-        if (board_history_stack_ptr_ > board_history_stack_begin_) {
-          board_history_stack_ptr_--;
-        }
         Move null_move;
         null_move.move_type_ = NULL_MOVE;  // Null Move。
 
@@ -259,19 +224,12 @@ namespace Sayuri {
 
         UnmakeMove(null_move);
         is_null_searching_ = false;
-        if (board_history_stack_ptr_ < board_history_stack_end_) {
-          *board_history_stack_ptr_ = pos_key;
-          board_history_stack_ptr_++;
-        }
 
         if (score >= beta) {
           depth -= 4;
           if (depth <= 0) {
             // クイース探索ノードに移行するため、ノード数を減らしておく。
             searched_nodes_--;
-            if (board_history_stack_ptr_ > board_history_stack_begin_) {
-              board_history_stack_ptr_--;
-            }
             return Quiesce(depth, level, alpha, beta, table);
           }
         }
@@ -413,9 +371,6 @@ namespace Sayuri {
     if (!has_legal_move) {
       if (is_checked) {
         // チェックメイト。
-        if (board_history_stack_ptr_ > board_history_stack_begin_) {
-          board_history_stack_ptr_--;
-        }
         pv_line.MarkCheckmated();
         int score = SCORE_LOSE;
         if (score >= beta) return beta;
@@ -423,9 +378,6 @@ namespace Sayuri {
         return score;
       } else {
         // ステールメイト。
-        if (board_history_stack_ptr_ > board_history_stack_begin_) {
-          board_history_stack_ptr_--;
-        }
         int score = SCORE_DRAW;
         if (score >= beta) return beta;
         if (score <= alpha) return alpha;
@@ -442,9 +394,6 @@ namespace Sayuri {
     }
 
     // 探索結果を返す。
-    if (board_history_stack_ptr_ > board_history_stack_begin_) {
-      board_history_stack_ptr_--;
-    }
     return alpha;
   }
   // 実体化。
@@ -723,19 +672,6 @@ namespace Sayuri {
     margin += depth <= 1 ? 300 : 400;
 
     return margin;
-  }
-
-  // 同じ局面の数をカウントする。
-  int ChessEngine::CountSamePosition(HashKey pos_key) const {
-    int count = 0;
-    for (HashKey* ptr = board_history_stack_begin_;
-    ptr < board_history_stack_ptr_; ptr++) {
-      if (*ptr == pos_key) {
-        count++;
-      }
-    }
-
-    return count;
   }
 
   // ストップ条件を設定する。

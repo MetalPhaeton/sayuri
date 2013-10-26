@@ -286,12 +286,6 @@ namespace Sayuri {
       // [戻り値]
       // マージン。
       int GetMargin(Move move, int depth);
-      // 同じ局面の数をカウントする。
-      // [引数]
-      // pos_key: 調べたい局面のハッシュキー。
-      // [戻り値]
-      // 同じ局面の数。
-      int CountSamePosition(HashKey pos_key) const;
       // 探索を中断しなければいけないかどうか。
       // [戻り値]
       // 探索を中断しなければいけないときはtrue。
@@ -356,12 +350,6 @@ namespace Sayuri {
       Move iid_stack_[MAX_PLYS];
       // キラームーブスタック。
       Move killer_stack_[MAX_PLYS];
-      // 局面の履歴スタック。
-      HashKey board_history_stack_[MAX_BOARD_HISTORY_STACK + 1];
-      // 局面の履歴スタックのポインタ。
-      HashKey* board_history_stack_begin_;  // 最初。
-      HashKey* board_history_stack_end_;  // 最後。
-      HashKey* board_history_stack_ptr_;  // 現在の位置。
       // 現在のIterative Deepeningの深さ。
       int i_depth_;
       // 探索したノード数。
