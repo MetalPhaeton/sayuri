@@ -29,6 +29,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <utility>
 #include <iterator>
 #include <thread>
 #include <chrono>
@@ -46,28 +47,42 @@ namespace Sayuri {
   /**************************/
   // コンストラクタ。
   UCIShell::UCIShell(ChessEngine* engine_ptr) :
-  engine_ptr_(engine_ptr) {
+  engine_ptr_(engine_ptr),
+  table_size_(64 * 1024 * 1024),
+  enable_pondering_(true) {
   }
 
   // コピーコンストラクタ。
   UCIShell::UCIShell(const UCIShell& shell) :
-  engine_ptr_(shell.engine_ptr_) {
+  engine_ptr_(shell.engine_ptr_),
+  table_size_(shell.table_size_),
+  enable_pondering_(shell.enable_pondering_) {
+    *(moves_to_search_ptr_) = *(shell.moves_to_search_ptr_);
   }
 
   // ムーブコンストラクタ。
   UCIShell::UCIShell(UCIShell&& shell) :
-  engine_ptr_(shell.engine_ptr_) {
+  engine_ptr_(shell.engine_ptr_),
+  table_size_(shell.table_size_),
+  enable_pondering_(shell.enable_pondering_) {
+    moves_to_search_ptr_ = std::move(shell.moves_to_search_ptr_);
   }
 
   // コピー代入。
   UCIShell& UCIShell::operator=(const UCIShell& shell) {
     engine_ptr_ = shell.engine_ptr_;
+    table_size_ = shell.table_size_;
+    enable_pondering_ = shell.enable_pondering_;
+    *(moves_to_search_ptr_) = *(shell.moves_to_search_ptr_);
     return *this;
   }
 
   // ムーブ代入。
   UCIShell& UCIShell::operator=(UCIShell&& shell) {
     engine_ptr_ = shell.engine_ptr_;
+    table_size_ = shell.table_size_;
+    enable_pondering_ = shell.enable_pondering_;
+    moves_to_search_ptr_ = std::move(shell.moves_to_search_ptr_);
     return *this;
   }
 
@@ -222,6 +237,10 @@ namespace Sayuri {
     // ポンダリングできるかどうか。
     std::cout << "option name Ponder type check default true" << std::endl;
 
+    // オプションの初期設定。
+    table_size_ = 64 * 1024 * 1024;
+    enable_pondering_ = true;
+
     std::cout << "uciok" << std::endl;
   }
 
@@ -277,6 +296,21 @@ namespace Sayuri {
             break;
           } else if (word.str_ == "ponder") {
             // ポンダリングの設定の場合。
+            parser.JumpToNextKeyword();
+            while (parser.HasNext()) {
+              word = parser.Get();
+              if (word.str_ == "value") {
+                word = parser.Get();
+                if (word.str_ == "true") {
+                  enable_pondering_ = true;
+                } else if (word.str_ == "false") {
+                  enable_pondering_ = false;
+                }
+                break;
+              }
+
+              parser.JumpToNextKeyword();
+            }
             break;
           }
         }

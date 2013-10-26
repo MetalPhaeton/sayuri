@@ -210,6 +210,8 @@ namespace Sayuri {
 
       // オプション。トランスポジションテーブルのサイズ。
       std::size_t table_size_;
+      // オプション。ポンダリングするかどうか。
+      bool enable_pondering_;
   };
 }  // namespace Sayuri
 
