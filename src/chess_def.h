@@ -257,6 +257,9 @@ namespace Sayuri {
   // 最大探索ノード数。
   constexpr std::size_t MAX_NODES = static_cast<std::size_t>(-1);
 
+  // ボードの履歴の保存数。
+  constexpr int MAX_BOARD_HISTORY_STACK = 1000;
+
   // 探索するノードの種類。
   enum class NodeType {
     PV,  // PVノードやAllノード。

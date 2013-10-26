@@ -247,7 +247,6 @@ namespace Sayuri {
       /******************/
       // クイース探索。
       // [引数]
-      // pos_key: 現在のハッシュキー。
       // depth: 現在の深さ。
       // level: 現在のレベル。
       // alpha: アルファ値。
@@ -255,8 +254,8 @@ namespace Sayuri {
       // table: トランスポジションテーブル。
       // [戻り値]
       // 評価値。
-      int Quiesce(HashKey pos_key, int depth, int level,
-      int alpha, int beta, TranspositionTable& table);
+      int Quiesce(int depth, int level, int alpha, int beta,
+      TranspositionTable& table);
       // 探索する。
       // [引数]
       // <Type>: ノードの種類。
@@ -287,6 +286,12 @@ namespace Sayuri {
       // [戻り値]
       // マージン。
       int GetMargin(Move move, int depth);
+      // 同じ局面の数をカウントする。
+      // [引数]
+      // pos_key: 調べたい局面のハッシュキー。
+      // [戻り値]
+      // 同じ局面の数。
+      int CountSamePosition(HashKey pos_key) const;
       // 探索を中断しなければいけないかどうか。
       // [戻り値]
       // 探索を中断しなければいけないときはtrue。
@@ -351,6 +356,12 @@ namespace Sayuri {
       Move iid_stack_[MAX_PLYS];
       // キラームーブスタック。
       Move killer_stack_[MAX_PLYS];
+      // 局面の履歴スタック。
+      HashKey board_history_stack_[MAX_BOARD_HISTORY_STACK + 1];
+      // 局面の履歴スタックのポインタ。
+      HashKey* board_history_stack_begin_;  // 最初。
+      HashKey* board_history_stack_end_;  // 最後。
+      HashKey* board_history_stack_ptr_;  // 現在の位置。
       // 現在のIterative Deepeningの深さ。
       int i_depth_;
       // 探索したノード数。
@@ -396,9 +407,7 @@ namespace Sayuri {
       /* ハッシュキー関連。 */
       /**********************/
       // ハッシュキーを得るための配列。
-      // 第1インデックスはサイド。
-      // 第2インデックスは駒の種類。
-      // 第3インデックスは駒の位置。
+      // key_table_[サイド][駒の種類][駒の位置]
       // それぞれのインデックスに値を入れると、
       // そのハッシュキーを得られる。
       static HashKey key_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];

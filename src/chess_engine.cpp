@@ -117,10 +117,18 @@ namespace Sayuri {
     for (int i = 0; i < MAX_PLYS; i++) {
       iid_stack_[i] = engine.iid_stack_[i];
     }
+
     // killer_stack_のコピー。
     for (int i = 0; i < MAX_PLYS; i++) {
       killer_stack_[i] = engine.killer_stack_[i];
     }
+
+    // 局面の履歴スタックのコピー。
+    for (int i = 0; i < MAX_BOARD_HISTORY_STACK; i++) {
+      board_history_stack_[i] = engine.board_history_stack_[i];
+    }
+    board_history_stack_ptr_ = board_history_stack_begin_
+    + (engine.board_history_stack_ptr_ - engine.board_history_stack_begin_);
 
     // 指し手の履歴をコピー。
     move_history_ = engine.move_history_;
@@ -203,6 +211,13 @@ namespace Sayuri {
       killer_stack_[i] = engine.killer_stack_[i];
     }
 
+    // 局面の履歴スタックのコピー。
+    for (int i = 0; i < MAX_BOARD_HISTORY_STACK; i++) {
+      board_history_stack_[i] = engine.board_history_stack_[i];
+    }
+    board_history_stack_ptr_ = board_history_stack_begin_
+    + (engine.board_history_stack_ptr_ - engine.board_history_stack_begin_);
+
     // 指し手の履歴をムーブ。
     move_history_ = std::move(engine.move_history_);
 
@@ -283,6 +298,13 @@ namespace Sayuri {
     for (int i = 0; i < MAX_PLYS; i++) {
       killer_stack_[i] = engine.killer_stack_[i];
     }
+
+    // 局面の履歴スタックのコピー。
+    for (int i = 0; i < MAX_BOARD_HISTORY_STACK; i++) {
+      board_history_stack_[i] = engine.board_history_stack_[i];
+    }
+    board_history_stack_ptr_ = board_history_stack_begin_
+    + (engine.board_history_stack_ptr_ - engine.board_history_stack_begin_);
 
     // 指し手の履歴をコピー。
     move_history_ = engine.move_history_;
@@ -367,6 +389,13 @@ namespace Sayuri {
       killer_stack_[i] = engine.killer_stack_[i];
     }
 
+    // 局面の履歴スタックのコピー。
+    for (int i = 0; i < MAX_BOARD_HISTORY_STACK; i++) {
+      board_history_stack_[i] = engine.board_history_stack_[i];
+    }
+    board_history_stack_ptr_ = board_history_stack_begin_
+    + (engine.board_history_stack_ptr_ - engine.board_history_stack_begin_);
+
     // 指し手の履歴をムーブ。
     move_history_ = std::move(engine.move_history_);
 
@@ -415,6 +444,12 @@ namespace Sayuri {
     can_en_passant_ = fen.can_en_passant();
     ply_100_ = fen.ply_100();
     ply_ = fen.ply();
+
+    // 局面の履歴を保存。
+    if (board_history_stack_ptr_ < board_history_stack_end_) {
+      *board_history_stack_ptr_ = GetCurrentKey();
+      board_history_stack_ptr_++;
+    }
   }
 
   // 新しいゲームの準備をする。
@@ -541,6 +576,14 @@ namespace Sayuri {
       killer_stack_[i] = Move();
     }
 
+    // 局面の履歴スタックの初期化。
+    board_history_stack_begin_ = board_history_stack_ptr_
+    = board_history_stack_;
+    board_history_stack_end_ =
+    &(board_history_stack_[(MAX_BOARD_HISTORY_STACK - 1) + 1]);
+    *board_history_stack_ptr_ = GetCurrentKey();
+    board_history_stack_ptr_++;
+
     // 手の履歴を削除。
     move_history_.clear();
 
@@ -597,6 +640,10 @@ namespace Sayuri {
       }
       move_history_.push_back(move);
       ply_100_history_.push_back(ply_100_);
+      if (board_history_stack_ptr_ < board_history_stack_end_) {
+        *board_history_stack_ptr_ = GetNextKey(GetCurrentKey(), move);
+        board_history_stack_ptr_++;
+      }
       MakeMove(move);
     } else {
       throw SayuriError("合法手ではありません。");
@@ -605,12 +652,15 @@ namespace Sayuri {
 
   // 手を戻す。
   void ChessEngine::UndoMove() {
-    if (move_history_.begin() < move_history_.end()) {
+    if (move_history_.size() >= 1) {
       ply_--;
       Move move = move_history_.back();
       ply_100_ = ply_100_history_.back();
       move_history_.pop_back();
       ply_100_history_.pop_back();
+      if (board_history_stack_ptr_ > board_history_stack_begin_) {
+        board_history_stack_ptr_--;
+      }
       UnmakeMove(move);
     } else {
       throw SayuriError("手を戻すことができません。");

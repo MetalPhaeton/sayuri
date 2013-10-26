@@ -2,11 +2,13 @@
 #include <cstring>
 #include <cstdlib>
 #include "chess_def.h"
-#include "init.h" #include "chess_engine.h"
+#include "init.h"
+#include "chess_engine.h"
 #include "uci_shell.h"
 
-int main(int argc, char* argv[]) {
+#include "debug.h"
 
+int main(int argc, char* argv[]) {
   if ((argc >= 2)
   && (std::strcmp(argv[1], "--help") == 0)) {
     // ヘルプの表示。
@@ -38,4 +40,5 @@ int main(int argc, char* argv[]) {
   }
 
   return EXIT_SUCCESS;
+  // return DebugMain(argc, argv);
 }
