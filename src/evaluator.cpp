@@ -300,6 +300,7 @@ namespace Sayuri {
     // 利き筋を作る。
     Bitboard attacks = 0ULL;
     Bitboard pawn_moves = 0ULL;
+    Bitboard en_passant = 0ULL;
     Bitboard castling_moves = 0ULL;
     switch (Type) {
       case PAWN:
@@ -318,12 +319,11 @@ namespace Sayuri {
           }
         }
         // 攻撃。
-        attacks = Util::GetPawnAttack(piece_square, piece_side)
-        & engine_ptr_->side_pieces()[enemy_piece_side];
+        attacks = Util::GetPawnAttack(piece_square, piece_side);
+
         // アンパッサン。
         if (engine_ptr_->can_en_passant()) {
-          attacks |= Util::BIT[engine_ptr_->en_passant_square()]
-          & Util::GetPawnAttack(piece_square, piece_side);
+          en_passant = Util::BIT[engine_ptr_->en_passant_square()] & attacks;
         }
         break;
       case KNIGHT:
@@ -365,7 +365,9 @@ namespace Sayuri {
 
     // 駒の動きやすさを計算。
     if (Type == PAWN) {
-      score = Util::CountBits(pawn_moves | attacks);
+      score = Util::CountBits(pawn_moves
+      | (attacks & engine_ptr_->side_pieces()[enemy_piece_side])
+      | en_passant);
     } else if (Type == KING) {
       score = Util::CountBits(castling_moves
       | (attacks & ~(engine_ptr_->side_pieces()[piece_side])));
@@ -394,9 +396,8 @@ namespace Sayuri {
 
     // 敵への攻撃を計算。
     if (Type == PAWN) {
-      score = Util::CountBits(attacks
-      & (engine_ptr_->side_pieces()[enemy_piece_side]
-      | Util::BIT[engine_ptr_->en_passant_square()]));
+      score = Util::CountBits
+      ((attacks & engine_ptr_->side_pieces()[enemy_piece_side]) | en_passant);
     } else if (Type != KING) {
       score = Util::CountBits(attacks
       & engine_ptr_->side_pieces()[enemy_piece_side]);

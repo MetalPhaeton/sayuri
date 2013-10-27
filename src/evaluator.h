@@ -203,7 +203,7 @@ namespace Sayuri {
       // ポーンの盾の重さ。
       static constexpr int WEIGHT_PAWN_SHIELD = 10;
       // キャスリングの重さ。
-      static constexpr int WEIGHT_CASTLING = 50;
+      static constexpr int WEIGHT_CASTLING = 25;
 
       /************************/
       /* 価値を計算する関数。 */
