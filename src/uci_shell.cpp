@@ -341,8 +341,7 @@ namespace Sayuri {
 
       if (word.str_ == "startpos") {
         // startposコマンド。
-        engine_ptr_->LoadFen(Fen(std::string
-        ("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")));
+        engine_ptr_->SetNewGame();
       } else if (word.str_ == "fen") {
         // fenコマンド。
         // FENを合体。
@@ -351,6 +350,7 @@ namespace Sayuri {
           fen_str += parser.Get().str_ + " ";
         }
         // エンジンにロード。
+        engine_ptr_->SetNewGame();
         engine_ptr_->LoadFen(Fen(fen_str));
       } else if (word.str_ == "moves") {
         // moveコマンド。
