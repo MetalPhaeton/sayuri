@@ -90,14 +90,14 @@ namespace Sayuri {
            0,  1,  2,  2,  2,  2,  1,  0
         },
         {  // ビショップ。
-          0, 0, 0, 0, 0, 0, 0, 0,
+          1, 0, 0, 0, 0, 0, 0, 1,
           0, 3, 0, 2, 2, 0, 3, 0,
-          0, 1, 1, 1, 1, 1, 1, 0,
+          0, 1, 2, 1, 1, 2, 1, 0,
           0, 0, 3, 2, 2, 3, 0, 0,
           0, 3, 2, 3, 3, 2, 3, 0,
           1, 2, 2, 2, 2, 2, 2, 1,
           0, 1, 1, 1, 1, 1, 1, 0,
-          0, 0, 0, 0, 0, 0, 0, 0
+          1, 0, 0, 0, 0, 0, 0, 1
         },
         {  // ルーク。
           0, 1, 2, 3, 3, 2, 1, 0,
@@ -170,8 +170,10 @@ namespace Sayuri {
       /********************/
       /* 駒の配置の重さ。 */
       /********************/
-      // ポーンの配置の重さ。終盤は2倍になる。
-      static constexpr int WEIGHT_PAWN_POSITION = 5;
+      // ポーンの中盤の配置の重さ。
+      static constexpr int WEIGHT_PAWN_POSITION_MIDDLE = 5;
+      // ポーンの終盤の配置の重さ。
+      static constexpr int WEIGHT_PAWN_POSITION_ENDING = 10;
       // ナイトの配置の重さ。
       static constexpr int WEIGHT_KNIGHT_POSITION = 10;
       // ビショップの配置の重さ。
@@ -197,13 +199,13 @@ namespace Sayuri {
       // 孤立ポーンの重さ。
       static constexpr int WEIGHT_ISO_PAWN = -30;
       // ビショップペアの重さ。
-      static constexpr int WEIGHT_BISHOP_PAIR = 20;
+      static constexpr int WEIGHT_BISHOP_PAIR = 50;
       // 早すぎるクイーンの出動の重さ。
       static constexpr int WEIGHT_EARLY_QUEEN_LAUNCHED = -30;
       // ポーンの盾の重さ。
-      static constexpr int WEIGHT_PAWN_SHIELD = 10;
-      // キャスリングの重さ。
-      static constexpr int WEIGHT_CASTLING = 25;
+      static constexpr int WEIGHT_PAWN_SHIELD = 30;
+      // キャスリングの重さ。(これの2倍が評価値。ポーン1個より重い。)
+      static constexpr int WEIGHT_CASTLING = 55;
 
       /************************/
       /* 価値を計算する関数。 */

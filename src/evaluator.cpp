@@ -40,7 +40,8 @@ namespace Sayuri {
   constexpr int Evaluator::WEIGHT_CENTER_CONTROL;
   constexpr int Evaluator::WEIGHT_DEVELOPMENT;
   constexpr int Evaluator::WEIGHT_ATTACK_ENEMY;
-  constexpr int Evaluator::WEIGHT_PAWN_POSITION;
+  constexpr int Evaluator::WEIGHT_PAWN_POSITION_MIDDLE;
+  constexpr int Evaluator::WEIGHT_PAWN_POSITION_ENDING;
   constexpr int Evaluator::WEIGHT_KNIGHT_POSITION;
   constexpr int Evaluator::WEIGHT_ROOK_POSITION;
   constexpr int Evaluator::WEIGHT_KING_POSITION_MIDDLE;
@@ -211,7 +212,6 @@ namespace Sayuri {
     int whole_score = material_value_
     + (WEIGHT_MOBILITY * mobility_value_)
     + (WEIGHT_ATTACK_ENEMY * attack_enemy_value_)
-    + (WEIGHT_PAWN_POSITION * position_value_[PAWN])
     + (WEIGHT_PASS_PAWN * pass_pawn_value_)
     + (WEIGHT_PROTECTED_PASS_PAWN * protected_pass_pawn_value_)
     + (WEIGHT_DOUBLE_PAWN * double_pawn_value_)
@@ -220,6 +220,7 @@ namespace Sayuri {
     // 中盤。
     int middle_score = (WEIGHT_CENTER_CONTROL * center_control_value_)
     + (WEIGHT_DEVELOPMENT * development_value_)
+    + (WEIGHT_PAWN_POSITION_MIDDLE * position_value_[PAWN])
     + (WEIGHT_KNIGHT_POSITION * position_value_[KNIGHT])
     + (WEIGHT_BISHOP_POSITION * position_value_[BISHOP])
     + (WEIGHT_ROOK_POSITION * position_value_[ROOK])
@@ -231,7 +232,7 @@ namespace Sayuri {
     + (WEIGHT_CASTLING * castling_value_);
 
     // 終盤。
-    int ending_score = (WEIGHT_PAWN_POSITION * position_value_[PAWN])
+    int ending_score = (WEIGHT_PAWN_POSITION_ENDING * position_value_[PAWN])
     + (WEIGHT_KING_POSITION_ENDING * king_position_ending_value_);
 
     return whole_score +
@@ -485,7 +486,7 @@ namespace Sayuri {
       pawn_shield_value_ += sign * score;
 
       // キャスリングを計算する。
-      score = 1;  // キャスリングはまだだが、放棄していない。
+      score = 0;  // キャスリングはまだだが、放棄していない。
       Castling rights_mask =
       piece_side == WHITE ? WHITE_CASTLING : BLACK_CASTLING;
       if (engine_ptr_->has_castled()[piece_side]) {
@@ -494,7 +495,7 @@ namespace Sayuri {
       } else {
         if (!(engine_ptr_->castling_rights() & rights_mask)) {
           // キャスリングの権利を放棄した。
-          score = 0;
+          score = -1;
         }
       }
       castling_value_ += sign * score;
