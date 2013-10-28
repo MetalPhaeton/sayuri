@@ -66,10 +66,10 @@ namespace Sayuri {
       // スタックに候補手を展開する関数。
       // (注)自らチェックされる手も作る。
       // [引数]
-      // tt_best_move: TTに登録された前回の繰り返しの最善手。
+      // prev_best: TTに登録された前回の繰り返しの最善手。
       // iid_move: IIDによる最善手。
       // killer: キラームーブ。
-      template<GenMoveType Type> void GenMoves(Move tt_best_move,
+      template<GenMoveType Type> void GenMoves(Move prev_best,
       Move iid_move, Move killer);
       // 次の手を取り出す。
       // [戻り値]
@@ -84,13 +84,13 @@ namespace Sayuri {
       // 手に点数をつける。
       // [引数]
       // ptr: 点数をつけるスロットのポインタ。
-      // tt_best_move: TTに登録された前回の繰り返しの最善手。
+      // prev_best: TTに登録された前回の繰り返しの最善手。
       // iid_move: IIDで得た手。
       // killer: キラームーブ。
       // side: 手のサイド。
       template<GenMoveType Type>
       void ScoreMove(MoveSlot* ptr,
-      Move tt_best_move, Move iid_move, Move killer, Side side);
+      Move prev_best, Move iid_move, Move killer, Side side);
       // SEE。
       // [引数]
       // move: 探したい手。

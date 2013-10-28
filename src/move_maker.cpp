@@ -126,7 +126,7 @@ namespace Sayuri {
 
   // 手をスタックに展開する。
   template<GenMoveType Type>
-  void MoveMaker::GenMoves(Move tt_best_move, Move iid_move, Move killer) {
+  void MoveMaker::GenMoves(Move prev_best, Move iid_move, Move killer) {
     // サイド。
     Side side = engine_ptr_->to_move();
     Side enemy_side = side ^ 0x3;
@@ -177,7 +177,7 @@ namespace Sayuri {
           // スタックに登録。
           if (last_ < end_) {
             last_->move_ = move;
-            ScoreMove<Type>(last_, tt_best_move, iid_move, killer, side);
+            ScoreMove<Type>(last_, prev_best, iid_move, killer, side);
             last_++;
           }
         }
@@ -233,7 +233,7 @@ namespace Sayuri {
             move.promotion_ = piece_type;
             if (last_ < end_) {
               last_->move_ = move;
-              ScoreMove<Type>(last_, tt_best_move, iid_move, killer, side);
+              ScoreMove<Type>(last_, prev_best, iid_move, killer, side);
               last_++;
             }
           }
@@ -241,7 +241,7 @@ namespace Sayuri {
           // 昇格しない場合。
           if (last_ < end_) {
             last_->move_ = move;
-            ScoreMove<Type>(last_, tt_best_move, iid_move, killer, side);
+            ScoreMove<Type>(last_, prev_best, iid_move, killer, side);
             last_++;
           }
         }
@@ -291,21 +291,21 @@ namespace Sayuri {
 
       if (last_ < end_) {
         last_->move_ = move;
-        ScoreMove<Type>(last_, tt_best_move, iid_move, killer, side);
+        ScoreMove<Type>(last_, prev_best, iid_move, killer, side);
         last_++;
       }
     }
   }
   // 実体化。
   template void MoveMaker::GenMoves<GenMoveType::NON_CAPTURE>
-  (Move tt_best_move, Move iid_move, Move killer);
+  (Move prev_best, Move iid_move, Move killer);
   template void MoveMaker::GenMoves<GenMoveType::CAPTURE>
-  (Move tt_best_move, Move iid_move, Move killer);
+  (Move prev_best, Move iid_move, Move killer);
   template<>
   void MoveMaker::GenMoves<GenMoveType::ALL>
-  (Move tt_best_move, Move iid_move, Move killer) {
-    GenMoves<GenMoveType::NON_CAPTURE>(tt_best_move, iid_move, killer);
-    GenMoves<GenMoveType::CAPTURE>(tt_best_move, iid_move, killer);
+  (Move prev_best, Move iid_move, Move killer) {
+    GenMoves<GenMoveType::NON_CAPTURE>(prev_best, iid_move, killer);
+    GenMoves<GenMoveType::CAPTURE>(prev_best, iid_move, killer);
   }
 
   // 次の手を返す。
@@ -336,7 +336,7 @@ namespace Sayuri {
   // 手に点数をつける。
   template<GenMoveType Type>
   void MoveMaker::ScoreMove(MoveMaker::MoveSlot* ptr,
-  Move tt_best_move, Move iid_move, Move killer, Side side) {
+  Move prev_best, Move iid_move, Move killer, Side side) {
     // 評価値の定義。
     // 前回の繰り返しでトランスポジションテーブルから得た最善手の点数。
     constexpr int BEST_MOVE_SCORE = MAX_VALUE;
@@ -346,7 +346,7 @@ namespace Sayuri {
     constexpr int KILLER_MOVE_SCORE = IID_MOVE_SCORE - 1;
 
     // 特殊な手の点数をつける。
-    if (ptr->move_ == tt_best_move) {
+    if (ptr->move_ == prev_best) {
       // 前回の最善手。
       ptr->score_ = BEST_MOVE_SCORE;
     } else if (ptr->move_ == iid_move) {

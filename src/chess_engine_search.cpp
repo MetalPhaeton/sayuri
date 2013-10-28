@@ -79,12 +79,12 @@ namespace Sayuri {
     // 候補手を作る。
     // 駒を取る手だけ。
     MoveMaker maker(this);
-    Move tt_best_move;
+    Move prev_best;
     if (IsAttacked(king_[side], enemy_side)) {
-      maker.GenMoves<GenMoveType::ALL>(tt_best_move, iid_stack_[level],
+      maker.GenMoves<GenMoveType::ALL>(prev_best, iid_stack_[level],
       killer_stack_[level]);
     } else {
-      maker.GenMoves<GenMoveType::CAPTURE>(tt_best_move, iid_stack_[level],
+      maker.GenMoves<GenMoveType::CAPTURE>(prev_best, iid_stack_[level],
       killer_stack_[level]);
     }
 
@@ -187,16 +187,16 @@ namespace Sayuri {
 
     // 前回の繰り返しの最善手を得る。
     TTEntry* prev_entry = table.GetFulfiledEntry(pos_key, depth - 1, side);
-    Move tt_best_move;
-    if (prev_entry && (prev_entry->value_flag() == TTValueFlag::EXACT)) {
-      tt_best_move = prev_entry->best_move();
+    Move prev_best;
+    if (prev_entry && (prev_entry->value_flag() != TTValueFlag::ALPHA)) {
+      prev_best = prev_entry->best_move();
     }
 
     // PVノードの時はIID、そうじゃないノードならNull Move Reduction。
     if (Type == NodeType::PV) {
       // 前回の繰り返しの最善手があればIIDしない。
-      if (tt_best_move.all_) {
-        iid_stack_[level] = tt_best_move;
+      if (prev_best.all_) {
+        iid_stack_[level] = prev_best;
       } else {
         if (depth >= 5) {
           // Internal Iterative Deepening。
@@ -241,7 +241,7 @@ namespace Sayuri {
     /**************/
     // 手を作る。
     MoveMaker maker(this);
-    maker.GenMoves<GenMoveType::ALL>(tt_best_move, iid_stack_[level],
+    maker.GenMoves<GenMoveType::ALL>(prev_best, iid_stack_[level],
     killer_stack_[level]);
 
     // Futility Pruningの準備。
@@ -465,13 +465,13 @@ namespace Sayuri {
       // 前回の繰り返しの最善手を得る。
       TTEntry* prev_entry =
       table.GetFulfiledEntry(pos_key, i_depth_ - 1, side);
-      Move tt_best_move;
-      if (prev_entry && (prev_entry->value_flag() == TTValueFlag::EXACT)) {
-        tt_best_move = prev_entry->best_move();
+      Move prev_best;
+      if (prev_entry && (prev_entry->value_flag() != TTValueFlag::ALPHA)) {
+        prev_best = prev_entry->best_move();
       }
 
       // 手を作る。
-      maker.GenMoves<GenMoveType::ALL>(tt_best_move, iid_stack_[level],
+      maker.GenMoves<GenMoveType::ALL>(prev_best, iid_stack_[level],
       killer_stack_[level]);
 
       // 手を探索。
