@@ -32,8 +32,11 @@
 #include "chess_engine.h"
 
 namespace Sayuri {
-  // Misakiの初期化。
+  // Sayuriの初期化。
   extern void Init();
+
+  // Sayuriの後処理。
+  extern void Postprocess();
 }  // namespace Sayuri
 
 #endif

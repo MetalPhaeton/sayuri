@@ -32,10 +32,15 @@
 #include "evaluator.h"
 
 namespace Sayuri {
-  // Misakiの初期化。
+  // Sayuriの初期化。
   void Init() {
     Util::InitUtil();
     ChessEngine::InitChessEngine();
     Evaluator::InitEvaluator();
+  }
+
+  // Sayuriの後処理。
+  void Postprocess() {
+    Evaluator::PostprocessEvaluator();
   }
 }  // namespace Sayuri

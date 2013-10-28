@@ -37,6 +37,9 @@ int main(int argc, char* argv[]) {
 
     // エンジン起動。
     shell_ptr->Run();
+
+    // 後処理。
+    Sayuri::Postprocess();
   }
 
   return EXIT_SUCCESS;

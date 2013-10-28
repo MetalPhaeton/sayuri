@@ -157,8 +157,14 @@ namespace Sayuri {
         // エントリーが正確な値。
         pv_line.SetMove(entry_ptr->best_move());
         pv_line.score(entry_ptr->score());
-        if (score >= beta) return beta;
-        if (score <= alpha) return alpha;
+        if (score >= beta) {
+          pv_line.score(beta);
+          return beta;
+        }
+        if (score <= alpha) {
+          pv_line.score(alpha);
+          return alpha;
+        }
         return score;
       } else if (entry_ptr->value_flag() == TTValueFlag::ALPHA) {
         // エントリーがアルファ値。
@@ -173,7 +179,7 @@ namespace Sayuri {
         // ベータ値以上が確定。
         if (score >= beta) {
           pv_line.SetMove(entry_ptr->best_move());
-          pv_line.score(entry_ptr->score());
+          pv_line.score(beta);
           return beta;
         }
         // アルファ値を上げられる。
@@ -704,7 +710,7 @@ namespace Sayuri {
   // SEEで使う次の手を得る。
   Move ChessEngine::GetNextSEEMove(Square target) const {
     // キングがターゲットの時はなし。
-    if (target == king_[to_move_]) {
+    if (target == king_[to_move_ ^ 0x3]) {
       return Move();
     }
 
