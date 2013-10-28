@@ -134,20 +134,6 @@ namespace Sayuri {
       // キャスリングできるかどうか判定。
       template<Castling Flag> bool CanCastling() const;
 
-      // 駒を動かす。
-      // 動かす前のキャスリングの権利とアンパッサンは記録される。
-      // 駒を取る場合は取った駒がmoveに記録される。
-      // 動かす駒の位置と移動先の位置が同じ場合はNull Move。
-      // そのmoveはUnmakeMove()で使われる。
-      // [引数]
-      // move[inout]: 動かす手。
-      void MakeMove(Move& move);
-
-      // MakeMove()で動かした駒を元に戻す。
-      // 必ず先にMakeMove()をすること。
-      // [引数]
-      // move: MakeMove()で動かした手。
-      void UnmakeMove(Move move);
 
       // その位置が攻撃されているかどうかチェックする。
       // [引数]
@@ -164,14 +150,12 @@ namespace Sayuri {
       // マテリアル。
       int GetMaterial(Side side) const;
 
-      /*
-      // 合法手があるかどうかチェックする。
+      // SEE。
       // [引数]
-      // side: 調べたいサイド。
+      // move: 探したい手。
       // [戻り値]
-      // 合法手があればtrue。
-      bool HasLegalMove(Side side);
-      */
+      // 評価値。
+      int SEE(Move move);
 
       // 現在の局面のハッシュキーを計算する。
       // (注)計算に時間がかかる。
@@ -294,12 +278,27 @@ namespace Sayuri {
       /******************************/
       /* その他のプライベート関数。 */
       /******************************/
+      // 駒を動かす。
+      // 動かす前のキャスリングの権利とアンパッサンは記録される。
+      // 駒を取る場合は取った駒がmoveに記録される。
+      // 動かす駒の位置と移動先の位置が同じ場合はNull Move。
+      // そのmoveはUnmakeMove()で使われる。
+      // [引数]
+      // move[inout]: 動かす手。
+      void MakeMove(Move& move);
+      // MakeMove()で動かした駒を元に戻す。
+      // 必ず先にMakeMove()をすること。
+      // [引数]
+      // move: MakeMove()で動かした手。
+      void UnmakeMove(Move move);
+
       // 駒を置く。（駒の種類piece_typeにEMPTYをおけば、駒を削除できる。）
       // [引数]
       // square: 置きたい位置。
       // piece_type: 駒の種類。
       // side: 置きたい駒のサイド。
       void PutPiece(Square square, Piece piece_type, Side side=NO_SIDE);
+
       // 駒の位置を変える。
       // (注)移動先の駒は上書きされる。
       // [引数]
@@ -309,6 +308,11 @@ namespace Sayuri {
 
       // キャスリングの権利を更新する。
       void UpdateCastlingRights();
+
+      // SEEで使う次の手を得る。
+      // [引数]
+      // target: 取る駒の位置。
+      Move GetNextSEEMove(Square target) const;
 
       /****************/
       /* メンバ変数。 */

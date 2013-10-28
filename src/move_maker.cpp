@@ -373,7 +373,7 @@ namespace Sayuri {
         // 現在チェックされていれば、<取る駒> - <自分の駒>。
         if (!(engine_ptr_->IsAttacked
         (engine_ptr_->king()[side], side ^ 0x3))) {
-          ptr->score_ = SEE(ptr->move_, side);
+          ptr->score_ = engine_ptr_->SEE(ptr->move_);
         } else {
           ptr->score_ = MATERIAL[engine_ptr_->piece_board()[ptr->move_.to_]]
           - MATERIAL[engine_ptr_->piece_board()[ptr->move_.from_]];
@@ -392,90 +392,4 @@ namespace Sayuri {
   template void MoveMaker::ScoreMove<GenMoveType::CAPTURE>
   (MoveMaker::MoveSlot* ptr, Move best_move, Move iid_move, Move killer,
   Side side);
-
-  // SEE。
-  int MoveMaker::SEE(Move move, Side side) {
-    int value = 0;
-
-    if (move.all_) {
-      // 取る駒の価値を得る。
-      int capture_value = MATERIAL[engine_ptr_->piece_board()[move.to_]];
-
-      // ポーンの昇格。
-      if (engine_ptr_->piece_board()[move.from_] == PAWN) {
-        if (((side == WHITE) && (Util::GetRank(move.to_) == RANK_8))
-        || ((side == BLACK) && (Util::GetRank(move.to_) == RANK_1))) {
-          // ボーナス。
-          capture_value += MATERIAL[QUEEN] - MATERIAL[PAWN];
-          // 昇格。
-          move.promotion_ = QUEEN;
-        }
-      }
-
-      engine_ptr_->MakeMove(move);
-
-      // 違法な手なら計算しない。
-      if (!(engine_ptr_->IsAttacked(engine_ptr_->king()[side], side ^ 0x3))) {
-        // 再帰して次の局面の評価値を得る。
-        Move next_move = GetSmallestAttackerMove(move.to_, side ^ 0x3);
-        value = capture_value - SEE(next_move, side ^ 0x3);
-      }
-
-      engine_ptr_->UnmakeMove(move);
-    }
-
-    return value;
-  }
-
-  // 最小の攻撃駒の攻撃の手を得る。
-  Move MoveMaker::GetSmallestAttackerMove(Square target,
-  Side side) const {
-    // キングがターゲットの時はなし。
-    if (target == engine_ptr_->king()[side]) {
-      return Move();
-    }
-
-    // 価値の低いものから調べる。
-    for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
-      Bitboard attack;
-      switch (piece_type) {
-        case PAWN:
-          attack = Util::GetPawnAttack(target, side ^ 0x3);
-          attack &= engine_ptr_->position()[side][PAWN];
-          break;
-        case KNIGHT:
-          attack = Util::GetKnightMove(target);
-          attack &= engine_ptr_->position()[side][KNIGHT];
-          break;
-        case BISHOP:
-          attack = engine_ptr_->GetBishopAttack(target);
-          attack &= engine_ptr_->position()[side][BISHOP];
-          break;
-        case ROOK:
-          attack = engine_ptr_->GetRookAttack(target);
-          attack &= engine_ptr_->position()[side][ROOK];
-          break;
-        case QUEEN:
-          attack = engine_ptr_->GetQueenAttack(target);
-          attack &= engine_ptr_->position()[side][QUEEN];
-          break;
-        case KING:
-          attack = Util::GetKingMove(target);
-          attack &= engine_ptr_->position()[side][KING];
-          break;
-        default:
-          throw SayuriError("駒の種類が不正です。");
-          break;
-      }
-      if (attack) {
-        Move move;
-        move.from_ = Util::GetSquare(attack);
-        move.to_  = target;
-        move.move_type_ = NORMAL;
-        return move;
-      }
-    }
-
-    return Move();
-  }
 }  // namespace Sayuri

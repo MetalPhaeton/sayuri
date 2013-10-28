@@ -91,15 +91,6 @@ namespace Sayuri {
       template<GenMoveType Type>
       void ScoreMove(MoveSlot* ptr,
       Move prev_best, Move iid_move, Move killer, Side side);
-      // SEE。
-      // [引数]
-      // move: 探したい手。
-      // side: 手番。
-      // [戻り値]
-      // 評価値。
-      int SEE(Move move, Side side);
-      // 最小価値の攻撃駒の動きを得る。
-      Move GetSmallestAttackerMove(Square target, Side side) const;
 
       /****************/
       /* メンバ変数。 */

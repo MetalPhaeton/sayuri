@@ -155,6 +155,7 @@ namespace Sayuri {
       int score = entry_ptr->value();
       if (entry_ptr->value_flag() == TTValueFlag::EXACT) {
         // エントリーが正確な値。
+        pv_line.SetMove(entry_ptr->best_move());
         if (score >= beta) return beta;
         if (score <= alpha) return alpha;
         return score;
@@ -170,6 +171,7 @@ namespace Sayuri {
         // エントリーがベータ値。
         // ベータ値以上が確定。
         if (score >= beta) {
+          pv_line.SetMove(entry_ptr->best_move());
           return beta;
         }
         // アルファ値を上げられる。
@@ -656,6 +658,97 @@ namespace Sayuri {
     return pv_line;
   }
 
+  // SEE。
+  int ChessEngine::SEE(Move move) {
+    int value = 0;
+
+    if (move.all_) {
+      // 取る手じゃなければ無視。
+      if ((side_board_[move.from_] != to_move_)
+      || (side_board_[move.to_] != (to_move_ ^ 0x3))) {
+        return value;
+      }
+
+      // キングを取る手なら無視。
+      if (piece_board_[move.to_] == KING) {
+        return value;
+      }
+
+      // 取る駒の価値を得る。
+      int capture_value = MATERIAL[piece_board_[move.to_]];
+
+      // ポーンの昇格。
+      if (move.promotion_) {
+        capture_value += MATERIAL[move.promotion_]
+        - MATERIAL[piece_board_[move.from_]];
+      }
+
+      Side side = to_move_;
+
+      MakeMove(move);
+
+      // 違法な手なら計算しない。
+      if (!(IsAttacked(king_[side], side ^ 0x3))) {
+        // 再帰して次の局面の評価値を得る。
+        value = capture_value - SEE(GetNextSEEMove(move.to_));
+      }
+
+      UnmakeMove(move);
+    }
+
+    return value;
+  }
+
+  // SEEで使う次の手を得る。
+  Move ChessEngine::GetNextSEEMove(Square target) const {
+    // キングがターゲットの時はなし。
+    if (target == king_[to_move_]) {
+      return Move();
+    }
+
+    // 価値の低いものから調べる。
+    for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+      Bitboard attackers;
+      Piece promotion = EMPTY;
+      switch (piece_type) {
+        case PAWN:
+          attackers = Util::GetPawnAttack(target, to_move_ ^ 0x3)
+          & position_[to_move_][PAWN];
+          if (((to_move_ == WHITE) && (Util::GetRank(target) == RANK_8))
+          || ((to_move_ == BLACK) && (Util::GetRank(target) == RANK_1))) {
+            promotion = QUEEN;
+          }
+          break;
+        case KNIGHT:
+          attackers = Util::GetKnightMove(target) & position_[to_move_][KNIGHT];
+          break;
+        case BISHOP:
+          attackers = GetBishopAttack(target) & position_[to_move_][BISHOP];
+          break;
+        case ROOK:
+          attackers = GetRookAttack(target) & position_[to_move_][ROOK];
+          break;
+        case QUEEN:
+          attackers = GetQueenAttack(target) & position_[to_move_][QUEEN];
+          break;
+        case KING:
+          attackers = Util::GetKingMove(target) & position_[to_move_][KING];
+          break;
+        default:
+          throw SayuriError("駒の種類が不正です。");
+          break;
+      }
+      if (attackers) {
+        Move move;
+        move.from_ = Util::GetSquare(attackers);
+        move.to_  = target;
+        move.promotion_ = promotion;
+        return move;
+      }
+    }
+
+    return Move();
+  }
   // Futility Pruningのマージンを計算する。
   int ChessEngine::GetMargin(Move move, int depth) {
     // マテリアルの変動。
