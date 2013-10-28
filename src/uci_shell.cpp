@@ -148,10 +148,10 @@ namespace Sayuri {
       int winner = (pv_line.length() - 1) % 2;
       if (winner == 1) {
         // エンジンがメイトした。
-        std::cout << "mate " << (pv_line.length() - 1);
+        std::cout << "mate " << ((pv_line.length() - 1) / 2) + 1;
       } else {
         // エンジンがメイトされた。
-        std::cout << "mate " << (-1 * (pv_line.length() - 1));
+        std::cout << "mate " << (-1 * ((pv_line.length() - 1) / 2));
       }
     } else {
       std::cout << "cp " << score;
