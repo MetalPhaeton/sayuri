@@ -82,11 +82,11 @@ namespace Sayuri {
       bool Fulfil(HashKey key, int depth, Side to_move) const;
       // エントリーをアップデートする。
       // [引数]
-      // value: 評価値。
+      // score: 評価値。
       // value_flag: 評価値の種類。
       // best_move: 最善手。
-      void Update(int value, TTValueFlag value_flag, Move best_move) {
-        value_ = value;
+      void Update(int score, TTValueFlag value_flag, Move best_move) {
+        score_ = score;
         value_flag_ = value_flag;
         best_move_ = best_move;
       }
@@ -103,7 +103,7 @@ namespace Sayuri {
       // 手番。
       Side to_move() const {return to_move_;}
       // 評価値。
-      int value() const {return value_;}
+      int score() const {return score_;}
       // 評価値の種類。
       TTValueFlag value_flag() const {return value_flag_;}
       // 最善手。
@@ -127,7 +127,7 @@ namespace Sayuri {
       // 手番。
       Side to_move_;
       // 評価値。
-      int value_;
+      int score_;
       // 評価値の種類。
       TTValueFlag value_flag_;
       // 最善手。

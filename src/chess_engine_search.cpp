@@ -152,10 +152,11 @@ namespace Sayuri {
     TTEntry* entry_ptr =
     table.GetFulfiledEntry(pos_key, depth, side);
     if (entry_ptr) {
-      int score = entry_ptr->value();
+      int score = entry_ptr->score();
       if (entry_ptr->value_flag() == TTValueFlag::EXACT) {
         // エントリーが正確な値。
         pv_line.SetMove(entry_ptr->best_move());
+        pv_line.score(entry_ptr->score());
         if (score >= beta) return beta;
         if (score <= alpha) return alpha;
         return score;
@@ -172,6 +173,7 @@ namespace Sayuri {
         // ベータ値以上が確定。
         if (score >= beta) {
           pv_line.SetMove(entry_ptr->best_move());
+          pv_line.score(entry_ptr->score());
           return beta;
         }
         // アルファ値を上げられる。
@@ -660,18 +662,18 @@ namespace Sayuri {
 
   // SEE。
   int ChessEngine::SEE(Move move) {
-    int value = 0;
+    int score = 0;
 
     if (move.all_) {
       // 取る手じゃなければ無視。
       if ((side_board_[move.from_] != to_move_)
       || (side_board_[move.to_] != (to_move_ ^ 0x3))) {
-        return value;
+        return score;
       }
 
       // キングを取る手なら無視。
       if (piece_board_[move.to_] == KING) {
-        return value;
+        return score;
       }
 
       // 取る駒の価値を得る。
@@ -690,13 +692,13 @@ namespace Sayuri {
       // 違法な手なら計算しない。
       if (!(IsAttacked(king_[side], side ^ 0x3))) {
         // 再帰して次の局面の評価値を得る。
-        value = capture_value - SEE(GetNextSEEMove(move.to_));
+        score = capture_value - SEE(GetNextSEEMove(move.to_));
       }
 
       UnmakeMove(move);
     }
 
-    return value;
+    return score;
   }
 
   // SEEで使う次の手を得る。

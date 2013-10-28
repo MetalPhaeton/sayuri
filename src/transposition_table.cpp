@@ -89,14 +89,14 @@ namespace Sayuri {
 
   // テーブルに追加する。
   void TranspositionTable::Add(HashKey pos_key, int depth,
-  Side to_move, int value, TTValueFlag value_flag, Move best_move) {
+  Side to_move, int score, TTValueFlag value_flag, Move best_move) {
     // テーブルのインデックスを得る。
     int index = GetTableIndex(pos_key);
 
     // 最後のエントリーのdepthを比べ、追加する側が大きければ追加。
     if (depth > entry_table_[index].back().depth()) {
       entry_table_[index].back() = TTEntry(pos_key, depth, to_move,
-      value, value_flag, best_move);
+      score, value_flag, best_move);
 
       // ソート。
       std::sort(entry_table_[index].begin(), entry_table_[index].end(),
@@ -197,12 +197,12 @@ namespace Sayuri {
   /************************/
   // コンストラクタ。
   TTEntry::TTEntry(HashKey key, int depth, Side to_move,
-  int value, TTValueFlag value_flag, Move best_move) :
+  int score, TTValueFlag value_flag, Move best_move) :
   exists_(true),
   key_(key),
   depth_(depth),
   to_move_(to_move),
-  value_(value),
+  score_(score),
   value_flag_(value_flag),
   best_move_(best_move) {
   }
@@ -213,7 +213,7 @@ namespace Sayuri {
   key_(0ULL),
   depth_(-MAX_VALUE),
   to_move_(NO_SIDE),
-  value_(0),
+  score_(0),
   value_flag_(TTValueFlag::ALPHA) {
   }
 
@@ -223,7 +223,7 @@ namespace Sayuri {
   key_(entry.key_),
   depth_(entry.depth_),
   to_move_(entry.to_move_),
-  value_(entry.value_),
+  score_(entry.score_),
   value_flag_(entry.value_flag_),
   best_move_(entry.best_move_) {
   }
@@ -234,7 +234,7 @@ namespace Sayuri {
   key_(entry.key_),
   depth_(entry.depth_),
   to_move_(entry.to_move_),
-  value_(entry.value_),
+  score_(entry.score_),
   value_flag_(entry.value_flag_),
   best_move_(entry.best_move_) {
   }
@@ -245,7 +245,7 @@ namespace Sayuri {
     key_ = entry.key_;
     depth_ = entry.depth_;
     to_move_ = entry.to_move_;
-    value_ = entry.value_;
+    score_ = entry.score_;
     value_flag_ = entry.value_flag_;
     best_move_ = entry.best_move_;
 
@@ -258,7 +258,7 @@ namespace Sayuri {
     key_ = entry.key_;
     depth_ = entry.depth_;
     to_move_ = entry.to_move_;
-    value_ = entry.value_;
+    score_ = entry.score_;
     value_flag_ = entry.value_flag_;
     best_move_ = entry.best_move_;
 
