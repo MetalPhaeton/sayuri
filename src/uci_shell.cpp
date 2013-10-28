@@ -163,6 +163,8 @@ namespace Sayuri {
     for (std::size_t i = 0; i < pv_line.length(); i++) {
       if (pv_line.line()[i].has_checkmated()) break;
 
+      if (!(pv_line.line()[i].move().all_)) break;
+
       std::cout << " " << TransMoveToString(pv_line.line()[i].move());
     }
     std::cout << std::endl;
