@@ -62,7 +62,7 @@ namespace Sayuri {
   // キングによる攻撃。
   const Evaluator::Weight Evaluator::WEIGHT_ATTACK_BY_KING(0.0, 2.0);
   // 相手キング周辺への攻撃
-  const Evaluator::Weight Evaluator::WEIGHT_ATTACK_AROUND_KING(1.0, 1.0);
+  const Evaluator::Weight Evaluator::WEIGHT_ATTACK_AROUND_KING(0.0, 3.0);
   // パスポーン。
   const Evaluator::Weight Evaluator::WEIGHT_PASS_PAWN(7.0, 14.0);
   // 守られたパスポーン。
@@ -82,7 +82,7 @@ namespace Sayuri {
   // ポーンの盾。
   const Evaluator::Weight Evaluator::WEIGHT_PAWN_SHIELD(40.0, 0.0);
   // キャスリング。(これの2倍が評価値。)
-  const Evaluator::Weight Evaluator::WEIGHT_CASTLING(12.5, 0.0);
+  const Evaluator::Weight Evaluator::WEIGHT_CASTLING(20.0, 0.0);
 
   /****************/
   /* static定数。 */
