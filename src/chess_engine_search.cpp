@@ -660,6 +660,13 @@ namespace Sayuri {
       if (ShouldBeStopped()) break;
     }
 
+    // 最後に情報を送る。
+    now = SysClock::now();
+    UCIShell::SendOtherInfo
+    (Chrono::duration_cast<Chrono::milliseconds>(now - start_time_),
+    searched_nodes_, table.GetUsedPermill());
+
+
     // 探索終了したけど、まだ思考を止めてはいけない場合、関数を終了しない。
     while (!ShouldBeStopped()) continue;
 
