@@ -59,6 +59,30 @@ namespace Sayuri {
   constexpr Bitboard Util::MAGIC_MASK_D[NUM_SQUARES];
   constexpr int Util::BLOCKER_MAP;
 
+  /************************/
+  /* Utilクラスの初期化。 */
+  /************************/
+  void Util::InitUtil() {
+    // num_bit16_table_[]を初期化する。
+    InitNumBit16Table();
+    // attack_table_***_[][]を初期化する。
+    InitAttackTable();
+    // pawn_move_[][]を初期化する。
+    InitPawnMove();
+    // pawn_2step_move_[][]を初期化する。
+    InitPawn2StepMove();
+    // pawn_attack_[][]を初期化する。
+    InitPawnAttack();
+    // knight_move_[]を初期化する。
+    InitKnightMove();
+    // bishop_move_[]を初期化する。
+    InitBishopMove();
+    // rook_move_[]を初期化する。
+    InitRookMove();
+    // king_move_[]を初期化する。
+    InitKingMove();
+  }
+
   /**********************************/
   /* ビットを数えるときに使うもの。 */
   /**********************************/
@@ -66,7 +90,7 @@ namespace Sayuri {
   // 引数には16ビットのパターンを入れる。
   int Util::num_bit16_table_[0xffff + 1];
   // num_bit16_table_[]を初期化する。
-  void Util::InitNumBit16Array() {
+  void Util::InitNumBit16Table() {
     for (unsigned int index = 0; index <= 0xffff; index++) {
       num_bit16_table_[index] = GetNumBits(index);
     }
@@ -87,7 +111,7 @@ namespace Sayuri {
   Bitboard Util::attack_table_90_[NUM_SQUARES][BLOCKER_MAP + 1];  // 90度。
   Bitboard Util::attack_table_135_[NUM_SQUARES][BLOCKER_MAP + 1];  // 135度。
   // attack_table_***_[][]を初期化する。
-  void Util::InitAttackArray() {
+  void Util::InitAttackTable() {
     // 0度のマップを作成。
     for (int square = 0; square < NUM_SQUARES; square++) {
       Bitboard point = BIT[square];

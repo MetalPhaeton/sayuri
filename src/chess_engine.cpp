@@ -380,6 +380,14 @@ namespace Sayuri {
   ChessEngine::~ChessEngine() {
   }
 
+  /*******************************/
+  /* ChessEngineクラスの初期化。 */
+  /*******************************/
+  void ChessEngine::InitChessEngine() {
+    // key_table_[][][]を初期化する。
+    InitKeyTable();
+  }
+
   /********************
    * パブリック関数。 *
    ********************/

@@ -40,26 +40,8 @@ namespace Sayuri {
       /************************/
       /* Utilクラスの初期化。 */
       /************************/
-      static void InitUtil() {
-        // num_bit16_table_[]を初期化する。
-        InitNumBit16Array();
-        // attack_table_***_[][]を初期化する。
-        InitAttackArray();
-        // pawn_move_[][]を初期化する。
-        InitPawnMove();
-        // pawn_2step_move_[][]を初期化する。
-        InitPawn2StepMove();
-        // pawn_attack_[][]を初期化する。
-        InitPawnAttack();
-        // knight_move_[]を初期化する。
-        InitKnightMove();
-        // bishop_move_[]を初期化する。
-        InitBishopMove();
-        // rook_move_[]を初期化する。
-        InitRookMove();
-        // king_move_[]を初期化する。
-        InitKingMove();
-      }
+      static void InitUtil();
+
       /************************/
       /* ビットボードの配列。 */
       /************************/
@@ -565,7 +547,7 @@ namespace Sayuri {
       // 引数には16ビットのパターンを入れる。
       static int num_bit16_table_[0xffff + 1];
       // num_bit16_table_[]を初期化する。
-      static void InitNumBit16Array();
+      static void InitNumBit16Table();
 
       /**************/
       /* マジック。 */
@@ -640,7 +622,7 @@ namespace Sayuri {
       // 135度。
       static Bitboard attack_table_135_[NUM_SQUARES][BLOCKER_MAP + 1];
       // attack_table_***_[][]を初期化する。
-      static void InitAttackArray();
+      static void InitAttackTable();
       // 45度座標のビットボードを通常の座標に戻す。
       // [引数]
       // bitboard45: 45度座標のビットボード。

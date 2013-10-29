@@ -41,6 +41,5 @@ namespace Sayuri {
 
   // Sayuriの後処理。
   void Postprocess() {
-    Evaluator::PostprocessEvaluator();
   }
 }  // namespace Sayuri

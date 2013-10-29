@@ -45,10 +45,7 @@ namespace Sayuri {
       /*******************************/
       /* ChessEngineクラスの初期化。 */
       /*******************************/
-      static void InitChessEngine() {
-        // key_table_[][][]を初期化する。
-        InitKeyTable();
-      }
+      static void InitChessEngine();
 
       /**************************/
       /* コンストラクタと代入。 */
