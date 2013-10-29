@@ -61,6 +61,8 @@ namespace Sayuri {
   const Evaluator::Weight Evaluator::WEIGHT_ATTACK(2.0, 2.0);
   // キングによる攻撃。
   const Evaluator::Weight Evaluator::WEIGHT_ATTACK_BY_KING(0.0, 2.0);
+  // 相手キング周辺への攻撃
+  const Evaluator::Weight Evaluator::WEIGHT_ATTACK_AROUND_KING(1.0, 1.0);
   // パスポーン。
   const Evaluator::Weight Evaluator::WEIGHT_PASS_PAWN(7.0, 14.0);
   // 守られたパスポーン。
@@ -193,6 +195,7 @@ namespace Sayuri {
     rook_open_value_ = 0.0;
     early_queen_launched_value_ = 0.0;
     pawn_shield_value_ = 0.0;
+    attack_around_king_value_ = 0.0;
     castling_value_ = 0.0;
 
     // サイド。
@@ -296,6 +299,9 @@ namespace Sayuri {
     // キングによる攻撃。
     score += WEIGHT_ATTACK_BY_KING.GetScore
     (num_pieces, attack_value_[KING]);
+    // 相手キング周辺への攻撃。
+    score += WEIGHT_ATTACK_AROUND_KING.GetScore
+    (num_pieces, attack_around_king_value_);
     // パスポーン。
     score += WEIGHT_PASS_PAWN.GetScore
     (num_pieces, pass_pawn_value_);
@@ -455,6 +461,32 @@ namespace Sayuri {
         break;
     }
 
+    // 駒の配置を計算。
+    if (piece_side == WHITE) {
+      value = POSITION_TABLE[Type][piece_square];
+    } else {
+      value = POSITION_TABLE[Type][FLIP[piece_square]];
+    }
+    position_value_[Type] += sign * value;
+    // ポーンの終盤の配置。
+    if (Type == PAWN) {
+      if (piece_side == WHITE) {
+        value = PAWN_POSITION_ENDING_TABLE[piece_square];
+      } else {
+        value = PAWN_POSITION_ENDING_TABLE[FLIP[piece_square]];
+      }
+      pawn_position_ending_value_ += sign * value;
+    }
+    // キングの終盤の配置。
+    if (Type == KING) {
+      if (piece_side == WHITE) {
+        value = KING_POSITION_ENDING_TABLE[piece_square];
+      } else {
+        value = KING_POSITION_ENDING_TABLE[FLIP[piece_square]];
+      }
+      king_position_ending_value_ += sign * value;
+    }
+
     // 駒の動きやすさを計算。
     if (Type == PAWN) {
       value = static_cast<double>(Util::CountBits(pawn_moves
@@ -499,30 +531,11 @@ namespace Sayuri {
     }
     attack_value_[Type] += sign * value;
 
-    // 駒の配置を計算。
-    if (piece_side == WHITE) {
-      value = POSITION_TABLE[Type][piece_square];
-    } else {
-      value = POSITION_TABLE[Type][FLIP[piece_square]];
-    }
-    position_value_[Type] += sign * value;
-    // ポーンの終盤の配置。
-    if (Type == PAWN) {
-      if (piece_side == WHITE) {
-        value = PAWN_POSITION_ENDING_TABLE[piece_square];
-      } else {
-        value = PAWN_POSITION_ENDING_TABLE[FLIP[piece_square]];
-      }
-      pawn_position_ending_value_ += sign * value;
-    }
-    // キングの終盤の配置。
-    if (Type == KING) {
-      if (piece_side == WHITE) {
-        value = KING_POSITION_ENDING_TABLE[piece_square];
-      } else {
-        value = KING_POSITION_ENDING_TABLE[FLIP[piece_square]];
-      }
-      king_position_ending_value_ += sign * value;
+    // 相手キング周辺への攻撃を計算。
+    if (Type != KING) {
+      value = static_cast<double>(Util::CountBits(attacks
+      & Util::GetKingMove(engine_ptr_->king()[enemy_piece_side])));
+      attack_around_king_value_ += sign * value;
     }
 
     // ポーンの構成を計算。

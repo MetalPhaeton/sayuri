@@ -129,6 +129,8 @@ namespace Sayuri {
       static const Weight WEIGHT_ATTACK;
       // キングによる攻撃。
       static const Weight WEIGHT_ATTACK_BY_KING;
+      // 相手キング周辺への攻撃。
+      static const Weight WEIGHT_ATTACK_AROUND_KING;
       // パスポーン。
       static const Weight WEIGHT_PASS_PAWN;
       // 守られたパスポーン。
@@ -335,6 +337,7 @@ namespace Sayuri {
       double sweet_center_control_value_;  // スウィートセンターのコントロール。
       double development_value_;  // 駒の展開。
       double attack_value_[NUM_PIECE_TYPES];  // 攻撃。
+      double attack_around_king_value_;  // 相手キング周辺への攻撃。
       double pass_pawn_value_;  // パスポーン。
       double protected_pass_pawn_value_;  // 守られたパスポーン。
       double double_pawn_value_;  // ダブルポーン。
