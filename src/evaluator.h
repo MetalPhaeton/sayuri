@@ -139,6 +139,10 @@ namespace Sayuri {
       static const Weight WEIGHT_ISO_PAWN;
       // ビショップペア。
       static const Weight WEIGHT_BISHOP_PAIR;
+      // セミオープンファイルのルーク。
+      static const Weight WEIGHT_ROOK_SEMI_OPEN;
+      // オープンファイルのルーク。
+      static const Weight WEIGHT_ROOK_OPEN;
       // 早すぎるクイーンの始動。
       static const Weight WEIGHT_EARLY_QUEEN_LAUNCHED;
       // ポーンの盾。
@@ -336,6 +340,8 @@ namespace Sayuri {
       double double_pawn_value_;  // ダブルポーン。
       double iso_pawn_value_;  // 孤立ポーン。
       double bishop_pair_value_;  // ビショップペア。
+      double rook_semi_open_value_;  // セミオープンファイルのルーク。
+      double rook_open_value_;  // オープンファイルのルーク。
       double early_queen_launched_value_;  // 早すぎるクイーンの始動。
       double pawn_shield_value_;  // ポーンの盾。
       double castling_value_;  // キャスリング。

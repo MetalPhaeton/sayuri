@@ -71,6 +71,10 @@ namespace Sayuri {
   const Evaluator::Weight Evaluator::WEIGHT_ISO_PAWN(-5.0, -2.5);
   // ビショップペア。
   const Evaluator::Weight Evaluator::WEIGHT_BISHOP_PAIR(30.0, 50.0);
+  // セミオープンファイルのルーク。
+  const Evaluator::Weight Evaluator::WEIGHT_ROOK_SEMI_OPEN(3.5, 3.5);
+  // オープンファイルのルーク。
+  const Evaluator::Weight Evaluator::WEIGHT_ROOK_OPEN(3.5, 3.5);
   // 早すぎるクイーンの始動。
   const Evaluator::Weight Evaluator::WEIGHT_EARLY_QUEEN_LAUNCHED(-4.0, 0.0);
   // ポーンの盾。
@@ -185,6 +189,8 @@ namespace Sayuri {
     double_pawn_value_ = 0.0;
     iso_pawn_value_ = 0.0;
     bishop_pair_value_ = 0.0;
+    rook_semi_open_value_ = 0.0;
+    rook_open_value_ = 0.0;
     early_queen_launched_value_ = 0.0;
     pawn_shield_value_ = 0.0;
     castling_value_ = 0.0;
@@ -209,7 +215,6 @@ namespace Sayuri {
 
     // 各駒毎に価値を計算する。
     Bitboard pieces = engine_ptr_->blocker_0();
-    Bitboard pieces_2 = pieces;
     for (; pieces; pieces &= pieces - 1) {
       Square piece_square = Util::GetSquare(pieces);
       Side piece_side = engine_ptr_->side_board()[piece_square];
@@ -239,11 +244,12 @@ namespace Sayuri {
     }
 
     // ウェイトを付けて評価値を得る。
-    const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES] =
-    engine_ptr_->position();
-    double num_pieces = static_cast<double>(Util::CountBits((pieces_2)
-    & ~(position[WHITE][PAWN] | position[BLACK][PAWN]
-    | position[WHITE][KING] | position[BLACK][KING])));
+    double num_pieces = static_cast<double>
+    (Util::CountBits((engine_ptr_->blocker_0())
+    & ~(engine_ptr_->position()[WHITE][PAWN]
+    | engine_ptr_->position()[BLACK][PAWN]
+    | engine_ptr_->position()[WHITE][KING]
+    | engine_ptr_->position()[BLACK][KING])));
     // マテリアル。
     double score = static_cast<double>(engine_ptr_->GetMaterial(side));
     // ポーンの配置。
@@ -305,6 +311,12 @@ namespace Sayuri {
     // ビショップペア。
     score += WEIGHT_BISHOP_PAIR.GetScore
     (num_pieces, bishop_pair_value_);
+    // セミオープンファイルのルーク。
+    score += WEIGHT_ROOK_SEMI_OPEN.GetScore
+    (num_pieces, rook_semi_open_value_);
+    // オープンファイルのルーク。
+    score += WEIGHT_ROOK_OPEN.GetScore
+    (num_pieces, rook_open_value_);
     // 早すぎるクイーンの始動。
     score += WEIGHT_EARLY_QUEEN_LAUNCHED.GetScore
     (num_pieces, early_queen_launched_value_);
@@ -516,36 +528,41 @@ namespace Sayuri {
     // ポーンの構成を計算。
     if (Type == PAWN) {
       // パスポーンを計算。
-      value = 0.0;
-      double value_2 = 0.0;
       if (!(engine_ptr_->position()[enemy_piece_side][PAWN]
       & pass_pawn_mask_[piece_side][piece_square])) {
-        value += 1.0;
+        pass_pawn_value_ += sign * 1.0;
         // 守られたパスポーン。
         if (engine_ptr_->position()[piece_side][PAWN]
         & Util::GetPawnAttack(piece_square, enemy_piece_side)) {
-          value_2 += 1.0;
+          protected_pass_pawn_value_ += sign * 1.0;
         }
       }
-      pass_pawn_value_ += sign * value;
-      protected_pass_pawn_value_ += sign * value_2;
 
       // ダブルポーンを計算。
       int fyle = Util::GetFyle(piece_square);
-      value = 0.0;
       if (Util::CountBits(engine_ptr_->position()[piece_side][PAWN]
       & Util::FYLE[fyle]) >= 2) {
-        value += 1.0;
+        double_pawn_value_ += sign * 1.0;
       }
-      double_pawn_value_ += sign * value;
 
       // 孤立ポーンを計算。
-      value = 0.0;
       if (!(engine_ptr_->position()[piece_side][PAWN]
       & iso_pawn_mask_[piece_square])) {
-        value += 1.0;
+        iso_pawn_value_ += sign * 1.0;
       }
-      iso_pawn_value_ += sign * value;
+    }
+
+    // セミオープン、オープンファイルのルークを計算。
+    if (Type == ROOK) {
+      // セミオープン。
+      if (!(engine_ptr_->position()[piece_side][PAWN]
+      & Util::FYLE[Util::GetFyle(piece_square)])) {
+        rook_semi_open_value_ += sign * 1.0;
+        if (!(engine_ptr_->position()[enemy_piece_side][PAWN]
+        & Util::FYLE[Util::GetFyle(piece_square)])) {
+          rook_open_value_ += sign * 1.0;
+        }
+      }
     }
 
     // クイーンの早過ぎる始動を計算。
