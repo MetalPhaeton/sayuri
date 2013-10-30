@@ -395,12 +395,20 @@ namespace Sayuri {
       /**********************/
       /* ハッシュキー関連。 */
       /**********************/
-      // ハッシュキーを得るための配列。
-      // key_table_[サイド][駒の種類][駒の位置]
-      // それぞれのインデックスに値を入れると、
-      // そのハッシュキーを得られる。
-      static HashKey key_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
-      // key_table_[][][]を初期化する。
+      // 駒の情報からハッシュキーを得るための配列。
+      // piece_key_table_[サイド][駒の種類][駒の位置]
+      static HashKey piece_key_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
+      // 手番からハッシュキーを得るための配列。
+      static HashKey to_move_key_table_[NUM_SIDES];
+      // キャスリングの権利からハッシュキーを得るための配列。
+      // 0: 白のショートキャスリング。
+      // 1: 白のロングキャスリング。
+      // 2: 黒のショートキャスリング。
+      // 3: 黒のロングキャスリング。
+      static HashKey castling_key_table_[4];
+      // アンパッサンの位置からハッシュキーを得るための配列。
+      static HashKey en_passant_key_table_[NUM_SQUARES];
+      // ハッシュキーの配列を初期化する。
       static void InitKeyTable();
   };
 }  // namespace Sayuri
