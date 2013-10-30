@@ -50,17 +50,17 @@ namespace Sayuri {
   // 終盤のキングの配置。
   const Evaluator::Weight Evaluator::WEIGHT_KING_POSITION_ENDING(0.0, 5.0);
   // 機動力。
-  const Evaluator::Weight Evaluator::WEIGHT_MOBILITY(2.0, 2.0);
+  const Evaluator::Weight Evaluator::WEIGHT_MOBILITY(1.0, 1.0);
   // センターコントロール。
-  const Evaluator::Weight Evaluator::WEIGHT_CENTER_CONTROL(1.0, 1.0);
+  const Evaluator::Weight Evaluator::WEIGHT_CENTER_CONTROL(0.5, 0.0);
   // スウィートセンターのコントロール。
-  const Evaluator::Weight Evaluator::WEIGHT_SWEET_CENTER_CONTROL(1.0, 1.0);
+  const Evaluator::Weight Evaluator::WEIGHT_SWEET_CENTER_CONTROL(0.5, 0.0);
   // 駒の展開。
   const Evaluator::Weight Evaluator::WEIGHT_DEVELOPMENT(2.5, 0.0);
   // 攻撃。
-  const Evaluator::Weight Evaluator::WEIGHT_ATTACK(2.0, 2.0);
+  const Evaluator::Weight Evaluator::WEIGHT_ATTACK(0.0, 0.0);
   // キングによる攻撃。
-  const Evaluator::Weight Evaluator::WEIGHT_ATTACK_BY_KING(0.0, 2.0);
+  const Evaluator::Weight Evaluator::WEIGHT_ATTACK_BY_KING(1.0, 0.0);
   // 相手キング周辺への攻撃
   const Evaluator::Weight Evaluator::WEIGHT_ATTACK_AROUND_KING(0.0, 3.0);
   // パスポーン。
@@ -73,6 +73,9 @@ namespace Sayuri {
   const Evaluator::Weight Evaluator::WEIGHT_ISO_PAWN(-5.0, -2.5);
   // ビショップペア。
   const Evaluator::Weight Evaluator::WEIGHT_BISHOP_PAIR(30.0, 50.0);
+  // ビショップにピンされたナイト。
+  const Evaluator::Weight
+  Evaluator::WEIGHT_PINED_KNIGHT_BY_BISHOP(-10.0, -10.0);
   // セミオープンファイルのルーク。
   const Evaluator::Weight Evaluator::WEIGHT_ROOK_SEMI_OPEN(3.5, 3.5);
   // オープンファイルのルーク。
@@ -191,6 +194,7 @@ namespace Sayuri {
     double_pawn_value_ = 0.0;
     iso_pawn_value_ = 0.0;
     bishop_pair_value_ = 0.0;
+    pined_knight_by_bishop_value_ = 0.0;
     rook_semi_open_value_ = 0.0;
     rook_open_value_ = 0.0;
     early_queen_launched_value_ = 0.0;
@@ -317,6 +321,9 @@ namespace Sayuri {
     // ビショップペア。
     score += WEIGHT_BISHOP_PAIR.GetScore
     (num_pieces, bishop_pair_value_);
+    // ビショップにピンされたナイト。
+    score += WEIGHT_PINED_KNIGHT_BY_BISHOP.GetScore
+    (num_pieces, pined_knight_by_bishop_value_);
     // セミオープンファイルのルーク。
     score += WEIGHT_ROOK_SEMI_OPEN.GetScore
     (num_pieces, rook_semi_open_value_);
@@ -563,6 +570,38 @@ namespace Sayuri {
       & iso_pawn_mask_[piece_square])) {
         iso_pawn_value_ += sign * 1.0;
       }
+    }
+
+    // ビショップにピンされたナイトを計算。
+    if (Type == KNIGHT) {
+      value = 0.0;
+      // 敵のビショップのビットボード。
+      Bitboard enemy_bishop = engine_ptr_->GetBishopAttack(piece_square)
+      & engine_ptr_->position()[enemy_piece_side][BISHOP];
+      // 味方のクイーンのビットボード。
+      Bitboard friend_queen = engine_ptr_->position()[piece_side][QUEEN];
+      // ビショップを一つ一つ探す。
+      for (; enemy_bishop; enemy_bishop &= enemy_bishop - 1) {
+        Square bishop_square = Util::GetSquare(enemy_bishop);
+        // 絶対ピン。
+        Bitboard line =
+        Util::GetLine(bishop_square, engine_ptr_->king()[piece_side]);
+        if ((Util::BIT[piece_square] & line)
+        && (Util::CountBits(engine_ptr_->blocker_0() & line) == 3)) {
+          value += 1.0;
+        }
+        // クイーンにピン。
+        // クイーンを一つ一つ探す。
+        Bitboard temp = friend_queen;
+        for (; temp; temp &= temp -1) {
+          line = Util::GetLine(bishop_square, Util::GetSquare(temp));
+          if ((Util::BIT[piece_square] & line)
+          && (Util::CountBits(engine_ptr_->blocker_0() & line) == 3)) {
+            value += 1.0;
+          }
+        }
+      }
+      pined_knight_by_bishop_value_ += sign * value;
     }
 
     // セミオープン、オープンファイルのルークを計算。

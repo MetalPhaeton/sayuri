@@ -39,7 +39,7 @@ namespace Sayuri {
   /* トランスポジションテーブルのクラス。 */
   /****************************************/
   // static定数。
-  constexpr HashKey TranspositionTable::TABLE_KEY_MASK;
+  constexpr Hash TranspositionTable::TABLE_KEY_MASK;
   constexpr std::size_t TranspositionTable::TABLE_SIZE;
 
   // コンストラクタ。
@@ -88,14 +88,14 @@ namespace Sayuri {
   }
 
   // テーブルに追加する。
-  void TranspositionTable::Add(HashKey pos_key, int depth,
+  void TranspositionTable::Add(Hash pos_hash, int depth,
   int score, ScoreType score_type, Move best_move) {
     // テーブルのインデックスを得る。
-    int index = GetTableIndex(pos_key);
+    int index = GetTableIndex(pos_hash);
 
     // 最後のエントリーのdepthを比べ、追加する側が大きければ追加。
     if (depth > entry_table_[index].back().depth()) {
-      entry_table_[index].back() = TTEntry(pos_key, depth, score,
+      entry_table_[index].back() = TTEntry(pos_hash, depth, score,
       score_type, best_move);
 
       // ソート。
@@ -105,16 +105,16 @@ namespace Sayuri {
   }
 
   // 該当するTTEntryを返す。
-  TTEntry* TranspositionTable::GetFulfiledEntry(HashKey pos_key,
+  TTEntry* TranspositionTable::GetFulfiledEntry(Hash pos_hash,
   int depth) const {
     // テーブルのインデックスを得る。
-    int index = GetTableIndex(pos_key);
+    int index = GetTableIndex(pos_hash);
 
     TTEntry* entry_ptr = nullptr;
     for (auto& entry : entry_table_[index]) {
       if (!(entry.exists())) return nullptr;  // エントリーがない。
 
-      if (entry.Fulfil(pos_key, depth)) {
+      if (entry.Fulfil(pos_hash, depth)) {
         entry_ptr = &entry;  // エントリーが見つかった。
         break;
       }
@@ -196,10 +196,10 @@ namespace Sayuri {
   /* エントリーのクラス。 */
   /************************/
   // コンストラクタ。
-  TTEntry::TTEntry(HashKey key, int depth, int score,
+  TTEntry::TTEntry(Hash hash, int depth, int score,
   ScoreType score_type, Move best_move) :
   exists_(true),
-  key_(key),
+  hash_(hash),
   depth_(depth),
   score_(score),
   score_type_(score_type),
@@ -209,7 +209,7 @@ namespace Sayuri {
   // デフォルトコンストラクタ。
   TTEntry::TTEntry() :
   exists_(false),
-  key_(0ULL),
+  hash_(0ULL),
   depth_(-MAX_VALUE),
   score_(0),
   score_type_(ScoreType::ALPHA) {
@@ -218,7 +218,7 @@ namespace Sayuri {
   // コピーコンストラクタ。
   TTEntry::TTEntry(const TTEntry& entry) :
   exists_(entry.exists_),
-  key_(entry.key_),
+  hash_(entry.hash_),
   depth_(entry.depth_),
   score_(entry.score_),
   score_type_(entry.score_type_),
@@ -228,7 +228,7 @@ namespace Sayuri {
   // ムーブコンストラクタ。
   TTEntry::TTEntry(TTEntry&& entry) :
   exists_(entry.exists_),
-  key_(entry.key_),
+  hash_(entry.hash_),
   depth_(entry.depth_),
   score_(entry.score_),
   score_type_(entry.score_type_),
@@ -238,7 +238,7 @@ namespace Sayuri {
   // コピー代入。
   TTEntry& TTEntry::operator=(const TTEntry& entry) {
     exists_ = entry.exists_;
-    key_ = entry.key_;
+    hash_ = entry.hash_;
     depth_ = entry.depth_;
     score_ = entry.score_;
     score_type_ = entry.score_type_;
@@ -250,7 +250,7 @@ namespace Sayuri {
   // ムーブ代入。
   TTEntry& TTEntry::operator=(TTEntry&& entry) {
     exists_ = entry.exists_;
-    key_ = entry.key_;
+    hash_ = entry.hash_;
     depth_ = entry.depth_;
     score_ = entry.score_;
     score_type_ = entry.score_type_;
@@ -260,10 +260,10 @@ namespace Sayuri {
   }
 
   // 該当するならtrue。
-  bool TTEntry::Fulfil(HashKey key, int depth) const {
+  bool TTEntry::Fulfil(Hash hash, int depth) const {
     if (!exists_) return false;
     if (depth > depth_) return false;
-    if (key != key_) return false;
+    if (hash != hash_) return false;
     return true;
   }
 

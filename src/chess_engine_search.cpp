@@ -130,7 +130,7 @@ namespace Sayuri {
 
   // 探索する。
   template<NodeType Type>
-  int ChessEngine::Search(HashKey pos_key, int depth, int level,
+  int ChessEngine::Search(Hash pos_hash, int depth, int level,
   int alpha, int beta, TranspositionTable& table, PVLine& pv_line) {
     // 探索中止の時。
     if (ShouldBeStopped()) return alpha;
@@ -143,6 +143,24 @@ namespace Sayuri {
       searched_level_ = level;
     }
 
+    // NOTE: 3回繰り返しをチェックすると、アホな手を指し始めるので、保留。
+    /*
+    // 3回繰り返しをチェックする。
+    int count = 0;
+    for (Hash* ptr = position_stack_begin_;
+    ptr < position_stack_ptr_; ptr++) {
+      if (*position_stack_ptr_ == pos_hash) {
+        count++;
+      }
+    }
+    if (count >= 3) {
+      int score = SCORE_DRAW;
+      if (score <= alpha) return alpha;
+      if (score >= beta) return beta;
+      return score;
+    }
+    */
+
     // サイドとチェックされているか。
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
@@ -150,7 +168,7 @@ namespace Sayuri {
 
     // トランスポジションテーブルを調べる。
     TTEntry* entry_ptr =
-    table.GetFulfiledEntry(pos_key, depth);
+    table.GetFulfiledEntry(pos_hash, depth);
     if (entry_ptr) {
       int score = entry_ptr->score();
       if (entry_ptr->score_type() == ScoreType::EXACT) {
@@ -196,7 +214,7 @@ namespace Sayuri {
     }
 
     // 前回の繰り返しの最善手を得る。
-    TTEntry* prev_entry = table.GetFulfiledEntry(pos_key, depth - 1);
+    TTEntry* prev_entry = table.GetFulfiledEntry(pos_hash, depth - 1);
     Move prev_best;
     if (prev_entry && (prev_entry->score_type() != ScoreType::ALPHA)) {
       prev_best = prev_entry->best_move();
@@ -211,8 +229,9 @@ namespace Sayuri {
         if (depth >= 5) {
           // Internal Iterative Deepening。
           PVLine temp_line;
-          Search<NodeType::PV> (pos_key, depth - 3, level, alpha, beta,
-          table, temp_line);
+          int reduction = 2;
+          Search<NodeType::PV>(pos_hash, depth - reduction - 1, level,
+          alpha, beta, table, temp_line);
 
           iid_stack_[level] = temp_line.line()[0].move();
         }
@@ -227,16 +246,16 @@ namespace Sayuri {
         MakeMove(null_move);
 
         // Null Move Search。
-        int reduction = (depth / 2) + 1;
+        int reduction = depth / 2;
         PVLine temp_line;
-        int score = -Search<NodeType::NON_PV>(pos_key, depth - reduction - 1,
+        int score = -Search<NodeType::NON_PV>(pos_hash, depth - reduction - 1,
         level + 1, -(beta), -(beta - 1), table, temp_line);
 
         UnmakeMove(null_move);
         is_null_searching_ = false;
 
         if (score >= beta) {
-          depth -= 4;
+          depth -= reduction;
           if (depth <= 0) {
             // クイース探索ノードに移行するため、ノード数を減らしておく。
             searched_nodes_--;
@@ -268,8 +287,8 @@ namespace Sayuri {
     int num_searched_moves = 0;
     bool has_legal_move = false;
     for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
-      // 次のハッシュキー。
-      HashKey next_key = GetNextKey(pos_key, move);
+      // 次のハッシュ。
+      Hash next_hash = GetNextHash(pos_hash, move);
 
       // マージン。
       int margin;
@@ -277,11 +296,14 @@ namespace Sayuri {
         margin = GetMargin(move, depth);
       }
 
+      *position_stack_ptr_ = next_hash;
+      position_stack_ptr_++;
       MakeMove(move);
 
       // 合法手じゃなければ次の手へ。
       if (IsAttacked(king_[side], enemy_side)) {
         UnmakeMove(move);
+        position_stack_ptr_--;
         continue;
       }
 
@@ -292,6 +314,7 @@ namespace Sayuri {
       if (do_futility_pruning) {
         if ((material + margin) <= alpha) {
           UnmakeMove(move);
+          position_stack_ptr_--;
           continue;
         }
       }
@@ -301,7 +324,7 @@ namespace Sayuri {
       int score;
       PVLine next_line;
       if ((depth >= 3) && (num_searched_moves >= 4)) {
-        int reduction = depth / 3;
+        int reduction = depth / 2;
         if (!is_checked && (Type == NodeType::NON_PV)) {
           // History Puruning。
           if (!move.captured_piece_
@@ -309,7 +332,7 @@ namespace Sayuri {
             reduction++;
           }
         }
-        score = -Search<NodeType::NON_PV>(next_key, depth - reduction - 1,
+        score = -Search<NodeType::NON_PV>(next_hash, depth - reduction - 1,
         level + 1, -(alpha + 1), -alpha, table, next_line);
       } else {
         // PVSearchをするためにalphaより大きくしておく。
@@ -319,17 +342,17 @@ namespace Sayuri {
         // PVSearch。
         if (is_searching_pv || (Type == NodeType::NON_PV)) {
           // フルウィンドウで探索。
-          score = -Search<Type>(next_key, depth - 1, level + 1,
+          score = -Search<Type>(next_hash, depth - 1, level + 1,
           -beta, -alpha, table, next_line);
         } else {
           // PV発見後のPVノード。
           // ゼロウィンドウ探索。
-          score = -Search<NodeType::NON_PV>(next_key, depth - 1, level + 1,
+          score = -Search<NodeType::NON_PV>(next_hash, depth - 1, level + 1,
           -(alpha + 1), -alpha, table, next_line);
           if (score > alpha) {
             // fail lowならず。
             // フルウィンドウで再探索。
-            score = -Search<NodeType::PV>(next_key, depth - 1, level + 1,
+            score = -Search<NodeType::PV>(next_hash, depth - 1, level + 1,
             -beta, -alpha, table, next_line);
           }
         }
@@ -337,6 +360,7 @@ namespace Sayuri {
 
 
       UnmakeMove(move);
+      position_stack_ptr_--;
       num_searched_moves++;
 
       // ベータ値を調べる。
@@ -396,21 +420,23 @@ namespace Sayuri {
     }
 
     // トランスポジションテーブルに登録。
-    if (!entry_ptr) {
-      table.Add(pos_key, depth, alpha, score_type,
-      pv_line.line()[0].move());
-    } else if (entry_ptr->depth() == depth) {
-      entry_ptr->Update(alpha, score_type, pv_line.line()[0].move());
+    if (!is_null_searching_) {
+      if (!entry_ptr) {
+        table.Add(pos_hash, depth, alpha, score_type,
+        pv_line.line()[0].move());
+      } else if (entry_ptr->depth() == depth) {
+        entry_ptr->Update(alpha, score_type, pv_line.line()[0].move());
+      }
     }
 
     // 探索結果を返す。
     return alpha;
   }
   // 実体化。
-  template int ChessEngine::Search<NodeType::PV>(HashKey pos_key,
+  template int ChessEngine::Search<NodeType::PV>(Hash pos_hash,
   int depth, int level, int alpha, int beta,
   TranspositionTable& table, PVLine& pv_line);
-  template int ChessEngine::Search<NodeType::NON_PV>(HashKey pos_key,
+  template int ChessEngine::Search<NodeType::NON_PV>(Hash pos_hash,
   int depth, int level, int alpha, int beta,
   TranspositionTable& table, PVLine& pv_line);
 
@@ -422,10 +448,6 @@ namespace Sayuri {
     searched_level_ = 0;
     is_null_searching_ = false;
     start_time_ = SysClock::now();
-    for (int i = 0; i < MAX_PLYS; i++) {
-      iid_stack_[i] = Move();
-      killer_stack_[i] = Move();
-    }
     for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
         for (int k = 0; k < NUM_SQUARES; k++) {
@@ -433,12 +455,16 @@ namespace Sayuri {
         }
       }
     }
+    for (int i = 0; i < MAX_PLYS; i++) {
+      iid_stack_[i] = Move();
+      killer_stack_[i] = Move();
+    }
     history_max_ = 1;
     stopper_.stop_now_ = false;
 
     // Iterative Deepening。
-    HashKey pos_key = GetCurrentKey();
     int level = 0;
+    Hash pos_hash = GetCurrentHash();
     int alpha = -MAX_VALUE;
     int beta = MAX_VALUE;
     Side side = to_move_;
@@ -474,7 +500,7 @@ namespace Sayuri {
 
       // 前回の繰り返しの最善手を得る。
       TTEntry* prev_entry =
-      table.GetFulfiledEntry(pos_key, i_depth_ - 1);
+      table.GetFulfiledEntry(pos_hash, i_depth_ - 1);
       Move prev_best;
       if (prev_entry && (prev_entry->score_type() != ScoreType::ALPHA)) {
         prev_best = prev_entry->best_move();
@@ -502,14 +528,17 @@ namespace Sayuri {
         // 探索したレベルをリセット。
         searched_level_ = 0;
 
-        // 次のハッシュキー。
-        HashKey next_key = GetNextKey(pos_key, move);
+        // 次のハッシュ。
+        Hash next_hash = GetNextHash(pos_hash, move);
 
+        *position_stack_ptr_ = next_hash;
+        position_stack_ptr_++;
         MakeMove(move);
 
         // 合法手じゃなければ次の手へ。
         if (IsAttacked(king_[side], enemy_side)) {
           UnmakeMove(move);
+          position_stack_ptr_--;
           continue;
         }
 
@@ -527,6 +556,7 @@ namespace Sayuri {
             // 探索すべき手ではなかった。
             // 次の手へ。
             UnmakeMove(move);
+            position_stack_ptr_--;
             continue;
           }
         }
@@ -559,7 +589,7 @@ namespace Sayuri {
 
             // フルでPVを探索。
             score = -Search<NodeType::PV>
-            (next_key, i_depth_ - 1, level + 1, -beta, -alpha,
+            (next_hash, i_depth_ - 1, level + 1, -beta, -alpha,
             table, next_line);
             // アルファ値、ベータ値を調べる。
             if (score >= beta) {
@@ -582,9 +612,9 @@ namespace Sayuri {
           // PV発見後。
           // Late move Reduction。
           if ((i_depth_ >= 3) && (num_searched_moves >= 4)) {
-            int reduction = i_depth_ / 3;
+            int reduction = i_depth_ / 2;
             // ゼロウィンドウ探索。
-            score = -Search<NodeType::NON_PV>(next_key,
+            score = -Search<NodeType::NON_PV>(next_hash,
             i_depth_ - reduction - 1, level + 1, -(alpha + 1),
             -alpha, table, next_line);
           } else {
@@ -595,7 +625,7 @@ namespace Sayuri {
           // 普通の探索。
           if (score > alpha) {
             // ゼロウィンドウ探索。
-            score = -Search<NodeType::NON_PV>(next_key, i_depth_ - 1,
+            score = -Search<NodeType::NON_PV>(next_hash, i_depth_ - 1,
             level + 1, -(alpha + 1), -alpha, table, next_line);
             if (score > alpha) {
               while (true) {
@@ -603,7 +633,7 @@ namespace Sayuri {
                 if (ShouldBeStopped()) break;
 
                 // フルウィンドウで再探索。
-                score = -Search<NodeType::PV>(next_key, i_depth_ - 1,
+                score = -Search<NodeType::PV>(next_hash, i_depth_ - 1,
                 level + 1, -beta, -alpha, table, next_line);
                 // アルファ値、ベータ値を調べる。
                 if (score >= beta) {
@@ -621,6 +651,7 @@ namespace Sayuri {
         }
 
         UnmakeMove(move);
+        position_stack_ptr_--;
         num_searched_moves++;
 
         // ストップがかかっていたらループを抜ける。
@@ -637,9 +668,9 @@ namespace Sayuri {
 
           // トランスポジションテーブルに登録。
           if (!entry_ptr) {
-            table.Add(pos_key, i_depth_, score, ScoreType::EXACT, move);
+            table.Add(pos_hash, i_depth_, score, ScoreType::EXACT, move);
 
-            entry_ptr = table.GetFulfiledEntry(pos_key, i_depth_);
+            entry_ptr = table.GetFulfiledEntry(pos_hash, i_depth_);
           } else {
             entry_ptr->Update(score, ScoreType::EXACT, move);
           }

@@ -43,16 +43,16 @@ namespace Sayuri {
   /****************/
   /* static変数。 */
   /****************/
-  // 駒の情報からハッシュキーを得るための配列。
-  // piece_key_table_[サイド][駒の種類][駒の位置]
-  HashKey ChessEngine::piece_key_table_
+  // 駒の情報からハッシュを得るための配列。
+  // piece_hash_table_[サイド][駒の種類][駒の位置]
+  Hash ChessEngine::piece_hash_table_
   [NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
-  // 手番からハッシュキーを得るための配列。
-  HashKey ChessEngine::to_move_key_table_[NUM_SIDES];
-  // キャスリングの権利からハッシュキーを得るための配列。
-  HashKey ChessEngine::castling_key_table_[4];
-  // アンパッサンの位置からハッシュキーを得るための配列。
-  HashKey ChessEngine::en_passant_key_table_[NUM_SQUARES];
+  // 手番からハッシュを得るための配列。
+  Hash ChessEngine::to_move_hash_table_[NUM_SIDES];
+  // キャスリングの権利からハッシュを得るための配列。
+  Hash ChessEngine::castling_hash_table_[4];
+  // アンパッサンの位置からハッシュを得るための配列。
+  Hash ChessEngine::en_passant_hash_table_[NUM_SQUARES];
 
   /**************************/
   /* コンストラクタと代入。 */
@@ -64,78 +64,8 @@ namespace Sayuri {
 
   // コピーコンストラクタ。
   ChessEngine::ChessEngine(const ChessEngine& engine) {
-    // 駒の配置をコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
-        position_[i][j] = engine.position_[i][j];
-      }
-    }
-
-    // 駒の種類の配置のコピー。
-    for (int i = 0; i < NUM_SQUARES; i++) {
-      piece_board_[i] = engine.piece_board_[i];
-    }
-
-    // サイドの配置のコピー。
-    for (int i = 0; i < NUM_SQUARES; i++) {
-      side_board_[i] = engine.side_board_[i];
-    }
-
-    // 各サイドの駒の配置のコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      side_pieces_[i] = engine.side_pieces_[i];
-    }
-
-    // ブロッカーのコピー。
-    blocker_0_ = engine.blocker_0_;
-    blocker_45_ = engine.blocker_45_;
-    blocker_90_ = engine.blocker_90_;
-    blocker_135_ = engine.blocker_135_;
-
-    // キングの位置のコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      king_[i] = engine.king_[i];
-    }
-
-    // 手番のコピー。
-    to_move_ = engine.to_move_;
-
-    // キャスリングの権利のコピー。
-    castling_rights_ = engine.castling_rights_;
-
-    // アンパッサンのコピー。
-    en_passant_square_ = engine.en_passant_square_;
-    can_en_passant_ = engine.can_en_passant_;
-
-    // 50手ルールの手数のコピー。
-    ply_100_ = engine.ply_100_;
-
-    // 手数のコピー。
-    ply_ = engine.ply_;
-
-    // キャスリングしたかどうかのコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      has_castled_[i] = engine.has_castled_[i];
-    }
-
-    // ヒストリーのコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_SQUARES; j++) {
-        for (int k = 0; k < NUM_SQUARES; k++) {
-          history_[i][j][k] = engine.history_[i][j][k];
-        }
-      }
-    }
-
-    // iid_stack_のコピー。
-    for (int i = 0; i < MAX_PLYS; i++) {
-      iid_stack_[i] = engine.iid_stack_[i];
-    }
-
-    // killer_stack_のコピー。
-    for (int i = 0; i < MAX_PLYS; i++) {
-      killer_stack_[i] = engine.killer_stack_[i];
-    }
+    // メンバをコピー。
+    ScanMember(engine);
 
     // 指し手の履歴をコピー。
     move_history_ = engine.move_history_;
@@ -146,77 +76,8 @@ namespace Sayuri {
 
   // ムーブコンストラクタ。
   ChessEngine::ChessEngine(ChessEngine&& engine) {
-    // 駒の配置をコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
-        position_[i][j] = engine.position_[i][j];
-      }
-    }
-
-    // 駒の種類の配置のコピー。
-    for (int i = 0; i < NUM_SQUARES; i++) {
-      piece_board_[i] = engine.piece_board_[i];
-    }
-
-    // サイドの配置のコピー。
-    for (int i = 0; i < NUM_SQUARES; i++) {
-      side_board_[i] = engine.side_board_[i];
-    }
-
-    // 各サイドの駒の配置のコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      side_pieces_[i] = engine.side_pieces_[i];
-    }
-
-    // ブロッカーのコピー。
-    blocker_0_ = engine.blocker_0_;
-    blocker_45_ = engine.blocker_45_;
-    blocker_90_ = engine.blocker_90_;
-    blocker_135_ = engine.blocker_135_;
-
-    // キングの位置のコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      king_[i] = engine.king_[i];
-    }
-
-    // 手番のコピー。
-    to_move_ = engine.to_move_;
-
-    // キャスリングの権利のコピー。
-    castling_rights_ = engine.castling_rights_;
-
-    // アンパッサンのコピー。
-    en_passant_square_ = engine.en_passant_square_;
-    can_en_passant_ = engine.can_en_passant_;
-
-    // 50手ルールの手数のコピー。
-    ply_100_ = engine.ply_100_;
-
-    // 手数のコピー。
-    ply_ = engine.ply_;
-
-    // キャスリングしたかどうかのコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      has_castled_[i] = engine.has_castled_[i];
-    }
-
-    // ヒストリーのコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_SQUARES; j++) {
-        for (int k = 0; k < NUM_SQUARES; k++) {
-          history_[i][j][k] = engine.history_[i][j][k];
-        }
-      }
-    }
-
-    // iid_stack_のコピー。
-    for (int i = 0; i < MAX_PLYS; i++) {
-      iid_stack_[i] = engine.iid_stack_[i];
-    }
-    // killer_stack_のコピー。
-    for (int i = 0; i < MAX_PLYS; i++) {
-      killer_stack_[i] = engine.killer_stack_[i];
-    }
+    // メンバをコピー。
+    ScanMember(engine);
 
     // 指し手の履歴をムーブ。
     move_history_ = std::move(engine.move_history_);
@@ -227,77 +88,8 @@ namespace Sayuri {
 
   // コピー代入。
   ChessEngine& ChessEngine::operator=(const ChessEngine& engine) {
-    // 駒の配置をコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
-        position_[i][j] = engine.position_[i][j];
-      }
-    }
-
-    // 駒の種類の配置のコピー。
-    for (int i = 0; i < NUM_SQUARES; i++) {
-      piece_board_[i] = engine.piece_board_[i];
-    }
-
-    // サイドの配置のコピー。
-    for (int i = 0; i < NUM_SQUARES; i++) {
-      side_board_[i] = engine.side_board_[i];
-    }
-
-    // 各サイドの駒の配置のコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      side_pieces_[i] = engine.side_pieces_[i];
-    }
-
-    // ブロッカーのコピー。
-    blocker_0_ = engine.blocker_0_;
-    blocker_45_ = engine.blocker_45_;
-    blocker_90_ = engine.blocker_90_;
-    blocker_135_ = engine.blocker_135_;
-
-    // キングの位置のコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      king_[i] = engine.king_[i];
-    }
-
-    // 手番のコピー。
-    to_move_ = engine.to_move_;
-
-    // キャスリングの権利のコピー。
-    castling_rights_ = engine.castling_rights_;
-
-    // アンパッサンのコピー。
-    en_passant_square_ = engine.en_passant_square_;
-    can_en_passant_ = engine.can_en_passant_;
-
-    // 50手ルールの手数のコピー。
-    ply_100_ = engine.ply_100_;
-
-    // 手数のコピー。
-    ply_ = engine.ply_;
-
-    // キャスリングしたかどうかのコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      has_castled_[i] = engine.has_castled_[i];
-    }
-
-    // ヒストリーのコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_SQUARES; j++) {
-        for (int k = 0; k < NUM_SQUARES; k++) {
-          history_[i][j][k] = engine.history_[i][j][k];
-        }
-      }
-    }
-
-    // iid_stack_のコピー。
-    for (int i = 0; i < MAX_PLYS; i++) {
-      iid_stack_[i] = engine.iid_stack_[i];
-    }
-    // killer_stack_のコピー。
-    for (int i = 0; i < MAX_PLYS; i++) {
-      killer_stack_[i] = engine.killer_stack_[i];
-    }
+    // メンバをコピー。
+    ScanMember(engine);
 
     // 指し手の履歴をコピー。
     move_history_ = engine.move_history_;
@@ -310,77 +102,8 @@ namespace Sayuri {
 
   // ムーブ代入。
   ChessEngine& ChessEngine::operator=(ChessEngine&& engine) {
-    // 駒の配置をコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
-        position_[i][j] = engine.position_[i][j];
-      }
-    }
-
-    // 駒の種類の配置のコピー。
-    for (int i = 0; i < NUM_SQUARES; i++) {
-      piece_board_[i] = engine.piece_board_[i];
-    }
-
-    // サイドの配置のコピー。
-    for (int i = 0; i < NUM_SQUARES; i++) {
-      side_board_[i] = engine.side_board_[i];
-    }
-
-    // 各サイドの駒の配置のコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      side_pieces_[i] = engine.side_pieces_[i];
-    }
-
-    // ブロッカーのコピー。
-    blocker_0_ = engine.blocker_0_;
-    blocker_45_ = engine.blocker_45_;
-    blocker_90_ = engine.blocker_90_;
-    blocker_135_ = engine.blocker_135_;
-
-    // キングの位置のコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      king_[i] = engine.king_[i];
-    }
-
-    // 手番のコピー。
-    to_move_ = engine.to_move_;
-
-    // キャスリングの権利のコピー。
-    castling_rights_ = engine.castling_rights_;
-
-    // アンパッサンのコピー。
-    en_passant_square_ = engine.en_passant_square_;
-    can_en_passant_ = engine.can_en_passant_;
-
-    // 50手ルールの手数のコピー。
-    ply_100_ = engine.ply_100_;
-
-    // 手数のコピー。
-    ply_ = engine.ply_;
-
-    // キャスリングしたかどうかのコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      has_castled_[i] = engine.has_castled_[i];
-    }
-
-    // ヒストリーのコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_SQUARES; j++) {
-        for (int k = 0; k < NUM_SQUARES; k++) {
-          history_[i][j][k] = engine.history_[i][j][k];
-        }
-      }
-    }
-
-    // iid_stack_のコピー。
-    for (int i = 0; i < MAX_PLYS; i++) {
-      iid_stack_[i] = engine.iid_stack_[i];
-    }
-    // killer_stack_のコピー。
-    for (int i = 0; i < MAX_PLYS; i++) {
-      killer_stack_[i] = engine.killer_stack_[i];
-    }
+    // メンバをコピー。
+    ScanMember(engine);
 
     // 指し手の履歴をムーブ。
     move_history_ = std::move(engine.move_history_);
@@ -398,8 +121,8 @@ namespace Sayuri {
   /* ChessEngineクラスの初期化。 */
   /*******************************/
   void ChessEngine::InitChessEngine() {
-    // ハッシュキーの配列を初期化する。
-    InitKeyTable();
+    // ハッシュの配列を初期化する。
+    InitHashTable();
   }
 
   /********************
@@ -438,6 +161,11 @@ namespace Sayuri {
     can_en_passant_ = fen.can_en_passant();
     ply_100_ = fen.ply_100();
     ply_ = fen.ply();
+
+    // 現在の局面を保存。
+    position_stack_ptr_ = position_stack_begin_;
+    *position_stack_ptr_ = GetCurrentHash();
+    position_stack_ptr_++;
   }
 
   // 新しいゲームの準備をする。
@@ -564,11 +292,85 @@ namespace Sayuri {
       killer_stack_[i] = Move();
     }
 
+    // 局面のスタックを初期化。
+    for (int i = 0; i < (MAX_POSITIONS + 1); i++) {
+      position_stack_[i] = 0ULL;
+    }
+    position_stack_begin_ = position_stack_ptr_ = position_stack_;
+    position_stack_end_ = &(position_stack_[(MAX_POSITIONS - 1) + 1]);
+    *position_stack_ptr_ = GetCurrentHash();
+    position_stack_ptr_++;
+
     // 手の履歴を削除。
     move_history_.clear();
 
     // 50手ルールの履歴を削除。
     ply_100_history_.clear();
+  }
+
+  // 他のエンジンのメンバをコピーする。
+  void ChessEngine::ScanMember(const ChessEngine& engine) {
+    // 駒の配置をコピー。
+    for (int i = 0; i < NUM_SIDES; i++) {
+      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
+        position_[i][j] = engine.position_[i][j];
+      }
+    }
+
+    // 駒の種類の配置のコピー。
+    for (int i = 0; i < NUM_SQUARES; i++) {
+      piece_board_[i] = engine.piece_board_[i];
+    }
+
+    // サイドの配置のコピー。
+    for (int i = 0; i < NUM_SQUARES; i++) {
+      side_board_[i] = engine.side_board_[i];
+    }
+
+    // 各サイドの駒の配置のコピー。
+    for (int i = 0; i < NUM_SIDES; i++) {
+      side_pieces_[i] = engine.side_pieces_[i];
+    }
+
+    // ブロッカーのコピー。
+    blocker_0_ = engine.blocker_0_;
+    blocker_45_ = engine.blocker_45_;
+    blocker_90_ = engine.blocker_90_;
+    blocker_135_ = engine.blocker_135_;
+
+    // キングの位置のコピー。
+    for (int i = 0; i < NUM_SIDES; i++) {
+      king_[i] = engine.king_[i];
+    }
+
+    // 手番のコピー。
+    to_move_ = engine.to_move_;
+
+    // キャスリングの権利のコピー。
+    castling_rights_ = engine.castling_rights_;
+
+    // アンパッサンのコピー。
+    en_passant_square_ = engine.en_passant_square_;
+    can_en_passant_ = engine.can_en_passant_;
+
+    // 50手ルールの手数のコピー。
+    ply_100_ = engine.ply_100_;
+
+    // 手数のコピー。
+    ply_ = engine.ply_;
+
+    // キャスリングしたかどうかのコピー。
+    for (int i = 0; i < NUM_SIDES; i++) {
+      has_castled_[i] = engine.has_castled_[i];
+    }
+
+    // ポジションスタックをコピー。
+    for (int i = 0; i < (MAX_POSITIONS + 1); i++) {
+      position_stack_[i] = engine.position_stack_[i];
+      if (&(engine.position_stack_[i]) == engine.position_stack_ptr_) {
+        position_stack_ptr_ = &(position_stack_[i]);
+      }
+    }
   }
 
   // 思考を始める。
@@ -621,6 +423,8 @@ namespace Sayuri {
       move_history_.push_back(move);
       ply_100_history_.push_back(ply_100_);
       MakeMove(move);
+      *position_stack_ptr_ = GetCurrentHash();
+      position_stack_ptr_++;
     } else {
       throw SayuriError("合法手ではありません。");
     }
@@ -635,6 +439,7 @@ namespace Sayuri {
       move_history_.pop_back();
       ply_100_history_.pop_back();
       UnmakeMove(move);
+      position_stack_ptr_--;
     } else {
       throw SayuriError("手を戻すことができません。");
     }
@@ -865,38 +670,38 @@ namespace Sayuri {
     return material;
   }
 
-  // 現在の局面のハッシュキーを計算する。
-  HashKey ChessEngine::GetCurrentKey() const {
-    HashKey key = 0ULL;
+  // 現在の局面のハッシュを計算する。
+  Hash ChessEngine::GetCurrentHash() const {
+    Hash hash = 0ULL;
 
-    // 駒の情報からキーを得る。
+    // 駒の情報からハッシュを得る。
     for (int square = 0; square < NUM_SQUARES; square++) {
-      key ^= piece_key_table_
+      hash ^= piece_hash_table_
       [side_board_[square]][piece_board_[square]][square];
     }
 
-    // 手番からキーを得る。
-    key ^= to_move_key_table_[to_move_];
+    // 手番からハッシュを得る。
+    hash ^= to_move_hash_table_[to_move_];
 
-    // キャスリングの権利からキーを得る。
+    // キャスリングの権利からハッシュを得る。
     Castling bit = 1;
     for (int i = 0; i < 4; i++) {
       if (castling_rights_ & bit) {
-        key ^= castling_key_table_[i];
+        hash ^= castling_hash_table_[i];
       }
       bit <<= 1;
     }
 
-    // アンパッサンからキーを得る。
+    // アンパッサンからハッシュを得る。
     if (can_en_passant_) {
-      key ^= en_passant_key_table_[en_passant_square_];
+      hash ^= en_passant_hash_table_[en_passant_square_];
     }
 
-    return key;
+    return hash;
   }
 
-  // 次の局面のハッシュキーを得る。
-  HashKey ChessEngine::GetNextKey(HashKey current_key, Move move) const {
+  // 次の局面のハッシュを得る。
+  Hash ChessEngine::GetNextHash(Hash current_hash, Move move) const {
     // 駒の位置の種類とサイドを得る。
     Piece piece_type = piece_board_[move.from_];
     Side piece_side = side_board_[move.from_];
@@ -916,40 +721,40 @@ namespace Sayuri {
       target_type = piece_board_[target_square];
     }
 
-    // 移動する駒のハッシュキーを得る。
-    HashKey piece_key =
-    piece_key_table_[piece_side][piece_type][move.from_];
+    // 移動する駒のハッシュを得る。
+    Hash piece_hash =
+    piece_hash_table_[piece_side][piece_type][move.from_];
 
-    // 取る駒のハッシュキーを得る。
-    HashKey target_key =
-    piece_key_table_[target_side][target_type][target_square];
+    // 取る駒のハッシュを得る。
+    Hash target_hash =
+    piece_hash_table_[target_side][target_type][target_square];
 
-    // 移動する駒の移動先のハッシュキーを得る。
-    HashKey move_key;
+    // 移動する駒の移動先のハッシュを得る。
+    Hash move_hash;
     if (move.promotion_) {
-      move_key =
-      piece_key_table_[piece_side][move.promotion_][move.to_];
+      move_hash =
+      piece_hash_table_[piece_side][move.promotion_][move.to_];
     } else {
-      move_key =
-      piece_key_table_[piece_side][piece_type][move.to_];
+      move_hash =
+      piece_hash_table_[piece_side][piece_type][move.to_];
     }
 
-    // 移動する駒のハッシュキーを削除する。
-    current_key ^= piece_key;
+    // 移動する駒のハッシュを削除する。
+    current_hash ^= piece_hash;
 
-    // 取る駒のハッシュキーを削除する。
-    current_key ^= target_key;
+    // 取る駒のハッシュを削除する。
+    current_hash ^= target_hash;
 
-    // 移動する駒の移動先のハッシュキーを追加する。
-    current_key ^= move_key;
+    // 移動する駒の移動先のハッシュを追加する。
+    current_hash ^= move_hash;
 
-    // 現在の手番のキーを削除。
-    current_key ^= to_move_key_table_[to_move_];
+    // 現在の手番のハッシュを削除。
+    current_hash ^= to_move_hash_table_[to_move_];
 
-    // 次の手番のキーを追加。
-    current_key ^= to_move_key_table_[to_move_ ^ 0x3];
+    // 次の手番のハッシュを追加。
+    current_hash ^= to_move_hash_table_[to_move_ ^ 0x3];
 
-    // キャスリングのキーをセット。
+    // キャスリングのハッシュをセット。
     Castling loss_rights = 0;
     if (piece_side == WHITE) {
       if (piece_type == KING) {
@@ -977,28 +782,28 @@ namespace Sayuri {
     Castling bit = 1;
     for (int i = 0; i < 4; i++) {
       if (castling_diff & bit) {
-        current_key ^= castling_key_table_[i];
+        current_hash ^= castling_hash_table_[i];
       }
       bit <<= 1;
     }
 
-    // アンパッサンのマスからキーを得る。
+    // アンパッサンのマスからハッシュを得る。
     if (can_en_passant_) {
-      // とりあえずアンパッサンのキーを削除。
-      current_key ^= en_passant_key_table_[en_passant_square_];
+      // とりあえずアンパッサンのハッシュを削除。
+      current_hash ^= en_passant_hash_table_[en_passant_square_];
     }
-    // ポーンの2歩の動きの場合はアンパッサンキーを追加。
+    // ポーンの2歩の動きの場合はアンパッサンハッシュを追加。
     if (piece_type == PAWN) {
       int move_diff = move.to_ - move.from_;
       if (move_diff > 8) {
-        current_key ^= en_passant_key_table_[move.to_ - 8];
+        current_hash ^= en_passant_hash_table_[move.to_ - 8];
       } else if (move_diff < -8) {
-        current_key ^= en_passant_key_table_[move.to_ + 8];
+        current_hash ^= en_passant_hash_table_[move.to_ + 8];
       }
     }
 
-    // 次の局面のハッシュキーを返す。
-    return current_key;
+    // 次の局面のハッシュを返す。
+    return current_hash;
   }
 
   /******************************
@@ -1084,32 +889,32 @@ namespace Sayuri {
     if (!(position_[BLACK][ROOK] & Util::BIT[A8]))
       castling_rights_ &= ~BLACK_LONG_CASTLING;
   }
-  /**********************
-   * ハッシュキー関連。 *
-   **********************/
-  // ハッシュキーの配列を初期化する。
-  void ChessEngine::InitKeyTable() {
+  /******************/
+  /* ハッシュ関連。 */
+  /******************/
+  // ハッシュの配列を初期化する。
+  void ChessEngine::InitHashTable() {
     // メルセンヌツイスターの準備。
     std::mt19937 engine(SysClock::to_time_t (SysClock::now()));
-    std::uniform_int_distribution<HashKey> dist(0ULL, 0xffffffffffffffffULL);
+    std::uniform_int_distribution<Hash> dist(0ULL, 0xffffffffffffffffULL);
 
     // 駒の情報の配列を初期化。
     for (int side = 0; side < NUM_SIDES; side++) {
       for (int piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
         for (int square = 0; square < NUM_SQUARES; square++) {
           if ((side == NO_SIDE) || (piece_type == EMPTY)) {
-            piece_key_table_[side][piece_type][square] = 0ULL;
+            piece_hash_table_[side][piece_type][square] = 0ULL;
           } else {
-            piece_key_table_[side][piece_type][square] = dist(engine);
+            piece_hash_table_[side][piece_type][square] = dist(engine);
           }
         }
       }
     }
 
     // 手番の配列を初期化。
-    to_move_key_table_[NO_SIDE] = 0ULL;
-    to_move_key_table_[WHITE] = 0ULL;
-    to_move_key_table_[BLACK] = dist(engine);
+    to_move_hash_table_[NO_SIDE] = 0ULL;
+    to_move_hash_table_[WHITE] = 0ULL;
+    to_move_hash_table_[BLACK] = dist(engine);
 
     // キャスリングの配列を初期化。
     // 0: 白のショートキャスリング。
@@ -1117,12 +922,12 @@ namespace Sayuri {
     // 2: 黒のショートキャスリング。
     // 3: 黒のロングキャスリング。
     for (int i = 0; i < 4; i++) {
-      castling_key_table_[i] = dist(engine);
+      castling_hash_table_[i] = dist(engine);
     }
 
     // アンパッサンの配列を初期化。
     for (int square = 0; square < NUM_SQUARES; square++) {
-      en_passant_key_table_[square] = dist(engine);
+      en_passant_hash_table_[square] = dist(engine);
     }
   }
 }  // namespace Sayuri

@@ -228,7 +228,7 @@ namespace Sayuri {
   };
 
   // ハッシュの型。
-  using HashKey = std::uint64_t;
+  using Hash = std::uint64_t;
 
   // 評価値の定義。
   constexpr int SCORE_WIN = 1000000;
@@ -257,8 +257,8 @@ namespace Sayuri {
   // 最大探索ノード数。
   constexpr std::size_t MAX_NODES = static_cast<std::size_t>(-1);
 
-  // ボードの履歴の保存数。
-  constexpr int MAX_BOARD_HISTORY_STACK = 1000;
+  // 局面の保存数。
+  constexpr int MAX_POSITIONS = 1000;
 
   // 探索するノードの種類。
   enum class NodeType {

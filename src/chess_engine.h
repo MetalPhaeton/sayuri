@@ -154,19 +154,19 @@ namespace Sayuri {
       // 評価値。
       int SEE(Move move);
 
-      // 現在の局面のハッシュキーを計算する。
+      // 現在の局面のハッシュを計算する。
       // (注)計算に時間がかかる。
       // [戻り値]
-      // 現在の局面のハッシュキー。
-      HashKey GetCurrentKey() const;
+      // 現在の局面のハッシュ。
+      Hash GetCurrentHash() const;
 
-      // 現在の局面と動かす手から次の局面のハッシュキーを得る。
+      // 現在の局面と動かす手から次の局面のハッシュを得る。
       // [引数]
-      // current_key: 現在のキー。
+      // current_hash: 現在のハッシュ。
       // move: 次の手。
       // [戻り値]
-      // 次の局面のハッシュキー。
-      HashKey GetNextKey(HashKey current_key, Move move) const;
+      // 次の局面のハッシュ。
+      Hash GetNextHash(Hash current_hash, Move move) const;
 
       /**************/
       /* アクセサ。 */
@@ -240,7 +240,7 @@ namespace Sayuri {
       // 探索する。
       // [引数]
       // <Type>: ノードの種類。
-      // pos_key: 現在のハッシュキー。
+      // pos_hash: 現在のハッシュ。
       // depth: 現在の深さ。
       // level: 現在のレベル。
       // alpha: アルファ値。
@@ -250,7 +250,7 @@ namespace Sayuri {
       // [戻り値]
       // 評価値。
       template<NodeType Type>
-      int Search(HashKey pos_key, int depth, int level, int alpha, int beta,
+      int Search(Hash pos_hash, int depth, int level, int alpha, int beta,
       TranspositionTable& table, PVLine& pv_line);
       // 探索のルート。
       // [引数]
@@ -275,6 +275,11 @@ namespace Sayuri {
       /******************************/
       /* その他のプライベート関数。 */
       /******************************/
+      // 他のエンジンのメンバをコピーする。
+      // [引数]
+      // engine: 他のエンジン。
+      void ScanMember(const ChessEngine& engine);
+
       // 駒を動かす。
       // 動かす前のキャスリングの権利とアンパッサンは記録される。
       // 駒を取る場合は取った駒がmoveに記録される。
@@ -353,6 +358,11 @@ namespace Sayuri {
       Move killer_stack_[MAX_PLYS];
       // 現在のIterative Deepeningの深さ。
       int i_depth_;
+      // 局面のスタック。
+      Hash position_stack_[MAX_POSITIONS + 1];
+      Hash* position_stack_begin_;
+      Hash* position_stack_end_;
+      Hash* position_stack_ptr_;
       // 探索したノード数。
       std::size_t searched_nodes_;
       // 探索開始時間。
@@ -392,24 +402,24 @@ namespace Sayuri {
       // 50手ルールの履歴。
       std::vector<int> ply_100_history_;
 
-      /**********************/
-      /* ハッシュキー関連。 */
-      /**********************/
-      // 駒の情報からハッシュキーを得るための配列。
-      // piece_key_table_[サイド][駒の種類][駒の位置]
-      static HashKey piece_key_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
+      /******************/
+      /* ハッシュ関連。 */
+      /******************/
+      // 駒の情報からハッシュを得るための配列。
+      // piece_hash_table_[サイド][駒の種類][駒の位置]
+      static Hash piece_hash_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
       // 手番からハッシュキーを得るための配列。
-      static HashKey to_move_key_table_[NUM_SIDES];
-      // キャスリングの権利からハッシュキーを得るための配列。
+      static Hash to_move_hash_table_[NUM_SIDES];
+      // キャスリングの権利からハッシュを得るための配列。
       // 0: 白のショートキャスリング。
       // 1: 白のロングキャスリング。
       // 2: 黒のショートキャスリング。
       // 3: 黒のロングキャスリング。
-      static HashKey castling_key_table_[4];
-      // アンパッサンの位置からハッシュキーを得るための配列。
-      static HashKey en_passant_key_table_[NUM_SQUARES];
-      // ハッシュキーの配列を初期化する。
-      static void InitKeyTable();
+      static Hash castling_hash_table_[4];
+      // アンパッサンの位置からハッシュを得るための配列。
+      static Hash en_passant_hash_table_[NUM_SQUARES];
+      // ハッシュの配列を初期化する。
+      static void InitHashTable();
   };
 }  // namespace Sayuri
 

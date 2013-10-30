@@ -48,13 +48,13 @@ namespace Sayuri {
       /**************************/
       // コンストラクタ。
       // [引数]
-      // pos_key: ポジションのハッシュキー。
+      // pos_hash: ポジションのハッシュ。
       // depth: 探索の深さ。
       // to_move: 手番。
       // value: 評価値。
       // score_type: 評価値の種類。
       // best_move: 最善手。
-      TTEntry(HashKey pos_key, int depth,
+      TTEntry(Hash pos_hash, int depth,
       int value, ScoreType score_type, Move best_move);
       // デフォルトコンストラクタ。
       TTEntry();
@@ -71,14 +71,14 @@ namespace Sayuri {
       /**********/
       /* 関数。 */
       /**********/
-      // ハッシュキーとレベルと深さと手番から
+      // ハッシュとレベルと深さと手番から
       // 同じポジションかどうか判定する。
       // [引数]
-      // key: ハッシュキー。
+      // hash: ハッシュ。
       // depth: 探索の深さ。
       // [戻り値]
       // 同じならtrue。
-      bool Fulfil(HashKey key, int depth) const;
+      bool Fulfil(Hash hash, int depth) const;
       // エントリーをアップデートする。
       // [引数]
       // score: 評価値。
@@ -95,8 +95,8 @@ namespace Sayuri {
       /**************/
       // データがあるかどうか。
       bool exists() const {return exists_;}
-      // ハッシュキー。
-      HashKey key() const {return key_;}
+      // ハッシュ。
+      Hash hash() const {return hash_;}
       // 深さ。
       int depth() const {return depth_;}
       // 評価値。
@@ -117,8 +117,8 @@ namespace Sayuri {
       /****************/
       // データがあるかどうか。
       bool exists_;
-      // ハッシュキー。
-      HashKey key_;
+      // ハッシュ。
+      Hash hash_;
       // 探索のレベル。
       int depth_;
       // 評価値。
@@ -137,8 +137,8 @@ namespace Sayuri {
       /**********/
       /* 定数。 */
       /**********/
-      // ハッシュキーのテーブル用マスク。
-      static constexpr HashKey TABLE_KEY_MASK = 0XffffULL;
+      // ハッシュのテーブル用マスク。
+      static constexpr Hash TABLE_KEY_MASK = 0XffffULL;
       // テーブルの大きさ。
       static constexpr std::size_t TABLE_SIZE = TABLE_KEY_MASK + 1;
 
@@ -160,21 +160,21 @@ namespace Sayuri {
       /**********/
       // テーブルに追加する。
       // [引数]
-      // key: ハッシュキー。
+      // hash: ハッシュ。
       // depth: 探索の深さ。
       // value: 評価値。
       // score_type: 評価値の種類。
       // best_move: 最善手。
-      void Add(HashKey key, int depth,
+      void Add(Hash hash, int depth,
       int value, ScoreType score_type, Move best_move);
       // 条件を満たすエントリーを得る。
       // [引数]
-      // pos_key: ハッシュキー。
+      // pos_hash: ハッシュ。
       // depth: 探索の深さ。
       // [戻り値]
       // 条件を満たすエントリー。
       // なければnullptr。
-      TTEntry* GetFulfiledEntry(HashKey pos_key, int depth) const;
+      TTEntry* GetFulfiledEntry(Hash pos_hash, int depth) const;
 
       // 大きさが何バイトか返す。
       // [戻り値]
@@ -213,9 +213,9 @@ namespace Sayuri {
       /**********************/
       // テーブルのインデックスを得る。
       // [引数]
-      // pos_key: ポジションのハッシュキー。
-      int GetTableIndex(HashKey pos_key) const {
-        return pos_key & (TABLE_KEY_MASK);
+      // pos_hash: ポジションのハッシュ。
+      int GetTableIndex(Hash pos_hash) const {
+        return pos_hash & (TABLE_KEY_MASK);
       }
 
       /****************/
