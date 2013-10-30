@@ -241,8 +241,8 @@ namespace Sayuri {
   /*****************************/
   /* Transposition Table関連。 */
   /*****************************/
-  // 評価値の種類。TTEntry::value_flag。
-  enum class TTValueFlag {
+  // 評価値の種類。TTEntry::score_type。
+  enum class TTScoreType {
     EXACT,  // 正確な評価値。
     ALPHA,  // アルファ値。
     BETA  // ベータ値。

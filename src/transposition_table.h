@@ -52,10 +52,10 @@ namespace Sayuri {
       // depth: 探索の深さ。
       // to_move: 手番。
       // value: 評価値。
-      // value_flag: 評価値の種類。
+      // score_type: 評価値の種類。
       // best_move: 最善手。
       TTEntry(HashKey pos_key, int depth,
-      Side to_move, int value, TTValueFlag value_flag, Move best_move);
+      int value, TTScoreType score_type, Move best_move);
       // デフォルトコンストラクタ。
       TTEntry();
       // コピーコンストラクタ。
@@ -76,18 +76,17 @@ namespace Sayuri {
       // [引数]
       // key: ハッシュキー。
       // depth: 探索の深さ。
-      // to_move: 手番。
       // [戻り値]
       // 同じならtrue。
-      bool Fulfil(HashKey key, int depth, Side to_move) const;
+      bool Fulfil(HashKey key, int depth) const;
       // エントリーをアップデートする。
       // [引数]
       // score: 評価値。
-      // value_flag: 評価値の種類。
+      // score_type: 評価値の種類。
       // best_move: 最善手。
-      void Update(int score, TTValueFlag value_flag, Move best_move) {
+      void Update(int score, TTScoreType score_type, Move best_move) {
         score_ = score;
-        value_flag_ = value_flag;
+        score_type_ = score_type;
         best_move_ = best_move;
       }
 
@@ -100,12 +99,10 @@ namespace Sayuri {
       HashKey key() const {return key_;}
       // 深さ。
       int depth() const {return depth_;}
-      // 手番。
-      Side to_move() const {return to_move_;}
       // 評価値。
       int score() const {return score_;}
       // 評価値の種類。
-      TTValueFlag value_flag() const {return value_flag_;}
+      TTScoreType score_type() const {return score_type_;}
       // 最善手。
       Move best_move() const {return best_move_;}
 
@@ -124,12 +121,10 @@ namespace Sayuri {
       HashKey key_;
       // 探索のレベル。
       int depth_;
-      // 手番。
-      Side to_move_;
       // 評価値。
       int score_;
       // 評価値の種類。
-      TTValueFlag value_flag_;
+      TTScoreType score_type_;
       // 最善手。
       Move best_move_;
   };
@@ -167,22 +162,19 @@ namespace Sayuri {
       // [引数]
       // key: ハッシュキー。
       // depth: 探索の深さ。
-      // to_move: 手番。
       // value: 評価値。
-      // value_flag: 評価値の種類。
+      // score_type: 評価値の種類。
       // best_move: 最善手。
-      void Add(HashKey key, int depth, Side to_move,
-      int value, TTValueFlag value_flag, Move best_move);
+      void Add(HashKey key, int depth,
+      int value, TTScoreType score_type, Move best_move);
       // 条件を満たすエントリーを得る。
       // [引数]
       // pos_key: ハッシュキー。
       // depth: 探索の深さ。
-      // to_move: 手番。
       // [戻り値]
       // 条件を満たすエントリー。
       // なければnullptr。
-      TTEntry* GetFulfiledEntry(HashKey pos_key, int depth,
-      Side to_move) const;
+      TTEntry* GetFulfiledEntry(HashKey pos_key, int depth) const;
 
       // 大きさが何バイトか返す。
       // [戻り値]
@@ -199,7 +191,7 @@ namespace Sayuri {
       // <Type>: 調べたい種類。
       // [戻り値]
       // 調べたい種類の比率データ。パーミル。
-      template<TTValueFlag Type>
+      template<TTScoreType Type>
       int GetRatioPermill() const;
 
       /****************/

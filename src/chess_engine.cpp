@@ -944,10 +944,10 @@ namespace Sayuri {
     current_key ^= move_key;
 
     // 現在の手番のキーを削除。
-    current_key ^= to_move_key_table_[piece_side];
+    current_key ^= to_move_key_table_[to_move_];
 
     // 次の手番のキーを追加。
-    current_key ^= to_move_key_table_[piece_side ^ 0x3];
+    current_key ^= to_move_key_table_[to_move_ ^ 0x3];
 
     // キャスリングのキーをセット。
     Castling loss_rights = 0;

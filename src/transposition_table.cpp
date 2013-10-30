@@ -89,14 +89,14 @@ namespace Sayuri {
 
   // テーブルに追加する。
   void TranspositionTable::Add(HashKey pos_key, int depth,
-  Side to_move, int score, TTValueFlag value_flag, Move best_move) {
+  int score, TTScoreType score_type, Move best_move) {
     // テーブルのインデックスを得る。
     int index = GetTableIndex(pos_key);
 
     // 最後のエントリーのdepthを比べ、追加する側が大きければ追加。
     if (depth > entry_table_[index].back().depth()) {
-      entry_table_[index].back() = TTEntry(pos_key, depth, to_move,
-      score, value_flag, best_move);
+      entry_table_[index].back() = TTEntry(pos_key, depth, score,
+      score_type, best_move);
 
       // ソート。
       std::sort(entry_table_[index].begin(), entry_table_[index].end(),
@@ -106,7 +106,7 @@ namespace Sayuri {
 
   // 該当するTTEntryを返す。
   TTEntry* TranspositionTable::GetFulfiledEntry(HashKey pos_key,
-  int depth, Side to_move) const {
+  int depth) const {
     // テーブルのインデックスを得る。
     int index = GetTableIndex(pos_key);
 
@@ -114,7 +114,7 @@ namespace Sayuri {
     for (auto& entry : entry_table_[index]) {
       if (!(entry.exists())) return nullptr;  // エントリーがない。
 
-      if (entry.Fulfil(pos_key, depth, to_move)) {
+      if (entry.Fulfil(pos_key, depth)) {
         entry_ptr = &entry;  // エントリーが見つかった。
         break;
       }
@@ -152,7 +152,7 @@ namespace Sayuri {
   }
 
   // エントリーの種類ごとの比率データ。
-  template<TTValueFlag Type>
+  template<TTScoreType Type>
   int TranspositionTable::GetRatioPermill() const {
     int num_all = 0;
     int num_entry = 0;
@@ -160,7 +160,7 @@ namespace Sayuri {
       for (auto& entry : entry_table_[i]) {
         if (entry.exists()) {
           num_all += 1;
-          if (entry.value_flag() == Type) {
+          if (entry.score_type() == Type) {
             num_entry += 1;
           }
         } else {
@@ -173,11 +173,11 @@ namespace Sayuri {
   }
   // 実体化。
   template
-  int TranspositionTable::GetRatioPermill<TTValueFlag::EXACT>() const;
+  int TranspositionTable::GetRatioPermill<TTScoreType::EXACT>() const;
   template
-  int TranspositionTable::GetRatioPermill<TTValueFlag::ALPHA>() const;
+  int TranspositionTable::GetRatioPermill<TTScoreType::ALPHA>() const;
   template
-  int TranspositionTable::GetRatioPermill<TTValueFlag::BETA>() const;
+  int TranspositionTable::GetRatioPermill<TTScoreType::BETA>() const;
 
   /****************/
   /* static関数。 */
@@ -196,14 +196,13 @@ namespace Sayuri {
   /* エントリーのクラス。 */
   /************************/
   // コンストラクタ。
-  TTEntry::TTEntry(HashKey key, int depth, Side to_move,
-  int score, TTValueFlag value_flag, Move best_move) :
+  TTEntry::TTEntry(HashKey key, int depth, int score,
+  TTScoreType score_type, Move best_move) :
   exists_(true),
   key_(key),
   depth_(depth),
-  to_move_(to_move),
   score_(score),
-  value_flag_(value_flag),
+  score_type_(score_type),
   best_move_(best_move) {
   }
 
@@ -212,9 +211,8 @@ namespace Sayuri {
   exists_(false),
   key_(0ULL),
   depth_(-MAX_VALUE),
-  to_move_(NO_SIDE),
   score_(0),
-  value_flag_(TTValueFlag::ALPHA) {
+  score_type_(TTScoreType::ALPHA) {
   }
 
   // コピーコンストラクタ。
@@ -222,9 +220,8 @@ namespace Sayuri {
   exists_(entry.exists_),
   key_(entry.key_),
   depth_(entry.depth_),
-  to_move_(entry.to_move_),
   score_(entry.score_),
-  value_flag_(entry.value_flag_),
+  score_type_(entry.score_type_),
   best_move_(entry.best_move_) {
   }
 
@@ -233,9 +230,8 @@ namespace Sayuri {
   exists_(entry.exists_),
   key_(entry.key_),
   depth_(entry.depth_),
-  to_move_(entry.to_move_),
   score_(entry.score_),
-  value_flag_(entry.value_flag_),
+  score_type_(entry.score_type_),
   best_move_(entry.best_move_) {
   }
 
@@ -244,9 +240,8 @@ namespace Sayuri {
     exists_ = entry.exists_;
     key_ = entry.key_;
     depth_ = entry.depth_;
-    to_move_ = entry.to_move_;
     score_ = entry.score_;
-    value_flag_ = entry.value_flag_;
+    score_type_ = entry.score_type_;
     best_move_ = entry.best_move_;
 
     return *this;
@@ -257,19 +252,17 @@ namespace Sayuri {
     exists_ = entry.exists_;
     key_ = entry.key_;
     depth_ = entry.depth_;
-    to_move_ = entry.to_move_;
     score_ = entry.score_;
-    value_flag_ = entry.value_flag_;
+    score_type_ = entry.score_type_;
     best_move_ = entry.best_move_;
 
     return *this;
   }
 
   // 該当するならtrue。
-  bool TTEntry::Fulfil(HashKey key, int depth, Side to_move) const {
+  bool TTEntry::Fulfil(HashKey key, int depth) const {
     if (!exists_) return false;
     if (depth > depth_) return false;
-    if (to_move != to_move_) return false;
     if (key != key_) return false;
     return true;
   }

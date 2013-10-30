@@ -150,10 +150,10 @@ namespace Sayuri {
 
     // トランスポジションテーブルを調べる。
     TTEntry* entry_ptr =
-    table.GetFulfiledEntry(pos_key, depth, side);
+    table.GetFulfiledEntry(pos_key, depth);
     if (entry_ptr) {
       int score = entry_ptr->score();
-      if (entry_ptr->value_flag() == TTValueFlag::EXACT) {
+      if (entry_ptr->score_type() == TTScoreType::EXACT) {
         // エントリーが正確な値。
         pv_line.SetMove(entry_ptr->best_move());
         pv_line.score(entry_ptr->score());
@@ -166,7 +166,7 @@ namespace Sayuri {
           return alpha;
         }
         return score;
-      } else if (entry_ptr->value_flag() == TTValueFlag::ALPHA) {
+      } else if (entry_ptr->score_type() == TTScoreType::ALPHA) {
         // エントリーがアルファ値。
         // アルファ値以下が確定。
         if (score <= alpha) {
@@ -196,9 +196,9 @@ namespace Sayuri {
     }
 
     // 前回の繰り返しの最善手を得る。
-    TTEntry* prev_entry = table.GetFulfiledEntry(pos_key, depth - 1, side);
+    TTEntry* prev_entry = table.GetFulfiledEntry(pos_key, depth - 1);
     Move prev_best;
-    if (prev_entry && (prev_entry->value_flag() != TTValueFlag::ALPHA)) {
+    if (prev_entry && (prev_entry->score_type() != TTScoreType::ALPHA)) {
       prev_best = prev_entry->best_move();
     }
 
@@ -263,7 +263,7 @@ namespace Sayuri {
     }
 
     // ループ。
-    TTValueFlag value_flag = TTValueFlag::ALPHA;
+    TTScoreType score_type = TTScoreType::ALPHA;
     bool is_searching_pv = true;
     int num_searched_moves = 0;
     bool has_legal_move = false;
@@ -346,7 +346,7 @@ namespace Sayuri {
         is_searching_pv = false;
 
         // トランスポジション用。
-        value_flag = TTValueFlag::EXACT;
+        score_type = TTScoreType::EXACT;
 
         // PVライン。
         pv_line.SetMove(move);
@@ -358,7 +358,7 @@ namespace Sayuri {
 
       if (score >= beta) {
         // トランスポジション用。
-        value_flag = TTValueFlag::BETA;
+        score_type = TTScoreType::BETA;
 
         // キラームーブ。
         killer_stack_[level] = move;
@@ -397,10 +397,10 @@ namespace Sayuri {
 
     // トランスポジションテーブルに登録。
     if (!entry_ptr) {
-      table.Add(pos_key, depth, side, alpha, value_flag,
+      table.Add(pos_key, depth, alpha, score_type,
       pv_line.line()[0].move());
     } else if (entry_ptr->depth() == depth) {
-      entry_ptr->Update(alpha, value_flag, pv_line.line()[0].move());
+      entry_ptr->Update(alpha, score_type, pv_line.line()[0].move());
     }
 
     // 探索結果を返す。
@@ -474,9 +474,9 @@ namespace Sayuri {
 
       // 前回の繰り返しの最善手を得る。
       TTEntry* prev_entry =
-      table.GetFulfiledEntry(pos_key, i_depth_ - 1, side);
+      table.GetFulfiledEntry(pos_key, i_depth_ - 1);
       Move prev_best;
-      if (prev_entry && (prev_entry->value_flag() != TTValueFlag::ALPHA)) {
+      if (prev_entry && (prev_entry->score_type() != TTScoreType::ALPHA)) {
         prev_best = prev_entry->best_move();
       }
 
@@ -637,12 +637,11 @@ namespace Sayuri {
 
           // トランスポジションテーブルに登録。
           if (!entry_ptr) {
-            table.Add(pos_key, i_depth_, side, score,
-            TTValueFlag::EXACT, move);
+            table.Add(pos_key, i_depth_, score, TTScoreType::EXACT, move);
 
-            entry_ptr = table.GetFulfiledEntry(pos_key, i_depth_, side);
+            entry_ptr = table.GetFulfiledEntry(pos_key, i_depth_);
           } else {
-            entry_ptr->Update(score, TTValueFlag::EXACT, move);
+            entry_ptr->Update(score, TTScoreType::EXACT, move);
           }
 
           // 標準出力にPV情報を送る。
