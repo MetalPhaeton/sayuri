@@ -242,7 +242,7 @@ namespace Sayuri {
   /* Transposition Table関連。 */
   /*****************************/
   // 評価値の種類。TTEntry::score_type。
-  enum class TTScoreType {
+  enum class ScoreType {
     EXACT,  // 正確な評価値。
     ALPHA,  // アルファ値。
     BETA  // ベータ値。

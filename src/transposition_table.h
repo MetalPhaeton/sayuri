@@ -55,7 +55,7 @@ namespace Sayuri {
       // score_type: 評価値の種類。
       // best_move: 最善手。
       TTEntry(HashKey pos_key, int depth,
-      int value, TTScoreType score_type, Move best_move);
+      int value, ScoreType score_type, Move best_move);
       // デフォルトコンストラクタ。
       TTEntry();
       // コピーコンストラクタ。
@@ -84,7 +84,7 @@ namespace Sayuri {
       // score: 評価値。
       // score_type: 評価値の種類。
       // best_move: 最善手。
-      void Update(int score, TTScoreType score_type, Move best_move) {
+      void Update(int score, ScoreType score_type, Move best_move) {
         score_ = score;
         score_type_ = score_type;
         best_move_ = best_move;
@@ -102,7 +102,7 @@ namespace Sayuri {
       // 評価値。
       int score() const {return score_;}
       // 評価値の種類。
-      TTScoreType score_type() const {return score_type_;}
+      ScoreType score_type() const {return score_type_;}
       // 最善手。
       Move best_move() const {return best_move_;}
 
@@ -124,7 +124,7 @@ namespace Sayuri {
       // 評価値。
       int score_;
       // 評価値の種類。
-      TTScoreType score_type_;
+      ScoreType score_type_;
       // 最善手。
       Move best_move_;
   };
@@ -166,7 +166,7 @@ namespace Sayuri {
       // score_type: 評価値の種類。
       // best_move: 最善手。
       void Add(HashKey key, int depth,
-      int value, TTScoreType score_type, Move best_move);
+      int value, ScoreType score_type, Move best_move);
       // 条件を満たすエントリーを得る。
       // [引数]
       // pos_key: ハッシュキー。
@@ -191,7 +191,7 @@ namespace Sayuri {
       // <Type>: 調べたい種類。
       // [戻り値]
       // 調べたい種類の比率データ。パーミル。
-      template<TTScoreType Type>
+      template<ScoreType Type>
       int GetRatioPermill() const;
 
       /****************/

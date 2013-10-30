@@ -89,7 +89,7 @@ namespace Sayuri {
 
   // テーブルに追加する。
   void TranspositionTable::Add(HashKey pos_key, int depth,
-  int score, TTScoreType score_type, Move best_move) {
+  int score, ScoreType score_type, Move best_move) {
     // テーブルのインデックスを得る。
     int index = GetTableIndex(pos_key);
 
@@ -152,7 +152,7 @@ namespace Sayuri {
   }
 
   // エントリーの種類ごとの比率データ。
-  template<TTScoreType Type>
+  template<ScoreType Type>
   int TranspositionTable::GetRatioPermill() const {
     int num_all = 0;
     int num_entry = 0;
@@ -173,11 +173,11 @@ namespace Sayuri {
   }
   // 実体化。
   template
-  int TranspositionTable::GetRatioPermill<TTScoreType::EXACT>() const;
+  int TranspositionTable::GetRatioPermill<ScoreType::EXACT>() const;
   template
-  int TranspositionTable::GetRatioPermill<TTScoreType::ALPHA>() const;
+  int TranspositionTable::GetRatioPermill<ScoreType::ALPHA>() const;
   template
-  int TranspositionTable::GetRatioPermill<TTScoreType::BETA>() const;
+  int TranspositionTable::GetRatioPermill<ScoreType::BETA>() const;
 
   /****************/
   /* static関数。 */
@@ -197,7 +197,7 @@ namespace Sayuri {
   /************************/
   // コンストラクタ。
   TTEntry::TTEntry(HashKey key, int depth, int score,
-  TTScoreType score_type, Move best_move) :
+  ScoreType score_type, Move best_move) :
   exists_(true),
   key_(key),
   depth_(depth),
@@ -212,7 +212,7 @@ namespace Sayuri {
   key_(0ULL),
   depth_(-MAX_VALUE),
   score_(0),
-  score_type_(TTScoreType::ALPHA) {
+  score_type_(ScoreType::ALPHA) {
   }
 
   // コピーコンストラクタ。
