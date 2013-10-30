@@ -408,7 +408,7 @@ namespace Sayuri {
       // 駒の情報からハッシュを得るための配列。
       // piece_hash_table_[サイド][駒の種類][駒の位置]
       static Hash piece_hash_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
-      // 手番からハッシュキーを得るための配列。
+      // 手番からハッシュを得るための配列。
       static Hash to_move_hash_table_[NUM_SIDES];
       // キャスリングの権利からハッシュを得るための配列。
       // 0: 白のショートキャスリング。
