@@ -36,7 +36,7 @@ namespace Sayuri {
       /**************************/
       /* コンストラクタと代入。 */
       /**************************/
-      Evaluator(ChessEngine* engine_ptr);
+      Evaluator(const ChessEngine& engine_ptr);
       Evaluator() = delete;
       Evaluator(const Evaluator& eval);
       Evaluator(Evaluator&& eval);
@@ -67,10 +67,10 @@ namespace Sayuri {
           /* コンストラクタと代入。 */
           /**************************/
           // [引数]
-          // openint_weight: ピース(ポーン以外の駒)が14個の時のウェイト。
-          // ending_weight: ピース(ポーン以外の駒)が0個の時のウェイト。
+          // openint_weight: 駒(キング以外)が30個の時のウェイト。
+          // ending_weight: 駒(キング以外)が0個の時のウェイト。
           Weight(double opening_weight, double ending_weight) :
-          modulus_((opening_weight - ending_weight) / 14.0),
+          modulus_((opening_weight - ending_weight) / 30.0),
           shift_(ending_weight) {}
 
           // その他のコンストラクタと代入。
@@ -329,7 +329,7 @@ namespace Sayuri {
       /* メンバ変数。 */
       /****************/
       // 使用するチェスエンジン。
-      ChessEngine* engine_ptr_;
+      const ChessEngine* engine_ptr_;
       // 価値の変数。
       double position_value_[NUM_PIECE_TYPES];  // 各駒の配置。
       double pawn_position_ending_value_;  //  ポーンの終盤の配置。

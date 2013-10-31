@@ -35,11 +35,12 @@
 #include "transposition_table.h"
 #include "fen.h"
 #include "pv_line.h"
+#include "position_record.h"
 
 namespace Sayuri {
-  /****************************/
-  /* チェスエンジンのクラス。 */
-  /****************************/
+  class PositionRecord;
+
+  // チェスエンジンのクラス。
   class ChessEngine {
     public:
       /*******************************/
@@ -152,7 +153,7 @@ namespace Sayuri {
       // move: 探したい手。
       // [戻り値]
       // 評価値。
-      int SEE(Move move);
+      int SEE(Move move) const;
 
       // 現在の局面のハッシュを計算する。
       // (注)計算に時間がかかる。
@@ -358,11 +359,6 @@ namespace Sayuri {
       Move killer_stack_[MAX_PLYS];
       // 現在のIterative Deepeningの深さ。
       int i_depth_;
-      // 局面のスタック。
-      Hash position_stack_[MAX_POSITIONS + 1];
-      Hash* position_stack_begin_;
-      Hash* position_stack_end_;
-      Hash* position_stack_ptr_;
       // 探索したノード数。
       std::size_t searched_nodes_;
       // 探索開始時間。
@@ -401,6 +397,8 @@ namespace Sayuri {
       std::vector<Move> move_history_;
       // 50手ルールの履歴。
       std::vector<int> ply_100_history_;
+      // 配置の履歴。
+      std::vector<PositionRecord> position_history_;
 
       /******************/
       /* ハッシュ関連。 */

@@ -38,6 +38,7 @@
 #include "evaluator.h"
 #include "error.h"
 #include "uci_shell.h"
+#include "position_record.h"
 
 namespace Sayuri {
   // クイース探索。
@@ -59,7 +60,7 @@ namespace Sayuri {
     Side enemy_side = side ^ 0x3;
 
     // stand_pad。
-    Evaluator eval(this);
+    Evaluator eval(*this);
     int stand_pad = eval.Evaluate();
 
     // アルファ値、ベータ値を調べる。
@@ -78,7 +79,7 @@ namespace Sayuri {
 
     // 候補手を作る。
     // 駒を取る手だけ。
-    MoveMaker maker(this);
+    MoveMaker maker(*this);
     Move prev_best;
     if (IsAttacked(king_[side], enemy_side)) {
       maker.GenMoves<GenMoveType::ALL>(prev_best, iid_stack_[level],
@@ -142,24 +143,6 @@ namespace Sayuri {
     if (level > searched_level_) {
       searched_level_ = level;
     }
-
-    // NOTE: 3回繰り返しをチェックすると、アホな手を指し始めるので、保留。
-    /*
-    // 3回繰り返しをチェックする。
-    int count = 0;
-    for (Hash* ptr = position_stack_begin_;
-    ptr < position_stack_ptr_; ptr++) {
-      if (*position_stack_ptr_ == pos_hash) {
-        count++;
-      }
-    }
-    if (count >= 3) {
-      int score = SCORE_DRAW;
-      if (score <= alpha) return alpha;
-      if (score >= beta) return beta;
-      return score;
-    }
-    */
 
     // サイドとチェックされているか。
     Side side = to_move_;
@@ -269,7 +252,7 @@ namespace Sayuri {
     /* PVSearch。 */
     /**************/
     // 手を作る。
-    MoveMaker maker(this);
+    MoveMaker maker(*this);
     maker.GenMoves<GenMoveType::ALL>(prev_best, iid_stack_[level],
     killer_stack_[level]);
 
@@ -296,14 +279,11 @@ namespace Sayuri {
         margin = GetMargin(move, depth);
       }
 
-      *position_stack_ptr_ = next_hash;
-      position_stack_ptr_++;
       MakeMove(move);
 
       // 合法手じゃなければ次の手へ。
       if (IsAttacked(king_[side], enemy_side)) {
         UnmakeMove(move);
-        position_stack_ptr_--;
         continue;
       }
 
@@ -314,7 +294,6 @@ namespace Sayuri {
       if (do_futility_pruning) {
         if ((material + margin) <= alpha) {
           UnmakeMove(move);
-          position_stack_ptr_--;
           continue;
         }
       }
@@ -358,9 +337,20 @@ namespace Sayuri {
         }
       }
 
+      // 相手の手番の初手の場合、3回繰り返しルールをチェック。
+      if (level == 1) {
+        int repetitions = 0;
+        for (auto& a : position_history_) {
+          if (a == *this) {
+            repetitions++;
+          }
+        }
+        if (repetitions >= 2) {
+          score = SCORE_DRAW;
+        }
+      }
 
       UnmakeMove(move);
-      position_stack_ptr_--;
       num_searched_moves++;
 
       // ベータ値を調べる。
@@ -473,7 +463,7 @@ namespace Sayuri {
     TimePoint now = SysClock::now();
     TimePoint next_send_info_time = now + Chrono::milliseconds(1000);
     std::vector<Move> move_vec;
-    MoveMaker maker(this);
+    MoveMaker maker(*this);
     for (i_depth_ = 1; i_depth_ <= MAX_PLYS; i_depth_++) {
       // 探索終了。
       if (ShouldBeStopped()) break;
@@ -531,14 +521,11 @@ namespace Sayuri {
         // 次のハッシュ。
         Hash next_hash = GetNextHash(pos_hash, move);
 
-        *position_stack_ptr_ = next_hash;
-        position_stack_ptr_++;
         MakeMove(move);
 
         // 合法手じゃなければ次の手へ。
         if (IsAttacked(king_[side], enemy_side)) {
           UnmakeMove(move);
-          position_stack_ptr_--;
           continue;
         }
 
@@ -556,7 +543,6 @@ namespace Sayuri {
             // 探索すべき手ではなかった。
             // 次の手へ。
             UnmakeMove(move);
-            position_stack_ptr_--;
             continue;
           }
         }
@@ -650,8 +636,18 @@ namespace Sayuri {
           }
         }
 
+        // 3回繰り返しルールをチェック。
+        int repetitions = 0;
+        for (auto& a : position_history_) {
+          if (a == *this) {
+            repetitions++;
+          }
+        }
+        if (repetitions >= 2) {
+          score = SCORE_DRAW;
+        }
+
         UnmakeMove(move);
-        position_stack_ptr_--;
         num_searched_moves++;
 
         // ストップがかかっていたらループを抜ける。
@@ -704,7 +700,7 @@ namespace Sayuri {
   }
 
   // SEE。
-  int ChessEngine::SEE(Move move) {
+  int ChessEngine::SEE(Move move) const {
     int score = 0;
 
     if (move.all_) {
@@ -730,15 +726,16 @@ namespace Sayuri {
 
       Side side = to_move_;
 
-      MakeMove(move);
+      ChessEngine* self = const_cast<ChessEngine*>(this);
+      self->MakeMove(move);
 
       // 違法な手なら計算しない。
       if (!(IsAttacked(king_[side], side ^ 0x3))) {
         // 再帰して次の局面の評価値を得る。
-        score = capture_value - SEE(GetNextSEEMove(move.to_));
+        score = capture_value - self->SEE(GetNextSEEMove(move.to_));
       }
 
-      UnmakeMove(move);
+      self->UnmakeMove(move);
     }
 
     return score;

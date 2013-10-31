@@ -38,6 +38,7 @@
 #include "move_maker.h"
 #include "error.h"
 #include "uci_shell.h"
+#include "position_record.h"
 
 namespace Sayuri {
   /****************/
@@ -72,6 +73,9 @@ namespace Sayuri {
 
     // 50手ルールの履歴をコピー。
     ply_100_history_ = engine.ply_100_history_;
+
+    // 駒の配置の履歴をコピー。
+    position_history_ = engine.position_history_;
   }
 
   // ムーブコンストラクタ。
@@ -84,6 +88,9 @@ namespace Sayuri {
 
     // 50手ルールの履歴をムーブ。
     ply_100_history_ = std::move(engine.ply_100_history_);
+
+    // 駒の配置の履歴をムーブ。
+    position_history_ = std::move(engine.position_history_);
   }
 
   // コピー代入。
@@ -96,6 +103,9 @@ namespace Sayuri {
 
     // 50手ルールの履歴をコピー。
     ply_100_history_ = engine.ply_100_history_;
+
+    // 駒の配置の履歴をコピー。
+    position_history_ = engine.position_history_;
 
     return *this;
   }
@@ -110,6 +120,9 @@ namespace Sayuri {
 
     // 50手ルールの履歴をムーブ。
     ply_100_history_ = std::move(engine.ply_100_history_);
+
+    // 駒の配置の履歴をムーブ。
+    position_history_ = std::move(engine.position_history_);
 
     return *this;
   }
@@ -129,6 +142,9 @@ namespace Sayuri {
    * パブリック関数。 *
    ********************/
   void ChessEngine::LoadFen(const Fen& fen) {
+    // とりあえず初期化。
+    SetNewGame();
+
     // キングの数がおかしいならやめる。
     int num_white_king = Util::CountBits(fen.position()[WHITE][KING]);
     int num_black_king = Util::CountBits(fen.position()[BLACK][KING]);
@@ -162,10 +178,11 @@ namespace Sayuri {
     ply_100_ = fen.ply_100();
     ply_ = fen.ply();
 
-    // 現在の局面を保存。
-    position_stack_ptr_ = position_stack_begin_;
-    *position_stack_ptr_ = GetCurrentHash();
-    position_stack_ptr_++;
+    // 履歴を設定。
+    ply_100_history_.clear();
+    ply_100_history_.push_back(ply_100_);
+    position_history_.clear();
+    position_history_.push_back(PositionRecord(*this));
   }
 
   // 新しいゲームの準備をする。
@@ -292,20 +309,16 @@ namespace Sayuri {
       killer_stack_[i] = Move();
     }
 
-    // 局面のスタックを初期化。
-    for (int i = 0; i < (MAX_POSITIONS + 1); i++) {
-      position_stack_[i] = 0ULL;
-    }
-    position_stack_begin_ = position_stack_ptr_ = position_stack_;
-    position_stack_end_ = &(position_stack_[(MAX_POSITIONS - 1) + 1]);
-    *position_stack_ptr_ = GetCurrentHash();
-    position_stack_ptr_++;
-
     // 手の履歴を削除。
     move_history_.clear();
 
-    // 50手ルールの履歴を削除。
+    // 50手ルールの履歴を初期化。
     ply_100_history_.clear();
+    ply_100_history_.push_back(0);
+
+    // 駒の配置を初期化。
+    position_history_.clear();
+    position_history_.push_back(PositionRecord(*this));
   }
 
   // 他のエンジンのメンバをコピーする。
@@ -363,14 +376,6 @@ namespace Sayuri {
     for (int i = 0; i < NUM_SIDES; i++) {
       has_castled_[i] = engine.has_castled_[i];
     }
-
-    // ポジションスタックをコピー。
-    for (int i = 0; i < (MAX_POSITIONS + 1); i++) {
-      position_stack_[i] = engine.position_stack_[i];
-      if (&(engine.position_stack_[i]) == engine.position_stack_ptr_) {
-        position_stack_ptr_ = &(position_stack_[i]);
-      }
-    }
   }
 
   // 思考を始める。
@@ -388,7 +393,7 @@ namespace Sayuri {
   void ChessEngine::PlayMove(Move move) {
     // 合法手かどうか調べる。
     // 手を展開する。
-    MoveMaker maker(this);
+    MoveMaker maker(*this);
     maker.GenMoves<GenMoveType::ALL>(Move(), Move(), Move());
     // 合法手かどうか調べる。
     bool is_legal = false;
@@ -423,8 +428,7 @@ namespace Sayuri {
       move_history_.push_back(move);
       ply_100_history_.push_back(ply_100_);
       MakeMove(move);
-      *position_stack_ptr_ = GetCurrentHash();
-      position_stack_ptr_++;
+      position_history_.push_back(PositionRecord(*this));
     } else {
       throw SayuriError("合法手ではありません。");
     }
@@ -438,8 +442,8 @@ namespace Sayuri {
       ply_100_ = ply_100_history_.back();
       move_history_.pop_back();
       ply_100_history_.pop_back();
+      position_history_.pop_back();
       UnmakeMove(move);
-      position_stack_ptr_--;
     } else {
       throw SayuriError("手を戻すことができません。");
     }

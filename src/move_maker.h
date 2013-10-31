@@ -52,7 +52,7 @@ namespace Sayuri {
       /**************************/
       /* コンストラクタと代入。 */
       /**************************/
-      MoveMaker(ChessEngine* engine_ptr);
+      MoveMaker(const ChessEngine& engine_ptr);
       MoveMaker() = delete;
       MoveMaker(const MoveMaker& maker);
       MoveMaker(MoveMaker&& maker);
@@ -96,7 +96,7 @@ namespace Sayuri {
       /* メンバ変数。 */
       /****************/
       // 親のチェスエンジン。
-      ChessEngine* engine_ptr_;
+      const ChessEngine* engine_ptr_;
 
       // 展開されるスタック。
       MoveSlot move_stack_[MAX_SLOTS + 1];

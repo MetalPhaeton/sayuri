@@ -213,13 +213,13 @@ namespace Sayuri {
     }
     ~Move() {}
     // 比較演算子。
-    bool operator==(const Move move) {
+    bool operator==(const Move move) const {
       if (move.from_ != from_) return false;
       if (move.to_ != to_) return false;
       if (move.promotion_ != promotion_) return false;
       return true;
     }
-    bool operator!=(const Move move) {
+    bool operator!=(const Move move) const {
       if (move.from_ != from_) return true;
       if (move.to_ != to_) return true;
       if (move.promotion_ != promotion_) return true;

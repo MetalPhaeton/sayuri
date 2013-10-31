@@ -41,8 +41,8 @@ namespace Sayuri {
   /* コンストラクタと代入。 */
   /**************************/
   //コンストラクタ。
-  MoveMaker::MoveMaker(ChessEngine* engine_ptr) :
-  engine_ptr_(engine_ptr) {
+  MoveMaker::MoveMaker(const ChessEngine& engine_ptr) :
+  engine_ptr_(&engine_ptr) {
     // スタックのポインターをセット。
     begin_ = last_ = current_ = move_stack_;
     end_ = &(move_stack_[MAX_SLOTS]);

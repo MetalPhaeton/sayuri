@@ -75,7 +75,7 @@ namespace Sayuri {
   const Evaluator::Weight Evaluator::WEIGHT_BISHOP_PAIR(30.0, 50.0);
   // ビショップにピンされたナイト。
   const Evaluator::Weight
-  Evaluator::WEIGHT_PINED_KNIGHT_BY_BISHOP(-10.0, -10.0);
+  Evaluator::WEIGHT_PINED_KNIGHT_BY_BISHOP(-5.0, 0.0);
   // セミオープンファイルのルーク。
   const Evaluator::Weight Evaluator::WEIGHT_ROOK_SEMI_OPEN(3.5, 3.5);
   // オープンファイルのルーク。
@@ -128,8 +128,8 @@ namespace Sayuri {
   /* コンストラクタと代入。 */
   /**************************/
   // コンストラクタ。
-  Evaluator::Evaluator(ChessEngine* engine_ptr)
-  : engine_ptr_(engine_ptr) {
+  Evaluator::Evaluator(const ChessEngine& engine_ptr)
+  : engine_ptr_(&engine_ptr) {
   }
 
   // コピーコンストラクタ。
@@ -253,9 +253,7 @@ namespace Sayuri {
     // ウェイトを付けて評価値を得る。
     double num_pieces = static_cast<double>
     (Util::CountBits((engine_ptr_->blocker_0())
-    & ~(engine_ptr_->position()[WHITE][PAWN]
-    | engine_ptr_->position()[BLACK][PAWN]
-    | engine_ptr_->position()[WHITE][KING]
+    & ~(engine_ptr_->position()[WHITE][KING]
     | engine_ptr_->position()[BLACK][KING])));
     // マテリアル。
     double score = static_cast<double>(engine_ptr_->GetMaterial(side));

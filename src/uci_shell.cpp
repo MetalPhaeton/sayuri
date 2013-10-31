@@ -352,7 +352,6 @@ namespace Sayuri {
           fen_str += parser.Get().str_ + " ";
         }
         // エンジンにロード。
-        engine_ptr_->SetNewGame();
         engine_ptr_->LoadFen(Fen(fen_str));
       } else if (word.str_ == "moves") {
         // moveコマンド。
