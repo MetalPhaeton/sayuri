@@ -100,7 +100,7 @@ namespace Sayuri {
 
   // ムーブ代入。
   TranspositionTable&
-  TranspositionTable::operator=(const TranspositionTable& table) {
+  TranspositionTable::operator=(TranspositionTable&& table) {
     max_bytes_ = table.max_bytes_;
     entry_table_ = std::move(table.entry_table_);
 
