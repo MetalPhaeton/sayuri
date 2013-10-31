@@ -30,7 +30,7 @@ cmake_minimum_required(VERSION 2.8)
 
 # プロジェクト名。
 project(SAYURI)
-set(VERSION "2013.10.30")
+set(VERSION "2013.10.31")
 
 # ソースとヘッダファイルのリスト。
 file(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
