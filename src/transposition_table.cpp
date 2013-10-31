@@ -42,6 +42,9 @@ namespace Sayuri {
   constexpr Hash TranspositionTable::TABLE_KEY_MASK;
   constexpr std::size_t TranspositionTable::TABLE_SIZE;
 
+  /**************************/
+  /* コンストラクタと代入。 */
+  /**************************/
   // コンストラクタ。
   TranspositionTable::TranspositionTable(std::size_t max_bytes) :
   entry_table_(new std::vector<TTEntry>[TABLE_SIZE]) {
@@ -74,10 +77,7 @@ namespace Sayuri {
   entry_table_(new std::vector<TTEntry>[TABLE_SIZE]) {
     // テーブルをコピー。
     for (std::size_t i = 0; i < TABLE_SIZE; i++) {
-      entry_table_[i].resize(table.entry_table_[i].size());
-      for (unsigned int j = 0; j < table.entry_table_[i].size(); j++) {
-        entry_table_[i][j] = table.entry_table_[i][j];
-      }
+      entry_table_[i] = table.entry_table_[i];
     }
   }
 
@@ -85,6 +85,26 @@ namespace Sayuri {
   TranspositionTable::TranspositionTable( TranspositionTable&& table) :
   max_bytes_(table.max_bytes_){
     entry_table_ = std::move(table.entry_table_); 
+  }
+
+  // コピー代入。
+  TranspositionTable&
+  TranspositionTable::operator=(const TranspositionTable& table) {
+    max_bytes_ = table.max_bytes_;
+
+    // テーブルをコピー。
+    for (std::size_t i = 0; i < TABLE_SIZE; i++) {
+      entry_table_[i] = table.entry_table_[i];
+    }
+  }
+
+  // ムーブ代入。
+  TranspositionTable&
+  TranspositionTable::operator=(const TranspositionTable& table) {
+    max_bytes_ = table.max_bytes_;
+    entry_table_ = std::move(table.entry_table_);
+
+    return *this;
   }
 
   // テーブルに追加する。

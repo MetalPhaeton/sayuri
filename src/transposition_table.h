@@ -46,7 +46,6 @@ namespace Sayuri {
       /**************************/
       /* コンストラクタと代入。 */
       /**************************/
-      // コンストラクタ。
       // [引数]
       // pos_hash: ポジションのハッシュ。
       // depth: 探索の深さ。
@@ -56,17 +55,12 @@ namespace Sayuri {
       // best_move: 最善手。
       TTEntry(Hash pos_hash, int depth,
       int value, ScoreType score_type, Move best_move);
-      // デフォルトコンストラクタ。
       TTEntry();
-      // コピーコンストラクタ。
       TTEntry(const TTEntry& entry);
-      // ムーブコンストラクタ。
       TTEntry(TTEntry&& entry);
-      // デストラクタ。
-      virtual ~TTEntry() {}
-      // 代入。
       TTEntry& operator=(const TTEntry& entry);
       TTEntry& operator=(TTEntry&& entry);
+      virtual ~TTEntry() {}
 
       /**********/
       /* 関数。 */
@@ -143,17 +137,18 @@ namespace Sayuri {
       static constexpr std::size_t TABLE_SIZE = TABLE_KEY_MASK + 1;
 
     public:
-      // コンストラクタ。
+      /**************************/
+      /* コンストラクタと代入。 */
+      /**************************/
       // [引数]
       // max_bytes: トランスポジションテーブルのサイズ指定。
       TranspositionTable(std::size_t max_bytes);
-      // コピーコンストラクタ。
       TranspositionTable(const TranspositionTable& table);
-      // ムーブコンストラクタ。
       TranspositionTable(TranspositionTable&& table);
-      TranspositionTable() = delete;
-      // デストラクタ。
+      TranspositionTable& operator=(const TranspositionTable& table);
+      TranspositionTable& operator=(TranspositionTable&& table);
       virtual ~TranspositionTable() {}
+      TranspositionTable() = delete;
 
       /**********/
       /* 関数。 */

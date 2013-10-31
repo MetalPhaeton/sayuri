@@ -36,12 +36,15 @@ namespace Sayuri {
       /**************************/
       /* コンストラクタと代入。 */
       /**************************/
-      Evaluator(const ChessEngine& engine_ptr);
+      // [引数]
+      // engine: 評価したいエンジン。
+      Evaluator(const ChessEngine& engine);
       Evaluator() = delete;
       Evaluator(const Evaluator& eval);
       Evaluator(Evaluator&& eval);
       Evaluator& operator=(const Evaluator& eval);
       Evaluator& operator=(Evaluator&& eval);
+      virtual ~Evaluator() {}
 
       /*****************************/
       /* Evaluatorクラスの初期化。 */
@@ -72,13 +75,24 @@ namespace Sayuri {
           Weight(double opening_weight, double ending_weight) :
           modulus_((opening_weight - ending_weight) / 30.0),
           shift_(ending_weight) {}
-
-          // その他のコンストラクタと代入。
+          Weight(const Weight& weight) :
+          modulus_(weight.modulus_),
+          shift_(weight.shift_){}
+          Weight(Weight&& weight) :
+          modulus_(weight.modulus_),
+          shift_(weight.shift_){}
+          Weight& operator=(const Weight& weight) {
+            modulus_ = weight.modulus_;
+            shift_ = weight.shift_;
+            return *this;
+          }
+          Weight& operator=(Weight&& weight) {
+            modulus_ = weight.modulus_;
+            shift_ = weight.shift_;
+            return *this;
+          }
+          virtual ~Weight() {}
           Weight() = delete;
-          Weight(const Weight&) = delete;
-          Weight(Weight&&) = delete;
-          Weight& operator=(const Weight&) = delete;
-          Weight& operator=(Weight&&) = delete;
 
           /********************/
           /* パブリック関数。 */

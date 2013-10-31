@@ -40,7 +40,6 @@ namespace Sayuri {
       /**************************/
       /* コンストラクタと代入。 */
       /**************************/
-      // コンストラクタ。
       PVSlot();
       PVSlot(const PVSlot& slot);
       PVSlot(PVSlot&& slot);

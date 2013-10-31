@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
     // エンジン準備。
     std::unique_ptr<Sayuri::ChessEngine> engine_ptr(new Sayuri::ChessEngine());
     std::unique_ptr<Sayuri::UCIShell>
-    shell_ptr(new Sayuri::UCIShell(engine_ptr.get()));
+    shell_ptr(new Sayuri::UCIShell(*engine_ptr));
 
     // エンジン起動。
     shell_ptr->Run();

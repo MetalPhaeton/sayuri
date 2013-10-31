@@ -128,8 +128,8 @@ namespace Sayuri {
   /* コンストラクタと代入。 */
   /**************************/
   // コンストラクタ。
-  Evaluator::Evaluator(const ChessEngine& engine_ptr)
-  : engine_ptr_(&engine_ptr) {
+  Evaluator::Evaluator(const ChessEngine& engine)
+  : engine_ptr_(&engine) {
   }
 
   // コピーコンストラクタ。

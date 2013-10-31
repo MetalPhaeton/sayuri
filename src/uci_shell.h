@@ -44,13 +44,15 @@ namespace Sayuri {
       /**************************/
       /* コンストラクタと代入。 */
       /**************************/
-      // コンストラクタ。
-      UCIShell(ChessEngine* engine_ptr);
+      // [引数]
+      // engine: UCIで操作したいエンジン。
+      UCIShell(ChessEngine& engine);
       UCIShell() = delete;
       UCIShell(const UCIShell& shell);
       UCIShell(UCIShell&& shell);
       UCIShell& operator=(const UCIShell& shell);
       UCIShell& operator=(UCIShell&& shell);
+      virtual ~UCIShell() {}
 
       /********************/
       /* パブリック関数。 */
@@ -160,6 +162,7 @@ namespace Sayuri {
           CommandParser(CommandParser&& parser);
           CommandParser& operator=(const CommandParser& parser);
           CommandParser& operator=(CommandParser&& parser);
+          virtual ~CommandParser() {}
 
           /********************/
           /* パブリック関数。 */

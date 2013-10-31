@@ -48,6 +48,7 @@ namespace Sayuri {
       PositionRecord(PositionRecord&& record);
       PositionRecord& operator=(const PositionRecord& record);
       PositionRecord& operator=(PositionRecord&& record);
+      virtual ~PositionRecord() {}
 
       /****************/
       /* 比較演算子。 */

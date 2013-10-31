@@ -46,8 +46,8 @@ namespace Sayuri {
   /* コンストラクタと代入。 */
   /**************************/
   // コンストラクタ。
-  UCIShell::UCIShell(ChessEngine* engine_ptr) :
-  engine_ptr_(engine_ptr),
+  UCIShell::UCIShell(ChessEngine& engine) :
+  engine_ptr_(&engine),
   table_size_(64 * 1024 * 1024),
   enable_pondering_(true) {
   }
