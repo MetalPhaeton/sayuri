@@ -229,7 +229,7 @@ namespace Sayuri {
         MakeMove(null_move);
 
         // Null Move Search。
-        int reduction = depth / 2;
+        int reduction = depth / 3;
         PVLine temp_line;
         int score = -Search<NodeType::NON_PV>(pos_hash, depth - reduction - 1,
         level + 1, -(beta), -(beta - 1), table, temp_line);
@@ -238,8 +238,9 @@ namespace Sayuri {
         is_null_searching_ = false;
 
         if (score >= beta) {
-          depth -= reduction;
+          depth -= 3;
           if (depth <= 0) {
+            // NOTE: たぶんここは処理されない。
             // クイース探索ノードに移行するため、ノード数を減らしておく。
             searched_nodes_--;
             return Quiesce(depth, level, alpha, beta, table);
@@ -303,7 +304,7 @@ namespace Sayuri {
       int score;
       PVLine next_line;
       if ((depth >= 3) && (num_searched_moves >= 4)) {
-        int reduction = depth / 2;
+        int reduction = 1;
         if (!is_checked && (Type == NodeType::NON_PV)) {
           // History Puruning。
           if (!move.captured_piece_
@@ -598,7 +599,7 @@ namespace Sayuri {
           // PV発見後。
           // Late move Reduction。
           if ((i_depth_ >= 3) && (num_searched_moves >= 4)) {
-            int reduction = i_depth_ / 2;
+            int reduction = 1;
             // ゼロウィンドウ探索。
             score = -Search<NodeType::NON_PV>(next_hash,
             i_depth_ - reduction - 1, level + 1, -(alpha + 1),

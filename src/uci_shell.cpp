@@ -465,6 +465,7 @@ namespace Sayuri {
           try {
             max_depth = std::stoi(parser.Get().str_);
             if (max_depth > MAX_PLYS) max_depth = MAX_PLYS;
+            thinking_time = Chrono::milliseconds(3600000);
           } catch (...) {
             // 無視。
           }
@@ -475,6 +476,7 @@ namespace Sayuri {
           try {
             max_nodes = std::stoull(parser.Get().str_);
             if (max_nodes > MAX_NODES) max_nodes = MAX_NODES;
+            thinking_time = Chrono::milliseconds(3600000);
           } catch (...) {
             // 無視。
           }
@@ -485,6 +487,7 @@ namespace Sayuri {
           try {
             max_depth = (std::stoi(parser.Get().str_) * 2) - 1;
             if (max_depth > MAX_PLYS) max_depth = MAX_PLYS;
+            thinking_time = Chrono::milliseconds(3600000);
           } catch (...) {
             // 無視。
           }

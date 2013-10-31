@@ -96,6 +96,8 @@ namespace Sayuri {
     for (std::size_t i = 0; i < TABLE_SIZE; i++) {
       entry_table_[i] = table.entry_table_[i];
     }
+
+    return *this;
   }
 
   // ムーブ代入。
