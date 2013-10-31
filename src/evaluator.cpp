@@ -83,9 +83,9 @@ namespace Sayuri {
   // 早すぎるクイーンの始動。
   const Evaluator::Weight Evaluator::WEIGHT_EARLY_QUEEN_LAUNCHED(-4.0, 0.0);
   // ポーンの盾。
-  const Evaluator::Weight Evaluator::WEIGHT_PAWN_SHIELD(40.0, 0.0);
+  const Evaluator::Weight Evaluator::WEIGHT_PAWN_SHIELD(7.5, 0.0);
   // キャスリング。(これの2倍が評価値。)
-  const Evaluator::Weight Evaluator::WEIGHT_CASTLING(20.0, 0.0);
+  const Evaluator::Weight Evaluator::WEIGHT_CASTLING(7.5, 0.0);
 
   /****************/
   /* static定数。 */
