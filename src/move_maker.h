@@ -55,11 +55,11 @@ namespace Sayuri {
       // [引数]
       // engine: 手を作る対象のエンジン。
       MoveMaker(const ChessEngine& engine);
-      MoveMaker() = delete;
       MoveMaker(const MoveMaker& maker);
       MoveMaker(MoveMaker&& maker);
       MoveMaker& operator=(const MoveMaker& maker);
       MoveMaker& operator=(MoveMaker&& maker);
+      MoveMaker() = delete;
       virtual ~MoveMaker() {}
 
       /********************/

@@ -39,11 +39,11 @@ namespace Sayuri {
       // [引数]
       // engine: 評価したいエンジン。
       Evaluator(const ChessEngine& engine);
-      Evaluator() = delete;
       Evaluator(const Evaluator& eval);
       Evaluator(Evaluator&& eval);
       Evaluator& operator=(const Evaluator& eval);
       Evaluator& operator=(Evaluator&& eval);
+      Evaluator() = delete;
       virtual ~Evaluator() {}
 
       /*****************************/

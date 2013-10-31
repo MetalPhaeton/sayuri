@@ -47,12 +47,12 @@ namespace Sayuri {
       // [引数]
       // engine: UCIで操作したいエンジン。
       UCIShell(ChessEngine& engine);
-      UCIShell() = delete;
       UCIShell(const UCIShell& shell);
       UCIShell(UCIShell&& shell);
       UCIShell& operator=(const UCIShell& shell);
       UCIShell& operator=(UCIShell&& shell);
       virtual ~UCIShell() {}
+      UCIShell() = delete;
 
       /********************/
       /* パブリック関数。 */
@@ -157,12 +157,12 @@ namespace Sayuri {
           // argv: コマンドの引数リスト。
           CommandParser(const std::vector<std::string>& keywords,
           const std::vector<std::string>& argv);
-          CommandParser() = delete;
           CommandParser(const CommandParser& parser);
           CommandParser(CommandParser&& parser);
           CommandParser& operator=(const CommandParser& parser);
           CommandParser& operator=(CommandParser&& parser);
           virtual ~CommandParser() {}
+          CommandParser() = delete;
 
           /********************/
           /* パブリック関数。 */
