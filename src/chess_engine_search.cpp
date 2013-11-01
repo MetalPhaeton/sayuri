@@ -597,7 +597,7 @@ namespace Sayuri {
           }
         } else {
           // PV発見後。
-          // Late move Reduction。
+          // Late Move Reduction。
           if ((i_depth_ >= 3) && (num_searched_moves >= 4)) {
             int reduction = 1;
             // ゼロウィンドウ探索。
