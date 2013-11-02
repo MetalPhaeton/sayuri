@@ -204,6 +204,7 @@ namespace Sayuri {
     }
 
     // PVノードの時はIID、そうじゃないノードならNull Move Reduction。
+    bool is_reduced_by_null = false;
     if (Type == NodeType::PV) {
       // 前回の繰り返しの最善手があればIIDしない。
       if (prev_best.all_) {
@@ -229,7 +230,7 @@ namespace Sayuri {
         MakeMove(null_move);
 
         // Null Move Search。
-        int reduction = depth / 3;
+        int reduction = 3;
         PVLine temp_line;
         int score = -Search<NodeType::NON_PV>(pos_hash, depth - reduction - 1,
         level + 1, -(beta), -(beta - 1), table, temp_line);
@@ -238,13 +239,8 @@ namespace Sayuri {
         is_null_searching_ = false;
 
         if (score >= beta) {
-          depth -= 3;
-          if (depth <= 0) {
-            // NOTE: たぶんここは処理されない。
-            // クイース探索ノードに移行するため、ノード数を減らしておく。
-            searched_nodes_--;
-            return Quiesce(depth, level, alpha, beta, table);
-          }
+          depth -= reduction;
+          is_reduced_by_null = true;
         }
       }
     }
@@ -301,9 +297,11 @@ namespace Sayuri {
 
       // 探索。
       // Late Move Reduction。
+      // ただし、Null Move Reductionされていれば実行しない。
       int score;
       PVLine next_line;
-      if ((depth >= 3) && (num_searched_moves >= 4)) {
+      if (!is_reduced_by_null && (depth >= 3)
+      && (num_searched_moves >= 4)) {
         int reduction = 1;
         if (!is_checked && (Type == NodeType::NON_PV)) {
           // History Puruning。
