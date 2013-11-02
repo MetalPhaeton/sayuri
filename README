@@ -50,4 +50,4 @@ CMakeでMakefileを作った後以下のコマンドを実行してください�
     sayuri-xxxx.xx.xx.tar.Z
     sayuri-xxxx.xx.xx.tar.bz2
     sayuri-xxxx.xx.xx.tar.gz
-(注)'xxxx.xx.xx'にはバージョン番号が入る。
+(注)'xxxx.xx.xx'にはバージョン番号が入ります。
