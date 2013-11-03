@@ -87,8 +87,6 @@ namespace Sayuri {
       /**************/
       /* アクセサ。 */
       /**************/
-      // データがあるかどうか。
-      bool exists() const {return exists_;}
       // ハッシュ。
       Hash hash() const {return hash_;}
       // 深さ。
@@ -109,8 +107,6 @@ namespace Sayuri {
       /****************/
       /* メンバ変数。 */
       /****************/
-      // データがあるかどうか。
-      bool exists_;
       // ハッシュ。
       Hash hash_;
       // 探索のレベル。
@@ -132,9 +128,9 @@ namespace Sayuri {
       /* 定数。 */
       /**********/
       // ハッシュのテーブル用マスク。
-      static constexpr Hash TABLE_KEY_MASK = 0XffffULL;
+      static constexpr Hash TABLE_HASH_MASK = 0XffffULL;
       // テーブルの大きさ。
-      static constexpr std::size_t TABLE_SIZE = TABLE_KEY_MASK + 1;
+      static constexpr std::size_t TABLE_SIZE = TABLE_HASH_MASK + 1;
 
     public:
       /**************************/
@@ -155,12 +151,12 @@ namespace Sayuri {
       /**********/
       // テーブルに追加する。
       // [引数]
-      // hash: ハッシュ。
+      // pos_hash: ハッシュ。
       // depth: 探索の深さ。
       // value: 評価値。
       // score_type: 評価値の種類。
       // best_move: 最善手。
-      void Add(Hash hash, int depth,
+      void Add(Hash pos_hash, int depth,
       int value, ScoreType score_type, Move best_move);
       // 条件を満たすエントリーを得る。
       // [引数]
@@ -169,25 +165,24 @@ namespace Sayuri {
       // [戻り値]
       // 条件を満たすエントリー。
       // なければnullptr。
-      TTEntry* GetFulfiledEntry(Hash pos_hash, int depth) const;
+      TTEntry* GetEntry(Hash pos_hash, int depth) const;
 
       // 大きさが何バイトか返す。
       // [戻り値]
       // サイズをバイト数で返す。
-      std::size_t GetSizeBytes() const;
+      std::size_t GetSizeBytes() const {
+        return num_all_entries_ * sizeof(TTEntry);
+      }
+
 
       // 使用されているエントリーのサイズを全体の何パーミルかを返す。
       // [戻り値]
       // エントリーのパーミル。
-      int GetUsedPermill() const;
+      int GetUsedPermill() const {
+        return static_cast<int>
+        ((num_used_entries_ * 1000) / num_all_entries_);
+      }
 
-      // エントリーの種類ごとの比率データ。
-      // [引数]
-      // <Type>: 調べたい種類。
-      // [戻り値]
-      // 調べたい種類の比率データ。パーミル。
-      template<ScoreType Type>
-      int GetRatioPermill() const;
 
       /****************/
       /* static関数。 */
@@ -195,12 +190,17 @@ namespace Sayuri {
       // テーブルの最小サイズを得る。
       // [戻り値]
       // 最小サイズ。
-      static std::size_t GetMinSize();
+      static std::size_t GetMinSize() {
+        return sizeof(TTEntry) * TABLE_SIZE;
+      }
 
       // テーブルの最大サイズを得る。
       // [戻り値]
       // 最大サイズ。
-      static std::size_t GetMaxSize();
+      static std::size_t GetMaxSize() {
+        // 最大1ギガ。
+        return 1024 * 1024 * 1024;
+      }
 
     private:
       /**********************/
@@ -210,14 +210,18 @@ namespace Sayuri {
       // [引数]
       // pos_hash: ポジションのハッシュ。
       int GetTableIndex(Hash pos_hash) const {
-        return pos_hash & (TABLE_KEY_MASK);
+        return pos_hash & (TABLE_HASH_MASK);
       }
 
       /****************/
       /* メンバ変数。 */
       /****************/
       // サイズの上限。
-      int max_bytes_;
+      std::size_t max_bytes_;
+      // 全てのエントリーの個数。
+      std::size_t num_all_entries_;
+      // 使用済みのエントリーの個数。
+      std::size_t num_used_entries_;
       // エントリーを登録するテーブル。
       std::unique_ptr<std::vector<TTEntry>[]> entry_table_;
   };

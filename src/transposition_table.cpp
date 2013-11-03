@@ -39,7 +39,7 @@ namespace Sayuri {
   /* トランスポジションテーブルのクラス。 */
   /****************************************/
   // static定数。
-  constexpr Hash TranspositionTable::TABLE_KEY_MASK;
+  constexpr Hash TranspositionTable::TABLE_HASH_MASK;
   constexpr std::size_t TranspositionTable::TABLE_SIZE;
 
   /**************************/
@@ -47,6 +47,7 @@ namespace Sayuri {
   /**************************/
   // コンストラクタ。
   TranspositionTable::TranspositionTable(std::size_t max_bytes) :
+  num_used_entries_(0),
   entry_table_(new std::vector<TTEntry>[TABLE_SIZE]) {
     // 大きさを整える。
     if (max_bytes > GetMaxSize()) {
@@ -59,7 +60,7 @@ namespace Sayuri {
     // エントリーをいくつ作るか計算する。
     std::size_t num_entries = max_bytes / sizeof(TTEntry);
 
-    // 一つのテーブルにつきいくつのエントリーを用意するか決める。
+    // 一つのインデックスにつきいくつのエントリーを用意するか決める。
     num_entries /= TABLE_SIZE;
     if (num_entries <= 0) {
       num_entries = 1;
@@ -69,11 +70,16 @@ namespace Sayuri {
     for (std::size_t i = 0; i < TABLE_SIZE; i++) {
       entry_table_[i].resize(num_entries);
     }
+
+    // 全てのエントリーの個数をセット。
+    num_all_entries_ = TABLE_SIZE * num_entries;
   }
 
   // コピーコンストラクタ。
   TranspositionTable::TranspositionTable(const TranspositionTable& table) :
   max_bytes_(table.max_bytes_),
+  num_all_entries_(table.num_all_entries_),
+  num_used_entries_(table.num_used_entries_),
   entry_table_(new std::vector<TTEntry>[TABLE_SIZE]) {
     // テーブルをコピー。
     for (std::size_t i = 0; i < TABLE_SIZE; i++) {
@@ -83,13 +89,17 @@ namespace Sayuri {
 
   // ムーブコンストラクタ。
   TranspositionTable::TranspositionTable( TranspositionTable&& table) :
-  max_bytes_(table.max_bytes_){
+  max_bytes_(table.max_bytes_),
+  num_all_entries_(table.num_all_entries_),
+  num_used_entries_(table.num_used_entries_) {
     entry_table_ = std::move(table.entry_table_); 
   }
 
   // コピー代入。
   TranspositionTable&
   TranspositionTable::operator=(const TranspositionTable& table) {
+    num_all_entries_ = table.num_all_entries_;
+    num_used_entries_ = table.num_used_entries_;
     max_bytes_ = table.max_bytes_;
 
     // テーブルをコピー。
@@ -103,6 +113,8 @@ namespace Sayuri {
   // ムーブ代入。
   TranspositionTable&
   TranspositionTable::operator=(TranspositionTable&& table) {
+    num_all_entries_ = table.num_all_entries_;
+    num_used_entries_ = table.num_used_entries_;
     max_bytes_ = table.max_bytes_;
     entry_table_ = std::move(table.entry_table_);
 
@@ -117,6 +129,11 @@ namespace Sayuri {
 
     // 最後のエントリーのdepthを比べ、追加する側が大きければ追加。
     if (depth > entry_table_[index].back().depth()) {
+      // 使用済みエントリーの数を増加。
+      if (entry_table_[index].back().depth() <= -MAX_VALUE) {
+        num_used_entries_++;
+      }
+      // エントリーを追加。
       entry_table_[index].back() = TTEntry(pos_hash, depth, score,
       score_type, best_move);
 
@@ -127,14 +144,14 @@ namespace Sayuri {
   }
 
   // 該当するTTEntryを返す。
-  TTEntry* TranspositionTable::GetFulfiledEntry(Hash pos_hash,
+  TTEntry* TranspositionTable::GetEntry(Hash pos_hash,
   int depth) const {
     // テーブルのインデックスを得る。
     int index = GetTableIndex(pos_hash);
 
     TTEntry* entry_ptr = nullptr;
     for (auto& entry : entry_table_[index]) {
-      if (!(entry.exists())) return nullptr;  // エントリーがない。
+      if (entry.depth() <= -MAX_VALUE) return nullptr;  // エントリーがない。
 
       if (entry.Fulfil(pos_hash, depth)) {
         entry_ptr = &entry;  // エントリーが見つかった。
@@ -145,82 +162,12 @@ namespace Sayuri {
     return entry_ptr;
   }
 
-  //　テーブルのサイズのバイト数を返す。
-  std::size_t TranspositionTable::GetSizeBytes() const {
-    // TTEntryのサイズ。
-    std::size_t bytes = sizeof(TTEntry) * entry_table_[0].size() * TABLE_SIZE;
-
-    return bytes;
-  }
-
-  // エントリーのパーミル。
-  int TranspositionTable::GetUsedPermill() const {
-    // 全エントリーの数。
-    int num_all = TABLE_SIZE * entry_table_[0].size();
-
-    // 記録されているエントリーの数。
-    int num_entries = 0;
-    for (std::size_t i = 0; i < TABLE_SIZE; i++) {
-      for (auto& entry : entry_table_[i]) {
-        if (entry.exists()) {
-          num_entries++;
-        } else {
-          break;
-        }
-      }
-    }
-
-    return (num_entries * 1000) / num_all;
-  }
-
-  // エントリーの種類ごとの比率データ。
-  template<ScoreType Type>
-  int TranspositionTable::GetRatioPermill() const {
-    int num_all = 0;
-    int num_entry = 0;
-    for (std::size_t i = 0; i < TABLE_SIZE; i++) {
-      for (auto& entry : entry_table_[i]) {
-        if (entry.exists()) {
-          num_all += 1;
-          if (entry.score_type() == Type) {
-            num_entry += 1;
-          }
-        } else {
-          break;
-        }
-      }
-    }
-
-    return (num_entry * 1000) / num_all;
-  }
-  // 実体化。
-  template
-  int TranspositionTable::GetRatioPermill<ScoreType::EXACT>() const;
-  template
-  int TranspositionTable::GetRatioPermill<ScoreType::ALPHA>() const;
-  template
-  int TranspositionTable::GetRatioPermill<ScoreType::BETA>() const;
-
-  /****************/
-  /* static関数。 */
-  /****************/
-  // テーブルの最小サイズを得る。
-  std::size_t TranspositionTable::GetMinSize() {
-    return sizeof(TTEntry) * TABLE_SIZE;
-  }
-
-  // テーブルの最大サイズを得る。
-  std::size_t TranspositionTable::GetMaxSize() {
-    return sizeof(TTEntry) * TABLE_SIZE * 100;
-  }
-
   /************************/
   /* エントリーのクラス。 */
   /************************/
   // コンストラクタ。
   TTEntry::TTEntry(Hash hash, int depth, int score,
   ScoreType score_type, Move best_move) :
-  exists_(true),
   hash_(hash),
   depth_(depth),
   score_(score),
@@ -230,7 +177,6 @@ namespace Sayuri {
 
   // デフォルトコンストラクタ。
   TTEntry::TTEntry() :
-  exists_(false),
   hash_(0ULL),
   depth_(-MAX_VALUE),
   score_(0),
@@ -239,7 +185,6 @@ namespace Sayuri {
 
   // コピーコンストラクタ。
   TTEntry::TTEntry(const TTEntry& entry) :
-  exists_(entry.exists_),
   hash_(entry.hash_),
   depth_(entry.depth_),
   score_(entry.score_),
@@ -249,7 +194,6 @@ namespace Sayuri {
 
   // ムーブコンストラクタ。
   TTEntry::TTEntry(TTEntry&& entry) :
-  exists_(entry.exists_),
   hash_(entry.hash_),
   depth_(entry.depth_),
   score_(entry.score_),
@@ -259,7 +203,6 @@ namespace Sayuri {
 
   // コピー代入。
   TTEntry& TTEntry::operator=(const TTEntry& entry) {
-    exists_ = entry.exists_;
     hash_ = entry.hash_;
     depth_ = entry.depth_;
     score_ = entry.score_;
@@ -271,7 +214,6 @@ namespace Sayuri {
 
   // ムーブ代入。
   TTEntry& TTEntry::operator=(TTEntry&& entry) {
-    exists_ = entry.exists_;
     hash_ = entry.hash_;
     depth_ = entry.depth_;
     score_ = entry.score_;
@@ -283,7 +225,6 @@ namespace Sayuri {
 
   // 該当するならtrue。
   bool TTEntry::Fulfil(Hash hash, int depth) const {
-    if (!exists_) return false;
     if (depth > depth_) return false;
     if (hash != hash_) return false;
     return true;

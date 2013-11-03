@@ -151,7 +151,7 @@ namespace Sayuri {
 
     // トランスポジションテーブルを調べる。
     TTEntry* entry_ptr =
-    table.GetFulfiledEntry(pos_hash, depth);
+    table.GetEntry(pos_hash, depth);
     if (entry_ptr) {
       int score = entry_ptr->score();
       if (entry_ptr->score_type() == ScoreType::EXACT) {
@@ -197,7 +197,7 @@ namespace Sayuri {
     }
 
     // 前回の繰り返しの最善手を得る。
-    TTEntry* prev_entry = table.GetFulfiledEntry(pos_hash, depth - 1);
+    TTEntry* prev_entry = table.GetEntry(pos_hash, depth - 1);
     Move prev_best;
     if (prev_entry && (prev_entry->score_type() != ScoreType::ALPHA)) {
       prev_best = prev_entry->best_move();
@@ -489,7 +489,7 @@ namespace Sayuri {
 
       // 前回の繰り返しの最善手を得る。
       TTEntry* prev_entry =
-      table.GetFulfiledEntry(pos_hash, i_depth_ - 1);
+      table.GetEntry(pos_hash, i_depth_ - 1);
       Move prev_best;
       if (prev_entry && (prev_entry->score_type() != ScoreType::ALPHA)) {
         prev_best = prev_entry->best_move();
@@ -665,7 +665,7 @@ namespace Sayuri {
           if (!entry_ptr) {
             table.Add(pos_hash, i_depth_, score, ScoreType::EXACT, move);
 
-            entry_ptr = table.GetFulfiledEntry(pos_hash, i_depth_);
+            entry_ptr = table.GetEntry(pos_hash, i_depth_);
           } else {
             entry_ptr->Update(score, ScoreType::EXACT, move);
           }
