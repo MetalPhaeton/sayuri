@@ -233,17 +233,26 @@ namespace Sayuri {
 
     // 変更可能オプションの表示。
     // トランスポジションテーブルのサイズの変更。
-    std::cout << "option name Hash type spin default 64 min "
+    std::cout << "option name Hash type spin default "
+    << (UCI_DEFAULT_TABLE_SIZE / (1024 * 1024)) << " min "
     << (TranspositionTable::GetMinSize() / (1024 * 1024)) << " max "
     << (TranspositionTable::GetMaxSize() / (1024 * 1024)) << std::endl;
     // ポンダリングできるかどうか。
-    std::cout << "option name Ponder type check default true" << std::endl;
+    std::cout << "option name Ponder type check default ";
+    if (UCI_DEFAULT_PONDER) {
+      std::cout << "true";
+    } else {
+      std::cout << "false";
+    }
+    std::cout << std::endl;
+
+    // オーケー。
+    std::cout << "uciok" << std::endl;
 
     // オプションの初期設定。
-    table_size_ = 64 * 1024 * 1024;
-    enable_pondering_ = true;
+    table_size_ = UCI_DEFAULT_TABLE_SIZE;
+    enable_pondering_ = UCI_DEFAULT_PONDER;
 
-    std::cout << "uciok" << std::endl;
   }
 
   // isreadyコマンド。
@@ -397,7 +406,7 @@ namespace Sayuri {
     // 準備。
     int max_depth = MAX_PLYS;
     std::size_t max_nodes = MAX_NODES;
-    Chrono::milliseconds thinking_time(60000);
+    Chrono::milliseconds thinking_time(-1U >> 1);
     bool infinite_thinking = false;
     moves_to_search_ptr_.reset(nullptr);
 
@@ -465,7 +474,6 @@ namespace Sayuri {
           try {
             max_depth = std::stoi(parser.Get().str_);
             if (max_depth > MAX_PLYS) max_depth = MAX_PLYS;
-            thinking_time = Chrono::milliseconds(3600000);
           } catch (...) {
             // 無視。
           }
@@ -476,7 +484,6 @@ namespace Sayuri {
           try {
             max_nodes = std::stoull(parser.Get().str_);
             if (max_nodes > MAX_NODES) max_nodes = MAX_NODES;
-            thinking_time = Chrono::milliseconds(3600000);
           } catch (...) {
             // 無視。
           }
@@ -487,7 +494,6 @@ namespace Sayuri {
           try {
             max_depth = (std::stoi(parser.Get().str_) * 2) - 1;
             if (max_depth > MAX_PLYS) max_depth = MAX_PLYS;
-            thinking_time = Chrono::milliseconds(3600000);
           } catch (...) {
             // 無視。
           }

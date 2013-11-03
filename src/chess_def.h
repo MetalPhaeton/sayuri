@@ -38,6 +38,12 @@ namespace Sayuri {
   constexpr const char* ID_NAME = "Sayuri 2013.11.02 devel";
   constexpr const char* ID_AUTHOR = "Ishibashi Hironori";
 
+  /*******************/
+  /* UCIオプション。 */
+  /*******************/
+  constexpr std::size_t UCI_DEFAULT_TABLE_SIZE = 64 * 1024 * 1024;
+  constexpr bool UCI_DEFAULT_PONDER = true;
+
   /**********/
   /* 基本。 */
   /**********/
