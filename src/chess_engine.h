@@ -29,6 +29,8 @@
 
 #include <iostream>
 #include <vector>
+#include <thread>
+#include <mutex>
 #include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
@@ -85,11 +87,12 @@ namespace Sayuri {
 
       // 思考を始める。
       // [引数]
+      // num_cores: CPUのコアの数。
       // table: 使用するトランスポジションテーブル。
       // moves_to_search_ptr: 探索する候補手。nullptrなら全ての手を探索する。
       // [戻り値]
       // PVライン。
-      PVLine Calculate(TranspositionTable& table,
+      PVLine Calculate(int num_cores, TranspositionTable& table,
       std::vector<Move>* moves_to_search_ptr);
 
       // 探索を終了させる。
@@ -272,6 +275,25 @@ namespace Sayuri {
       // [戻り値]
       // 探索を中断しなければいけないときはtrue。
       bool ShouldBeStopped();
+      // PVSplit用子スレッド。
+      // [引数]
+      // engine: エンジン。
+      // is_ready_ok: スレッドの準備完了フラグ。
+      // score_type: 現在のところの評価値の種類。
+      // move: 指し手。
+      // do_lmr: Late Move Reductionするかしないか。
+      // has_legal_move: 合法手があったかどうかのフラグ。
+      // pos_hash: 現在のハッシュ。
+      // depth: 現在の深さ。
+      // level: 現在のレベル。
+      // alpha: アルファ値。
+      // beta: ベータ値。
+      // table: トランスポジションテーブル。
+      // pv_line: PVライン。
+      static void ThreadPVSplit(ChessEngine& engine, bool& is_ready_ok,
+      ScoreType& score_type, Move move, bool do_lmr, bool& has_legal_move,
+      Hash pos_hash, int depth, int level, int& alpha, int beta,
+      TranspositionTable& table, PVLine& pv_line);
 
       /******************************/
       /* その他のプライベート関数。 */
@@ -399,6 +421,10 @@ namespace Sayuri {
       std::vector<int> ply_100_history_;
       // 配置の履歴。
       std::vector<PositionRecord> position_history_;
+      // PVSplit用ミューテックス。
+      std::mutex pvs_mutex_;
+      // PVSplit用スレッドのベクトル。
+      std::vector<std::thread> pvs_thread_vec_;
 
       /******************/
       /* ハッシュ関連。 */

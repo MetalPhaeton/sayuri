@@ -30,6 +30,7 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
+#include <mutex>
 #include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
@@ -124,6 +125,8 @@ namespace Sayuri {
   // テーブルに追加する。
   void TranspositionTable::Add(Hash pos_hash, int depth,
   int score, ScoreType score_type, Move best_move) {
+    mutex_.lock();  // ロック。
+
     // テーブルのインデックスを得る。
     int index = GetTableIndex(pos_hash);
 
@@ -141,17 +144,21 @@ namespace Sayuri {
       std::sort(entry_table_[index].begin(), entry_table_[index].end(),
       &TTEntry::Compare);
     }
+
+    mutex_.unlock();  // ロック解除。
   }
 
   // 該当するTTEntryを返す。
   TTEntry* TranspositionTable::GetEntry(Hash pos_hash,
-  int depth) const {
+  int depth) {
+    mutex_.lock();  // ロック。
+
     // テーブルのインデックスを得る。
     int index = GetTableIndex(pos_hash);
 
     TTEntry* entry_ptr = nullptr;
     for (auto& entry : entry_table_[index]) {
-      if (entry.depth() <= -MAX_VALUE) return nullptr;  // エントリーがない。
+      if (entry.depth() <= -MAX_VALUE) break;  // エントリーがない。
 
       if (entry.Fulfil(pos_hash, depth)) {
         entry_ptr = &entry;  // エントリーが見つかった。
@@ -159,6 +166,9 @@ namespace Sayuri {
       }
 
     }
+
+    mutex_.unlock();  // ロック解除。
+
     return entry_ptr;
   }
 
@@ -228,6 +238,13 @@ namespace Sayuri {
     if (depth > depth_) return false;
     if (hash != hash_) return false;
     return true;
+  }
+
+  // エントリーをアップデートする。
+  void TTEntry::Update(int score, ScoreType score_type, Move best_move) {
+    score_ = score;
+    score_type_ = score_type;
+    best_move_ = best_move;
   }
 
   // ソート用比較関数。

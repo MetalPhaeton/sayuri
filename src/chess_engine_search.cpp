@@ -29,6 +29,9 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <thread>
+#include <mutex>
+#include <memory>
 #include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
@@ -267,6 +270,31 @@ namespace Sayuri {
     int num_searched_moves = 0;
     bool has_legal_move = false;
     for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
+      // PVSplit。
+      if ((depth > 3) && !is_searching_pv && (Type == NodeType::PV)) {
+        bool run_pvs = false;
+        for (auto& a : pvs_thread_vec_) {
+          if (!(a.joinable())) {
+            // 空きスレッドあり。
+            bool do_lmr = (!is_reduced_by_null && (num_searched_moves >= 4));
+            // スレッド開始。
+            bool is_ready_ok = false;
+            a = std::thread(ThreadPVSplit, std::ref(*this),
+            std::ref(is_ready_ok), std::ref(score_type), move, do_lmr,
+            std::ref(has_legal_move), pos_hash, depth, level, std::ref(alpha),
+            beta, std::ref(table), std::ref(pv_line));
+            run_pvs = true;
+            // 準備完了まで待つ。
+            while (!is_ready_ok) continue;
+            break;
+          }
+        }
+        if (run_pvs) {
+          num_searched_moves++;
+          continue;
+        }
+      }
+
       // 次のハッシュ。
       Hash next_hash = GetNextHash(pos_hash, move);
 
@@ -300,7 +328,8 @@ namespace Sayuri {
       // ただし、Null Move Reductionされていれば実行しない。
       int score;
       PVLine next_line;
-      if (!is_reduced_by_null && (depth >= 3)
+      int temp_alpha = alpha;  // PVSplit対策。
+      if (!is_searching_pv && !is_reduced_by_null && (depth >= 3)
       && (num_searched_moves >= 4)) {
         int reduction = 1;
         if (!is_checked && (Type == NodeType::NON_PV)) {
@@ -311,27 +340,27 @@ namespace Sayuri {
           }
         }
         score = -Search<NodeType::NON_PV>(next_hash, depth - reduction - 1,
-        level + 1, -(alpha + 1), -alpha, table, next_line);
+        level + 1, -(temp_alpha + 1), -temp_alpha, table, next_line);
       } else {
         // PVSearchをするためにalphaより大きくしておく。
-        score = alpha + 1;
+        score = temp_alpha + 1;
       }
-      if (score > alpha) {
+      if (score > temp_alpha) {
         // PVSearch。
         if (is_searching_pv || (Type == NodeType::NON_PV)) {
           // フルウィンドウで探索。
           score = -Search<Type>(next_hash, depth - 1, level + 1,
-          -beta, -alpha, table, next_line);
+          -beta, -temp_alpha, table, next_line);
         } else {
           // PV発見後のPVノード。
           // ゼロウィンドウ探索。
           score = -Search<NodeType::NON_PV>(next_hash, depth - 1, level + 1,
-          -(alpha + 1), -alpha, table, next_line);
-          if (score > alpha) {
+          -(temp_alpha + 1), -temp_alpha, table, next_line);
+          if (score > temp_alpha) {
             // fail lowならず。
             // フルウィンドウで再探索。
             score = -Search<NodeType::PV>(next_hash, depth - 1, level + 1,
-            -beta, -alpha, table, next_line);
+            -beta, -temp_alpha, table, next_line);
           }
         }
       }
@@ -352,8 +381,8 @@ namespace Sayuri {
       UnmakeMove(move);
       num_searched_moves++;
 
-      // ベータ値を調べる。
       // アルファ値を更新。
+      pvs_mutex_.lock();  // ロック。
       if (score > alpha) {
         // PVを見つけた。
         is_searching_pv = false;
@@ -369,7 +398,8 @@ namespace Sayuri {
         alpha = score;
       }
 
-      if (score >= beta) {
+      // ベータ値を調べる。
+      if (alpha >= beta) {
         // トランスポジション用。
         score_type = ScoreType::BETA;
 
@@ -386,7 +416,16 @@ namespace Sayuri {
 
         // ベータカット。
         alpha = beta;
+        pvs_mutex_.unlock();  // ロック解除。
         break;
+      }
+      pvs_mutex_.unlock();  // ロック解除。
+    }
+
+    // PVSplitスレッドを待つ。
+    for (auto& a : pvs_thread_vec_) {
+      if (a.joinable()) {
+        a.join();
       }
     }
 
@@ -414,7 +453,9 @@ namespace Sayuri {
         table.Add(pos_hash, depth, alpha, score_type,
         pv_line.line()[0].move());
       } else if (entry_ptr->depth() == depth) {
+        table.Lock();
         entry_ptr->Update(alpha, score_type, pv_line.line()[0].move());
+        table.Unlock();
       }
     }
 
@@ -696,6 +737,100 @@ namespace Sayuri {
     while (!ShouldBeStopped()) continue;
 
     return pv_line;
+  }
+
+  // PVSplit用子スレッド。
+  void ChessEngine::ThreadPVSplit(ChessEngine& engine, bool& is_ready_ok,
+  ScoreType& score_type, Move move, bool do_lmr, bool& has_legal_move,
+  Hash pos_hash, int depth, int level, int& alpha, int beta,
+  TranspositionTable& table, PVLine& pv_line) {
+    // 探索準備。
+    engine.pvs_mutex_.lock();  // ロック。
+    std::unique_ptr<ChessEngine> child_ptr(new ChessEngine(engine));
+    Hash next_hash = child_ptr->GetNextHash(pos_hash, move);
+    Side side = child_ptr->to_move_;
+    Side enemy_side = side ^ 0x3;
+    child_ptr->pvs_thread_vec_.clear();
+    PVLine next_line;
+    child_ptr->searched_nodes_ = 0;
+    engine.pvs_mutex_.unlock();  // ロック解除。
+
+    // 準備完了。
+    is_ready_ok = true;
+
+    child_ptr->MakeMove(move);
+
+    // 合法手かどうかのチェック。
+    // 合法手じゃなければ何もしない。
+    if (child_ptr->IsAttacked(child_ptr->king_[side], enemy_side)) {
+      child_ptr->UnmakeMove(move);
+      return;
+    }
+
+    // 合法手があったのでフラグを立てる。
+    has_legal_move = true;
+
+    // Late Move Reduction。
+    int score;
+    int temp_alpha = alpha;  // PVSplit対策。
+    if (do_lmr) {
+      int reduction = 1;
+      score = -(child_ptr->Search<NodeType::NON_PV>(next_hash,
+      depth - reduction - 1, level + 1, -(temp_alpha + 1), -temp_alpha,
+      table, next_line));
+    } else {
+      score = temp_alpha + 1;
+    }
+    // PVSearch。
+    // ただし、すでに最初のPVは見つけてあるので、そこはカット。
+    if (score > temp_alpha) {
+      score = -(child_ptr->Search<NodeType::NON_PV>(next_hash, depth - 1,
+      level + 1, -(temp_alpha + 1), -temp_alpha, table, next_line));
+      if (score > temp_alpha) {
+        score = -(child_ptr->Search<NodeType::PV>(next_hash, depth - 1,
+        level + 1, -beta, -temp_alpha, table, next_line));
+      }
+    }
+
+    // 相手の最初の手番の場合、3回繰り返しのルールをチェック。
+    if (level == 1) {
+      int repetitions = 0;
+      for (auto& a : child_ptr->position_history_) {
+        if (a == *child_ptr) {
+          repetitions++;
+        }
+      }
+      if (repetitions >= 2) {
+        score = SCORE_DRAW;
+      }
+    }
+
+    child_ptr->UnmakeMove(move);
+
+    // アルファ値、ベータ値のチェック。
+    engine.pvs_mutex_.lock();  // ロック。
+    if (score > alpha) {
+      score_type = ScoreType::EXACT;
+      pv_line.SetMove(move);
+      pv_line.Insert(next_line);
+      pv_line.score(score);
+      alpha = score;
+    }
+    if (alpha >= beta) {
+      score_type = ScoreType::BETA;
+      engine.killer_stack_[level] = move;
+      if (!(move.captured_piece_)) {
+        engine.history_[side][move.from_][move.to_] += depth * depth;
+        if (engine.history_[side][move.from_][move.to_]
+        > engine.history_max_) {
+          engine.history_max_ = engine.history_[side][move.from_][move.to_];
+        }
+      }
+      alpha = beta;
+    }
+    engine.pvs_mutex_.unlock();  // ロック解除。
+
+    engine.searched_nodes_ += child_ptr->searched_nodes_;
   }
 
   // SEE。

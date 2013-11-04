@@ -376,11 +376,44 @@ namespace Sayuri {
     for (int i = 0; i < NUM_SIDES; i++) {
       has_castled_[i] = engine.has_castled_[i];
     }
+
+    // ヒストリーのコピー。
+    for (int i = 0; i < NUM_SIDES; i++) {
+      for (int j = 0; j < NUM_SQUARES; j++) {
+        for (int k = 0; k < NUM_SQUARES; k++) {
+          history_[i][j][k] = engine.history_[i][j][k];
+        }
+      }
+    }
+    history_max_ = engine.history_max_;
+
+    // IIDスタックとキラースタックのコピー。
+    for (int i = 0; i < MAX_PLYS; i++) {
+      iid_stack_[i] = engine.iid_stack_[i];
+      killer_stack_[i] = engine.killer_stack_[i];
+    }
+
+    // 現在のITerative Deepeningの深さのコピー。
+    i_depth_ = engine.i_depth_;
+
+    // 探索開始時間のコピー。
+    start_time_ = engine.start_time_;
+
+    // ストッパーのコピー。
+    stopper_.stop_now_ = engine.stopper_.stop_now_;
+    stopper_.max_nodes_ = engine.stopper_.max_nodes_;
+    stopper_.max_depth_ = engine.stopper_.max_depth_;
+    stopper_.thinking_time_ = engine.stopper_.thinking_time_;
+    stopper_.infinite_thinking_ = engine.stopper_.infinite_thinking_;
   }
 
   // 思考を始める。
-  PVLine ChessEngine::Calculate(TranspositionTable& table,
+  PVLine ChessEngine::Calculate(int num_cores, TranspositionTable& table,
   std::vector<Move>* moves_to_search_ptr) {
+    // #テスト。
+    num_cores = 2;
+
+    pvs_thread_vec_.resize(num_cores - 1);
     return std::move(SearchRoot(table, moves_to_search_ptr));
   }
 

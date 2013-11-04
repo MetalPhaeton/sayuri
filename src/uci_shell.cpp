@@ -202,8 +202,9 @@ namespace Sayuri {
     (shell.table_size_));
 
     // 思考開始。
+    // #テスト。
     PVLine pv_line = shell.engine_ptr_->Calculate
-    (*(table_ptr.get()), shell.moves_to_search_ptr_.get());
+    (2, *(table_ptr.get()), shell.moves_to_search_ptr_.get());
 
     // 最善手を表示。
     std::cout << "bestmove ";

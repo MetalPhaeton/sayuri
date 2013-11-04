@@ -30,6 +30,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <mutex>
 #include <cstddef>
 #include "chess_def.h"
 #include "chess_util.h"
@@ -38,9 +39,7 @@
 namespace Sayuri {
   class TranspositionTable;
 
-  /********************************************/
-  /* トランスポジションテーブルのエントリー。 */
-  /********************************************/
+  // トランスポジションテーブルのエントリー。
   class TTEntry {
     public:
       /**************************/
@@ -78,11 +77,7 @@ namespace Sayuri {
       // score: 評価値。
       // score_type: 評価値の種類。
       // best_move: 最善手。
-      void Update(int score, ScoreType score_type, Move best_move) {
-        score_ = score;
-        score_type_ = score_type;
-        best_move_ = best_move;
-      }
+      void Update(int score, ScoreType score_type, Move best_move);
 
       /**************/
       /* アクセサ。 */
@@ -119,9 +114,7 @@ namespace Sayuri {
       Move best_move_;
   };
 
-  /****************************************/
-  /* トランスポジションテーブルのクラス。 */
-  /****************************************/
+  // トランスポジションテーブルのクラス。
   class TranspositionTable {
     private:
       /**********/
@@ -165,7 +158,7 @@ namespace Sayuri {
       // [戻り値]
       // 条件を満たすエントリー。
       // なければnullptr。
-      TTEntry* GetEntry(Hash pos_hash, int depth) const;
+      TTEntry* GetEntry(Hash pos_hash, int depth);
 
       // 大きさが何バイトか返す。
       // [戻り値]
@@ -183,6 +176,9 @@ namespace Sayuri {
         ((num_used_entries_ * 1000) / num_all_entries_);
       }
 
+      // トランスポジションテーブルのロックを使う。
+      void Lock() {mutex_.lock();}
+      void Unlock() {mutex_.unlock();}
 
       /****************/
       /* static関数。 */
@@ -224,6 +220,8 @@ namespace Sayuri {
       std::size_t num_used_entries_;
       // エントリーを登録するテーブル。
       std::unique_ptr<std::vector<TTEntry>[]> entry_table_;
+      // ミューテックス。
+      std::mutex mutex_;
   };
 }  // namespace Sayuri
 
