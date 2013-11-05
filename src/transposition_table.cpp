@@ -142,7 +142,7 @@ namespace Sayuri {
 
       // ソート。
       std::sort(entry_table_[index].begin(), entry_table_[index].end(),
-      &TTEntry::Compare);
+      TTEntry::Compare);
     }
 
     mutex_.unlock();  // ロック解除。

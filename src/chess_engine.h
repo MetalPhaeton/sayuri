@@ -447,6 +447,8 @@ namespace Sayuri {
       std::vector<std::thread> pvs_thread_vec_;
       // PVSplitのスレッド実行をするべきレベル。
       int pvs_node_level_;
+      // 自分が子供かどうか。
+      bool is_child_;
 
       /******************/
       /* ハッシュ関連。 */

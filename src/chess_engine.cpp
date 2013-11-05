@@ -413,7 +413,7 @@ namespace Sayuri {
     // #テスト。
     num_cores = 2;
 
-    pvs_thread_vec_.resize(num_cores - 1);
+    pvs_thread_vec_.resize(num_cores);
     return std::move(SearchRoot(table, moves_to_search_ptr));
   }
 
