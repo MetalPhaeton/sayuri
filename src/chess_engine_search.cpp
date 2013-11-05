@@ -303,8 +303,8 @@ namespace Sayuri {
       // ただし、Null Move Reductionされていれば実行しない。
       int score;
       PVLine next_line;
-      if (!is_searching_pv && !is_reduced_by_null && (depth >= 3)
-      && (num_searched_moves >= 4)) {
+      if (!is_checked && !(move.captured_piece_) && !(move.promotion_)
+      && !is_reduced_by_null && (depth >= 3) && (num_searched_moves >= 4)) {
         int reduction = 1;
         if (!is_checked && (Type == NodeType::NON_PV)) {
           // History Puruning。
@@ -470,6 +470,7 @@ namespace Sayuri {
     TimePoint next_send_info_time = now + Chrono::milliseconds(1000);
     std::vector<Move> move_vec;
     MoveMaker maker(*this);
+    bool is_checked = IsAttacked(king_[side], enemy_side);
     for (i_depth_ = 1; i_depth_ <= MAX_PLYS; i_depth_++) {
       // 探索終了。
       if (ShouldBeStopped()) break;
@@ -603,7 +604,8 @@ namespace Sayuri {
         } else {
           // PV発見後。
           // Late Move Reduction。
-          if ((i_depth_ >= 3) && (num_searched_moves >= 4)) {
+          if (!is_checked && !(move.captured_piece_) && !(move.promotion_)
+          && (i_depth_ >= 3) && (num_searched_moves >= 4)) {
             int reduction = 1;
             // ゼロウィンドウ探索。
             score = -Search<NodeType::NON_PV>(next_hash,
