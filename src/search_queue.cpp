@@ -33,6 +33,123 @@
 #include "chess_engine.h"
 #include "transposition_table.h"
 #include "pv_line.h"
+#include "move_maker.h"
 
 namespace Sayuri {
+  /**************************/
+  /* コンストラクタと代入。 */
+  /**************************/
+  SearchQueue::SearchQueue(MoveMaker& maker, ChessEngine& engine, Hash pos_hash,
+  int depth, int level, int& alpha, int& beta, int& delta,
+  TranspositionTable& table, PVLine& pv_line, int& searched_moves,
+  int material, bool is_checked,
+  std::vector<Move>* moves_to_search_ptr,
+  std::vector<Move>* root_move_vec_ptr) :
+  engine_ptr_(&engine),
+  pos_hash_(pos_hash),
+  depth_(depth),
+  level_(level),
+  alpha_ptr_(&alpha),
+  beta_ptr_(&beta),
+  delta_ptr_(&delta),
+  table_ptr_(&table),
+  pv_line_ptr_(&pv_line),
+  searched_moves_ptr_(&searched_moves),
+  material_(material),
+  is_checked_(is_checked),
+  moves_to_search_ptr_(moves_to_search_ptr),
+  root_move_vec_ptr_(root_move_vec_ptr),
+  maker_ptr_(&maker) {}
+
+  // コピーコンストラクタ。
+  SearchQueue::SearchQueue(const SearchQueue& queue) :
+  engine_ptr_(queue.engine_ptr_),
+  pos_hash_(queue.pos_hash_),
+  depth_(queue.depth_),
+  level_(queue.level_),
+  alpha_ptr_(queue.alpha_ptr_),
+  beta_ptr_(queue.beta_ptr_),
+  delta_ptr_(queue.delta_ptr_),
+  table_ptr_(queue.table_ptr_),
+  pv_line_ptr_(queue.pv_line_ptr_),
+  searched_moves_ptr_(queue.searched_moves_ptr_),
+  material_(queue.material_),
+  is_checked_(queue.is_checked_),
+  moves_to_search_ptr_(queue.moves_to_search_ptr_),
+  root_move_vec_ptr_(queue.root_move_vec_ptr_),
+  maker_ptr_(queue.maker_ptr_) {}
+
+  // ムーブコンストラクタ。
+  SearchQueue::SearchQueue(SearchQueue&& queue) :
+  engine_ptr_(queue.engine_ptr_),
+  pos_hash_(queue.pos_hash_),
+  depth_(queue.depth_),
+  level_(queue.level_),
+  alpha_ptr_(queue.alpha_ptr_),
+  beta_ptr_(queue.beta_ptr_),
+  delta_ptr_(queue.delta_ptr_),
+  table_ptr_(queue.table_ptr_),
+  pv_line_ptr_(queue.pv_line_ptr_),
+  searched_moves_ptr_(queue.searched_moves_ptr_),
+  material_(queue.material_),
+  is_checked_(queue.is_checked_),
+  moves_to_search_ptr_(queue.moves_to_search_ptr_),
+  root_move_vec_ptr_(queue.root_move_vec_ptr_),
+  maker_ptr_(queue.maker_ptr_) {}
+
+  // コピー代入。
+  SearchQueue& SearchQueue::operator=(const SearchQueue& queue) {
+    engine_ptr_ = queue.engine_ptr_;
+    pos_hash_ = queue.pos_hash_;
+    depth_ = queue.depth_;
+    level_ = queue.level_;
+    alpha_ptr_ = queue.alpha_ptr_;
+    beta_ptr_ = queue.beta_ptr_;
+    delta_ptr_ = queue.delta_ptr_;
+    table_ptr_ = queue.table_ptr_;
+    pv_line_ptr_ = queue.pv_line_ptr_;
+    searched_moves_ptr_ = queue.searched_moves_ptr_;
+    material_ = queue.material_;
+    is_checked_ = queue.is_checked_;
+    moves_to_search_ptr_ = queue.moves_to_search_ptr_;
+    root_move_vec_ptr_ = queue.root_move_vec_ptr_;
+    maker_ptr_ = queue.maker_ptr_;
+
+    return *this;
+  }
+
+  // ムーブ代入。
+  SearchQueue& SearchQueue::operator=(SearchQueue&& queue) {
+    engine_ptr_ = queue.engine_ptr_;
+    pos_hash_ = queue.pos_hash_;
+    depth_ = queue.depth_;
+    level_ = queue.level_;
+    alpha_ptr_ = queue.alpha_ptr_;
+    beta_ptr_ = queue.beta_ptr_;
+    delta_ptr_ = queue.delta_ptr_;
+    table_ptr_ = queue.table_ptr_;
+    pv_line_ptr_ = queue.pv_line_ptr_;
+    searched_moves_ptr_ = queue.searched_moves_ptr_;
+    material_ = queue.material_;
+    is_checked_ = queue.is_checked_;
+    moves_to_search_ptr_ = queue.moves_to_search_ptr_;
+    root_move_vec_ptr_ = queue.root_move_vec_ptr_;
+    maker_ptr_ = queue.maker_ptr_;
+
+    return *this;
+  }
+
+  /********************/
+  /* パブリック関数。 */
+  /********************/
+  // 仕事を得る。
+  Move SearchQueue::Dequeue() {
+    mutex_.lock();  // ロック。
+
+    Move move = maker_ptr_->PickMove();
+
+    mutex_.unlock();  // ロック解除。
+
+    return move;
+  }
 }  // namespace Sayuri
