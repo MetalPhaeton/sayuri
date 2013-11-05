@@ -275,45 +275,6 @@ namespace Sayuri {
       // [戻り値]
       // 探索を中断しなければいけないときはtrue。
       bool ShouldBeStopped();
-      // PVSplit用子スレッド。
-      // [引数]
-      // engine: エンジン。
-      // is_ready_ok: スレッドの準備完了フラグ。
-      // score_type: 現在のところの評価値の種類。
-      // move: 指し手。
-      // do_lmr: Late Move Reductionするかしないか。
-      // has_legal_move: 合法手があったかどうかのフラグ。
-      // pos_hash: 現在のハッシュ。
-      // depth: 現在の深さ。
-      // level: 現在のレベル。
-      // alpha: アルファ値。
-      // beta: ベータ値。
-      // table: トランスポジションテーブル。
-      // pv_line: PVライン。
-      static void ThreadPVSplit(ChessEngine& engine, bool& is_ready_ok,
-      ScoreType& score_type, Move move, bool do_lmr, bool& has_legal_move,
-      Hash pos_hash, int depth, int level, int& alpha, int beta,
-      TranspositionTable& table, PVLine& pv_line);
-      // PVSplit用子スレッド、ルートノード用。
-      // [引数]
-      // engine: エンジン。
-      // is_ready_ok: スレッドの準備完了フラグ。
-      // move: 指し手。
-      // do_lmr: Late Move Reductionするかしないか。
-      // pos_hash: 現在のハッシュ。
-      // depth: 現在の深さ。
-      // level: 現在のレベル。
-      // alpha: アルファ値。
-      // beta: ベータ値。
-      // delta: ベータの増分。
-      // table: トランスポジションテーブル。
-      // pv_line: PVライン。
-      // move_vec: 手のベクトル。情報表示用に使う。
-      // entry_ptr: ルートノードのTTエントリーのポインタ。
-      static void ThreadPVSplitRoot(ChessEngine& engine, bool& is_ready_ok,
-      Move move, bool do_lmr, Hash pos_hash, int depth, int level,
-      int& alpha, int beta, int delta, TranspositionTable& table,
-      PVLine& pv_line, std::vector<Move>& move_vec, TTEntry* entry_ptr);
 
       /******************************/
       /* その他のプライベート関数。 */
@@ -445,10 +406,8 @@ namespace Sayuri {
       std::mutex pvs_mutex_;
       // PVSplit用スレッドのベクトル。
       std::vector<std::thread> pvs_thread_vec_;
-      // PVSplitのスレッド実行をするべきレベル。
-      int pvs_node_level_;
-      // 自分が子供かどうか。
-      bool is_child_;
+      // PVSplit用、自分が子供かどうか。
+      bool is_pvs_child_;
 
       /******************/
       /* ハッシュ関連。 */

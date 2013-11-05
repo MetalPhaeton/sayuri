@@ -455,8 +455,7 @@ namespace Sayuri {
     }
     history_max_ = 1;
     stopper_.stop_now_ = false;
-    pvs_node_level_ = 0;
-    is_child_ = false;
+    is_pvs_child_ = false;
 
     // Iterative Deepening。
     int level = 0;
@@ -486,7 +485,6 @@ namespace Sayuri {
         alpha -= delta;
       }
       bool is_searching_pv = true;
-      pvs_node_level_ = 1;
       TTEntry* entry_ptr = nullptr;
 
 
@@ -664,7 +662,6 @@ namespace Sayuri {
         // 最善手を見つけた。
         if (score > alpha) {
           is_searching_pv = false;
-          pvs_node_level_ = 0;
 
           // PVラインにセット。
           pv_line.SetMove(move);
@@ -706,231 +703,6 @@ namespace Sayuri {
     while (!ShouldBeStopped()) continue;
 
     return pv_line;
-  }
-
-  // PVSplit用子スレッド。
-  void ChessEngine::ThreadPVSplit(ChessEngine& engine, bool& is_ready_ok,
-  ScoreType& score_type, Move move, bool do_lmr, bool& has_legal_move,
-  Hash pos_hash, int depth, int level, int& alpha, int beta,
-  TranspositionTable& table, PVLine& pv_line) {
-    // 探索準備。
-    engine.pvs_mutex_.lock();  // ロック。
-    std::unique_ptr<ChessEngine> child_ptr(new ChessEngine(engine));
-    Hash next_hash = child_ptr->GetNextHash(pos_hash, move);
-    Side side = child_ptr->to_move_;
-    Side enemy_side = side ^ 0x3;
-    child_ptr->pvs_thread_vec_.clear();
-    PVLine next_line;
-    child_ptr->searched_nodes_ = 0;
-    child_ptr->pvs_node_level_ = 0;
-    child_ptr->is_child_ = true;
-    engine.pvs_mutex_.unlock();  // ロック解除。
-
-    // 準備完了。
-    is_ready_ok = true;
-
-    child_ptr->MakeMove(move);
-
-    // 合法手かどうかのチェック。
-    // 合法手じゃなければ何もしない。
-    if (child_ptr->IsAttacked(child_ptr->king_[side], enemy_side)) {
-      child_ptr->UnmakeMove(move);
-      return;
-    }
-
-    // 合法手があったのでフラグを立てる。
-    has_legal_move = true;
-
-    // Late Move Reduction。
-    int score;
-    if (do_lmr) {
-      int reduction = 1;
-      score = -(child_ptr->Search<NodeType::NON_PV>(next_hash,
-      depth - reduction - 1, level + 1, -(alpha + 1), -alpha,
-      table, next_line));
-    } else {
-      score = alpha + 1;
-    }
-    // PVSearch。
-    // ただし、すでに最初のPVは見つけてあるので、そこはカット。
-    if (score > alpha) {
-      score = -(child_ptr->Search<NodeType::NON_PV>(next_hash, depth - 1,
-      level + 1, -(alpha + 1), -alpha, table, next_line));
-      if (score > alpha) {
-        score = -(child_ptr->Search<NodeType::PV>(next_hash, depth - 1,
-        level + 1, -beta, -alpha, table, next_line));
-      }
-    }
-
-    // 相手の最初の手番の場合、3回繰り返しのルールをチェック。
-    if (level == 1) {
-      int repetitions = 0;
-      for (auto& a : child_ptr->position_history_) {
-        if (a == *child_ptr) {
-          repetitions++;
-        }
-      }
-      if (repetitions >= 2) {
-        score = SCORE_DRAW;
-      }
-    }
-
-    child_ptr->UnmakeMove(move);
-
-    // アルファ値、ベータ値のチェック。
-    engine.pvs_mutex_.lock();  // ロック。
-    if (score > alpha) {
-      score_type = ScoreType::EXACT;
-      pv_line.SetMove(move);
-      pv_line.Insert(next_line);
-      pv_line.score(score);
-      alpha = score;
-    }
-    if (alpha >= beta) {
-      score_type = ScoreType::BETA;
-      engine.killer_stack_[level] = move;
-      if (!(move.captured_piece_)) {
-        engine.history_[side][move.from_][move.to_] += depth * depth;
-        if (engine.history_[side][move.from_][move.to_]
-        > engine.history_max_) {
-          engine.history_max_ = engine.history_[side][move.from_][move.to_];
-        }
-      }
-      alpha = beta;
-    }
-    engine.pvs_mutex_.unlock();  // ロック解除。
-
-    engine.searched_nodes_ += child_ptr->searched_nodes_;
-  }
-
-  // PVSplit用子スレッド、ルートノード用。
-  void ChessEngine::ThreadPVSplitRoot(ChessEngine& engine, bool& is_ready_ok,
-  Move move, bool do_lmr, Hash pos_hash, int depth, int level,
-  int& alpha, int beta, int delta, TranspositionTable& table, PVLine& pv_line,
-  std::vector<Move>& move_vec, TTEntry* entry_ptr) {
-    // 探索準備。
-    engine.pvs_mutex_.lock();  // ロック。
-    std::unique_ptr<ChessEngine> child_ptr(new ChessEngine(engine));
-    Hash next_hash = child_ptr->GetNextHash(pos_hash, move);
-    Side side = child_ptr->to_move_;
-    Side enemy_side = side ^ 0x3;
-    child_ptr->pvs_thread_vec_.clear();
-    PVLine next_line;
-    child_ptr->searched_nodes_ = 0;
-    child_ptr->pvs_node_level_ = 0;
-    child_ptr->is_child_ = true;
-    engine.pvs_mutex_.unlock();  // ロック解除。
-
-    // 準備完了。
-    is_ready_ok = true;
-
-    child_ptr->MakeMove(move);
-
-    // 合法手かどうかのチェック。
-    // 合法手じゃなければ何もしない。
-    if (child_ptr->IsAttacked(child_ptr->king_[side], enemy_side)) {
-      child_ptr->UnmakeMove(move);
-      return;
-    }
-
-    // 現在探索している手の情報を送る。
-    engine.pvs_mutex_.lock();  // ロック。
-    int move_num = 0;
-    for (auto& move_2 : move_vec) {
-      if (move_2 == move) {
-        UCIShell::SendCurrentMoveInfo(move, move_num);
-        break;
-      }
-      move_num++;
-    }
-    engine.pvs_mutex_.unlock();  // ロック解除。
-
-    // Late Move Reduction。
-    int score;
-    int temp_alpha = alpha;  // PVSplit対策。
-    if (do_lmr) {
-      int reduction = 1;
-      // ゼロウィンドウ探索。
-      score = -(child_ptr->Search<NodeType::NON_PV>(next_hash,
-      depth - reduction - 1, level + 1, -(temp_alpha + 1),
-      -temp_alpha, table, next_line));
-    } else {
-      // 普通に探索するためにscoreをalphaより大きくしておく。
-      score = temp_alpha + 1;
-    }
-
-    // 普通の探索。
-    if (score > temp_alpha) {
-      // ゼロウィンドウ探索。
-      score = -(child_ptr->Search<NodeType::NON_PV>(next_hash, depth - 1,
-      level + 1, -(temp_alpha + 1), -temp_alpha, table, next_line));
-      if (score > temp_alpha) {
-        while (true) {
-          // 探索終了。
-          if (engine.ShouldBeStopped()) break;
-
-          // フルウィンドウで再探索。
-          score = -(child_ptr->Search<NodeType::PV>(next_hash, depth - 1,
-          level + 1, -beta, -temp_alpha, table, next_line));
-          // アルファ値、ベータ値を調べる。
-          if (score >= beta) {
-            // 探索失敗。
-            // ベータ値を広げる。
-            delta *= 2;
-            beta += delta;
-            continue;
-          } else {
-            break;
-          }
-        }
-      }
-    }
-
-    // 3回繰り返しルールをチェック。
-    int repetitions = 0;
-    for (auto& a : child_ptr->position_history_) {
-      if (a == *child_ptr) {
-        repetitions++;
-      }
-    }
-    if (repetitions >= 2) {
-      score = SCORE_DRAW;
-    }
-
-    child_ptr->UnmakeMove(move);
-
-    if (engine.ShouldBeStopped()) {
-      child_ptr->StopCalculation();
-      return;
-    }
-
-    // アルファを更新。
-    engine.pvs_mutex_.lock();  // ロック。
-    if (score > alpha) {
-      // PVラインにセット。
-      pv_line.SetMove(move);
-      pv_line.Insert(next_line);
-      pv_line.score(score);
-
-      // トランスポジションテーブルに登録。
-      if (entry_ptr) {
-        table.Lock();
-        entry_ptr->Update(score, ScoreType::EXACT, move);
-        table.Unlock();
-      }
-
-      // 標準出力にPV情報を送る。
-      TimePoint now = SysClock::now();
-      Chrono::milliseconds time =
-      Chrono::duration_cast<Chrono::milliseconds>(now - engine.start_time_);
-      UCIShell::SendPVInfo(depth, engine.searched_level_, score, time,
-      engine.searched_nodes_ + child_ptr->searched_nodes_, pv_line);
-
-      alpha = score;
-    }
-    engine.pvs_mutex_.unlock();
-
-    engine.searched_nodes_ += child_ptr->searched_nodes_;
   }
 
   // SEE。
