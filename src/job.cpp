@@ -1,5 +1,5 @@
 /*
-   search_queue.cpp: マルチスレッド探索用キューの実装。
+   job.cpp: マルチスレッド探索用の仕事クラスの実装。
 
    The MIT License (MIT)
 
@@ -24,7 +24,7 @@
    IN THE SOFTWARE.
 */
 
-#include "search_queue.h"
+#include "job.h"
 
 #include <iostream>
 #include <mutex>
@@ -39,13 +39,13 @@ namespace Sayuri {
   /**************************/
   /* コンストラクタと代入。 */
   /**************************/
-  SearchQueue::SearchQueue(MoveMaker& maker, ChessEngine& engine, Hash pos_hash,
+  Job::Job(MoveMaker& maker, ChessEngine& client, Hash pos_hash,
   int depth, int level, int& alpha, int& beta, int& delta,
   TranspositionTable& table, PVLine& pv_line, int& searched_moves,
   int material, bool is_checked,
   std::vector<Move>* moves_to_search_ptr,
   std::vector<Move>* root_move_vec_ptr) :
-  engine_ptr_(&engine),
+  client_ptr_(&client),
   pos_hash_(pos_hash),
   depth_(depth),
   level_(level),
@@ -62,8 +62,8 @@ namespace Sayuri {
   maker_ptr_(&maker) {}
 
   // コピーコンストラクタ。
-  SearchQueue::SearchQueue(const SearchQueue& queue) :
-  engine_ptr_(queue.engine_ptr_),
+  Job::Job(const Job& queue) :
+  client_ptr_(queue.client_ptr_),
   pos_hash_(queue.pos_hash_),
   depth_(queue.depth_),
   level_(queue.level_),
@@ -80,8 +80,8 @@ namespace Sayuri {
   maker_ptr_(queue.maker_ptr_) {}
 
   // ムーブコンストラクタ。
-  SearchQueue::SearchQueue(SearchQueue&& queue) :
-  engine_ptr_(queue.engine_ptr_),
+  Job::Job(Job&& queue) :
+  client_ptr_(queue.client_ptr_),
   pos_hash_(queue.pos_hash_),
   depth_(queue.depth_),
   level_(queue.level_),
@@ -98,8 +98,8 @@ namespace Sayuri {
   maker_ptr_(queue.maker_ptr_) {}
 
   // コピー代入。
-  SearchQueue& SearchQueue::operator=(const SearchQueue& queue) {
-    engine_ptr_ = queue.engine_ptr_;
+  Job& Job::operator=(const Job& queue) {
+    client_ptr_ = queue.client_ptr_;
     pos_hash_ = queue.pos_hash_;
     depth_ = queue.depth_;
     level_ = queue.level_;
@@ -119,8 +119,8 @@ namespace Sayuri {
   }
 
   // ムーブ代入。
-  SearchQueue& SearchQueue::operator=(SearchQueue&& queue) {
-    engine_ptr_ = queue.engine_ptr_;
+  Job& Job::operator=(Job&& queue) {
+    client_ptr_ = queue.client_ptr_;
     pos_hash_ = queue.pos_hash_;
     depth_ = queue.depth_;
     level_ = queue.level_;
@@ -143,7 +143,7 @@ namespace Sayuri {
   /* パブリック関数。 */
   /********************/
   // 仕事を得る。
-  Move SearchQueue::Dequeue() {
+  Move Job::Dequeue() {
     mutex_.lock();  // ロック。
 
     Move move = maker_ptr_->PickMove();

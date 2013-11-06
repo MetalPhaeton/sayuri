@@ -1,5 +1,5 @@
 /*
-   search_queue.h: マルチスレッド探索用キュー。
+   job.h: マルチスレッド探索用仕事クラス。
 
    The MIT License (MIT)
 
@@ -39,15 +39,15 @@
 namespace Sayuri {
   class ChessEngine;
 
-  // マルチスレッド探索用キューのクラス。
-  class SearchQueue {
+  // マルチスレッド探索用の仕事クラス。
+  class Job {
     public:
       /**************************/
       /* コンストラクタと代入。 */
       /**************************/
       // [引数]
       // maker: 仕事用の手が入っているムーブメーカー。
-      // engine: 親チェスエンジン。
+      // client: 親チェスエンジン。
       // pos_hash: 現在の局面のハッシュ。
       // depth: 現在の深さ。
       // level: 現在のレベル。
@@ -61,19 +61,19 @@ namespace Sayuri {
       // is_checked: 現在チェックされているかどうか。
       // moves_to_search_ptr: ルートで探索すべき手のベクトル。ないならnullptr。
       // root_move_vec_ptr: ルートで作成した手のベクトル。ないならnullptr。
-      SearchQueue(MoveMaker& maker, ChessEngine& engine, Hash pos_hash,
+      Job(MoveMaker& maker, ChessEngine& client, Hash pos_hash,
       int depth, int level, int& alpha, int& beta, int& delta,
       TranspositionTable& table, PVLine& pv_line, int& searched_moves,
       int material, bool is_checked,
       std::vector<Move>* moves_to_search_ptr,
       std::vector<Move>* root_move_vec_ptr);
 
-      SearchQueue(const SearchQueue& queue);
-      SearchQueue(SearchQueue&& queue);
-      SearchQueue& operator=(const SearchQueue& queue);
-      SearchQueue& operator=(SearchQueue&& queue);
-      virtual ~SearchQueue() {}
-      SearchQueue() = delete;
+      Job(const Job& queue);
+      Job(Job&& queue);
+      Job& operator=(const Job& queue);
+      Job& operator=(Job&& queue);
+      virtual ~Job() {}
+      Job() = delete;
 
       /********************/
       /* パブリンク関数。 */
@@ -86,7 +86,7 @@ namespace Sayuri {
       /**************/
       /* アクセサ。 */
       /**************/
-      ChessEngine& engine() {return *engine_ptr_;}
+      ChessEngine& client() {return *client_ptr_;}
       Hash pos_hash() const {return pos_hash_;}
       int depth() const {return depth_;}
       int level() const {return level_;}
@@ -106,7 +106,7 @@ namespace Sayuri {
       /* メンバ変数。 */
       /****************/
       // 親スレッドより情報。
-      ChessEngine* engine_ptr_;
+      ChessEngine* client_ptr_;
       Hash pos_hash_;
       int depth_;
       int level_;
