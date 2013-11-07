@@ -27,6 +27,7 @@
 #define MOVE_MAKER_H
 
 #include <iostream>
+#include <mutex>
 #include <cstddef>
 #include "chess_def.h"
 #include "chess_engine.h"
@@ -107,6 +108,8 @@ namespace Sayuri {
       MoveSlot* last_;
       MoveSlot* current_;
       MoveSlot* end_;
+      // ミューテックス。
+      std::mutex mutex_;
   };
 }  // namespace Sayuri
 

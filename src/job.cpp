@@ -142,14 +142,8 @@ namespace Sayuri {
   /********************/
   /* パブリック関数。 */
   /********************/
-  // 仕事を得る。
-  Move Job::Dequeue() {
-    mutex_.lock();  // ロック。
-
-    Move move = maker_ptr_->PickMove();
-
-    mutex_.unlock();  // ロック解除。
-
-    return move;
+  // 手を得る。
+  Move Job::PickMove() {
+    return maker_ptr_->PickMove();
   }
 }  // namespace Sayuri

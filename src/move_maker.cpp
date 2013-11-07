@@ -27,6 +27,7 @@
 #include "move_maker.h"
 
 #include <iostream>
+#include <mutex>
 #include <cstddef>
 #include "chess_def.h"
 #include "chess_engine.h"
@@ -127,6 +128,8 @@ namespace Sayuri {
   // 手をスタックに展開する。
   template<GenMoveType Type>
   void MoveMaker::GenMoves(Move prev_best, Move iid_move, Move killer) {
+    mutex_.lock();  // ロック。
+
     // サイド。
     Side side = engine_ptr_->to_move();
     Side enemy_side = side ^ 0x3;
@@ -295,6 +298,8 @@ namespace Sayuri {
         last_++;
       }
     }
+
+    mutex_.unlock();  // ロック解除。
   }
   // 実体化。
   template void MoveMaker::GenMoves<GenMoveType::NON_CAPTURE>
@@ -310,10 +315,13 @@ namespace Sayuri {
 
   // 次の手を返す。
   Move MoveMaker::PickMove() {
+    mutex_.lock();  // ロック。
+
     MoveSlot slot;
 
     // 手がなければ何もしない。
     if (last_ <= begin_) {
+      mutex_.unlock();
       return slot.move_;
     }
 
@@ -330,6 +338,7 @@ namespace Sayuri {
       }
     }
 
+    mutex_.unlock();
     return slot.move_;
   }
 
