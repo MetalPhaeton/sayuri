@@ -24,8 +24,8 @@
    IN THE SOFTWARE.
 */
 
-#ifndef SEARCH_QUEUE_H
-#define SEARCH_QUEUE_H
+#ifndef JOB_H
+#define JOB_H
 
 #include <iostream>
 #include <mutex>
