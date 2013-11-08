@@ -293,7 +293,7 @@ namespace Sayuri {
       // 他のエンジンの基本メンバをコピーする。
       // [引数]
       // engine: 他のエンジン。
-      void ScanMember(const ChessEngine& engine);
+      void ScanBasicMember(const ChessEngine& engine);
       // 他のエンジンの共有メンバのコピー。
       // [引数]
       // engine: 他のエンジン。
@@ -303,7 +303,6 @@ namespace Sayuri {
       // engine: 他のエンジン。
       void MoveSharedMember(ChessEngine&& engine);
       // 他のエンジンと共有メンバを共有する。
-      // 基本メンバはコピー。
       // [引数]
       // engine: 他のエンジン。
       void LinkSharedMember(ChessEngine& engine);
@@ -347,9 +346,9 @@ namespace Sayuri {
       /****************/
       /* メンバ変数。 */
       /****************/
-      /***************************************************************/
-      /* 基本メンバ。(他のエンジンと共有されるとき、コピーされる。)  */
-      /***************************************************************/
+      /*****************/
+      /* 基本メンバ。  */
+      /*****************/
       // 駒の配置のビットボードの配列。
       Bitboard position_[NUM_SIDES][NUM_PIECE_TYPES];
       // 駒の種類の配置。
@@ -399,8 +398,6 @@ namespace Sayuri {
       std::shared_ptr<TimePoint> start_time_ptr_;
       // 探索したレベル。
       std::shared_ptr<int> searched_level_ptr_;
-      // ヌルサーチ中かどうか。
-      std::shared_ptr<bool> is_null_searching_ptr_;
       // ストップ条件構造体。
       struct Stopper {
         // 何が何でも探索を中断。
@@ -466,6 +463,8 @@ namespace Sayuri {
       /************************************************************/
       /* 固有メンバ。(他のエンジンとコピーも共有もしないメンバ。) */
       /************************************************************/
+      // 今ヌルムーブのサーチ中かどうか。
+      bool is_null_searching_;
       // PVSplit用ミューテックス。
       std::mutex pvs_mutex_;
       // PVSplit用スレッドのベクトル。

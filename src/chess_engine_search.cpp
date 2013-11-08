@@ -227,12 +227,12 @@ namespace Sayuri {
         }
       }
     } else {
-      if (!(*is_null_searching_ptr_) && !is_checked && (depth >= 4)) {
+      if (!is_null_searching_ && !is_checked && (depth >= 4)) {
         // Null Move Reduction。
         Move null_move;
         null_move.move_type_ = NULL_MOVE;  // Null Move。
 
-        (*is_null_searching_ptr_) = true;
+        is_null_searching_ = true;
         MakeMove(null_move);
 
         // Null Move Search。
@@ -242,7 +242,7 @@ namespace Sayuri {
         level + 1, -(beta), -(beta - 1), table, temp_line);
 
         UnmakeMove(null_move);
-        (*is_null_searching_ptr_) = false;
+        is_null_searching_ = false;
 
         if (score >= beta) {
           depth -= reduction;
@@ -417,7 +417,7 @@ namespace Sayuri {
     }
 
     // トランスポジションテーブルに登録。
-    if (!(*is_null_searching_ptr_)) {
+    if (!is_null_searching_) {
       if (!entry_ptr) {
         table.Add(pos_hash, depth, alpha, score_type,
         pv_line.line()[0].move());
@@ -445,7 +445,6 @@ namespace Sayuri {
     // 初期化。
     (*num_searched_nodes_ptr_) = 0;
     (*searched_level_ptr_) = 0;
-    (*is_null_searching_ptr_) = false;
     (*start_time_ptr_) = SysClock::now();
     for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
@@ -460,6 +459,7 @@ namespace Sayuri {
     }
     (*history_max_ptr_) = 1;
     stopper_ptr_->stop_now_ = false;
+    is_null_searching_ = false;
 
     // Iterative Deepening。
     int level = 0;

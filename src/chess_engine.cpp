@@ -71,7 +71,7 @@ namespace Sayuri {
   // コピーコンストラクタ。
   ChessEngine::ChessEngine(const ChessEngine& engine) {
     // 基本メンバをコピー。
-    ScanMember(engine);
+    ScanBasicMember(engine);
 
     // 共有メンバのコピー。
     ScanSharedMember(engine);
@@ -80,7 +80,7 @@ namespace Sayuri {
   // ムーブコンストラクタ。
   ChessEngine::ChessEngine(ChessEngine&& engine) {
     // 基本メンバをコピー。
-    ScanMember(engine);
+    ScanBasicMember(engine);
 
     // 共有メンバのムーブ。
     MoveSharedMember(std::move(engine));
@@ -89,7 +89,7 @@ namespace Sayuri {
   // コピー代入。
   ChessEngine& ChessEngine::operator=(const ChessEngine& engine) {
     // 基本メンバをコピー。
-    ScanMember(engine);
+    ScanBasicMember(engine);
 
     // 共有メンバをコピー。
     ScanSharedMember(engine);
@@ -100,7 +100,7 @@ namespace Sayuri {
   // ムーブ代入。
   ChessEngine& ChessEngine::operator=(ChessEngine&& engine) {
     // 基本メンバをコピー。
-    ScanMember(engine);
+    ScanBasicMember(engine);
 
     // 共有メンバをムーブ。
     MoveSharedMember(std::move(engine));
@@ -301,9 +301,6 @@ namespace Sayuri {
     // 探索したレベルの初期化。
     searched_level_ptr_.reset(new int(0));
 
-    // ヌルサーチ中かどうかのフラグの初期化。
-    is_null_searching_ptr_.reset(new bool(false));
-
     // ストッパーの初期化。
     stopper_ptr_.reset(new Stopper());
 
@@ -323,7 +320,7 @@ namespace Sayuri {
   }
 
   // 他のエンジンの基本メンバをコピーする。
-  void ChessEngine::ScanMember(const ChessEngine& engine) {
+  void ChessEngine::ScanBasicMember(const ChessEngine& engine) {
     // 駒の配置をコピー。
     for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_PIECE_TYPES; j++) {
@@ -414,9 +411,6 @@ namespace Sayuri {
     // 探索したレベルのコピー。
     searched_level_ptr_.reset(new int(*(engine.searched_level_ptr_)));
 
-    // ヌルサーチ中かどうかのコピー。
-    is_null_searching_ptr_.reset(new bool(*(engine.is_null_searching_ptr_)));
-
     // ストッパーのコピー。
     stopper_ptr_.reset(new Stopper(*(engine.stopper_ptr_)));
 
@@ -461,9 +455,6 @@ namespace Sayuri {
     // 探索したレベルのムーブ。
     searched_level_ptr_ = std::move(engine.searched_level_ptr_);
 
-    // ヌルサーチ中かどうかのムーブ。
-    is_null_searching_ptr_ = std::move(engine.is_null_searching_ptr_);
-
     // ストッパーのムーブ。
     stopper_ptr_ = std::move(engine.stopper_ptr_);
 
@@ -482,9 +473,6 @@ namespace Sayuri {
 
   // 他のエンジンと共有メンバを共有する。
   void ChessEngine::LinkSharedMember(ChessEngine& engine) {
-    // 基本メンバをコピー。
-    ScanMember(engine);
-
     // 共有メンバを共有。
     history_ptr_ = engine.history_ptr_;
     history_max_ptr_ = engine.history_max_ptr_;
@@ -494,7 +482,6 @@ namespace Sayuri {
     num_searched_nodes_ptr_ = engine.num_searched_nodes_ptr_;
     start_time_ptr_ = engine.start_time_ptr_;
     searched_level_ptr_ = engine.searched_level_ptr_;
-    is_null_searching_ptr_ = engine.is_null_searching_ptr_;
     stopper_ptr_ = engine.stopper_ptr_;
     move_history_ptr_ = engine.move_history_ptr_;
     ply_100_history_ptr_ = engine.ply_100_history_ptr_;
