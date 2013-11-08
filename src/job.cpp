@@ -41,8 +41,8 @@ namespace Sayuri {
   /**************************/
   Job::Job(MoveMaker& maker, ChessEngine& client, Hash pos_hash,
   int depth, int level, int& alpha, int& beta, int& delta,
-  TranspositionTable& table, PVLine& pv_line, int& searched_moves,
-  int material, bool is_checked,
+  TranspositionTable& table, PVLine& pv_line,bool is_reduced_by_null,
+  int& num_searched_moves, int material, bool is_checked,
   std::vector<Move>* moves_to_search_ptr,
   std::vector<Move>* root_move_vec_ptr) :
   client_ptr_(&client),
@@ -54,12 +54,14 @@ namespace Sayuri {
   delta_ptr_(&delta),
   table_ptr_(&table),
   pv_line_ptr_(&pv_line),
-  searched_moves_ptr_(&searched_moves),
+  is_reduced_by_null_(is_reduced_by_null),
+  num_searched_moves_ptr_(&num_searched_moves),
   material_(material),
   is_checked_(is_checked),
   moves_to_search_ptr_(moves_to_search_ptr),
   root_move_vec_ptr_(root_move_vec_ptr),
-  maker_ptr_(&maker) {}
+  maker_ptr_(&maker),
+  helper_counter_(0) {}
 
   // コピーコンストラクタ。
   Job::Job(const Job& queue) :
@@ -72,12 +74,14 @@ namespace Sayuri {
   delta_ptr_(queue.delta_ptr_),
   table_ptr_(queue.table_ptr_),
   pv_line_ptr_(queue.pv_line_ptr_),
-  searched_moves_ptr_(queue.searched_moves_ptr_),
+  is_reduced_by_null_(queue.is_reduced_by_null_),
+  num_searched_moves_ptr_(queue.num_searched_moves_ptr_),
   material_(queue.material_),
   is_checked_(queue.is_checked_),
   moves_to_search_ptr_(queue.moves_to_search_ptr_),
   root_move_vec_ptr_(queue.root_move_vec_ptr_),
-  maker_ptr_(queue.maker_ptr_) {}
+  maker_ptr_(queue.maker_ptr_),
+  helper_counter_(queue.helper_counter_) {}
 
   // ムーブコンストラクタ。
   Job::Job(Job&& queue) :
@@ -90,12 +94,14 @@ namespace Sayuri {
   delta_ptr_(queue.delta_ptr_),
   table_ptr_(queue.table_ptr_),
   pv_line_ptr_(queue.pv_line_ptr_),
-  searched_moves_ptr_(queue.searched_moves_ptr_),
+  is_reduced_by_null_(queue.is_reduced_by_null_),
+  num_searched_moves_ptr_(queue.num_searched_moves_ptr_),
   material_(queue.material_),
   is_checked_(queue.is_checked_),
   moves_to_search_ptr_(queue.moves_to_search_ptr_),
   root_move_vec_ptr_(queue.root_move_vec_ptr_),
-  maker_ptr_(queue.maker_ptr_) {}
+  maker_ptr_(queue.maker_ptr_),
+  helper_counter_(queue.helper_counter_) {}
 
   // コピー代入。
   Job& Job::operator=(const Job& queue) {
@@ -108,12 +114,14 @@ namespace Sayuri {
     delta_ptr_ = queue.delta_ptr_;
     table_ptr_ = queue.table_ptr_;
     pv_line_ptr_ = queue.pv_line_ptr_;
-    searched_moves_ptr_ = queue.searched_moves_ptr_;
+    is_reduced_by_null_ = queue.is_reduced_by_null_;
+    num_searched_moves_ptr_ = queue.num_searched_moves_ptr_;
     material_ = queue.material_;
     is_checked_ = queue.is_checked_;
     moves_to_search_ptr_ = queue.moves_to_search_ptr_;
     root_move_vec_ptr_ = queue.root_move_vec_ptr_;
     maker_ptr_ = queue.maker_ptr_;
+    helper_counter_ = queue.helper_counter_;
 
     return *this;
   }
@@ -129,12 +137,14 @@ namespace Sayuri {
     delta_ptr_ = queue.delta_ptr_;
     table_ptr_ = queue.table_ptr_;
     pv_line_ptr_ = queue.pv_line_ptr_;
-    searched_moves_ptr_ = queue.searched_moves_ptr_;
+    is_reduced_by_null_ = queue.is_reduced_by_null_;
+    num_searched_moves_ptr_ = queue.num_searched_moves_ptr_;
     material_ = queue.material_;
     is_checked_ = queue.is_checked_;
     moves_to_search_ptr_ = queue.moves_to_search_ptr_;
     root_move_vec_ptr_ = queue.root_move_vec_ptr_;
     maker_ptr_ = queue.maker_ptr_;
+    helper_counter_ = queue.helper_counter_;
 
     return *this;
   }
@@ -145,5 +155,23 @@ namespace Sayuri {
   // 手を得る。
   Move Job::PickMove() {
     return maker_ptr_->PickMove();
+  }
+
+  // ヘルパーの数を増やす。
+  void Job::CountHelper() {
+    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+    helper_counter_++;
+  }
+
+  // 仕事終了の合図を出す。
+  void Job::FinishMyJob() {
+    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+    helper_counter_--;
+  }
+
+  // ヘルパー全員の仕事終了まで待機する。
+  void Job::WaitForHelpers() {
+    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+    cond_.wait(lock, [this] {return helper_counter_ <= 0;});
   }
 }  // namespace Sayuri

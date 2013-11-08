@@ -31,6 +31,9 @@
 #include <random>
 #include <cstddef>
 #include <utility>
+#include <memory>
+#include <vector>
+#include <array>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "transposition_table.h"
@@ -39,6 +42,8 @@
 #include "error.h"
 #include "uci_shell.h"
 #include "position_record.h"
+#include "job.h"
+#include "helper_queue.h"
 
 namespace Sayuri {
   /****************/
@@ -65,64 +70,40 @@ namespace Sayuri {
 
   // コピーコンストラクタ。
   ChessEngine::ChessEngine(const ChessEngine& engine) {
-    // メンバをコピー。
+    // 基本メンバをコピー。
     ScanMember(engine);
 
-    // 指し手の履歴をコピー。
-    move_history_ = engine.move_history_;
-
-    // 50手ルールの履歴をコピー。
-    ply_100_history_ = engine.ply_100_history_;
-
-    // 駒の配置の履歴をコピー。
-    position_history_ = engine.position_history_;
+    // 共有メンバのコピー。
+    ScanSharedMember(engine);
   }
 
   // ムーブコンストラクタ。
   ChessEngine::ChessEngine(ChessEngine&& engine) {
-    // メンバをコピー。
+    // 基本メンバをコピー。
     ScanMember(engine);
 
-    // 指し手の履歴をムーブ。
-    move_history_ = std::move(engine.move_history_);
-
-    // 50手ルールの履歴をムーブ。
-    ply_100_history_ = std::move(engine.ply_100_history_);
-
-    // 駒の配置の履歴をムーブ。
-    position_history_ = std::move(engine.position_history_);
+    // 共有メンバのムーブ。
+    MoveSharedMember(std::move(engine));
   }
 
   // コピー代入。
   ChessEngine& ChessEngine::operator=(const ChessEngine& engine) {
-    // メンバをコピー。
+    // 基本メンバをコピー。
     ScanMember(engine);
 
-    // 指し手の履歴をコピー。
-    move_history_ = engine.move_history_;
-
-    // 50手ルールの履歴をコピー。
-    ply_100_history_ = engine.ply_100_history_;
-
-    // 駒の配置の履歴をコピー。
-    position_history_ = engine.position_history_;
+    // 共有メンバをコピー。
+    ScanSharedMember(engine);
 
     return *this;
   }
 
   // ムーブ代入。
   ChessEngine& ChessEngine::operator=(ChessEngine&& engine) {
-    // メンバをコピー。
+    // 基本メンバをコピー。
     ScanMember(engine);
 
-    // 指し手の履歴をムーブ。
-    move_history_ = std::move(engine.move_history_);
-
-    // 50手ルールの履歴をムーブ。
-    ply_100_history_ = std::move(engine.ply_100_history_);
-
-    // 駒の配置の履歴をムーブ。
-    position_history_ = std::move(engine.position_history_);
+    // 共有メンバをムーブ。
+    MoveSharedMember(std::move(engine));
 
     return *this;
   }
@@ -179,10 +160,10 @@ namespace Sayuri {
     ply_ = fen.ply();
 
     // 履歴を設定。
-    ply_100_history_.clear();
-    ply_100_history_.push_back(ply_100_);
-    position_history_.clear();
-    position_history_.push_back(PositionRecord(*this));
+    ply_100_history_ptr_->clear();
+    ply_100_history_ptr_->push_back(ply_100_);
+    position_history_ptr_->clear();
+    position_history_ptr_->push_back(PositionRecord(*this));
   }
 
   // 新しいゲームの準備をする。
@@ -291,37 +272,57 @@ namespace Sayuri {
     }
 
     // ヒストリーの初期化。
+    history_ptr_.reset (new std::array<std::array<std::array<int,
+    NUM_SQUARES>, NUM_SQUARES>, NUM_SIDES>);
     for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
         for (int k = 0; k < NUM_SQUARES; k++) {
-          history_[i][j][k] = 0;
+          (*history_ptr_)[i][j][k] = 0;
         }
       }
     }
-    history_max_ = 1;
+    history_max_ptr_.reset(new int(1));
 
     // iid_stack_の初期化。
-    for (int i = 0; i < MAX_PLYS; i++) {
-      iid_stack_[i] = Move();
-    }
+    iid_stack_ptr_.reset(new std::array<Move, MAX_PLYS>);
+
     // killer_stack_の初期化。
-    for (int i = 0; i < MAX_PLYS; i++) {
-      killer_stack_[i] = Move();
-    }
+    killer_stack_ptr_.reset(new std::array<Move, MAX_PLYS>);
+
+    // i_depth_ptr_の初期化。
+    i_depth_ptr_.reset(new int(0));
+
+    // num_searched_nodes_ptr_の初期化。
+    num_searched_nodes_ptr_.reset(new std::size_t(0));
+
+    // 探索開始時間の初期化。
+    start_time_ptr_.reset(new TimePoint());
+
+    // 探索したレベルの初期化。
+    searched_level_ptr_.reset(new int(0));
+
+    // ヌルサーチ中かどうかのフラグの初期化。
+    is_null_searching_ptr_.reset(new bool(false));
+
+    // ストッパーの初期化。
+    stopper_ptr_.reset(new Stopper());
 
     // 手の履歴を削除。
-    move_history_.clear();
+    move_history_ptr_.reset(new std::vector<Move>(0));
 
     // 50手ルールの履歴を初期化。
-    ply_100_history_.clear();
-    ply_100_history_.push_back(0);
+    ply_100_history_ptr_.reset(new std::vector<int>(0));
+    ply_100_history_ptr_->push_back(0);
 
     // 駒の配置を初期化。
-    position_history_.clear();
-    position_history_.push_back(PositionRecord(*this));
+    position_history_ptr_.reset(new std::vector<PositionRecord>(0));
+    position_history_ptr_->push_back(PositionRecord(*this));
+
+    // スレッドのキューを初期化。
+    helper_queue_ptr_.reset(new HelperQueue());
   }
 
-  // 他のエンジンのメンバをコピーする。
+  // 他のエンジンの基本メンバをコピーする。
   void ChessEngine::ScanMember(const ChessEngine& engine) {
     // 駒の配置をコピー。
     for (int i = 0; i < NUM_SIDES; i++) {
@@ -376,35 +377,128 @@ namespace Sayuri {
     for (int i = 0; i < NUM_SIDES; i++) {
       has_castled_[i] = engine.has_castled_[i];
     }
+  }
 
-    // ヒストリーのコピー。
+  // 他のエンジンの共有メンバのコピー。
+  void ChessEngine::ScanSharedMember(const ChessEngine& engine) {
+    // ヒストリーをコピー。
+    history_ptr_.reset(new std::array<std::array<std::array<int,
+    NUM_SQUARES>, NUM_SQUARES>, NUM_SIDES>);
     for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
         for (int k = 0; k < NUM_SQUARES; k++) {
-          history_[i][j][k] = engine.history_[i][j][k];
+          (*history_ptr_)[i][j][k] = (*(engine.history_ptr_))[i][j][k];
         }
       }
     }
-    history_max_ = engine.history_max_;
+    history_max_ptr_.reset(new int(*(engine.history_max_ptr_)));
 
-    // IIDスタックとキラースタックのコピー。
+    // iid_stack_とkiller_stack_のコピー。
+    iid_stack_ptr_.reset(new std::array<Move, MAX_PLYS>);
+    killer_stack_ptr_.reset(new std::array<Move, MAX_PLYS>);
     for (int i = 0; i < MAX_PLYS; i++) {
-      iid_stack_[i] = engine.iid_stack_[i];
-      killer_stack_[i] = engine.killer_stack_[i];
+      (*iid_stack_ptr_)[i] = (*(engine.iid_stack_ptr_))[i];
+      (*killer_stack_ptr_)[i] = (*(engine.killer_stack_ptr_))[i];
     }
 
-    // 現在のITerative Deepeningの深さのコピー。
-    i_depth_ = engine.i_depth_;
+    // Iterative Deepeningの深さをコピー。
+    i_depth_ptr_.reset(new int(*(engine.i_depth_ptr_)));
+
+    // 探索したノード数のコピー。
+    num_searched_nodes_ptr_.reset
+    (new std::size_t(*(engine.num_searched_nodes_ptr_)));
 
     // 探索開始時間のコピー。
-    start_time_ = engine.start_time_;
+    start_time_ptr_.reset(new TimePoint(*(engine.start_time_ptr_)));
+
+    // 探索したレベルのコピー。
+    searched_level_ptr_.reset(new int(*(engine.searched_level_ptr_)));
+
+    // ヌルサーチ中かどうかのコピー。
+    is_null_searching_ptr_.reset(new bool(*(engine.is_null_searching_ptr_)));
 
     // ストッパーのコピー。
-    stopper_.stop_now_ = engine.stopper_.stop_now_;
-    stopper_.max_nodes_ = engine.stopper_.max_nodes_;
-    stopper_.max_depth_ = engine.stopper_.max_depth_;
-    stopper_.thinking_time_ = engine.stopper_.thinking_time_;
-    stopper_.infinite_thinking_ = engine.stopper_.infinite_thinking_;
+    stopper_ptr_.reset(new Stopper(*(engine.stopper_ptr_)));
+
+    // 指し手の履歴のコピー。
+    move_history_ptr_.reset(new std::vector<Move>
+    (engine.move_history_ptr_->size()));
+    *move_history_ptr_ = *(engine.move_history_ptr_);
+
+    // 50手ルールの履歴のコピー。
+    ply_100_history_ptr_.reset(new std::vector<int>
+    (engine.ply_100_history_ptr_->size()));
+    *ply_100_history_ptr_ = *(engine.ply_100_history_ptr_);
+
+    // 駒の配置の履歴をコピー。
+    position_history_ptr_.reset(new std::vector<PositionRecord>
+    (engine.position_history_ptr_->size()));
+    *position_history_ptr_ = *(engine.position_history_ptr_);
+
+    // スレッドのキューを初期化。
+    helper_queue_ptr_.reset(new HelperQueue(*(engine.helper_queue_ptr_)));
+  }
+
+  // 他のエンジンの共有メンバのムーブ。
+  void ChessEngine::MoveSharedMember(ChessEngine&& engine) {
+    // ヒストリーをムーブ。
+    history_ptr_ = std::move(engine.history_ptr_);
+    history_max_ptr_ = std::move(engine.history_max_ptr_);
+
+    // iid_stack_とkiller_stack_のムーブ。
+    iid_stack_ptr_ = std::move(engine.iid_stack_ptr_);
+    killer_stack_ptr_ = std::move(engine.killer_stack_ptr_);
+
+    // Iterative Deepeningの深さをムーブ。
+    i_depth_ptr_ = std::move(engine.i_depth_ptr_);
+
+    // 探索したノード数のムーブ。
+    num_searched_nodes_ptr_ = std::move(engine.num_searched_nodes_ptr_);
+
+    // 探索開始時間のムーブ。
+    start_time_ptr_ = std::move(engine.start_time_ptr_);
+
+    // 探索したレベルのムーブ。
+    searched_level_ptr_ = std::move(engine.searched_level_ptr_);
+
+    // ヌルサーチ中かどうかのムーブ。
+    is_null_searching_ptr_ = std::move(engine.is_null_searching_ptr_);
+
+    // ストッパーのムーブ。
+    stopper_ptr_ = std::move(engine.stopper_ptr_);
+
+    // 指し手の履歴のムーブ。
+    move_history_ptr_ = std::move(engine.move_history_ptr_);
+
+    // 50手ルールの履歴のムーブ。
+    ply_100_history_ptr_ = std::move(engine.ply_100_history_ptr_);
+
+    // 駒の配置の履歴をムーブ。
+    position_history_ptr_ = std::move(engine.position_history_ptr_);
+
+    // スレッドのキューをムーブ。
+    helper_queue_ptr_ = std::move(engine.helper_queue_ptr_);
+  }
+
+  // 他のエンジンと共有メンバを共有する。
+  void ChessEngine::LinkSharedMember(ChessEngine& engine) {
+    // 基本メンバをコピー。
+    ScanMember(engine);
+
+    // 共有メンバを共有。
+    history_ptr_ = engine.history_ptr_;
+    history_max_ptr_ = engine.history_max_ptr_;
+    iid_stack_ptr_ = engine.iid_stack_ptr_;
+    killer_stack_ptr_ = engine.killer_stack_ptr_;
+    i_depth_ptr_ = engine.i_depth_ptr_;
+    num_searched_nodes_ptr_ = engine.num_searched_nodes_ptr_;
+    start_time_ptr_ = engine.start_time_ptr_;
+    searched_level_ptr_ = engine.searched_level_ptr_;
+    is_null_searching_ptr_ = engine.is_null_searching_ptr_;
+    stopper_ptr_ = engine.stopper_ptr_;
+    move_history_ptr_ = engine.move_history_ptr_;
+    ply_100_history_ptr_ = engine.ply_100_history_ptr_;
+    position_history_ptr_ = engine.position_history_ptr_;
   }
 
   // 思考を始める。
@@ -419,7 +513,7 @@ namespace Sayuri {
 
   // 思考を停止する。
   void ChessEngine::StopCalculation() {
-    stopper_.stop_now_ = true;
+    stopper_ptr_->stop_now_ = true;
   }
 
   // 手を指す。
@@ -458,10 +552,10 @@ namespace Sayuri {
       } else {
         ply_100_++;
       }
-      move_history_.push_back(move);
-      ply_100_history_.push_back(ply_100_);
+      move_history_ptr_->push_back(move);
+      ply_100_history_ptr_->push_back(ply_100_);
       MakeMove(move);
-      position_history_.push_back(PositionRecord(*this));
+      position_history_ptr_->push_back(PositionRecord(*this));
     } else {
       throw SayuriError("合法手ではありません。");
     }
@@ -469,13 +563,13 @@ namespace Sayuri {
 
   // 手を戻す。
   void ChessEngine::UndoMove() {
-    if (move_history_.size() >= 1) {
+    if (move_history_ptr_->size() >= 1) {
       ply_--;
-      Move move = move_history_.back();
-      ply_100_ = ply_100_history_.back();
-      move_history_.pop_back();
-      ply_100_history_.pop_back();
-      position_history_.pop_back();
+      Move move = move_history_ptr_->back();
+      ply_100_ = ply_100_history_ptr_->back();
+      move_history_ptr_->pop_back();
+      ply_100_history_ptr_->pop_back();
+      position_history_ptr_->pop_back();
       UnmakeMove(move);
     } else {
       throw SayuriError("手を戻すことができません。");

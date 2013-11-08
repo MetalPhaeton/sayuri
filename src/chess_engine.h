@@ -29,6 +29,8 @@
 
 #include <iostream>
 #include <vector>
+#include <memory>
+#include <array>
 #include <thread>
 #include <mutex>
 #include <cstddef>
@@ -38,9 +40,13 @@
 #include "fen.h"
 #include "pv_line.h"
 #include "position_record.h"
+#include "job.h"
+#include "helper_queue.h"
 
 namespace Sayuri {
   class PositionRecord;
+  class Job;
+  class HelperQueue;
 
   // チェスエンジンのクラス。
   class ChessEngine {
@@ -216,15 +222,20 @@ namespace Sayuri {
       // キャスリングしたかどうか。
       const bool (& has_castled() const)[NUM_SIDES] {return has_castled_;}
       // ヒストリー。history()[side][from][to]。
-      const int (& history() const)[NUM_SIDES][NUM_SQUARES][NUM_SQUARES] {
-        return history_;
+      const std::array<std::array<std::array<int,
+      NUM_SQUARES>, NUM_SQUARES>, NUM_SIDES>& history() const {
+        return *history_ptr_;
       }
       // ヒストリーの最大値。
-      int history_max() const {return history_max_;}
+      int history_max() const {return *history_max_ptr_;}
       // IIDでの最善手スタック。
-      const Move (& iid_stack() const)[MAX_PLYS] {return iid_stack_;}
+      const std::array<Move, MAX_PLYS>& iid_stack() const {
+        return *iid_stack_ptr_;
+      }
       // キラームーブスタック。
-      const Move (& killer_stack() const)[MAX_PLYS] {return killer_stack_;}
+      const std::array<Move, MAX_PLYS>& killer_stack() const {
+        return *killer_stack_ptr_;
+      }
 
     private:
       /******************/
@@ -279,10 +290,23 @@ namespace Sayuri {
       /******************************/
       /* その他のプライベート関数。 */
       /******************************/
-      // 他のエンジンのメンバをコピーする。
+      // 他のエンジンの基本メンバをコピーする。
       // [引数]
       // engine: 他のエンジン。
       void ScanMember(const ChessEngine& engine);
+      // 他のエンジンの共有メンバのコピー。
+      // [引数]
+      // engine: 他のエンジン。
+      void ScanSharedMember(const ChessEngine& engine);
+      // 他のエンジンの共有メンバのムーブ。
+      // [引数]
+      // engine: 他のエンジン。
+      void MoveSharedMember(ChessEngine&& engine);
+      // 他のエンジンと共有メンバを共有する。
+      // 基本メンバはコピー。
+      // [引数]
+      // engine: 他のエンジン。
+      void LinkSharedMember(ChessEngine& engine);
 
       // 駒を動かす。
       // 動かす前のキャスリングの権利とアンパッサンは記録される。
@@ -323,6 +347,9 @@ namespace Sayuri {
       /****************/
       /* メンバ変数。 */
       /****************/
+      /***************************************************************/
+      /* 基本メンバ。(他のエンジンと共有されるとき、コピーされる。)  */
+      /***************************************************************/
       // 駒の配置のビットボードの配列。
       Bitboard position_[NUM_SIDES][NUM_PIECE_TYPES];
       // 駒の種類の配置。
@@ -352,62 +379,97 @@ namespace Sayuri {
       int ply_;
       // キャスリングしたかどうか。
       bool has_castled_[NUM_SIDES];
-      // ヒストリー。history_[side][from][to]。
-      int history_[NUM_SIDES][NUM_SQUARES][NUM_SQUARES];
+      /********************************************************/
+      /* 共有メンバ。(指定した他のエンジンと共有するメンバ。) */
+      /********************************************************/
+      // ヒストリー。(*history_ptr_)[side][from][to]。
+      std::shared_ptr<std::array<std::array<std::array<int,
+      NUM_SQUARES>, NUM_SQUARES>, NUM_SIDES>> history_ptr_;
       // ヒストリーの最大値。
-      int history_max_;
+      std::shared_ptr<int> history_max_ptr_;
       // IIDでの最善手スタック。
-      Move iid_stack_[MAX_PLYS];
+      std::shared_ptr<std::array<Move, MAX_PLYS>> iid_stack_ptr_;
       // キラームーブスタック。
-      Move killer_stack_[MAX_PLYS];
+      std::shared_ptr<std::array<Move, MAX_PLYS>> killer_stack_ptr_;
       // 現在のIterative Deepeningの深さ。
-      int i_depth_;
+      std::shared_ptr<int> i_depth_ptr_;
       // 探索したノード数。
-      std::size_t searched_nodes_;
+      std::shared_ptr<std::size_t> num_searched_nodes_ptr_;
       // 探索開始時間。
-      TimePoint start_time_;
+      std::shared_ptr<TimePoint> start_time_ptr_;
       // 探索したレベル。
-      int searched_level_;
-      // ヌルサーチ中。
-      bool is_null_searching_;
+      std::shared_ptr<int> searched_level_ptr_;
+      // ヌルサーチ中かどうか。
+      std::shared_ptr<bool> is_null_searching_ptr_;
       // ストップ条件構造体。
       struct Stopper {
         // 何が何でも探索を中断。
-        bool stop_now_;
-
+        volatile bool stop_now_;
         // 最大探索ノード数。
-        std::size_t max_nodes_;
-
+        volatile std::size_t max_nodes_;
         // 最大探索深さ。
-        int max_depth_;
-
+        volatile int max_depth_;
         // 思考時間。
-        int thinking_time_;
-
+        volatile int thinking_time_;
         // 無限に考える。
-        bool infinite_thinking_;
+        volatile bool infinite_thinking_;
 
         // コンストラクタ。
         Stopper() :
         stop_now_(false),
         max_nodes_(MAX_NODES),
         max_depth_(MAX_PLYS),
-        thinking_time_(3600000),
+        thinking_time_(-1U >> 1),
         infinite_thinking_(false) {}
+        // コピーコンストラクタ。
+        Stopper(const Stopper& stopper) :
+        stop_now_(stopper.stop_now_),
+        max_nodes_(stopper.max_nodes_),
+        max_depth_(stopper.max_depth_),
+        thinking_time_(stopper.thinking_time_),
+        infinite_thinking_(stopper.infinite_thinking_) {}
+        // ムーブコンストラクタ。
+        Stopper(Stopper&& stopper) :
+        stop_now_(stopper.stop_now_),
+        max_nodes_(stopper.max_nodes_),
+        max_depth_(stopper.max_depth_),
+        thinking_time_(stopper.thinking_time_),
+        infinite_thinking_(stopper.infinite_thinking_) {}
+        // コピー代入。
+        Stopper& operator=(const Stopper& stopper) {
+          stop_now_ = stopper.stop_now_;
+          max_nodes_ = stopper.max_nodes_;
+          max_depth_ = stopper.max_depth_;
+          thinking_time_ = stopper.thinking_time_;
+          infinite_thinking_ = stopper.infinite_thinking_;
+          return *this;
+        }
+        // ムーブ代入。
+        Stopper& operator=(Stopper&& stopper) {
+          stop_now_ = stopper.stop_now_;
+          max_nodes_ = stopper.max_nodes_;
+          max_depth_ = stopper.max_depth_;
+          thinking_time_ = stopper.thinking_time_;
+          infinite_thinking_ = stopper.infinite_thinking_;
+          return *this;
+        }
       };
-      volatile Stopper stopper_;
+      std::shared_ptr<Stopper> stopper_ptr_;
       // 指し手の履歴。
-      std::vector<Move> move_history_;
+      std::shared_ptr<std::vector<Move>> move_history_ptr_;
       // 50手ルールの履歴。
-      std::vector<int> ply_100_history_;
+      std::shared_ptr<std::vector<int>> ply_100_history_ptr_;
       // 配置の履歴。
-      std::vector<PositionRecord> position_history_;
+      std::shared_ptr<std::vector<PositionRecord>> position_history_ptr_;
+      // スレッドのキュー。
+      std::shared_ptr<HelperQueue> helper_queue_ptr_;
+      /************************************************************/
+      /* 固有メンバ。(他のエンジンとコピーも共有もしないメンバ。) */
+      /************************************************************/
       // PVSplit用ミューテックス。
       std::mutex pvs_mutex_;
       // PVSplit用スレッドのベクトル。
       std::vector<std::thread> pvs_thread_vec_;
-      // PVSplit用、自分が子供かどうか。
-      bool is_pvs_child_;
 
       /******************/
       /* ハッシュ関連。 */

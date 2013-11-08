@@ -125,7 +125,7 @@ namespace Sayuri {
   // テーブルに追加する。
   void TranspositionTable::Add(Hash pos_hash, int depth,
   int score, ScoreType score_type, Move best_move) {
-    mutex_.lock();  // ロック。
+    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
 
     // テーブルのインデックスを得る。
     int index = GetTableIndex(pos_hash);
@@ -144,14 +144,12 @@ namespace Sayuri {
       std::sort(entry_table_[index].begin(), entry_table_[index].end(),
       TTEntry::Compare);
     }
-
-    mutex_.unlock();  // ロック解除。
   }
 
   // 該当するTTEntryを返す。
   TTEntry* TranspositionTable::GetEntry(Hash pos_hash,
   int depth) {
-    mutex_.lock();  // ロック。
+    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
 
     // テーブルのインデックスを得る。
     int index = GetTableIndex(pos_hash);
@@ -166,8 +164,6 @@ namespace Sayuri {
       }
 
     }
-
-    mutex_.unlock();  // ロック解除。
 
     return entry_ptr;
   }

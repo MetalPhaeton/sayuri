@@ -29,6 +29,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <memory>
 #include <thread>
 #include <mutex>
 #include <memory>
@@ -42,6 +43,8 @@
 #include "error.h"
 #include "uci_shell.h"
 #include "position_record.h"
+#include "job.h"
+#include "helper_queue.h"
 
 namespace Sayuri {
   // クイース探索。
@@ -51,11 +54,11 @@ namespace Sayuri {
     if (ShouldBeStopped()) return alpha;
 
     // ノード数を加算。
-    searched_nodes_++;
+    (*num_searched_nodes_ptr_)++;
 
     // 最大探索数。
-    if (level > searched_level_) {
-      searched_level_ = level;
+    if (level > (*searched_level_ptr_)) {
+      (*searched_level_ptr_) = level;
     }
 
     // サイド。
@@ -85,11 +88,11 @@ namespace Sayuri {
     MoveMaker maker(*this);
     Move prev_best;
     if (IsAttacked(king_[side], enemy_side)) {
-      maker.GenMoves<GenMoveType::ALL>(prev_best, iid_stack_[level],
-      killer_stack_[level]);
+      maker.GenMoves<GenMoveType::ALL>(prev_best, (*iid_stack_ptr_)[level],
+      (*killer_stack_ptr_)[level]);
     } else {
-      maker.GenMoves<GenMoveType::CAPTURE>(prev_best, iid_stack_[level],
-      killer_stack_[level]);
+      maker.GenMoves<GenMoveType::CAPTURE>(prev_best, (*iid_stack_ptr_)[level],
+      (*killer_stack_ptr_)[level]);
     }
 
     // マテリアルを得る。
@@ -140,11 +143,11 @@ namespace Sayuri {
     if (ShouldBeStopped()) return alpha;
 
     // ノード数を加算。
-    searched_nodes_++;
+    (*num_searched_nodes_ptr_)++;
 
     // 最大探索数。
-    if (level > searched_level_) {
-      searched_level_ = level;
+    if (level > (*searched_level_ptr_)) {
+      (*searched_level_ptr_) = level;
     }
 
     // サイドとチェックされているか。
@@ -195,7 +198,7 @@ namespace Sayuri {
     // 限界探索数を超えていてもクイース。
     if ((depth <= 0) || (level >= MAX_PLYS)) {
       // クイース探索ノードに移行するため、ノード数を減らしておく。
-      searched_nodes_--;
+      (*num_searched_nodes_ptr_)--;
       return Quiesce(depth, level, alpha, beta, table);
     }
 
@@ -211,7 +214,7 @@ namespace Sayuri {
     if (Type == NodeType::PV) {
       // 前回の繰り返しの最善手があればIIDしない。
       if (prev_best.all_) {
-        iid_stack_[level] = prev_best;
+        (*iid_stack_ptr_)[level] = prev_best;
       } else {
         if (depth >= 5) {
           // Internal Iterative Deepening。
@@ -220,16 +223,16 @@ namespace Sayuri {
           Search<NodeType::PV>(pos_hash, depth - reduction - 1, level,
           alpha, beta, table, temp_line);
 
-          iid_stack_[level] = temp_line.line()[0].move();
+          (*iid_stack_ptr_)[level] = temp_line.line()[0].move();
         }
       }
     } else {
-      if (!is_null_searching_ && !is_checked && (depth >= 4)) {
+      if (!(*is_null_searching_ptr_) && !is_checked && (depth >= 4)) {
         // Null Move Reduction。
         Move null_move;
         null_move.move_type_ = NULL_MOVE;  // Null Move。
 
-        is_null_searching_ = true;
+        (*is_null_searching_ptr_) = true;
         MakeMove(null_move);
 
         // Null Move Search。
@@ -239,7 +242,7 @@ namespace Sayuri {
         level + 1, -(beta), -(beta - 1), table, temp_line);
 
         UnmakeMove(null_move);
-        is_null_searching_ = false;
+        (*is_null_searching_ptr_) = false;
 
         if (score >= beta) {
           depth -= reduction;
@@ -253,8 +256,8 @@ namespace Sayuri {
     /**************/
     // 手を作る。
     MoveMaker maker(*this);
-    maker.GenMoves<GenMoveType::ALL>(prev_best, iid_stack_[level],
-    killer_stack_[level]);
+    maker.GenMoves<GenMoveType::ALL>(prev_best, (*iid_stack_ptr_)[level],
+    (*killer_stack_ptr_)[level]);
 
     // Futility Pruningの準備。
     bool do_futility_pruning = false;
@@ -309,7 +312,8 @@ namespace Sayuri {
         if (!is_checked && (Type == NodeType::NON_PV)) {
           // History Puruning。
           if (!move.captured_piece_
-          && (history_[side][move.from_][move.to_] < (history_max_ / 2))) {
+          && ((*history_ptr_)[side][move.from_][move.to_]
+          < ((*history_max_ptr_) / 2))) {
             reduction++;
           }
         }
@@ -342,7 +346,7 @@ namespace Sayuri {
       // 相手の手番の初手の場合、3回繰り返しルールをチェック。
       if (level == 1) {
         int repetitions = 0;
-        for (auto& a : position_history_) {
+        for (auto& a : (*position_history_ptr_)) {
           if (a == *this) {
             repetitions++;
           }
@@ -377,13 +381,14 @@ namespace Sayuri {
         score_type = ScoreType::BETA;
 
         // キラームーブ。
-        killer_stack_[level] = move;
+        (*killer_stack_ptr_)[level] = move;
 
         // ヒストリー。
         if (!(move.captured_piece_)) {
-          history_[side][move.from_][move.to_] += depth * depth;
-          if (history_[side][move.from_][move.to_] > history_max_) {
-            history_max_ = history_[side][move.from_][move.to_];
+          (*history_ptr_)[side][move.from_][move.to_] += depth * depth;
+          if ((*history_ptr_)[side][move.from_][move.to_]
+          > (*history_max_ptr_)) {
+            (*history_max_ptr_) = (*history_ptr_)[side][move.from_][move.to_];
           }
         }
 
@@ -412,7 +417,7 @@ namespace Sayuri {
     }
 
     // トランスポジションテーブルに登録。
-    if (!is_null_searching_) {
+    if (!(*is_null_searching_ptr_)) {
       if (!entry_ptr) {
         table.Add(pos_hash, depth, alpha, score_type,
         pv_line.line()[0].move());
@@ -438,24 +443,23 @@ namespace Sayuri {
   PVLine ChessEngine::SearchRoot(TranspositionTable& table,
   std::vector<Move>* moves_to_search_ptr) {
     // 初期化。
-    searched_nodes_ = 0;
-    searched_level_ = 0;
-    is_null_searching_ = false;
-    start_time_ = SysClock::now();
+    (*num_searched_nodes_ptr_) = 0;
+    (*searched_level_ptr_) = 0;
+    (*is_null_searching_ptr_) = false;
+    (*start_time_ptr_) = SysClock::now();
     for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
         for (int k = 0; k < NUM_SQUARES; k++) {
-          history_[i][j][k] = 0;
+          (*history_ptr_)[i][j][k] = 0;
         }
       }
     }
     for (int i = 0; i < MAX_PLYS; i++) {
-      iid_stack_[i] = Move();
-      killer_stack_[i] = Move();
+      (*iid_stack_ptr_)[i] = Move();
+      (*killer_stack_ptr_)[i] = Move();
     }
-    history_max_ = 1;
-    stopper_.stop_now_ = false;
-    is_pvs_child_ = false;
+    (*history_max_ptr_) = 1;
+    stopper_ptr_->stop_now_ = false;
 
     // Iterative Deepening。
     int level = 0;
@@ -470,14 +474,14 @@ namespace Sayuri {
     std::vector<Move> move_vec;
     MoveMaker maker(*this);
     bool is_checked = IsAttacked(king_[side], enemy_side);
-    for (i_depth_ = 1; i_depth_ <= MAX_PLYS; i_depth_++) {
+    for ((*i_depth_ptr_) = 1; (*i_depth_ptr_) <= MAX_PLYS; (*i_depth_ptr_)++) {
       // 探索終了。
       if (ShouldBeStopped()) break;
 
       // 準備。
       int delta = 15;
       // 探索窓の設定。
-      if (i_depth_ < 5) {
+      if ((*i_depth_ptr_) < 5) {
         alpha = -MAX_VALUE;
         beta = MAX_VALUE;
       } else {
@@ -489,22 +493,22 @@ namespace Sayuri {
 
 
       // ノードを加算。
-      searched_nodes_++;
+      (*num_searched_nodes_ptr_)++;
 
       // 標準出力に深さ情報を送る。
-      UCIShell::SendDepthInfo(i_depth_);
+      UCIShell::SendDepthInfo(*i_depth_ptr_);
 
       // 前回の繰り返しの最善手を得る。
       TTEntry* prev_entry =
-      table.GetEntry(pos_hash, i_depth_ - 1);
+      table.GetEntry(pos_hash, (*i_depth_ptr_) - 1);
       Move prev_best;
       if (prev_entry && (prev_entry->score_type() != ScoreType::ALPHA)) {
         prev_best = prev_entry->best_move();
       }
 
       // 手を作る。
-      maker.GenMoves<GenMoveType::ALL>(prev_best, iid_stack_[level],
-      killer_stack_[level]);
+      maker.GenMoves<GenMoveType::ALL>(prev_best, (*iid_stack_ptr_)[level],
+      (*killer_stack_ptr_)[level]);
 
       // 手を探索。
       int num_searched_moves = 0;
@@ -514,9 +518,9 @@ namespace Sayuri {
         // 情報を送る。
         now = SysClock::now();
         if (now > next_send_info_time) {
-          UCIShell::SendOtherInfo
-          (Chrono::duration_cast<Chrono::milliseconds>(now - start_time_),
-          searched_nodes_, table.GetUsedPermill());
+          UCIShell::SendOtherInfo(Chrono::duration_cast<Chrono::milliseconds>
+          (now - (*start_time_ptr_)), (*num_searched_nodes_ptr_),
+          table.GetUsedPermill());
 
           next_send_info_time = now + Chrono::milliseconds(1000);
         }
@@ -539,7 +543,7 @@ namespace Sayuri {
         }
 
         // 探索したレベルをリセット。
-        searched_level_ = 0;
+        (*searched_level_ptr_) = 0;
 
         // 次のハッシュ。
         Hash next_hash = GetNextHash(pos_hash, move);
@@ -553,7 +557,7 @@ namespace Sayuri {
         }
 
         // 現在探索している手の情報を送る。
-        if (i_depth_ <= 1) {
+        if ((*i_depth_ptr_) <= 1) {
           // 最初の探索。
           UCIShell::SendCurrentMoveInfo(move, move_num);
           move_vec.push_back(move);
@@ -580,7 +584,7 @@ namespace Sayuri {
 
             // フルでPVを探索。
             score = -Search<NodeType::PV>
-            (next_hash, i_depth_ - 1, level + 1, -beta, -alpha,
+            (next_hash, (*i_depth_ptr_) - 1, level + 1, -beta, -alpha,
             table, next_line);
             // アルファ値、ベータ値を調べる。
             if (score >= beta) {
@@ -603,11 +607,11 @@ namespace Sayuri {
           // PV発見後。
           // Late Move Reduction。
           if (!is_checked && !(move.captured_piece_) && !(move.promotion_)
-          && (i_depth_ >= 3) && (num_searched_moves >= 4)) {
+          && ((*i_depth_ptr_) >= 3) && (num_searched_moves >= 4)) {
             int reduction = 1;
             // ゼロウィンドウ探索。
             score = -Search<NodeType::NON_PV>(next_hash,
-            i_depth_ - reduction - 1, level + 1, -(alpha + 1),
+            (*i_depth_ptr_) - reduction - 1, level + 1, -(alpha + 1),
             -alpha, table, next_line);
           } else {
             // 普通に探索するためにscoreをalphaより大きくしておく。
@@ -617,7 +621,7 @@ namespace Sayuri {
           // 普通の探索。
           if (score > alpha) {
             // ゼロウィンドウ探索。
-            score = -Search<NodeType::NON_PV>(next_hash, i_depth_ - 1,
+            score = -Search<NodeType::NON_PV>(next_hash, (*i_depth_ptr_) - 1,
             level + 1, -(alpha + 1), -alpha, table, next_line);
             if (score > alpha) {
               while (true) {
@@ -625,7 +629,7 @@ namespace Sayuri {
                 if (ShouldBeStopped()) break;
 
                 // フルウィンドウで再探索。
-                score = -Search<NodeType::PV>(next_hash, i_depth_ - 1,
+                score = -Search<NodeType::PV>(next_hash, (*i_depth_ptr_) - 1,
                 level + 1, -beta, -alpha, table, next_line);
                 // アルファ値、ベータ値を調べる。
                 if (score >= beta) {
@@ -644,7 +648,7 @@ namespace Sayuri {
 
         // 3回繰り返しルールをチェック。
         int repetitions = 0;
-        for (auto& a : position_history_) {
+        for (auto& a : (*position_history_ptr_)) {
           if (a == *this) {
             repetitions++;
           }
@@ -670,9 +674,10 @@ namespace Sayuri {
 
           // トランスポジションテーブルに登録。
           if (!entry_ptr) {
-            table.Add(pos_hash, i_depth_, score, ScoreType::EXACT, move);
+            table.Add(pos_hash, (*i_depth_ptr_),
+            score, ScoreType::EXACT, move);
 
-            entry_ptr = table.GetEntry(pos_hash, i_depth_);
+            entry_ptr = table.GetEntry(pos_hash, (*i_depth_ptr_));
           } else {
             entry_ptr->Update(score, ScoreType::EXACT, move);
           }
@@ -680,9 +685,10 @@ namespace Sayuri {
           // 標準出力にPV情報を送る。
           TimePoint now = SysClock::now();
           Chrono::milliseconds time =
-          Chrono::duration_cast<Chrono::milliseconds>(now - start_time_);
-          UCIShell::SendPVInfo(i_depth_, searched_level_, score, time,
-          searched_nodes_, pv_line);
+          Chrono::duration_cast<Chrono::milliseconds>
+          (now - (*start_time_ptr_));
+          UCIShell::SendPVInfo((*i_depth_ptr_), (*searched_level_ptr_), score,
+          time, (*num_searched_nodes_ptr_), pv_line);
 
           alpha = score;
         }
@@ -695,8 +701,8 @@ namespace Sayuri {
     // 最後に情報を送る。
     now = SysClock::now();
     UCIShell::SendOtherInfo
-    (Chrono::duration_cast<Chrono::milliseconds>(now - start_time_),
-    searched_nodes_, table.GetUsedPermill());
+    (Chrono::duration_cast<Chrono::milliseconds>(now - (*start_time_ptr_)),
+    (*num_searched_nodes_ptr_), table.GetUsedPermill());
 
 
     // 探索終了したけど、まだ思考を止めてはいけない場合、関数を終了しない。
@@ -818,33 +824,33 @@ namespace Sayuri {
   // ストップ条件を設定する。
   void ChessEngine::SetStopper(int max_depth, std::size_t max_nodes,
   Chrono::milliseconds thinking_time, bool infinite_thinking) {
-    stopper_.max_depth_ = max_depth <= MAX_PLYS ? max_depth : MAX_PLYS;
-    stopper_.max_nodes_ = max_nodes <= MAX_NODES ? max_nodes : MAX_NODES;
-    stopper_.thinking_time_ = thinking_time.count();
-    stopper_.infinite_thinking_ = infinite_thinking;
+    stopper_ptr_->max_depth_ = max_depth <= MAX_PLYS ? max_depth : MAX_PLYS;
+    stopper_ptr_->max_nodes_ = max_nodes <= MAX_NODES ? max_nodes : MAX_NODES;
+    stopper_ptr_->thinking_time_ = thinking_time.count();
+    stopper_ptr_->infinite_thinking_ = infinite_thinking;
   }
 
   // 思考の無限時間フラグを設定する。
   void ChessEngine::EnableInfiniteThinking(bool enable) {
-    stopper_.infinite_thinking_ = enable;
+    stopper_ptr_->infinite_thinking_ = enable;
   }
 
   // 探索中止しなければいけないかどうか。
   bool ChessEngine::ShouldBeStopped() {
-    if (stopper_.stop_now_) return true;
-    if (stopper_.infinite_thinking_) return false;
-    if (i_depth_ > stopper_.max_depth_) {
-      stopper_.stop_now_ = true;
+    if (stopper_ptr_->stop_now_) return true;
+    if (stopper_ptr_->infinite_thinking_) return false;
+    if ((*i_depth_ptr_) > stopper_ptr_->max_depth_) {
+      stopper_ptr_->stop_now_ = true;
       return true;
     }
-    if (searched_nodes_ >= stopper_.max_nodes_) {
-      stopper_.stop_now_ = true;
+    if ((*num_searched_nodes_ptr_) >= stopper_ptr_->max_nodes_) {
+      stopper_ptr_->stop_now_ = true;
       return true;
     }
     TimePoint now = SysClock::now();
     if ((Chrono::duration_cast<Chrono::milliseconds>
-    (now - start_time_)).count() >= stopper_.thinking_time_) {
-      stopper_.stop_now_ = true;
+    (now - (*start_time_ptr_))).count() >= stopper_ptr_->thinking_time_) {
+      stopper_ptr_->stop_now_ = true;
       return true;
     }
     return false;

@@ -38,6 +38,7 @@
 
 namespace Sayuri {
   class ChessEngine;
+  class MoveMaker;
 
   // マルチスレッド探索用の仕事クラス。
   class Job {
@@ -56,15 +57,16 @@ namespace Sayuri {
       // delta: ルート探索時、ベータ値の増分の変数。(更新される。)
       // table: トランスポジションテーブル。
       // pv_lien: 現在のノードのPVライン。
-      // serached_moves: いくつ手を探索したかの変数。(更新される。)
+      // is_reduced_by_null: Null Move Reductionでリダクションされたかどうか。
+      // num_serached_moves: いくつ手を探索したかの変数。(更新される。)
       // material: 現在のマテリアル。
       // is_checked: 現在チェックされているかどうか。
       // moves_to_search_ptr: ルートで探索すべき手のベクトル。ないならnullptr。
       // root_move_vec_ptr: ルートで作成した手のベクトル。ないならnullptr。
       Job(MoveMaker& maker, ChessEngine& client, Hash pos_hash,
       int depth, int level, int& alpha, int& beta, int& delta,
-      TranspositionTable& table, PVLine& pv_line, int& searched_moves,
-      int material, bool is_checked,
+      TranspositionTable& table, PVLine& pv_line, bool is_reduced_by_null,
+      int& num_searched_moves, int material, bool is_checked,
       std::vector<Move>* moves_to_search_ptr,
       std::vector<Move>* root_move_vec_ptr);
 
@@ -76,12 +78,18 @@ namespace Sayuri {
       Job() = delete;
 
       /********************/
-      /* パブリンク関数。 */
+      /* パブリック関数。 */
       /********************/
       // 手を得る。
       // [戻り値]
       // 手。
       Move PickMove();
+      // ヘルパーの数を一つ増やす。
+      void CountHelper();
+      // 仕事終了の合図を出す。
+      void FinishMyJob();
+      // ヘルパーが全員仕事を終えるまで待機する。
+      void WaitForHelpers();
 
       /**************/
       /* アクセサ。 */
@@ -95,7 +103,8 @@ namespace Sayuri {
       int& delta() {return *delta_ptr_;}
       TranspositionTable& table() {return *table_ptr_;}
       PVLine& pv_line() {return *pv_line_ptr_;}
-      int& searched_moves() {return *searched_moves_ptr_;}
+      bool is_reduced_by_null() {return is_reduced_by_null_;}
+      int& searched_moves() {return *num_searched_moves_ptr_;}
       int material() const {return material_;}
       bool is_checked() const {return is_checked_;}
       std::vector<Move>* moves_to_search_ptr() {return moves_to_search_ptr_;}
@@ -115,7 +124,8 @@ namespace Sayuri {
       int* delta_ptr_;
       TranspositionTable* table_ptr_;
       PVLine* pv_line_ptr_;
-      int* searched_moves_ptr_;
+      bool is_reduced_by_null_;
+      int* num_searched_moves_ptr_;
       int material_;
       bool is_checked_;
       std::vector<Move>* moves_to_search_ptr_;
@@ -123,9 +133,12 @@ namespace Sayuri {
 
       // 仕事用ムーブメーカー。
       MoveMaker* maker_ptr_;
-
+      // ヘルパーカウンター。
+      volatile int helper_counter_;
       // ミューテックス。
       std::mutex mutex_;
+      // コンディション変数。
+      std::condition_variable cond_;
   };
 }  // namespace Sayuri
 

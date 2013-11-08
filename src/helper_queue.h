@@ -33,23 +33,19 @@
 #include "job.h"
 
 namespace Sayuri {
+  class Job;
+
   // マルチスレッド探索のスレッドのキューのクラス。
   class HelperQueue {
     public:
       /**************************/
       /* コンストラクタと代入。 */
       /**************************/
-      HelperQueue() : job_ptr_(nullptr) {}
-      HelperQueue(const HelperQueue& queue) : job_ptr_(nullptr) {}
-      HelperQueue(HelperQueue&& queue) : job_ptr_(nullptr) {}
-      HelperQueue& operator=(const HelperQueue& queue) {
-        job_ptr_ = nullptr;
-        return *this;
-      }
-      HelperQueue& operator=(HelperQueue&& queue) {
-        job_ptr_ = nullptr;
-        return *this;
-      }
+      HelperQueue();
+      HelperQueue(const HelperQueue& queue);
+      HelperQueue(HelperQueue&& queue);
+      HelperQueue& operator=(const HelperQueue& queue);
+      HelperQueue& operator=(HelperQueue&& queue);
       virtual ~HelperQueue() {}
 
       /********************/
@@ -76,6 +72,8 @@ namespace Sayuri {
       std::mutex mutex_;
       // コンディション。
       std::condition_variable cond_;
+      // もうヘルパーは必要ない。
+      bool no_more_help_;
   };
 }  // namespace Sayuri
 

@@ -128,7 +128,7 @@ namespace Sayuri {
   // 手をスタックに展開する。
   template<GenMoveType Type>
   void MoveMaker::GenMoves(Move prev_best, Move iid_move, Move killer) {
-    mutex_.lock();  // ロック。
+    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
 
     // サイド。
     Side side = engine_ptr_->to_move();
@@ -298,8 +298,6 @@ namespace Sayuri {
         last_++;
       }
     }
-
-    mutex_.unlock();  // ロック解除。
   }
   // 実体化。
   template void MoveMaker::GenMoves<GenMoveType::NON_CAPTURE>
@@ -315,13 +313,12 @@ namespace Sayuri {
 
   // 次の手を返す。
   Move MoveMaker::PickMove() {
-    mutex_.lock();  // ロック。
+    std::unique_lock<std::mutex> lock(mutex_);
 
     MoveSlot slot;
 
     // 手がなければ何もしない。
     if (last_ <= begin_) {
-      mutex_.unlock();
       return slot.move_;
     }
 
@@ -338,7 +335,6 @@ namespace Sayuri {
       }
     }
 
-    mutex_.unlock();
     return slot.move_;
   }
 

@@ -32,27 +32,60 @@
 #include "job.h"
 
 namespace Sayuri {
+  /**************************/
+  /* コンストラクタと代入。 */
+  /**************************/
+  // コンストラクタ。
+  HelperQueue::HelperQueue() : job_ptr_(nullptr), no_more_help_(false) {}
+
+  // コピーコンストラクタ。
+  HelperQueue::HelperQueue(const HelperQueue& queue) :
+  job_ptr_(queue.job_ptr_), no_more_help_(queue.no_more_help_) {}
+
+  // ムーブコンストラクタ。
+  HelperQueue::HelperQueue(HelperQueue&& queue) :
+  job_ptr_(queue.job_ptr_), no_more_help_(queue.no_more_help_) {}
+
+  // コピー代入。
+  HelperQueue& HelperQueue::operator=(const HelperQueue& queue) {
+    job_ptr_ = queue.job_ptr_;
+    no_more_help_ = queue.no_more_help_;
+    return *this;
+  }
+
+  // ムーブ代入。
+  HelperQueue& HelperQueue::operator=(HelperQueue&& queue) {
+    job_ptr_ = queue.job_ptr_;
+    no_more_help_ = queue.no_more_help_;
+    return *this;
+  }
   /********************/
   /* パブリック関数。 */
   /********************/
   // 空きスレッドが仕事を得る。
   Job* HelperQueue::GetJob() {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
 
     // 待つ。
-    cond_.wait(lock);
+    if (!no_more_help_) {
+      cond_.wait(lock);
+    }
 
     return job_ptr_;
   }
 
   // 空きスレッドに仕事を依頼する。
   void HelperQueue::Help(Job& job) {
+    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+    
     job_ptr_ = &job;
     cond_.notify_one();
   }
 
   // 空きスレッドをキューから開放する。
   void HelperQueue::ReleaseHelper() {
+    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+
     job_ptr_ = nullptr;
     cond_.notify_all();
   }
