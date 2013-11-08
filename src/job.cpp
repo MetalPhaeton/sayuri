@@ -41,9 +41,9 @@ namespace Sayuri {
   /**************************/
   Job::Job(MoveMaker& maker, ChessEngine& client, Hash pos_hash,
   int depth, int level, int& alpha, int& beta, int& delta,
-  TranspositionTable& table, PVLine& pv_line,bool is_reduced_by_null,
-  int& num_searched_moves, int material, bool is_checked,
-  std::vector<Move>* moves_to_search_ptr,
+  TranspositionTable& table, PVLine& pv_line,bool is_null_searching, 
+  bool is_reduced_by_null, int& num_searched_moves, int material,
+  bool is_checked, std::vector<Move>* moves_to_search_ptr,
   std::vector<Move>* root_move_vec_ptr) :
   client_ptr_(&client),
   pos_hash_(pos_hash),
@@ -54,6 +54,7 @@ namespace Sayuri {
   delta_ptr_(&delta),
   table_ptr_(&table),
   pv_line_ptr_(&pv_line),
+  is_null_searching_(is_null_searching),
   is_reduced_by_null_(is_reduced_by_null),
   num_searched_moves_ptr_(&num_searched_moves),
   material_(material),
@@ -74,6 +75,7 @@ namespace Sayuri {
   delta_ptr_(queue.delta_ptr_),
   table_ptr_(queue.table_ptr_),
   pv_line_ptr_(queue.pv_line_ptr_),
+  is_null_searching_(queue.is_null_searching_),
   is_reduced_by_null_(queue.is_reduced_by_null_),
   num_searched_moves_ptr_(queue.num_searched_moves_ptr_),
   material_(queue.material_),
@@ -94,6 +96,7 @@ namespace Sayuri {
   delta_ptr_(queue.delta_ptr_),
   table_ptr_(queue.table_ptr_),
   pv_line_ptr_(queue.pv_line_ptr_),
+  is_null_searching_(queue.is_null_searching_),
   is_reduced_by_null_(queue.is_reduced_by_null_),
   num_searched_moves_ptr_(queue.num_searched_moves_ptr_),
   material_(queue.material_),
@@ -114,6 +117,7 @@ namespace Sayuri {
     delta_ptr_ = queue.delta_ptr_;
     table_ptr_ = queue.table_ptr_;
     pv_line_ptr_ = queue.pv_line_ptr_;
+    is_null_searching_ = queue.is_null_searching_;
     is_reduced_by_null_ = queue.is_reduced_by_null_;
     num_searched_moves_ptr_ = queue.num_searched_moves_ptr_;
     material_ = queue.material_;
@@ -137,6 +141,7 @@ namespace Sayuri {
     delta_ptr_ = queue.delta_ptr_;
     table_ptr_ = queue.table_ptr_;
     pv_line_ptr_ = queue.pv_line_ptr_;
+    is_null_searching_ = queue.is_null_searching_;
     is_reduced_by_null_ = queue.is_reduced_by_null_;
     num_searched_moves_ptr_ = queue.num_searched_moves_ptr_;
     material_ = queue.material_;

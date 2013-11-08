@@ -57,6 +57,7 @@ namespace Sayuri {
       // delta: ルート探索時、ベータ値の増分の変数。(更新される。)
       // table: トランスポジションテーブル。
       // pv_lien: 現在のノードのPVライン。
+      // is_null_searching: ヌルムーブの探索中かどうか。
       // is_reduced_by_null: Null Move Reductionでリダクションされたかどうか。
       // num_serached_moves: いくつ手を探索したかの変数。(更新される。)
       // material: 現在のマテリアル。
@@ -65,9 +66,9 @@ namespace Sayuri {
       // root_move_vec_ptr: ルートで作成した手のベクトル。ないならnullptr。
       Job(MoveMaker& maker, ChessEngine& client, Hash pos_hash,
       int depth, int level, int& alpha, int& beta, int& delta,
-      TranspositionTable& table, PVLine& pv_line, bool is_reduced_by_null,
-      int& num_searched_moves, int material, bool is_checked,
-      std::vector<Move>* moves_to_search_ptr,
+      TranspositionTable& table, PVLine& pv_line, bool is_null_searching,
+      bool is_reduced_by_null, int& num_searched_moves, int material,
+      bool is_checked, std::vector<Move>* moves_to_search_ptr,
       std::vector<Move>* root_move_vec_ptr);
 
       Job(const Job& queue);
@@ -103,7 +104,8 @@ namespace Sayuri {
       int& delta() {return *delta_ptr_;}
       TranspositionTable& table() {return *table_ptr_;}
       PVLine& pv_line() {return *pv_line_ptr_;}
-      bool is_reduced_by_null() {return is_reduced_by_null_;}
+      bool is_null_searching() const {return is_null_searching_;}
+      bool is_reduced_by_null() const {return is_reduced_by_null_;}
       int& searched_moves() {return *num_searched_moves_ptr_;}
       int material() const {return material_;}
       bool is_checked() const {return is_checked_;}
@@ -124,6 +126,7 @@ namespace Sayuri {
       int* delta_ptr_;
       TranspositionTable* table_ptr_;
       PVLine* pv_line_ptr_;
+      bool is_null_searching_;
       bool is_reduced_by_null_;
       int* num_searched_moves_ptr_;
       int material_;
