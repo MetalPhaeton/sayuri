@@ -29,6 +29,7 @@
 #include <iostream>
 #include <utility>
 #include <vector>
+#include <array>
 #include <algorithm>
 #include <mutex>
 #include <cstddef>
@@ -49,7 +50,7 @@ namespace Sayuri {
   // コンストラクタ。
   TranspositionTable::TranspositionTable(std::size_t max_bytes) :
   num_used_entries_(0),
-  entry_table_(new std::vector<TTEntry>[TABLE_SIZE]) {
+  entry_table_ptr_(new std::array<std::vector<TTEntry>, TABLE_SIZE>()) {
     // 大きさを整える。
     if (max_bytes > GetMaxSize()) {
       max_bytes = GetMaxSize();
@@ -69,7 +70,7 @@ namespace Sayuri {
 
     // 配列をリサイズ。
     for (std::size_t i = 0; i < TABLE_SIZE; i++) {
-      entry_table_[i].resize(num_entries);
+      (*entry_table_ptr_)[i].resize(num_entries);
     }
 
     // 全てのエントリーの個数をセット。
@@ -81,10 +82,10 @@ namespace Sayuri {
   max_bytes_(table.max_bytes_),
   num_all_entries_(table.num_all_entries_),
   num_used_entries_(table.num_used_entries_),
-  entry_table_(new std::vector<TTEntry>[TABLE_SIZE]) {
+  entry_table_ptr_(new std::array<std::vector<TTEntry>, TABLE_SIZE>()) {
     // テーブルをコピー。
     for (std::size_t i = 0; i < TABLE_SIZE; i++) {
-      entry_table_[i] = table.entry_table_[i];
+      (*entry_table_ptr_)[i] = (*(table.entry_table_ptr_))[i];
     }
   }
 
@@ -93,7 +94,7 @@ namespace Sayuri {
   max_bytes_(table.max_bytes_),
   num_all_entries_(table.num_all_entries_),
   num_used_entries_(table.num_used_entries_) {
-    entry_table_ = std::move(table.entry_table_); 
+    entry_table_ptr_ = std::move(table.entry_table_ptr_); 
   }
 
   // コピー代入。
@@ -105,7 +106,7 @@ namespace Sayuri {
 
     // テーブルをコピー。
     for (std::size_t i = 0; i < TABLE_SIZE; i++) {
-      entry_table_[i] = table.entry_table_[i];
+      (*entry_table_ptr_)[i] = (*(table.entry_table_ptr_))[i];
     }
 
     return *this;
@@ -117,7 +118,7 @@ namespace Sayuri {
     num_all_entries_ = table.num_all_entries_;
     num_used_entries_ = table.num_used_entries_;
     max_bytes_ = table.max_bytes_;
-    entry_table_ = std::move(table.entry_table_);
+    entry_table_ptr_ = std::move(table.entry_table_ptr_);
 
     return *this;
   }
@@ -131,18 +132,18 @@ namespace Sayuri {
     int index = GetTableIndex(pos_hash);
 
     // 最後のエントリーのdepthを比べ、追加する側が大きければ追加。
-    if (depth > entry_table_[index].back().depth()) {
+    if (depth > (*entry_table_ptr_)[index].back().depth()) {
       // 使用済みエントリーの数を増加。
-      if (entry_table_[index].back().depth() <= -MAX_VALUE) {
+      if ((*entry_table_ptr_)[index].back().depth() <= -MAX_VALUE) {
         num_used_entries_++;
       }
       // エントリーを追加。
-      entry_table_[index].back() = TTEntry(pos_hash, depth, score,
+      (*entry_table_ptr_)[index].back() = TTEntry(pos_hash, depth, score,
       score_type, best_move);
 
       // ソート。
-      std::sort(entry_table_[index].begin(), entry_table_[index].end(),
-      TTEntry::Compare);
+      std::sort((*entry_table_ptr_)[index].begin(),
+      (*entry_table_ptr_)[index].end(), TTEntry::Compare);
     }
   }
 
@@ -155,7 +156,7 @@ namespace Sayuri {
     int index = GetTableIndex(pos_hash);
 
     TTEntry* entry_ptr = nullptr;
-    for (auto& entry : entry_table_[index]) {
+    for (auto& entry : (*entry_table_ptr_)[index]) {
       if (entry.depth() <= -MAX_VALUE) break;  // エントリーがない。
 
       if (entry.Fulfil(pos_hash, depth)) {

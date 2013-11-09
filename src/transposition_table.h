@@ -30,6 +30,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <array>
 #include <mutex>
 #include <cstddef>
 #include "chess_def.h"
@@ -219,7 +220,8 @@ namespace Sayuri {
       // 使用済みのエントリーの個数。
       std::size_t num_used_entries_;
       // エントリーを登録するテーブル。
-      std::unique_ptr<std::vector<TTEntry>[]> entry_table_;
+      std::unique_ptr<std::array<std::vector<TTEntry>, TABLE_SIZE>>
+      entry_table_ptr_;
       // ミューテックス。
       std::mutex mutex_;
   };
