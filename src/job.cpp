@@ -172,6 +172,7 @@ namespace Sayuri {
   void Job::FinishMyJob() {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
     helper_counter_--;
+    cond_.notify_all();
   }
 
   // ヘルパー全員の仕事終了まで待機する。

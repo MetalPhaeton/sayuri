@@ -273,7 +273,7 @@ namespace Sayuri {
 
     // ヒストリーの初期化。
     history_ptr_.reset (new std::array<std::array<std::array<int,
-    NUM_SQUARES>, NUM_SQUARES>, NUM_SIDES>);
+    NUM_SQUARES>, NUM_SQUARES>, NUM_SIDES>());
     for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
         for (int k = 0; k < NUM_SQUARES; k++) {
@@ -284,10 +284,10 @@ namespace Sayuri {
     history_max_ptr_.reset(new int(1));
 
     // iid_stack_の初期化。
-    iid_stack_ptr_.reset(new std::array<Move, MAX_PLYS>);
+    iid_stack_ptr_.reset(new std::array<Move, MAX_PLYS>());
 
     // killer_stack_の初期化。
-    killer_stack_ptr_.reset(new std::array<Move, MAX_PLYS>);
+    killer_stack_ptr_.reset(new std::array<Move, MAX_PLYS>());
 
     // i_depth_ptr_の初期化。
     i_depth_ptr_.reset(new int(0));
@@ -380,7 +380,7 @@ namespace Sayuri {
   void ChessEngine::ScanSharedMember(const ChessEngine& engine) {
     // ヒストリーをコピー。
     history_ptr_.reset(new std::array<std::array<std::array<int,
-    NUM_SQUARES>, NUM_SQUARES>, NUM_SIDES>);
+    NUM_SQUARES>, NUM_SQUARES>, NUM_SIDES>());
     for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
         for (int k = 0; k < NUM_SQUARES; k++) {
@@ -391,8 +391,8 @@ namespace Sayuri {
     history_max_ptr_.reset(new int(*(engine.history_max_ptr_)));
 
     // iid_stack_とkiller_stack_のコピー。
-    iid_stack_ptr_.reset(new std::array<Move, MAX_PLYS>);
-    killer_stack_ptr_.reset(new std::array<Move, MAX_PLYS>);
+    iid_stack_ptr_.reset(new std::array<Move, MAX_PLYS>());
+    killer_stack_ptr_.reset(new std::array<Move, MAX_PLYS>());
     for (int i = 0; i < MAX_PLYS; i++) {
       (*iid_stack_ptr_)[i] = (*(engine.iid_stack_ptr_))[i];
       (*killer_stack_ptr_)[i] = (*(engine.killer_stack_ptr_))[i];
