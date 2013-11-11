@@ -260,27 +260,30 @@ namespace Sayuri {
     (*killer_stack_ptr_)[level]);
 
     // Futility Pruningの準備。
-    bool do_futility_pruning = false;
-    int material;
-    if (depth <= 2) {
-      material = GetMaterial(side);
-      do_futility_pruning = true;
-    }
+    int material = GetMaterial(side);
 
-    // ループ。
+    // 探索ループ。
     ScoreType score_type = ScoreType::ALPHA;
     bool is_searching_pv = true;
     int num_searched_moves = 0;
     bool has_legal_move = false;
+    // 仕事の生成。
+    int dummy_delta = 0;
+    Job job(maker, *this, Type, pos_hash, depth, level, alpha, beta,
+    dummy_delta, table, pv_line, is_reduced_by_null, num_searched_moves,
+    is_searching_pv, score_type, material, is_checked, has_legal_move,
+    nullptr, nullptr);
     for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
+      // 2つ目以降の手なら助けを呼ぶ。
+      if (num_searched_moves >= 1) {
+        helper_queue_ptr_->Help(job);
+      }
+
       // 次のハッシュ。
       Hash next_hash = GetNextHash(pos_hash, move);
 
       // マージン。
-      int margin;
-      if (do_futility_pruning) {
-        margin = GetMargin(move, depth);
-      }
+      int margin = GetMargin(move, depth);
 
       MakeMove(move);
 
@@ -294,7 +297,7 @@ namespace Sayuri {
       has_legal_move = true;
 
       // Futility Pruning。
-      if (do_futility_pruning) {
+      if (depth <= 2) {
         if ((material + margin) <= alpha) {
           UnmakeMove(move);
           continue;
@@ -309,11 +312,10 @@ namespace Sayuri {
       if (!is_checked && !(move.captured_piece_) && !(move.promotion_)
       && !is_reduced_by_null && (depth >= 3) && (num_searched_moves >= 4)) {
         int reduction = 1;
-        if (!is_checked && (Type == NodeType::NON_PV)) {
-          // History Puruning。
-          if (!move.captured_piece_
-          && ((*history_ptr_)[side][move.from_][move.to_]
-          < ((*history_max_ptr_) / 2))) {
+        if (Type == NodeType::NON_PV) {
+          // History Pruning。
+          if ((*history_ptr_)[side][move.from_][move.to_]
+          < ((*history_max_ptr_) / 2)) {
             reduction++;
           }
         }
@@ -359,13 +361,17 @@ namespace Sayuri {
       UnmakeMove(move);
       num_searched_moves++;
 
+      pvs_mutex_.lock();  // ロック。
+
       // アルファ値を更新。
       if (score > alpha) {
         // PVを見つけた。
         is_searching_pv = false;
 
-        // トランスポジション用。
-        score_type = ScoreType::EXACT;
+        // 評価値のタイプをセット。
+        if (score_type == ScoreType::ALPHA) {
+          score_type = ScoreType::EXACT;
+        }
 
         // PVライン。
         pv_line.SetMove(move);
@@ -377,7 +383,7 @@ namespace Sayuri {
 
       // ベータ値を調べる。
       if (score >= beta) {
-        // トランスポジション用。
+        // 評価値の種類をセット。
         score_type = ScoreType::BETA;
 
         // キラームーブ。
@@ -393,10 +399,17 @@ namespace Sayuri {
         }
 
         // ベータカット。
+        pvs_mutex_.unlock();  // ロック解除。
         alpha = beta;
         break;
       }
+
+      pvs_mutex_.unlock();  // ロック解除。
     }
+
+    // スレッドを合流。
+    job.WaitForHelpers();
+
 
     // このノードでゲーム終了だった場合。
     if (!has_legal_move) {
@@ -709,6 +722,167 @@ namespace Sayuri {
     while (!ShouldBeStopped()) continue;
 
     return pv_line;
+  }
+
+  // 探索用子スレッド。
+  void ChessEngine::ThreadPVSplit() {
+  }
+
+  // 子スレッドで探索。
+  template<NodeType Type>
+  void ChessEngine::SearchAsChild(Job& job) {
+    // 仕事ループ。
+    Side side = to_move_;
+    Side enemy_side = side ^ 0x3;
+    for (Move move = job.PickMove(); move.all_; move = job.PickMove()) {
+      // すでにベータカットされていれば仕事をしない。
+      if (job.alpha() >= job.beta()) {
+        break;
+      }
+
+      // 2つ目以降の手の探索なら助けを呼ぶ。
+      if (job.searched_moves() >= 1) {
+        helper_queue_ptr_->Help(job);
+      }
+
+      // 次のハッシュ。
+      Hash next_hash = GetNextHash(job.pos_hash(), move);
+
+      // マージン。
+      int margin = GetMargin(move, depth);
+
+      MakeMove(move);
+
+      // 合法手じゃなければ次の手へ。
+      if (IsAttacked(king_[side], enemy_side)) {
+        UnmakeMove(move);
+        continue;
+      }
+
+      // 合法手が見つかったのでフラグを立てる。
+      job.has_legal_move() = true;
+
+      // Futility Pruning。
+      if (depth <= 2) {
+        if ((job.material() + margin) <= job.alpha()) {
+          UnmakeMove(move);
+          continue;
+        }
+      }
+
+      // Late Move Reduction。
+      // ただし、Null Move Reductionされていれば実行しない。
+      int score;
+      PVLine next_line;
+      int temp_alpha = job.alpha();
+      int temp_beta = job.beta();
+      if (!(job.is_checked()) && !(move.captured_piece_) && !(move.promotion_)
+      && !(job.is_reduced_by_null()) && (job.depth() >= 3)
+      && (job.num_searched_moves() >= 4)) {
+        int reduction = 1;
+        // History Pruning。
+        if (Type == NodeType::NON_PV) {
+          if ((*history_ptr_)[side][move.from_][move.to_]
+          < ((*history_max_ptr_) / 2)) {
+            reduction++;
+          }
+        }
+        score = -Search<NodeType::NON_PV>(next_hash, depth - reduction - 1,
+        level + 1, -(temp_alpha + 1), -temp_alpha, job.table(), next_line);
+      } else {
+        // PVSearchをするためにtemp_alphaより大きくしておく。
+        score = temp_alpha + 1;
+      }
+      if (score > temp_alpha) {
+        // PVSearch。
+        if (job.is_searching_pv() || (Type == NodeType::NON_PV)) {
+          // フルウィンドウ探索。
+          score = -Search<Type>(next_hash, depth - 1, level + 1,
+          -temp_beta, -temp_alpha, job.teble(), next_line);
+        } else {
+          // PV発見後。
+          // ゼロウィンドウ探索。
+          score = -Search<NodeType::NON_PV>(next_hash, depth - 1, level + 1,
+          -(temp_alpha + 1), -temp_alpha, job.table(), next_line);
+          if (score > alpha) {
+            // fail lowならず。
+            score = -Search<NodeType::PV>(next_hash, depth - 1, level + 1,
+            -temp_beta, -temp_alpha, job.table(), next_line);
+          }
+        }
+      }
+
+      // 最初の手番なら3回繰り返しをチェック。
+      if (level <= 1) {
+        int repetitions = 0;
+        for (auto& a : (*position_history_ptr_)) {
+          if (a == *this) {
+            repetitions++;
+          }
+        }
+        if (repetitions >= 2) {
+          score = SCORE_DRAW;
+        }
+      }
+
+      UnmakeMove(move);
+      (job.num_searched_moves())++;
+
+      job.client().pvs_mutex_.lock();  // ロック。
+
+      // アルファ値を更新。
+      if (score > job.alpha()) {
+        // PVを見つけた。
+        job.is_searching_pv() = false;
+
+        // 評価値のタイプをセット。
+        if (job.score_type() == ScoreType::ALPHA) {
+          score_type = ScoreType::EXACT;
+        }
+
+        // PVラインをセット。
+        job.pv_line().SetMove(move);
+        job.pv_line().Insert(next_line);
+        job.pv_line().score(score);
+
+        job.alpha() = score;
+      }
+
+      // ベータ値を調べる。
+      if (score > job.beta()) {
+        // 評価値の種類をセット。
+        job.score_type() = ScoreType::BETA;
+
+        // キラームーブ。
+        (*killer_stack_ptr_)[level] = move;
+
+        // ヒストリー。
+        if (!(move.captured_piece_)) {
+          (*history_ptr_)[side][move.from_][move.to_] += depth * depth;
+          if ((*history_ptr_)[side][move.from_][move.to_]
+          > (*history_max_ptr_)) {
+            (*history_max_ptr_) = (*history_ptr_)[side][move.from_][move.to_];
+          }
+        }
+
+        // ベータカット。
+        job.client().mutex_.unlock();  // ロック解除。
+        alpha = beta;
+        break;
+      }
+
+      job.client().pvs_mutex_.unlock();  // ロック解除。
+    }
+
+    // 仕事終了。
+    job.FinishMyJob();
+  }
+  // 実体化。
+  template void ChessEngine::SearchAsChild<NodeType::PV>(Job& job);
+  template void ChessEngine::SearchAsChild<NodeType::NON_PV>(Job& job);
+
+  // ルートノードで子スレッドで探索。
+  void ChessEngine::SearchRootAsChild(Job& job) {
   }
 
   // SEE。

@@ -275,6 +275,16 @@ namespace Sayuri {
       // PVライン。
       PVLine SearchRoot(TranspositionTable& table,
       std::vector<Move>* moves_to_search_ptr);
+      // 探索用子スレッド。
+      static void ThreadPVSpilt();
+      // 子スレッドで探索。
+      // [引数]
+      // job: 探索用仕事。
+      template<NodeType Type> void SearchAsChild(Job& job);
+      // ルートノードで子スレッドで探索。
+      // [引数]
+      // job: 探索用仕事。
+      void SearchRootAsChild(Job& job);
       // Futility Pruningのマージンを計算する。
       // [引数]
       // move: 指し手。

@@ -268,8 +268,8 @@ namespace Sayuri {
 
   // 探索するノードの種類。
   enum class NodeType {
-    PV,  // PVノードやAllノード。
-    NON_PV  // PVじゃないノード。
+    PV,  // PVノード。
+    NON_PV  // その他のノード。
   };
 
   // 候補手の種類。

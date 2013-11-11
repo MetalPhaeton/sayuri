@@ -48,7 +48,8 @@ namespace Sayuri {
       /**************************/
       // [引数]
       // maker: 仕事用の手が入っているムーブメーカー。
-      // client: 親チェスエンジン。
+      // client: 依頼主のチェスエンジン。
+      // node_type: ノードのタイプ。
       // pos_hash: 現在の局面のハッシュ。
       // depth: 現在の深さ。
       // level: 現在のレベル。
@@ -57,24 +58,27 @@ namespace Sayuri {
       // delta: ルート探索時、ベータ値の増分の変数。(更新される。)
       // table: トランスポジションテーブル。
       // pv_lien: 現在のノードのPVライン。
-      // is_null_searching: ヌルムーブの探索中かどうか。
       // is_reduced_by_null: Null Move Reductionでリダクションされたかどうか。
       // num_serached_moves: いくつ手を探索したかの変数。(更新される。)
+      // is_searching_pv: PVを探している最中かどうか。(更新される。)
+      // score_type: 評価値のタイプ。(更新される。)
       // material: 現在のマテリアル。
       // is_checked: 現在チェックされているかどうか。
+      // has_legal_move: 合法手が見つかったかどうか。(更新される。)
       // moves_to_search_ptr: ルートで探索すべき手のベクトル。ないならnullptr。
       // root_move_vec_ptr: ルートで作成した手のベクトル。ないならnullptr。
-      Job(MoveMaker& maker, ChessEngine& client, Hash pos_hash,
-      int depth, int level, int& alpha, int& beta, int& delta,
-      TranspositionTable& table, PVLine& pv_line, bool is_null_searching,
-      bool is_reduced_by_null, int& num_searched_moves, int material,
-      bool is_checked, std::vector<Move>* moves_to_search_ptr,
+      Job(MoveMaker& maker, ChessEngine& client, NodeType node_type,
+      Hash pos_hash, int depth, int level, int& alpha, int& beta, int& delta,
+      TranspositionTable& table, PVLine& pv_line, bool is_reduced_by_null,
+      int& num_searched_moves, bool& is_searching_pv,
+      ScoreType& score_type, int material, bool is_checked,
+      bool& has_legal_move, std::vector<Move>* moves_to_search_ptr,
       std::vector<Move>* root_move_vec_ptr);
 
-      Job(const Job& queue);
-      Job(Job&& queue);
-      Job& operator=(const Job& queue);
-      Job& operator=(Job&& queue);
+      Job(const Job& job);
+      Job(Job&& job);
+      Job& operator=(const Job& job);
+      Job& operator=(Job&& job);
       virtual ~Job() {}
       Job() = delete;
 
@@ -96,6 +100,7 @@ namespace Sayuri {
       /* アクセサ。 */
       /**************/
       ChessEngine& client() {return *client_ptr_;}
+      NodeType node_type() const {return node_type_;}
       Hash pos_hash() const {return pos_hash_;}
       int depth() const {return depth_;}
       int level() const {return level_;}
@@ -104,11 +109,13 @@ namespace Sayuri {
       int& delta() {return *delta_ptr_;}
       TranspositionTable& table() {return *table_ptr_;}
       PVLine& pv_line() {return *pv_line_ptr_;}
-      bool is_null_searching() const {return is_null_searching_;}
       bool is_reduced_by_null() const {return is_reduced_by_null_;}
-      int& searched_moves() {return *num_searched_moves_ptr_;}
+      int& num_searched_moves() {return *num_searched_moves_ptr_;}
+      bool& is_searching_pv() {return *is_searching_pv_ptr_;}
+      ScoreType& score_type() {return *score_type_ptr_;}
       int material() const {return material_;}
       bool is_checked() const {return is_checked_;}
+      bool& has_legal_move() {return *has_legal_move_ptr_;}
       std::vector<Move>* moves_to_search_ptr() {return moves_to_search_ptr_;}
       std::vector<Move>* root_move_vec_ptr() {return root_move_vec_ptr_;}
 
@@ -118,6 +125,7 @@ namespace Sayuri {
       /****************/
       // 親スレッドより情報。
       ChessEngine* client_ptr_;
+      NodeType node_type_;
       Hash pos_hash_;
       int depth_;
       int level_;
@@ -126,11 +134,13 @@ namespace Sayuri {
       int* delta_ptr_;
       TranspositionTable* table_ptr_;
       PVLine* pv_line_ptr_;
-      bool is_null_searching_;
       bool is_reduced_by_null_;
       int* num_searched_moves_ptr_;
+      bool* is_searching_pv_ptr_;
+      ScoreType* score_type_ptr_;
       int material_;
       bool is_checked_;
+      bool* has_legal_move_ptr_;
       std::vector<Move>* moves_to_search_ptr_;
       std::vector<Move>* root_move_vec_ptr_;
 

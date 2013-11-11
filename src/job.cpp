@@ -39,13 +39,15 @@ namespace Sayuri {
   /**************************/
   /* コンストラクタと代入。 */
   /**************************/
-  Job::Job(MoveMaker& maker, ChessEngine& client, Hash pos_hash,
-  int depth, int level, int& alpha, int& beta, int& delta,
-  TranspositionTable& table, PVLine& pv_line,bool is_null_searching, 
-  bool is_reduced_by_null, int& num_searched_moves, int material,
-  bool is_checked, std::vector<Move>* moves_to_search_ptr,
+  Job::Job(MoveMaker& maker, ChessEngine& client, NodeType node_type,
+  Hash pos_hash, int depth, int level, int& alpha, int& beta, int& delta,
+  TranspositionTable& table, PVLine& pv_line, bool is_reduced_by_null,
+  int& num_searched_moves, bool& is_searching_pv,
+  ScoreType& score_type, int material, bool is_checked, bool& has_legal_move,
+  std::vector<Move>* moves_to_search_ptr,
   std::vector<Move>* root_move_vec_ptr) :
   client_ptr_(&client),
+  node_type_(node_type),
   pos_hash_(pos_hash),
   depth_(depth),
   level_(level),
@@ -54,102 +56,116 @@ namespace Sayuri {
   delta_ptr_(&delta),
   table_ptr_(&table),
   pv_line_ptr_(&pv_line),
-  is_null_searching_(is_null_searching),
   is_reduced_by_null_(is_reduced_by_null),
   num_searched_moves_ptr_(&num_searched_moves),
+  is_searching_pv_ptr_(&is_searching_pv),
+  score_type_ptr_(&score_type),
   material_(material),
   is_checked_(is_checked),
+  has_legal_move_ptr_(&has_legal_move),
   moves_to_search_ptr_(moves_to_search_ptr),
   root_move_vec_ptr_(root_move_vec_ptr),
   maker_ptr_(&maker),
   helper_counter_(0) {}
 
   // コピーコンストラクタ。
-  Job::Job(const Job& queue) :
-  client_ptr_(queue.client_ptr_),
-  pos_hash_(queue.pos_hash_),
-  depth_(queue.depth_),
-  level_(queue.level_),
-  alpha_ptr_(queue.alpha_ptr_),
-  beta_ptr_(queue.beta_ptr_),
-  delta_ptr_(queue.delta_ptr_),
-  table_ptr_(queue.table_ptr_),
-  pv_line_ptr_(queue.pv_line_ptr_),
-  is_null_searching_(queue.is_null_searching_),
-  is_reduced_by_null_(queue.is_reduced_by_null_),
-  num_searched_moves_ptr_(queue.num_searched_moves_ptr_),
-  material_(queue.material_),
-  is_checked_(queue.is_checked_),
-  moves_to_search_ptr_(queue.moves_to_search_ptr_),
-  root_move_vec_ptr_(queue.root_move_vec_ptr_),
-  maker_ptr_(queue.maker_ptr_),
-  helper_counter_(queue.helper_counter_) {}
+  Job::Job(const Job& job) :
+  client_ptr_(job.client_ptr_),
+  node_type_(job.node_type_)
+  pos_hash_(job.pos_hash_),
+  depth_(job.depth_),
+  level_(job.level_),
+  alpha_ptr_(job.alpha_ptr_),
+  beta_ptr_(job.beta_ptr_),
+  delta_ptr_(job.delta_ptr_),
+  table_ptr_(job.table_ptr_),
+  pv_line_ptr_(job.pv_line_ptr_),
+  is_reduced_by_null_(job.is_reduced_by_null_),
+  num_searched_moves_ptr_(job.num_searched_moves_ptr_),
+  is_searching_pv_ptr_(job.is_searching_pv_ptr_),
+  score_type_ptr_(job.score_type_ptr_),
+  material_(job.material_),
+  is_checked_(job.is_checked_),
+  has_legal_move_ptr_(job.has_legal_move_ptr_),
+  moves_to_search_ptr_(job.moves_to_search_ptr_),
+  root_move_vec_ptr_(job.root_move_vec_ptr_),
+  maker_ptr_(job.maker_ptr_),
+  helper_counter_(job.helper_counter_) {}
 
   // ムーブコンストラクタ。
-  Job::Job(Job&& queue) :
-  client_ptr_(queue.client_ptr_),
-  pos_hash_(queue.pos_hash_),
-  depth_(queue.depth_),
-  level_(queue.level_),
-  alpha_ptr_(queue.alpha_ptr_),
-  beta_ptr_(queue.beta_ptr_),
-  delta_ptr_(queue.delta_ptr_),
-  table_ptr_(queue.table_ptr_),
-  pv_line_ptr_(queue.pv_line_ptr_),
-  is_null_searching_(queue.is_null_searching_),
-  is_reduced_by_null_(queue.is_reduced_by_null_),
-  num_searched_moves_ptr_(queue.num_searched_moves_ptr_),
-  material_(queue.material_),
-  is_checked_(queue.is_checked_),
-  moves_to_search_ptr_(queue.moves_to_search_ptr_),
-  root_move_vec_ptr_(queue.root_move_vec_ptr_),
-  maker_ptr_(queue.maker_ptr_),
-  helper_counter_(queue.helper_counter_) {}
+  Job::Job(Job&& job) :
+  client_ptr_(job.client_ptr_),
+  node_type_(job.node_type_),
+  pos_hash_(job.pos_hash_),
+  depth_(job.depth_),
+  level_(job.level_),
+  alpha_ptr_(job.alpha_ptr_),
+  beta_ptr_(job.beta_ptr_),
+  delta_ptr_(job.delta_ptr_),
+  table_ptr_(job.table_ptr_),
+  pv_line_ptr_(job.pv_line_ptr_),
+  is_reduced_by_null_(job.is_reduced_by_null_),
+  num_searched_moves_ptr_(job.num_searched_moves_ptr_),
+  is_searching_pv_ptr_(job.is_searching_pv_ptr_),
+  score_type_ptr_(job.score_type_ptr_),
+  material_(job.material_),
+  is_checked_(job.is_checked_),
+  has_legal_move_ptr_(job.has_legal_move_ptr_),
+  moves_to_search_ptr_(job.moves_to_search_ptr_),
+  root_move_vec_ptr_(job.root_move_vec_ptr_),
+  maker_ptr_(job.maker_ptr_),
+  helper_counter_(job.helper_counter_) {}
 
   // コピー代入。
-  Job& Job::operator=(const Job& queue) {
-    client_ptr_ = queue.client_ptr_;
-    pos_hash_ = queue.pos_hash_;
-    depth_ = queue.depth_;
-    level_ = queue.level_;
-    alpha_ptr_ = queue.alpha_ptr_;
-    beta_ptr_ = queue.beta_ptr_;
-    delta_ptr_ = queue.delta_ptr_;
-    table_ptr_ = queue.table_ptr_;
-    pv_line_ptr_ = queue.pv_line_ptr_;
-    is_null_searching_ = queue.is_null_searching_;
-    is_reduced_by_null_ = queue.is_reduced_by_null_;
-    num_searched_moves_ptr_ = queue.num_searched_moves_ptr_;
-    material_ = queue.material_;
-    is_checked_ = queue.is_checked_;
-    moves_to_search_ptr_ = queue.moves_to_search_ptr_;
-    root_move_vec_ptr_ = queue.root_move_vec_ptr_;
-    maker_ptr_ = queue.maker_ptr_;
-    helper_counter_ = queue.helper_counter_;
+  Job& Job::operator=(const Job& job) {
+    client_ptr_ = job.client_ptr_;
+    node_type_ = job.node_type_;
+    pos_hash_ = job.pos_hash_;
+    depth_ = job.depth_;
+    level_ = job.level_;
+    alpha_ptr_ = job.alpha_ptr_;
+    beta_ptr_ = job.beta_ptr_;
+    delta_ptr_ = job.delta_ptr_;
+    table_ptr_ = job.table_ptr_;
+    pv_line_ptr_ = job.pv_line_ptr_;
+    is_reduced_by_null_ = job.is_reduced_by_null_;
+    num_searched_moves_ptr_ = job.num_searched_moves_ptr_;
+    is_searching_pv_ptr_ = job.is_searching_pv_ptr_;
+    score_type_ptr_ = job.score_type_ptr_;
+    material_ = job.material_;
+    is_checked_ = job.is_checked_;
+    has_legal_move_ptr_ = job.has_legal_move_ptr_;
+    moves_to_search_ptr_ = job.moves_to_search_ptr_;
+    root_move_vec_ptr_ = job.root_move_vec_ptr_;
+    maker_ptr_ = job.maker_ptr_;
+    helper_counter_ = job.helper_counter_;
 
     return *this;
   }
 
   // ムーブ代入。
-  Job& Job::operator=(Job&& queue) {
-    client_ptr_ = queue.client_ptr_;
-    pos_hash_ = queue.pos_hash_;
-    depth_ = queue.depth_;
-    level_ = queue.level_;
-    alpha_ptr_ = queue.alpha_ptr_;
-    beta_ptr_ = queue.beta_ptr_;
-    delta_ptr_ = queue.delta_ptr_;
-    table_ptr_ = queue.table_ptr_;
-    pv_line_ptr_ = queue.pv_line_ptr_;
-    is_null_searching_ = queue.is_null_searching_;
-    is_reduced_by_null_ = queue.is_reduced_by_null_;
-    num_searched_moves_ptr_ = queue.num_searched_moves_ptr_;
-    material_ = queue.material_;
-    is_checked_ = queue.is_checked_;
-    moves_to_search_ptr_ = queue.moves_to_search_ptr_;
-    root_move_vec_ptr_ = queue.root_move_vec_ptr_;
-    maker_ptr_ = queue.maker_ptr_;
-    helper_counter_ = queue.helper_counter_;
+  Job& Job::operator=(Job&& job) {
+    client_ptr_ = job.client_ptr_;
+    node_type_ = job.node_type_;
+    pos_hash_ = job.pos_hash_;
+    depth_ = job.depth_;
+    level_ = job.level_;
+    alpha_ptr_ = job.alpha_ptr_;
+    beta_ptr_ = job.beta_ptr_;
+    delta_ptr_ = job.delta_ptr_;
+    table_ptr_ = job.table_ptr_;
+    pv_line_ptr_ = job.pv_line_ptr_;
+    is_reduced_by_null_ = job.is_reduced_by_null_;
+    num_searched_moves_ptr_ = job.num_searched_moves_ptr_;
+    is_searching_pv_ptr_ = job.is_searching_pv_ptr_;
+    score_type_ptr_ = job.score_type_ptr_;
+    material_ = job.material_;
+    is_checked_ = job.is_checked_;
+    has_legal_move_ptr_ = job.has_legal_move_ptr_;
+    moves_to_search_ptr_ = job.moves_to_search_ptr_;
+    root_move_vec_ptr_ = job.root_move_vec_ptr_;
+    maker_ptr_ = job.maker_ptr_;
+    helper_counter_ = job.helper_counter_;
 
     return *this;
   }

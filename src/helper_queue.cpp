@@ -71,6 +71,8 @@ namespace Sayuri {
       cond_.wait(lock);
     }
 
+    job_ptr_->CountHelper();
+
     return job_ptr_;
   }
 
