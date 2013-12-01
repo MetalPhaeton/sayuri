@@ -480,12 +480,12 @@ namespace Sayuri {
   }
 
   // 思考を始める。
-  PVLine ChessEngine::Calculate(int num_cores, TranspositionTable& table,
+  PVLine ChessEngine::Calculate(int num_threads, TranspositionTable& table,
   std::vector<Move>* moves_to_search_ptr) {
     // #テスト。
-    num_cores = 2;
+    num_threads = 2;
 
-    pvs_thread_vec_.resize(num_cores);
+    pvs_thread_vec_.resize(num_threads);
     return std::move(SearchRoot(table, moves_to_search_ptr));
   }
 
