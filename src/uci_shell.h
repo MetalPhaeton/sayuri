@@ -63,7 +63,7 @@ namespace Sayuri {
       /****************/
       /* static関数。 */
       /****************/
-      // PV情報を標準出力に送る。
+      // PV情報を標準出力に表示。
       // [引数]
       // depth: 基本の深さ。
       // seldepth: Quiesceの深さ。
@@ -71,23 +71,23 @@ namespace Sayuri {
       // time: 思考時間。
       // num_nodes: 探索したノード数。
       // pv_line: PVライン。
-      static void SendPVInfo(int depth, int seldepth, int score,
+      static void PrintPVInfo(int depth, int seldepth, int score,
       Chrono::milliseconds time, std::size_t num_nodes, PVLine& pv_line);
-      // 深さ情報を標準出力に送る。
+      // 深さ情報を標準出力に表示。
       // [引数]
       // depth: 基本の深さ。
-      static void SendDepthInfo(int depth);
-      // 現在探索している手の情報を標準出力に送る。
+      static void PrintDepthInfo(int depth);
+      // 現在探索している手の情報を標準出力に表示。
       // [引数]
       // move: 現在探索している手。
       // move_num: 手の番号。
-      static void SendCurrentMoveInfo(Move move, int move_num);
-      // その他の情報を標準出力に送る。
+      static void PrintCurrentMoveInfo(Move move, int move_num);
+      // その他の情報を標準出力に表示。
       // [引数]
       // time: 時間。
       // num_nodes: 探索したノード数。
       // hashfull: トランスポジションテーブルの使用量。
-      static void SendOtherInfo(Chrono::milliseconds time,
+      static void PrintOtherInfo(Chrono::milliseconds time,
       std::size_t num_nodes, int hashfull);
 
       // インプット用スレッド。

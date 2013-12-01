@@ -298,9 +298,6 @@ namespace Sayuri {
     // 探索開始時間の初期化。
     start_time_ptr_.reset(new TimePoint());
 
-    // 探索したレベルの初期化。
-    searched_level_ptr_.reset(new int(0));
-
     // ストッパーの初期化。
     stopper_ptr_.reset(new Stopper());
 
@@ -408,9 +405,6 @@ namespace Sayuri {
     // 探索開始時間のコピー。
     start_time_ptr_.reset(new TimePoint(*(engine.start_time_ptr_)));
 
-    // 探索したレベルのコピー。
-    searched_level_ptr_.reset(new int(*(engine.searched_level_ptr_)));
-
     // ストッパーのコピー。
     stopper_ptr_.reset(new Stopper(*(engine.stopper_ptr_)));
 
@@ -452,9 +446,6 @@ namespace Sayuri {
     // 探索開始時間のムーブ。
     start_time_ptr_ = std::move(engine.start_time_ptr_);
 
-    // 探索したレベルのムーブ。
-    searched_level_ptr_ = std::move(engine.searched_level_ptr_);
-
     // ストッパーのムーブ。
     stopper_ptr_ = std::move(engine.stopper_ptr_);
 
@@ -481,11 +472,11 @@ namespace Sayuri {
     i_depth_ptr_ = engine.i_depth_ptr_;
     num_searched_nodes_ptr_ = engine.num_searched_nodes_ptr_;
     start_time_ptr_ = engine.start_time_ptr_;
-    searched_level_ptr_ = engine.searched_level_ptr_;
     stopper_ptr_ = engine.stopper_ptr_;
     move_history_ptr_ = engine.move_history_ptr_;
     ply_100_history_ptr_ = engine.ply_100_history_ptr_;
     position_history_ptr_ = engine.position_history_ptr_;
+    helper_queue_ptr_ = engine.helper_queue_ptr_;
   }
 
   // 思考を始める。

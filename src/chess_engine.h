@@ -276,7 +276,7 @@ namespace Sayuri {
       PVLine SearchRoot(TranspositionTable& table,
       std::vector<Move>* moves_to_search_ptr);
       // 探索用子スレッド。
-      static void ThreadPVSpilt();
+      static void ThreadPVSplit();
       // 子スレッドで探索。
       // [引数]
       // job: 探索用仕事。
@@ -406,8 +406,6 @@ namespace Sayuri {
       std::shared_ptr<std::size_t> num_searched_nodes_ptr_;
       // 探索開始時間。
       std::shared_ptr<TimePoint> start_time_ptr_;
-      // 探索したレベル。
-      std::shared_ptr<int> searched_level_ptr_;
       // ストップ条件構造体。
       struct Stopper {
         // 何が何でも探索を中断。
@@ -475,6 +473,8 @@ namespace Sayuri {
       /************************************************************/
       // 今ヌルムーブのサーチ中かどうか。
       bool is_null_searching_;
+      // 探索したレベル。
+      int searched_level_;
       // PVSplit用ミューテックス。
       std::mutex pvs_mutex_;
       // PVSplit用スレッドのベクトル。

@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <mutex>
+#include <chrono>
 #include <condition_variable>
 #include "chess_def.h"
 #include "chess_engine.h"
@@ -56,8 +57,8 @@ namespace Sayuri {
       // alpha: 現在のアルファ値の変数。(更新される。)
       // beta: 現在のベータ値の変数。(更新される。)
       // delta: ルート探索時、ベータ値の増分の変数。(更新される。)
-      // table: トランスポジションテーブル。
-      // pv_lien: 現在のノードのPVライン。
+      // table: トランスポジションテーブル。(更新される。)
+      // pv_lien: 現在のノードのPVライン。(更新される。)
       // is_reduced_by_null: Null Move Reductionでリダクションされたかどうか。
       // num_serached_moves: いくつ手を探索したかの変数。(更新される。)
       // is_searching_pv: PVを探している最中かどうか。(更新される。)
@@ -67,13 +68,14 @@ namespace Sayuri {
       // has_legal_move: 合法手が見つかったかどうか。(更新される。)
       // moves_to_search_ptr: ルートで探索すべき手のベクトル。ないならnullptr。
       // root_move_vec_ptr: ルートで作成した手のベクトル。ないならnullptr。
+      // next_print_info_time: 情報を出力する時間。
       Job(MoveMaker& maker, ChessEngine& client, NodeType node_type,
       Hash pos_hash, int depth, int level, int& alpha, int& beta, int& delta,
       TranspositionTable& table, PVLine& pv_line, bool is_reduced_by_null,
       int& num_searched_moves, bool& is_searching_pv,
       ScoreType& score_type, int material, bool is_checked,
       bool& has_legal_move, std::vector<Move>* moves_to_search_ptr,
-      std::vector<Move>* root_move_vec_ptr);
+      std::vector<Move>* root_move_vec_ptr, TimePoint& next_print_info_time);
 
       Job(const Job& job);
       Job(Job&& job);
@@ -118,6 +120,7 @@ namespace Sayuri {
       bool& has_legal_move() {return *has_legal_move_ptr_;}
       std::vector<Move>* moves_to_search_ptr() {return moves_to_search_ptr_;}
       std::vector<Move>* root_move_vec_ptr() {return root_move_vec_ptr_;}
+      TimePoint& next_print_info_time() {return *next_print_info_time_ptr_;}
 
     private:
       /****************/
@@ -143,6 +146,7 @@ namespace Sayuri {
       bool* has_legal_move_ptr_;
       std::vector<Move>* moves_to_search_ptr_;
       std::vector<Move>* root_move_vec_ptr_;
+      TimePoint* next_print_info_time_ptr_;
 
       // 仕事用ムーブメーカー。
       MoveMaker* maker_ptr_;

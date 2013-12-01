@@ -138,7 +138,7 @@ namespace Sayuri {
   /* static関数。 */
   /****************/
   // PV情報を標準出力に送る。
-  void UCIShell::SendPVInfo(int depth, int seldepth, int score,
+  void UCIShell::PrintPVInfo(int depth, int seldepth, int score,
   Chrono::milliseconds time, std::size_t num_nodes, PVLine& pv_line) {
     std::cout << "info";
     std::cout << " depth " << depth;
@@ -171,12 +171,12 @@ namespace Sayuri {
   }
 
   // 深さ情報を標準出力に送る。
-  void UCIShell::SendDepthInfo(int depth) {
+  void UCIShell::PrintDepthInfo(int depth) {
     std::cout << "info depth " << depth << std::endl;
   }
 
   // 現在探索している手の情報を標準出力に送る。
-  void UCIShell::SendCurrentMoveInfo(Move move, int move_num) {
+  void UCIShell::PrintCurrentMoveInfo(Move move, int move_num) {
     // 手の情報を送る。
     std::cout << "info currmove " << TransMoveToString(move);
 
@@ -185,7 +185,7 @@ namespace Sayuri {
   }
 
   // その他の情報を標準出力に送る。
-  void UCIShell::SendOtherInfo(Chrono::milliseconds time,
+  void UCIShell::PrintOtherInfo(Chrono::milliseconds time,
   std::size_t num_nodes, int hashfull) {
     int time_2 = time.count();
     if (time_2 <= 0) time_2 = 1;

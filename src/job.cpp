@@ -45,7 +45,7 @@ namespace Sayuri {
   int& num_searched_moves, bool& is_searching_pv,
   ScoreType& score_type, int material, bool is_checked, bool& has_legal_move,
   std::vector<Move>* moves_to_search_ptr,
-  std::vector<Move>* root_move_vec_ptr) :
+  std::vector<Move>* root_move_vec_ptr, TimePoint& next_print_info_time) :
   client_ptr_(&client),
   node_type_(node_type),
   pos_hash_(pos_hash),
@@ -65,13 +65,14 @@ namespace Sayuri {
   has_legal_move_ptr_(&has_legal_move),
   moves_to_search_ptr_(moves_to_search_ptr),
   root_move_vec_ptr_(root_move_vec_ptr),
+  next_print_info_time_ptr_(&next_print_info_time),
   maker_ptr_(&maker),
   helper_counter_(0) {}
 
   // コピーコンストラクタ。
   Job::Job(const Job& job) :
   client_ptr_(job.client_ptr_),
-  node_type_(job.node_type_)
+  node_type_(job.node_type_),
   pos_hash_(job.pos_hash_),
   depth_(job.depth_),
   level_(job.level_),
@@ -89,6 +90,7 @@ namespace Sayuri {
   has_legal_move_ptr_(job.has_legal_move_ptr_),
   moves_to_search_ptr_(job.moves_to_search_ptr_),
   root_move_vec_ptr_(job.root_move_vec_ptr_),
+  next_print_info_time_ptr_(job.next_print_info_time_ptr_),
   maker_ptr_(job.maker_ptr_),
   helper_counter_(job.helper_counter_) {}
 
@@ -113,6 +115,7 @@ namespace Sayuri {
   has_legal_move_ptr_(job.has_legal_move_ptr_),
   moves_to_search_ptr_(job.moves_to_search_ptr_),
   root_move_vec_ptr_(job.root_move_vec_ptr_),
+  next_print_info_time_ptr_(job.next_print_info_time_ptr_),
   maker_ptr_(job.maker_ptr_),
   helper_counter_(job.helper_counter_) {}
 
@@ -137,6 +140,7 @@ namespace Sayuri {
     has_legal_move_ptr_ = job.has_legal_move_ptr_;
     moves_to_search_ptr_ = job.moves_to_search_ptr_;
     root_move_vec_ptr_ = job.root_move_vec_ptr_;
+    next_print_info_time_ptr_ = job.next_print_info_time_ptr_;
     maker_ptr_ = job.maker_ptr_;
     helper_counter_ = job.helper_counter_;
 
@@ -164,6 +168,7 @@ namespace Sayuri {
     has_legal_move_ptr_ = job.has_legal_move_ptr_;
     moves_to_search_ptr_ = job.moves_to_search_ptr_;
     root_move_vec_ptr_ = job.root_move_vec_ptr_;
+    next_print_info_time_ptr_ = job.next_print_info_time_ptr_;
     maker_ptr_ = job.maker_ptr_;
     helper_counter_ = job.helper_counter_;
 
