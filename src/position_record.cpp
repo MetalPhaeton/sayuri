@@ -35,8 +35,9 @@ namespace Sayuri {
   /* コンストラクタと代入。 */
   /**************************/
   PositionRecord::PositionRecord(const ChessEngine& engine) {
-    // 駒の配置をコピー。
+    // 駒の配置をコピー。ついでにhas_castled_もコピー。
     for (int i = 0; i < NUM_SIDES; i++) {
+      has_castled_[i] = engine.has_castled()[i];
       for (int j = 0; j < NUM_PIECE_TYPES; j++) {
         position_[i][j] = engine.position()[i][j];
       }
@@ -47,6 +48,8 @@ namespace Sayuri {
     castling_rights_ = engine.castling_rights();
     en_passant_square_ = engine.en_passant_square();
     can_en_passant_ = engine.can_en_passant();
+    ply_100_ = engine.ply_100();
+    ply_ = engine.ply();
     pos_hash_ = engine.GetCurrentHash();
   }
 
@@ -56,8 +59,11 @@ namespace Sayuri {
   castling_rights_(0),
   en_passant_square_(0),
   can_en_passant_(false),
+  ply_100_(0),
+  ply_(0),
   pos_hash_(0ULL) {
     for (int i = 0; i < NUM_SIDES; i++) {
+      has_castled_[i] = false;
       for (int j = 0; j < NUM_PIECE_TYPES; j++) {
         position_[i][j] = 0ULL;
       }
@@ -164,6 +170,7 @@ namespace Sayuri {
   void PositionRecord::ScanMember(const PositionRecord& record) {
     // 駒の配置をコピー。
     for (int i = 0; i < NUM_SIDES; i++) {
+      has_castled_[i] = record.has_castled_[i];
       for (int j = 0; j < NUM_PIECE_TYPES; j++) {
         position_[i][j] = record.position_[i][j];
       }
@@ -174,6 +181,8 @@ namespace Sayuri {
     castling_rights_ = record.castling_rights_;
     en_passant_square_ = record.en_passant_square_;
     can_en_passant_ = record.can_en_passant_;
+    ply_100_ = record.ply_100_;
+    ply_ = record.ply_;
     pos_hash_ = record.pos_hash_;
   }
 }  // namespace Sayuri

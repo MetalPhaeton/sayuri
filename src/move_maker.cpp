@@ -45,7 +45,7 @@ namespace Sayuri {
   MoveMaker::MoveMaker(const ChessEngine& engine) :
   engine_ptr_(&engine) {
     // スタックのポインターをセット。
-    begin_ = last_ = current_ = move_stack_;
+    begin_ = last_ = move_stack_;
     end_ = &(move_stack_[MAX_SLOTS]);
   }
 
@@ -60,9 +60,6 @@ namespace Sayuri {
       if (maker.last_ == &(maker.move_stack_[i])) {
         last_ = &(move_stack_[i]);
       }
-      if (maker.current_ == &(maker.move_stack_[i])) {
-        current_ = &(move_stack_[i]);
-      }
     }
   }
 
@@ -76,9 +73,6 @@ namespace Sayuri {
       }
       if (maker.last_ == &(maker.move_stack_[i])) {
         last_ = &(move_stack_[i]);
-      }
-      if (maker.current_ == &(maker.move_stack_[i])) {
-        current_ = &(move_stack_[i]);
       }
     }
   }
@@ -95,9 +89,6 @@ namespace Sayuri {
       if (maker.last_ == &(maker.move_stack_[i])) {
         last_ = &(move_stack_[i]);
       }
-      if (maker.current_ == &(maker.move_stack_[i])) {
-        current_ = &(move_stack_[i]);
-      }
     }
     return *this;
   }
@@ -113,9 +104,6 @@ namespace Sayuri {
       }
       if (maker.last_ == &(maker.move_stack_[i])) {
         last_ = &(move_stack_[i]);
-      }
-      if (maker.current_ == &(maker.move_stack_[i])) {
-        current_ = &(move_stack_[i]);
       }
     }
     return *this;
@@ -336,6 +324,15 @@ namespace Sayuri {
     }
 
     return slot.move_;
+  }
+
+  // スタックに残っている候補手の数を返す。
+  int MoveMaker::CountMoves() const {
+    int count = 0;
+    for (MoveSlot* ptr = begin_; ptr < last_; ptr++) {
+      count++;
+    }
+    return count;
   }
 
   // 手に点数をつける。

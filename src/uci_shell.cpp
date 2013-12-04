@@ -48,15 +48,17 @@ namespace Sayuri {
   // コンストラクタ。
   UCIShell::UCIShell(ChessEngine& engine) :
   engine_ptr_(&engine),
-  table_size_(64 * 1024 * 1024),
-  enable_pondering_(true) {
+  table_size_(UCI_DEFAULT_TABLE_SIZE),
+  enable_pondering_(UCI_DEFAULT_PONDER),
+  num_threads_(UCI_DEFAULT_THREADS) {
   }
 
   // コピーコンストラクタ。
   UCIShell::UCIShell(const UCIShell& shell) :
   engine_ptr_(shell.engine_ptr_),
   table_size_(shell.table_size_),
-  enable_pondering_(shell.enable_pondering_) {
+  enable_pondering_(shell.enable_pondering_),
+  num_threads_(shell.num_threads_) {
     *(moves_to_search_ptr_) = *(shell.moves_to_search_ptr_);
   }
 
@@ -64,7 +66,8 @@ namespace Sayuri {
   UCIShell::UCIShell(UCIShell&& shell) :
   engine_ptr_(shell.engine_ptr_),
   table_size_(shell.table_size_),
-  enable_pondering_(shell.enable_pondering_) {
+  enable_pondering_(shell.enable_pondering_),
+  num_threads_(shell.num_threads_) {
     moves_to_search_ptr_ = std::move(shell.moves_to_search_ptr_);
   }
 
@@ -73,6 +76,7 @@ namespace Sayuri {
     engine_ptr_ = shell.engine_ptr_;
     table_size_ = shell.table_size_;
     enable_pondering_ = shell.enable_pondering_;
+    num_threads_ = shell.num_threads_;
     *(moves_to_search_ptr_) = *(shell.moves_to_search_ptr_);
     return *this;
   }
@@ -82,6 +86,7 @@ namespace Sayuri {
     engine_ptr_ = shell.engine_ptr_;
     table_size_ = shell.table_size_;
     enable_pondering_ = shell.enable_pondering_;
+    num_threads_ = shell.num_threads_;
     moves_to_search_ptr_ = std::move(shell.moves_to_search_ptr_);
     return *this;
   }
@@ -202,9 +207,8 @@ namespace Sayuri {
     (shell.table_size_));
 
     // 思考開始。
-    // #テスト。
     PVLine pv_line = shell.engine_ptr_->Calculate
-    (2, *(table_ptr.get()), shell.moves_to_search_ptr_.get());
+    (shell.num_threads_, *(table_ptr.get()), shell.moves_to_search_ptr_.get());
 
     // 最善手を表示。
     std::cout << "bestmove ";
@@ -246,6 +250,9 @@ namespace Sayuri {
       std::cout << "false";
     }
     std::cout << std::endl;
+    // スレッドの数。
+    std::cout << "option name Threads type spin defalut"
+    << UCI_DEFAULT_THREADS << " min " << 1 << std::endl;
 
     // オーケー。
     std::cout << "uciok" << std::endl;
@@ -253,6 +260,7 @@ namespace Sayuri {
     // オプションの初期設定。
     table_size_ = UCI_DEFAULT_TABLE_SIZE;
     enable_pondering_ = UCI_DEFAULT_PONDER;
+    num_threads_ = UCI_DEFAULT_THREADS;
 
   }
 
@@ -324,6 +332,23 @@ namespace Sayuri {
               parser.JumpToNextKeyword();
             }
             break;
+          } else if (word.str_ == "threads") {
+            // スレッドの数の変更の場合。
+            parser.JumpToNextKeyword();
+            while (parser.HasNext()) {
+              word = parser.Get();
+              if (word.str_ == "value") {
+                try {
+                  num_threads_ = std::stoi(parser.Get().str_);
+                } catch (...) {
+                  // 無視。
+                }
+                break;
+              }
+
+              parser.JumpToNextKeyword();
+            }
+            break;
           }
         }
       }
@@ -381,8 +406,8 @@ namespace Sayuri {
   // goコマンド。
   void UCIShell::CommandGo(const std::vector<std::string>& argv) {
     // 思考スレッドを終了させる。
+    engine_ptr_->StopCalculation();
     if (thinking_thread_.joinable()) {
-      engine_ptr_->StopCalculation();
       thinking_thread_.join();
     }
 

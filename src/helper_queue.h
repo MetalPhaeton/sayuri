@@ -30,9 +30,11 @@
 #include <iostream>
 #include <mutex>
 #include <condition_variable>
+#include "chess_engine.h"
 #include "job.h"
 
 namespace Sayuri {
+  class ChessEngine;
   class Job;
 
   // マルチスレッド探索のスレッドのキューのクラス。
@@ -55,12 +57,20 @@ namespace Sayuri {
       // [戻り値]
       // 仕事へのポインタ。なければnullptr。
       Job* GetJob();
+      // 待っているヘルパーの数を得る。
+      // [戻り値]
+      // 待っているヘルパーの数。
+      int CountHelpers() const {return num_helpers_;}
       // 空きスレッドに仕事を依頼する。
       // [引数]
       // job: 仕事。
       void Help(Job& job);
+      // 空きスレッドに仕事を依頼する。ルートノード用。
+      // [引数]
+      // job: 仕事。
+      void HelpRoot(Job& job);
       // 待機中の空きスレッドをキューから開放する。
-      void ReleaseHelper();
+      void ReleaseHelpers();
 
     private:
       /****************/
@@ -70,10 +80,16 @@ namespace Sayuri {
       Job* job_ptr_;
       // ミューテックス。
       std::mutex mutex_;
-      // コンディション。
-      std::condition_variable cond_;
+      // ヘルパー用コンディション。
+      std::condition_variable helper_cond_;
+      // クライアント用コンディション。
+      std::condition_variable client_cond_;
       // もうヘルパーは必要ない。
-      bool no_more_help_;
+      volatile bool no_more_help_;
+      // 待っているヘルパーの数。
+      volatile int num_helpers_;
+      // ルートノードのクライアントが待っているかどうか。
+      volatile bool is_root_client_waiting_;
   };
 }  // namespace Sayuri
 

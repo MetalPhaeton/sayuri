@@ -31,15 +31,18 @@
 #include <mutex>
 #include <chrono>
 #include <condition_variable>
+#include <memory>
 #include "chess_def.h"
 #include "chess_engine.h"
 #include "transposition_table.h"
 #include "pv_line.h"
 #include "move_maker.h"
+#include "position_record.h"
 
 namespace Sayuri {
   class ChessEngine;
   class MoveMaker;
+  class PositionRecord;
 
   // マルチスレッド探索用の仕事クラス。
   class Job {
@@ -48,33 +51,36 @@ namespace Sayuri {
       /* コンストラクタと代入。 */
       /**************************/
       // [引数]
+      // mutex: そのノードのミューテックス。
       // maker: 仕事用の手が入っているムーブメーカー。
-      // client: 依頼主のチェスエンジン。
+      // client: クライアントのチェスエンジン。
+      // record: 仕事作成時のクライアントの駒の配置など。
       // node_type: ノードのタイプ。
-      // pos_hash: 現在の局面のハッシュ。
-      // depth: 現在の深さ。
-      // level: 現在のレベル。
+      // pos_hash: 仕事作成時のノードの局面のハッシュ。
+      // depth: 仕事作成時のノードの深さ。
+      // level: 仕事作成時のノードのレベル。
       // alpha: 現在のアルファ値の変数。(更新される。)
       // beta: 現在のベータ値の変数。(更新される。)
       // delta: ルート探索時、ベータ値の増分の変数。(更新される。)
       // table: トランスポジションテーブル。(更新される。)
-      // pv_lien: 現在のノードのPVライン。(更新される。)
+      // pv_line: 現在のノードのPVライン。(更新される。)
       // is_reduced_by_null: Null Move Reductionでリダクションされたかどうか。
       // num_serached_moves: いくつ手を探索したかの変数。(更新される。)
       // is_searching_pv: PVを探している最中かどうか。(更新される。)
       // score_type: 評価値のタイプ。(更新される。)
-      // material: 現在のマテリアル。
-      // is_checked: 現在チェックされているかどうか。
+      // material: 仕事作成時のノードのマテリアル。
+      // is_checked: チェックされているかどうか。
       // has_legal_move: 合法手が見つかったかどうか。(更新される。)
       // moves_to_search_ptr: ルートで探索すべき手のベクトル。ないならnullptr。
       // root_move_vec_ptr: ルートで作成した手のベクトル。ないならnullptr。
-      // next_print_info_time: 情報を出力する時間。
-      Job(MoveMaker& maker, ChessEngine& client, NodeType node_type,
-      Hash pos_hash, int depth, int level, int& alpha, int& beta, int& delta,
-      TranspositionTable& table, PVLine& pv_line, bool is_reduced_by_null,
-      int& num_searched_moves, bool& is_searching_pv,
-      ScoreType& score_type, int material, bool is_checked,
-      bool& has_legal_move, std::vector<Move>* moves_to_search_ptr,
+      // next_print_info_time: 情報を出力する時間。(更新される。)
+      Job(std::mutex& mutex, MoveMaker& maker, ChessEngine& client,
+      PositionRecord& record, NodeType node_type, Hash pos_hash, int depth,
+      int level, int& alpha, int& beta, int& delta, TranspositionTable& table,
+      PVLine& pv_line, bool is_reduced_by_null, int& num_searched_moves,
+      bool& is_searching_pv, ScoreType& score_type, int material,
+      bool is_checked, bool& has_legal_move,
+      std::vector<Move>* moves_to_search_ptr,
       std::vector<Move>* root_move_vec_ptr, TimePoint& next_print_info_time);
 
       Job(const Job& job);
@@ -97,37 +103,75 @@ namespace Sayuri {
       void FinishMyJob();
       // ヘルパーが全員仕事を終えるまで待機する。
       void WaitForHelpers();
+      // 外部用コンディションで待機する。
+      void Wait();
+      // 外部用コンディションで通知する。
+      void Notify();
 
       /**************/
       /* アクセサ。 */
       /**************/
+      // そのノードのミューテックス。
+      std::mutex& mutex() {return *mutex_ptr_;}
+      // クライアントのチェスエンジン。
       ChessEngine& client() {return *client_ptr_;}
+      // 仕事作成時のクライアントの駒の配置など。
+      PositionRecord& record() {return *record_ptr_;}
+      // ノードのタイプ。
       NodeType node_type() const {return node_type_;}
+      // 仕事作成時のノードの局面のハッシュ。
       Hash pos_hash() const {return pos_hash_;}
+      // 仕事作成時のノードの深さ。
       int depth() const {return depth_;}
+      // 仕事作成時のノードのレベル。
       int level() const {return level_;}
+      // 現在のアルファ値の変数。(更新される。)
       int& alpha() {return *alpha_ptr_;}
+      // 現在のベータ値の変数。(更新される。)
       int& beta() {return *beta_ptr_;}
+      // ルート探索時、ベータ値の増分の変数。(更新される。)
       int& delta() {return *delta_ptr_;}
+      // トランスポジションテーブル。(更新される。)
       TranspositionTable& table() {return *table_ptr_;}
+      // 現在のノードのPVライン。(更新される。)
       PVLine& pv_line() {return *pv_line_ptr_;}
+      // Null Move Reductionでリダクションされたかどうか。
       bool is_reduced_by_null() const {return is_reduced_by_null_;}
+      // いくつ手を探索したかの変数。(更新される。)
       int& num_searched_moves() {return *num_searched_moves_ptr_;}
+      // PVを探している最中かどうか。(更新される。)
       bool& is_searching_pv() {return *is_searching_pv_ptr_;}
+      // 評価値のタイプ。(更新される。)
       ScoreType& score_type() {return *score_type_ptr_;}
+      // 仕事作成時のノードのマテリアル。
       int material() const {return material_;}
+      // チェックされているかどうか。
       bool is_checked() const {return is_checked_;}
+      // 合法手が見つかったかどうか。(更新される。)
       bool& has_legal_move() {return *has_legal_move_ptr_;}
+      // ルートで探索すべき手のベクトル。ないならnullptr。
       std::vector<Move>* moves_to_search_ptr() {return moves_to_search_ptr_;}
+      // ルートで作成した手のベクトル。ないならnullptr。
       std::vector<Move>* root_move_vec_ptr() {return root_move_vec_ptr_;}
+      // 情報を出力する時間。(更新される。)
       TimePoint& next_print_info_time() {return *next_print_info_time_ptr_;}
 
     private:
+      /**********************/
+      /* プライベート関数。 */
+      /**********************/
+      // メンバーをコピーする。
+      // [引数]
+      // job: コピー元。
+      void ScanMember(const Job& job);
+
       /****************/
       /* メンバ変数。 */
       /****************/
       // 親スレッドより情報。
+      std::mutex* mutex_ptr_;
       ChessEngine* client_ptr_;
+      PositionRecord* record_ptr_;
       NodeType node_type_;
       Hash pos_hash_;
       int depth_;
@@ -154,7 +198,7 @@ namespace Sayuri {
       volatile int helper_counter_;
       // ミューテックス。
       std::mutex mutex_;
-      // コンディション変数。
+      // コンディション。
       std::condition_variable cond_;
   };
 }  // namespace Sayuri

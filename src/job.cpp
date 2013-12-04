@@ -34,19 +34,22 @@
 #include "transposition_table.h"
 #include "pv_line.h"
 #include "move_maker.h"
+#include "position_record.h"
 
 namespace Sayuri {
   /**************************/
   /* コンストラクタと代入。 */
   /**************************/
-  Job::Job(MoveMaker& maker, ChessEngine& client, NodeType node_type,
-  Hash pos_hash, int depth, int level, int& alpha, int& beta, int& delta,
-  TranspositionTable& table, PVLine& pv_line, bool is_reduced_by_null,
-  int& num_searched_moves, bool& is_searching_pv,
-  ScoreType& score_type, int material, bool is_checked, bool& has_legal_move,
-  std::vector<Move>* moves_to_search_ptr,
+  Job::Job(std::mutex& mutex, MoveMaker& maker, ChessEngine& client,
+  PositionRecord& record, NodeType node_type, Hash pos_hash, int depth,
+  int level, int& alpha, int& beta, int& delta, TranspositionTable& table,
+  PVLine& pv_line, bool is_reduced_by_null, int& num_searched_moves,
+  bool& is_searching_pv, ScoreType& score_type, int material, bool is_checked,
+  bool& has_legal_move, std::vector<Move>* moves_to_search_ptr,
   std::vector<Move>* root_move_vec_ptr, TimePoint& next_print_info_time) :
+  mutex_ptr_(&mutex),
   client_ptr_(&client),
+  record_ptr_(&record),
   node_type_(node_type),
   pos_hash_(pos_hash),
   depth_(depth),
@@ -70,107 +73,25 @@ namespace Sayuri {
   helper_counter_(0) {}
 
   // コピーコンストラクタ。
-  Job::Job(const Job& job) :
-  client_ptr_(job.client_ptr_),
-  node_type_(job.node_type_),
-  pos_hash_(job.pos_hash_),
-  depth_(job.depth_),
-  level_(job.level_),
-  alpha_ptr_(job.alpha_ptr_),
-  beta_ptr_(job.beta_ptr_),
-  delta_ptr_(job.delta_ptr_),
-  table_ptr_(job.table_ptr_),
-  pv_line_ptr_(job.pv_line_ptr_),
-  is_reduced_by_null_(job.is_reduced_by_null_),
-  num_searched_moves_ptr_(job.num_searched_moves_ptr_),
-  is_searching_pv_ptr_(job.is_searching_pv_ptr_),
-  score_type_ptr_(job.score_type_ptr_),
-  material_(job.material_),
-  is_checked_(job.is_checked_),
-  has_legal_move_ptr_(job.has_legal_move_ptr_),
-  moves_to_search_ptr_(job.moves_to_search_ptr_),
-  root_move_vec_ptr_(job.root_move_vec_ptr_),
-  next_print_info_time_ptr_(job.next_print_info_time_ptr_),
-  maker_ptr_(job.maker_ptr_),
-  helper_counter_(job.helper_counter_) {}
+  Job::Job(const Job& job) {
+    ScanMember(job);
+  }
 
   // ムーブコンストラクタ。
-  Job::Job(Job&& job) :
-  client_ptr_(job.client_ptr_),
-  node_type_(job.node_type_),
-  pos_hash_(job.pos_hash_),
-  depth_(job.depth_),
-  level_(job.level_),
-  alpha_ptr_(job.alpha_ptr_),
-  beta_ptr_(job.beta_ptr_),
-  delta_ptr_(job.delta_ptr_),
-  table_ptr_(job.table_ptr_),
-  pv_line_ptr_(job.pv_line_ptr_),
-  is_reduced_by_null_(job.is_reduced_by_null_),
-  num_searched_moves_ptr_(job.num_searched_moves_ptr_),
-  is_searching_pv_ptr_(job.is_searching_pv_ptr_),
-  score_type_ptr_(job.score_type_ptr_),
-  material_(job.material_),
-  is_checked_(job.is_checked_),
-  has_legal_move_ptr_(job.has_legal_move_ptr_),
-  moves_to_search_ptr_(job.moves_to_search_ptr_),
-  root_move_vec_ptr_(job.root_move_vec_ptr_),
-  next_print_info_time_ptr_(job.next_print_info_time_ptr_),
-  maker_ptr_(job.maker_ptr_),
-  helper_counter_(job.helper_counter_) {}
+  Job::Job(Job&& job) {
+    ScanMember(job);
+  }
 
   // コピー代入。
   Job& Job::operator=(const Job& job) {
-    client_ptr_ = job.client_ptr_;
-    node_type_ = job.node_type_;
-    pos_hash_ = job.pos_hash_;
-    depth_ = job.depth_;
-    level_ = job.level_;
-    alpha_ptr_ = job.alpha_ptr_;
-    beta_ptr_ = job.beta_ptr_;
-    delta_ptr_ = job.delta_ptr_;
-    table_ptr_ = job.table_ptr_;
-    pv_line_ptr_ = job.pv_line_ptr_;
-    is_reduced_by_null_ = job.is_reduced_by_null_;
-    num_searched_moves_ptr_ = job.num_searched_moves_ptr_;
-    is_searching_pv_ptr_ = job.is_searching_pv_ptr_;
-    score_type_ptr_ = job.score_type_ptr_;
-    material_ = job.material_;
-    is_checked_ = job.is_checked_;
-    has_legal_move_ptr_ = job.has_legal_move_ptr_;
-    moves_to_search_ptr_ = job.moves_to_search_ptr_;
-    root_move_vec_ptr_ = job.root_move_vec_ptr_;
-    next_print_info_time_ptr_ = job.next_print_info_time_ptr_;
-    maker_ptr_ = job.maker_ptr_;
-    helper_counter_ = job.helper_counter_;
+    ScanMember(job);
 
     return *this;
   }
 
   // ムーブ代入。
   Job& Job::operator=(Job&& job) {
-    client_ptr_ = job.client_ptr_;
-    node_type_ = job.node_type_;
-    pos_hash_ = job.pos_hash_;
-    depth_ = job.depth_;
-    level_ = job.level_;
-    alpha_ptr_ = job.alpha_ptr_;
-    beta_ptr_ = job.beta_ptr_;
-    delta_ptr_ = job.delta_ptr_;
-    table_ptr_ = job.table_ptr_;
-    pv_line_ptr_ = job.pv_line_ptr_;
-    is_reduced_by_null_ = job.is_reduced_by_null_;
-    num_searched_moves_ptr_ = job.num_searched_moves_ptr_;
-    is_searching_pv_ptr_ = job.is_searching_pv_ptr_;
-    score_type_ptr_ = job.score_type_ptr_;
-    material_ = job.material_;
-    is_checked_ = job.is_checked_;
-    has_legal_move_ptr_ = job.has_legal_move_ptr_;
-    moves_to_search_ptr_ = job.moves_to_search_ptr_;
-    root_move_vec_ptr_ = job.root_move_vec_ptr_;
-    next_print_info_time_ptr_ = job.next_print_info_time_ptr_;
-    maker_ptr_ = job.maker_ptr_;
-    helper_counter_ = job.helper_counter_;
+    ScanMember(job);
 
     return *this;
   }
@@ -183,7 +104,7 @@ namespace Sayuri {
     return maker_ptr_->PickMove();
   }
 
-  // ヘルパーの数を増やす。
+  // ヘルパーのカウント数を増やす。
   void Job::CountHelper() {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
     helper_counter_++;
@@ -199,6 +120,39 @@ namespace Sayuri {
   // ヘルパー全員の仕事終了まで待機する。
   void Job::WaitForHelpers() {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
-    cond_.wait(lock, [this] {return helper_counter_ <= 0;});
+    while (helper_counter_ > 0) {
+      cond_.wait(lock);
+    }
+  }
+
+  /**********************/
+  /* プライベート関数。 */
+  /**********************/
+  // メンバーをコピーする。
+  void Job::ScanMember(const Job& job) {
+    mutex_ptr_ = job.mutex_ptr_;
+    client_ptr_ = job.client_ptr_;
+    record_ptr_ = job.record_ptr_;
+    node_type_ = job.node_type_;
+    pos_hash_ = job.pos_hash_;
+    depth_ = job.depth_;
+    level_ = job.level_;
+    alpha_ptr_ = job.alpha_ptr_;
+    beta_ptr_ = job.beta_ptr_;
+    delta_ptr_ = job.delta_ptr_;
+    table_ptr_ = job.table_ptr_;
+    pv_line_ptr_ = job.pv_line_ptr_;
+    is_reduced_by_null_ = job.is_reduced_by_null_;
+    num_searched_moves_ptr_ = job.num_searched_moves_ptr_;
+    is_searching_pv_ptr_ = job.is_searching_pv_ptr_;
+    score_type_ptr_ = job.score_type_ptr_;
+    material_ = job.material_;
+    is_checked_ = job.is_checked_;
+    has_legal_move_ptr_ = job.has_legal_move_ptr_;
+    moves_to_search_ptr_ = job.moves_to_search_ptr_;
+    root_move_vec_ptr_ = job.root_move_vec_ptr_;
+    next_print_info_time_ptr_ = job.next_print_info_time_ptr_;
+    maker_ptr_ = job.maker_ptr_;
+    helper_counter_ = job.helper_counter_;
   }
 }  // namespace Sayuri

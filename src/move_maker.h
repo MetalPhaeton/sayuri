@@ -81,6 +81,10 @@ namespace Sayuri {
       // 次の手。
       // もしなければmove.all_が0の手を返す。
       Move PickMove();
+      // スタック内に残っている候補手の数を返す。
+      // [戻り値]
+      // 残っている候補手の数。
+      int CountMoves() const;
 
     private:
       /**********************/
@@ -108,7 +112,6 @@ namespace Sayuri {
       // スタックのポインタ。
       MoveSlot* begin_;
       MoveSlot* last_;
-      MoveSlot* current_;
       MoveSlot* end_;
       // ミューテックス。
       std::mutex mutex_;

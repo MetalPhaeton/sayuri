@@ -41,8 +41,9 @@ namespace Sayuri {
   /*******************/
   /* UCIオプション。 */
   /*******************/
-  constexpr std::size_t UCI_DEFAULT_TABLE_SIZE = 64 * 1024 * 1024;
+  constexpr std::size_t UCI_DEFAULT_TABLE_SIZE = 32 * 1024 * 1024;
   constexpr bool UCI_DEFAULT_PONDER = true;
+  constexpr int UCI_DEFAULT_THREADS = 1;
 
   /**********/
   /* 基本。 */

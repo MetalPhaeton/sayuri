@@ -73,6 +73,10 @@ namespace Sayuri {
       // [引数]
       // fen: 読み込むFenオブジェクト。
       void LoadFen(const Fen& fen);
+      // PositionRecordから読み込む。
+      // [引数]
+      // record: 読み込むPositionRecord。
+      void LoadRecord(const PositionRecord& record);
 
       // 新しいゲームの準備をする。
       void SetNewGame();
@@ -275,8 +279,10 @@ namespace Sayuri {
       // PVライン。
       PVLine SearchRoot(TranspositionTable& table,
       std::vector<Move>* moves_to_search_ptr);
-      // 探索用子スレッド。
-      static void ThreadPVSplit();
+      // 探索用子スレッド。(YBWC)
+      // [引数]
+      // parent: スレッドを呼び出したエンジン。
+      static void ThreadYBWC(ChessEngine& parent);
       // 子スレッドで探索。
       // [引数]
       // job: 探索用仕事。
@@ -475,10 +481,10 @@ namespace Sayuri {
       bool is_null_searching_;
       // 探索したレベル。
       int searched_level_;
-      // PVSplit用ミューテックス。
-      std::mutex pvs_mutex_;
-      // PVSplit用スレッドのベクトル。
-      std::vector<std::thread> pvs_thread_vec_;
+      // ミューテックス。
+      std::mutex mutex_;
+      // スレッドのベクトル。
+      std::vector<std::thread> thread_vec_;
 
       /******************/
       /* ハッシュ関連。 */

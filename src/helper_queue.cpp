@@ -36,20 +36,25 @@ namespace Sayuri {
   /* コンストラクタと代入。 */
   /**************************/
   // コンストラクタ。
-  HelperQueue::HelperQueue() : job_ptr_(nullptr), no_more_help_(false) {}
+  HelperQueue::HelperQueue() : job_ptr_(nullptr), no_more_help_(false),
+  num_helpers_(0), is_root_client_waiting_(false) {}
 
   // コピーコンストラクタ。
   HelperQueue::HelperQueue(const HelperQueue& queue) :
-  job_ptr_(queue.job_ptr_), no_more_help_(queue.no_more_help_) {}
+  job_ptr_(queue.job_ptr_), no_more_help_(queue.no_more_help_),
+  num_helpers_(queue.num_helpers_), is_root_client_waiting_(false) {}
 
   // ムーブコンストラクタ。
   HelperQueue::HelperQueue(HelperQueue&& queue) :
-  job_ptr_(queue.job_ptr_), no_more_help_(queue.no_more_help_) {}
+  job_ptr_(queue.job_ptr_), no_more_help_(queue.no_more_help_),
+  num_helpers_(queue.num_helpers_), is_root_client_waiting_(false) {}
 
   // コピー代入。
   HelperQueue& HelperQueue::operator=(const HelperQueue& queue) {
     job_ptr_ = queue.job_ptr_;
     no_more_help_ = queue.no_more_help_;
+    num_helpers_ = queue.num_helpers_;
+    is_root_client_waiting_ = queue.is_root_client_waiting_;
     return *this;
   }
 
@@ -57,6 +62,8 @@ namespace Sayuri {
   HelperQueue& HelperQueue::operator=(HelperQueue&& queue) {
     job_ptr_ = queue.job_ptr_;
     no_more_help_ = queue.no_more_help_;
+    num_helpers_ = queue.num_helpers_;
+    is_root_client_waiting_ = queue.is_root_client_waiting_;
     return *this;
   }
   /********************/
@@ -66,29 +73,80 @@ namespace Sayuri {
   Job* HelperQueue::GetJob() {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
 
-    // 待つ。
-    if (!no_more_help_) {
-      cond_.wait(lock);
+    // ヘルパーが必要なければnullptrを返す。
+    if (no_more_help_) {
+      client_cond_.notify_all();
+      return nullptr;
     }
 
-    job_ptr_->CountHelper();
+    // 待つ。
+    // ルートノードのクライアントが待っていれば待たない。
+    if (!is_root_client_waiting_) {
+      while (!job_ptr_) {
+        num_helpers_++;
+        helper_cond_.wait(lock);
+        num_helpers_--;
+        // 待っている間にno_more_help_が立っているかもしれないので、
+        // もう一度確認。
+        // ヘルパーが必要なければnullptrを返す。
+        if (no_more_help_) {
+          client_cond_.notify_all();
+          return nullptr;
+        }
+      }
+    }
+    is_root_client_waiting_ = false;
 
-    return job_ptr_;
+
+    // 仕事の準備。
+    job_ptr_->CountHelper();
+    Job* temp = job_ptr_;
+    job_ptr_ = nullptr;
+
+    // 準備完了を通知。
+    client_cond_.notify_all();
+
+    return temp;
   }
 
   // 空きスレッドに仕事を依頼する。
   void HelperQueue::Help(Job& job) {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
     
+    // ヘルパーがいれば仕事を依頼。
+    if (num_helpers_ > 0) {
+      job_ptr_ = &job;
+      helper_cond_.notify_one();
+
+      // ヘルパーの準備が完了するまで待つ。
+      client_cond_.wait(lock);
+    }
+  }
+
+  // 空きスレッドに仕事を依頼する。ルートノード用。
+  void HelperQueue::HelpRoot(Job& job) {
+    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+
     job_ptr_ = &job;
-    cond_.notify_one();
+    helper_cond_.notify_one();
+
+    // ヘルパーがやってきて、準備が完了するまで待つ。
+    is_root_client_waiting_ = true;
+    client_cond_.wait(lock);
+    is_root_client_waiting_ = false;
   }
 
   // 空きスレッドをキューから開放する。
-  void HelperQueue::ReleaseHelper() {
+  void HelperQueue::ReleaseHelpers() {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
 
     job_ptr_ = nullptr;
-    cond_.notify_all();
+    no_more_help_ = true;
+    helper_cond_.notify_all();
+
+    // 無事、ヘルパーが抜けるまで待つ。
+    while (num_helpers_ > 0) {
+      client_cond_.wait(lock);
+    }
   }
 }  // namespace Sayuri

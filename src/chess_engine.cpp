@@ -123,25 +123,22 @@ namespace Sayuri {
    * パブリック関数。 *
    ********************/
   void ChessEngine::LoadFen(const Fen& fen) {
-    // とりあえず初期化。
-    SetNewGame();
-
     // キングの数がおかしいならやめる。
     int num_white_king = Util::CountBits(fen.position()[WHITE][KING]);
     int num_black_king = Util::CountBits(fen.position()[BLACK][KING]);
     if ((num_white_king != 1) || (num_black_king != 1)) return;
 
     // まず駒の配置を空にする。
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Square square = 0; square < NUM_SQUARES; square++) {
-        PutPiece(square, EMPTY, side);
-      }
+    for (Bitboard bb = blocker_0_; bb; bb &= bb - 1) {
+      Square square = Util::GetSquare(bb);
+      PutPiece(square, EMPTY, NO_SIDE);
     }
           
 
     // 配置をする。
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+    for (Side side = WHITE; side < NUM_SIDES; side++) {
+      for (Piece piece_type = PAWN; piece_type < NUM_PIECE_TYPES;
+      piece_type++) {
         // 駒をセット。
         Bitboard bb = fen.position()[side][piece_type];
         for (; bb; bb &= bb - 1) {
@@ -164,6 +161,38 @@ namespace Sayuri {
     ply_100_history_ptr_->push_back(ply_100_);
     position_history_ptr_->clear();
     position_history_ptr_->push_back(PositionRecord(*this));
+  }
+
+  // PositionRecordから読み込む。
+  void ChessEngine::LoadRecord(const PositionRecord& record) {
+    // まず駒の配置を空にする。
+    for (Bitboard bb = blocker_0_; bb; bb &= bb - 1) {
+      Square square = Util::GetSquare(bb);
+      PutPiece(square, EMPTY, NO_SIDE);
+    }
+          
+
+    // 配置をする。ついでにhas_castled_もセット。
+    for (Side side = WHITE; side < NUM_SIDES; side++) {
+      has_castled_[side] = record.has_castled()[side];
+      for (Piece piece_type = PAWN; piece_type < NUM_PIECE_TYPES;
+      piece_type++) {
+        // 駒をセット。
+        Bitboard bb = record.position()[side][piece_type];
+        for (; bb; bb &= bb - 1) {
+          Square square = Util::GetSquare(bb);
+          PutPiece(square, piece_type, side);
+        }
+      }
+    }
+
+    // 残りを設定。
+    to_move_ = record.to_move();
+    castling_rights_ = record.castling_rights();
+    en_passant_square_ = record.en_passant_square();
+    can_en_passant_ = record.can_en_passant();
+    ply_100_ = record.ply_100();
+    ply_ = record.ply();
   }
 
   // 新しいゲームの準備をする。
@@ -482,10 +511,7 @@ namespace Sayuri {
   // 思考を始める。
   PVLine ChessEngine::Calculate(int num_threads, TranspositionTable& table,
   std::vector<Move>* moves_to_search_ptr) {
-    // #テスト。
-    num_threads = 2;
-
-    pvs_thread_vec_.resize(num_threads);
+    thread_vec_.resize(num_threads);
     return std::move(SearchRoot(table, moves_to_search_ptr));
   }
 

@@ -73,6 +73,12 @@ namespace Sayuri {
       Square en_passant_square() const {return en_passant_square_;}
       // アンパッサンできるかどうか。
       bool can_en_passant() const {return can_en_passant_;}
+      // 50手ルールの手数。
+      int ply_100() const {return ply_100_;}
+      // 手数。
+      int ply() const {return ply_;}
+      // キャスリングしたかどうか。
+      const bool (& has_castled() const)[NUM_SIDES] {return has_castled_;}
       // 配置のハッシュ。
       Hash pos_hash() const {return pos_hash_;}
 
@@ -98,6 +104,12 @@ namespace Sayuri {
       Square en_passant_square_;
       // アンパッサンできるかどうか。
       bool can_en_passant_;
+      // 50手ルールの手数。
+      int ply_100_;
+      // 手数。
+      int ply_;
+      // キャスリングしたかどうか。
+      bool has_castled_[NUM_SIDES];
       // 配置のハッシュ。
       Hash pos_hash_;
   };

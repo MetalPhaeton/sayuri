@@ -215,6 +215,8 @@ namespace Sayuri {
       std::size_t table_size_;
       // オプション。ポンダリングするかどうか。
       bool enable_pondering_;
+      // オプション。スレッドの数。
+      int num_threads_;
   };
 }  // namespace Sayuri
 
