@@ -303,6 +303,9 @@ namespace Sayuri {
     // 共有メンバ構造体を初期化。
     shared_st_ptr_.reset(new SharedStruct());
 
+    // 指し手の履歴を初期化。
+    shared_st_ptr_->move_history_.clear();
+
     // 50手ルールの履歴を初期化。
     shared_st_ptr_->ply_100_history_.push_back(0);
 
