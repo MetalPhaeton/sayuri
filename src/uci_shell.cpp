@@ -240,8 +240,7 @@ namespace Sayuri {
     // トランスポジションテーブルのサイズの変更。
     std::cout << "option name Hash type spin default "
     << (UCI_DEFAULT_TABLE_SIZE / (1024 * 1024)) << " min "
-    << (TranspositionTable::GetMinSize() / (1024 * 1024)) << " max "
-    << (TranspositionTable::GetMaxSize() / (1024 * 1024)) << std::endl;
+    << (TranspositionTable::GetMinSize() / (1024 * 1024)) << std::endl;
     // ポンダリングできるかどうか。
     std::cout << "option name Ponder type check default ";
     if (UCI_DEFAULT_PONDER) {

@@ -191,14 +191,6 @@ namespace Sayuri {
         return sizeof(TTEntry) * TABLE_SIZE;
       }
 
-      // テーブルの最大サイズを得る。
-      // [戻り値]
-      // 最大サイズ。
-      static std::size_t GetMaxSize() {
-        // 最大1ギガ。
-        return 1024 * 1024 * 1024;
-      }
-
     private:
       /**********************/
       /* プライベート関数。 */

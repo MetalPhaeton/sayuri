@@ -52,9 +52,7 @@ namespace Sayuri {
   num_used_entries_(0),
   entry_table_ptr_(new std::array<std::vector<TTEntry>, TABLE_SIZE>()) {
     // 大きさを整える。
-    if (max_bytes > GetMaxSize()) {
-      max_bytes = GetMaxSize();
-    } else if (max_bytes < GetMinSize()) {
+    if (max_bytes < GetMinSize()) {
       max_bytes = GetMinSize();
     }
     max_bytes_ = max_bytes;
