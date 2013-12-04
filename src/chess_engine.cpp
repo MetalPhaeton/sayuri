@@ -74,7 +74,7 @@ namespace Sayuri {
     ScanBasicMember(engine);
 
     // 共有メンバのコピー。
-    ScanSharedMember(engine);
+    shared_st_ptr_.reset(new SharedStruct(*(engine.shared_st_ptr_)));
   }
 
   // ムーブコンストラクタ。
@@ -83,7 +83,7 @@ namespace Sayuri {
     ScanBasicMember(engine);
 
     // 共有メンバのムーブ。
-    MoveSharedMember(std::move(engine));
+    shared_st_ptr_ = std::move(shared_st_ptr_);
   }
 
   // コピー代入。
@@ -92,7 +92,7 @@ namespace Sayuri {
     ScanBasicMember(engine);
 
     // 共有メンバをコピー。
-    ScanSharedMember(engine);
+    shared_st_ptr_.reset(new SharedStruct(*(engine.shared_st_ptr_)));
 
     return *this;
   }
@@ -103,7 +103,7 @@ namespace Sayuri {
     ScanBasicMember(engine);
 
     // 共有メンバをムーブ。
-    MoveSharedMember(std::move(engine));
+    shared_st_ptr_ = std::move(shared_st_ptr_);
 
     return *this;
   }
@@ -157,10 +157,10 @@ namespace Sayuri {
     ply_ = fen.ply();
 
     // 履歴を設定。
-    ply_100_history_ptr_->clear();
-    ply_100_history_ptr_->push_back(ply_100_);
-    position_history_ptr_->clear();
-    position_history_ptr_->push_back(PositionRecord(*this));
+    shared_st_ptr_->ply_100_history_.clear();
+    shared_st_ptr_->ply_100_history_.push_back(ply_100_);
+    shared_st_ptr_->position_history_.clear();
+    shared_st_ptr_->position_history_.push_back(PositionRecord(*this));
   }
 
   // PositionRecordから読み込む。
@@ -300,49 +300,14 @@ namespace Sayuri {
       has_castled_[i] = false;
     }
 
-    // ヒストリーの初期化。
-    history_ptr_.reset (new std::array<std::array<std::array<int,
-    NUM_SQUARES>, NUM_SQUARES>, NUM_SIDES>());
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_SQUARES; j++) {
-        for (int k = 0; k < NUM_SQUARES; k++) {
-          (*history_ptr_)[i][j][k] = 0;
-        }
-      }
-    }
-    history_max_ptr_.reset(new int(1));
-
-    // iid_stack_の初期化。
-    iid_stack_ptr_.reset(new std::array<Move, MAX_PLYS>());
-
-    // killer_stack_の初期化。
-    killer_stack_ptr_.reset(new std::array<Move, MAX_PLYS>());
-
-    // i_depth_ptr_の初期化。
-    i_depth_ptr_.reset(new int(0));
-
-    // num_searched_nodes_ptr_の初期化。
-    num_searched_nodes_ptr_.reset(new std::size_t(0));
-
-    // 探索開始時間の初期化。
-    start_time_ptr_.reset(new TimePoint());
-
-    // ストッパーの初期化。
-    stopper_ptr_.reset(new Stopper());
-
-    // 手の履歴を削除。
-    move_history_ptr_.reset(new std::vector<Move>(0));
+    // 共有メンバ構造体を初期化。
+    shared_st_ptr_.reset(new SharedStruct());
 
     // 50手ルールの履歴を初期化。
-    ply_100_history_ptr_.reset(new std::vector<int>(0));
-    ply_100_history_ptr_->push_back(0);
+    shared_st_ptr_->ply_100_history_.push_back(0);
 
     // 駒の配置を初期化。
-    position_history_ptr_.reset(new std::vector<PositionRecord>(0));
-    position_history_ptr_->push_back(PositionRecord(*this));
-
-    // スレッドのキューを初期化。
-    helper_queue_ptr_.reset(new HelperQueue());
+    shared_st_ptr_->position_history_.push_back(PositionRecord(*this));
   }
 
   // 他のエンジンの基本メンバをコピーする。
@@ -402,112 +367,6 @@ namespace Sayuri {
     }
   }
 
-  // 他のエンジンの共有メンバのコピー。
-  void ChessEngine::ScanSharedMember(const ChessEngine& engine) {
-    // ヒストリーをコピー。
-    history_ptr_.reset(new std::array<std::array<std::array<int,
-    NUM_SQUARES>, NUM_SQUARES>, NUM_SIDES>());
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_SQUARES; j++) {
-        for (int k = 0; k < NUM_SQUARES; k++) {
-          (*history_ptr_)[i][j][k] = (*(engine.history_ptr_))[i][j][k];
-        }
-      }
-    }
-    history_max_ptr_.reset(new int(*(engine.history_max_ptr_)));
-
-    // iid_stack_とkiller_stack_のコピー。
-    iid_stack_ptr_.reset(new std::array<Move, MAX_PLYS>());
-    killer_stack_ptr_.reset(new std::array<Move, MAX_PLYS>());
-    for (int i = 0; i < MAX_PLYS; i++) {
-      (*iid_stack_ptr_)[i] = (*(engine.iid_stack_ptr_))[i];
-      (*killer_stack_ptr_)[i] = (*(engine.killer_stack_ptr_))[i];
-    }
-
-    // Iterative Deepeningの深さをコピー。
-    i_depth_ptr_.reset(new int(*(engine.i_depth_ptr_)));
-
-    // 探索したノード数のコピー。
-    num_searched_nodes_ptr_.reset
-    (new std::size_t(*(engine.num_searched_nodes_ptr_)));
-
-    // 探索開始時間のコピー。
-    start_time_ptr_.reset(new TimePoint(*(engine.start_time_ptr_)));
-
-    // ストッパーのコピー。
-    stopper_ptr_.reset(new Stopper(*(engine.stopper_ptr_)));
-
-    // 指し手の履歴のコピー。
-    move_history_ptr_.reset(new std::vector<Move>
-    (engine.move_history_ptr_->size()));
-    *move_history_ptr_ = *(engine.move_history_ptr_);
-
-    // 50手ルールの履歴のコピー。
-    ply_100_history_ptr_.reset(new std::vector<int>
-    (engine.ply_100_history_ptr_->size()));
-    *ply_100_history_ptr_ = *(engine.ply_100_history_ptr_);
-
-    // 駒の配置の履歴をコピー。
-    position_history_ptr_.reset(new std::vector<PositionRecord>
-    (engine.position_history_ptr_->size()));
-    *position_history_ptr_ = *(engine.position_history_ptr_);
-
-    // スレッドのキューを初期化。
-    helper_queue_ptr_.reset(new HelperQueue(*(engine.helper_queue_ptr_)));
-  }
-
-  // 他のエンジンの共有メンバのムーブ。
-  void ChessEngine::MoveSharedMember(ChessEngine&& engine) {
-    // ヒストリーをムーブ。
-    history_ptr_ = std::move(engine.history_ptr_);
-    history_max_ptr_ = std::move(engine.history_max_ptr_);
-
-    // iid_stack_とkiller_stack_のムーブ。
-    iid_stack_ptr_ = std::move(engine.iid_stack_ptr_);
-    killer_stack_ptr_ = std::move(engine.killer_stack_ptr_);
-
-    // Iterative Deepeningの深さをムーブ。
-    i_depth_ptr_ = std::move(engine.i_depth_ptr_);
-
-    // 探索したノード数のムーブ。
-    num_searched_nodes_ptr_ = std::move(engine.num_searched_nodes_ptr_);
-
-    // 探索開始時間のムーブ。
-    start_time_ptr_ = std::move(engine.start_time_ptr_);
-
-    // ストッパーのムーブ。
-    stopper_ptr_ = std::move(engine.stopper_ptr_);
-
-    // 指し手の履歴のムーブ。
-    move_history_ptr_ = std::move(engine.move_history_ptr_);
-
-    // 50手ルールの履歴のムーブ。
-    ply_100_history_ptr_ = std::move(engine.ply_100_history_ptr_);
-
-    // 駒の配置の履歴をムーブ。
-    position_history_ptr_ = std::move(engine.position_history_ptr_);
-
-    // スレッドのキューをムーブ。
-    helper_queue_ptr_ = std::move(engine.helper_queue_ptr_);
-  }
-
-  // 他のエンジンと共有メンバを共有する。
-  void ChessEngine::LinkSharedMember(ChessEngine& engine) {
-    // 共有メンバを共有。
-    history_ptr_ = engine.history_ptr_;
-    history_max_ptr_ = engine.history_max_ptr_;
-    iid_stack_ptr_ = engine.iid_stack_ptr_;
-    killer_stack_ptr_ = engine.killer_stack_ptr_;
-    i_depth_ptr_ = engine.i_depth_ptr_;
-    num_searched_nodes_ptr_ = engine.num_searched_nodes_ptr_;
-    start_time_ptr_ = engine.start_time_ptr_;
-    stopper_ptr_ = engine.stopper_ptr_;
-    move_history_ptr_ = engine.move_history_ptr_;
-    ply_100_history_ptr_ = engine.ply_100_history_ptr_;
-    position_history_ptr_ = engine.position_history_ptr_;
-    helper_queue_ptr_ = engine.helper_queue_ptr_;
-  }
-
   // 思考を始める。
   PVLine ChessEngine::Calculate(int num_threads, TranspositionTable& table,
   std::vector<Move>* moves_to_search_ptr) {
@@ -517,7 +376,7 @@ namespace Sayuri {
 
   // 思考を停止する。
   void ChessEngine::StopCalculation() {
-    stopper_ptr_->stop_now_ = true;
+    shared_st_ptr_->stop_now_ = true;
   }
 
   // 手を指す。
@@ -556,10 +415,10 @@ namespace Sayuri {
       } else {
         ply_100_++;
       }
-      move_history_ptr_->push_back(move);
-      ply_100_history_ptr_->push_back(ply_100_);
+      shared_st_ptr_->move_history_.push_back(move);
+      shared_st_ptr_->ply_100_history_.push_back(ply_100_);
       MakeMove(move);
-      position_history_ptr_->push_back(PositionRecord(*this));
+      shared_st_ptr_->position_history_.push_back(PositionRecord(*this));
     } else {
       throw SayuriError("合法手ではありません。");
     }
@@ -567,13 +426,13 @@ namespace Sayuri {
 
   // 手を戻す。
   void ChessEngine::UndoMove() {
-    if (move_history_ptr_->size() >= 1) {
+    if (shared_st_ptr_->move_history_.size() >= 1) {
       ply_--;
-      Move move = move_history_ptr_->back();
-      ply_100_ = ply_100_history_ptr_->back();
-      move_history_ptr_->pop_back();
-      ply_100_history_ptr_->pop_back();
-      position_history_ptr_->pop_back();
+      Move move = shared_st_ptr_->move_history_.back();
+      ply_100_ = shared_st_ptr_->ply_100_history_.back();
+      shared_st_ptr_->move_history_.pop_back();
+      shared_st_ptr_->ply_100_history_.pop_back();
+      shared_st_ptr_->position_history_.pop_back();
       UnmakeMove(move);
     } else {
       throw SayuriError("手を戻すことができません。");
@@ -1064,5 +923,83 @@ namespace Sayuri {
     for (int square = 0; square < NUM_SQUARES; square++) {
       en_passant_hash_table_[square] = dist(engine);
     }
+  }
+
+  /**********************/
+  /* 共有メンバ構造体。 */
+  /**********************/
+  // コンストラクタ。
+  ChessEngine::SharedStruct::SharedStruct() :
+  history_max_(0),
+  i_depth_(1),
+  num_searched_nodes_(0),
+  stop_now_(false),
+  max_nodes_(-1ULL),
+  max_depth_(MAX_PLYS),
+  thinking_time_(-1U >> 1),
+  infinite_thinking_(false) {
+    for (int i = 0; i < NUM_SIDES; i++) {
+      for (int j = 0; j < NUM_SQUARES; j++) {
+        for (int k = 0; k < NUM_SQUARES; k++) {
+          history_[i][j][k] = 0;
+        }
+      }
+    }
+    for (int i = 0; i < MAX_PLYS; i++) {
+      iid_stack_[i] = Move();
+      killer_stack_[i] = Move();
+    }
+  }
+
+  // コピーコンストラクタ。
+  ChessEngine::SharedStruct::SharedStruct(const SharedStruct& shared_st) {
+    ScanMember(shared_st);
+  }
+
+  // ムーブコンストラクタ。
+  ChessEngine::SharedStruct::SharedStruct(SharedStruct&& shared_st) {
+    ScanMember(shared_st);
+  }
+
+  // コピー代入。
+  ChessEngine::SharedStruct& ChessEngine::SharedStruct::operator=
+  (const SharedStruct& shared_st) {
+    ScanMember(shared_st);
+    return *this;
+  }
+
+  // ムーブ代入。
+  ChessEngine::SharedStruct& ChessEngine::SharedStruct::operator=
+  (SharedStruct&& shared_st) {
+    ScanMember(shared_st);
+    return *this;
+  }
+
+  // メンバをコピーする。
+  void ChessEngine::SharedStruct::ScanMember(const SharedStruct& shared_st) {
+    for (int i = 0; i < NUM_SIDES; i++) {
+      for (int j = 0; j < NUM_SQUARES; j++) {
+        for (int k = 0; k < NUM_SQUARES; k++) {
+          history_[i][j][k] = shared_st.history_[i][j][k];
+        }
+      }
+    }
+    history_max_ = shared_st.history_max_;
+    for (int i = 0; i < MAX_PLYS; i++) {
+      iid_stack_[i] = shared_st.iid_stack_[i];
+      killer_stack_[i] = shared_st.killer_stack_[i];
+    }
+    i_depth_ = shared_st.i_depth_;
+    num_searched_nodes_ = shared_st.num_searched_nodes_;
+    start_time_ = shared_st.start_time_;
+    stop_now_ = shared_st.stop_now_;
+    max_nodes_ = shared_st.max_nodes_;
+    max_depth_ = shared_st.max_depth_;
+    thinking_time_ = shared_st.thinking_time_;
+    infinite_thinking_ = shared_st.infinite_thinking_;
+    move_history_ = shared_st.move_history_;
+    ply_100_history_ = shared_st.ply_100_history_;
+    position_history_ = shared_st.position_history_;
+    helper_queue_ptr_.reset(new HelperQueue(*(shared_st.helper_queue_ptr_)));
   }
 }  // namespace Sayuri

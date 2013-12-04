@@ -54,7 +54,7 @@ namespace Sayuri {
     if (ShouldBeStopped()) return alpha;
 
     // ノード数を加算。
-    (*num_searched_nodes_ptr_)++;
+    shared_st_ptr_->num_searched_nodes_++;
 
     // 最大探索数。
     if (level > searched_level_) {
@@ -88,11 +88,13 @@ namespace Sayuri {
     MoveMaker maker(*this);
     Move prev_best;
     if (IsAttacked(king_[side], enemy_side)) {
-      maker.GenMoves<GenMoveType::ALL>(prev_best, (*iid_stack_ptr_)[level],
-      (*killer_stack_ptr_)[level]);
+      maker.GenMoves<GenMoveType::ALL>(prev_best,
+      shared_st_ptr_->iid_stack_[level],
+      shared_st_ptr_->killer_stack_[level]);
     } else {
-      maker.GenMoves<GenMoveType::CAPTURE>(prev_best, (*iid_stack_ptr_)[level],
-      (*killer_stack_ptr_)[level]);
+      maker.GenMoves<GenMoveType::CAPTURE>(prev_best,
+      shared_st_ptr_->iid_stack_[level],
+      shared_st_ptr_->killer_stack_[level]);
     }
 
     // マテリアルを得る。
@@ -143,7 +145,7 @@ namespace Sayuri {
     if (ShouldBeStopped()) return alpha;
 
     // ノード数を加算。
-    (*num_searched_nodes_ptr_)++;
+    shared_st_ptr_->num_searched_nodes_++;
 
     // 最大探索数。
     if (level > searched_level_) {
@@ -198,7 +200,7 @@ namespace Sayuri {
     // 限界探索数を超えていてもクイース。
     if ((depth <= 0) || (level >= MAX_PLYS)) {
       // クイース探索ノードに移行するため、ノード数を減らしておく。
-      (*num_searched_nodes_ptr_)--;
+      shared_st_ptr_->num_searched_nodes_--;
       return Quiesce(depth, level, alpha, beta, table);
     }
 
@@ -214,7 +216,7 @@ namespace Sayuri {
     if (Type == NodeType::PV) {
       // 前回の繰り返しの最善手があればIIDしない。
       if (prev_best.all_) {
-        (*iid_stack_ptr_)[level] = prev_best;
+        shared_st_ptr_->iid_stack_[level] = prev_best;
       } else {
         if (depth >= 5) {
           // Internal Iterative Deepening。
@@ -223,7 +225,7 @@ namespace Sayuri {
           Search<NodeType::PV>(pos_hash, depth - reduction - 1, level,
           alpha, beta, table, temp_line);
 
-          (*iid_stack_ptr_)[level] = temp_line.line()[0].move();
+          shared_st_ptr_->iid_stack_[level] = temp_line.line()[0].move();
         }
       }
     } else {
@@ -256,8 +258,9 @@ namespace Sayuri {
     /**************/
     // 手を作る。
     MoveMaker maker(*this);
-    maker.GenMoves<GenMoveType::ALL>(prev_best, (*iid_stack_ptr_)[level],
-    (*killer_stack_ptr_)[level]);
+    maker.GenMoves<GenMoveType::ALL>(prev_best,
+    shared_st_ptr_->iid_stack_[level],
+    shared_st_ptr_->killer_stack_[level]);
 
     // Futility Pruningの準備。
     int material = GetMaterial(side);
@@ -284,7 +287,7 @@ namespace Sayuri {
 
       // 4つ目以降の手なら助けを呼ぶ。
       if (num_searched_moves >= 4) {
-        helper_queue_ptr_->Help(job);
+        shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
       // 次のハッシュ。
@@ -324,8 +327,8 @@ namespace Sayuri {
         int reduction = 1;
         if (Type == NodeType::NON_PV) {
           // History Pruning。
-          if ((*history_ptr_)[side][move.from_][move.to_]
-          < ((*history_max_ptr_) / 2)) {
+          if (shared_st_ptr_->history_[side][move.from_][move.to_]
+          < (shared_st_ptr_->history_max_ / 2)) {
             reduction++;
           }
         }
@@ -358,7 +361,7 @@ namespace Sayuri {
       // 相手の手番の初手の場合、3回繰り返しルールをチェック。
       if (level == 1) {
         int repetitions = 0;
-        for (auto& a : (*position_history_ptr_)) {
+        for (auto& a : shared_st_ptr_->position_history_) {
           if (a == *this) {
             repetitions++;
           }
@@ -397,14 +400,17 @@ namespace Sayuri {
         score_type = ScoreType::BETA;
 
         // キラームーブ。
-        (*killer_stack_ptr_)[level] = move;
+        shared_st_ptr_->killer_stack_[level] = move;
 
         // ヒストリー。
         if (!(move.captured_piece_)) {
-          (*history_ptr_)[side][move.from_][move.to_] += depth * depth;
-          if ((*history_ptr_)[side][move.from_][move.to_]
-          > (*history_max_ptr_)) {
-            (*history_max_ptr_) = (*history_ptr_)[side][move.from_][move.to_];
+          shared_st_ptr_->history_[side][move.from_][move.to_] +=
+          depth * depth;
+
+          if (shared_st_ptr_->history_[side][move.from_][move.to_]
+          > shared_st_ptr_->history_max_) {
+            shared_st_ptr_->history_max_ =
+            shared_st_ptr_->history_[side][move.from_][move.to_];
           }
         }
 
@@ -466,27 +472,27 @@ namespace Sayuri {
   PVLine ChessEngine::SearchRoot(TranspositionTable& table,
   std::vector<Move>* moves_to_search_ptr) {
     // 初期化。
-    (*num_searched_nodes_ptr_) = 0;
+    shared_st_ptr_->num_searched_nodes_ = 0;
     searched_level_ = 0;
-    (*start_time_ptr_) = SysClock::now();
+    shared_st_ptr_->start_time_ = SysClock::now();
     for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
         for (int k = 0; k < NUM_SQUARES; k++) {
-          (*history_ptr_)[i][j][k] = 0;
+          shared_st_ptr_->history_[i][j][k] = 0;
         }
       }
     }
     for (int i = 0; i < MAX_PLYS; i++) {
-      (*iid_stack_ptr_)[i] = Move();
-      (*killer_stack_ptr_)[i] = Move();
+      shared_st_ptr_->iid_stack_[i] = Move();
+      shared_st_ptr_->killer_stack_[i] = Move();
     }
-    (*history_max_ptr_) = 1;
-    stopper_ptr_->stop_now_ = false;
-    *i_depth_ptr_ = 1;
+    shared_st_ptr_->history_max_ = 1;
+    shared_st_ptr_->stop_now_ = false;
+    shared_st_ptr_->i_depth_ = 1;
     is_null_searching_ = false;
 
     // スレッドの準備。
-    helper_queue_ptr_.reset(new HelperQueue());
+    shared_st_ptr_->helper_queue_ptr_.reset(new HelperQueue());
     for (auto& thread : thread_vec_) {
       thread = std::thread(ThreadYBWC, std::ref(*this));
     }
@@ -504,14 +510,15 @@ namespace Sayuri {
     std::vector<Move> root_move_vec;
     MoveMaker maker(*this);
     bool is_checked = IsAttacked(king_[side], enemy_side);
-    for ((*i_depth_ptr_) = 1; (*i_depth_ptr_) <= MAX_PLYS; (*i_depth_ptr_)++) {
+    for (shared_st_ptr_->i_depth_ = 1; shared_st_ptr_->i_depth_ <= MAX_PLYS;
+    shared_st_ptr_->i_depth_++) {
       // 探索終了。
       if (ShouldBeStopped()) break;
 
       // 準備。
       int delta = 15;
       // 探索窓の設定。
-      if ((*i_depth_ptr_) < 5) {
+      if (shared_st_ptr_->i_depth_ < 5) {
         alpha = -MAX_VALUE;
         beta = MAX_VALUE;
       } else {
@@ -521,14 +528,14 @@ namespace Sayuri {
       bool is_searching_pv = true;
 
       // ノードを加算。
-      (*num_searched_nodes_ptr_)++;
+      shared_st_ptr_->num_searched_nodes_++;
 
       // 標準出力に深さ情報を送る。
-      UCIShell::PrintDepthInfo(*i_depth_ptr_);
+      UCIShell::PrintDepthInfo(shared_st_ptr_->i_depth_);
 
       // 前回の繰り返しの最善手を得る。
       TTEntry* prev_entry =
-      table.GetEntry(pos_hash, (*i_depth_ptr_) - 1);
+      table.GetEntry(pos_hash, shared_st_ptr_->i_depth_ - 1);
       Move prev_best;
       if (prev_entry && (prev_entry->score_type() != ScoreType::ALPHA)) {
         prev_best = prev_entry->best_move();
@@ -537,27 +544,28 @@ namespace Sayuri {
       // 仕事を作る。
       std::mutex mutex;
       PositionRecord record(*this);
-      maker.GenMoves<GenMoveType::ALL>(prev_best, (*iid_stack_ptr_)[level],
-      (*killer_stack_ptr_)[level]);
+      maker.GenMoves<GenMoveType::ALL>(prev_best,
+      shared_st_ptr_->iid_stack_[level],
+      shared_st_ptr_->killer_stack_[level]);
       NodeType node_type = NodeType::PV;
       int num_searched_moves = 0;
       bool is_reduced_by_null = false;
       ScoreType score_type = ScoreType::EXACT;
       int material = GetMaterial(to_move_);
       bool has_legal_move = false;
-      Job job(mutex, maker, *this, record, node_type, pos_hash, *i_depth_ptr_,
-      level, alpha, beta, delta, table, pv_line, is_reduced_by_null,
-      num_searched_moves, is_searching_pv, score_type,
+      Job job(mutex, maker, *this, record, node_type, pos_hash,
+      shared_st_ptr_->i_depth_, level, alpha, beta, delta, table, pv_line,
+      is_reduced_by_null, num_searched_moves, is_searching_pv, score_type,
       material, is_checked, has_legal_move, moves_to_search_ptr,
       &root_move_vec, next_print_info_time);
 
       // ヘルプして待つ。
-      helper_queue_ptr_->HelpRoot(job);
+      shared_st_ptr_->helper_queue_ptr_->HelpRoot(job);
       job.WaitForHelpers();
     }
 
     // スレッドをジョイン。
-    helper_queue_ptr_->ReleaseHelpers();
+    shared_st_ptr_->helper_queue_ptr_->ReleaseHelpers();
     for (auto& thread : thread_vec_) {
       if (thread.joinable()) {
         thread.join();
@@ -567,8 +575,9 @@ namespace Sayuri {
     // 最後に情報を送る。
     now = SysClock::now();
     UCIShell::PrintOtherInfo
-    (Chrono::duration_cast<Chrono::milliseconds>(now - (*start_time_ptr_)),
-    (*num_searched_nodes_ptr_), table.GetUsedPermill());
+    (Chrono::duration_cast<Chrono::milliseconds>
+    (now - (shared_st_ptr_->start_time_)),
+    shared_st_ptr_->num_searched_nodes_, table.GetUsedPermill());
 
 
     // 探索終了したけど、まだ思考を止めてはいけない場合、関数を終了しない。
@@ -582,7 +591,7 @@ namespace Sayuri {
     // 子エンジンを作る。
     parent.mutex_.lock();
     std::unique_ptr<ChessEngine> child_ptr(new ChessEngine());
-    child_ptr->LinkSharedMember(parent);
+    child_ptr->shared_st_ptr_ = parent.shared_st_ptr_;
     parent.mutex_.unlock();
 
     // 仕事ループ。
@@ -592,7 +601,7 @@ namespace Sayuri {
       }
 
       // 仕事を拾う。
-      Job* job_ptr = child_ptr->helper_queue_ptr_->GetJob();
+      Job* job_ptr = child_ptr->shared_st_ptr_->helper_queue_ptr_->GetJob();
 
       if (!job_ptr) {
         break;
@@ -629,7 +638,7 @@ namespace Sayuri {
 
       // 4つ目以降の手の探索なら助けを呼ぶ。
       if (job.num_searched_moves() >= 4) {
-        helper_queue_ptr_->Help(job);
+        shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
       // 次のハッシュ。
@@ -669,8 +678,8 @@ namespace Sayuri {
         int reduction = 1;
         // History Pruning。
         if (Type == NodeType::NON_PV) {
-          if ((*history_ptr_)[side][move.from_][move.to_]
-          < ((*history_max_ptr_) / 2)) {
+          if (shared_st_ptr_->history_[side][move.from_][move.to_]
+          < (shared_st_ptr_->history_max_ / 2)) {
             reduction++;
           }
         }
@@ -704,7 +713,7 @@ namespace Sayuri {
       // 最初の手番なら3回繰り返しをチェック。
       if (job.level() <= 1) {
         int repetitions = 0;
-        for (auto& a : (*position_history_ptr_)) {
+        for (auto& a : shared_st_ptr_->position_history_) {
           if (a == *this) {
             repetitions++;
           }
@@ -748,15 +757,16 @@ namespace Sayuri {
         job.score_type() = ScoreType::BETA;
 
         // キラームーブ。
-        (*killer_stack_ptr_)[job.level()] = move;
+        shared_st_ptr_->killer_stack_[job.level()] = move;
 
         // ヒストリー。
         if (!(move.captured_piece_)) {
-          (*history_ptr_)[side][move.from_][move.to_] +=
+          shared_st_ptr_->history_[side][move.from_][move.to_] +=
           job.depth() * job.depth();
-          if ((*history_ptr_)[side][move.from_][move.to_]
-          > (*history_max_ptr_)) {
-            (*history_max_ptr_) = (*history_ptr_)[side][move.from_][move.to_];
+          if (shared_st_ptr_->history_[side][move.from_][move.to_]
+          > shared_st_ptr_->history_max_) {
+            shared_st_ptr_->history_max_ =
+            shared_st_ptr_->history_[side][move.from_][move.to_];
           }
         }
 
@@ -789,8 +799,8 @@ namespace Sayuri {
       TimePoint now = SysClock::now();
       if (now > job.next_print_info_time()) {
         UCIShell::PrintOtherInfo(Chrono::duration_cast<Chrono::milliseconds>
-        (now - (*start_time_ptr_)), (*num_searched_nodes_ptr_),
-        job.table().GetUsedPermill());
+        (now - shared_st_ptr_->start_time_),
+        shared_st_ptr_->num_searched_nodes_, job.table().GetUsedPermill());
 
         job.next_print_info_time() = now + Chrono::milliseconds(1000);
       }
@@ -815,7 +825,7 @@ namespace Sayuri {
 
       // 4つ目以降の手の探索なら助けを呼ぶ。
       if (job.num_searched_moves() >= 4) {
-        helper_queue_ptr_->Help(job);
+        shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
       // 探索したレベルをリセット。
@@ -948,7 +958,7 @@ namespace Sayuri {
 
       // 3回繰り返しルールをチェック。
       int repetitions = 0;
-      for (auto& a : (*position_history_ptr_)) {
+      for (auto& a : shared_st_ptr_->position_history_) {
         if (a == *this) {
           repetitions++;
         }
@@ -986,9 +996,9 @@ namespace Sayuri {
         now = SysClock::now();
         Chrono::milliseconds time =
         Chrono::duration_cast<Chrono::milliseconds>
-        (now - (*start_time_ptr_));
+        (now - shared_st_ptr_->start_time_);
         UCIShell::PrintPVInfo(job.depth(), searched_level_, score,
-        time, (*num_searched_nodes_ptr_), job.pv_line());
+        time, shared_st_ptr_->num_searched_nodes_, job.pv_line());
 
         job.alpha() = score;
       }
@@ -1112,33 +1122,33 @@ namespace Sayuri {
   // ストップ条件を設定する。
   void ChessEngine::SetStopper(int max_depth, std::size_t max_nodes,
   Chrono::milliseconds thinking_time, bool infinite_thinking) {
-    stopper_ptr_->max_depth_ = max_depth <= MAX_PLYS ? max_depth : MAX_PLYS;
-    stopper_ptr_->max_nodes_ = max_nodes <= MAX_NODES ? max_nodes : MAX_NODES;
-    stopper_ptr_->thinking_time_ = thinking_time.count();
-    stopper_ptr_->infinite_thinking_ = infinite_thinking;
+    shared_st_ptr_->max_depth_ = max_depth <= MAX_PLYS ? max_depth : MAX_PLYS;
+    shared_st_ptr_->max_nodes_ = max_nodes <= MAX_NODES ? max_nodes : MAX_NODES;
+    shared_st_ptr_->thinking_time_ = thinking_time;
+    shared_st_ptr_->infinite_thinking_ = infinite_thinking;
   }
 
   // 思考の無限時間フラグを設定する。
   void ChessEngine::EnableInfiniteThinking(bool enable) {
-    stopper_ptr_->infinite_thinking_ = enable;
+    shared_st_ptr_->infinite_thinking_ = enable;
   }
 
   // 探索中止しなければいけないかどうか。
   bool ChessEngine::ShouldBeStopped() {
-    if (stopper_ptr_->stop_now_) return true;
-    if (stopper_ptr_->infinite_thinking_) return false;
-    if ((*i_depth_ptr_) > stopper_ptr_->max_depth_) {
-      stopper_ptr_->stop_now_ = true;
+    if (shared_st_ptr_->stop_now_) return true;
+    if (shared_st_ptr_->infinite_thinking_) return false;
+    if (shared_st_ptr_->i_depth_ > shared_st_ptr_->max_depth_) {
+      shared_st_ptr_->stop_now_ = true;
       return true;
     }
-    if ((*num_searched_nodes_ptr_) >= stopper_ptr_->max_nodes_) {
-      stopper_ptr_->stop_now_ = true;
+    if (shared_st_ptr_->num_searched_nodes_ >= shared_st_ptr_->max_nodes_) {
+      shared_st_ptr_->stop_now_ = true;
       return true;
     }
     TimePoint now = SysClock::now();
-    if ((Chrono::duration_cast<Chrono::milliseconds>
-    (now - (*start_time_ptr_))).count() >= stopper_ptr_->thinking_time_) {
-      stopper_ptr_->stop_now_ = true;
+    if ((now - (shared_st_ptr_->start_time_))
+    >= shared_st_ptr_->thinking_time_) {
+      shared_st_ptr_->stop_now_ = true;
       return true;
     }
     return false;
