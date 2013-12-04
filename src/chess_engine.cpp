@@ -949,6 +949,7 @@ namespace Sayuri {
       iid_stack_[i] = Move();
       killer_stack_[i] = Move();
     }
+    helper_queue_ptr_.reset(new HelperQueue());
   }
 
   // コピーコンストラクタ。
