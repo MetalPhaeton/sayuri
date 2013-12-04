@@ -611,22 +611,22 @@ namespace Sayuri {
 
         if (job_ptr->level() <= 0) {
           // ルートノード。
-          child_ptr->SearchRootAsChild(*job_ptr);
+          child_ptr->SearchRootParallel(*job_ptr);
         } else {
           // ルートではないノード。
           if (job_ptr->node_type() == NodeType::PV) {
-            child_ptr->SearchAsChild<NodeType::PV>(*job_ptr);
+            child_ptr->SearchParallel<NodeType::PV>(*job_ptr);
           } else {
-            child_ptr->SearchAsChild<NodeType::NON_PV>(*job_ptr);
+            child_ptr->SearchParallel<NodeType::NON_PV>(*job_ptr);
           }
         }
       }
     }
   }
 
-  // 子スレッドで探索。
+  // 並列探索。
   template<NodeType Type>
-  void ChessEngine::SearchAsChild(Job& job) {
+  void ChessEngine::SearchParallel(Job& job) {
     // 仕事ループ。
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
@@ -783,18 +783,18 @@ namespace Sayuri {
     job.FinishMyJob();
   }
   // 実体化。
-  template void ChessEngine::SearchAsChild<NodeType::PV>(Job& job);
-  template void ChessEngine::SearchAsChild<NodeType::NON_PV>(Job& job);
+  template void ChessEngine::SearchParallel<NodeType::PV>(Job& job);
+  template void ChessEngine::SearchParallel<NodeType::NON_PV>(Job& job);
 
-  // ルートノードで子スレッドで探索。
-  void ChessEngine::SearchRootAsChild(Job& job) {
+  // ルートノードで並列探索。
+  void ChessEngine::SearchRootParallel(Job& job) {
     // 仕事ループ。
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
     for (Move move = job.PickMove(); move.all_; move = job.PickMove()) {
       if (ShouldBeStopped()) break;
 
-      // 情報を送る。
+      // 定時(1秒)報告の情報を送る。
       job.mutex().lock();  // ロック。
       TimePoint now = SysClock::now();
       if (now > job.next_print_info_time()) {
@@ -992,7 +992,7 @@ namespace Sayuri {
           entry_ptr->Update(score, ScoreType::EXACT, move);
         }
 
-        // 標準出力にPV情報を送る。
+        // 標準出力にPV情報を表示。
         now = SysClock::now();
         Chrono::milliseconds time =
         Chrono::duration_cast<Chrono::milliseconds>

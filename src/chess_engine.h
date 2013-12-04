@@ -278,18 +278,18 @@ namespace Sayuri {
       // PVライン。
       PVLine SearchRoot(TranspositionTable& table,
       std::vector<Move>* moves_to_search_ptr);
-      // 探索用子スレッド。(YBWC)
+      // YBWC探索用スレッド。
       // [引数]
       // parent: スレッドを呼び出したエンジン。
       static void ThreadYBWC(ChessEngine& parent);
-      // 子スレッドで探索。
+      // 並列探索。
       // [引数]
       // job: 探索用仕事。
-      template<NodeType Type> void SearchAsChild(Job& job);
-      // ルートノードで子スレッドで探索。
+      template<NodeType Type> void SearchParallel(Job& job);
+      // ルートノードで並列探索。
       // [引数]
       // job: 探索用仕事。
-      void SearchRootAsChild(Job& job);
+      void SearchRootParallel(Job& job);
       // Futility Pruningのマージンを計算する。
       // [引数]
       // move: 指し手。

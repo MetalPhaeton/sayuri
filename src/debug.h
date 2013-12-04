@@ -1,5 +1,5 @@
 /*
-   debug.h: Misakiをデバッグする。
+   debug.h: Sayuriをデバッグする。
 
    The MIT License (MIT)
 
