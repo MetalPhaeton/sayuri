@@ -32,8 +32,6 @@
 #include "chess_util.h"
 #include "error.h"
 
-#include "mylib.h"
-
 namespace Sayuri {
   /**************************/
   /* コンストラクタと代入。 */
@@ -41,7 +39,7 @@ namespace Sayuri {
   // コンストラクタ。
   Fen::Fen(const std::string fen_str) {
     // fen_strを分解。
-    std::vector<std::string> fen_tokens = MyLib::Split(fen_str, " ", "");
+    std::vector<std::string> fen_tokens = Util::Split(fen_str, " ", "");
 
     try {
       // FENを解析。
@@ -188,7 +186,7 @@ namespace Sayuri {
 
     // ランク毎に区切って、逆転。
     // fenは8ランクから始まるので、1ランクからに逆転する必要がある。
-    std::vector<std::string> position_vec = MyLib::Split(position_str, "/", "");
+    std::vector<std::string> position_vec = Util::Split(position_str, "/", "");
     std::reverse(position_vec.begin(), position_vec.end());
 
     // 値を格納していく。

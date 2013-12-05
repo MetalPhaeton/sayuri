@@ -27,6 +27,8 @@
 #include "chess_util.h"
 
 #include <iostream>
+#include <string>
+#include <vector>
 #include "chess_def.h"
 
 namespace Sayuri {
@@ -526,5 +528,61 @@ namespace Sayuri {
       | GetLeftUpBitboard(point)
       | GetLeftDownBitboard(point);
     }
+  }
+
+  std::vector<std::string> Util::Split(std::string str, std::string delim,
+  std::string delim_kept) {
+    std::vector<std::string> ret;  // 結果。
+
+    // 一文字づつ処理する。
+    std::vector<char> c_vec;  // その他の文字を格納する。
+    for (char& str_c : str) {
+      // 区切り文字か検査。
+      bool is_delim = false;
+      for (char& delim_c : delim) {
+        if (str_c == delim_c) {
+          is_delim = true;
+          break;
+        }
+      }
+
+      // 残す区切り文字か検査。
+      bool is_delim_kept = false;
+      for (char& delim_kept_c : delim_kept) {
+        if (str_c == delim_kept_c) {
+          is_delim_kept = true;
+          break;
+        }
+      }
+
+      if (is_delim) {
+        // 区切り文字。
+        if (c_vec.size() > 0) {
+          c_vec.push_back('\0');  // ヌル文字を追加。
+          ret.push_back(std::string(c_vec.data()));
+          c_vec.clear();
+        }
+      } else if (is_delim_kept) {
+        // 残す区切り文字。
+        if (c_vec.size() > 0) {
+          c_vec.push_back('\0');  // ヌル文字を追加。
+          ret.push_back(std::string(c_vec.data()));
+          c_vec.clear();
+        }
+        c_vec.push_back(str_c);
+        c_vec.push_back('\0');  // ヌル文字を追加。
+        ret.push_back(std::string(c_vec.data()));
+        c_vec.clear();
+      } else {
+        // その他の文字。
+        c_vec.push_back(str_c);
+      }
+    }
+    if (c_vec.size() > 0) {
+      c_vec.push_back('\0');  // ヌル文字を追加。
+      ret.push_back(std::string(c_vec.data()));
+    }
+
+    return std::move(ret);
   }
 }  // namespace Sayuri

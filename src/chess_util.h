@@ -28,6 +28,8 @@
 #define CHESS_UTIL_H
 
 #include <iostream>
+#include <string>
+#include <vector>
 
 #include "chess_def.h"
 
@@ -527,6 +529,15 @@ namespace Sayuri {
       static Rank GetRank(Square square) {
         return square >> 3;
       }
+      // 文字列を切り分ける。
+      // [引数]
+      // str: 切り分ける文字列。
+      // delim: 区切り文字。(複数可。)
+      // delim_kept: 要素として残す区切り文字。(複数可。)
+      // [戻り値]
+      // 切り分けられた文字列のベクトル。
+      static std::vector<std::string> Split(std::string str,
+      std::string delim, std::string delim_kept);
 
       /**************************/
       /* コンストラクタと代入。 */

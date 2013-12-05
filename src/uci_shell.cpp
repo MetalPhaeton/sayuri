@@ -39,7 +39,6 @@
 #include "chess_util.h"
 #include "pv_line.h"
 #include "error.h"
-#include "mylib.h"
 
 namespace Sayuri {
   /**************************/
@@ -112,7 +111,7 @@ namespace Sayuri {
     while (true) {
       std::string input;
       std::getline(std::cin, input);
-      std::vector<std::string> argv = MyLib::Split(input, " ", "");
+      std::vector<std::string> argv = Util::Split(input, " ", "");
       CommandParser parser(commands, argv);
       parser.JumpToNextKeyword();
       Word word = parser.Get();

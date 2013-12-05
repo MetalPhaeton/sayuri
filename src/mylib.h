@@ -41,11 +41,11 @@ namespace MyLib {
   // [引数]
   // str: 切り分ける文字列。
   // delim: 区切り文字。(複数可。)
-  // delim_left: 残す区切り文字。(複数可。)
+  // delim_kept: 残す区切り文字。(複数可。)
   // [戻り値]
   // 切り分けられた文字列のベクトル。
   std::vector<std::string> Split(std::string str, std::string delim,
-  std::string delim_left);
+  std::string delim_kept);
 }  // namespace MyLib
 
 #endif
