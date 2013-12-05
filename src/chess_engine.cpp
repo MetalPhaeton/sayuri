@@ -370,6 +370,7 @@ namespace Sayuri {
   // 思考を始める。
   PVLine ChessEngine::Calculate(int num_threads, TranspositionTable& table,
   std::vector<Move>* moves_to_search_ptr) {
+    num_threads = num_threads >= 1 ? num_threads : 1;
     thread_vec_.resize(num_threads);
     return std::move(SearchRoot(table, moves_to_search_ptr));
   }

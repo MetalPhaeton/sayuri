@@ -239,7 +239,8 @@ namespace Sayuri {
     // トランスポジションテーブルのサイズの変更。
     std::cout << "option name Hash type spin default "
     << (UCI_DEFAULT_TABLE_SIZE / (1024 * 1024)) << " min "
-    << (TranspositionTable::GetMinSize() / (1024 * 1024)) << std::endl;
+    << ((TranspositionTable::GetMinSize() / (1024 * 1024)) + 1) << " max "
+    << UCI_MAX_TABLE_SIZE / (1024 * 1024) << std::endl;
     // ポンダリングできるかどうか。
     std::cout << "option name Ponder type check default ";
     if (UCI_DEFAULT_PONDER) {
@@ -249,8 +250,9 @@ namespace Sayuri {
     }
     std::cout << std::endl;
     // スレッドの数。
-    std::cout << "option name Threads type spin defalut"
-    << UCI_DEFAULT_THREADS << " min " << 1 << std::endl;
+    std::cout << "option name Threads type spin defalut "
+    << UCI_DEFAULT_THREADS << " min " << 1 << " max "
+    << UCI_MAX_THREADS << std::endl;
 
     // オーケー。
     std::cout << "uciok" << std::endl;
@@ -303,6 +305,13 @@ namespace Sayuri {
               if (word.str_ == "value") {
                 try {
                   table_size_ = std::stoull(parser.Get().str_) * 1024 * 1024;
+
+                  table_size_ =
+                  table_size_ >= TranspositionTable::GetMinSize()
+                  ? table_size_ : TranspositionTable::GetMinSize();
+
+                  table_size_ = table_size_ <= UCI_MAX_TABLE_SIZE
+                  ? table_size_ : UCI_MAX_TABLE_SIZE;
                 } catch (...) {
                   // 無視。
                 }
@@ -338,6 +347,10 @@ namespace Sayuri {
               if (word.str_ == "value") {
                 try {
                   num_threads_ = std::stoi(parser.Get().str_);
+
+                  num_threads_ = num_threads_ >= 1 ? num_threads_ : 1;
+                  num_threads_ = num_threads_ <= UCI_MAX_THREADS
+                  ? num_threads_ : UCI_MAX_THREADS;
                 } catch (...) {
                   // 無視。
                 }
