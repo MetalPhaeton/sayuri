@@ -530,6 +530,10 @@ namespace Sayuri {
     }
   }
 
+  /**********************/
+  /* その他の便利関数。 */
+  /**********************/
+  // 文字列を切り分ける。
   std::vector<std::string> Util::Split(std::string str, std::string delim,
   std::string delim_kept) {
     std::vector<std::string> ret;  // 結果。
