@@ -158,9 +158,9 @@ namespace Sayuri {
     bool is_checked = IsAttacked(king_[side], enemy_side);
 
     // トランスポジションテーブルを調べる。
-    TTEntry* entry_ptr =
-    table.GetEntry(pos_hash, depth);
+    TTEntry* entry_ptr = table.GetEntry(pos_hash, depth);
     if (entry_ptr) {
+      table.Lock();
       int score = entry_ptr->score();
       if (entry_ptr->score_type() == ScoreType::EXACT) {
         // エントリーが正確な値。
@@ -168,17 +168,21 @@ namespace Sayuri {
         pv_line.score(entry_ptr->score());
         if (score >= beta) {
           pv_line.score(beta);
+          table.Unlock();
           return beta;
         }
         if (score <= alpha) {
           pv_line.score(alpha);
+          table.Unlock();
           return alpha;
         }
+        table.Unlock();
         return score;
       } else if (entry_ptr->score_type() == ScoreType::ALPHA) {
         // エントリーがアルファ値。
         // アルファ値以下が確定。
         if (score <= alpha) {
+          table.Unlock();
           return alpha;
         }
         // ベータ値を下げられる。
@@ -189,11 +193,13 @@ namespace Sayuri {
         if (score >= beta) {
           pv_line.SetMove(entry_ptr->best_move());
           pv_line.score(beta);
+          table.Unlock();
           return beta;
         }
         // アルファ値を上げられる。
         if (score > alpha) alpha = score - 1;
       }
+      table.Unlock();
     }
 
     // 深さが0ならクイース。
@@ -259,8 +265,7 @@ namespace Sayuri {
     // 手を作る。
     MoveMaker maker(*this);
     maker.GenMoves<GenMoveType::ALL>(prev_best,
-    shared_st_ptr_->iid_stack_[level],
-    shared_st_ptr_->killer_stack_[level]);
+    shared_st_ptr_->iid_stack_[level], shared_st_ptr_->killer_stack_[level]);
 
     // Futility Pruningの準備。
     int material = GetMaterial(side);
@@ -285,7 +290,7 @@ namespace Sayuri {
         break;
       }
 
-      // 4つ目以降の手なら助けを呼ぶ。
+      // 4つ目以降の手なら別スレッドに助けを求める。(YBWC)
       if (num_searched_moves >= 4) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
@@ -338,6 +343,7 @@ namespace Sayuri {
         // PVSearchをするためにtemp_alphaより大きくしておく。
         score = temp_alpha + 1;
       }
+
       if (score > temp_alpha) {
         // PVSearch。
         if (is_searching_pv || (Type == NodeType::NON_PV)) {
@@ -359,7 +365,7 @@ namespace Sayuri {
       }
 
       // 相手の手番の初手の場合、3回繰り返しルールをチェック。
-      if (level == 1) {
+      if (level <= 1) {
         int repetitions = 0;
         for (auto& a : shared_st_ptr_->position_history_) {
           if (a == *this) {
@@ -472,8 +478,8 @@ namespace Sayuri {
   PVLine ChessEngine::SearchRoot(TranspositionTable& table,
   std::vector<Move>* moves_to_search_ptr) {
     // 初期化。
-    shared_st_ptr_->num_searched_nodes_ = 0;
     searched_level_ = 0;
+    shared_st_ptr_->num_searched_nodes_ = 0;
     shared_st_ptr_->start_time_ = SysClock::now();
     for (int i = 0; i < NUM_SIDES; i++) {
       for (int j = 0; j < NUM_SQUARES; j++) {
@@ -545,8 +551,7 @@ namespace Sayuri {
       std::mutex mutex;
       PositionRecord record(*this);
       maker.GenMoves<GenMoveType::ALL>(prev_best,
-      shared_st_ptr_->iid_stack_[level],
-      shared_st_ptr_->killer_stack_[level]);
+      shared_st_ptr_->iid_stack_[level], shared_st_ptr_->killer_stack_[level]);
       NodeType node_type = NodeType::PV;
       int num_searched_moves = 0;
       bool is_reduced_by_null = false;
@@ -636,7 +641,7 @@ namespace Sayuri {
         break;
       }
 
-      // 4つ目以降の手の探索なら助けを呼ぶ。
+      // 4つ目以降の手の探索なら別スレッドに助けを求める。(YBWC)
       if (job.num_searched_moves() >= 4) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
@@ -690,6 +695,7 @@ namespace Sayuri {
         // PVSearchをするためにtemp_alphaより大きくしておく。
         score = temp_alpha + 1;
       }
+
       if (score > temp_alpha) {
         // PVSearch。
         if (job.is_searching_pv() || (Type == NodeType::NON_PV)) {
@@ -724,7 +730,7 @@ namespace Sayuri {
       }
 
       UnmakeMove(move);
-      (job.num_searched_moves())++;
+      job.num_searched_moves()++;
 
       job.mutex().lock();  // ロック。
 
@@ -823,7 +829,7 @@ namespace Sayuri {
         }
       }
 
-      // 4つ目以降の手の探索なら助けを呼ぶ。
+      // 4つ目以降の手の探索なら別スレッドに助けを求める。(YBWC)
       if (job.num_searched_moves() >= 4) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
