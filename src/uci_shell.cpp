@@ -304,7 +304,8 @@ namespace Sayuri {
               word = parser.Get();
               if (word.str_ == "value") {
                 try {
-                  table_size_ = std::stoull(parser.Get().str_) * 1024 * 1024;
+                  table_size_ =
+                  std::stoull(parser.Get().str_) * 1024ULL * 1024ULL;
 
                   table_size_ =
                   table_size_ >= TranspositionTable::GetMinSize()
