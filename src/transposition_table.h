@@ -124,7 +124,7 @@ namespace Sayuri {
       // ハッシュのテーブル用マスク。
       static constexpr Hash TABLE_HASH_MASK = 0XffffULL;
       // テーブルの大きさ。
-      static constexpr std::size_t TABLE_SIZE = TABLE_HASH_MASK + 1;
+      static constexpr std::size_t TABLE_SIZE = TABLE_HASH_MASK + 1ULL;
 
     public:
       /**************************/
