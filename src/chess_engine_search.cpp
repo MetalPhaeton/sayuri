@@ -272,7 +272,6 @@ namespace Sayuri {
 
     // 探索ループ。
     ScoreType score_type = ScoreType::ALPHA;
-    bool is_searching_pv = true;
     int num_searched_moves = 0;
     bool has_legal_move = false;
     // 仕事の生成。
@@ -282,7 +281,7 @@ namespace Sayuri {
     TimePoint dummy_time;
     Job job(mutex, maker, *this, record, Type, pos_hash, depth, level,
     alpha, beta, dummy_delta, table, pv_line, is_reduced_by_null,
-    num_searched_moves, is_searching_pv, score_type, material,
+    num_searched_moves, score_type, material,
     is_checked, has_legal_move, nullptr, nullptr, dummy_time);
     for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
       // すでにベータカットされていればループを抜ける。
@@ -346,7 +345,7 @@ namespace Sayuri {
 
       if (score > temp_alpha) {
         // PVSearch。
-        if (is_searching_pv || (Type == NodeType::NON_PV)) {
+        if ((num_searched_moves <= 0) || (Type == NodeType::NON_PV)) {
           // フルウィンドウで探索。
           score = -Search<Type>(next_hash, depth - 1, level + 1,
           -temp_beta, -temp_alpha, table, next_line);
@@ -384,9 +383,6 @@ namespace Sayuri {
 
       // アルファ値を更新。
       if (score > alpha) {
-        // PVを見つけた。
-        is_searching_pv = false;
-
         // 評価値のタイプをセット。
         if (score_type == ScoreType::ALPHA) {
           score_type = ScoreType::EXACT;
@@ -531,7 +527,6 @@ namespace Sayuri {
         beta = alpha + delta;
         alpha -= delta;
       }
-      bool is_searching_pv = true;
 
       // ノードを加算。
       shared_st_ptr_->num_searched_nodes_++;
@@ -560,7 +555,7 @@ namespace Sayuri {
       bool has_legal_move = false;
       Job job(mutex, maker, *this, record, node_type, pos_hash,
       shared_st_ptr_->i_depth_, level, alpha, beta, delta, table, pv_line,
-      is_reduced_by_null, num_searched_moves, is_searching_pv, score_type,
+      is_reduced_by_null, num_searched_moves, score_type,
       material, is_checked, has_legal_move, moves_to_search_ptr,
       &root_move_vec, next_print_info_time);
 
@@ -698,7 +693,7 @@ namespace Sayuri {
 
       if (score > temp_alpha) {
         // PVSearch。
-        if (job.is_searching_pv() || (Type == NodeType::NON_PV)) {
+        if ((job.num_searched_moves() <= 0) || (Type == NodeType::NON_PV)) {
           // フルウィンドウ探索。
           score = -Search<Type>(next_hash, job.depth() - 1,
           job.level() + 1, -temp_beta, -temp_alpha, job.table(), next_line);
@@ -741,9 +736,6 @@ namespace Sayuri {
 
       // アルファ値を更新。
       if (score > job.alpha()) {
-        // PVを見つけた。
-        job.is_searching_pv() = false;
-
         // 評価値のタイプをセット。
         if (job.score_type() == ScoreType::ALPHA) {
           job.score_type() = ScoreType::EXACT;
@@ -873,7 +865,7 @@ namespace Sayuri {
       PVLine next_line;
       int temp_alpha = job.alpha();
       int temp_beta = job.beta();
-      if (job.is_searching_pv()) {
+      if (job.num_searched_moves() <= 0) {
         while (true) {
           // 探索終了。
           if (ShouldBeStopped()) break;
@@ -982,8 +974,6 @@ namespace Sayuri {
       // 最善手を見つけた。
       job.mutex().lock();  // ロック。
       if (score > job.alpha()) {
-        job.is_searching_pv() = false;
-
         // PVラインにセット。
         job.pv_line().SetMove(move);
         job.pv_line().Insert(next_line);

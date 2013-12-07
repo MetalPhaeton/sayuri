@@ -44,8 +44,8 @@ namespace Sayuri {
   PositionRecord& record, NodeType node_type, Hash pos_hash, int depth,
   int level, int& alpha, int& beta, int& delta, TranspositionTable& table,
   PVLine& pv_line, bool is_reduced_by_null, int& num_searched_moves,
-  bool& is_searching_pv, ScoreType& score_type, int material, bool is_checked,
-  bool& has_legal_move, std::vector<Move>* moves_to_search_ptr,
+  ScoreType& score_type, int material, bool is_checked, bool& has_legal_move,
+  std::vector<Move>* moves_to_search_ptr,
   std::vector<Move>* root_move_vec_ptr, TimePoint& next_print_info_time) :
   mutex_ptr_(&mutex),
   client_ptr_(&client),
@@ -61,7 +61,6 @@ namespace Sayuri {
   pv_line_ptr_(&pv_line),
   is_reduced_by_null_(is_reduced_by_null),
   num_searched_moves_ptr_(&num_searched_moves),
-  is_searching_pv_ptr_(&is_searching_pv),
   score_type_ptr_(&score_type),
   material_(material),
   is_checked_(is_checked),
@@ -144,7 +143,6 @@ namespace Sayuri {
     pv_line_ptr_ = job.pv_line_ptr_;
     is_reduced_by_null_ = job.is_reduced_by_null_;
     num_searched_moves_ptr_ = job.num_searched_moves_ptr_;
-    is_searching_pv_ptr_ = job.is_searching_pv_ptr_;
     score_type_ptr_ = job.score_type_ptr_;
     material_ = job.material_;
     is_checked_ = job.is_checked_;
