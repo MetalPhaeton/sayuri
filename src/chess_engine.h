@@ -34,6 +34,7 @@
 #include <thread>
 #include <mutex>
 #include <cstddef>
+#include <cstdint>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "transposition_table.h"
@@ -226,11 +227,12 @@ namespace Sayuri {
       // キャスリングしたかどうか。
       const bool (& has_castled() const)[NUM_SIDES] {return has_castled_;}
       // ヒストリー。history()[side][from][to]。
-      const int (& history() const)[NUM_SIDES][NUM_SQUARES][NUM_SQUARES] {
+      const std::uint64_t
+      (& history() const)[NUM_SIDES][NUM_SQUARES][NUM_SQUARES] {
         return shared_st_ptr_->history_;
       }
       // ヒストリーの最大値。
-      int history_max() const {return shared_st_ptr_->history_max_;}
+      std::uint64_t history_max() const {return shared_st_ptr_->history_max_;}
       // IIDでの最善手スタック。
       const Move (& iid_stack() const)[MAX_PLYS] {
         return shared_st_ptr_->iid_stack_;
@@ -387,10 +389,10 @@ namespace Sayuri {
       /********************************************************/
       // 共有メンバ構造体。
       struct SharedStruct {
-        // ヒストリー。(*history_ptr_)[side][from][to]。
-        int history_[NUM_SIDES][NUM_SQUARES][NUM_SQUARES];
+        // ヒストリー。history_[side][from][to]。
+        std::uint64_t history_[NUM_SIDES][NUM_SQUARES][NUM_SQUARES];
         // ヒストリーの最大値。
-        int history_max_;
+        std::uint64_t history_max_;
         // IIDでの最善手スタック。
         Move iid_stack_[MAX_PLYS];
         // キラームーブスタック。

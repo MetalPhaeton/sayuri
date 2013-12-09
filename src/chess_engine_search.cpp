@@ -280,8 +280,8 @@ namespace Sayuri {
     int dummy_delta = 0;
     TimePoint dummy_time;
     Job job(mutex, maker, *this, record, Type, pos_hash, depth, level,
-    alpha, beta, dummy_delta, table, pv_line, is_reduced_by_null,
-    num_searched_moves, score_type, material,
+    alpha, beta, dummy_delta, table, pv_line, is_null_searching_,
+    is_reduced_by_null, num_searched_moves, score_type, material,
     is_checked, has_legal_move, nullptr, nullptr, dummy_time);
     for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
       // すでにベータカットされていればループを抜ける。
@@ -290,7 +290,7 @@ namespace Sayuri {
       }
 
       // 4つ目以降の手なら別スレッドに助けを求める。(YBWC)
-      if (num_searched_moves >= 4) {
+      if (num_searched_moves >= 1) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
@@ -407,7 +407,7 @@ namespace Sayuri {
         // ヒストリー。
         if (!(move.captured_piece_)) {
           shared_st_ptr_->history_[side][move.from_][move.to_] +=
-          depth * depth;
+          depth;
 
           if (shared_st_ptr_->history_[side][move.from_][move.to_]
           > shared_st_ptr_->history_max_) {
@@ -488,7 +488,7 @@ namespace Sayuri {
       shared_st_ptr_->iid_stack_[i] = Move();
       shared_st_ptr_->killer_stack_[i] = Move();
     }
-    shared_st_ptr_->history_max_ = 1;
+    shared_st_ptr_->history_max_ = 1ULL;
     shared_st_ptr_->stop_now_ = false;
     shared_st_ptr_->i_depth_ = 1;
     is_null_searching_ = false;
@@ -555,7 +555,7 @@ namespace Sayuri {
       bool has_legal_move = false;
       Job job(mutex, maker, *this, record, node_type, pos_hash,
       shared_st_ptr_->i_depth_, level, alpha, beta, delta, table, pv_line,
-      is_reduced_by_null, num_searched_moves, score_type,
+      is_null_searching_, is_reduced_by_null, num_searched_moves, score_type,
       material, is_checked, has_legal_move, moves_to_search_ptr,
       &root_move_vec, next_print_info_time);
 
@@ -609,6 +609,9 @@ namespace Sayuri {
         // 駒の配置を読み込む。
         child_ptr->LoadRecord(job_ptr->record());
 
+        // Null Move探索中かどうかをセット。
+        child_ptr->is_null_searching_ = job_ptr->is_null_searching();
+
         if (job_ptr->level() <= 0) {
           // ルートノード。
           child_ptr->SearchRootParallel(*job_ptr);
@@ -637,7 +640,7 @@ namespace Sayuri {
       }
 
       // 4つ目以降の手の探索なら別スレッドに助けを求める。(YBWC)
-      if (job.num_searched_moves() >= 4) {
+      if (job.num_searched_moves() >= 1) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
@@ -760,7 +763,7 @@ namespace Sayuri {
         // ヒストリー。
         if (!(move.captured_piece_)) {
           shared_st_ptr_->history_[side][move.from_][move.to_] +=
-          job.depth() * job.depth();
+          job.depth();
           if (shared_st_ptr_->history_[side][move.from_][move.to_]
           > shared_st_ptr_->history_max_) {
             shared_st_ptr_->history_max_ =
@@ -822,7 +825,7 @@ namespace Sayuri {
       }
 
       // 4つ目以降の手の探索なら別スレッドに助けを求める。(YBWC)
-      if (job.num_searched_moves() >= 4) {
+      if (job.num_searched_moves() >= 1) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 

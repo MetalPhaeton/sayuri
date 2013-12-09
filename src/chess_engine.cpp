@@ -384,6 +384,7 @@ namespace Sayuri {
   void ChessEngine::PlayMove(Move move) {
     // 合法手かどうか調べる。
     // 手を展開する。
+    shared_st_ptr_->history_max_ = 1ULL;  // makerが0の乗算をしないように。
     MoveMaker maker(*this);
     maker.GenMoves<GenMoveType::ALL>(Move(), Move(), Move());
     // 合法手かどうか調べる。
@@ -931,7 +932,7 @@ namespace Sayuri {
   /**********************/
   // コンストラクタ。
   ChessEngine::SharedStruct::SharedStruct() :
-  history_max_(0),
+  history_max_(1ULL),
   i_depth_(1),
   num_searched_nodes_(0),
   stop_now_(false),
