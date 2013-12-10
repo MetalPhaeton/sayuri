@@ -289,7 +289,7 @@ namespace Sayuri {
         break;
       }
 
-      // 4つ目以降の手なら別スレッドに助けを求める。(YBWC)
+      // 1つ目以降の手なら別スレッドに助けを求める。(YBWC)
       if (num_searched_moves >= 1) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
@@ -645,7 +645,7 @@ namespace Sayuri {
         break;
       }
 
-      // 4つ目以降の手の探索なら別スレッドに助けを求める。(YBWC)
+      // 1つ目以降の手の探索なら別スレッドに助けを求める。(YBWC)
       if (job.num_searched_moves() >= 1) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
@@ -836,7 +836,7 @@ namespace Sayuri {
         }
       }
 
-      // 4つ目以降の手の探索なら別スレッドに助けを求める。(YBWC)
+      // 1つ目以降の手の探索なら別スレッドに助けを求める。(YBWC)
       if (job.num_searched_moves() >= 1) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
