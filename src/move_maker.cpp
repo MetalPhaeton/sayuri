@@ -365,11 +365,6 @@ namespace Sayuri {
         ptr->score_ =
         (engine_ptr_->history()[side][ptr->move_.from_][ptr->move_.to_]
         * 99ULL) / engine_ptr_->history_max();
-        /*
-        ptr->score_ =
-        ((engine_ptr_->history()[side][ptr->move_.from_][ptr->move_.to_]
-        * MATERIAL[PAWN]) / engine_ptr_->history_max());
-        */
         // 昇格の得点を加算。
         if (ptr->move_.promotion_) {
           ptr->score_ += MATERIAL[ptr->move_.promotion_] - MATERIAL[PAWN];
