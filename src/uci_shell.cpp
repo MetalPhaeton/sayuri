@@ -108,32 +108,37 @@ namespace Sayuri {
     commands.push_back("quit");
 
     // メインループ。
-    while (true) {
+    bool loop = true;
+    while (loop) {
       std::string input;
       std::getline(std::cin, input);
       std::vector<std::string> argv = Util::Split(input, " ", "");
       CommandParser parser(commands, argv);
       parser.JumpToNextKeyword();
-      Word word = parser.Get();
-      if (word.str_ == "uci") {
-        CommandUCI();
-      } else if (word.str_ == "isready") {
-        CommandIsReady();
-      } else if (word.str_ == "setoption") {
-        CommandSetOption(argv);
-      } else if (word.str_ == "ucinewgame") {
-        CommandUCINewGame();
-      } else if (word.str_ == "position") {
-        CommandPosition(argv);
-      } else if (word.str_ == "go") {
-        CommandGo(argv);
-      } else if (word.str_ == "stop") {
-        CommandStop();
-      } else if (word.str_ == "ponderhit") {
-        CommandPonderHit();
-      } else if (word.str_ == "quit") {
-        CommandStop();
-        break;
+      while (parser.HasNext()) {
+        Word word = parser.Get();
+        if (word.str_ == "uci") {
+          CommandUCI();
+        } else if (word.str_ == "isready") {
+          CommandIsReady();
+        } else if (word.str_ == "setoption") {
+          CommandSetOption(argv);
+        } else if (word.str_ == "ucinewgame") {
+          CommandUCINewGame();
+        } else if (word.str_ == "position") {
+          CommandPosition(argv);
+        } else if (word.str_ == "go") {
+          CommandGo(argv);
+        } else if (word.str_ == "stop") {
+          CommandStop();
+        } else if (word.str_ == "ponderhit") {
+          CommandPonderHit();
+        } else if (word.str_ == "quit") {
+          CommandStop();
+          loop = false;
+          break;
+        }
+        parser.JumpToNextKeyword();
       }
     }
   }
@@ -681,15 +686,15 @@ namespace Sayuri {
 
       // 構文リストに入れる。
       if (is_keyword) {
-        syntax_vector_.push_back(Word {"", WordType::DELIM});
-        syntax_vector_.push_back(Word {a, WordType::KEYWORD});
+        syntax_vector_.push_back(Word("", WordType::DELIM));
+        syntax_vector_.push_back(Word(a, WordType::KEYWORD));
       } else {
-        syntax_vector_.push_back(Word {a, WordType::PARAM});
+        syntax_vector_.push_back(Word(a, WordType::PARAM));
       }
     }
 
     // 最後に区切りを入れる。
-    syntax_vector_.push_back(Word {"", WordType::DELIM});
+    syntax_vector_.push_back(Word("", WordType::DELIM));
 
     // イテレータをセット。
     itr_ = syntax_vector_.begin();

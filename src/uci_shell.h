@@ -140,11 +140,33 @@ namespace Sayuri {
         std::string str_;  //単語の文字列。
         WordType type_;  // 単語の種類。
 
+        /**************************/
+        /* コンストラクタと代入。 */
+        /**************************/
+        Word(std::string str, WordType type) {
+          str_ = str;
+          type_ = type;
+        }
+        Word() : type_(WordType::PARAM) {}
+        Word(const Word& word) {
+          str_ = word.str_;
+          type_ = word.type_;
+        }
+        Word(Word&& word) {
+          str_ = word.str_;
+          type_ = word.type_;
+        }
         Word& operator=(const Word& word) {
           str_ = word.str_;
           type_ = word.type_;
           return *this;
         }
+        Word& operator=(Word&& word) {
+          str_ = word.str_;
+          type_ = word.type_;
+          return *this;
+        }
+        virtual ~Word() {}
       };
       // パーサ。
       class CommandParser {

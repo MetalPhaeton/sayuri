@@ -312,7 +312,7 @@ namespace Sayuri {
       has_legal_move = true;
 
       // Futility Pruning。
-      if (depth <= 2) {
+      if (depth <= 3) {
         if ((material + margin) <= alpha) {
           UnmakeMove(move);
           continue;
@@ -326,8 +326,10 @@ namespace Sayuri {
       PVLine next_line;
       int temp_alpha = alpha;
       int temp_beta = beta;
+      bool did_lmr = false;
       if (!is_checked && !(move.captured_piece_) && !(move.promotion_)
       && !is_reduced_by_null && (depth >= 3) && (num_searched_moves >= 4)) {
+        did_lmr = true;
         int reduction = 1;
         if (Type == NodeType::NON_PV) {
           // History Pruning。
@@ -351,9 +353,13 @@ namespace Sayuri {
           -temp_beta, -temp_alpha, table, next_line);
         } else {
           // PV発見後のPVノード。
-          // ゼロウィンドウ探索。
-          score = -Search<NodeType::NON_PV>(next_hash, depth - 1, level + 1,
-          -(temp_alpha + 1), -temp_alpha, table, next_line);
+          // ゼロウィンドウ探索。(LMRしていないとき。)
+          if (!did_lmr) {
+            score = -Search<NodeType::NON_PV>(next_hash, depth - 1, level + 1,
+            -(temp_alpha + 1), -temp_alpha, table, next_line);
+          } else {
+            score = temp_alpha + 1;
+          }
           if (score > temp_alpha) {
             // fail lowならず。
             // フルウィンドウで再探索。
@@ -662,7 +668,7 @@ namespace Sayuri {
       job.has_legal_move() = true;
 
       // Futility Pruning。
-      if (job.depth() <= 2) {
+      if (job.depth() <= 3) {
         if ((job.material() + margin) <= job.alpha()) {
           UnmakeMove(move);
           continue;
@@ -675,9 +681,11 @@ namespace Sayuri {
       PVLine next_line;
       int temp_alpha = job.alpha();
       int temp_beta = job.beta();
+      bool did_lmr = false;
       if (!(job.is_checked()) && !(move.captured_piece_) && !(move.promotion_)
       && !(job.is_reduced_by_null()) && (job.depth() >= 3)
       && (job.num_searched_moves() >= 4)) {
+        did_lmr = true;
         int reduction = 1;
         // History Pruning。
         if (Type == NodeType::NON_PV) {
@@ -702,10 +710,14 @@ namespace Sayuri {
           job.level() + 1, -temp_beta, -temp_alpha, job.table(), next_line);
         } else {
           // PV発見後。
-          // ゼロウィンドウ探索。
-          score = -Search<NodeType::NON_PV>(next_hash, job.depth() - 1,
-          job.level() + 1, -(temp_alpha + 1), -temp_alpha, job.table(),
-          next_line);
+          // ゼロウィンドウ探索。(LMRしていないとき。)
+          if (!did_lmr) {
+            score = -Search<NodeType::NON_PV>(next_hash, job.depth() - 1,
+            job.level() + 1, -(temp_alpha + 1), -temp_alpha, job.table(),
+            next_line);
+          } else {
+            score = temp_alpha + 1;
+          }
           if (score > temp_alpha) {
             // fail lowならず。
             score = -Search<NodeType::PV>(next_hash, job.depth() - 1,
@@ -907,9 +919,11 @@ namespace Sayuri {
       } else {
         // PV発見後。
         // Late Move Reduction。
+        bool did_lmr = false;
         if (!(job.is_checked())
         && !(move.captured_piece_) && !(move.promotion_)
         && (job.depth() >= 3) && (job.num_searched_moves() >= 4)) {
+          did_lmr = true;
           int reduction = 1;
           // ゼロウィンドウ探索。
           score = -Search<NodeType::NON_PV>(next_hash,
@@ -922,10 +936,14 @@ namespace Sayuri {
 
         // 普通の探索。
         if (score > temp_alpha) {
-          // ゼロウィンドウ探索。
-          score = -Search<NodeType::NON_PV>(next_hash, job.depth() - 1,
-          job.level() + 1, -(temp_alpha + 1), -temp_alpha, job.table(),
-          next_line);
+          // ゼロウィンドウ探索。(LMRしていないとき。)
+          if (!did_lmr) {
+            score = -Search<NodeType::NON_PV>(next_hash, job.depth() - 1,
+            job.level() + 1, -(temp_alpha + 1), -temp_alpha, job.table(),
+            next_line);
+          } else {
+            score = temp_alpha + 1;
+          }
           if (score > temp_alpha) {
             while (true) {
               // 探索終了。
@@ -1112,8 +1130,10 @@ namespace Sayuri {
       }
     }
 
-    // ポジションの評価の最大値。
-    margin += depth <= 1 ? 300 : 400;
+    // マージン。
+    if (depth <= 1) margin += MATERIAL[KNIGHT];
+    else if (depth == 2) margin += MATERIAL[ROOK];
+    else margin += MATERIAL[QUEEN];
 
     return margin;
   }
