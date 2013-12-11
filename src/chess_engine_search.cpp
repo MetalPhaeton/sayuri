@@ -282,7 +282,7 @@ namespace Sayuri {
     Job job(mutex, maker, *this, record, Type, pos_hash, depth, level,
     alpha, beta, dummy_delta, table, pv_line, is_null_searching_,
     is_reduced_by_null, num_searched_moves, score_type, material,
-    is_checked, has_legal_move, nullptr, nullptr, dummy_time);
+    is_checked, has_legal_move, nullptr, dummy_time);
     for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
       // すでにベータカットされていればループを抜ける。
       if (alpha >= beta) {
@@ -515,7 +515,6 @@ namespace Sayuri {
     PVLine pv_line;
     TimePoint now = SysClock::now();
     TimePoint next_print_info_time = now + Chrono::milliseconds(1000);
-    std::vector<Move> root_move_vec;
     MoveMaker maker(*this);
     bool is_checked = IsAttacked(king_[side], enemy_side);
     for (shared_st_ptr_->i_depth_ = 1; shared_st_ptr_->i_depth_ <= MAX_PLYS;
@@ -563,7 +562,7 @@ namespace Sayuri {
       shared_st_ptr_->i_depth_, level, alpha, beta, delta, table, pv_line,
       is_null_searching_, is_reduced_by_null, num_searched_moves, score_type,
       material, is_checked, has_legal_move, moves_to_search_ptr,
-      &root_move_vec, next_print_info_time);
+      next_print_info_time);
 
       // ヘルプして待つ。
       shared_st_ptr_->helper_queue_ptr_->HelpRoot(job);
@@ -857,22 +856,7 @@ namespace Sayuri {
 
       // 現在探索している手の情報を表示。
       job.mutex().lock();  // ロック。
-      if (job.depth() <= 1) {
-        // 最初の探索。
-        UCIShell::PrintCurrentMoveInfo(move,
-        job.root_move_vec_ptr()->size());
-        job.root_move_vec_ptr()->push_back(move);
-      } else {
-        // 2回目以降の探索。
-        int move_num = 0;
-        for (auto& move_2 : *(job.root_move_vec_ptr())) {
-          if (move_2 == move) {
-            UCIShell::PrintCurrentMoveInfo(move, move_num);
-            break;
-          }
-          move_num++;
-        }
-      }
+      UCIShell::PrintCurrentMoveInfo(move, job.Count());
       job.mutex().unlock();
 
       // PVSearch。

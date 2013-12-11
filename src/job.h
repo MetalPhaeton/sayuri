@@ -72,7 +72,6 @@ namespace Sayuri {
       // is_checked: チェックされているかどうか。
       // has_legal_move: 合法手が見つかったかどうか。(更新される。)
       // moves_to_search_ptr: ルートで探索すべき手のベクトル。ないならnullptr。
-      // root_move_vec_ptr: ルートで作成した手のベクトル。ないならnullptr。
       // next_print_info_time: 情報を出力する時間。(更新される。)
       Job(std::mutex& mutex, MoveMaker& maker, ChessEngine& client,
       PositionRecord& record, NodeType node_type, Hash pos_hash, int depth,
@@ -81,7 +80,7 @@ namespace Sayuri {
       int& num_searched_moves, ScoreType& score_type, int material,
       bool is_checked, bool& has_legal_move,
       std::vector<Move>* moves_to_search_ptr,
-      std::vector<Move>* root_move_vec_ptr, TimePoint& next_print_info_time);
+      TimePoint& next_print_info_time);
 
       Job(const Job& job);
       Job(Job&& job);
@@ -103,10 +102,8 @@ namespace Sayuri {
       void FinishMyJob();
       // ヘルパーが全員仕事を終えるまで待機する。
       void WaitForHelpers();
-      // 外部用コンディションで待機する。
-      void Wait();
-      // 外部用コンディションで通知する。
-      void Notify();
+      // 数を数える。UCIのcurrmovenumberの表示に使用する。
+      int Count();
 
       /**************/
       /* アクセサ。 */
@@ -151,8 +148,6 @@ namespace Sayuri {
       bool& has_legal_move() {return *has_legal_move_ptr_;}
       // ルートで探索すべき手のベクトル。ないならnullptr。
       std::vector<Move>* moves_to_search_ptr() {return moves_to_search_ptr_;}
-      // ルートで作成した手のベクトル。ないならnullptr。
-      std::vector<Move>* root_move_vec_ptr() {return root_move_vec_ptr_;}
       // 情報を出力する時間。(更新される。)
       TimePoint& next_print_info_time() {return *next_print_info_time_ptr_;}
 
@@ -189,7 +184,6 @@ namespace Sayuri {
       bool is_checked_;
       bool* has_legal_move_ptr_;
       std::vector<Move>* moves_to_search_ptr_;
-      std::vector<Move>* root_move_vec_ptr_;
       TimePoint* next_print_info_time_ptr_;
 
       // 仕事用ムーブメーカー。
@@ -200,6 +194,8 @@ namespace Sayuri {
       std::mutex mutex_;
       // コンディション。
       std::condition_variable cond_;
+      // 数を数えるためのカウンター。UCIのcurrmovenumberの表示に使用する。
+      volatile int counter_;
   };
 }  // namespace Sayuri
 
