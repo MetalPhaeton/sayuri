@@ -1,3 +1,5 @@
+(English version of README is in the second half in this file.)
+
 Sayuri - UCI用チェスエンジン。
 Copyright (c) 2013 Ishibashi Hironori
 ================================================================================
@@ -69,3 +71,81 @@ Ponderの有効化、無効化。(デフォルトはtrue。)
 
 探索用スレッドの数。(デフォルトは1。最大は64。最小は1。)
     setoption name Threads value <スレッドの数>
+
+
+*******************
+* English Version *
+*******************
+================================================================================
+Sayuri - Chess Engine for UCI.
+Copyright (c) 2013 Ishibashi Hironori
+================================================================================
+Sayuri is a chess engine for UCI that is created by C++11 standard libraries only.
+All source codes are in src directory.
+You can build Sayuri with setup to compile C++11 source codes.
+You can easily build it with CMake.
+
+The Compiled binaries are in following directories.
+    Linux 64-bit: SayuriCompiled/Linux/For64Bit
+
+
+--------------------------------------------------------------------------------
+How to build Sayuri with CMake
+--------------------------------------------------------------------------------
+Sayuri can be easily built with CMake.
+The default compiler is "clang++". (If you want to change the compiler, you should change the 26th and 27th line of CMakeLists.txt.)
+
+How to build:
+    1. Change the working directory to which has CMakeLists.txt file.
+    2. Execute following commands.
+        $ mkdir build
+        $ cd build
+        $ cmake ..
+        $ make
+    3. The executable file named "sayuri" has been built in "build" directory.
+
+
+--------------------------------------------------------------------------------
+How to build Sayuri with CMake in debug mode.
+--------------------------------------------------------------------------------
+You can build Sayuri without optimization in debug mode.
+
+How to build:
+    1. Change the working directory to which has CMakeLists.txt file.
+    2. Execute following commands.
+        $ mkdir build
+        $ cd build
+        $ cmake -DCMAKE_BUILD_TYPE=Debug ..
+        $ make
+    3. The executable file named "sayuri" has been built in "build" directory.
+
+
+--------------------------------------------------------------------------------
+How to build distributable source code packages
+--------------------------------------------------------------------------------
+Execute a following command after making Makefile by CMake.
+    $ make dist
+
+And then following three packages will be created.
+    sayuri-xxxx.xx.xx.tar.Z
+    sayuri-xxxx.xx.xx.tar.bz2
+    sayuri-xxxx.xx.xx.tar.gz
+(Note) 'xxxx.xx.xx' is a version number.
+
+
+--------------------------------------------------------------------------------
+UCI Options
+--------------------------------------------------------------------------------
+With following commands, you can change setup of Sayuri.
+
+To change the size(megabytes) of a hash table.
+(Default is 32. Maximum is 8192. Minimum is 3.)
+    setoption name Hash value <size(megabytes)>
+
+To enable ponder.
+(Default is "true".)
+    setoption name Ponder value <true or false>
+
+To change the number of threads.
+(Default is 1. Maximum is 64. Minimum is 1.)
+    setoption name Threads value <the number of threads>
