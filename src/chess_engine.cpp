@@ -205,19 +205,19 @@ namespace Sayuri {
     // 白の駒。
     position_[WHITE][EMPTY] = 0ULL;
     position_[WHITE][PAWN] = Util::RANK[RANK_2];
-    position_[WHITE][KNIGHT] = Util::BIT[B1] | Util::BIT[G1];
-    position_[WHITE][BISHOP] = Util::BIT[C1] | Util::BIT[F1];
-    position_[WHITE][ROOK] = Util::BIT[A1] | Util::BIT[H1];
-    position_[WHITE][QUEEN] = Util::BIT[D1];
-    position_[WHITE][KING] = Util::BIT[E1];
+    position_[WHITE][KNIGHT] = Util::SQUARE[B1] | Util::SQUARE[G1];
+    position_[WHITE][BISHOP] = Util::SQUARE[C1] | Util::SQUARE[F1];
+    position_[WHITE][ROOK] = Util::SQUARE[A1] | Util::SQUARE[H1];
+    position_[WHITE][QUEEN] = Util::SQUARE[D1];
+    position_[WHITE][KING] = Util::SQUARE[E1];
     // 黒の駒。
     position_[BLACK][EMPTY] = 0ULL;
     position_[BLACK][PAWN] = Util::RANK[RANK_7];
-    position_[BLACK][KNIGHT] = Util::BIT[B8] | Util::BIT[G8];
-    position_[BLACK][BISHOP] = Util::BIT[C8] | Util::BIT[F8];
-    position_[BLACK][ROOK] = Util::BIT[A8] | Util::BIT[H8];
-    position_[BLACK][QUEEN] = Util::BIT[D8];
-    position_[BLACK][KING] = Util::BIT[E8];
+    position_[BLACK][KNIGHT] = Util::SQUARE[B8] | Util::SQUARE[G8];
+    position_[BLACK][BISHOP] = Util::SQUARE[C8] | Util::SQUARE[F8];
+    position_[BLACK][ROOK] = Util::SQUARE[A8] | Util::SQUARE[H8];
+    position_[BLACK][QUEEN] = Util::SQUARE[D8];
+    position_[BLACK][KING] = Util::SQUARE[E8];
 
     // 各サイドの駒の配置を作る。
     side_pieces_[NO_SIDE] = 0ULL;
@@ -236,9 +236,9 @@ namespace Sayuri {
     for (Bitboard copy = blocker_0_; copy; copy &= copy - 1) {
       Square square = Util::GetSquare(copy);
 
-      blocker_45_ |= Util::BIT[Util::ROT45[square]];
-      blocker_90_ |= Util::BIT[Util::ROT90[square]];
-      blocker_135_ |= Util::BIT[Util::ROT135[square]];
+      blocker_45_ |= Util::SQUARE[Util::ROT45[square]];
+      blocker_90_ |= Util::SQUARE[Util::ROT90[square]];
+      blocker_135_ |= Util::SQUARE[Util::ROT135[square]];
     }
 
     // 駒の種類とサイドの配置を作る。
@@ -448,7 +448,7 @@ namespace Sayuri {
 
     if (Flag == WHITE_SHORT_CASTLING) {
       if (king_[WHITE] != E1) return false;
-      if (!(position_[WHITE][ROOK] & Util::BIT[H1])) return false;
+      if (!(position_[WHITE][ROOK] & Util::SQUARE[H1])) return false;
       if (IsAttacked(E1, BLACK)) return false;
       if (IsAttacked(F1, BLACK)) return false;
       if (IsAttacked(G1, BLACK)) return false;
@@ -456,7 +456,7 @@ namespace Sayuri {
       if (piece_board_[G1]) return false;
     } else if (Flag == WHITE_LONG_CASTLING) {
       if (king_[WHITE] != E1) return false;
-      if (!(position_[WHITE][ROOK] & Util::BIT[A1])) return false;
+      if (!(position_[WHITE][ROOK] & Util::SQUARE[A1])) return false;
       if (IsAttacked(E1, BLACK)) return false;
       if (IsAttacked(D1, BLACK)) return false;
       if (IsAttacked(C1, BLACK)) return false;
@@ -465,7 +465,7 @@ namespace Sayuri {
       if (piece_board_[B1]) return false;
     } else if (Flag == BLACK_SHORT_CASTLING) {
       if (king_[BLACK] != E8) return false;
-      if (!(position_[BLACK][ROOK] & Util::BIT[H8])) return false;
+      if (!(position_[BLACK][ROOK] & Util::SQUARE[H8])) return false;
       if (IsAttacked(E8, WHITE)) return false;
       if (IsAttacked(F8, WHITE)) return false;
       if (IsAttacked(G8, WHITE)) return false;
@@ -473,7 +473,7 @@ namespace Sayuri {
       if (piece_board_[G8]) return false;
     } else if (Flag == BLACK_LONG_CASTLING){
       if (king_[BLACK] != E8) return false;
-      if (!(position_[BLACK][ROOK] & Util::BIT[A8])) return false;
+      if (!(position_[BLACK][ROOK] & Util::SQUARE[A8])) return false;
       if (IsAttacked(E8, WHITE)) return false;
       if (IsAttacked(D8, WHITE)) return false;
       if (IsAttacked(C8, WHITE)) return false;
@@ -815,8 +815,8 @@ namespace Sayuri {
 
     // 置く位置のメンバを消す。
     if (placed_piece) {
-      position_[placed_side][placed_piece] &= ~Util::BIT[square];
-      side_pieces_[placed_side] &= ~Util::BIT[square];
+      position_[placed_side][placed_piece] &= ~Util::SQUARE[square];
+      side_pieces_[placed_side] &= ~Util::SQUARE[square];
     }
 
     // 置く駒がEMPTYか置くサイドがNO_SIDEなら
@@ -825,10 +825,10 @@ namespace Sayuri {
       piece_board_[square] = EMPTY;
       side_board_[square] = NO_SIDE;
       if (placed_piece) {
-        blocker_0_ &= ~Util::BIT[square];
-        blocker_45_ &= ~Util::BIT[Util::ROT45[square]];
-        blocker_90_ &= ~Util::BIT[Util::ROT90[square]];
-        blocker_135_ &= ~Util::BIT[Util::ROT135[square]];
+        blocker_0_ &= ~Util::SQUARE[square];
+        blocker_45_ &= ~Util::SQUARE[Util::ROT45[square]];
+        blocker_90_ &= ~Util::SQUARE[Util::ROT90[square]];
+        blocker_135_ &= ~Util::SQUARE[Util::ROT135[square]];
       }
       return;
     }
@@ -839,12 +839,12 @@ namespace Sayuri {
     side_board_[square] = side;
 
     // 置く位置のビットボードをセットする。
-    position_[side][piece_type] |= Util::BIT[square];
-    side_pieces_[side] |= Util::BIT[square];
-    blocker_0_ |= Util::BIT[square];
-    blocker_45_ |= Util::BIT[Util::ROT45[square]];
-    blocker_90_ |= Util::BIT[Util::ROT90[square]];
-    blocker_135_ |= Util::BIT[Util::ROT135[square]];
+    position_[side][piece_type] |= Util::SQUARE[square];
+    side_pieces_[side] |= Util::SQUARE[square];
+    blocker_0_ |= Util::SQUARE[square];
+    blocker_45_ |= Util::SQUARE[Util::ROT45[square]];
+    blocker_90_ |= Util::SQUARE[Util::ROT90[square]];
+    blocker_135_ |= Util::SQUARE[Util::ROT135[square]];
 
     // キングの位置を更新する。
     if (piece_type == KING) {
@@ -872,17 +872,17 @@ namespace Sayuri {
     if (king_[BLACK] != E8) castling_rights_ &= ~BLACK_CASTLING;
 
     // 白のルークがh1にいなければ白のショートキャスリングの権利を放棄。
-    if (!(position_[WHITE][ROOK] & Util::BIT[H1]))
+    if (!(position_[WHITE][ROOK] & Util::SQUARE[H1]))
       castling_rights_ &= ~WHITE_SHORT_CASTLING;
     // 白のルークがa1にいなければ白のロングキャスリングの権利を放棄。
-    if (!(position_[WHITE][ROOK] & Util::BIT[A1]))
+    if (!(position_[WHITE][ROOK] & Util::SQUARE[A1]))
       castling_rights_ &= ~WHITE_LONG_CASTLING;
 
     // 黒のルークがh8にいなければ黒のショートキャスリングの権利を放棄。
-    if (!(position_[BLACK][ROOK] & Util::BIT[H8]))
+    if (!(position_[BLACK][ROOK] & Util::SQUARE[H8]))
       castling_rights_ &= ~BLACK_SHORT_CASTLING;
     // 黒のルークがa8にいなければ黒のロングキャスリングの権利を放棄。
-    if (!(position_[BLACK][ROOK] & Util::BIT[A8]))
+    if (!(position_[BLACK][ROOK] & Util::SQUARE[A8]))
       castling_rights_ &= ~BLACK_LONG_CASTLING;
   }
   /******************/

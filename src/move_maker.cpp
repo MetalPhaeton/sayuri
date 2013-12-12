@@ -200,7 +200,7 @@ namespace Sayuri {
         & engine_ptr_->side_pieces()[enemy_side];
         // アンパッサンがある場合。
         if (engine_ptr_->can_en_passant()) {
-          move_bitboard |= Util::BIT[engine_ptr_->en_passant_square()]
+          move_bitboard |= Util::SQUARE[engine_ptr_->en_passant_square()]
           & Util::GetPawnAttack(from, side);
         }
       } 
@@ -248,17 +248,17 @@ namespace Sayuri {
       // キャスリングの動きを追加。
       if (side == WHITE) {
         if (engine_ptr_->CanCastling<WHITE_SHORT_CASTLING>()) {
-          move_bitboard |= Util::BIT[G1];
+          move_bitboard |= Util::SQUARE[G1];
         }
         if (engine_ptr_->CanCastling<WHITE_LONG_CASTLING>()) {
-          move_bitboard |= Util::BIT[C1];
+          move_bitboard |= Util::SQUARE[C1];
         }
       } else {
         if (engine_ptr_->CanCastling<BLACK_SHORT_CASTLING>()) {
-          move_bitboard |= Util::BIT[G8];
+          move_bitboard |= Util::SQUARE[G8];
         }
         if (engine_ptr_->CanCastling<BLACK_LONG_CASTLING>()) {
-          move_bitboard |= Util::BIT[C8];
+          move_bitboard |= Util::SQUARE[C8];
         }
       }
     } else {

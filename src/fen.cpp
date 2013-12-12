@@ -92,20 +92,20 @@ namespace Sayuri {
     position_[WHITE][PAWN] = Util::RANK[RANK_2];
     position_[BLACK][PAWN] = Util::RANK[RANK_7];
     // ナイト。
-    position_[WHITE][KNIGHT] = Util::BIT[B1] | Util::BIT[G1];
-    position_[BLACK][KNIGHT] = Util::BIT[B8] | Util::BIT[G8];
+    position_[WHITE][KNIGHT] = Util::SQUARE[B1] | Util::SQUARE[G1];
+    position_[BLACK][KNIGHT] = Util::SQUARE[B8] | Util::SQUARE[G8];
     // ビショップ。
-    position_[WHITE][BISHOP] = Util::BIT[C1] | Util::BIT[F1];
-    position_[BLACK][BISHOP] = Util::BIT[C8] | Util::BIT[F8];
+    position_[WHITE][BISHOP] = Util::SQUARE[C1] | Util::SQUARE[F1];
+    position_[BLACK][BISHOP] = Util::SQUARE[C8] | Util::SQUARE[F8];
     // ルーク。
-    position_[WHITE][ROOK] = Util::BIT[A1] | Util::BIT[H1];
-    position_[BLACK][ROOK] = Util::BIT[A8] | Util::BIT[H8];
+    position_[WHITE][ROOK] = Util::SQUARE[A1] | Util::SQUARE[H1];
+    position_[BLACK][ROOK] = Util::SQUARE[A8] | Util::SQUARE[H8];
     // クイーン。
-    position_[WHITE][QUEEN] = Util::BIT[D1];
-    position_[BLACK][QUEEN] = Util::BIT[D8];
+    position_[WHITE][QUEEN] = Util::SQUARE[D1];
+    position_[BLACK][QUEEN] = Util::SQUARE[D8];
     // キング。
-    position_[WHITE][KING] = Util::BIT[E1];
-    position_[BLACK][KING] = Util::BIT[E8];
+    position_[WHITE][KING] = Util::SQUARE[E1];
+    position_[BLACK][KING] = Util::SQUARE[E8];
   }
   // コピーコンストラクタ。
   Fen::Fen(const Fen& fen) :
@@ -207,40 +207,40 @@ namespace Sayuri {
             square += (b - '0') - 1;
             break;
           case 'P':
-            position_[WHITE][PAWN] |= Util::BIT[square];
+            position_[WHITE][PAWN] |= Util::SQUARE[square];
             break;
           case 'N':
-            position_[WHITE][KNIGHT] |= Util::BIT[square];
+            position_[WHITE][KNIGHT] |= Util::SQUARE[square];
             break;
           case 'B':
-            position_[WHITE][BISHOP] |= Util::BIT[square];
+            position_[WHITE][BISHOP] |= Util::SQUARE[square];
             break;
           case 'R':
-            position_[WHITE][ROOK] |= Util::BIT[square];
+            position_[WHITE][ROOK] |= Util::SQUARE[square];
             break;
           case 'Q':
-            position_[WHITE][QUEEN] |= Util::BIT[square];
+            position_[WHITE][QUEEN] |= Util::SQUARE[square];
             break;
           case 'K':
-            position_[WHITE][KING] |= Util::BIT[square];
+            position_[WHITE][KING] |= Util::SQUARE[square];
             break;
           case 'p':
-            position_[BLACK][PAWN] |= Util::BIT[square];
+            position_[BLACK][PAWN] |= Util::SQUARE[square];
             break;
           case 'n':
-            position_[BLACK][KNIGHT] |= Util::BIT[square];
+            position_[BLACK][KNIGHT] |= Util::SQUARE[square];
             break;
           case 'b':
-            position_[BLACK][BISHOP] |= Util::BIT[square];
+            position_[BLACK][BISHOP] |= Util::SQUARE[square];
             break;
           case 'r':
-            position_[BLACK][ROOK] |= Util::BIT[square];
+            position_[BLACK][ROOK] |= Util::SQUARE[square];
             break;
           case 'q':
-            position_[BLACK][QUEEN] |= Util::BIT[square];
+            position_[BLACK][QUEEN] |= Util::SQUARE[square];
             break;
           case 'k':
-            position_[BLACK][KING] |= Util::BIT[square];
+            position_[BLACK][KING] |= Util::SQUARE[square];
             break;
           default:
             throw SayuriError("FENを解析できません。");

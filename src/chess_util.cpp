@@ -46,7 +46,7 @@ namespace Sayuri {
   /****************/
   /* static定数。 */
   /****************/
-  constexpr Bitboard Util::BIT[NUM_SQUARES];
+  constexpr Bitboard Util::SQUARE[NUM_SQUARES];
   constexpr Bitboard Util::FYLE[NUM_FYLES];
   constexpr Bitboard Util::RANK[NUM_RANKS];
   constexpr Square Util::ROT45[NUM_SQUARES];
@@ -116,7 +116,7 @@ namespace Sayuri {
   void Util::InitAttackTable() {
     // 0度のマップを作成。
     for (int square = 0; square < NUM_SQUARES; square++) {
-      Bitboard point = BIT[square];
+      Bitboard point = SQUARE[square];
       point >>= MAGIC_SHIFT_V[square];
       for (int map = 0; map <= BLOCKER_MAP; map++) {
         Bitboard attack = 0ULL;
@@ -142,7 +142,7 @@ namespace Sayuri {
     }
     // 45度のマップを作成。
     for (int square = 0; square < NUM_SQUARES; square++) {
-      Bitboard point = BIT[ROT45[square]];
+      Bitboard point = SQUARE[ROT45[square]];
       point >>= MAGIC_SHIFT_D[ROT45[square]];
       for (int map = 0; map <= BLOCKER_MAP; map++) {
         Bitboard attack = 0ULL;
@@ -170,7 +170,7 @@ namespace Sayuri {
     }
     // 90度のマップを作成。
     for (int square = 0; square < NUM_SQUARES; square++) {
-      Bitboard point = BIT[ROT90[square]];
+      Bitboard point = SQUARE[ROT90[square]];
       point >>= MAGIC_SHIFT_V[ROT90[square]];
       for (int map = 0; map <= BLOCKER_MAP; map++) {
         Bitboard attack = 0ULL;
@@ -198,7 +198,7 @@ namespace Sayuri {
     }
     // 135度のマップを作成。
     for (int square = 0; square < NUM_SQUARES; square++) {
-      Bitboard point = BIT[ROT135[square]];
+      Bitboard point = SQUARE[ROT135[square]];
       point >>= MAGIC_SHIFT_D[ROT135[square]];
       for (int map = 0; map <= BLOCKER_MAP; map++) {
         Bitboard attack = 0ULL;
@@ -233,7 +233,7 @@ namespace Sayuri {
       // 45度座標の位置を得る。
       Square square45 = CountZero(bitboard45);
       // 変換して追加。
-      bitboard |= BIT[R_ROT45[square45]];
+      bitboard |= SQUARE[R_ROT45[square45]];
     }
 
     // 返す。
@@ -247,7 +247,7 @@ namespace Sayuri {
       // 90度座標の位置を得る。
       Square square90 = CountZero(bitboard90);
       // 変換して追加。
-      bitboard |= BIT[R_ROT90[square90]];
+      bitboard |= SQUARE[R_ROT90[square90]];
     }
 
     // 返す。
@@ -261,7 +261,7 @@ namespace Sayuri {
       // 135度座標の位置を得る。
       Square square135 = CountZero(bitboard135);
       // 変換して追加。
-      bitboard |= BIT[R_ROT135[square135]];
+      bitboard |= SQUARE[R_ROT135[square135]];
     }
 
     // 返す。
@@ -293,8 +293,8 @@ namespace Sayuri {
     for (int square1 = 0; square1 < NUM_SQUARES; square1++) {
       for (int square2 = 0; square2 < NUM_SQUARES; square2++) {
         // 端点を入手する。
-        Bitboard point1 = BIT[square1];
-        Bitboard point2 = BIT[square2];
+        Bitboard point1 = SQUARE[square1];
+        Bitboard point2 = SQUARE[square2];
 
         // 右から調べていく。
         Bitboard temp = point1;
@@ -391,7 +391,7 @@ namespace Sayuri {
   void Util::InitPawnMove() {
     // ポーンの動きを作る。
     for (int square = 0; square < NUM_SQUARES; square++) {
-      Bitboard point = BIT[square];
+      Bitboard point = SQUARE[square];
       // どちらのサイドでもない。
       pawn_move_[NO_SIDE][square] = 0;
       // 白。
@@ -404,7 +404,7 @@ namespace Sayuri {
   void Util::InitPawn2StepMove() {
     // ポーンの2歩の動きを作る。
     for (int square = 0; square < NUM_SQUARES; square++) {
-      Bitboard point = BIT[square];
+      Bitboard point = SQUARE[square];
 
       // とりあえず0で初期化する。
       pawn_2step_move_[NO_SIDE][square] = 0ULL;
@@ -426,7 +426,7 @@ namespace Sayuri {
   void Util::InitPawnAttack() {
     // 攻撃筋を入れる。
     for (int square = 0; square < NUM_SQUARES; square++) {
-      Bitboard point = BIT[square];
+      Bitboard point = SQUARE[square];
 
       // どちらでもない。
       pawn_attack_[NO_SIDE][square] = 0ULL;
@@ -442,7 +442,7 @@ namespace Sayuri {
   void Util::InitKnightMove() {
     // 動きを入れる。
     for (int square = 0; square < NUM_SQUARES; square++) {
-      Bitboard point = BIT[square];
+      Bitboard point = SQUARE[square];
 
       knight_move_[square] = GetRightRightUpBitboard(point)
       | GetRightUpUpBitboard(point)
@@ -458,7 +458,7 @@ namespace Sayuri {
   void Util::InitBishopMove() {
     // 動きを入れる。
     for (int square = 0; square < NUM_SQUARES; square++) {
-      Bitboard point = BIT[square];
+      Bitboard point = SQUARE[square];
       bishop_move_[square] = 0;
 
       // 右上の動きを入れる。
@@ -487,7 +487,7 @@ namespace Sayuri {
   void Util::InitRookMove() {
     // 動きを入れる。
     for (int square = 0; square < NUM_SQUARES; square++) {
-      Bitboard point = BIT[square];
+      Bitboard point = SQUARE[square];
       rook_move_[square] = 0;
 
       // 右の動きを入れる。
@@ -516,7 +516,7 @@ namespace Sayuri {
   void Util::InitKingMove() {
     // 動きを入れる。
     for (int square = 0; square < NUM_SQUARES; square++) {
-      Bitboard point = BIT[square];
+      Bitboard point = SQUARE[square];
 
       // 動きを入れる。
       king_move_[square] = GetRightBitboard(point)

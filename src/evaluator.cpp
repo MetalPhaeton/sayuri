@@ -426,7 +426,7 @@ namespace Sayuri {
 
         // アンパッサン。
         if (engine_ptr_->can_en_passant()) {
-          en_passant = Util::BIT[engine_ptr_->en_passant_square()] & attacks;
+          en_passant = Util::SQUARE[engine_ptr_->en_passant_square()] & attacks;
         }
         break;
       case KNIGHT:
@@ -447,17 +447,17 @@ namespace Sayuri {
         // キャスリングの動きを追加。
         if (piece_side == WHITE) {
           if (engine_ptr_->CanCastling<WHITE_SHORT_CASTLING>()) {
-            castling_moves |= Util::BIT[G1];
+            castling_moves |= Util::SQUARE[G1];
           }
           if (engine_ptr_->CanCastling<WHITE_LONG_CASTLING>()) {
-            castling_moves |= Util::BIT[C1];
+            castling_moves |= Util::SQUARE[C1];
           }
         } else {
           if (engine_ptr_->CanCastling<BLACK_SHORT_CASTLING>()) {
-            castling_moves |= Util::BIT[G8];
+            castling_moves |= Util::SQUARE[G8];
           }
           if (engine_ptr_->CanCastling<BLACK_LONG_CASTLING>()) {
-            castling_moves |= Util::BIT[C8];
+            castling_moves |= Util::SQUARE[C8];
           }
         }
         break;
@@ -518,7 +518,7 @@ namespace Sayuri {
     // 駒の展開を計算。
     if ((Type == KNIGHT) || (Type == BISHOP)) {
       value = 0.0;
-      if (Util::BIT[piece_square] & ~(start_position_[piece_side][Type])) {
+      if (Util::SQUARE[piece_square] & ~(start_position_[piece_side][Type])) {
         value += 1.0;
       }
       development_value_ += sign * value;
@@ -584,7 +584,7 @@ namespace Sayuri {
         // 絶対ピン。
         Bitboard line =
         Util::GetLine(bishop_square, engine_ptr_->king()[piece_side]);
-        if ((Util::BIT[piece_square] & line)
+        if ((Util::SQUARE[piece_square] & line)
         && (Util::CountBits(engine_ptr_->blocker_0() & line) == 3)) {
           value += 1.0;
         }
@@ -593,7 +593,7 @@ namespace Sayuri {
         Bitboard temp = friend_queen;
         for (; temp; temp &= temp -1) {
           line = Util::GetLine(bishop_square, Util::GetSquare(temp));
-          if ((Util::BIT[piece_square] & line)
+          if ((Util::SQUARE[piece_square] & line)
           && (Util::CountBits(engine_ptr_->blocker_0() & line) == 3)) {
             value += 1.0;
           }
@@ -618,7 +618,7 @@ namespace Sayuri {
     // クイーンの早過ぎる始動を計算。
     if (Type == QUEEN) {
       value = 0.0;
-      if (Util::BIT[piece_square] & ~(start_position_[piece_side][QUEEN])) {
+      if (Util::SQUARE[piece_square] & ~(start_position_[piece_side][QUEEN])) {
         value += static_cast<double>
         (Util::CountBits(engine_ptr_->position()[piece_side][KNIGHT]
         & start_position_[piece_side][KNIGHT]));
@@ -671,38 +671,38 @@ namespace Sayuri {
     start_position_[BLACK][PAWN] = Util::RANK[RANK_7];
 
     // ナイト。
-    start_position_[WHITE][KNIGHT] = Util::BIT[B1] | Util::BIT[G1];
-    start_position_[BLACK][KNIGHT] = Util::BIT[B8] | Util::BIT[G8];
+    start_position_[WHITE][KNIGHT] = Util::SQUARE[B1] | Util::SQUARE[G1];
+    start_position_[BLACK][KNIGHT] = Util::SQUARE[B8] | Util::SQUARE[G8];
 
     // ビショップ。
-    start_position_[WHITE][BISHOP] = Util::BIT[C1] | Util::BIT[F1];
-    start_position_[BLACK][BISHOP] = Util::BIT[C8] | Util::BIT[F8];
+    start_position_[WHITE][BISHOP] = Util::SQUARE[C1] | Util::SQUARE[F1];
+    start_position_[BLACK][BISHOP] = Util::SQUARE[C8] | Util::SQUARE[F8];
 
     // ルーク。
-    start_position_[WHITE][ROOK] = Util::BIT[A1] | Util::BIT[H1];
-    start_position_[BLACK][ROOK] = Util::BIT[A8] | Util::BIT[H8];
+    start_position_[WHITE][ROOK] = Util::SQUARE[A1] | Util::SQUARE[H1];
+    start_position_[BLACK][ROOK] = Util::SQUARE[A8] | Util::SQUARE[H8];
 
     // クイーン。
-    start_position_[WHITE][QUEEN] = Util::BIT[D1];
-    start_position_[BLACK][QUEEN] = Util::BIT[D8];
+    start_position_[WHITE][QUEEN] = Util::SQUARE[D1];
+    start_position_[BLACK][QUEEN] = Util::SQUARE[D8];
 
     // キング。
-    start_position_[WHITE][KING] = Util::BIT[E1];
-    start_position_[BLACK][KING] = Util::BIT[E8];
+    start_position_[WHITE][KING] = Util::SQUARE[E1];
+    start_position_[BLACK][KING] = Util::SQUARE[E8];
   }
 
   // センターマスクを初期化する。
   void Evaluator::InitCenterMask() {
     // センター。
     center_mask_ =
-    Util::BIT[C3] | Util::BIT[C4] | Util::BIT[C5] | Util::BIT[C6]
-    | Util::BIT[D3] | Util::BIT[D4] | Util::BIT[D5] | Util::BIT[D6]
-    | Util::BIT[E3] | Util::BIT[E4] | Util::BIT[E5] | Util::BIT[E6]
-    | Util::BIT[F3] | Util::BIT[F4] | Util::BIT[F5] | Util::BIT[F6];
+    Util::SQUARE[C3] | Util::SQUARE[C4] | Util::SQUARE[C5] | Util::SQUARE[C6]
+    | Util::SQUARE[D3] | Util::SQUARE[D4] | Util::SQUARE[D5] | Util::SQUARE[D6]
+    | Util::SQUARE[E3] | Util::SQUARE[E4] | Util::SQUARE[E5] | Util::SQUARE[E6]
+    | Util::SQUARE[F3] | Util::SQUARE[F4] | Util::SQUARE[F5] | Util::SQUARE[F6];
 
     // スウィートセンター。
-    sweet_center_mask_ = Util::BIT[D4] | Util::BIT[D5]
-    | Util::BIT[E4] | Util::BIT[E5];
+    sweet_center_mask_ = Util::SQUARE[D4] | Util::SQUARE[D5]
+    | Util::SQUARE[E4] | Util::SQUARE[E5];
   }
 
   // pass_pawn_mask_[][]を初期化する。
@@ -728,11 +728,11 @@ namespace Sayuri {
 
           // 自分の位置より手前のランクは消す。
           if (side == WHITE) {
-            Bitboard temp = (Util::BIT[square] - 1)
+            Bitboard temp = (Util::SQUARE[square] - 1)
             | Util::RANK[Util::GetRank(square)];
             mask &= ~temp;
           } else {
-            Bitboard temp = ~(Util::BIT[square] - 1)
+            Bitboard temp = ~(Util::SQUARE[square] - 1)
             | Util::RANK[Util::GetRank(square)];
             mask &= ~temp;
           }
@@ -771,19 +771,19 @@ namespace Sayuri {
           if ((side == WHITE)
           && ((square == A1) || (square == B1) || (square == C1))) {
             pawn_shield_mask_[side][square] =
-            Util::BIT[A2] | Util::BIT[B2] | Util::BIT[C2];
+            Util::SQUARE[A2] | Util::SQUARE[B2] | Util::SQUARE[C2];
           } else if ((side == WHITE)
           && ((square == F1) || (square == G1) || (square == H1))) {
             pawn_shield_mask_[side][square] =
-            Util::BIT[F2] | Util::BIT[G2] | Util::BIT[H2];
+            Util::SQUARE[F2] | Util::SQUARE[G2] | Util::SQUARE[H2];
           } else if ((side == BLACK)
           && ((square == A8) || (square == B8) || (square == C8))) {
             pawn_shield_mask_[side][square] =
-            Util::BIT[A7] | Util::BIT[B7] | Util::BIT[C7];
+            Util::SQUARE[A7] | Util::SQUARE[B7] | Util::SQUARE[C7];
           } else if ((side == BLACK)
           && ((square == F8) || (square == G8) || (square == H8))) {
             pawn_shield_mask_[side][square] =
-            Util::BIT[F7] | Util::BIT[G7] | Util::BIT[H7];
+            Util::SQUARE[F7] | Util::SQUARE[G7] | Util::SQUARE[H7];
           } else {  // キングサイドでもクイーンサイドでもない。
             pawn_shield_mask_[side][square] = 0;
           }

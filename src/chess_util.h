@@ -48,7 +48,7 @@ namespace Sayuri {
       /* ビットボードの配列。 */
       /************************/
       // マスのビットボード。
-      static constexpr Bitboard BIT[NUM_SQUARES] {
+      static constexpr Bitboard SQUARE[NUM_SQUARES] {
         0x1ULL, 0x1ULL << 1, 0x1ULL << 2, 0x1ULL << 3,
         0x1ULL << 4, 0x1ULL << 5, 0x1ULL << 6, 0x1ULL << 7,
         0x1ULL << 8, 0x1ULL << 9, 0x1ULL << 10, 0x1ULL << 11,
