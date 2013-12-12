@@ -88,6 +88,12 @@ namespace Sayuri {
         0xffULL << (6 * 8),
         0xffULL << (7 * 8)
       };
+      // マスの色のビットボード。
+      static constexpr Bitboard SQCOLOR[NUM_SIDES] {
+        0x0ULL,
+        0xaa55aa55aa55aa55ULL,
+        0x55aa55aa55aa55aaULL
+      };
 
       /**********************/
       /* 回転座標変換配列。 */

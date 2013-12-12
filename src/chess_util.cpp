@@ -49,6 +49,7 @@ namespace Sayuri {
   constexpr Bitboard Util::SQUARE[NUM_SQUARES];
   constexpr Bitboard Util::FYLE[NUM_FYLES];
   constexpr Bitboard Util::RANK[NUM_RANKS];
+  constexpr Bitboard Util::SQCOLOR[NUM_SIDES];
   constexpr Square Util::ROT45[NUM_SQUARES];
   constexpr Square Util::ROT90[NUM_SQUARES];
   constexpr Square Util::ROT135[NUM_SQUARES];
