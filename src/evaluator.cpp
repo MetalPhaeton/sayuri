@@ -426,7 +426,8 @@ namespace Sayuri {
 
         // アンパッサン。
         if (engine_ptr_->can_en_passant()) {
-          en_passant = Util::SQUARE[engine_ptr_->en_passant_square()] & attacks;
+          en_passant =
+          Util::SQUARE[engine_ptr_->en_passant_square()] & attacks;
         }
         break;
       case KNIGHT:
@@ -654,12 +655,18 @@ namespace Sayuri {
     }
   }
   // 実体化。
-  template void Evaluator::CalValue<PAWN>(Square piece_type, Side piece_side);
-  template void Evaluator::CalValue<KNIGHT>(Square piece_type, Side piece_side);
-  template void Evaluator::CalValue<BISHOP>(Square piece_type, Side piece_side);
-  template void Evaluator::CalValue<ROOK>(Square piece_type, Side piece_side);
-  template void Evaluator::CalValue<QUEEN>(Square piece_type, Side piece_side);
-  template void Evaluator::CalValue<KING>(Square piece_type, Side piece_side);
+  template void Evaluator::CalValue<PAWN>
+  (Square piece_type, Side piece_side);
+  template void Evaluator::CalValue<KNIGHT>
+  (Square piece_type, Side piece_side);
+  template void Evaluator::CalValue<BISHOP>
+  (Square piece_type, Side piece_side);
+  template void Evaluator::CalValue<ROOK>
+  (Square piece_type, Side piece_side);
+  template void Evaluator::CalValue<QUEEN>
+  (Square piece_type, Side piece_side);
+  template void Evaluator::CalValue<KING>
+  (Square piece_type, Side piece_side);
 
   /******************************/
   /* その他のプライベート関数。 */
@@ -694,11 +701,14 @@ namespace Sayuri {
   // センターマスクを初期化する。
   void Evaluator::InitCenterMask() {
     // センター。
-    center_mask_ =
-    Util::SQUARE[C3] | Util::SQUARE[C4] | Util::SQUARE[C5] | Util::SQUARE[C6]
-    | Util::SQUARE[D3] | Util::SQUARE[D4] | Util::SQUARE[D5] | Util::SQUARE[D6]
-    | Util::SQUARE[E3] | Util::SQUARE[E4] | Util::SQUARE[E5] | Util::SQUARE[E6]
-    | Util::SQUARE[F3] | Util::SQUARE[F4] | Util::SQUARE[F5] | Util::SQUARE[F6];
+    center_mask_ = Util::SQUARE[C3] | Util::SQUARE[C4]
+    | Util::SQUARE[C5] | Util::SQUARE[C6]
+    | Util::SQUARE[D3] | Util::SQUARE[D4]
+    | Util::SQUARE[D5] | Util::SQUARE[D6]
+    | Util::SQUARE[E3] | Util::SQUARE[E4]
+    | Util::SQUARE[E5] | Util::SQUARE[E6]
+    | Util::SQUARE[F3] | Util::SQUARE[F4]
+    | Util::SQUARE[F5] | Util::SQUARE[F6];
 
     // スウィートセンター。
     sweet_center_mask_ = Util::SQUARE[D4] | Util::SQUARE[D5]

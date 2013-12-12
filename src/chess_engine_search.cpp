@@ -1073,7 +1073,8 @@ namespace Sayuri {
           }
           break;
         case KNIGHT:
-          attackers = Util::GetKnightMove(target) & position_[to_move_][KNIGHT];
+          attackers =
+          Util::GetKnightMove(target) & position_[to_move_][KNIGHT];
           break;
         case BISHOP:
           attackers = GetBishopAttack(target) & position_[to_move_][BISHOP];
@@ -1126,7 +1127,8 @@ namespace Sayuri {
   void ChessEngine::SetStopper(int max_depth, std::size_t max_nodes,
   Chrono::milliseconds thinking_time, bool infinite_thinking) {
     shared_st_ptr_->max_depth_ = max_depth <= MAX_PLYS ? max_depth : MAX_PLYS;
-    shared_st_ptr_->max_nodes_ = max_nodes <= MAX_NODES ? max_nodes : MAX_NODES;
+    shared_st_ptr_->max_nodes_ =
+    max_nodes <= MAX_NODES ? max_nodes : MAX_NODES;
     shared_st_ptr_->thinking_time_ = thinking_time;
     shared_st_ptr_->infinite_thinking_ = infinite_thinking;
   }
