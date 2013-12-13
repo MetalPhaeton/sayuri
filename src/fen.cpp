@@ -1,6 +1,6 @@
 /* 
    fen.cpp: fenパーサの実装ファイル。
-   Copyright (c) 2013 Ishibashi Hironori
+   Copyright (c) 2013 Hironori Ishibashi
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
