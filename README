@@ -1,4 +1,4 @@
-(English version of README is in the second half in this file.)
+(English version of README is in the second half of this file.)
 
 Sayuri - UCI用チェスエンジン
 Copyright (c) 2013 Hironori Ishibashi
@@ -81,7 +81,7 @@ Sayuri - Chess Engine for UCI
 Copyright (c) 2013 Hironori Ishibashi
 ================================================================================
 Sayuri is a chess engine for UCI that is created by C++11 standard libraries only.
-All source codes are in src directory.
+All source codes are in "src" directory.
 You can build Sayuri with setup to compile C++11 source codes.
 You can easily build it with CMake.
 
