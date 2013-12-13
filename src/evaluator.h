@@ -153,8 +153,12 @@ namespace Sayuri {
       static const Weight WEIGHT_DOUBLE_PAWN;
       // 孤立ポーン。
       static const Weight WEIGHT_ISO_PAWN;
+      // ポーンの盾。
+      static const Weight WEIGHT_PAWN_SHIELD;
       // ビショップペア。
       static const Weight WEIGHT_BISHOP_PAIR;
+      // ばっどビショップ。
+      static const Weight WEIGHT_BAD_BISHOP;
       // ビショップにピンされたナイト。
       static const Weight WEIGHT_PINED_KNIGHT_BY_BISHOP;
       // セミオープンファイルのルーク。
@@ -163,8 +167,8 @@ namespace Sayuri {
       static const Weight WEIGHT_ROOK_OPEN;
       // 早すぎるクイーンの始動。
       static const Weight WEIGHT_EARLY_QUEEN_LAUNCHED;
-      // ポーンの盾。
-      static const Weight WEIGHT_PAWN_SHIELD;
+      // キング周りの弱いマス。
+      static const Weight WEIGHT_WEAK_SQUARE;
       // キャスリング。(これの2倍が評価値。)
       static const Weight WEIGHT_CASTLING;
 
@@ -339,6 +343,11 @@ namespace Sayuri {
       // pawn_shield_mask_[][]を初期化する。
       static void InitPawnShieldMask();
 
+      // 弱いマスのマスク。
+      static Bitboard weak_square_mask_[NUM_SIDES][NUM_SQUARES];
+      // weak_square_mask_[][]を初期化する。
+      static void InitWeakSquareMask();
+
       /****************/
       /* メンバ変数。 */
       /****************/
@@ -358,12 +367,14 @@ namespace Sayuri {
       double protected_pass_pawn_value_;  // 守られたパスポーン。
       double double_pawn_value_;  // ダブルポーン。
       double iso_pawn_value_;  // 孤立ポーン。
+      double pawn_shield_value_;  // ポーンの盾。
       double bishop_pair_value_;  // ビショップペア。
+      double bad_bishop_value_;  // バッドビショップ。
       double pined_knight_by_bishop_value_;  // ビショップにピンされたナイト。
       double rook_semi_open_value_;  // セミオープンファイルのルーク。
       double rook_open_value_;  // オープンファイルのルーク。
       double early_queen_launched_value_;  // 早すぎるクイーンの始動。
-      double pawn_shield_value_;  // ポーンの盾。
+      double weak_square_value_;  // キング周りの弱いマス。
       double castling_value_;  // キャスリング。
   };
 }  // namespace Sayuri

@@ -71,8 +71,12 @@ namespace Sayuri {
   const Evaluator::Weight Evaluator::WEIGHT_DOUBLE_PAWN(-2.5, -5.0);
   // 孤立ポーン。
   const Evaluator::Weight Evaluator::WEIGHT_ISO_PAWN(-5.0, -2.5);
+  // ポーンの盾。
+  const Evaluator::Weight Evaluator::WEIGHT_PAWN_SHIELD(2.5, 0.0);
   // ビショップペア。
-  const Evaluator::Weight Evaluator::WEIGHT_BISHOP_PAIR(30.0, 50.0);
+  const Evaluator::Weight Evaluator::WEIGHT_BISHOP_PAIR(10.0, 20.0);
+  // バッドビショップ。
+  const Evaluator::Weight Evaluator::WEIGHT_BAD_BISHOP(-0.7, 0.0);
   // ビショップにピンされたナイト。
   const Evaluator::Weight
   Evaluator::WEIGHT_PINED_KNIGHT_BY_BISHOP(-5.0, 0.0);
@@ -82,8 +86,8 @@ namespace Sayuri {
   const Evaluator::Weight Evaluator::WEIGHT_ROOK_OPEN(3.5, 3.5);
   // 早すぎるクイーンの始動。
   const Evaluator::Weight Evaluator::WEIGHT_EARLY_QUEEN_LAUNCHED(-4.0, 0.0);
-  // ポーンの盾。
-  const Evaluator::Weight Evaluator::WEIGHT_PAWN_SHIELD(7.5, 0.0);
+  // キング周りの弱いマス。
+  const Evaluator::Weight Evaluator::WEIGHT_WEAK_SQUARE(-2.0, 0.0);
   // キャスリング。(これの2倍が評価値。)
   const Evaluator::Weight Evaluator::WEIGHT_CASTLING(7.5, 0.0);
 
@@ -105,6 +109,7 @@ namespace Sayuri {
   Bitboard Evaluator::pass_pawn_mask_[NUM_SIDES][NUM_SQUARES];
   Bitboard Evaluator::iso_pawn_mask_[NUM_SQUARES];
   Bitboard Evaluator::pawn_shield_mask_[NUM_SIDES][NUM_SQUARES];
+  Bitboard Evaluator::weak_square_mask_[NUM_SIDES][NUM_SQUARES];
 
   /**********************/
   /* ファイルスコープ。 */
@@ -168,6 +173,8 @@ namespace Sayuri {
     InitIsoPawnMask();
     // pawn_shield_mask_[][]を初期化する。
     InitPawnShieldMask();
+    // weak_square_mask_[][]を初期化する。
+    InitWeakSquareMask();
   }
 
   /********************/
@@ -193,13 +200,15 @@ namespace Sayuri {
     protected_pass_pawn_value_ = 0.0;
     double_pawn_value_ = 0.0;
     iso_pawn_value_ = 0.0;
+    pawn_shield_value_ = 0.0;
     bishop_pair_value_ = 0.0;
+    bad_bishop_value_ = 0.0;
     pined_knight_by_bishop_value_ = 0.0;
     rook_semi_open_value_ = 0.0;
     rook_open_value_ = 0.0;
     early_queen_launched_value_ = 0.0;
-    pawn_shield_value_ = 0.0;
     attack_around_king_value_ = 0.0;
+    weak_square_value_ = 0.0;
     castling_value_ = 0.0;
 
     // サイド。
@@ -316,9 +325,15 @@ namespace Sayuri {
     // 孤立ポーン。
     score += WEIGHT_ISO_PAWN.GetScore
     (num_pieces, iso_pawn_value_);
+    // ポーンの盾。
+    score += WEIGHT_PAWN_SHIELD.GetScore
+    (num_pieces, pawn_shield_value_);
     // ビショップペア。
     score += WEIGHT_BISHOP_PAIR.GetScore
     (num_pieces, bishop_pair_value_);
+    // バッドビショップ。
+    score += WEIGHT_BAD_BISHOP.GetScore
+    (num_pieces, bad_bishop_value_);
     // ビショップにピンされたナイト。
     score += WEIGHT_PINED_KNIGHT_BY_BISHOP.GetScore
     (num_pieces, pined_knight_by_bishop_value_);
@@ -331,9 +346,9 @@ namespace Sayuri {
     // 早すぎるクイーンの始動。
     score += WEIGHT_EARLY_QUEEN_LAUNCHED.GetScore
     (num_pieces, early_queen_launched_value_);
-    // ポーンの盾。
-    score += WEIGHT_PAWN_SHIELD.GetScore
-    (num_pieces, pawn_shield_value_);
+    // キング周りの弱いマス。
+    score += WEIGHT_WEAK_SQUARE.GetScore
+    (num_pieces, weak_square_value_);
     // キャスリング。(これの2倍が評価値。)
     score += WEIGHT_CASTLING.GetScore
     (num_pieces, castling_value_);
@@ -569,6 +584,30 @@ namespace Sayuri {
       & iso_pawn_mask_[piece_square])) {
         iso_pawn_value_ += sign * 1.0;
       }
+
+      // ポーンの盾を計算。
+      if ((Util::SQUARE[piece_square]
+      & pawn_shield_mask_[piece_side][engine_ptr_->king()[piece_side]])) {
+        if (piece_side == WHITE) {
+          value = static_cast<double>(8 - Util::GetRank(piece_square));
+        } else {
+          value = static_cast<double>(Util::GetRank(piece_square) - 1);
+        }
+        pawn_shield_value_ += sign * value;
+      }
+    }
+
+    // バッドビショップを計算。
+    if (Type == BISHOP) {
+      value = 0.0;
+      if ((Util::SQUARE[piece_square] & Util::SQCOLOR[WHITE])) {
+        value = static_cast<double>(Util::CountBits
+        (engine_ptr_->position()[piece_side][PAWN] & Util::SQCOLOR[WHITE]));
+      } else {
+        value = static_cast<double>(Util::CountBits
+        (engine_ptr_->position()[piece_side][PAWN] & Util::SQCOLOR[BLACK]));
+      }
+      bad_bishop_value_ += sign * value;
     }
 
     // ビショップにピンされたナイトを計算。
@@ -630,13 +669,26 @@ namespace Sayuri {
       early_queen_launched_value_ += sign * value;
     }
 
-    // ポーンシールドとキャスリングを計算。
+    // キャスリングを計算。
     if (Type == KING) {
-      // ポーンの盾を計算する。
-      value = static_cast<double>
-      (Util::CountBits(engine_ptr_->position()[piece_side][PAWN]
-      & pawn_shield_mask_[piece_side][piece_square]));
-      pawn_shield_value_ += sign * value;
+      // キング周りの弱いマスを計算。
+      // 弱いマス。
+      value = 0.0;
+      Bitboard weak = (~(engine_ptr_->position()[piece_side][PAWN]))
+      & weak_square_mask_[piece_side][piece_square];
+      // それぞれの色のマスの弱いマスの数。
+      int white_weak = Util::CountBits(weak & Util::SQCOLOR[WHITE]);
+      int black_weak = Util::CountBits(weak & Util::SQCOLOR[BLACK]);
+      // 相手の白マスビショップの数と弱い白マスの数を掛け算。
+      value += static_cast<double>(Util::CountBits
+      (engine_ptr_->position()[enemy_piece_side][BISHOP]
+      & Util::SQCOLOR[WHITE]) * white_weak);
+      // 相手の黒マスビショップの数と弱い黒マスの数を掛け算。
+      value += static_cast<double>(Util::CountBits
+      (engine_ptr_->position()[enemy_piece_side][BISHOP]
+      & Util::SQCOLOR[BLACK]) * black_weak);
+      // 評価値にする。
+      weak_square_value_ += sign * value;
 
       // キャスリングを計算する。
       value = 0.0;  // キャスリングはまだだが、放棄していない。
@@ -776,26 +828,67 @@ namespace Sayuri {
         if (side == NO_SIDE) {  // どちらのサイドでもなければ空。
           pawn_shield_mask_[side][square] = 0ULL;
         } else {
-          // 第1ランクのキングサイドとクイーンサイドのとき
-          // ポーンの盾の位置を記録する。
           if ((side == WHITE)
-          && ((square == A1) || (square == B1) || (square == C1))) {
+          && ((square == A1) || (square == B1) || (square == C1)
+          || (square == A2) || (square == B2) || (square == C2))) {
             pawn_shield_mask_[side][square] =
-            Util::SQUARE[A2] | Util::SQUARE[B2] | Util::SQUARE[C2];
+            Util::FYLE[FYLE_A] | Util::FYLE[FYLE_B] | Util::FYLE[FYLE_C];
           } else if ((side == WHITE)
-          && ((square == F1) || (square == G1) || (square == H1))) {
+          && ((square == F1) || (square == G1) || (square == H1)
+          || (square == F2) || (square == G2) || (square == H2))) {
             pawn_shield_mask_[side][square] =
-            Util::SQUARE[F2] | Util::SQUARE[G2] | Util::SQUARE[H2];
+            Util::FYLE[FYLE_F] | Util::FYLE[FYLE_G] | Util::FYLE[FYLE_H];
           } else if ((side == BLACK)
-          && ((square == A8) || (square == B8) || (square == C8))) {
+          && ((square == A8) || (square == B8) || (square == C8)
+          || (square == A7) || (square == B7) || (square == C7))) {
             pawn_shield_mask_[side][square] =
-            Util::SQUARE[A7] | Util::SQUARE[B7] | Util::SQUARE[C7];
+            Util::FYLE[FYLE_A] | Util::FYLE[FYLE_B] | Util::FYLE[FYLE_C];
           } else if ((side == BLACK)
-          && ((square == F8) || (square == G8) || (square == H8))) {
+          && ((square == F8) || (square == G8) || (square == H8)
+          || (square == F7) || (square == G7) || (square == H7))) {
             pawn_shield_mask_[side][square] =
-            Util::SQUARE[F7] | Util::SQUARE[G7] | Util::SQUARE[H7];
-          } else {  // キングサイドでもクイーンサイドでもない。
-            pawn_shield_mask_[side][square] = 0;
+            Util::FYLE[FYLE_F] | Util::FYLE[FYLE_G] | Util::FYLE[FYLE_H];
+          } else {
+            pawn_shield_mask_[side][square] = 0ULL;
+          }
+        }
+      }
+    }
+  }
+
+  // weak_square_mask_[][]を初期化する。
+  void Evaluator::InitWeakSquareMask() {
+    for (int side = 0; side < NUM_SIDES; side++) {
+      for (int square = 0; square < NUM_SQUARES; square++) {
+        if (side == NO_SIDE) {  // どちらのサイドでもなければ空。
+          weak_square_mask_[side][square] = 0ULL;
+        } else {
+          if ((side == WHITE)
+          && ((square == A1) || (square == B1) || (square == C1)
+          || (square == A2) || (square == B2) || (square == C2))) {
+            weak_square_mask_[side][square] =
+            (Util::FYLE[FYLE_A] | Util::FYLE[FYLE_B] | Util::FYLE[FYLE_C])
+            & (Util::RANK[RANK_2] | Util::RANK[RANK_3]);
+          } else if ((side == WHITE)
+          && ((square == F1) || (square == G1) || (square == H1)
+          || (square == F2) || (square == G2) || (square == H2))) {
+            weak_square_mask_[side][square] =
+            (Util::FYLE[FYLE_F] | Util::FYLE[FYLE_G] | Util::FYLE[FYLE_H])
+            & (Util::RANK[RANK_2] | Util::RANK[RANK_3]);
+          } else if ((side == BLACK)
+          && ((square == A8) || (square == B8) || (square == C8)
+          || (square == A7) || (square == B7) || (square == C7))) {
+            weak_square_mask_[side][square] =
+            (Util::FYLE[FYLE_A] | Util::FYLE[FYLE_B] | Util::FYLE[FYLE_C])
+            & (Util::RANK[RANK_7] | Util::RANK[RANK_6]);
+          } else if ((side == BLACK)
+          && ((square == F8) || (square == G8) || (square == H8)
+          || (square == F7) || (square == G7) || (square == H7))) {
+            weak_square_mask_[side][square] =
+            (Util::FYLE[FYLE_F] | Util::FYLE[FYLE_G] | Util::FYLE[FYLE_H])
+            & (Util::RANK[RANK_7] | Util::RANK[RANK_6]);
+          } else {
+            weak_square_mask_[side][square] = 0ULL;
           }
         }
       }
