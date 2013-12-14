@@ -1152,6 +1152,9 @@ namespace Sayuri {
 
   // 探索中止しなければいけないかどうか。
   bool ChessEngine::ShouldBeStopped() {
+    // 最低1手は考える。
+    if (shared_st_ptr_->i_depth_ <= 1) return false;
+
     if (shared_st_ptr_->stop_now_) return true;
     if (shared_st_ptr_->infinite_thinking_) return false;
     if (shared_st_ptr_->i_depth_ > shared_st_ptr_->max_depth_) {
