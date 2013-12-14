@@ -352,8 +352,6 @@ namespace Sayuri {
     // IIDで得た最善手の点数。
     constexpr int IID_MOVE_SCORE = BEST_MOVE_SCORE - 1;
     // キラームーブの点数。
-    // #test
-    // constexpr int KILLER_MOVE_SCORE = IID_MOVE_SCORE - 1;
     constexpr int KILLER_1_MOVE_SCORE = 99;
     constexpr int KILLER_2_MOVE_SCORE = KILLER_1_MOVE_SCORE - 1;
     // ヒストリーの点数の最大値。
