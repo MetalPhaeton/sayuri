@@ -396,6 +396,8 @@ namespace Sayuri {
             ptr->score_ += MATERIAL[ptr->move_.promotion_] - MATERIAL[PAWN];
           }
         }
+      } else {
+        ptr->score_ = 0;
       }
     }
   }
