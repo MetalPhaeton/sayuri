@@ -238,7 +238,8 @@ namespace Sayuri {
         return shared_st_ptr_->iid_stack_;
       }
       // キラームーブスタック。
-      const Move (& killer_stack() const)[MAX_PLYS] {
+      // killer_stack_[ply][同一レベル: 0、2プライ前: 1]
+      const Move (& killer_stack() const)[MAX_PLYS + 2][2] {
         return shared_st_ptr_->killer_stack_;
       }
 
@@ -396,7 +397,8 @@ namespace Sayuri {
         // IIDでの最善手スタック。
         Move iid_stack_[MAX_PLYS];
         // キラームーブスタック。
-        Move killer_stack_[MAX_PLYS];
+        // killer_stack_[ply][同一レベル: 0、2プライ前: 1]
+        Move killer_stack_[MAX_PLYS + 2][2];
         // 現在のIterative Deepeningの深さ。
         int i_depth_;
         // 探索したノード数。

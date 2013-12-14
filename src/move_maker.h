@@ -73,9 +73,10 @@ namespace Sayuri {
       // [引数]
       // prev_best: TTに登録された前回の繰り返しの最善手。
       // iid_move: IIDによる最善手。
-      // killer: キラームーブ。
+      // killer_1: キラームーブ。同一レベルのノードで記録した手。
+      // killer_2: キラームーブ。2プライ前のレベルのノードで記録した手。
       template<GenMoveType Type> void GenMoves(Move prev_best,
-      Move iid_move, Move killer);
+      Move iid_move, Move killer_1, Move killer_2);
       // 次の手を取り出す。
       // [戻り値]
       // 次の手。
@@ -96,10 +97,12 @@ namespace Sayuri {
       // prev_best: TTに登録された前回の繰り返しの最善手。
       // iid_move: IIDで得た手。
       // killer: キラームーブ。
+      // killer_1: キラームーブ。同一レベルのノードで記録した手。
+      // killer_2: キラームーブ。2プライ前のレベルのノードで記録した手。
       // side: 手のサイド。
       template<GenMoveType Type>
       void ScoreMove(MoveSlot* ptr,
-      Move prev_best, Move iid_move, Move killer, Side side);
+      Move prev_best, Move iid_move, Move killer_1, Move killer_2, Side side);
 
       /****************/
       /* メンバ変数。 */

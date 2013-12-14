@@ -386,7 +386,7 @@ namespace Sayuri {
     // 手を展開する。
     shared_st_ptr_->history_max_ = 1ULL;  // makerが0の除算をしないように。
     MoveMaker maker(*this);
-    maker.GenMoves<GenMoveType::ALL>(Move(), Move(), Move());
+    maker.GenMoves<GenMoveType::ALL>(Move(), Move(), Move(), Move());
     // 合法手かどうか調べる。
     bool is_legal = false;
     Side side = to_move_;
@@ -952,7 +952,10 @@ namespace Sayuri {
     }
     for (int i = 0; i < MAX_PLYS; i++) {
       iid_stack_[i] = Move();
-      killer_stack_[i] = Move();
+      killer_stack_[i][0] = Move();
+      killer_stack_[i][1] = Move();
+      killer_stack_[i + 2][0] = Move();
+      killer_stack_[i + 2][1] = Move();
     }
     helper_queue_ptr_.reset(new HelperQueue());
   }
@@ -993,7 +996,10 @@ namespace Sayuri {
     history_max_ = shared_st.history_max_;
     for (int i = 0; i < MAX_PLYS; i++) {
       iid_stack_[i] = shared_st.iid_stack_[i];
-      killer_stack_[i] = shared_st.killer_stack_[i];
+      killer_stack_[i][0] = shared_st.killer_stack_[i][0];
+      killer_stack_[i][0] = shared_st.killer_stack_[i][0];
+      killer_stack_[i + 2][1] = shared_st.killer_stack_[i + 2][1];
+      killer_stack_[i + 2][1] = shared_st.killer_stack_[i + 2][1];
     }
     i_depth_ = shared_st.i_depth_;
     num_searched_nodes_ = shared_st.num_searched_nodes_;

@@ -90,11 +90,13 @@ namespace Sayuri {
     if (IsAttacked(king_[side], enemy_side)) {
       maker.GenMoves<GenMoveType::ALL>(prev_best,
       shared_st_ptr_->iid_stack_[level],
-      shared_st_ptr_->killer_stack_[level]);
+      shared_st_ptr_->killer_stack_[level][0],
+      shared_st_ptr_->killer_stack_[level][1]);
     } else {
       maker.GenMoves<GenMoveType::CAPTURE>(prev_best,
       shared_st_ptr_->iid_stack_[level],
-      shared_st_ptr_->killer_stack_[level]);
+      shared_st_ptr_->killer_stack_[level][0],
+      shared_st_ptr_->killer_stack_[level][1]);
     }
 
     // マテリアルを得る。
@@ -265,7 +267,9 @@ namespace Sayuri {
     // 手を作る。
     MoveMaker maker(*this);
     maker.GenMoves<GenMoveType::ALL>(prev_best,
-    shared_st_ptr_->iid_stack_[level], shared_st_ptr_->killer_stack_[level]);
+    shared_st_ptr_->iid_stack_[level],
+    shared_st_ptr_->killer_stack_[level][0],
+    shared_st_ptr_->killer_stack_[level][1]);
 
     // Futility Pruningの準備。
     int material = GetMaterial(side);
@@ -289,8 +293,8 @@ namespace Sayuri {
         break;
       }
 
-      // 1つ目以降の手なら別スレッドに助けを求める。(YBWC)
-      if (num_searched_moves >= 1) {
+      // 4つ目以降の手なら別スレッドに助けを求める。(YBWC)
+      if (num_searched_moves >= 4) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
@@ -407,14 +411,14 @@ namespace Sayuri {
         // 評価値の種類をセット。
         score_type = ScoreType::BETA;
 
-        // キラームーブ。
-        shared_st_ptr_->killer_stack_[level] = move;
-
-        // ヒストリー。
+        // 取らない手。
         if (!(move.captured_piece_)) {
-          shared_st_ptr_->history_[side][move.from_][move.to_] +=
-          depth;
+          // キラームーブ。
+          shared_st_ptr_->killer_stack_[level][0] = move;
+          shared_st_ptr_->killer_stack_[level + 2][1] = move;
 
+          // ヒストリー。
+          shared_st_ptr_->history_[side][move.from_][move.to_] += depth;
           if (shared_st_ptr_->history_[side][move.from_][move.to_]
           > shared_st_ptr_->history_max_) {
             shared_st_ptr_->history_max_ =
@@ -492,7 +496,10 @@ namespace Sayuri {
     }
     for (int i = 0; i < MAX_PLYS; i++) {
       shared_st_ptr_->iid_stack_[i] = Move();
-      shared_st_ptr_->killer_stack_[i] = Move();
+      shared_st_ptr_->killer_stack_[i][0] = Move();
+      shared_st_ptr_->killer_stack_[i][1] = Move();
+      shared_st_ptr_->killer_stack_[i + 2][0] = Move();
+      shared_st_ptr_->killer_stack_[i + 2][1] = Move();
     }
     shared_st_ptr_->history_max_ = 1ULL;
     shared_st_ptr_->stop_now_ = false;
@@ -551,7 +558,9 @@ namespace Sayuri {
       std::mutex mutex;
       PositionRecord record(*this);
       maker.GenMoves<GenMoveType::ALL>(prev_best,
-      shared_st_ptr_->iid_stack_[level], shared_st_ptr_->killer_stack_[level]);
+      shared_st_ptr_->iid_stack_[level],
+      shared_st_ptr_->killer_stack_[level][0],
+      shared_st_ptr_->killer_stack_[level][1]);
       NodeType node_type = NodeType::PV;
       int num_searched_moves = 0;
       bool is_reduced_by_null = false;
@@ -644,8 +653,8 @@ namespace Sayuri {
         break;
       }
 
-      // 1つ目以降の手の探索なら別スレッドに助けを求める。(YBWC)
-      if (job.num_searched_moves() >= 1) {
+      // 4つ目以降の手の探索なら別スレッドに助けを求める。(YBWC)
+      if (job.num_searched_moves() >= 4) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
@@ -768,13 +777,14 @@ namespace Sayuri {
         // 評価値の種類をセット。
         job.score_type() = ScoreType::BETA;
 
-        // キラームーブ。
-        shared_st_ptr_->killer_stack_[job.level()] = move;
-
-        // ヒストリー。
+        // 取らない手。
         if (!(move.captured_piece_)) {
-          shared_st_ptr_->history_[side][move.from_][move.to_] +=
-          job.depth();
+          // キラームーブ。
+          shared_st_ptr_->killer_stack_[job.level()][0] = move;
+          shared_st_ptr_->killer_stack_[job.level() + 2][1] = move;
+
+          // ヒストリー。
+          shared_st_ptr_->history_[side][move.from_][move.to_] += job.depth();
           if (shared_st_ptr_->history_[side][move.from_][move.to_]
           > shared_st_ptr_->history_max_) {
             shared_st_ptr_->history_max_ =
@@ -835,8 +845,8 @@ namespace Sayuri {
         }
       }
 
-      // 1つ目以降の手の探索なら別スレッドに助けを求める。(YBWC)
-      if (job.num_searched_moves() >= 1) {
+      // 4つ目以降の手の探索なら別スレッドに助けを求める。(YBWC)
+      if (job.num_searched_moves() >= 4) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
