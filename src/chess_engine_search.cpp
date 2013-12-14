@@ -1044,6 +1044,8 @@ namespace Sayuri {
       if (!(IsAttacked(king_[side], side ^ 0x3))) {
         // 再帰して次の局面の評価値を得る。
         score = capture_value - self->SEE(GetNextSEEMove(move.to_));
+        // Standing Pad。
+        score = score >= 0 ? score : 0;
       }
 
       self->UnmakeMove(move);
