@@ -418,7 +418,8 @@ namespace Sayuri {
           shared_st_ptr_->killer_stack_[level + 2][1] = move;
 
           // ヒストリー。
-          shared_st_ptr_->history_[side][move.from_][move.to_] += depth;
+          shared_st_ptr_->history_[side][move.from_][move.to_] +=
+          depth * depth;
           if (shared_st_ptr_->history_[side][move.from_][move.to_]
           > shared_st_ptr_->history_max_) {
             shared_st_ptr_->history_max_ =
@@ -784,7 +785,8 @@ namespace Sayuri {
           shared_st_ptr_->killer_stack_[job.level() + 2][1] = move;
 
           // ヒストリー。
-          shared_st_ptr_->history_[side][move.from_][move.to_] += job.depth();
+          shared_st_ptr_->history_[side][move.from_][move.to_] +=
+          job.depth() * job.depth();
           if (shared_st_ptr_->history_[side][move.from_][move.to_]
           > shared_st_ptr_->history_max_) {
             shared_st_ptr_->history_max_ =
@@ -1025,12 +1027,6 @@ namespace Sayuri {
     int score = 0;
 
     if (move.all_) {
-      // 取る手じゃなければ無視。
-      if ((side_board_[move.from_] != to_move_)
-      || (side_board_[move.to_] != (to_move_ ^ 0x3))) {
-        return score;
-      }
-
       // キングを取る手なら無視。
       if (piece_board_[move.to_] == KING) {
         return score;
@@ -1073,7 +1069,7 @@ namespace Sayuri {
 
     // 価値の低いものから調べる。
     for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
-      Bitboard attackers;
+      Bitboard attackers = 0ULL;
       Piece promotion = EMPTY;
       switch (piece_type) {
         case PAWN:
@@ -1109,6 +1105,7 @@ namespace Sayuri {
         move.from_ = Util::GetSquare(attackers);
         move.to_  = target;
         move.promotion_ = promotion;
+        move.move_type_ = NORMAL;
         return move;
       }
     }

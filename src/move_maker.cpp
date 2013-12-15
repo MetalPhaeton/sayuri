@@ -351,8 +351,10 @@ namespace Sayuri {
     constexpr int BEST_MOVE_SCORE = MAX_VALUE;
     // IIDで得た最善手の点数。
     constexpr int IID_MOVE_SCORE = BEST_MOVE_SCORE - 1;
+    // 駒を取る手の下限値。20 * 20を目安に設定。
+    constexpr int MIN_CAPTURE_SCORE = 403;
     // キラームーブの点数。
-    constexpr int KILLER_1_MOVE_SCORE = 99;
+    constexpr int KILLER_1_MOVE_SCORE = MIN_CAPTURE_SCORE - 1;
     constexpr int KILLER_2_MOVE_SCORE = KILLER_1_MOVE_SCORE - 1;
     // ヒストリーの点数の最大値。
     constexpr std::uint64_t MAX_HISTORY_SCORE = KILLER_2_MOVE_SCORE - 1;
@@ -372,17 +374,7 @@ namespace Sayuri {
       ptr->score_ = KILLER_2_MOVE_SCORE;
     } else {
       // その他の手を各候補手のタイプに分ける。
-      if (Type == GenMoveType::NON_CAPTURE) {
-        // ヒストリーを使って点数をつけていく。
-        // ヒストリーをセンチポーンに換算。
-        ptr->score_ =
-        (engine_ptr_->history()[side][ptr->move_.from_][ptr->move_.to_]
-        * MAX_HISTORY_SCORE) / engine_ptr_->history_max();
-        // 昇格の得点を加算。
-        if (ptr->move_.promotion_) {
-          ptr->score_ += MATERIAL[ptr->move_.promotion_] - MATERIAL[PAWN];
-        }
-      } else if (Type == GenMoveType::CAPTURE) {
+      if ((Type == GenMoveType::CAPTURE) || ptr->move_.promotion_) {
         // SEEで点数をつけていく。
         // 現在チェックされていれば、<取る駒> - <自分の駒>。
         if (!(engine_ptr_->IsAttacked
@@ -396,8 +388,12 @@ namespace Sayuri {
             ptr->score_ += MATERIAL[ptr->move_.promotion_] - MATERIAL[PAWN];
           }
         }
+        ptr->score_ += MIN_CAPTURE_SCORE;
       } else {
-        ptr->score_ = 0;
+        // ヒストリーを使って点数をつけていく。
+        ptr->score_ =
+        (engine_ptr_->history()[side][ptr->move_.from_][ptr->move_.to_]
+        * MAX_HISTORY_SCORE) / engine_ptr_->history_max();
       }
     }
   }
