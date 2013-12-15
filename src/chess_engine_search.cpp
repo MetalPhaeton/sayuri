@@ -326,7 +326,7 @@ namespace Sayuri {
       // 探索。
       // Late Move Reduction。
       // ただし、Null Move Reductionされていれば実行しない。
-      int score;
+      int score = 0;
       PVLine next_line;
       int temp_alpha = alpha;
       int temp_beta = beta;
@@ -686,7 +686,7 @@ namespace Sayuri {
 
       // Late Move Reduction。
       // ただし、Null Move Reductionされていれば実行しない。
-      int score;
+      int score = 0;
       PVLine next_line;
       int temp_alpha = job.alpha();
       int temp_beta = job.beta();
@@ -872,7 +872,7 @@ namespace Sayuri {
       job.mutex().unlock();
 
       // PVSearch。
-      int score;
+      int score = 0;
       PVLine next_line;
       int temp_alpha = job.alpha();
       int temp_beta = job.beta();
