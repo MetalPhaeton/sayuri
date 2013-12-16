@@ -260,10 +260,9 @@ namespace Sayuri {
     }
 
     // ウェイトを付けて評価値を得る。
+    constexpr int NUM_KINGS = 2;
     double num_pieces = static_cast<double>
-    (Util::CountBits((engine_ptr_->blocker_0())
-    & ~(engine_ptr_->position()[WHITE][KING]
-    | engine_ptr_->position()[BLACK][KING])));
+    (Util::CountBits(engine_ptr_->blocker_0()) - NUM_KINGS);
     // マテリアル。
     double score = static_cast<double>(engine_ptr_->GetMaterial(side));
     // ポーンの配置。
