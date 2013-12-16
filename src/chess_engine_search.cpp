@@ -1033,7 +1033,13 @@ namespace Sayuri {
       }
 
       // 取る駒の価値を得る。
-      int capture_value = MATERIAL[piece_board_[move.to_]];
+      int capture_value = 0;
+      if (move.move_type_ == EN_PASSANT) {
+        // アンパッサン。
+        capture_value = MATERIAL[PAWN];
+      } else {
+        capture_value = MATERIAL[piece_board_[move.to_]];
+      }
 
       // ポーンの昇格。
       if (move.promotion_) {
