@@ -1132,7 +1132,7 @@ namespace Sayuri {
 
     // マージン。
     if (depth <= 1) margin += MATERIAL[KNIGHT];
-    else if (depth == 2) margin += MATERIAL[ROOK];
+    else if (depth == 2) margin += MATERIAL[ROOK] + MATERIAL[PAWN];
     else margin += MATERIAL[QUEEN];
 
     return margin;
