@@ -35,7 +35,7 @@ namespace Sayuri {
   /******************/
   /* エンジン情報。 */
   /******************/
-  constexpr const char* ID_NAME = "Sayuri 2013.12.17";
+  constexpr const char* ID_NAME = "Sayuri 2013.12.18";
   constexpr const char* ID_AUTHOR = "Hironori Ishibashi";
 
   /*******************/
