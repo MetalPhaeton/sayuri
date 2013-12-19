@@ -43,7 +43,7 @@ namespace Sayuri {
   Job::Job(std::mutex& mutex, MoveMaker& maker, ChessEngine& client,
   PositionRecord& record, NodeType node_type, Hash pos_hash, int depth,
   int level, int& alpha, int& beta, int& delta, TranspositionTable& table,
-  PVLine& pv_line, bool is_null_searching, bool is_reduced_by_null,
+  PVLine& pv_line, bool is_null_searching, int null_reduction,
   int& num_searched_moves, ScoreType& score_type, int material,
   bool is_checked, bool& has_legal_move,
   std::vector<Move>* moves_to_search_ptr, TimePoint& next_print_info_time) :
@@ -60,7 +60,7 @@ namespace Sayuri {
   table_ptr_(&table),
   pv_line_ptr_(&pv_line),
   is_null_searching_(is_null_searching),
-  is_reduced_by_null_(is_reduced_by_null),
+  null_reduction_(null_reduction),
   num_searched_moves_ptr_(&num_searched_moves),
   score_type_ptr_(&score_type),
   material_(material),
@@ -149,7 +149,7 @@ namespace Sayuri {
     table_ptr_ = job.table_ptr_;
     pv_line_ptr_ = job.pv_line_ptr_;
     is_null_searching_ = job.is_null_searching_;
-    is_reduced_by_null_ = job.is_reduced_by_null_;
+    null_reduction_ = job.null_reduction_;
     num_searched_moves_ptr_ = job.num_searched_moves_ptr_;
     score_type_ptr_ = job.score_type_ptr_;
     material_ = job.material_;

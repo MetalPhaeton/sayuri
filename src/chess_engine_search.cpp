@@ -220,7 +220,7 @@ namespace Sayuri {
     }
 
     // PVノードの時はIID、そうじゃないノードならNull Move Reduction。
-    bool is_reduced_by_null = false;
+    int null_reduction = 0;
     if (Type == NodeType::PV) {
       // 前回の繰り返しの最善手があればIIDしない。
       if (prev_best.all_) {
@@ -256,7 +256,7 @@ namespace Sayuri {
 
         if (score >= beta) {
           depth -= reduction;
-          is_reduced_by_null = true;
+          null_reduction = reduction;
         }
       }
     }
@@ -285,7 +285,7 @@ namespace Sayuri {
     TimePoint dummy_time;
     Job job(mutex, maker, *this, record, Type, pos_hash, depth, level,
     alpha, beta, dummy_delta, table, pv_line, is_null_searching_,
-    is_reduced_by_null, num_searched_moves, score_type, material,
+    null_reduction, num_searched_moves, score_type, material,
     is_checked, has_legal_move, nullptr, dummy_time);
     for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
       // すでにベータカットされていればループを抜ける。
@@ -332,7 +332,7 @@ namespace Sayuri {
       int temp_beta = beta;
       bool did_lmr = false;
       if (!is_checked && !(move.captured_piece_) && !(move.promotion_)
-      && !is_reduced_by_null && (depth >= 3) && (num_searched_moves >= 4)) {
+      && !null_reduction && (depth >= 3) && (num_searched_moves >= 4)) {
         did_lmr = true;
         int reduction = 1;
         if (Type == NodeType::NON_PV) {
@@ -459,7 +459,9 @@ namespace Sayuri {
     }
 
     // トランスポジションテーブルに登録。
-    if (!is_null_searching_) {
+    // Null Move探索中の局面は登録しない。
+    // Null Move Reductionされていた場合、容量節約のため登録しない。
+    if (!is_null_searching_ || !null_reduction) {
       if (!entry_ptr) {
         table.Add(pos_hash, depth, alpha, score_type,
         pv_line.line()[0].move());
@@ -564,13 +566,13 @@ namespace Sayuri {
       shared_st_ptr_->killer_stack_[level][1]);
       NodeType node_type = NodeType::PV;
       int num_searched_moves = 0;
-      bool is_reduced_by_null = false;
+      int null_reduction = 0;
       ScoreType score_type = ScoreType::EXACT;
       int material = GetMaterial(to_move_);
       bool has_legal_move = false;
       Job job(mutex, maker, *this, record, node_type, pos_hash,
       shared_st_ptr_->i_depth_, level, alpha, beta, delta, table, pv_line,
-      is_null_searching_, is_reduced_by_null, num_searched_moves, score_type,
+      is_null_searching_, null_reduction, num_searched_moves, score_type,
       material, is_checked, has_legal_move, moves_to_search_ptr,
       next_print_info_time);
 
@@ -692,7 +694,7 @@ namespace Sayuri {
       int temp_beta = job.beta();
       bool did_lmr = false;
       if (!(job.is_checked()) && !(move.captured_piece_) && !(move.promotion_)
-      && !(job.is_reduced_by_null()) && (job.depth() >= 3)
+      && !(job.null_reduction()) && (job.depth() >= 3)
       && (job.num_searched_moves() >= 4)) {
         did_lmr = true;
         int reduction = 1;
