@@ -65,14 +65,6 @@ namespace Sayuri {
       /**********/
       /* 関数。 */
       /**********/
-      // ハッシュとレベルと深さと手番から
-      // 同じポジションかどうか判定する。
-      // [引数]
-      // hash: ハッシュ。
-      // depth: 探索の深さ。
-      // [戻り値]
-      // 同じならtrue。
-      bool Fulfil(Hash hash, int depth) const;
       // エントリーをアップデートする。
       // [引数]
       // score: 評価値。
@@ -94,11 +86,6 @@ namespace Sayuri {
       // 最善手。
       Move best_move() const {return best_move_;}
 
-      /**********************/
-      /* ソート用比較関数。 */
-      /**********************/
-      static bool Compare(const TTEntry& first, const TTEntry& second);
-
     private:
       /****************/
       /* メンバ変数。 */
@@ -117,22 +104,13 @@ namespace Sayuri {
 
   // トランスポジションテーブルのクラス。
   class TranspositionTable {
-    private:
-      /**********/
-      /* 定数。 */
-      /**********/
-      // ハッシュのテーブル用マスク。
-      static constexpr Hash TABLE_HASH_MASK = 0XffffULL;
-      // テーブルの大きさ。
-      static constexpr std::size_t TABLE_SIZE = TABLE_HASH_MASK + 1ULL;
-
     public:
       /**************************/
       /* コンストラクタと代入。 */
       /**************************/
       // [引数]
-      // max_bytes: トランスポジションテーブルのサイズ指定。
-      TranspositionTable(std::size_t max_bytes);
+      // table_size: トランスポジションテーブルのサイズ指定。
+      TranspositionTable(std::size_t table_size);
       TranspositionTable(const TranspositionTable& table);
       TranspositionTable(TranspositionTable&& table);
       TranspositionTable& operator=(const TranspositionTable& table);
@@ -165,7 +143,7 @@ namespace Sayuri {
       // [戻り値]
       // サイズをバイト数で返す。
       std::size_t GetSizeBytes() const {
-        return num_all_entries_ * sizeof(TTEntry);
+        return entry_table_ptr_->size() * sizeof(TTEntry);
       }
 
 
@@ -174,22 +152,12 @@ namespace Sayuri {
       // エントリーのパーミル。
       int GetUsedPermill() const {
         return static_cast<int>
-        ((num_used_entries_ * 1000) / num_all_entries_);
+        ((num_used_entries_ * 1000) / entry_table_ptr_->size());
       }
 
       // トランスポジションテーブルのロックを使う。
       void Lock() {mutex_.lock();}
       void Unlock() {mutex_.unlock();}
-
-      /****************/
-      /* static関数。 */
-      /****************/
-      // テーブルの最小サイズを得る。
-      // [戻り値]
-      // 最小サイズ。
-      static std::size_t GetMinSize() {
-        return sizeof(TTEntry) * TABLE_SIZE;
-      }
 
     private:
       /**********************/
@@ -198,22 +166,17 @@ namespace Sayuri {
       // テーブルのインデックスを得る。
       // [引数]
       // pos_hash: ポジションのハッシュ。
-      int GetTableIndex(Hash pos_hash) const {
-        return pos_hash & (TABLE_HASH_MASK);
+      std::size_t GetTableIndex(Hash pos_hash) const {
+        return pos_hash % entry_table_ptr_->size();
       }
 
       /****************/
       /* メンバ変数。 */
       /****************/
-      // サイズの上限。
-      std::size_t max_bytes_;
-      // 全てのエントリーの個数。
-      std::size_t num_all_entries_;
       // 使用済みのエントリーの個数。
       std::size_t num_used_entries_;
       // エントリーを登録するテーブル。
-      std::unique_ptr<std::array<std::vector<TTEntry>, TABLE_SIZE>>
-      entry_table_ptr_;
+      std::unique_ptr<std::vector<TTEntry>> entry_table_ptr_;
       // ミューテックス。
       std::mutex mutex_;
   };
