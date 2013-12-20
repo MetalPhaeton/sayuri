@@ -29,8 +29,6 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-#include <array>
-#include <algorithm>
 #include <mutex>
 #include <cstddef>
 #include "chess_def.h"

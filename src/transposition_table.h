@@ -30,7 +30,6 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-#include <array>
 #include <mutex>
 #include <cstddef>
 #include "chess_def.h"
