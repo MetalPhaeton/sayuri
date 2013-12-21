@@ -63,14 +63,20 @@ UCIオプション
 --------------------------------------------------------------------------------
 以下のコマンドでエンジンの設定を変更できます。
 
-ハッシュテーブルのサイズを変更。(デフォルトは32。最大は8192。最小は3。)
+ハッシュテーブルのサイズを変更。(デフォルトは32。最大は8192。最小は8。)
     setoption name Hash value <サイズ、メガバイト>
+
+ハッシュテーブルを初期化。
+    setoption name Clear Hash
 
 Ponderの有効化、無効化。(デフォルトはtrue。)
     setoption name Ponder value <true、又はfalse>
 
 探索用スレッドの数。(デフォルトは1。最大は64。最小は1。)
     setoption name Threads value <スレッドの数>
+
+アナライズモードの有効化、無効化。(デフォルトはfalse。)
+    setoption name UCI_AnalyseMode value <true、又はfalse>
 
 
 *******************
@@ -138,14 +144,21 @@ UCI Options
 --------------------------------------------------------------------------------
 With following commands, you can change setup of Sayuri.
 
-To change the size(megabytes) of a hash table.
-(Default is 32. Maximum is 8192. Minimum is 3.)
+Change the size(megabytes) of a hash table.
+(Default is 32. Maximum is 8192. Minimum is 8.)
     setoption name Hash value <size(megabytes)>
 
-To enable ponder.
+Initialize the hash table.
+    setoption name Clear Hash
+
+Enable ponder.
 (Default is "true".)
     setoption name Ponder value <true or false>
 
-To change the number of threads.
+Change the number of threads.
 (Default is 1. Maximum is 64. Minimum is 1.)
     setoption name Threads value <the number of threads>
+
+Enable analyse mode.
+(Default is "false".)
+    setoption name UCI_AnalyseMode value <true or false>
