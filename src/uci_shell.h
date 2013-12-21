@@ -228,6 +228,8 @@ namespace Sayuri {
       /****************/
       // チェスエンジン。
       ChessEngine* engine_ptr_;
+      // トランスポジションテーブル。
+      std::unique_ptr<TranspositionTable> table_ptr_;
       // スレッド。
       std::thread thinking_thread_;
       // 思考すべき候補手のベクトル。
@@ -239,6 +241,8 @@ namespace Sayuri {
       bool enable_pondering_;
       // オプション。スレッドの数。
       int num_threads_;
+      // アナライズモード。
+      bool analyse_mode_;
   };
 }  // namespace Sayuri
 

@@ -95,8 +95,8 @@ namespace Sayuri {
       num_used_entries_++;
     }
 
-    // depthがすでに登録されているエントリーより大きければ登録。
-    if (depth > (*entry_table_ptr_)[index].depth()) {
+    // depthがすでに登録されているエントリー以上なら登録。
+    if (depth >= (*entry_table_ptr_)[index].depth()) {
       (*entry_table_ptr_)[index] =
       TTEntry(pos_hash, depth, score, score_type, best_move);
     }

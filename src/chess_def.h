@@ -48,6 +48,7 @@ namespace Sayuri {
   constexpr bool UCI_DEFAULT_PONDER = true;
   constexpr int UCI_DEFAULT_THREADS = 1;
   constexpr int UCI_MAX_THREADS = 64;
+  constexpr bool UCI_DEFAULT_ANALYSE_MODE = false;
 
   /**********/
   /* 基本。 */
