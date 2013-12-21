@@ -44,7 +44,8 @@ namespace Sayuri {
   // コンストラクタ。
   TranspositionTable::TranspositionTable(std::size_t table_size) :
   num_used_entries_(0),
-  entry_table_ptr_(new std::vector<TTEntry>(1)) {
+  entry_table_ptr_(new std::vector<TTEntry>(1)),
+  age_(0) {
     // エントリーをいくつ作るか計算する。
     std::size_t num_entries = table_size / sizeof(TTEntry);
 
@@ -57,18 +58,21 @@ namespace Sayuri {
   // コピーコンストラクタ。
   TranspositionTable::TranspositionTable(const TranspositionTable& table) :
   num_used_entries_(table.num_used_entries_),
-  entry_table_ptr_(new std::vector<TTEntry>(*(table.entry_table_ptr_))) {}
+  entry_table_ptr_(new std::vector<TTEntry>(*(table.entry_table_ptr_))),
+  age_(table.age_) {}
 
   // ムーブコンストラクタ。
   TranspositionTable::TranspositionTable( TranspositionTable&& table) :
   num_used_entries_(table.num_used_entries_),
-  entry_table_ptr_(std::move(table.entry_table_ptr_)){}
+  entry_table_ptr_(std::move(table.entry_table_ptr_)),
+  age_(table.age_) {}
 
   // コピー代入。
   TranspositionTable&
   TranspositionTable::operator=(const TranspositionTable& table) {
     num_used_entries_ = table.num_used_entries_;
     *entry_table_ptr_ = *(table.entry_table_ptr_);
+    age_ = table.age_;
 
     return *this;
   }
@@ -78,6 +82,7 @@ namespace Sayuri {
   TranspositionTable::operator=(TranspositionTable&& table) {
     num_used_entries_ = table.num_used_entries_;
     entry_table_ptr_ = std::move(table.entry_table_ptr_);
+    age_ = table.age_;
 
     return *this;
   }
@@ -95,10 +100,12 @@ namespace Sayuri {
       num_used_entries_++;
     }
 
+    // テーブルが若い時にに登録されているものなら上書き。
     // depthがすでに登録されているエントリー以上なら登録。
-    if (depth >= (*entry_table_ptr_)[index].depth()) {
+    if (((*entry_table_ptr_)[index].table_age() < age_)
+    || (depth >= (*entry_table_ptr_)[index].depth())) {
       (*entry_table_ptr_)[index] =
-      TTEntry(pos_hash, depth, score, score_type, best_move);
+      TTEntry(pos_hash, depth, score, score_type, best_move, age_);
     }
   }
 
@@ -122,22 +129,22 @@ namespace Sayuri {
   /* エントリーのクラス。 */
   /************************/
   // コンストラクタ。
-  TTEntry::TTEntry(Hash hash, int depth, int score,
-  ScoreType score_type, Move best_move) :
+  TTEntry::TTEntry(Hash hash, int depth, int score, ScoreType score_type,
+  Move best_move, int table_age) :
   hash_(hash),
   depth_(depth),
   score_(score),
   score_type_(score_type),
-  best_move_(best_move) {
-  }
+  best_move_(best_move),
+  table_age_(table_age) {}
 
   // デフォルトコンストラクタ。
   TTEntry::TTEntry() :
   hash_(0ULL),
   depth_(-MAX_VALUE),
   score_(0),
-  score_type_(ScoreType::ALPHA) {
-  }
+  score_type_(ScoreType::ALPHA),
+  table_age_(-1) {}
 
   // コピーコンストラクタ。
   TTEntry::TTEntry(const TTEntry& entry) :
@@ -145,8 +152,8 @@ namespace Sayuri {
   depth_(entry.depth_),
   score_(entry.score_),
   score_type_(entry.score_type_),
-  best_move_(entry.best_move_) {
-  }
+  best_move_(entry.best_move_),
+  table_age_(entry.table_age_) {}
 
   // ムーブコンストラクタ。
   TTEntry::TTEntry(TTEntry&& entry) :
@@ -154,8 +161,8 @@ namespace Sayuri {
   depth_(entry.depth_),
   score_(entry.score_),
   score_type_(entry.score_type_),
-  best_move_(entry.best_move_) {
-  }
+  best_move_(entry.best_move_),
+  table_age_(entry.table_age_) {}
 
   // コピー代入。
   TTEntry& TTEntry::operator=(const TTEntry& entry) {
@@ -164,6 +171,7 @@ namespace Sayuri {
     score_ = entry.score_;
     score_type_ = entry.score_type_;
     best_move_ = entry.best_move_;
+    table_age_ = entry.table_age_;
 
     return *this;
   }
@@ -175,14 +183,17 @@ namespace Sayuri {
     score_ = entry.score_;
     score_type_ = entry.score_type_;
     best_move_ = entry.best_move_;
+    table_age_ = entry.table_age_;
 
     return *this;
   }
 
   // エントリーをアップデートする。
-  void TTEntry::Update(int score, ScoreType score_type, Move best_move) {
+  void TTEntry::Update(int score, ScoreType score_type, Move best_move,
+  int table_age) {
     score_ = score;
     score_type_ = score_type;
     best_move_ = best_move;
+    table_age_ = table_age;
   }
 }  // namespace Sayuri

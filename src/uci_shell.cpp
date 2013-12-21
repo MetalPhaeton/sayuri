@@ -220,6 +220,9 @@ namespace Sayuri {
       shell.table_ptr_.reset(new TranspositionTable(shell.table_size_));
     }
 
+    // テーブルの年齢の増加。
+    shell.table_ptr_->GrowOld();
+
     // 思考開始。
     PVLine pv_line = shell.engine_ptr_->Calculate (shell.num_threads_,
     *(shell.table_ptr_.get()), shell.moves_to_search_ptr_.get());

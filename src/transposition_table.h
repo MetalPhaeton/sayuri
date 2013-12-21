@@ -52,8 +52,9 @@ namespace Sayuri {
       // value: 評価値。
       // score_type: 評価値の種類。
       // best_move: 最善手。
-      TTEntry(Hash pos_hash, int depth,
-      int value, ScoreType score_type, Move best_move);
+      // table_age: トランスポジションテーブルの年齢。
+      TTEntry(Hash pos_hash, int depth, int value, ScoreType score_type,
+      Move best_move, int table_age);
       TTEntry();
       TTEntry(const TTEntry& entry);
       TTEntry(TTEntry&& entry);
@@ -69,7 +70,9 @@ namespace Sayuri {
       // score: 評価値。
       // score_type: 評価値の種類。
       // best_move: 最善手。
-      void Update(int score, ScoreType score_type, Move best_move);
+      // table_age: トランスポジションテーブルの年齢。
+      void Update(int score, ScoreType score_type, Move best_move,
+      int table_age);
 
       /**************/
       /* アクセサ。 */
@@ -84,6 +87,8 @@ namespace Sayuri {
       ScoreType score_type() const {return score_type_;}
       // 最善手。
       Move best_move() const {return best_move_;}
+      // トランスポジションテーブルの年齢。
+      int table_age() const {return table_age_;}
 
     private:
       /****************/
@@ -99,6 +104,8 @@ namespace Sayuri {
       ScoreType score_type_;
       // 最善手。
       Move best_move_;
+      // 記録時のトランスポジションテーブルの年齢。
+      int table_age_;
   };
 
   // トランスポジションテーブルのクラス。
@@ -117,9 +124,9 @@ namespace Sayuri {
       virtual ~TranspositionTable() {}
       TranspositionTable() = delete;
 
-      /**********/
-      /* 関数。 */
-      /**********/
+      /********************/
+      /* パブリック関数。 */
+      /********************/
       // テーブルに追加する。
       // [引数]
       // pos_hash: ハッシュ。
@@ -129,6 +136,7 @@ namespace Sayuri {
       // best_move: 最善手。
       void Add(Hash pos_hash, int depth,
       int value, ScoreType score_type, Move best_move);
+
       // 条件を満たすエントリーを得る。
       // [引数]
       // pos_hash: ハッシュ。
@@ -137,6 +145,9 @@ namespace Sayuri {
       // 条件を満たすエントリー。
       // なければnullptr。
       TTEntry* GetEntry(Hash pos_hash, int depth);
+
+      // 年を取る。
+      void GrowOld() {age_++;}
 
       // 大きさが何バイトか返す。
       // [戻り値]
@@ -158,6 +169,12 @@ namespace Sayuri {
       void Lock() {mutex_.lock();}
       void Unlock() {mutex_.unlock();}
 
+      /**************/
+      /* アクセサ。 */
+      /**************/
+      // 年齢。
+      int age() const {return age_;}
+
     private:
       /**********************/
       /* プライベート関数。 */
@@ -176,6 +193,8 @@ namespace Sayuri {
       std::size_t num_used_entries_;
       // エントリーを登録するテーブル。
       std::unique_ptr<std::vector<TTEntry>> entry_table_ptr_;
+      // 年齢。
+      int age_;
       // ミューテックス。
       std::mutex mutex_;
   };

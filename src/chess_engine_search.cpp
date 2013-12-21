@@ -467,7 +467,8 @@ namespace Sayuri {
         pv_line.line()[0].move());
       } else if (entry_ptr->depth() == depth) {
         table.Lock();
-        entry_ptr->Update(alpha, score_type, pv_line.line()[0].move());
+        entry_ptr->Update(alpha, score_type, pv_line.line()[0].move(),
+        table.age());
         table.Unlock();
       }
     }
@@ -1004,7 +1005,9 @@ namespace Sayuri {
           job.table().Add(job.pos_hash(), job.depth(), score,
           ScoreType::EXACT, move);
         } else {
-          entry_ptr->Update(score, ScoreType::EXACT, move);
+          job.table().Lock();
+          entry_ptr->Update(score, ScoreType::EXACT, move, job.table().age());
+          job.table().Unlock();
         }
 
         // 標準出力にPV情報を表示。
