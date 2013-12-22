@@ -533,10 +533,26 @@ namespace Sayuri {
     TimePoint next_print_info_time = now + Chrono::milliseconds(1000);
     MoveMaker maker(*this);
     bool is_checked = IsAttacked(king_[side], enemy_side);
+    bool found_winning_mate = false;
     for (shared_st_ptr_->i_depth_ = 1; shared_st_ptr_->i_depth_ <= MAX_PLYS;
     shared_st_ptr_->i_depth_++) {
       // 探索終了。
       if (ShouldBeStopped()) break;
+
+      // ノードを加算。
+      shared_st_ptr_->num_searched_nodes_++;
+
+      // 勝てるメイトをすでに見つけていたら探索しない。
+      if (found_winning_mate) {
+        Chrono::milliseconds time =
+        Chrono::duration_cast<Chrono::milliseconds>
+        (SysClock::now() - shared_st_ptr_->start_time_);
+
+        UCIShell::PrintPVInfo(shared_st_ptr_->i_depth_, 0, SCORE_WIN, time,
+        shared_st_ptr_->num_searched_nodes_, pv_line);
+
+        continue;
+      }
 
       // 準備。
       int delta = 15;
@@ -548,9 +564,6 @@ namespace Sayuri {
         beta = alpha + delta;
         alpha -= delta;
       }
-
-      // ノードを加算。
-      shared_st_ptr_->num_searched_nodes_++;
 
       // 標準出力に深さ情報を送る。
       UCIShell::PrintDepthInfo(shared_st_ptr_->i_depth_);
@@ -585,6 +598,13 @@ namespace Sayuri {
       // ヘルプして待つ。
       shared_st_ptr_->helper_queue_ptr_->HelpRoot(job);
       job.WaitForHelpers();
+
+      // 勝てるメイトを見つけたらフラグを立てる。
+      // 直接ループを抜けない理由は、depth等の終了条件対策。
+      if ((pv_line.line()[pv_line.length() - 1].has_checkmated())
+      && (pv_line.score() >= SCORE_WIN)) {
+        found_winning_mate = true;
+      }
     }
 
     // スレッドをジョイン。
@@ -1020,6 +1040,7 @@ namespace Sayuri {
         Chrono::milliseconds time =
         Chrono::duration_cast<Chrono::milliseconds>
         (now - shared_st_ptr_->start_time_);
+
         UCIShell::PrintPVInfo(job.depth(), searched_level_, score,
         time, shared_st_ptr_->num_searched_nodes_, job.pv_line());
 

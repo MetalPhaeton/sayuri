@@ -74,14 +74,14 @@ namespace Sayuri {
   // ポーンの盾。
   const Evaluator::Weight Evaluator::WEIGHT_PAWN_SHIELD(2.5, 0.0);
   // ビショップペア。
-  const Evaluator::Weight Evaluator::WEIGHT_BISHOP_PAIR(10.0, 20.0);
+  const Evaluator::Weight Evaluator::WEIGHT_BISHOP_PAIR(10.0, 60.0);
   // バッドビショップ。
   const Evaluator::Weight Evaluator::WEIGHT_BAD_BISHOP(-0.7, 0.0);
   // ビショップにピンされたナイト。
   const Evaluator::Weight
   Evaluator::WEIGHT_PINED_KNIGHT_BY_BISHOP(-5.0, 0.0);
   // ルークペア。
-  const Evaluator::Weight Evaluator::WEIGHT_ROOK_PAIR(100.0, 200.0);
+  const Evaluator::Weight Evaluator::WEIGHT_ROOK_PAIR(10.0, 60.0);
   // セミオープンファイルのルーク。
   const Evaluator::Weight Evaluator::WEIGHT_ROOK_SEMI_OPEN(3.5, 3.5);
   // オープンファイルのルーク。
