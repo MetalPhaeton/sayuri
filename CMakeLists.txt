@@ -49,9 +49,9 @@ set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -Wall -O2 -march=native")
 set(CMAKE_C_FLAGS_DEBUG "-std=c++11 -Wall -O0 -g -march=native")
 set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -Wall -O0 -g -march=native")
 
-# プロファイル用オプションの設定。
-set(CMAKE_C_FLAGS_PROFILE "-std=c++11 -w -pg -march=native")
-set(CMAKE_CXX_FLAGS_PROFILE "-std=c++11 -w -pg -march=native")
+# プロファイル用コンパイラオプションの設定。
+set(CMAKE_C_FLAGS_PROFILE "-std=c++11 -Wall -pg -march=native")
+set(CMAKE_CXX_FLAGS_PROFILE "-std=c++11 -Wall -pg -march=native")
 
 # ビルド設定。
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
