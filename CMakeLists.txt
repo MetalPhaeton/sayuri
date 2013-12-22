@@ -42,8 +42,8 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 # リリース用のコンパイラのオプション設定。
-set(CMAKE_C_FLAGSE_RELEASE "-std=c++11 -Wall -g -O2 -march=native")
-set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -Wall -g -O2 -march=native")
+set(CMAKE_C_FLAGSE_RELEASE "-std=c++11 -Wall -O2 -march=native")
+set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -Wall -O2 -march=native")
 
 # デバッグ用のコンパイラオプションの設定
 set(CMAKE_C_FLAGS_DEBUG "-std=c++11 -Wall -O0 -g -march=native")
