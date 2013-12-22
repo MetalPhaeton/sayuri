@@ -157,12 +157,14 @@ namespace Sayuri {
       static const Weight WEIGHT_PAWN_SHIELD;
       // ビショップペア。
       static const Weight WEIGHT_BISHOP_PAIR;
-      // ばっどビショップ。
+      // バッドビショップ。
       static const Weight WEIGHT_BAD_BISHOP;
       // ビショップにピンされたナイト。
       static const Weight WEIGHT_PINED_KNIGHT_BY_BISHOP;
       // セミオープンファイルのルーク。
       static const Weight WEIGHT_ROOK_SEMI_OPEN;
+      // ルークペア。
+      static const Weight WEIGHT_ROOK_PAIR;
       // オープンファイルのルーク。
       static const Weight WEIGHT_ROOK_OPEN;
       // 早すぎるクイーンの始動。
@@ -371,6 +373,7 @@ namespace Sayuri {
       double bishop_pair_value_;  // ビショップペア。
       double bad_bishop_value_;  // バッドビショップ。
       double pined_knight_by_bishop_value_;  // ビショップにピンされたナイト。
+      double rook_pair_value_;  // ルークペア。
       double rook_semi_open_value_;  // セミオープンファイルのルーク。
       double rook_open_value_;  // オープンファイルのルーク。
       double early_queen_launched_value_;  // 早すぎるクイーンの始動。

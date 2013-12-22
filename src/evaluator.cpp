@@ -80,6 +80,8 @@ namespace Sayuri {
   // ビショップにピンされたナイト。
   const Evaluator::Weight
   Evaluator::WEIGHT_PINED_KNIGHT_BY_BISHOP(-5.0, 0.0);
+  // ルークペア。
+  const Evaluator::Weight Evaluator::WEIGHT_ROOK_PAIR(100.0, 200.0);
   // セミオープンファイルのルーク。
   const Evaluator::Weight Evaluator::WEIGHT_ROOK_SEMI_OPEN(3.5, 3.5);
   // オープンファイルのルーク。
@@ -204,6 +206,7 @@ namespace Sayuri {
     bishop_pair_value_ = 0.0;
     bad_bishop_value_ = 0.0;
     pined_knight_by_bishop_value_ = 0.0;
+    rook_pair_value_ = 0.0;
     rook_semi_open_value_ = 0.0;
     rook_open_value_ = 0.0;
     early_queen_launched_value_ = 0.0;
@@ -227,6 +230,13 @@ namespace Sayuri {
     }
     if (Util::CountBits(engine_ptr_->position()[enemy_side][BISHOP]) >= 2) {
       bishop_pair_value_ -= 1.0;
+    }
+    // ルークペア。
+    if (Util::CountBits(engine_ptr_->position()[side][ROOK]) >= 2) {
+      rook_pair_value_ += 1.0;
+    }
+    if (Util::CountBits(engine_ptr_->position()[enemy_side][ROOK]) >= 2) {
+      rook_pair_value_ -= 1.0;
     }
 
     // 各駒毎に価値を計算する。
@@ -336,6 +346,9 @@ namespace Sayuri {
     // ビショップにピンされたナイト。
     score += WEIGHT_PINED_KNIGHT_BY_BISHOP.GetScore
     (num_pieces, pined_knight_by_bishop_value_);
+    // ルークペア。
+    score += WEIGHT_ROOK_PAIR.GetScore
+    (num_pieces, rook_pair_value_);
     // セミオープンファイルのルーク。
     score += WEIGHT_ROOK_SEMI_OPEN.GetScore
     (num_pieces, rook_semi_open_value_);
