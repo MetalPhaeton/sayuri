@@ -240,8 +240,8 @@ namespace Sayuri {
     }
 
     // 各駒毎に価値を計算する。
-    Bitboard pieces = engine_ptr_->blocker_0();
-    for (; pieces; pieces &= pieces - 1) {
+    Bitboard all_pieces = engine_ptr_->blocker_0();
+    for (Bitboard pieces = all_pieces; pieces; pieces &= pieces - 1) {
       Square piece_square = Util::GetSquare(pieces);
       Side piece_side = engine_ptr_->side_board()[piece_square];
       switch (engine_ptr_->piece_board()[piece_square]) {
@@ -272,7 +272,7 @@ namespace Sayuri {
     // ウェイトを付けて評価値を得る。
     constexpr int NUM_KINGS = 2;
     double num_pieces = static_cast<double>
-    (Util::CountBits(engine_ptr_->blocker_0()) - NUM_KINGS);
+    (Util::CountBits(all_pieces) - NUM_KINGS);
     // マテリアル。
     double score = static_cast<double>(engine_ptr_->GetMaterial(side));
     // ポーンの配置。
