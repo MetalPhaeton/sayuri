@@ -74,12 +74,14 @@ namespace Sayuri {
   // ポーンの盾。
   const Evaluator::Weight Evaluator::WEIGHT_PAWN_SHIELD(2.5, 0.0);
   // ビショップペア。
-  const Evaluator::Weight Evaluator::WEIGHT_BISHOP_PAIR(10.0, 20.0);
+  const Evaluator::Weight Evaluator::WEIGHT_BISHOP_PAIR(10.0, 60.0);
   // バッドビショップ。
   const Evaluator::Weight Evaluator::WEIGHT_BAD_BISHOP(-0.7, 0.0);
   // ビショップにピンされたナイト。
   const Evaluator::Weight
   Evaluator::WEIGHT_PINED_KNIGHT_BY_BISHOP(-5.0, 0.0);
+  // ルークペア。
+  const Evaluator::Weight Evaluator::WEIGHT_ROOK_PAIR(10.0, 60.0);
   // セミオープンファイルのルーク。
   const Evaluator::Weight Evaluator::WEIGHT_ROOK_SEMI_OPEN(3.5, 3.5);
   // オープンファイルのルーク。
@@ -204,6 +206,7 @@ namespace Sayuri {
     bishop_pair_value_ = 0.0;
     bad_bishop_value_ = 0.0;
     pined_knight_by_bishop_value_ = 0.0;
+    rook_pair_value_ = 0.0;
     rook_semi_open_value_ = 0.0;
     rook_open_value_ = 0.0;
     early_queen_launched_value_ = 0.0;
@@ -228,10 +231,17 @@ namespace Sayuri {
     if (Util::CountBits(engine_ptr_->position()[enemy_side][BISHOP]) >= 2) {
       bishop_pair_value_ -= 1.0;
     }
+    // ルークペア。
+    if (Util::CountBits(engine_ptr_->position()[side][ROOK]) >= 2) {
+      rook_pair_value_ += 1.0;
+    }
+    if (Util::CountBits(engine_ptr_->position()[enemy_side][ROOK]) >= 2) {
+      rook_pair_value_ -= 1.0;
+    }
 
     // 各駒毎に価値を計算する。
-    Bitboard pieces = engine_ptr_->blocker_0();
-    for (; pieces; pieces &= pieces - 1) {
+    Bitboard all_pieces = engine_ptr_->blocker_0();
+    for (Bitboard pieces = all_pieces; pieces; pieces &= pieces - 1) {
       Square piece_square = Util::GetSquare(pieces);
       Side piece_side = engine_ptr_->side_board()[piece_square];
       switch (engine_ptr_->piece_board()[piece_square]) {
@@ -262,7 +272,7 @@ namespace Sayuri {
     // ウェイトを付けて評価値を得る。
     constexpr int NUM_KINGS = 2;
     double num_pieces = static_cast<double>
-    (Util::CountBits(engine_ptr_->blocker_0()) - NUM_KINGS);
+    (Util::CountBits(all_pieces) - NUM_KINGS);
     // マテリアル。
     double score = static_cast<double>(engine_ptr_->GetMaterial(side));
     // ポーンの配置。
@@ -336,6 +346,9 @@ namespace Sayuri {
     // ビショップにピンされたナイト。
     score += WEIGHT_PINED_KNIGHT_BY_BISHOP.GetScore
     (num_pieces, pined_knight_by_bishop_value_);
+    // ルークペア。
+    score += WEIGHT_ROOK_PAIR.GetScore
+    (num_pieces, rook_pair_value_);
     // セミオープンファイルのルーク。
     score += WEIGHT_ROOK_SEMI_OPEN.GetScore
     (num_pieces, rook_semi_open_value_);
