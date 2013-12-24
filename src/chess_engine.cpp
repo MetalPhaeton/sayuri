@@ -421,8 +421,6 @@ namespace Sayuri {
       shared_st_ptr_->ply_100_history_.push_back(ply_100_);
       MakeMove(move);
       shared_st_ptr_->position_history_.push_back(PositionRecord(*this));
-    } else {
-      throw SayuriError("合法手ではありません。");
     }
   }
 
