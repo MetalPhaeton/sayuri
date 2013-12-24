@@ -602,7 +602,7 @@ namespace Sayuri {
       // 勝てるメイトを見つけたらフラグを立てる。
       // 直接ループを抜けない理由は、depth等の終了条件対策。
       if ((pv_line.line()[pv_line.length() - 1].has_checkmated())
-      && (pv_line.score() >= SCORE_WIN)) {
+      && ((pv_line.length() - 1) % 2) == 1) {
         found_winning_mate = true;
       }
     }
