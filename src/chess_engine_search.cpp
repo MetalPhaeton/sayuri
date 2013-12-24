@@ -532,7 +532,7 @@ namespace Sayuri {
     TimePoint next_print_info_time = now + Chrono::milliseconds(1000);
     MoveMaker maker(*this);
     bool is_checked = IsAttacked(king_[side], enemy_side);
-    bool found_winning_mate = false;
+    bool found_mate = false;
     for (shared_st_ptr_->i_depth_ = 1; shared_st_ptr_->i_depth_ <= MAX_PLYS;
     shared_st_ptr_->i_depth_++) {
       // 探索終了。
@@ -541,8 +541,8 @@ namespace Sayuri {
       // ノードを加算。
       shared_st_ptr_->num_searched_nodes_++;
 
-      // 勝てるメイトをすでに見つけていたら探索しない。
-      if (found_winning_mate) {
+      // メイトをすでに見つけていたら探索しない。
+      if (found_mate) {
         Chrono::milliseconds time =
         Chrono::duration_cast<Chrono::milliseconds>
         (SysClock::now() - shared_st_ptr_->start_time_);
@@ -598,13 +598,10 @@ namespace Sayuri {
       shared_st_ptr_->helper_queue_ptr_->HelpRoot(job);
       job.WaitForHelpers();
 
-      // 勝てるメイトを見つけたらフラグを立てる。
+      // メイトを見つけたらフラグを立てる。
       // 直接ループを抜けない理由は、depth等の終了条件対策。
-      // if ((pv_line.line()[pv_line.length() - 1].has_checkmated())
-      // && ((pv_line.length() - 1) % 2) == 1) {
-      // test
       if (pv_line.line()[pv_line.length() - 1].has_checkmated()) {
-        found_winning_mate = true;
+        found_mate = true;
       }
     }
 
