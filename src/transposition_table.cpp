@@ -118,7 +118,7 @@ namespace Sayuri {
     TTEntry* entry_ptr = nullptr;
     std::size_t index = GetTableIndex(pos_hash);
     if ((depth <= (*entry_table_ptr_)[index].depth())
-    && (pos_hash == (*entry_table_ptr_)[index].hash())) {
+    && (pos_hash == (*entry_table_ptr_)[index].pos_hash())) {
       entry_ptr = &((*entry_table_ptr_)[index]);
     }
 
@@ -129,9 +129,9 @@ namespace Sayuri {
   /* エントリーのクラス。 */
   /************************/
   // コンストラクタ。
-  TTEntry::TTEntry(Hash hash, int depth, int score, ScoreType score_type,
+  TTEntry::TTEntry(Hash pos_hash, int depth, int score, ScoreType score_type,
   Move best_move, int table_age) :
-  hash_(hash),
+  pos_hash_(pos_hash),
   depth_(depth),
   score_(score),
   score_type_(score_type),
@@ -140,7 +140,7 @@ namespace Sayuri {
 
   // デフォルトコンストラクタ。
   TTEntry::TTEntry() :
-  hash_(0ULL),
+  pos_hash_(0ULL),
   depth_(-MAX_VALUE),
   score_(0),
   score_type_(ScoreType::ALPHA),
@@ -148,7 +148,7 @@ namespace Sayuri {
 
   // コピーコンストラクタ。
   TTEntry::TTEntry(const TTEntry& entry) :
-  hash_(entry.hash_),
+  pos_hash_(entry.pos_hash_),
   depth_(entry.depth_),
   score_(entry.score_),
   score_type_(entry.score_type_),
@@ -157,7 +157,7 @@ namespace Sayuri {
 
   // ムーブコンストラクタ。
   TTEntry::TTEntry(TTEntry&& entry) :
-  hash_(entry.hash_),
+  pos_hash_(entry.pos_hash_),
   depth_(entry.depth_),
   score_(entry.score_),
   score_type_(entry.score_type_),
@@ -166,7 +166,7 @@ namespace Sayuri {
 
   // コピー代入。
   TTEntry& TTEntry::operator=(const TTEntry& entry) {
-    hash_ = entry.hash_;
+    pos_hash_ = entry.pos_hash_;
     depth_ = entry.depth_;
     score_ = entry.score_;
     score_type_ = entry.score_type_;
@@ -178,7 +178,7 @@ namespace Sayuri {
 
   // ムーブ代入。
   TTEntry& TTEntry::operator=(TTEntry&& entry) {
-    hash_ = entry.hash_;
+    pos_hash_ = entry.pos_hash_;
     depth_ = entry.depth_;
     score_ = entry.score_;
     score_type_ = entry.score_type_;

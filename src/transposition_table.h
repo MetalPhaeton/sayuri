@@ -78,7 +78,7 @@ namespace Sayuri {
       /* アクセサ。 */
       /**************/
       // ハッシュ。
-      Hash hash() const {return hash_;}
+      Hash pos_hash() const {return pos_hash_;}
       // 深さ。
       int depth() const {return depth_;}
       // 評価値。
@@ -95,7 +95,7 @@ namespace Sayuri {
       /* メンバ変数。 */
       /****************/
       // ハッシュ。
-      Hash hash_;
+      Hash pos_hash_;
       // 探索のレベル。
       int depth_;
       // 評価値。
