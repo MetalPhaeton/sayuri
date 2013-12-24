@@ -600,8 +600,10 @@ namespace Sayuri {
 
       // 勝てるメイトを見つけたらフラグを立てる。
       // 直接ループを抜けない理由は、depth等の終了条件対策。
-      if ((pv_line.line()[pv_line.length() - 1].has_checkmated())
-      && ((pv_line.length() - 1) % 2) == 1) {
+      // if ((pv_line.line()[pv_line.length() - 1].has_checkmated())
+      // && ((pv_line.length() - 1) % 2) == 1) {
+      // test
+      if (pv_line.line()[pv_line.length() - 1].has_checkmated()) {
         found_winning_mate = true;
       }
     }
@@ -911,16 +913,10 @@ namespace Sayuri {
           // フルでPVを探索。
           score = -Search<NodeType::PV> (next_hash, job.depth() - 1,
           job.level() + 1, -temp_beta, -temp_alpha, job.table(), next_line);
-          // チェックメイト、アルファ値、ベータ値を調べる。
+          // アルファ値、ベータ値を調べる。
           job.mutex().lock();  // ロック。
           if (next_line.line()[next_line.length() - 1].has_checkmated()) {
-            if ((next_line.length() % 2) == 1) {
-              score = job.beta() = SCORE_WIN;
-            } else {
-              score = job.alpha() = SCORE_LOSE;
-            }
-            job.mutex().unlock();
-            break;
+            job.delta() = MAX_VALUE;
           }
           if (score >= temp_beta) {
             // 探索失敗。
@@ -986,14 +982,10 @@ namespace Sayuri {
               job.level() + 1, -temp_beta, -temp_alpha, job.table(),
               next_line);
 
-              // チェックメイト、アルファ値、ベータ値を調べる。
+              // アルファ値、ベータ値を調べる。
               job.mutex().lock();  // ロック。
               if (next_line.line()[next_line.length() - 1].has_checkmated()) {
-                if ((next_line.length() % 2) == 1) {
-                  score = job.beta() = SCORE_WIN;
-                }
-                job.mutex().unlock();
-                break;
+                job.delta() = MAX_VALUE;
               }
               if (score >= temp_beta) {
                 // 探索失敗。

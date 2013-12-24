@@ -169,7 +169,7 @@ namespace Sayuri {
         std::cout << "mate " << ((pv_line.length() - 1) / 2) + 1;
       } else {
         // エンジンがメイトされた。
-        std::cout << "mate " << (-1 * ((pv_line.length() - 1) / 2));
+        std::cout << "mate -" << (pv_line.length() - 1) / 2;
       }
     } else {
       std::cout << "cp " << score;
