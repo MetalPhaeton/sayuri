@@ -892,16 +892,44 @@ namespace Sayuri {
   void ChessEngine::InitHashTable() {
     // メルセンヌツイスターの準備。
     std::mt19937 engine(SysClock::to_time_t (SysClock::now()));
-    std::uniform_int_distribution<Hash> dist(0ULL, 0xffffffffffffffffULL);
+    std::uniform_int_distribution<Hash> dist(0ULL, -1ULL);
+
+    // ダブリのないハッシュを生成。
+    int length =
+    NUM_SIDES + NUM_PIECE_TYPES + NUM_SQUARES + 1 + 4 + NUM_SQUARES;
+    Hash temp_table[length];
+    int temp_count = 0;
+    for (int i = 0; i < length; i++) {
+      // ダブリを調べる。
+      bool loop = true;
+      Hash hash = 0ULL;
+      while (loop) {
+        hash = dist(engine);
+        loop = false;
+        if (hash == 0ULL) {
+          loop = true;
+          continue;
+        }
+        for (int j = 0; j < i; j++) {
+          if (hash == temp_table[j]) {
+            loop = true;
+            break;
+          }
+        }
+      }
+
+      temp_table[i] = hash;
+    }
 
     // 駒の情報の配列を初期化。
-    for (int side = 0; side < NUM_SIDES; side++) {
-      for (int piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
-        for (int square = 0; square < NUM_SQUARES; square++) {
-          if ((side == NO_SIDE) || (piece_type == EMPTY)) {
-            piece_hash_table_[side][piece_type][square] = 0ULL;
+    for (int i = 0; i < NUM_SIDES; i++) {
+      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
+        for (int k = 0; k < NUM_SQUARES; k++) {
+          if ((i == NO_SIDE) || (j == EMPTY)) {
+            piece_hash_table_[i][j][k] = 0ULL;
           } else {
-            piece_hash_table_[side][piece_type][square] = dist(engine);
+            piece_hash_table_[i][j][k] = temp_table[temp_count];
+            temp_count++;
           }
         }
       }
@@ -910,7 +938,8 @@ namespace Sayuri {
     // 手番の配列を初期化。
     to_move_hash_table_[NO_SIDE] = 0ULL;
     to_move_hash_table_[WHITE] = 0ULL;
-    to_move_hash_table_[BLACK] = dist(engine);
+    to_move_hash_table_[BLACK] = temp_table[temp_count];
+    temp_count++;
 
     // キャスリングの配列を初期化。
     // 0: 白のショートキャスリング。
@@ -918,12 +947,14 @@ namespace Sayuri {
     // 2: 黒のショートキャスリング。
     // 3: 黒のロングキャスリング。
     for (int i = 0; i < 4; i++) {
-      castling_hash_table_[i] = dist(engine);
+      castling_hash_table_[i] = temp_table[temp_count];
+      temp_count++;
     }
 
     // アンパッサンの配列を初期化。
-    for (int square = 0; square < NUM_SQUARES; square++) {
-      en_passant_hash_table_[square] = dist(engine);
+    for (int i = 0; i < NUM_SQUARES; i++) {
+      en_passant_hash_table_[i] = temp_table[temp_count];
+      temp_count++;
     }
   }
 
