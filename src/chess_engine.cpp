@@ -788,12 +788,13 @@ namespace Sayuri {
       // とりあえずアンパッサンのハッシュを削除。
       current_hash ^= en_passant_hash_table_[en_passant_square_];
     }
+
     // ポーンの2歩の動きの場合はアンパッサンハッシュを追加。
     if (piece_type == PAWN) {
       int move_diff = move.to_ - move.from_;
-      if (move_diff > 8) {
+      if (move_diff >= 16) {
         current_hash ^= en_passant_hash_table_[move.to_ - 8];
-      } else if (move_diff < -8) {
+      } else if (move_diff <= -16) {
         current_hash ^= en_passant_hash_table_[move.to_ + 8];
       }
     }
