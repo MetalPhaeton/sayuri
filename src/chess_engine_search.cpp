@@ -896,7 +896,7 @@ namespace Sayuri {
       // 現在探索している手の情報を表示。
       job.mutex().lock();  // ロック。
       UCIShell::PrintCurrentMoveInfo(move, job.Count());
-      job.mutex().unlock();
+      job.mutex().unlock();  // ロック解除。
 
       // PVSearch。
       int score = 0;
