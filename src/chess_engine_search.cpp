@@ -171,8 +171,6 @@ namespace Sayuri {
       int score = entry_ptr->score();
       if (entry_ptr->score_type() == ScoreType::EXACT) {
         // エントリーが正確な値。
-        pv_line.SetMove(entry_ptr->best_move());
-        pv_line.score(entry_ptr->score());
         if (score >= beta) {
           pv_line.score(beta);
           table.Unlock();
@@ -183,12 +181,14 @@ namespace Sayuri {
           table.Unlock();
           return alpha;
         }
+        pv_line.score(score);
         table.Unlock();
         return score;
       } else if (entry_ptr->score_type() == ScoreType::ALPHA) {
         // エントリーがアルファ値。
         // アルファ値以下が確定。
         if (score <= alpha) {
+          pv_line.score(alpha);
           table.Unlock();
           return alpha;
         }
@@ -198,7 +198,6 @@ namespace Sayuri {
         // エントリーがベータ値。
         // ベータ値以上が確定。
         if (score >= beta) {
-          pv_line.SetMove(entry_ptr->best_move());
           pv_line.score(beta);
           table.Unlock();
           return beta;
@@ -912,8 +911,17 @@ namespace Sayuri {
           // フルでPVを探索。
           score = -Search<NodeType::PV> (next_hash, job.depth() - 1,
           job.level() + 1, -temp_beta, -temp_alpha, job.table(), next_line);
-          // アルファ値、ベータ値を調べる。
+          // チェックメイト、アルファ値、ベータ値を調べる。
           job.mutex().lock();  // ロック。
+          if (next_line.line()[next_line.length() - 1].has_checkmated()) {
+            if ((next_line.length() % 2) == 1) {
+              score = job.beta() = SCORE_WIN;
+            } else {
+              score = job.alpha() = SCORE_LOSE;
+            }
+            job.mutex().unlock();
+            break;
+          }
           if (score >= temp_beta) {
             // 探索失敗。
             if (job.beta() <= temp_beta) {
@@ -977,8 +985,16 @@ namespace Sayuri {
               score = -Search<NodeType::PV>(next_hash, job.depth() - 1,
               job.level() + 1, -temp_beta, -temp_alpha, job.table(),
               next_line);
-              // アルファ値、ベータ値を調べる。
+
+              // チェックメイト、アルファ値、ベータ値を調べる。
               job.mutex().lock();  // ロック。
+              if (next_line.line()[next_line.length() - 1].has_checkmated()) {
+                if ((next_line.length() % 2) == 1) {
+                  score = job.beta() = SCORE_WIN;
+                }
+                job.mutex().unlock();
+                break;
+              }
               if (score >= temp_beta) {
                 // 探索失敗。
                 if (job.beta() <= temp_beta) {
