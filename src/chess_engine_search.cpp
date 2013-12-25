@@ -344,7 +344,7 @@ namespace Sayuri {
       int temp_beta = beta;
       bool did_lmr = false;
       if (!is_checked && !(move.captured_piece_) && !(move.promotion_)
-      && !null_reduction && (depth >= 4) && (num_moves > 5)) {
+      && !null_reduction && (depth >= 3) && (num_moves >= 5)) {
         did_lmr = true;
         int reduction = 1;
         if (Type == NodeType::NON_PV) {
@@ -730,7 +730,7 @@ namespace Sayuri {
       int temp_beta = job.beta();
       bool did_lmr = false;
       if (!(job.is_checked()) && !(move.captured_piece_) && !(move.promotion_)
-      && !(job.null_reduction()) && (job.depth() >= 4) && (num_moves > 5)) {
+      && !(job.null_reduction()) && (job.depth() >= 3) && (num_moves >= 5)) {
         did_lmr = true;
         int reduction = 1;
         // History Pruning。
@@ -976,7 +976,7 @@ namespace Sayuri {
         bool did_lmr = false;
         if (!(job.is_checked())
         && !(move.captured_piece_) && !(move.promotion_)
-        && (job.depth() >= 4) && (num_moves > 5)) {
+        && (job.depth() >= 3) && (num_moves >= 5)) {
           did_lmr = true;
           int reduction = 1;
           // ゼロウィンドウ探索。

@@ -894,11 +894,11 @@ namespace Sayuri {
     std::uniform_int_distribution<Hash> dist(0ULL, -1ULL);
 
     // ダブリのないハッシュを生成。
-    int length =
+    constexpr int LENGTH =
     NUM_SIDES + NUM_PIECE_TYPES + NUM_SQUARES + 1 + 4 + NUM_SQUARES;
-    Hash temp_table[length];
+    Hash temp_table[LENGTH];
     int temp_count = 0;
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < LENGTH; i++) {
       // ダブリを調べる。
       bool loop = true;
       Hash hash = 0ULL;
