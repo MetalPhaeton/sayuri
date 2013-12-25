@@ -929,7 +929,7 @@ namespace Sayuri {
           // チェックメイト、アルファ値、ベータ値を調べる。
           job.mutex().lock();  // ロック。
           if (next_line.ply_mate() >= 0) {
-            if ((next_line.ply_mate() % 2) == 0) {
+            if ((next_line.ply_mate() % 2) == 1) {
               // 勝ちのメイト。
               score = SCORE_WIN;
               job.alpha() = -MAX_VALUE;
@@ -941,7 +941,7 @@ namespace Sayuri {
               score = SCORE_LOSE;
               job.alpha() = -MAX_VALUE;
               job.mutex().unlock();
-              continue;
+              break;
             }
           }
           if (score >= temp_beta) {
@@ -1011,7 +1011,7 @@ namespace Sayuri {
               // チェックメイト、アルファ値、ベータ値を調べる。
               job.mutex().lock();  // ロック。
               if ((next_line.ply_mate() >= 0)
-              && ((next_line.ply_mate() % 2) == 0)) {
+              && ((next_line.ply_mate() % 2) == 1)) {
                 score = SCORE_WIN;
                 job.beta() = MAX_VALUE;
                 job.mutex().unlock();
