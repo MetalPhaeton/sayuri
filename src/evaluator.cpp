@@ -48,7 +48,7 @@ namespace Sayuri {
   // 終盤のポーンの配置。
   const Evaluator::Weight Evaluator::WEIGHT_PAWN_POSITION_ENDING(0.0, 20.0);
   // 終盤のキングの配置。
-  const Evaluator::Weight Evaluator::WEIGHT_KING_POSITION_ENDING(0.0, 5.0);
+  const Evaluator::Weight Evaluator::WEIGHT_KING_POSITION_ENDING(0.0, 12.0);
   // 機動力。
   const Evaluator::Weight Evaluator::WEIGHT_MOBILITY(1.0, 1.0);
   // センターコントロール。
