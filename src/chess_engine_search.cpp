@@ -926,28 +926,17 @@ namespace Sayuri {
           // フルでPVを探索。
           score = -Search<NodeType::PV> (next_hash, job.depth() - 1,
           job.level() + 1, -temp_beta, -temp_alpha, job.table(), next_line);
-          // チェックメイト、アルファ値、ベータ値を調べる。
+
+          // アルファ値、ベータ値を調べる。
           job.mutex().lock();  // ロック。
-          if (next_line.ply_mate() >= 0) {
-            if ((next_line.ply_mate() % 2) == 1) {
-              // 勝ちのメイト。
-              score = SCORE_WIN;
-              job.alpha() = -MAX_VALUE;
-              job.beta() = MAX_VALUE;
-              job.mutex().unlock();
-              break;
-            } else {
-              // 負けのメイト。
-              score = SCORE_LOSE;
-              job.alpha() = -MAX_VALUE;
-              job.mutex().unlock();
-              break;
-            }
-          }
           if (score >= temp_beta) {
             // 探索失敗。
-            if (job.beta() <= temp_beta) {
-              // ベータ値を広げる。
+            // ベータ値を広げる。
+            if ((next_line.ply_mate() >= 0)
+            && ((next_line.ply_mate() % 2) == 1)) {
+              // メイトっぽかった場合。
+              job.beta() = MAX_VALUE;
+            } else {
               job.delta() *= 2;
               job.beta() += job.delta();
             }
@@ -956,8 +945,12 @@ namespace Sayuri {
             continue;
           } else if (score <= temp_alpha) {
             // 探索失敗。
-            if (job.alpha() >= temp_alpha) {
-              // アルファ値を広げる。
+            // アルファ値を広げる。
+            if ((next_line.ply_mate() >= 0)
+            && ((next_line.ply_mate() % 2) == 0)) {
+              // メイトされていたかもしれない場合。
+              job.alpha() = -MAX_VALUE;
+            } else {
               job.delta() *= 2;
               job.alpha() -= job.delta();
             }
@@ -1008,19 +1001,17 @@ namespace Sayuri {
               job.level() + 1, -temp_beta, -temp_alpha, job.table(),
               next_line);
 
-              // チェックメイト、アルファ値、ベータ値を調べる。
+              // ベータ値を調べる。
               job.mutex().lock();  // ロック。
-              if ((next_line.ply_mate() >= 0)
-              && ((next_line.ply_mate() % 2) == 1)) {
-                score = SCORE_WIN;
-                job.beta() = MAX_VALUE;
-                job.mutex().unlock();
-                break;
-              }
               if (score >= temp_beta) {
                 // 探索失敗。
-                if (job.beta() <= temp_beta) {
-                  // ベータ値を広げる。
+                // ベータ値を広げる。
+                if ((next_line.ply_mate() >= 0)
+                && ((next_line.ply_mate() % 2) == 1)) {
+                  // メイトっぽかった場合。
+                  job.beta() = MAX_VALUE;
+                  job.mutex().unlock();
+                } else {
                   job.delta() *= 2;
                   job.beta() += job.delta();
                 }
