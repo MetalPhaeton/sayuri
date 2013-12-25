@@ -162,14 +162,14 @@ namespace Sayuri {
     std::cout << " depth " << depth;
     std::cout << " seldepth " << seldepth;
     std::cout << " score ";
-    if (pv_line.line()[pv_line.length() - 1].has_checkmated()) {
-      int winner = (pv_line.length() - 1) % 2;
+    if (pv_line.ply_mate() >= 0) {
+      int winner = pv_line.ply_mate() % 2;
       if (winner == 1) {
         // エンジンがメイトした。
-        std::cout << "mate " << ((pv_line.length() - 1) / 2) + 1;
+        std::cout << "mate " << (pv_line.ply_mate() / 2) + 1;
       } else {
         // エンジンがメイトされた。
-        std::cout << "mate -" << (pv_line.length() - 1) / 2;
+        std::cout << "mate -" << pv_line.ply_mate() / 2;
       }
     } else {
       std::cout << "cp " << score;
@@ -179,11 +179,9 @@ namespace Sayuri {
     // PVラインを送る。
     std::cout << " pv";
     for (std::size_t i = 0; i < pv_line.length(); i++) {
-      if (pv_line.line()[i].has_checkmated()) break;
+      if (!(pv_line.line()[i].all_)) break;
 
-      if (!(pv_line.line()[i].move().all_)) break;
-
-      std::cout << " " << TransMoveToString(pv_line.line()[i].move());
+      std::cout << " " << TransMoveToString(pv_line.line()[i]);
     }
     std::cout << std::endl;
   }
@@ -229,15 +227,13 @@ namespace Sayuri {
 
     // 最善手を表示。
     std::cout << "bestmove ";
-    if ((pv_line.length() > 0)
-    && (!(pv_line.line()[0].has_checkmated()))) {
-      std::string move_str = TransMoveToString(pv_line.line()[0].move());
+    if (pv_line.length() >= 1) {
+      std::string move_str = TransMoveToString(pv_line.line()[0]);
       std::cout << move_str;
 
       // 2手目があるならponderで表示。
-      if ((pv_line.length() >= 2)
-      && (!(pv_line.line()[1].has_checkmated()))) {
-        move_str = TransMoveToString(pv_line.line()[1].move());
+      if (pv_line.length() >= 2) {
+        move_str = TransMoveToString(pv_line.line()[1]);
         std::cout << " ponder " << move_str;
       }
     }

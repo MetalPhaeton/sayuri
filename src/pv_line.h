@@ -32,49 +32,6 @@
 #include "chess_def.h"
 
 namespace Sayuri {
-  class PVLine;
-
-  // PVLineのスロット。
-  class PVSlot {
-    public:
-      /**************************/
-      /* コンストラクタと代入。 */
-      /**************************/
-      PVSlot();
-      PVSlot(const PVSlot& slot);
-      PVSlot(PVSlot&& slot);
-      PVSlot& operator=(const PVSlot& slot);
-      PVSlot& operator=(PVSlot&& slot);
-      virtual ~PVSlot() {}
-
-      /**************/
-      /* アクセサ。 */
-      /**************/
-      // 手。
-      Move move() const {return move_;}
-      // チェックメイトされたか。
-      bool has_checkmated() const {return has_checkmated_;}
-
-      /******************/
-      /* ミューテータ。 */
-      /******************/
-      // 手。
-      void move(Move& move) {move_ = move;}
-      // チェックメイトされたか。
-      void has_checkmated(bool has_checkmated) {
-        has_checkmated_ = has_checkmated;
-      }
-
-    private:
-      /****************/
-      /* メンバ変数。 */
-      /****************/
-      // 手。
-      Move move_;
-      // チェックメイトされたか。
-      bool has_checkmated_;
-  };
-
   // PVライン。
   class PVLine {
     public:
@@ -99,24 +56,26 @@ namespace Sayuri {
       // [引数]
       // pv_line: コピーするライン。
       void Insert(const PVLine& pv_line);
-      // 最初の要素にチェックメイトされたことを記録する。
-      void MarkCheckmated();
 
       /**************/
       /* アクセサ。 */
       /**************/
       // 長さ。
       std::size_t length() const {return length_;}
-      // ライン。
-      const PVSlot (& line() const)[MAX_PLYS + 1] {return line_;}
+      // PVライン。
+      const Move (& line() const)[MAX_PLYS] {return line_;}
       // 評価値。
       int score() const {return score_;}
+      // メイトまでのプライ。-1はメイトなし。
+      int ply_mate() const {return ply_mate_;}
 
       /******************/
       /* ミューテータ。 */
       /******************/
       // 評価値。
       void score(int score) {score_ = score;}
+      // メイトまでのプライ。
+      void ply_mate(int ply_mate) {ply_mate_ = ply_mate;}
 
       /**********************/
       /* ソート用比較関数。 */
@@ -129,10 +88,12 @@ namespace Sayuri {
       /****************/
       // 長さ。
       std::size_t length_;
-      // ライン。
-      PVSlot line_[MAX_PLYS + 1];
+      // PVライン。
+      Move line_[MAX_PLYS];
       // 評価値。
       int score_;
+      // メイトまでのプライ。-1はメイトなし。
+      int ply_mate_;
   };
 }  // namespace_Sayuri
 

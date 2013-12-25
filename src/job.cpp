@@ -44,8 +44,7 @@ namespace Sayuri {
   PositionRecord& record, NodeType node_type, Hash pos_hash, int depth,
   int level, int& alpha, int& beta, int& delta, TranspositionTable& table,
   PVLine& pv_line, bool is_null_searching, int null_reduction,
-  int& num_searched_moves, ScoreType& score_type, int material,
-  bool is_checked, bool& has_legal_move,
+  ScoreType& score_type, int material, bool is_checked, bool& has_legal_move,
   std::vector<Move>* moves_to_search_ptr, TimePoint& next_print_info_time) :
   mutex_ptr_(&mutex),
   client_ptr_(&client),
@@ -61,7 +60,6 @@ namespace Sayuri {
   pv_line_ptr_(&pv_line),
   is_null_searching_(is_null_searching),
   null_reduction_(null_reduction),
-  num_searched_moves_ptr_(&num_searched_moves),
   score_type_ptr_(&score_type),
   material_(material),
   is_checked_(is_checked),
@@ -70,7 +68,7 @@ namespace Sayuri {
   next_print_info_time_ptr_(&next_print_info_time),
   maker_ptr_(&maker),
   helper_counter_(0),
-  counter_(1) {}
+  counter_(0) {}
 
   // コピーコンストラクタ。
   Job::Job(const Job& job) {
@@ -127,8 +125,9 @@ namespace Sayuri {
 
   // 数を数える。UCIのcurrmovenumberの表示に使用する。
   int Job::Count() {
+    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
     counter_++;
-    return counter_ - 1;
+    return counter_;
   }
 
   /**********************/
@@ -150,7 +149,6 @@ namespace Sayuri {
     pv_line_ptr_ = job.pv_line_ptr_;
     is_null_searching_ = job.is_null_searching_;
     null_reduction_ = job.null_reduction_;
-    num_searched_moves_ptr_ = job.num_searched_moves_ptr_;
     score_type_ptr_ = job.score_type_ptr_;
     material_ = job.material_;
     is_checked_ = job.is_checked_;

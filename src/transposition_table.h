@@ -52,9 +52,10 @@ namespace Sayuri {
       // value: 評価値。
       // score_type: 評価値の種類。
       // best_move: 最善手。
+      // ply_mate: メイトまでのプライ。-1ならメイトなし。
       // table_age: トランスポジションテーブルの年齢。
       TTEntry(Hash pos_hash, int depth, int value, ScoreType score_type,
-      Move best_move, int table_age);
+      Move best_move, int ply_mate, int table_age);
       TTEntry();
       TTEntry(const TTEntry& entry);
       TTEntry(TTEntry&& entry);
@@ -70,9 +71,10 @@ namespace Sayuri {
       // score: 評価値。
       // score_type: 評価値の種類。
       // best_move: 最善手。
+      // ply_mate: メイトまでのプライ。-1ならメイトなし。
       // table_age: トランスポジションテーブルの年齢。
       void Update(int score, ScoreType score_type, Move best_move,
-      int table_age);
+      int ply_mate, int table_age);
 
       /**************/
       /* アクセサ。 */
@@ -87,6 +89,8 @@ namespace Sayuri {
       ScoreType score_type() const {return score_type_;}
       // 最善手。
       Move best_move() const {return best_move_;}
+      // メイトまでのプライ。-1ならメイトなし。
+      int ply_mate() const {return ply_mate_;}
       // トランスポジションテーブルの年齢。
       int table_age() const {return table_age_;}
 
@@ -104,6 +108,8 @@ namespace Sayuri {
       ScoreType score_type_;
       // 最善手。
       Move best_move_;
+      // メイトまでのプライ。-1ならメイトなし。
+      int ply_mate_;
       // 記録時のトランスポジションテーブルの年齢。
       int table_age_;
   };
@@ -134,8 +140,9 @@ namespace Sayuri {
       // value: 評価値。
       // score_type: 評価値の種類。
       // best_move: 最善手。
-      void Add(Hash pos_hash, int depth,
-      int value, ScoreType score_type, Move best_move);
+      // ply_mate: メイトまでのプライ。-1ならメイトなし。
+      void Add(Hash pos_hash, int depth, int value, ScoreType score_type,
+      Move best_move, int ply_mate);
 
       // 条件を満たすエントリーを得る。
       // [引数]

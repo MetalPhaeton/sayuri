@@ -66,7 +66,6 @@ namespace Sayuri {
       // pv_line: 現在のノードのPVライン。(更新される。)
       // is_null_searching: Null Moveで探索中かどうか。
       // null_reduction: Null Move Reductionのリダクションの数。 
-      // num_serached_moves: いくつ手を探索したかの変数。(更新される。)
       // score_type: 評価値のタイプ。(更新される。)
       // material: 仕事作成時のノードのマテリアル。
       // is_checked: チェックされているかどうか。
@@ -77,9 +76,8 @@ namespace Sayuri {
       PositionRecord& record, NodeType node_type, Hash pos_hash, int depth,
       int level, int& alpha, int& beta, int& delta, TranspositionTable& table,
       PVLine& pv_line, bool is_null_searching, int null_reduction,
-      int& num_searched_moves, ScoreType& score_type, int material,
-      bool is_checked, bool& has_legal_move,
-      std::vector<Move>* moves_to_search_ptr,
+      ScoreType& score_type, int material, bool is_checked,
+      bool& has_legal_move, std::vector<Move>* moves_to_search_ptr,
       TimePoint& next_print_info_time);
 
       Job(const Job& job);
@@ -136,8 +134,6 @@ namespace Sayuri {
       bool is_null_searching() const {return is_null_searching_;}
       // Null Move Reductionのリダクションの数。
       int null_reduction() const {return null_reduction_;}
-      // いくつ手を探索したかの変数。(更新される。)
-      int& num_searched_moves() {return *num_searched_moves_ptr_;}
       // 評価値のタイプ。(更新される。)
       ScoreType& score_type() {return *score_type_ptr_;}
       // 仕事作成時のノードのマテリアル。
@@ -178,7 +174,6 @@ namespace Sayuri {
       PVLine* pv_line_ptr_;
       bool is_null_searching_;
       int null_reduction_;
-      int* num_searched_moves_ptr_;
       ScoreType* score_type_ptr_;
       int material_;
       bool is_checked_;
