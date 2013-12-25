@@ -100,7 +100,7 @@ namespace Sayuri {
       void FinishMyJob();
       // ヘルパーが全員仕事を終えるまで待機する。
       void WaitForHelpers();
-      // 数を数える。UCIのcurrmovenumberの表示に使用する。
+      // 数を数える。探索した手の数を数えるときに使う。
       int Count();
 
       /**************/

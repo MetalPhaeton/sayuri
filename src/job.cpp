@@ -123,7 +123,7 @@ namespace Sayuri {
     }
   }
 
-  // 数を数える。UCIのcurrmovenumberの表示に使用する。
+  // 数を数える。探索した手の数を数えるときに使う。
   int Job::Count() {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
     counter_++;
