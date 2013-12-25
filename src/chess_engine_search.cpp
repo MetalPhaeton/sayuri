@@ -233,8 +233,8 @@ namespace Sayuri {
         if (depth >= 5) {
           // Internal Iterative Deepening。
           PVLine temp_line;
-          int reduction = 2;
-          Search<NodeType::PV>(pos_hash, depth - reduction - 1, level,
+          constexpr int IID_DEPTH = 4;
+          Search<NodeType::PV>(pos_hash, IID_DEPTH, level,
           alpha, beta, table, temp_line);
 
           shared_st_ptr_->iid_stack_[level] = temp_line.line()[0].move();
@@ -336,7 +336,7 @@ namespace Sayuri {
       int temp_beta = beta;
       bool did_lmr = false;
       if (!is_checked && !(move.captured_piece_) && !(move.promotion_)
-      && !null_reduction && (depth >= 3) && (num_searched_moves >= 4)) {
+      && !null_reduction && (depth >= 4) && (num_searched_moves >= 5)) {
         did_lmr = true;
         int reduction = 1;
         if (Type == NodeType::NON_PV) {
@@ -718,8 +718,8 @@ namespace Sayuri {
       int temp_beta = job.beta();
       bool did_lmr = false;
       if (!(job.is_checked()) && !(move.captured_piece_) && !(move.promotion_)
-      && !(job.null_reduction()) && (job.depth() >= 3)
-      && (job.num_searched_moves() >= 4)) {
+      && !(job.null_reduction()) && (job.depth() >= 4)
+      && (job.num_searched_moves() >= 5)) {
         did_lmr = true;
         int reduction = 1;
         // History Pruning。
@@ -947,7 +947,7 @@ namespace Sayuri {
         bool did_lmr = false;
         if (!(job.is_checked())
         && !(move.captured_piece_) && !(move.promotion_)
-        && (job.depth() >= 3) && (job.num_searched_moves() >= 4)) {
+        && (job.depth() >= 4) && (job.num_searched_moves() >= 5)) {
           did_lmr = true;
           int reduction = 1;
           // ゼロウィンドウ探索。
