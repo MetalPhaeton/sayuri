@@ -1200,7 +1200,7 @@ namespace Sayuri {
   }
 
   // ストップ条件を設定する。
-  void ChessEngine::SetStopper(int max_depth, std::size_t max_nodes,
+  void ChessEngine::SetStopper(int max_depth, std::uint64_t max_nodes,
   Chrono::milliseconds thinking_time, bool infinite_thinking) {
     shared_st_ptr_->max_depth_ = max_depth <= MAX_PLYS ? max_depth : MAX_PLYS;
     shared_st_ptr_->max_nodes_ =

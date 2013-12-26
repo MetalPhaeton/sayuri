@@ -88,7 +88,7 @@ namespace Sayuri {
       // max_nodes: 最大探索ノード数。
       // thinking_time: 思考時間。
       // infinite_thinking: 無限に思考するかどうか。
-      void SetStopper(int max_depth, std::size_t max_nodes,
+      void SetStopper(int max_depth, std::uint64_t max_nodes,
       Chrono::milliseconds thinking_time, bool infinite_thinking);
 
       // 思考の無限時間フラグをセットする。
@@ -402,13 +402,13 @@ namespace Sayuri {
         // 現在のIterative Deepeningの深さ。
         int i_depth_;
         // 探索したノード数。
-        std::size_t num_searched_nodes_;
+        std::uint64_t num_searched_nodes_;
         // 探索開始時間。
         TimePoint start_time_;
         // 探索ストップ条件。何が何でも探索を中断。
         bool stop_now_;
         // 探索ストップ条件。最大探索ノード数。
-        std::size_t max_nodes_;
+        std::uint64_t max_nodes_;
         // 探索ストップ条件。最大探索深さ。
         int max_depth_;
         // 探索ストップ条件。思考時間。

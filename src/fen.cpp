@@ -43,20 +43,20 @@ namespace Sayuri {
 
     try {
       // FENを解析。
-      constexpr int index_position = 0;
-      constexpr int index_to_move = 1;
-      constexpr int index_castling_rights = 2;
-      constexpr int index_en_passant = 3;
-      constexpr int index_ply_100 = 4;
-      constexpr int index_ply = 5;
+      constexpr unsigned int index_position = 0;
+      constexpr unsigned int index_to_move = 1;
+      constexpr unsigned int index_castling_rights = 2;
+      constexpr unsigned int index_en_passant = 3;
+      constexpr unsigned int index_ply_100 = 4;
+      constexpr unsigned int index_ply = 5;
       EvalPosition(fen_tokens[index_position]);
       EvalToMove(fen_tokens[index_to_move]);
       EvalCastlingRights(fen_tokens[index_castling_rights]);
-      if (fen_tokens.size() > static_cast<size_t>(index_en_passant)) {
+      if (fen_tokens.size() > index_en_passant) {
         EvalEnPassant(fen_tokens[index_en_passant]);
-        if (fen_tokens.size() > static_cast<size_t>(index_ply_100)) {
+        if (fen_tokens.size() > index_ply_100) {
           EvalPly100(fen_tokens[index_ply_100]);
-          if (fen_tokens.size() > static_cast<size_t>(index_ply)) {
+          if (fen_tokens.size() > index_ply) {
             EvalPly(fen_tokens[index_ply], fen_tokens[index_to_move]);
           } else {
             ply_ = 1;

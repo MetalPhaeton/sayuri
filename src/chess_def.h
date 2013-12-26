@@ -267,7 +267,7 @@ namespace Sayuri {
   constexpr int MAX_PLYS = 100;
 
   // 最大探索ノード数。
-  constexpr std::size_t MAX_NODES = static_cast<std::size_t>(-1);
+  constexpr std::uint64_t MAX_NODES = static_cast<std::size_t>(-1);
 
   // 局面の保存数。
   constexpr int MAX_POSITIONS = 1000;

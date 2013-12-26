@@ -35,6 +35,8 @@
 #include <chrono>
 #include <sstream>
 #include <utility>
+#include <cstddef>
+#include <cstdint>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "pv_line.h"
@@ -157,7 +159,7 @@ namespace Sayuri {
   /****************/
   // PV情報を標準出力に送る。
   void UCIShell::PrintPVInfo(int depth, int seldepth, int score,
-  Chrono::milliseconds time, std::size_t num_nodes, PVLine& pv_line) {
+  Chrono::milliseconds time, std::uint64_t num_nodes, PVLine& pv_line) {
     std::cout << "info";
     std::cout << " depth " << depth;
     std::cout << " seldepth " << seldepth;
@@ -202,7 +204,7 @@ namespace Sayuri {
 
   // その他の情報を標準出力に送る。
   void UCIShell::PrintOtherInfo(Chrono::milliseconds time,
-  std::size_t num_nodes, int hashfull) {
+  std::uint64_t num_nodes, int hashfull) {
     int time_2 = time.count();
     if (time_2 <= 0) time_2 = 1;
     std::cout << "info time " << time_2;
@@ -496,7 +498,7 @@ namespace Sayuri {
 
     // 準備。
     int max_depth = MAX_PLYS;
-    std::size_t max_nodes = MAX_NODES;
+    std::uint64_t max_nodes = MAX_NODES;
     Chrono::milliseconds thinking_time(-1U >> 1);
     bool infinite_thinking = false;
     moves_to_search_ptr_.reset(nullptr);
