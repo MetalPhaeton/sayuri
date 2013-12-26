@@ -48,7 +48,7 @@ namespace Sayuri {
   // 終盤のポーンの配置。
   const Evaluator::Weight Evaluator::WEIGHT_PAWN_POSITION_ENDING(0.0, 20.0);
   // 終盤のキングの配置。
-  const Evaluator::Weight Evaluator::WEIGHT_KING_POSITION_ENDING(0.0, 12.0);
+  const Evaluator::Weight Evaluator::WEIGHT_KING_POSITION_ENDING(0.0, 15.0);
   // 機動力。
   const Evaluator::Weight Evaluator::WEIGHT_MOBILITY(1.0, 1.0);
   // センターコントロール。
@@ -79,7 +79,7 @@ namespace Sayuri {
   const Evaluator::Weight Evaluator::WEIGHT_BAD_BISHOP(-0.7, 0.0);
   // ビショップにピンされたナイト。
   const Evaluator::Weight
-  Evaluator::WEIGHT_PINED_KNIGHT_BY_BISHOP(-5.0, 0.0);
+  Evaluator::WEIGHT_PINED_KNIGHT_BY_BISHOP(-10.0, 0.0);
   // ルークペア。
   const Evaluator::Weight Evaluator::WEIGHT_ROOK_PAIR(10.0, 60.0);
   // セミオープンファイルのルーク。
@@ -89,9 +89,9 @@ namespace Sayuri {
   // 早すぎるクイーンの始動。
   const Evaluator::Weight Evaluator::WEIGHT_EARLY_QUEEN_LAUNCHED(-4.0, 0.0);
   // キング周りの弱いマス。
-  const Evaluator::Weight Evaluator::WEIGHT_WEAK_SQUARE(-2.0, 0.0);
-  // キャスリング。(これの2倍が評価値。)
-  const Evaluator::Weight Evaluator::WEIGHT_CASTLING(7.5, 0.0);
+  const Evaluator::Weight Evaluator::WEIGHT_WEAK_SQUARE(-5.0, 0.0);
+  // キャスリング。(これの2倍が評価値。権利の放棄は-1倍。)
+  const Evaluator::Weight Evaluator::WEIGHT_CASTLING(45.0, 0.0);
 
   /****************/
   /* static定数。 */
@@ -642,9 +642,8 @@ namespace Sayuri {
         }
         // クイーンにピン。
         // クイーンを一つ一つ探す。
-        Bitboard temp = friend_queen;
-        for (; temp; temp &= temp -1) {
-          line = Util::GetLine(bishop_square, Util::GetSquare(temp));
+        for (Bitboard bb = friend_queen; bb; bb &= bb -1) {
+          line = Util::GetLine(bishop_square, Util::GetSquare(bb));
           if ((Util::SQUARE[piece_square] & line)
           && (Util::CountBits(engine_ptr_->blocker_0() & line) == 3)) {
             value += 1.0;
@@ -681,7 +680,7 @@ namespace Sayuri {
       early_queen_launched_value_ += sign * value;
     }
 
-    // キャスリングを計算。
+    // キングの守りを計算。
     if (Type == KING) {
       // キング周りの弱いマスを計算。
       // 弱いマス。
