@@ -77,9 +77,8 @@ namespace Sayuri {
   const Evaluator::Weight Evaluator::WEIGHT_BISHOP_PAIR(10.0, 60.0);
   // バッドビショップ。
   const Evaluator::Weight Evaluator::WEIGHT_BAD_BISHOP(-0.7, 0.0);
-  // ビショップにピンされたナイト。
-  const Evaluator::Weight
-  Evaluator::WEIGHT_PINED_KNIGHT_BY_BISHOP(-10.0, 0.0);
+  // ナイトをピン。
+  const Evaluator::Weight Evaluator::WEIGHT_PIN_KNIGHT(10.0, 0.0);
   // ルークペア。
   const Evaluator::Weight Evaluator::WEIGHT_ROOK_PAIR(10.0, 60.0);
   // セミオープンファイルのルーク。
@@ -205,7 +204,7 @@ namespace Sayuri {
     pawn_shield_value_ = 0.0;
     bishop_pair_value_ = 0.0;
     bad_bishop_value_ = 0.0;
-    pined_knight_by_bishop_value_ = 0.0;
+    pin_knight_value_ = 0.0;
     rook_pair_value_ = 0.0;
     rook_semi_open_value_ = 0.0;
     rook_open_value_ = 0.0;
@@ -327,8 +326,8 @@ namespace Sayuri {
     // バッドビショップ。
     score += WEIGHT_BAD_BISHOP(num_pieces) * bad_bishop_value_;
     // ビショップにピンされたナイト。
-    score += WEIGHT_PINED_KNIGHT_BY_BISHOP(num_pieces)
-    * pined_knight_by_bishop_value_;
+    // ナイトをピン。
+    score += WEIGHT_PIN_KNIGHT(num_pieces) * pin_knight_value_;
     // ルークペア。
     score += WEIGHT_ROOK_PAIR(num_pieces) * rook_pair_value_;
     // セミオープンファイルのルーク。
@@ -587,8 +586,8 @@ namespace Sayuri {
       }
     }
 
-    // バッドビショップを計算。
     if (Type == BISHOP) {
+      // バッドビショップを計算。
       value = 0.0;
       if ((Util::SQUARE[piece_square] & Util::SQCOLOR[WHITE])) {
         value = static_cast<double>(Util::CountBits
@@ -598,37 +597,30 @@ namespace Sayuri {
         (engine_ptr_->position()[piece_side][PAWN] & Util::SQCOLOR[BLACK]));
       }
       bad_bishop_value_ += sign * value;
-    }
 
-    // ビショップにピンされたナイトを計算。
-    if (Type == KNIGHT) {
+      // ナイトをピンを計算。
+      // 絶対ピン。
       value = 0.0;
-      // 敵のビショップのビットボード。
-      Bitboard enemy_bishop = engine_ptr_->GetBishopAttack(piece_square)
-      & engine_ptr_->position()[enemy_piece_side][BISHOP];
-      // 味方のクイーンのビットボード。
-      Bitboard friend_queen = engine_ptr_->position()[piece_side][QUEEN];
-      // ビショップを一つ一つ探す。
-      for (; enemy_bishop; enemy_bishop &= enemy_bishop - 1) {
-        Square bishop_square = Util::GetSquare(enemy_bishop);
-        // 絶対ピン。
-        Bitboard line =
-        Util::GetLine(bishop_square, engine_ptr_->king()[piece_side]);
-        if ((Util::SQUARE[piece_square] & line)
-        && (Util::CountBits(engine_ptr_->blocker_0() & line) == 3)) {
+      Bitboard line =
+      Util::GetLine(piece_square, engine_ptr_->king()[enemy_piece_side]);
+      if ((line & attacks
+      & engine_ptr_->position()[enemy_piece_side][KNIGHT])) {
+        if (Util::CountBits(line & engine_ptr_->blocker_0()) == 3) {
           value += 1.0;
         }
-        // クイーンにピン。
-        // クイーンを一つ一つ探す。
-        for (Bitboard bb = friend_queen; bb; bb &= bb -1) {
-          line = Util::GetLine(bishop_square, Util::GetSquare(bb));
-          if ((Util::SQUARE[piece_square] & line)
-          && (Util::CountBits(engine_ptr_->blocker_0() & line) == 3)) {
+      }
+      // クイーンへのピン。
+      for (Bitboard bb = engine_ptr_->position()[enemy_piece_side][QUEEN];
+      bb; bb &= bb - 1) {
+        line = Util::GetLine(piece_square, Util::GetSquare(bb));
+        if ((line & attacks
+        & engine_ptr_->position()[enemy_piece_side][KNIGHT])) {
+          if (Util::CountBits(line & engine_ptr_->blocker_0()) == 3) {
             value += 1.0;
           }
         }
       }
-      pined_knight_by_bishop_value_ += sign * value;
+      pin_knight_value_ += sign * value;
     }
 
     // セミオープン、オープンファイルのルークを計算。
