@@ -94,17 +94,16 @@ namespace Sayuri {
           virtual ~Weight() {}
           Weight() = delete;
 
-          /********************/
-          /* パブリック関数。 */
-          /********************/
-          // 評価値を局面のフェーズの一次関数で計算して返す。
+          /************/
+          /* 演算子。 */
+          /************/
+          // ウェイトを返す。
           // [引数]
-          // num_pieces: ピース(ポーン以外の駒)の数。
-          // value: ウェイトに掛ける評価値の元になる値。
+          // num_pieces: キング以外の全ての駒の数。
           // [戻り値]
-          // 評価値。
-          double GetScore(double num_pieces, double value) const {
-            return ((modulus_ * num_pieces) + shift_) * value;
+          // ウェイト。
+          double operator()(double num_pieces) const {
+            return (modulus_ * num_pieces) + shift_;
           }
 
         private:

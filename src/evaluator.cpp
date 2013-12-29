@@ -276,94 +276,72 @@ namespace Sayuri {
     // マテリアル。
     double score = static_cast<double>(engine_ptr_->GetMaterial(side));
     // ポーンの配置。
-    score += WEIGHT_PAWN_POSITION.GetScore
-    (num_pieces, position_value_[PAWN]);
+    score += WEIGHT_PAWN_POSITION(num_pieces) * position_value_[PAWN];
     // ナイトの配置。
-    score += WEIGHT_KNIGHT_POSITION.GetScore
-    (num_pieces, position_value_[KNIGHT]);
+    score += WEIGHT_KNIGHT_POSITION(num_pieces) * position_value_[KNIGHT];
     // ビショップの配置。
-    score += WEIGHT_BISHOP_POSITION.GetScore
-    (num_pieces, position_value_[BISHOP]);
+    score += WEIGHT_BISHOP_POSITION(num_pieces) * position_value_[BISHOP];
     // ルークの配置。
-    score += WEIGHT_ROOK_POSITION.GetScore
-    (num_pieces, position_value_[ROOK]);
+    score += WEIGHT_ROOK_POSITION(num_pieces) * position_value_[ROOK];
     // クイーンの配置。
-    score += WEIGHT_QUEEN_POSITION.GetScore
-    (num_pieces, position_value_[QUEEN]);
+    score += WEIGHT_QUEEN_POSITION(num_pieces) * position_value_[QUEEN];
     // キングの配置。
-    score += WEIGHT_KING_POSITION.GetScore
-    (num_pieces, position_value_[KING]);
+    score += WEIGHT_KING_POSITION(num_pieces) * position_value_[KING];
     // 終盤のポーンの配置。
-    score += WEIGHT_PAWN_POSITION_ENDING.GetScore
-    (num_pieces, pawn_position_ending_value_);
+    score += WEIGHT_PAWN_POSITION_ENDING(num_pieces)
+    * pawn_position_ending_value_;
     // 終盤のキングの配置。
-    score += WEIGHT_KING_POSITION_ENDING.GetScore
-    (num_pieces, king_position_ending_value_);
+    score += WEIGHT_KING_POSITION_ENDING(num_pieces)
+    * king_position_ending_value_;
     // 機動力。
-    score += WEIGHT_MOBILITY.GetScore
-    (num_pieces, mobility_value_);
+    score += WEIGHT_MOBILITY(num_pieces) * mobility_value_;
     // センターコントロール。
-    score += WEIGHT_CENTER_CONTROL.GetScore
-    (num_pieces, center_control_value_);
+    score += WEIGHT_CENTER_CONTROL(num_pieces) * center_control_value_;
     // スウィートセンターのコントロール。
-    score += WEIGHT_SWEET_CENTER_CONTROL.GetScore
-    (num_pieces, sweet_center_control_value_);
+    score += WEIGHT_SWEET_CENTER_CONTROL(num_pieces)
+    * sweet_center_control_value_;
     // 駒の展開。
-    score += WEIGHT_DEVELOPMENT.GetScore
-    (num_pieces, development_value_);
+    score += WEIGHT_DEVELOPMENT(num_pieces) * development_value_;
     // 攻撃。
+    double temp_weight = WEIGHT_ATTACK(num_pieces);
     for (int i = PAWN; i <= QUEEN; i++) {
-      score += WEIGHT_ATTACK.GetScore
-      (num_pieces, attack_value_[i]);
+      score += temp_weight * attack_value_[i];
     }
     // キングによる攻撃。
-    score += WEIGHT_ATTACK_BY_KING.GetScore
-    (num_pieces, attack_value_[KING]);
+    score += WEIGHT_ATTACK_BY_KING(num_pieces) * attack_value_[KING];
     // 相手キング周辺への攻撃。
-    score += WEIGHT_ATTACK_AROUND_KING.GetScore
-    (num_pieces, attack_around_king_value_);
+    score += WEIGHT_ATTACK_AROUND_KING(num_pieces) * attack_around_king_value_;
     // パスポーン。
-    score += WEIGHT_PASS_PAWN.GetScore
-    (num_pieces, pass_pawn_value_);
+    score += WEIGHT_PASS_PAWN(num_pieces) * pass_pawn_value_;
     // 守られたパスポーン。
-    score += WEIGHT_PROTECTED_PASS_PAWN.GetScore
-    (num_pieces, protected_pass_pawn_value_);
+    score += WEIGHT_PROTECTED_PASS_PAWN(num_pieces)
+    * protected_pass_pawn_value_;
     // ダブルポーン。
-    score += WEIGHT_DOUBLE_PAWN.GetScore
-    (num_pieces, double_pawn_value_);
+    score += WEIGHT_DOUBLE_PAWN(num_pieces) * double_pawn_value_;
     // 孤立ポーン。
-    score += WEIGHT_ISO_PAWN.GetScore
-    (num_pieces, iso_pawn_value_);
+    score += WEIGHT_ISO_PAWN(num_pieces) * iso_pawn_value_;
     // ポーンの盾。
-    score += WEIGHT_PAWN_SHIELD.GetScore
-    (num_pieces, pawn_shield_value_);
+    score += WEIGHT_PAWN_SHIELD(num_pieces) * pawn_shield_value_;
     // ビショップペア。
-    score += WEIGHT_BISHOP_PAIR.GetScore
-    (num_pieces, bishop_pair_value_);
+    score += WEIGHT_BISHOP_PAIR(num_pieces) * bishop_pair_value_;
     // バッドビショップ。
-    score += WEIGHT_BAD_BISHOP.GetScore
-    (num_pieces, bad_bishop_value_);
+    score += WEIGHT_BAD_BISHOP(num_pieces) * bad_bishop_value_;
     // ビショップにピンされたナイト。
-    score += WEIGHT_PINED_KNIGHT_BY_BISHOP.GetScore
-    (num_pieces, pined_knight_by_bishop_value_);
+    score += WEIGHT_PINED_KNIGHT_BY_BISHOP(num_pieces)
+    * pined_knight_by_bishop_value_;
     // ルークペア。
-    score += WEIGHT_ROOK_PAIR.GetScore
-    (num_pieces, rook_pair_value_);
+    score += WEIGHT_ROOK_PAIR(num_pieces) * rook_pair_value_;
     // セミオープンファイルのルーク。
-    score += WEIGHT_ROOK_SEMI_OPEN.GetScore
-    (num_pieces, rook_semi_open_value_);
+    score += WEIGHT_ROOK_SEMI_OPEN(num_pieces) * rook_semi_open_value_;
     // オープンファイルのルーク。
-    score += WEIGHT_ROOK_OPEN.GetScore
-    (num_pieces, rook_open_value_);
+    score += WEIGHT_ROOK_OPEN(num_pieces) * rook_open_value_;
     // 早すぎるクイーンの始動。
-    score += WEIGHT_EARLY_QUEEN_LAUNCHED.GetScore
-    (num_pieces, early_queen_launched_value_);
+    score += WEIGHT_EARLY_QUEEN_LAUNCHED(num_pieces)
+    * early_queen_launched_value_;
     // キング周りの弱いマス。
-    score += WEIGHT_WEAK_SQUARE.GetScore
-    (num_pieces, weak_square_value_);
+    score += WEIGHT_WEAK_SQUARE(num_pieces) * weak_square_value_;
     // キャスリング。(これの2倍が評価値。)
-    score += WEIGHT_CASTLING.GetScore
-    (num_pieces, castling_value_);
+    score += WEIGHT_CASTLING(num_pieces) * castling_value_;
 
     return static_cast<int>(score);
   }
