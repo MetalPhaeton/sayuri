@@ -106,51 +106,40 @@ namespace Sayuri {
   /********************/
   // エンジンを実行する。
   void UCIShell::Run() {
-    // コマンド。
-    std::vector<std::string> commands;
-    commands.push_back("uci");
-    commands.push_back("isready");
-    commands.push_back("setoption");
-    commands.push_back("ucinewgame");
-    commands.push_back("position");
-    commands.push_back("go");
-    commands.push_back("stop");
-    commands.push_back("ponderhit");
-    commands.push_back("quit");
-
-    // メインループ。
-    bool loop = true;
-    while (loop) {
+    while (true) {
       std::string input;
       std::getline(std::cin, input);
-      std::vector<std::string> argv = Util::Split(input, " ", "");
-      CommandParser parser(commands, argv);
-      parser.JumpToNextKeyword();
-      while (parser.HasNext()) {
-        Word word = parser.Get();
-        if (word.str_ == "uci") {
-          CommandUCI();
-        } else if (word.str_ == "isready") {
-          CommandIsReady();
-        } else if (word.str_ == "setoption") {
-          CommandSetOption(argv);
-        } else if (word.str_ == "ucinewgame") {
-          CommandUCINewGame();
-        } else if (word.str_ == "position") {
-          CommandPosition(argv);
-        } else if (word.str_ == "go") {
-          CommandGo(argv);
-        } else if (word.str_ == "stop") {
-          CommandStop();
-        } else if (word.str_ == "ponderhit") {
-          CommandPonderHit();
-        } else if (word.str_ == "quit") {
-          CommandStop();
-          loop = false;
-          break;
-        }
-        parser.JumpToNextKeyword();
+
+      std::vector<std::string> argv = Util::Split(input, " \t", "");
+
+      if (argv[0] == "quit") {
+        break;
+      } else {
+        Input(input);
       }
+    }
+  }
+
+  // UCIコマンドを実行する。("quit"以外。)
+  void UCIShell::Input(const std::string& input) {
+    // コマンド実行。
+    std::vector<std::string> argv = Util::Split(input, " \t", "");
+    if (argv[0] == "uci") {
+      CommandUCI();
+    } else if (argv[0] == "isready") {
+      CommandIsReady();
+    } else if (argv[0] == "setoption") {
+      CommandSetOption(argv);
+    } else if (argv[0] == "ucinewgame") {
+      CommandUCINewGame();
+    } else if (argv[0] == "position") {
+      CommandPosition(argv);
+    } else if (argv[0] == "go") {
+      CommandGo(argv);
+    } else if (argv[0] == "stop") {
+      CommandStop();
+    } else if (argv[0] == "ponderhit") {
+      CommandPonderHit();
     }
   }
 

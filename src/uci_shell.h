@@ -60,6 +60,11 @@ namespace Sayuri {
       // エンジンを実行する。
       void Run();
 
+      // UCIコマンドを実行する。("quit"以外。)
+      // [引数]
+      // input: UCIコマンド入力。("quit"以外。)
+      void Input(const std::string& input);
+
       /****************/
       /* static関数。 */
       /****************/
@@ -90,10 +95,6 @@ namespace Sayuri {
       static void PrintOtherInfo(Chrono::milliseconds time,
       std::uint64_t num_nodes, int hashfull);
 
-      // インプット用スレッド。
-      // [引数]
-      // shell: UCIシェル。
-      static void ThreadUCIInput(UCIShell& shell);
       // 思考用スレッド。
       // [引数]
       // shell: UCIシェル。
