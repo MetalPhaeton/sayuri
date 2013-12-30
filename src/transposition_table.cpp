@@ -193,14 +193,4 @@ namespace Sayuri {
 
     return *this;
   }
-
-  // エントリーをアップデートする。
-  void TTEntry::Update(int score, ScoreType score_type, Move best_move,
-  int ply_mate, int table_age) {
-    score_ = score;
-    score_type_ = score_type;
-    best_move_ = best_move;
-    ply_mate_ = ply_mate;
-    table_age_ = table_age;
-  }
 }  // namespace Sayuri

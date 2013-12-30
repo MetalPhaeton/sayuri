@@ -474,15 +474,8 @@ namespace Sayuri {
     // Null Move探索中の局面は登録しない。
     // Null Move Reductionされていた場合、容量節約のため登録しない。
     if (!is_null_searching_ || !null_reduction) {
-      if (!entry_ptr) {
-        table.Add(pos_hash, depth, alpha, score_type,
-        pv_line.line()[0], pv_line.ply_mate());
-      } else if (entry_ptr->depth() == depth) {
-        table.Lock();
-        entry_ptr->Update(alpha, score_type, pv_line.line()[0],
-        pv_line.ply_mate(), table.age());
-        table.Unlock();
-      }
+      table.Add(pos_hash, depth, alpha, score_type,
+      pv_line.line()[0], pv_line.ply_mate());
     }
 
     // 探索結果を返す。
@@ -1053,17 +1046,9 @@ namespace Sayuri {
         job.pv_line().score(score);
 
         // トランスポジションテーブルに登録。
-        TTEntry* entry_ptr = job.table().GetEntry(job.pos_hash(), job.depth());
-        if (!entry_ptr) {
-          job.table().Add(job.pos_hash(), job.depth(), score,
-          ScoreType::EXACT, job.pv_line().line()[0],
-          job.pv_line().ply_mate());
-        } else {
-          job.table().Lock();
-          entry_ptr->Update(score, ScoreType::EXACT, job.pv_line().line()[0],
-          job.pv_line().ply_mate(), job.table().age());
-          job.table().Unlock();
-        }
+        job.table().Add(job.pos_hash(), job.depth(), score,
+        ScoreType::EXACT, job.pv_line().line()[0],
+        job.pv_line().ply_mate());
 
         // 標準出力にPV情報を表示。
         now = SysClock::now();
