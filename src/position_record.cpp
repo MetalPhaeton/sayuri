@@ -36,9 +36,9 @@ namespace Sayuri {
   /**************************/
   PositionRecord::PositionRecord(const ChessEngine& engine) {
     // 駒の配置をコピー。ついでにhas_castled_もコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
+    for (Side i = 0; i < NUM_SIDES; i++) {
       has_castled_[i] = engine.has_castled()[i];
-      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
+      for (Piece j = 0; j < NUM_PIECE_TYPES; j++) {
         position_[i][j] = engine.position()[i][j];
       }
     }
