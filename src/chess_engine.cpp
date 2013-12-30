@@ -128,22 +128,33 @@ namespace Sayuri {
     int num_black_king = Util::CountBits(fen.position()[BLACK][KING]);
     if ((num_white_king != 1) || (num_black_king != 1)) return;
 
-    // まず駒の配置を空にする。
-    for (Bitboard bb = blocker_0_; bb; bb &= bb - 1) {
-      Square square = Util::GetSquare(bb);
-      PutPiece(square, EMPTY, NO_SIDE);
+    // 空にする。
+    for (Square i = 0; i < NUM_SQUARES; i++) {
+      piece_board_[i] = EMPTY;
+      side_board_[i] = NO_SIDE;
     }
-          
+    blocker_0_ = 0ULL;
+    blocker_45_ = 0ULL;
+    blocker_90_ = 0ULL;
+    blocker_135_ = 0ULL;
 
-    // 配置をする。
-    for (Side side = WHITE; side < NUM_SIDES; side++) {
-      for (Piece piece_type = PAWN; piece_type < NUM_PIECE_TYPES;
-      piece_type++) {
-        // 駒をセット。
-        Bitboard bb = fen.position()[side][piece_type];
-        for (; bb; bb &= bb - 1) {
+    // 駒を配置する。
+    for (Side i = WHITE; i <= BLACK; i++) {
+      side_pieces_[i] = 0ULL;
+      for (Piece j = PAWN; j <= KING; j++) {
+        position_[i][j] = fen.position()[i][j];
+        for (Bitboard bb = position_[i][j]; bb; bb &= bb - 1) {
           Square square = Util::GetSquare(bb);
-          PutPiece(square, piece_type, side);
+          side_board_[square] = i;
+          piece_board_[square] = j;
+          side_pieces_[i] |= Util::SQUARE[square];
+          blocker_0_ |= Util::SQUARE[square];
+          blocker_45_ |= Util::SQUARE[Util::ROT45[square]];
+          blocker_90_ |= Util::SQUARE[Util::ROT90[square]];
+          blocker_135_ |= Util::SQUARE[Util::ROT135[square]];
+          if (j == KING) {
+            king_[i] = square;
+          }
         }
       }
     }
@@ -165,23 +176,34 @@ namespace Sayuri {
 
   // PositionRecordから読み込む。
   void ChessEngine::LoadRecord(const PositionRecord& record) {
-    // まず駒の配置を空にする。
-    for (Bitboard bb = blocker_0_; bb; bb &= bb - 1) {
-      Square square = Util::GetSquare(bb);
-      PutPiece(square, EMPTY, NO_SIDE);
+    // 空にする。
+    for (Square i = 0; i < NUM_SQUARES; i++) {
+      piece_board_[i] = EMPTY;
+      side_board_[i] = NO_SIDE;
     }
-          
+    blocker_0_ = 0ULL;
+    blocker_45_ = 0ULL;
+    blocker_90_ = 0ULL;
+    blocker_135_ = 0ULL;
 
-    // 配置をする。ついでにhas_castled_もセット。
-    for (Side side = WHITE; side < NUM_SIDES; side++) {
-      has_castled_[side] = record.has_castled()[side];
-      for (Piece piece_type = PAWN; piece_type < NUM_PIECE_TYPES;
-      piece_type++) {
-        // 駒をセット。
-        Bitboard bb = record.position()[side][piece_type];
-        for (; bb; bb &= bb - 1) {
+    // 駒を配置する。
+    for (Side i = WHITE; i <= BLACK; i++) {
+      has_castled_[i] = record.has_castled()[i];
+      side_pieces_[i] = 0ULL;
+      for (Piece j = PAWN; j <= KING; j++) {
+        position_[i][j] = record.position()[i][j];
+        for (Bitboard bb = position_[i][j]; bb; bb &= bb - 1) {
           Square square = Util::GetSquare(bb);
-          PutPiece(square, piece_type, side);
+          side_board_[square] = i;
+          piece_board_[square] = j;
+          side_pieces_[i] |= Util::SQUARE[square];
+          blocker_0_ |= Util::SQUARE[square];
+          blocker_45_ |= Util::SQUARE[Util::ROT45[square]];
+          blocker_90_ |= Util::SQUARE[Util::ROT90[square]];
+          blocker_135_ |= Util::SQUARE[Util::ROT135[square]];
+          if (j == KING) {
+            king_[i] = square;
+          }
         }
       }
     }
@@ -312,26 +334,30 @@ namespace Sayuri {
 
   // 他のエンジンの基本メンバをコピーする。
   void ChessEngine::ScanBasicMember(const ChessEngine& engine) {
-    // 駒の配置をコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
+    // サイド毎のコピー。
+    for (Side i = 0; i < NUM_SIDES; i++) {
+      // 駒の配置をコピー。
+      for (Piece j = 0; j < NUM_PIECE_TYPES; j++) {
         position_[i][j] = engine.position_[i][j];
       }
-    }
 
-    // 駒の種類の配置のコピー。
-    for (int i = 0; i < NUM_SQUARES; i++) {
-      piece_board_[i] = engine.piece_board_[i];
-    }
-
-    // サイドの配置のコピー。
-    for (int i = 0; i < NUM_SQUARES; i++) {
-      side_board_[i] = engine.side_board_[i];
-    }
-
-    // 各サイドの駒の配置のコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
+      // 各サイドの駒の配置のコピー。
       side_pieces_[i] = engine.side_pieces_[i];
+
+      // キングの位置のコピー。
+      king_[i] = engine.king_[i];
+
+      // キャスリングしたかどうかのコピー。
+      has_castled_[i] = engine.has_castled_[i];
+    }
+
+    // マス毎のコピー。
+    for (Square i = 0; i < NUM_SQUARES; i++) {
+      // 駒の種類の配置のコピー。
+      piece_board_[i] = engine.piece_board_[i];
+
+      // サイドの配置のコピー。
+      side_board_[i] = engine.side_board_[i];
     }
 
     // ブロッカーのコピー。
@@ -339,11 +365,6 @@ namespace Sayuri {
     blocker_45_ = engine.blocker_45_;
     blocker_90_ = engine.blocker_90_;
     blocker_135_ = engine.blocker_135_;
-
-    // キングの位置のコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      king_[i] = engine.king_[i];
-    }
 
     // 手番のコピー。
     to_move_ = engine.to_move_;
@@ -360,11 +381,6 @@ namespace Sayuri {
 
     // 手数のコピー。
     ply_ = engine.ply_;
-
-    // キャスリングしたかどうかのコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      has_castled_[i] = engine.has_castled_[i];
-    }
   }
 
   // 思考を始める。
