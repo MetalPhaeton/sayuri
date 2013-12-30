@@ -63,19 +63,6 @@ namespace Sayuri {
       TTEntry& operator=(TTEntry&& entry);
       virtual ~TTEntry() {}
 
-      /**********/
-      /* 関数。 */
-      /**********/
-      // エントリーをアップデートする。
-      // [引数]
-      // score: 評価値。
-      // score_type: 評価値の種類。
-      // best_move: 最善手。
-      // ply_mate: メイトまでのプライ。-1ならメイトなし。
-      // table_age: トランスポジションテーブルの年齢。
-      void Update(int score, ScoreType score_type, Move best_move,
-      int ply_mate, int table_age);
-
       /**************/
       /* アクセサ。 */
       /**************/
