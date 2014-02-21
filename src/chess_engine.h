@@ -40,11 +40,13 @@
 #include "transposition_table.h"
 #include "fen.h"
 #include "pv_line.h"
+#include "uci_shell.h"
 #include "position_record.h"
 #include "job.h"
 #include "helper_queue.h"
 
 namespace Sayuri {
+  class UCIShell;
   class PositionRecord;
   class Job;
   class HelperQueue;
@@ -101,10 +103,11 @@ namespace Sayuri {
       // num_threads: スレッド数。
       // table: 使用するトランスポジションテーブル。
       // moves_to_search_ptr: 探索する候補手。nullptrなら全ての手を探索する。
+      // shell: UCI出力に使用するシェル。
       // [戻り値]
       // PVライン。
       PVLine Calculate(int num_threads, TranspositionTable& table,
-      std::vector<Move>* moves_to_search_ptr);
+      std::vector<Move>* moves_to_search_ptr, UCIShell& shell);
 
       // 探索を終了させる。
       void StopCalculation();
@@ -277,14 +280,16 @@ namespace Sayuri {
       // [引数]
       // table: 使用するトランスポジションテーブル。
       // moves_to_search_ptr: 探索する候補手。nullptrなら全ての手を探索する。
+      // shell: UCI出力に使用するシェル。
       // [戻り値]
       // PVライン。
       PVLine SearchRoot(TranspositionTable& table,
-      std::vector<Move>* moves_to_search_ptr);
+      std::vector<Move>* moves_to_search_ptr, UCIShell& shell);
       // YBWC探索用スレッド。
       // [引数]
       // parent: スレッドを呼び出したエンジン。
-      static void ThreadYBWC(ChessEngine& parent);
+      // shell: UCI出力に使用するシェル。
+      static void ThreadYBWC(ChessEngine& parent, UCIShell& shell);
       // 並列探索。
       // [引数]
       // job: 探索用仕事。
@@ -292,7 +297,8 @@ namespace Sayuri {
       // ルートノードで並列探索。
       // [引数]
       // job: 探索用仕事。
-      void SearchRootParallel(Job& job);
+      // shell: UCI出力に使用するシェル。
+      void SearchRootParallel(Job& job, UCIShell& shell);
       // Futility Pruningのマージンを計算する。
       // [引数]
       // move: 指し手。

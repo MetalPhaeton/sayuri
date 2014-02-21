@@ -27,12 +27,32 @@
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
+#include <string>
 #include "chess_def.h"
 #include "init.h"
 #include "chess_engine.h"
 #include "uci_shell.h"
 
 #include "debug.h"
+
+// UCI出力を標準出力に出力。
+void Print(std::string message) {
+  std::cout << message << std::endl;
+}
+
+// コマンド入力ループ。
+void Run(Sayuri::UCIShell& shell) {
+  while (true) {
+    std::string input;
+    std::getline(std::cin, input);
+
+    if (input == "quit") {
+      break;
+    } else {
+      shell.InputCommand(input);
+    }
+  }
+}
 
 int main(int argc, char* argv[]) {
   if ((argc >= 2)
@@ -60,9 +80,10 @@ int main(int argc, char* argv[]) {
     std::unique_ptr<Sayuri::ChessEngine> engine_ptr(new Sayuri::ChessEngine());
     std::unique_ptr<Sayuri::UCIShell>
     shell_ptr(new Sayuri::UCIShell(*engine_ptr));
+    shell_ptr->AddOutputListener(Print);
 
     // エンジン起動。
-    shell_ptr->Run();
+    Run(*shell_ptr);
 
     // 後処理。
     Sayuri::Postprocess();

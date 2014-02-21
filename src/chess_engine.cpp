@@ -385,10 +385,10 @@ namespace Sayuri {
 
   // 思考を始める。
   PVLine ChessEngine::Calculate(int num_threads, TranspositionTable& table,
-  std::vector<Move>* moves_to_search_ptr) {
+  std::vector<Move>* moves_to_search_ptr, UCIShell& shell) {
     num_threads = num_threads >= 1 ? num_threads : 1;
     thread_vec_.resize(num_threads);
-    return std::move(SearchRoot(table, moves_to_search_ptr));
+    return std::move(SearchRoot(table, moves_to_search_ptr, shell));
   }
 
   // 思考を停止する。

@@ -27,6 +27,7 @@
 #include "uci_shell.h"
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <utility>
@@ -37,6 +38,7 @@
 #include <utility>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "pv_line.h"
@@ -53,7 +55,8 @@ namespace Sayuri {
   table_size_(UCI_DEFAULT_TABLE_SIZE),
   enable_pondering_(UCI_DEFAULT_PONDER),
   num_threads_(UCI_DEFAULT_THREADS),
-  analyse_mode_(UCI_DEFAULT_ANALYSE_MODE) {}
+  analyse_mode_(UCI_DEFAULT_ANALYSE_MODE),
+  output_listeners_(0) {}
 
   // コピーコンストラクタ。
   UCIShell::UCIShell(const UCIShell& shell) :
@@ -64,6 +67,7 @@ namespace Sayuri {
   num_threads_(shell.num_threads_),
   analyse_mode_(shell.analyse_mode_) {
     *(moves_to_search_ptr_) = *(shell.moves_to_search_ptr_);
+    output_listeners_ = shell.output_listeners_;
   }
 
   // ムーブコンストラクタ。
@@ -75,6 +79,7 @@ namespace Sayuri {
   num_threads_(shell.num_threads_),
   analyse_mode_(shell.analyse_mode_) {
     moves_to_search_ptr_ = std::move(shell.moves_to_search_ptr_);
+    output_listeners_ = std::move(shell.output_listeners_);
   }
 
   // コピー代入。
@@ -86,6 +91,7 @@ namespace Sayuri {
     num_threads_ = shell.num_threads_;
     analyse_mode_ = shell.analyse_mode_;
     *(moves_to_search_ptr_) = *(shell.moves_to_search_ptr_);
+    output_listeners_ = shell.output_listeners_;
     return *this;
   }
 
@@ -98,30 +104,22 @@ namespace Sayuri {
     num_threads_ = shell.num_threads_;
     analyse_mode_ = shell.analyse_mode_;
     moves_to_search_ptr_ = std::move(shell.moves_to_search_ptr_);
+    output_listeners_ = std::move(shell.output_listeners_);
     return *this;
+  }
+
+  // デストラクタ。
+  UCIShell::~UCIShell() {
+    if (thinking_thread_.joinable()) {
+      thinking_thread_.join();
+    }
   }
 
   /********************/
   /* パブリック関数。 */
   /********************/
-  // エンジンを実行する。
-  void UCIShell::Run() {
-    while (true) {
-      std::string input;
-      std::getline(std::cin, input);
-
-      std::vector<std::string> argv = Util::Split(input, " \t", "");
-
-      if (argv[0] == "quit") {
-        break;
-      } else {
-        Input(input);
-      }
-    }
-  }
-
   // UCIコマンドを実行する。("quit"以外。)
-  void UCIShell::Input(const std::string& input) {
+  void UCIShell::InputCommand(const std::string input) {
     // コマンド実行。
     std::vector<std::string> argv = Util::Split(input, " \t", "");
     if (argv[0] == "uci") {
@@ -143,63 +141,92 @@ namespace Sayuri {
     }
   }
 
+  // UCI出力を受け取る関数を登録する。
+  void UCIShell::AddOutputListener
+  (std::function<void(const std::string&)> func) {
+    output_listeners_.push_back(func);
+  }
+
   /****************/
   /* static関数。 */
   /****************/
   // PV情報を標準出力に送る。
   void UCIShell::PrintPVInfo(int depth, int seldepth, int score,
   Chrono::milliseconds time, std::uint64_t num_nodes, PVLine& pv_line) {
-    std::cout << "info";
-    std::cout << " depth " << depth;
-    std::cout << " seldepth " << seldepth;
-    std::cout << " score ";
+    std::ostringstream sout;
+    sout << "info";
+    sout << " depth " << depth;
+    sout << " seldepth " << seldepth;
+    sout << " score ";
     if (pv_line.ply_mate() >= 0) {
       int winner = pv_line.ply_mate() % 2;
       if (winner == 1) {
         // エンジンがメイトした。
-        std::cout << "mate " << (pv_line.ply_mate() / 2) + 1;
+        sout << "mate " << (pv_line.ply_mate() / 2) + 1;
       } else {
         // エンジンがメイトされた。
-        std::cout << "mate -" << pv_line.ply_mate() / 2;
+        sout << "mate -" << pv_line.ply_mate() / 2;
       }
     } else {
-      std::cout << "cp " << score;
+      sout << "cp " << score;
     }
-    std::cout << " time " << time.count();
-    std::cout << " nodes " << num_nodes;
+    sout << " time " << time.count();
+    sout << " nodes " << num_nodes;
     // PVラインを送る。
-    std::cout << " pv";
+    sout << " pv";
     for (std::size_t i = 0; i < pv_line.length(); i++) {
       if (!(pv_line.line()[i].all_)) break;
 
-      std::cout << " " << TransMoveToString(pv_line.line()[i]);
+      sout << " " << TransMoveToString(pv_line.line()[i]);
     }
-    std::cout << std::endl;
+
+    // 出力関数に送る。
+    for (auto& func : output_listeners_) {
+      func(sout.str());
+    }
   }
 
   // 深さ情報を標準出力に送る。
   void UCIShell::PrintDepthInfo(int depth) {
-    std::cout << "info depth " << depth << std::endl;
+    std::ostringstream sout;
+    sout << "info depth " << depth;
+    // 出力関数に送る。
+    for (auto& func : output_listeners_) {
+      func(sout.str());
+    }
   }
 
   // 現在探索している手の情報を標準出力に送る。
   void UCIShell::PrintCurrentMoveInfo(Move move, int move_num) {
+    std::ostringstream sout;
     // 手の情報を送る。
-    std::cout << "info currmove " << TransMoveToString(move);
+    sout << "info currmove " << TransMoveToString(move);
 
     // 手の番号を送る。
-    std::cout << " currmovenumber " << move_num << std::endl;
+    sout << " currmovenumber " << move_num;
+
+    // 出力関数に送る。
+    for (auto& func : output_listeners_) {
+      func(sout.str());
+    }
   }
 
   // その他の情報を標準出力に送る。
   void UCIShell::PrintOtherInfo(Chrono::milliseconds time,
   std::uint64_t num_nodes, int hashfull) {
+    std::ostringstream sout;
+
     int time_2 = time.count();
     if (time_2 <= 0) time_2 = 1;
-    std::cout << "info time " << time_2;
-    std::cout << " nodes " << num_nodes;
-    std::cout << " hashfull " << hashfull;
-    std::cout << " nps " << (num_nodes * 1000) / time_2 << std::endl;
+    sout << "info time " << time_2;
+    sout << " nodes " << num_nodes;
+    sout << " hashfull " << hashfull;
+    sout << " nps " << (num_nodes * 1000) / time_2;
+
+    // 出力関数に送る。
+    for (auto& func : output_listeners_) {
+      func(sout.str());
+    }
   }
 
   // 思考スレッド。
@@ -214,21 +241,26 @@ namespace Sayuri {
 
     // 思考開始。
     PVLine pv_line = shell.engine_ptr_->Calculate (shell.num_threads_,
-    *(shell.table_ptr_.get()), shell.moves_to_search_ptr_.get());
+    *(shell.table_ptr_.get()), shell.moves_to_search_ptr_.get(), shell);
 
     // 最善手を表示。
-    std::cout << "bestmove ";
+    std::ostringstream sout;
+
+    sout << "bestmove ";
     if (pv_line.length() >= 1) {
       std::string move_str = TransMoveToString(pv_line.line()[0]);
-      std::cout << move_str;
+      sout << move_str;
 
       // 2手目があるならponderで表示。
       if (pv_line.length() >= 2) {
         move_str = TransMoveToString(pv_line.line()[1]);
-        std::cout << " ponder " << move_str;
+        sout << " ponder " << move_str;
       }
     }
-    std::cout << std::endl;
+    // 出力関数に送る。
+    for (auto& func : shell.output_listeners_) {
+      func(sout.str());
+    }
   }
 
   /*********************/
@@ -236,42 +268,44 @@ namespace Sayuri {
   /*********************/
   // uciコマンド。
   void UCIShell::CommandUCI() {
+    std::ostringstream sout;
+
     // IDを表示。
-    std::cout << "id name " << ID_NAME << std::endl;
-    std::cout << "id author " << ID_AUTHOR << std::endl;
+    sout << "id name " << ID_NAME << std::endl;
+    sout << "id author " << ID_AUTHOR << std::endl;
 
     // 変更可能オプションの表示。
     // トランスポジションテーブルのサイズの変更。
-    std::cout << "option name Hash type spin default "
+    sout << "option name Hash type spin default "
     << (UCI_DEFAULT_TABLE_SIZE / (1024 * 1024)) << " min "
     << UCI_MIN_TABLE_SIZE / (1024 * 1024) << " max "
     << UCI_MAX_TABLE_SIZE / (1024 * 1024) << std::endl;
 
     // トランスポジションテーブルの初期化。
-    std::cout << "option name Clear Hash type button" << std::endl;
+    sout << "option name Clear Hash type button" << std::endl;
 
     // ポンダリングできるかどうか。
-    std::cout << "option name Ponder type check default ";
+    sout << "option name Ponder type check default ";
     if (UCI_DEFAULT_PONDER) {
-      std::cout << "true";
+      sout << "true";
     } else {
-      std::cout << "false";
+      sout << "false";
     }
-    std::cout << std::endl;
+    sout << std::endl;
 
     // スレッドの数。
-    std::cout << "option name Threads type spin defalut "
+    sout << "option name Threads type spin defalut "
     << UCI_DEFAULT_THREADS << " min " << 1 << " max "
     << UCI_MAX_THREADS << std::endl;
 
     // アナライズモード。
-    std::cout << "option name UCI_AnalyseMode type check default ";
-    if (UCI_DEFAULT_ANALYSE_MODE) std::cout << "true";
-    else std::cout << "false";
-    std::cout << std::endl;
+    sout << "option name UCI_AnalyseMode type check default ";
+    if (UCI_DEFAULT_ANALYSE_MODE) sout << "true";
+    else sout << "false";
+    sout << std::endl;
 
     // オーケー。
-    std::cout << "uciok" << std::endl;
+    sout << "uciok";
 
     // オプションの初期設定。
     table_size_ = UCI_DEFAULT_TABLE_SIZE;
@@ -279,11 +313,17 @@ namespace Sayuri {
     enable_pondering_ = UCI_DEFAULT_PONDER;
     num_threads_ = UCI_DEFAULT_THREADS;
 
+    // 出力関数に送る。
+    for (auto& func : output_listeners_) {
+      func(sout.str());
+    }
   }
 
   // isreadyコマンド。
   void UCIShell::CommandIsReady() {
-    std::cout << "readyok" << std::endl;
+    for (auto& func : output_listeners_) {
+      func("readyok");
+    }
   }
 
   // setoptionコマンド。

@@ -281,7 +281,6 @@ namespace Sayuri {
     // Futility Pruningの準備。
     int material = GetMaterial(side);
 
-    // test
     int num_moves = 0;
 
     // 探索ループ。
@@ -324,7 +323,6 @@ namespace Sayuri {
       // 合法手があったのでフラグを立てる。
       has_legal_move = true;
 
-      // test
       num_moves = job.Count();
 
       // Futility Pruning。
@@ -492,7 +490,7 @@ namespace Sayuri {
 
   // 探索のルート。
   PVLine ChessEngine::SearchRoot(TranspositionTable& table,
-  std::vector<Move>* moves_to_search_ptr) {
+  std::vector<Move>* moves_to_search_ptr, UCIShell& shell) {
     // 初期化。
     searched_level_ = 0;
     shared_st_ptr_->num_searched_nodes_ = 0;
@@ -519,7 +517,7 @@ namespace Sayuri {
     // スレッドの準備。
     shared_st_ptr_->helper_queue_ptr_.reset(new HelperQueue());
     for (auto& thread : thread_vec_) {
-      thread = std::thread(ThreadYBWC, std::ref(*this));
+      thread = std::thread(ThreadYBWC, std::ref(*this), std::ref(shell));
     }
 
     // Iterative Deepening。
@@ -549,7 +547,7 @@ namespace Sayuri {
         Chrono::duration_cast<Chrono::milliseconds>
         (SysClock::now() - shared_st_ptr_->start_time_);
 
-        UCIShell::PrintPVInfo(shared_st_ptr_->i_depth_, 0, pv_line.score(),
+        shell.PrintPVInfo(shared_st_ptr_->i_depth_, 0, pv_line.score(),
         time, shared_st_ptr_->num_searched_nodes_, pv_line);
 
         continue;
@@ -567,7 +565,7 @@ namespace Sayuri {
       }
 
       // 標準出力に深さ情報を送る。
-      UCIShell::PrintDepthInfo(shared_st_ptr_->i_depth_);
+      shell.PrintDepthInfo(shared_st_ptr_->i_depth_);
 
       // 前回の繰り返しの最善手を得る。
       TTEntry* prev_entry =
@@ -616,7 +614,7 @@ namespace Sayuri {
 
     // 最後に情報を送る。
     now = SysClock::now();
-    UCIShell::PrintOtherInfo
+    shell.PrintOtherInfo
     (Chrono::duration_cast<Chrono::milliseconds>
     (now - (shared_st_ptr_->start_time_)),
     shared_st_ptr_->num_searched_nodes_, table.GetUsedPermill());
@@ -629,7 +627,7 @@ namespace Sayuri {
   }
 
   // 探索用子スレッド。
-  void ChessEngine::ThreadYBWC(ChessEngine& parent) {
+  void ChessEngine::ThreadYBWC(ChessEngine& parent, UCIShell& shell) {
     // 子エンジンを作る。
     parent.mutex_.lock();
     std::unique_ptr<ChessEngine> child_ptr(new ChessEngine());
@@ -656,7 +654,7 @@ namespace Sayuri {
 
         if (job_ptr->level() <= 0) {
           // ルートノード。
-          child_ptr->SearchRootParallel(*job_ptr);
+          child_ptr->SearchRootParallel(*job_ptr, shell);
         } else {
           // ルートではないノード。
           if (job_ptr->node_type() == NodeType::PV) {
@@ -701,7 +699,6 @@ namespace Sayuri {
         continue;
       }
 
-      // test
       num_moves = job.Count();
 
       // 合法手が見つかったのでフラグを立てる。
@@ -839,11 +836,10 @@ namespace Sayuri {
   template void ChessEngine::SearchParallel<NodeType::NON_PV>(Job& job);
 
   // ルートノードで並列探索。
-  void ChessEngine::SearchRootParallel(Job& job) {
+  void ChessEngine::SearchRootParallel(Job& job, UCIShell& shell) {
     // 仕事ループ。
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
-    // test
     int num_moves = 0;
     for (Move move = job.PickMove(); move.all_; move = job.PickMove()) {
       if (ShouldBeStopped()) break;
@@ -852,7 +848,7 @@ namespace Sayuri {
       job.mutex().lock();  // ロック。
       TimePoint now = SysClock::now();
       if (now > job.next_print_info_time()) {
-        UCIShell::PrintOtherInfo(Chrono::duration_cast<Chrono::milliseconds>
+        shell.PrintOtherInfo(Chrono::duration_cast<Chrono::milliseconds>
         (now - shared_st_ptr_->start_time_),
         shared_st_ptr_->num_searched_nodes_, job.table().GetUsedPermill());
 
@@ -896,14 +892,11 @@ namespace Sayuri {
         continue;
       }
 
-      // test
       num_moves = job.Count();
 
       // 現在探索している手の情報を表示。
-      // test
       job.mutex().lock();  // ロック。
-      // UCIShell::PrintCurrentMoveInfo(move, job.Count());
-      UCIShell::PrintCurrentMoveInfo(move, num_moves);
+      shell.PrintCurrentMoveInfo(move, num_moves);
       job.mutex().unlock();  // ロック解除。
 
       // PVSearch。
@@ -1056,7 +1049,7 @@ namespace Sayuri {
         Chrono::duration_cast<Chrono::milliseconds>
         (now - shared_st_ptr_->start_time_);
 
-        UCIShell::PrintPVInfo(job.depth(), searched_level_, score,
+        shell.PrintPVInfo(job.depth(), searched_level_, score,
         time, shared_st_ptr_->num_searched_nodes_, job.pv_line());
 
         job.alpha() = score;

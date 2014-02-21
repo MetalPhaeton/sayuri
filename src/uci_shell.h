@@ -33,11 +33,14 @@
 #include <cstddef>
 #include <thread>
 #include <memory>
+#include <functional>
 #include "chess_def.h"
 #include "chess_engine.h"
 #include "pv_line.h"
 
 namespace Sayuri {
+  class ChessEngine;
+
   // UCIのインターフェス。
   class UCIShell {
     public:
@@ -51,23 +54,22 @@ namespace Sayuri {
       UCIShell(UCIShell&& shell);
       UCIShell& operator=(const UCIShell& shell);
       UCIShell& operator=(UCIShell&& shell);
-      virtual ~UCIShell() {}
+      virtual ~UCIShell();
       UCIShell() = delete;
 
       /********************/
       /* パブリック関数。 */
       /********************/
-      // エンジンを実行する。
-      void Run();
-
       // UCIコマンドを実行する。("quit"以外。)
       // [引数]
       // input: UCIコマンド入力。("quit"以外。)
-      void Input(const std::string& input);
+      void InputCommand(const std::string input);
 
-      /****************/
-      /* static関数。 */
-      /****************/
+      // UCI出力を受け取る関数を登録する。
+      // [引数]
+      // func: UCI出力を受け取る関数。void(std::string)型。
+      void AddOutputListener(std::function<void(const std::string&)> func);
+
       // PV情報を標準出力に表示。
       // [引数]
       // depth: 基本の深さ。
@@ -76,25 +78,31 @@ namespace Sayuri {
       // time: 思考時間。
       // num_nodes: 探索したノード数。
       // pv_line: PVライン。
-      static void PrintPVInfo(int depth, int seldepth, int score,
+      void PrintPVInfo(int depth, int seldepth, int score,
       Chrono::milliseconds time, std::uint64_t num_nodes, PVLine& pv_line);
+
       // 深さ情報を標準出力に表示。
       // [引数]
       // depth: 基本の深さ。
-      static void PrintDepthInfo(int depth);
+      void PrintDepthInfo(int depth);
+
       // 現在探索している手の情報を標準出力に表示。
       // [引数]
       // move: 現在探索している手。
       // move_num: 手の番号。
-      static void PrintCurrentMoveInfo(Move move, int move_num);
+      void PrintCurrentMoveInfo(Move move, int move_num);
+
       // その他の情報を標準出力に表示。
       // [引数]
       // time: 時間。
       // num_nodes: 探索したノード数。
       // hashfull: トランスポジションテーブルの使用量。
-      static void PrintOtherInfo(Chrono::milliseconds time,
+      void PrintOtherInfo(Chrono::milliseconds time,
       std::uint64_t num_nodes, int hashfull);
 
+      /****************/
+      /* static関数。 */
+      /****************/
       // 思考用スレッド。
       // [引数]
       // shell: UCIシェル。
@@ -244,6 +252,9 @@ namespace Sayuri {
       int num_threads_;
       // アナライズモード。
       bool analyse_mode_;
+
+      // UCI出力を受け取る関数のベクトル。
+      std::vector<std::function<void(const std::string&)>> output_listeners_;
   };
 }  // namespace Sayuri
 
