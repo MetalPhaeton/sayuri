@@ -17,8 +17,7 @@ CMakeを使ったビルド方法
 --------------------------------------------------------------------------------
 CMakeを使って簡単にビルドすることができます。
 使用するコンパイラはデフォルトで「clang++」となります。
-(コンパイラを変更したいときは、
-CMakeLists.txtの26行目、27行目のコンパイラ設定を変更してください。)
+(コンパイラを変更したいときは、CMakeLists.txtの26行目、27行目のコンパイラ設定を変更してください。)
 
 以下、ビルド手順。
 1. CMakeLists.txtのあるディレクトリに移動します。
@@ -27,7 +26,10 @@ CMakeLists.txtの26行目、27行目のコンパイラ設定を変更してく�
     $ cd build
     $ cmake ..
     $ make
-3. buildディレクトリ内にsayuriという実行ファイルができます。
+3. buildディレクト内に以下のファイル/ディレクトリが完成します。
+    * sayuri: 実行ファイル。
+    * libsayurilib.a: 静的ライブラリ。
+    * include: 静的ライブラリ用ヘッダファイルの入ったディレクトリ。
 
 
 --------------------------------------------------------------------------------
@@ -42,7 +44,126 @@ CMakeLists.txtの26行目、27行目のコンパイラ設定を変更してく�
     $ cd build
     $ cmake -DCMAKE_BUILD_TYPE=Debug ..
     $ make
-3. buildディレクトリ内にsayuriという実行ファイルができます。
+3. buildディレクト内に以下のファイル/ディレクトリが完成します。
+    * sayuri: 実行ファイル。
+    * libsayurilib.a: 静的ライブラリ。
+    * include: 静的ライブラリ用ヘッダファイルの入ったディレクトリ。
+
+
+--------------------------------------------------------------------------------
+CMakeで作成した際の各ファイルについて
+--------------------------------------------------------------------------------
+「sayuri」はUCIチェスエンジンです。
+    通常のUCIエンジンとして利用する場合はこのファイルのみ使います。
+    その場合、「libsayurilib.a」と「include」は削除して構いません。
+
+「libsayurilib.a」と「include」はSayuriを静的ライブラリとして使用する際に使います。
+    Sayuriをあなたのプログラムに組み込む際に使う静的ライブラリです。
+    「include」ディレクトリにSayuriの全ヘッダファイルがあるので、それらと共に使用します。
+    その場合、「sayuri」は使用しません。削除して構いません。
+
+
+--------------------------------------------------------------------------------
+libsayurilib.aの使い方
+--------------------------------------------------------------------------------
+Sayuriはマルチスレッドプログラムなので、Linuxを使っている場合は、コンパイルの際、pthreadをリンクさせる必要があります。
+
+Sayuriのネームスペースは「Sayuri」です。
+
+【準備】
+include/sayuri.hをソースコードにインクルードします。
+
+ライブラリを使用する前に以下の関数でライブラリを初期化します。
+    Sayuri::Init();
+(注) 初期化は必ずしてください。初期化しないとライブラリは正しく動きません。
+
+エンジンとUCIシェルを作成します。
+Sayuri::ChessEngineは思考部分です。
+Sayuri::UCIShellはSayuri::ChessEngineと外部をUCIコマンドで仲介するクラスです。
+以下のコードで作成します。
+    Sayuri::ChessEngine engine();
+    Sayuri::UCIShell shell(engine);
+    又は、
+    Sayuri::ChessEngine* engine_ptr = new Sayuri::ChessEngine();
+    Sayuri::UCIShell* shell_ptr = new Sayuri::UCIShell(*engine_ptr);
+    又は、
+    #include <memory>
+    std::unique_ptr<Sayuri::ChessEngine> engine_ptr(new Sayuri::ChessEngine());
+    std::unique_ptr<Sayuri::UCIShell> shell_ptr(new Sayuri::UCIShell(*engine_ptr));
+
+【ライブラリの操作方法】
+ライブラリは通常のUCIエンジンの操作とよく似ていて、UCIコマンドを使って操作します。
+
+ライブラリへの入力は、以下のSayuri::UCIShellオブジェクトの関数のinput引数にUCIコマンドを渡して行います。
+    void UCIShell::InputCommand(const std::string& input)
+
+ライブラリからの出力はコールバック関数で受け取ります。
+コールバック関数の型は以下のとおりです。
+関数名、引数名はあなたの好きな名前にしてください。
+    void name_of_function(const std::string& name_of_param)
+name_of_paramにライブラリからの出力が入力されます。
+
+コールバック関数は、以下のSayuri::UCIShellオブジェクトの以下の関数のfunc引数に渡して登録します。
+    void UCIShell::AddOutputListener(std::function<void(const std::string&)> func)
+
+【具体例】
+簡単な例は以下のようになります。
+    #include <iostream>
+    #include <string>
+    #include <memory>
+
+    #include "include/sayuri.h"  // Sayuriライブラリのヘッダファイル。
+
+    // ライブラリからの出力を受け取るコールバック関数。
+    // この例では出力をそのまま標準出力に流している。
+    void Print(const std::string& message) {
+        std::cout << message << std::endl;
+        // ライブラリからの出力は最終行を改行しないので、この例では改行する。
+    }
+
+    // メイン。
+    int main(int argc, char* argv[]) {
+        /********/
+        /* 準備 */
+        /********/
+        // ライブラリの初期化。必ずやる。
+        Sayuri::Init();
+
+        // 思考部分の作成。
+        std::unique_ptr<Sayuri::ChessEngine> engine_ptr(new Sayuri::ChessEngine());
+
+        // UCIコマンドを思考部分に渡すクラスを作成。
+        std::unique_ptr<Sayuri::UCIShell> shell_ptr(new Sayuri::UCIShell(*engine_ptr));
+
+        // ライブラリからの出力を受け取るコールバック関数を登録。
+        shell_ptr->AddOutputListener(Print);
+
+        /********************/
+        /* ライブラリの操作 */
+        /********************/
+        // InputCommand()でライブラリに指示する。
+
+        shell->InputCommand("uci");
+        // ID、オプション、"uciok"の出力がPrint()に送られる。
+
+        shell->InputCommand("isready");
+        // "readyok"の出力がPrint()に送られる。
+
+        shell->InputCommand("position startpos");
+        shell->InputCommand("isready");
+        // "readyok"の出力がPrint()に送られる。
+
+        shell->InputCommand("go depth 10");
+        // 別スレッドが起動し、思考開始。
+        // 思考は別スレッドで行われるので制御がすぐに戻ってくる。
+
+        while (......) {......}
+        // 思考終了まで待つ。
+        // 思考中は"info ..."という出力がPrint()にたくさん送られる。
+        // 思考終了後は"bestmove ..."という出力で最善手がPrint()に送られる。
+
+        return 0;
+    }
 
 
 --------------------------------------------------------------------------------
@@ -109,6 +230,10 @@ How to build:
         $ cmake ..
         $ make
     3. The executable file named "sayuri" has been built in "build" directory.
+    3. Following files/directory have been created in "build" directory.
+        * sayuri: Executable file.
+        * libsayurilib.a: Static library.
+        * include: A directory for libsayurilib.a.
 
 
 --------------------------------------------------------------------------------
@@ -123,9 +248,129 @@ How to build:
         $ cd build
         $ cmake -DCMAKE_BUILD_TYPE=Debug ..
         $ make
-    3. The executable file named "sayuri" has been built in "build" directory.
+    3. Following files/directory have been created in "build" directory.
+        * sayuri: Executable file.
+        * libsayurilib.a: Static library.
+        * include: A directory for libsayurilib.a.
 
 
+--------------------------------------------------------------------------------
+About each files created when using CMake.
+--------------------------------------------------------------------------------
+"sayuri" is an executable UCI chess engine.
+    When you want to use Sayuri as UCI chess engine, you use this file only.
+    If so, you can delete "libsayurilib.a" and "include".
+
+"libsayurilib.a" and "include" are files when you use Sayuri as static library.
+    These files are used when you put Sayuri in your program.
+    All header files are in "include" directory. You can use these headers with the static library.
+    If so, you don't need "sayuri" file. You can delete it.
+
+
+--------------------------------------------------------------------------------
+How to use libsayurilib.a
+--------------------------------------------------------------------------------
+Sayuri is a multithreading program. So when you compile your program with libsayurilib.a, if you use Linux, you need to link pthread to your program. 
+
+Namespace of Sayuri is "Sayuri".
+
+[Preparation]
+Include "include/sayuri.h"
+Before using the library, you must initialize Sayuri with following function.
+    Sayuri::Init();
+(Note!!) You "must" initialize the library before using it, because if you don't do so, the library doesn't work well.
+
+Create an engine and a UCI shell.
+Sayuri::ChessEngine is a engine of calculation.
+Sayuri::UCIShell is an object to mediate between the engine and outer with UCI commands.
+You can create these objects by following codes.
+    Sayuri::ChessEngine engine();
+    Sayuri::UCIShell shell(engine);
+
+    or
+
+    Sayuri::ChessEngine* engine_ptr = new Sayuri::ChessEngine();
+    Sayuri::UCIShell* shell_ptr = new Sayuri::UCIShell(*engine_ptr);
+
+    or
+
+    #include <memory>
+    std::unique_ptr<Sayuri::ChessEngine> engine_ptr(new Sayuri::ChessEngine());
+    std::unique_ptr<Sayuri::UCIShell> shell_ptr(new Sayuri::UCIShell(*engine_ptr));
+
+[Maneuvering the library]
+This library is like the ordinary UCI engine. You can maneuver library with UCI commands.
+
+If you want to control the library, you need to use a following function with putting the commands into "input" parameter.
+    void UCIShell::InputCommand(const std::string& input)
+
+You can receive outputs from the library by call-back function.
+The type of call-back function is as follows. You can name function name and parameter name.
+    void name_of_function(const std::string& name_of_param)
+The library input UCI output into "name_of_param" parameter.
+
+Your call-back function  can be registered to the library with a following function of Sayuri::UCIShell.
+    void UCIShell::AddOutputListener(std::function<void(const std::string&)> func)
+
+[Example]
+The simple example is as follows.
+    #include <iostream>
+    #include <string>
+    #include <memory>
+
+    #include "include/sayuri.h"  // A header file of Sayuri.
+
+    // Your call-back function to receive the output from the library.
+    // In this example, the output is sent to standard output.
+    void Print(const std::string& message) {
+        std::cout << message << std::endl;
+        // The last line of the output from the library doesn't have line feed.
+        // So this example put line feed after the output.
+    }
+
+    // Main function.
+    int main(int argc, char* argv[]) {
+        /***************/
+        /* Preparation */
+        /***************/
+        // Initialize the library. You "must" do this.
+        Sayuri::Init();
+
+        // Create an engine.
+        std::unique_ptr<Sayuri::ChessEngine> engine_ptr(new Sayuri::ChessEngine());
+
+        // Create an object to mediate with UCI commands.
+        std::unique_ptr<Sayuri::UCIShell> shell_ptr(new Sayuri::UCIShell(*engine_ptr));
+
+        // Register your call-back function to receive the output from the library.
+        shell_ptr->AddOutputListener(Print);
+
+        /***************************/
+        /* Maneuvering the library */
+        /***************************/
+        // You can control the library with InputCommand().
+
+        shell->InputCommand("uci");
+        // The library send ID, configurable options and "uciok" output to Print().
+
+        shell->InputCommand("isready");
+        // "redyok" output is sent to Print().
+
+        shell->InputCommand("position startpos");
+        shell->InputCommand("isready");
+        // "redyok" output is sent to Print().
+
+        shell->InputCommand("go depth 10");
+        // The library run another thread and start calculation.
+        // The calculation is running on the another thread, so the control will come back soon.
+
+        while (......) {......}
+        // Wait for concluding calculation.
+        // In calculating, the library send a lot of "info ..." output to Print().
+        // After calculation, the library send the best move with "bestmove ..." output to Print().
+
+        return 0;
+    }
 --------------------------------------------------------------------------------
 How to build distributable source code packages
 --------------------------------------------------------------------------------
@@ -144,21 +389,21 @@ UCI Options
 --------------------------------------------------------------------------------
 With following commands, you can change setup of Sayuri.
 
-Change the size(megabytes) of a hash table.
+To Change the size(megabytes) of a hash table.
 (Default is 32. Maximum is 8192. Minimum is 8.)
     setoption name Hash value <size(megabytes)>
 
-Initialize the hash table.
+To Initialize the hash table.
     setoption name Clear Hash
 
-Enable ponder.
+To Enable ponder.
 (Default is "true".)
     setoption name Ponder value <true or false>
 
-Change the number of threads.
+To Change the number of threads.
 (Default is 1. Maximum is 64. Minimum is 1.)
     setoption name Threads value <the number of threads>
 
-Enable analyse mode.
+To Enable analyse mode.
 (Default is "false".)
     setoption name UCI_AnalyseMode value <true or false>
