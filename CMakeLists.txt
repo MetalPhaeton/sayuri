@@ -2,7 +2,7 @@
 #
 #  The MIT License (MIT)
 #
-#  Copyright (c) 2013 Hironori Ishibashi
+#  Copyright (c) 2014 Hironori Ishibashi
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to
@@ -30,7 +30,7 @@ cmake_minimum_required(VERSION 2.8)
 
 # プロジェクト名。
 project(SAYURI)
-set(VERSION "2014.01.01")
+set(VERSION "2014.02.21")
 
 # ソースとヘッダファイルのリスト。
 file(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
