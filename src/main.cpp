@@ -36,7 +36,7 @@
 #include "debug.h"
 
 // UCI出力を標準出力に出力。
-void Print(std::string message) {
+void Print(const std::string& message) {
   std::cout << message << std::endl;
 }
 
