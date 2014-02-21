@@ -1,7 +1,7 @@
 (English version of README is in the second half of this file.)
 
 Sayuri - UCI用チェスエンジン
-Copyright (c) 2013 Hironori Ishibashi
+Copyright (c) 2014 Hironori Ishibashi
 ================================================================================
 SayuriはC++11の標準ライブラリのみで作ったUCI対応チェスエンジンです。
 全てのソースファイルはsrcディレクトリにあります。
