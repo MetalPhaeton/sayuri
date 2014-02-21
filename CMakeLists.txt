@@ -35,6 +35,9 @@ set(VERSION "2014.01.01")
 # ソースとヘッダファイルのリスト。
 file(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
+# ライブラリ作成用ソースファイルのリスト。
+file(GLOB LIBSRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+list(REMOVE_ITEM LIBSRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 
 # デフォルトでリリース用のコンパイルに設定する。
 if(NOT CMAKE_BUILD_TYPE)
@@ -58,6 +61,19 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_executable(sayuri ${SRCS})
 target_link_libraries(sayuri pthread)
 add_dependencies(sayuri ${HEADERS})
+
+# ライブラリのビルド設定。
+add_library(sayurilib STATIC ${LIBSRCS})
+target_link_libraries(sayurilib pthread)
+add_dependencies(sayurilib ${HEADERS})
+# インクルードファイル作成設定。
+add_custom_command(TARGET sayurilib POST_BUILD
+COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/include)
+foreach(HFILE ${HEADERS})
+    add_custom_command(TARGET sayurilib POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E
+    copy ${HFILE} ${CMAKE_CURRENT_BINARY_DIR}/include/)
+endforeach(HFILE ${HEADERS})
 
 # CPackの設定。
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "sayuri-${VERSION}")
