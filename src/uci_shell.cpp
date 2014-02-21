@@ -271,41 +271,76 @@ namespace Sayuri {
     std::ostringstream sout;
 
     // IDを表示。
-    sout << "id name " << ID_NAME << std::endl;
-    sout << "id author " << ID_AUTHOR << std::endl;
+    sout << "id name " << ID_NAME;
+    // 出力関数に送る。
+    for (auto& func : output_listeners_) {
+      func(sout.str());
+    }
+
+    sout.str("");
+    sout << "id author " << ID_AUTHOR;
+    // 出力関数に送る。
+    for (auto& func : output_listeners_) {
+      func(sout.str());
+    }
 
     // 変更可能オプションの表示。
     // トランスポジションテーブルのサイズの変更。
+    sout.str("");
     sout << "option name Hash type spin default "
     << (UCI_DEFAULT_TABLE_SIZE / (1024 * 1024)) << " min "
     << UCI_MIN_TABLE_SIZE / (1024 * 1024) << " max "
-    << UCI_MAX_TABLE_SIZE / (1024 * 1024) << std::endl;
+    << UCI_MAX_TABLE_SIZE / (1024 * 1024);
+    // 出力関数に送る。
+    for (auto& func : output_listeners_) {
+      func(sout.str());
+    }
 
     // トランスポジションテーブルの初期化。
-    sout << "option name Clear Hash type button" << std::endl;
+    sout.str("");
+    sout << "option name Clear Hash type button";
+    // 出力関数に送る。
+    for (auto& func : output_listeners_) {
+      func(sout.str());
+    }
 
     // ポンダリングできるかどうか。
+    sout.str("");
     sout << "option name Ponder type check default ";
     if (UCI_DEFAULT_PONDER) {
       sout << "true";
     } else {
       sout << "false";
     }
-    sout << std::endl;
+    // 出力関数に送る。
+    for (auto& func : output_listeners_) {
+      func(sout.str());
+    }
 
     // スレッドの数。
+    sout.str("");
     sout << "option name Threads type spin defalut "
-    << UCI_DEFAULT_THREADS << " min " << 1 << " max "
-    << UCI_MAX_THREADS << std::endl;
+    << UCI_DEFAULT_THREADS << " min " << 1 << " max " << UCI_MAX_THREADS;
+    // 出力関数に送る。
+    for (auto& func : output_listeners_) {
+      func(sout.str());
+    }
 
     // アナライズモード。
+    sout.str("");
     sout << "option name UCI_AnalyseMode type check default ";
     if (UCI_DEFAULT_ANALYSE_MODE) sout << "true";
     else sout << "false";
-    sout << std::endl;
+    // 出力関数に送る。
+    for (auto& func : output_listeners_) {
+      func(sout.str());
+    }
 
     // オーケー。
-    sout << "uciok";
+    // 出力関数に送る。
+    for (auto& func : output_listeners_) {
+      func("uciok");
+    }
 
     // オプションの初期設定。
     table_size_ = UCI_DEFAULT_TABLE_SIZE;
@@ -313,10 +348,6 @@ namespace Sayuri {
     enable_pondering_ = UCI_DEFAULT_PONDER;
     num_threads_ = UCI_DEFAULT_THREADS;
 
-    // 出力関数に送る。
-    for (auto& func : output_listeners_) {
-      func(sout.str());
-    }
   }
 
   // isreadyコマンド。
