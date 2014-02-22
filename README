@@ -17,7 +17,8 @@ CMakeを使ったビルド方法
 --------------------------------------------------------------------------------
 CMakeを使って簡単にビルドすることができます。
 使用するコンパイラはデフォルトで「clang++」となります。
-(コンパイラを変更したいときは、CMakeLists.txtの26行目、27行目のコンパイラ設定を変更してください。)
+(コンパイラを変更したいときは、
+CMakeLists.txtの26行目、27行目のコンパイラ設定を変更してください。)
 
 以下、ビルド手順。
 1. CMakeLists.txtのあるディレクトリに移動します。
@@ -57,16 +58,19 @@ CMakeで作成した際の各ファイルについて
     通常のUCIエンジンとして利用する場合はこのファイルのみ使います。
     その場合、「libsayurilib.a」と「include」は削除して構いません。
 
-「libsayurilib.a」と「include」はSayuriを静的ライブラリとして使用する際に使います。
+「libsayurilib.a」と「include」はSayuriを
+静的ライブラリとして使用する際に使います。
     Sayuriをあなたのプログラムに組み込む際に使う静的ライブラリです。
-    「include」ディレクトリにSayuriの全ヘッダファイルがあるので、それらと共に使用します。
+    「include」ディレクトリにSayuriの全ヘッダファイルがあるので、
+    それらと共に使用します。
     その場合、「sayuri」は使用しません。削除して構いません。
 
 
 --------------------------------------------------------------------------------
 libsayurilib.aの使い方
 --------------------------------------------------------------------------------
-Sayuriはマルチスレッドプログラムなので、Linuxを使っている場合は、コンパイルの際、pthreadをリンクさせる必要があります。
+Sayuriはマルチスレッドプログラムなので、Linuxを使っている場合は、
+コンパイルの際、pthreadをリンクさせる必要があります。
 
 Sayuriのネームスペースは「Sayuri」です。
 
@@ -88,13 +92,17 @@ Sayuri::UCIShellはSayuri::ChessEngineと外部をUCIコマンドで仲介する
     Sayuri::UCIShell* shell_ptr = new Sayuri::UCIShell(*engine_ptr);
     又は、
     #include <memory>
-    std::unique_ptr<Sayuri::ChessEngine> engine_ptr(new Sayuri::ChessEngine());
-    std::unique_ptr<Sayuri::UCIShell> shell_ptr(new Sayuri::UCIShell(*engine_ptr));
+    std::unique_ptr<Sayuri::ChessEngine>
+    engine_ptr(new Sayuri::ChessEngine());
+    std::unique_ptr<Sayuri::UCIShell>
+    shell_ptr(new Sayuri::UCIShell(*engine_ptr));
 
 【ライブラリの操作方法】
-ライブラリは通常のUCIエンジンの操作とよく似ていて、UCIコマンドを使って操作します。
+ライブラリは通常のUCIエンジンの操作とよく似ていて、
+UCIコマンドを使って操作します。
 
-ライブラリへの入力は、以下のSayuri::UCIShellオブジェクトの関数のinput引数にUCIコマンドを渡して行います。
+ライブラリへの入力は、以下のSayuri::UCIShellオブジェクトの関数の
+input引数にUCIコマンドを渡して行います。
     void UCIShell::InputCommand(const std::string& input)
 
 ライブラリからの出力はコールバック関数で受け取ります。
@@ -103,8 +111,10 @@ Sayuri::UCIShellはSayuri::ChessEngineと外部をUCIコマンドで仲介する
     void name_of_function(const std::string& name_of_param)
 name_of_paramにライブラリからの出力が入力されます。
 
-コールバック関数は、以下のSayuri::UCIShellオブジェクトの以下の関数のfunc引数に渡して登録します。
-    void UCIShell::AddOutputListener(std::function<void(const std::string&)> func)
+コールバック関数は、以下のSayuri::UCIShellオブジェクトの以下の関数の
+func引数に渡して登録します。
+    void
+    UCIShell::AddOutputListener(std::function<void(const std::string&)> func)
 
 【具体例】
 簡単な例は以下のようになります。
@@ -130,10 +140,12 @@ name_of_paramにライブラリからの出力が入力されます。
         Sayuri::Init();
 
         // 思考部分の作成。
-        std::unique_ptr<Sayuri::ChessEngine> engine_ptr(new Sayuri::ChessEngine());
+        std::unique_ptr<Sayuri::ChessEngine>
+        engine_ptr(new Sayuri::ChessEngine());
 
         // UCIコマンドを思考部分に渡すクラスを作成。
-        std::unique_ptr<Sayuri::UCIShell> shell_ptr(new Sayuri::UCIShell(*engine_ptr));
+        std::unique_ptr<Sayuri::UCIShell>
+        shell_ptr(new Sayuri::UCIShell(*engine_ptr));
 
         // ライブラリからの出力を受け取るコールバック関数を登録。
         shell_ptr->AddOutputListener(Print);
@@ -207,7 +219,8 @@ Ponderの有効化、無効化。(デフォルトはtrue。)
 Sayuri - Chess Engine for UCI
 Copyright (c) 2013 Hironori Ishibashi
 ================================================================================
-Sayuri is a chess engine for UCI that is created by C++11 standard libraries only.
+Sayuri is a chess engine for UCI that is created by
+C++11 standard libraries only.
 All source files are in "src" directory.
 You can build Sayuri with any compiler that supports C++11 source code.
 You can easily build it with CMake.
@@ -220,7 +233,8 @@ The Compiled binaries are in following directories.
 How to build Sayuri with CMake
 --------------------------------------------------------------------------------
 Sayuri can be easily built with CMake.
-The default compiler is "clang++". (If you want to change the compiler, you should change the 26th and 27th line of CMakeLists.txt.)
+The default compiler is "clang++". (If you want to change the compiler,
+you should change the 26th and 27th line of CMakeLists.txt.)
 
 How to build:
     1. Change the working directory to which has CMakeLists.txt file.
@@ -263,14 +277,17 @@ About each files created when using CMake.
 
 "libsayurilib.a" and "include" are files when you use Sayuri as static library.
     These files are used when you put Sayuri in your program.
-    All header files are in "include" directory. You can use these headers with the static library.
+    All header files are in "include" directory.
+    You can use these headers with the static library.
     If so, you don't need "sayuri" file. You can delete it.
 
 
 --------------------------------------------------------------------------------
 How to use libsayurilib.a
 --------------------------------------------------------------------------------
-Sayuri is a multithreading program. So when you compile your program with libsayurilib.a, if you use Linux, you need to link pthread to your program. 
+Sayuri is a multithreading program.
+So when you compile your program with libsayurilib.a,
+if you use Linux, you need to link pthread to your program. 
 
 Namespace of Sayuri is "Sayuri".
 
@@ -278,11 +295,13 @@ Namespace of Sayuri is "Sayuri".
 Include "include/sayuri.h"
 Before using the library, you must initialize Sayuri with following function.
     Sayuri::Init();
-(Note!!) You "must" initialize the library before using it, because if you don't do so, the library doesn't work well.
+(Note!!) You "must" initialize the library before using it,
+because if you don't do so, the library doesn't work well.
 
 Create an engine and a UCI shell.
 Sayuri::ChessEngine is a engine of calculation.
-Sayuri::UCIShell is an object to mediate between the engine and outer with UCI commands.
+Sayuri::UCIShell is an object to mediate between
+the engine and outer with UCI commands.
 You can create these objects by following codes.
     Sayuri::ChessEngine engine();
     Sayuri::UCIShell shell(engine);
@@ -295,22 +314,30 @@ You can create these objects by following codes.
     or
 
     #include <memory>
-    std::unique_ptr<Sayuri::ChessEngine> engine_ptr(new Sayuri::ChessEngine());
-    std::unique_ptr<Sayuri::UCIShell> shell_ptr(new Sayuri::UCIShell(*engine_ptr));
+    std::unique_ptr<Sayuri::ChessEngine>
+    engine_ptr(new Sayuri::ChessEngine());
+    std::unique_ptr<Sayuri::UCIShell>
+    shell_ptr(new Sayuri::UCIShell(*engine_ptr));
 
 [Maneuvering the library]
-This library is like the ordinary UCI engine. You can maneuver library with UCI commands.
+This library is like the ordinary UCI engine.
+You can maneuver library with UCI commands.
 
-If you want to control the library, you need to use a following function with putting the commands into "input" parameter.
+If you want to control the library,
+you need to use a following function with putting the commands into
+"input" parameter.
     void UCIShell::InputCommand(const std::string& input)
 
 You can receive outputs from the library by call-back function.
-The type of call-back function is as follows. You can name function name and parameter name.
+The type of call-back function is as follows.
+You can name function name and parameter name.
     void name_of_function(const std::string& name_of_param)
 The library input UCI output into "name_of_param" parameter.
 
-Your call-back function  can be registered to the library with a following function of Sayuri::UCIShell.
-    void UCIShell::AddOutputListener(std::function<void(const std::string&)> func)
+Your call-back function  can be registered to the library with
+a following function of Sayuri::UCIShell.
+    void
+    UCIShell::AddOutputListener(std::function<void(const std::string&)> func)
 
 [Example]
 The simple example is as follows.
@@ -324,7 +351,8 @@ The simple example is as follows.
     // In this example, the output is sent to standard output.
     void Print(const std::string& message) {
         std::cout << message << std::endl;
-        // The last line of the output from the library doesn't have line feed.
+        // The last line of the output from the library
+        // doesn't have line feed.
         // So this example put line feed after the output.
     }
 
@@ -337,12 +365,15 @@ The simple example is as follows.
         Sayuri::Init();
 
         // Create an engine.
-        std::unique_ptr<Sayuri::ChessEngine> engine_ptr(new Sayuri::ChessEngine());
+        std::unique_ptr<Sayuri::ChessEngine>
+        engine_ptr(new Sayuri::ChessEngine());
 
         // Create an object to mediate with UCI commands.
-        std::unique_ptr<Sayuri::UCIShell> shell_ptr(new Sayuri::UCIShell(*engine_ptr));
+        std::unique_ptr<Sayuri::UCIShell>
+        shell_ptr(new Sayuri::UCIShell(*engine_ptr));
 
-        // Register your call-back function to receive the output from the library.
+        // Register your call-back function to receive the output from
+        // the library.
         shell_ptr->AddOutputListener(Print);
 
         /***************************/
@@ -351,7 +382,8 @@ The simple example is as follows.
         // You can control the library with InputCommand().
 
         shell->InputCommand("uci");
-        // The library send ID, configurable options and "uciok" output to Print().
+        // The library send ID, configurable options and "uciok" output to
+        // Print().
 
         shell->InputCommand("isready");
         // "redyok" output is sent to Print().
@@ -362,12 +394,15 @@ The simple example is as follows.
 
         shell->InputCommand("go depth 10");
         // The library run another thread and start calculation.
-        // The calculation is running on the another thread, so the control will come back soon.
+        // The calculation is running on the another thread,
+        // so the control will come back soon.
 
         while (......) {......}
         // Wait for concluding calculation.
-        // In calculating, the library send a lot of "info ..." output to Print().
-        // After calculation, the library send the best move with "bestmove ..." output to Print().
+        // In calculating, the library send a lot of "info ..." output to
+        // Print().
+        // After calculation, the library send the best move with
+        // "bestmove ..." output to Print().
 
         return 0;
     }
