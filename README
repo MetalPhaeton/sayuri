@@ -68,6 +68,12 @@ CMakeで作成した際の各ファイルについて
 
 --------------------------------------------------------------------------------
 libsayurilib.aの使い方
+
+(注) Sayuriは「MIT License」です。
+「libsayurilib.a」を利用したソフトウェアを作成する際は、
+本「LICENSE」ファイル内の英語表記部分をどこかに表示してください。
+例えば、あなたのソフトウェアのREADMEやLICENSEファイルに表記をコピペするなど。
+そのルールだけ守ればあとは何に利用しようと自由です。
 --------------------------------------------------------------------------------
 Sayuriはマルチスレッドプログラムなので、Linuxを使っている場合は、
 コンパイルの際、pthreadをリンクさせる必要があります。
@@ -284,6 +290,13 @@ About each files created when using CMake.
 
 --------------------------------------------------------------------------------
 How to use libsayurilib.a
+
+(Note!!) Sayuri is "MIT License".
+If you make software with "libsayurilib.a",
+you have to display English part of Sayuri's "LICENSE" file on somewhere.
+For example, to copy and paste it on
+your README or LICENSE file with your software.
+If you do so, you can use "libsayurilib.a" freely.
 --------------------------------------------------------------------------------
 Sayuri is a multithreading program.
 So when you compile your program with libsayurilib.a,
