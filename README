@@ -291,7 +291,7 @@ About each files created when using CMake.
 --------------------------------------------------------------------------------
 How to use libsayurilib.a
 
-(Note!!) Sayuri is "MIT License".
+(Note!!) Sayuri is "MIT License" software.
 If you make software with "libsayurilib.a",
 you have to display English part of Sayuri's "LICENSE" file on somewhere.
 For example, to copy and paste it on
