@@ -69,7 +69,7 @@ CMakeで作成した際の各ファイルについて
 --------------------------------------------------------------------------------
 libsayurilib.aの使い方
 
-(注) Sayuriは「MIT License」です。
+(注) Sayuriは「MIT License」ソフトウェアです。
 「libsayurilib.a」を利用したソフトウェアを作成する際は、
 本「LICENSE」ファイル内の英語表記部分をどこかに表示してください。
 例えば、あなたのソフトウェアのREADMEやLICENSEファイルに表記をコピペするなど。
@@ -223,7 +223,7 @@ Ponderの有効化、無効化。(デフォルトはtrue。)
 *******************
 ================================================================================
 Sayuri - Chess Engine for UCI
-Copyright (c) 2013 Hironori Ishibashi
+Copyright (c) 2014 Hironori Ishibashi
 ================================================================================
 Sayuri is a chess engine for UCI that is created by
 C++11 standard libraries only.
@@ -294,8 +294,8 @@ How to use libsayurilib.a
 (Note!!) Sayuri is "MIT License" software.
 If you make software with "libsayurilib.a",
 you have to display English part of Sayuri's "LICENSE" file on somewhere.
-For example, to copy and paste it on
-your README or LICENSE file with your software.
+For example, to copy and paste it onto
+your README or LICENSE file of your software.
 If you do so, you can use "libsayurilib.a" freely.
 --------------------------------------------------------------------------------
 Sayuri is a multithreading program.
