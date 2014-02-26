@@ -3,7 +3,7 @@
 
    The MIT License (MIT)
 
-   Copyright (c) 2013 Hironori Ishibashi
+   Copyright (c) 2014 Hironori Ishibashi
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -73,9 +73,9 @@ namespace Sayuri {
       int ply() const {return ply_;}
 
     private:
-      /************/
-      /* パーサ。 */
-      /************/
+      /*****************/
+      /* FEN評価関数。 */
+      /*****************/
       // 駒の配置トークンを評価する。
       void EvalPosition(const std::string& position_str);
       // 手番トークンを評価する。

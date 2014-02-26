@@ -1,6 +1,6 @@
 /* 
    fen.cpp: fenパーサの実装ファイル。
-   Copyright (c) 2013 Hironori Ishibashi
+   Copyright (c) 2014 Hironori Ishibashi
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -307,20 +307,20 @@ namespace Sayuri {
 
     // アンパッサンがある。
     can_en_passant_ = true;
+
     // ファイルから評価。
-    Bitboard fyle = 0ULL;
     int index = en_passant_str[0] - 'a';
     if ((index < 0) || (index > 7)) {
       throw SayuriError("FENを解析できません。");
     }
-    fyle = Util::FYLE[index];
+    Bitboard fyle = Util::FYLE[index];
+
     // ランクを評価。
-    Bitboard rank = 0ULL;
     index = (en_passant_str[1] - '0') - 1;
     if ((index < 0) || (index > 7)) {
       throw SayuriError("FENを解析できません。");
     }
-    rank |= Util::RANK[index];
+    Bitboard rank = Util::RANK[index];
 
     en_passant_square_ = Util::GetSquare(fyle & rank);
   }
