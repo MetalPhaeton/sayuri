@@ -104,9 +104,7 @@ namespace Sayuri {
       /* static関数。 */
       /****************/
       // 思考用スレッド。
-      // [引数]
-      // shell: UCIシェル。
-      static void ThreadThinking(UCIShell& shell);
+      void ThreadThinking();
 
     private:
       /*********************/

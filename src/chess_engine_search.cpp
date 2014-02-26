@@ -517,7 +517,8 @@ namespace Sayuri {
     // スレッドの準備。
     shared_st_ptr_->helper_queue_ptr_.reset(new HelperQueue());
     for (auto& thread : thread_vec_) {
-      thread = std::thread(ThreadYBWC, std::ref(*this), std::ref(shell));
+      thread =
+      std::thread(&ChessEngine::ThreadYBWC, std::ref(*this), std::ref(shell));
     }
 
     // Iterative Deepening。
@@ -627,16 +628,16 @@ namespace Sayuri {
   }
 
   // 探索用子スレッド。
-  void ChessEngine::ThreadYBWC(ChessEngine& parent, UCIShell& shell) {
+  void ChessEngine::ThreadYBWC(UCIShell& shell) {
     // 子エンジンを作る。
-    parent.mutex_.lock();
+    mutex_.lock();
     std::unique_ptr<ChessEngine> child_ptr(new ChessEngine());
-    child_ptr->shared_st_ptr_ = parent.shared_st_ptr_;
-    parent.mutex_.unlock();
+    child_ptr->shared_st_ptr_ = shared_st_ptr_;
+    mutex_.unlock();
 
     // 仕事ループ。
     while (true) {
-      if (parent.ShouldBeStopped()) {
+      if (ShouldBeStopped()) {
         break;
       }
 

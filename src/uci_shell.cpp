@@ -230,18 +230,18 @@ namespace Sayuri {
   }
 
   // 思考スレッド。
-  void UCIShell::ThreadThinking(UCIShell& shell) {
+  void UCIShell::ThreadThinking() {
     // アナライズモードならトランスポジションテーブルを初期化。
-    if (shell.analyse_mode_) {
-      shell.table_ptr_.reset(new TranspositionTable(shell.table_size_));
+    if (analyse_mode_) {
+      table_ptr_.reset(new TranspositionTable(table_size_));
     }
 
     // テーブルの年齢の増加。
-    shell.table_ptr_->GrowOld();
+    table_ptr_->GrowOld();
 
     // 思考開始。
-    PVLine pv_line = shell.engine_ptr_->Calculate (shell.num_threads_,
-    *(shell.table_ptr_.get()), shell.moves_to_search_ptr_.get(), shell);
+    PVLine pv_line = engine_ptr_->Calculate (num_threads_,
+    *(table_ptr_.get()), moves_to_search_ptr_.get(), *this);
 
     // 最善手を表示。
     std::ostringstream sout;
@@ -258,7 +258,7 @@ namespace Sayuri {
       }
     }
     // 出力関数に送る。
-    for (auto& func : shell.output_listeners_) {
+    for (auto& func : output_listeners_) {
       func(sout.str());
     }
   }
@@ -672,7 +672,8 @@ namespace Sayuri {
     // 別スレッドで思考開始。
     engine_ptr_->SetStopper(max_depth, max_nodes, thinking_time,
     infinite_thinking);
-    thinking_thread_ = std::thread(ThreadThinking, std::ref(*this));
+    thinking_thread_ =
+    std::thread(&UCIShell::ThreadThinking, std::ref(*this));
   }
 
   // stopコマンド。

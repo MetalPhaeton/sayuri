@@ -287,9 +287,8 @@ namespace Sayuri {
       std::vector<Move>* moves_to_search_ptr, UCIShell& shell);
       // YBWC探索用スレッド。
       // [引数]
-      // parent: スレッドを呼び出したエンジン。
       // shell: UCI出力に使用するシェル。
-      static void ThreadYBWC(ChessEngine& parent, UCIShell& shell);
+      void ThreadYBWC(UCIShell& shell);
       // 並列探索。
       // [引数]
       // job: 探索用仕事。
