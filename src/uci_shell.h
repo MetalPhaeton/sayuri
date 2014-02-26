@@ -100,13 +100,13 @@ namespace Sayuri {
       void PrintOtherInfo(Chrono::milliseconds time,
       std::uint64_t num_nodes, int hashfull);
 
-      /****************/
-      /* static関数。 */
-      /****************/
+    private:
+      /**********************/
+      /* プライベート関数。 */
+      /**********************/
       // 思考用スレッド。
       void ThreadThinking();
 
-    private:
       /*********************/
       /* UCIコマンド関数。 */
       /*********************/
