@@ -219,10 +219,8 @@ namespace Sayuri {
       Side to_move() const {return to_move_;}
       // キャスリングの権利。
       Castling castling_rights() const {return castling_rights_;}
-      // アンパッサンの位置。
+      // アンパッサンの位置。アンパッサンができなければ0。
       Square en_passant_square() const {return en_passant_square_;}
-      // アンパッサンできるかどうか。
-      bool can_en_passant() const {return can_en_passant_;}
       // 50手ルール。
       int ply_100() const {return ply_100_;}
       // 現在の手数。
@@ -379,10 +377,8 @@ namespace Sayuri {
       Side to_move_;
       // キャスリングの権利。
       Castling castling_rights_;
-      // アンパッサンの位置。
+      // アンパッサンの位置。アンパッサンできなければ0。
       Square en_passant_square_;
-      // アンパッサンできるかどうか。
-      bool can_en_passant_;
       // 50手ルール。
       int ply_100_;
       // 現在の手数。

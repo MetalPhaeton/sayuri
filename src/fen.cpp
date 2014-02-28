@@ -67,7 +67,6 @@ namespace Sayuri {
         }
       } else {
         en_passant_square_ = 0;
-        can_en_passant_ = false;
         ply_100_ = 0;
         ply_ = 1;
       }
@@ -84,7 +83,6 @@ namespace Sayuri {
   to_move_(WHITE),
   castling_rights_(ALL_CASTLING),
   en_passant_square_(0),
-  can_en_passant_(false),
   ply_100_(0),
   ply_(1) {
     // 駒を初期配置にする。
@@ -107,12 +105,12 @@ namespace Sayuri {
     position_[WHITE][KING] = Util::SQUARE[E1];
     position_[BLACK][KING] = Util::SQUARE[E8];
   }
+
   // コピーコンストラクタ。
   Fen::Fen(const Fen& fen) :
   to_move_(fen.to_move_),
   castling_rights_(fen.castling_rights_),
   en_passant_square_(fen.en_passant_square_),
-  can_en_passant_(fen.can_en_passant_),
   ply_100_(fen.ply_100_),
   ply_(fen.ply_) {
     // 駒の配置をコピー。
@@ -122,12 +120,12 @@ namespace Sayuri {
       }
     }
   }
+
   // ムーブコンストラクタ。
   Fen::Fen(Fen&& fen) :
   to_move_(fen.to_move_),
   castling_rights_(fen.castling_rights_),
   en_passant_square_(fen.en_passant_square_),
-  can_en_passant_(fen.can_en_passant_),
   ply_100_(fen.ply_100_),
   ply_(fen.ply_) {
     // 駒の配置をコピー。
@@ -137,13 +135,13 @@ namespace Sayuri {
       }
     }
   }
+
   // コピー代入。
   Fen& Fen::operator=(const Fen& fen) {
     // メンバをコピー。
     to_move_ = fen.to_move_;
     castling_rights_ = fen.castling_rights_;
     en_passant_square_ = fen.en_passant_square_;
-    can_en_passant_ = fen.can_en_passant_;
     ply_100_ = fen.ply_100_;
     ply_ = fen.ply_;
     for (int i = 0; i < NUM_SIDES; i++) {
@@ -154,13 +152,13 @@ namespace Sayuri {
 
     return *this;
   }
+
   // ムーブ代入。
   Fen& Fen::operator=(Fen&& fen) {
     // メンバをコピー。
     to_move_ = fen.to_move_;
     castling_rights_ = fen.castling_rights_;
     en_passant_square_ = fen.en_passant_square_;
-    can_en_passant_ = fen.can_en_passant_;
     ply_100_ = fen.ply_100_;
     ply_ = fen.ply_;
     for (int i = 0; i < NUM_SIDES; i++) {
@@ -300,13 +298,9 @@ namespace Sayuri {
   void Fen::EvalEnPassant(const std::string& en_passant_str) {
     // アンパッサンがない。
     if (en_passant_str[0] == '-') {
-      can_en_passant_ = false;
       en_passant_square_ = 0;
       return;
     }
-
-    // アンパッサンがある。
-    can_en_passant_ = true;
 
     // ファイルから評価。
     int index = en_passant_str[0] - 'a';
@@ -316,8 +310,11 @@ namespace Sayuri {
     Bitboard fyle = Util::FYLE[index];
 
     // ランクを評価。
-    index = (en_passant_str[1] - '0') - 1;
-    if ((index < 0) || (index > 7)) {
+    if (en_passant_str[1] == '3') {
+      index = RANK_3;
+    } else if (en_passant_str[1] == '6') {
+      index = RANK_6;
+    } else {
       throw SayuriError("FENを解析できません。");
     }
     Bitboard rank = Util::RANK[index];

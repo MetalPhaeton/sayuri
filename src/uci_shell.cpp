@@ -38,6 +38,7 @@
 #include <utility>
 #include <cstddef>
 #include <cstdint>
+#include <cctype>
 #include <functional>
 #include "chess_def.h"
 #include "chess_util.h"
@@ -359,24 +360,13 @@ namespace Sayuri {
 
   // setoptionコマンド。
   void UCIShell::CommandSetOption(const std::vector<std::string>& argv) {
-    // 全部小文字にしておく。
-    std::vector<std::string> argv2 = argv;
-    constexpr char DELTA = 'A' - 'a';
-    for (auto& a : argv2) {
-      for (auto& b : a) {
-        if ((b >= 'A') && (b <= 'Z')) {
-          b -= DELTA;
-        }
-      }
-    }
-
     // サブコマンド。
     std::vector<std::string> sub_commands;
     sub_commands.push_back("name");
     sub_commands.push_back("value");
 
     // パーサ。
-    CommandParser parser(sub_commands, argv2);
+    CommandParser parser(sub_commands, argv);
 
     while (parser.HasNext()) {
       Word word = parser.Get();
@@ -385,6 +375,11 @@ namespace Sayuri {
         // nameコマンド。
         while (!(parser.IsDelim())) {
           word = parser.Get();
+          // nameは大文字小文字関係なし。
+          // なので全て小文字にする。
+          for (auto& c : word) {
+            c = std::tolower(c)
+          }
           if (word.str_ == "hash") {
             // ハッシュ値の変更の場合。
             parser.JumpToNextKeyword();

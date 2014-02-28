@@ -163,7 +163,6 @@ namespace Sayuri {
     to_move_ = fen.to_move();
     castling_rights_ = fen.castling_rights();
     en_passant_square_ = fen.en_passant_square();
-    can_en_passant_ = fen.can_en_passant();
     ply_100_ = fen.ply_100();
     ply_ = fen.ply();
 
@@ -212,7 +211,6 @@ namespace Sayuri {
     to_move_ = record.to_move();
     castling_rights_ = record.castling_rights();
     en_passant_square_ = record.en_passant_square();
-    can_en_passant_ = record.can_en_passant();
     ply_100_ = record.ply_100();
     ply_ = record.ply();
   }
@@ -309,7 +307,6 @@ namespace Sayuri {
 
     // アンパッサンを初期化。
     en_passant_square_ = 0;
-    can_en_passant_ = false;
 
     // 50手ルールを初期化。
     ply_100_ = 0;
@@ -374,7 +371,6 @@ namespace Sayuri {
 
     // アンパッサンのコピー。
     en_passant_square_ = engine.en_passant_square_;
-    can_en_passant_ = engine.can_en_passant_;
 
     // 50手ルールの手数のコピー。
     ply_100_ = engine.ply_100_;
@@ -516,12 +512,13 @@ namespace Sayuri {
 
     // 動かす前のキャスリングの権利とアンパッサンを記録する。
     move.last_castling_rights_ = castling_rights_;
-    move.last_can_en_passant_ = can_en_passant_;
     move.last_en_passant_square_ = en_passant_square_;
+
+    // アンパッサンを解除。
+    en_passant_square_ = 0;
 
     // NULL_MOVEならNull moveする。
     if (move.move_type_ == NULL_MOVE) {
-      can_en_passant_ = false;
       return;
     }
 
@@ -529,7 +526,6 @@ namespace Sayuri {
     // 移動前と移動後が同じならNull Move。
     if (move.from_ == move.to_) {
       move.move_type_ = NULL_MOVE;
-      can_en_passant_ = false;
       return;
     }
 
@@ -548,7 +544,6 @@ namespace Sayuri {
         ReplacePiece(A8, D8);
       }
       has_castled_[side] = true;
-      can_en_passant_ = false;
     } else if (move.move_type_ == EN_PASSANT) {  // アンパッサンの場合。
       // 取った駒をボーンにする。
       move.captured_piece_ = PAWN;
@@ -556,10 +551,8 @@ namespace Sayuri {
       ReplacePiece(move.from_, move.to_);
       // アンパッサンのターゲットを消す。
       Square en_passant_target =
-      side == WHITE ? en_passant_square_ - 8 : en_passant_square_ + 8;
+      side == WHITE ? move.to_ - 8 : move.to_ + 8;
       PutPiece(en_passant_target, EMPTY);
-
-      can_en_passant_ = false;
     } else {  // それ以外の場合。
       // 取る駒を登録する。
       move.captured_piece_ = piece_board_[move.to_];
@@ -573,13 +566,8 @@ namespace Sayuri {
       if (piece_board_[move.to_] == PAWN) {
         if (((side == WHITE) && ((move.from_ + 16) == move.to_))
         || ((side == BLACK) && ((move.from_ - 16) == move.to_))) {
-          can_en_passant_ = true;
           en_passant_square_ = side == WHITE ? move.to_ - 8 : move.to_ + 8;
-        } else {
-          can_en_passant_ = false;
         }
-      } else {
-        can_en_passant_ = false;
       }
     }
 
@@ -596,7 +584,6 @@ namespace Sayuri {
 
     // 動かす前のキャスリングの権利とアンパッサンを復元する。
     castling_rights_ = move.last_castling_rights_;
-    can_en_passant_ = move.last_can_en_passant_;
     en_passant_square_ = move.last_en_passant_square_;
 
     // moveがNULL_MOVEなら返る。
@@ -703,9 +690,7 @@ namespace Sayuri {
     }
 
     // アンパッサンからハッシュを得る。
-    if (can_en_passant_) {
-      hash ^= en_passant_hash_table_[en_passant_square_];
-    }
+    hash ^= en_passant_hash_table_[en_passant_square_];
 
     return hash;
   }
@@ -720,7 +705,7 @@ namespace Sayuri {
     Piece target_type = piece_board_[move.to_];
     Side target_side = side_board_[move.to_];
     Square target_square = move.to_;
-    if ((piece_type == PAWN) && can_en_passant_
+    if ((piece_type == PAWN) && en_passant_square_
     && (move.to_ == en_passant_square_)) {
       // アンパッサンの時。
       if (piece_side == WHITE) {
@@ -731,32 +716,22 @@ namespace Sayuri {
       target_type = piece_board_[target_square];
     }
 
-    // 移動する駒のハッシュを得る。
-    Hash piece_hash =
+    // 移動する駒のハッシュを削除する。
+    current_hash ^=
     piece_hash_table_[piece_side][piece_type][move.from_];
 
-    // 取る駒のハッシュを得る。
-    Hash target_hash =
+    // 取る駒のハッシュを削除する。
+    current_hash ^=
     piece_hash_table_[target_side][target_type][target_square];
 
-    // 移動する駒の移動先のハッシュを得る。
-    Hash move_hash;
+    // 移動する駒の移動先のハッシュを追加する。
     if (move.promotion_) {
-      move_hash =
+      current_hash ^=
       piece_hash_table_[piece_side][move.promotion_][move.to_];
     } else {
-      move_hash =
+      current_hash ^=
       piece_hash_table_[piece_side][piece_type][move.to_];
     }
-
-    // 移動する駒のハッシュを削除する。
-    current_hash ^= piece_hash;
-
-    // 取る駒のハッシュを削除する。
-    current_hash ^= target_hash;
-
-    // 移動する駒の移動先のハッシュを追加する。
-    current_hash ^= move_hash;
 
     // 現在の手番のハッシュを削除。
     current_hash ^= to_move_hash_table_[to_move_];
@@ -797,18 +772,15 @@ namespace Sayuri {
       bit <<= 1;
     }
 
-    // アンパッサンのマスからハッシュを得る。
-    if (can_en_passant_) {
-      // とりあえずアンパッサンのハッシュを削除。
-      current_hash ^= en_passant_hash_table_[en_passant_square_];
-    }
+    // とりあえずアンパッサンのハッシュを削除。
+    current_hash ^= en_passant_hash_table_[en_passant_square_];
 
     // ポーンの2歩の動きの場合はアンパッサンハッシュを追加。
     if (piece_type == PAWN) {
       int move_diff = move.to_ - move.from_;
-      if (move_diff >= 16) {
+      if (move_diff == 16) {
         current_hash ^= en_passant_hash_table_[move.to_ - 8];
-      } else if (move_diff <= -16) {
+      } else if (move_diff == -16) {
         current_hash ^= en_passant_hash_table_[move.to_ + 8];
       }
     }
@@ -967,7 +939,8 @@ namespace Sayuri {
     }
 
     // アンパッサンの配列を初期化。
-    for (int i = 0; i < NUM_SQUARES; i++) {
+    en_passant_hash_table_[0] = 0ULL;
+    for (int i = 1; i < NUM_SQUARES; i++) {
       en_passant_hash_table_[i] = temp_table[temp_count];
       temp_count++;
     }

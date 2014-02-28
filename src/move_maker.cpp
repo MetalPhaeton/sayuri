@@ -3,7 +3,7 @@
 
    The MIT License (MIT)
 
-   Copyright (c) 2013 Hironori Ishibashi
+   Copyright (c) 2014 Hironori Ishibashi
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -201,7 +201,7 @@ namespace Sayuri {
         move_bitboard = Util::GetPawnAttack(from, side)
         & engine_ptr_->side_pieces()[enemy_side];
         // アンパッサンがある場合。
-        if (engine_ptr_->can_en_passant()) {
+        if (engine_ptr_->en_passant_square()) {
           move_bitboard |= Util::SQUARE[engine_ptr_->en_passant_square()]
           & Util::GetPawnAttack(from, side);
         }
@@ -212,7 +212,7 @@ namespace Sayuri {
         Move move;
         move.from_ = from;
         move.to_ = Util::GetSquare(move_bitboard);
-        if (engine_ptr_->can_en_passant()
+        if (engine_ptr_->en_passant_square()
         && (move.to_ == engine_ptr_->en_passant_square())) {
           move.move_type_ = EN_PASSANT;
         } else {

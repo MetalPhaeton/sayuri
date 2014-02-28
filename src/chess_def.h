@@ -201,7 +201,7 @@ namespace Sayuri {
 
   // 手の型。
   union Move {
-    std::uint32_t all_ : 31;
+    std::uint32_t all_ : 30;
     struct {
       unsigned int from_ : 6;  // 駒の位置。
       unsigned int to_ : 6;  // 移動先の位置。
@@ -209,8 +209,6 @@ namespace Sayuri {
       unsigned int promotion_ : 3;  // 昇格する駒の種類。
       // 動かす前のキャスリングのフラグ。
       unsigned int last_castling_rights_ : 4;
-      // 動かす前のアンパッサンできるかどうか。
-      bool last_can_en_passant_ : 1;
       // 動かす前のアンパッサンの位置。
       unsigned int last_en_passant_square_ : 6;
       unsigned int move_type_ : 2;  // 手の種類。

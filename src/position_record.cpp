@@ -3,7 +3,7 @@
 
    The MIT License (MIT)
 
-   Copyright (c) 2013 Hironori Ishibashi
+   Copyright (c) 2014 Hironori Ishibashi
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -47,7 +47,6 @@ namespace Sayuri {
     to_move_ = engine.to_move();
     castling_rights_ = engine.castling_rights();
     en_passant_square_ = engine.en_passant_square();
-    can_en_passant_ = engine.can_en_passant();
     ply_100_ = engine.ply_100();
     ply_ = engine.ply();
     pos_hash_ = engine.GetCurrentHash();
@@ -58,7 +57,6 @@ namespace Sayuri {
   to_move_(NO_SIDE),
   castling_rights_(0),
   en_passant_square_(0),
-  can_en_passant_(false),
   ply_100_(0),
   ply_(0),
   pos_hash_(0ULL) {
@@ -99,10 +97,7 @@ namespace Sayuri {
     if (pos_hash_ != engine.GetCurrentHash()) return false;
     if (to_move_ != engine.to_move()) return false;
     if (castling_rights_ != engine.castling_rights()) return false;
-    if (can_en_passant_ != engine.can_en_passant()) return false;
-    if (can_en_passant_) {
-      if (en_passant_square_ != engine.en_passant_square()) return false;
-    }
+    if (en_passant_square_ != engine.en_passant_square()) return false;
     for (int i = WHITE; i <= BLACK; i++) {
       for (int j = PAWN; j <= KING; j++) {
         if (position_[i][j] != engine.position()[i][j]) return false;
@@ -116,10 +111,7 @@ namespace Sayuri {
     if (pos_hash_ != engine.GetCurrentHash()) return true;
     if (to_move_ != engine.to_move()) return true;
     if (castling_rights_ != engine.castling_rights()) return true;
-    if (can_en_passant_ != engine.can_en_passant()) return true;
-    if (can_en_passant_) {
-      if (en_passant_square_ != engine.en_passant_square()) return true;
-    }
+    if (en_passant_square_ != engine.en_passant_square()) return true;
     for (int i = WHITE; i <= BLACK; i++) {
       for (int j = PAWN; j <= KING; j++) {
         if (position_[i][j] != engine.position()[i][j]) return true;
@@ -133,10 +125,7 @@ namespace Sayuri {
     if (pos_hash_ != record.pos_hash_) return false;
     if (to_move_ != record.to_move_) return false;
     if (castling_rights_ != record.castling_rights_) return false;
-    if (can_en_passant_ != record.can_en_passant_) return false;
-    if (can_en_passant_) {
-      if (en_passant_square_ != record.en_passant_square_) return false;
-    }
+    if (en_passant_square_ != record.en_passant_square_) return false;
     for (int i = WHITE; i <= BLACK; i++) {
       for (int j = PAWN; j <= KING; j++) {
         if (position_[i][j] != record.position_[i][j]) return false;
@@ -150,10 +139,7 @@ namespace Sayuri {
     if (pos_hash_ != record.pos_hash_) return true;
     if (to_move_ != record.to_move_) return true;
     if (castling_rights_ != record.castling_rights_) return true;
-    if (can_en_passant_ != record.can_en_passant_) return true;
-    if (can_en_passant_) {
-      if (en_passant_square_ != record.en_passant_square_) return true;
-    }
+    if (en_passant_square_ != record.en_passant_square_) return true;
     for (int i = WHITE; i <= BLACK; i++) {
       for (int j = PAWN; j <= KING; j++) {
         if (position_[i][j] != record.position_[i][j]) return true;
@@ -180,7 +166,6 @@ namespace Sayuri {
     to_move_ = record.to_move_;
     castling_rights_ = record.castling_rights_;
     en_passant_square_ = record.en_passant_square_;
-    can_en_passant_ = record.can_en_passant_;
     ply_100_ = record.ply_100_;
     ply_ = record.ply_;
     pos_hash_ = record.pos_hash_;

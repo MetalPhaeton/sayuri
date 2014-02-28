@@ -3,7 +3,7 @@
 
    The MIT License (MIT)
 
-   Copyright (c) 2013 Hironori Ishibashi
+   Copyright (c) 2014 Hironori Ishibashi
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -36,13 +36,8 @@
 #include <random>
 #include <vector>
 #include <thread>
-#include "chess_def.h"
-#include "chess_util.h"
-#include "init.h"
-#include "error.h"
-#include "chess_engine.h"
-#include "uci_shell.h"
-#include "pv_line.h"
+
+#include "sayuri.h"
 
 namespace Sayuri {
   /**************************/
@@ -50,6 +45,8 @@ namespace Sayuri {
   /**************************/
   // ================================================================
   int DebugMain(int argc, char* argv[]) {
+    // 初期化。
+    Init();
     return 0;
   }
   // ================================================================
@@ -198,19 +195,17 @@ namespace Sayuri {
       std::cout << "q";
     std::cout << std::endl;
 
-    // アンパッサンできるかどうかを出力する。
-    bool can_en_passant = move.last_can_en_passant_;
-    std::cout << "Last Can En Passant: ";
-    if (can_en_passant) std::cout << "True";
-    else std::cout << "False";
-    std::cout << std::endl;
-
     // アンパッサンのターゲットを出力する。
-    Square en_passant_square = move.last_en_passant_square_;
-    fyle = Util::GetFyle(en_passant_square);
-    rank = Util::GetRank(en_passant_square);
-    std::cout << "Last En Passant Square: "
-    << fyle_table[fyle] << rank_table[rank] << std::endl;
+    if (move.last_en_passant_square_) {
+      Square en_passant_square = move.last_en_passant_square_;
+      fyle = Util::GetFyle(en_passant_square);
+      rank = Util::GetRank(en_passant_square);
+      std::cout << "Last En Passant Square: "
+      << fyle_table[fyle] << rank_table[rank] << std::endl;
+    } else {
+      std::cout << "Last En Passant Square: "
+      << move.last_en_passant_square_ << std::endl;
+    }
 
     // 手の種類を出力する。
     std::cout << "Move Type: ";
