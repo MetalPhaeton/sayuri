@@ -28,12 +28,8 @@
 #include <cstring>
 #include <cstdlib>
 #include <string>
-#include "chess_def.h"
-#include "init.h"
-#include "chess_engine.h"
-#include "uci_shell.h"
 
-#include "debug.h"
+#include "sayuri.h"
 
 // UCI出力を標準出力に出力。
 void Print(const std::string& message) {
@@ -55,6 +51,7 @@ void Run(Sayuri::UCIShell& shell) {
 }
 
 int main(int argc, char* argv[]) {
+  /*
   if ((argc >= 2)
   && (std::strcmp(argv[1], "--help") == 0)) {
     // ヘルプの表示。
@@ -90,5 +87,6 @@ int main(int argc, char* argv[]) {
   }
 
   return EXIT_SUCCESS;
-  // return DebugMain(argc, argv);
+  */
+  return DebugMain(argc, argv);
 }

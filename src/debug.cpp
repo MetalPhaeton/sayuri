@@ -57,7 +57,7 @@ namespace Sayuri {
   // 擬似ハッシュ生成。
   Hash GenPseudoHash() {
     std::mt19937 engine(SysClock::to_time_t(SysClock::now()));
-    std::uniform_int_distribution<Hash> dist(0, 0xffffffffffffffffULL);
+    std::uniform_int_distribution<Hash> dist(0, -1ULL);
     return dist(engine);
   }
 
