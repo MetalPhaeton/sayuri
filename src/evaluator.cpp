@@ -86,7 +86,7 @@ namespace Sayuri {
   // オープンファイルのルーク。
   const Evaluator::Weight Evaluator::WEIGHT_ROOK_OPEN(3.5, 3.5);
   // 早すぎるクイーンの始動。
-  const Evaluator::Weight Evaluator::WEIGHT_EARLY_QUEEN_LAUNCHED(-4.0, 0.0);
+  const Evaluator::Weight Evaluator::WEIGHT_EARLY_QUEEN_LAUNCHED(-20.0, 0.0);
   // キング周りの弱いマス。
   const Evaluator::Weight Evaluator::WEIGHT_WEAK_SQUARE(-5.0, 0.0);
   // キャスリング。(これの2倍が評価値。権利の放棄は-1倍。)
