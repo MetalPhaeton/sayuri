@@ -249,7 +249,7 @@ namespace Sayuri {
   constexpr int SCORE_LOSE = -SCORE_WIN;
   constexpr int SCORE_DRAW = 0;
   constexpr int MATERIAL[NUM_PIECE_TYPES] {
-    0, 100, 300, 320, 500, 900, SCORE_WIN
+    0, 100, 300, 300, 500, 900, SCORE_WIN
   };
 
   /*****************************/
