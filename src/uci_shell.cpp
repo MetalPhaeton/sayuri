@@ -377,8 +377,8 @@ namespace Sayuri {
           word = parser.Get();
           // nameは大文字小文字関係なし。
           // なので全て小文字にする。
-          for (auto& c : word) {
-            c = std::tolower(c)
+          for (auto& c : word.str_) {
+            c = std::tolower(c);
           }
           if (word.str_ == "hash") {
             // ハッシュ値の変更の場合。
