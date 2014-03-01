@@ -28,9 +28,8 @@
 #define SAYURI_DEBUG_H
 
 #include <iostream>
-#include "chess_def.h"
-#include "chess_util.h"
-#include "error.h"
+
+#include "sayuri.h"
 
 namespace Sayuri {
   // デバッグ用メイン関数。
@@ -84,14 +83,41 @@ namespace Sayuri {
   /**********************
    * ストップウォッチ。 *
    **********************/
-  // ストップウォッチをスタートする。
-  void Start();
-  // ストップウォッチをストップする。
-  void Stop();
-  // ストップウォッチで計測した秒数を得る。
-  // [戻り値]
-  // 計測した秒数。
-  int GetTime();
+  class StopWatch {
+    public:
+      /**************************/
+      /* コンストラクタと代入。 */
+      /**************************/
+      StopWatch();
+      StopWatch(const StopWatch& watch);
+      StopWatch(StopWatch&& watch);
+      StopWatch& operator=(const StopWatch& watch);
+      StopWatch& operator=(StopWatch&& watch);
+      virtual ~StopWatch() {}
+
+      /********************/
+      /* パブリック関数。 */
+      /********************/
+      // ストップウォッチをスタート。
+      void Start();
+
+      // ストップウォッチをストップ。
+      void Stop();
+
+      // 計測時間を得る。(ミリ秒。)
+      // [戻り値]
+      // 計測時間。(ミリ秒。)
+      int GetTime();
+
+    private:
+      /****************/
+      /* メンバ変数。 */
+      /****************/
+      // スタート時間。
+      TimePoint start_point_;
+      // ストップ時間。
+      TimePoint stop_point_;
+  };
 }  // namespace Sayuri
 
 #endif

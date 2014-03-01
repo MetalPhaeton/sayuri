@@ -293,21 +293,48 @@ namespace Sayuri {
   /**********************
    * ストップウォッチ。 *
    **********************/
-  namespace {
-    TimePoint start_point;
-    TimePoint end_point;
+  // コンストラクタ。
+  StopWatch::StopWatch() :
+  start_point_(SysClock::now()),
+  stop_point_(SysClock::now()) {}
+
+  // コピーコンストラクタ。
+  StopWatch::StopWatch(const StopWatch& watch) :
+  start_point_(watch.start_point_),
+  stop_point_(watch.stop_point_) {}
+
+  // ムーブコンストラクタ。
+  StopWatch::StopWatch(StopWatch&& watch) :
+  start_point_(std::move(watch.start_point_)),
+  stop_point_(std::move(watch.stop_point_)) {}
+
+  // コピー代入。
+  StopWatch& StopWatch::operator=(const StopWatch& watch) {
+    start_point_ = watch.start_point_;
+    stop_point_ = watch.stop_point_;
+    return *this;
   }
+
+  // ムーブ代入。
+  StopWatch& StopWatch::operator=(StopWatch&& watch) {
+    start_point_ = std::move(watch.start_point_);
+    stop_point_ = std::move(watch.stop_point_);
+    return *this;
+  }
+
   // ストップウォッチをスタートする。
-  void Start() {
-    start_point = SysClock::now();
+  void StopWatch::Start() {
+    start_point_ = SysClock::now();
   }
+
   // ストップウォッチをストップする。
-  void Stop() {
-    end_point = SysClock::now();
+  void StopWatch::Stop() {
+    stop_point_ = SysClock::now();
   }
+
   // ストップウォッチで計測した秒数を得る。
-  int GetTime() {
+  int StopWatch::GetTime() {
     return Chrono::duration_cast<Chrono::milliseconds>
-    (end_point - start_point).count();
+    (stop_point_ - start_point_).count();
   }
 }  // namespace Sayuri
