@@ -44,8 +44,9 @@ namespace Sayuri {
   PositionRecord& record, NodeType node_type, Hash pos_hash, int depth,
   int level, int& alpha, int& beta, int& delta, TranspositionTable& table,
   PVLine& pv_line, bool is_null_searching, int null_reduction,
-  ScoreType& score_type, int material, bool is_checked, bool& has_legal_move,
-  std::vector<Move>* moves_to_search_ptr, TimePoint& next_print_info_time) :
+  ScoreType& score_type, int material, bool is_checked, int num_all_moves,
+  bool& has_legal_move, std::vector<Move>* moves_to_search_ptr,
+  TimePoint& next_print_info_time) :
   mutex_ptr_(&mutex),
   client_ptr_(&client),
   record_ptr_(&record),
@@ -63,6 +64,7 @@ namespace Sayuri {
   score_type_ptr_(&score_type),
   material_(material),
   is_checked_(is_checked),
+  num_all_moves_(num_all_moves),
   has_legal_move_ptr_(&has_legal_move),
   moves_to_search_ptr_(moves_to_search_ptr),
   next_print_info_time_ptr_(&next_print_info_time),
@@ -152,6 +154,7 @@ namespace Sayuri {
     score_type_ptr_ = job.score_type_ptr_;
     material_ = job.material_;
     is_checked_ = job.is_checked_;
+    num_all_moves_ = job.num_all_moves_;
     has_legal_move_ptr_ = job.has_legal_move_ptr_;
     moves_to_search_ptr_ = job.moves_to_search_ptr_;
     next_print_info_time_ptr_ = job.next_print_info_time_ptr_;

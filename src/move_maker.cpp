@@ -115,13 +115,16 @@ namespace Sayuri {
 
   // 手をスタックに展開する。
   template<GenMoveType Type>
-  void MoveMaker::GenMoves(Move prev_best, Move iid_move,
+  int MoveMaker::GenMoves(Move prev_best, Move iid_move,
   Move killer_1, Move killer_2) {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
 
     // サイド。
     Side side = engine_ptr_->to_move();
     Side enemy_side = side ^ 0x3;
+
+    // 生成したての数。
+    int num_moves = 0;
 
     // ナイト、ビショップ、ルーク、クイーンの候補手を作る。
     for (int piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
@@ -171,6 +174,7 @@ namespace Sayuri {
             last_->move_ = move;
             ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2,
             side);
+            num_moves++;
             last_++;
           }
         }
@@ -228,6 +232,7 @@ namespace Sayuri {
               last_->move_ = move;
               ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2,
               side);
+              num_moves++;
               last_++;
             }
           }
@@ -237,6 +242,7 @@ namespace Sayuri {
             last_->move_ = move;
             ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2,
             side);
+            num_moves++;
             last_++;
           }
         }
@@ -287,23 +293,28 @@ namespace Sayuri {
       if (last_ < end_) {
         last_->move_ = move;
         ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2, side);
+        num_moves++;
         last_++;
       }
     }
+
+    return num_moves;
   }
   // 実体化。
-  template void MoveMaker::GenMoves<GenMoveType::NON_CAPTURE>
+  template int MoveMaker::GenMoves<GenMoveType::NON_CAPTURE>
   (Move prev_best, Move iid_move, Move killer_1, Move killer_2);
-  template void MoveMaker::GenMoves<GenMoveType::CAPTURE>
+  template int MoveMaker::GenMoves<GenMoveType::CAPTURE>
   (Move prev_best, Move iid_move, Move killer_1, Move killer_2);
   template<>
-  void MoveMaker::GenMoves<GenMoveType::ALL>
+  int MoveMaker::GenMoves<GenMoveType::ALL>
   (Move prev_best, Move iid_move, Move killer_1, Move killer_2) {
-    GenMoves<GenMoveType::NON_CAPTURE>
+    int num_moves = GenMoves<GenMoveType::NON_CAPTURE>
     (prev_best, iid_move, killer_1, killer_2);
 
-    GenMoves<GenMoveType::CAPTURE>
+    num_moves += GenMoves<GenMoveType::CAPTURE>
     (prev_best, iid_move, killer_1, killer_2);
+
+    return num_moves;
   }
 
   // 次の手を返す。

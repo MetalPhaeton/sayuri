@@ -69,6 +69,7 @@ namespace Sayuri {
       // score_type: 評価値のタイプ。(更新される。)
       // material: 仕事作成時のノードのマテリアル。
       // is_checked: チェックされているかどうか。
+      // num_all_moves: 生成された手の数。
       // has_legal_move: 合法手が見つかったかどうか。(更新される。)
       // moves_to_search_ptr: ルートで探索すべき手のベクトル。ないならnullptr。
       // next_print_info_time: 情報を出力する時間。(更新される。)
@@ -76,7 +77,7 @@ namespace Sayuri {
       PositionRecord& record, NodeType node_type, Hash pos_hash, int depth,
       int level, int& alpha, int& beta, int& delta, TranspositionTable& table,
       PVLine& pv_line, bool is_null_searching, int null_reduction,
-      ScoreType& score_type, int material, bool is_checked,
+      ScoreType& score_type, int material, bool is_checked, int num_all_moves,
       bool& has_legal_move, std::vector<Move>* moves_to_search_ptr,
       TimePoint& next_print_info_time);
 
@@ -140,6 +141,8 @@ namespace Sayuri {
       int material() const {return material_;}
       // チェックされているかどうか。
       bool is_checked() const {return is_checked_;}
+      // 生成された手の数。
+      int num_all_moves() const {return num_all_moves_;}
       // 合法手が見つかったかどうか。(更新される。)
       bool& has_legal_move() {return *has_legal_move_ptr_;}
       // ルートで探索すべき手のベクトル。ないならnullptr。
@@ -177,6 +180,7 @@ namespace Sayuri {
       ScoreType* score_type_ptr_;
       int material_;
       bool is_checked_;
+      int num_all_moves_;
       bool* has_legal_move_ptr_;
       std::vector<Move>* moves_to_search_ptr_;
       TimePoint* next_print_info_time_ptr_;

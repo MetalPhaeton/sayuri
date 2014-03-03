@@ -273,7 +273,7 @@ namespace Sayuri {
     /**************/
     // 手を作る。
     MoveMaker maker(*this);
-    maker.GenMoves<GenMoveType::ALL>(prev_best,
+    int num_all_moves = maker.GenMoves<GenMoveType::ALL>(prev_best,
     shared_st_ptr_->iid_stack_[level],
     shared_st_ptr_->killer_stack_[level][0],
     shared_st_ptr_->killer_stack_[level][1]);
@@ -294,7 +294,7 @@ namespace Sayuri {
     Job job(mutex, maker, *this, record, Type, pos_hash, depth, level,
     alpha, beta, dummy_delta, table, pv_line, is_null_searching_,
     null_reduction, score_type, material,
-    is_checked, has_legal_move, nullptr, dummy_time);
+    is_checked, num_all_moves, has_legal_move, nullptr, dummy_time);
     for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
       // すでにベータカットされていればループを抜ける。
       if (alpha >= beta) {
@@ -342,7 +342,8 @@ namespace Sayuri {
       int temp_beta = beta;
       bool did_lmr = false;
       if (!is_checked && !(move.captured_piece_) && !(move.promotion_)
-      && !null_reduction && (depth >= 3) && (num_moves >= 5)) {
+      && !null_reduction && (depth >= 4)
+      && (num_moves > ((num_all_moves + 1) / 2))) {
         did_lmr = true;
         int reduction = 1;
         if (Type == NodeType::NON_PV) {
@@ -579,7 +580,7 @@ namespace Sayuri {
       // 仕事を作る。
       std::mutex mutex;
       PositionRecord record(*this);
-      maker.GenMoves<GenMoveType::ALL>(prev_best,
+      int num_all_moves = maker.GenMoves<GenMoveType::ALL>(prev_best,
       shared_st_ptr_->iid_stack_[level],
       shared_st_ptr_->killer_stack_[level][0],
       shared_st_ptr_->killer_stack_[level][1]);
@@ -591,7 +592,7 @@ namespace Sayuri {
       Job job(mutex, maker, *this, record, node_type, pos_hash,
       shared_st_ptr_->i_depth_, level, alpha, beta, delta, table, pv_line,
       is_null_searching_, null_reduction, score_type,
-      material, is_checked, has_legal_move, moves_to_search_ptr,
+      material, is_checked, num_all_moves, has_legal_move, moves_to_search_ptr,
       next_print_info_time);
 
       // ヘルプして待つ。
@@ -721,7 +722,8 @@ namespace Sayuri {
       int temp_beta = job.beta();
       bool did_lmr = false;
       if (!(job.is_checked()) && !(move.captured_piece_) && !(move.promotion_)
-      && !(job.null_reduction()) && (job.depth() >= 3) && (num_moves >= 5)) {
+      && !(job.null_reduction()) && (job.depth() >= 4)
+      && (num_moves > ((job.num_all_moves() + 1) / 2))) {
         did_lmr = true;
         int reduction = 1;
         // History Pruning。
@@ -956,7 +958,8 @@ namespace Sayuri {
         bool did_lmr = false;
         if (!(job.is_checked())
         && !(move.captured_piece_) && !(move.promotion_)
-        && (job.depth() >= 3) && (num_moves >= 5)) {
+        && (job.depth() >= 4)
+        && (num_moves > ((job.num_all_moves() + 1) / 2))) {
           did_lmr = true;
           int reduction = 1;
           // ゼロウィンドウ探索。

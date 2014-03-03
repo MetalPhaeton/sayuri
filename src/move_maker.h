@@ -76,7 +76,9 @@ namespace Sayuri {
       // iid_move: IIDによる最善手。
       // killer_1: キラームーブ。同一レベルのノードで記録した手。
       // killer_2: キラームーブ。2プライ前のレベルのノードで記録した手。
-      template<GenMoveType Type> void GenMoves(Move prev_best,
+      // [戻り値]
+      // 生成した手の数。
+      template<GenMoveType Type> int GenMoves(Move prev_best,
       Move iid_move, Move killer_1, Move killer_2);
       // 次の手を取り出す。
       // [戻り値]
