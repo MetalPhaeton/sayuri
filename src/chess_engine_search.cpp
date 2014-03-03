@@ -385,16 +385,13 @@ namespace Sayuri {
         }
       }
 
-      // 相手の手番の初手の場合、3回繰り返しルールをチェック。
+      // 同じ局面の繰り返しは0点。
       if (level <= 1) {
-        int repetitions = 0;
-        for (auto& a : shared_st_ptr_->position_history_) {
-          if (a == *this) {
-            repetitions++;
+        for (auto& position : shared_st_ptr_->position_history_) {
+          if (position == *this) {
+            score = SCORE_DRAW;
+            break;
           }
-        }
-        if (repetitions >= 2) {
-          score = SCORE_DRAW;
         }
       }
 
@@ -767,16 +764,13 @@ namespace Sayuri {
         }
       }
 
-      // 最初の手番なら3回繰り返しをチェック。
+      // 同じ局面の繰り返しは0点。
       if (job.level() <= 1) {
-        int repetitions = 0;
-        for (auto& a : shared_st_ptr_->position_history_) {
-          if (a == *this) {
-            repetitions++;
+        for (auto& position : shared_st_ptr_->position_history_) {
+          if (position == *this) {
+            score = SCORE_DRAW;
+            break;
           }
-        }
-        if (repetitions >= 2) {
-          score = SCORE_DRAW;
         }
       }
 
@@ -1020,15 +1014,12 @@ namespace Sayuri {
         }
       }
 
-      // 3回繰り返しルールをチェック。
-      int repetitions = 0;
-      for (auto& a : shared_st_ptr_->position_history_) {
-        if (a == *this) {
-          repetitions++;
+      // 同じ局面の繰り返しは0点。
+      for (auto& position : shared_st_ptr_->position_history_) {
+        if (position == *this) {
+          score = SCORE_DRAW;
+          break;
         }
-      }
-      if (repetitions >= 2) {
-        score = SCORE_DRAW;
       }
 
       UnmakeMove(move);
