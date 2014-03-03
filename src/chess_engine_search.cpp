@@ -346,8 +346,9 @@ namespace Sayuri {
       && (num_moves > ((num_all_moves + 1) / 2))) {
         did_lmr = true;
         int reduction = 1;
+
+        // History Pruning。
         if (Type == NodeType::NON_PV) {
-          // History Pruning。
           if (shared_st_ptr_->history_[side][move.from_][move.to_]
           < (shared_st_ptr_->history_max_ / 2)) {
             reduction++;
@@ -726,6 +727,7 @@ namespace Sayuri {
       && (num_moves > ((job.num_all_moves() + 1) / 2))) {
         did_lmr = true;
         int reduction = 1;
+
         // History Pruning。
         if (Type == NodeType::NON_PV) {
           if (shared_st_ptr_->history_[side][move.from_][move.to_]
