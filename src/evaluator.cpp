@@ -72,7 +72,7 @@ namespace Sayuri {
   // 孤立ポーン。
   const Evaluator::Weight Evaluator::WEIGHT_ISO_PAWN(-5.0, -2.5);
   // ポーンの盾。
-  const Evaluator::Weight Evaluator::WEIGHT_PAWN_SHIELD(2.5, 0.0);
+  const Evaluator::Weight Evaluator::WEIGHT_PAWN_SHIELD(3.0, 0.0);
   // ビショップペア。
   const Evaluator::Weight Evaluator::WEIGHT_BISHOP_PAIR(10.0, 60.0);
   // バッドビショップ。
@@ -80,7 +80,7 @@ namespace Sayuri {
   // ナイトをピン。
   const Evaluator::Weight Evaluator::WEIGHT_PIN_KNIGHT(10.0, 0.0);
   // ルークペア。
-  const Evaluator::Weight Evaluator::WEIGHT_ROOK_PAIR(10.0, 60.0);
+  const Evaluator::Weight Evaluator::WEIGHT_ROOK_PAIR(0.0, 0.0);
   // セミオープンファイルのルーク。
   const Evaluator::Weight Evaluator::WEIGHT_ROOK_SEMI_OPEN(3.5, 3.5);
   // オープンファイルのルーク。
@@ -111,24 +111,6 @@ namespace Sayuri {
   Bitboard Evaluator::iso_pawn_mask_[NUM_SQUARES];
   Bitboard Evaluator::pawn_shield_mask_[NUM_SIDES][NUM_SQUARES];
   Bitboard Evaluator::weak_square_mask_[NUM_SIDES][NUM_SQUARES];
-
-  /**********************/
-  /* ファイルスコープ。 */
-  /**********************/
-  namespace {
-    // ボードを鏡対象に上下反転させる配列。
-    // <配列>[flip[<位置>]]と使うと上下が反転する。
-    constexpr Square FLIP[NUM_SQUARES] {
-      A8, B8, C8, D8, E8, F8, G8, H8,
-      A7, B7, C7, D7, E7, F7, G7, H7,
-      A6, B6, C6, D6, E6, F6, G6, H6,
-      A5, B5, C5, D5, E5, F5, G5, H5,
-      A4, B4, C4, D4, E4, F4, G4, H4,
-      A3, B3, C3, D3, E3, F3, G3, H3,
-      A2, B2, C2, D2, E2, F2, G2, H2,
-      A1, B1, C1, D1, E1, F1, G1, H1
-    };
-  }  // namespace
 
   /**************************/
   /* コンストラクタと代入。 */
@@ -475,7 +457,7 @@ namespace Sayuri {
     if (piece_side == WHITE) {
       value = POSITION_TABLE[Type][piece_square];
     } else {
-      value = POSITION_TABLE[Type][FLIP[piece_square]];
+      value = POSITION_TABLE[Type][Util::FLIP[piece_square]];
     }
     position_value_[Type] += sign * value;
     // ポーンの終盤の配置。
@@ -483,7 +465,7 @@ namespace Sayuri {
       if (piece_side == WHITE) {
         value = PAWN_POSITION_ENDING_TABLE[piece_square];
       } else {
-        value = PAWN_POSITION_ENDING_TABLE[FLIP[piece_square]];
+        value = PAWN_POSITION_ENDING_TABLE[Util::FLIP[piece_square]];
       }
       pawn_position_ending_value_ += sign * value;
     }
@@ -492,7 +474,7 @@ namespace Sayuri {
       if (piece_side == WHITE) {
         value = KING_POSITION_ENDING_TABLE[piece_square];
       } else {
-        value = KING_POSITION_ENDING_TABLE[FLIP[piece_square]];
+        value = KING_POSITION_ENDING_TABLE[Util::FLIP[piece_square]];
       }
       king_position_ending_value_ += sign * value;
     }
@@ -578,9 +560,10 @@ namespace Sayuri {
       if ((Util::SQUARE[piece_square]
       & pawn_shield_mask_[piece_side][engine_ptr_->king()[piece_side]])) {
         if (piece_side == WHITE) {
-          value = static_cast<double>(8 - Util::GetRank(piece_square));
+          value =
+          static_cast<double>(POSITION_TABLE[PAWN][Util::FLIP[piece_square]]);
         } else {
-          value = static_cast<double>(Util::GetRank(piece_square) - 1);
+          value = static_cast<double>(POSITION_TABLE[PAWN][piece_square]);
         }
         pawn_shield_value_ += sign * value;
       }

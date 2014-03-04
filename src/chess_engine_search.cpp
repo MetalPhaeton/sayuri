@@ -160,8 +160,8 @@ namespace Sayuri {
     bool is_checked = IsAttacked(king_[side], enemy_side);
 
     // トランスポジションテーブルを調べる。
+    // 局面の繰り返し対策などのため、
     // 自分の初手と相手の初手の場合(level < 2の場合)は参照しない。
-    // 3回繰り返しルール対策などのため、いわゆる「3手の読み」をする。
     TTEntry* entry_ptr = nullptr;
     if (level >= 2) {
       entry_ptr = table.GetEntry(pos_hash, depth);
