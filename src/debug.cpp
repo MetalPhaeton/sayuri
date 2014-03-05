@@ -47,31 +47,6 @@ namespace Sayuri {
   int DebugMain(int argc, char* argv[]) {
     // 初期化。
     Init();
-
-    // チェスエンジンを作成。
-    ChessEngine* engine_ptr = new ChessEngine();
-
-    // ポジションを作成。
-    std::string fen = "2q4k/p2P4/8/8/8/8/8/7K w - -";
-
-    // ポジションをセット。
-    engine_ptr->LoadFen(Fen(fen));
-
-    // 手を作成。
-    Move move;
-    move.from_ = D7;
-    move.to_ = C8;
-    move.promotion_ = QUEEN;
-    move.move_type_ = NORMAL;
-
-    // 実験。
-    int material = engine_ptr->GetMaterial(engine_ptr->to_move());
-    int next_material = engine_ptr->GetNextMyMaterial(material, move);
-    PrintPosition(engine_ptr->position());
-    std::cout << "Current Material: " << material << std::endl;
-    std::cout << "Next My Material: " << next_material << std::endl;
-
-    delete engine_ptr;
     return 0;
   }
   // ================================================================
