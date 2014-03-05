@@ -165,6 +165,14 @@ namespace Sayuri {
       // マテリアル。
       int GetMaterial(Side side) const;
 
+      // 手から次の局面の自分のマテリアルを得る。(相手のマテリアルではない。)
+      // [引数]
+      // current_material: 現在の局面のマテリアル。
+      // move: 次の手。
+      // [戻り値]
+      // 次の局面の自分のマテリアル。
+      int GetNextMyMaterial(int current_material, Move move) const;
+
       // SEE。
       // [引数]
       // move: 探したい手。
@@ -254,11 +262,12 @@ namespace Sayuri {
       // level: 現在のレベル。
       // alpha: アルファ値。
       // beta: ベータ値。
+      // material: 現在のマテリアル。
       // table: トランスポジションテーブル。
       // [戻り値]
       // 評価値。
       int Quiesce(int depth, int level, int alpha, int beta,
-      TranspositionTable& table);
+      int material, TranspositionTable& table);
       // 探索する。
       // [引数]
       // <Type>: ノードの種類。
@@ -267,13 +276,14 @@ namespace Sayuri {
       // level: 現在のレベル。
       // alpha: アルファ値。
       // beta: ベータ値。
+      // material: 現在のマテリアル。
       // table: トランスポジションテーブル。
       // pv_line: PVラインが格納される。
       // [戻り値]
       // 評価値。
       template<NodeType Type>
       int Search(Hash pos_hash, int depth, int level, int alpha, int beta,
-      TranspositionTable& table, PVLine& pv_line);
+      int material, TranspositionTable& table, PVLine& pv_line);
       // 探索のルート。
       // [引数]
       // table: 使用するトランスポジションテーブル。
@@ -298,11 +308,10 @@ namespace Sayuri {
       void SearchRootParallel(Job& job, UCIShell& shell);
       // Futility Pruningのマージンを計算する。
       // [引数]
-      // move: 指し手。
       // depth: 現在の深さ。
       // [戻り値]
       // マージン。
-      int GetMargin(Move move, int depth);
+      int GetMargin(int depth);
       // 探索を中断しなければいけないかどうか。
       // [戻り値]
       // 探索を中断しなければいけないときはtrue。

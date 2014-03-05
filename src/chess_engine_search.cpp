@@ -49,7 +49,7 @@
 namespace Sayuri {
   // クイース探索。
   int ChessEngine::Quiesce(int depth, int level, int alpha, int beta,
-  TranspositionTable& table) {
+  int material, TranspositionTable& table) {
     // 探索中止の時。
     if (ShouldBeStopped()) return alpha;
 
@@ -67,7 +67,7 @@ namespace Sayuri {
 
     // stand_pad。
     Evaluator eval(*this);
-    int stand_pad = eval.Evaluate();
+    int stand_pad = eval.Evaluate(material);
 
     // アルファ値、ベータ値を調べる。
     if (stand_pad >= beta) {
@@ -99,13 +99,13 @@ namespace Sayuri {
       shared_st_ptr_->killer_stack_[level][1]);
     }
 
-    // マテリアルを得る。
-    int material = GetMaterial(side);
-
     // 探索する。
     for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
       // マージン。
-      int margin = GetMargin(move, depth);
+      int margin = GetMargin(depth);
+
+      // 次の自分のマテリアル。
+      int next_my_material = GetNextMyMaterial(material, move);
 
       MakeMove(move);
 
@@ -116,13 +116,14 @@ namespace Sayuri {
       }
 
       // Futility Pruning。
-      if ((material + margin) <= alpha) {
+      if ((next_my_material + margin) <= alpha) {
         UnmakeMove(move);
         continue;
       }
 
       // 次の手を探索。
-      int score = -Quiesce(depth - 1, level + 1, -beta, -alpha, table);
+      int score = -Quiesce(depth - 1, level + 1, -beta, -alpha,
+      -next_my_material, table);
 
       UnmakeMove(move);
 
@@ -142,7 +143,8 @@ namespace Sayuri {
   // 探索する。
   template<NodeType Type>
   int ChessEngine::Search(Hash pos_hash, int depth, int level,
-  int alpha, int beta, TranspositionTable& table, PVLine& pv_line) {
+  int alpha, int beta, int material, TranspositionTable& table,
+  PVLine& pv_line) {
     // 探索中止の時。
     if (ShouldBeStopped()) return alpha;
 
@@ -216,7 +218,7 @@ namespace Sayuri {
     if ((depth <= 0) || (level >= MAX_PLYS)) {
       // クイース探索ノードに移行するため、ノード数を減らしておく。
       shared_st_ptr_->num_searched_nodes_--;
-      return Quiesce(depth, level, alpha, beta, table);
+      return Quiesce(depth, level, alpha, beta, material, table);
     }
 
     // 前回の繰り返しの最善手を得る。
@@ -238,7 +240,7 @@ namespace Sayuri {
           PVLine temp_line;
           constexpr int IID_DEPTH = 4;
           Search<NodeType::PV>(pos_hash, IID_DEPTH, level,
-          alpha, beta, table, temp_line);
+          alpha, beta, material, table, temp_line);
 
           shared_st_ptr_->iid_stack_[level] = temp_line.line()[0];
         }
@@ -256,7 +258,7 @@ namespace Sayuri {
         int reduction = 3;
         PVLine temp_line;
         int score = -Search<NodeType::NON_PV>(pos_hash, depth - reduction - 1,
-        level + 1, -(beta), -(beta - 1), table, temp_line);
+        level + 1, -(beta), -(beta - 1), -material, table, temp_line);
 
         UnmakeMove(null_move);
         is_null_searching_ = false;
@@ -277,9 +279,6 @@ namespace Sayuri {
     shared_st_ptr_->iid_stack_[level],
     shared_st_ptr_->killer_stack_[level][0],
     shared_st_ptr_->killer_stack_[level][1]);
-
-    // Futility Pruningの準備。
-    int material = GetMaterial(side);
 
     int num_moves = 0;
 
@@ -310,7 +309,10 @@ namespace Sayuri {
       Hash next_hash = GetNextHash(pos_hash, move);
 
       // マージン。
-      int margin = GetMargin(move, depth);
+      int margin = GetMargin(depth);
+
+      // 次の自分のマテリアル。
+      int next_my_material = GetNextMyMaterial(material, move);
 
       MakeMove(move);
 
@@ -327,7 +329,7 @@ namespace Sayuri {
 
       // Futility Pruning。
       if (depth <= 3) {
-        if ((material + margin) <= alpha) {
+        if ((next_my_material + margin) <= alpha) {
           UnmakeMove(move);
           continue;
         }
@@ -355,7 +357,8 @@ namespace Sayuri {
           }
         }
         score = -Search<NodeType::NON_PV>(next_hash, depth - reduction - 1,
-        level + 1, -(temp_alpha + 1), -temp_alpha, table, next_line);
+        level + 1, -(temp_alpha + 1), -temp_alpha, -next_my_material, table,
+        next_line);
       } else {
         // PVSearchをするためにtemp_alphaより大きくしておく。
         score = temp_alpha + 1;
@@ -366,13 +369,14 @@ namespace Sayuri {
         if ((num_moves <= 1) || (Type == NodeType::NON_PV)) {
           // フルウィンドウで探索。
           score = -Search<Type>(next_hash, depth - 1, level + 1,
-          -temp_beta, -temp_alpha, table, next_line);
+          -temp_beta, -temp_alpha, -next_my_material, table, next_line);
         } else {
           // PV発見後のPVノード。
           // ゼロウィンドウ探索。(LMRしていないとき。)
           if (!did_lmr) {
             score = -Search<NodeType::NON_PV>(next_hash, depth - 1, level + 1,
-            -(temp_alpha + 1), -temp_alpha, table, next_line);
+            -(temp_alpha + 1), -temp_alpha, -next_my_material, table,
+            next_line);
           } else {
             score = temp_alpha + 1;
           }
@@ -380,7 +384,7 @@ namespace Sayuri {
             // fail lowならず。
             // フルウィンドウで再探索。
             score = -Search<NodeType::PV>(next_hash, depth - 1, level + 1,
-            -temp_beta, -temp_alpha, table, next_line);
+            -temp_beta, -temp_alpha, -next_my_material, table, next_line);
           }
         }
       }
@@ -481,10 +485,10 @@ namespace Sayuri {
   }
   // 実体化。
   template int ChessEngine::Search<NodeType::PV>(Hash pos_hash,
-  int depth, int level, int alpha, int beta,
+  int depth, int level, int alpha, int beta, int material,
   TranspositionTable& table, PVLine& pv_line);
   template int ChessEngine::Search<NodeType::NON_PV>(Hash pos_hash,
-  int depth, int level, int alpha, int beta,
+  int depth, int level, int alpha, int beta, int material,
   TranspositionTable& table, PVLine& pv_line);
 
   // 探索のルート。
@@ -523,6 +527,7 @@ namespace Sayuri {
     // Iterative Deepening。
     int level = 0;
     Hash pos_hash = GetCurrentHash();
+    int material = GetMaterial(to_move_);
     int alpha = -MAX_VALUE;
     int beta = MAX_VALUE;
     Side side = to_move_;
@@ -585,7 +590,6 @@ namespace Sayuri {
       NodeType node_type = NodeType::PV;
       int null_reduction = 0;
       ScoreType score_type = ScoreType::EXACT;
-      int material = GetMaterial(to_move_);
       bool has_legal_move = false;
       Job job(mutex, maker, *this, record, node_type, pos_hash,
       shared_st_ptr_->i_depth_, level, alpha, beta, delta, table, pv_line,
@@ -689,7 +693,10 @@ namespace Sayuri {
       Hash next_hash = GetNextHash(job.pos_hash(), move);
 
       // マージン。
-      int margin = GetMargin(move, job.depth());
+      int margin = GetMargin(job.depth());
+
+      // 次の局面のマテリアルを得る。
+      int next_my_material = GetNextMyMaterial(job.material(), move);
 
       MakeMove(move);
 
@@ -706,7 +713,7 @@ namespace Sayuri {
 
       // Futility Pruning。
       if (job.depth() <= 3) {
-        if ((job.material() + margin) <= job.alpha()) {
+        if ((next_my_material + margin) <= job.alpha()) {
           UnmakeMove(move);
           continue;
         }
@@ -734,7 +741,8 @@ namespace Sayuri {
         }
         score = -Search<NodeType::NON_PV>(next_hash,
         job.depth() - reduction - 1, job.level() + 1,
-        -(temp_alpha + 1), -temp_alpha, job.table(), next_line);
+        -(temp_alpha + 1), -temp_alpha, -next_my_material, job.table(),
+        next_line);
       } else {
         // PVSearchをするためにtemp_alphaより大きくしておく。
         score = temp_alpha + 1;
@@ -745,21 +753,23 @@ namespace Sayuri {
         if ((num_moves <= 1) || (Type == NodeType::NON_PV)) {
           // フルウィンドウ探索。
           score = -Search<Type>(next_hash, job.depth() - 1,
-          job.level() + 1, -temp_beta, -temp_alpha, job.table(), next_line);
+          job.level() + 1, -temp_beta, -temp_alpha, -next_my_material,
+          job.table(), next_line);
         } else {
           // PV発見後。
           // ゼロウィンドウ探索。(LMRしていないとき。)
           if (!did_lmr) {
             score = -Search<NodeType::NON_PV>(next_hash, job.depth() - 1,
-            job.level() + 1, -(temp_alpha + 1), -temp_alpha, job.table(),
-            next_line);
+            job.level() + 1, -(temp_alpha + 1), -temp_alpha,
+            -next_my_material, job.table(), next_line);
           } else {
             score = temp_alpha + 1;
           }
           if (score > temp_alpha) {
             // fail lowならず。
             score = -Search<NodeType::PV>(next_hash, job.depth() - 1,
-            job.level() + 1, -temp_beta, -temp_alpha, job.table(), next_line);
+            job.level() + 1, -temp_beta, -temp_alpha, -next_my_material,
+            job.table(), next_line);
           }
         }
       }
@@ -883,6 +893,9 @@ namespace Sayuri {
       // 次のハッシュ。
       Hash next_hash = GetNextHash(job.pos_hash(), move);
 
+      // 次の局面のマテリアル。
+      int next_my_material = GetNextMyMaterial(job.material(), move);
+
       MakeMove(move);
 
       // 合法手じゃなければ次の手へ。
@@ -910,7 +923,8 @@ namespace Sayuri {
 
           // フルでPVを探索。
           score = -Search<NodeType::PV> (next_hash, job.depth() - 1,
-          job.level() + 1, -temp_beta, -temp_alpha, job.table(), next_line);
+          job.level() + 1, -temp_beta, -temp_alpha, -next_my_material,
+          job.table(), next_line);
 
           // アルファ値、ベータ値を調べる。
           job.mutex().lock();  // ロック。
@@ -961,7 +975,7 @@ namespace Sayuri {
           // ゼロウィンドウ探索。
           score = -Search<NodeType::NON_PV>(next_hash,
           job.depth() - reduction - 1, job.level() + 1, -(temp_alpha + 1),
-          -temp_alpha, job.table(), next_line);
+          -temp_alpha, -next_my_material, job.table(), next_line);
         } else {
           // 普通に探索するためにscoreをalphaより大きくしておく。
           score = temp_alpha + 1;
@@ -972,8 +986,8 @@ namespace Sayuri {
           // ゼロウィンドウ探索。(LMRしていないとき。)
           if (!did_lmr) {
             score = -Search<NodeType::NON_PV>(next_hash, job.depth() - 1,
-            job.level() + 1, -(temp_alpha + 1), -temp_alpha, job.table(),
-            next_line);
+            job.level() + 1, -(temp_alpha + 1), -temp_alpha,
+            -next_my_material, job.table(), next_line);
           } else {
             score = temp_alpha + 1;
           }
@@ -984,8 +998,8 @@ namespace Sayuri {
 
               // フルウィンドウで再探索。
               score = -Search<NodeType::PV>(next_hash, job.depth() - 1,
-              job.level() + 1, -temp_beta, -temp_alpha, job.table(),
-              next_line);
+              job.level() + 1, -temp_beta, -temp_alpha, -next_my_material,
+              job.table(), next_line);
 
               // ベータ値を調べる。
               job.mutex().lock();  // ロック。
@@ -1155,23 +1169,10 @@ namespace Sayuri {
     return Move();
   }
   // Futility Pruningのマージンを計算する。
-  int ChessEngine::GetMargin(Move move, int depth) {
-    // マテリアルの変動。
-    int margin = MATERIAL[piece_board_[move.to_]];
-    // 昇格の値を加算。
-    if (piece_board_[move.from_] == PAWN) {
-      if ((Util::GetRank(move.to_) == RANK_8)
-      || (Util::GetRank(move.to_) == RANK_1)) {
-        margin += MATERIAL[QUEEN] - MATERIAL[PAWN];
-      }
-    }
-
-    // マージン。
-    if (depth <= 1) margin += MATERIAL[KNIGHT];
-    else if (depth == 2) margin += MATERIAL[ROOK] + MATERIAL[PAWN];
-    else margin += MATERIAL[QUEEN];
-
-    return margin;
+  int ChessEngine::GetMargin(int depth) {
+    if (depth <= 1) return MATERIAL[KNIGHT];
+    else if (depth == 2) return MATERIAL[ROOK] + MATERIAL[PAWN];
+    else return MATERIAL[QUEEN];
   }
 
   // ストップ条件を設定する。

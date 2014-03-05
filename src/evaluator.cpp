@@ -165,7 +165,7 @@ namespace Sayuri {
   /********************/
 
   // 評価値を返す。
-  int Evaluator::Evaluate() {
+  int Evaluator::Evaluate(int material) {
     // 価値の変数の初期化。
     for (int i = 0; i < NUM_PIECE_TYPES; i++) {
       position_value_[i] = 0.0;
@@ -255,7 +255,7 @@ namespace Sayuri {
     double num_pieces = static_cast<double>
     (Util::CountBits(all_pieces) - NUM_KINGS);
     // マテリアル。
-    double score = static_cast<double>(engine_ptr_->GetMaterial(side));
+    double score = material;
     // ポーンの配置。
     score += WEIGHT_PAWN_POSITION(num_pieces) * position_value_[PAWN];
     // ナイトの配置。

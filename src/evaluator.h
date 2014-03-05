@@ -56,9 +56,11 @@ namespace Sayuri {
       /* パブリック関数。 */
       /********************/
       // 現在の局面の評価値を返す。
+      // [引数]
+      // material: 現在の局面のマテリアル。
       // [戻り値]
       // 評価値。
-      int Evaluate();
+      int Evaluate(int material);
 
     private:
       /******************************/

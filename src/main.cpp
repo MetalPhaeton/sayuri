@@ -51,7 +51,6 @@ void Run(Sayuri::UCIShell& shell) {
 }
 
 int main(int argc, char* argv[]) {
-  /*
   if ((argc >= 2)
   && (std::strcmp(argv[1], "--help") == 0)) {
     // ヘルプの表示。
@@ -87,6 +86,5 @@ int main(int argc, char* argv[]) {
   }
 
   return EXIT_SUCCESS;
-  */
-  return Sayuri::DebugMain(argc, argv);
+  // return Sayuri::DebugMain(argc, argv);
 }

@@ -667,6 +667,21 @@ namespace Sayuri {
     return material;
   }
 
+  // 次の局面の自分のマテリアルを得る。
+  int ChessEngine::GetNextMyMaterial(int current_material, Move move) const {
+    if (move.move_type_ == EN_PASSANT) {
+      // アンパッサン。
+      return current_material + MATERIAL[PAWN];
+    } else if (move.promotion_) {
+      // プロモーション。
+      return current_material + MATERIAL[piece_board_[move.to_]]
+      + MATERIAL[move.promotion_] - MATERIAL[piece_board_[move.from_]];
+    } else {
+      // その他の手。
+      return current_material + MATERIAL[piece_board_[move.to_]];
+    }
+  }
+
   // 現在の局面のハッシュを計算する。
   Hash ChessEngine::GetCurrentHash() const {
     Hash hash = 0ULL;
