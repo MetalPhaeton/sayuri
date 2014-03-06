@@ -46,12 +46,6 @@ namespace Sayuri {
         MoveSlot() : score_(-MAX_VALUE) {}
       };
 
-      /**************/
-      /* 定数など。 */
-      /**************/
-      // 最大スロット数。
-      static constexpr std::size_t MAX_SLOTS = 200;
-
     public:
       /**************************/
       /* コンストラクタと代入。 */
@@ -114,7 +108,7 @@ namespace Sayuri {
       const ChessEngine* engine_ptr_;
 
       // 展開されるスタック。
-      MoveSlot move_stack_[MAX_SLOTS + 1];
+      MoveSlot move_stack_[MAX_CANDIDATES + 1];
       // スタックのポインタ。
       MoveSlot* begin_;
       MoveSlot* last_;

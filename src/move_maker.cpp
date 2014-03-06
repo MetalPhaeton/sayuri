@@ -33,11 +33,6 @@
 #include "chess_engine.h"
 
 namespace Sayuri {
-  /****************/
-  /* static定数。 */
-  /****************/
-  constexpr std::size_t MoveMaker::MAX_SLOTS;
-
   /**************************/
   /* コンストラクタと代入。 */
   /**************************/
@@ -46,13 +41,13 @@ namespace Sayuri {
   engine_ptr_(&engine) {
     // スタックのポインターをセット。
     begin_ = last_ = move_stack_;
-    end_ = &(move_stack_[MAX_SLOTS]);
+    end_ = &(move_stack_[MAX_CANDIDATES]);
   }
 
   // コピーコンストラクタ。
   MoveMaker::MoveMaker(const MoveMaker& maker) :
   engine_ptr_(maker.engine_ptr_) {
-    for (std::size_t i = 0; i <= MAX_SLOTS; i++) {
+    for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
         begin_ = &(move_stack_[i]);
@@ -66,7 +61,7 @@ namespace Sayuri {
   // ムーブコンストラクタ。
   MoveMaker::MoveMaker(MoveMaker&& maker) :
   engine_ptr_(maker.engine_ptr_) {
-    for (std::size_t i = 0; i <= MAX_SLOTS; i++) {
+    for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
         begin_ = &(move_stack_[i]);
@@ -81,7 +76,7 @@ namespace Sayuri {
   MoveMaker& MoveMaker::operator=
   (const MoveMaker& maker) {
     engine_ptr_ = maker.engine_ptr_;
-    for (std::size_t i = 0; i <= MAX_SLOTS; i++) {
+    for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
         begin_ = &(move_stack_[i]);
@@ -97,7 +92,7 @@ namespace Sayuri {
   MoveMaker& MoveMaker::operator=
   (MoveMaker&& maker) {
     engine_ptr_ = maker.engine_ptr_;
-    for (std::size_t i = 0; i <= MAX_SLOTS; i++) {
+    for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
         begin_ = &(move_stack_[i]);

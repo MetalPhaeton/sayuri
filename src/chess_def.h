@@ -262,6 +262,30 @@ namespace Sayuri {
     BETA  // ベータ値。
   };
 
+  /********************/
+  /* 候補手の最大値。 */
+  /********************/
+  // ポーンの候補手の最大値。
+  constexpr int MAX_PAWN_CANDIDATES = 4;
+  // ナイトの候補手の最大値。
+  constexpr int MAX_KNIGHT_CANDIDATES = 8;
+  // ビショップの候補手の最大値。
+  constexpr int MAX_BISHOP_CANDIDATES = 13;
+  // ルークの候補手の最大値。
+  constexpr int MAX_ROOK_CANDIDATES = 14;
+  // クイーンの候補手の最大値。
+  constexpr int MAX_QUEEN_CANDIDATES =
+  MAX_BISHOP_CANDIDATES + MAX_ROOK_CANDIDATES;
+  // キングの候補手の最大値。
+  constexpr int MAX_KING_CANDIDATES = 8;
+
+  // 一つの局面における候補手の最大値。
+  constexpr int MAX_CANDIDATES = (MAX_KNIGHT_CANDIDATES * 2)
+  + (MAX_BISHOP_CANDIDATES * 2)
+  + (MAX_ROOK_CANDIDATES * 2)
+  + (MAX_QUEEN_CANDIDATES * 9)
+  + (MAX_KING_CANDIDATES);
+
   /**********************/
   /* 探索エンジン関連。 */
   /**********************/
@@ -270,9 +294,6 @@ namespace Sayuri {
 
   // 最大探索ノード数。
   constexpr std::uint64_t MAX_NODES = static_cast<std::size_t>(-1);
-
-  // 局面の保存数。
-  constexpr int MAX_POSITIONS = 1000;
 
   // 探索するノードの種類。
   enum class NodeType {
