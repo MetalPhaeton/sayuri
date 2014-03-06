@@ -75,22 +75,22 @@ namespace Sayuri {
           // openint_weight: 駒(キング以外)が30個の時のウェイト。
           // ending_weight: 駒(キング以外)が0個の時のウェイト。
           Weight(double opening_weight, double ending_weight) :
-          modulus_((opening_weight - ending_weight) / 30.0),
-          shift_(ending_weight) {}
+          slope_((opening_weight - ending_weight) / 30.0),
+          y_intercept_(ending_weight) {}
           Weight(const Weight& weight) :
-          modulus_(weight.modulus_),
-          shift_(weight.shift_){}
+          slope_(weight.slope_),
+          y_intercept_(weight.y_intercept_){}
           Weight(Weight&& weight) :
-          modulus_(weight.modulus_),
-          shift_(weight.shift_){}
+          slope_(weight.slope_),
+          y_intercept_(weight.y_intercept_){}
           Weight& operator=(const Weight& weight) {
-            modulus_ = weight.modulus_;
-            shift_ = weight.shift_;
+            slope_ = weight.slope_;
+            y_intercept_ = weight.y_intercept_;
             return *this;
           }
           Weight& operator=(Weight&& weight) {
-            modulus_ = weight.modulus_;
-            shift_ = weight.shift_;
+            slope_ = weight.slope_;
+            y_intercept_ = weight.y_intercept_;
             return *this;
           }
           virtual ~Weight() {}
@@ -105,12 +105,12 @@ namespace Sayuri {
           // [戻り値]
           // ウェイト。
           double operator()(double num_pieces) const {
-            return (modulus_ * num_pieces) + shift_;
+            return (slope_ * num_pieces) + y_intercept_;
           }
 
         private:
-          double modulus_;
-          double shift_;
+          double slope_;
+          double y_intercept_;
       };
 
       /****************/
