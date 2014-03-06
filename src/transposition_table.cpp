@@ -28,7 +28,6 @@
 
 #include <iostream>
 #include <utility>
-#include <vector>
 #include <mutex>
 #include <cstddef>
 #include "chess_def.h"
@@ -43,35 +42,41 @@ namespace Sayuri {
   /**************************/
   // コンストラクタ。
   TranspositionTable::TranspositionTable(std::size_t table_size) :
+  num_entries_(0),
   num_used_entries_(0),
-  entry_table_ptr_(new std::vector<TTEntry>(1)),
+  entry_table_(nullptr),
   age_(0) {
     // エントリーをいくつ作るか計算する。
-    std::size_t num_entries = table_size / sizeof(TTEntry);
+    num_entries_ = table_size / sizeof(TTEntry);
+    num_entries_ = num_entries_ >= 1 ? num_entries_ : 1;
 
     // テーブルを作成。
-    if (num_entries > 1) {
-      entry_table_ptr_->resize(num_entries);
-    }
+    entry_table_.reset(new TTEntry[num_entries_]);
   }
 
   // コピーコンストラクタ。
   TranspositionTable::TranspositionTable(const TranspositionTable& table) :
+  num_entries_(table.num_entries_),
   num_used_entries_(table.num_used_entries_),
-  entry_table_ptr_(new std::vector<TTEntry>(*(table.entry_table_ptr_))),
+  entry_table_(new TTEntry[table.num_entries_]),
   age_(table.age_) {}
 
   // ムーブコンストラクタ。
   TranspositionTable::TranspositionTable( TranspositionTable&& table) :
+  num_entries_(table.num_entries_),
   num_used_entries_(table.num_used_entries_),
-  entry_table_ptr_(std::move(table.entry_table_ptr_)),
+  entry_table_(std::move(table.entry_table_)),
   age_(table.age_) {}
 
   // コピー代入。
   TranspositionTable&
   TranspositionTable::operator=(const TranspositionTable& table) {
+    num_entries_ = table.num_entries_;
     num_used_entries_ = table.num_used_entries_;
-    *entry_table_ptr_ = *(table.entry_table_ptr_);
+    entry_table_.reset(new TTEntry[num_entries_]);
+    for (int i = 0; i < num_entries_; i++) {
+      entry_table_[i] = table.entry_table_[i];
+    }
     age_ = table.age_;
 
     return *this;
@@ -80,8 +85,9 @@ namespace Sayuri {
   // ムーブ代入。
   TranspositionTable&
   TranspositionTable::operator=(TranspositionTable&& table) {
+    num_entries_ = table.num_entries_;
     num_used_entries_ = table.num_used_entries_;
-    entry_table_ptr_ = std::move(table.entry_table_ptr_);
+    entry_table_ = std::move(table.entry_table_);
     age_ = table.age_;
 
     return *this;
@@ -96,15 +102,15 @@ namespace Sayuri {
     std::size_t index = GetTableIndex(pos_hash);
 
     // 空いているエントリーへの登録なら使用済みエントリー数をカウント。
-    if ((*entry_table_ptr_)[index].depth() <= -MAX_VALUE) {
+    if (entry_table_[index].depth() <= -MAX_VALUE) {
       num_used_entries_++;
     }
 
     // テーブルが若い時にに登録されているものなら上書き。
     // depthがすでに登録されているエントリー以上なら登録。
-    if (((*entry_table_ptr_)[index].table_age() < age_)
-    || (depth >= (*entry_table_ptr_)[index].depth())) {
-      (*entry_table_ptr_)[index] =
+    if ((entry_table_[index].table_age() < age_)
+    || (depth >= entry_table_[index].depth())) {
+      entry_table_[index] =
       TTEntry(pos_hash, depth, score, score_type, best_move, ply_mate, age_);
     }
   }
@@ -117,9 +123,9 @@ namespace Sayuri {
     // エントリーを得る。
     TTEntry* entry_ptr = nullptr;
     std::size_t index = GetTableIndex(pos_hash);
-    if (((*entry_table_ptr_)[index].depth() >= depth)
-    && ((*entry_table_ptr_)[index].pos_hash() == pos_hash)) {
-      entry_ptr = &((*entry_table_ptr_)[index]);
+    if ((entry_table_[index].depth() >= depth)
+    && (entry_table_[index].pos_hash() == pos_hash)) {
+      entry_ptr = &(entry_table_[index]);
     }
 
     return entry_ptr;

@@ -28,7 +28,6 @@
 #define TRANSPOSITION_TABLE_H
 
 #include <iostream>
-#include <vector>
 #include <memory>
 #include <mutex>
 #include <cstddef>
@@ -147,7 +146,7 @@ namespace Sayuri {
       // [戻り値]
       // サイズをバイト数で返す。
       std::size_t GetSizeBytes() const {
-        return entry_table_ptr_->size() * sizeof(TTEntry);
+        return num_entries_ * sizeof(TTEntry);
       }
 
 
@@ -156,7 +155,7 @@ namespace Sayuri {
       // エントリーのパーミル。
       int GetUsedPermill() const {
         return static_cast<int>
-        ((num_used_entries_ * 1000) / entry_table_ptr_->size());
+        ((num_used_entries_ * 1000) / num_entries_);
       }
 
       // トランスポジションテーブルのロックを使う。
@@ -177,16 +176,18 @@ namespace Sayuri {
       // [引数]
       // pos_hash: ポジションのハッシュ。
       std::size_t GetTableIndex(Hash pos_hash) const {
-        return pos_hash % entry_table_ptr_->size();
+        return pos_hash % num_entries_;
       }
 
       /****************/
       /* メンバ変数。 */
       /****************/
+      // エントリーの個数。
+      std::size_t num_entries_;
       // 使用済みのエントリーの個数。
       std::size_t num_used_entries_;
       // エントリーを登録するテーブル。
-      std::unique_ptr<std::vector<TTEntry>> entry_table_ptr_;
+      std::unique_ptr<TTEntry[]> entry_table_;
       // 年齢。
       int age_;
       // ミューテックス。
