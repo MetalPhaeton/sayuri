@@ -320,7 +320,7 @@ namespace Sayuri {
 
     // スレッドの数。
     sout.str("");
-    sout << "option name Threads type spin defalut "
+    sout << "option name Threads type spin default "
     << UCI_DEFAULT_THREADS << " min " << 1 << " max " << UCI_MAX_THREADS;
     // 出力関数に送る。
     for (auto& func : output_listeners_) {
