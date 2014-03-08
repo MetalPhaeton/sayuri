@@ -148,9 +148,6 @@ namespace Sayuri {
     output_listeners_.push_back(func);
   }
 
-  /****************/
-  /* static関数。 */
-  /****************/
   // PV情報を標準出力に送る。
   void UCIShell::PrintPVInfo(int depth, int seldepth, int score,
   Chrono::milliseconds time, std::uint64_t num_nodes, PVLine& pv_line) {
