@@ -502,14 +502,14 @@ namespace Sayuri {
     searched_level_ = 0;
     shared_st_ptr_->num_searched_nodes_ = 0;
     shared_st_ptr_->start_time_ = SysClock::now();
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_SQUARES; j++) {
-        for (int k = 0; k < NUM_SQUARES; k++) {
-          shared_st_ptr_->history_[i][j][k] = 0;
+    for (Side side = 0U; side < NUM_SIDES; side++) {
+      for (Square from = 0U; from < NUM_SQUARES; from++) {
+        for (Square to = 0U; to < NUM_SQUARES; to++) {
+          shared_st_ptr_->history_[side][from][to] = 0;
         }
       }
     }
-    for (int i = 0; i < MAX_PLYS; i++) {
+    for (std::uint32_t i = 0U; i < MAX_PLYS; i++) {
       shared_st_ptr_->iid_stack_[i] = 0U;
       shared_st_ptr_->killer_stack_[i][0] = 0U;
       shared_st_ptr_->killer_stack_[i][1] = 0U;

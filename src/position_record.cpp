@@ -60,10 +60,10 @@ namespace Sayuri {
   ply_100_(0),
   ply_(0),
   pos_hash_(0ULL) {
-    for (int i = 0; i < NUM_SIDES; i++) {
-      has_castled_[i] = false;
-      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
-        position_[i][j] = 0ULL;
+    for (Side side = 0U; side < NUM_SIDES; side++) {
+      has_castled_[side] = false;
+      for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES; piece_type++) {
+        position_[side][piece_type] = 0ULL;
       }
     }
   }
@@ -98,9 +98,12 @@ namespace Sayuri {
     if (to_move_ != engine.to_move()) return false;
     if (castling_rights_ != engine.castling_rights()) return false;
     if (en_passant_square_ != engine.en_passant_square()) return false;
-    for (int i = WHITE; i <= BLACK; i++) {
-      for (int j = PAWN; j <= KING; j++) {
-        if (position_[i][j] != engine.position()[i][j]) return false;
+    for (Side side = WHITE; side <= BLACK; side++) {
+      for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+        if (position_[side][piece_type]
+        != engine.position()[side][piece_type]) {
+          return false;
+        }
       }
     }
 
@@ -112,9 +115,12 @@ namespace Sayuri {
     if (to_move_ != engine.to_move()) return true;
     if (castling_rights_ != engine.castling_rights()) return true;
     if (en_passant_square_ != engine.en_passant_square()) return true;
-    for (int i = WHITE; i <= BLACK; i++) {
-      for (int j = PAWN; j <= KING; j++) {
-        if (position_[i][j] != engine.position()[i][j]) return true;
+    for (Side side = WHITE; side <= BLACK; side++) {
+      for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+        if (position_[side][piece_type]
+        != engine.position()[side][piece_type]) {
+          return true;
+        }
       }
     }
 
@@ -126,9 +132,12 @@ namespace Sayuri {
     if (to_move_ != record.to_move_) return false;
     if (castling_rights_ != record.castling_rights_) return false;
     if (en_passant_square_ != record.en_passant_square_) return false;
-    for (int i = WHITE; i <= BLACK; i++) {
-      for (int j = PAWN; j <= KING; j++) {
-        if (position_[i][j] != record.position_[i][j]) return false;
+    for (Side side = WHITE; side <= BLACK; side++) {
+      for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+        if (position_[side][piece_type]
+        != record.position_[side][piece_type]) {
+          return false;
+        }
       }
     }
 
@@ -140,9 +149,12 @@ namespace Sayuri {
     if (to_move_ != record.to_move_) return true;
     if (castling_rights_ != record.castling_rights_) return true;
     if (en_passant_square_ != record.en_passant_square_) return true;
-    for (int i = WHITE; i <= BLACK; i++) {
-      for (int j = PAWN; j <= KING; j++) {
-        if (position_[i][j] != record.position_[i][j]) return true;
+    for (Side side = WHITE; side <= BLACK; side++) {
+      for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+        if (position_[side][piece_type]
+        != record.position_[side][piece_type]) {
+          return true;
+        }
       }
     }
 
@@ -155,10 +167,10 @@ namespace Sayuri {
   // メンバをコピーする。
   void PositionRecord::ScanMember(const PositionRecord& record) {
     // 駒の配置をコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      has_castled_[i] = record.has_castled_[i];
-      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
-        position_[i][j] = record.position_[i][j];
+    for (Side side = 0U; side < NUM_SIDES; side++) {
+      has_castled_[side] = record.has_castled_[side];
+      for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES; piece_type++) {
+        position_[side][piece_type] = record.position_[side][piece_type];
       }
     }
 

@@ -73,15 +73,15 @@ namespace Sayuri {
     // ビットボードを出力。
     Bitboard bit = 0x1ULL << (8 * 7);  // 初期位置a8へシフト。
     char c = '8';  // ランクの文字。
-    for (int i = 0; i < NUM_RANKS; i++) {
+    for (Rank rank = 0U; rank < NUM_RANKS; rank++) {
       osstream << c << "| ";
-      for (int j = 0; j < NUM_FYLES; j++) {
+      for (Fyle fyle = 0; fyle < NUM_FYLES; fyle++) {
         if (bitboard & bit) {
           osstream << "@ ";
         } else {
           osstream << ". ";
         }
-        if (j < 7) bit <<= 1;
+        if (fyle < 7) bit <<= 1;
       }
       // 一つ下のランクへ。
       bit >>= (7 + 8);
@@ -242,9 +242,9 @@ namespace Sayuri {
     // 駒の配置を出力。
     Bitboard bit = 0x1ULL << (8 * 7);  // 初期位置a8へシフト。
     char c = '8';  // ランクの文字。
-    for (int i = 0; i < NUM_RANKS; i++) {
+    for (Rank rank = 0; rank < NUM_RANKS; rank++) {
       osstream << c << "| ";
-      for (int j = 0; j < NUM_FYLES; j++) {
+      for (Fyle fyle = 0; fyle < NUM_FYLES; fyle++) {
         if (position[WHITE][PAWN] & bit) {
           osstream << "P ";
         } else if (position[WHITE][KNIGHT] & bit) {
@@ -273,7 +273,7 @@ namespace Sayuri {
           osstream << ". ";
         }
 
-        if (j < 7) bit <<= 1;
+        if (fyle < 7) bit <<= 1;
       }
       // 一つ下のランクへ。
       bit >>= (7 + 8);

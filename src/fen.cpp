@@ -1,6 +1,10 @@
 /* 
    fen.cpp: fenパーサの実装ファイル。
+
+   The MIT License (MIT)
+
    Copyright (c) 2014 Hironori Ishibashi
+
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to
@@ -114,9 +118,10 @@ namespace Sayuri {
   ply_100_(fen.ply_100_),
   ply_(fen.ply_) {
     // 駒の配置をコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
-        position_[i][j] = fen.position_[i][j];
+    for (Side side = 0U; side < NUM_SIDES; side++) {
+      for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES;
+      piece_type++) {
+        position_[side][piece_type] = fen.position_[side][piece_type];
       }
     }
   }
@@ -129,9 +134,10 @@ namespace Sayuri {
   ply_100_(fen.ply_100_),
   ply_(fen.ply_) {
     // 駒の配置をコピー。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
-        position_[i][j] = fen.position_[i][j];
+    for (Side side = 0U; side < NUM_SIDES; side++) {
+      for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES;
+      piece_type++) {
+        position_[side][piece_type] = fen.position_[side][piece_type];
       }
     }
   }
@@ -144,9 +150,10 @@ namespace Sayuri {
     en_passant_square_ = fen.en_passant_square_;
     ply_100_ = fen.ply_100_;
     ply_ = fen.ply_;
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
-        position_[i][j] = fen.position_[i][j];
+    for (Side side = 0U; side < NUM_SIDES; side++) {
+      for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES;
+      piece_type++) {
+        position_[side][piece_type] = fen.position_[side][piece_type];
       }
     }
 
@@ -161,9 +168,10 @@ namespace Sayuri {
     en_passant_square_ = fen.en_passant_square_;
     ply_100_ = fen.ply_100_;
     ply_ = fen.ply_;
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
-        position_[i][j] = fen.position_[i][j];
+    for (Side side = 0U; side < NUM_SIDES; side++) {
+      for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES;
+      piece_type++) {
+        position_[side][piece_type] = fen.position_[side][piece_type];
       }
     }
 
@@ -176,9 +184,9 @@ namespace Sayuri {
   // 駒の配置トークンを評価する。
   void Fen::EvalPosition(const std::string& position_str) {
     // 駒の配置を初期化。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
-        position_[i][j] = 0ULL;
+    for (Side side = 0U; side < NUM_SIDES; side++) {
+      for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES; piece_type++) {
+        position_[side][piece_type] = 0ULL;
       }
     }
 

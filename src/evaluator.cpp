@@ -167,8 +167,8 @@ namespace Sayuri {
   // 評価値を返す。
   int Evaluator::Evaluate(int material) {
     // 価値の変数の初期化。
-    for (int i = 0; i < NUM_PIECE_TYPES; i++) {
-      position_value_[i] = 0.0;
+    for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      position_value_[piece_type] = 0.0;
     }
     pawn_position_ending_value_ = 0.0;
     king_position_ending_value_ = 0.0;
@@ -176,8 +176,8 @@ namespace Sayuri {
     center_control_value_ = 0.0;
     sweet_center_control_value_ = 0.0;
     development_value_ = 0.0;
-    for (int i = 0; i < NUM_PIECE_TYPES; i++) {
-      attack_value_[i] = 0.0;
+    for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      attack_value_[piece_type] = 0.0;
     }
     pass_pawn_value_ = 0.0;
     protected_pass_pawn_value_ = 0.0;
@@ -285,8 +285,8 @@ namespace Sayuri {
     score += WEIGHT_DEVELOPMENT(num_pieces) * development_value_;
     // 攻撃。
     double temp_weight = WEIGHT_ATTACK(num_pieces);
-    for (int i = PAWN; i <= QUEEN; i++) {
-      score += temp_weight * attack_value_[i];
+    for (Piece piece_type = PAWN; piece_type <= QUEEN; piece_type++) {
+      score += temp_weight * attack_value_[piece_type];
     }
     // キングによる攻撃。
     score += WEIGHT_ATTACK_BY_KING(num_pieces) * attack_value_[KING];
@@ -734,8 +734,8 @@ namespace Sayuri {
   // pass_pawn_mask_[][]を初期化する。
   void Evaluator::InitPassPawnMask() {
     // マスクを作って初期化する。
-    for (int side = 0; side < NUM_SIDES; side++) {
-      for (int square = 0; square < NUM_SQUARES; square++) {
+    for (Side side = 0U; side < NUM_SIDES; side++) {
+      for (Square square = 0U; square < NUM_SQUARES; square++) {
         Bitboard mask = 0ULL;
         if (side == NO_SIDE) {  // どちらのサイドでもなければ0。
           pass_pawn_mask_[side][square] = 0;
@@ -772,7 +772,7 @@ namespace Sayuri {
 
   // iso_pawn_mask_[]を初期化する。
   void Evaluator::InitIsoPawnMask() {
-    for (int square = 0; square < NUM_SQUARES; square++) {
+    for (Square square = 0U; square < NUM_SQUARES; square++) {
       Fyle fyle = Util::GetFyle(square);
       if (fyle == FYLE_A) {
         iso_pawn_mask_[square] = Util::FYLE[fyle + 1];
@@ -787,8 +787,8 @@ namespace Sayuri {
 
   // pawn_shield_mask_[][]を初期化する。
   void Evaluator::InitPawnShieldMask() {
-    for (int side = 0; side < NUM_SIDES; side++) {
-      for (int square = 0; square < NUM_SQUARES; square++) {
+    for (Side side = 0U; side < NUM_SIDES; side++) {
+      for (Square square = 0U; square < NUM_SQUARES; square++) {
         if (side == NO_SIDE) {  // どちらのサイドでもなければ空。
           pawn_shield_mask_[side][square] = 0ULL;
         } else {
@@ -822,8 +822,8 @@ namespace Sayuri {
 
   // weak_square_mask_[][]を初期化する。
   void Evaluator::InitWeakSquareMask() {
-    for (int side = 0; side < NUM_SIDES; side++) {
-      for (int square = 0; square < NUM_SQUARES; square++) {
+    for (Side side = 0U; side < NUM_SIDES; side++) {
+      for (Square square = 0U; square < NUM_SQUARES; square++) {
         if (side == NO_SIDE) {  // どちらのサイドでもなければ空。
           weak_square_mask_[side][square] = 0ULL;
         } else {

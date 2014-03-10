@@ -123,7 +123,7 @@ namespace Sayuri {
     int num_moves = 0;
 
     // ナイト、ビショップ、ルーク、クイーンの候補手を作る。
-    for (int piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
+    for (Piece piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
       Bitboard pieces = engine_ptr_->position()[side][piece_type];
 
       for (; pieces; pieces &= pieces - 1) {

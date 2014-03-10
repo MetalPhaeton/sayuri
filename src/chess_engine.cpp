@@ -30,6 +30,7 @@
 #include <sstream>
 #include <random>
 #include <cstddef>
+#include <cstdint>
 #include <utility>
 #include <memory>
 #include <vector>
@@ -219,8 +220,8 @@ namespace Sayuri {
   void ChessEngine::SetNewGame() {
     // 駒の配置を作る。
     // どちらでもない。
-    for (int piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
-      position_[NO_SIDE][piece_type] = 0;
+    for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      position_[NO_SIDE][piece_type] = 0ULL;
     }
     // 白の駒。
     position_[WHITE][EMPTY] = 0ULL;
@@ -243,7 +244,7 @@ namespace Sayuri {
     side_pieces_[NO_SIDE] = 0ULL;
     side_pieces_[WHITE] = 0ULL;
     side_pieces_[BLACK] = 0ULL;
-    for (int i = PAWN; i < NUM_PIECE_TYPES; i++) {
+    for (Piece i = PAWN; i < NUM_PIECE_TYPES; i++) {
       side_pieces_[WHITE] |= position_[WHITE][i];
       side_pieces_[BLACK] |= position_[BLACK][i];
     }
@@ -263,7 +264,7 @@ namespace Sayuri {
 
     // 駒の種類とサイドの配置を作る。
     Bitboard point = 1ULL;
-    for (int i = 0; i < NUM_SQUARES; i++) {
+    for (Square i = 0U; i < NUM_SQUARES; i++) {
       // サイドの配置。
       if (side_pieces_[WHITE] & point) side_board_[i] = WHITE;
       else if (side_pieces_[BLACK] & point) side_board_[i] = BLACK;
@@ -315,7 +316,7 @@ namespace Sayuri {
     ply_ = 1;
 
     // キャスリングしたかどうかの初期化。
-    for (int i = 0; i < NUM_SIDES; i++) {
+    for (Side i = 0U; i < NUM_SIDES; i++) {
       has_castled_[i] = false;
     }
 
@@ -691,7 +692,7 @@ namespace Sayuri {
     Hash hash = 0ULL;
 
     // 駒の情報からハッシュを得る。
-    for (int square = 0; square < NUM_SQUARES; square++) {
+    for (Square square = 0U; square < NUM_SQUARES; square++) {
       hash ^= piece_hash_table_
       [side_board_[square]][piece_board_[square]][square];
     }
@@ -933,13 +934,15 @@ namespace Sayuri {
     }
 
     // 駒の情報の配列を初期化。
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_PIECE_TYPES; j++) {
-        for (int k = 0; k < NUM_SQUARES; k++) {
-          if ((i == NO_SIDE) || (j == EMPTY)) {
-            piece_hash_table_[i][j][k] = 0ULL;
+    for (Side side = 0U; side < NUM_SIDES; side++) {
+      for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES;
+      piece_type++) {
+        for (Square square = 0U; square < NUM_SQUARES; square++) {
+          if ((side == NO_SIDE) || (piece_type == EMPTY)) {
+            piece_hash_table_[side][piece_type][square] = 0ULL;
           } else {
-            piece_hash_table_[i][j][k] = temp_table[temp_count];
+            piece_hash_table_[side][piece_type][square] =
+            temp_table[temp_count];
             temp_count++;
           }
         }
@@ -964,8 +967,8 @@ namespace Sayuri {
 
     // アンパッサンの配列を初期化。
     en_passant_hash_table_[0] = 0ULL;
-    for (int i = 1; i < NUM_SQUARES; i++) {
-      en_passant_hash_table_[i] = temp_table[temp_count];
+    for (Square square = 1; square < NUM_SQUARES; square++) {
+      en_passant_hash_table_[square] = temp_table[temp_count];
       temp_count++;
     }
   }
@@ -986,14 +989,14 @@ namespace Sayuri {
   move_history_(0),
   ply_100_history_(0),
   position_history_(0) {
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_SQUARES; j++) {
-        for (int k = 0; k < NUM_SQUARES; k++) {
-          history_[i][j][k] = 0;
+    for (Side side = 0; side < NUM_SIDES; side++) {
+      for (Square from = 0; from < NUM_SQUARES; from++) {
+        for (Square to = 0; to < NUM_SQUARES; to++) {
+          history_[side][from][to] = 0;
         }
       }
     }
-    for (int i = 0; i < MAX_PLYS; i++) {
+    for (unsigned int i = 0; i < MAX_PLYS; i++) {
       iid_stack_[i] = 0U;
       killer_stack_[i][0] = 0U;
       killer_stack_[i][1] = 0U;
@@ -1029,15 +1032,15 @@ namespace Sayuri {
 
   // メンバをコピーする。
   void ChessEngine::SharedStruct::ScanMember(const SharedStruct& shared_st) {
-    for (int i = 0; i < NUM_SIDES; i++) {
-      for (int j = 0; j < NUM_SQUARES; j++) {
-        for (int k = 0; k < NUM_SQUARES; k++) {
-          history_[i][j][k] = shared_st.history_[i][j][k];
+    for (Side side = 0; side < NUM_SIDES; side++) {
+      for (Square from = 0; from < NUM_SQUARES; from++) {
+        for (Square to = 0; to < NUM_SQUARES; to++) {
+          history_[side][from][to] = shared_st.history_[side][from][to];
         }
       }
     }
     history_max_ = shared_st.history_max_;
-    for (int i = 0; i < MAX_PLYS; i++) {
+    for (std::uint32_t i = 0U; i < MAX_PLYS; i++) {
       iid_stack_[i] = shared_st.iid_stack_[i];
       killer_stack_[i][0] = shared_st.killer_stack_[i][0];
       killer_stack_[i][0] = shared_st.killer_stack_[i][0];

@@ -61,7 +61,7 @@ namespace Sayuri {
   using Bitboard = std::uint64_t;
 
   // マスの型。
-  using Square = int;
+  using Square = std::uint32_t;
   constexpr Square A1 = 0;
   constexpr Square B1 = 1;
   constexpr Square C1 = 2;
@@ -128,7 +128,7 @@ namespace Sayuri {
   constexpr Square H8 = 63;
 
   // ファイルの型。
-  using Fyle = int;
+  using Fyle = std::uint32_t;
   constexpr Fyle FYLE_A = 0;
   constexpr Fyle FYLE_B = 1;
   constexpr Fyle FYLE_C = 2;
@@ -139,7 +139,7 @@ namespace Sayuri {
   constexpr Fyle FYLE_H = 7;
 
   // ランクの型。
-  using Rank = int;
+  using Rank = std::uint32_t;
   constexpr Rank RANK_1 = 0;
   constexpr Rank RANK_2 = 1;
   constexpr Rank RANK_3 = 2;
@@ -150,13 +150,13 @@ namespace Sayuri {
   constexpr Rank RANK_8 = 7;
 
   // サイドの型。
-  using Side = int;
+  using Side = std::uint32_t;
   constexpr Side NO_SIDE = 0;
   constexpr Side WHITE = 1;
   constexpr Side BLACK = 2;
 
   // 駒の型。
-  using Piece = int;
+  using Piece = std::uint32_t;
   constexpr Piece EMPTY = 0;
   constexpr Piece PAWN = 1;
   constexpr Piece KNIGHT = 2;
@@ -166,11 +166,11 @@ namespace Sayuri {
   constexpr Piece KING = 6;
 
   // 数の定義。
-  constexpr int NUM_SQUARES = 64;
-  constexpr int NUM_FYLES = 8;
-  constexpr int NUM_RANKS = 8;
-  constexpr int NUM_SIDES = 3;
-  constexpr int NUM_PIECE_TYPES = 7;
+  constexpr Square NUM_SQUARES = 64;
+  constexpr Fyle NUM_FYLES = 8;
+  constexpr Rank NUM_RANKS = 8;
+  constexpr Side NUM_SIDES = 3;
+  constexpr Piece NUM_PIECE_TYPES = 7;
   constexpr int MAX_VALUE = 9999999;
 
   // キャスリングのフラグの型。
@@ -281,50 +281,6 @@ namespace Sayuri {
     return (move1 & BASE_MASK) == (move2 & BASE_MASK);
   }
 
-  // 手の型。
-  /*
-  union Move {
-    unsigned int all_;
-    struct {
-      unsigned int from_ : 6;  // 駒の位置。
-      unsigned int to_ : 6;  // 移動先の位置。
-      unsigned int promotion_ : 3;  // 昇格する駒の種類。
-      unsigned int captured_piece_ : 3;  // 取った駒の種類。
-      // 動かす前のキャスリングのフラグ。
-      unsigned int last_castling_rights_ : 4;
-      // 動かす前のアンパッサンの位置。
-      unsigned int last_en_passant_square_ : 6;
-      unsigned int move_type_ : 2;  // 手の種類。
-    };
-    // コンストラクタと代入。
-    Move() : all_(0) {}
-    Move(const Move& move) {all_ = move.all_;}
-    Move(Move&& move) {all_ = move.all_;}
-    Move& operator=(const Move& move) {
-      all_ = move.all_;
-      return *this;
-    }
-    Move& operator=(Move&& move) {
-      all_ = move.all_;
-      return *this;
-    }
-    ~Move() {}
-    // 比較演算子。
-    bool operator==(const Move move) const {
-      if (move.from_ != from_) return false;
-      if (move.to_ != to_) return false;
-      if (move.promotion_ != promotion_) return false;
-      return true;
-    }
-    bool operator!=(const Move move) const {
-      if (move.from_ != from_) return true;
-      if (move.to_ != to_) return true;
-      if (move.promotion_ != promotion_) return true;
-      return false;
-    }
-  };
-  */
-
   // ハッシュの型。
   using Hash = std::uint64_t;
 
@@ -350,21 +306,21 @@ namespace Sayuri {
   /* 候補手の最大値。 */
   /********************/
   // ポーンの候補手の最大値。
-  constexpr int MAX_PAWN_CANDIDATES = 4;
+  constexpr std::uint32_t MAX_PAWN_CANDIDATES = 4;
   // ナイトの候補手の最大値。
-  constexpr int MAX_KNIGHT_CANDIDATES = 8;
+  constexpr std::uint32_t MAX_KNIGHT_CANDIDATES = 8;
   // ビショップの候補手の最大値。
-  constexpr int MAX_BISHOP_CANDIDATES = 13;
+  constexpr std::uint32_t MAX_BISHOP_CANDIDATES = 13;
   // ルークの候補手の最大値。
-  constexpr int MAX_ROOK_CANDIDATES = 14;
+  constexpr std::uint32_t MAX_ROOK_CANDIDATES = 14;
   // クイーンの候補手の最大値。
-  constexpr int MAX_QUEEN_CANDIDATES =
+  constexpr std::uint32_t MAX_QUEEN_CANDIDATES =
   MAX_BISHOP_CANDIDATES + MAX_ROOK_CANDIDATES;
   // キングの候補手の最大値。
-  constexpr int MAX_KING_CANDIDATES = 8;
+  constexpr std::uint32_t MAX_KING_CANDIDATES = 8;
 
   // 一つの局面における候補手の最大値。
-  constexpr int MAX_CANDIDATES = (MAX_KNIGHT_CANDIDATES * 2)
+  constexpr std::uint32_t MAX_CANDIDATES = (MAX_KNIGHT_CANDIDATES * 2)
   + (MAX_BISHOP_CANDIDATES * 2)
   + (MAX_ROOK_CANDIDATES * 2)
   + (MAX_QUEEN_CANDIDATES * 9)
@@ -374,7 +330,7 @@ namespace Sayuri {
   /* 探索エンジン関連。 */
   /**********************/
   // 最大探索手数。
-  constexpr int MAX_PLYS = 100;
+  constexpr std::uint32_t MAX_PLYS = 100;
 
   // 最大探索ノード数。
   constexpr std::uint64_t MAX_NODES = static_cast<std::size_t>(-1);
