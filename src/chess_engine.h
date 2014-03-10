@@ -331,7 +331,7 @@ namespace Sayuri {
       // 動かす駒の位置と移動先の位置が同じ場合はNull Move。
       // そのmoveはUnmakeMove()で使われる。
       // [引数]
-      // move[inout]: 動かす手。
+      // move: 動かす手。
       void MakeMove(Move& move);
       // MakeMove()で動かした駒を元に戻す。
       // 必ず先にMakeMove()をすること。
