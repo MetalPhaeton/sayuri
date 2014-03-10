@@ -201,7 +201,7 @@ namespace Sayuri {
 
   // 手の型。
   union Move {
-    std::uint32_t all_ : 30;
+    unsigned int all_;
     struct {
       unsigned int from_ : 6;  // 駒の位置。
       unsigned int to_ : 6;  // 移動先の位置。
