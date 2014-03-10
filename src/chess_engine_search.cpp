@@ -86,7 +86,7 @@ namespace Sayuri {
     // 候補手を作る。
     // 駒を取る手だけ。
     MoveMaker maker(*this);
-    Move prev_best;
+    Move prev_best = 0U;
     if (IsAttacked(king_[side], enemy_side)) {
       maker.GenMoves<GenMoveType::ALL>(prev_best,
       shared_st_ptr_->iid_stack_[level],
@@ -100,7 +100,7 @@ namespace Sayuri {
     }
 
     // 探索する。
-    for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
+    for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
       // マージン。
       int margin = GetMargin(depth);
 
@@ -223,7 +223,7 @@ namespace Sayuri {
 
     // 前回の繰り返しの最善手を得る。
     TTEntry* prev_entry = table.GetEntry(pos_hash, depth - 1);
-    Move prev_best;
+    Move prev_best = 0U;
     if (prev_entry && (prev_entry->score_type() != ScoreType::ALPHA)) {
       prev_best = prev_entry->best_move();
     }
@@ -232,7 +232,7 @@ namespace Sayuri {
     int null_reduction = 0;
     if (Type == NodeType::PV) {
       // 前回の繰り返しの最善手があればIIDしない。
-      if (prev_best.all_) {
+      if (prev_best) {
         shared_st_ptr_->iid_stack_[level] = prev_best;
       } else {
         if (depth >= 5) {
@@ -248,8 +248,7 @@ namespace Sayuri {
     } else {
       if (!is_null_searching_ && !is_checked && (depth >= 4)) {
         // Null Move Reduction。
-        Move null_move;
-        null_move.move_type_ = NULL_MOVE;  // Null Move。
+        Move null_move = 0U;
 
         is_null_searching_ = true;
         MakeMove(null_move);
@@ -294,7 +293,7 @@ namespace Sayuri {
     alpha, beta, dummy_delta, table, pv_line, is_null_searching_,
     null_reduction, score_type, material,
     is_checked, num_all_moves, has_legal_move, nullptr, dummy_time);
-    for (Move move = maker.PickMove(); move.all_; move = maker.PickMove()) {
+    for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
       // すでにベータカットされていればループを抜ける。
       if (alpha >= beta) {
         break;
@@ -335,6 +334,11 @@ namespace Sayuri {
         }
       }
 
+      // 手の情報を得る。
+      Square from = move_from(move);
+      Square to = move_to(move);
+      Piece promotion = move_promotion(move);
+
       // 探索。
       // Late Move Reduction。
       // ただし、Null Move Reductionされていれば実行しない。
@@ -343,7 +347,8 @@ namespace Sayuri {
       int temp_alpha = alpha;
       int temp_beta = beta;
       bool did_lmr = false;
-      if (!is_checked && !(move.captured_piece_) && !(move.promotion_)
+      if (!is_checked
+      && !move_captured_piece(move) && !promotion
       && !null_reduction && (depth >= 4)
       && (num_moves > ((num_all_moves + 1) / 2))) {
         did_lmr = true;
@@ -351,7 +356,7 @@ namespace Sayuri {
 
         // History Pruning。
         if (Type == NodeType::NON_PV) {
-          if (shared_st_ptr_->history_[side][move.from_][move.to_]
+          if (shared_st_ptr_->history_[side][from][to]
           < (shared_st_ptr_->history_max_ / 2)) {
             reduction++;
           }
@@ -423,18 +428,17 @@ namespace Sayuri {
         score_type = ScoreType::BETA;
 
         // 取らない手。
-        if (!(move.captured_piece_)) {
+        if (!move_captured_piece(move)) {
           // キラームーブ。
           shared_st_ptr_->killer_stack_[level][0] = move;
           shared_st_ptr_->killer_stack_[level + 2][1] = move;
 
           // ヒストリー。
-          shared_st_ptr_->history_[side][move.from_][move.to_] +=
-          depth * depth;
-          if (shared_st_ptr_->history_[side][move.from_][move.to_]
+          shared_st_ptr_->history_[side][from][to] += depth * depth;
+          if (shared_st_ptr_->history_[side][from][to]
           > shared_st_ptr_->history_max_) {
             shared_st_ptr_->history_max_ =
-            shared_st_ptr_->history_[side][move.from_][move.to_];
+            shared_st_ptr_->history_[side][from][to];
           }
         }
 
@@ -506,11 +510,11 @@ namespace Sayuri {
       }
     }
     for (int i = 0; i < MAX_PLYS; i++) {
-      shared_st_ptr_->iid_stack_[i] = Move();
-      shared_st_ptr_->killer_stack_[i][0] = Move();
-      shared_st_ptr_->killer_stack_[i][1] = Move();
-      shared_st_ptr_->killer_stack_[i + 2][0] = Move();
-      shared_st_ptr_->killer_stack_[i + 2][1] = Move();
+      shared_st_ptr_->iid_stack_[i] = 0U;
+      shared_st_ptr_->killer_stack_[i][0] = 0U;
+      shared_st_ptr_->killer_stack_[i][1] = 0U;
+      shared_st_ptr_->killer_stack_[i + 2][0] = 0U;
+      shared_st_ptr_->killer_stack_[i + 2][1] = 0U;
     }
     shared_st_ptr_->history_max_ = 1ULL;
     shared_st_ptr_->stop_now_ = false;
@@ -575,7 +579,7 @@ namespace Sayuri {
       // 前回の繰り返しの最善手を得る。
       TTEntry* prev_entry =
       table.GetEntry(pos_hash, shared_st_ptr_->i_depth_ - 1);
-      Move prev_best;
+      Move prev_best = 0U;
       if (prev_entry && (prev_entry->score_type() != ScoreType::ALPHA)) {
         prev_best = prev_entry->best_move();
       }
@@ -678,7 +682,7 @@ namespace Sayuri {
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
     int num_moves = 0;
-    for (Move move = job.PickMove(); move.all_; move = job.PickMove()) {
+    for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // すでにベータカットされていれば仕事をしない。
       if (job.alpha() >= job.beta()) {
         break;
@@ -719,6 +723,11 @@ namespace Sayuri {
         }
       }
 
+      // 手の情報を得る。
+      Square from = move_from(move);
+      Square to = move_to(move);
+      Piece promotion = move_promotion(move);
+
       // Late Move Reduction。
       // ただし、Null Move Reductionされていれば実行しない。
       int score = 0;
@@ -726,7 +735,8 @@ namespace Sayuri {
       int temp_alpha = job.alpha();
       int temp_beta = job.beta();
       bool did_lmr = false;
-      if (!(job.is_checked()) && !(move.captured_piece_) && !(move.promotion_)
+      if (!(job.is_checked())
+      && !move_captured_piece(move) && !(promotion)
       && !(job.null_reduction()) && (job.depth() >= 4)
       && (num_moves > ((job.num_all_moves() + 1) / 2))) {
         did_lmr = true;
@@ -734,7 +744,7 @@ namespace Sayuri {
 
         // History Pruning。
         if (Type == NodeType::NON_PV) {
-          if (shared_st_ptr_->history_[side][move.from_][move.to_]
+          if (shared_st_ptr_->history_[side][from][to]
           < (shared_st_ptr_->history_max_ / 2)) {
             reduction++;
           }
@@ -813,18 +823,18 @@ namespace Sayuri {
         job.score_type() = ScoreType::BETA;
 
         // 取らない手。
-        if (!(move.captured_piece_)) {
+        if (!move_captured_piece(move)) {
           // キラームーブ。
           shared_st_ptr_->killer_stack_[job.level()][0] = move;
           shared_st_ptr_->killer_stack_[job.level() + 2][1] = move;
 
           // ヒストリー。
-          shared_st_ptr_->history_[side][move.from_][move.to_] +=
+          shared_st_ptr_->history_[side][from][to] +=
           job.depth() * job.depth();
-          if (shared_st_ptr_->history_[side][move.from_][move.to_]
+          if (shared_st_ptr_->history_[side][from][to]
           > shared_st_ptr_->history_max_) {
             shared_st_ptr_->history_max_ =
-            shared_st_ptr_->history_[side][move.from_][move.to_];
+            shared_st_ptr_->history_[side][from][to];
           }
         }
 
@@ -850,7 +860,7 @@ namespace Sayuri {
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
     int num_moves = 0;
-    for (Move move = job.PickMove(); move.all_; move = job.PickMove()) {
+    for (Move move = job.PickMove(); move; move = job.PickMove()) {
       if (ShouldBeStopped()) break;
 
       // 定時(1秒)報告の情報を送る。
@@ -869,7 +879,7 @@ namespace Sayuri {
       if (job.moves_to_search_ptr()) {
         bool hit = false;
         for (auto& move_2 : *(job.moves_to_search_ptr())) {
-          if (move_2 == move) {
+          if (EqualMove(move_2, move)) {
             // 探索すべき手だった。
             hit = true;
             break;
@@ -967,7 +977,7 @@ namespace Sayuri {
         // Late Move Reduction。
         bool did_lmr = false;
         if (!(job.is_checked())
-        && !(move.captured_piece_) && !(move.promotion_)
+        && !move_captured_piece(move) && !move_promotion(move)
         && (job.depth() >= 4)
         && (num_moves > ((job.num_all_moves() + 1) / 2))) {
           did_lmr = true;
@@ -1076,25 +1086,30 @@ namespace Sayuri {
   int ChessEngine::SEE(Move move) const {
     int score = 0;
 
-    if (move.all_) {
+    if (move) {
+      // 手の情報を得る。
+      Square to = move_to(move);
+      Piece promotion = move_promotion(move);
+      MoveType move_type = move_move_type(move);
+
       // キングを取る手なら無視。
-      if (piece_board_[move.to_] == KING) {
+      if (piece_board_[to] == KING) {
         return score;
       }
 
       // 取る駒の価値を得る。
       int capture_value = 0;
-      if (move.move_type_ == EN_PASSANT) {
+      if (move_type == EN_PASSANT) {
         // アンパッサン。
         capture_value = MATERIAL[PAWN];
       } else {
-        capture_value = MATERIAL[piece_board_[move.to_]];
+        capture_value = MATERIAL[piece_board_[to]];
       }
 
       // ポーンの昇格。
-      if (move.promotion_) {
-        capture_value += MATERIAL[move.promotion_]
-        - MATERIAL[piece_board_[move.from_]];
+      if (promotion) {
+        capture_value += MATERIAL[promotion]
+        - MATERIAL[PAWN];
       }
 
       Side side = to_move_;
@@ -1105,7 +1120,7 @@ namespace Sayuri {
       // 違法な手なら計算しない。
       if (!(IsAttacked(king_[side], side ^ 0x3))) {
         // 再帰して次の局面の評価値を得る。
-        score = capture_value - self->SEE(GetNextSEEMove(move.to_));
+        score = capture_value - self->SEE(GetNextSEEMove(to));
         // Standing Pad。
         score = score >= 0 ? score : 0;
       }
@@ -1120,7 +1135,7 @@ namespace Sayuri {
   Move ChessEngine::GetNextSEEMove(Square target) const {
     // キングがターゲットの時はなし。
     if (target == king_[to_move_ ^ 0x3]) {
-      return Move();
+      return 0U;
     }
 
     // 価値の低いものから調べる。
@@ -1157,16 +1172,16 @@ namespace Sayuri {
           break;
       }
       if (attackers) {
-        Move move;
-        move.from_ = Util::GetSquare(attackers);
-        move.to_  = target;
-        move.promotion_ = promotion;
-        move.move_type_ = NORMAL;
+        Move move = 0U;
+        move_from(move, Util::GetSquare(attackers));
+        move_to(move, target);
+        move_promotion(move, promotion);
+        move_move_type(move, NORMAL);
         return move;
       }
     }
 
-    return Move();
+    return 0U;
   }
   // Futility Pruningのマージンを計算する。
   int ChessEngine::GetMargin(int depth) {

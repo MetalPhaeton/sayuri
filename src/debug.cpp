@@ -47,6 +47,7 @@ namespace Sayuri {
   int DebugMain(int argc, char* argv[]) {
     // 初期化。
     Init();
+
     return 0;
   }
   // ================================================================
@@ -107,24 +108,24 @@ namespace Sayuri {
     };
 
     // ファイルとランク。
-    Fyle fyle;
-    Rank rank;
+    Fyle fyle = 0;
+    Rank rank = 0;
 
     // 動かす駒の位置を出力する。
     std::cout << "From: ";
-    fyle = Util::GetFyle(move.from_);
-    rank = Util::GetRank(move.from_);
+    fyle = Util::GetFyle(move_from(move));
+    rank = Util::GetRank(move_from(move));
     std::cout << fyle_table[fyle] << rank_table[rank] << std::endl;
 
     // 移動先の位置を出力する。
     std::cout << "To: ";
-    fyle = Util::GetFyle(move.to_);
-    rank = Util::GetRank(move.to_);
+    fyle = Util::GetFyle(move_to(move));
+    rank = Util::GetRank(move_to(move));
     std::cout << fyle_table[fyle] << rank_table[rank] << std::endl;
 
     // 取った駒の種類を出力する。
     std::cout << "Captured Piece: ";
-    switch (move.captured_piece_) {
+    switch (move_captured_piece(move)) {
       case EMPTY:
         std::cout << "None";
         break;
@@ -154,7 +155,7 @@ namespace Sayuri {
 
     // 昇格する駒の種類を出力する。
     std::cout << "Promotion: ";
-    switch (move.promotion_) {
+    switch (move_promotion(move)) {
       case EMPTY:
         std::cout << "None";
         break;
@@ -183,8 +184,8 @@ namespace Sayuri {
     std::cout << std::endl;
 
     // キャスリングを出力する。
-    Castling castling = move.last_castling_rights_;
-    std::cout << "Last Castling Rights: ";
+    Castling castling = move_castling_rights(move);
+    std::cout << "Castling Rights: ";
     if (castling & WHITE_SHORT_CASTLING)
       std::cout << "K";
     if (castling & WHITE_LONG_CASTLING)
@@ -196,20 +197,18 @@ namespace Sayuri {
     std::cout << std::endl;
 
     // アンパッサンのターゲットを出力する。
-    if (move.last_en_passant_square_) {
-      Square en_passant_square = move.last_en_passant_square_;
+    if (Square en_passant_square = move_en_passant_square(move)) {
       fyle = Util::GetFyle(en_passant_square);
       rank = Util::GetRank(en_passant_square);
-      std::cout << "Last En Passant Square: "
+      std::cout << "En Passant Square: "
       << fyle_table[fyle] << rank_table[rank] << std::endl;
     } else {
-      std::cout << "Last En Passant Square: "
-      << move.last_en_passant_square_ << std::endl;
+      std::cout << "En Passant Square: Nothing" << std::endl;
     }
 
     // 手の種類を出力する。
     std::cout << "Move Type: ";
-    switch (move.move_type_) {
+    switch (move_move_type(move)) {
       case NORMAL:
         std::cout << "Normal";
         break;

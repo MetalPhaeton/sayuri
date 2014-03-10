@@ -398,12 +398,12 @@ namespace Sayuri {
     // 手を展開する。
     shared_st_ptr_->history_max_ = 1ULL;  // makerが0の除算をしないように。
     MoveMaker maker(*this);
-    maker.GenMoves<GenMoveType::ALL>(Move(), Move(), Move(), Move());
+    maker.GenMoves<GenMoveType::ALL>(0U, 0U, 0U, 0U);
     // 合法手かどうか調べる。
     bool is_legal = false;
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
-    for (Move temp_move = maker.PickMove(); temp_move.all_;
+    for (Move temp_move = maker.PickMove(); temp_move;
     temp_move = maker.PickMove()) {
       MakeMove(temp_move);
       // temp_moveが合法手かどうか調べる。
@@ -412,7 +412,7 @@ namespace Sayuri {
         continue;
       }
       // temp_moveと同じ手かどうか調べる。
-      if (move == temp_move) {
+      if (EqualMove(move, temp_move)) {
         UnmakeMove(temp_move);
         move = temp_move;
         is_legal = true;
@@ -423,8 +423,8 @@ namespace Sayuri {
 
     if (is_legal) {
       ply_++;
-      if ((piece_board_[move.from_] == PAWN)
-      || (piece_board_[move.to_] != EMPTY)) {
+      if ((piece_board_[move_from(move)] == PAWN)
+      || (piece_board_[move_to(move)] != EMPTY)) {
         ply_100_ = 0;
       } else {
         ply_100_++;
@@ -511,62 +511,61 @@ namespace Sayuri {
     to_move_ = to_move_ ^ 0x3;
 
     // 動かす前のキャスリングの権利とアンパッサンを記録する。
-    move.last_castling_rights_ = castling_rights_;
-    move.last_en_passant_square_ = en_passant_square_;
+    move_castling_rights(move, castling_rights_);
+    move_en_passant_square(move, en_passant_square_);
 
     // アンパッサンを解除。
     en_passant_square_ = 0;
 
-    // NULL_MOVEならNull moveする。
-    if (move.move_type_ == NULL_MOVE) {
-      return;
-    }
+    // 手の要素を得る。
+    Square from = move_from(move);
+    Square to = move_to(move);
+    Piece promotion = move_promotion(move);
+    MoveType move_type = move_move_type(move);
 
-    // 移動前と移動後の位置を得る。
-    // 移動前と移動後が同じならNull Move。
-    if (move.from_ == move.to_) {
-      move.move_type_ = NULL_MOVE;
+    // NULL_MOVEならNull moveする。
+    if (move_type == NULL_MOVE) {
       return;
     }
 
     // 手の種類によって分岐する。
-    if (move.move_type_ == CASTLING) {  // キャスリングの場合。
+    if (move_type == CASTLING) {  // キャスリングの場合。
       // キングを動かす。
-      ReplacePiece(move.from_, move.to_);
+      ReplacePiece(from, to);
       // ルークを動かす。
-      if (move.to_ == G1) {
+      if (to == G1) {
         ReplacePiece(H1, F1);
-      } else if (move.to_ == C1) {
+      } else if (to == C1) {
         ReplacePiece(A1, D1);
-      } else if (move.to_ == G8) {
+      } else if (to == G8) {
         ReplacePiece(H8, F8);
-      } else if (move.to_ == C8) {
+      } else if (to == C8) {
         ReplacePiece(A8, D8);
       }
       has_castled_[side] = true;
-    } else if (move.move_type_ == EN_PASSANT) {  // アンパッサンの場合。
+    } else if (move_type == EN_PASSANT) {  // アンパッサンの場合。
       // 取った駒をボーンにする。
-      move.captured_piece_ = PAWN;
+      move_captured_piece(move, PAWN);
       // 動かす。
-      ReplacePiece(move.from_, move.to_);
+      ReplacePiece(from, to);
       // アンパッサンのターゲットを消す。
       Square en_passant_target =
-      side == WHITE ? move.to_ - 8 : move.to_ + 8;
+      side == WHITE ? to - 8 : to + 8;
       PutPiece(en_passant_target, EMPTY);
     } else {  // それ以外の場合。
       // 取る駒を登録する。
-      move.captured_piece_ = piece_board_[move.to_];
+      move_captured_piece(move, piece_board_[to]);
       // 駒を動かす。
-      ReplacePiece(move.from_, move.to_);
+      ReplacePiece(from, to);
       // 駒を昇格させるなら、駒を昇格させる。
-      if (move.promotion_) {
-        PutPiece(move.to_, move.promotion_, side);
+      if (promotion) {
+        PutPiece(to, promotion, side);
       }
       // ポーンの2歩の動きの場合はアンパッサンできるようにする。
-      if (piece_board_[move.to_] == PAWN) {
-        if (((side == WHITE) && ((move.from_ + 16) == move.to_))
-        || ((side == BLACK) && ((move.from_ - 16) == move.to_))) {
-          en_passant_square_ = side == WHITE ? move.to_ - 8 : move.to_ + 8;
+      if (piece_board_[to] == PAWN) {
+        if (((side == WHITE) && ((from + 16) == to))
+        || ((side == BLACK) && ((from - 16) == to))) {
+          en_passant_square_ = side == WHITE ? to - 8 : to + 8;
         }
       }
     }
@@ -583,43 +582,48 @@ namespace Sayuri {
     to_move_ ^=  0x3;
 
     // 動かす前のキャスリングの権利とアンパッサンを復元する。
-    castling_rights_ = move.last_castling_rights_;
-    en_passant_square_ = move.last_en_passant_square_;
+    castling_rights_ = move_castling_rights(move);
+    en_passant_square_ = move_en_passant_square(move);
+
+    // 手の情報を得る。
+    Square from = move_from(move);
+    Square to = move_to(move);
+    Piece promotion = move_promotion(move);
+    MoveType move_type = move_move_type(move);
 
     // moveがNULL_MOVEなら返る。
-    if (move.move_type_ == NULL_MOVE) {
+    if (move_type == NULL_MOVE) {
       return;
     }
 
     // 駒の位置を戻す。
-    ReplacePiece(move.to_, move.from_);
+    ReplacePiece(to, from);
 
     // 手の種類で分岐する。
-    if (move.move_type_ == CASTLING) {  // キャスリングの場合。
+    if (move_type == CASTLING) {  // キャスリングの場合。
       // ルークを戻す。
-      if (move.to_ == G1) {
+      if (to == G1) {
         ReplacePiece(F1, H1);
-      } else if (move.to_ == C1) {
+      } else if (to == C1) {
         ReplacePiece(D1, A1);
-      } else if (move.to_ == G8) {
+      } else if (to == G8) {
         ReplacePiece(F8, H8);
-      } else if (move.to_ == C8) {
+      } else if (to == C8) {
         ReplacePiece(D8, A8);
       }
       has_castled_[to_move_] = false;
-    } else if (move.move_type_ == EN_PASSANT) {  // アンパッサンの場合。
+    } else if (move_type == EN_PASSANT) {  // アンパッサンの場合。
       // アンパッサンのターゲットを戻す。
       Square en_passant_target =
       to_move_ == WHITE ? en_passant_square_ - 8 : en_passant_square_ + 8;
-      PutPiece(en_passant_target, move.captured_piece_, enemy_side);
+      PutPiece(en_passant_target, PAWN, enemy_side);
     } else {  // それ以外の場合。
       // 取った駒を戻す。
-      if (move.captured_piece_) {
-        PutPiece(move.to_, move.captured_piece_, enemy_side);
-      }
+      PutPiece(to, move_captured_piece(move), enemy_side);
+
       // 昇格ならポーンに戻す。
-      if (move.promotion_) {
-        PutPiece(move.from_, PAWN, to_move_);
+      if (promotion) {
+        PutPiece(from, PAWN, to_move_);
       }
     }
   }
@@ -669,16 +673,16 @@ namespace Sayuri {
 
   // 次の局面の自分のマテリアルを得る。
   int ChessEngine::GetNextMyMaterial(int current_material, Move move) const {
-    if (move.move_type_ == EN_PASSANT) {
+    if (move_move_type(move) == EN_PASSANT) {
       // アンパッサン。
       return current_material + MATERIAL[PAWN];
-    } else if (move.promotion_) {
+    } else if (Piece promotion = move_promotion(move)) {
       // プロモーション。
-      return current_material + MATERIAL[piece_board_[move.to_]]
-      + MATERIAL[move.promotion_] - MATERIAL[piece_board_[move.from_]];
+      return current_material + MATERIAL[piece_board_[move_to(move)]]
+      + MATERIAL[promotion] - MATERIAL[PAWN];
     } else {
       // その他の手。
-      return current_material + MATERIAL[piece_board_[move.to_]];
+      return current_material + MATERIAL[piece_board_[move_to(move)]];
     }
   }
 
@@ -712,40 +716,45 @@ namespace Sayuri {
 
   // 次の局面のハッシュを得る。
   Hash ChessEngine::GetNextHash(Hash current_hash, Move move) const {
+    // 駒の情報を得る。
+    Square from = move_from(move);
+    Square to = move_to(move);
+    Piece promotion = move_promotion(move);
+
     // 駒の位置の種類とサイドを得る。
-    Piece piece_type = piece_board_[move.from_];
-    Side piece_side = side_board_[move.from_];
+    Piece piece_type = piece_board_[from];
+    Side piece_side = side_board_[from];
 
     // 取る駒の種類とサイドを得る。
-    Piece target_type = piece_board_[move.to_];
-    Side target_side = side_board_[move.to_];
-    Square target_square = move.to_;
+    Piece target_type = piece_board_[to];
+    Side target_side = side_board_[to];
+    Square target_square = to;
     if ((piece_type == PAWN) && en_passant_square_
-    && (move.to_ == en_passant_square_)) {
+    && (to == en_passant_square_)) {
       // アンパッサンの時。
       if (piece_side == WHITE) {
-        target_square = move.to_ - 8;
+        target_square = to - 8;
       } else {
-        target_square = move.to_ + 8;
+        target_square = to + 8;
       }
       target_type = piece_board_[target_square];
     }
 
     // 移動する駒のハッシュを削除する。
     current_hash ^=
-    piece_hash_table_[piece_side][piece_type][move.from_];
+    piece_hash_table_[piece_side][piece_type][from];
 
     // 取る駒のハッシュを削除する。
     current_hash ^=
     piece_hash_table_[target_side][target_type][target_square];
 
     // 移動する駒の移動先のハッシュを追加する。
-    if (move.promotion_) {
+    if (promotion) {
       current_hash ^=
-      piece_hash_table_[piece_side][move.promotion_][move.to_];
+      piece_hash_table_[piece_side][promotion][to];
     } else {
       current_hash ^=
-      piece_hash_table_[piece_side][piece_type][move.to_];
+      piece_hash_table_[piece_side][piece_type][to];
     }
 
     // 現在の手番のハッシュを削除。
@@ -760,9 +769,9 @@ namespace Sayuri {
       if (piece_type == KING) {
         loss_rights |= WHITE_CASTLING;
       } else if (piece_type == ROOK) {
-        if (move.from_ == H1) {
+        if (from == H1) {
           loss_rights |= WHITE_SHORT_CASTLING;
-        } else if (move.from_ == A1) {
+        } else if (from == A1) {
           loss_rights |= WHITE_LONG_CASTLING;
         }
       }
@@ -770,9 +779,9 @@ namespace Sayuri {
       if (piece_type == KING) {
         loss_rights |= BLACK_CASTLING;
       } else if (piece_type == ROOK) {
-        if (move.from_ == H8) {
+        if (from == H8) {
           loss_rights |= BLACK_SHORT_CASTLING;
-        } else if (move.from_ == A8) {
+        } else if (from == A8) {
           loss_rights |= BLACK_LONG_CASTLING;
         }
       }
@@ -792,11 +801,11 @@ namespace Sayuri {
 
     // ポーンの2歩の動きの場合はアンパッサンハッシュを追加。
     if (piece_type == PAWN) {
-      int move_diff = move.to_ - move.from_;
+      int move_diff = to - from;
       if (move_diff == 16) {
-        current_hash ^= en_passant_hash_table_[move.to_ - 8];
+        current_hash ^= en_passant_hash_table_[to - 8];
       } else if (move_diff == -16) {
-        current_hash ^= en_passant_hash_table_[move.to_ + 8];
+        current_hash ^= en_passant_hash_table_[to + 8];
       }
     }
 
@@ -985,11 +994,11 @@ namespace Sayuri {
       }
     }
     for (int i = 0; i < MAX_PLYS; i++) {
-      iid_stack_[i] = Move();
-      killer_stack_[i][0] = Move();
-      killer_stack_[i][1] = Move();
-      killer_stack_[i + 2][0] = Move();
-      killer_stack_[i + 2][1] = Move();
+      iid_stack_[i] = 0U;
+      killer_stack_[i][0] = 0U;
+      killer_stack_[i][1] = 0U;
+      killer_stack_[i + 2][0] = 0U;
+      killer_stack_[i + 2][1] = 0U;
     }
     helper_queue_ptr_.reset(new HelperQueue());
   }

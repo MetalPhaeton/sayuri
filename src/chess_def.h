@@ -192,6 +192,32 @@ namespace Sayuri {
   // 全キャスリング。
   constexpr Castling ALL_CASTLING = WHITE_CASTLING | BLACK_CASTLING;
 
+  // 手の型。
+  using Move = std::uint32_t;
+
+  // 手のビットフィールドの定数。
+  constexpr Move SQUARE_MASK = 0x3f;
+  constexpr Move PIECE_MASK = 0x7;
+  constexpr Move CASTLING_MASK = 0xf;
+  constexpr Move TYPE_MASK = 0x3;
+  constexpr std::uint32_t FROM_SHIFT = 0;
+  constexpr std::uint32_t TO_SHIFT = 6;
+  constexpr std::uint32_t PROMOTION_SHIFT = 12;
+  constexpr std::uint32_t MOVE_TYPE_SHIFT = 15;
+  constexpr std::uint32_t CAPTURED_PIECE_SHIFT = 17;
+  constexpr std::uint32_t CASTLING_RIGHTS_SHIFT = 20;
+  constexpr std::uint32_t EN_PASSANT_SQUARE_SHIFT = 24;
+  constexpr Move FROM_MASK = SQUARE_MASK << FROM_SHIFT;
+  constexpr Move TO_MASK = SQUARE_MASK << TO_SHIFT;
+  constexpr Move PROMOTION_MASK = PIECE_MASK << PROMOTION_SHIFT;
+  constexpr Move MOVE_TYPE_MASK = TYPE_MASK << MOVE_TYPE_SHIFT;
+  constexpr Move CAPTURED_PIECE_MASK = PIECE_MASK << CAPTURED_PIECE_SHIFT;
+  constexpr Move CASTLING_RIGHTS_MASK =
+  CASTLING_MASK << CASTLING_RIGHTS_SHIFT;
+  constexpr Move EN_PASSANT_SQUARE_MASK =
+  SQUARE_MASK << EN_PASSANT_SQUARE_SHIFT;
+  constexpr Move BASE_MASK = FROM_MASK | TO_MASK | PROMOTION_MASK;
+
   // 手の種類の定数。
   using MoveType = int;
   constexpr MoveType NULL_MOVE = 0;
@@ -199,7 +225,64 @@ namespace Sayuri {
   constexpr MoveType CASTLING = 2;
   constexpr MoveType EN_PASSANT = 3;
 
+  // 手のビットフィールドのアクセサ。
+  inline Square move_from(Move& move) {
+    return (move & FROM_MASK) >> FROM_SHIFT;
+  }
+  inline Square move_to(Move& move) {
+    return (move & TO_MASK) >> TO_SHIFT;
+  }
+  inline Piece move_promotion(Move& move) {
+    return (move & PROMOTION_MASK) >> PROMOTION_SHIFT;
+  }
+  inline MoveType move_move_type(Move& move) {
+    return (move & MOVE_TYPE_MASK) >> MOVE_TYPE_SHIFT;
+  }
+  inline Piece move_captured_piece(Move& move) {
+    return (move & CAPTURED_PIECE_MASK) >> CAPTURED_PIECE_SHIFT;
+  }
+  inline Castling move_castling_rights(Move& move) {
+    return (move & CASTLING_RIGHTS_MASK) >> CASTLING_RIGHTS_SHIFT;
+  }
+  inline Square move_en_passant_square(Move& move) {
+    return (move & EN_PASSANT_SQUARE_MASK) >> EN_PASSANT_SQUARE_SHIFT;
+  }
+
+  // 手のビットフィールドのミューテータ。
+  inline void move_from(Move& move, Square from) {
+    move = (move & ~FROM_MASK) | ((from & SQUARE_MASK) << FROM_SHIFT);
+  }
+  inline void move_to(Move& move, Square to) {
+    move = (move & ~TO_MASK) | ((to & SQUARE_MASK) << TO_SHIFT);
+  }
+  inline void move_promotion(Move& move, Piece promotion) {
+    move = (move & ~PROMOTION_MASK)
+    | ((promotion & PIECE_MASK) << PROMOTION_SHIFT);
+  }
+  inline void move_move_type(Move& move, MoveType move_type) {
+    move = (move & ~MOVE_TYPE_MASK)
+    | ((move_type & TYPE_MASK) << MOVE_TYPE_SHIFT);
+  }
+  inline void move_captured_piece(Move& move, Piece captured_piece) {
+    move = (move & ~CAPTURED_PIECE_MASK)
+    | ((captured_piece & PIECE_MASK) << CAPTURED_PIECE_SHIFT);
+  }
+  inline void move_castling_rights(Move& move, Castling castling_rights) {
+    move = (move & ~CASTLING_RIGHTS_MASK)
+    | ((castling_rights & CASTLING_MASK) << CASTLING_RIGHTS_SHIFT);
+  }
+  inline void move_en_passant_square(Move& move, Square en_passant_square) {
+    move = (move & ~EN_PASSANT_SQUARE_MASK)
+    | ((en_passant_square & SQUARE_MASK) << EN_PASSANT_SQUARE_SHIFT);
+  }
+
+  // 手の比較。
+  inline bool EqualMove(Move& move1, Move& move2) {
+    return (move1 & BASE_MASK) == (move2 & BASE_MASK);
+  }
+
   // 手の型。
+  /*
   union Move {
     unsigned int all_;
     struct {
@@ -240,6 +323,7 @@ namespace Sayuri {
       return false;
     }
   };
+  */
 
   // ハッシュの型。
   using Hash = std::uint64_t;

@@ -29,6 +29,7 @@
 #include <iostream>
 #include <mutex>
 #include <cstddef>
+#include <utility>
 #include "chess_def.h"
 #include "chess_engine.h"
 
@@ -159,10 +160,10 @@ namespace Sayuri {
 
         for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
           // 手を作る。
-          Move move;
-          move.from_ = from;
-          move.to_ = Util::GetSquare(move_bitboard);
-          move.move_type_ = NORMAL;
+          Move move = 0U;
+          move_from(move, from);
+          move_to(move, Util::GetSquare(move_bitboard));
+          move_move_type(move, NORMAL);
 
           // スタックに登録。
           if (last_ < end_) {
@@ -208,21 +209,22 @@ namespace Sayuri {
 
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
         // 手を作る。
-        Move move;
-        move.from_ = from;
-        move.to_ = Util::GetSquare(move_bitboard);
+        Move move = 0U;
+        move_from(move, from);
+        Square to = Util::GetSquare(move_bitboard);
+        move_to(move, to);
         if (engine_ptr_->en_passant_square()
-        && (move.to_ == engine_ptr_->en_passant_square())) {
-          move.move_type_ = EN_PASSANT;
+        && (to == engine_ptr_->en_passant_square())) {
+          move_move_type(move, EN_PASSANT);
         } else {
-          move.move_type_ = NORMAL;
+          move_move_type(move, NORMAL);
         }
 
-        if (((side == WHITE) && (Util::GetRank(move.to_) == RANK_8))
-        || ((side == BLACK) && (Util::GetRank(move.to_) == RANK_1))) {
+        if (((side == WHITE) && (Util::GetRank(to) == RANK_8))
+        || ((side == BLACK) && (Util::GetRank(to) == RANK_1))) {
           // 昇格を設定。
           for (Piece piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
-            move.promotion_ = piece_type;
+            move_promotion(move, piece_type);
             if (last_ < end_) {
               last_->move_ = move;
               ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2,
@@ -271,18 +273,19 @@ namespace Sayuri {
       move_bitboard &= engine_ptr_->side_pieces()[enemy_side];
     }
     for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
-      Move move;
-      move.from_ = from;
-      move.to_ = Util::GetSquare(move_bitboard);
+      Move move = 0U;
+      move_from(move, from);
+      Square to = Util::GetSquare(move_bitboard);
+      move_to(move, to);
 
       // キャスリングを設定。
       if (((side == WHITE) && (from == E1)
-      && ((move.to_ == G1) || (move.to_ == C1)))
+      && ((to == G1) || (to == C1)))
       || ((side == BLACK) && (from == E8)
-      && ((move.to_ == G8) || (move.to_ == C8)))) {
-        move.move_type_ = CASTLING;
+      && ((to == G8) || (to == C8)))) {
+        move_move_type(move, CASTLING);
       } else {
-        move.move_type_ = NORMAL;
+        move_move_type(move, NORMAL);
       }
 
       if (last_ < end_) {
@@ -320,7 +323,7 @@ namespace Sayuri {
 
     // 手がなければ何もしない。
     if (last_ <= begin_) {
-      return slot.move_;
+      return 0U;
     }
 
     // とりあえず最後の手をポップ。
@@ -330,9 +333,7 @@ namespace Sayuri {
     // 一番高い手を探し、スワップ。
     for (MoveSlot* ptr = begin_; ptr < last_; ptr++) {
       if (ptr->score_ > slot.score_) {
-        MoveSlot temp = *ptr;
-        *ptr = slot;
-        slot = temp;
+        std::swap(slot, *ptr);
       }
     }
 
@@ -366,39 +367,41 @@ namespace Sayuri {
     constexpr std::uint64_t MAX_HISTORY_SCORE = KILLER_2_MOVE_SCORE - 1;
 
     // 特殊な手の点数をつける。
-    if (ptr->move_ == prev_best) {
+    if (EqualMove(ptr->move_, prev_best)) {
       // 前回の最善手。
       ptr->score_ = BEST_MOVE_SCORE;
-    } else if (ptr->move_ == iid_move) {
+    } else if (EqualMove(ptr->move_, iid_move)) {
       // IIDムーブ。
       ptr->score_ = IID_MOVE_SCORE;
-    } else if (ptr->move_ == killer_1){
+    } else if (EqualMove(ptr->move_, killer_1)) {
       // キラームーブ。
       ptr->score_ = KILLER_1_MOVE_SCORE;
-    } else if (ptr->move_ == killer_2){
+    } else if (EqualMove(ptr->move_, killer_2)) {
       // キラームーブ。
       ptr->score_ = KILLER_2_MOVE_SCORE;
     } else {
       // その他の手を各候補手のタイプに分ける。
-      if ((Type == GenMoveType::CAPTURE) || ptr->move_.promotion_) {
+      Piece promotion = move_promotion(ptr->move_);
+      if ((Type == GenMoveType::CAPTURE) || promotion) {
         // SEEで点数をつけていく。
         // 現在チェックされていれば、<取る駒> - <自分の駒>。
         if (!(engine_ptr_->IsAttacked
         (engine_ptr_->king()[side], side ^ 0x3))) {
           ptr->score_ = engine_ptr_->SEE(ptr->move_);
         } else {
-          ptr->score_ = MATERIAL[engine_ptr_->piece_board()[ptr->move_.to_]]
-          - MATERIAL[engine_ptr_->piece_board()[ptr->move_.from_]];
+          ptr->score_ =
+          MATERIAL[engine_ptr_->piece_board()[move_to(ptr->move_)]]
+          - MATERIAL[engine_ptr_->piece_board()[move_from(ptr->move_)]];
           // 昇格の得点を加算。
-          if (ptr->move_.promotion_) {
-            ptr->score_ += MATERIAL[ptr->move_.promotion_] - MATERIAL[PAWN];
+          if (promotion) {
+            ptr->score_ += MATERIAL[promotion] - MATERIAL[PAWN];
           }
         }
         ptr->score_ += MIN_CAPTURE_SCORE;
       } else {
         // ヒストリーを使って点数をつけていく。
-        ptr->score_ =
-        (engine_ptr_->history()[side][ptr->move_.from_][ptr->move_.to_]
+        ptr->score_ = (engine_ptr_->history()
+        [side][move_from(ptr->move_)][move_to(ptr->move_)]
         * MAX_HISTORY_SCORE) / engine_ptr_->history_max();
       }
     }

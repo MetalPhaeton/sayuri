@@ -42,8 +42,6 @@ namespace Sayuri {
       struct MoveSlot {
         Move move_;
         int score_;
-
-        MoveSlot() : score_(-MAX_VALUE) {}
       };
 
     public:

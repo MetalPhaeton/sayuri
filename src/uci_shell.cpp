@@ -173,7 +173,7 @@ namespace Sayuri {
     // PVラインを送る。
     sout << " pv";
     for (std::size_t i = 0; i < pv_line.length(); i++) {
-      if (!(pv_line.line()[i].all_)) break;
+      if (!(pv_line.line()[i])) break;
 
       sout << " " << TransMoveToString(pv_line.line()[i]);
     }
@@ -512,7 +512,7 @@ namespace Sayuri {
         while (!(parser.IsDelim())) {
           Move move = TransStringToMove(parser.Get().str_);
           // 手を指す。
-          if (move.all_) {
+          if (move) {
             engine_ptr_->PlayMove(move);
           }
         }
@@ -565,7 +565,7 @@ namespace Sayuri {
         // searchmovesコマンド。
         while (!(parser.IsDelim())) {
           Move move = TransStringToMove(parser.Get().str_);
-          if (move.all_) {
+          if (move) {
             if (moves_to_search_ptr_ == nullptr) {
               moves_to_search_ptr_.reset(new std::vector<Move>());
             }
@@ -691,11 +691,13 @@ namespace Sayuri {
     std::ostringstream oss;
 
     // ストリームに流しこむ。
-    oss << static_cast<char>(Util::GetFyle(move.from_) + 'a');
-    oss << static_cast<char>(Util::GetRank(move.from_) + '1');
-    oss << static_cast<char>(Util::GetFyle(move.to_) + 'a');
-    oss << static_cast<char>(Util::GetRank(move.to_) + '1');
-    switch (move.promotion_) {
+    Square from = move_from(move);
+    Square to = move_to(move);
+    oss << static_cast<char>(Util::GetFyle(from) + 'a');
+    oss << static_cast<char>(Util::GetRank(from) + '1');
+    oss << static_cast<char>(Util::GetFyle(to) + 'a');
+    oss << static_cast<char>(Util::GetRank(to) + '1');
+    switch (move_promotion(move)) {
       case KNIGHT:
         oss << 'n';
         break;
@@ -717,48 +719,48 @@ namespace Sayuri {
 
   // 文字列を手に変換。
   Move UCIShell::TransStringToMove(std::string move_str) {
-    Move move, null_move;
+    Move move = 0U;
 
-    if (move_str.size() < 4) return null_move;
+    if (move_str.size() < 4) return 0U;
 
     // fromをパース。
+    Square from = 0U;
     if ((move_str[0] < 'a') || (move_str[0] > 'h')) {
-      return null_move;
+      return 0U;
     }
-    int fyle = move_str[0] - 'a';
-    move.from_ |= fyle;
+    from |= move_str[0] - 'a';
     if ((move_str[1] < '1') || (move_str[1] > '8')) {
-      return null_move;
+      return 0U;
     }
-    int rank = move_str[1] - '1';
-    move.from_ |= (rank << 3);
+    from |= (move_str[1] - '1') << 3;
+    move_from(move, from);
 
     // toをパース。
+    Square to = 0U;
     if ((move_str[2] < 'a') || (move_str[2] > 'h')) {
-      return null_move;
+      return 0U;
     }
-    fyle = move_str[2] - 'a';
-    move.to_ |= fyle;
+    to |= move_str[2] - 'a';
     if ((move_str[3] < '1') || (move_str[3] > '8')) {
-      return null_move;
+      return 0U;
     }
-    rank = move_str[3] - '1';
-    move.to_ |= (rank << 3);
+    to |= (move_str[3] - '1') << 3;
+    move_to(move, to);
 
     // 昇格をパース。
     if (move_str.size() >= 5) {
       switch (move_str[4]) {
         case 'n':
-          move.promotion_ = KNIGHT;
+          move_promotion(move, KNIGHT);
           break;
         case 'b':
-          move.promotion_ = BISHOP;
+          move_promotion(move, BISHOP);
           break;
         case 'r':
-          move.promotion_ = ROOK;
+          move_promotion(move, ROOK);
           break;
         case 'q':
-          move.promotion_ = QUEEN;
+          move_promotion(move, QUEEN);
           break;
         default:
           break;
