@@ -736,7 +736,7 @@ namespace Sayuri {
       int temp_beta = job.beta();
       bool did_lmr = false;
       if (!(job.is_checked())
-      && !move_captured_piece(move) && !(promotion)
+      && !move_captured_piece(move) && !promotion
       && !(job.null_reduction()) && (job.depth() >= 4)
       && (num_moves > ((job.num_all_moves() + 1) / 2))) {
         did_lmr = true;
@@ -878,8 +878,8 @@ namespace Sayuri {
       // 探索すべき手が指定されていれば、今の手がその手かどうか調べる。
       if (job.moves_to_search_ptr()) {
         bool hit = false;
-        for (auto& move_2 : *(job.moves_to_search_ptr())) {
-          if (EqualMove(move_2, move)) {
+        for (auto& move2 : *(job.moves_to_search_ptr())) {
+          if (EqualMove(move2, move)) {
             // 探索すべき手だった。
             hit = true;
             break;

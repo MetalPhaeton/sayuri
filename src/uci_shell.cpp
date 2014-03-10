@@ -508,7 +508,7 @@ namespace Sayuri {
         // エンジンにロード。
         engine_ptr_->LoadFen(Fen(fen_str));
       } else if (word.str_ == "moves") {
-        // moveコマンド。
+        // movesコマンド。
         while (!(parser.IsDelim())) {
           Move move = TransStringToMove(parser.Get().str_);
           // 手を指す。
