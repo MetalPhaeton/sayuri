@@ -52,13 +52,6 @@ namespace Sayuri {
   }
   // ================================================================
 
-  // 擬似ハッシュ生成。
-  Hash GenPseudoHash() {
-    std::mt19937 engine(SysClock::to_time_t(SysClock::now()));
-    std::uniform_int_distribution<Hash> dist(0, -1ULL);
-    return dist(engine);
-  }
-
   // ビットボードを出力する。
   void PrintBitboard(Bitboard bitboard) {
     // 出力する文字列ストリーム。

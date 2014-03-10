@@ -35,11 +35,6 @@ namespace Sayuri {
   // デバッグ用メイン関数。
   int DebugMain(int argc, char* argv[]);
 
-  // 擬似ハッシュ生成。
-  // [戻り値]
-  // ランダムに生成されたハッシュ。
-  Hash GenPseudoHash();
-
   // ビットボードを以下のように出力する。
   // @はビットが立っている場所。
   //  +-----------------+
