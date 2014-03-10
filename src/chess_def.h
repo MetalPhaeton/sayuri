@@ -205,8 +205,8 @@ namespace Sayuri {
     struct {
       unsigned int from_ : 6;  // 駒の位置。
       unsigned int to_ : 6;  // 移動先の位置。
-      unsigned int captured_piece_ : 3;  // 取った駒の種類。
       unsigned int promotion_ : 3;  // 昇格する駒の種類。
+      unsigned int captured_piece_ : 3;  // 取った駒の種類。
       // 動かす前のキャスリングのフラグ。
       unsigned int last_castling_rights_ : 4;
       // 動かす前のアンパッサンの位置。
