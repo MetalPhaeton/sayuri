@@ -72,7 +72,7 @@ namespace Sayuri {
   // 孤立ポーン。
   const Evaluator::Weight Evaluator::WEIGHT_ISO_PAWN(-5.0, -2.5);
   // ポーンの盾。
-  const Evaluator::Weight Evaluator::WEIGHT_PAWN_SHIELD(3.0, 0.0);
+  const Evaluator::Weight Evaluator::WEIGHT_PAWN_SHIELD(6.0, 0.0);
   // ビショップペア。
   const Evaluator::Weight Evaluator::WEIGHT_BISHOP_PAIR(10.0, 60.0);
   // バッドビショップ。
@@ -80,7 +80,7 @@ namespace Sayuri {
   // ナイトをピン。
   const Evaluator::Weight Evaluator::WEIGHT_PIN_KNIGHT(10.0, 0.0);
   // ルークペア。
-  const Evaluator::Weight Evaluator::WEIGHT_ROOK_PAIR(0.0, 0.0);
+  const Evaluator::Weight Evaluator::WEIGHT_ROOK_PAIR(10.0, 20.0);
   // セミオープンファイルのルーク。
   const Evaluator::Weight Evaluator::WEIGHT_ROOK_SEMI_OPEN(3.5, 3.5);
   // オープンファイルのルーク。
@@ -594,6 +594,17 @@ namespace Sayuri {
       }
       // クイーンへのピン。
       for (Bitboard bb = engine_ptr_->position()[enemy_piece_side][QUEEN];
+      bb; bb &= bb - 1) {
+        line = Util::GetLine(piece_square, Util::GetSquare(bb));
+        if ((line & attacks
+        & engine_ptr_->position()[enemy_piece_side][KNIGHT])) {
+          if (Util::CountBits(line & engine_ptr_->blocker_0()) == 3) {
+            value += 1.0;
+          }
+        }
+      }
+      // ルークへのピン。
+      for (Bitboard bb = engine_ptr_->position()[enemy_piece_side][ROOK];
       bb; bb &= bb - 1) {
         line = Util::GetLine(piece_square, Util::GetSquare(bb));
         if ((line & attacks

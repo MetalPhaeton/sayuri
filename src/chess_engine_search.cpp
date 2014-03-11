@@ -263,8 +263,8 @@ namespace Sayuri {
         is_null_searching_ = false;
 
         if (score >= beta) {
-          depth -= reduction;
-          null_reduction = reduction;
+          depth -= reduction - 1;
+          null_reduction = reduction - 1;
         }
       }
     }
@@ -478,7 +478,7 @@ namespace Sayuri {
     // トランスポジションテーブルに登録。
     // Null Move探索中の局面は登録しない。
     // Null Move Reductionされていた場合、容量節約のため登録しない。
-    if (!is_null_searching_ || !null_reduction) {
+    if (!is_null_searching_ && !null_reduction) {
       table.Add(pos_hash, depth, alpha, score_type,
       pv_line.line()[0], pv_line.ply_mate());
     }
