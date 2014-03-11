@@ -100,10 +100,8 @@ namespace Sayuri {
     }
 
     // 探索する。
+    int margin = GetMargin(depth);
     for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
-      // マージン。
-      int margin = GetMargin(depth);
-
       // 次の自分のマテリアル。
       int next_my_material = GetNextMyMaterial(material, move);
 
@@ -237,12 +235,12 @@ namespace Sayuri {
       } else {
         if (depth >= 5) {
           // Internal Iterative Deepening。
-          PVLine temp_line;
-          constexpr int IID_DEPTH = 4;
-          Search<NodeType::PV>(pos_hash, IID_DEPTH, level,
-          alpha, beta, material, table, temp_line);
+          PVLine next_line;
+          constexpr int iid_depth = 4;
+          Search<NodeType::PV>(pos_hash, iid_depth - 1, level,
+          alpha, beta, material, table, next_line);
 
-          shared_st_ptr_->iid_stack_[level] = temp_line.line()[0];
+          shared_st_ptr_->iid_stack_[level] = next_line.line()[0];
         }
       }
     } else {
@@ -254,10 +252,10 @@ namespace Sayuri {
         MakeMove(null_move);
 
         // Null Move Search。
-        int reduction = 3;
-        PVLine temp_line;
+        constexpr int reduction = 3;
+        PVLine dummy_line;
         int score = -Search<NodeType::NON_PV>(pos_hash, depth - reduction - 1,
-        level + 1, -(beta), -(beta - 1), -material, table, temp_line);
+        level + 1, -(beta), -(beta - 1), -material, table, dummy_line);
 
         UnmakeMove(null_move);
         is_null_searching_ = false;
@@ -269,9 +267,52 @@ namespace Sayuri {
       }
     }
 
-    /**************/
-    /* PVSearch。 */
-    /**************/
+    // ProbCut。(保留。)
+    /*
+    if ((Type == NodeType::NON_PV)) {
+      if (!is_null_searching_ && !is_checked && (depth >= 5)) {
+        // 手を作る。
+        MoveMaker maker(*this);
+        maker.GenMoves<GenMoveType::ALL>(prev_best,
+        shared_st_ptr_->iid_stack_[level],
+        shared_st_ptr_->killer_stack_[level][0],
+        shared_st_ptr_->killer_stack_[level][1]);
+
+        // 浅読みパラメータ。
+        int prob_beta = beta + 200;
+        int prob_depth = depth - 4;
+
+        // 探索。
+        for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
+          // 次のノードへの準備。
+          Hash next_hash = GetNextHash(pos_hash, move);
+          int next_my_material = GetNextMyMaterial(material, move);
+
+          MakeMove(move);
+
+          // 合法手じゃなければ次の手へ。
+          if (IsAttacked(king_[side], enemy_side)) {
+            UnmakeMove(move);
+            continue;
+          }
+
+          PVLine dummy_line;
+          int score = -Search<NodeType::NON_PV>(next_hash, prob_depth - 1,
+          level + 1, -prob_beta, -(prob_beta - 1), -next_my_material, table,
+          dummy_line);
+
+          UnmakeMove(move);
+
+          // ベータカット。
+          if (score >= prob_beta) {
+            return beta;
+          }
+        }
+      }
+    }
+    */
+
+    // PVSearch。
     // 手を作る。
     MoveMaker maker(*this);
     int num_all_moves = maker.GenMoves<GenMoveType::ALL>(prev_best,
@@ -284,6 +325,7 @@ namespace Sayuri {
     // 探索ループ。
     ScoreType score_type = ScoreType::ALPHA;
     bool has_legal_move = false;
+    int margin = GetMargin(depth);
     // 仕事の生成。
     std::mutex mutex;
     PositionRecord record(*this);
@@ -306,9 +348,6 @@ namespace Sayuri {
 
       // 次のハッシュ。
       Hash next_hash = GetNextHash(pos_hash, move);
-
-      // マージン。
-      int margin = GetMargin(depth);
 
       // 次の自分のマテリアル。
       int next_my_material = GetNextMyMaterial(material, move);
@@ -346,12 +385,10 @@ namespace Sayuri {
       PVLine next_line;
       int temp_alpha = alpha;
       int temp_beta = beta;
-      bool did_lmr = false;
       if (!is_checked
       && !move_captured_piece(move) && !promotion
       && !null_reduction && (depth >= 4)
       && (num_moves > ((num_all_moves + 1) / 2))) {
-        did_lmr = true;
         int reduction = 1;
 
         // History Pruning。
@@ -377,14 +414,11 @@ namespace Sayuri {
           -temp_beta, -temp_alpha, -next_my_material, table, next_line);
         } else {
           // PV発見後のPVノード。
-          // ゼロウィンドウ探索。(LMRしていないとき。)
-          if (!did_lmr) {
-            score = -Search<NodeType::NON_PV>(next_hash, depth - 1, level + 1,
-            -(temp_alpha + 1), -temp_alpha, -next_my_material, table,
-            next_line);
-          } else {
-            score = temp_alpha + 1;
-          }
+          // ゼロウィンドウ探索。
+          score = -Search<NodeType::NON_PV>(next_hash, depth - 1, level + 1,
+          -(temp_alpha + 1), -temp_alpha, -next_my_material, table,
+          next_line);
+
           if (score > temp_alpha) {
             // fail lowならず。
             // フルウィンドウで再探索。
@@ -682,6 +716,7 @@ namespace Sayuri {
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
     int num_moves = 0;
+    int margin = GetMargin(job.depth());
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // すでにベータカットされていれば仕事をしない。
       if (job.alpha() >= job.beta()) {
@@ -695,9 +730,6 @@ namespace Sayuri {
 
       // 次のハッシュ。
       Hash next_hash = GetNextHash(job.pos_hash(), move);
-
-      // マージン。
-      int margin = GetMargin(job.depth());
 
       // 次の局面のマテリアルを得る。
       int next_my_material = GetNextMyMaterial(job.material(), move);
@@ -734,12 +766,10 @@ namespace Sayuri {
       PVLine next_line;
       int temp_alpha = job.alpha();
       int temp_beta = job.beta();
-      bool did_lmr = false;
       if (!(job.is_checked())
       && !move_captured_piece(move) && !promotion
       && !(job.null_reduction()) && (job.depth() >= 4)
       && (num_moves > ((job.num_all_moves() + 1) / 2))) {
-        did_lmr = true;
         int reduction = 1;
 
         // History Pruning。
@@ -767,14 +797,11 @@ namespace Sayuri {
           job.table(), next_line);
         } else {
           // PV発見後。
-          // ゼロウィンドウ探索。(LMRしていないとき。)
-          if (!did_lmr) {
-            score = -Search<NodeType::NON_PV>(next_hash, job.depth() - 1,
-            job.level() + 1, -(temp_alpha + 1), -temp_alpha,
-            -next_my_material, job.table(), next_line);
-          } else {
-            score = temp_alpha + 1;
-          }
+          // ゼロウィンドウ探索。
+          score = -Search<NodeType::NON_PV>(next_hash, job.depth() - 1,
+          job.level() + 1, -(temp_alpha + 1), -temp_alpha,
+          -next_my_material, job.table(), next_line);
+
           if (score > temp_alpha) {
             // fail lowならず。
             score = -Search<NodeType::PV>(next_hash, job.depth() - 1,
@@ -975,12 +1002,10 @@ namespace Sayuri {
       } else {
         // PV発見後。
         // Late Move Reduction。
-        bool did_lmr = false;
         if (!(job.is_checked())
         && !move_captured_piece(move) && !move_promotion(move)
         && (job.depth() >= 4)
         && (num_moves > ((job.num_all_moves() + 1) / 2))) {
-          did_lmr = true;
           int reduction = 1;
           // ゼロウィンドウ探索。
           score = -Search<NodeType::NON_PV>(next_hash,
@@ -993,14 +1018,11 @@ namespace Sayuri {
 
         // 普通の探索。
         if (score > temp_alpha) {
-          // ゼロウィンドウ探索。(LMRしていないとき。)
-          if (!did_lmr) {
-            score = -Search<NodeType::NON_PV>(next_hash, job.depth() - 1,
-            job.level() + 1, -(temp_alpha + 1), -temp_alpha,
-            -next_my_material, job.table(), next_line);
-          } else {
-            score = temp_alpha + 1;
-          }
+          // ゼロウィンドウ探索。
+          score = -Search<NodeType::NON_PV>(next_hash, job.depth() - 1,
+          job.level() + 1, -(temp_alpha + 1), -temp_alpha,
+          -next_my_material, job.table(), next_line);
+
           if (score > temp_alpha) {
             while (true) {
               // 探索終了。

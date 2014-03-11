@@ -505,7 +505,7 @@ namespace Sayuri {
     // 駒の展開を計算。
     if ((Type == KNIGHT) || (Type == BISHOP)) {
       value = 0.0;
-      if (Util::SQUARE[piece_square] & ~(start_position_[piece_side][Type])) {
+      if (!(Util::SQUARE[piece_square] & start_position_[piece_side][Type])) {
         value += 1.0;
       }
       development_value_ += sign * value;
@@ -582,35 +582,36 @@ namespace Sayuri {
       bad_bishop_value_ += sign * value;
 
       // ナイトをピンを計算。
-      // 絶対ピン。
       value = 0.0;
-      Bitboard line =
-      Util::GetLine(piece_square, engine_ptr_->king()[enemy_piece_side]);
-      if ((line & attacks
-      & engine_ptr_->position()[enemy_piece_side][KNIGHT])) {
-        if (Util::CountBits(line & engine_ptr_->blocker_0()) == 3) {
-          value += 1.0;
-        }
-      }
-      // クイーンへのピン。
-      for (Bitboard bb = engine_ptr_->position()[enemy_piece_side][QUEEN];
-      bb; bb &= bb - 1) {
-        line = Util::GetLine(piece_square, Util::GetSquare(bb));
-        if ((line & attacks
-        & engine_ptr_->position()[enemy_piece_side][KNIGHT])) {
+      Bitboard target_knight =
+      attacks & engine_ptr_->position()[enemy_piece_side][KNIGHT];
+      if (target_knight) {
+        // 絶対ピン。
+        Bitboard line =
+        Util::GetLine(piece_square, engine_ptr_->king()[enemy_piece_side]);
+        if ((line & target_knight)) {
           if (Util::CountBits(line & engine_ptr_->blocker_0()) == 3) {
             value += 1.0;
           }
         }
-      }
-      // ルークへのピン。
-      for (Bitboard bb = engine_ptr_->position()[enemy_piece_side][ROOK];
-      bb; bb &= bb - 1) {
-        line = Util::GetLine(piece_square, Util::GetSquare(bb));
-        if ((line & attacks
-        & engine_ptr_->position()[enemy_piece_side][KNIGHT])) {
-          if (Util::CountBits(line & engine_ptr_->blocker_0()) == 3) {
-            value += 1.0;
+        // クイーンへのピン。
+        for (Bitboard bb = engine_ptr_->position()[enemy_piece_side][QUEEN];
+        bb; bb &= bb - 1) {
+          line = Util::GetLine(piece_square, Util::GetSquare(bb));
+          if ((line & target_knight)) {
+            if (Util::CountBits(line & engine_ptr_->blocker_0()) == 3) {
+              value += 1.0;
+            }
+          }
+        }
+        // ルークへのピン。
+        for (Bitboard bb = engine_ptr_->position()[enemy_piece_side][ROOK];
+        bb; bb &= bb - 1) {
+          line = Util::GetLine(piece_square, Util::GetSquare(bb));
+          if ((line & target_knight)) {
+            if (Util::CountBits(line & engine_ptr_->blocker_0()) == 3) {
+              value += 1.0;
+            }
           }
         }
       }
@@ -619,12 +620,12 @@ namespace Sayuri {
 
     // セミオープン、オープンファイルのルークを計算。
     if (Type == ROOK) {
+      Bitboard rook_fyle = Util::FYLE[Util::GetFyle(piece_square)];
       // セミオープン。
-      if (!(engine_ptr_->position()[piece_side][PAWN]
-      & Util::FYLE[Util::GetFyle(piece_square)])) {
+      if (!(engine_ptr_->position()[piece_side][PAWN] & rook_fyle)) {
         rook_semi_open_value_ += sign * 1.0;
-        if (!(engine_ptr_->position()[enemy_piece_side][PAWN]
-        & Util::FYLE[Util::GetFyle(piece_square)])) {
+        // オープン。
+        if (!(engine_ptr_->position()[enemy_piece_side][PAWN] & rook_fyle)) {
           rook_open_value_ += sign * 1.0;
         }
       }
@@ -633,7 +634,8 @@ namespace Sayuri {
     // クイーンの早過ぎる始動を計算。
     if (Type == QUEEN) {
       value = 0.0;
-      if (Util::SQUARE[piece_square] & ~(start_position_[piece_side][QUEEN])) {
+      if (!(Util::SQUARE[piece_square]
+      & start_position_[piece_side][QUEEN])) {
         value += static_cast<double>
         (Util::CountBits(engine_ptr_->position()[piece_side][KNIGHT]
         & start_position_[piece_side][KNIGHT]));
