@@ -166,13 +166,11 @@ namespace Sayuri {
           move_move_type(move, NORMAL);
 
           // スタックに登録。
-          if (last_ < end_) {
-            last_->move_ = move;
-            ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2,
-            side);
-            num_moves++;
-            last_++;
-          }
+          last_->move_ = move;
+          ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2,
+          side);
+          num_moves++;
+          last_++;
         }
       }
     }
@@ -225,23 +223,19 @@ namespace Sayuri {
           // 昇格を設定。
           for (Piece piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
             move_promotion(move, piece_type);
-            if (last_ < end_) {
-              last_->move_ = move;
-              ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2,
-              side);
-              num_moves++;
-              last_++;
-            }
-          }
-        } else {
-          // 昇格しない場合。
-          if (last_ < end_) {
             last_->move_ = move;
             ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2,
             side);
             num_moves++;
             last_++;
           }
+        } else {
+          // 昇格しない場合。
+          last_->move_ = move;
+          ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2,
+          side);
+          num_moves++;
+          last_++;
         }
       }
     }
@@ -288,12 +282,10 @@ namespace Sayuri {
         move_move_type(move, NORMAL);
       }
 
-      if (last_ < end_) {
-        last_->move_ = move;
-        ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2, side);
-        num_moves++;
-        last_++;
-      }
+      last_->move_ = move;
+      ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2, side);
+      num_moves++;
+      last_++;
     }
 
     return num_moves;

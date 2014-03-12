@@ -84,6 +84,9 @@ namespace Sayuri {
       // 新しいゲームの準備をする。
       void SetNewGame();
 
+      // ハッシュの配列を初期化する。
+      static void InitHashTable();
+
       // 探索のストップ条件を設定する。
       // [引数]
       // max_depth: 最大探索深さ。
@@ -479,8 +482,6 @@ namespace Sayuri {
       static Hash castling_hash_table_[4];
       // アンパッサンの位置からハッシュを得るための配列。
       static Hash en_passant_hash_table_[NUM_SQUARES];
-      // ハッシュの配列を初期化する。
-      static void InitHashTable();
   };
 }  // namespace Sayuri
 
