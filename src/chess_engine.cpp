@@ -529,6 +529,30 @@ namespace Sayuri {
       return;
     }
 
+    // キャスリングの権利を更新。
+    Piece piece = piece_board_[from];
+    if (side == WHITE) {
+      if (piece == KING) {
+        castling_rights_ &= ~WHITE_CASTLING;
+      } else if (piece == ROOK) {
+        if (from == H1) {
+          castling_rights_ &= ~WHITE_SHORT_CASTLING;
+        } else if (from == A1) {
+          castling_rights_ &= ~WHITE_LONG_CASTLING;
+        }
+      }
+    } else {
+      if (piece == KING) {
+        castling_rights_ &= ~BLACK_CASTLING;
+      } else if (piece == ROOK) {
+        if (from == H8) {
+          castling_rights_ &= ~BLACK_SHORT_CASTLING;
+        } else if (from == A8) {
+          castling_rights_ &= ~BLACK_LONG_CASTLING;
+        }
+      }
+    }
+
     // 手の種類によって分岐する。
     if (move_type == CASTLING) {  // キャスリングの場合。
       // キングを動かす。
@@ -570,8 +594,6 @@ namespace Sayuri {
         }
       }
     }
-
-    UpdateCastlingRights();
   }
 
   // 手を元に戻す。
@@ -874,29 +896,6 @@ namespace Sayuri {
     PutPiece(from, EMPTY, NO_SIDE);
   }
 
-  // キャスリングの権利を更新する。
-  void ChessEngine::UpdateCastlingRights() {
-    // 白キングがe1にいなければ白のキャスリングの権利を放棄。
-    if (king_[WHITE] != E1)
-      castling_rights_ &= ~WHITE_CASTLING;
-
-    // 黒キングがe8にいなければ黒のキャスリングの権利を放棄。
-    if (king_[BLACK] != E8) castling_rights_ &= ~BLACK_CASTLING;
-
-    // 白のルークがh1にいなければ白のショートキャスリングの権利を放棄。
-    if (!(position_[WHITE][ROOK] & Util::SQUARE[H1]))
-      castling_rights_ &= ~WHITE_SHORT_CASTLING;
-    // 白のルークがa1にいなければ白のロングキャスリングの権利を放棄。
-    if (!(position_[WHITE][ROOK] & Util::SQUARE[A1]))
-      castling_rights_ &= ~WHITE_LONG_CASTLING;
-
-    // 黒のルークがh8にいなければ黒のショートキャスリングの権利を放棄。
-    if (!(position_[BLACK][ROOK] & Util::SQUARE[H8]))
-      castling_rights_ &= ~BLACK_SHORT_CASTLING;
-    // 黒のルークがa8にいなければ黒のロングキャスリングの権利を放棄。
-    if (!(position_[BLACK][ROOK] & Util::SQUARE[A8]))
-      castling_rights_ &= ~BLACK_LONG_CASTLING;
-  }
   /******************/
   /* ハッシュ関連。 */
   /******************/

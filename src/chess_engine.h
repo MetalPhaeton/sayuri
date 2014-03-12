@@ -353,9 +353,6 @@ namespace Sayuri {
       // to: 移動先。
       void ReplacePiece(Square from, Square to);
 
-      // キャスリングの権利を更新する。
-      void UpdateCastlingRights();
-
       // SEEで使う次の手を得る。
       // [引数]
       // target: 取る駒の位置。

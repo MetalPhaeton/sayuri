@@ -365,6 +365,8 @@ namespace Sayuri {
     constexpr int KILLER_2_MOVE_SCORE = KILLER_1_MOVE_SCORE - 1;
     // ヒストリーの点数の最大値。
     constexpr std::uint64_t MAX_HISTORY_SCORE = KILLER_2_MOVE_SCORE - 1;
+    // 悪い取る手の点数。
+    constexpr int BAD_CAPTURE_SCORE = -1;
 
     // 特殊な手の点数をつける。
     if (EqualMove(ptr->move_, prev_best)) {
@@ -397,7 +399,8 @@ namespace Sayuri {
             ptr->score_ += MATERIAL[promotion] - MATERIAL[PAWN];
           }
         }
-        ptr->score_ += MIN_CAPTURE_SCORE;
+        ptr->score_ = ptr->score_ >= 0 ? ptr->score_ + MIN_CAPTURE_SCORE
+        : BAD_CAPTURE_SCORE;
       } else {
         // ヒストリーを使って点数をつけていく。
         ptr->score_ = (engine_ptr_->history()

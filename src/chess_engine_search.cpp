@@ -376,7 +376,6 @@ namespace Sayuri {
       // 手の情報を得る。
       Square from = move_from(move);
       Square to = move_to(move);
-      Piece promotion = move_promotion(move);
 
       // 探索。
       // Late Move Reduction。
@@ -386,9 +385,9 @@ namespace Sayuri {
       int temp_alpha = alpha;
       int temp_beta = beta;
       if (!is_checked
-      && !move_captured_piece(move) && !promotion
+      && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
       && !null_reduction && (depth >= 4)
-      && (num_moves > ((num_all_moves + 1) / 2))) {
+      && (num_moves > ((num_all_moves + 2) / 3))) {
         int reduction = 1;
 
         // History Pruning。
@@ -462,7 +461,7 @@ namespace Sayuri {
         score_type = ScoreType::BETA;
 
         // 取らない手。
-        if (!move_captured_piece(move)) {
+        if (!(move & CAPTURED_PIECE_MASK)) {
           // キラームーブ。
           shared_st_ptr_->killer_stack_[level][0] = move;
           shared_st_ptr_->killer_stack_[level + 2][1] = move;
@@ -758,7 +757,6 @@ namespace Sayuri {
       // 手の情報を得る。
       Square from = move_from(move);
       Square to = move_to(move);
-      Piece promotion = move_promotion(move);
 
       // Late Move Reduction。
       // ただし、Null Move Reductionされていれば実行しない。
@@ -767,9 +765,9 @@ namespace Sayuri {
       int temp_alpha = job.alpha();
       int temp_beta = job.beta();
       if (!(job.is_checked())
-      && !move_captured_piece(move) && !promotion
+      && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
       && !(job.null_reduction()) && (job.depth() >= 4)
-      && (num_moves > ((job.num_all_moves() + 1) / 2))) {
+      && (num_moves > ((job.num_all_moves() + 2) / 3))) {
         int reduction = 1;
 
         // History Pruning。
@@ -850,7 +848,7 @@ namespace Sayuri {
         job.score_type() = ScoreType::BETA;
 
         // 取らない手。
-        if (!move_captured_piece(move)) {
+        if (!(move & CAPTURED_PIECE_MASK)) {
           // キラームーブ。
           shared_st_ptr_->killer_stack_[job.level()][0] = move;
           shared_st_ptr_->killer_stack_[job.level() + 2][1] = move;
@@ -1003,9 +1001,9 @@ namespace Sayuri {
         // PV発見後。
         // Late Move Reduction。
         if (!(job.is_checked())
-        && !move_captured_piece(move) && !move_promotion(move)
+        && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
         && (job.depth() >= 4)
-        && (num_moves > ((job.num_all_moves() + 1) / 2))) {
+        && (num_moves > ((job.num_all_moves() + 2) / 3))) {
           int reduction = 1;
           // ゼロウィンドウ探索。
           score = -Search<NodeType::NON_PV>(next_hash,
@@ -1111,7 +1109,6 @@ namespace Sayuri {
     if (move) {
       // 手の情報を得る。
       Square to = move_to(move);
-      Piece promotion = move_promotion(move);
       MoveType move_type = move_move_type(move);
 
       // キングを取る手なら無視。
@@ -1129,8 +1126,8 @@ namespace Sayuri {
       }
 
       // ポーンの昇格。
-      if (promotion) {
-        capture_value += MATERIAL[promotion]
+      if ((move & PROMOTION_MASK)) {
+        capture_value += MATERIAL[move_promotion(move)]
         - MATERIAL[PAWN];
       }
 
@@ -1143,8 +1140,6 @@ namespace Sayuri {
       if (!(IsAttacked(king_[side], side ^ 0x3))) {
         // 再帰して次の局面の評価値を得る。
         score = capture_value - self->SEE(GetNextSEEMove(to));
-        // Standing Pad。
-        score = score >= 0 ? score : 0;
       }
 
       self->UnmakeMove(move);
