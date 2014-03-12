@@ -277,8 +277,8 @@ namespace Sayuri {
   }
 
   // 手の比較。
-  inline bool EqualMove(Move& move1, Move& move2) {
-    return (move1 & BASE_MASK) == (move2 & BASE_MASK);
+  inline bool EqualMove(Move& move_1, Move& move_2) {
+    return (move_1 & BASE_MASK) == (move_2 & BASE_MASK);
   }
 
   // ハッシュの型。

@@ -467,7 +467,7 @@ namespace Sayuri {
           shared_st_ptr_->killer_stack_[level + 2][1] = move;
 
           // ヒストリー。
-          shared_st_ptr_->history_[side][from][to] += depth * depth;
+          shared_st_ptr_->history_[side][from][to] += depth;
           if (shared_st_ptr_->history_[side][from][to]
           > shared_st_ptr_->history_max_) {
             shared_st_ptr_->history_max_ =
@@ -677,9 +677,7 @@ namespace Sayuri {
 
     // 仕事ループ。
     while (true) {
-      if (ShouldBeStopped()) {
-        break;
-      }
+      if (ShouldBeStopped()) break;
 
       // 仕事を拾う。
       Job* job_ptr = child_ptr->shared_st_ptr_->helper_queue_ptr_->GetJob();
@@ -854,8 +852,7 @@ namespace Sayuri {
           shared_st_ptr_->killer_stack_[job.level() + 2][1] = move;
 
           // ヒストリー。
-          shared_st_ptr_->history_[side][from][to] +=
-          job.depth() * job.depth();
+          shared_st_ptr_->history_[side][from][to] += job.depth();
           if (shared_st_ptr_->history_[side][from][to]
           > shared_st_ptr_->history_max_) {
             shared_st_ptr_->history_max_ =
@@ -903,8 +900,8 @@ namespace Sayuri {
       // 探索すべき手が指定されていれば、今の手がその手かどうか調べる。
       if (job.moves_to_search_ptr()) {
         bool hit = false;
-        for (auto& move2 : *(job.moves_to_search_ptr())) {
-          if (EqualMove(move2, move)) {
+        for (auto& move_2 : *(job.moves_to_search_ptr())) {
+          if (EqualMove(move_2, move)) {
             // 探索すべき手だった。
             hit = true;
             break;

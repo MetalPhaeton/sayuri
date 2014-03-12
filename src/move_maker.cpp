@@ -383,8 +383,7 @@ namespace Sayuri {
       ptr->score_ = KILLER_2_MOVE_SCORE;
     } else {
       // その他の手を各候補手のタイプに分ける。
-      Piece promotion = move_promotion(ptr->move_);
-      if ((Type == GenMoveType::CAPTURE) || promotion) {
+      if ((Type == GenMoveType::CAPTURE) || (ptr->move_ & PROMOTION_MASK)) {
         // SEEで点数をつけていく。
         // 現在チェックされていれば、<取る駒> - <自分の駒>。
         if (!(engine_ptr_->IsAttacked
@@ -395,7 +394,7 @@ namespace Sayuri {
           MATERIAL[engine_ptr_->piece_board()[move_to(ptr->move_)]]
           - MATERIAL[engine_ptr_->piece_board()[move_from(ptr->move_)]];
           // 昇格の得点を加算。
-          if (promotion) {
+          if (Piece promotion = move_promotion(ptr->move_)) {
             ptr->score_ += MATERIAL[promotion] - MATERIAL[PAWN];
           }
         }
