@@ -478,6 +478,7 @@ namespace Sayuri {
   // ucinewgameコマンド。
   void UCIShell::CommandUCINewGame() {
     engine_ptr_->SetNewGame();
+    ChessEngine::InitHashTable();
     table_ptr_.reset(new TranspositionTable(table_size_));
   }
 
