@@ -93,7 +93,7 @@ namespace Sayuri {
       // max_nodes: 最大探索ノード数。
       // thinking_time: 思考時間。
       // infinite_thinking: 無限に思考するかどうか。
-      void SetStopper(int max_depth, std::uint64_t max_nodes,
+      void SetStopper(std::uint32_t max_depth, std::uint64_t max_nodes,
       Chrono::milliseconds thinking_time, bool infinite_thinking);
 
       // 思考の無限時間フラグをセットする。
@@ -269,7 +269,7 @@ namespace Sayuri {
       // table: トランスポジションテーブル。
       // [戻り値]
       // 評価値。
-      int Quiesce(int depth, int level, int alpha, int beta,
+      int Quiesce(int depth, std::uint32_t level, int alpha, int beta,
       int material, TranspositionTable& table);
       // 探索する。
       // [引数]
@@ -285,8 +285,8 @@ namespace Sayuri {
       // [戻り値]
       // 評価値。
       template<NodeType Type>
-      int Search(Hash pos_hash, int depth, int level, int alpha, int beta,
-      int material, TranspositionTable& table, PVLine& pv_line);
+      int Search(Hash pos_hash, int depth, std::uint32_t level, int alpha,
+      int beta, int material, TranspositionTable& table, PVLine& pv_line);
       // 探索のルート。
       // [引数]
       // table: 使用するトランスポジションテーブル。
@@ -410,7 +410,7 @@ namespace Sayuri {
         // killer_stack_[ply][同一レベル: 0、2プライ前: 1]
         Move killer_stack_[MAX_PLYS + 2][2];
         // 現在のIterative Deepeningの深さ。
-        int i_depth_;
+        std::uint32_t i_depth_;
         // 探索したノード数。
         std::uint64_t num_searched_nodes_;
         // 探索開始時間。
@@ -420,7 +420,7 @@ namespace Sayuri {
         // 探索ストップ条件。最大探索ノード数。
         std::uint64_t max_nodes_;
         // 探索ストップ条件。最大探索深さ。
-        int max_depth_;
+        std::uint32_t max_depth_;
         // 探索ストップ条件。思考時間。
         Chrono::milliseconds thinking_time_;
         // 探索ストップ条件。無限に考える。
@@ -460,7 +460,7 @@ namespace Sayuri {
       // 今ヌルムーブのサーチ中かどうか。
       bool is_null_searching_;
       // 探索したレベル。
-      int searched_level_;
+      std::uint32_t searched_level_;
       // ミューテックス。
       std::mutex mutex_;
       // スレッドのベクトル。

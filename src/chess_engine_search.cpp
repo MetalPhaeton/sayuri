@@ -34,6 +34,7 @@
 #include <mutex>
 #include <memory>
 #include <cstddef>
+#include <cstdint>
 #include "chess_def.h"
 #include "chess_util.h"
 #include "transposition_table.h"
@@ -48,7 +49,7 @@
 
 namespace Sayuri {
   // クイース探索。
-  int ChessEngine::Quiesce(int depth, int level, int alpha, int beta,
+  int ChessEngine::Quiesce(int depth, std::uint32_t level, int alpha, int beta,
   int material, TranspositionTable& table) {
     // 探索中止の時。
     if (ShouldBeStopped()) return alpha;
@@ -140,7 +141,7 @@ namespace Sayuri {
 
   // 探索する。
   template<NodeType Type>
-  int ChessEngine::Search(Hash pos_hash, int depth, int level,
+  int ChessEngine::Search(Hash pos_hash, int depth, std::uint32_t level,
   int alpha, int beta, int material, TranspositionTable& table,
   PVLine& pv_line) {
     // 探索中止の時。
@@ -522,10 +523,10 @@ namespace Sayuri {
   }
   // 実体化。
   template int ChessEngine::Search<NodeType::PV>(Hash pos_hash,
-  int depth, int level, int alpha, int beta, int material,
+  int depth, std::uint32_t level, int alpha, int beta, int material,
   TranspositionTable& table, PVLine& pv_line);
   template int ChessEngine::Search<NodeType::NON_PV>(Hash pos_hash,
-  int depth, int level, int alpha, int beta, int material,
+  int depth, std::uint32_t level, int alpha, int beta, int material,
   TranspositionTable& table, PVLine& pv_line);
 
   // 探索のルート。
@@ -1205,7 +1206,7 @@ namespace Sayuri {
   }
 
   // ストップ条件を設定する。
-  void ChessEngine::SetStopper(int max_depth, std::uint64_t max_nodes,
+  void ChessEngine::SetStopper(std::uint32_t max_depth, std::uint64_t max_nodes,
   Chrono::milliseconds thinking_time, bool infinite_thinking) {
     shared_st_ptr_->max_depth_ = max_depth <= MAX_PLYS ? max_depth : MAX_PLYS;
     shared_st_ptr_->max_nodes_ =

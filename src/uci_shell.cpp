@@ -550,7 +550,7 @@ namespace Sayuri {
     CommandParser parser(sub_commands, argv);
 
     // 準備。
-    int max_depth = MAX_PLYS;
+    std::uint32_t max_depth = MAX_PLYS;
     std::uint64_t max_nodes = MAX_NODES;
     Chrono::milliseconds thinking_time(-1U >> 1);
     bool infinite_thinking = false;

@@ -479,7 +479,7 @@ namespace Sayuri {
       king_position_ending_value_ += sign * value;
     }
 
-    // 駒の動きやすさを計算。
+    // ピースの動きやすさを計算。
     if (Type == PAWN) {
       value = static_cast<double>(Util::CountBits(pawn_moves
       | (attacks & engine_ptr_->side_pieces()[enemy_piece_side])

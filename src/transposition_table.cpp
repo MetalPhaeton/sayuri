@@ -74,7 +74,7 @@ namespace Sayuri {
     num_entries_ = table.num_entries_;
     num_used_entries_ = table.num_used_entries_;
     entry_table_.reset(new TTEntry[num_entries_]);
-    for (int i = 0; i < num_entries_; i++) {
+    for (std::size_t i = 0; i < num_entries_; i++) {
       entry_table_[i] = table.entry_table_[i];
     }
     age_ = table.age_;
