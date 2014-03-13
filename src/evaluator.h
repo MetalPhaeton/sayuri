@@ -311,11 +311,6 @@ namespace Sayuri {
       // [戻り値]
       // 十分な駒があればtrue。
       bool HasEnoughPieces(Side side) const;
-      // 局面の進行状況を得る。
-      // [戻り値]
-      // 進行状況。0.0以上、1.0以下。
-      // 値が小さいほどエンディングに近い。
-      double GetPhase() const;
 
       /****************/
       /* 局面分析用。 */

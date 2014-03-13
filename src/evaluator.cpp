@@ -358,21 +358,6 @@ namespace Sayuri {
     return false;
   }
 
-  // 進行状況を得る。
-  // フェーズは一次関数で計算。
-  double Evaluator::GetPhase() const {
-    constexpr double MODULUS = 1.0 / 14.0;
-
-    double num_pieces = static_cast<double>(Util::CountBits
-    (engine_ptr_->blocker_0() & ~(engine_ptr_->position()[WHITE][PAWN]
-    | engine_ptr_->position()[BLACK][PAWN]
-    | engine_ptr_->position()[WHITE][KING]
-    | engine_ptr_->position()[BLACK][KING])));
-    if (num_pieces > 14.0) num_pieces = 14.0;
-
-    return MODULUS * num_pieces;
-  }
-
   /************************/
   /* 価値を計算する関数。 */
   /************************/
