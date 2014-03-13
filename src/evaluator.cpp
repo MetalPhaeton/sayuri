@@ -58,9 +58,7 @@ namespace Sayuri {
   // 駒の展開。
   const Evaluator::Weight Evaluator::WEIGHT_DEVELOPMENT(2.5, 0.0);
   // 攻撃。
-  const Evaluator::Weight Evaluator::WEIGHT_ATTACK(0.0, 0.0);
-  // キングによる攻撃。
-  const Evaluator::Weight Evaluator::WEIGHT_ATTACK_BY_KING(1.0, 0.0);
+  const Evaluator::Weight Evaluator::WEIGHT_ATTACK(1.0, 0.0);
   // 相手キング周辺への攻撃
   const Evaluator::Weight Evaluator::WEIGHT_ATTACK_AROUND_KING(0.0, 3.0);
   // パスポーン。
@@ -176,9 +174,7 @@ namespace Sayuri {
     center_control_value_ = 0.0;
     sweet_center_control_value_ = 0.0;
     development_value_ = 0.0;
-    for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES; piece_type++) {
-      attack_value_[piece_type] = 0.0;
-    }
+    attack_value_ = 0.0;
     pass_pawn_value_ = 0.0;
     protected_pass_pawn_value_ = 0.0;
     double_pawn_value_ = 0.0;
@@ -284,12 +280,7 @@ namespace Sayuri {
     // 駒の展開。
     score += WEIGHT_DEVELOPMENT(num_pieces) * development_value_;
     // 攻撃。
-    double temp_weight = WEIGHT_ATTACK(num_pieces);
-    for (Piece piece_type = PAWN; piece_type <= QUEEN; piece_type++) {
-      score += temp_weight * attack_value_[piece_type];
-    }
-    // キングによる攻撃。
-    score += WEIGHT_ATTACK_BY_KING(num_pieces) * attack_value_[KING];
+    score += WEIGHT_ATTACK(num_pieces) * attack_value_;
     // 相手キング周辺への攻撃。
     score += WEIGHT_ATTACK_AROUND_KING(num_pieces) * attack_around_king_value_;
     // パスポーン。
@@ -506,7 +497,7 @@ namespace Sayuri {
     if ((Type == PAWN) && en_passant) {
       value += ATTACK_VALUE_TABLE[Type][PAWN];
     }
-    attack_value_[Type] += sign * value;
+    attack_value_ += sign * value;
 
     // 相手キング周辺への攻撃を計算。
     if (Type != KING) {
