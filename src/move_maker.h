@@ -88,7 +88,6 @@ namespace Sayuri {
       /**********************/
       // 手に点数をつける。
       // [引数]
-      // ptr: 点数をつけるスロットのポインタ。
       // prev_best: TTに登録された前回の繰り返しの最善手。
       // iid_move: IIDで得た手。
       // killer: キラームーブ。
@@ -96,8 +95,8 @@ namespace Sayuri {
       // killer_2: キラームーブ。2プライ前のレベルのノードで記録した手。
       // side: 手のサイド。
       template<GenMoveType Type>
-      void ScoreMove(MoveSlot* ptr,
-      Move prev_best, Move iid_move, Move killer_1, Move killer_2, Side side);
+      void ScoreMoves(MoveSlot* start, Move prev_best, Move iid_move,
+      Move killer_1, Move killer_2, Side side);
 
       /****************/
       /* メンバ変数。 */
@@ -107,10 +106,15 @@ namespace Sayuri {
 
       // 展開されるスタック。
       MoveSlot move_stack_[MAX_CANDIDATES + 1];
+
       // スタックのポインタ。
       MoveSlot* begin_;
       MoveSlot* last_;
       MoveSlot* end_;
+
+      // ヒストリーの最大値。
+      std::uint64_t history_max_;
+
       // ミューテックス。
       std::mutex mutex_;
   };

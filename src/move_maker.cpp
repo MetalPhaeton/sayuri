@@ -39,7 +39,8 @@ namespace Sayuri {
   /**************************/
   //コンストラクタ。
   MoveMaker::MoveMaker(const ChessEngine& engine) :
-  engine_ptr_(&engine) {
+  engine_ptr_(&engine),
+  history_max_(1Ull) {
     // スタックのポインターをセット。
     begin_ = last_ = move_stack_;
     end_ = &(move_stack_[MAX_CANDIDATES]);
@@ -47,7 +48,8 @@ namespace Sayuri {
 
   // コピーコンストラクタ。
   MoveMaker::MoveMaker(const MoveMaker& maker) :
-  engine_ptr_(maker.engine_ptr_) {
+  engine_ptr_(maker.engine_ptr_),
+  history_max_(maker.history_max_) {
     for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
@@ -61,7 +63,8 @@ namespace Sayuri {
 
   // ムーブコンストラクタ。
   MoveMaker::MoveMaker(MoveMaker&& maker) :
-  engine_ptr_(maker.engine_ptr_) {
+  engine_ptr_(maker.engine_ptr_),
+  history_max_(maker.history_max_) {
     for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
@@ -77,6 +80,7 @@ namespace Sayuri {
   MoveMaker& MoveMaker::operator=
   (const MoveMaker& maker) {
     engine_ptr_ = maker.engine_ptr_;
+    history_max_ = maker.history_max_;
     for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
@@ -93,6 +97,7 @@ namespace Sayuri {
   MoveMaker& MoveMaker::operator=
   (MoveMaker&& maker) {
     engine_ptr_ = maker.engine_ptr_;
+    history_max_ = maker.history_max_;
     for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
@@ -121,6 +126,9 @@ namespace Sayuri {
 
     // 生成したての数。
     int num_moves = 0;
+
+    // 生成開始時のMoveSlotのポインタ。
+    MoveSlot* start = last_;
 
     // ナイト、ビショップ、ルーク、クイーンの候補手を作る。
     for (Piece piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
@@ -162,13 +170,19 @@ namespace Sayuri {
           // 手を作る。
           Move move = 0U;
           move_from(move, from);
-          move_to(move, Util::GetSquare(move_bitboard));
+          Square to = Util::GetSquare(move_bitboard);
+          move_to(move, to);
           move_move_type(move, NORMAL);
+
+          // ヒストリーの最大値を更新。
+          if (Type == GenMoveType::NON_CAPTURE) {
+            if (engine_ptr_->history()[side][from][to] > history_max_) {
+              history_max_ = engine_ptr_->history()[side][from][to];
+            }
+          }
 
           // スタックに登録。
           last_->move_ = move;
-          ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2,
-          side);
           num_moves++;
           last_++;
         }
@@ -211,6 +225,14 @@ namespace Sayuri {
         move_from(move, from);
         Square to = Util::GetSquare(move_bitboard);
         move_to(move, to);
+
+        // ヒストリーの最大値を更新。
+        if (Type == GenMoveType::NON_CAPTURE) {
+          if (engine_ptr_->history()[side][from][to] > history_max_) {
+            history_max_ = engine_ptr_->history()[side][from][to];
+          }
+        }
+
         if (engine_ptr_->en_passant_square()
         && (to == engine_ptr_->en_passant_square())) {
           move_move_type(move, EN_PASSANT);
@@ -224,16 +246,12 @@ namespace Sayuri {
           for (Piece piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
             move_promotion(move, piece_type);
             last_->move_ = move;
-            ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2,
-            side);
             num_moves++;
             last_++;
           }
         } else {
           // 昇格しない場合。
           last_->move_ = move;
-          ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2,
-          side);
           num_moves++;
           last_++;
         }
@@ -272,6 +290,13 @@ namespace Sayuri {
       Square to = Util::GetSquare(move_bitboard);
       move_to(move, to);
 
+      // ヒストリーの最大値を更新。
+      if (Type == GenMoveType::NON_CAPTURE) {
+        if (engine_ptr_->history()[side][from][to] > history_max_) {
+          history_max_ = engine_ptr_->history()[side][from][to];
+        }
+      }
+
       // キャスリングを設定。
       if (((side == WHITE) && (from == E1)
       && ((to == G1) || (to == C1)))
@@ -283,11 +308,11 @@ namespace Sayuri {
       }
 
       last_->move_ = move;
-      ScoreMove<Type>(last_, prev_best, iid_move, killer_1, killer_2, side);
       num_moves++;
       last_++;
     }
 
+    ScoreMoves<Type>(start, prev_best, iid_move, killer_1, killer_2, side);
     return num_moves;
   }
   // 実体化。
@@ -343,8 +368,8 @@ namespace Sayuri {
 
   // 手に点数をつける。
   template<GenMoveType Type>
-  void MoveMaker::ScoreMove(MoveMaker::MoveSlot* ptr,
-  Move prev_best, Move iid_move, Move killer_1, Move killer_2, Side side) {
+  void MoveMaker::ScoreMoves(MoveSlot* start, Move prev_best, Move iid_move,
+  Move killer_1, Move killer_2, Side side) {
     // 評価値の定義。
     // 前回の繰り返しでトランスポジションテーブルから得た最善手の点数。
     constexpr int BEST_MOVE_SCORE = MAX_VALUE;
@@ -360,51 +385,53 @@ namespace Sayuri {
     // 悪い取る手の点数。
     constexpr int BAD_CAPTURE_SCORE = -1;
 
-    // 特殊な手の点数をつける。
-    if (EqualMove(ptr->move_, prev_best)) {
-      // 前回の最善手。
-      ptr->score_ = BEST_MOVE_SCORE;
-    } else if (EqualMove(ptr->move_, iid_move)) {
-      // IIDムーブ。
-      ptr->score_ = IID_MOVE_SCORE;
-    } else if (EqualMove(ptr->move_, killer_1)) {
-      // キラームーブ。
-      ptr->score_ = KILLER_1_MOVE_SCORE;
-    } else if (EqualMove(ptr->move_, killer_2)) {
-      // キラームーブ。
-      ptr->score_ = KILLER_2_MOVE_SCORE;
-    } else {
-      // その他の手を各候補手のタイプに分ける。
-      if ((Type == GenMoveType::CAPTURE) || (ptr->move_ & PROMOTION_MASK)) {
-        // SEEで点数をつけていく。
-        // 現在チェックされていれば、<取る駒> - <自分の駒>。
-        if (!(engine_ptr_->IsAttacked
-        (engine_ptr_->king()[side], side ^ 0x3))) {
-          ptr->score_ = engine_ptr_->SEE(ptr->move_);
-        } else {
-          ptr->score_ =
-          MATERIAL[engine_ptr_->piece_board()[move_to(ptr->move_)]]
-          - MATERIAL[engine_ptr_->piece_board()[move_from(ptr->move_)]];
-          // 昇格の得点を加算。
-          if (Piece promotion = move_promotion(ptr->move_)) {
-            ptr->score_ += MATERIAL[promotion] - MATERIAL[PAWN];
-          }
-        }
-        ptr->score_ = ptr->score_ >= 0 ? ptr->score_ + MIN_CAPTURE_SCORE
-        : BAD_CAPTURE_SCORE;
+    for (MoveSlot* ptr = start; ptr < last_; ptr++) {
+      // 特殊な手の点数をつける。
+      if (EqualMove(ptr->move_, prev_best)) {
+        // 前回の最善手。
+        ptr->score_ = BEST_MOVE_SCORE;
+      } else if (EqualMove(ptr->move_, iid_move)) {
+        // IIDムーブ。
+        ptr->score_ = IID_MOVE_SCORE;
+      } else if (EqualMove(ptr->move_, killer_1)) {
+        // キラームーブ。
+        ptr->score_ = KILLER_1_MOVE_SCORE;
+      } else if (EqualMove(ptr->move_, killer_2)) {
+        // キラームーブ。
+        ptr->score_ = KILLER_2_MOVE_SCORE;
       } else {
-        // ヒストリーを使って点数をつけていく。
-        ptr->score_ = (engine_ptr_->history()
-        [side][move_from(ptr->move_)][move_to(ptr->move_)]
-        * MAX_HISTORY_SCORE) / engine_ptr_->history_max();
+        // その他の手を各候補手のタイプに分ける。
+        if ((Type == GenMoveType::CAPTURE) || (ptr->move_ & PROMOTION_MASK)) {
+          // SEEで点数をつけていく。
+          // 現在チェックされていれば、<取る駒> - <自分の駒>。
+          if (!(engine_ptr_->IsAttacked
+          (engine_ptr_->king()[side], side ^ 0x3))) {
+            ptr->score_ = engine_ptr_->SEE(ptr->move_);
+          } else {
+            ptr->score_ =
+            MATERIAL[engine_ptr_->piece_board()[move_to(ptr->move_)]]
+            - MATERIAL[engine_ptr_->piece_board()[move_from(ptr->move_)]];
+            // 昇格の得点を加算。
+            if (Piece promotion = move_promotion(ptr->move_)) {
+              ptr->score_ += MATERIAL[promotion] - MATERIAL[PAWN];
+            }
+          }
+          ptr->score_ = ptr->score_ >= 0 ? ptr->score_ + MIN_CAPTURE_SCORE
+          : BAD_CAPTURE_SCORE;
+        } else {
+          // ヒストリーを使って点数をつけていく。
+          ptr->score_ = (engine_ptr_->history()
+          [side][move_from(ptr->move_)][move_to(ptr->move_)]
+          * MAX_HISTORY_SCORE) / history_max_;
+        }
       }
     }
   }
   // 実体化。
-  template void MoveMaker::ScoreMove<GenMoveType::NON_CAPTURE>
-  (MoveMaker::MoveSlot* ptr, Move best_move, Move iid_move,
-  Move killer_1, Move killer_2, Side side);
-  template void MoveMaker::ScoreMove<GenMoveType::CAPTURE>
-  (MoveMaker::MoveSlot* ptr, Move best_move, Move iid_move,
-  Move killer_1, Move killer_2, Side side);
+  template void MoveMaker::ScoreMoves<GenMoveType::NON_CAPTURE>
+  (MoveSlot* start, Move best_move, Move iid_move, Move killer_1,
+  Move killer_2, Side side);
+  template void MoveMaker::ScoreMoves<GenMoveType::CAPTURE>
+  (MoveSlot* start, Move best_move, Move iid_move, Move killer_1,
+  Move killer_2, Side side);
 }  // namespace Sayuri
