@@ -467,7 +467,7 @@ namespace Sayuri {
           shared_st_ptr_->killer_stack_[level + 2][1] = move;
 
           // ヒストリー。
-          shared_st_ptr_->history_[side][from][to] += depth;
+          shared_st_ptr_->history_[side][from][to] += depth * depth;
           if (shared_st_ptr_->history_[side][from][to]
           > shared_st_ptr_->history_max_) {
             shared_st_ptr_->history_max_ =
@@ -852,7 +852,7 @@ namespace Sayuri {
           shared_st_ptr_->killer_stack_[job.level() + 2][1] = move;
 
           // ヒストリー。
-          shared_st_ptr_->history_[side][from][to] += job.depth();
+          shared_st_ptr_->history_[side][from][to] += job.depth() * job.depth();
           if (shared_st_ptr_->history_[side][from][to]
           > shared_st_ptr_->history_max_) {
             shared_st_ptr_->history_max_ =
