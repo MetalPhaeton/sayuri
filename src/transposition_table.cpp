@@ -118,8 +118,6 @@ namespace Sayuri {
   // 該当するTTEntryを返す。
   TTEntry* TranspositionTable::GetEntry(Hash pos_hash,
   int depth) {
-    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
-
     // エントリーを得る。
     TTEntry* entry_ptr = nullptr;
     std::size_t index = GetTableIndex(pos_hash);

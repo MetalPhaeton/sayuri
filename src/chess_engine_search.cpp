@@ -161,14 +161,20 @@ namespace Sayuri {
     bool is_checked = IsAttacked(king_[side], enemy_side);
 
     // トランスポジションテーブルを調べる。
+    table.Lock();
+    TTEntry* prev_entry = table.GetEntry(pos_hash, depth - 1);
+    Move prev_best = 0U;
+    if (prev_entry && (prev_entry->score_type() != ScoreType::ALPHA)) {
+      prev_best = prev_entry->best_move();
+    }
     // 局面の繰り返し対策などのため、
     // 自分の初手と相手の初手の場合(level < 2の場合)は参照しない。
+    // 前回の繰り返しの最善手を得る。
     TTEntry* entry_ptr = nullptr;
     if (level >= 2) {
       entry_ptr = table.GetEntry(pos_hash, depth);
     }
     if (entry_ptr) {
-      table.Lock();
       int score = entry_ptr->score();
       if (entry_ptr->score_type() == ScoreType::EXACT) {
         // エントリーが正確な値。
@@ -209,8 +215,8 @@ namespace Sayuri {
         // アルファ値を上げられる。
         if (score > alpha) alpha = score - 1;
       }
-      table.Unlock();
     }
+    table.Unlock();
 
     // 深さが0ならクイース。
     // 限界探索数を超えていてもクイース。
@@ -218,13 +224,6 @@ namespace Sayuri {
       // クイース探索ノードに移行するため、ノード数を減らしておく。
       shared_st_ptr_->num_searched_nodes_--;
       return Quiesce(depth, level, alpha, beta, material, table);
-    }
-
-    // 前回の繰り返しの最善手を得る。
-    TTEntry* prev_entry = table.GetEntry(pos_hash, depth - 1);
-    Move prev_best = 0U;
-    if (prev_entry && (prev_entry->score_type() != ScoreType::ALPHA)) {
-      prev_best = prev_entry->best_move();
     }
 
     // PVノードの時はIID、そうじゃないノードならNull Move Reduction。
@@ -268,8 +267,14 @@ namespace Sayuri {
       }
     }
 
-    // ProbCut。(保留。)
-    /*
+    // 手を作る。
+    MoveMaker maker(*this);
+    int num_all_moves = maker.GenMoves<GenMoveType::ALL>(prev_best,
+    shared_st_ptr_->iid_stack_[level],
+    shared_st_ptr_->killer_stack_[level][0],
+    shared_st_ptr_->killer_stack_[level][1]);
+
+    // ProbCut。
     if ((Type == NodeType::NON_PV)) {
       if (!is_null_searching_ && !is_checked && (depth >= 5)) {
         // 手を作る。
@@ -297,33 +302,53 @@ namespace Sayuri {
             continue;
           }
 
-          PVLine dummy_line;
+          PVLine next_line;
           int score = -Search<NodeType::NON_PV>(next_hash, prob_depth - 1,
           level + 1, -prob_beta, -(prob_beta - 1), -next_my_material, table,
-          dummy_line);
+          next_line);
 
           UnmakeMove(move);
 
           // ベータカット。
           if (score >= prob_beta) {
+            // PVライン。
+            pv_line.SetMove(move);
+            pv_line.Insert(next_line);
+
+            // 取らない手。
+            if (!(move & CAPTURED_PIECE_MASK)) {
+              // 手の情報を得る。
+              Square from = move_from(move);
+              Square to = move_to(move);
+
+              // キラームーブ。
+              shared_st_ptr_->killer_stack_[level][0] = move;
+              shared_st_ptr_->killer_stack_[level + 2][1] = move;
+
+              // ヒストリー。
+              shared_st_ptr_->history_[side][from][to] += depth * depth;
+              if (shared_st_ptr_->history_[side][from][to]
+              > shared_st_ptr_->history_max_) {
+                shared_st_ptr_->history_max_ =
+                shared_st_ptr_->history_[side][from][to];
+              }
+            }
+
+            // トランスポジションテーブルに登録。
+            // Null Move Reductionされていた場合、容量節約のため登録しない。
+            if (null_reduction) {
+              table.Add(pos_hash, depth, beta, ScoreType::BETA,
+              pv_line.line()[0], pv_line.ply_mate());
+            }
             return beta;
           }
         }
       }
     }
-    */
 
     // PVSearch。
-    // 手を作る。
-    MoveMaker maker(*this);
-    int num_all_moves = maker.GenMoves<GenMoveType::ALL>(prev_best,
-    shared_st_ptr_->iid_stack_[level],
-    shared_st_ptr_->killer_stack_[level][0],
-    shared_st_ptr_->killer_stack_[level][1]);
-
+    num_all_moves = maker.RegenMoves();
     int num_moves = 0;
-
-    // 探索ループ。
     ScoreType score_type = ScoreType::ALPHA;
     bool has_legal_move = false;
     int margin = GetMargin(depth);
@@ -611,12 +636,14 @@ namespace Sayuri {
       shell.PrintDepthInfo(shared_st_ptr_->i_depth_);
 
       // 前回の繰り返しの最善手を得る。
+      table.Lock();
       TTEntry* prev_entry =
       table.GetEntry(pos_hash, shared_st_ptr_->i_depth_ - 1);
       Move prev_best = 0U;
       if (prev_entry && (prev_entry->score_type() != ScoreType::ALPHA)) {
         prev_best = prev_entry->best_move();
       }
+      table.Unlock();
 
       // 仕事を作る。
       std::mutex mutex;

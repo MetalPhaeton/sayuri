@@ -40,16 +40,18 @@ namespace Sayuri {
   //コンストラクタ。
   MoveMaker::MoveMaker(const ChessEngine& engine) :
   engine_ptr_(&engine),
-  history_max_(1Ull) {
+  history_max_(1Ull),
+  num_moves_(0U) {
     // スタックのポインターをセット。
-    begin_ = last_ = move_stack_;
+    begin_ = last_ = max_ = move_stack_;
     end_ = &(move_stack_[MAX_CANDIDATES]);
   }
 
   // コピーコンストラクタ。
   MoveMaker::MoveMaker(const MoveMaker& maker) :
   engine_ptr_(maker.engine_ptr_),
-  history_max_(maker.history_max_) {
+  history_max_(maker.history_max_),
+  num_moves_(maker.num_moves_) {
     for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
@@ -57,6 +59,9 @@ namespace Sayuri {
       }
       if (maker.last_ == &(maker.move_stack_[i])) {
         last_ = &(move_stack_[i]);
+      }
+      if (maker.max_ == &(maker.move_stack_[i])) {
+        max_ = &(move_stack_[i]);
       }
     }
   }
@@ -64,7 +69,8 @@ namespace Sayuri {
   // ムーブコンストラクタ。
   MoveMaker::MoveMaker(MoveMaker&& maker) :
   engine_ptr_(maker.engine_ptr_),
-  history_max_(maker.history_max_) {
+  history_max_(maker.history_max_),
+  num_moves_(maker.num_moves_) {
     for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
@@ -72,6 +78,9 @@ namespace Sayuri {
       }
       if (maker.last_ == &(maker.move_stack_[i])) {
         last_ = &(move_stack_[i]);
+      } 
+      if (maker.max_ == &(maker.move_stack_[i])) {
+        max_ = &(move_stack_[i]);
       }
     }
   }
@@ -81,6 +90,7 @@ namespace Sayuri {
   (const MoveMaker& maker) {
     engine_ptr_ = maker.engine_ptr_;
     history_max_ = maker.history_max_;
+    num_moves_ = maker.num_moves_;
     for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
@@ -88,6 +98,9 @@ namespace Sayuri {
       }
       if (maker.last_ == &(maker.move_stack_[i])) {
         last_ = &(move_stack_[i]);
+      }
+      if (maker.max_ == &(maker.move_stack_[i])) {
+        max_ = &(move_stack_[i]);
       }
     }
     return *this;
@@ -98,6 +111,7 @@ namespace Sayuri {
   (MoveMaker&& maker) {
     engine_ptr_ = maker.engine_ptr_;
     history_max_ = maker.history_max_;
+    num_moves_ = maker.num_moves_;
     for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
       move_stack_[i] = maker.move_stack_[i];
       if (maker.begin_ == &(maker.move_stack_[i])) {
@@ -105,6 +119,9 @@ namespace Sayuri {
       }
       if (maker.last_ == &(maker.move_stack_[i])) {
         last_ = &(move_stack_[i]);
+      }
+      if (maker.max_ == &(maker.move_stack_[i])) {
+        max_ = &(move_stack_[i]);
       }
     }
     return *this;
@@ -123,9 +140,6 @@ namespace Sayuri {
     // サイド。
     Side side = engine_ptr_->to_move();
     Side enemy_side = side ^ 0x3;
-
-    // 生成したての数。
-    int num_moves = 0;
 
     // 生成開始時のMoveSlotのポインタ。
     MoveSlot* start = last_;
@@ -183,7 +197,7 @@ namespace Sayuri {
 
           // スタックに登録。
           last_->move_ = move;
-          num_moves++;
+          num_moves_++;
           last_++;
         }
       }
@@ -246,13 +260,13 @@ namespace Sayuri {
           for (Piece piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
             move_promotion(move, piece_type);
             last_->move_ = move;
-            num_moves++;
+            num_moves_++;
             last_++;
           }
         } else {
           // 昇格しない場合。
           last_->move_ = move;
-          num_moves++;
+          num_moves_++;
           last_++;
         }
       }
@@ -308,12 +322,13 @@ namespace Sayuri {
       }
 
       last_->move_ = move;
-      num_moves++;
+      num_moves_++;
       last_++;
     }
 
     ScoreMoves<Type>(start, prev_best, iid_move, killer_1, killer_2, side);
-    return num_moves;
+    max_ = last_;
+    return num_moves_;
   }
   // 実体化。
   template int MoveMaker::GenMoves<GenMoveType::NON_CAPTURE>
@@ -323,13 +338,13 @@ namespace Sayuri {
   template<>
   int MoveMaker::GenMoves<GenMoveType::ALL>
   (Move prev_best, Move iid_move, Move killer_1, Move killer_2) {
-    int num_moves = GenMoves<GenMoveType::NON_CAPTURE>
+    GenMoves<GenMoveType::NON_CAPTURE>
     (prev_best, iid_move, killer_1, killer_2);
 
-    num_moves += GenMoves<GenMoveType::CAPTURE>
+    GenMoves<GenMoveType::CAPTURE>
     (prev_best, iid_move, killer_1, killer_2);
 
-    return num_moves;
+    return num_moves_;
   }
 
   // 次の手を返す。

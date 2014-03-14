@@ -131,6 +131,7 @@ namespace Sayuri {
       Move best_move, int ply_mate);
 
       // 条件を満たすエントリーを得る。
+      // Lock()とUnlock()で挟んでロックする。
       // [引数]
       // pos_hash: ハッシュ。
       // depth: 探索の深さ。
