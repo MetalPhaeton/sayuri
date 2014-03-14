@@ -226,8 +226,7 @@ namespace Sayuri {
       return Quiesce(depth, level, alpha, beta, material, table);
     }
 
-    // PVノードの時はIID、そうじゃないノードならNull Move Reduction。
-    int null_reduction = 0;
+    // Internal Iterative Deepening。
     if (Type == NodeType::PV) {
       // 前回の繰り返しの最善手があればIIDしない。
       if (prev_best) {
@@ -237,13 +236,17 @@ namespace Sayuri {
           // Internal Iterative Deepening。
           PVLine next_line;
           constexpr int iid_depth = 4;
-          Search<NodeType::PV>(pos_hash, iid_depth - 1, level,
+          Search<NodeType::PV>(pos_hash, iid_depth, level,
           alpha, beta, material, table, next_line);
 
           shared_st_ptr_->iid_stack_[level] = next_line.line()[0];
         }
       }
-    } else {
+    }
+
+    // Null Move Reduction。
+    int null_reduction = 0;
+    if (Type == NodeType::NON_PV) {
       if (!is_null_searching_ && !is_checked && (depth >= 4)) {
         // Null Move Reduction。
         Move null_move = 0U;
