@@ -272,7 +272,7 @@ namespace Sayuri {
 
     // 手を作る。
     MoveMaker maker(*this);
-    int num_all_moves = maker.GenMoves<GenMoveType::ALL>(prev_best,
+    maker.GenMoves<GenMoveType::ALL>(prev_best,
     shared_st_ptr_->iid_stack_[level],
     shared_st_ptr_->killer_stack_[level][0],
     shared_st_ptr_->killer_stack_[level][1]);
@@ -350,7 +350,8 @@ namespace Sayuri {
     }
 
     // PVSearch。
-    num_all_moves = maker.RegenMoves();
+    int num_all_moves = maker.RegenMoves();
+    int num_reduce_moves = (num_all_moves + 2) / 3;
     int num_moves = 0;
     ScoreType score_type = ScoreType::ALPHA;
     bool has_legal_move = false;
@@ -416,7 +417,7 @@ namespace Sayuri {
       if (!is_checked
       && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
       && !null_reduction && (depth >= 4)
-      && (num_moves > ((num_all_moves + 2) / 3))) {
+      && (num_moves > num_reduce_moves)) {
         int reduction = 1;
 
         // History Pruning。
@@ -745,6 +746,7 @@ namespace Sayuri {
     Side enemy_side = side ^ 0x3;
     int num_moves = 0;
     int margin = GetMargin(job.depth());
+    int num_reduce_moves = (job.num_all_moves() + 2) / 3;
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // すでにベータカットされていれば仕事をしない。
       if (job.alpha() >= job.beta()) {
@@ -796,7 +798,7 @@ namespace Sayuri {
       if (!(job.is_checked())
       && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
       && !(job.null_reduction()) && (job.depth() >= 4)
-      && (num_moves > ((job.num_all_moves() + 2) / 3))) {
+      && (num_moves > num_reduce_moves)) {
         int reduction = 1;
 
         // History Pruning。
@@ -913,6 +915,7 @@ namespace Sayuri {
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
     int num_moves = 0;
+    int num_reduce_moves = (job.num_all_moves() + 2) / 3;
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       if (ShouldBeStopped()) break;
 
@@ -1031,7 +1034,7 @@ namespace Sayuri {
         if (!(job.is_checked())
         && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
         && (job.depth() >= 4)
-        && (num_moves > ((job.num_all_moves() + 2) / 3))) {
+        && (num_moves > num_reduce_moves)) {
           int reduction = 1;
           // ゼロウィンドウ探索。
           score = -Search<NodeType::NON_PV>(next_hash,
