@@ -298,7 +298,6 @@ namespace Sayuri {
     score += WEIGHT_BISHOP_PAIR(num_pieces) * bishop_pair_value_;
     // バッドビショップ。
     score += WEIGHT_BAD_BISHOP(num_pieces) * bad_bishop_value_;
-    // ビショップにピンされたナイト。
     // ナイトをピン。
     score += WEIGHT_PIN_KNIGHT(num_pieces) * pin_knight_value_;
     // ルークペア。
