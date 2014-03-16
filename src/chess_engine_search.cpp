@@ -178,40 +178,60 @@ namespace Sayuri {
       int score = entry_ptr->score();
       if (entry_ptr->score_type() == ScoreType::EXACT) {
         // エントリーが正確な値。
+        if (!(entry_ptr->best_move() & CAPTURED_PIECE_MASK)
+        && (level < MAX_PLYS)) {
+          // キラームーブをセット。
+          Move best_move = entry_ptr->best_move();
+          shared_st_ptr_->killer_stack_[level][0] = best_move;
+          shared_st_ptr_->killer_stack_[level + 2][1] = best_move;
+        }
+
         pv_line.ply_mate(entry_ptr->ply_mate());
         if (score >= beta) {
           pv_line.score(beta);
           table.Unlock();
           return beta;
         }
+
         if (score <= alpha) {
           pv_line.score(alpha);
           table.Unlock();
           return alpha;
         }
+
         pv_line.score(score);
         table.Unlock();
         return score;
       } else if (entry_ptr->score_type() == ScoreType::ALPHA) {
         // エントリーがアルファ値。
-        // アルファ値以下が確定。
         if (score <= alpha) {
+          // アルファ値以下が確定。
           pv_line.score(alpha);
           pv_line.ply_mate(entry_ptr->ply_mate());
           table.Unlock();
           return alpha;
         }
+
         // ベータ値を下げられる。
         if (score < beta) beta = score + 1;
       } else {
         // エントリーがベータ値。
-        // ベータ値以上が確定。
+        if (!(entry_ptr->best_move() & CAPTURED_PIECE_MASK)
+        && (level < MAX_PLYS)) {
+          // キラームーブをセット。
+          Move best_move = entry_ptr->best_move();
+          shared_st_ptr_->killer_stack_[level][0] = best_move;
+          shared_st_ptr_->killer_stack_[level + 2][1] = best_move;
+        }
+
         if (score >= beta) {
+          // ベータ値以上が確定。
           pv_line.score(beta);
           pv_line.ply_mate(entry_ptr->ply_mate());
           table.Unlock();
           return beta;
         }
+
         // アルファ値を上げられる。
         if (score > alpha) alpha = score - 1;
       }
