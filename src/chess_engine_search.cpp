@@ -1254,8 +1254,8 @@ namespace Sayuri {
   // Futility Pruningのマージンを計算する。
   int ChessEngine::GetMargin(int depth) {
     if (depth <= 1) return MATERIAL[KNIGHT];
-    if (depth >= 3) return MATERIAL[QUEEN];
-    return MATERIAL[ROOK] + MATERIAL[PAWN];
+    if (depth >= 3) return MATERIAL[KNIGHT] * 3;
+    return MATERIAL[KNIGHT] * 2;
   }
 
   // ストップ条件を設定する。
