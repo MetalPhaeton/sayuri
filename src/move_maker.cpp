@@ -418,19 +418,7 @@ namespace Sayuri {
         // その他の手を各候補手のタイプに分ける。
         if ((Type == GenMoveType::CAPTURE) || (ptr->move_ & PROMOTION_MASK)) {
           // SEEで点数をつけていく。
-          // 現在チェックされていれば、<取る駒> - <自分の駒>。
-          if (!(engine_ptr_->IsAttacked
-          (engine_ptr_->king()[side], side ^ 0x3))) {
-            ptr->score_ = engine_ptr_->SEE(ptr->move_);
-          } else {
-            ptr->score_ =
-            MATERIAL[engine_ptr_->piece_board()[move_to(ptr->move_)]]
-            - MATERIAL[engine_ptr_->piece_board()[move_from(ptr->move_)]];
-            // 昇格の得点を加算。
-            if (Piece promotion = move_promotion(ptr->move_)) {
-              ptr->score_ += MATERIAL[promotion] - MATERIAL[PAWN];
-            }
-          }
+          ptr->score_ = engine_ptr_->SEE(ptr->move_);
           ptr->score_ = ptr->score_ >= 0 ? ptr->score_ + MIN_CAPTURE_SCORE
           : BAD_CAPTURE_SCORE;
         } else {
