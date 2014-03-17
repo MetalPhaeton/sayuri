@@ -371,7 +371,7 @@ namespace Sayuri {
     }
     int num_all_moves = maker.RegenMoves();
     int num_early_moves = num_all_moves / 5;
-    num_early_moves = num_early_moves <= 0 ? 1 : num_early_moves;
+    num_early_moves = num_early_moves >= 3 ? num_early_moves : 3;
     int num_moves = 0;
     ScoreType score_type = ScoreType::ALPHA;
     bool has_legal_move = false;
@@ -775,7 +775,7 @@ namespace Sayuri {
     int num_moves = 0;
     int margin = GetMargin(job.depth());
     int num_early_moves = job.num_all_moves() / 5;
-    num_early_moves = num_early_moves <= 0 ? 1 : num_early_moves;
+    num_early_moves = num_early_moves >= 3 ? num_early_moves : 3;
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // すでにベータカットされていれば仕事をしない。
       if (job.alpha() >= job.beta()) {
@@ -949,7 +949,7 @@ namespace Sayuri {
     Side enemy_side = side ^ 0x3;
     int num_moves = 0;
     int num_early_moves = job.num_all_moves() / 5;
-    num_early_moves = num_early_moves <= 0 ? 1 : num_early_moves;
+    num_early_moves = num_early_moves >= 3 ? num_early_moves : 3;
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       if (ShouldBeStopped()) break;
 
