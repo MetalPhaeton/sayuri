@@ -58,7 +58,7 @@ namespace Sayuri {
   // 駒の展開。
   const Evaluator::Weight Evaluator::WEIGHT_DEVELOPMENT(2.5, 0.0);
   // 攻撃。
-  const Evaluator::Weight Evaluator::WEIGHT_ATTACK(1.0, 0.0);
+  const Evaluator::Weight Evaluator::WEIGHT_ATTACK(2.0, 0.0);
   // 相手キング周辺への攻撃
   const Evaluator::Weight Evaluator::WEIGHT_ATTACK_AROUND_KING(0.0, 3.0);
   // パスポーン。
