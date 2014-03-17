@@ -70,7 +70,7 @@ namespace Sayuri {
   // 孤立ポーン。
   const Evaluator::Weight Evaluator::WEIGHT_ISO_PAWN(-5.0, -2.5);
   // ポーンの盾。
-  const Evaluator::Weight Evaluator::WEIGHT_PAWN_SHIELD(6.0, 0.0);
+  const Evaluator::Weight Evaluator::WEIGHT_PAWN_SHIELD(15.0, 0.0);
   // ビショップペア。
   const Evaluator::Weight Evaluator::WEIGHT_BISHOP_PAIR(10.0, 60.0);
   // バッドビショップ。
@@ -98,6 +98,7 @@ namespace Sayuri {
   constexpr double Evaluator::KING_POSITION_ENDING_TABLE[NUM_SQUARES];
   constexpr double Evaluator::ATTACK_VALUE_TABLE
   [NUM_PIECE_TYPES][NUM_PIECE_TYPES];
+  constexpr double Evaluator::PAWN_SHIELD_TABLE[NUM_SQUARES];
 
   /****************/
   /* static変数。 */
@@ -535,10 +536,9 @@ namespace Sayuri {
       if ((Util::SQUARE[piece_square]
       & pawn_shield_mask_[piece_side][engine_ptr_->king()[piece_side]])) {
         if (piece_side == WHITE) {
-          value =
-          static_cast<double>(POSITION_TABLE[PAWN][Util::FLIP[piece_square]]);
+          value = PAWN_SHIELD_TABLE[piece_square];
         } else {
-          value = static_cast<double>(POSITION_TABLE[PAWN][piece_square]);
+          value = PAWN_SHIELD_TABLE[Util::FLIP[piece_square]];
         }
         pawn_shield_value_ += sign * value;
       }
