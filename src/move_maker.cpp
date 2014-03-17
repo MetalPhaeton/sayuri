@@ -390,6 +390,8 @@ namespace Sayuri {
     constexpr int BEST_MOVE_SCORE = MAX_VALUE;
     // IIDで得た最善手の点数。
     constexpr int IID_MOVE_SCORE = BEST_MOVE_SCORE - 1;
+    // 相手キングをチェックする手の点数。
+    constexpr int CHECKING_MOVE_SCORE = IID_MOVE_SCORE - 1;
     // 駒を取る手の下限値。20 * 20を目安に設定。
     constexpr int MIN_CAPTURE_SCORE = 403;
     // キラームーブの点数。
@@ -400,7 +402,45 @@ namespace Sayuri {
     // 悪い取る手の点数。
     constexpr int BAD_CAPTURE_SCORE = -1;
 
+    Bitboard enemy_king_bb = Util::SQUARE[engine_ptr_->king()[side ^ 0x3]];
     for (MoveSlot* ptr = start; ptr < last_; ptr++) {
+      // 手の情報を得る。
+      Square from = move_from(ptr->move_);
+      Square to = move_to(ptr->move_);
+
+      // 相手キングをチェックする手かどうか調べる。
+      bool is_checking_move = false;
+      switch (engine_ptr_->piece_board()[from]) {
+        case PAWN:
+          if ((enemy_king_bb & Util::GetPawnAttack(from, side))) {
+            is_checking_move = true;
+          }
+          break;
+        case KNIGHT:
+          if ((enemy_king_bb & Util::GetKnightMove(from))) {
+            is_checking_move = true;
+          }
+          break;
+        case BISHOP:
+          if ((enemy_king_bb & engine_ptr_->GetBishopAttack(from))) {
+            is_checking_move = true;
+          }
+          break;
+        case ROOK:
+          if ((enemy_king_bb & engine_ptr_->GetRookAttack(from))) {
+            is_checking_move = true;
+          }
+          break;
+        case QUEEN:
+          if ((enemy_king_bb & engine_ptr_->GetQueenAttack(from))) {
+            is_checking_move = true;
+          }
+          break;
+        default:
+          // 何もしない。
+          break;
+      }
+
       // 特殊な手の点数をつける。
       if (EqualMove(ptr->move_, prev_best)) {
         // 前回の最善手。
@@ -408,6 +448,9 @@ namespace Sayuri {
       } else if (EqualMove(ptr->move_, iid_move)) {
         // IIDムーブ。
         ptr->score_ = IID_MOVE_SCORE;
+      } else if (is_checking_move) {
+        // 相手キングをチェックする手。
+        ptr->score_ = CHECKING_MOVE_SCORE;
       } else if (EqualMove(ptr->move_, killer_1)) {
         // キラームーブ。
         ptr->score_ = KILLER_1_MOVE_SCORE;
@@ -423,8 +466,7 @@ namespace Sayuri {
           : BAD_CAPTURE_SCORE;
         } else {
           // ヒストリーを使って点数をつけていく。
-          ptr->score_ = (engine_ptr_->history()
-          [side][move_from(ptr->move_)][move_to(ptr->move_)]
+          ptr->score_ = (engine_ptr_->history()[side][from][to]
           * MAX_HISTORY_SCORE) / history_max_;
         }
       }
