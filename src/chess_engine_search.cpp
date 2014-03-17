@@ -370,8 +370,8 @@ namespace Sayuri {
       depth += 1;
     }
     int num_all_moves = maker.RegenMoves();
-    int num_reduce_moves = num_all_moves / 5;
-    num_reduce_moves = num_reduce_moves <= 0 ? 1 : num_reduce_moves;
+    int num_early_moves = num_all_moves / 5;
+    num_early_moves = num_early_moves <= 0 ? 1 : num_early_moves;
     int num_moves = 0;
     ScoreType score_type = ScoreType::ALPHA;
     bool has_legal_move = false;
@@ -437,7 +437,7 @@ namespace Sayuri {
       if (!is_checked
       && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
       && !null_reduction && (depth >= 4)
-      && (num_moves > num_reduce_moves)
+      && (num_moves > num_early_moves)
       && !EqualMove(move, shared_st_ptr_->killer_stack_[level][0])
       && !EqualMove(move, shared_st_ptr_->killer_stack_[level][1])) {
         int reduction = 1;
@@ -774,8 +774,8 @@ namespace Sayuri {
     Side enemy_side = side ^ 0x3;
     int num_moves = 0;
     int margin = GetMargin(job.depth());
-    int num_reduce_moves = job.num_all_moves() / 5;
-    num_reduce_moves = num_reduce_moves <= 0 ? 1 : num_reduce_moves;
+    int num_early_moves = job.num_all_moves() / 5;
+    num_early_moves = num_early_moves <= 0 ? 1 : num_early_moves;
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // すでにベータカットされていれば仕事をしない。
       if (job.alpha() >= job.beta()) {
@@ -827,7 +827,7 @@ namespace Sayuri {
       if (!(job.is_checked())
       && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
       && !(job.null_reduction()) && (job.depth() >= 4)
-      && (num_moves > num_reduce_moves)
+      && (num_moves > num_early_moves)
       && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level()][0])
       && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level()][1])) {
         int reduction = 1;
@@ -948,8 +948,8 @@ namespace Sayuri {
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
     int num_moves = 0;
-    int num_reduce_moves = job.num_all_moves() / 5;
-    num_reduce_moves = num_reduce_moves <= 0 ? 1 : num_reduce_moves;
+    int num_early_moves = job.num_all_moves() / 5;
+    num_early_moves = num_early_moves <= 0 ? 1 : num_early_moves;
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       if (ShouldBeStopped()) break;
 
@@ -1068,7 +1068,7 @@ namespace Sayuri {
         if (!(job.is_checked())
         && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
         && (job.depth() >= 4)
-        && (num_moves > num_reduce_moves)) {
+        && (num_moves > num_early_moves)) {
           int reduction = 1;
           // ゼロウィンドウ探索。
           score = -Search<NodeType::NON_PV>(next_hash,
