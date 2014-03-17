@@ -155,6 +155,7 @@ namespace Sayuri {
 
     // トランスポジションテーブルを調べる。
     table.Lock();
+    // 前回の繰り返しの最善手を得る。
     TTEntry* prev_entry = table.GetEntry(pos_hash, depth - 1);
     Move prev_best = 0U;
     if (prev_entry && (prev_entry->score_type() != ScoreType::ALPHA)) {
@@ -245,7 +246,7 @@ namespace Sayuri {
       if (prev_best) {
         shared_st_ptr_->iid_stack_[level] = prev_best;
       } else {
-        if (depth >= 5) {
+        if (!is_checked && (depth >= 5)) {
           // Internal Iterative Deepening。
           PVLine next_line;
           constexpr int iid_depth = 4;
@@ -277,8 +278,8 @@ namespace Sayuri {
         is_null_searching_ = false;
 
         if (score >= beta) {
-          depth -= reduction - 1;
-          null_reduction = reduction - 1;
+          depth -= reduction;
+          null_reduction = reduction;
         }
       }
     }
@@ -356,6 +357,7 @@ namespace Sayuri {
               table.Add(pos_hash, depth, beta, ScoreType::BETA,
               pv_line.line()[0], pv_line.ply_mate());
             }
+
             return beta;
           }
         }
@@ -368,7 +370,8 @@ namespace Sayuri {
       depth += 1;
     }
     int num_all_moves = maker.RegenMoves();
-    int num_reduce_moves = (num_all_moves + 2) / 3;
+    int num_reduce_moves = num_all_moves / 5;
+    num_reduce_moves = num_reduce_moves <= 0 ? 1 : num_reduce_moves;
     int num_moves = 0;
     ScoreType score_type = ScoreType::ALPHA;
     bool has_legal_move = false;
@@ -434,11 +437,15 @@ namespace Sayuri {
       if (!is_checked
       && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
       && !null_reduction && (depth >= 4)
-      && (num_moves > num_reduce_moves)) {
+      && (num_moves > num_reduce_moves)
+      && !EqualMove(move, shared_st_ptr_->killer_stack_[level][0])
+      && !EqualMove(move, shared_st_ptr_->killer_stack_[level][1])) {
         int reduction = 1;
 
-        // History Pruning。
         if (Type == NodeType::NON_PV) {
+          reduction++;
+
+          // History Pruning。
           if (shared_st_ptr_->history_[side][from][to]
           < (shared_st_ptr_->history_max_ / 2)) {
             reduction++;
@@ -767,7 +774,8 @@ namespace Sayuri {
     Side enemy_side = side ^ 0x3;
     int num_moves = 0;
     int margin = GetMargin(job.depth());
-    int num_reduce_moves = (job.num_all_moves() + 2) / 3;
+    int num_reduce_moves = job.num_all_moves() / 5;
+    num_reduce_moves = num_reduce_moves <= 0 ? 1 : num_reduce_moves;
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // すでにベータカットされていれば仕事をしない。
       if (job.alpha() >= job.beta()) {
@@ -819,11 +827,15 @@ namespace Sayuri {
       if (!(job.is_checked())
       && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
       && !(job.null_reduction()) && (job.depth() >= 4)
-      && (num_moves > num_reduce_moves)) {
+      && (num_moves > num_reduce_moves)
+      && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level()][0])
+      && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level()][1])) {
         int reduction = 1;
 
-        // History Pruning。
         if (Type == NodeType::NON_PV) {
+          reduction++;
+
+          // History Pruning。
           if (shared_st_ptr_->history_[side][from][to]
           < (shared_st_ptr_->history_max_ / 2)) {
             reduction++;
@@ -936,7 +948,8 @@ namespace Sayuri {
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
     int num_moves = 0;
-    int num_reduce_moves = (job.num_all_moves() + 2) / 3;
+    int num_reduce_moves = job.num_all_moves() / 5;
+    num_reduce_moves = num_reduce_moves <= 0 ? 1 : num_reduce_moves;
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       if (ShouldBeStopped()) break;
 
