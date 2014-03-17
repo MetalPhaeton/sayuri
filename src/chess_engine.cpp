@@ -995,7 +995,7 @@ namespace Sayuri {
         }
       }
     }
-    for (unsigned int i = 0; i < MAX_PLYS; i++) {
+    for (unsigned int i = 0; i < (MAX_PLYS + 1); i++) {
       iid_stack_[i] = 0U;
       killer_stack_[i][0] = 0U;
       killer_stack_[i][1] = 0U;
@@ -1039,7 +1039,7 @@ namespace Sayuri {
       }
     }
     history_max_ = shared_st.history_max_;
-    for (std::uint32_t i = 0U; i < MAX_PLYS; i++) {
+    for (std::uint32_t i = 0U; i < (MAX_PLYS + 1); i++) {
       iid_stack_[i] = shared_st.iid_stack_[i];
       killer_stack_[i][0] = shared_st.killer_stack_[i][0];
       killer_stack_[i][0] = shared_st.killer_stack_[i][0];

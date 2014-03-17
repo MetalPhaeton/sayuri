@@ -246,12 +246,12 @@ namespace Sayuri {
       // ヒストリーの最大値。
       std::uint64_t history_max() const {return shared_st_ptr_->history_max_;}
       // IIDでの最善手スタック。
-      const Move (& iid_stack() const)[MAX_PLYS] {
+      const Move (& iid_stack() const)[MAX_PLYS + 1] {
         return shared_st_ptr_->iid_stack_;
       }
       // キラームーブスタック。
       // killer_stack_[ply][同一レベル: 0、2プライ前: 1]
-      const Move (& killer_stack() const)[MAX_PLYS + 2][2] {
+      const Move (& killer_stack() const)[MAX_PLYS + 2 + 1][2] {
         return shared_st_ptr_->killer_stack_;
       }
 
@@ -405,10 +405,10 @@ namespace Sayuri {
         // ヒストリーの最大値。
         std::uint64_t history_max_;
         // IIDでの最善手スタック。
-        Move iid_stack_[MAX_PLYS];
+        Move iid_stack_[MAX_PLYS + 1];
         // キラームーブスタック。
         // killer_stack_[ply][同一レベル: 0、2プライ前: 1]
-        Move killer_stack_[MAX_PLYS + 2][2];
+        Move killer_stack_[MAX_PLYS + 2 + 1][2];
         // 現在のIterative Deepeningの深さ。
         std::uint32_t i_depth_;
         // 探索したノード数。

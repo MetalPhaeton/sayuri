@@ -87,17 +87,10 @@ namespace Sayuri {
     // 候補手を作る。
     // 駒を取る手だけ。
     MoveMaker maker(*this);
-    Move prev_best = 0U;
     if (IsAttacked(king_[side], enemy_side)) {
-      maker.GenMoves<GenMoveType::ALL>(prev_best,
-      shared_st_ptr_->iid_stack_[level],
-      shared_st_ptr_->killer_stack_[level][0],
-      shared_st_ptr_->killer_stack_[level][1]);
+      maker.GenMoves<GenMoveType::ALL>(0U, 0U, 0U, 0U);
     } else {
-      maker.GenMoves<GenMoveType::CAPTURE>(prev_best,
-      shared_st_ptr_->iid_stack_[level],
-      shared_st_ptr_->killer_stack_[level][0],
-      shared_st_ptr_->killer_stack_[level][1]);
+      maker.GenMoves<GenMoveType::CAPTURE>(0U, 0U, 0U, 0U);
     }
 
     // 探索する。
@@ -370,6 +363,10 @@ namespace Sayuri {
     }
 
     // PVSearch。
+    // Check Extension。
+    if (is_checked) {
+      depth += 1;
+    }
     int num_all_moves = maker.RegenMoves();
     int num_reduce_moves = (num_all_moves + 2) / 3;
     int num_moves = 0;
@@ -592,7 +589,7 @@ namespace Sayuri {
         }
       }
     }
-    for (std::uint32_t i = 0U; i < MAX_PLYS; i++) {
+    for (std::uint32_t i = 0U; i < (MAX_PLYS + 1); i++) {
       shared_st_ptr_->iid_stack_[i] = 0U;
       shared_st_ptr_->killer_stack_[i][0] = 0U;
       shared_st_ptr_->killer_stack_[i][1] = 0U;
@@ -670,6 +667,11 @@ namespace Sayuri {
       table.Unlock();
 
       // 仕事を作る。
+      // Check Extension。
+      int depth = shared_st_ptr_->i_depth_;
+      if (is_checked) {
+        depth += 1;
+      }
       std::mutex mutex;
       PositionRecord record(*this);
       int num_all_moves = maker.GenMoves<GenMoveType::ALL>(prev_best,
@@ -680,11 +682,10 @@ namespace Sayuri {
       int null_reduction = 0;
       ScoreType score_type = ScoreType::EXACT;
       bool has_legal_move = false;
-      Job job(mutex, maker, *this, record, node_type, pos_hash,
-      shared_st_ptr_->i_depth_, level, alpha, beta, delta, table, pv_line,
-      is_null_searching_, null_reduction, score_type,
-      material, is_checked, num_all_moves, has_legal_move, moves_to_search_ptr,
-      next_print_info_time);
+      Job job(mutex, maker, *this, record, node_type, pos_hash, depth, level,
+      alpha, beta, delta, table, pv_line, is_null_searching_, null_reduction,
+      score_type, material, is_checked, num_all_moves, has_legal_move,
+      moves_to_search_ptr, next_print_info_time);
 
       // ヘルプして待つ。
       shared_st_ptr_->helper_queue_ptr_->HelpRoot(job);

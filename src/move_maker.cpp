@@ -412,27 +412,27 @@ namespace Sayuri {
       bool is_checking_move = false;
       switch (engine_ptr_->piece_board()[from]) {
         case PAWN:
-          if ((enemy_king_bb & Util::GetPawnAttack(from, side))) {
+          if ((enemy_king_bb & Util::GetPawnAttack(to, side))) {
             is_checking_move = true;
           }
           break;
         case KNIGHT:
-          if ((enemy_king_bb & Util::GetKnightMove(from))) {
+          if ((enemy_king_bb & Util::GetKnightMove(to))) {
             is_checking_move = true;
           }
           break;
         case BISHOP:
-          if ((enemy_king_bb & engine_ptr_->GetBishopAttack(from))) {
+          if ((enemy_king_bb & engine_ptr_->GetBishopAttack(to))) {
             is_checking_move = true;
           }
           break;
         case ROOK:
-          if ((enemy_king_bb & engine_ptr_->GetRookAttack(from))) {
+          if ((enemy_king_bb & engine_ptr_->GetRookAttack(to))) {
             is_checking_move = true;
           }
           break;
         case QUEEN:
-          if ((enemy_king_bb & engine_ptr_->GetQueenAttack(from))) {
+          if ((enemy_king_bb & engine_ptr_->GetQueenAttack(to))) {
             is_checking_move = true;
           }
           break;
