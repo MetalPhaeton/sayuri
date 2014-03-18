@@ -435,9 +435,9 @@ namespace Sayuri {
       int temp_alpha = alpha;
       int temp_beta = beta;
       if (!is_checked
-      && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
       && !null_reduction && (depth >= 4)
       && (num_moves > num_early_moves)
+      && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
       && !EqualMove(move, shared_st_ptr_->killer_stack_[level][0])
       && !EqualMove(move, shared_st_ptr_->killer_stack_[level][1])) {
         int reduction = 1;
@@ -825,9 +825,9 @@ namespace Sayuri {
       int temp_alpha = job.alpha();
       int temp_beta = job.beta();
       if (!(job.is_checked())
-      && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
       && !(job.null_reduction()) && (job.depth() >= 4)
       && (num_moves > num_early_moves)
+      && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
       && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level()][0])
       && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level()][1])) {
         int reduction = 1;
@@ -1066,9 +1066,9 @@ namespace Sayuri {
         // PV発見後。
         // Late Move Reduction。
         if (!(job.is_checked())
-        && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
         && (job.depth() >= 4)
-        && (num_moves > num_early_moves)) {
+        && (num_moves > num_early_moves)
+        && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))) {
           int reduction = 1;
           // ゼロウィンドウ探索。
           score = -Search<NodeType::NON_PV>(next_hash,
