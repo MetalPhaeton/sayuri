@@ -353,7 +353,7 @@ namespace Sayuri {
 
             // トランスポジションテーブルに登録。
             // Null Move Reductionされていた場合、容量節約のため登録しない。
-            if (null_reduction) {
+            if (!null_reduction && !ShouldBeStopped()) {
               table.Add(pos_hash, depth, beta, ScoreType::BETA,
               pv_line.line()[0], pv_line.ply_mate());
             }
@@ -565,7 +565,7 @@ namespace Sayuri {
     // トランスポジションテーブルに登録。
     // Null Move探索中の局面は登録しない。
     // Null Move Reductionされていた場合、容量節約のため登録しない。
-    if (!is_null_searching_ && !null_reduction) {
+    if (!is_null_searching_ && !null_reduction && !ShouldBeStopped()) {
       table.Add(pos_hash, depth, alpha, score_type,
       pv_line.line()[0], pv_line.ply_mate());
     }
