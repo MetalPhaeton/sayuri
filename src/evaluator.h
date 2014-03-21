@@ -367,7 +367,7 @@ namespace Sayuri {
       double position_value_[NUM_PIECE_TYPES];  // 各駒の配置。
       double pawn_position_ending_value_;  //  ポーンの終盤の配置。
       double king_position_ending_value_;  //  キングの終盤の配置。
-      double mobility_value_;  // 駒の動きやすさ。
+      double mobility_value_;  // 機動力。
       double center_control_value_;  // センターコントロール。
       double sweet_center_control_value_;  // スウィートセンターのコントロール。
       double development_value_;  // 駒の展開。

@@ -455,15 +455,8 @@ namespace Sayuri {
       king_position_ending_value_ += sign * value;
     }
 
-    // ピースの動きやすさを計算。
-    if (Type == PAWN) {
-      value = static_cast<double>(Util::CountBits(pawn_moves
-      | (attacks & engine_ptr_->side_pieces()[enemy_piece_side])
-      | en_passant));
-    } else if (Type == KING) {
-      value = static_cast<double>(Util::CountBits(castling_moves
-      | (attacks & ~(engine_ptr_->side_pieces()[piece_side]))));
-    } else {
+    // 機動力を計算。
+    if ((Type != PAWN) && (Type != KING)) {
       value = static_cast<double>(Util::CountBits(attacks
       & ~(engine_ptr_->side_pieces()[piece_side])));
     }
