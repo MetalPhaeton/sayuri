@@ -166,11 +166,17 @@ namespace Sayuri {
   constexpr Piece KING = 6;
 
   // 数の定義。
+  // マスの数。
   constexpr Square NUM_SQUARES = 64;
+  // ファイルの数。
   constexpr Fyle NUM_FYLES = 8;
+  // ランクの数。
   constexpr Rank NUM_RANKS = 8;
+  // サイドの数。(NO_SIDEを含む。)
   constexpr Side NUM_SIDES = 3;
+  // 駒の種類の数。(EMPTYを含む。)
   constexpr Piece NUM_PIECE_TYPES = 7;
+  // とても大きな数。
   constexpr int MAX_VALUE = 9999999;
 
   // キャスリングのフラグの型。
