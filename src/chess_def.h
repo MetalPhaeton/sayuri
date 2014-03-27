@@ -196,81 +196,119 @@ namespace Sayuri {
   using Move = std::uint32_t;
 
   // 手のビットフィールドの定数。
+  // 位置のマスク。6ビット。
   constexpr Move SQUARE_MASK = 0x3f;
+  // 駒のマスク。3ビット。
   constexpr Move PIECE_MASK = 0x7;
+  // キャスリングのマスク。4ビット。
   constexpr Move CASTLING_MASK = 0xf;
-  constexpr Move TYPE_MASK = 0x3;
+  // 手の種類のマスク。2ビット。
+  constexpr Move MTYPE_MASK = 0x3;
+  // 動かす駒の位置のビット位置。
   constexpr std::uint32_t FROM_SHIFT = 0;
+  // 移動先の位置のビット位置。
   constexpr std::uint32_t TO_SHIFT = 6;
+  // 昇格する駒の種類のビット位置。
   constexpr std::uint32_t PROMOTION_SHIFT = 12;
+  // 駒の種類のビット位置。
   constexpr std::uint32_t MOVE_TYPE_SHIFT = 15;
+  // 取った駒の種類のビット位置。
   constexpr std::uint32_t CAPTURED_PIECE_SHIFT = 17;
+  // キャスリングの権利のビット位置。
   constexpr std::uint32_t CASTLING_RIGHTS_SHIFT = 20;
+  // アンパッサンの位置のビット位置。
   constexpr std::uint32_t EN_PASSANT_SQUARE_SHIFT = 24;
+  // 動かす駒の位置のマスク。
   constexpr Move FROM_MASK = SQUARE_MASK << FROM_SHIFT;
+  // 移動先の位置のマスク。
   constexpr Move TO_MASK = SQUARE_MASK << TO_SHIFT;
+  // 昇格する駒の位置のマスク。
   constexpr Move PROMOTION_MASK = PIECE_MASK << PROMOTION_SHIFT;
-  constexpr Move MOVE_TYPE_MASK = TYPE_MASK << MOVE_TYPE_SHIFT;
+  // 手の種類のマスク。
+  constexpr Move MOVE_TYPE_MASK = MTYPE_MASK << MOVE_TYPE_SHIFT;
+  // 取った駒の種類のマスク。
   constexpr Move CAPTURED_PIECE_MASK = PIECE_MASK << CAPTURED_PIECE_SHIFT;
+  // キャスリングの権利のマスク。
   constexpr Move CASTLING_RIGHTS_MASK =
   CASTLING_MASK << CASTLING_RIGHTS_SHIFT;
+  // アンパッサンの位置のマスク。
   constexpr Move EN_PASSANT_SQUARE_MASK =
   SQUARE_MASK << EN_PASSANT_SQUARE_SHIFT;
+  // 手の比較に使うマスク。
   constexpr Move BASE_MASK = FROM_MASK | TO_MASK | PROMOTION_MASK;
 
   // 手の種類の定数。
+  // 手の種類の型。
   using MoveType = int;
+  // ヌルムーブ。
   constexpr MoveType NULL_MOVE = 0;
+  // 通常の手。(コマを取らない手。駒をとる手。)
   constexpr MoveType NORMAL = 1;
+  // キャスリング。
   constexpr MoveType CASTLING = 2;
+  // アンパッサン。
   constexpr MoveType EN_PASSANT = 3;
 
   // 手のビットフィールドのアクセサ。
+  // 動かす駒の位置。
   inline Square move_from(Move& move) {
     return (move & FROM_MASK) >> FROM_SHIFT;
   }
+  // 移動先の位置。
   inline Square move_to(Move& move) {
     return (move & TO_MASK) >> TO_SHIFT;
   }
+  // 昇格する駒の種類。
   inline Piece move_promotion(Move& move) {
     return (move & PROMOTION_MASK) >> PROMOTION_SHIFT;
   }
+  // 手の種類。
   inline MoveType move_move_type(Move& move) {
     return (move & MOVE_TYPE_MASK) >> MOVE_TYPE_SHIFT;
   }
+  // 取った駒の種類。
   inline Piece move_captured_piece(Move& move) {
     return (move & CAPTURED_PIECE_MASK) >> CAPTURED_PIECE_SHIFT;
   }
+  // キャスリングの権利。
   inline Castling move_castling_rights(Move& move) {
     return (move & CASTLING_RIGHTS_MASK) >> CASTLING_RIGHTS_SHIFT;
   }
+  // アンパッサンの位置。
   inline Square move_en_passant_square(Move& move) {
     return (move & EN_PASSANT_SQUARE_MASK) >> EN_PASSANT_SQUARE_SHIFT;
   }
 
   // 手のビットフィールドのミューテータ。
+  // 動かす駒の位置。
   inline void move_from(Move& move, Square from) {
     move = (move & ~FROM_MASK) | ((from & SQUARE_MASK) << FROM_SHIFT);
   }
+  // 移動先の位置。
   inline void move_to(Move& move, Square to) {
     move = (move & ~TO_MASK) | ((to & SQUARE_MASK) << TO_SHIFT);
   }
+  // 昇格する駒の種類。
   inline void move_promotion(Move& move, Piece promotion) {
     move = (move & ~PROMOTION_MASK)
     | ((promotion & PIECE_MASK) << PROMOTION_SHIFT);
   }
+  // 手の種類。
   inline void move_move_type(Move& move, MoveType move_type) {
     move = (move & ~MOVE_TYPE_MASK)
-    | ((move_type & TYPE_MASK) << MOVE_TYPE_SHIFT);
+    | ((move_type & MTYPE_MASK) << MOVE_TYPE_SHIFT);
   }
+  // 取った駒の種類。
   inline void move_captured_piece(Move& move, Piece captured_piece) {
     move = (move & ~CAPTURED_PIECE_MASK)
     | ((captured_piece & PIECE_MASK) << CAPTURED_PIECE_SHIFT);
   }
+  // キャスリングの権利。
   inline void move_castling_rights(Move& move, Castling castling_rights) {
     move = (move & ~CASTLING_RIGHTS_MASK)
     | ((castling_rights & CASTLING_MASK) << CASTLING_RIGHTS_SHIFT);
   }
+  // アンパッサンの位置。
   inline void move_en_passant_square(Move& move, Square en_passant_square) {
     move = (move & ~EN_PASSANT_SQUARE_MASK)
     | ((en_passant_square & SQUARE_MASK) << EN_PASSANT_SQUARE_SHIFT);
@@ -285,9 +323,13 @@ namespace Sayuri {
   using Hash = std::uint64_t;
 
   // 評価値の定義。
+  // 勝ち。
   constexpr int SCORE_WIN = 1000000;
+  // 負け。
   constexpr int SCORE_LOSE = -SCORE_WIN;
+  // 引き分け。
   constexpr int SCORE_DRAW = 0;
+  // マテリアル。
   constexpr int MATERIAL[NUM_PIECE_TYPES] {
     0, 100, 400, 400, 600, 1200, SCORE_WIN
   };
