@@ -75,9 +75,9 @@ namespace Sayuri {
   // 駒の配置のビットボード。
   void PrintPosition(const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]);
 
-  /**********************
-   * ストップウォッチ。 *
-   **********************/
+  /**********************/
+  /* ストップウォッチ。 */
+  /**********************/
   class StopWatch {
     public:
       /**************************/

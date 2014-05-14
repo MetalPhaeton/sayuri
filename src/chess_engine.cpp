@@ -120,9 +120,9 @@ namespace Sayuri {
     InitHashTable();
   }
 
-  /********************
-   * パブリック関数。 *
-   ********************/
+  /********************/
+  /* パブリック関数。 */
+  /********************/
   void ChessEngine::LoadFen(const Fen& fen) {
     // キングの数がおかしいならやめる。
     int num_white_king = Util::CountBits(fen.position()[WHITE][KING]);
@@ -836,9 +836,9 @@ namespace Sayuri {
     return current_hash;
   }
 
-  /******************************
-   * その他のプライベート関数。 *
-   ******************************/
+  /******************************/
+  /* その他のプライベート関数。 */
+  /******************************/
   // 駒を置く。（駒の種類piece_typeにEMPTYをおけば、駒を削除できる。）
   void ChessEngine::PutPiece(Square square, Piece piece_type, Side side) {
     // 置く位置の現在の駒の種類を入手する。
