@@ -45,6 +45,7 @@
 #include "position_record.h"
 #include "job.h"
 #include "helper_queue.h"
+#include "params.h"
 
 namespace Sayuri {
   /****************/
@@ -65,8 +66,11 @@ namespace Sayuri {
   /* コンストラクタと代入。 */
   /***************************/
   // コンストラクタ。
-  ChessEngine::ChessEngine() {
+  ChessEngine::ChessEngine(const EvalParams& eval_params) {
     SetNewGame();
+
+    // 評価関数用パラメータのコピー。
+    shared_st_ptr_->eval_params_ = eval_params;
   }
 
   // コピーコンストラクタ。

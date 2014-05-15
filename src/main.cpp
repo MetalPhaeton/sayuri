@@ -73,7 +73,8 @@ int main(int argc, char* argv[]) {
     Sayuri::Init();
 
     // エンジン準備。
-    std::unique_ptr<Sayuri::ChessEngine> engine_ptr(new Sayuri::ChessEngine());
+    std::unique_ptr<Sayuri::ChessEngine>
+    engine_ptr(new Sayuri::ChessEngine(Sayuri::EvalParams()));
     std::unique_ptr<Sayuri::UCIShell>
     shell_ptr(new Sayuri::UCIShell(*engine_ptr));
     shell_ptr->AddOutputListener(Print);

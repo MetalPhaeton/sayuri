@@ -39,3 +39,4 @@
 #include "pv_line.h"
 #include "transposition_table.h"
 #include "uci_shell.h"
+#include "params.h"

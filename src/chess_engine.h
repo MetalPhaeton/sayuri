@@ -44,6 +44,7 @@
 #include "position_record.h"
 #include "job.h"
 #include "helper_queue.h"
+#include "params.h"
 
 namespace Sayuri {
   class UCIShell;
@@ -62,7 +63,10 @@ namespace Sayuri {
       /**************************/
       /* コンストラクタと代入。 */
       /**************************/
-      ChessEngine();
+      // コンストラクタ。
+      // [引数]
+      // eval_params: 評価関数用パラメータ。
+      ChessEngine(const EvalParams& eval_params);
       ChessEngine(const ChessEngine& engine);
       ChessEngine(ChessEngine&& engine);
       ChessEngine& operator=(const ChessEngine& engine);
@@ -254,8 +258,15 @@ namespace Sayuri {
       const Move (& killer_stack() const)[MAX_PLYS + 2 + 1][2] {
         return shared_st_ptr_->killer_stack_;
       }
+      // 評価関数用パラメータ。
+      const EvalParams& eval_params() const {
+        return shared_st_ptr_->eval_params_;
+      }
 
     private:
+      // プライベートコンストラクタ。
+      ChessEngine() {}
+
       /**************/
       /* 探索関数。 */
       /**************/
@@ -433,6 +444,9 @@ namespace Sayuri {
         std::vector<PositionRecord> position_history_;
         // スレッドのキュー。
         std::unique_ptr<HelperQueue> helper_queue_ptr_;
+        // 評価関数用パラメータ。
+        EvalParams eval_params_;
+
 
         /**************************/
         /* コンストラクタと代入。 */
