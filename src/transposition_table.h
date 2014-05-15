@@ -66,7 +66,7 @@ namespace Sayuri {
       /* パブリック関数。 */
       /********************/
       // 自身が有効かどうか。
-      operator bool() const {return depth_ > -MAX_VALUE;}
+      explicit operator bool() const {return depth_ > -MAX_VALUE;}
 
       /**************/
       /* アクセサ。 */
