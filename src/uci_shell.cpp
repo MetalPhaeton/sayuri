@@ -478,7 +478,6 @@ namespace Sayuri {
   // ucinewgameコマンド。
   void UCIShell::CommandUCINewGame() {
     engine_ptr_->SetNewGame();
-    ChessEngine::InitHashTable();
     table_ptr_.reset(new TranspositionTable(table_size_));
   }
 
@@ -498,7 +497,7 @@ namespace Sayuri {
 
       if (word.str_ == "startpos") {
         // startposコマンド。
-        engine_ptr_->SetNewGame();
+        engine_ptr_->SetStartPosition();
       } else if (word.str_ == "fen") {
         // fenコマンド。
         // FENを合体。

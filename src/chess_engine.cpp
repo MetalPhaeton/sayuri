@@ -48,20 +48,6 @@
 #include "params.h"
 
 namespace Sayuri {
-  /****************/
-  /* static変数。 */
-  /****************/
-  // 駒の情報からハッシュを得るための配列。
-  // piece_hash_table_[サイド][駒の種類][駒の位置]
-  Hash ChessEngine::piece_hash_table_
-  [NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
-  // 手番からハッシュを得るための配列。
-  Hash ChessEngine::to_move_hash_table_[NUM_SIDES];
-  // キャスリングの権利からハッシュを得るための配列。
-  Hash ChessEngine::castling_hash_table_[4];
-  // アンパッサンの位置からハッシュを得るための配列。
-  Hash ChessEngine::en_passant_hash_table_[NUM_SQUARES];
-
   /**************************/
   /* コンストラクタと代入。 */
   /***************************/
@@ -120,8 +106,6 @@ namespace Sayuri {
   /* ChessEngineクラスの初期化。 */
   /*******************************/
   void ChessEngine::InitChessEngine() {
-    // ハッシュの配列を初期化する。
-    InitHashTable();
   }
 
   /********************/
@@ -220,8 +204,8 @@ namespace Sayuri {
     ply_ = record.ply();
   }
 
-  // 新しいゲームの準備をする。
-  void ChessEngine::SetNewGame() {
+  // 駒を初期配置にセットする。
+  void ChessEngine::SetStartPosition() {
     // 駒の配置を作る。
     // どちらでもない。
     for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES; piece_type++) {
@@ -324,6 +308,20 @@ namespace Sayuri {
       has_castled_[i] = false;
     }
 
+    if (shared_st_ptr_) {
+      // 50手ルールの履歴を初期化。
+      shared_st_ptr_->ply_100_history_.push_back(0);
+
+      // 駒の配置の履歴を初期化。
+      shared_st_ptr_->position_history_.push_back(PositionRecord(*this));
+    }
+  }
+
+  // 新しいゲームの準備をする。
+  void ChessEngine::SetNewGame() {
+    // 駒の配置を初期化。
+    SetStartPosition();
+
     // 共有メンバ構造体を初期化。
     const EvalParams* eval_params_ptr = nullptr;
     if (shared_st_ptr_) {
@@ -335,7 +333,7 @@ namespace Sayuri {
     // 50手ルールの履歴を初期化。
     shared_st_ptr_->ply_100_history_.push_back(0);
 
-    // 駒の配置を初期化。
+    // 駒の配置の履歴を初期化。
     shared_st_ptr_->position_history_.push_back(PositionRecord(*this));
   }
 
@@ -724,24 +722,24 @@ namespace Sayuri {
 
     // 駒の情報からハッシュを得る。
     for (Square square = 0U; square < NUM_SQUARES; square++) {
-      hash ^= piece_hash_table_
+      hash ^= shared_st_ptr_->piece_hash_table_
       [side_board_[square]][piece_board_[square]][square];
     }
 
     // 手番からハッシュを得る。
-    hash ^= to_move_hash_table_[to_move_];
+    hash ^= shared_st_ptr_->to_move_hash_table_[to_move_];
 
     // キャスリングの権利からハッシュを得る。
     Castling bit = 1;
     for (int i = 0; i < 4; i++) {
       if (castling_rights_ & bit) {
-        hash ^= castling_hash_table_[i];
+        hash ^= shared_st_ptr_->castling_hash_table_[i];
       }
       bit <<= 1;
     }
 
     // アンパッサンからハッシュを得る。
-    hash ^= en_passant_hash_table_[en_passant_square_];
+    hash ^= shared_st_ptr_->en_passant_hash_table_[en_passant_square_];
 
     return hash;
   }
@@ -774,26 +772,26 @@ namespace Sayuri {
 
     // 移動する駒のハッシュを削除する。
     current_hash ^=
-    piece_hash_table_[piece_side][piece_type][from];
+    shared_st_ptr_->piece_hash_table_[piece_side][piece_type][from];
 
     // 取る駒のハッシュを削除する。
     current_hash ^=
-    piece_hash_table_[target_side][target_type][target_square];
+    shared_st_ptr_->piece_hash_table_[target_side][target_type][target_square];
 
     // 移動する駒の移動先のハッシュを追加する。
     if (promotion) {
       current_hash ^=
-      piece_hash_table_[piece_side][promotion][to];
+      shared_st_ptr_->piece_hash_table_[piece_side][promotion][to];
     } else {
       current_hash ^=
-      piece_hash_table_[piece_side][piece_type][to];
+      shared_st_ptr_->piece_hash_table_[piece_side][piece_type][to];
     }
 
     // 現在の手番のハッシュを削除。
-    current_hash ^= to_move_hash_table_[to_move_];
+    current_hash ^= shared_st_ptr_->to_move_hash_table_[to_move_];
 
     // 次の手番のハッシュを追加。
-    current_hash ^= to_move_hash_table_[to_move_ ^ 0x3];
+    current_hash ^= shared_st_ptr_->to_move_hash_table_[to_move_ ^ 0x3];
 
     // キャスリングのハッシュをセット。
     Castling loss_rights = 0;
@@ -823,21 +821,21 @@ namespace Sayuri {
     Castling bit = 1;
     for (int i = 0; i < 4; i++) {
       if (castling_diff & bit) {
-        current_hash ^= castling_hash_table_[i];
+        current_hash ^= shared_st_ptr_->castling_hash_table_[i];
       }
       bit <<= 1;
     }
 
     // とりあえずアンパッサンのハッシュを削除。
-    current_hash ^= en_passant_hash_table_[en_passant_square_];
+    current_hash ^= shared_st_ptr_->en_passant_hash_table_[en_passant_square_];
 
     // ポーンの2歩の動きの場合はアンパッサンハッシュを追加。
     if (piece_type == PAWN) {
       int move_diff = to - from;
       if (move_diff == 16) {
-        current_hash ^= en_passant_hash_table_[to - 8];
+        current_hash ^= shared_st_ptr_->en_passant_hash_table_[to - 8];
       } else if (move_diff == -16) {
-        current_hash ^= en_passant_hash_table_[to + 8];
+        current_hash ^= shared_st_ptr_->en_passant_hash_table_[to + 8];
       }
     }
 
@@ -905,11 +903,119 @@ namespace Sayuri {
     PutPiece(from, EMPTY, NO_SIDE);
   }
 
-  /******************/
-  /* ハッシュ関連。 */
-  /******************/
+  /**********************/
+  /* 共有メンバ構造体。 */
+  /**********************/
+  // コンストラクタ。
+  ChessEngine::SharedStruct::SharedStruct() :
+  history_max_(1ULL),
+  i_depth_(1),
+  num_searched_nodes_(0),
+  stop_now_(false),
+  max_nodes_(-1ULL),
+  max_depth_(MAX_PLYS),
+  thinking_time_(-1U >> 1),
+  infinite_thinking_(false),
+  move_history_(0),
+  ply_100_history_(0),
+  position_history_(0),
+  eval_params_ptr_(nullptr) {
+    for (Side side = 0; side < NUM_SIDES; side++) {
+      for (Square from = 0; from < NUM_SQUARES; from++) {
+        for (Square to = 0; to < NUM_SQUARES; to++) {
+          history_[side][from][to] = 0;
+        }
+      }
+    }
+    for (unsigned int i = 0; i < (MAX_PLYS + 1); i++) {
+      iid_stack_[i] = 0U;
+      killer_stack_[i][0] = 0U;
+      killer_stack_[i][1] = 0U;
+      killer_stack_[i + 2][0] = 0U;
+      killer_stack_[i + 2][1] = 0U;
+    }
+    helper_queue_ptr_.reset(new HelperQueue());
+    InitHashTable();
+  }
+
+  // コピーコンストラクタ。
+  ChessEngine::SharedStruct::SharedStruct(const SharedStruct& shared_st) {
+    ScanMember(shared_st);
+  }
+
+  // ムーブコンストラクタ。
+  ChessEngine::SharedStruct::SharedStruct(SharedStruct&& shared_st) {
+    ScanMember(shared_st);
+  }
+
+  // コピー代入。
+  ChessEngine::SharedStruct& ChessEngine::SharedStruct::operator=
+  (const SharedStruct& shared_st) {
+    ScanMember(shared_st);
+    return *this;
+  }
+
+  // ムーブ代入。
+  ChessEngine::SharedStruct& ChessEngine::SharedStruct::operator=
+  (SharedStruct&& shared_st) {
+    ScanMember(shared_st);
+    return *this;
+  }
+
+  // メンバをコピーする。
+  void ChessEngine::SharedStruct::ScanMember(const SharedStruct& shared_st) {
+    for (Side side = 0; side < NUM_SIDES; side++) {
+      for (Square from = 0; from < NUM_SQUARES; from++) {
+        for (Square to = 0; to < NUM_SQUARES; to++) {
+          history_[side][from][to] = shared_st.history_[side][from][to];
+        }
+      }
+    }
+    history_max_ = shared_st.history_max_;
+    for (std::uint32_t i = 0U; i < (MAX_PLYS + 1); i++) {
+      iid_stack_[i] = shared_st.iid_stack_[i];
+      killer_stack_[i][0] = shared_st.killer_stack_[i][0];
+      killer_stack_[i][0] = shared_st.killer_stack_[i][0];
+      killer_stack_[i + 2][1] = shared_st.killer_stack_[i + 2][1];
+      killer_stack_[i + 2][1] = shared_st.killer_stack_[i + 2][1];
+    }
+    i_depth_ = shared_st.i_depth_;
+    num_searched_nodes_ = shared_st.num_searched_nodes_;
+    start_time_ = shared_st.start_time_;
+    stop_now_ = shared_st.stop_now_;
+    max_nodes_ = shared_st.max_nodes_;
+    max_depth_ = shared_st.max_depth_;
+    thinking_time_ = shared_st.thinking_time_;
+    infinite_thinking_ = shared_st.infinite_thinking_;
+    move_history_ = shared_st.move_history_;
+    ply_100_history_ = shared_st.ply_100_history_;
+    position_history_ = shared_st.position_history_;
+    helper_queue_ptr_.reset(new HelperQueue(*(shared_st.helper_queue_ptr_)));
+    eval_params_ptr_ = shared_st.eval_params_ptr_;
+
+    // ハッシュ関連。
+    for (Side side = 0U; side < NUM_SIDES; side++) {
+      for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES; piece_type++) {
+        for (Square square = 0U; square < NUM_SQUARES; square++) {
+          piece_hash_table_[side][piece_type][square] =
+          shared_st.piece_hash_table_[side][piece_type][square];
+        }
+      }
+    }
+    for (Side side = 0U; side < NUM_SIDES; side++) {
+      to_move_hash_table_[side] = shared_st.to_move_hash_table_[side];
+    }
+    for (int i = 0; i < 4; i++) {
+      castling_hash_table_[i] = shared_st.castling_hash_table_[i];
+    }
+    for (Square square = 0U; square < NUM_SQUARES; square++) {
+      en_passant_hash_table_[square] =
+      shared_st.en_passant_hash_table_[square];
+    }
+  }
+
   // ハッシュの配列を初期化する。
-  void ChessEngine::InitHashTable() {
+  void ChessEngine::SharedStruct::InitHashTable() {
     // メルセンヌツイスターの準備。
     std::mt19937 engine(SysClock::to_time_t (SysClock::now()));
     std::uniform_int_distribution<Hash> dist(0ULL, -1ULL);
@@ -979,95 +1085,5 @@ namespace Sayuri {
       en_passant_hash_table_[square] = temp_table[temp_count];
       temp_count++;
     }
-  }
-
-  /**********************/
-  /* 共有メンバ構造体。 */
-  /**********************/
-  // コンストラクタ。
-  ChessEngine::SharedStruct::SharedStruct() :
-  history_max_(1ULL),
-  i_depth_(1),
-  num_searched_nodes_(0),
-  stop_now_(false),
-  max_nodes_(-1ULL),
-  max_depth_(MAX_PLYS),
-  thinking_time_(-1U >> 1),
-  infinite_thinking_(false),
-  move_history_(0),
-  ply_100_history_(0),
-  position_history_(0),
-  eval_params_ptr_(nullptr) {
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Square from = 0; from < NUM_SQUARES; from++) {
-        for (Square to = 0; to < NUM_SQUARES; to++) {
-          history_[side][from][to] = 0;
-        }
-      }
-    }
-    for (unsigned int i = 0; i < (MAX_PLYS + 1); i++) {
-      iid_stack_[i] = 0U;
-      killer_stack_[i][0] = 0U;
-      killer_stack_[i][1] = 0U;
-      killer_stack_[i + 2][0] = 0U;
-      killer_stack_[i + 2][1] = 0U;
-    }
-    helper_queue_ptr_.reset(new HelperQueue());
-  }
-
-  // コピーコンストラクタ。
-  ChessEngine::SharedStruct::SharedStruct(const SharedStruct& shared_st) {
-    ScanMember(shared_st);
-  }
-
-  // ムーブコンストラクタ。
-  ChessEngine::SharedStruct::SharedStruct(SharedStruct&& shared_st) {
-    ScanMember(shared_st);
-  }
-
-  // コピー代入。
-  ChessEngine::SharedStruct& ChessEngine::SharedStruct::operator=
-  (const SharedStruct& shared_st) {
-    ScanMember(shared_st);
-    return *this;
-  }
-
-  // ムーブ代入。
-  ChessEngine::SharedStruct& ChessEngine::SharedStruct::operator=
-  (SharedStruct&& shared_st) {
-    ScanMember(shared_st);
-    return *this;
-  }
-
-  // メンバをコピーする。
-  void ChessEngine::SharedStruct::ScanMember(const SharedStruct& shared_st) {
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Square from = 0; from < NUM_SQUARES; from++) {
-        for (Square to = 0; to < NUM_SQUARES; to++) {
-          history_[side][from][to] = shared_st.history_[side][from][to];
-        }
-      }
-    }
-    history_max_ = shared_st.history_max_;
-    for (std::uint32_t i = 0U; i < (MAX_PLYS + 1); i++) {
-      iid_stack_[i] = shared_st.iid_stack_[i];
-      killer_stack_[i][0] = shared_st.killer_stack_[i][0];
-      killer_stack_[i][0] = shared_st.killer_stack_[i][0];
-      killer_stack_[i + 2][1] = shared_st.killer_stack_[i + 2][1];
-      killer_stack_[i + 2][1] = shared_st.killer_stack_[i + 2][1];
-    }
-    i_depth_ = shared_st.i_depth_;
-    num_searched_nodes_ = shared_st.num_searched_nodes_;
-    start_time_ = shared_st.start_time_;
-    stop_now_ = shared_st.stop_now_;
-    max_nodes_ = shared_st.max_nodes_;
-    max_depth_ = shared_st.max_depth_;
-    thinking_time_ = shared_st.thinking_time_;
-    infinite_thinking_ = shared_st.infinite_thinking_;
-    move_history_ = shared_st.move_history_;
-    ply_100_history_ = shared_st.ply_100_history_;
-    position_history_ = shared_st.position_history_;
-    helper_queue_ptr_.reset(new HelperQueue(*(shared_st.helper_queue_ptr_)));
-    eval_params_ptr_ = shared_st.eval_params_ptr_;
   }
 }  // namespace Sayuri

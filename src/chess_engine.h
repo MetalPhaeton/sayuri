@@ -85,11 +85,11 @@ namespace Sayuri {
       // record: 読み込むPositionRecord。
       void LoadRecord(const PositionRecord& record);
 
+      // 駒を初期配置にセットする。
+      void SetStartPosition();
+
       // 新しいゲームの準備をする。
       void SetNewGame();
-
-      // ハッシュの配列を初期化する。
-      static void InitHashTable();
 
       // 探索のストップ条件を設定する。
       // [引数]
@@ -447,6 +447,22 @@ namespace Sayuri {
         // 評価関数用パラメータのポインタ。
         const EvalParams* eval_params_ptr_;
 
+        /******************/
+        /* ハッシュ関連。 */
+        /******************/
+        // 駒の情報からハッシュを得るための配列。
+        // piece_hash_table_[サイド][駒の種類][駒の位置]
+        Hash piece_hash_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
+        // 手番からハッシュを得るための配列。
+        Hash to_move_hash_table_[NUM_SIDES];
+        // キャスリングの権利からハッシュを得るための配列。
+        // 0: 白のショートキャスリング。
+        // 1: 白のロングキャスリング。
+        // 2: 黒のショートキャスリング。
+        // 3: 黒のロングキャスリング。
+        Hash castling_hash_table_[4];
+        // アンパッサンの位置からハッシュを得るための配列。
+        Hash en_passant_hash_table_[NUM_SQUARES];
 
         /**************************/
         /* コンストラクタと代入。 */
@@ -465,6 +481,10 @@ namespace Sayuri {
         // [引数]
         // shared_st: コピー元。
         void ScanMember(const SharedStruct& shared_st);
+
+        // ハッシュの配列を初期化する。
+        void InitHashTable();
+
       };
       std::shared_ptr<SharedStruct> shared_st_ptr_;
 
@@ -479,23 +499,6 @@ namespace Sayuri {
       std::mutex mutex_;
       // スレッドのベクトル。
       std::vector<std::thread> thread_vec_;
-
-      /******************/
-      /* ハッシュ関連。 */
-      /******************/
-      // 駒の情報からハッシュを得るための配列。
-      // piece_hash_table_[サイド][駒の種類][駒の位置]
-      static Hash piece_hash_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
-      // 手番からハッシュを得るための配列。
-      static Hash to_move_hash_table_[NUM_SIDES];
-      // キャスリングの権利からハッシュを得るための配列。
-      // 0: 白のショートキャスリング。
-      // 1: 白のロングキャスリング。
-      // 2: 黒のショートキャスリング。
-      // 3: 黒のロングキャスリング。
-      static Hash castling_hash_table_[4];
-      // アンパッサンの位置からハッシュを得るための配列。
-      static Hash en_passant_hash_table_[NUM_SQUARES];
   };
 }  // namespace Sayuri
 
