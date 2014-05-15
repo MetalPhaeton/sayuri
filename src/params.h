@@ -33,6 +33,273 @@
 namespace Sayuri {
   // 探索アルゴリズムのパラメータのクラス。
   class SearchParams {
+    public:
+      /**************************/
+      /* コンストラクタと代入。 */
+      /**************************/
+      SearchParams();
+      SearchParams(const SearchParams& params);
+      SearchParams(SearchParams&& params);
+      SearchParams& operator=(const SearchParams& params);
+      SearchParams& operator=(SearchParams&& params);
+      virtual ~SearchParams() {}
+
+      /**************/
+      /* アクセサ。 */
+      /**************/
+      // Aspiration Search。
+      // 有効かどうか。
+      bool enable_aspiration_search() const {return enable_aspiration_search_;}
+      // 残り深さの制限。
+      int aspiration_search_limit_depth() const {
+        return aspiration_search_limit_depth_;
+      }
+      // デルタ値。
+      int aspiration_search_delta() const {return aspiration_search_delta_;}
+
+      // SEE。
+      // 有効かどうか。
+      bool enable_see() const {return enable_see_;}
+
+      // ヒストリー。
+      // 有効かどうか。
+      bool enable_history() const {return enable_history_;}
+
+      // キラームーブ。
+      // 有効かどうか。
+      bool enable_killer() const {return enable_killer_;}
+      // 2プライ先のキラームーブが有効かどうか。
+      bool enable_killer_2() const {return enable_killer_2_;}
+
+      // トランスポジションテーブル。
+      // 有効かどうか。
+      bool enable_ttable() const {return enable_ttable_;}
+
+      // Internal Iterative Deepening。
+      // 有効かどうか。
+      bool enable_iid() const {return enable_iid_;}
+      // 残り深さの制限。
+      int iid_limit_depth() const {return iid_limit_depth_;}
+      // IIDで読む深さ。
+      int iid_search_depth() const {return iid_search_depth_;}
+
+      // Null Move Reduction。
+      // 有効かどうか。
+      bool enable_nmr() const {return enable_nmr_;}
+      // 残り深さの制限。
+      int nmr_limit_depth() const {return nmr_limit_depth_;}
+      // 何プライ浅く読むか。
+      int nmr_search_reduction() const {return nmr_search_reduction_;}
+      // リダクションする深さ。
+      int nmr_reduction() const {return nmr_reduction_;}
+
+      // ProbCut。
+      // 有効かどうか。
+      bool enable_probcut() const {return enable_probcut_;}
+      // 残り深さの制限。
+      int probcut_limit_depth() const {return probcut_limit_depth_;}
+
+      // History Pruning。
+      // (ヒストリーが無効の場合は設定にかかわらず無効になる。)
+      // 有効かどうか。
+      bool enable_history_pruning() const {return enable_history_pruning_;}
+      // 残り深さの制限。
+      int history_pruning_limit_depth() const {
+        return history_pruning_limit_depth_;
+      }
+      // 最大値に対する閾値。 1.0から0.0。
+      double history_pruning_threshold() const {
+        return history_pruning_threshold_;
+      }
+      // リダクションする深さ。
+      int history_pruning_reduction() const {
+        return history_pruning_reduction_;
+      }
+
+      // Late Move Reduction。
+      // 有効かどうか。
+      bool enable_lmr() const {return enable_lmr_;}
+      // 残り深さの制限。
+      int lmr_limit_depth() const {return lmr_limit_depth_;}
+      // 全候補手中、リダクションしない手数の閾値。 1.0から0.0。
+      double lmr_threshold() const {return lmr_threshold_;}
+      // リダクションする深さ。
+      int lmr_reduction() const {return lmr_reduction_;}
+
+      // Futility Pruning。
+      // 有効かどうか。
+      bool enable_futility_pruning() const {return enable_futility_pruning_;}
+      // 有効にする残り深さ。
+      int futility_pruning_depth() const {return futility_pruning_depth_;}
+      // 1プライあたりのマージン。
+      int futility_pruning_margin() const {return futility_pruning_margin_;}
+
+      /******************/
+      /* ミューテータ。 */
+      /******************/
+      // Aspiration Search。
+      // 有効かどうか。
+      void enable_aspiration_search(bool enable) {
+        enable_aspiration_search_ = enable;
+      }
+      // 残り深さの制限。
+      void aspiration_search_limit_depth(int depth) {
+        aspiration_search_limit_depth_ = depth;
+      }
+      // デルタ値。
+      void aspiration_search_delta(int delta) {
+        aspiration_search_delta_ = delta;
+      }
+
+      // SEE。
+      // 有効かどうか。
+      void enable_see(bool enable) {enable_see_ = enable;}
+
+      // ヒストリー。
+      // 有効かどうか。
+      void enable_history(bool enable) {enable_history_ = enable;}
+
+      // キラームーブ。
+      // 有効かどうか。
+      void enable_killer(bool enable) {enable_killer_ = enable;}
+      // 2プライ先のキラームーブが有効かどうか。
+      void enable_killer_2(bool enable) {enable_killer_2_ = enable;}
+
+      // トランスポジションテーブル。
+      // 有効かどうか。
+      void enable_ttable(bool enable) {enable_ttable_ = enable;}
+
+      // Internal Iterative Deepening。
+      // 有効かどうか。
+      void enable_iid(bool enable) {enable_iid_ = enable;}
+      // 残り深さの制限。
+      void iid_limit_depth(int depth) {iid_limit_depth_ = depth;}
+      // IIDで読む深さ。
+      void iid_search_depth(int depth) {iid_search_depth_ = depth;}
+
+      // Null Move Reduction。
+      // 有効かどうか。
+      void enable_nmr(bool enable) {enable_nmr_ = enable;}
+      // 残り深さの制限。
+      void nmr_limit_depth(int depth) {nmr_limit_depth_ = depth;}
+      // 何プライ浅く読むか。
+      void nmr_search_reduction(int reduction) {
+        nmr_search_reduction_ = reduction;
+      }
+      // リダクションする深さ。
+      void nmr_reduction(int reduction) {nmr_reduction_ = reduction;}
+
+      // ProbCut。
+      // 有効かどうか。
+      void enable_probcut(bool enable) {enable_probcut_ = enable;}
+      // 残り深さの制限。
+      void probcut_limit_depth(int depth) {probcut_limit_depth_ = depth;}
+
+      // History Pruning。
+      // (ヒストリーが無効の場合は設定にかかわらず無効になる。)
+      // 有効かどうか。
+      void enable_history_pruning(bool enable) {
+        enable_history_pruning_ = enable;
+      }
+      // 残り深さの制限。
+      void history_pruning_limit_depth(int depth) {
+        history_pruning_limit_depth_ = depth;
+      }
+      // 最大値に対する閾値。 1.0から0.0。
+      void history_pruning_threshold(double threshold) {
+        history_pruning_threshold_ = threshold;
+      }
+      // リダクションする深さ。
+      void history_pruning_reduction(int reduction) {
+        history_pruning_reduction_ = reduction;
+      }
+
+      // Late Move Reduction。
+      // 有効かどうか。
+      void enable_lmr(bool enable) {enable_lmr_ = enable;}
+      // 残り深さの制限。
+      void lmr_limit_depth(int depth) {lmr_limit_depth_ = depth;}
+      // 全候補手中、リダクションしない手数の閾値。 1.0から0.0。
+      void lmr_threshold(double threshold) {lmr_threshold_ = threshold;}
+      // リダクションする深さ。
+      void lmr_reduction(int reduction) {lmr_reduction_ = reduction;}
+
+      // Futility Pruning。
+      // 有効かどうか。
+      void enable_futility_pruning(bool enable) {
+        enable_futility_pruning_ = enable;
+      }
+      // 有効にする残り深さ。
+      void futility_pruning_depth(int depth) {
+        futility_pruning_depth_ = depth;
+      }
+      // 1プライあたりのマージン。
+      void futility_pruning_margin(int margin) {
+        futility_pruning_margin_ = margin;
+      }
+
+    private:
+      /**********************/
+      /* プライベート関数。 */
+      /**********************/
+      // メンバをコピーする。
+      void ScanMember(const SearchParams& params);
+
+      /****************/
+      /* メンバ変数。 */
+      /****************/
+      // Aspiration Search。
+      bool enable_aspiration_search_;  // 有効かどうか。
+      int aspiration_search_limit_depth_;  // 残り深さの制限。
+      int aspiration_search_delta_;  // デルタ値。
+
+      // SEE。
+      bool enable_see_;  // 有効かどうか。
+
+      // ヒストリー。
+      bool enable_history_;  // 有効かどうか。
+
+      // キラームーブ。
+      bool enable_killer_;  // 有効かどうか。
+      bool enable_killer_2_;  // 2プライ先のキラームーブが有効かどうか。
+
+      // トランスポジションテーブル。
+      bool enable_ttable_;  // 有効かどうか。
+
+      // Internal Iterative Deepening。
+      bool enable_iid_;  // 有効かどうか。
+      int iid_limit_depth_;  // 残り深さの制限。
+      int iid_search_depth_;  // IIDで読む深さ。
+
+      // Null Move Reduction。
+      bool enable_nmr_;  // 有効かどうか。
+      int nmr_limit_depth_;  // 残り深さの制限。
+      int nmr_search_reduction_;  // 何プライ浅く読むか。
+      int nmr_reduction_;  // リダクションする深さ。
+
+      // ProbCut。
+      bool enable_probcut_;  // 有効かどうか。
+      int probcut_limit_depth_;  // 残り深さの制限。
+
+      // History Pruning。
+      // (ヒストリーが無効の場合は設定にかかわらず無効になる。)
+      bool enable_history_pruning_;  // 有効かどうか。
+      int history_pruning_limit_depth_;  // 残り深さの制限。
+      // 最大値に対する閾値。 1.0 から 0.0。
+      double history_pruning_threshold_;
+      int history_pruning_reduction_;  // リダクションする深さ。
+
+      // Late Move Reduction。
+      bool enable_lmr_;  // 有効かどうか。
+      int lmr_limit_depth_;  // 残り深さの制限。
+      // 全候補手中、リダクションしない手数の閾値。 1.0 から 0.0。
+      double lmr_threshold_;
+      int lmr_reduction_;  // リダクションする深さ。
+
+      // Futility Pruning。
+      bool enable_futility_pruning_;  // 有効かどうか。
+      int futility_pruning_depth_;  // 有効にする残り深さ。
+      int futility_pruning_margin_;  // 1プライあたりのマージン。
   };
 
   // 評価関数のパラメータのウェイトのクラス。

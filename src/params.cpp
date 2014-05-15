@@ -29,6 +29,94 @@
 #include <iostream>
 
 namespace Sayuri {
+  /******************/
+  /* SearchParams。 */
+  /******************/
+  // コンストラクタ。
+  SearchParams::SearchParams() :
+    enable_aspiration_search_(true),
+    aspiration_search_limit_depth_(4),
+    aspiration_search_delta_(15),
+    enable_see_(true),
+    enable_history_(true),
+    enable_killer_(true),
+    enable_killer_2_(true),
+    enable_ttable_(true),
+    enable_iid_(true),
+    iid_limit_depth_(5),
+    iid_search_depth_(4),
+    enable_nmr_(true),
+    nmr_limit_depth_(4),
+    nmr_search_reduction_(3),
+    nmr_reduction_(3),
+    enable_probcut_(true),
+    probcut_limit_depth_(5),
+    enable_history_pruning_(true),
+    history_pruning_limit_depth_(4),
+    history_pruning_threshold_(0.5),
+    history_pruning_reduction_(1),
+    enable_lmr_(true),
+    lmr_limit_depth_(4),
+    lmr_threshold_(0.25),
+    lmr_reduction_(1),
+    enable_futility_pruning_(true),
+    futility_pruning_depth_(3),
+    futility_pruning_margin_(300) {}
+
+  // コピーコンストラクタ。
+  SearchParams::SearchParams(const SearchParams& params) {
+    ScanMember(params);
+  }
+
+  // ムーブコンストラクタ。
+  SearchParams::SearchParams(SearchParams&& params) {
+    ScanMember(params);
+  }
+
+  // コピー代入。
+  SearchParams& SearchParams::operator=(const SearchParams& params) {
+    ScanMember(params);
+    return *this;
+  }
+
+  // ムーブ代入。
+  SearchParams& SearchParams::operator=(SearchParams&& params) {
+    ScanMember(params);
+    return *this;
+  }
+
+  // メンバをコピーする。
+  void SearchParams::ScanMember(const SearchParams& params) {
+    enable_aspiration_search_ = params.enable_aspiration_search_;
+    aspiration_search_limit_depth_ = params.aspiration_search_limit_depth_;
+    aspiration_search_delta_ = params.aspiration_search_delta_;
+    enable_see_ = params.enable_see_;
+    enable_history_ = params.enable_history_;
+    enable_killer_ = params.enable_killer_;
+    enable_killer_2_ = params.enable_killer_2_;
+    enable_ttable_ = params.enable_ttable_;
+    enable_iid_ = params.enable_iid_;
+    iid_limit_depth_ = params.iid_limit_depth_;
+    iid_search_depth_ = params.iid_search_depth_;
+    enable_nmr_ = params.enable_nmr_;
+    nmr_limit_depth_ = params.nmr_limit_depth_;
+    nmr_search_reduction_ = params.nmr_search_reduction_;
+    nmr_reduction_ = params.nmr_reduction_;
+    enable_probcut_ = params.enable_probcut_;
+    probcut_limit_depth_ = params.probcut_limit_depth_;
+    enable_history_pruning_ = params.enable_history_pruning_;
+    history_pruning_limit_depth_ = params.history_pruning_limit_depth_;
+    history_pruning_threshold_ = params.history_pruning_threshold_;
+    history_pruning_reduction_ = params.history_pruning_reduction_;
+    enable_lmr_ = params.enable_lmr_;
+    lmr_limit_depth_ = params.lmr_limit_depth_;
+    lmr_threshold_ = params.lmr_threshold_;
+    lmr_reduction_ = params.lmr_reduction_;
+    enable_futility_pruning_ = params.enable_futility_pruning_;
+    futility_pruning_depth_ = params.futility_pruning_depth_;
+    futility_pruning_margin_ = params.futility_pruning_margin_;
+  }
+
   /****************/
   /* EvalParams。 */
   /****************/
