@@ -260,12 +260,12 @@ namespace Sayuri {
       }
       // 評価関数用パラメータ。
       const EvalParams& eval_params() const {
-        return shared_st_ptr_->eval_params_;
+        return *(shared_st_ptr_->eval_params_ptr_);
       }
 
     private:
       // プライベートコンストラクタ。
-      ChessEngine() {}
+      ChessEngine() {SetNewGame();}
 
       /**************/
       /* 探索関数。 */
@@ -444,8 +444,8 @@ namespace Sayuri {
         std::vector<PositionRecord> position_history_;
         // スレッドのキュー。
         std::unique_ptr<HelperQueue> helper_queue_ptr_;
-        // 評価関数用パラメータ。
-        EvalParams eval_params_;
+        // 評価関数用パラメータのポインタ。
+        const EvalParams* eval_params_ptr_;
 
 
         /**************************/

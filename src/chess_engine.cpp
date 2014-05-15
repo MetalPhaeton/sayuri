@@ -70,7 +70,7 @@ namespace Sayuri {
     SetNewGame();
 
     // 評価関数用パラメータのコピー。
-    shared_st_ptr_->eval_params_ = eval_params;
+    shared_st_ptr_->eval_params_ptr_ = &eval_params;
   }
 
   // コピーコンストラクタ。
@@ -325,7 +325,12 @@ namespace Sayuri {
     }
 
     // 共有メンバ構造体を初期化。
+    const EvalParams* eval_params_ptr = nullptr;
+    if (shared_st_ptr_) {
+      eval_params_ptr = shared_st_ptr_->eval_params_ptr_;  // 一時待避。
+    }
     shared_st_ptr_.reset(new SharedStruct());
+    shared_st_ptr_->eval_params_ptr_ = eval_params_ptr;  // 復帰。
 
     // 50手ルールの履歴を初期化。
     shared_st_ptr_->ply_100_history_.push_back(0);
@@ -991,7 +996,8 @@ namespace Sayuri {
   infinite_thinking_(false),
   move_history_(0),
   ply_100_history_(0),
-  position_history_(0) {
+  position_history_(0),
+  eval_params_ptr_(nullptr) {
     for (Side side = 0; side < NUM_SIDES; side++) {
       for (Square from = 0; from < NUM_SQUARES; from++) {
         for (Square to = 0; to < NUM_SQUARES; to++) {
@@ -1062,5 +1068,6 @@ namespace Sayuri {
     ply_100_history_ = shared_st.ply_100_history_;
     position_history_ = shared_st.position_history_;
     helper_queue_ptr_.reset(new HelperQueue(*(shared_st.helper_queue_ptr_)));
+    eval_params_ptr_ = shared_st.eval_params_ptr_;
   }
 }  // namespace Sayuri

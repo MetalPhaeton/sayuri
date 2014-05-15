@@ -27,79 +27,11 @@
 #include "evaluator.h"
 
 #include <iostream>
+#include "chess_engine.h"
 #include "error.h"
+#include "params.h"
 
 namespace Sayuri {
-  /**********************/
-  /* static const定数。 */
-  /**********************/
-  // ポーンの配置。
-  const Evaluator::Weight Evaluator::WEIGHT_PAWN_POSITION(2.0, 0.0);
-  // ナイトの配置。
-  const Evaluator::Weight Evaluator::WEIGHT_KNIGHT_POSITION(2.5, 0.0);
-  // ビショップの配置。
-  const Evaluator::Weight Evaluator::WEIGHT_BISHOP_POSITION(3.5, 0.0);
-  // ルークの配置。
-  const Evaluator::Weight Evaluator::WEIGHT_ROOK_POSITION(2.5, 0.0);
-  // クイーンの配置。
-  const Evaluator::Weight Evaluator::WEIGHT_QUEEN_POSITION(2.5, 0.0);
-  // キングの配置。
-  const Evaluator::Weight Evaluator::WEIGHT_KING_POSITION(10.0, 0.0);
-  // 終盤のポーンの配置。
-  const Evaluator::Weight Evaluator::WEIGHT_PAWN_POSITION_ENDING(0.0, 20.0);
-  // 終盤のキングの配置。
-  const Evaluator::Weight Evaluator::WEIGHT_KING_POSITION_ENDING(0.0, 15.0);
-  // 機動力。
-  const Evaluator::Weight Evaluator::WEIGHT_MOBILITY(1.0, 1.0);
-  // センターコントロール。
-  const Evaluator::Weight Evaluator::WEIGHT_CENTER_CONTROL(0.5, 0.0);
-  // スウィートセンターのコントロール。
-  const Evaluator::Weight Evaluator::WEIGHT_SWEET_CENTER_CONTROL(0.5, 0.0);
-  // 駒の展開。
-  const Evaluator::Weight Evaluator::WEIGHT_DEVELOPMENT(2.5, 0.0);
-  // 攻撃。
-  const Evaluator::Weight Evaluator::WEIGHT_ATTACK(2.0, 0.0);
-  // 相手キング周辺への攻撃
-  const Evaluator::Weight Evaluator::WEIGHT_ATTACK_AROUND_KING(0.0, 3.0);
-  // パスポーン。
-  const Evaluator::Weight Evaluator::WEIGHT_PASS_PAWN(7.0, 14.0);
-  // 守られたパスポーン。
-  const Evaluator::Weight Evaluator::WEIGHT_PROTECTED_PASS_PAWN(2.5, 2.5);
-  // ダブルポーン。
-  const Evaluator::Weight Evaluator::WEIGHT_DOUBLE_PAWN(-2.5, -5.0);
-  // 孤立ポーン。
-  const Evaluator::Weight Evaluator::WEIGHT_ISO_PAWN(-5.0, -2.5);
-  // ポーンの盾。
-  const Evaluator::Weight Evaluator::WEIGHT_PAWN_SHIELD(15.0, 0.0);
-  // ビショップペア。
-  const Evaluator::Weight Evaluator::WEIGHT_BISHOP_PAIR(10.0, 60.0);
-  // バッドビショップ。
-  const Evaluator::Weight Evaluator::WEIGHT_BAD_BISHOP(-0.7, 0.0);
-  // ナイトをピン。
-  const Evaluator::Weight Evaluator::WEIGHT_PIN_KNIGHT(10.0, 0.0);
-  // ルークペア。
-  const Evaluator::Weight Evaluator::WEIGHT_ROOK_PAIR(10.0, 20.0);
-  // セミオープンファイルのルーク。
-  const Evaluator::Weight Evaluator::WEIGHT_ROOK_SEMI_OPEN(3.5, 3.5);
-  // オープンファイルのルーク。
-  const Evaluator::Weight Evaluator::WEIGHT_ROOK_OPEN(3.5, 3.5);
-  // 早すぎるクイーンの始動。
-  const Evaluator::Weight Evaluator::WEIGHT_EARLY_QUEEN_LAUNCHED(-20.0, 0.0);
-  // キング周りの弱いマス。
-  const Evaluator::Weight Evaluator::WEIGHT_WEAK_SQUARE(-5.0, 0.0);
-  // キャスリング。(これの2倍が評価値。権利の放棄は-1倍。)
-  const Evaluator::Weight Evaluator::WEIGHT_CASTLING(45.0, 0.0);
-
-  /****************/
-  /* static定数。 */
-  /****************/
-  constexpr double Evaluator::POSITION_TABLE[NUM_PIECE_TYPES][NUM_SQUARES];
-  constexpr double Evaluator::PAWN_POSITION_ENDING_TABLE[NUM_SQUARES];
-  constexpr double Evaluator::KING_POSITION_ENDING_TABLE[NUM_SQUARES];
-  constexpr double Evaluator::ATTACK_VALUE_TABLE
-  [NUM_PIECE_TYPES][NUM_PIECE_TYPES];
-  constexpr double Evaluator::PAWN_SHIELD_TABLE[NUM_SQUARES];
-
   /****************/
   /* static変数。 */
   /****************/
@@ -166,16 +98,19 @@ namespace Sayuri {
   // 評価値を返す。
   int Evaluator::Evaluate(int material) {
     // 価値の変数の初期化。
-    for (Piece piece_type = 0U; piece_type < NUM_PIECE_TYPES; piece_type++) {
-      position_value_[piece_type] = 0.0;
+    for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+      opening_position_value_[piece_type] = 0.0;
     }
-    pawn_position_ending_value_ = 0.0;
-    king_position_ending_value_ = 0.0;
+    for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+      ending_position_value_[piece_type] = 0.0;
+    }
     mobility_value_ = 0.0;
     center_control_value_ = 0.0;
     sweet_center_control_value_ = 0.0;
     development_value_ = 0.0;
-    attack_value_ = 0.0;
+    for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+      attack_value_[piece_type] = 0.0;
+    }
     pass_pawn_value_ = 0.0;
     protected_pass_pawn_value_ = 0.0;
     double_pawn_value_ = 0.0;
@@ -185,12 +120,13 @@ namespace Sayuri {
     bad_bishop_value_ = 0.0;
     pin_knight_value_ = 0.0;
     rook_pair_value_ = 0.0;
-    rook_semi_open_value_ = 0.0;
-    rook_open_value_ = 0.0;
+    rook_semiopen_fyle_value_ = 0.0;
+    rook_open_fyle_value_ = 0.0;
     early_queen_launched_value_ = 0.0;
     attack_around_king_value_ = 0.0;
     weak_square_value_ = 0.0;
     castling_value_ = 0.0;
+    abandoned_castling_value_ = 0.0;
 
     // サイド。
     Side side = engine_ptr_->to_move();
@@ -251,69 +187,76 @@ namespace Sayuri {
     constexpr int NUM_KINGS = 2;
     double num_pieces = static_cast<double>
     (Util::CountBits(all_pieces) - NUM_KINGS);
+    const EvalParams& params = engine_ptr_->eval_params();
     // マテリアル。
     double score = material;
-    // ポーンの配置。
-    score += WEIGHT_PAWN_POSITION(num_pieces) * position_value_[PAWN];
-    // ナイトの配置。
-    score += WEIGHT_KNIGHT_POSITION(num_pieces) * position_value_[KNIGHT];
-    // ビショップの配置。
-    score += WEIGHT_BISHOP_POSITION(num_pieces) * position_value_[BISHOP];
-    // ルークの配置。
-    score += WEIGHT_ROOK_POSITION(num_pieces) * position_value_[ROOK];
-    // クイーンの配置。
-    score += WEIGHT_QUEEN_POSITION(num_pieces) * position_value_[QUEEN];
-    // キングの配置。
-    score += WEIGHT_KING_POSITION(num_pieces) * position_value_[KING];
-    // 終盤のポーンの配置。
-    score += WEIGHT_PAWN_POSITION_ENDING(num_pieces)
-    * pawn_position_ending_value_;
-    // 終盤のキングの配置。
-    score += WEIGHT_KING_POSITION_ENDING(num_pieces)
-    * king_position_ending_value_;
+    // オープニング時の駒の配置。
+    const Weight (& weights_1)[NUM_PIECE_TYPES] =
+    params.weight_opening_position();
+    for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+      score += weights_1[piece_type](num_pieces)
+      * opening_position_value_[piece_type];
+    }
+    // エンディング時の駒の配置。
+    const Weight (& weights_2)[NUM_PIECE_TYPES] =
+    params.weight_ending_position();
+    for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+      score += weights_2[piece_type](num_pieces)
+      * ending_position_value_[piece_type];
+    }
     // 機動力。
-    score += WEIGHT_MOBILITY(num_pieces) * mobility_value_;
+    score += params.weight_mobility()(num_pieces) * mobility_value_;
     // センターコントロール。
-    score += WEIGHT_CENTER_CONTROL(num_pieces) * center_control_value_;
+    score += params.weight_center_control()(num_pieces)
+    * center_control_value_;
     // スウィートセンターのコントロール。
-    score += WEIGHT_SWEET_CENTER_CONTROL(num_pieces)
+    score += params.weight_sweet_center_control()(num_pieces)
     * sweet_center_control_value_;
     // 駒の展開。
-    score += WEIGHT_DEVELOPMENT(num_pieces) * development_value_;
+    score += params.weight_development()(num_pieces) * development_value_;
     // 攻撃。
-    score += WEIGHT_ATTACK(num_pieces) * attack_value_;
+    const Weight (& weights_3)[NUM_PIECE_TYPES] = params.weight_attack();
+    for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+      score += weights_3[piece_type](num_pieces) * attack_value_[piece_type];
+    }
     // 相手キング周辺への攻撃。
-    score += WEIGHT_ATTACK_AROUND_KING(num_pieces) * attack_around_king_value_;
+    score += params.weight_attack_around_king()(num_pieces)
+    * attack_around_king_value_;
     // パスポーン。
-    score += WEIGHT_PASS_PAWN(num_pieces) * pass_pawn_value_;
+    score += params.weight_pass_pawn()(num_pieces) * pass_pawn_value_;
     // 守られたパスポーン。
-    score += WEIGHT_PROTECTED_PASS_PAWN(num_pieces)
+    score += params.weight_protected_pass_pawn()(num_pieces)
     * protected_pass_pawn_value_;
     // ダブルポーン。
-    score += WEIGHT_DOUBLE_PAWN(num_pieces) * double_pawn_value_;
+    score += params.weight_double_pawn()(num_pieces) * double_pawn_value_;
     // 孤立ポーン。
-    score += WEIGHT_ISO_PAWN(num_pieces) * iso_pawn_value_;
+    score += params.weight_iso_pawn()(num_pieces) * iso_pawn_value_;
     // ポーンの盾。
-    score += WEIGHT_PAWN_SHIELD(num_pieces) * pawn_shield_value_;
+    score += params.weight_pawn_shield()(num_pieces) * pawn_shield_value_;
     // ビショップペア。
-    score += WEIGHT_BISHOP_PAIR(num_pieces) * bishop_pair_value_;
+    score += params.weight_bishop_pair()(num_pieces) * bishop_pair_value_;
     // バッドビショップ。
-    score += WEIGHT_BAD_BISHOP(num_pieces) * bad_bishop_value_;
+    score += params.weight_bad_bishop()(num_pieces) * bad_bishop_value_;
     // ナイトをピン。
-    score += WEIGHT_PIN_KNIGHT(num_pieces) * pin_knight_value_;
+    score += params.weight_pin_knight()(num_pieces) * pin_knight_value_;
     // ルークペア。
-    score += WEIGHT_ROOK_PAIR(num_pieces) * rook_pair_value_;
+    score += params.weight_rook_pair()(num_pieces) * rook_pair_value_;
     // セミオープンファイルのルーク。
-    score += WEIGHT_ROOK_SEMI_OPEN(num_pieces) * rook_semi_open_value_;
+    score += params.weight_rook_semiopen_fyle()(num_pieces)
+    * rook_semiopen_fyle_value_;
     // オープンファイルのルーク。
-    score += WEIGHT_ROOK_OPEN(num_pieces) * rook_open_value_;
+    score += params.weight_rook_open_fyle()(num_pieces)
+    * rook_open_fyle_value_;
     // 早すぎるクイーンの始動。
-    score += WEIGHT_EARLY_QUEEN_LAUNCHED(num_pieces)
+    score += params.weight_early_queen_launched()(num_pieces)
     * early_queen_launched_value_;
     // キング周りの弱いマス。
-    score += WEIGHT_WEAK_SQUARE(num_pieces) * weak_square_value_;
-    // キャスリング。(これの2倍が評価値。)
-    score += WEIGHT_CASTLING(num_pieces) * castling_value_;
+    score += params.weight_weak_square()(num_pieces) * weak_square_value_;
+    // キャスリング。
+    score += params.weight_castling()(num_pieces) * castling_value_;
+    // キャスリングの放棄。
+    score += params.weight_abandoned_castling()(num_pieces)
+    * abandoned_castling_value_;
 
     return static_cast<int>(score);
   }
@@ -361,6 +304,9 @@ namespace Sayuri {
     // 値と符号。自分の駒ならプラス。敵の駒ならマイナス。
     double value;
     double sign = piece_side == engine_ptr_->to_move() ? 1.0 : -1.0;
+
+    // 評価関数用パラメータを得る。
+    const EvalParams& params = engine_ptr_->eval_params();
 
     // 利き筋を作る。
     Bitboard attacks = 0ULL;
@@ -429,74 +375,64 @@ namespace Sayuri {
         break;
     }
 
-    // 駒の配置を計算。
+    // オープニング時の駒の配置を計算。
     if (piece_side == WHITE) {
-      value = POSITION_TABLE[Type][piece_square];
+      opening_position_value_[Type] += sign
+      * params.opening_position_value_table()[Type][piece_square];
     } else {
-      value = POSITION_TABLE[Type][Util::FLIP[piece_square]];
+      opening_position_value_[Type] += sign
+      * params.opening_position_value_table()[Type][Util::FLIP[piece_square]];
     }
-    position_value_[Type] += sign * value;
-    // ポーンの終盤の配置。
-    if (Type == PAWN) {
-      if (piece_side == WHITE) {
-        value = PAWN_POSITION_ENDING_TABLE[piece_square];
-      } else {
-        value = PAWN_POSITION_ENDING_TABLE[Util::FLIP[piece_square]];
-      }
-      pawn_position_ending_value_ += sign * value;
-    }
-    // キングの終盤の配置。
-    if (Type == KING) {
-      if (piece_side == WHITE) {
-        value = KING_POSITION_ENDING_TABLE[piece_square];
-      } else {
-        value = KING_POSITION_ENDING_TABLE[Util::FLIP[piece_square]];
-      }
-      king_position_ending_value_ += sign * value;
+
+    // エンディング時の駒の配置を計算。
+    if (piece_side == WHITE) {
+      ending_position_value_[Type] += sign
+      * params.ending_position_value_table()[Type][piece_square];
+    } else {
+      ending_position_value_[Type] += sign
+      * params.ending_position_value_table()[Type][Util::FLIP[piece_square]];
     }
 
     // 機動力を計算。
     if ((Type != PAWN) && (Type != KING)) {
-      value = static_cast<double>(Util::CountBits(attacks
+      mobility_value_ += sign * static_cast<double>(Util::CountBits(attacks
       & ~(engine_ptr_->side_pieces()[piece_side])));
     }
-    mobility_value_ += sign * value;
 
     // センターコントロールを計算。
     if (Type != KING) {
-      value = static_cast<double>(Util::CountBits(attacks & center_mask_));
-      center_control_value_ += sign * value;
-      value =
-      static_cast<double>(Util::CountBits(attacks & sweet_center_mask_));
-      sweet_center_control_value_ += sign * value;
+      center_control_value_ += sign
+      * static_cast<double>(Util::CountBits(attacks & center_mask_));
+
+      sweet_center_control_value_ += sign
+      * static_cast<double>(Util::CountBits(attacks & sweet_center_mask_));
     }
 
     // 駒の展開を計算。
     if ((Type == KNIGHT) || (Type == BISHOP)) {
-      value = 0.0;
       if (!(Util::SQUARE[piece_square] & start_position_[piece_side][Type])) {
-        value += 1.0;
+        development_value_ += sign * 1.0;
       }
-      development_value_ += sign * value;
     }
 
     // 敵への攻撃を計算。
     Bitboard temp = attacks & (engine_ptr_->side_pieces()[enemy_piece_side]);
     value = 0.0;
+    const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES] =
+    params.attack_value_table();
     for (; temp; temp &= temp - 1) {
-      value += ATTACK_VALUE_TABLE
-      [Type][engine_ptr_->piece_board()[Util::GetSquare(temp)]];
+      value += table[Type][engine_ptr_->piece_board()[Util::GetSquare(temp)]];
     }
     if ((Type == PAWN) && en_passant) {
-      value += ATTACK_VALUE_TABLE[Type][PAWN];
+      value += table[PAWN][PAWN];
     }
-    attack_value_ += sign * value;
+    attack_value_[Type] += sign * value;
 
     // 相手キング周辺への攻撃を計算。
     if (Type != KING) {
-      value = static_cast<double>(Util::CountBits(attacks
+      attack_around_king_value_ += sign
+      * static_cast<double>(Util::CountBits(attacks
       & Util::GetKingMove(engine_ptr_->king()[enemy_piece_side])));
-      attack_around_king_value_ += sign * value;
     }
 
     // ポーンの構成を計算。
@@ -529,25 +465,24 @@ namespace Sayuri {
       if ((Util::SQUARE[piece_square]
       & pawn_shield_mask_[piece_side][engine_ptr_->king()[piece_side]])) {
         if (piece_side == WHITE) {
-          value = PAWN_SHIELD_TABLE[piece_square];
+          pawn_shield_value_ += sign
+          * params.pawn_shield_value_table()[piece_square];
         } else {
-          value = PAWN_SHIELD_TABLE[Util::FLIP[piece_square]];
+          pawn_shield_value_ += sign
+          * params.pawn_shield_value_table()[Util::FLIP[piece_square]];
         }
-        pawn_shield_value_ += sign * value;
       }
     }
 
     if (Type == BISHOP) {
       // バッドビショップを計算。
-      value = 0.0;
       if ((Util::SQUARE[piece_square] & Util::SQCOLOR[WHITE])) {
-        value = static_cast<double>(Util::CountBits
+        bad_bishop_value_ += sign * static_cast<double>(Util::CountBits
         (engine_ptr_->position()[piece_side][PAWN] & Util::SQCOLOR[WHITE]));
       } else {
-        value = static_cast<double>(Util::CountBits
+        bad_bishop_value_ += sign * static_cast<double>(Util::CountBits
         (engine_ptr_->position()[piece_side][PAWN] & Util::SQCOLOR[BLACK]));
       }
-      bad_bishop_value_ += sign * value;
 
       // ナイトをピンを計算。
       value = 0.0;
@@ -591,10 +526,10 @@ namespace Sayuri {
       Bitboard rook_fyle = Util::FYLE[Util::GetFyle(piece_square)];
       // セミオープン。
       if (!(engine_ptr_->position()[piece_side][PAWN] & rook_fyle)) {
-        rook_semi_open_value_ += sign * 1.0;
+        rook_semiopen_fyle_value_ += sign * 1.0;
         // オープン。
         if (!(engine_ptr_->position()[enemy_piece_side][PAWN] & rook_fyle)) {
-          rook_open_value_ += sign * 1.0;
+          rook_open_fyle_value_ += sign * 1.0;
         }
       }
     }
@@ -636,19 +571,17 @@ namespace Sayuri {
       weak_square_value_ += sign * value;
 
       // キャスリングを計算する。
-      value = 0.0;  // キャスリングはまだだが、放棄していない。
       Castling rights_mask =
       piece_side == WHITE ? WHITE_CASTLING : BLACK_CASTLING;
       if (engine_ptr_->has_castled()[piece_side]) {
         // キャスリングした。
-        value = 2.0;
+        castling_value_ += sign * 1.0;
       } else {
         if (!(engine_ptr_->castling_rights() & rights_mask)) {
           // キャスリングの権利を放棄した。
-          value = -1.0;
+          abandoned_castling_value_ += sign * 1.0;
         }
       }
-      castling_value_ += sign * value;
     }
   }
   // 実体化。

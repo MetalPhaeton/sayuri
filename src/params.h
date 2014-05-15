@@ -150,78 +150,90 @@ namespace Sayuri {
       EvalParams& operator=(EvalParams&& params);
       virtual ~EvalParams() {}
 
-      /*****************************/
-      /* アクセサ。 (セットも可。) */
-      /*****************************/
+      /**************/
+      /* アクセサ。 */
+      /**************/
       // オープニング時の駒の配置の価値テーブル。
-      double (& opening_position_value_table())
+      const double (& opening_position_value_table() const)
       [NUM_PIECE_TYPES][NUM_SQUARES] {return opening_position_value_table_;}
       // エンディング時の駒の配置の価値テーブル。
-      double (& ending_position_value_table())
+      const double (& ending_position_value_table() const)
       [NUM_PIECE_TYPES][NUM_SQUARES] {return ending_position_value_table_;}
       // 駒への攻撃の価値テーブル。
-      double (& attack_value_table())
+      const double (& attack_value_table() const)
       [NUM_PIECE_TYPES][NUM_PIECE_TYPES] {return attack_value_table_;}
       // ポーンの盾の配置の価値テーブル。
-      double (& pawn_shield_value_table())
+      const double (& pawn_shield_value_table() const)
       [NUM_SQUARES] {return pawn_shield_value_table_;}
 
       // オープニング時の駒の配置のウェイト。
-      Weight (& weight_opening_position())[NUM_PIECE_TYPES] {
+      const Weight (& weight_opening_position() const)[NUM_PIECE_TYPES] {
         return weight_opening_position_;
       }
       // エンディング時の駒の配置のウェイト。
-      Weight (& weight_ending_position())[NUM_PIECE_TYPES] {
+      const Weight (& weight_ending_position() const)[NUM_PIECE_TYPES] {
         return weight_ending_position_;
       }
       // 機動力のウェイト。
-      Weight& weight_mobility() {return weight_mobility_;}
+      const Weight& weight_mobility() const {return weight_mobility_;}
       // センターコントロールのウェイト。
-      Weight& weight_center_control() {return weight_center_control_;}
+      const Weight& weight_center_control() const {
+        return weight_center_control_;
+      }
       // スウィートセンターのコントロールのウェイト。
-      Weight& weight_sweet_center_control() {
+      const Weight& weight_sweet_center_control() const {
         return weight_sweet_center_control_;
       }
       // 駒の展開のウェイト。
-      Weight& weight_development() {return weight_development_;}
+      const Weight& weight_development() const {return weight_development_;}
       // 駒への攻撃のウェイト。
-      Weight& weight_attack() {return weight_attack_;}
+      const Weight(& weight_attack() const)[NUM_PIECE_TYPES] {
+        return weight_attack_;
+      }
       // 相手キング周辺への攻撃。
-      Weight& weight_attack_around_king() {return weight_attack_around_king_;}
+      const Weight& weight_attack_around_king() const {
+        return weight_attack_around_king_;
+      }
       // パスポーンのウェイト。
-      Weight& weight_pass_pawn() {return weight_pass_pawn_;}
+      const Weight& weight_pass_pawn() const {return weight_pass_pawn_;}
       // 守られたパスポーンのウェイト。
-      Weight& weight_protected_pass_pawn() {
+      const Weight& weight_protected_pass_pawn() const {
         return weight_protected_pass_pawn_;
       }
       // ダブルポーンのウェイト。
-      Weight& weight_double_pawn() {return weight_double_pawn_;}
+      const Weight& weight_double_pawn() const {return weight_double_pawn_;}
       // 孤立ポーン。
-      Weight& weight_iso_pawn() {return weight_iso_pawn_;}
+      const Weight& weight_iso_pawn() const {return weight_iso_pawn_;}
       // ポーンの盾のウェイト。
-      Weight& weight_pawn_shield() {return weight_pawn_shield_;}
+      const Weight& weight_pawn_shield() const {return weight_pawn_shield_;}
       // ビショップペアのウェイト。
-      Weight& weight_bishop_pair() {return weight_bishop_pair_;}
+      const Weight& weight_bishop_pair() const {return weight_bishop_pair_;}
       // バッドビショップのウェイト。
-      Weight& weight_bad_bishop() {return weight_bad_bishop_;}
+      const Weight& weight_bad_bishop() const {return weight_bad_bishop_;}
       // ビショップで相手のナイトをピンのウェイト。
-      Weight& weight_pin_knight() {return weight_pin_knight_;}
+      const Weight& weight_pin_knight() const {return weight_pin_knight_;}
       // ルークペアのウェイト。
-      Weight& weight_rook_pair() {return weight_rook_pair_;}
+      const Weight& weight_rook_pair() const {return weight_rook_pair_;}
       // セミオープンファイルのルークのウェイト。
-      Weight& weight_rook_semiopen_fyle() {return weight_rook_semiopen_fyle_;}
+      const Weight& weight_rook_semiopen_fyle() const {
+        return weight_rook_semiopen_fyle_;
+      }
       // オープンファイルのルーク。
-      Weight& weight_rook_open_fyle() {return weight_rook_open_fyle_;}
+      const Weight& weight_rook_open_fyle() const {
+        return weight_rook_open_fyle_;
+      }
       // 早すぎるクイーンの始動のウェイト。
-      Weight& weight_early_queen_launched() {
+      const Weight& weight_early_queen_launched() const {
         return weight_early_queen_launched_;
       }
       // キング周りの弱いマスのウェイト。
-      Weight& weight_weak_square() {return weight_weak_square_;}
+      const Weight& weight_weak_square() const {return weight_weak_square_;}
       // キャスリングのウェイト。
-      Weight& weight_castling() {return weight_castling_;}
+      const Weight& weight_castling() const {return weight_castling_;}
       // キャスリングの放棄のウェイト。
-      Weight& weight_abandoned_castling() {return weight_abandoned_castling_;}
+      const Weight& weight_abandoned_castling() const {
+        return weight_abandoned_castling_;
+      }
 
       /******************/
       /* ミューテータ。 */
@@ -237,6 +249,85 @@ namespace Sayuri {
       (const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES]);
       // ポーンの盾の配置の価値テーブル。
       void pawn_shield_value_table(const double (& table)[NUM_SQUARES]);
+
+      // オープニング時の駒の配置のウェイト。
+      void weight_opening_position(const Weight (& weights)[NUM_PIECE_TYPES]);
+      // エンディング時の駒の配置のウェイト。
+      void weight_ending_position(const Weight (& weights)[NUM_PIECE_TYPES]);
+      // 機動力のウェイト。
+      void weight_mobility(const Weight& weight) {weight_mobility_ = weight;}
+      // センターコントロールのウェイト。
+      void weight_center_control(const Weight& weight) {
+        weight_center_control_ = weight;
+      }
+      // スウィートセンターのコントロールのウェイト。
+      void weight_sweet_center_control(const Weight& weight) {
+        weight_sweet_center_control_ = weight;
+      }
+      // 駒の展開のウェイト。
+      void weight_development(const Weight& weight) {
+        weight_development_ = weight;
+      }
+      // 駒への攻撃のウェイト。
+      void weight_attack(const Weight (& weights)[NUM_PIECE_TYPES]);
+      // 相手キング周辺への攻撃のウェイト。
+      void weight_attack_around_king(const Weight& weight) {
+        weight_attack_around_king_ = weight;
+      }
+      // パスポーンのウェイト。
+      void weight_pass_pawn(const Weight& weight) {
+        weight_pass_pawn_ = weight;
+      }
+      // 守られたパスポーンのウェイト。
+      void weight_protected_pass_pawn(const Weight& weight) {
+        weight_protected_pass_pawn_ = weight;
+      }
+      // ダブルポーンのウェイト。
+      void weight_double_pawn(const Weight& weight) {
+        weight_double_pawn_ = weight;
+      }
+      // 孤立ポーンのウェイト。
+      void weight_iso_pawn(const Weight& weight) {weight_iso_pawn_ = weight;}
+      // ポーンの盾のウェイト。
+      void weight_pawn_shield(const Weight& weight) {
+        weight_pawn_shield_ = weight;
+      }
+      // ビショップペアのウェイト。
+      void weight_bishop_pair(const Weight& weight) {
+        weight_bishop_pair_ = weight;
+      }
+      // バッドビショップのウェイト。
+      void weight_bad_bishop(const Weight& weight) {
+        weight_bad_bishop_ = weight;
+      }
+      // ビショップで相手のナイトをピンのウェイト。
+      void weight_pin_knight(const Weight& weight) {
+        weight_pin_knight_ = weight;
+      }
+      // ルークペアのウェイト。
+      void weight_rook_pair(const Weight& weight) {weight_rook_pair_ = weight;}
+      // セミオープンファイルのルークのウェイト。
+      void weight_rook_semiopen_fyle(const Weight& weight) {
+        weight_rook_semiopen_fyle_ = weight;
+      }
+      // オープンファイルのルークのウェイト。
+      void weight_rook_open_fyle(const Weight& weight) {
+        weight_rook_open_fyle_ = weight;
+      }
+      // 早すぎるクイーンの始動のウェイト。
+      void weight_early_queen_launched(const Weight& weight) {
+        weight_early_queen_launched_ = weight;
+      }
+      // キング周りの弱いマスのウェイト。
+      void weight_weak_square(const Weight& weight) {
+        weight_weak_square_ = weight;
+      }
+      // キャスリングのウェイト。
+      void weight_castling(const Weight& weight) {weight_castling_ = weight;}
+      // キャスリングの放棄のウェイト。
+      void weight_abandoned_castling(const Weight& weight) {
+        weight_abandoned_castling_ = weight;
+      }
 
     private:
       // メンバをコピーする。
@@ -272,7 +363,7 @@ namespace Sayuri {
       // 駒の展開。
       Weight weight_development_;
       // 駒への攻撃。
-      Weight weight_attack_;
+      Weight weight_attack_[NUM_PIECE_TYPES];
       // 相手キング周辺への攻撃。
       Weight weight_attack_around_king_;
       // パスポーン。
