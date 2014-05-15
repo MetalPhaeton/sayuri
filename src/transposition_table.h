@@ -62,6 +62,12 @@ namespace Sayuri {
       TTEntry& operator=(TTEntry&& entry);
       virtual ~TTEntry() {}
 
+      /********************/
+      /* パブリック関数。 */
+      /********************/
+      // 自身が有効かどうか。
+      operator bool() const {return depth_ > -MAX_VALUE;}
+
       /**************/
       /* アクセサ。 */
       /**************/
@@ -137,8 +143,7 @@ namespace Sayuri {
       // depth: 探索の深さ。
       // [戻り値]
       // 条件を満たすエントリー。
-      // なければnullptr。
-      TTEntry* GetEntry(Hash pos_hash, int depth);
+      const TTEntry& GetEntry(Hash pos_hash, int depth) const;
 
       // 年を取る。
       void GrowOld() {age_++;}
@@ -183,6 +188,8 @@ namespace Sayuri {
       /****************/
       /* メンバ変数。 */
       /****************/
+      // 無効なエントリー。
+      const TTEntry null_entry_;
       // エントリーの個数。
       std::size_t num_entries_;
       // 使用済みのエントリーの個数。

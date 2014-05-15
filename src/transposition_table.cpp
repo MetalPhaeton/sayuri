@@ -42,6 +42,7 @@ namespace Sayuri {
   /**************************/
   // コンストラクタ。
   TranspositionTable::TranspositionTable(std::size_t table_size) :
+  null_entry_(),
   num_entries_(0),
   num_used_entries_(0),
   entry_table_(nullptr),
@@ -56,6 +57,7 @@ namespace Sayuri {
 
   // コピーコンストラクタ。
   TranspositionTable::TranspositionTable(const TranspositionTable& table) :
+  null_entry_(),
   num_entries_(table.num_entries_),
   num_used_entries_(table.num_used_entries_),
   entry_table_(new TTEntry[table.num_entries_]),
@@ -63,6 +65,7 @@ namespace Sayuri {
 
   // ムーブコンストラクタ。
   TranspositionTable::TranspositionTable( TranspositionTable&& table) :
+  null_entry_(),
   num_entries_(table.num_entries_),
   num_used_entries_(table.num_used_entries_),
   entry_table_(std::move(table.entry_table_)),
@@ -116,17 +119,17 @@ namespace Sayuri {
   }
 
   // 該当するTTEntryを返す。
-  TTEntry* TranspositionTable::GetEntry(Hash pos_hash,
-  int depth) {
+  const TTEntry& TranspositionTable::GetEntry(Hash pos_hash,
+  int depth) const {
     // エントリーを得る。
-    TTEntry* entry_ptr = nullptr;
     std::size_t index = GetTableIndex(pos_hash);
     if ((entry_table_[index].depth() >= depth)
     && (entry_table_[index].pos_hash() == pos_hash)) {
-      entry_ptr = &(entry_table_[index]);
+      return entry_table_[index];
     }
 
-    return entry_ptr;
+    // 条件外なので、無効なエントリーを返す。
+    return null_entry_;
   }
 
   /************************/

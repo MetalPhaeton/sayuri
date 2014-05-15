@@ -156,78 +156,77 @@ namespace Sayuri {
     // トランスポジションテーブルを調べる。
     table.Lock();
     // 前回の繰り返しの最善手を得る。
-    TTEntry* prev_entry = table.GetEntry(pos_hash, depth - 1);
+    const TTEntry& prev_entry = table.GetEntry(pos_hash, depth - 1);
     Move prev_best = 0U;
-    if (prev_entry && (prev_entry->score_type() != ScoreType::ALPHA)) {
-      prev_best = prev_entry->best_move();
+    if (prev_entry && (prev_entry.score_type() != ScoreType::ALPHA)) {
+      prev_best = prev_entry.best_move();
     }
     // 局面の繰り返し対策などのため、
     // 自分の初手と相手の初手の場合(level < 2の場合)は参照しない。
     // 前回の繰り返しの最善手を得る。
-    TTEntry* entry_ptr = nullptr;
     if (level >= 2) {
-      entry_ptr = table.GetEntry(pos_hash, depth);
-    }
-    if (entry_ptr) {
-      int score = entry_ptr->score();
-      if (entry_ptr->score_type() == ScoreType::EXACT) {
-        // エントリーが正確な値。
-        if (!(entry_ptr->best_move() & CAPTURED_PIECE_MASK)
-        && (level < MAX_PLYS)) {
-          // キラームーブをセット。
-          Move best_move = entry_ptr->best_move();
-          shared_st_ptr_->killer_stack_[level][0] = best_move;
-          shared_st_ptr_->killer_stack_[level + 2][1] = best_move;
-        }
+      const TTEntry& tt_entry = table.GetEntry(pos_hash, depth);
+      if (tt_entry) {
+        int score = tt_entry.score();
+        if (tt_entry.score_type() == ScoreType::EXACT) {
+          // エントリーが正確な値。
+          if (!(tt_entry.best_move() & CAPTURED_PIECE_MASK)
+          && (level < MAX_PLYS)) {
+            // キラームーブをセット。
+            Move best_move = tt_entry.best_move();
+            shared_st_ptr_->killer_stack_[level][0] = best_move;
+            shared_st_ptr_->killer_stack_[level + 2][1] = best_move;
+          }
 
-        pv_line.ply_mate(entry_ptr->ply_mate());
-        if (score >= beta) {
-          pv_line.score(beta);
+          pv_line.ply_mate(tt_entry.ply_mate());
+          if (score >= beta) {
+            pv_line.score(beta);
+            table.Unlock();
+            return beta;
+          }
+
+          if (score <= alpha) {
+            pv_line.score(alpha);
+            table.Unlock();
+            return alpha;
+          }
+
+          pv_line.score(score);
           table.Unlock();
-          return beta;
-        }
+          return score;
+        } else if (tt_entry.score_type() == ScoreType::ALPHA) {
+          // エントリーがアルファ値。
+          if (score <= alpha) {
+            // アルファ値以下が確定。
+            pv_line.score(alpha);
+            pv_line.ply_mate(tt_entry.ply_mate());
+            table.Unlock();
+            return alpha;
+          }
 
-        if (score <= alpha) {
-          pv_line.score(alpha);
-          table.Unlock();
-          return alpha;
-        }
+          // ベータ値を下げられる。
+          if (score < beta) beta = score + 1;
+        } else {
+          // エントリーがベータ値。
+          if (!(tt_entry.best_move() & CAPTURED_PIECE_MASK)
+          && (level < MAX_PLYS)) {
+            // キラームーブをセット。
+            Move best_move = tt_entry.best_move();
+            shared_st_ptr_->killer_stack_[level][0] = best_move;
+            shared_st_ptr_->killer_stack_[level + 2][1] = best_move;
+          }
 
-        pv_line.score(score);
-        table.Unlock();
-        return score;
-      } else if (entry_ptr->score_type() == ScoreType::ALPHA) {
-        // エントリーがアルファ値。
-        if (score <= alpha) {
-          // アルファ値以下が確定。
-          pv_line.score(alpha);
-          pv_line.ply_mate(entry_ptr->ply_mate());
-          table.Unlock();
-          return alpha;
-        }
+          if (score >= beta) {
+            // ベータ値以上が確定。
+            pv_line.score(beta);
+            pv_line.ply_mate(tt_entry.ply_mate());
+            table.Unlock();
+            return beta;
+          }
 
-        // ベータ値を下げられる。
-        if (score < beta) beta = score + 1;
-      } else {
-        // エントリーがベータ値。
-        if (!(entry_ptr->best_move() & CAPTURED_PIECE_MASK)
-        && (level < MAX_PLYS)) {
-          // キラームーブをセット。
-          Move best_move = entry_ptr->best_move();
-          shared_st_ptr_->killer_stack_[level][0] = best_move;
-          shared_st_ptr_->killer_stack_[level + 2][1] = best_move;
+          // アルファ値を上げられる。
+          if (score > alpha) alpha = score - 1;
         }
-
-        if (score >= beta) {
-          // ベータ値以上が確定。
-          pv_line.score(beta);
-          pv_line.ply_mate(entry_ptr->ply_mate());
-          table.Unlock();
-          return beta;
-        }
-
-        // アルファ値を上げられる。
-        if (score > alpha) alpha = score - 1;
       }
     }
     table.Unlock();
@@ -665,11 +664,11 @@ namespace Sayuri {
 
       // 前回の繰り返しの最善手を得る。
       table.Lock();
-      TTEntry* prev_entry =
+      const TTEntry& prev_entry =
       table.GetEntry(pos_hash, shared_st_ptr_->i_depth_ - 1);
       Move prev_best = 0U;
-      if (prev_entry && (prev_entry->score_type() != ScoreType::ALPHA)) {
-        prev_best = prev_entry->best_move();
+      if (prev_entry && (prev_entry.score_type() != ScoreType::ALPHA)) {
+        prev_best = prev_entry.best_move();
       }
       table.Unlock();
 
