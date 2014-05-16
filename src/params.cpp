@@ -27,6 +27,7 @@
 # include "params.h"
 
 #include <iostream>
+#include <cstdint>
 
 namespace Sayuri {
   /******************/
@@ -34,37 +35,42 @@ namespace Sayuri {
   /******************/
   // コンストラクタ。
   SearchParams::SearchParams() :
-    enable_aspiration_search_(true),
-    aspiration_search_limit_depth_(4),
-    aspiration_search_delta_(15),
-    enable_see_(true),
-    enable_history_(true),
-    enable_killer_(true),
-    enable_killer_2_(true),
-    enable_ttable_(true),
-    enable_iid_(true),
-    iid_limit_depth_(5),
-    iid_search_depth_(4),
-    enable_nmr_(true),
-    nmr_limit_depth_(4),
-    nmr_search_reduction_(3),
-    nmr_reduction_(3),
-    enable_probcut_(true),
-    probcut_limit_depth_(5),
-    enable_history_pruning_(true),
-    history_pruning_limit_depth_(4),
-    history_pruning_threshold_(0.5),
-    history_pruning_reduction_(1),
-    enable_lmr_(true),
-    lmr_limit_depth_(4),
-    lmr_threshold_(0.25),
-    lmr_reduction_(1),
-    enable_futility_pruning_(true),
-    futility_pruning_depth_(3),
-    futility_pruning_margin_(300) {
-      // ヒストリーをチェック。
-      if (!enable_history_) enable_history_pruning_ = false;
-    }
+  ybwc_more_than_(3),
+  enable_aspiration_windows_(true),
+  aspiration_windows_limit_depth_(5),
+  aspiration_windows_delta_(15),
+  enable_see_(true),
+  enable_history_(true),
+  enable_killer_(true),
+  enable_killer_2_(true),
+  enable_ttable_(true),
+  enable_iid_(true),
+  iid_limit_depth_(5),
+  iid_search_depth_(4),
+  enable_nmr_(true),
+  nmr_limit_depth_(4),
+  nmr_search_reduction_(3),
+  nmr_reduction_(3),
+  enable_probcut_(true),
+  probcut_limit_depth_(5),
+  probcut_margin_(200),
+  probcut_search_reduction_(4),
+  enable_history_pruning_(true),
+  history_pruning_limit_depth_(4),
+  history_pruning_threshold_(0.5),
+  history_pruning_reduction_(1),
+  enable_lmr_(true),
+  lmr_limit_depth_(4),
+  lmr_threshold_(0.20),
+  lmr_more_than_(4),
+  lmr_reduction_(1),
+  enable_futility_pruning_(true),
+  futility_pruning_depth_(3),
+  futility_pruning_margin_(300) {
+    // ヒストリーをチェック。
+    if (!enable_history_) enable_history_pruning_ = false;
+    if (!enable_killer_) enable_killer_2_ = false;
+  }
 
   // コピーコンストラクタ。
   SearchParams::SearchParams(const SearchParams& params) {
@@ -90,9 +96,10 @@ namespace Sayuri {
 
   // メンバをコピーする。
   void SearchParams::ScanMember(const SearchParams& params) {
-    enable_aspiration_search_ = params.enable_aspiration_search_;
-    aspiration_search_limit_depth_ = params.aspiration_search_limit_depth_;
-    aspiration_search_delta_ = params.aspiration_search_delta_;
+    ybwc_more_than_ = params.ybwc_more_than_;
+    enable_aspiration_windows_ = params.enable_aspiration_windows_;
+    aspiration_windows_limit_depth_ = params.aspiration_windows_limit_depth_;
+    aspiration_windows_delta_ = params.aspiration_windows_delta_;
     enable_see_ = params.enable_see_;
     enable_history_ = params.enable_history_;
     enable_killer_ = params.enable_killer_;
@@ -107,6 +114,8 @@ namespace Sayuri {
     nmr_reduction_ = params.nmr_reduction_;
     enable_probcut_ = params.enable_probcut_;
     probcut_limit_depth_ = params.probcut_limit_depth_;
+    probcut_margin_ = params.probcut_margin_;
+    probcut_search_reduction_ = params.probcut_search_reduction_;
     enable_history_pruning_ = params.enable_history_pruning_;
     history_pruning_limit_depth_ = params.history_pruning_limit_depth_;
     history_pruning_threshold_ = params.history_pruning_threshold_;
@@ -114,6 +123,7 @@ namespace Sayuri {
     enable_lmr_ = params.enable_lmr_;
     lmr_limit_depth_ = params.lmr_limit_depth_;
     lmr_threshold_ = params.lmr_threshold_;
+    lmr_more_than_ =params.lmr_more_than_;
     lmr_reduction_ = params.lmr_reduction_;
     enable_futility_pruning_ = params.enable_futility_pruning_;
     futility_pruning_depth_ = params.futility_pruning_depth_;

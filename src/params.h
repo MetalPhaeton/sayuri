@@ -28,6 +28,7 @@
 #define PARAMS_H
 
 #include <iostream>
+#include <cstdint>
 #include "chess_def.h"
 
 namespace Sayuri {
@@ -47,15 +48,21 @@ namespace Sayuri {
       /**************/
       /* アクセサ。 */
       /**************/
-      // Aspiration Search。
+      // YBWC。
+      // 指定の候補手数以上で実行する。
+      int ybwc_more_than() const {return ybwc_more_than_;}
+
+      // Aspiration Windows。
       // 有効かどうか。
-      bool enable_aspiration_search() const {return enable_aspiration_search_;}
+      bool enable_aspiration_windows() const {
+        return enable_aspiration_windows_;
+      }
       // 残り深さの制限。
-      int aspiration_search_limit_depth() const {
-        return aspiration_search_limit_depth_;
+      std::uint32_t aspiration_windows_limit_depth() const {
+        return aspiration_windows_limit_depth_;
       }
       // デルタ値。
-      int aspiration_search_delta() const {return aspiration_search_delta_;}
+      int aspiration_windows_delta() const {return aspiration_windows_delta_;}
 
       // SEE。
       // 有効かどうか。
@@ -98,6 +105,10 @@ namespace Sayuri {
       bool enable_probcut() const {return enable_probcut_;}
       // 残り深さの制限。
       int probcut_limit_depth() const {return probcut_limit_depth_;}
+      // ベータ値増加分。
+      int probcut_margin() const {return probcut_margin_;}
+      // 何プライ浅く読むか。
+      int probcut_search_reduction() const {return probcut_search_reduction_;}
 
       // History Pruning。
       // (ヒストリーが無効の場合は設定にかかわらず無効になる。)
@@ -123,6 +134,9 @@ namespace Sayuri {
       int lmr_limit_depth() const {return lmr_limit_depth_;}
       // 全候補手中、リダクションしない手数の閾値。 1.0から0.0。
       double lmr_threshold() const {return lmr_threshold_;}
+      // 指定の候補手数以上で実行する。
+      int lmr_more_than() const {return lmr_more_than_;}
+      // 少なくとも最初の何手はLMRしない。
       // リダクションする深さ。
       int lmr_reduction() const {return lmr_reduction_;}
 
@@ -137,18 +151,22 @@ namespace Sayuri {
       /******************/
       /* ミューテータ。 */
       /******************/
-      // Aspiration Search。
+      // YBWC。
+      // 指定の候補手数以上で実行する。
+      void ybwc_more_than(int num_moves) {ybwc_more_than_ = num_moves;}
+
+      // Aspiration Windows。
       // 有効かどうか。
-      void enable_aspiration_search(bool enable) {
-        enable_aspiration_search_ = enable;
+      void enable_aspiration_windows(bool enable) {
+        enable_aspiration_windows_ = enable;
       }
       // 残り深さの制限。
-      void aspiration_search_limit_depth(int depth) {
-        aspiration_search_limit_depth_ = depth;
+      void aspiration_windows_limit_depth(std::uint32_t depth) {
+        aspiration_windows_limit_depth_ = depth;
       }
       // デルタ値。
-      void aspiration_search_delta(int delta) {
-        aspiration_search_delta_ = delta;
+      void aspiration_windows_delta(int delta) {
+        aspiration_windows_delta_ = delta;
       }
 
       // SEE。
@@ -163,7 +181,10 @@ namespace Sayuri {
       // 有効かどうか。
       void enable_killer(bool enable) {enable_killer_ = enable;}
       // 2プライ先のキラームーブが有効かどうか。
-      void enable_killer_2(bool enable) {enable_killer_2_ = enable;}
+      void enable_killer_2(bool enable) {
+        if (enable_killer_) enable_killer_2_ = enable;
+        else enable_killer_2_ = false;
+      }
 
       // トランスポジションテーブル。
       // 有効かどうか。
@@ -194,6 +215,12 @@ namespace Sayuri {
       void enable_probcut(bool enable) {enable_probcut_ = enable;}
       // 残り深さの制限。
       void probcut_limit_depth(int depth) {probcut_limit_depth_ = depth;}
+      // ベータ値増加分。
+      void probcut_margin(int margin) {probcut_margin_ = margin;}
+      // 何プライ浅く読むか。
+      void probcut_search_reduction(int reduction) {
+        probcut_search_reduction_ = reduction;
+      }
 
       // History Pruning。
       // (ヒストリーが無効の場合は設定にかかわらず無効になる。)
@@ -222,6 +249,8 @@ namespace Sayuri {
       void lmr_limit_depth(int depth) {lmr_limit_depth_ = depth;}
       // 全候補手中、リダクションしない手数の閾値。 1.0から0.0。
       void lmr_threshold(double threshold) {lmr_threshold_ = threshold;}
+      // 指定の候補手数以上で実行する。
+      void lmr_more_than(int num_moves) {lmr_more_than_ = num_moves;}
       // リダクションする深さ。
       void lmr_reduction(int reduction) {lmr_reduction_ = reduction;}
 
@@ -249,10 +278,13 @@ namespace Sayuri {
       /****************/
       /* メンバ変数。 */
       /****************/
-      // Aspiration Search。
-      bool enable_aspiration_search_;  // 有効かどうか。
-      int aspiration_search_limit_depth_;  // 残り深さの制限。
-      int aspiration_search_delta_;  // デルタ値。
+      // YBWC。
+      int ybwc_more_than_;  // 指定の候補手数以上で実行する。
+
+      // Aspiration Windows。
+      bool enable_aspiration_windows_;  // 有効かどうか。
+      std::uint32_t aspiration_windows_limit_depth_;  // 残り深さの制限。
+      int aspiration_windows_delta_;  // デルタ値。
 
       // SEE。
       bool enable_see_;  // 有効かどうか。
@@ -281,6 +313,8 @@ namespace Sayuri {
       // ProbCut。
       bool enable_probcut_;  // 有効かどうか。
       int probcut_limit_depth_;  // 残り深さの制限。
+      int probcut_margin_;  // ベータ値増加分。
+      int probcut_search_reduction_; // 何プライ浅く読むか。
 
       // History Pruning。
       // (ヒストリーが無効の場合は設定にかかわらず無効になる。)
@@ -295,6 +329,7 @@ namespace Sayuri {
       int lmr_limit_depth_;  // 残り深さの制限。
       // 全候補手中、リダクションしない手数の閾値。 1.0 から 0.0。
       double lmr_threshold_;
+      int lmr_more_than_;  // 指定の候補手数以上で実行する。
       int lmr_reduction_;  // リダクションする深さ。
 
       // Futility Pruning。
