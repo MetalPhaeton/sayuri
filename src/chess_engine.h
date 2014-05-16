@@ -65,8 +65,10 @@ namespace Sayuri {
       /**************************/
       // コンストラクタ。
       // [引数]
+      // search_params: 探索関数用パラメータ。
       // eval_params: 評価関数用パラメータ。
-      ChessEngine(const EvalParams& eval_params);
+      ChessEngine(const SearchParams& search_params,
+      const EvalParams& eval_params);
       ChessEngine(const ChessEngine& engine);
       ChessEngine(ChessEngine&& engine);
       ChessEngine& operator=(const ChessEngine& engine);
@@ -76,10 +78,16 @@ namespace Sayuri {
       /********************/
       /* パブリック関数。 */
       /********************/
-      // 評価関数用パラメータをセットする。
+      // 探索関数用パラメータを再設定する。
       // [引数]
-      // eval_params: 評価関数用パラメータ。
-      void SetEvalParams(const EvalParams& eval_params) {
+      // search_params: 再設定する探索関数用パラメータ。
+      void ResetSearchParams(const SearchParams& search_params) {
+        shared_st_ptr_->search_params_ptr_ = &search_params;
+      }
+      // 評価関数用パラメータを再設定する。
+      // [引数]
+      // eval_params: 再設定する評価関数用パラメータ。
+      void ResetEvalParams(const EvalParams& eval_params) {
         shared_st_ptr_->eval_params_ptr_ = &eval_params;
       }
       // FENを読み込む。
@@ -263,6 +271,10 @@ namespace Sayuri {
       // killer_stack_[ply][同一レベル: 0、2プライ前: 1]
       const Move (& killer_stack() const)[MAX_PLYS + 2 + 1][2] {
         return shared_st_ptr_->killer_stack_;
+      }
+      // 探索関数用パラメータ。
+      const SearchParams& search_params() const {
+        return *(shared_st_ptr_->search_params_ptr_);
       }
       // 評価関数用パラメータ。
       const EvalParams& eval_params() const {
@@ -450,6 +462,8 @@ namespace Sayuri {
         std::vector<PositionRecord> position_history_;
         // スレッドのキュー。
         std::unique_ptr<HelperQueue> helper_queue_ptr_;
+        // 探索関数用パラメータのポインタ。
+        const SearchParams* search_params_ptr_;
         // 評価関数用パラメータのポインタ。
         const EvalParams* eval_params_ptr_;
 

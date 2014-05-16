@@ -52,9 +52,12 @@ namespace Sayuri {
   /* コンストラクタと代入。 */
   /***************************/
   // コンストラクタ。
-  ChessEngine::ChessEngine(const EvalParams& eval_params) {
+  ChessEngine::ChessEngine(const SearchParams& search_params,
+  const EvalParams& eval_params) {
     SetNewGame();
 
+    // 探索関数用パラメータのコピー。
+    shared_st_ptr_->search_params_ptr_ = &search_params;
     // 評価関数用パラメータのコピー。
     shared_st_ptr_->eval_params_ptr_ = &eval_params;
   }
@@ -323,12 +326,15 @@ namespace Sayuri {
     SetStartPosition();
 
     // 共有メンバ構造体を初期化。
-    const EvalParams* eval_params_ptr = nullptr;
+    const SearchParams* temp_sp_ptr = nullptr;
+    const EvalParams* temp_ep_ptr = nullptr;
     if (shared_st_ptr_) {
-      eval_params_ptr = shared_st_ptr_->eval_params_ptr_;  // 一時待避。
+      temp_sp_ptr = shared_st_ptr_->search_params_ptr_;  // 一時待避。
+      temp_ep_ptr = shared_st_ptr_->eval_params_ptr_;  // 一時待避。
     }
     shared_st_ptr_.reset(new SharedStruct());
-    shared_st_ptr_->eval_params_ptr_ = eval_params_ptr;  // 復帰。
+    shared_st_ptr_->search_params_ptr_ = temp_sp_ptr;  // 復帰。
+    shared_st_ptr_->eval_params_ptr_ = temp_ep_ptr;  // 復帰。
 
     // 50手ルールの履歴を初期化。
     shared_st_ptr_->ply_100_history_.push_back(0);
@@ -991,6 +997,7 @@ namespace Sayuri {
     ply_100_history_ = shared_st.ply_100_history_;
     position_history_ = shared_st.position_history_;
     helper_queue_ptr_.reset(new HelperQueue(*(shared_st.helper_queue_ptr_)));
+    search_params_ptr_ = shared_st.search_params_ptr_;
     eval_params_ptr_ = shared_st.eval_params_ptr_;
 
     // ハッシュ関連。

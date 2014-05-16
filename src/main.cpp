@@ -73,11 +73,14 @@ int main(int argc, char* argv[]) {
     Sayuri::Init();
 
     // エンジン準備。
+    std::unique_ptr<Sayuri::SearchParams>
+    search_params_ptr(new Sayuri::SearchParams());
+
     std::unique_ptr<Sayuri::EvalParams>
     eval_params_ptr(new Sayuri::EvalParams());
 
     std::unique_ptr<Sayuri::ChessEngine>
-    engine_ptr(new Sayuri::ChessEngine(*eval_params_ptr));
+    engine_ptr(new Sayuri::ChessEngine(*search_params_ptr, *eval_params_ptr));
 
     std::unique_ptr<Sayuri::UCIShell>
     shell_ptr(new Sayuri::UCIShell(*engine_ptr));

@@ -31,7 +31,7 @@
 #include "chess_def.h"
 
 namespace Sayuri {
-  // 探索アルゴリズムのパラメータのクラス。
+  // 探索関数用パラメータのクラス。
   class SearchParams {
     public:
       /**************************/
@@ -303,7 +303,7 @@ namespace Sayuri {
       int futility_pruning_margin_;  // 1プライあたりのマージン。
   };
 
-  // 評価関数のパラメータのウェイトのクラス。
+  // 評価関数用パラメータのウェイトのクラス。
   class Weight {
     public:
       /**************************/
@@ -405,7 +405,7 @@ namespace Sayuri {
       double y_intercept_;
   };
 
-  // 評価関数のパラメータのクラス。
+  // 評価関数用パラメータのクラス。
   class EvalParams {
     public:
       /**************************/
