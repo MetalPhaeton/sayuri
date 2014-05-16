@@ -456,7 +456,8 @@ namespace Sayuri {
     lmr_threshold =
     lmr_threshold < lmr_more_than ? lmr_more_than : lmr_threshold;
 
-    int lmr_reduction = shared_st_ptr_->search_params_ptr_->lmr_reduction();
+    int lmr_search_reduction =
+    shared_st_ptr_->search_params_ptr_->lmr_search_reduction();
 
     // Futility Pruning。
     bool enable_futility_pruning =
@@ -542,7 +543,7 @@ namespace Sayuri {
         if (is_hp_or_lmr_ok && (new_depth >= lmr_limit_depth)
         && (num_moves > lmr_threshold)) {
           score = -Search<NodeType::NON_PV>(next_hash,
-          new_depth - lmr_reduction - 1, level + 1, -(temp_alpha + 1),
+          new_depth - lmr_search_reduction - 1, level + 1, -(temp_alpha + 1),
           -temp_alpha, -next_my_material, table, next_line);
         } else {
           // PVSearchをするためにtemp_alphaより大きくしておく。
@@ -914,7 +915,8 @@ namespace Sayuri {
     lmr_threshold =
     lmr_threshold < lmr_more_than ? lmr_more_than : lmr_threshold;
 
-    int lmr_reduction = shared_st_ptr_->search_params_ptr_->lmr_reduction();
+    int lmr_search_reduction =
+    shared_st_ptr_->search_params_ptr_->lmr_search_reduction();
 
     // Futility Pruning。
     bool enable_futility_pruning =
@@ -1000,7 +1002,7 @@ namespace Sayuri {
         if (is_hp_or_lmr_ok && (new_depth >= lmr_limit_depth)
         && (num_moves > lmr_threshold)) {
           score = -Search<NodeType::NON_PV>(next_hash,
-          new_depth - lmr_reduction - 1, job.level() + 1,
+          new_depth - lmr_search_reduction - 1, job.level() + 1,
           -(temp_alpha + 1), -temp_alpha, -next_my_material, job.table(),
           next_line);
         } else {
@@ -1135,8 +1137,8 @@ namespace Sayuri {
     lmr_threshold =
     lmr_threshold < lmr_more_than ? lmr_more_than : lmr_threshold;
 
-    int lmr_reduction =
-    shared_st_ptr_->search_params_ptr_->lmr_reduction();
+    int lmr_search_reduction =
+    shared_st_ptr_->search_params_ptr_->lmr_search_reduction();
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       if (ShouldBeStopped()) break;
@@ -1260,7 +1262,7 @@ namespace Sayuri {
           && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))) {
             // ゼロウィンドウ探索。
             score = -Search<NodeType::NON_PV>(next_hash,
-            job.depth() - lmr_reduction - 1, job.level() + 1,
+            job.depth() - lmr_search_reduction - 1, job.level() + 1,
             -(temp_alpha + 1), -temp_alpha, -next_my_material, job.table(),
             next_line);
           } else {

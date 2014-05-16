@@ -138,7 +138,7 @@ namespace Sayuri {
       int lmr_more_than() const {return lmr_more_than_;}
       // 少なくとも最初の何手はLMRしない。
       // リダクションする深さ。
-      int lmr_reduction() const {return lmr_reduction_;}
+      int lmr_search_reduction() const {return lmr_search_reduction_;}
 
       // Futility Pruning。
       // 有効かどうか。
@@ -252,7 +252,9 @@ namespace Sayuri {
       // 指定の候補手数以上で実行する。
       void lmr_more_than(int num_moves) {lmr_more_than_ = num_moves;}
       // リダクションする深さ。
-      void lmr_reduction(int reduction) {lmr_reduction_ = reduction;}
+      void lmr_search_reduction(int reduction) {
+        lmr_search_reduction_ = reduction;
+      }
 
       // Futility Pruning。
       // 有効かどうか。
@@ -330,7 +332,7 @@ namespace Sayuri {
       // 全候補手中、リダクションしない手数の閾値。 1.0 から 0.0。
       double lmr_threshold_;
       int lmr_more_than_;  // 指定の候補手数以上で実行する。
-      int lmr_reduction_;  // リダクションする深さ。
+      int lmr_search_reduction_;  // リダクションする深さ。
 
       // Futility Pruning。
       bool enable_futility_pruning_;  // 有効かどうか。

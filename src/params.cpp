@@ -63,7 +63,7 @@ namespace Sayuri {
   lmr_limit_depth_(4),
   lmr_threshold_(0.20),
   lmr_more_than_(4),
-  lmr_reduction_(1),
+  lmr_search_reduction_(1),
   enable_futility_pruning_(true),
   futility_pruning_depth_(3),
   futility_pruning_margin_(300) {
@@ -124,7 +124,7 @@ namespace Sayuri {
     lmr_limit_depth_ = params.lmr_limit_depth_;
     lmr_threshold_ = params.lmr_threshold_;
     lmr_more_than_ =params.lmr_more_than_;
-    lmr_reduction_ = params.lmr_reduction_;
+    lmr_search_reduction_ = params.lmr_search_reduction_;
     enable_futility_pruning_ = params.enable_futility_pruning_;
     futility_pruning_depth_ = params.futility_pruning_depth_;
     futility_pruning_margin_ = params.futility_pruning_margin_;
