@@ -199,7 +199,8 @@ namespace Sayuri {
       // (ヒストリーが無効の場合は設定にかかわらず無効になる。)
       // 有効かどうか。
       void enable_history_pruning(bool enable) {
-        enable_history_pruning_ = enable;
+        if (enable_history_) enable_history_pruning_ = enable;
+        else enable_history_pruning_ = false;
       }
       // 残り深さの制限。
       void history_pruning_limit_depth(int depth) {

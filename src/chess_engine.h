@@ -76,6 +76,12 @@ namespace Sayuri {
       /********************/
       /* パブリック関数。 */
       /********************/
+      // 評価関数用パラメータをセットする。
+      // [引数]
+      // eval_params: 評価関数用パラメータ。
+      void SetEvalParams(const EvalParams& eval_params) {
+        shared_st_ptr_->eval_params_ptr_ = &eval_params;
+      }
       // FENを読み込む。
       // [引数]
       // fen: 読み込むFenオブジェクト。

@@ -61,7 +61,10 @@ namespace Sayuri {
     lmr_reduction_(1),
     enable_futility_pruning_(true),
     futility_pruning_depth_(3),
-    futility_pruning_margin_(300) {}
+    futility_pruning_margin_(300) {
+      // ヒストリーをチェック。
+      if (!enable_history_) enable_history_pruning_ = false;
+    }
 
   // コピーコンストラクタ。
   SearchParams::SearchParams(const SearchParams& params) {
