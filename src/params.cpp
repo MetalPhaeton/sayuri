@@ -57,6 +57,8 @@ namespace Sayuri {
   probcut_search_reduction_(4),
   enable_history_pruning_(true),
   history_pruning_limit_depth_(4),
+  history_pruning_move_threshold_(0.20),
+  history_pruning_more_than_(4),
   history_pruning_threshold_(0.5),
   history_pruning_reduction_(1),
   enable_lmr_(true),
@@ -118,6 +120,7 @@ namespace Sayuri {
     probcut_search_reduction_ = params.probcut_search_reduction_;
     enable_history_pruning_ = params.enable_history_pruning_;
     history_pruning_limit_depth_ = params.history_pruning_limit_depth_;
+    history_pruning_move_threshold_ = params.history_pruning_move_threshold_;
     history_pruning_threshold_ = params.history_pruning_threshold_;
     history_pruning_reduction_ = params.history_pruning_reduction_;
     enable_lmr_ = params.enable_lmr_;

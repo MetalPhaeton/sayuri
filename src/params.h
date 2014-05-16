@@ -118,6 +118,14 @@ namespace Sayuri {
       int history_pruning_limit_depth() const {
         return history_pruning_limit_depth_;
       }
+      // 全候補手中、枝刈りしない手数の閾値。 1.0から0.0。
+      double history_pruning_move_threshold() const {
+        return history_pruning_move_threshold_;
+      }
+      // 指定の候補手数以上で実行する。
+      int history_pruning_more_than() const {
+        return history_pruning_more_than_;
+      }
       // 最大値に対する閾値。 1.0から0.0。
       double history_pruning_threshold() const {
         return history_pruning_threshold_;
@@ -136,7 +144,6 @@ namespace Sayuri {
       double lmr_threshold() const {return lmr_threshold_;}
       // 指定の候補手数以上で実行する。
       int lmr_more_than() const {return lmr_more_than_;}
-      // 少なくとも最初の何手はLMRしない。
       // リダクションする深さ。
       int lmr_search_reduction() const {return lmr_search_reduction_;}
 
@@ -233,6 +240,14 @@ namespace Sayuri {
       void history_pruning_limit_depth(int depth) {
         history_pruning_limit_depth_ = depth;
       }
+      // 全候補手中、枝刈りしない手数の閾値。 1.0から0.0。
+      void history_pruning_move_threshold(double threshold) {
+        history_pruning_move_threshold_ = threshold;
+      }
+      // 指定の候補手数以上で実行する。
+      void history_pruning_more_than(int num_moves) {
+        history_pruning_more_than_ = num_moves;
+      }
       // 最大値に対する閾値。 1.0から0.0。
       void history_pruning_threshold(double threshold) {
         history_pruning_threshold_ = threshold;
@@ -322,6 +337,10 @@ namespace Sayuri {
       // (ヒストリーが無効の場合は設定にかかわらず無効になる。)
       bool enable_history_pruning_;  // 有効かどうか。
       int history_pruning_limit_depth_;  // 残り深さの制限。
+      // 全候補手中、枝刈りしない手数の閾値。 1.0から0.0。
+      double history_pruning_move_threshold_;
+      // 指定の候補手数以上で実行する。
+      int history_pruning_more_than_;
       // 最大値に対する閾値。 1.0 から 0.0。
       double history_pruning_threshold_;
       int history_pruning_reduction_;  // リダクションする深さ。

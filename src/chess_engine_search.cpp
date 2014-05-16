@@ -436,6 +436,15 @@ namespace Sayuri {
     int history_pruning_limit_depth =
     shared_st_ptr_->search_params_ptr_->history_pruning_limit_depth();
 
+    int history_pruning_move_threshold = static_cast<int>
+    (num_all_moves * shared_st_ptr_->search_params_ptr_->
+    history_pruning_move_threshold());
+    int history_pruning_more_than =
+    shared_st_ptr_->search_params_ptr_->history_pruning_more_than();
+    history_pruning_move_threshold =
+    history_pruning_move_threshold < history_pruning_more_than 
+    ? history_pruning_more_than : history_pruning_move_threshold;
+
     std::uint64_t history_pruning_threshold = static_cast<std::uint64_t>
     (shared_st_ptr_->history_max_
     * shared_st_ptr_->search_params_ptr_->history_pruning_threshold());
@@ -530,6 +539,7 @@ namespace Sayuri {
       if (Type == NodeType::NON_PV) {
         if (enable_history_pruning) {
           if (is_hp_or_lmr_ok && (new_depth >= history_pruning_limit_depth)
+          && (num_moves > history_pruning_move_threshold)
           && (shared_st_ptr_->history_[side][from][to]
           < history_pruning_threshold)) {
             new_depth -= history_pruning_reduction;
@@ -882,8 +892,7 @@ namespace Sayuri {
     Side enemy_side = side ^ 0x3;
     int num_moves = 0;
     int margin = GetMargin(job.depth());
-    int num_early_moves = job.num_all_moves() / 5;
-    num_early_moves = num_early_moves >= 4 ? num_early_moves : 4;
+
     // パラメータ保存。
     // YBWC。
     int ybwc_more_than = shared_st_ptr_->search_params_ptr_->ybwc_more_than();
@@ -894,6 +903,15 @@ namespace Sayuri {
 
     int history_pruning_limit_depth =
     shared_st_ptr_->search_params_ptr_->history_pruning_limit_depth();
+
+    int history_pruning_move_threshold = static_cast<int>
+    (job.num_all_moves() * shared_st_ptr_->search_params_ptr_->
+    history_pruning_move_threshold());
+    int history_pruning_more_than =
+    shared_st_ptr_->search_params_ptr_->history_pruning_more_than();
+    history_pruning_move_threshold =
+    history_pruning_move_threshold < history_pruning_more_than
+    ? history_pruning_more_than : history_pruning_move_threshold;
 
     std::uint64_t history_pruning_threshold = static_cast<std::uint64_t>
     (shared_st_ptr_->history_max_
@@ -989,6 +1007,7 @@ namespace Sayuri {
       if (Type == NodeType::NON_PV) {
         if (enable_history_pruning) {
           if (is_hp_or_lmr_ok && (new_depth >= history_pruning_limit_depth)
+          && (num_moves > history_pruning_move_threshold)
           && (shared_st_ptr_->history_[side][from][to]
           < history_pruning_threshold)) {
             new_depth -= history_pruning_reduction;
