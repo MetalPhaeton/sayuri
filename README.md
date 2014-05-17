@@ -46,7 +46,7 @@ Sayuri - UCI用チェスエンジン
 * `README.md` : このファイル。
 * `CMakeLists.txt` : CMakeのビルド設定ファイル。
 * `LICENSE` : 使用許諾書。
-* `as_static_library.md` : Sayuriを静的ライブラリとして使う方法。
+* `UseAsStaticLibrary.md` : Sayuriを静的ライブラリとして使う方法。
 
 
 
@@ -99,7 +99,7 @@ CMakeを使って簡単にビルドすることができます。
 「`libsayurilib.a`」と「`include`」はSayuriを静的ライブラリとして
 使用する場合に使います。  
 その場合は「`sayuri`」は必要ありません。  
-詳しくは「`as_static_library.md`」を読んで下さい。
+詳しくは「`UseAsStaticLibrary.md`」を読んで下さい。
 
 
 
@@ -188,7 +188,7 @@ Files and Directories
 * `README.md` : This file.
 * `CMakeLists.txt` : A configuration file for CMake.
 * `LICENSE` : The software license.
-* `as_static_library.md` : How to use Sayuri as a static library.
+* `UseAsStaticLibrary.md` : How to use Sayuri as a static library.
 
 
 
@@ -240,7 +240,7 @@ When you use it, you don't need "`libsayurilib.a`" and "`include`".
 "`libsayurilib.a`" and "`include`" are files for using Sayuri as
 a static library.
 When you use them, you don't need "`sayuri`".
-Please read "`as_static_library.md`" for details.
+Please read "`UseAsStaticLibrary.md`" for details.
 
 
 
