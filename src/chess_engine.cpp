@@ -313,9 +313,11 @@ namespace Sayuri {
 
     if (shared_st_ptr_) {
       // 50手ルールの履歴を初期化。
+      shared_st_ptr_->ply_100_history_.clear();
       shared_st_ptr_->ply_100_history_.push_back(0);
 
       // 駒の配置の履歴を初期化。
+      shared_st_ptr_->position_history_.clear();
       shared_st_ptr_->position_history_.push_back(PositionRecord(*this));
     }
   }
