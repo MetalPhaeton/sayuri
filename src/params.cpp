@@ -35,7 +35,7 @@ namespace Sayuri {
   /******************/
   // コンストラクタ。
   SearchParams::SearchParams() :
-  ybwc_more_than_(3),
+  ybwc_after_(3),
   enable_aspiration_windows_(true),
   aspiration_windows_limit_depth_(5),
   aspiration_windows_delta_(15),
@@ -57,14 +57,14 @@ namespace Sayuri {
   probcut_search_reduction_(4),
   enable_history_pruning_(true),
   history_pruning_limit_depth_(4),
-  history_pruning_move_threshold_(0.20),
-  history_pruning_more_than_(4),
+  history_pruning_move_threshold_(0.5),
+  history_pruning_after_(10),
   history_pruning_threshold_(0.5),
   history_pruning_reduction_(1),
   enable_lmr_(true),
   lmr_limit_depth_(4),
   lmr_threshold_(0.20),
-  lmr_more_than_(4),
+  lmr_after_(4),
   lmr_search_reduction_(1),
   enable_futility_pruning_(true),
   futility_pruning_depth_(3),
@@ -98,7 +98,7 @@ namespace Sayuri {
 
   // メンバをコピーする。
   void SearchParams::ScanMember(const SearchParams& params) {
-    ybwc_more_than_ = params.ybwc_more_than_;
+    ybwc_after_ = params.ybwc_after_;
     enable_aspiration_windows_ = params.enable_aspiration_windows_;
     aspiration_windows_limit_depth_ = params.aspiration_windows_limit_depth_;
     aspiration_windows_delta_ = params.aspiration_windows_delta_;
@@ -121,12 +121,13 @@ namespace Sayuri {
     enable_history_pruning_ = params.enable_history_pruning_;
     history_pruning_limit_depth_ = params.history_pruning_limit_depth_;
     history_pruning_move_threshold_ = params.history_pruning_move_threshold_;
+    history_pruning_after_ = params.history_pruning_after_;
     history_pruning_threshold_ = params.history_pruning_threshold_;
     history_pruning_reduction_ = params.history_pruning_reduction_;
     enable_lmr_ = params.enable_lmr_;
     lmr_limit_depth_ = params.lmr_limit_depth_;
     lmr_threshold_ = params.lmr_threshold_;
-    lmr_more_than_ =params.lmr_more_than_;
+    lmr_after_ =params.lmr_after_;
     lmr_search_reduction_ = params.lmr_search_reduction_;
     enable_futility_pruning_ = params.enable_futility_pruning_;
     futility_pruning_depth_ = params.futility_pruning_depth_;

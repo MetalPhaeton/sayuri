@@ -50,7 +50,7 @@ namespace Sayuri {
       /**************/
       // YBWC。
       // 指定の候補手数以上で実行する。
-      int ybwc_more_than() const {return ybwc_more_than_;}
+      int ybwc_after() const {return ybwc_after_;}
 
       // Aspiration Windows。
       // 有効かどうか。
@@ -123,8 +123,8 @@ namespace Sayuri {
         return history_pruning_move_threshold_;
       }
       // 指定の候補手数以上で実行する。
-      int history_pruning_more_than() const {
-        return history_pruning_more_than_;
+      int history_pruning_after() const {
+        return history_pruning_after_;
       }
       // 最大値に対する閾値。 1.0から0.0。
       double history_pruning_threshold() const {
@@ -143,7 +143,7 @@ namespace Sayuri {
       // 全候補手中、リダクションしない手数の閾値。 1.0から0.0。
       double lmr_threshold() const {return lmr_threshold_;}
       // 指定の候補手数以上で実行する。
-      int lmr_more_than() const {return lmr_more_than_;}
+      int lmr_after() const {return lmr_after_;}
       // リダクションする深さ。
       int lmr_search_reduction() const {return lmr_search_reduction_;}
 
@@ -160,7 +160,7 @@ namespace Sayuri {
       /******************/
       // YBWC。
       // 指定の候補手数以上で実行する。
-      void ybwc_more_than(int num_moves) {ybwc_more_than_ = num_moves;}
+      void ybwc_after(int num_moves) {ybwc_after_ = num_moves;}
 
       // Aspiration Windows。
       // 有効かどうか。
@@ -245,8 +245,8 @@ namespace Sayuri {
         history_pruning_move_threshold_ = threshold;
       }
       // 指定の候補手数以上で実行する。
-      void history_pruning_more_than(int num_moves) {
-        history_pruning_more_than_ = num_moves;
+      void history_pruning_after(int num_moves) {
+        history_pruning_after_ = num_moves;
       }
       // 最大値に対する閾値。 1.0から0.0。
       void history_pruning_threshold(double threshold) {
@@ -265,7 +265,7 @@ namespace Sayuri {
       // 全候補手中、リダクションしない手数の閾値。 1.0から0.0。
       void lmr_threshold(double threshold) {lmr_threshold_ = threshold;}
       // 指定の候補手数以上で実行する。
-      void lmr_more_than(int num_moves) {lmr_more_than_ = num_moves;}
+      void lmr_after(int num_moves) {lmr_after_ = num_moves;}
       // リダクションする深さ。
       void lmr_search_reduction(int reduction) {
         lmr_search_reduction_ = reduction;
@@ -296,7 +296,7 @@ namespace Sayuri {
       /* メンバ変数。 */
       /****************/
       // YBWC。
-      int ybwc_more_than_;  // 指定の候補手数以上で実行する。
+      int ybwc_after_;  // 指定の候補手数以上で実行する。
 
       // Aspiration Windows。
       bool enable_aspiration_windows_;  // 有効かどうか。
@@ -340,7 +340,7 @@ namespace Sayuri {
       // 全候補手中、枝刈りしない手数の閾値。 1.0から0.0。
       double history_pruning_move_threshold_;
       // 指定の候補手数以上で実行する。
-      int history_pruning_more_than_;
+      int history_pruning_after_;
       // 最大値に対する閾値。 1.0 から 0.0。
       double history_pruning_threshold_;
       int history_pruning_reduction_;  // リダクションする深さ。
@@ -350,7 +350,7 @@ namespace Sayuri {
       int lmr_limit_depth_;  // 残り深さの制限。
       // 全候補手中、リダクションしない手数の閾値。 1.0 から 0.0。
       double lmr_threshold_;
-      int lmr_more_than_;  // 指定の候補手数以上で実行する。
+      int lmr_after_;  // 指定の候補手数以上で実行する。
       int lmr_search_reduction_;  // リダクションする深さ。
 
       // Futility Pruning。

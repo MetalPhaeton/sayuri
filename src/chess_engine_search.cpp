@@ -427,7 +427,7 @@ namespace Sayuri {
     is_checked, num_all_moves, has_legal_move, nullptr, dummy_time);
     // パラメータ保存。
     // YBWC。
-    int ybwc_more_than = shared_st_ptr_->search_params_ptr_->ybwc_more_than();
+    int ybwc_after = shared_st_ptr_->search_params_ptr_->ybwc_after();
 
     // History Pruning。
     bool enable_history_pruning =
@@ -439,11 +439,11 @@ namespace Sayuri {
     int history_pruning_move_threshold = static_cast<int>
     (num_all_moves * shared_st_ptr_->search_params_ptr_->
     history_pruning_move_threshold());
-    int history_pruning_more_than =
-    shared_st_ptr_->search_params_ptr_->history_pruning_more_than();
+    int history_pruning_after =
+    shared_st_ptr_->search_params_ptr_->history_pruning_after();
     history_pruning_move_threshold =
-    history_pruning_move_threshold < history_pruning_more_than 
-    ? history_pruning_more_than : history_pruning_move_threshold;
+    history_pruning_move_threshold < history_pruning_after 
+    ? history_pruning_after : history_pruning_move_threshold;
 
     std::uint64_t history_pruning_threshold = static_cast<std::uint64_t>
     (shared_st_ptr_->history_max_
@@ -460,10 +460,8 @@ namespace Sayuri {
 
     int lmr_threshold = static_cast<int>
     (num_all_moves * shared_st_ptr_->search_params_ptr_->lmr_threshold());
-    int lmr_more_than =
-    shared_st_ptr_->search_params_ptr_->lmr_more_than();
-    lmr_threshold =
-    lmr_threshold < lmr_more_than ? lmr_more_than : lmr_threshold;
+    int lmr_after = shared_st_ptr_->search_params_ptr_->lmr_after();
+    lmr_threshold = lmr_threshold < lmr_after ? lmr_after : lmr_threshold;
 
     int lmr_search_reduction =
     shared_st_ptr_->search_params_ptr_->lmr_search_reduction();
@@ -482,7 +480,7 @@ namespace Sayuri {
       }
 
       // 別スレッドに助けを求める。(YBWC)
-      if (num_moves > ybwc_more_than) {
+      if (num_moves > ybwc_after) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
@@ -895,7 +893,7 @@ namespace Sayuri {
 
     // パラメータ保存。
     // YBWC。
-    int ybwc_more_than = shared_st_ptr_->search_params_ptr_->ybwc_more_than();
+    int ybwc_after = shared_st_ptr_->search_params_ptr_->ybwc_after();
 
     // History Pruning。
     bool enable_history_pruning =
@@ -907,11 +905,11 @@ namespace Sayuri {
     int history_pruning_move_threshold = static_cast<int>
     (job.num_all_moves() * shared_st_ptr_->search_params_ptr_->
     history_pruning_move_threshold());
-    int history_pruning_more_than =
-    shared_st_ptr_->search_params_ptr_->history_pruning_more_than();
+    int history_pruning_after =
+    shared_st_ptr_->search_params_ptr_->history_pruning_after();
     history_pruning_move_threshold =
-    history_pruning_move_threshold < history_pruning_more_than
-    ? history_pruning_more_than : history_pruning_move_threshold;
+    history_pruning_move_threshold < history_pruning_after
+    ? history_pruning_after : history_pruning_move_threshold;
 
     std::uint64_t history_pruning_threshold = static_cast<std::uint64_t>
     (shared_st_ptr_->history_max_
@@ -928,10 +926,8 @@ namespace Sayuri {
 
     int lmr_threshold = static_cast<int>(job.num_all_moves()
     * shared_st_ptr_->search_params_ptr_->lmr_threshold());
-    int lmr_more_than =
-    shared_st_ptr_->search_params_ptr_->lmr_more_than();
-    lmr_threshold =
-    lmr_threshold < lmr_more_than ? lmr_more_than : lmr_threshold;
+    int lmr_after = shared_st_ptr_->search_params_ptr_->lmr_after();
+    lmr_threshold = lmr_threshold < lmr_after ? lmr_after : lmr_threshold;
 
     int lmr_search_reduction =
     shared_st_ptr_->search_params_ptr_->lmr_search_reduction();
@@ -950,7 +946,7 @@ namespace Sayuri {
       }
 
       // 別スレッドに助けを求める。(YBWC)
-      if (num_moves > ybwc_more_than) {
+      if (num_moves > ybwc_after) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
@@ -1141,7 +1137,7 @@ namespace Sayuri {
 
     // パラメータを保存。
     // YBWC。
-    int ybwc_more_than = shared_st_ptr_->search_params_ptr_->ybwc_more_than();
+    int ybwc_after = shared_st_ptr_->search_params_ptr_->ybwc_after();
 
     // Late Move Reduction。
     bool enable_lmr = shared_st_ptr_->search_params_ptr_->enable_lmr();
@@ -1151,10 +1147,8 @@ namespace Sayuri {
 
     int lmr_threshold = static_cast<int>(job.num_all_moves()
     * shared_st_ptr_->search_params_ptr_->lmr_threshold());
-    int lmr_more_than =
-    shared_st_ptr_->search_params_ptr_->lmr_more_than();
-    lmr_threshold =
-    lmr_threshold < lmr_more_than ? lmr_more_than : lmr_threshold;
+    int lmr_after = shared_st_ptr_->search_params_ptr_->lmr_after();
+    lmr_threshold = lmr_threshold < lmr_after ? lmr_after : lmr_threshold;
 
     int lmr_search_reduction =
     shared_st_ptr_->search_params_ptr_->lmr_search_reduction();
@@ -1192,7 +1186,7 @@ namespace Sayuri {
       }
 
       // 別スレッドに助けを求める。(YBWC)
-      if (num_moves > ybwc_more_than) {
+      if (num_moves > ybwc_after) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
