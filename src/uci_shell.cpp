@@ -53,6 +53,7 @@ namespace Sayuri {
   UCIShell::UCIShell(ChessEngine& engine) :
   engine_ptr_(&engine),
   table_ptr_(new TranspositionTable(UCI_MIN_TABLE_SIZE)),
+  moves_to_search_(0),
   table_size_(UCI_DEFAULT_TABLE_SIZE),
   enable_pondering_(UCI_DEFAULT_PONDER),
   num_threads_(UCI_DEFAULT_THREADS),
@@ -63,35 +64,35 @@ namespace Sayuri {
   UCIShell::UCIShell(const UCIShell& shell) :
   engine_ptr_(shell.engine_ptr_),
   table_ptr_(new TranspositionTable(*(shell.table_ptr_))),
+  moves_to_search_(shell.moves_to_search_),
   table_size_(shell.table_size_),
   enable_pondering_(shell.enable_pondering_),
   num_threads_(shell.num_threads_),
-  analyse_mode_(shell.analyse_mode_) {
-    *(moves_to_search_ptr_) = *(shell.moves_to_search_ptr_);
-    output_listeners_ = shell.output_listeners_;
+  analyse_mode_(shell.analyse_mode_),
+  output_listeners_(shell.output_listeners_) {
   }
 
   // ムーブコンストラクタ。
   UCIShell::UCIShell(UCIShell&& shell) :
   engine_ptr_(shell.engine_ptr_),
   table_ptr_(std::move(shell.table_ptr_)),
+  moves_to_search_(std::move(shell.moves_to_search_)),
   table_size_(shell.table_size_),
   enable_pondering_(shell.enable_pondering_),
   num_threads_(shell.num_threads_),
-  analyse_mode_(shell.analyse_mode_) {
-    moves_to_search_ptr_ = std::move(shell.moves_to_search_ptr_);
-    output_listeners_ = std::move(shell.output_listeners_);
+  analyse_mode_(shell.analyse_mode_),
+  output_listeners_(std::move(shell.output_listeners_)) {
   }
 
   // コピー代入。
   UCIShell& UCIShell::operator=(const UCIShell& shell) {
     engine_ptr_ = shell.engine_ptr_;
     *table_ptr_ = *(shell.table_ptr_);
+    moves_to_search_ = shell.moves_to_search_;
     table_size_ = shell.table_size_;
     enable_pondering_ = shell.enable_pondering_;
     num_threads_ = shell.num_threads_;
     analyse_mode_ = shell.analyse_mode_;
-    *(moves_to_search_ptr_) = *(shell.moves_to_search_ptr_);
     output_listeners_ = shell.output_listeners_;
     return *this;
   }
@@ -100,11 +101,11 @@ namespace Sayuri {
   UCIShell& UCIShell::operator=(UCIShell&& shell) {
     engine_ptr_ = shell.engine_ptr_;
     table_ptr_ = std::move(shell.table_ptr_);
+    moves_to_search_ = std::move(shell.moves_to_search_);
     table_size_ = shell.table_size_;
     enable_pondering_ = shell.enable_pondering_;
     num_threads_ = shell.num_threads_;
     analyse_mode_ = shell.analyse_mode_;
-    moves_to_search_ptr_ = std::move(shell.moves_to_search_ptr_);
     output_listeners_ = std::move(shell.output_listeners_);
     return *this;
   }
@@ -239,7 +240,7 @@ namespace Sayuri {
 
     // 思考開始。
     PVLine pv_line = engine_ptr_->Calculate (num_threads_,
-    *(table_ptr_.get()), moves_to_search_ptr_.get(), *this);
+    *(table_ptr_.get()), moves_to_search_, *this);
 
     // 最善手を表示。
     std::ostringstream sout;
@@ -553,7 +554,7 @@ namespace Sayuri {
     std::uint64_t max_nodes = MAX_NODES;
     Chrono::milliseconds thinking_time(-1U >> 1);
     bool infinite_thinking = false;
-    moves_to_search_ptr_.reset(nullptr);
+    moves_to_search_.clear();
 
     // サブコマンドを解析。
     while (parser.HasNext()) {
@@ -566,10 +567,7 @@ namespace Sayuri {
         while (!(parser.IsDelim())) {
           Move move = TransStringToMove(parser.Get().str_);
           if (move) {
-            if (moves_to_search_ptr_ == nullptr) {
-              moves_to_search_ptr_.reset(new std::vector<Move>());
-            }
-            moves_to_search_ptr_->push_back(move);
+            moves_to_search_.push_back(move);
           } else {
             break;
           }

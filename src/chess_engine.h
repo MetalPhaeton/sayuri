@@ -123,12 +123,12 @@ namespace Sayuri {
       // [引数]
       // num_threads: スレッド数。
       // table: 使用するトランスポジションテーブル。
-      // moves_to_search_ptr: 探索する候補手。nullptrなら全ての手を探索する。
+      // moves_to_search: 探索する候補手。空なら全ての手を探索する。
       // shell: UCI出力に使用するシェル。
       // [戻り値]
       // PVライン。
       PVLine Calculate(int num_threads, TranspositionTable& table,
-      std::vector<Move>* moves_to_search_ptr, UCIShell& shell);
+      const std::vector<Move>& moves_to_search, UCIShell& shell);
 
       // 探索を終了させる。
       void StopCalculation();
@@ -319,12 +319,12 @@ namespace Sayuri {
       // 探索のルート。
       // [引数]
       // table: 使用するトランスポジションテーブル。
-      // moves_to_search_ptr: 探索する候補手。nullptrなら全ての手を探索する。
+      // moves_to_search: 探索する候補手。空なら全ての手を探索する。
       // shell: UCI出力に使用するシェル。
       // [戻り値]
       // PVライン。
       PVLine SearchRoot(TranspositionTable& table,
-      std::vector<Move>* moves_to_search_ptr, UCIShell& shell);
+      const std::vector<Move>& moves_to_search, UCIShell& shell);
       // YBWC探索用スレッド。
       // [引数]
       // shell: UCI出力に使用するシェル。

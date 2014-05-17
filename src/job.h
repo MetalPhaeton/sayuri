@@ -71,14 +71,14 @@ namespace Sayuri {
       // is_checked: チェックされているかどうか。
       // num_all_moves: 生成された手の数。
       // has_legal_move: 合法手が見つかったかどうか。(更新される。)
-      // moves_to_search_ptr: ルートで探索すべき手のベクトル。ないならnullptr。
+      // moves_to_search: ルートで探索すべき手のベクトル。空なら全て探索。
       // next_print_info_time: 情報を出力する時間。(更新される。)
       Job(std::mutex& mutex, MoveMaker& maker, ChessEngine& client,
       PositionRecord& record, NodeType node_type, Hash pos_hash, int depth,
       int level, int& alpha, int& beta, int& delta, TranspositionTable& table,
       PVLine& pv_line, bool is_null_searching, int null_reduction,
       ScoreType& score_type, int material, bool is_checked, int num_all_moves,
-      bool& has_legal_move, std::vector<Move>* moves_to_search_ptr,
+      bool& has_legal_move, const std::vector<Move>& moves_to_search,
       TimePoint& next_print_info_time);
 
       Job(const Job& job);
@@ -145,8 +145,10 @@ namespace Sayuri {
       int num_all_moves() const {return num_all_moves_;}
       // 合法手が見つかったかどうか。(更新される。)
       bool& has_legal_move() {return *has_legal_move_ptr_;}
-      // ルートで探索すべき手のベクトル。ないならnullptr。
-      std::vector<Move>* moves_to_search_ptr() {return moves_to_search_ptr_;}
+      // ルートで探索すべき手のベクトル。
+      const std::vector<Move>& moves_to_search() {
+        return *moves_to_search_ptr_;
+      }
       // 情報を出力する時間。(更新される。)
       TimePoint& next_print_info_time() {return *next_print_info_time_ptr_;}
 
@@ -182,7 +184,7 @@ namespace Sayuri {
       bool is_checked_;
       int num_all_moves_;
       bool* has_legal_move_ptr_;
-      std::vector<Move>* moves_to_search_ptr_;
+      const std::vector<Move>* moves_to_search_ptr_;
       TimePoint* next_print_info_time_ptr_;
 
       // 仕事用ムーブメーカー。

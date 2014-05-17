@@ -45,7 +45,7 @@ namespace Sayuri {
   int level, int& alpha, int& beta, int& delta, TranspositionTable& table,
   PVLine& pv_line, bool is_null_searching, int null_reduction,
   ScoreType& score_type, int material, bool is_checked, int num_all_moves,
-  bool& has_legal_move, std::vector<Move>* moves_to_search_ptr,
+  bool& has_legal_move, const std::vector<Move>& moves_to_search,
   TimePoint& next_print_info_time) :
   mutex_ptr_(&mutex),
   client_ptr_(&client),
@@ -66,7 +66,7 @@ namespace Sayuri {
   is_checked_(is_checked),
   num_all_moves_(num_all_moves),
   has_legal_move_ptr_(&has_legal_move),
-  moves_to_search_ptr_(moves_to_search_ptr),
+  moves_to_search_ptr_(&moves_to_search),
   next_print_info_time_ptr_(&next_print_info_time),
   maker_ptr_(&maker),
   helper_counter_(0),

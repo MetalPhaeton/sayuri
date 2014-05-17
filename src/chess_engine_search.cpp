@@ -420,11 +420,12 @@ namespace Sayuri {
     std::mutex mutex;
     PositionRecord record(*this);
     int dummy_delta = 0;
+    std::vector<Move> dummy_vec(0);
     TimePoint dummy_time;
     Job job(mutex, maker, *this, record, Type, pos_hash, depth, level,
     alpha, beta, dummy_delta, table, pv_line, is_null_searching_,
     null_reduction, score_type, material,
-    is_checked, num_all_moves, has_legal_move, nullptr, dummy_time);
+    is_checked, num_all_moves, has_legal_move, dummy_vec, dummy_time);
     // パラメータ保存。
     // YBWC。
     int ybwc_after = shared_st_ptr_->search_params_ptr_->ybwc_after();
@@ -695,7 +696,7 @@ namespace Sayuri {
 
   // 探索のルート。
   PVLine ChessEngine::SearchRoot(TranspositionTable& table,
-  std::vector<Move>* moves_to_search_ptr, UCIShell& shell) {
+  const std::vector<Move>& moves_to_search, UCIShell& shell) {
     // 初期化。
     searched_level_ = 0;
     shared_st_ptr_->num_searched_nodes_ = 0;
@@ -808,7 +809,7 @@ namespace Sayuri {
       Job job(mutex, maker, *this, record, node_type, pos_hash, depth, level,
       alpha, beta, delta, table, pv_line, is_null_searching_, null_reduction,
       score_type, material, is_checked, num_all_moves, has_legal_move,
-      moves_to_search_ptr, next_print_info_time);
+      moves_to_search, next_print_info_time);
 
       // ヘルプして待つ。
       shared_st_ptr_->helper_queue_ptr_->HelpRoot(job);
@@ -1169,9 +1170,10 @@ namespace Sayuri {
       job.mutex().unlock();  // ロック解除。
 
       // 探索すべき手が指定されていれば、今の手がその手かどうか調べる。
-      if (job.moves_to_search_ptr()) {
+      if (!(job.moves_to_search().empty())) {
         bool hit = false;
-        for (auto& move_2 : *(job.moves_to_search_ptr())) {
+        const std::vector<Move>& vec = job.moves_to_search();
+        for (auto move_2 : vec) {
           if (EqualMove(move_2, move)) {
             // 探索すべき手だった。
             hit = true;

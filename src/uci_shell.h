@@ -240,7 +240,7 @@ namespace Sayuri {
       // スレッド。
       std::thread thinking_thread_;
       // 思考すべき候補手のベクトル。
-      std::unique_ptr<std::vector<Move>> moves_to_search_ptr_;
+      std::vector<Move> moves_to_search_;
 
       // オプション。トランスポジションテーブルのサイズ。
       std::size_t table_size_;
