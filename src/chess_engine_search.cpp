@@ -724,7 +724,7 @@ namespace Sayuri {
     shared_st_ptr_->helper_queue_ptr_.reset(new HelperQueue());
     for (auto& thread : thread_vec_) {
       thread =
-      std::thread(&ChessEngine::ThreadYBWC, std::ref(*this), std::ref(shell));
+      std::thread(&ChessEngine::ThreadYBWC, this, std::ref(shell));
     }
 
     // Iterative Deepening。

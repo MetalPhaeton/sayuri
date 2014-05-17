@@ -663,7 +663,7 @@ namespace Sayuri {
     engine_ptr_->SetStopper(max_depth, max_nodes, thinking_time,
     infinite_thinking);
     thinking_thread_ =
-    std::thread(&UCIShell::ThreadThinking, std::ref(*this));
+    std::thread(&UCIShell::ThreadThinking, this);
   }
 
   // stopコマンド。
