@@ -268,14 +268,14 @@ You can change Sayuri's settings with the following commands.
 * To change size of the hash table. (Default: 32 MB, Max: 8192 MB, Min: 8 MB)  
   `setoption name Hash value <Size(MB)>`
 
-* To initialize the hash table.
+* To initialize the hash table.  
   `setoption name Clear Hash`
 
-* To enable Ponder. (Default: true)
+* To enable Ponder. (Default: true)  
   `setoption name Ponder value <true or false>`
 
-* To change the number of threads. (Default: 1, Max: 64, Min: 1)
+* To change the number of threads. (Default: 1, Max: 64, Min: 1)  
   `setoption name Threads value <Number of threads>`
 
-* To enable analyse mode. (Default: false)
+* To enable analyse mode. (Default: false)  
   `setoption name UCI_AnalyseMode value <true or false>`
