@@ -82,6 +82,8 @@ Sayuri::Init();
 
 以下の2つのパラメータ用オブジェクトを作成します。
 
+| オブジェクト   | 意味                               |
+|----------------|------------------------------------|
 | `SearchParams` | 探索アルゴリズムを操作する設定値。 |
 | `EvalParams`   | 局面評価に関する設定値。           |
 
@@ -97,6 +99,8 @@ eval_params_ptr(new Sayuri::EvalParams());
 
 「`ChessEngine`」オブジェクトを作り、上記2つのオブジェクトを関連付けます。
 
+| オブジェクト  | 意味                                              |
+|---------------|---------------------------------------------------|
 | `ChessEngine` | 次の一手を思考するオブジェクト。 チェスエンジン。 |
 
 ``` cpp
@@ -107,7 +111,9 @@ engine_ptr(new Sayuri::ChessEngine(*search_params_ptr, *eval_params_ptr));
 
 「`UCIShell`」オブジェクトを作り、エンジンを関連付けます。
 
-| `UCIShell` | UCIコマンドでチェスエンジンを操作するオブジェクト。 |
+| オブジェクト | 意味                                                |
+|--------------|-----------------------------------------------------|
+| `UCIShell`   | UCIコマンドでチェスエンジンを操作するオブジェクト。 |
 
 ``` cpp
 // UCIShellを作り、エンジンを関連付ける。
@@ -256,6 +262,8 @@ int main(int argc, char* argv[]) {
 以下では分かりやすいようにアクセサを例にとって説明します。  
 ミューテータを使用したい場合は以下の表を参考に書き換えて下さい。
 
+| 種類             | 形                              |
+|------------------|---------------------------------|
 | アクセサの型     | `型 パラメータ名()`             |
 | ミューテータの型 | `void パラメータ名(型　変数名)` |
 
@@ -417,6 +425,8 @@ int main(int argc, char* argv[]) {
 以下では分かりやすいようにアクセサを例にとって説明します。  
 ミューテータを使用したい場合は以下の表を参考に書き換えて下さい。
 
+| 種類             | 形                              |
+|------------------|---------------------------------|
 | アクセサの型     | `型　パラメータ名()`            |
 | ミューテータの型 | `void パラメータ名(型　変数名)` |
 
@@ -647,6 +657,8 @@ Sayuri::Init();
 
 Create the following 2 objects for parameters.
 
+| Object name    | Meaning                                    |
+|----------------|--------------------------------------------|
 | `SearchParams` | The parameters for the search algorithm.   |
 | `EvalParams`   | The parameters of the evaluation function. |
 
@@ -662,6 +674,8 @@ eval_params_ptr(new Sayuri::EvalParams());
 
 Create "`ChessEngine`" object and relate the above 2 objects to it.
 
+| Object name   | Meaning                                             |
+|---------------|-----------------------------------------------------|
 | `ChessEngine` | A object to thinking the next move. A chess engine. |
 
 ``` cpp
@@ -672,7 +686,9 @@ engine_ptr(new Sayuri::ChessEngine(*search_params_ptr, *eval_params_ptr));
 
 Create "`UCIShell`" object and relate the engine to it.
 
-| `UCIShell` | A object to operate the engine with UCI Commands. |
+| Object name | Meaning                                           |
+|-------------|---------------------------------------------------|
+| `UCIShell`  | A object to operate the engine with UCI Commands. |
 
 ``` cpp
 // Create UCIShell and relate the engine to it.
@@ -817,6 +833,8 @@ As default, it's set by the author's intuition.
 I explain with an accessor.  
 If you want to use the mutator, translate it with the following table.
 
+| Type of functions   | Skeleton                       |
+|---------------------|--------------------------------|
 | Type of an accessor | `Type ParameterName()`         |
 | Type of a mutator   | `void ParameterName(Type arg)` |
 
@@ -981,6 +999,8 @@ As default, it's set by the author's experience as a chess player.
 I explain with an accessor.  
 If you want to use the mutator, translate it with the following table.
 
+| Type of functions   | Skeleton                       |
+|---------------------|--------------------------------|
 | Type of an accessor | `Type ParameterName()`         |
 | Type of a mutator   | `void ParameterName(Type arg)` |
 
