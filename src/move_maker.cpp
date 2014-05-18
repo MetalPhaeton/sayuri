@@ -40,7 +40,7 @@ namespace Sayuri {
   //コンストラクタ。
   MoveMaker::MoveMaker(const ChessEngine& engine) :
   engine_ptr_(&engine),
-  history_max_(1Ull),
+  history_max_(1),
   num_moves_(0) {
     // スタックのポインターをセット。
     begin_ = last_ = max_ = move_stack_;
