@@ -41,7 +41,7 @@ namespace Sayuri {
   MoveMaker::MoveMaker(const ChessEngine& engine) :
   engine_ptr_(&engine),
   history_max_(1Ull),
-  num_moves_(0U) {
+  num_moves_(0) {
     // スタックのポインターをセット。
     begin_ = last_ = max_ = move_stack_;
     end_ = &(move_stack_[MAX_CANDIDATES]);
@@ -182,7 +182,7 @@ namespace Sayuri {
 
         for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
           // 手を作る。
-          Move move = 0U;
+          Move move = 0;
           move_from(move, from);
           Square to = Util::GetSquare(move_bitboard);
           move_to(move, to);
@@ -208,7 +208,7 @@ namespace Sayuri {
     for (; pieces; pieces &= pieces - 1) {
       Square from = Util::GetSquare(pieces);
 
-      Bitboard move_bitboard = 0ULL;
+      Bitboard move_bitboard = 0;
       if (Type == GenMoveType::NON_CAPTURE) {
         // キャプチャーじゃない手。
         // ポーンの一歩の動き。
@@ -235,7 +235,7 @@ namespace Sayuri {
 
       for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
         // 手を作る。
-        Move move = 0U;
+        Move move = 0;
         move_from(move, from);
         Square to = Util::GetSquare(move_bitboard);
         move_to(move, to);
@@ -299,7 +299,7 @@ namespace Sayuri {
       move_bitboard &= engine_ptr_->side_pieces()[enemy_side];
     }
     for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
-      Move move = 0U;
+      Move move = 0;
       move_from(move, from);
       Square to = Util::GetSquare(move_bitboard);
       move_to(move, to);
@@ -355,7 +355,7 @@ namespace Sayuri {
 
     // 手がなければ何もしない。
     if (last_ <= begin_) {
-      return 0U;
+      return 0;
     }
 
     // とりあえず最後の手をポップ。

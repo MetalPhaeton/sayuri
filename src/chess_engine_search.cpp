@@ -88,9 +88,9 @@ namespace Sayuri {
     // 駒を取る手だけ。
     MoveMaker maker(*this);
     if (IsAttacked(king_[side], enemy_side)) {
-      maker.GenMoves<GenMoveType::ALL>(0U, 0U, 0U, 0U);
+      maker.GenMoves<GenMoveType::ALL>(0, 0, 0, 0);
     } else {
-      maker.GenMoves<GenMoveType::CAPTURE>(0U, 0U, 0U, 0U);
+      maker.GenMoves<GenMoveType::CAPTURE>(0, 0, 0, 0);
     }
 
     // 探索する。
@@ -161,7 +161,7 @@ namespace Sayuri {
     bool is_checked = IsAttacked(king_[side], enemy_side);
 
     // トランスポジションテーブルを調べる。
-    Move prev_best = 0U;
+    Move prev_best = 0;
     if (shared_st_ptr_->search_params_ptr_->enable_ttable()) {
       table.Lock();
       // 前回の繰り返しの最善手を得る。
@@ -284,7 +284,7 @@ namespace Sayuri {
         if (!is_null_searching_ && !is_checked && (depth
         >= shared_st_ptr_->search_params_ptr_->nmr_limit_depth())) {
           // Null Move Reduction。
-          Move null_move = 0U;
+          Move null_move = 0;
 
           is_null_searching_ = true;
           MakeMove(null_move);
@@ -572,8 +572,8 @@ namespace Sayuri {
         } else {
           // PV発見後のPVノード。
           // ゼロウィンドウ探索。
-          score = -Search<NodeType::NON_PV>(next_hash, new_depth - 1, level + 1,
-          -(temp_alpha + 1), -temp_alpha, -next_my_material, table,
+          score = -Search<NodeType::NON_PV>(next_hash, new_depth - 1,
+          level + 1, -(temp_alpha + 1), -temp_alpha, -next_my_material, table,
           next_line);
 
           if (score > temp_alpha) {
@@ -701,21 +701,21 @@ namespace Sayuri {
     searched_level_ = 0;
     shared_st_ptr_->num_searched_nodes_ = 0;
     shared_st_ptr_->start_time_ = SysClock::now();
-    for (Side side = 0U; side < NUM_SIDES; side++) {
-      for (Square from = 0U; from < NUM_SQUARES; from++) {
-        for (Square to = 0U; to < NUM_SQUARES; to++) {
+    for (Side side = 0; side < NUM_SIDES; side++) {
+      for (Square from = 0; from < NUM_SQUARES; from++) {
+        for (Square to = 0; to < NUM_SQUARES; to++) {
           shared_st_ptr_->history_[side][from][to] = 0;
         }
       }
     }
-    for (std::uint32_t i = 0U; i < (MAX_PLYS + 1); i++) {
-      shared_st_ptr_->iid_stack_[i] = 0U;
-      shared_st_ptr_->killer_stack_[i][0] = 0U;
-      shared_st_ptr_->killer_stack_[i][1] = 0U;
-      shared_st_ptr_->killer_stack_[i + 2][0] = 0U;
-      shared_st_ptr_->killer_stack_[i + 2][1] = 0U;
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      shared_st_ptr_->iid_stack_[i] = 0;
+      shared_st_ptr_->killer_stack_[i][0] = 0;
+      shared_st_ptr_->killer_stack_[i][1] = 0;
+      shared_st_ptr_->killer_stack_[i + 2][0] = 0;
+      shared_st_ptr_->killer_stack_[i + 2][1] = 0;
     }
-    shared_st_ptr_->history_max_ = 1ULL;
+    shared_st_ptr_->history_max_ = 1;
     shared_st_ptr_->stop_now_ = false;
     shared_st_ptr_->i_depth_ = 1;
     is_null_searching_ = false;
@@ -779,7 +779,7 @@ namespace Sayuri {
       shell.PrintDepthInfo(shared_st_ptr_->i_depth_);
 
       // 前回の繰り返しの最善手を得る。
-      Move prev_best = 0U;
+      Move prev_best = 0;
       if (shared_st_ptr_->search_params_ptr_->enable_ttable()) {
         table.Lock();
         const TTEntry& prev_entry =
@@ -1430,12 +1430,12 @@ namespace Sayuri {
   Move ChessEngine::GetNextSEEMove(Square target) const {
     // キングがターゲットの時はなし。
     if (target == king_[to_move_ ^ 0x3]) {
-      return 0U;
+      return 0;
     }
 
     // 価値の低いものから調べる。
     for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
-      Bitboard attackers = 0ULL;
+      Bitboard attackers = 0;
       Piece promotion = EMPTY;
       switch (piece_type) {
         case PAWN:
@@ -1467,7 +1467,7 @@ namespace Sayuri {
           break;
       }
       if (attackers) {
-        Move move = 0U;
+        Move move = 0;
         move_from(move, Util::GetSquare(attackers));
         move_to(move, target);
         move_promotion(move, promotion);
@@ -1476,7 +1476,7 @@ namespace Sayuri {
       }
     }
 
-    return 0U;
+    return 0;
   }
   // Futility Pruningのマージンを計算する。
   int ChessEngine::GetMargin(int depth) {
@@ -1489,8 +1489,9 @@ namespace Sayuri {
   }
 
   // ストップ条件を設定する。
-  void ChessEngine::SetStopper(std::uint32_t max_depth, std::uint64_t max_nodes,
-  Chrono::milliseconds thinking_time, bool infinite_thinking) {
+  void ChessEngine::SetStopper(std::uint32_t max_depth,
+  std::uint64_t max_nodes, Chrono::milliseconds thinking_time,
+  bool infinite_thinking) {
     shared_st_ptr_->max_depth_ = max_depth <= MAX_PLYS ? max_depth : MAX_PLYS;
     shared_st_ptr_->max_nodes_ =
     max_nodes <= MAX_NODES ? max_nodes : MAX_NODES;

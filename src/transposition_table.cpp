@@ -148,11 +148,11 @@ namespace Sayuri {
 
   // デフォルトコンストラクタ。
   TTEntry::TTEntry() :
-  pos_hash_(0ULL),
+  pos_hash_(0),
   depth_(-MAX_VALUE),
   score_(0),
   score_type_(ScoreType::ALPHA),
-  best_move_(0U),
+  best_move_(0),
   ply_mate_(-1),
   table_age_(-1) {}
 

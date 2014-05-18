@@ -717,30 +717,30 @@ namespace Sayuri {
 
   // 文字列を手に変換。
   Move UCIShell::TransStringToMove(std::string move_str) {
-    Move move = 0U;
+    Move move = 0;
 
-    if (move_str.size() < 4) return 0U;
+    if (move_str.size() < 4) return 0;
 
     // fromをパース。
-    Square from = 0U;
+    Square from = 0;
     if ((move_str[0] < 'a') || (move_str[0] > 'h')) {
-      return 0U;
+      return 0;
     }
     from |= move_str[0] - 'a';
     if ((move_str[1] < '1') || (move_str[1] > '8')) {
-      return 0U;
+      return 0;
     }
     from |= (move_str[1] - '1') << 3;
     move_from(move, from);
 
     // toをパース。
-    Square to = 0U;
+    Square to = 0;
     if ((move_str[2] < 'a') || (move_str[2] > 'h')) {
-      return 0U;
+      return 0;
     }
     to |= move_str[2] - 'a';
     if ((move_str[3] < '1') || (move_str[3] > '8')) {
-      return 0U;
+      return 0;
     }
     to |= (move_str[3] - '1') << 3;
     move_to(move, to);
