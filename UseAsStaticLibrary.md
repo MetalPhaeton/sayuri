@@ -618,7 +618,7 @@ Background
 * Using it as static library, you don't need "`main.cpp`" in
  "`src`" diractory.  
  Because it gets in the way of compiling your program,
- you should delete the file or move it to elsewhare.
+ you should delete the file or move it to elsewhere.
 
 * All source files and header file are placed in "`src`" directory.  
   It doesn't need the other files.  
@@ -800,7 +800,7 @@ int main(int argc, char* argv[]) {
     // The engine sends "readyok" message to Print().
 
     shell_ptr->InputCommand("go depth 10");
-    // Search until the depth of 10 plys.
+    // Search until the depth of 10 plies.
     // Return the control soon because the engine is thinking
     // on the other thread.
     // The process log is sent to Print().
@@ -874,7 +874,7 @@ If it doesn't work, please confirm "`param.h`".
 
 * `bool enable_killer_2()`
     * A parameter whether it enables Killer Move Heuristic
-      after 2 plys or not.  
+      after 2 plies or not.  
       If "`enable_killer`" is not enabled, it won't be enabled.
 
 ###### Transposition Table ######
