@@ -381,7 +381,7 @@ namespace Sayuri {
   constexpr std::uint32_t MAX_PLYS = 100;
 
   // 最大探索ノード数。
-  constexpr std::uint64_t MAX_NODES = static_cast<std::size_t>(-1);
+  constexpr std::uint64_t MAX_NODES = -1ULL;
 
   // 探索するノードの種類。
   enum class NodeType {

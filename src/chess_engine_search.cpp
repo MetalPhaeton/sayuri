@@ -437,18 +437,16 @@ namespace Sayuri {
     int history_pruning_limit_depth =
     shared_st_ptr_->search_params_ptr_->history_pruning_limit_depth();
 
-    int history_pruning_move_threshold = static_cast<int>
-    (num_all_moves * shared_st_ptr_->search_params_ptr_->
-    history_pruning_move_threshold());
+    int history_pruning_move_threshold = num_all_moves *
+    shared_st_ptr_->search_params_ptr_->history_pruning_move_threshold();
     int history_pruning_after =
     shared_st_ptr_->search_params_ptr_->history_pruning_after();
     history_pruning_move_threshold =
     history_pruning_move_threshold < history_pruning_after 
     ? history_pruning_after : history_pruning_move_threshold;
 
-    std::uint64_t history_pruning_threshold = static_cast<std::uint64_t>
-    (shared_st_ptr_->history_max_
-    * shared_st_ptr_->search_params_ptr_->history_pruning_threshold());
+    std::uint64_t history_pruning_threshold = shared_st_ptr_->history_max_
+    * shared_st_ptr_->search_params_ptr_->history_pruning_threshold();
 
     int history_pruning_reduction =
     shared_st_ptr_->search_params_ptr_->history_pruning_reduction();
@@ -459,8 +457,8 @@ namespace Sayuri {
     int lmr_limit_depth =
     shared_st_ptr_->search_params_ptr_->lmr_limit_depth();
 
-    int lmr_threshold = static_cast<int>
-    (num_all_moves * shared_st_ptr_->search_params_ptr_->lmr_threshold());
+    int lmr_threshold = num_all_moves
+    * shared_st_ptr_->search_params_ptr_->lmr_threshold();
     int lmr_after = shared_st_ptr_->search_params_ptr_->lmr_after();
     lmr_threshold = lmr_threshold < lmr_after ? lmr_after : lmr_threshold;
 
@@ -903,18 +901,16 @@ namespace Sayuri {
     int history_pruning_limit_depth =
     shared_st_ptr_->search_params_ptr_->history_pruning_limit_depth();
 
-    int history_pruning_move_threshold = static_cast<int>
-    (job.num_all_moves() * shared_st_ptr_->search_params_ptr_->
-    history_pruning_move_threshold());
+    int history_pruning_move_threshold = job.num_all_moves()
+    * shared_st_ptr_->search_params_ptr_->history_pruning_move_threshold();
     int history_pruning_after =
     shared_st_ptr_->search_params_ptr_->history_pruning_after();
     history_pruning_move_threshold =
     history_pruning_move_threshold < history_pruning_after
     ? history_pruning_after : history_pruning_move_threshold;
 
-    std::uint64_t history_pruning_threshold = static_cast<std::uint64_t>
-    (shared_st_ptr_->history_max_
-    * shared_st_ptr_->search_params_ptr_->history_pruning_threshold());
+    std::uint64_t history_pruning_threshold = shared_st_ptr_->history_max_
+    * shared_st_ptr_->search_params_ptr_->history_pruning_threshold();
 
     int history_pruning_reduction =
     shared_st_ptr_->search_params_ptr_->history_pruning_reduction();
@@ -925,8 +921,8 @@ namespace Sayuri {
     int lmr_limit_depth =
     shared_st_ptr_->search_params_ptr_->lmr_limit_depth();
 
-    int lmr_threshold = static_cast<int>(job.num_all_moves()
-    * shared_st_ptr_->search_params_ptr_->lmr_threshold());
+    int lmr_threshold = job.num_all_moves()
+    * shared_st_ptr_->search_params_ptr_->lmr_threshold();
     int lmr_after = shared_st_ptr_->search_params_ptr_->lmr_after();
     lmr_threshold = lmr_threshold < lmr_after ? lmr_after : lmr_threshold;
 
@@ -1146,8 +1142,8 @@ namespace Sayuri {
     int lmr_limit_depth =
     shared_st_ptr_->search_params_ptr_->lmr_limit_depth();
 
-    int lmr_threshold = static_cast<int>(job.num_all_moves()
-    * shared_st_ptr_->search_params_ptr_->lmr_threshold());
+    int lmr_threshold = job.num_all_moves()
+    * shared_st_ptr_->search_params_ptr_->lmr_threshold();
     int lmr_after = shared_st_ptr_->search_params_ptr_->lmr_after();
     lmr_threshold = lmr_threshold < lmr_after ? lmr_after : lmr_threshold;
 

@@ -157,8 +157,8 @@ namespace Sayuri {
   weight_rook_open_fyle_(3.5, 3.5),
   weight_early_queen_launched_(-20.0, 0.0),
   weight_weak_square_(-5.0, 0.0),
-  weight_castling_(90.0, 0.0),
-  weight_abandoned_castling_(-45.0, 0.0) {
+  weight_castling_(20.0, 0.0),
+  weight_abandoned_castling_(-35.0, 0.0) {
     // オープニング時の駒の配置の価値テーブルの初期化。
     constexpr double TABLE_1[NUM_PIECE_TYPES][NUM_SQUARES] {
       {  // EMPTY。

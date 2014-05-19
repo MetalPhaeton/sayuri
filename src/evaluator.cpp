@@ -185,8 +185,7 @@ namespace Sayuri {
 
     // ウェイトを付けて評価値を得る。
     constexpr int NUM_KINGS = 2;
-    double num_pieces = static_cast<double>
-    (Util::CountBits(all_pieces) - NUM_KINGS);
+    double num_pieces = Util::CountBits(all_pieces) - NUM_KINGS;
     const EvalParams& params = engine_ptr_->eval_params();
     // マテリアル。
     double score = material;
@@ -395,17 +394,16 @@ namespace Sayuri {
 
     // 機動力を計算。
     if ((Type != PAWN) && (Type != KING)) {
-      mobility_value_ += sign * static_cast<double>(Util::CountBits(attacks
-      & ~(engine_ptr_->side_pieces()[piece_side])));
+      mobility_value_ += sign * Util::CountBits(attacks
+      & ~(engine_ptr_->side_pieces()[piece_side]));
     }
 
     // センターコントロールを計算。
     if (Type != KING) {
-      center_control_value_ += sign
-      * static_cast<double>(Util::CountBits(attacks & center_mask_));
+      center_control_value_ += sign * Util::CountBits(attacks & center_mask_);
 
       sweet_center_control_value_ += sign
-      * static_cast<double>(Util::CountBits(attacks & sweet_center_mask_));
+      * Util::CountBits(attacks & sweet_center_mask_);
     }
 
     // 駒の展開を計算。
@@ -430,9 +428,8 @@ namespace Sayuri {
 
     // 相手キング周辺への攻撃を計算。
     if (Type != KING) {
-      attack_around_king_value_ += sign
-      * static_cast<double>(Util::CountBits(attacks
-      & Util::GetKingMove(engine_ptr_->king()[enemy_piece_side])));
+      attack_around_king_value_ += sign * Util::CountBits(attacks
+      & Util::GetKingMove(engine_ptr_->king()[enemy_piece_side]));
     }
 
     // ポーンの構成を計算。
@@ -477,11 +474,11 @@ namespace Sayuri {
     if (Type == BISHOP) {
       // バッドビショップを計算。
       if ((Util::SQUARE[piece_square] & Util::SQCOLOR[WHITE])) {
-        bad_bishop_value_ += sign * static_cast<double>(Util::CountBits
-        (engine_ptr_->position()[piece_side][PAWN] & Util::SQCOLOR[WHITE]));
+        bad_bishop_value_ += sign * Util::CountBits
+        (engine_ptr_->position()[piece_side][PAWN] & Util::SQCOLOR[WHITE]);
       } else {
-        bad_bishop_value_ += sign * static_cast<double>(Util::CountBits
-        (engine_ptr_->position()[piece_side][PAWN] & Util::SQCOLOR[BLACK]));
+        bad_bishop_value_ += sign * Util::CountBits
+        (engine_ptr_->position()[piece_side][PAWN] & Util::SQCOLOR[BLACK]);
       }
 
       // ナイトをピンを計算。
@@ -539,12 +536,10 @@ namespace Sayuri {
       value = 0.0;
       if (!(Util::SQUARE[piece_square]
       & start_position_[piece_side][QUEEN])) {
-        value += static_cast<double>
-        (Util::CountBits(engine_ptr_->position()[piece_side][KNIGHT]
-        & start_position_[piece_side][KNIGHT]));
-        value += static_cast<double>
-        (Util::CountBits(engine_ptr_->position()[piece_side][BISHOP]
-        & start_position_[piece_side][BISHOP]));
+        value += Util::CountBits(engine_ptr_->position()[piece_side][KNIGHT]
+        & start_position_[piece_side][KNIGHT]);
+        value += Util::CountBits(engine_ptr_->position()[piece_side][BISHOP]
+        & start_position_[piece_side][BISHOP]);
       }
       early_queen_launched_value_ += sign * value;
     }
@@ -560,13 +555,11 @@ namespace Sayuri {
       int white_weak = Util::CountBits(weak & Util::SQCOLOR[WHITE]);
       int black_weak = Util::CountBits(weak & Util::SQCOLOR[BLACK]);
       // 相手の白マスビショップの数と弱い白マスの数を掛け算。
-      value += static_cast<double>(Util::CountBits
-      (engine_ptr_->position()[enemy_piece_side][BISHOP]
-      & Util::SQCOLOR[WHITE]) * white_weak);
+      value += Util::CountBits(engine_ptr_->position()
+      [enemy_piece_side][BISHOP] & Util::SQCOLOR[WHITE]) * white_weak;
       // 相手の黒マスビショップの数と弱い黒マスの数を掛け算。
-      value += static_cast<double>(Util::CountBits
-      (engine_ptr_->position()[enemy_piece_side][BISHOP]
-      & Util::SQCOLOR[BLACK]) * black_weak);
+      value += Util::CountBits(engine_ptr_->position()
+      [enemy_piece_side][BISHOP] & Util::SQCOLOR[BLACK]) * black_weak;
       // 評価値にする。
       weak_square_value_ += sign * value;
 

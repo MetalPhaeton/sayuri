@@ -160,8 +160,7 @@ namespace Sayuri {
       // [戻り値]
       // エントリーのパーミル。
       int GetUsedPermill() const {
-        return static_cast<int>
-        ((num_used_entries_ * 1000) / num_entries_);
+        return (num_used_entries_ * 1000) / num_entries_;
       }
 
       // トランスポジションテーブルのロックを使う。
