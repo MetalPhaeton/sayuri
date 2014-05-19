@@ -36,7 +36,6 @@
 #include <memory>
 #include <functional>
 #include <utility>
-#include <cctype>
 #include "chess_def.h"
 #include "chess_engine.h"
 #include "pv_line.h"
@@ -93,14 +92,8 @@ namespace Sayuri {
       }
 
       void operator()(const std::string& command_line) {
-        // 全部小文字にする。
-        std::string command_line_2 = "";
-        for (auto& c : command_line) {
-          command_line_2 += std::tolower(c);
-        }
-
         // トークンに分ける。
-        std::vector<std::string> tokens = Util::Split(command_line_2, " ", "");
+        std::vector<std::string> tokens = Util::Split(command_line, " ", "");
 
         // コマンドを探す。
         CommandArgs args;

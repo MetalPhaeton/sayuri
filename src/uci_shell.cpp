@@ -38,6 +38,7 @@
 #include <utility>
 #include <cstddef>
 #include <cstdint>
+#include <cctype>
 #include <functional>
 #include "chess_def.h"
 #include "chess_util.h"
@@ -418,6 +419,9 @@ namespace Sayuri {
       name_str += args["name"][i] + " ";
     }
     name_str.pop_back();
+
+    // nameの文字を全部小文字にする。
+    for (auto& c : name_str) c = std::tolower(c);
 
     // nameごとの処理。
     if (name_str == "hash") {

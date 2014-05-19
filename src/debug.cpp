@@ -36,6 +36,7 @@
 #include <random>
 #include <vector>
 #include <thread>
+#include <functional>
 
 #include "sayuri.h"
 
@@ -43,14 +44,29 @@ namespace Sayuri {
   /**************************/
   /* デバッグ用メイン関数。 */
   /**************************/
-  // ================================================================
+  // ==========================================================================
   int DebugMain(int argc, char* argv[]) {
+    // プログラムの起動。
     // 初期化。
-    Init();
+    Sayuri::Init();
+
+    // エンジン準備。
+    std::unique_ptr<Sayuri::SearchParams>
+    search_params_ptr(new Sayuri::SearchParams());
+
+    std::unique_ptr<Sayuri::EvalParams>
+    eval_params_ptr(new Sayuri::EvalParams());
+
+    std::unique_ptr<Sayuri::ChessEngine>
+    engine_ptr(new Sayuri::ChessEngine(*search_params_ptr, *eval_params_ptr));
+
+    std::unique_ptr<Sayuri::UCIShell>
+    shell_ptr(new Sayuri::UCIShell(*engine_ptr));
+  // ==========================================================================
 
     return 0;
   }
-  // ================================================================
+  // ==========================================================================
 
   // ビットボードを出力する。
   void PrintBitboard(Bitboard bitboard) {
