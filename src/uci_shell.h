@@ -30,16 +30,111 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include <cstddef>
 #include <thread>
 #include <memory>
 #include <functional>
+#include <utility>
+#include <cctype>
 #include "chess_def.h"
 #include "chess_engine.h"
 #include "pv_line.h"
 
 namespace Sayuri {
   class ChessEngine;
+
+  // UCIコマンドラインのクラス。
+  class UCICommand {
+    public:
+      // コマンド引数の型。
+      using CommandArgs =
+      std::map<std::string, std::vector<std::string>>;
+
+      /**************************/
+      /* コンストラクタと代入。 */
+      /**************************/
+      UCICommand() : func_vec_(0) {}
+      UCICommand(const UCICommand& command) :
+      func_vec_(command.func_vec_) {}
+      UCICommand(UCICommand&& command) :
+      func_vec_(std::move(command.func_vec_)) {}
+      UCICommand& operator=(const UCICommand& command) {
+        func_vec_ = command.func_vec_;
+        return *this;
+      }
+      UCICommand& operator=(UCICommand&& command) {
+        func_vec_ = std::move(command.func_vec_);
+        return *this;
+      }
+      virtual ~UCICommand() {}
+
+      /********************/
+      /* パブリック関数。 */
+      /********************/
+      // コマンドに合わせたコールバック関数を登録する。
+      // [引数]
+      // command_name: コマンド名。 コマンドラインの先頭の単語。
+      // subcommand_name_vec: サブコマンド名の配列。
+      // func: そのコマンドを実行するための関数。
+      void Add(const std::string& command_name,
+      const std::vector<std::string>& subcommand_name_vec,
+      std::function<void(CommandArgs&)> func) {
+        for (auto& command_func : func_vec_) {
+          if (command_func.command_name_ == command_name) {
+            command_func.subcommand_name_vec_ = subcommand_name_vec;
+            command_func.func_ = func;
+            return;
+          }
+        }
+
+        func_vec_.push_back(CommandFunction
+        {command_name, subcommand_name_vec, func});
+      }
+
+      void operator()(const std::string& command_line) {
+        // 全部小文字にする。
+        std::string command_line_2 = "";
+        for (auto& c : command_line) {
+          command_line_2 += std::tolower(c);
+        }
+
+        // トークンに分ける。
+        std::vector<std::string> tokens = Util::Split(command_line_2, " ", "");
+
+        // コマンドを探す。
+        CommandArgs args;
+        for (auto& command_func : func_vec_) {
+          if (command_func.command_name_ == tokens[0]) {
+            // コマンドラインをパース。
+            std::string temp = "";
+            for (auto& word : tokens) {
+              for (auto& subcommand_name :
+              command_func.subcommand_name_vec_) {
+                if (word == subcommand_name) {
+                  temp = word;
+                  break;
+                }
+              }
+              args[temp].push_back(word);
+            }
+
+            // コマンドを実行。
+            command_func.func_(args);
+            return;
+          }
+        }
+      }
+
+    private:
+      // 登録されたコマンド関数。
+      struct CommandFunction {
+        std::string command_name_;
+        std::vector<std::string> subcommand_name_vec_;
+        std::function<void(CommandArgs&)> func_;
+      };
+      std::vector<CommandFunction> func_vec_;
+  };
 
   // UCIのインターフェス。
   class UCIShell {
@@ -111,108 +206,37 @@ namespace Sayuri {
       /* UCIコマンド関数。 */
       /*********************/
       // uciコマンド。
-      void CommandUCI();
+      // [引数]
+      // args: コマンド引数。
+      void CommandUCI(UCICommand::CommandArgs& args);
       // isreadyコマンド。
-      void CommandIsReady();
+      // [引数]
+      // args: コマンド引数。
+      void CommandIsReady(UCICommand::CommandArgs& args);
       // setoptionコマンド。
       // [引数]
-      // argv: コマンド引数。argv[0]はコマンド名。
-      void CommandSetOption(const std::vector<std::string>& argv);
+      // args: コマンド引数。
+      void CommandSetOption(UCICommand::CommandArgs& args);
       // ucinewgameコマンド。
-      void CommandUCINewGame();
+      // [引数]
+      // args: コマンド引数。
+      void CommandUCINewGame(UCICommand::CommandArgs& args);
       // positionコマンド。
       // [引数]
-      // argv: コマンド引数。argv[0]はコマンド名。
-      void CommandPosition(const std::vector<std::string>& argv);
+      // args: コマンド引数。
+      void CommandPosition(UCICommand::CommandArgs& args);
       // goコマンド。
       // [引数]
-      // argv: コマンド引数。argv[0]はコマンド名。
-      void CommandGo(const std::vector<std::string>& argv);
+      // args: コマンド引数。
+      void CommandGo(UCICommand::CommandArgs& args);
       // stopコマンド。
-      void CommandStop();
+      // [引数]
+      // args: コマンド引数。
+      void CommandStop(UCICommand::CommandArgs& args);
       // ponderhitコマンド。
-      void CommandPonderHit();
-
-      /*************************/
-      /* UCIコマンドのパーサ。 */
-      /*************************/
-      // 単語の種類。
-      enum class WordType {
-        KEYWORD,  // キーワード。
-        PARAM,  // 引数。
-        DELIM  // 区切り。
-      };
-      // コマンドの単語。
-      struct Word {
-        std::string str_;  //単語の文字列。
-        WordType type_;  // 単語の種類。
-
-        /**************************/
-        /* コンストラクタと代入。 */
-        /**************************/
-        Word(std::string str, WordType type) {
-          str_ = str;
-          type_ = type;
-        }
-        Word() : type_(WordType::PARAM) {}
-        Word(const Word& word) {
-          str_ = word.str_;
-          type_ = word.type_;
-        }
-        Word(Word&& word) {
-          str_ = word.str_;
-          type_ = word.type_;
-        }
-        Word& operator=(const Word& word) {
-          str_ = word.str_;
-          type_ = word.type_;
-          return *this;
-        }
-        Word& operator=(Word&& word) {
-          str_ = word.str_;
-          type_ = word.type_;
-          return *this;
-        }
-        virtual ~Word() {}
-      };
-      // パーサ。
-      class CommandParser {
-        public:
-          /**************************/
-          /* コンストラクタと代入。 */
-          /**************************/
-          // [引数]
-          // keywords: キーワードの配列。
-          // argv: コマンドの引数リスト。
-          CommandParser(const std::vector<std::string>& keywords,
-          const std::vector<std::string>& argv);
-          CommandParser(const CommandParser& parser);
-          CommandParser(CommandParser&& parser);
-          CommandParser& operator=(const CommandParser& parser);
-          CommandParser& operator=(CommandParser&& parser);
-          virtual ~CommandParser() {}
-          CommandParser() = delete;
-
-          /********************/
-          /* パブリック関数。 */
-          /********************/
-          // 単語を得る。
-          const Word& Get();
-          // 単語があるかどうか。
-          bool HasNext() const;
-          // 区切りかどうか。
-          bool IsDelim() const;
-          // 次のキーワードへジャンプ。
-          void JumpToNextKeyword();
-          // 冒頭にリセット。
-          void Reset();
-
-        private:
-          // 構文リスト。
-          std::vector<Word> syntax_vector_;
-          // 構文リストのイテレータ。
-          std::vector<Word>::const_iterator itr_;
-      };
+      // [引数]
+      // args: コマンド引数。
+      void CommandPonderHit(UCICommand::CommandArgs& args);
 
       /**************/
       /* 便利関数。 */
@@ -233,6 +257,9 @@ namespace Sayuri {
       /****************/
       /* メンバ変数。 */
       /****************/
+      // UCIコマンドパーサ。
+      UCICommand uci_command_;
+
       // チェスエンジン。
       ChessEngine* engine_ptr_;
       // トランスポジションテーブル。

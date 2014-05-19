@@ -38,7 +38,6 @@
 #include <utility>
 #include <cstddef>
 #include <cstdint>
-#include <cctype>
 #include <functional>
 #include "chess_def.h"
 #include "chess_util.h"
@@ -51,6 +50,7 @@ namespace Sayuri {
   /**************************/
   // コンストラクタ。
   UCIShell::UCIShell(ChessEngine& engine) :
+  uci_command_(),
   engine_ptr_(&engine),
   table_ptr_(new TranspositionTable(UCI_MIN_TABLE_SIZE)),
   moves_to_search_(0),
@@ -58,10 +58,71 @@ namespace Sayuri {
   enable_pondering_(UCI_DEFAULT_PONDER),
   num_threads_(UCI_DEFAULT_THREADS),
   analyse_mode_(UCI_DEFAULT_ANALYSE_MODE),
-  output_listeners_(0) {}
+  output_listeners_(0) {
+    using namespace std::placeholders;
+
+    // コマンドを登録する。
+    // uciコマンド。
+    std::vector<std::string> temp_1 {
+      "uci"
+    };
+    uci_command_.Add("uci", temp_1,
+    std::bind(&UCIShell::CommandUCI, this, _1));
+
+    // isreadyコマンド。
+    std::vector<std::string> temp_2 {
+      "isready"
+    };
+    uci_command_.Add("isready", temp_2,
+    std::bind(&UCIShell::CommandIsReady, this, _1));
+
+    // setoptionコマンド。
+    std::vector<std::string> temp_3 {
+      "setoption", "name", "value"
+    };
+    uci_command_.Add("setoption", temp_3,
+    std::bind(&UCIShell::CommandSetOption, this, _1));
+
+    // ucinewgameコマンド。
+    std::vector<std::string> temp_4 {
+      "ucinewgame"
+    };
+    uci_command_.Add("ucinewgame", temp_4,
+    std::bind(&UCIShell::CommandUCINewGame, this, _1));
+
+    // positionコマンド。
+    std::vector<std::string> temp_5 {
+      "position", "startpos", "fen", "moves"
+    };
+    uci_command_.Add("position", temp_5,
+    std::bind(&UCIShell::CommandPosition, this, _1));
+
+    // goコマンド。
+    std::vector<std::string> temp_6 {
+      "go", "searchmoves", "ponder", "wtime", "btime", "winc", "binc",
+      "movestogo", "depth", "nodes", "mate", "movetime", "infinite"
+    };
+    uci_command_.Add("go", temp_6,
+    std::bind(&UCIShell::CommandGo, this, _1));
+
+    // stopコマンド。
+    std::vector<std::string> temp_7 {
+      "stop"
+    };
+    uci_command_.Add("stop", temp_7,
+    std::bind(&UCIShell::CommandStop, this, _1));
+
+    // ponderhitコマンド。
+    std::vector<std::string> temp_8 {
+      "ponderhit"
+    };
+    uci_command_.Add("ponderhit", temp_8,
+    std::bind(&UCIShell::CommandPonderHit, this, _1));
+  }
 
   // コピーコンストラクタ。
   UCIShell::UCIShell(const UCIShell& shell) :
+  uci_command_(shell.uci_command_),
   engine_ptr_(shell.engine_ptr_),
   table_ptr_(new TranspositionTable(*(shell.table_ptr_))),
   moves_to_search_(shell.moves_to_search_),
@@ -74,6 +135,7 @@ namespace Sayuri {
 
   // ムーブコンストラクタ。
   UCIShell::UCIShell(UCIShell&& shell) :
+  uci_command_(std::move(shell.uci_command_)),
   engine_ptr_(shell.engine_ptr_),
   table_ptr_(std::move(shell.table_ptr_)),
   moves_to_search_(std::move(shell.moves_to_search_)),
@@ -86,6 +148,7 @@ namespace Sayuri {
 
   // コピー代入。
   UCIShell& UCIShell::operator=(const UCIShell& shell) {
+    uci_command_ = shell.uci_command_;
     engine_ptr_ = shell.engine_ptr_;
     *table_ptr_ = *(shell.table_ptr_);
     moves_to_search_ = shell.moves_to_search_;
@@ -99,6 +162,7 @@ namespace Sayuri {
 
   // ムーブ代入。
   UCIShell& UCIShell::operator=(UCIShell&& shell) {
+    uci_command_ = std::move(shell.uci_command_);
     engine_ptr_ = shell.engine_ptr_;
     table_ptr_ = std::move(shell.table_ptr_);
     moves_to_search_ = std::move(shell.moves_to_search_);
@@ -123,24 +187,7 @@ namespace Sayuri {
   // UCIコマンドを実行する。("quit"以外。)
   void UCIShell::InputCommand(const std::string input) {
     // コマンド実行。
-    std::vector<std::string> argv = Util::Split(input, " \t", "");
-    if (argv[0] == "uci") {
-      CommandUCI();
-    } else if (argv[0] == "isready") {
-      CommandIsReady();
-    } else if (argv[0] == "setoption") {
-      CommandSetOption(argv);
-    } else if (argv[0] == "ucinewgame") {
-      CommandUCINewGame();
-    } else if (argv[0] == "position") {
-      CommandPosition(argv);
-    } else if (argv[0] == "go") {
-      CommandGo(argv);
-    } else if (argv[0] == "stop") {
-      CommandStop();
-    } else if (argv[0] == "ponderhit") {
-      CommandPonderHit();
-    }
+    uci_command_(input);
   }
 
   // UCI出力を受け取る関数を登録する。
@@ -266,7 +313,7 @@ namespace Sayuri {
   /* UCIコマンド関数。 */
   /*********************/
   // uciコマンド。
-  void UCIShell::CommandUCI() {
+  void UCIShell::CommandUCI(UCICommand::CommandArgs& args) {
     std::ostringstream sout;
 
     // IDを表示。
@@ -350,205 +397,107 @@ namespace Sayuri {
   }
 
   // isreadyコマンド。
-  void UCIShell::CommandIsReady() {
+  void UCIShell::CommandIsReady(UCICommand::CommandArgs& args) {
     for (auto& func : output_listeners_) {
       func("readyok");
     }
   }
 
   // setoptionコマンド。
-  void UCIShell::CommandSetOption(const std::vector<std::string>& argv) {
-    // サブコマンド。
-    std::vector<std::string> sub_commands;
-    sub_commands.push_back("name");
-    sub_commands.push_back("value");
+  void UCIShell::CommandSetOption(UCICommand::CommandArgs& args) {
+    // nameとvalueがあるかどうか。
+    // なければ設定できない。
+    if ((args.find("name") == args.end())
+    || (args.find("value") == args.end())) {
+      return;
+    }
 
-    // パーサ。
-    CommandParser parser(sub_commands, argv);
+    // nameの文字列をくっつける。
+    std::string name_str = "";
+    for (unsigned int i = 1; i < args["name"].size(); i++) {
+      name_str += args["name"][i] + " ";
+    }
+    name_str.pop_back();
 
-    while (parser.HasNext()) {
-      Word word = parser.Get();
+    // nameごとの処理。
+    if (name_str == "hash") {
+      // トランスポジションテーブルのサイズ変更。
+      try {
+        table_size_ = std::stoull(args["value"][1]) * 1024ULL * 1024ULL;
 
-      if (word.str_ == "name") {
-        // nameコマンド。
-        while (!(parser.IsDelim())) {
-          word = parser.Get();
-          // nameは大文字小文字関係なし。
-          // なので全て小文字にする。
-          for (auto& c : word.str_) {
-            c = std::tolower(c);
-          }
-          if (word.str_ == "hash") {
-            // ハッシュ値の変更の場合。
-            parser.JumpToNextKeyword();
-            while (parser.HasNext()) {
-              word = parser.Get();
-              if (word.str_ == "value") {
-                try {
-                  table_size_ =
-                  std::stoull(parser.Get().str_) * 1024ULL * 1024ULL;
+        table_size_ = table_size_ >= UCI_MIN_TABLE_SIZE
+        ? table_size_ : UCI_MIN_TABLE_SIZE;
 
-                  table_size_ = table_size_ >= UCI_MIN_TABLE_SIZE
-                  ? table_size_ : UCI_MIN_TABLE_SIZE;
+        table_size_ = table_size_ <= UCI_MAX_TABLE_SIZE
+        ? table_size_ : UCI_MAX_TABLE_SIZE;
 
-                  table_size_ = table_size_ <= UCI_MAX_TABLE_SIZE
-                  ? table_size_ : UCI_MAX_TABLE_SIZE;
-
-                  table_ptr_.reset(new TranspositionTable(table_size_));
-                } catch (...) {
-                  // 無視。
-                }
-                break;
-              }
-
-              parser.JumpToNextKeyword();
-            }
-            break;
-          } else if (word.str_ == "clear") {
-            // トランスポジションテーブルの初期化の場合。
-            word = parser.Get();
-            if (word.str_ == "hash") {
-              table_ptr_.reset(new TranspositionTable(table_size_));
-            }
-            break;
-          } else if (word.str_ == "ponder") {
-            // ポンダリングの設定の場合。
-            parser.JumpToNextKeyword();
-            while (parser.HasNext()) {
-              word = parser.Get();
-              if (word.str_ == "value") {
-                word = parser.Get();
-                if (word.str_ == "true") {
-                  enable_pondering_ = true;
-                } else if (word.str_ == "false") {
-                  enable_pondering_ = false;
-                }
-                break;
-              }
-
-              parser.JumpToNextKeyword();
-            }
-            break;
-          } else if (word.str_ == "threads") {
-            // スレッドの数の変更の場合。
-            parser.JumpToNextKeyword();
-            while (parser.HasNext()) {
-              word = parser.Get();
-              if (word.str_ == "value") {
-                try {
-                  num_threads_ = std::stoi(parser.Get().str_);
-
-                  num_threads_ = num_threads_ >= 1 ? num_threads_ : 1;
-                  num_threads_ = num_threads_ <= UCI_MAX_THREADS
-                  ? num_threads_ : UCI_MAX_THREADS;
-                } catch (...) {
-                  // 無視。
-                }
-                break;
-              }
-
-              parser.JumpToNextKeyword();
-            }
-            break;
-          } else if (word.str_ == "uci_analysemode") {
-            // アナライズモードの場合。
-            parser.JumpToNextKeyword();
-            while (parser.HasNext()) {
-              word = parser.Get();
-              if (word.str_ == "value") {
-                word = parser.Get();
-                if (word.str_ == "true") {
-                  analyse_mode_ = true;
-                } else if (word.str_ == "false") {
-                  analyse_mode_ = false;
-                }
-                break;
-              }
-
-              parser.JumpToNextKeyword();
-            }
-            break;
-          }
-        }
+        table_ptr_.reset(new TranspositionTable(table_size_));
+      } catch (...) {
+        // 無視。
       }
+    } else if (name_str == "clear hash") {
+      // トランスポジションテーブルの初期化。
+      table_ptr_.reset(new TranspositionTable(table_size_));
+    } else if (name_str == "ponder") {
+      // Ponderの有効化、無効化。
+      if (args["value"][1] == "true") enable_pondering_ = true;
+      else if (args["value"][1] == "false") enable_pondering_ = false;
+    } else if (name_str == "threads") {
+      // スレッドの数の変更。
+      try {
+        num_threads_ = std::stoi(args["value"][1]);
 
-      parser.JumpToNextKeyword();
+        num_threads_ = num_threads_ >= 1 ? num_threads_ : 1;
+        num_threads_ = num_threads_ <= UCI_MAX_THREADS
+        ?  num_threads_ : UCI_MAX_THREADS;
+      } catch (...) {
+        // 無視。
+      }
+    } else if (name_str == "uci_analysemode") {
+      // アナライズモードの有効化、無効化。
+      if (args["value"][1] == "true") analyse_mode_ = true;
+      else if (args["value"][1] == "false") analyse_mode_ = false;
     }
   }
 
   // ucinewgameコマンド。
-  void UCIShell::CommandUCINewGame() {
+  void UCIShell::CommandUCINewGame(UCICommand::CommandArgs& args) {
     engine_ptr_->SetNewGame();
     table_ptr_.reset(new TranspositionTable(table_size_));
   }
 
   // positionコマンド。
-  void UCIShell::CommandPosition(const std::vector<std::string>& argv) {
-    // サブコマンド。
-    std::vector<std::string> sub_commands;
-    sub_commands.push_back("startpos");
-    sub_commands.push_back("fen");
-    sub_commands.push_back("moves");
+  void UCIShell::CommandPosition(UCICommand::CommandArgs& args) {
+    // startposコマンド。
+    if (args.find("startpos") != args.end()) {
+      engine_ptr_->SetStartPosition();
+    }
 
-    // パーサ。
-    CommandParser parser(sub_commands, argv);
-
-    while (parser.HasNext()) {
-      Word word = parser.Get();
-
-      if (word.str_ == "startpos") {
-        // startposコマンド。
-        engine_ptr_->SetStartPosition();
-      } else if (word.str_ == "fen") {
-        // fenコマンド。
-        // FENを合体。
-        std::string fen_str = "";
-        while (!(parser.IsDelim())) {
-          fen_str += parser.Get().str_ + " ";
-        }
-        // エンジンにロード。
-        engine_ptr_->LoadFen(Fen(fen_str));
-      } else if (word.str_ == "moves") {
-        // movesコマンド。
-        while (!(parser.IsDelim())) {
-          Move move = TransStringToMove(parser.Get().str_);
-          // 手を指す。
-          if (move) {
-            engine_ptr_->PlayMove(move);
-          }
-        }
+    // fenコマンド。
+    if (args.find("fen") != args.end()) {
+      // fenコマンドをくっつける。
+      std::string fen_str = "";
+      for (unsigned int i = 1; i < args["fen"].size(); i++) {
+        fen_str += args["fen"][i] + " ";
       }
+      fen_str.pop_back();
 
-      parser.JumpToNextKeyword();
+      // エンジンに読み込む。
+      engine_ptr_->LoadFen(Fen(fen_str));
+    }
+
+    // movesコマンド。
+    if (args.find("moves") != args.end()) {
+      // 手を指していく。
+      for (unsigned int i = 1; i < args["moves"].size(); i++) {
+        Move move = TransStringToMove(args["moves"][i]);
+        if (move) engine_ptr_->PlayMove(move);
+      }
     }
   }
 
   // goコマンド。
-  void UCIShell::CommandGo(const std::vector<std::string>& argv) {
-    // 思考スレッドを終了させる。
-    engine_ptr_->StopCalculation();
-    if (thinking_thread_.joinable()) {
-      thinking_thread_.join();
-    }
-
-    // サブコマンドの配列。
-    std::vector<std::string> sub_commands;
-    sub_commands.push_back("searchmoves");
-    sub_commands.push_back("ponder");
-    sub_commands.push_back("wtime");
-    sub_commands.push_back("btime");
-    sub_commands.push_back("winc");
-    sub_commands.push_back("binc");
-    sub_commands.push_back("movestogo");
-    sub_commands.push_back("depth");
-    sub_commands.push_back("nodes");
-    sub_commands.push_back("mate");
-    sub_commands.push_back("movetime");
-    sub_commands.push_back("infinite");
-
-    // パース。
-    CommandParser parser(sub_commands, argv);
-
+  void UCIShell::CommandGo(UCICommand::CommandArgs& args) {
     // 準備。
     std::uint32_t max_depth = MAX_PLYS;
     std::uint64_t max_nodes = MAX_NODES;
@@ -556,107 +505,118 @@ namespace Sayuri {
     bool infinite_thinking = false;
     moves_to_search_.clear();
 
-    // サブコマンドを解析。
-    while (parser.HasNext()) {
-      Word word = parser.Get();
+    // 思考スレッドを終了させる。
+    engine_ptr_->StopCalculation();
+    if (thinking_thread_.joinable()) {
+      thinking_thread_.join();
+    }
 
-      if (word.str_ == "searchmoves") {
-        if (parser.IsDelim()) continue;
-
-        // searchmovesコマンド。
-        while (!(parser.IsDelim())) {
-          Move move = TransStringToMove(parser.Get().str_);
-          if (move) {
-            moves_to_search_.push_back(move);
-          } else {
-            break;
-          }
-        }
-      } else if (word.str_ == "ponder") {
-        // ponderコマンド。
-        infinite_thinking = true;
-      } else if (word.str_ == "wtime") {
-        // wtimeコマンド。
-        // 10分以上あるなら1分考える。5分未満なら持ち時間の10分の1。
-        if (!(parser.IsDelim())) {
-          if (engine_ptr_->to_move() == WHITE) {
-            try {
-              Chrono::milliseconds time_control =
-              Chrono::milliseconds(std::stoull(parser.Get().str_));
-              if (time_control.count() >= 600000) {
-                thinking_time = Chrono::milliseconds(60000);
-              } else {
-                thinking_time = time_control / 10;
-              }
-            } catch (...) {
-              // 無視。
-            }
-          }
-        }
-      } else if (word.str_ == "btime") {
-        // btimeコマンド。
-        // 10分以上あるなら1分考える。5分未満なら持ち時間の10分の1。
-        if (!(parser.IsDelim())) {
-          if (engine_ptr_->to_move() == BLACK) {
-            try {
-              Chrono::milliseconds time_control =
-              Chrono::milliseconds(std::stoull(parser.Get().str_));
-              if (time_control.count() >= 600000) {
-                thinking_time = Chrono::milliseconds(60000);
-              } else {
-                thinking_time = time_control / 10;
-              }
-            } catch (...) {
-              // 無視。
-            }
-          }
-        }
-      } else if (word.str_ == "depth") {
-        // depthコマンド。
-        if (!(parser.IsDelim())) {
-          try {
-            max_depth = std::stoi(parser.Get().str_);
-            if (max_depth > MAX_PLYS) max_depth = MAX_PLYS;
-          } catch (...) {
-            // 無視。
-          }
-        }
-      } else if (word.str_ == "nodes") {
-        // nodesコマンド。
-        if (!(parser.IsDelim())) {
-          try {
-            max_nodes = std::stoull(parser.Get().str_);
-            if (max_nodes > MAX_NODES) max_nodes = MAX_NODES;
-          } catch (...) {
-            // 無視。
-          }
-        }
-      } else if (word.str_ == "mate") {
-        // mateコマンド。
-        if (!(parser.IsDelim())) {
-          try {
-            max_depth = (std::stoi(parser.Get().str_) * 2) - 1;
-            if (max_depth > MAX_PLYS) max_depth = MAX_PLYS;
-          } catch (...) {
-            // 無視。
-          }
-        }
-      } else if (word.str_ == "movetime") {
-        // movetimeコマンド。
-        if (!(parser.IsDelim())) {
-          try {
-            thinking_time =
-            Chrono::milliseconds(std::stoull(parser.Get().str_));
-          } catch (...) {
-            // 無視。
-          }
-        }
-      } else if (word.str_ == "infinite") {
-        // infiniteコマンド。
-        infinite_thinking = true;
+    // searchmovesコマンド。
+    if (args.find("searchmoves") != args.end()) {
+      for (unsigned int i = 1; i < args["searchmoves"].size(); i++) {
+        Move move = TransStringToMove(args["searchmoves"][i]);
+        if (move) moves_to_search_.push_back(move);
       }
+    }
 
-      parser.JumpToNextKeyword();
+    // ponderコマンド。
+    if (args.find("ponder") != args.end()) {
+      infinite_thinking = true;
+    }
+
+    // wtimeコマンド。
+    if (args.find("wtime") != args.end()) {
+      // 10分以上あるなら1分考える。5分未満なら持ち時間の10分の1。
+      if (engine_ptr_->to_move() == WHITE) {
+        try {
+          Chrono::milliseconds time_control =
+          Chrono::milliseconds(std::stoull(args["wtime"][1]));
+          if (time_control.count() >= 600000) {
+            thinking_time = Chrono::milliseconds(60000);
+          } else {
+            thinking_time = time_control / 10;
+          }
+        } catch (...) {
+          // 無視。
+        }
+      }
+    }
+
+    // btimeコマンド。
+    if (args.find("btime") != args.end()) {
+      // 10分以上あるなら1分考える。5分未満なら持ち時間の10分の1。
+      if (engine_ptr_->to_move() == BLACK) {
+        try {
+          Chrono::milliseconds time_control =
+          Chrono::milliseconds(std::stoull(args["btime"][1]));
+          if (time_control.count() >= 600000) {
+            thinking_time = Chrono::milliseconds(60000);
+          } else {
+            thinking_time = time_control / 10;
+          }
+        } catch (...) {
+          // 無視。
+        }
+      }
+    }
+
+    // wincコマンド。
+    if (args.find("winc") != args.end()) {
+      // 何もしない。
+    }
+
+    // bincコマンド。
+    if (args.find("binc") != args.end()) {
+      // 何もしない。
+    }
+
+    // movestogoコマンド。
+    if (args.find("movestogo") != args.end()) {
+      // 何もしない。
+    }
+
+    // depthコマンド。
+    if (args.find("depth") != args.end()) {
+      try {
+        max_depth = std::stoi(args["depth"][1]);
+        if (max_depth > MAX_PLYS) max_depth = MAX_PLYS;
+      } catch (...) {
+        // 無視。
+      }
+    }
+
+    // nodesコマンド。
+    if (args.find("nodes") != args.end()) {
+      try {
+        max_nodes = std::stoull(args["nodes"][1]);
+        if (max_nodes > MAX_NODES) max_nodes = MAX_NODES;
+      } catch (...) {
+        // 無視。
+      }
+    }
+
+    // mateコマンド。
+    if (args.find("mate") != args.end()) {
+      try {
+        max_depth = (std::stoi(args["mate"][1]) * 2) - 1;
+        if (max_depth > MAX_PLYS) max_depth = MAX_PLYS;
+      } catch (...) {
+        // 無視。
+      }
+    }
+
+    // movetimeコマンド。
+    if (args.find("movetime") != args.end()) {
+      try {
+        thinking_time = Chrono::milliseconds(std::stoull(args["movetime"][1]));
+      } catch (...) {
+        // 無視。
+      }
+    }
+
+    // infiniteコマンド。
+    if (args.find("infinite") != args.end()) {
+      infinite_thinking = true;
     }
 
     // 別スレッドで思考開始。
@@ -667,7 +627,7 @@ namespace Sayuri {
   }
 
   // stopコマンド。
-  void UCIShell::CommandStop() {
+  void UCIShell::CommandStop(UCICommand::CommandArgs& args) {
     // 思考スレッドを終了させる。
     if (thinking_thread_.joinable()) {
       engine_ptr_->StopCalculation();
@@ -676,7 +636,7 @@ namespace Sayuri {
   }
 
   // ponderhitコマンド。
-  void UCIShell::CommandPonderHit() {
+  void UCIShell::CommandPonderHit(UCICommand::CommandArgs& args) {
     engine_ptr_->EnableInfiniteThinking(false);
   }
 
@@ -766,102 +726,5 @@ namespace Sayuri {
     }
 
     return move;
-  }
-
-  /*************************/
-  /* UCIコマンドのパーサ。 */
-  /*************************/
-  // コンストラクタ。
-  UCIShell::CommandParser::CommandParser
-  (const std::vector<std::string>& keywords,
-  const std::vector<std::string>& argv) {
-    // 構文解析。
-    for (auto& a : argv) {
-      bool is_keyword = false;
-
-      // キーワードかどうか調べる。
-      for (auto& b : keywords) {
-        if (a == b) {
-          is_keyword = true;
-          break;
-        }
-      }
-
-      // 構文リストに入れる。
-      if (is_keyword) {
-        syntax_vector_.push_back(Word("", WordType::DELIM));
-        syntax_vector_.push_back(Word(a, WordType::KEYWORD));
-      } else {
-        syntax_vector_.push_back(Word(a, WordType::PARAM));
-      }
-    }
-
-    // 最後に区切りを入れる。
-    syntax_vector_.push_back(Word("", WordType::DELIM));
-
-    // イテレータをセット。
-    itr_ = syntax_vector_.begin();
-  }
-
-  // コピーコンストラクタ。
-  UCIShell::CommandParser::CommandParser(const CommandParser& parser) {
-    syntax_vector_ = parser.syntax_vector_;
-    itr_ = syntax_vector_.begin()
-    + std::distance(parser.syntax_vector_.begin(), parser.itr_);
-  }
-
-  // ムーブコンストラクタ。
-  UCIShell::CommandParser::CommandParser(CommandParser&& parser) {
-    syntax_vector_ = std::move(parser.syntax_vector_);
-    itr_ = std::move(parser.itr_);
-  }
-
-  // コピー代入。
-  UCIShell::CommandParser&
-  UCIShell::CommandParser::operator=(const CommandParser& parser) {
-    syntax_vector_ = parser.syntax_vector_;
-    itr_ = syntax_vector_.begin()
-    + std::distance(parser.syntax_vector_.begin(), parser.itr_);
-    return *this;
-  }
-
-  // ムーブ代入。
-  UCIShell::CommandParser&
-  UCIShell::CommandParser::operator=(CommandParser&& parser) {
-    syntax_vector_ = std::move(parser.syntax_vector_);
-    itr_ = std::move(parser.itr_);
-    return *this;
-  }
-
-  // 単語を得る。
-  const UCIShell::Word& UCIShell::CommandParser::Get() {
-    itr_++;
-    return *(itr_ - 1);
-  }
-
-  // 単語があるかどうか。
-  bool UCIShell::CommandParser::HasNext() const {
-    return itr_ < syntax_vector_.end();
-  }
-
-  // 区切りかどうか。
-  bool UCIShell::CommandParser::IsDelim() const {
-    return itr_->type_ == WordType::DELIM;
-  }
-
-  // 次のキーワードへジャンプ。
-  void UCIShell::CommandParser::JumpToNextKeyword() {
-    itr_++;
-    while (itr_ < syntax_vector_.end()) {
-      if (itr_->type_ == WordType::KEYWORD) {
-        return;
-      }
-      itr_++;
-    }
-  }
-
-  // 冒頭にリセット。
-  void UCIShell::CommandParser::Reset() {
-    itr_ = syntax_vector_.begin();
   }
 }  // namespace Sayuri
