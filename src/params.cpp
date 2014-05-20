@@ -148,7 +148,7 @@ namespace Sayuri {
   weight_protected_pass_pawn_(2.5, 2.5),
   weight_double_pawn_(-2.5, -5.0),
   weight_iso_pawn_(-5.0, -2.5),
-  weight_pawn_shield_(15.0, 0.0),
+  weight_pawn_shield_(30.0, 0.0),
   weight_bishop_pair_(10.0, 60.0),
   weight_bad_bishop_(-0.7, 0.0),
   weight_pin_knight_(10.0, 0.0),
@@ -157,8 +157,8 @@ namespace Sayuri {
   weight_rook_open_fyle_(3.5, 3.5),
   weight_early_queen_launched_(-20.0, 0.0),
   weight_weak_square_(-5.0, 0.0),
-  weight_castling_(20.0, 0.0),
-  weight_abandoned_castling_(-35.0, 0.0) {
+  weight_castling_(10.0, 0.0),
+  weight_abandoned_castling_(-110.0, 0.0) {
     // オープニング時の駒の配置の価値テーブルの初期化。
     constexpr double TABLE_1[NUM_PIECE_TYPES][NUM_SQUARES] {
       {  // EMPTY。
@@ -337,14 +337,14 @@ namespace Sayuri {
 
     // ポーンの盾の配置の価値テーブルを初期化。
     constexpr double TABLE_4[NUM_SQUARES] {
-      7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0,
-      6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0,
-      5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0,
-      4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0,
-      3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0,
-      2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0,
-      1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+       2.0,  2.0,  2.0,  2.0,  2.0,  2.0,  2.0,  2.0,
+       1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,
+       0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,
+      -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
+      -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0,
+      -3.0, -3.0, -3.0, -3.0, -3.0, -3.0, -3.0, -3.0,
+      -4.0, -4.0, -4.0, -4.0, -4.0, -4.0, -4.0, -4.0,
+      -5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0
     };
     for (Square square = 0; square < NUM_SQUARES; square++) {
       pawn_shield_value_table_[square] = TABLE_4[square];
