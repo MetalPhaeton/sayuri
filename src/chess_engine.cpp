@@ -1025,10 +1025,6 @@ namespace Sayuri {
 
   // ハッシュの配列を初期化する。
   void ChessEngine::SharedStruct::InitHashTable() {
-    // メルセンヌツイスターの準備。
-    std::mt19937 engine(SysClock::to_time_t (SysClock::now()));
-    std::uniform_int_distribution<Hash> dist(0, -1ULL);
-
     // ダブリのないハッシュを生成。
     constexpr int LENGTH =
     NUM_SIDES + NUM_PIECE_TYPES + NUM_SQUARES + 1 + 4 + NUM_SQUARES;
@@ -1039,7 +1035,7 @@ namespace Sayuri {
       bool loop = true;
       Hash hash = 0;
       while (loop) {
-        hash = dist(engine);
+        hash = Util::GetRandomHash();
         loop = false;
         if (hash == 0) {
           loop = true;

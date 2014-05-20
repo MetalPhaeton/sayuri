@@ -30,6 +30,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <random>
 
 #include "chess_def.h"
 
@@ -555,6 +556,8 @@ namespace Sayuri {
       // 切り分けられた文字列のベクトル。
       static std::vector<std::string> Split(std::string str,
       std::string delim, std::string delim_kept);
+      // ランダムな数値を得る。
+      static Hash GetRandomHash() {return dist_(engine_);}
 
       /**************************/
       /* コンストラクタと代入。 */
@@ -705,6 +708,14 @@ namespace Sayuri {
       static void InitRookMove();
       // king_move_[]を初期化する。
       static void InitKingMove();
+
+      /************************/
+      /* その他のstatic変数。 */
+      /************************/
+      // ランダム用オブジェクト。
+      static std::mt19937 engine_;  // メルセンヌツイスターエンジン。
+      static std::uniform_int_distribution<Hash> dist_;  // Hash型線形分布。
+      static void InitRandom();  // ランダム関連を初期化する。
   };
 }  // namespace Sayuri
 

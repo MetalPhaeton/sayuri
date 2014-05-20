@@ -29,6 +29,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <random>
 #include "chess_def.h"
 
 namespace Sayuri {
@@ -85,6 +86,8 @@ namespace Sayuri {
     InitRookMove();
     // king_move_[]を初期化する。
     InitKingMove();
+    // ランダム関連を初期化する。
+    InitRandom();
   }
 
   /**********************************/
@@ -590,5 +593,14 @@ namespace Sayuri {
     }
 
     return std::move(ret);
+  }
+
+  // ランダム関連の初期化。
+  std::mt19937 Util::engine_;
+  std::uniform_int_distribution<Hash> Util::dist_;
+  void Util::InitRandom() {
+    // メルセンヌツイスターの準備。
+    engine_ = std::mt19937(SysClock::to_time_t(SysClock::now()));
+    dist_ = std::uniform_int_distribution<Hash>(0, -1ULL);
   }
 }  // namespace Sayuri
