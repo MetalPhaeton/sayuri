@@ -1027,7 +1027,7 @@ namespace Sayuri {
   void ChessEngine::SharedStruct::InitHashTable() {
     // ダブリのないハッシュを生成。
     constexpr int LENGTH =
-    NUM_SIDES + NUM_PIECE_TYPES + NUM_SQUARES + 1 + 4 + NUM_SQUARES;
+    (NUM_SIDES * NUM_PIECE_TYPES * NUM_SQUARES) + 1 + 4 + NUM_SQUARES;
     Hash temp_table[LENGTH];
     int temp_count = 0;
     for (int i = 0; i < LENGTH; i++) {
