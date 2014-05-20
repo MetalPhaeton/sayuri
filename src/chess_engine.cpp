@@ -730,24 +730,24 @@ namespace Sayuri {
 
     // 駒の情報からハッシュを得る。
     for (Square square = 0; square < NUM_SQUARES; square++) {
-      hash ^= shared_st_ptr_->piece_hash_table_
+      hash ^= shared_st_ptr_->piece_hash_value_table_
       [side_board_[square]][piece_board_[square]][square];
     }
 
     // 手番からハッシュを得る。
-    hash ^= shared_st_ptr_->to_move_hash_table_[to_move_];
+    hash ^= shared_st_ptr_->to_move_hash_value_table_[to_move_];
 
     // キャスリングの権利からハッシュを得る。
     Castling bit = 1;
     for (int i = 0; i < 4; i++) {
       if (castling_rights_ & bit) {
-        hash ^= shared_st_ptr_->castling_hash_table_[i];
+        hash ^= shared_st_ptr_->castling_hash_value_table_[i];
       }
       bit <<= 1;
     }
 
     // アンパッサンからハッシュを得る。
-    hash ^= shared_st_ptr_->en_passant_hash_table_[en_passant_square_];
+    hash ^= shared_st_ptr_->en_passant_hash_value_table_[en_passant_square_];
 
     return hash;
   }
@@ -780,26 +780,26 @@ namespace Sayuri {
 
     // 移動する駒のハッシュを削除する。
     current_hash ^=
-    shared_st_ptr_->piece_hash_table_[piece_side][piece_type][from];
+    shared_st_ptr_->piece_hash_value_table_[piece_side][piece_type][from];
 
     // 取る駒のハッシュを削除する。
-    current_hash ^=
-    shared_st_ptr_->piece_hash_table_[target_side][target_type][target_square];
+    current_hash ^= shared_st_ptr_->piece_hash_value_table_
+    [target_side][target_type][target_square];
 
     // 移動する駒の移動先のハッシュを追加する。
     if (promotion) {
       current_hash ^=
-      shared_st_ptr_->piece_hash_table_[piece_side][promotion][to];
+      shared_st_ptr_->piece_hash_value_table_[piece_side][promotion][to];
     } else {
       current_hash ^=
-      shared_st_ptr_->piece_hash_table_[piece_side][piece_type][to];
+      shared_st_ptr_->piece_hash_value_table_[piece_side][piece_type][to];
     }
 
     // 現在の手番のハッシュを削除。
-    current_hash ^= shared_st_ptr_->to_move_hash_table_[to_move_];
+    current_hash ^= shared_st_ptr_->to_move_hash_value_table_[to_move_];
 
     // 次の手番のハッシュを追加。
-    current_hash ^= shared_st_ptr_->to_move_hash_table_[to_move_ ^ 0x3];
+    current_hash ^= shared_st_ptr_->to_move_hash_value_table_[to_move_ ^ 0x3];
 
     // キャスリングのハッシュをセット。
     Castling loss_rights = 0;
@@ -829,21 +829,22 @@ namespace Sayuri {
     Castling bit = 1;
     for (int i = 0; i < 4; i++) {
       if (castling_diff & bit) {
-        current_hash ^= shared_st_ptr_->castling_hash_table_[i];
+        current_hash ^= shared_st_ptr_->castling_hash_value_table_[i];
       }
       bit <<= 1;
     }
 
     // とりあえずアンパッサンのハッシュを削除。
-    current_hash ^= shared_st_ptr_->en_passant_hash_table_[en_passant_square_];
+    current_hash ^=
+    shared_st_ptr_->en_passant_hash_value_table_[en_passant_square_];
 
     // ポーンの2歩の動きの場合はアンパッサンハッシュを追加。
     if (piece_type == PAWN) {
       int move_diff = to - from;
       if (move_diff == 16) {
-        current_hash ^= shared_st_ptr_->en_passant_hash_table_[to - 8];
+        current_hash ^= shared_st_ptr_->en_passant_hash_value_table_[to - 8];
       } else if (move_diff == -16) {
-        current_hash ^= shared_st_ptr_->en_passant_hash_table_[to + 8];
+        current_hash ^= shared_st_ptr_->en_passant_hash_value_table_[to + 8];
       }
     }
 
@@ -943,7 +944,7 @@ namespace Sayuri {
       killer_stack_[i + 2][1] = 0;
     }
     helper_queue_ptr_.reset(new HelperQueue());
-    InitHashTable();
+    InitHashValueTable();
   }
 
   // コピーコンストラクタ。
@@ -1006,25 +1007,26 @@ namespace Sayuri {
     for (Side side = 0; side < NUM_SIDES; side++) {
       for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
         for (Square square = 0; square < NUM_SQUARES; square++) {
-          piece_hash_table_[side][piece_type][square] =
-          shared_st.piece_hash_table_[side][piece_type][square];
+          piece_hash_value_table_[side][piece_type][square] =
+          shared_st.piece_hash_value_table_[side][piece_type][square];
         }
       }
     }
     for (Side side = 0; side < NUM_SIDES; side++) {
-      to_move_hash_table_[side] = shared_st.to_move_hash_table_[side];
+      to_move_hash_value_table_[side] =
+      shared_st.to_move_hash_value_table_[side];
     }
     for (int i = 0; i < 4; i++) {
-      castling_hash_table_[i] = shared_st.castling_hash_table_[i];
+      castling_hash_value_table_[i] = shared_st.castling_hash_value_table_[i];
     }
     for (Square square = 0; square < NUM_SQUARES; square++) {
-      en_passant_hash_table_[square] =
-      shared_st.en_passant_hash_table_[square];
+      en_passant_hash_value_table_[square] =
+      shared_st.en_passant_hash_value_table_[square];
     }
   }
 
   // ハッシュの配列を初期化する。
-  void ChessEngine::SharedStruct::InitHashTable() {
+  void ChessEngine::SharedStruct::InitHashValueTable() {
     // ダブリのないハッシュを生成。
     constexpr int LENGTH =
     (NUM_SIDES * NUM_PIECE_TYPES * NUM_SQUARES) + 1 + 4 + NUM_SQUARES;
@@ -1058,9 +1060,9 @@ namespace Sayuri {
       piece_type++) {
         for (Square square = 0; square < NUM_SQUARES; square++) {
           if ((side == NO_SIDE) || (piece_type == EMPTY)) {
-            piece_hash_table_[side][piece_type][square] = 0;
+            piece_hash_value_table_[side][piece_type][square] = 0;
           } else {
-            piece_hash_table_[side][piece_type][square] =
+            piece_hash_value_table_[side][piece_type][square] =
             temp_table[temp_count];
             temp_count++;
           }
@@ -1069,9 +1071,9 @@ namespace Sayuri {
     }
 
     // 手番の配列を初期化。
-    to_move_hash_table_[NO_SIDE] = 0;
-    to_move_hash_table_[WHITE] = 0;
-    to_move_hash_table_[BLACK] = temp_table[temp_count];
+    to_move_hash_value_table_[NO_SIDE] = 0;
+    to_move_hash_value_table_[WHITE] = 0;
+    to_move_hash_value_table_[BLACK] = temp_table[temp_count];
     temp_count++;
 
     // キャスリングの配列を初期化。
@@ -1080,14 +1082,14 @@ namespace Sayuri {
     // 2: 黒のショートキャスリング。
     // 3: 黒のロングキャスリング。
     for (int i = 0; i < 4; i++) {
-      castling_hash_table_[i] = temp_table[temp_count];
+      castling_hash_value_table_[i] = temp_table[temp_count];
       temp_count++;
     }
 
     // アンパッサンの配列を初期化。
-    en_passant_hash_table_[0] = 0;
+    en_passant_hash_value_table_[0] = 0;
     for (Square square = 1; square < NUM_SQUARES; square++) {
-      en_passant_hash_table_[square] = temp_table[temp_count];
+      en_passant_hash_value_table_[square] = temp_table[temp_count];
       temp_count++;
     }
   }

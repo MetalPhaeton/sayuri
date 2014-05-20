@@ -471,18 +471,18 @@ namespace Sayuri {
         /* ハッシュ関連。 */
         /******************/
         // 駒の情報からハッシュを得るための配列。
-        // piece_hash_table_[サイド][駒の種類][駒の位置]
-        Hash piece_hash_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
+        // piece_hash_value_table_[サイド][駒の種類][駒の位置]
+        Hash piece_hash_value_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
         // 手番からハッシュを得るための配列。
-        Hash to_move_hash_table_[NUM_SIDES];
+        Hash to_move_hash_value_table_[NUM_SIDES];
         // キャスリングの権利からハッシュを得るための配列。
         // 0: 白のショートキャスリング。
         // 1: 白のロングキャスリング。
         // 2: 黒のショートキャスリング。
         // 3: 黒のロングキャスリング。
-        Hash castling_hash_table_[4];
+        Hash castling_hash_value_table_[4];
         // アンパッサンの位置からハッシュを得るための配列。
-        Hash en_passant_hash_table_[NUM_SQUARES];
+        Hash en_passant_hash_value_table_[NUM_SQUARES];
 
         /**************************/
         /* コンストラクタと代入。 */
@@ -503,7 +503,7 @@ namespace Sayuri {
         void ScanMember(const SharedStruct& shared_st);
 
         // ハッシュの配列を初期化する。
-        void InitHashTable();
+        void InitHashValueTable();
 
       };
       std::shared_ptr<SharedStruct> shared_st_ptr_;
