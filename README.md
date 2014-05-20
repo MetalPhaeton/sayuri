@@ -35,7 +35,9 @@ Sayuri - UCI用チェスエンジン
 
 * `src` : ソースファイルのディレクトリ。
 * `SayuriCompiled` : コンパイル済みバイナリファイルのディレクトリ。
-    * `Linux` : リナックス用バイナリファイルのディレクトリ。
+    * `Linux` : Linux用バイナリファイルのディレクトリ。
+        * `For64Bit` : 64ビットCPU向けのバイナリファイルのディレクトリ。
+    * `Windows` : Windows用バイナリファイル。 (Linux版MinGWで作成。)
         * `For64Bit` : 64ビットCPU向けのバイナリファイルのディレクトリ。
 * `SayuriLogo` : ロゴ画像ファイルのディレクトリ。
 * `SampleGames` : Sayuriとその他のエンジンによるサンプルゲームの
@@ -178,7 +180,9 @@ Files and Directories
 
 * `src` : For Sayuri's source files.
 * `SayuriCompiled` : For Sayuri's binary file.
-    * `Linux` : For Linux OS.
+    * `Linux` : For binary files for Linux.
+        * `For64Bit` : For 64 bit machines.
+    * `Windows` : For binary files for Windows. (Created by Linux MinGW.)
         * `For64Bit` : For 64 bit machines.
 * `SayuriLogo` : For the logo image files.
 * `SampleGames` : For sample game files of Sayuri vs other chess engines.
