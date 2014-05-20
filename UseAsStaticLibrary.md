@@ -267,8 +267,22 @@ int main(int argc, char* argv[]) {
 | アクセサの型     | `型 パラメータ名()`             |
 | ミューテータの型 | `void パラメータ名(型　変数名)` |
 
+配列のインデックスで使う「`駒の種類`」、「`位置`」に入れる値は以下の通りです。
+
+| 種類       | 入れる値                                                     |
+|------------|--------------------------------------------------------------|
+| `駒の種類` | `EMPTY`、`PAWN`、`KNIGHT`、`BISHOP`、`ROOK`、`QUEEN`、`KING` |
+| `位置`     | `A1`、`B1`、`C1` ...... `F8`、`G8`、`H8`                     |
+
 (注) 綴りを間違えてしまっているかもしれません。  
 上手く機能しない場合は、「`params.h`」を見て確認して下さい。
+
+###### マテリアル ######
+
+* `int (& material())[駒の種類]`
+    * 駒の価値。  
+      チェスエンジンにおいて最も重要な数値。  
+      探索アルゴリズムだけでなく、評価関数でも極めて重要な要素。
 
 ###### YBWC ######
 
@@ -429,6 +443,13 @@ int main(int argc, char* argv[]) {
 |------------------|---------------------------------|
 | アクセサの型     | `型　パラメータ名()`            |
 | ミューテータの型 | `void パラメータ名(型　変数名)` |
+
+配列のインデックスで使う「`駒の種類`」、「`位置`」に入れる値は以下の通りです。
+
+| 種類       | 入れる値                                                     |
+|------------|--------------------------------------------------------------|
+| `駒の種類` | `EMPTY`、`PAWN`、`KNIGHT`、`BISHOP`、`ROOK`、`QUEEN`、`KING` |
+| `位置`     | `A1`、`B1`、`C1` ...... `F8`、`G8`、`H8`                     |
 
 (注) 綴りを間違えてしまっているかもしれません。  
 上手く機能しない場合は、「`params.h`」を見て確認して下さい。
@@ -838,8 +859,23 @@ If you want to use the mutator, translate it with the following table.
 | Type of an accessor | `Type ParameterName()`         |
 | Type of a mutator   | `void ParameterName(Type arg)` |
 
+The following table is the index value of the array for `[piece type]` or
+`[square]`.
+
+| Name         | Index value                                                  |
+|--------------|--------------------------------------------------------------|
+| `piece type` | `EMPTY`, `PAWN`, `KNIGHT`, `BISHOP`, `ROOK`, `QUEEN`, `KING` |
+| `square`     | `A1`, `B1`, `C1` ...... `F8`, `G8`, `H8`                     |
+
 Note: I may mistake spells.  
 If it doesn't work, please confirm "`param.h`".
+
+###### Material ######
+
+* `int (& material())[piece type]`
+    * The values of a piece.  
+      This is the most important numbers of chess engines.  
+      Not only for search algorithm, but also evaluation function.
 
 ###### YBWC ######
 
@@ -1003,6 +1039,14 @@ If you want to use the mutator, translate it with the following table.
 |---------------------|--------------------------------|
 | Type of an accessor | `Type ParameterName()`         |
 | Type of a mutator   | `void ParameterName(Type arg)` |
+
+The following table is the index value of the array for `[piece type]` or
+`[square]`.
+
+| Name         | Index value                                                  |
+|--------------|--------------------------------------------------------------|
+| `piece type` | `EMPTY`, `PAWN`, `KNIGHT`, `BISHOP`, `ROOK`, `QUEEN`, `KING` |
+| `square`     | `A1`, `B1`, `C1` ...... `F8`, `G8`, `H8`                     |
 
 Note: I may mistake spells.  
 If it doesn't work, please confirm "`param.h`".

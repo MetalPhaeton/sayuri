@@ -48,6 +48,9 @@ namespace Sayuri {
       /**************/
       /* アクセサ。 */
       /**************/
+      // マテリアル。
+      const int (& material() const)[NUM_PIECE_TYPES] {return material_;}
+
       // YBWC。
       // 指定の候補手数以上で実行する。
       int ybwc_after() const {return ybwc_after_;}
@@ -158,6 +161,9 @@ namespace Sayuri {
       /******************/
       /* ミューテータ。 */
       /******************/
+      // マテリアル。
+      void material(int (& table)[NUM_PIECE_TYPES]);
+
       // YBWC。
       // 指定の候補手数以上で実行する。
       void ybwc_after(int num_moves) {ybwc_after_ = num_moves;}
@@ -295,6 +301,9 @@ namespace Sayuri {
       /****************/
       /* メンバ変数。 */
       /****************/
+      // マテリアル。
+      int material_[NUM_PIECE_TYPES];
+
       // YBWC。
       int ybwc_after_;  // 指定の候補手数以上で実行する。
 

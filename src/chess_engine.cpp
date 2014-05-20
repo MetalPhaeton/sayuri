@@ -701,7 +701,7 @@ namespace Sayuri {
 
     int material = 0;
     for (Piece piece_type = PAWN; piece_type <= QUEEN; piece_type++) {
-      material += MATERIAL[piece_type]
+      material += shared_st_ptr_->search_params_ptr_->material()[piece_type]
       * (Util::CountBits(position_[side][piece_type])
       - Util::CountBits(position_[enemy_side][piece_type]));
     }
@@ -713,14 +713,18 @@ namespace Sayuri {
   int ChessEngine::GetNextMyMaterial(int current_material, Move move) const {
     if (move_move_type(move) == EN_PASSANT) {
       // アンパッサン。
-      return current_material + MATERIAL[PAWN];
+      return current_material
+      + shared_st_ptr_->search_params_ptr_->material()[PAWN];
     } else if (Piece promotion = move_promotion(move)) {
       // プロモーション。
-      return current_material + MATERIAL[piece_board_[move_to(move)]]
-      + MATERIAL[promotion] - MATERIAL[PAWN];
+      return current_material + shared_st_ptr_->search_params_ptr_->
+      material()[piece_board_[move_to(move)]]
+      + shared_st_ptr_->search_params_ptr_->material()[promotion]
+      - shared_st_ptr_->search_params_ptr_->material()[PAWN];
     } else {
       // その他の手。
-      return current_material + MATERIAL[piece_board_[move_to(move)]];
+      return current_material + shared_st_ptr_->search_params_ptr_->
+      material()[piece_board_[move_to(move)]];
     }
   }
 

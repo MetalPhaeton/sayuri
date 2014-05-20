@@ -335,10 +335,6 @@ namespace Sayuri {
   constexpr int SCORE_LOSE = -SCORE_WIN;
   // 引き分け。
   constexpr int SCORE_DRAW = 0;
-  // マテリアル。
-  constexpr int MATERIAL[NUM_PIECE_TYPES] {
-    0, 100, 400, 400, 600, 1200, SCORE_WIN
-  };
 
   /*****************************/
   /* Transposition Table関連。 */

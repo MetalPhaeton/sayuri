@@ -69,6 +69,15 @@ namespace Sayuri {
   enable_futility_pruning_(true),
   futility_pruning_depth_(3),
   futility_pruning_margin_(300) {
+    // マテリアルの初期化。
+    material_[EMPTY] = 0;  // 何もなし。
+    material_[PAWN] = 100;  // ポーン。
+    material_[KNIGHT] = 400;  // ナイト。
+    material_[BISHOP] = 400;  // ビショップ。
+    material_[ROOK] = 600;  // ルーク。
+    material_[QUEEN] = 1200;  // クイーン。
+    material_[KING] = SCORE_WIN;  // キング。
+
     // ヒストリーをチェック。
     if (!enable_history_) enable_history_pruning_ = false;
     if (!enable_killer_) enable_killer_2_ = false;
@@ -98,6 +107,9 @@ namespace Sayuri {
 
   // メンバをコピーする。
   void SearchParams::ScanMember(const SearchParams& params) {
+    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      material_[piece_type] = params.material_[piece_type];
+    }
     ybwc_after_ = params.ybwc_after_;
     enable_aspiration_windows_ = params.enable_aspiration_windows_;
     aspiration_windows_limit_depth_ = params.aspiration_windows_limit_depth_;

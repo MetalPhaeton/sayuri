@@ -1394,15 +1394,17 @@ namespace Sayuri {
       int capture_value = 0;
       if (move_type == EN_PASSANT) {
         // アンパッサン。
-        capture_value = MATERIAL[PAWN];
+        capture_value = shared_st_ptr_->search_params_ptr_->material()[PAWN];
       } else {
-        capture_value = MATERIAL[piece_board_[to]];
+        capture_value =
+        shared_st_ptr_->search_params_ptr_->material()[piece_board_[to]];
       }
 
       // ポーンの昇格。
       if ((move & PROMOTION_MASK)) {
-        capture_value += MATERIAL[move_promotion(move)]
-        - MATERIAL[PAWN];
+        capture_value +=
+        shared_st_ptr_->search_params_ptr_->material()[move_promotion(move)]
+        - shared_st_ptr_->search_params_ptr_->material()[PAWN];
       }
 
       Side side = to_move_;
