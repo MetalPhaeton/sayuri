@@ -54,6 +54,8 @@ namespace Sayuri {
       // YBWC。
       // 指定の候補手数以上で実行する。
       int ybwc_after() const {return ybwc_after_;}
+      // 深さ制限。
+      int ybwc_limit_depth() const {return ybwc_limit_depth_;}
 
       // Aspiration Windows。
       // 有効かどうか。
@@ -167,6 +169,8 @@ namespace Sayuri {
       // YBWC。
       // 指定の候補手数以上で実行する。
       void ybwc_after(int num_moves) {ybwc_after_ = num_moves;}
+      // 深さ制限。
+      void ybwc_limit_depth(int depth) {ybwc_limit_depth_ = depth;}
 
       // Aspiration Windows。
       // 有効かどうか。
@@ -306,6 +310,7 @@ namespace Sayuri {
 
       // YBWC。
       int ybwc_after_;  // 指定の候補手数以上で実行する。
+      int ybwc_limit_depth_;  // 深さ制限。
 
       // Aspiration Windows。
       bool enable_aspiration_windows_;  // 有効かどうか。

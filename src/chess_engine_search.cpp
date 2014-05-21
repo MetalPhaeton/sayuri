@@ -429,6 +429,8 @@ namespace Sayuri {
     // パラメータ保存。
     // YBWC。
     int ybwc_after = shared_st_ptr_->search_params_ptr_->ybwc_after();
+    int ybwc_limit_depth =
+    shared_st_ptr_->search_params_ptr_->ybwc_limit_depth();
 
     // History Pruning。
     bool enable_history_pruning =
@@ -479,7 +481,7 @@ namespace Sayuri {
       }
 
       // 別スレッドに助けを求める。(YBWC)
-      if (num_moves > ybwc_after) {
+      if ((depth >= ybwc_limit_depth) && (num_moves > ybwc_after)) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
@@ -893,6 +895,8 @@ namespace Sayuri {
     // パラメータ保存。
     // YBWC。
     int ybwc_after = shared_st_ptr_->search_params_ptr_->ybwc_after();
+    int ybwc_limit_depth =
+    shared_st_ptr_->search_params_ptr_->ybwc_limit_depth();
 
     // History Pruning。
     bool enable_history_pruning =
@@ -943,7 +947,7 @@ namespace Sayuri {
       }
 
       // 別スレッドに助けを求める。(YBWC)
-      if (num_moves > ybwc_after) {
+      if ((job.depth() >= ybwc_limit_depth) && (num_moves > ybwc_after)) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
@@ -1135,6 +1139,8 @@ namespace Sayuri {
     // パラメータを保存。
     // YBWC。
     int ybwc_after = shared_st_ptr_->search_params_ptr_->ybwc_after();
+    int ybwc_limit_depth =
+    shared_st_ptr_->search_params_ptr_->ybwc_limit_depth();
 
     // Late Move Reduction。
     bool enable_lmr = shared_st_ptr_->search_params_ptr_->enable_lmr();
@@ -1184,7 +1190,7 @@ namespace Sayuri {
       }
 
       // 別スレッドに助けを求める。(YBWC)
-      if (num_moves > ybwc_after) {
+      if ((job.depth() >= ybwc_limit_depth) && (num_moves > ybwc_after)) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
