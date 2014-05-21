@@ -52,10 +52,10 @@ namespace Sayuri {
       const int (& material() const)[NUM_PIECE_TYPES] {return material_;}
 
       // YBWC。
-      // 指定の候補手数以上で実行する。
-      int ybwc_after() const {return ybwc_after_;}
       // 深さ制限。
       int ybwc_limit_depth() const {return ybwc_limit_depth_;}
+      // 指定の候補手数以上で実行する。
+      int ybwc_after() const {return ybwc_after_;}
 
       // Aspiration Windows。
       // 有効かどうか。
@@ -167,10 +167,10 @@ namespace Sayuri {
       void material(const int (& table)[NUM_PIECE_TYPES]);
 
       // YBWC。
-      // 指定の候補手数以上で実行する。
-      void ybwc_after(int num_moves) {ybwc_after_ = num_moves;}
       // 深さ制限。
       void ybwc_limit_depth(int depth) {ybwc_limit_depth_ = depth;}
+      // 指定の候補手数以上で実行する。
+      void ybwc_after(int num_moves) {ybwc_after_ = num_moves;}
 
       // Aspiration Windows。
       // 有効かどうか。
@@ -309,8 +309,8 @@ namespace Sayuri {
       int material_[NUM_PIECE_TYPES];
 
       // YBWC。
-      int ybwc_after_;  // 指定の候補手数以上で実行する。
       int ybwc_limit_depth_;  // 深さ制限。
+      int ybwc_after_;  // 指定の候補手数以上で実行する。
 
       // Aspiration Windows。
       bool enable_aspiration_windows_;  // 有効かどうか。

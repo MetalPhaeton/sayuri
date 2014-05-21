@@ -35,8 +35,8 @@ namespace Sayuri {
   /******************/
   // コンストラクタ。
   SearchParams::SearchParams() :
-  ybwc_after_(3),
   ybwc_limit_depth_(4),
+  ybwc_after_(3),
   enable_aspiration_windows_(true),
   aspiration_windows_limit_depth_(5),
   aspiration_windows_delta_(15),
@@ -111,8 +111,8 @@ namespace Sayuri {
     for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
       material_[piece_type] = params.material_[piece_type];
     }
-    ybwc_after_ = params.ybwc_after_;
     ybwc_limit_depth_ = params.ybwc_limit_depth_;
+    ybwc_after_ = params.ybwc_after_;
     enable_aspiration_windows_ = params.enable_aspiration_windows_;
     aspiration_windows_limit_depth_ = params.aspiration_windows_limit_depth_;
     aspiration_windows_delta_ = params.aspiration_windows_delta_;
