@@ -411,11 +411,14 @@ namespace Sayuri {
     if (is_checked) {
       depth += 1;
     }
+
+    // 準備。
     int num_all_moves = maker.RegenMoves();
     int num_moves = 0;
     ScoreType score_type = ScoreType::ALPHA;
     bool has_legal_move = false;
     int margin = GetMargin(depth);
+
     // 仕事の生成。
     std::mutex mutex;
     PositionRecord record(*this);
@@ -426,6 +429,7 @@ namespace Sayuri {
     alpha, beta, dummy_delta, table, pv_line, is_null_searching_,
     null_reduction, score_type, material,
     is_checked, num_all_moves, has_legal_move, dummy_vec, dummy_time);
+
     // パラメータ保存。
     // YBWC。
     int ybwc_after = shared_st_ptr_->search_params_ptr_->ybwc_after();
