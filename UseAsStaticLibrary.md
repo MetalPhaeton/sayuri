@@ -286,6 +286,9 @@ int main(int argc, char* argv[]) {
 
 ###### YBWC ######
 
+* `int ybwc_limit_depth()`
+    * 「`現在のdepth >= 設定値`」で YBWC を実行する。
+
 * `int ybwc_after()`
     * 現在の局面の[設定値]番目以降の候補手から別スレッドに助けを求める。
 
@@ -879,6 +882,9 @@ If it doesn't work, please confirm "`param.h`".
 
 ###### YBWC ######
 
+* `int ybwc_limit_depth()`
+    * Execute YBWC when "`the_current_depth >= the_parameter`".
+
 * `int ybwc_after()`
     * Call for help to other thread after [the parameter]th candidate move.
 
@@ -888,7 +894,7 @@ If it doesn't work, please confirm "`param.h`".
     * A parameter whether it enables Aspiration Windows or not.
 
 * `std::uint32_t aspiration_windows_limit_depth()`
-    * Execute Aspiration Windows by "`the_current_depth >= the_parameter`".
+    * Execute Aspiration Windows when "`the_current_depth >= the_parameter`".
 
 * `int aspiration_windows_delta()`
     * It expands the window size based on the parameter.
@@ -924,7 +930,7 @@ If it doesn't work, please confirm "`param.h`".
     * A parameter whether it enables IID or not.
 
 * `int iid_limit_depth()`
-    * Execute IID by "`the_current_depth >= the_parameter`".
+    * Execute IID when "`the_current_depth >= the_parameter`".
 
 * `int iid_search_depth()`
     * The searching depth in IID.
@@ -935,7 +941,7 @@ If it doesn't work, please confirm "`param.h`".
     * A parameter whether it enables NMR or not.
 
 * `int nmr_limit_depth()`
-    * Execute NMR by "`the_current_depth >= the_parameter`".
+    * Execute NMR when "`the_current_depth >= the_parameter`".
 
 * `int nmr_search_reduction()`
     * A parameter how many reduce the current depth when NMR searches.
@@ -949,7 +955,7 @@ If it doesn't work, please confirm "`param.h`".
     * A parameter whether it enables ProbCut or not.
 
 * `int probcut_limit_depth()`
-    * Execute ProbCut by "`the_current_depth >= the_parameter`".
+    * Execute ProbCut when "`the_current_depth >= the_parameter`".
 
 * `int probcut_margin()`
     * A incremental value of the beta value when ProbCut searches.
@@ -964,7 +970,7 @@ If it doesn't work, please confirm "`param.h`".
       If History Heuristic is not enabled, this parameter won't be enable.
 
 * `int history_pruning_limit_depth()`
-    * Execute History Pruning by "`the_current_depth >= the_parameter`".
+    * Execute History Pruning when "`the_current_depth >= the_parameter`".
 
 * `double history_pruning_move_threshold()`
     * The threshold whether it executes History Pruning or not.  
@@ -991,7 +997,7 @@ If it doesn't work, please confirm "`param.h`".
     * A parameter whether it enables LMR or not.  
 
 * `int lmr_limit_depth()`
-    * Execute LMR by "`the_current_depth >= the_parameter`".
+    * Execute LMR when "`the_current_depth >= the_parameter`".
 
 * `int lmr_threshold()`
     * The threshold whether it executes LMR or not.  
