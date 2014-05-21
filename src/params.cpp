@@ -146,6 +146,13 @@ namespace Sayuri {
     futility_pruning_margin_ = params.futility_pruning_margin_;
   }
 
+  // マテリアルのミューテータ。
+  void SearchParams::material(const int (& table)[NUM_PIECE_TYPES]) {
+    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      material_[piece_type] = table[piece_type];
+    }
+  }
+
   /****************/
   /* EvalParams。 */
   /****************/

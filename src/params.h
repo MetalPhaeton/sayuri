@@ -162,7 +162,7 @@ namespace Sayuri {
       /* ミューテータ。 */
       /******************/
       // マテリアル。
-      void material(int (& table)[NUM_PIECE_TYPES]);
+      void material(const int (& table)[NUM_PIECE_TYPES]);
 
       // YBWC。
       // 指定の候補手数以上で実行する。
