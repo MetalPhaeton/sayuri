@@ -28,6 +28,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <string>
+#include <memory>
 
 #include "sayuri.h"
 
