@@ -48,20 +48,20 @@ namespace Sayuri {
   int DebugMain(int argc, char* argv[]) {
     // プログラムの起動。
     // 初期化。
-    Sayuri::Init();
+    Init();
 
     // エンジン準備。
-    std::unique_ptr<Sayuri::SearchParams>
-    search_params_ptr(new Sayuri::SearchParams());
+    std::unique_ptr<SearchParams>
+    search_params_ptr(new SearchParams());
 
-    std::unique_ptr<Sayuri::EvalParams>
-    eval_params_ptr(new Sayuri::EvalParams());
+    std::unique_ptr<EvalParams>
+    eval_params_ptr(new EvalParams());
 
-    std::unique_ptr<Sayuri::ChessEngine>
-    engine_ptr(new Sayuri::ChessEngine(*search_params_ptr, *eval_params_ptr));
+    std::unique_ptr<ChessEngine>
+    engine_ptr(new ChessEngine(*search_params_ptr, *eval_params_ptr));
 
-    std::unique_ptr<Sayuri::UCIShell>
-    shell_ptr(new Sayuri::UCIShell(*engine_ptr));
+    std::unique_ptr<UCIShell>
+    shell_ptr(new UCIShell(*engine_ptr));
   // ==========================================================================
 
     return 0;
@@ -296,6 +296,121 @@ namespace Sayuri {
 
     // 標準出力に出力。
     std::cout << osstream.str();
+  }
+
+  // PositionRecordを出力。
+  void PrintPositionRecord(const PositionRecord& record) {
+    PrintPosition(record.position());
+    std::cout << "To Move: ";
+    switch (record.to_move()) {
+      case NO_SIDE:
+        std::cout << "No Side";
+        break;
+      case WHITE:
+        std::cout << "White";
+        break;
+      case BLACK:
+        std::cout << "Black";
+        break;
+      default:
+        std::cout << "Error";
+        break;
+    }
+    std::cout << std::endl;
+    std::cout << "Castling Rights:" << std::endl;
+    Castling rights = record.castling_rights();
+    if (rights) {
+      if ((rights & WHITE_SHORT_CASTLING)) {
+        std::cout << "    White Short" << std::endl;
+      }
+      if ((rights & WHITE_LONG_CASTLING)) {
+        std::cout << "    White Long" << std::endl;
+      }
+      if ((rights & BLACK_SHORT_CASTLING)) {
+        std::cout << "    Black Short" << std::endl;
+      }
+      if ((rights & BLACK_LONG_CASTLING)) {
+        std::cout << "    Black Long" << std::endl;
+      }
+    } else {
+      std::cout << "    No One Has Rights" << std::endl;
+    }
+    std::cout << "En Passant Square: ";
+    Square en_passant = record.en_passant_square();
+    if (en_passant) {
+      std::string fyle_str[NUM_FYLES] {
+        "a", "b", "c", "d", "e", "f", "g", "h"
+      };
+      std::string rank_str[NUM_RANKS] {
+        "1", "2", "3", "4", "5", "6", "7", "8"
+      };
+      std::cout << fyle_str[Util::GetFyle(en_passant)];
+      std::cout << rank_str[Util::GetRank(en_passant)] << std::endl;
+    } else {
+      std::cout << "No Square" << std::endl;
+    }
+    std::cout << "Ply 100 Rule: " << record.ply_100() << std::endl;
+    std::cout << "Ply: " << record.ply() << std::endl;
+    std::cout << "Has Castled:" << std::endl;
+    std::cout << "    White: ";
+    if (record.has_castled()[WHITE]) std::cout << "Yes" << std::endl;
+    else std::cout << "No" << std::endl;
+    std::cout << "    Black: ";
+    if (record.has_castled()[BLACK]) std::cout << "Yes" << std::endl;
+    else std::cout << "No" << std::endl;
+    std::cout << "Current Hash: " << record.pos_hash() << std::endl;
+  }
+
+  // EvalResultを出力する。
+  void PrintEvalResult(const EvalResult& result) {
+    std::string piece_name[NUM_PIECE_TYPES] {
+      "Empty", "Pawn", "Knight", "Bishop", "Rook","Queen", "King"
+    };
+
+    std::cout << "Total Score: " << result.score_ << std::endl;
+    std::cout << "Opening Position:" << std::endl;
+    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+      std::cout << "    " << piece_name[type] << ": "
+      << result.score_opening_position_[type] << std::endl;
+    }
+    std::cout << "Ending Position:" << std::endl;
+    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+      std::cout << "    " << piece_name[type] << ": "
+      << result.score_ending_position_[type] << std::endl;
+    }
+    std::cout << "Mobility: " << result.score_mobility_ << std::endl;
+    std::cout << "Center Control: " << result.score_center_control_
+    << std::endl;
+    std::cout << "Sweet Center Control: "
+    << result.score_sweet_center_control_ << std::endl;
+    std::cout << "Development: " << result.score_development_ << std::endl;
+    std::cout << "Attack:" << std::endl;
+    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+      std::cout << "    " << piece_name[type] << ": "
+      << result.score_attack_[type] << std::endl;
+    }
+    std::cout << "Attack Around King: " << result.score_attack_around_king_
+    << std::endl;
+    std::cout << "Pass Pawn: " << result.score_pass_pawn_ << std::endl;
+    std::cout << "Protected Pass Pawn: " << result.score_protected_pass_pawn_
+    << std::endl;
+    std::cout << "Double Pawn: " << result.score_double_pawn_ << std::endl;
+    std::cout << "Iso Pawn: " << result.score_iso_pawn_ << std::endl;
+    std::cout << "Pawn Shield: " << result.score_pawn_shield_ << std::endl;
+    std::cout << "Bishop Pair: " << result.score_bishop_pair_ << std::endl;
+    std::cout << "Bad Bishop: " << result.score_bad_bishop_ << std::endl;
+    std::cout << "Pin Knight: " << result.score_pin_knight_ << std::endl;
+    std::cout << "Rook Pair: " << result.score_rook_pair_ << std::endl;
+    std::cout << "Rook Semiopen Fyle: " << result.score_rook_semiopen_fyle_
+    << std::endl;
+    std::cout << "Rook Open Fyle: " << result.score_rook_open_fyle_
+    << std::endl;
+    std::cout << "Early Queen Launched: "
+    << result.score_early_queen_launched_ << std::endl;
+    std::cout << "Weak Square: " << result.score_weak_square_ << std::endl;
+    std::cout << "Castling: " << result.score_castling_ << std::endl;
+    std::cout << "Abandoned Castling: " << result.score_abandoned_castling_
+    << std::endl;
   }
 
   /**********************/

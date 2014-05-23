@@ -75,6 +75,16 @@ namespace Sayuri {
   // 駒の配置のビットボード。
   void PrintPosition(const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]);
 
+  // PositionRecordを出力する。
+  // [引数]
+  // record: 駒の配置の記録。
+  void PrintPositionRecord(const PositionRecord& record);
+
+  // EvalResultを出力する。
+  // [引数]
+  // result: 結果の構造体。
+  void PrintEvalResult(const EvalResult& result);
+
   /**********************/
   /* ストップウォッチ。 */
   /**********************/
