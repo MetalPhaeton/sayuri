@@ -368,6 +368,7 @@ namespace Sayuri {
     };
 
     std::cout << "Total Score: " << result.score_ << std::endl;
+    std::cout << "Material: " << result.material_ << std::endl;
     std::ostringstream os;
     double total = 0.0;
     for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {

@@ -37,6 +37,8 @@ namespace Sayuri {
     // 総合評価値。
     double score_;
 
+    // マテリアル。
+    double material_;
     // オープニング時の駒の配置の評価値。
     double score_opening_position_[NUM_PIECE_TYPES];
     // エンディング時の駒の配置の評価値。

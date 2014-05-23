@@ -270,6 +270,8 @@ namespace Sayuri {
     const EvalParams& params = engine_ptr_->eval_params();
     double num_pieces = Util::CountBits(engine_ptr_->blocker_0()) - 2;
 
+    // マテリアル。
+    result.material_ = engine_ptr_->GetMaterial(engine_ptr_->to_move());
     // オープニング時の駒の配置の評価値。
     for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
       result.score_opening_position_[piece_type] =
