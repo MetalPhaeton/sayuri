@@ -424,7 +424,8 @@ namespace Sayuri {
         attacks = Util::GetPawnAttack(piece_square, piece_side);
 
         // アンパッサン。
-        if (engine_ptr_->en_passant_square()) {
+        if (engine_ptr_->en_passant_square()
+        && (piece_side == engine_ptr_->to_move())) {
           en_passant =
           Util::SQUARE[engine_ptr_->en_passant_square()] & attacks;
         }
