@@ -337,7 +337,7 @@ namespace Sayuri {
     result.score_rook_open_fyle_ = params.weight_rook_open_fyle()(num_pieces)
     * rook_open_fyle_value_;
     // 早すぎるクイーンの始動の評価値。
-    result.socre_early_queen_launched_ = params.weight_early_queen_launched()
+    result.score_early_queen_launched_ = params.weight_early_queen_launched()
     (num_pieces) * early_queen_launched_value_;
     // キング周りの弱いマスの評価値。
     result.score_weak_square_ = params.weight_weak_square()(num_pieces)

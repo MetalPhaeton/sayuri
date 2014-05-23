@@ -76,7 +76,7 @@ namespace Sayuri {
     // オープンファイルのルークの評価値。
     double score_rook_open_fyle_;
     // 早すぎるクイーンの始動の評価値。
-    double socre_early_queen_launched_;
+    double score_early_queen_launched_;
     // キング周りの弱いマスの評価値。
     double score_weak_square_;
     // キャスリングの評価値。
