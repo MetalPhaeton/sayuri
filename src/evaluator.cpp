@@ -260,6 +260,98 @@ namespace Sayuri {
     return static_cast<int>(score);
   }
 
+  // 現在の局面を評価し、構造体にして返す。
+  EvalResult Evaluator::GetEvalResult() {
+    EvalResult result;
+
+    // 総合評価値。
+    result.score_ = Evaluate(engine_ptr_->GetMaterial(engine_ptr_->to_move()));
+
+    const EvalParams& params = engine_ptr_->eval_params();
+    double num_pieces = Util::CountBits(engine_ptr_->blocker_0()) - 2;
+
+    // オープニング時の駒の配置の評価値。
+    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      result.score_opening_position_[piece_type] =
+      params.weight_opening_position()[piece_type](num_pieces)
+      * opening_position_value_[piece_type];
+    }
+    // エンディング時の駒の配置の評価値。
+    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      result.score_ending_position_[piece_type] =
+      params.weight_ending_position()[piece_type](num_pieces)
+      * ending_position_value_[piece_type];
+    }
+    // 機動力の評価値。
+    result.score_mobility_ = params.weight_mobility()(num_pieces)
+    * mobility_value_;
+    // センターコントロールの評価値。
+    result.score_center_control_ = params.weight_center_control()(num_pieces)
+    * center_control_value_;
+    // スウィートセンターのコントロールの評価値。
+    result.score_sweet_center_control_ = params.weight_sweet_center_control()
+    (num_pieces) * sweet_center_control_value_;
+    // 駒の展開の評価値。
+    result.score_development_ = params.weight_development()(num_pieces)
+    * development_value_;
+    // 攻撃の評価値。
+    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      result.score_attack_[piece_type] =
+      params.weight_attack()[piece_type](num_pieces)
+      * attack_value_[piece_type];
+    }
+    // 相手キング周辺への攻撃の評価値。
+    result.score_attack_around_king_ = params.weight_attack_around_king()
+    (num_pieces) * attack_around_king_value_;
+    // パスポーンの評価値。
+    result.score_pass_pawn_ = params.weight_pass_pawn()(num_pieces)
+    * pass_pawn_value_;
+    // 守られたパスポーンの評価値。
+    result.score_protected_pass_pawn_ = params.weight_protected_pass_pawn()
+    (num_pieces) * protected_pass_pawn_value_;
+    // ダブルポーンの評価値。
+    result.score_double_pawn_ = params.weight_double_pawn()(num_pieces)
+    * double_pawn_value_;
+    // 孤立ポーンの評価値。
+    result.score_iso_pawn_ = params.weight_iso_pawn()(num_pieces)
+    * iso_pawn_value_;
+    // ポーンの盾の評価値。
+    result.score_pawn_shield_ = params.weight_pawn_shield()(num_pieces)
+    * pawn_shield_value_;
+    // ビショップペアの評価値。
+    result.score_bishop_pair_ = params.weight_bishop_pair()(num_pieces)
+    * bishop_pair_value_;
+    // バッドビショップの評価値。
+    result.score_bad_bishop_ = params.weight_bad_bishop()(num_pieces)
+    * bad_bishop_value_;
+    // 相手のナイトをビショップでピンの評価値。
+    result.score_pin_knight_ = params.weight_pin_knight()(num_pieces)
+    * pin_knight_value_;
+    // ルークペアの評価値。
+    result.score_rook_pair_ = params.weight_rook_pair()(num_pieces)
+    * rook_pair_value_;
+    // セミオープンファイルのルークの評価値。
+    result.score_rook_semiopen_fyle_ = params.weight_rook_semiopen_fyle()
+    (num_pieces) * rook_semiopen_fyle_value_;
+    // オープンファイルのルークの評価値。
+    result.score_rook_open_fyle_ = params.weight_rook_open_fyle()(num_pieces)
+    * rook_open_fyle_value_;
+    // 早すぎるクイーンの始動の評価値。
+    result.socre_early_queen_launched_ = params.weight_early_queen_launched()
+    (num_pieces) * early_queen_launched_value_;
+    // キング周りの弱いマスの評価値。
+    result.score_weak_square_ = params.weight_weak_square()(num_pieces)
+    * weak_square_value_;
+    // キャスリングの評価値。
+    result.score_castling_ = params.weight_castling()(num_pieces)
+    * castling_value_;
+    // キャスリングの放棄の評価値。
+    result.score_abandoned_castling_ = params.weight_abandoned_castling()
+    (num_pieces) * abandoned_castling_value_;
+
+    return result;
+  }
+
   /****************************/
   /* 局面評価に使用する関数。 */
   /****************************/

@@ -32,6 +32,60 @@
 #include "params.h"
 
 namespace Sayuri {
+  // 評価した結果を格納する構造体。
+  struct EvalResult {
+    // 総合評価値。
+    double score_;
+
+    // オープニング時の駒の配置の評価値。
+    double score_opening_position_[NUM_PIECE_TYPES];
+    // エンディング時の駒の配置の評価値。
+    double score_ending_position_[NUM_PIECE_TYPES];
+    // 機動力の評価値。
+    double score_mobility_;
+    // センターコントロールの評価値。
+    double score_center_control_;
+    // スウィートセンターのコントロールの評価値。
+    double score_sweet_center_control_;
+    // 駒の展開の評価値。
+    double score_development_;
+    // 攻撃の評価値。
+    double score_attack_[NUM_PIECE_TYPES];
+    // 相手キング周辺への攻撃の評価値。
+    double score_attack_around_king_;
+    // パスポーンの評価値。
+    double score_pass_pawn_;
+    // 守られたパスポーンの評価値。
+    double score_protected_pass_pawn_;
+    // ダブルポーンの評価値。
+    double score_double_pawn_;
+    // 孤立ポーンの評価値。
+    double score_iso_pawn_;
+    // ポーンの盾の評価値。
+    double score_pawn_shield_;
+    // ビショップペアの評価値。
+    double score_bishop_pair_;
+    // バッドビショップの評価値。
+    double score_bad_bishop_;
+    // 相手のナイトをビショップでピンの評価値。
+    double score_pin_knight_;
+    // ルークペアの評価値。
+    double score_rook_pair_;
+    // セミオープンファイルのルークの評価値。
+    double score_rook_semiopen_fyle_;
+    // オープンファイルのルークの評価値。
+    double score_rook_open_fyle_;
+    // 早すぎるクイーンの始動の評価値。
+    double socre_early_queen_launched_;
+    // キング周りの弱いマスの評価値。
+    double score_weak_square_;
+    // キャスリングの評価値。
+    double score_castling_;
+    // キャスリングの放棄の評価値。
+    double score_abandoned_castling_;
+  };
+
+  // 局面を評価するクラス。
   class Evaluator {
     public:
       /**************************/
@@ -62,6 +116,9 @@ namespace Sayuri {
       // [戻り値]
       // 評価値。
       int Evaluate(int material);
+
+      // 現在の局面を評価し、構造体にして返す。
+      EvalResult GetEvalResult();
 
     private:
       /************************/
