@@ -368,27 +368,39 @@ namespace Sayuri {
     };
 
     std::cout << "Total Score: " << result.score_ << std::endl;
-    std::cout << "Opening Position:" << std::endl;
+    std::ostringstream os;
+    double total = 0.0;
     for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
-      std::cout << "    " << piece_name[type] << ": "
+      os << "    " << piece_name[type] << ": "
       << result.score_opening_position_[type] << std::endl;
+      total += result.score_opening_position_[type];
     }
-    std::cout << "Ending Position:" << std::endl;
+    std::cout << "Opening Position: " << total << std::endl;
+    std::cout << os.str();
+    os.str("");
+    total = 0.0;
     for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
-      std::cout << "    " << piece_name[type] << ": "
+      os << "    " << piece_name[type] << ": "
       << result.score_ending_position_[type] << std::endl;
+      total += result.score_ending_position_[type];
     }
+    std::cout << "Ending Position: " << total << std::endl;
+    std::cout << os.str();
     std::cout << "Mobility: " << result.score_mobility_ << std::endl;
     std::cout << "Center Control: " << result.score_center_control_
     << std::endl;
     std::cout << "Sweet Center Control: "
     << result.score_sweet_center_control_ << std::endl;
     std::cout << "Development: " << result.score_development_ << std::endl;
-    std::cout << "Attack:" << std::endl;
+    os.str("");
+    total = 0.0;
     for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
-      std::cout << "    " << piece_name[type] << ": "
+      os << "    " << piece_name[type] << ": "
       << result.score_attack_[type] << std::endl;
+      total += result.score_attack_[type];
     }
+    std::cout << "Attack: " << total << std::endl;
+    std::cout << os.str();
     std::cout << "Attack Around King: " << result.score_attack_around_king_
     << std::endl;
     std::cout << "Pass Pawn: " << result.score_pass_pawn_ << std::endl;
