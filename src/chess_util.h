@@ -32,7 +32,7 @@
 #include <vector>
 #include <random>
 
-#include "chess_def.h"
+#include "common.h"
 
 namespace Sayuri {
   /********************************/

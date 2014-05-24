@@ -29,7 +29,7 @@
 
 #include <iostream>
 #include <cstddef>
-#include "chess_def.h"
+#include "common.h"
 
 namespace Sayuri {
   // PVライン。

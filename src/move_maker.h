@@ -30,8 +30,7 @@
 #include <iostream>
 #include <mutex>
 #include <cstddef>
-#include "chess_def.h"
-#include "chess_engine.h"
+#include "common.h"
 
 namespace Sayuri {
   class ChessEngine;
@@ -88,6 +87,9 @@ namespace Sayuri {
       int CountMoves() const;
 
     private:
+      // デバッグ用関数をフレンド。
+      friend int DebugMain(int argc, char* argv[]);
+
       /**********************/
       /* プライベート関数。 */
       /**********************/

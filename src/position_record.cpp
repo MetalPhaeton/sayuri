@@ -27,7 +27,7 @@
 #include "position_record.h"
 
 #include <iostream>
-#include "chess_def.h"
+#include "common.h"
 #include "chess_engine.h"
 
 namespace Sayuri {

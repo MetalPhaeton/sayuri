@@ -32,9 +32,7 @@
 #include <vector>
 #include <algorithm>
 #include <cstddef>
-#include "chess_def.h"
-#include "chess_util.h"
-#include "error.h"
+#include "common.h"
 
 namespace Sayuri {
   /**************************/

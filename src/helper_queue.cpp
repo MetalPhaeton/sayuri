@@ -29,6 +29,7 @@
 #include <iostream>
 #include <mutex>
 #include <condition_variable>
+#include "common.h"
 #include "job.h"
 
 namespace Sayuri {

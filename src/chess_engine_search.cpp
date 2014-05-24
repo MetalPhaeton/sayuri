@@ -35,17 +35,16 @@
 #include <memory>
 #include <cstddef>
 #include <cstdint>
-#include "chess_def.h"
-#include "chess_util.h"
+#include "common.h"
 #include "transposition_table.h"
 #include "move_maker.h"
 #include "pv_line.h"
 #include "evaluator.h"
-#include "error.h"
 #include "uci_shell.h"
 #include "position_record.h"
 #include "job.h"
 #include "helper_queue.h"
+#include "params.h"
 
 namespace Sayuri {
   // クイース探索。

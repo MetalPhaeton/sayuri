@@ -30,8 +30,7 @@
 #include <iostream>
 #include <mutex>
 #include <condition_variable>
-#include "chess_engine.h"
-#include "job.h"
+#include "common.h"
 
 namespace Sayuri {
   class ChessEngine;

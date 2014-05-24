@@ -35,12 +35,11 @@
 #include <memory>
 #include <vector>
 #include <array>
-#include "chess_def.h"
-#include "chess_util.h"
+#include "common.h"
 #include "transposition_table.h"
 #include "fen.h"
 #include "move_maker.h"
-#include "error.h"
+#include "pv_line.h"
 #include "uci_shell.h"
 #include "position_record.h"
 #include "job.h"

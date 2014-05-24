@@ -30,8 +30,7 @@
 #include <utility>
 #include <mutex>
 #include <cstddef>
-#include "chess_def.h"
-#include "chess_util.h"
+#include "common.h"
 
 namespace Sayuri {
   /****************************************/

@@ -30,7 +30,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "chess_def.h"
+#include "common.h"
 
 namespace Sayuri {
   /*********************/

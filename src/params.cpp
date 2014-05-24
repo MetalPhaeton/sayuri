@@ -28,6 +28,7 @@
 
 #include <iostream>
 #include <cstdint>
+#include "common.h"
 
 namespace Sayuri {
   /******************/

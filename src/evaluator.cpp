@@ -27,8 +27,8 @@
 #include "evaluator.h"
 
 #include <iostream>
+#include "common.h"
 #include "chess_engine.h"
-#include "error.h"
 #include "params.h"
 
 namespace Sayuri {

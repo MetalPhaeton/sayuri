@@ -40,10 +40,11 @@
 #include <cstdint>
 #include <cctype>
 #include <functional>
-#include "chess_def.h"
-#include "chess_util.h"
+#include "common.h"
+#include "chess_engine.h"
+#include "transposition_table.h"
 #include "pv_line.h"
-#include "error.h"
+#include "fen.h"
 
 namespace Sayuri {
   /**************************/
@@ -730,5 +731,53 @@ namespace Sayuri {
     }
 
     return move;
+  }
+
+  /********************/
+  /* UCICommand関連。 */
+  /********************/
+  // コマンドごとのコールバック関数を登録する。
+  void UCICommand::Add(const std::string& command_name,
+  const std::vector<std::string>& subcommand_name_vec,
+  std::function<void(CommandArgs&)> func) {
+    for (auto& command_func : func_vec_) {
+      if (command_func.command_name_ == command_name) {
+        command_func.subcommand_name_vec_ = subcommand_name_vec;
+        command_func.func_ = func;
+        return;
+      }
+    }
+
+    func_vec_.push_back(CommandFunction
+    {command_name, subcommand_name_vec, func});
+  }
+
+  // コマンドを実行する。
+  void UCICommand::operator()(const std::string& command_line) {
+    // トークンに分ける。
+    std::vector<std::string> tokens = Util::Split(command_line, " ", "");
+
+    // コマンドを探す。
+    CommandArgs args;
+    for (auto& command_func : func_vec_) {
+      if (command_func.command_name_ == tokens[0]) {
+        // コマンドラインをパース。
+        std::string temp = "";
+        for (auto& word : tokens) {
+          for (auto& subcommand_name :
+          command_func.subcommand_name_vec_) {
+            if (word == subcommand_name) {
+              temp = word;
+              break;
+            }
+          }
+          args[temp].push_back(word);
+        }
+
+        // コマンドを実行。
+        command_func.func_(args);
+        return;
+      }
+    }
   }
 }  // namespace Sayuri

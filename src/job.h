@@ -32,17 +32,14 @@
 #include <chrono>
 #include <condition_variable>
 #include <memory>
-#include "chess_def.h"
-#include "chess_engine.h"
-#include "transposition_table.h"
-#include "pv_line.h"
-#include "move_maker.h"
-#include "position_record.h"
+#include "common.h"
 
 namespace Sayuri {
   class ChessEngine;
+  class TranspositionTable;
   class MoveMaker;
   class PositionRecord;
+  class PVLine;
 
   // マルチスレッド探索用の仕事クラス。
   class Job {

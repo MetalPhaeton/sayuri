@@ -28,8 +28,7 @@
 #define POSITION_RECORD_H
 
 #include <iostream>
-#include "chess_def.h"
-#include "chess_engine.h"
+#include "common.h"
 
 namespace Sayuri {
   class ChessEngine;

@@ -35,22 +35,20 @@
 #include <mutex>
 #include <cstddef>
 #include <cstdint>
-#include "chess_def.h"
-#include "chess_util.h"
-#include "transposition_table.h"
-#include "fen.h"
-#include "pv_line.h"
-#include "uci_shell.h"
+#include "common.h"
 #include "position_record.h"
-#include "job.h"
 #include "helper_queue.h"
-#include "params.h"
 
 namespace Sayuri {
+  class Fen;
+  class TranspositionTable;
+  class PVLine;
   class UCIShell;
   class PositionRecord;
   class Job;
   class HelperQueue;
+  class SearchParams;
+  class EvalParams;
 
   // チェスエンジンのクラス。
   class ChessEngine {
@@ -282,6 +280,9 @@ namespace Sayuri {
       }
 
     private:
+      // デバッグ用関数をフレンド。
+      friend int DebugMain(int argc, char* argv[]);
+
       // プライベートコンストラクタ。
       ChessEngine() {SetNewGame();}
 

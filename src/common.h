@@ -1,5 +1,5 @@
 /*
-   init.h: Sayuriの初期化。
+   common.h: 共同ヘッダ。
 
    The MIT License (MIT)
 
@@ -24,18 +24,17 @@
    IN THE SOFTWARE.
 */
 
-#ifndef INIT_H
-#define INIT_H
+#ifndef COMMON_H
+#define COMMON_H
 
-#include <iostream>
-#include "common.h"
+// 共同で使うヘッダファイル。
+#include "chess_def.h"  // チェスの定義。
+#include "chess_util.h"  // 便利ツール。
+#include "error.h"  // エラー型。
 
 namespace Sayuri {
-  // Sayuriの初期化。
-  extern void Init();
-
-  // Sayuriの後処理。
-  extern void Postprocess();
+  // デバッグ用関数。
+  extern int DebugMain(int argc, char* argv[]);
 }  // namespace Sayuri
 
 #endif

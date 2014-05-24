@@ -29,7 +29,7 @@
 
 #include <iostream>
 #include <cstdint>
-#include "chess_def.h"
+#include "common.h"
 
 namespace Sayuri {
   // 探索関数用パラメータのクラス。

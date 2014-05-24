@@ -28,10 +28,11 @@
 #define EVALUATOR_H
 
 #include <iostream>
-#include "chess_engine.h"
-#include "params.h"
+#include "common.h"
 
 namespace Sayuri {
+  class ChessEngine;
+
   // 評価した結果を格納する構造体。
   struct EvalResult {
     // 総合評価値。
@@ -123,6 +124,9 @@ namespace Sayuri {
       EvalResult GetEvalResult();
 
     private:
+      // デバッグ用関数をフレンド。
+      friend int DebugMain(int argc, char* argv[]);
+
       /************************/
       /* 価値を計算する関数。 */
       /************************/

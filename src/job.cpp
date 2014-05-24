@@ -29,7 +29,7 @@
 #include <iostream>
 #include <mutex>
 #include <condition_variable>
-#include "chess_def.h"
+#include "common.h"
 #include "chess_engine.h"
 #include "transposition_table.h"
 #include "pv_line.h"

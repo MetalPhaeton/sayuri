@@ -31,9 +31,7 @@
 #include <memory>
 #include <mutex>
 #include <cstddef>
-#include "chess_def.h"
-#include "chess_util.h"
-#include "error.h"
+#include "common.h"
 
 namespace Sayuri {
   class TranspositionTable;
@@ -174,6 +172,9 @@ namespace Sayuri {
       int age() const {return age_;}
 
     private:
+      // デバッグ用関数をフレンド。
+      friend int DebugMain(int argc, char* argv[]);
+
       /**********************/
       /* プライベート関数。 */
       /**********************/

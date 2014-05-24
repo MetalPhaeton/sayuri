@@ -28,10 +28,12 @@
 #define SAYURI_DEBUG_H
 
 #include <iostream>
-
-#include "sayuri.h"
+#include "common.h"
 
 namespace Sayuri {
+  class PositionRecord;
+  struct EvalResult;
+
   // デバッグ用メイン関数。
   int DebugMain(int argc, char* argv[]);
 

@@ -36,12 +36,12 @@
 #include <memory>
 #include <functional>
 #include <utility>
-#include "chess_def.h"
-#include "chess_engine.h"
-#include "pv_line.h"
+#include "common.h"
 
 namespace Sayuri {
   class ChessEngine;
+  class TranspositionTable;
+  class PVLine;
 
   // UCIコマンドラインのクラス。
   class UCICommand {
@@ -78,46 +78,12 @@ namespace Sayuri {
       // func: そのコマンドを実行するための関数。
       void Add(const std::string& command_name,
       const std::vector<std::string>& subcommand_name_vec,
-      std::function<void(CommandArgs&)> func) {
-        for (auto& command_func : func_vec_) {
-          if (command_func.command_name_ == command_name) {
-            command_func.subcommand_name_vec_ = subcommand_name_vec;
-            command_func.func_ = func;
-            return;
-          }
-        }
+      std::function<void(CommandArgs&)> func);
 
-        func_vec_.push_back(CommandFunction
-        {command_name, subcommand_name_vec, func});
-      }
-
-      void operator()(const std::string& command_line) {
-        // トークンに分ける。
-        std::vector<std::string> tokens = Util::Split(command_line, " ", "");
-
-        // コマンドを探す。
-        CommandArgs args;
-        for (auto& command_func : func_vec_) {
-          if (command_func.command_name_ == tokens[0]) {
-            // コマンドラインをパース。
-            std::string temp = "";
-            for (auto& word : tokens) {
-              for (auto& subcommand_name :
-              command_func.subcommand_name_vec_) {
-                if (word == subcommand_name) {
-                  temp = word;
-                  break;
-                }
-              }
-              args[temp].push_back(word);
-            }
-
-            // コマンドを実行。
-            command_func.func_(args);
-            return;
-          }
-        }
-      }
+      // コマンドを実行する。
+      // [引数]
+      // command_line: UCIコマンド。
+      void operator()(const std::string& command_line);
 
     private:
       // 登録されたコマンド関数。
