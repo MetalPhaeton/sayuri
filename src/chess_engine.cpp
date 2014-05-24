@@ -52,31 +52,61 @@ namespace Sayuri {
   /***************************/
   // コンストラクタ。
   ChessEngine::ChessEngine(const SearchParams& search_params,
-  const EvalParams& eval_params) {
+  const EvalParams& eval_params) :
+  evaluator_(*this) {
     SetNewGame();
 
-    // 探索関数用パラメータのコピー。
+    // 探索関数用パラメータ。
     shared_st_ptr_->search_params_ptr_ = &search_params;
-    // 評価関数用パラメータのコピー。
+    // 評価関数用パラメータ。
     shared_st_ptr_->eval_params_ptr_ = &eval_params;
+
+    // ムーブメーカー。
+    maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      maker_table_[i] = MoveMaker(*this);
+    }
+  }
+
+  // プライベートコンストラクタ。
+  ChessEngine::ChessEngine() : evaluator_(*this) {
+    SetNewGame();
+
+    // ムーブメーカー。
+    maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      maker_table_[i] = MoveMaker(*this);
+    }
   }
 
   // コピーコンストラクタ。
-  ChessEngine::ChessEngine(const ChessEngine& engine) {
+  ChessEngine::ChessEngine(const ChessEngine& engine) : evaluator_(*this) {
     // 基本メンバをコピー。
     ScanBasicMember(engine);
 
     // 共有メンバのコピー。
     shared_st_ptr_.reset(new SharedStruct(*(engine.shared_st_ptr_)));
+
+    // ムーブメーカー。
+    maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      maker_table_[i] = MoveMaker(*this);
+    }
   }
 
   // ムーブコンストラクタ。
-  ChessEngine::ChessEngine(ChessEngine&& engine) {
+  ChessEngine::ChessEngine(ChessEngine&& engine) : evaluator_(*this) {
     // 基本メンバをコピー。
     ScanBasicMember(engine);
 
     // 共有メンバのムーブ。
     shared_st_ptr_ = std::move(shared_st_ptr_);
+
+    // ムーブメーカー。
+    maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      maker_table_[i] = MoveMaker(*this);
+    }
   }
 
   // コピー代入。

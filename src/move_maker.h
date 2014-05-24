@@ -50,11 +50,11 @@ namespace Sayuri {
       // [引数]
       // engine: 手を作る対象のエンジン。
       MoveMaker(const ChessEngine& engine);
+      MoveMaker() {}
       MoveMaker(const MoveMaker& maker);
       MoveMaker(MoveMaker&& maker);
       MoveMaker& operator=(const MoveMaker& maker);
       MoveMaker& operator=(MoveMaker&& maker);
-      MoveMaker() = delete;
       virtual ~MoveMaker() {}
 
       /********************/
@@ -71,16 +71,26 @@ namespace Sayuri {
       // 生成した手の数。
       template<GenMoveType Type> int GenMoves(Move prev_best,
       Move iid_move, Move killer_1, Move killer_2);
+
       // スタックに候補手を再展開する。
       int RegenMoves() {
         last_ = max_;
         return num_moves_;
       }
+
+      // スタックをリセットする。
+      void ResetStack() {
+        begin_ = last_ = max_ = move_stack_;
+        num_moves_ = 0;
+        history_max_ = 1;
+      }
+
       // 次の手を取り出す。
       // [戻り値]
       // 次の手。
       // もしなければmove.all_が0の手を返す。
       Move PickMove();
+
       // スタック内に残っている候補手の数を返す。
       // [戻り値]
       // 残っている候補手の数。
@@ -93,6 +103,18 @@ namespace Sayuri {
       /**********************/
       /* プライベート関数。 */
       /**********************/
+      // スタックに候補手を展開する。 内部用。
+      // (注)自らチェックされる手も作る。
+      // [引数]
+      // prev_best: TTに登録された前回の繰り返しの最善手。
+      // iid_move: IIDによる最善手。
+      // killer_1: キラームーブ。同一レベルのノードで記録した手。
+      // killer_2: キラームーブ。2プライ前のレベルのノードで記録した手。
+      // [戻り値]
+      // 生成した手の数。
+      template<GenMoveType Type> int GenMovesCore(Move prev_best,
+      Move iid_move, Move killer_1, Move killer_2);
+
       // 手に点数をつける。
       // [引数]
       // prev_best: TTに登録された前回の繰り返しの最善手。

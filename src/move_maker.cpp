@@ -127,13 +127,78 @@ namespace Sayuri {
     return *this;
   }
 
-  /******************/
-  /* その他の関数。 */
-  /******************/
-
+  /********************/
+  /* パブリック関数。 */
+  /********************/
   // 手をスタックに展開する。
+  template<GenMoveType Type> int MoveMaker::GenMoves(Move prev_best,
+  Move iid_move, Move killer_1, Move killer_2) {
+    // 初期化。
+    begin_ = last_ = max_ = move_stack_;
+    num_moves_ = 0;
+    history_max_ = 1;
+
+    return GenMovesCore<Type>(prev_best, iid_move, killer_1, killer_2);
+  }
+  // インスタンス化。
+  template int MoveMaker::GenMoves<GenMoveType::NON_CAPTURE>(Move prev_best,
+  Move iid_move, Move killer_1, Move killer_2);
+  template int MoveMaker::GenMoves<GenMoveType::CAPTURE>(Move prev_best,
+  Move iid_move, Move killer_1, Move killer_2);
+  template <>
+  int MoveMaker::GenMoves<GenMoveType::ALL>(Move prev_best,
+  Move iid_move, Move killer_1, Move killer_2) {
+    // 初期化。
+    begin_ = last_ = max_ = move_stack_;
+    num_moves_ = 0;
+    history_max_ = 1;
+
+    int num_moves = GenMovesCore<GenMoveType::NON_CAPTURE>(prev_best,
+    iid_move, killer_1, killer_2);
+
+    num_moves += GenMovesCore<GenMoveType::CAPTURE>(prev_best,
+    iid_move, killer_1, killer_2);
+
+    return num_moves;
+  }
+
+  // 次の手を返す。
+  Move MoveMaker::PickMove() {
+    std::unique_lock<std::mutex> lock(mutex_);
+
+    MoveSlot slot;
+
+    // 手がなければ何もしない。
+    if (last_ <= begin_) {
+      return 0;
+    }
+
+    // とりあえず最後の手をポップ。
+    last_--;
+    slot = *last_;
+
+    // 一番高い手を探し、スワップ。
+    for (MoveSlot* ptr = begin_; ptr < last_; ptr++) {
+      if (ptr->score_ > slot.score_) {
+        std::swap(slot, *ptr);
+      }
+    }
+
+    return slot.move_;
+  }
+
+  // スタックに残っている候補手の数を返す。
+  int MoveMaker::CountMoves() const {
+    int count = 0;
+    for (MoveSlot* ptr = begin_; ptr < last_; ptr++) {
+      count++;
+    }
+    return count;
+  }
+
+  // 手を生成する。 内部用。
   template<GenMoveType Type>
-  int MoveMaker::GenMoves(Move prev_best, Move iid_move,
+  int MoveMaker::GenMovesCore(Move prev_best, Move iid_move,
   Move killer_1, Move killer_2) {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
 
@@ -331,55 +396,10 @@ namespace Sayuri {
     return num_moves_;
   }
   // 実体化。
-  template int MoveMaker::GenMoves<GenMoveType::NON_CAPTURE>
+  template int MoveMaker::GenMovesCore<GenMoveType::NON_CAPTURE>
   (Move prev_best, Move iid_move, Move killer_1, Move killer_2);
-  template int MoveMaker::GenMoves<GenMoveType::CAPTURE>
+  template int MoveMaker::GenMovesCore<GenMoveType::CAPTURE>
   (Move prev_best, Move iid_move, Move killer_1, Move killer_2);
-  template<>
-  int MoveMaker::GenMoves<GenMoveType::ALL>
-  (Move prev_best, Move iid_move, Move killer_1, Move killer_2) {
-    GenMoves<GenMoveType::NON_CAPTURE>
-    (prev_best, iid_move, killer_1, killer_2);
-
-    GenMoves<GenMoveType::CAPTURE>
-    (prev_best, iid_move, killer_1, killer_2);
-
-    return num_moves_;
-  }
-
-  // 次の手を返す。
-  Move MoveMaker::PickMove() {
-    std::unique_lock<std::mutex> lock(mutex_);
-
-    MoveSlot slot;
-
-    // 手がなければ何もしない。
-    if (last_ <= begin_) {
-      return 0;
-    }
-
-    // とりあえず最後の手をポップ。
-    last_--;
-    slot = *last_;
-
-    // 一番高い手を探し、スワップ。
-    for (MoveSlot* ptr = begin_; ptr < last_; ptr++) {
-      if (ptr->score_ > slot.score_) {
-        std::swap(slot, *ptr);
-      }
-    }
-
-    return slot.move_;
-  }
-
-  // スタックに残っている候補手の数を返す。
-  int MoveMaker::CountMoves() const {
-    int count = 0;
-    for (MoveSlot* ptr = begin_; ptr < last_; ptr++) {
-      count++;
-    }
-    return count;
-  }
 
   // 手に点数をつける。
   template<GenMoveType Type>

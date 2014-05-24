@@ -66,8 +66,7 @@ namespace Sayuri {
     Side enemy_side = side ^ 0x3;
 
     // stand_pad。
-    Evaluator eval(*this);
-    int stand_pad = eval.Evaluate(material);
+    int stand_pad = evaluator_.Evaluate(material);
 
     // アルファ値、ベータ値を調べる。
     if (stand_pad >= beta) {
@@ -85,7 +84,7 @@ namespace Sayuri {
 
     // 候補手を作る。
     // 駒を取る手だけ。
-    MoveMaker maker(*this);
+    MoveMaker& maker = maker_table_[level];
     if (IsAttacked(king_[side], enemy_side)) {
       maker.GenMoves<GenMoveType::ALL>(0, 0, 0, 0);
     } else {
@@ -313,7 +312,7 @@ namespace Sayuri {
     }
 
     // 手を作る。
-    MoveMaker maker(*this);
+    MoveMaker& maker = maker_table_[level];
     maker.GenMoves<GenMoveType::ALL>(prev_best,
     shared_st_ptr_->iid_stack_[level],
     shared_st_ptr_->killer_stack_[level][0],
@@ -325,11 +324,7 @@ namespace Sayuri {
         if (!is_null_searching_ && !is_checked && (depth
         >= shared_st_ptr_->search_params_ptr_->probcut_limit_depth())) {
           // 手を作る。
-          MoveMaker maker(*this);
-          maker.GenMoves<GenMoveType::ALL>(prev_best,
-          shared_st_ptr_->iid_stack_[level],
-          shared_st_ptr_->killer_stack_[level][0],
-          shared_st_ptr_->killer_stack_[level][1]);
+          maker.RegenMoves();
 
           // 浅読みパラメータ。
           int prob_beta =
@@ -741,7 +736,7 @@ namespace Sayuri {
     PVLine pv_line;
     TimePoint now = SysClock::now();
     TimePoint next_print_info_time = now + Chrono::milliseconds(1000);
-    MoveMaker maker(*this);
+    MoveMaker& maker = maker_table_[level];
     bool is_checked = IsAttacked(king_[side], enemy_side);
     bool found_mate = false;
     for (shared_st_ptr_->i_depth_ = 1; shared_st_ptr_->i_depth_ <= MAX_PLYS;

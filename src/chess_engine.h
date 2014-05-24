@@ -36,12 +36,15 @@
 #include <cstddef>
 #include <cstdint>
 #include "common.h"
+#include "evaluator.h"
 #include "position_record.h"
 #include "helper_queue.h"
 
 namespace Sayuri {
   class Fen;
   class TranspositionTable;
+  class MoveMaker;
+  class Evaluator;
   class PVLine;
   class UCIShell;
   class PositionRecord;
@@ -284,7 +287,7 @@ namespace Sayuri {
       friend int DebugMain(int argc, char* argv[]);
 
       // プライベートコンストラクタ。
-      ChessEngine() {SetNewGame();}
+      ChessEngine();
 
       /**************/
       /* 探索関数。 */
@@ -516,6 +519,10 @@ namespace Sayuri {
       bool is_null_searching_;
       // 探索したレベル。
       std::uint32_t searched_level_;
+      // ムーブメーカーのテーブル。 maker_table_[level]。
+      std::unique_ptr<MoveMaker[]> maker_table_;
+      // Evaluator。
+      Evaluator evaluator_;
       // ミューテックス。
       std::mutex mutex_;
       // スレッドのベクトル。
