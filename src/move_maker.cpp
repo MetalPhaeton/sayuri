@@ -200,8 +200,6 @@ namespace Sayuri {
   template<GenMoveType Type>
   int MoveMaker::GenMovesCore(Move prev_best, Move iid_move,
   Move killer_1, Move killer_2) {
-    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
-
     // サイド。
     Side side = engine_ptr_->to_move();
     Side enemy_side = side ^ 0x3;

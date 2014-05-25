@@ -523,6 +523,8 @@ namespace Sayuri {
       std::unique_ptr<MoveMaker[]> maker_table_;
       // Evaluator。
       Evaluator evaluator_;
+      // マルチスレッド用仕事のテーブル。 job_table_[level]。
+      std::unique_ptr<Job[]> job_table_;
       // ミューテックス。
       std::mutex mutex_;
       // スレッドのベクトル。

@@ -40,37 +40,8 @@ namespace Sayuri {
   /**************************/
   /* コンストラクタと代入。 */
   /**************************/
-  Job::Job(std::mutex& mutex, MoveMaker& maker, ChessEngine& client,
-  PositionRecord& record, NodeType node_type, Hash pos_hash, int depth,
-  int level, int& alpha, int& beta, int& delta, TranspositionTable& table,
-  PVLine& pv_line, bool is_null_searching, int null_reduction,
-  ScoreType& score_type, int material, bool is_checked, int num_all_moves,
-  bool& has_legal_move, const std::vector<Move>& moves_to_search,
-  TimePoint& next_print_info_time) :
-  mutex_ptr_(&mutex),
-  client_ptr_(&client),
-  record_ptr_(&record),
-  node_type_(node_type),
-  pos_hash_(pos_hash),
-  depth_(depth),
-  level_(level),
-  alpha_ptr_(&alpha),
-  beta_ptr_(&beta),
-  delta_ptr_(&delta),
-  table_ptr_(&table),
-  pv_line_ptr_(&pv_line),
-  is_null_searching_(is_null_searching),
-  null_reduction_(null_reduction),
-  score_type_ptr_(&score_type),
-  material_(material),
-  is_checked_(is_checked),
-  num_all_moves_(num_all_moves),
-  has_legal_move_ptr_(&has_legal_move),
-  moves_to_search_ptr_(&moves_to_search),
-  next_print_info_time_ptr_(&next_print_info_time),
-  maker_ptr_(&maker),
-  helper_counter_(0),
-  counter_(0) {}
+  // コンストラクタ。
+  Job::Job() : maker_ptr_(nullptr), helper_counter_(0), counter_(0) {}
 
   // コピーコンストラクタ。
   Job::Job(const Job& job) {

@@ -66,6 +66,12 @@ namespace Sayuri {
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
       maker_table_[i] = MoveMaker(*this);
     }
+
+    // Job。
+    job_table_.reset(new Job[MAX_PLYS + 1]);
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      job_table_[i].client_ptr_ = this;
+    }
   }
 
   // プライベートコンストラクタ。
@@ -76,6 +82,12 @@ namespace Sayuri {
     maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
       maker_table_[i] = MoveMaker(*this);
+    }
+
+    // Job。
+    job_table_.reset(new Job[MAX_PLYS + 1]);
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      job_table_[i].client_ptr_ = this;
     }
   }
 
@@ -92,6 +104,12 @@ namespace Sayuri {
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
       maker_table_[i] = MoveMaker(*this);
     }
+
+    // Job。
+    job_table_.reset(new Job[MAX_PLYS + 1]);
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      job_table_[i].client_ptr_ = this;
+    }
   }
 
   // ムーブコンストラクタ。
@@ -106,6 +124,12 @@ namespace Sayuri {
     maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
       maker_table_[i] = MoveMaker(*this);
+    }
+
+    // Job。
+    job_table_.reset(new Job[MAX_PLYS + 1]);
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      job_table_[i].client_ptr_ = this;
     }
   }
 
