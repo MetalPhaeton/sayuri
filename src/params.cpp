@@ -51,13 +51,13 @@ namespace Sayuri {
   iid_search_depth_(4),
   enable_nmr_(true),
   nmr_limit_depth_(4),
-  nmr_search_reduction_(3),
+  nmr_search_reduction_(4),
   nmr_reduction_(3),
-  enable_probcut_(true),
+  enable_probcut_(false),
   probcut_limit_depth_(5),
   probcut_margin_(200),
   probcut_search_reduction_(4),
-  enable_history_pruning_(true),
+  enable_history_pruning_(false),
   history_pruning_limit_depth_(4),
   history_pruning_move_threshold_(0.6),
   history_pruning_after_(10),
@@ -70,7 +70,7 @@ namespace Sayuri {
   lmr_search_reduction_(1),
   enable_futility_pruning_(true),
   futility_pruning_depth_(3),
-  futility_pruning_margin_(300) {
+  futility_pruning_margin_(400) {
     // マテリアルの初期化。
     material_[EMPTY] = 0;  // 何もなし。
     material_[PAWN] = 100;  // ポーン。
@@ -161,25 +161,25 @@ namespace Sayuri {
   /****************/
   // コンストラクタ。
   EvalParams::EvalParams() :
-  weight_mobility_(1.0, 1.0),
+  weight_mobility_(1.0, 3.0),
   weight_center_control_(0.5, 0.0),
   weight_sweet_center_control_(0.5, 0.0),
   weight_development_(2.5, 0.0),
   weight_attack_around_king_(0.0, 3.0),
   weight_pass_pawn_(7.0, 14.0),
   weight_protected_pass_pawn_(2.5, 2.5),
-  weight_double_pawn_(-2.5, -5.0),
+  weight_double_pawn_(-10.0, -20.0),
   weight_iso_pawn_(-5.0, -2.5),
   weight_pawn_shield_(30.0, 0.0),
   weight_bishop_pair_(10.0, 60.0),
-  weight_bad_bishop_(-0.7, 0.0),
+  weight_bad_bishop_(-1.5, 0.0),
   weight_pin_knight_(10.0, 0.0),
   weight_rook_pair_(10.0, 20.0),
-  weight_rook_semiopen_fyle_(3.5, 3.5),
-  weight_rook_open_fyle_(3.5, 3.5),
+  weight_rook_semiopen_fyle_(7.5, 7.5),
+  weight_rook_open_fyle_(7.5, 7.5),
   weight_early_queen_launched_(-20.0, 0.0),
   weight_weak_square_(-5.0, 0.0),
-  weight_castling_(10.0, 0.0),
+  weight_castling_(20.0, 0.0),
   weight_abandoned_castling_(-110.0, 0.0) {
     // オープニング時の駒の配置の価値テーブルの初期化。
     constexpr double TABLE_1[NUM_PIECE_TYPES][NUM_SQUARES] {
@@ -196,12 +196,12 @@ namespace Sayuri {
       {  // ポーン。
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        1.0, 2.0, 3.0, 4.0, 4.0, 3.0, 2.0, 1.0,
-        2.0, 3.0, 4.0, 5.0, 5.0, 4.0, 3.0, 2.0,
-        3.0, 4.0, 5.0, 6.0, 6.0, 5.0, 4.0, 3.0,
-        4.0, 5.0, 6.0, 7.0, 7.0, 6.0, 5.0, 4.0,
-        5.0, 6.0, 7.0, 8.0, 8.0, 7.0, 6.0, 5.0,
-        6.0, 7.0, 8.0, 9.0, 9.0, 8.0, 7.0, 6.0
+        0.5, 1.0, 1.5, 2.0, 2.0, 1.5, 1.0, 0.5,
+        1.0, 1.5, 2.0, 2.5, 2.5, 2.0, 1.5, 1.0,
+        1.5, 2.0, 2.5, 3.0, 3.0, 2.5, 2.0, 1.5,
+        2.0, 2.5, 3.0, 3.5, 3.5, 3.0, 2.5, 2.0,
+        2.5, 3.0, 3.5, 4.0, 4.0, 3.5, 3.0, 2.5,
+        3.0, 3.5, 4.0, 4.5, 4.5, 4.0, 3.5, 3.0
       },
       {  // ナイト。
         -3.0, -2.0, -1.0, -1.0, -1.0, -1.0, -2.0, -3.0,
@@ -219,9 +219,9 @@ namespace Sayuri {
         1.0, 2.0, 3.0, 2.0, 2.0, 3.0, 2.0, 1.0,
         0.0, 1.0, 3.0, 3.0, 3.0, 3.0, 1.0, 0.0,
         0.0, 1.0, 2.0, 3.0, 3.0, 2.0, 1.0, 0.0,
-        0.0, 0.0, 1.0, 2.0, 2.0, 1.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+        0.0, 1.0, 2.0, 2.0, 2.0, 2.0, 1.0, 0.0,
+        0.0, 2.0, 1.0, 1.0, 1.0, 1.0, 2.0, 0.0,
+        1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0
       },
       {  // ルーク。
         0.0, 1.0, 2.0, 3.0, 3.0, 2.0, 1.0, 0.0,
@@ -234,14 +234,14 @@ namespace Sayuri {
         4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0
       },
       {  // クイーン。
-        -3.0, -2.0, -2.0, -1.0, -1.0, -2.0, -2.0, -3.0,
-        -2.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -2.0,
-        -2.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -2.0,
+        -2.0, -1.5, -1.0,  0.0,  0.0, -1.0, -1.5, -2.0,
+        -1.5, -1.0,  0.0,  1.0,  1.0,  0.0, -1.0, -1.5,
         -1.0,  0.0,  1.0,  2.0,  2.0,  1.0,  0.0, -1.0,
+         0.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  0.0,
+         0.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  0.0,
         -1.0,  0.0,  1.0,  2.0,  2.0,  1.0,  0.0, -1.0,
-        -2.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -2.0,
-        -2.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -2.0,
-        -3.0, -2.0, -2.0, -1.0, -1.0, -2.0, -2.0, -3.0
+        -1.5, -1.0,  0.0,  0.0,  0.0,  0.0, -1.0, -1.5,
+        -2.0, -1.5, -1.0,  0.0,  0.0, -1.0, -1.5, -2.0
       },
       {  // キング。
          1.0,  1.0,  0.0, -1.0, -1.0,  0.0,  1.0,  1.0,
@@ -374,12 +374,12 @@ namespace Sayuri {
 
     // オープニング時の駒の配置のウェイトを初期化。
     weight_opening_position_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_opening_position_[PAWN] = Weight(2.0, 0.0);  // ポーン。
-    weight_opening_position_[KNIGHT] = Weight(2.5, 0.0);  // ナイト。
-    weight_opening_position_[BISHOP] = Weight(3.5, 0.0);  // ビショップ。
-    weight_opening_position_[ROOK] = Weight(2.5, 0.0);  // ルーク。
-    weight_opening_position_[QUEEN] = Weight(2.5, 0.0);  // クイーン。
-    weight_opening_position_[KING] = Weight(10.0, 0.0);  // キング。
+    weight_opening_position_[PAWN] = Weight(25.0, 0.0);  // ポーン。
+    weight_opening_position_[KNIGHT] = Weight(20.0, 0.0);  // ナイト。
+    weight_opening_position_[BISHOP] = Weight(20.0, 0.0);  // ビショップ。
+    weight_opening_position_[ROOK] = Weight(15.0, 0.0);  // ルーク。
+    weight_opening_position_[QUEEN] = Weight(7.5, 0.0);  // クイーン。
+    weight_opening_position_[KING] = Weight(30.0, 0.0);  // キング。
 
     // エンディング時の駒の配置のウェイトを初期化。
     weight_ending_position_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
@@ -388,7 +388,7 @@ namespace Sayuri {
     weight_ending_position_[BISHOP] = Weight(0.0, 0.0);  // ビショップ。
     weight_ending_position_[ROOK] = Weight(0.0, 0.0);  // ルーク。
     weight_ending_position_[QUEEN] = Weight(0.0, 0.0);  // クイーン。
-    weight_ending_position_[KING] = Weight(0.0, 15.0);  // キング。
+    weight_ending_position_[KING] = Weight(0.0, 20.0);  // キング。
 
     // 駒への攻撃のウェイトを初期化。
     weight_attack_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
