@@ -158,8 +158,8 @@ Index
 
 
 
-Feature
--------
+Features
+--------
 
 * MIT License.
 * A chess engine for UCI.
