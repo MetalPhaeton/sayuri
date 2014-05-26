@@ -150,7 +150,7 @@ Sayuri - UCI Chess Engine
 Index
 -----
 
-* [Feature](#feature)
+* [Features](#features)
 * [Files and Directories](#files-and-directories)
 * [How To Build with CMake](#how-to-build-with-cmake)
 * [To Make Distributable Packages](#to-make-distributable-packages)
