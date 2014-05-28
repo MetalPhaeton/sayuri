@@ -35,34 +35,39 @@ namespace Sayuri {
   /* コンストラクタと代入。 */
   /**************************/
   // コンストラクタ。
-  PVLine::PVLine() : length_(0), score_(0), ply_mate_(-1) {}
+  PVLine::PVLine() : begin_(line_), end_(&(line_[MAX_PLYS + 1])),
+  last_(begin_), score_(0), ply_mate_(-1) {}
 
   // コピーコンストラクタ。
   PVLine::PVLine(const PVLine& pv_line) :
-  length_(pv_line.length_),
+  begin_(line_),
+  end_(&(line_[MAX_PLYS + 1])),
+  last_(begin_ + (pv_line.last_ - pv_line.begin_)),
   score_(pv_line.score_),
   ply_mate_(pv_line.ply_mate_) {
-    for (std::size_t i = 0; i < length_; i++) {
+    for (int i = 0; i < (end_ - begin_); i++) {
       line_[i] = pv_line.line_[i];
     }
   }
 
   // ムーブコンストラクタ。
   PVLine::PVLine(PVLine&& pv_line) :
-  length_(pv_line.length_),
+  begin_(line_),
+  end_(&(line_[MAX_PLYS + 1])),
+  last_(begin_ + (pv_line.last_ - pv_line.begin_)),
   score_(pv_line.score_),
   ply_mate_(pv_line.ply_mate_) {
-    for (std::size_t i = 0; i < length_; i++) {
+    for (int i = 0; i < (end_ - begin_); i++) {
       line_[i] = pv_line.line_[i];
     }
   }
 
   // コピー代入。
   PVLine& PVLine::operator=(const PVLine& pv_line) {
-    length_ = pv_line.length_;
     score_ = pv_line.score_;
     ply_mate_ = pv_line.ply_mate_;
-    for (std::size_t i = 0; i < length_; i++) {
+    last_ = begin_ + (pv_line.last_ - pv_line.begin_);
+    for (int i = 0; i < (end_ - begin_); i++) {
       line_[i] = pv_line.line_[i];
     }
 
@@ -71,10 +76,10 @@ namespace Sayuri {
 
   // ムーブ代入。
   PVLine& PVLine::operator=(PVLine&& pv_line) {
-    length_ = pv_line.length_;
     score_ = pv_line.score_;
     ply_mate_ = pv_line.ply_mate_;
-    for (std::size_t i = 0; i < length_; i++) {
+    last_ = begin_ + (pv_line.last_ - pv_line.begin_);
+    for (int i = 0; i < (end_ - begin_); i++) {
       line_[i] = pv_line.line_[i];
     }
 
@@ -84,25 +89,15 @@ namespace Sayuri {
   /********************/
   /* パブリック関数。 */
   /********************/
-  // 最初の要素に手をセットする。
-  void PVLine::SetMove(Move move) {
-    line_[0] = move;
-    length_ = 1;
-  }
-
   // PVラインを2番目以降の要素にコピーする。
   void PVLine::Insert(const PVLine& pv_line) {
-    // 長さをコピー。
-    length_ = pv_line.length_ + 1;
-    if (length_ > static_cast<std::size_t>(MAX_PLYS))
-      length_ = static_cast<std::size_t>(MAX_PLYS);
+    // PVラインをコピー。
+    last_ = (begin_ + 1) + (pv_line.last_ - pv_line.begin_);
+    for (int i = 1; i < (last_ - begin_); i++) {
+      line_[i] = pv_line.line_[i - 1];
+    }
 
     // メイトまでのプライをコピー。
     ply_mate_ = pv_line.ply_mate_;
-
-    // PVラインをコピー。
-    for (std::size_t i = 1; i < length_; i++) {
-      line_[i] = pv_line.line_[i - 1];
-    }
   }
 }  // namespace Sayuri

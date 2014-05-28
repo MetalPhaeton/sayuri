@@ -48,22 +48,29 @@ namespace Sayuri {
       /********************/
       /* パブリック関数。 */
       /********************/
-      // 最初の要素に手を登録する。
-      // [引数]
-      // move: セットする手。
-      void SetMove(Move move);
+      // 手を最初に挿入する。
+      void SetMove(Move move) {
+        line_[0] = move;
+        last_ = begin_ + 1;
+      }
       // PVLineを2番目以降の要素にコピーする。
       // [引数]
       // pv_line: コピーするライン。
       void Insert(const PVLine& pv_line);
+      // ラインをリセットする。
+      void ResetLine() {
+        last_ = begin_;
+        score_ = 0;
+        ply_mate_ = -1;
+      }
 
       /**************/
       /* アクセサ。 */
       /**************/
+      // ライン。
+      const Move& operator[](int index) const {return line_[index];}
       // 長さ。
-      std::size_t length() const {return length_;}
-      // PVライン。
-      const Move (& line() const)[MAX_PLYS] {return line_;}
+      std::size_t length() const {return last_ - begin_;}
       // 評価値。
       int score() const {return score_;}
       // メイトまでのプライ。-1はメイトなし。
@@ -77,19 +84,16 @@ namespace Sayuri {
       // メイトまでのプライ。
       void ply_mate(int ply_mate) {ply_mate_ = ply_mate;}
 
-      /**********************/
-      /* ソート用比較関数。 */
-      /**********************/
-      static bool Compare(const PVLine& first, const PVLine& second);
-
     private:
       /****************/
       /* メンバ変数。 */
       /****************/
-      // 長さ。
-      std::size_t length_;
       // PVライン。
-      Move line_[MAX_PLYS];
+      Move line_[MAX_PLYS + 1 + 1];
+      // PVラインのポインタ。
+      Move* begin_;
+      Move* end_;
+      Move* last_;
       // 評価値。
       int score_;
       // メイトまでのプライ。-1はメイトなし。

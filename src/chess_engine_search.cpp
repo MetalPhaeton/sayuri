@@ -140,8 +140,7 @@ namespace Sayuri {
   // 探索する。
   template<NodeType Type>
   int ChessEngine::Search(Hash pos_hash, int depth, std::uint32_t level,
-  int alpha, int beta, int material, TranspositionTable& table,
-  PVLine& pv_line) {
+  int alpha, int beta, int material, TranspositionTable& table) {
     // 探索中止の時。
     if (ShouldBeStopped()) return alpha;
 
@@ -157,6 +156,9 @@ namespace Sayuri {
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
     bool is_checked = IsAttacked(king_[side], enemy_side);
+
+    // PVLineをリセット。
+    pv_line_table_[level].ResetLine();
 
     // トランスポジションテーブルを調べる。
     Move prev_best = 0;
@@ -176,10 +178,10 @@ namespace Sayuri {
           int score = tt_entry.score();
           if (tt_entry.score_type() == ScoreType::EXACT) {
             // エントリーが正確な値。
+            Move best_move = tt_entry.best_move();
             if (!(tt_entry.best_move() & CAPTURED_PIECE_MASK)
             && (level < MAX_PLYS)) {
               // キラームーブをセット。
-              Move best_move = tt_entry.best_move();
               if (shared_st_ptr_->search_params_ptr_->enable_killer()) {
                 shared_st_ptr_->killer_stack_[level][0] = best_move;
                 if (shared_st_ptr_->search_params_ptr_->enable_killer_2()) {
@@ -188,28 +190,28 @@ namespace Sayuri {
               }
             }
 
-            pv_line.ply_mate(tt_entry.ply_mate());
+            pv_line_table_[level].ply_mate(tt_entry.ply_mate());
             if (score >= beta) {
-              pv_line.score(beta);
+              pv_line_table_[level].score(beta);
               table.Unlock();
               return beta;
             }
 
             if (score <= alpha) {
-              pv_line.score(alpha);
+              pv_line_table_[level].score(alpha);
               table.Unlock();
               return alpha;
             }
 
-            pv_line.score(score);
+            pv_line_table_[level].score(score);
             table.Unlock();
             return score;
           } else if (tt_entry.score_type() == ScoreType::ALPHA) {
             // エントリーがアルファ値。
             if (score <= alpha) {
               // アルファ値以下が確定。
-              pv_line.score(alpha);
-              pv_line.ply_mate(tt_entry.ply_mate());
+              pv_line_table_[level].score(alpha);
+              pv_line_table_[level].ply_mate(tt_entry.ply_mate());
               table.Unlock();
               return alpha;
             }
@@ -218,10 +220,10 @@ namespace Sayuri {
             if (score < beta) beta = score + 1;
           } else {
             // エントリーがベータ値。
+            Move best_move = tt_entry.best_move();
             if (!(tt_entry.best_move() & CAPTURED_PIECE_MASK)
             && (level < MAX_PLYS)) {
               // キラームーブをセット。
-              Move best_move = tt_entry.best_move();
               if (shared_st_ptr_->search_params_ptr_->enable_killer()) {
                 shared_st_ptr_->killer_stack_[level][0] = best_move;
                 if (shared_st_ptr_->search_params_ptr_->enable_killer_2()) {
@@ -232,8 +234,8 @@ namespace Sayuri {
 
             if (score >= beta) {
               // ベータ値以上が確定。
-              pv_line.score(beta);
-              pv_line.ply_mate(tt_entry.ply_mate());
+              pv_line_table_[level].score(beta);
+              pv_line_table_[level].ply_mate(tt_entry.ply_mate());
               table.Unlock();
               return beta;
             }
@@ -264,12 +266,11 @@ namespace Sayuri {
           if (!is_checked && (depth
           >= shared_st_ptr_->search_params_ptr_->iid_limit_depth())) {
             // Internal Iterative Deepening。
-            PVLine next_line;
             Search<NodeType::PV>(pos_hash,
             shared_st_ptr_->search_params_ptr_->iid_search_depth(), level,
-            alpha, beta, material, table, next_line);
+            alpha, beta, material, table);
 
-            shared_st_ptr_->iid_stack_[level] = next_line.line()[0];
+            shared_st_ptr_->iid_stack_[level] = pv_line_table_[level][0];
           }
         }
       }
@@ -288,10 +289,9 @@ namespace Sayuri {
           MakeMove(null_move);
 
           // Null Move Search。
-          PVLine dummy_line;
           int score = -Search<NodeType::NON_PV>(pos_hash, depth
           - shared_st_ptr_->search_params_ptr_->nmr_search_reduction() - 1,
-          level + 1, -(beta), -(beta - 1), -material, table, dummy_line);
+          level + 1, -(beta), -(beta - 1), -material, table);
 
           UnmakeMove(null_move);
           is_null_searching_ = false;
@@ -346,18 +346,16 @@ namespace Sayuri {
               continue;
             }
 
-            PVLine next_line;
             int score = -Search<NodeType::NON_PV>(next_hash, prob_depth - 1,
-            level + 1, -prob_beta, -(prob_beta - 1), -next_my_material, table,
-            next_line);
+            level + 1, -prob_beta, -(prob_beta - 1), -next_my_material, table);
 
             UnmakeMove(move);
 
             // ベータカット。
             if (score >= prob_beta) {
               // PVライン。
-              pv_line.SetMove(move);
-              pv_line.Insert(next_line);
+              pv_line_table_[level].SetMove(move);
+              pv_line_table_[level].Insert(pv_line_table_[level + 1]);
 
               // 取らない手。
               if (!(move & CAPTURED_PIECE_MASK)) {
@@ -389,7 +387,7 @@ namespace Sayuri {
               if (shared_st_ptr_->search_params_ptr_->enable_ttable()) {
                 if (!null_reduction && !ShouldBeStopped()) {
                   table.Add(pos_hash, depth, beta, ScoreType::BETA,
-                  pv_line.line()[0], pv_line.ply_mate());
+                  pv_line_table_[level][0], pv_line_table_[level].ply_mate());
                 }
               }
 
@@ -427,7 +425,7 @@ namespace Sayuri {
     job.alpha_ptr_ = &alpha;
     job.beta_ptr_ = &beta;
     job.table_ptr_ = &table;
-    job.pv_line_ptr_ = &pv_line;
+    job.pv_line_ptr_ = &pv_line_table_[level];
     job.is_null_searching_ = is_null_searching_;
     job.null_reduction_ = null_reduction;
     job.score_type_ptr_ = &score_type;
@@ -530,7 +528,6 @@ namespace Sayuri {
 
       // 探索。
       int score = 0;
-      PVLine next_line;
       int temp_alpha = alpha;
       int temp_beta = beta;
       int new_depth = depth;
@@ -563,7 +560,7 @@ namespace Sayuri {
         && (num_moves > lmr_threshold)) {
           score = -Search<NodeType::NON_PV>(next_hash,
           new_depth - lmr_search_reduction - 1, level + 1, -(temp_alpha + 1),
-          -temp_alpha, -next_my_material, table, next_line);
+          -temp_alpha, -next_my_material, table);
         } else {
           // PVSearchをするためにtemp_alphaより大きくしておく。
           score = temp_alpha + 1;
@@ -578,19 +575,18 @@ namespace Sayuri {
         if ((num_moves <= 1) || (Type == NodeType::NON_PV)) {
           // フルウィンドウで探索。
           score = -Search<Type>(next_hash, new_depth - 1, level + 1,
-          -temp_beta, -temp_alpha, -next_my_material, table, next_line);
+          -temp_beta, -temp_alpha, -next_my_material, table);
         } else {
           // PV発見後のPVノード。
           // ゼロウィンドウ探索。
           score = -Search<NodeType::NON_PV>(next_hash, new_depth - 1,
-          level + 1, -(temp_alpha + 1), -temp_alpha, -next_my_material, table,
-          next_line);
+          level + 1, -(temp_alpha + 1), -temp_alpha, -next_my_material, table);
 
           if (score > temp_alpha) {
             // fail lowならず。
             // フルウィンドウで再探索。
             score = -Search<NodeType::PV>(next_hash, new_depth - 1, level + 1,
-            -temp_beta, -temp_alpha, -next_my_material, table, next_line);
+            -temp_beta, -temp_alpha, -next_my_material, table);
           }
         }
       }
@@ -617,8 +613,8 @@ namespace Sayuri {
         }
 
         // PVライン。
-        pv_line.SetMove(move);
-        pv_line.Insert(next_line);
+        pv_line_table_[level].SetMove(move);
+        pv_line_table_[level].Insert(pv_line_table_[level + 1]);
 
         alpha = score;
       }
@@ -669,15 +665,15 @@ namespace Sayuri {
         int score = SCORE_LOSE;
         if (score < alpha) score = alpha;
         if (score > beta) score = beta;
-        pv_line.score(score);
-        pv_line.ply_mate(level);
+        pv_line_table_[level].score(score);
+        pv_line_table_[level].ply_mate(level);
         return score;
       } else {
         // ステールメイト。
         int score = SCORE_DRAW;
         if (score < alpha) score = alpha;
         if (score > beta) score = beta;
-        pv_line.score(score);
+        pv_line_table_[level].score(score);
         return score;
       }
     }
@@ -688,21 +684,21 @@ namespace Sayuri {
     if (shared_st_ptr_->search_params_ptr_->enable_ttable()) {
       if (!is_null_searching_ && !null_reduction && !ShouldBeStopped()) {
         table.Add(pos_hash, depth, alpha, score_type,
-        pv_line.line()[0], pv_line.ply_mate());
+        pv_line_table_[level][0], pv_line_table_[level].ply_mate());
       }
     }
 
     // 探索結果を返す。
-    pv_line.score(alpha);
+    pv_line_table_[level].score(alpha);
     return alpha;
   }
   // 実体化。
   template int ChessEngine::Search<NodeType::PV>(Hash pos_hash,
   int depth, std::uint32_t level, int alpha, int beta, int material,
-  TranspositionTable& table, PVLine& pv_line);
+  TranspositionTable& table);
   template int ChessEngine::Search<NodeType::NON_PV>(Hash pos_hash,
   int depth, std::uint32_t level, int alpha, int beta, int material,
-  TranspositionTable& table, PVLine& pv_line);
+  TranspositionTable& table);
 
   // 探索のルート。
   PVLine ChessEngine::SearchRoot(TranspositionTable& table,
@@ -724,6 +720,9 @@ namespace Sayuri {
       shared_st_ptr_->killer_stack_[i][1] = 0;
       shared_st_ptr_->killer_stack_[i + 2][0] = 0;
       shared_st_ptr_->killer_stack_[i + 2][1] = 0;
+      maker_table_[i].ResetStack();
+      pv_line_table_[i].ResetLine();
+      job_table_[i] = Job();
     }
     shared_st_ptr_->history_max_ = 1;
     shared_st_ptr_->stop_now_ = false;
@@ -745,7 +744,6 @@ namespace Sayuri {
     int beta = MAX_VALUE;
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
-    PVLine pv_line;
     TimePoint now = SysClock::now();
     TimePoint next_print_info_time = now + Chrono::milliseconds(1000);
     MoveMaker& maker = maker_table_[level];
@@ -765,8 +763,9 @@ namespace Sayuri {
         Chrono::duration_cast<Chrono::milliseconds>
         (SysClock::now() - shared_st_ptr_->start_time_);
 
-        shell.PrintPVInfo(shared_st_ptr_->i_depth_, 0, pv_line.score(),
-        time, shared_st_ptr_->num_searched_nodes_, pv_line);
+        shell.PrintPVInfo(shared_st_ptr_->i_depth_, 0,
+        pv_line_table_[level].score(), time,
+        shared_st_ptr_->num_searched_nodes_, pv_line_table_[level]);
 
         continue;
       }
@@ -827,7 +826,7 @@ namespace Sayuri {
       job.beta_ptr_ = &beta;
       job.delta_ptr_ = &delta;
       job.table_ptr_ = &table;
-      job.pv_line_ptr_ = &pv_line;
+      job.pv_line_ptr_ = &pv_line_table_[level];
       job.is_null_searching_ = is_null_searching_;
       job.null_reduction_ = 0;
       job.score_type_ptr_ = &score_type;
@@ -844,7 +843,7 @@ namespace Sayuri {
 
       // メイトを見つけたらフラグを立てる。
       // 直接ループを抜けない理由は、depth等の終了条件対策。
-      if (pv_line.ply_mate() >= 0) {
+      if (pv_line_table_[level].ply_mate() >= 0) {
         found_mate = true;
       }
     }
@@ -868,7 +867,7 @@ namespace Sayuri {
     // 探索終了したけど、まだ思考を止めてはいけない場合、関数を終了しない。
     while (!ShouldBeStopped()) continue;
 
-    return pv_line;
+    return pv_line_table_[level];
   }
 
   // 探索用子スレッド。
@@ -1013,7 +1012,6 @@ namespace Sayuri {
 
       // 探索。
       int score = 0;
-      PVLine next_line;
       int temp_alpha = *(job.alpha_ptr_);
       int temp_beta = *(job.beta_ptr_);
       int new_depth = job.depth_;
@@ -1046,8 +1044,8 @@ namespace Sayuri {
         && (num_moves > lmr_threshold)) {
           score = -Search<NodeType::NON_PV>(next_hash,
           new_depth - lmr_search_reduction - 1, job.level_ + 1,
-          -(temp_alpha + 1), -temp_alpha, -next_my_material, *(job.table_ptr_),
-          next_line);
+          -(temp_alpha + 1), -temp_alpha, -next_my_material,
+          *(job.table_ptr_));
         } else {
           // PVSearchをするためにtemp_alphaより大きくしておく。
           score = temp_alpha + 1;
@@ -1063,19 +1061,19 @@ namespace Sayuri {
           // フルウィンドウ探索。
           score = -Search<Type>(next_hash, new_depth - 1,
           job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
-          *(job.table_ptr_), next_line);
+          *(job.table_ptr_));
         } else {
           // PV発見後。
           // ゼロウィンドウ探索。
           score = -Search<NodeType::NON_PV>(next_hash, new_depth - 1,
           job.level_ + 1, -(temp_alpha + 1), -temp_alpha,
-          -next_my_material, *(job.table_ptr_), next_line);
+          -next_my_material, *(job.table_ptr_));
 
           if (score > temp_alpha) {
             // fail lowならず。
             score = -Search<NodeType::PV>(next_hash, new_depth - 1,
             job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
-            *(job.table_ptr_), next_line);
+            *(job.table_ptr_));
           }
         }
       }
@@ -1108,7 +1106,7 @@ namespace Sayuri {
 
         // PVラインをセット。
         job.pv_line_ptr_->SetMove(move);
-        job.pv_line_ptr_->Insert(next_line);
+        job.pv_line_ptr_->Insert(pv_line_table_[job.level_ + 1]);
 
         *(job.alpha_ptr_) = score;
       }
@@ -1247,7 +1245,6 @@ namespace Sayuri {
 
       // PVSearch。
       int score = 0;
-      PVLine next_line;
       int temp_alpha = *(job.alpha_ptr_);
       int temp_beta = *(job.beta_ptr_);
       if (num_moves <= 1) {
@@ -1258,15 +1255,15 @@ namespace Sayuri {
           // フルでPVを探索。
           score = -Search<NodeType::PV> (next_hash, job.depth_ - 1,
           job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
-          *(job.table_ptr_), next_line);
+          *(job.table_ptr_));
 
           // アルファ値、ベータ値を調べる。
           job.mutex_ptr_->lock();  // ロック。
           if (score >= temp_beta) {
             // 探索失敗。
             // ベータ値を広げる。
-            if ((next_line.ply_mate() >= 0)
-            && ((next_line.ply_mate() % 2) == 1)) {
+            if ((pv_line_table_[job.level_ + 1].ply_mate() >= 0)
+            && ((pv_line_table_[job.level_ + 1].ply_mate() % 2) == 1)) {
               // メイトっぽかった場合。
               *(job.beta_ptr_) = MAX_VALUE;
             } else {
@@ -1279,8 +1276,8 @@ namespace Sayuri {
           } else if (score <= temp_alpha) {
             // 探索失敗。
             // アルファ値を広げる。
-            if ((next_line.ply_mate() >= 0)
-            && ((next_line.ply_mate() % 2) == 0)) {
+            if ((pv_line_table_[job.level_ + 1].ply_mate() >= 0)
+            && ((pv_line_table_[job.level_ + 1].ply_mate() % 2) == 0)) {
               // メイトされていたかもしれない場合。
               *(job.alpha_ptr_) = -MAX_VALUE;
             } else {
@@ -1308,7 +1305,7 @@ namespace Sayuri {
             score = -Search<NodeType::NON_PV>(next_hash,
             job.depth_ - lmr_search_reduction - 1, job.level_ + 1,
             -(temp_alpha + 1), -temp_alpha, -next_my_material,
-            *(job.table_ptr_), next_line);
+            *(job.table_ptr_));
           } else {
             // 普通に探索するためにscoreをalphaより大きくしておく。
             score = temp_alpha + 1;
@@ -1323,7 +1320,7 @@ namespace Sayuri {
           // ゼロウィンドウ探索。
           score = -Search<NodeType::NON_PV>(next_hash, job.depth_ - 1,
           job.level_ + 1, -(temp_alpha + 1), -temp_alpha,
-          -next_my_material, *(job.table_ptr_), next_line);
+          -next_my_material, *(job.table_ptr_));
 
           if (score > temp_alpha) {
             while (true) {
@@ -1333,15 +1330,15 @@ namespace Sayuri {
               // フルウィンドウで再探索。
               score = -Search<NodeType::PV>(next_hash, job.depth_ - 1,
               job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
-              *(job.table_ptr_), next_line);
+              *(job.table_ptr_));
 
               // ベータ値を調べる。
               job.mutex_ptr_->lock();  // ロック。
               if (score >= temp_beta) {
                 // 探索失敗。
                 // ベータ値を広げる。
-                if ((next_line.ply_mate() >= 0)
-                && ((next_line.ply_mate() % 2) == 1)) {
+                if ((pv_line_table_[job.level_ + 1].ply_mate() >= 0)
+                && ((pv_line_table_[job.level_ + 1].ply_mate() % 2) == 1)) {
                   // メイトっぽかった場合。
                   *(job.beta_ptr_) = MAX_VALUE;
                   job.mutex_ptr_->unlock();
@@ -1380,13 +1377,13 @@ namespace Sayuri {
       if (score > *(job.alpha_ptr_)) {
         // PVラインにセット。
         job.pv_line_ptr_->SetMove(move);
-        job.pv_line_ptr_->Insert(next_line);
+        job.pv_line_ptr_->Insert(pv_line_table_[job.level_ + 1]);
         job.pv_line_ptr_->score(score);
 
         // トランスポジションテーブルに登録。
         if (shared_st_ptr_->search_params_ptr_->enable_ttable()) {
           job.table_ptr_->Add(job.pos_hash_, job.depth_, score,
-          ScoreType::EXACT, job.pv_line_ptr_->line()[0],
+          ScoreType::EXACT, (*(job.pv_line_ptr_))[0],
           job.pv_line_ptr_->ply_mate());
         }
 

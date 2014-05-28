@@ -67,6 +67,9 @@ namespace Sayuri {
       maker_table_[i] = MoveMaker(*this);
     }
 
+    // PVLine。
+    pv_line_table_.reset(new PVLine[MAX_PLYS + 1]);
+
     // Job。
     job_table_.reset(new Job[MAX_PLYS + 1]);
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
@@ -83,6 +86,9 @@ namespace Sayuri {
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
       maker_table_[i] = MoveMaker(*this);
     }
+
+    // PVLine。
+    pv_line_table_.reset(new PVLine[MAX_PLYS + 1]);
 
     // Job。
     job_table_.reset(new Job[MAX_PLYS + 1]);
@@ -105,6 +111,9 @@ namespace Sayuri {
       maker_table_[i] = MoveMaker(*this);
     }
 
+    // PVLine。
+    pv_line_table_.reset(new PVLine[MAX_PLYS + 1]);
+
     // Job。
     job_table_.reset(new Job[MAX_PLYS + 1]);
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
@@ -125,6 +134,9 @@ namespace Sayuri {
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
       maker_table_[i] = MoveMaker(*this);
     }
+
+    // PVLine。
+    pv_line_table_.reset(new PVLine[MAX_PLYS + 1]);
 
     // Job。
     job_table_.reset(new Job[MAX_PLYS + 1]);

@@ -138,9 +138,9 @@ namespace Sayuri {
 
       // スタックのポインタ。
       MoveSlot* begin_;
+      MoveSlot* end_;
       MoveSlot* last_;
       MoveSlot* max_;
-      MoveSlot* end_;
 
       // ヒストリーの最大値。
       std::uint64_t history_max_;

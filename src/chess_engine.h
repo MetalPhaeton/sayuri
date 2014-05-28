@@ -314,12 +314,11 @@ namespace Sayuri {
       // beta: ベータ値。
       // material: 現在のマテリアル。
       // table: トランスポジションテーブル。
-      // pv_line: PVラインが格納される。
       // [戻り値]
       // 評価値。
       template<NodeType Type>
       int Search(Hash pos_hash, int depth, std::uint32_t level, int alpha,
-      int beta, int material, TranspositionTable& table, PVLine& pv_line);
+      int beta, int material, TranspositionTable& table);
       // 探索のルート。
       // [引数]
       // table: 使用するトランスポジションテーブル。
@@ -521,6 +520,8 @@ namespace Sayuri {
       std::uint32_t searched_level_;
       // ムーブメーカーのテーブル。 maker_table_[level]。
       std::unique_ptr<MoveMaker[]> maker_table_;
+      // PVLineのテーブル。  pv_line_table_[level]。
+      std::unique_ptr<PVLine[]> pv_line_table_;
       // Evaluator。
       Evaluator evaluator_;
       // マルチスレッド用仕事のテーブル。 job_table_[level]。

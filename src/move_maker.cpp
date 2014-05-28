@@ -40,48 +40,38 @@ namespace Sayuri {
   //コンストラクタ。
   MoveMaker::MoveMaker(const ChessEngine& engine) :
   engine_ptr_(&engine),
+  begin_(move_stack_),
+  end_(&(move_stack_[MAX_CANDIDATES])),
+  last_(begin_),
+  max_(begin_),
   history_max_(1),
-  num_moves_(0) {
-    // スタックのポインターをセット。
-    begin_ = last_ = max_ = move_stack_;
-    end_ = &(move_stack_[MAX_CANDIDATES]);
-  }
+  num_moves_(0) {}
 
   // コピーコンストラクタ。
   MoveMaker::MoveMaker(const MoveMaker& maker) :
   engine_ptr_(maker.engine_ptr_),
+  begin_(move_stack_),
+  end_(&(move_stack_[MAX_CANDIDATES])),
+  last_(begin_ + (maker.last_ - maker.begin_)),
+  max_(begin_ + (maker.max_ - maker.begin_)),
   history_max_(maker.history_max_),
   num_moves_(maker.num_moves_) {
-    for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
+    for (int i = 0; i < (end_ - begin_); i++) {
       move_stack_[i] = maker.move_stack_[i];
-      if (maker.begin_ == &(maker.move_stack_[i])) {
-        begin_ = &(move_stack_[i]);
-      }
-      if (maker.last_ == &(maker.move_stack_[i])) {
-        last_ = &(move_stack_[i]);
-      }
-      if (maker.max_ == &(maker.move_stack_[i])) {
-        max_ = &(move_stack_[i]);
-      }
     }
   }
 
   // ムーブコンストラクタ。
   MoveMaker::MoveMaker(MoveMaker&& maker) :
   engine_ptr_(maker.engine_ptr_),
+  begin_(move_stack_),
+  end_(&(move_stack_[MAX_CANDIDATES])),
+  last_(begin_ + (maker.last_ - maker.begin_)),
+  max_(begin_ + (maker.max_ - maker.begin_)),
   history_max_(maker.history_max_),
   num_moves_(maker.num_moves_) {
-    for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
+    for (int i = 0; i < (end_ - begin_); i++) {
       move_stack_[i] = maker.move_stack_[i];
-      if (maker.begin_ == &(maker.move_stack_[i])) {
-        begin_ = &(move_stack_[i]);
-      }
-      if (maker.last_ == &(maker.move_stack_[i])) {
-        last_ = &(move_stack_[i]);
-      } 
-      if (maker.max_ == &(maker.move_stack_[i])) {
-        max_ = &(move_stack_[i]);
-      }
     }
   }
 
@@ -91,17 +81,10 @@ namespace Sayuri {
     engine_ptr_ = maker.engine_ptr_;
     history_max_ = maker.history_max_;
     num_moves_ = maker.num_moves_;
-    for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
+    last_ = begin_ + (maker.last_ - maker.begin_);
+    max_ = begin_ + (maker.max_ - maker.begin_);
+    for (int i = 0; i < (end_ - begin_); i++) {
       move_stack_[i] = maker.move_stack_[i];
-      if (maker.begin_ == &(maker.move_stack_[i])) {
-        begin_ = &(move_stack_[i]);
-      }
-      if (maker.last_ == &(maker.move_stack_[i])) {
-        last_ = &(move_stack_[i]);
-      }
-      if (maker.max_ == &(maker.move_stack_[i])) {
-        max_ = &(move_stack_[i]);
-      }
     }
     return *this;
   }
@@ -112,17 +95,10 @@ namespace Sayuri {
     engine_ptr_ = maker.engine_ptr_;
     history_max_ = maker.history_max_;
     num_moves_ = maker.num_moves_;
-    for (std::size_t i = 0; i <= MAX_CANDIDATES; i++) {
+    last_ = begin_ + (maker.last_ - maker.begin_);
+    max_ = begin_ + (maker.max_ - maker.begin_);
+    for (int i = 0; i < (end_ - begin_); i++) {
       move_stack_[i] = maker.move_stack_[i];
-      if (maker.begin_ == &(maker.move_stack_[i])) {
-        begin_ = &(move_stack_[i]);
-      }
-      if (maker.last_ == &(maker.move_stack_[i])) {
-        last_ = &(move_stack_[i]);
-      }
-      if (maker.max_ == &(maker.move_stack_[i])) {
-        max_ = &(move_stack_[i]);
-      }
     }
     return *this;
   }

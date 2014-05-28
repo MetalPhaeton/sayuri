@@ -223,9 +223,9 @@ namespace Sayuri {
     // PVラインを送る。
     sout << " pv";
     for (std::size_t i = 0; i < pv_line.length(); i++) {
-      if (!(pv_line.line()[i])) break;
+      if (!(pv_line[i])) break;
 
-      sout << " " << TransMoveToString(pv_line.line()[i]);
+      sout << " " << TransMoveToString(pv_line[i]);
     }
 
     // 出力関数に送る。
@@ -296,12 +296,12 @@ namespace Sayuri {
 
     sout << "bestmove ";
     if (pv_line.length() >= 1) {
-      std::string move_str = TransMoveToString(pv_line.line()[0]);
+      std::string move_str = TransMoveToString(pv_line[0]);
       sout << move_str;
 
       // 2手目があるならponderで表示。
       if (pv_line.length() >= 2) {
-        move_str = TransMoveToString(pv_line.line()[1]);
+        move_str = TransMoveToString(pv_line[1]);
         sout << " ponder " << move_str;
       }
     }
