@@ -255,173 +255,242 @@ int main(int argc, char* argv[]) {
 
 「`SearchParams`」は探索アルゴリズムを設定します。
 
-アクセサ、ミューテータで設定値を取得、変更します。
+例 :  
+
+* `パラメータ`
+    * `アクセサ`
+    * `ミューテータ`
+    * 説明。
 
 デフォルトでは、作者の勘でそれなりの強さに設定されています。
 
-以下では分かりやすいようにアクセサを例にとって説明します。  
-ミューテータを使用したい場合は以下の表を参考に書き換えて下さい。
+配列のインデックスで使う値は以下の通りです。
 
-| 種類             | 形                              |
-|------------------|---------------------------------|
-| アクセサの型     | `型 パラメータ名()`             |
-| ミューテータの型 | `void パラメータ名(型　変数名)` |
-
-配列のインデックスで使う「`駒の種類`」、「`位置`」に入れる値は以下の通りです。
-
-| 種類       | 入れる値                                                     |
-|------------|--------------------------------------------------------------|
-| `駒の種類` | `EMPTY`、`PAWN`、`KNIGHT`、`BISHOP`、`ROOK`、`QUEEN`、`KING` |
-| `位置`     | `A1`、`B1`、`C1` ...... `F8`、`G8`、`H8`                     |
+| 要素数            | 入れる値                                               |
+|-------------------|--------------------------------------------------------|
+| `NUM_PIECE_TYPES` | `EMPTY` `PAWN` `KNIGHT` `BISHOP` `ROOK` `QUEEN` `KING` |
+| `NUM_SQUARES`     | `A1` `B1` `C1` ...... `F8` `G8` `H8`                   |
 
 (注) 綴りを間違えてしまっているかもしれません。  
 上手く機能しない場合は、「`params.h`」を見て確認して下さい。
 
 ###### マテリアル ######
 
-* `int (& material())[駒の種類]`
+* `int material_[NUM_PIECE_TYPES]`
+    * `int (& material())[NUM_PIECE_TYPES]`
+    * `void material(int (& table)[NUM_PIECE_TYPES])`
     * 駒の価値。  
       チェスエンジンにおいて最も重要な数値。  
       探索アルゴリズムだけでなく、評価関数でも極めて重要な要素。
 
 ###### YBWC ######
 
-* `int ybwc_limit_depth()`
+* `int ybwc_limit_depthint_`
+    * `int ybwc_limit_depth()`
+    * `void ybwc_limit_depth(int depth)`
     * 「`現在のdepth >= 設定値`」で YBWC を実行する。
 
-* `int ybwc_after()`
+* `int ybwc_after_`
+    * `int ybwc_after()`
+    * `void ybwc_after(int num_moves)`
     * 現在の局面の[設定値]番目以降の候補手から別スレッドに助けを求める。
 
 ###### Aspiration Windows ######
 
-* `bool enable_aspiration_windows()`
+* `bool enable_aspiration_windows_`
+    * `bool enable_aspiration_windows()`
+    * `void enable_aspiration_windows(bool enable)`
     * Aspiration Windowsが有効かどうかの設定値。
 
-* `std::uint32_t aspiration_windows_limit_depth()`
+* `std::uint32_t aspiration_windows_limit_depth_`
+    * `std::uint32_t aspiration_windows_limit_depth()`
+    * `void aspiration_windows_limit_depth(std::uint32_t depth)`
     * 「`現在のdepth >= 設定値`」で Aspiration Windows を実行する。
 
-* `int aspiration_windows_delta()`
+* `int aspiration_windows_delta_`
+    * `int aspiration_windows_delta()`
+    * `void aspiration_windows_delta(int delta)`
     * この設定値をベースにウィンドウのサイズを広げていく。
 
 ###### SEE ######
 
-* `bool enable_see()`
+* `bool enable_see_`
+    * `bool enable_see()`
+    * `void enable_see(bool enable)`
     * Move OrderingでSEEが有効かどうかの設定値。
 
 ###### History Heuristic ######
 
-* `bool enable_history()`
+* `bool enable_history_`
+    * `bool enable_history()`
+    * `void enable_history(bool enable)`
     * History Heuristicが有効かどうかの設定値。
 
 ###### Killer Move Heuristic ######
 
-* `bool enable_killer()`
+* `bool enable_killer_`
+    * `bool enable_killer()`
+    * `void enable_killer(bool enable)`
     * Killer Move Heuristicが有効かどうかの設定値。
 
-* `bool enable_killer_2()`
+* `bool enable_killer_2_`
+    * `bool enable_killer_2()`
+    * `void enable_killer_2(bool enable)`
     * 2プライ先のキラームーブが有効かどうかの設定値。  
       「`enable_killer`」が有効でないと有効にならない。
 
 ###### Transposition Table ######
 
-* `bool enable_ttable()`
+* `bool enable_ttable_`
+    * `bool enable_ttable()`
+    * `void enable_ttable(bool enable)`
     * Transposition Tableが有効かどうかの設定値。
 
 ###### Internal Iterative Deepening ######
 
-* `bool enable_iid()`
+* `bool enable_iid_`
+    * `bool enable_iid()`
+    * `void enable_iid(bool enable)`
     * IIDが有効かどうかの設定値。
 
-* `int iid_limit_depth()`
+* `int iid_limit_depth_`
+    * `int iid_limit_depth()`
+    * `void iid_limit_depth(int depth)`
     * 「`現在のdepth >= 設定値`」で IID を実行する。
 
-* `int iid_search_depth()`
+* `int iid_search_depth_`
+    * `int iid_search_depth()`
+    * `void iid_search_depth(int depth)`
     * IIDで探索する深さ。
 
 ###### Null Move Reduction ######
 
-* `bool enable_nmr()`
+* `bool enable_nmr_`
+    * `bool enable_nmr()`
+    * `void enable_nmr(bool enable)`
     * NMRが有効かどうかの設定値。
 
-* `int nmr_limit_depth()`
+* `int nmr_limit_depth_`
+    * `int nmr_limit_depth()`
+    * `void nmr_limit_depth(int depth)`
     * 「`現在のdepth >= 設定値`」で NMR を実行する。
 
-* `int nmr_search_reduction()`
+* `int nmr_search_reduction_`
+    * `int nmr_search_reduction()`
+    * `void nmr_search_reduction(int reduction)`
     * 現在のノードの深さより、どれだけ浅く探索するかの設定値。
 
-* `int nmr_reduction()`
+* `int nmr_reduction_`
+    * `int nmr_reduction()`
+    * `void nmr_reduction(int reduction)`
     * NMRでベータ値を超えた際、現在の深さを減らす量。
 
 ###### ProbCut ######
 
-* `bool enable_probcut()`
+* `bool enable_probcut_`
+    * `bool enable_probcut()`
+    * `void enable_probcut(bool enable)`
     * ProbCutが有効かどうかの設定値。
 
-* `int probcut_limit_depth()`
+* `int probcut_limit_depth_`
+    * `int probcut_limit_depth()`
+    * `void probcut_limit_depth(int depth)`
     * 「`現在のdepth >= 設定値`」で ProbCut を実行する。
 
-* `int probcut_margin()`
+* `int probcut_margin_`
+    * `int probcut_margin()`
+    * `void probcut_margin(int margin)`
     * ProbCutをする際のベータ値増量分。
 
-* `int probcut_search_reduction()`
+* `int probcut_search_reduction_`
+    * `int probcut_search_reduction()`
+    * `void probcut_search_reduction(int reduction)`
     * 現在のノードの深さより、どれだけ浅く探索するかの設定値。
 
 ###### History Pruning ######
 
-* `bool enable_history_pruning()`
+* `bool enable_history_pruning_`
+    * `bool enable_history_pruning()`
+    * `void enable_history_pruning(bool enable)`
     * History Pruningが有効かどうかの設定値。  
       History Heuristicが有効でないと有効にならない。
 
-* `int history_pruning_limit_depth()`
+* `int history_pruning_limit_depth_`
+    * `int history_pruning_limit_depth()`
+    * `void history_pruning_limit_depth(int depth)`
     * 「`現在のdepth >= 設定値`」で History Pruning を実行する。
 
-* `double history_pruning_move_threshold()`
+* `double history_pruning_move_threshold_`
+    * `double history_pruning_move_threshold()`
+    * `void history_pruning_move_threshold(double threshold)`
     * 候補手に対して、History Pruningするかしないかの閾値。  
       「`X = 設定値 * 全候補手の数`」で、X 番目以降の候補手に対して実行する。  
       0.0から1.0の間で設定する。
 
-* `int history_pruning_after()`
+* `int history_pruning_after_`
+    * `int history_pruning_after()`
+    * `void history_pruning_after(int num_moves)`
     * 「`history_pruning_move_threshold`」がどんなに小さくても、
       [設定値]番目の候補手まではHistory Pruningしない。
 
-* `double history_pruning_threshold()`
+* `double history_pruning_threshold_`
+    * `double history_pruning_threshold()`
+    * `void history_pruning_threshold(double threshold)`
     * ヒストリー値に対して、History Pruningするかしないかの閾値。  
       「`X = 設定値 * 最大ヒストリー`」で、ヒストリー値が X 以下の手なら
       探索する深さを減らす。  
       0.0から1.0の間で設定する。
 
-* `int history_pruning_reduction()`
+* `int history_pruning_reduction_`
+    * `int history_pruning_reduction()`
+    * `void history_pruning_reduction(int reduction)`
     * 閾値以下のヒストリー値の手の、深さを減らす量。
 
 ###### Late Move Reduction ######
 
-* `bool enable_lmr()`
+* `bool enable_lmr_`
+    * `bool enable_lmr()`
+    * `void enable_lmr(bool enable)`
     * LMRが有効かどうかの設定値。  
 
-* `int lmr_limit_depth()`
+* `int lmr_limit_depth_`
+    * `int lmr_limit_depth()`
+    * `void lmr_limit_depth(int depth)`
     * 「`現在のdepth >= 設定値`」で LMR を実行する。
 
-* `int lmr_threshold()`
+* `double lmr_threshold_`
+    * `double lmr_threshold()`
+    * `void lmr_threshold(double threshold)`
     * 全候補手の数に対して、LMRするかしないかの閾値。  
       「`X = 設定値 * 全候補手の数`」で、X 番目以降の候補手に対して実行する。  
       0.0から1.0の間で設定する。
 
-* `int lmr_after()`
+* `int lmr_after_`
+    * `int lmr_after()`
+    * `void lmr_after(int num_moves)`
     * 「`lmr_threshold`」がどんなに小さくても、
       [設定値]番目の候補手まではLMRしない。
 
-* `int lmr_search_reduction()`
+* `int lmr_search_reduction_`
+    * `int lmr_search_reduction()`
+    * `void lmr_search_reduction(int reduction)`
     * 現在のノードの深さより、どれだけ浅く探索するかの設定値。
 
 ###### Futility Pruning ######
 
-* `bool enable_futility_pruning()`
+* `bool enable_futility_pruning_`
+    * `bool enable_futility_pruning()`
+    * `void enable_futility_pruning(bool enable)`
     * 「`現在のdepth <= 設定値`」で Futility Pruning を実行する。
 
-* `int futility_pruning_depth()`
+* `int futility_pruning_depth_`
+    * `int futility_pruning_depth()`
+    * `void futility_pruning_depth(int depth)`
     * 設定値以下の残り深さでFutility Pruningを実行する。
 
-* `int futility_pruning_margin()`
+* `int futility_pruning_margin_`
+    * `int futility_pruning_margin()`
+    * `void futility_pruning_margin(int margin)`
     * Futility Pruningの1プライあたりのマージン。  
       「`X = 設定値 * 残り深さ`」がそのノードでのマージンとなる。
 
@@ -435,24 +504,21 @@ int main(int argc, char* argv[]) {
 評価値は次の計算式で計算されます。  
 "`the_score = (weight_1 * value_1) + (weight_2 * value_2) + ...`".
 
-アクセサ、ミューテータで設定値を取得、変更します。
+例 :  
+
+* `パラメータ`
+    * `アクセサ`
+    * `ミューテータ`
+    * 説明。
 
 デフォルトでは、作者のチェス経験を元に設定されています。
 
-以下では分かりやすいようにアクセサを例にとって説明します。  
-ミューテータを使用したい場合は以下の表を参考に書き換えて下さい。
+配列のインデックスで使う値は以下の通りです。
 
-| 種類             | 形                              |
-|------------------|---------------------------------|
-| アクセサの型     | `型　パラメータ名()`            |
-| ミューテータの型 | `void パラメータ名(型　変数名)` |
-
-配列のインデックスで使う「`駒の種類`」、「`位置`」に入れる値は以下の通りです。
-
-| 種類       | 入れる値                                                     |
-|------------|--------------------------------------------------------------|
-| `駒の種類` | `EMPTY`、`PAWN`、`KNIGHT`、`BISHOP`、`ROOK`、`QUEEN`、`KING` |
-| `位置`     | `A1`、`B1`、`C1` ...... `F8`、`G8`、`H8`                     |
+| 要素数            | 入れる値                                               |
+|-------------------|--------------------------------------------------------|
+| `NUM_PIECE_TYPES` | `EMPTY` `PAWN` `KNIGHT` `BISHOP` `ROOK` `QUEEN` `KING` |
+| `NUM_SQUARES`     | `A1` `B1` `C1` ...... `F8` `G8` `H8`                   |
 
 (注) 綴りを間違えてしまっているかもしれません。  
 上手く機能しない場合は、「`params.h`」を見て確認して下さい。
@@ -462,18 +528,29 @@ int main(int argc, char* argv[]) {
 値テーブルは駒の位置の値、攻撃する駒種類の値を定義した配列です。  
 「`値 * ウェイト`」が実際の評価値となります。
 
-* `double (& opening_position_value_table())[駒の種類][位置]`
-    * オープニング時における「`駒の種類`」が「`位置`」にいる時の値です。
+* `double opening_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES]`
+    * `double (& opening_position_value_table())[NUM_PIECE_TYPES][NUM_SQUARES]`
+    * `void opening_position_value_table
+      (double (& table)[NUM_PIECE_TYPES][NUM_SQUARES])`
+    * オープニング時における、特定の駒が特定の位置にいるときの値です。
 
-* `double (& ending_position_value_table())[駒の種類][位置]`
-    * エンディング時における「`駒の種類`」が「`位置`」にいる時の値です。
+* `double ending_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES]`
+    * `double (& ending_position_value_table())[NUM_PIECE_TYPES][NUM_SQUARES]`
+    * `void ending_position_value_table
+      (double (& table)[NUM_PIECE_TYPES][NUM_SQUARES])`
+    * エンディング時における、特定の駒が特定の位置にいるときの値です。
 
-* `double (& attack_value_table())[攻撃側の駒の種類][対象の駒の種類]`
-    * 「`攻撃側の駒の種類`」が「`対象の駒の種類`」を
+* `double attack_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES]`
+    * `double (& attack_value_table())[NUM_PIECE_TYPES][NUM_PIECE_TYPES]`
+    * `void attack_value_table
+      (double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES])`
+    * 攻撃側の駒(最初のインデックス)が対象の駒(2つ目のインデックス)を
       攻撃している時の値です。
 
-* `double (& pawn_shield_value_table())[位置]`
-    * キングを守るべきポーンが「`位置`」にいる時の値です。  
+* `double pawn_shield_value_table_[NUM_SQUARES]`
+    * `double (& pawn_shield_value_table())[NUM_SQUARES]`
+    * `void pawn_shield_value_table(double (& table)[NUM_SQUARES])`
+    * キングを守るべきポーンが特定の位置にいる時の値です。  
 
 キングを守るべきポーンの定義
 
@@ -490,10 +567,19 @@ int main(int argc, char* argv[]) {
 エンディング時(駒がキングのみの状態)の設定値から、現在の駒の数を変数とした
 一次関数で計算します。
 
-* `double opening_weight()`
+* コンストラクタ。
+    * `Weight(double opening_weight, double ending_weight)`
+        * `opening_weight`: オープニング時のウェイト。
+        * `ending_weight`: エンディング時のウェイト。
+
+* `double opening_weight_`
+    * `double opening_weight()`
+    * `void opening_weight(double weight)`
     * オープニング時(駒が32個の状態)の設定値。
 
-* `double ending_weight()`
+* `double ending_weight_`
+    * `double ending_weight()`
+    * `void ending_weight(double weight)`
     * エンディング時(駒がキングのみの状態)の設定値。
 
 ### 各種ウェイト ###
@@ -501,96 +587,142 @@ int main(int argc, char* argv[]) {
 「`EvalParams`」内の、戦略要素ごとの「重み」です。  
 全て「`Weight`」オブジェクトです。
 
-* `Weight (& weight_opening_position())[駒の種類]`
-    * 「`double (& opening_position_value_table())[駒の種類][位置]`」
+* `Weight (& weight_opening_position())[NUM_PIECE_TYPES]`
+    * `Weight (& weight_opening_position())[NUM_PIECE_TYPES]`
+    * `void weight_opening_position(Weight (& weights)[NUM_PIECE_TYPES])`
+    * 「`double opening_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES]`」
       にかけ合わせる重みです。  
-      「`駒の種類`」ごとに設定します。
+      駒の種類ごとに設定します。
 
-* `Weight (& weight_ending_position())[駒の種類]`
-    * 「`double (& ending_position_value_table())[駒の種類][位置]`」
+* `Weight (& weight_ending_position())[NUM_PIECE_TYPES]`
+    * `Weight (& weight_ending_position())[NUM_PIECE_TYPES]`
+    * `void weight_ending_position(Weight (& weights)[NUM_PIECE_TYPES])`
+    * 「`double ending_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES]`」
       にかけ合わせる重みです。  
-      「`駒の種類`」ごとに設定します。
+      駒の種類ごとに設定します。
 
-* `Weight& weight_mobility()`
+* `Weight& weight_mobility_`
+    * `Weight& weight_mobility()`
+    * `void weight_mobility(Weight& weight)`
     * 駒の機動力に対する重みです。
 
-* `Weight& weight_center_control()`
+* `Weight& weight_center_control_`
+    * `Weight& weight_center_control()`
+    * `void weight_center_control(Weight& weight)`
     * c3、f3、c6、f6 を四隅とする矩形領域のコントロールに対する重みです。
 
-* `Weight& weight_sweet_center_control()`
+* `Weight& weight_sweet_center_control_`
+    * `Weight& weight_sweet_center_control()`
+    * `void weight_sweet_center_control(Weight& weight)`
     * d4、e4、d5、e5 のコントロールに対する重みです。
 
-* `Weight& weight_development()`
+* `Weight weight_development_`
+    * `Weight& weight_development()`
+    * `void weight_development(Weight& weight)`
     * ナイト、ビショップの展開(初期位置にいない状態)に対する重みです。
 
-* `Weight& (& weight_attack())[攻撃側の駒の種類]`
-    * 「`double (& attack_value_table())[攻撃側の駒の種類][対象の駒の種類]`」
+* `Weight& (& weight_attack())[NUM_PIECE_TYPES]`
+    * `Weight& (& weight_attack())[NUM_PIECE_TYPES]`
+    * `void weight_attack(Weight (& weights)[NUM_PIECE_TYPES])`
+    * 「`double attack_value_table_[NUM_PIECE_TYPES][NUM_PIECETYPES]`」
       に対する重みです。  
       攻撃側の駒の種類ごとに設定します。
 
-* `Weight& weight_attack_around_king()`
+* `Weight weight_attack_around_king_`
+    * `Weight& weight_attack_around_king()`
+    * `void weight_attack_around_king(Weight& weight)`
     * 相手のキング周辺への攻撃に対する重みです。
 
-* `Weight& weight_pass_pawn()`
+* `Weight weight_pass_pawn_`
+    * `Weight& weight_pass_pawn()`
+    * `void weight_pass_pawn(Weight& weight)`
     * パスポーンに対する重みです。
 
-* `Weight& weight_protected_pass_pawn()`
+* `Weight weight_protected_pass_pawn_`
+    * `Weight& weight_protected_pass_pawn()`
+    * `void weight_protected_pass_pawn(Weight& weight)`
     * 守られたパスポーンに対する重みです。  
       「`weight_pass_pawn`」に上乗せする形になります。
 
-* `Weight& weight_double_pawn()`
+* `Weight weight_double_pawn_`
+    * `Weight& weight_double_pawn()`
+    * `void weight_double_pawn(Weight& weight)`
     * ダブルポーンに対する重みです。  
       戦略的にペナルティになるので、マイナス値を設定するのがいいと思います。
 
-* `Weight& weight_iso_pawn()`
+* `Weight weight_iso_pawn_`
+    * `Weight& weight_iso_pawn()`
+    * `void weight_iso_pawn(Weight& weight)`
     * 孤立ポーンに対する重みです。  
       戦略的にペナルティになるので、マイナス値を設定するのがいいと思います。
 
-* `Weight& weight_pawn_shield()`
+* `Weight weight_pawn_shield_`
+    * `Weight& weight_pawn_shield()`
+    * `void weight_pawn_shield(Weight& weight)`
     * 「`double (& pawn_shield_value_table())[位置]`」に対する重みです。
 
-* `Weight& weight_bishop_pair()`
+* `Weight weight_bishop_pair_`
+    * `Weight& weight_bishop_pair()`
+    * `void weight_bishop_pair(Weight& weight)`
     * ビショップが2つ以上存在していた場合に対する重みです。  
       3つ以上あっても2つの時と同じ評価値になります。
 
-* `Weight& weight_bad_bishop()`
+* `Weight weight_bad_bishop_`
+    * `Weight& weight_bad_bishop()`
+    * `void weight_bad_bishop(Weight& weight)`
     * バッドビショップに対する重みです。  
       戦略的にペナルティになるので、マイナス値を設定するのがいいと思います。
 
-* `Weight& weight_pin_knight()`
+* `Weight weight_pin_knight_`
+    * `Weight& weight_pin_knight()`
+    * `void weight_pin_knight(Weight& weight)`
     * ビショップが相手のナイトを相手のルーク、クイーン、キングに
       ピンした時に対する重みです。
 
-* `Weight& weight_rook_pair()`
+* `Weight weight_rook_pair_`
+    * `Weight& weight_rook_pair()`
+    * `void weight_rook_pair(Weight& weight)`
     * ルークが2つ以上存在していた場合に対する重みです。  
       3つ以上あっても2つの時と同じ評価値になります。
 
-* `Weight& weight_rook_semiopen_fyle()`
+* `Weight weight_rook_semiopen_fyle_`
+    * `Weight& weight_rook_semiopen_fyle()`
+    * `void weight_rook_semiopen_fyle(Weight& weight)`
     * ルークがセミオープンファイルにいた場合に対する重みです。  
       作者の都合上、綴りが「`fyle`」になっています。 ミスではありません。
 
-* `Weight& weight_rook_open_fyle()`
+* `Weight weight_rook_open_fyle_`
+    * `Weight& weight_rook_open_fyle()`
+    * `void weight_rook_open_fyle(Weight& weight)`
     * ルークがオープンファイルにいた場合に対する重みです。  
       作者の都合上、綴りが「`fyle`」になっています。 ミスではありません。
 
-* `Weight& weight_early_queen_launched()`
+* `Weight weight_early_queen_launched_`
+    * `Weight& weight_early_queen_launched()`
+    * `void weight_early_queen_launched(Weight& weight)`
     * クイーンの展開が早すぎた場合に対する重みです。  
       ナイトやビショップが展開された数で早すぎるかどうかを判断します。  
       戦略的にペナルティになるので、マイナス値を設定するのがいいと思います。
 
-* `Weight& weight_weak_square()`
+* `Weight weight_weak_square_`
+    * `Weight& weight_weak_square()`
+    * `void weight_weak_square(Weight& weight)`
     * キング周りの弱いマスに対する重みです。  
       相手のビショップがいるマスの色と、キング周りのポーンの配置で
       弱さを計算します。  
       戦略的にペナルティになるので、マイナス値を設定するのがいいと思います。
 
-* `Weight& weight_castling()`
+* `Weight weight_castling_`
+    * `Weight& weight_castling()`
+    * `void weight_castling(Weight& weight)`
     * キャスリングに対する重みです。  
       ゲーム中でキャスリングしたかどうかで判断します。  
       すでにキャスリングされた状態からゲームが始まった場合は、
       キャスリングを放棄したものとしてみなします。
 
-* `Weight& weight_abandoned_castling()`
+* `Weight weight_abandoned_castling_`
+    * `Weight& weight_abandoned_castling()`
+    * `void weight_abandoned_castling(Weight& weight)`
     * キャスリングの放棄に対する重みです。  
       ゲーム中でキャスリングしたかどうかで判断します。  
       すでにキャスリングされた状態からゲームが始まった場合は、
@@ -850,177 +982,243 @@ To Customize of Search Algorithm
 
 "`SearchParams`" sets parameters to the search algorithm.
 
-To use an accessor or a mutator, you can get or change the parameters.
+Example :  
 
-As default, it's set by the author's intuition.
+* `Parameter`
+    * `Accessor`
+    * `Mutator`
+    * Explanation.
 
-I explain with an accessor.  
-If you want to use the mutator, translate it with the following table.
+The following words are indexes of array.
 
-| Type of functions   | Skeleton                       |
-|---------------------|--------------------------------|
-| Type of an accessor | `Type ParameterName()`         |
-| Type of a mutator   | `void ParameterName(Type arg)` |
-
-The following table is the index value of the array for `[piece type]` or
-`[square]`.
-
-| Name         | Index value                                                  |
-|--------------|--------------------------------------------------------------|
-| `piece type` | `EMPTY`, `PAWN`, `KNIGHT`, `BISHOP`, `ROOK`, `QUEEN`, `KING` |
-| `square`     | `A1`, `B1`, `C1` ...... `F8`, `G8`, `H8`                     |
+| Number of index   |  Constant                                              |
+|-------------------|--------------------------------------------------------|
+| `NUM_PIECE_TYPES` | `EMPTY` `PAWN` `KNIGHT` `BISHOP` `ROOK` `QUEEN` `KING` |
+| `NUM_SQUARES`     | `A1` `B1` `C1` ...... `F8` `G8` `H8`                   |
 
 Note: I may mistake spells.  
 If it doesn't work, please confirm "`param.h`".
 
 ###### Material ######
 
-* `int (& material())[piece type]`
+* `int material_[NUM_PIECE_TYPES]`
+    * `int (& material())[NUM_PIECE_TYPES]`
+    * `void material(int (& table)[NUM_PIECE_TYPES])`
     * The values of a piece.  
       This is the most important numbers of chess engines.  
       Not only for search algorithm, but also evaluation function.
 
 ###### YBWC ######
 
-* `int ybwc_limit_depth()`
+* `int ybwc_limit_depth_`
+    * `int ybwc_limit_depth()`
+    * `void ybwc_limit_depth(int depth)`
     * Execute YBWC when "`the_current_depth >= the_parameter`".
 
-* `int ybwc_after()`
+* `int ybwc_after_`
+    * `int ybwc_after()`
+    * `void ybwc_after(int num_moves)`
     * Call for help to other thread after [the parameter]th candidate move.
 
 ###### Aspiration Windows ######
 
-* `bool enable_aspiration_windows()`
+* `bool enable_aspiration_windows_`
+    * `bool enable_aspiration_windows()`
+    * `void enable_aspiration_windows(bool enable)`
     * A parameter whether it enables Aspiration Windows or not.
 
-* `std::uint32_t aspiration_windows_limit_depth()`
+* `std::uint32_t aspiration_windows_limit_depth_`
+    * `std::uint32_t aspiration_windows_limit_depth()`
+    * `void::uint32_t aspiration_windows_limit_depth(std::uint32_t depth)`
     * Execute Aspiration Windows when "`the_current_depth >= the_parameter`".
 
-* `int aspiration_windows_delta()`
+* `int aspiration_windows_delta_`
+    * `int aspiration_windows_delta()`
+    * `void aspiration_windows_delta(int delta)`
     * It expands the window size based on the parameter.
 
 ###### SEE ######
 
-* `bool enable_see()`
+* `bool enable_see_`
+    * `bool enable_see()`
+    * `void enable_see(bool enable)`
     * A parameter whether it enables SEE or not.
 
 ###### History Heuristic ######
 
-* `bool enable_history()`
+* `bool enable_history_`
+    * `bool enable_history()`
+    * `void enable_history(bool enable)`
     * A parameter whether it enables History Heuristic or not.
 
 ###### Killer Move Heuristic ######
 
-* `bool enable_killer()`
+* `bool enable_killer_`
+    * `bool enable_killer()`
+    * `void enable_killer(bool enable)`
     * A parameter whether it enables Killer Move Heuristic or not.
 
-* `bool enable_killer_2()`
+* `bool enable_killer_2_`
+    * `bool enable_killer_2()`
+    * `void enable_killer_2(bool enable)`
     * A parameter whether it enables Killer Move Heuristic
       after 2 plies or not.  
       If "`enable_killer`" is not enabled, it won't be enabled.
 
 ###### Transposition Table ######
 
-* `bool enable_ttable()`
+* `bool enable_ttable_`
+    * `bool enable_ttable()`
+    * `void enable_ttable(bool enable)`
     * A parameter whether it enables Transposition Table or not.
 
 ###### Internal Iterative Deepening ######
 
-* `bool enable_iid()`
+* `bool enable_iid_`
+    * `bool enable_iid()`
+    * `void enable_iid(bool enable)`
     * A parameter whether it enables IID or not.
 
-* `int iid_limit_depth()`
+* `int iid_limit_depth_`
+    * `int iid_limit_depth()`
+    * `void iid_limit_depth(int depth)`
     * Execute IID when "`the_current_depth >= the_parameter`".
 
-* `int iid_search_depth()`
+* `int iid_search_depth_`
+    * `int iid_search_depth()`
+    * `void iid_search_depth(int depth)`
     * The searching depth in IID.
 
 ###### Null Move Reduction ######
 
-* `bool enable_nmr()`
+* `bool enable_nmr_`
+    * `bool enable_nmr()`
+    * `void enable_nmr(bool enable)`
     * A parameter whether it enables NMR or not.
 
-* `int nmr_limit_depth()`
+* `int nmr_limit_depth_`
+    * `int nmr_limit_depth()`
+    * `void nmr_limit_depth(int depth)`
     * Execute NMR when "`the_current_depth >= the_parameter`".
 
-* `int nmr_search_reduction()`
+* `int nmr_search_reduction_`
+    * `int nmr_search_reduction()`
+    * `void nmr_search_reduction(int reduction)`
     * A parameter how many reduce the current depth when NMR searches.
 
-* `int nmr_reduction()`
+* `int nmr_reduction_`
+    * `int nmr_reduction()`
+    * `void nmr_reduction(int reduction)`
     * The reduction of depth by NMR.
 
 ###### ProbCut ######
 
-* `bool enable_probcut()`
+* `bool enable_probcut_`
+    * `bool enable_probcut()`
+    * `void enable_probcut(bool enable)`
     * A parameter whether it enables ProbCut or not.
 
-* `int probcut_limit_depth()`
+* `int probcut_limit_depth_`
+    * `int probcut_limit_depth()`
+    * `void probcut_limit_depth(int depth)`
     * Execute ProbCut when "`the_current_depth >= the_parameter`".
 
-* `int probcut_margin()`
+* `int probcut_margin_`
+    * `int probcut_margin()`
+    * `void probcut_margin(int margin)`
     * A incremental value of the beta value when ProbCut searches.
 
-* `int probcut_search_reduction()`
+* `int probcut_search_reduction_`
+    * `int probcut_search_reduction()`
+    * `void probcut_search_reduction(int reduction)`
     * A parameter how many reduce the current depth when ProbCut searches.
 
 ###### History Pruning ######
 
-* `bool enable_history_pruning()`
+* `bool enable_history_pruning_`
+    * `bool enable_history_pruning()`
+    * `void enable_history_pruning(bool enable)`
     * A parameter whether it enables History Pruning or not.  
       If History Heuristic is not enabled, this parameter won't be enable.
 
-* `int history_pruning_limit_depth()`
+* `int history_pruning_limit_depth_`
+    * `int history_pruning_limit_depth()`
+    * `void history_pruning_limit_depth(int depth)`
     * Execute History Pruning when "`the_current_depth >= the_parameter`".
 
-* `double history_pruning_move_threshold()`
+* `double history_pruning_move_threshold_`
+    * `double history_pruning_move_threshold()`
+    * `void history_pruning_move_threshold(double threshold)`
     * The threshold whether it executes History Pruning or not.  
       "`X = the_parameter * number_of_all_candidate_moves`", it executes
       History Pruning after [X]th candidate move.  
       This parameter is set from 0.0 to 1.0.
 
-* `int history_pruning_after()`
+* `int history_pruning_after_`
+    * `int history_pruning_after()`
+    * `void history_pruning_after(int num_moves)`
     * Even if "`history_pruning_move_threshold`" is too few, it doesn't do
       History Pruning until [the parameter]th candidate move.
 
-* `double history_pruning_threshold()`
+* `double history_pruning_threshold_`
+    * `double history_pruning_threshold()`
+    * `void history_pruning_threshold(double threshold)`
     * The threshold whether it executes History Pruning or not.  
       "`X = the_parameter * the_max_history_value`", it executes
       History Pruning to a move which has history value less than X.  
       This parameter is set from 0.0 to 1.0.
 
-* `int history_pruning_reduction()`
+* `int history_pruning_reduction_`
+    * `int history_pruning_reduction()`
+    * `void history_pruning_reduction(int reduction)`
     * The reduction of depth by History Pruning.
 
 ###### Late Move Reduction ######
 
-* `bool enable_lmr()`
+* `bool enable_lmr_`
+    * `bool enable_lmr()`
+    * `void enable_lmr(bool enable)`
     * A parameter whether it enables LMR or not.  
 
-* `int lmr_limit_depth()`
+* `int lmr_limit_depth_`
+    * `int lmr_limit_depth()`
+    * `void lmr_limit_depth(int depth)`
     * Execute LMR when "`the_current_depth >= the_parameter`".
 
-* `int lmr_threshold()`
+* `double lmr_threshold_`
+    * `doubld lmr_threshold()`
+    * `void lmr_threshold(double threshold)`
     * The threshold whether it executes LMR or not.  
       "`X = the_parameter * the_number_of_candidate_moves`", it executes
       LMR after [X]th candidate move.  
       This parameter is set from 0.0 to 1.0.
 
-* `int lmr_after()`
+* `int lmr_after_`
+    * `int lmr_after()`
+    * `void lmr_after(int num_moves)`
     * Even if "`lmr_threshold`" is too few, it doesn't do
       LMR until [the parameter]th candidate move.
 
-* `int lmr_search_reduction()`
+* `int lmr_search_reduction_`
+    * `int lmr_search_reduction()`
+    * `void lmr_search_reduction(int reduction)`
     * A parameter how many reduce the current depth when LMR searches.
 
 ###### Futility Pruning ######
 
-* `bool enable_futility_pruning()`
+* `bool enable_futility_pruning_`
+    * `bool enable_futility_pruning()`
+    * `void enable_futility_pruning(bool enable)`
     * A parameter whether it enables Futility Pruning or not.  
 
-* `int futility_pruning_depth()`
+* `int futility_pruning_depth_`
+    * `int futility_pruning_depth()`
+    * `void futility_pruning_depth(int depth)`
     * Execute Futility Pruning by "`the_current_depth <= the_parameter`".
 
-* `int futility_pruning_margin()`
+* `int futility_pruning_margin_`
+    * `int futility_pruning_margin()`
+    * `void futility_pruning_margin(int margin)`
     * The margin per 1 ply of depth.  
       "`the_margin = the_parameter * the_current_depth`"
 
@@ -1034,25 +1232,19 @@ To Customize of Evaluation Function
 The evaluated score is defined by
 "`the_score = (weight_1 * value_1) + (weight_2 * value_2) + ...`".
 
-To use an accessor or a mutator, you can get or change the parameters.
+Example :  
 
-As default, it's set by the author's experience as a chess player.
+* `Parameter`
+    * `Accessor`
+    * `Mutator`
+    * Explanation.
 
-I explain with an accessor.  
-If you want to use the mutator, translate it with the following table.
+The following words are indexes of array.
 
-| Type of functions   | Skeleton                       |
-|---------------------|--------------------------------|
-| Type of an accessor | `Type ParameterName()`         |
-| Type of a mutator   | `void ParameterName(Type arg)` |
-
-The following table is the index value of the array for `[piece type]` or
-`[square]`.
-
-| Name         | Index value                                                  |
-|--------------|--------------------------------------------------------------|
-| `piece type` | `EMPTY`, `PAWN`, `KNIGHT`, `BISHOP`, `ROOK`, `QUEEN`, `KING` |
-| `square`     | `A1`, `B1`, `C1` ...... `F8`, `G8`, `H8`                     |
+| Number of index   |  Constant                                              |
+|-------------------|--------------------------------------------------------|
+| `NUM_PIECE_TYPES` | `EMPTY` `PAWN` `KNIGHT` `BISHOP` `ROOK` `QUEEN` `KING` |
+| `NUM_SQUARES`     | `A1` `B1` `C1` ...... `F8` `G8` `H8`                   |
 
 Note: I may mistake spells.  
 If it doesn't work, please confirm "`param.h`".
@@ -1062,18 +1254,29 @@ If it doesn't work, please confirm "`param.h`".
 The value tables are array that defines the value of a place for the piece
 or the value of the attacker.  
 
-* `double (& opening_position_value_table())[piece type][square]`
-    * The values that a piece of [piece type] is at [square] when the opening.
+* `double opening_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES]`
+    * `double (& opening_position_value_table())[NUM_PIECE_TYPES][NUM_SQUARES]`
+    * `void opening_position_value_table
+      (double (& table)[NUM_PIECE_TYPES][NUM_SQUARES])`
+    * The values that a piece is at a square when the opening.
 
-* `double (& ending_position_value_table())[piece type][square]`
-    * The values that a piece of [piece type] is at [square] when the ending.
+* `double ending_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES]`
+    * `double (& ending_position_value_table())[NUM_PIECE_TYPES][NUM_SQUARES]`
+    * `void ending_position_value_table
+      (double (& table)[NUM_PIECE_TYPES][NUM_SQUARES])`
+    * The values that a piece is at a square when the ending.
 
-* `double (& attack_value_table())[attacker type][target type]`
-    * The values when a piece of [attacker type] attacks the another piece of
-      [target type].
+* `double attack_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES]`
+    * `double (& attack_value_table())[NUM_PIECE_TYPES][NUM_PIECE_TYPES]`
+    * `void attack_value_table
+      (double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES])`
+    * The values when an attacker(first index) attacks
+      the another piece(second index).
 
-* `double (& pawn_shield_value_table())[square]`
-    * The values that a Pawn which has to guard its King is at [square].
+* `double pawn_shield_value_table_[NUM_SQUARES]`
+    * `double (& pawn_shield_value_table())[NUM_SQUARES]`
+    * `void pawn_shield_value_table(double (& table)[NUM_SQUARES])`
+    * The values that a Pawn which has to guard its King is at a square.
 
 The definition of Pawns which have to guard its King.
 
@@ -1090,10 +1293,19 @@ It calculates the weight by linear function using the 2 parameters
 when the opening (there are 32 pieces on the board) and when the ending
 (there are 2 Kings only on the board).
 
-* `double opening_weight()`
+* Constractor.
+    * `Weight(double opening_weight, double ending_weight)`
+        * `opening_weight`: The weight when opening.
+        * `ending_weight`: The weight when ending.
+
+* `double opening_weight_`
+    * `double opening_weight()`
+    * `void opening_weight(double weight)`
     * The weight when the opening (there are 32 pieces on the board).
 
-* `double ending_weight()`
+* `double ending_weight_`
+    * `double ending_weight()`
+    * `void ending_weight(double weight)`
     * The weight when the ending (there are 2 Kings only on the board).
 
 ### Each weight ###
@@ -1101,104 +1313,150 @@ when the opening (there are 32 pieces on the board) and when the ending
 The followings are the weights for the elements of the chess strategies.  
 All the weights are "`Weight`" object.
 
-* `Weight (& weight_opening_position())[piece type]`
+* `Weight (& weight_opening_position())[NUM_PIECE_TYPES]`
+    * `Weight (& weight_opening_position())[NUM_PIECE_TYPES]`
+    * `void weight_opening_position(Weight (& weights)[NUM_PIECE_TYPES])`
     * The weight for
-      "`double (& opening_position_value_table())[piece type][square]`".  
+      "`double opening_position_value_table_[piece type][square]`".  
       You can set the weight for each piece type.
 
-* `Weight (& weight_ending_position())[piece type]`
+* `Weight (& weight_ending_position())[NUM_PIECE_TYPES]`
+    * `Weight (& weight_ending_position())[NUM_PIECE_TYPES]`
+    * `void weight_ending_position(Weight (& weights)[NUM_PIECE_TYPES])`
     * The weight for
-      "`double (& ending_position_value_table())[piece type][square]`".  
+      "`double ending_position_value_table_[piece type][square]`".  
       You can set the weight for each piece type.
 
-* `Weight& weight_mobility()`
+* `Weight& weight_mobility_`
+    * `Weight& weight_mobility()`
+    * `void weight_mobility(Weight& weight)`
     * The weight for the mobility of each piece.
 
-* `Weight& weight_center_control()`
+* `Weight& weight_center_control_`
+    * `Weight& weight_center_control()`
+    * `void weight_center_control(Weight& weight)`
     * The weight for the control of the rectangle to have the corners of
       c3, f3, c6, f6.
 
-* `Weight& weight_sweet_center_control()`
+* `Weight& weight_sweet_center_control_`
+    * `Weight& weight_sweet_center_control()`
+    * `void weight_sweet_center_control(Weight& weight)`
     * The weight for the control of d4, e4, d5, e5.
 
-* `Weight& weight_development()`
+* `Weight& weight_development_`
+    * `Weight& weight_development()`
+    * `void weight_development(Weight& weight)`
     * The weight for the Development (not exist on the starting position)
       of Knights and Bishops.
 
-* `Weight& (& weight_attack())[attacker type]`
+* `Weight& (& weight_attack())[NUM_PIECE_TYPES]`
+    * `Weight& (& weight_attack())[NUM_PIECE_TYPES]`
+    * `void weight_attack(Weight (& weights)[NUM_PIECE_TYPES])`
     * The weight for
-      "`double (& attack_value_table())[attacker type][target type]`".  
+      "`double attack_value_table_[attacker type][target type]`".  
       You can set the weight for each piece type as attacker.
 
-* `Weight& weight_attack_around_king()`
+* `Weight& weight_attack_around_king_`
+    * `Weight& weight_attack_around_king()`
+    * `void weight_attack_around_king(Weight& weight)`
     * The weight for the attacks around the opponent's King.
 
-* `Weight& weight_pass_pawn()`
+* `Weight& weight_pass_pawn_`
+    * `Weight& weight_pass_pawn()`
+    * `void weight_pass_pawn(Weight& weight)`
     * The weight for the Pass Pawns.
 
-* `Weight& weight_protected_pass_pawn()`
+* `Weight& weight_protected_pass_pawn_`
+    * `Weight& weight_protected_pass_pawn()`
+    * `void weight_protected_pass_pawn(Weight& weight)`
     * The weight for the Protected Pass Pawns.  
       It adds "`weight_pass_pawn`".
 
-* `Weight& weight_double_pawn()`
+* `Weight& weight_double_pawn_`
+    * `Weight& weight_double_pawn()`
+    * `void weight_double_pawn(Weight& weight)`
     * The weight for the Double Pawns.  
       Because it is defined as the penalty on the chess strategies,
       I think it should be a negative number.
 
-* `Weight& weight_iso_pawn()`
+* `Weight& weight_iso_pawn_`
+    * `Weight& weight_iso_pawn()`
+    * `void weight_iso_pawn(Weight& weight)`
     * The weight for the Isolated Pawns.  
       Because it is defined as the penalty on the chess strategies,
       I think it should be a negative number.
 
-* `Weight& weight_pawn_shield()`
+* `Weight& weight_pawn_shield_`
+    * `Weight& weight_pawn_shield()`
+    * `void weight_pawn_shield(Weight& weight)`
     * The weight for "`double (& pawn_shield_value_table())[square]`".  
 
-* `Weight& weight_bishop_pair()`
+* `Weight& weight_bishop_pair_`
+    * `Weight& weight_bishop_pair()`
+    * `void weight_bishop_pair(Weight& weight)`
     * The weight for more than 2 Bishops existing on the board.  
       Even if more than 3 Bishops exist,
       the score is same as 2 Bishops existing.
 
-* `Weight& weight_bad_bishop()`
+* `Weight& weight_bad_bishop_`
+    * `Weight& weight_bad_bishop()`
+    * `void weight_bad_bishop(Weight& weight)`
     * The weight for the Bad Bishops.  
       Because it is defined as the penalty on the chess strategies,
       I think it should be a negative number.
 
-* `Weight& weight_pin_knight()`
+* `Weight& weight_pin_knight_`
+    * `Weight& weight_pin_knight()`
+    * `void weight_pin_knight(Weight& weight)`
     * The weight for that a Bishop pins the opponent's Knight to his Rook,
       Queen, King.
 
-* `Weight& weight_rook_pair()`
+* `Weight& weight_rook_pair_`
+    * `Weight& weight_rook_pair()`
+    * `void weight_rook_pair(Weight& weight)`
     * The weight for more than 2 Rooks existing on the board.  
       Even if more than 3 Rooks exist, the score is same as 2 Rooks existing.
 
-* `Weight& weight_rook_semiopen_fyle()`
+* `Weight& weight_rook_semiopen_fyle_`
+    * `Weight& weight_rook_semiopen_fyle()`
+    * `void weight_rook_semiopen_fyle(Weight& weight)`
     * The weight for the Rooks on the semi-open file.  
       For some reasons, I write "fyle" instead of "file". It's not mistake. 
 
-* `Weight& weight_rook_open_fyle()`
+* `Weight& weight_rook_open_fyle_`
+    * `Weight& weight_rook_open_fyle()`
+    * `void weight_rook_open_fyle(Weight& weight)`
     * The weight for the Rooks on the open file.  
       For some reasons, I write "fyle" instead of "file". It's not mistake. 
 
-* `Weight& weight_early_queen_launched()`
+* `Weight& weight_early_queen_launched_`
+    * `Weight& weight_early_queen_launched()`
+    * `void weight_early_queen_launched(Weight& weight)`
     * The weight for too early to develop the Queen.  
       It judges by how many the minor pieces have been developed.  
       Because it is defined as the penalty on the chess strategies,
       I think it should be a negative number.
 
-* `Weight& weight_weak_square()`
+* `Weight& weight_weak_square_`
+    * `Weight& weight_weak_square()`
+    * `void weight_weak_square(Weight& weight)`
     * The weight for the weak squares around the King.  
       It is calculated by the pawn structure around the King and
       the color of squares to be the opponent's Bishop.  
       Because it is defined as the penalty on the chess strategies,
       I think it should be a negative number.
 
-* `Weight& weight_castling()`
+* `Weight& weight_castling_`
+    * `Weight& weight_castling()`
+    * `void weight_castling(Weight& weight)`
     * The weight for the castling.  
       It judges whether the King has castled in the game or not.  
       If the game starts with the position that the King already has castled,
       it judges as the King abandoned its castling rights.
 
-* `Weight& weight_abandoned_castling()`
+* `Weight& weight_abandoned_castling_`
+    * `Weight& weight_abandoned_castling()`
+    * `void weight_abandoned_castling(Weight& weight)`
     * The weight for the King abandoned its castling rights.  
       It judges whether the King has castled in the game or not.  
       If the game starts with the position that the King already has castled,
