@@ -206,14 +206,14 @@ namespace Sayuri {
     sout << " depth " << depth;
     sout << " seldepth " << seldepth;
     sout << " score ";
-    if (pv_line.ply_mate() >= 0) {
-      int winner = pv_line.ply_mate() % 2;
+    if (pv_line.mate_in() >= 0) {
+      int winner = pv_line.mate_in() % 2;
       if (winner == 1) {
         // エンジンがメイトした。
-        sout << "mate " << (pv_line.ply_mate() / 2) + 1;
+        sout << "mate " << (pv_line.mate_in() / 2) + 1;
       } else {
         // エンジンがメイトされた。
-        sout << "mate -" << pv_line.ply_mate() / 2;
+        sout << "mate -" << pv_line.mate_in() / 2;
       }
     } else {
       sout << "cp " << score;

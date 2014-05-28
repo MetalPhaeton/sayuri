@@ -36,7 +36,7 @@ namespace Sayuri {
   /**************************/
   // コンストラクタ。
   PVLine::PVLine() : begin_(line_), end_(&(line_[MAX_PLYS + 1])),
-  last_(begin_), score_(0), ply_mate_(-1) {}
+  last_(begin_), score_(0), mate_in_(-1) {}
 
   // コピーコンストラクタ。
   PVLine::PVLine(const PVLine& pv_line) :
@@ -44,7 +44,7 @@ namespace Sayuri {
   end_(&(line_[MAX_PLYS + 1])),
   last_(begin_ + (pv_line.last_ - pv_line.begin_)),
   score_(pv_line.score_),
-  ply_mate_(pv_line.ply_mate_) {
+  mate_in_(pv_line.mate_in_) {
     for (int i = 0; i < (end_ - begin_); i++) {
       line_[i] = pv_line.line_[i];
     }
@@ -56,7 +56,7 @@ namespace Sayuri {
   end_(&(line_[MAX_PLYS + 1])),
   last_(begin_ + (pv_line.last_ - pv_line.begin_)),
   score_(pv_line.score_),
-  ply_mate_(pv_line.ply_mate_) {
+  mate_in_(pv_line.mate_in_) {
     for (int i = 0; i < (end_ - begin_); i++) {
       line_[i] = pv_line.line_[i];
     }
@@ -65,7 +65,7 @@ namespace Sayuri {
   // コピー代入。
   PVLine& PVLine::operator=(const PVLine& pv_line) {
     score_ = pv_line.score_;
-    ply_mate_ = pv_line.ply_mate_;
+    mate_in_ = pv_line.mate_in_;
     last_ = begin_ + (pv_line.last_ - pv_line.begin_);
     for (int i = 0; i < (end_ - begin_); i++) {
       line_[i] = pv_line.line_[i];
@@ -77,7 +77,7 @@ namespace Sayuri {
   // ムーブ代入。
   PVLine& PVLine::operator=(PVLine&& pv_line) {
     score_ = pv_line.score_;
-    ply_mate_ = pv_line.ply_mate_;
+    mate_in_ = pv_line.mate_in_;
     last_ = begin_ + (pv_line.last_ - pv_line.begin_);
     for (int i = 0; i < (end_ - begin_); i++) {
       line_[i] = pv_line.line_[i];
@@ -98,6 +98,6 @@ namespace Sayuri {
     }
 
     // メイトまでのプライをコピー。
-    ply_mate_ = pv_line.ply_mate_;
+    mate_in_ = pv_line.mate_in_;
   }
 }  // namespace Sayuri

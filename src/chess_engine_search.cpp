@@ -190,7 +190,6 @@ namespace Sayuri {
               }
             }
 
-            pv_line_table_[level].ply_mate(tt_entry.ply_mate());
             if (score >= beta) {
               pv_line_table_[level].score(beta);
               table.Unlock();
@@ -211,7 +210,6 @@ namespace Sayuri {
             if (score <= alpha) {
               // アルファ値以下が確定。
               pv_line_table_[level].score(alpha);
-              pv_line_table_[level].ply_mate(tt_entry.ply_mate());
               table.Unlock();
               return alpha;
             }
@@ -235,7 +233,6 @@ namespace Sayuri {
             if (score >= beta) {
               // ベータ値以上が確定。
               pv_line_table_[level].score(beta);
-              pv_line_table_[level].ply_mate(tt_entry.ply_mate());
               table.Unlock();
               return beta;
             }
@@ -387,7 +384,7 @@ namespace Sayuri {
               if (shared_st_ptr_->search_params_ptr_->enable_ttable()) {
                 if (!null_reduction && !ShouldBeStopped()) {
                   table.Add(pos_hash, depth, beta, ScoreType::BETA,
-                  pv_line_table_[level][0], pv_line_table_[level].ply_mate());
+                  pv_line_table_[level][0]);
                 }
               }
 
@@ -666,7 +663,7 @@ namespace Sayuri {
         if (score < alpha) score = alpha;
         if (score > beta) score = beta;
         pv_line_table_[level].score(score);
-        pv_line_table_[level].ply_mate(level);
+        pv_line_table_[level].mate_in(level);
         return score;
       } else {
         // ステールメイト。
@@ -684,7 +681,7 @@ namespace Sayuri {
     if (shared_st_ptr_->search_params_ptr_->enable_ttable()) {
       if (!is_null_searching_ && !null_reduction && !ShouldBeStopped()) {
         table.Add(pos_hash, depth, alpha, score_type,
-        pv_line_table_[level][0], pv_line_table_[level].ply_mate());
+        pv_line_table_[level][0]);
       }
     }
 
@@ -843,7 +840,7 @@ namespace Sayuri {
 
       // メイトを見つけたらフラグを立てる。
       // 直接ループを抜けない理由は、depth等の終了条件対策。
-      if (pv_line_table_[level].ply_mate() >= 0) {
+      if (pv_line_table_[level].mate_in() >= 0) {
         found_mate = true;
       }
     }
@@ -1262,8 +1259,8 @@ namespace Sayuri {
           if (score >= temp_beta) {
             // 探索失敗。
             // ベータ値を広げる。
-            if ((pv_line_table_[job.level_ + 1].ply_mate() >= 0)
-            && ((pv_line_table_[job.level_ + 1].ply_mate() % 2) == 1)) {
+            if ((pv_line_table_[job.level_ + 1].mate_in() >= 0)
+            && ((pv_line_table_[job.level_ + 1].mate_in() % 2) == 1)) {
               // メイトっぽかった場合。
               *(job.beta_ptr_) = MAX_VALUE;
             } else {
@@ -1276,8 +1273,8 @@ namespace Sayuri {
           } else if (score <= temp_alpha) {
             // 探索失敗。
             // アルファ値を広げる。
-            if ((pv_line_table_[job.level_ + 1].ply_mate() >= 0)
-            && ((pv_line_table_[job.level_ + 1].ply_mate() % 2) == 0)) {
+            if ((pv_line_table_[job.level_ + 1].mate_in() >= 0)
+            && ((pv_line_table_[job.level_ + 1].mate_in() % 2) == 0)) {
               // メイトされていたかもしれない場合。
               *(job.alpha_ptr_) = -MAX_VALUE;
             } else {
@@ -1337,8 +1334,8 @@ namespace Sayuri {
               if (score >= temp_beta) {
                 // 探索失敗。
                 // ベータ値を広げる。
-                if ((pv_line_table_[job.level_ + 1].ply_mate() >= 0)
-                && ((pv_line_table_[job.level_ + 1].ply_mate() % 2) == 1)) {
+                if ((pv_line_table_[job.level_ + 1].mate_in() >= 0)
+                && ((pv_line_table_[job.level_ + 1].mate_in() % 2) == 1)) {
                   // メイトっぽかった場合。
                   *(job.beta_ptr_) = MAX_VALUE;
                   job.mutex_ptr_->unlock();
@@ -1383,8 +1380,7 @@ namespace Sayuri {
         // トランスポジションテーブルに登録。
         if (shared_st_ptr_->search_params_ptr_->enable_ttable()) {
           job.table_ptr_->Add(job.pos_hash_, job.depth_, score,
-          ScoreType::EXACT, (*(job.pv_line_ptr_))[0],
-          job.pv_line_ptr_->ply_mate());
+          ScoreType::EXACT, (*(job.pv_line_ptr_))[0]);
         }
 
         // 標準出力にPV情報を表示。

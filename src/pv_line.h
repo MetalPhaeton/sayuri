@@ -61,7 +61,7 @@ namespace Sayuri {
       void ResetLine() {
         last_ = begin_;
         score_ = 0;
-        ply_mate_ = -1;
+        mate_in_ = -1;
       }
 
       /**************/
@@ -74,7 +74,7 @@ namespace Sayuri {
       // 評価値。
       int score() const {return score_;}
       // メイトまでのプライ。-1はメイトなし。
-      int ply_mate() const {return ply_mate_;}
+      int mate_in() const {return mate_in_;}
 
       /******************/
       /* ミューテータ。 */
@@ -82,7 +82,7 @@ namespace Sayuri {
       // 評価値。
       void score(int score) {score_ = score;}
       // メイトまでのプライ。
-      void ply_mate(int ply_mate) {ply_mate_ = ply_mate;}
+      void mate_in(int mate_in) {mate_in_ = mate_in;}
 
     private:
       /****************/
@@ -97,7 +97,7 @@ namespace Sayuri {
       // 評価値。
       int score_;
       // メイトまでのプライ。-1はメイトなし。
-      int ply_mate_;
+      int mate_in_;
   };
 }  // namespace_Sayuri
 
