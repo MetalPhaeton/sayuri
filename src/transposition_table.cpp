@@ -97,7 +97,7 @@ namespace Sayuri {
 
   // テーブルに追加する。
   void TranspositionTable::Add(Hash pos_hash, int depth, int score,
-  ScoreType score_type, Move best_move) {
+  ScoreType score_type, Move best_move, int mate_in) {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
 
     // テーブルのインデックスを得る。
@@ -113,7 +113,7 @@ namespace Sayuri {
     if ((entry_table_[index].table_age() < age_)
     || (depth >= entry_table_[index].depth())) {
       entry_table_[index] =
-      TTEntry(pos_hash, depth, score, score_type, best_move, age_);
+      TTEntry(pos_hash, depth, score, score_type, best_move, mate_in, age_);
     }
   }
 
@@ -136,12 +136,13 @@ namespace Sayuri {
   /************************/
   // コンストラクタ。
   TTEntry::TTEntry(Hash pos_hash, int depth, int score, ScoreType score_type,
-  Move best_move, int table_age) :
+  Move best_move, int mate_in, int table_age) :
   pos_hash_(pos_hash),
   depth_(depth),
   score_(score),
   score_type_(score_type),
   best_move_(best_move),
+  mate_in_(mate_in),
   table_age_(table_age) {}
 
   // デフォルトコンストラクタ。
@@ -151,6 +152,7 @@ namespace Sayuri {
   score_(0),
   score_type_(ScoreType::ALPHA),
   best_move_(0),
+  mate_in_(-1),
   table_age_(-1) {}
 
   // コピーコンストラクタ。
@@ -160,6 +162,7 @@ namespace Sayuri {
   score_(entry.score_),
   score_type_(entry.score_type_),
   best_move_(entry.best_move_),
+  mate_in_(entry.mate_in_),
   table_age_(entry.table_age_) {}
 
   // ムーブコンストラクタ。
@@ -169,6 +172,7 @@ namespace Sayuri {
   score_(entry.score_),
   score_type_(entry.score_type_),
   best_move_(entry.best_move_),
+  mate_in_(entry.mate_in_),
   table_age_(entry.table_age_) {}
 
   // コピー代入。
@@ -178,6 +182,7 @@ namespace Sayuri {
     score_ = entry.score_;
     score_type_ = entry.score_type_;
     best_move_ = entry.best_move_;
+    mate_in_ = entry.mate_in_;
     table_age_ = entry.table_age_;
 
     return *this;
@@ -190,6 +195,7 @@ namespace Sayuri {
     score_ = entry.score_;
     score_type_ = entry.score_type_;
     best_move_ = entry.best_move_;
+    mate_in_ = entry.mate_in_;
     table_age_ = entry.table_age_;
 
     return *this;

@@ -51,7 +51,7 @@ namespace Sayuri {
       // 手を最初に挿入する。
       void SetMove(Move move) {
         line_[0] = move;
-        last_ = begin_ + 1;
+        last_ = 1;
       }
       // PVLineを2番目以降の要素にコピーする。
       // [引数]
@@ -59,7 +59,7 @@ namespace Sayuri {
       void Insert(const PVLine& pv_line);
       // ラインをリセットする。
       void ResetLine() {
-        last_ = begin_;
+        last_ = 0;
         score_ = 0;
         mate_in_ = -1;
       }
@@ -70,7 +70,7 @@ namespace Sayuri {
       // ライン。
       const Move& operator[](int index) const {return line_[index];}
       // 長さ。
-      std::size_t length() const {return last_ - begin_;}
+      std::size_t length() const {return last_;}
       // 評価値。
       int score() const {return score_;}
       // メイトまでのプライ。-1はメイトなし。
@@ -91,9 +91,7 @@ namespace Sayuri {
       // PVライン。
       Move line_[MAX_PLYS + 1 + 1];
       // PVラインのポインタ。
-      Move* begin_;
-      Move* end_;
-      Move* last_;
+      std::size_t last_;
       // 評価値。
       int score_;
       // メイトまでのプライ。-1はメイトなし。

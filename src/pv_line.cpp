@@ -35,29 +35,24 @@ namespace Sayuri {
   /* コンストラクタと代入。 */
   /**************************/
   // コンストラクタ。
-  PVLine::PVLine() : begin_(line_), end_(&(line_[MAX_PLYS + 1])),
-  last_(begin_), score_(0), mate_in_(-1) {}
+  PVLine::PVLine() : last_(0), score_(0), mate_in_(-1) {}
 
   // コピーコンストラクタ。
   PVLine::PVLine(const PVLine& pv_line) :
-  begin_(line_),
-  end_(&(line_[MAX_PLYS + 1])),
-  last_(begin_ + (pv_line.last_ - pv_line.begin_)),
+  last_(pv_line.last_),
   score_(pv_line.score_),
   mate_in_(pv_line.mate_in_) {
-    for (int i = 0; i < (end_ - begin_); i++) {
+    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); i++) {
       line_[i] = pv_line.line_[i];
     }
   }
 
   // ムーブコンストラクタ。
   PVLine::PVLine(PVLine&& pv_line) :
-  begin_(line_),
-  end_(&(line_[MAX_PLYS + 1])),
-  last_(begin_ + (pv_line.last_ - pv_line.begin_)),
+  last_(pv_line.last_),
   score_(pv_line.score_),
   mate_in_(pv_line.mate_in_) {
-    for (int i = 0; i < (end_ - begin_); i++) {
+    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); i++) {
       line_[i] = pv_line.line_[i];
     }
   }
@@ -66,8 +61,8 @@ namespace Sayuri {
   PVLine& PVLine::operator=(const PVLine& pv_line) {
     score_ = pv_line.score_;
     mate_in_ = pv_line.mate_in_;
-    last_ = begin_ + (pv_line.last_ - pv_line.begin_);
-    for (int i = 0; i < (end_ - begin_); i++) {
+    last_ = pv_line.last_;
+    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); i++) {
       line_[i] = pv_line.line_[i];
     }
 
@@ -78,8 +73,8 @@ namespace Sayuri {
   PVLine& PVLine::operator=(PVLine&& pv_line) {
     score_ = pv_line.score_;
     mate_in_ = pv_line.mate_in_;
-    last_ = begin_ + (pv_line.last_ - pv_line.begin_);
-    for (int i = 0; i < (end_ - begin_); i++) {
+    last_ = pv_line.last_;
+    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); i++) {
       line_[i] = pv_line.line_[i];
     }
 
@@ -92,8 +87,8 @@ namespace Sayuri {
   // PVラインを2番目以降の要素にコピーする。
   void PVLine::Insert(const PVLine& pv_line) {
     // PVラインをコピー。
-    last_ = (begin_ + 1) + (pv_line.last_ - pv_line.begin_);
-    for (int i = 1; i < (last_ - begin_); i++) {
+    last_ = pv_line.last_ + 1;
+    for (std::size_t i = 1; i < last_; i++) {
       line_[i] = pv_line.line_[i - 1];
     }
 

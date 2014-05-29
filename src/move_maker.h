@@ -30,6 +30,7 @@
 #include <iostream>
 #include <mutex>
 #include <cstddef>
+#include <cstdint>
 #include "common.h"
 
 namespace Sayuri {
@@ -75,13 +76,12 @@ namespace Sayuri {
       // スタックに候補手を再展開する。
       int RegenMoves() {
         last_ = max_;
-        return num_moves_;
+        return CountMoves();
       }
 
       // スタックをリセットする。
       void ResetStack() {
-        begin_ = last_ = max_ = move_stack_;
-        num_moves_ = 0;
+        last_ = max_ = 0;
         history_max_ = 1;
       }
 
@@ -94,7 +94,7 @@ namespace Sayuri {
       // スタック内に残っている候補手の数を返す。
       // [戻り値]
       // 残っている候補手の数。
-      int CountMoves() const;
+      int CountMoves() const {return last_;}
 
     private:
       // デバッグ用関数をフレンド。
@@ -110,9 +110,7 @@ namespace Sayuri {
       // iid_move: IIDによる最善手。
       // killer_1: キラームーブ。同一レベルのノードで記録した手。
       // killer_2: キラームーブ。2プライ前のレベルのノードで記録した手。
-      // [戻り値]
-      // 生成した手の数。
-      template<GenMoveType Type> int GenMovesCore(Move prev_best,
+      template<GenMoveType Type> void GenMovesCore(Move prev_best,
       Move iid_move, Move killer_1, Move killer_2);
 
       // 手に点数をつける。
@@ -124,7 +122,7 @@ namespace Sayuri {
       // killer_2: キラームーブ。2プライ前のレベルのノードで記録した手。
       // side: 手のサイド。
       template<GenMoveType Type>
-      void ScoreMoves(MoveSlot* start, Move prev_best, Move iid_move,
+      void ScoreMoves(std::size_t start, Move prev_best, Move iid_move,
       Move killer_1, Move killer_2, Side side);
 
       /****************/
@@ -137,16 +135,11 @@ namespace Sayuri {
       MoveSlot move_stack_[MAX_CANDIDATES + 1];
 
       // スタックのポインタ。
-      MoveSlot* begin_;
-      MoveSlot* end_;
-      MoveSlot* last_;
-      MoveSlot* max_;
+      std::size_t last_;
+      std::size_t max_;
 
       // ヒストリーの最大値。
       std::uint64_t history_max_;
-
-      // 展開された手の数。
-      std::int32_t num_moves_;
 
       // ミューテックス。
       std::mutex mutex_;

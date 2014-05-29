@@ -49,9 +49,10 @@ namespace Sayuri {
       // value: 評価値。
       // score_type: 評価値の種類。
       // best_move: 最善手。
+      // mate_in: メイトまでの手数。
       // table_age: トランスポジションテーブルの年齢。
       TTEntry(Hash pos_hash, int depth, int value, ScoreType score_type,
-      Move best_move, int table_age);
+      Move best_move, int mate_in,  int table_age);
       TTEntry();
       TTEntry(const TTEntry& entry);
       TTEntry(TTEntry&& entry);
@@ -78,6 +79,8 @@ namespace Sayuri {
       ScoreType score_type() const {return score_type_;}
       // 最善手。
       Move best_move() const {return best_move_;}
+      // メイトまでの手数。
+      int mate_in() const {return mate_in_;}
       // トランスポジションテーブルの年齢。
       int table_age() const {return table_age_;}
 
@@ -95,6 +98,8 @@ namespace Sayuri {
       ScoreType score_type_;
       // 最善手。
       Move best_move_;
+      // メイトまでの手数。
+      int mate_in_;
       // 記録時のトランスポジションテーブルの年齢。
       int table_age_;
   };
@@ -125,8 +130,9 @@ namespace Sayuri {
       // value: 評価値。
       // score_type: 評価値の種類。
       // best_move: 最善手。
+      // mate_in: メイトまでの手数。
       void Add(Hash pos_hash, int depth, int value, ScoreType score_type,
-      Move best_move);
+      Move best_move, int mate_in);
 
       // 条件を満たすエントリーを得る。
       // Lock()とUnlock()で挟んでロックする。
