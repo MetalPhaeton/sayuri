@@ -39,73 +39,29 @@ namespace Sayuri {
   /* コンストラクタと代入。 */
   /**************************/
   // コンストラクタ。
-  Fen::Fen(const std::string fen_str) {
+  Fen::Fen(const std::string fen_str) :
+  en_passant_square_(0),
+  ply_100_(0),
+  ply_(1) {
     // fen_strを分解。
     std::vector<std::string> fen_tokens = Util::Split(fen_str, " ", "");
 
     try {
       // FENを解析。
-      constexpr unsigned int index_position = 0;
-      constexpr unsigned int index_to_move = 1;
-      constexpr unsigned int index_castling_rights = 2;
-      constexpr unsigned int index_en_passant = 3;
-      constexpr unsigned int index_ply_100 = 4;
-      constexpr unsigned int index_ply = 5;
-      EvalPosition(fen_tokens[index_position]);
-      EvalToMove(fen_tokens[index_to_move]);
-      EvalCastlingRights(fen_tokens[index_castling_rights]);
-      if (fen_tokens.size() > index_en_passant) {
-        EvalEnPassant(fen_tokens[index_en_passant]);
-        if (fen_tokens.size() > index_ply_100) {
-          EvalPly100(fen_tokens[index_ply_100]);
-          if (fen_tokens.size() > index_ply) {
-            EvalPly(fen_tokens[index_ply], fen_tokens[index_to_move]);
-          } else {
-            ply_ = 1;
-          }
-        } else {
-          ply_100_ = 0;
-          ply_ = 1;
-        }
-      } else {
-        en_passant_square_ = 0;
-        ply_100_ = 0;
-        ply_ = 1;
-      }
-    } catch (SayuriError error) {
-      throw error;
+      EvalPosition(fen_tokens[0]);
+      EvalToMove(fen_tokens[1]);
+      EvalCastlingRights(fen_tokens[2]);
+      if (fen_tokens.size() >= 4) EvalEnPassant(fen_tokens[3]);
+      if (fen_tokens.size() >= 5) EvalPly100(fen_tokens[4]);
+      if (fen_tokens.size() >= 6) EvalPly(fen_tokens[5]);
     } catch (...) {
-      throw SayuriError("FENを解析できません。");
+      SetStartPosition();
     }
-
   }
 
   // デフォルトコンストラクタ。
-  Fen::Fen() :
-  to_move_(WHITE),
-  castling_rights_(ALL_CASTLING),
-  en_passant_square_(0),
-  ply_100_(0),
-  ply_(1) {
-    // 駒を初期配置にする。
-    // ポーン。
-    position_[WHITE][PAWN] = Util::RANK[RANK_2];
-    position_[BLACK][PAWN] = Util::RANK[RANK_7];
-    // ナイト。
-    position_[WHITE][KNIGHT] = Util::SQUARE[B1] | Util::SQUARE[G1];
-    position_[BLACK][KNIGHT] = Util::SQUARE[B8] | Util::SQUARE[G8];
-    // ビショップ。
-    position_[WHITE][BISHOP] = Util::SQUARE[C1] | Util::SQUARE[F1];
-    position_[BLACK][BISHOP] = Util::SQUARE[C8] | Util::SQUARE[F8];
-    // ルーク。
-    position_[WHITE][ROOK] = Util::SQUARE[A1] | Util::SQUARE[H1];
-    position_[BLACK][ROOK] = Util::SQUARE[A8] | Util::SQUARE[H8];
-    // クイーン。
-    position_[WHITE][QUEEN] = Util::SQUARE[D1];
-    position_[BLACK][QUEEN] = Util::SQUARE[D8];
-    // キング。
-    position_[WHITE][KING] = Util::SQUARE[E1];
-    position_[BLACK][KING] = Util::SQUARE[E8];
+  Fen::Fen() {
+    SetStartPosition();
   }
 
   // コピーコンストラクタ。
@@ -117,8 +73,7 @@ namespace Sayuri {
   ply_(fen.ply_) {
     // 駒の配置をコピー。
     for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES;
-      piece_type++) {
+      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
         position_[side][piece_type] = fen.position_[side][piece_type];
       }
     }
@@ -133,8 +88,7 @@ namespace Sayuri {
   ply_(fen.ply_) {
     // 駒の配置をコピー。
     for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES;
-      piece_type++) {
+      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
         position_[side][piece_type] = fen.position_[side][piece_type];
       }
     }
@@ -149,8 +103,7 @@ namespace Sayuri {
     ply_100_ = fen.ply_100_;
     ply_ = fen.ply_;
     for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES;
-      piece_type++) {
+      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
         position_[side][piece_type] = fen.position_[side][piece_type];
       }
     }
@@ -167,8 +120,7 @@ namespace Sayuri {
     ply_100_ = fen.ply_100_;
     ply_ = fen.ply_;
     for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES;
-      piece_type++) {
+      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
         position_[side][piece_type] = fen.position_[side][piece_type];
       }
     }
@@ -337,15 +289,45 @@ namespace Sayuri {
     }
   }
   // 手数をバースする。
-  void Fen::EvalPly(const std::string& ply_str,
-  const std::string& to_move_str) {
+  void Fen::EvalPly(const std::string& ply_str) {
     try {
       ply_ = std::stoi(ply_str) * 2;
-      if (to_move_str[0] == 'w') {
+      if (to_move_ == WHITE) {
         ply_ -= 1;
       }
     } catch (...) {
       throw SayuriError("FENを解析できません。");
     }
   }
+
+  /**********************/
+  /* プライベート関数。 */
+  void Fen::SetStartPosition() {
+    to_move_ = WHITE;
+    castling_rights_ = ALL_CASTLING;
+    en_passant_square_ = 0;
+    ply_100_ = 0;
+    ply_ = 1;
+
+    // 駒を初期配置にする。
+    // ポーン。
+    position_[WHITE][PAWN] = Util::RANK[RANK_2];
+    position_[BLACK][PAWN] = Util::RANK[RANK_7];
+    // ナイト。
+    position_[WHITE][KNIGHT] = Util::SQUARE[B1] | Util::SQUARE[G1];
+    position_[BLACK][KNIGHT] = Util::SQUARE[B8] | Util::SQUARE[G8];
+    // ビショップ。
+    position_[WHITE][BISHOP] = Util::SQUARE[C1] | Util::SQUARE[F1];
+    position_[BLACK][BISHOP] = Util::SQUARE[C8] | Util::SQUARE[F8];
+    // ルーク。
+    position_[WHITE][ROOK] = Util::SQUARE[A1] | Util::SQUARE[H1];
+    position_[BLACK][ROOK] = Util::SQUARE[A8] | Util::SQUARE[H8];
+    // クイーン。
+    position_[WHITE][QUEEN] = Util::SQUARE[D1];
+    position_[BLACK][QUEEN] = Util::SQUARE[D8];
+    // キング。
+    position_[WHITE][KING] = Util::SQUARE[E1];
+    position_[BLACK][KING] = Util::SQUARE[E8];
+  }
+  /**********************/
 }  // namespace Sayuri

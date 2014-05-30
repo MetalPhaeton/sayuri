@@ -44,7 +44,6 @@ namespace Sayuri {
       // [引数]
       // fen_str: fenデータ。
       Fen(const std::string fen_str);
-
       Fen();
       Fen(const Fen& fen);
       Fen(Fen&& fen);
@@ -85,8 +84,13 @@ namespace Sayuri {
       // 50手ルールトークンを評価する。
       void EvalPly100(const std::string& ply_100_str);
       // 手数トークンを評価する。
-      void EvalPly(const std::string& ply_str,
-      const std::string& to_move_str);
+      void EvalPly(const std::string& ply_str);
+
+      /**********************/
+      /* プライベート関数。 */
+      /**********************/
+      // スタートポジションにセット。
+      void SetStartPosition();
 
       /****************/
       /* メンバ変数。 */
