@@ -72,28 +72,28 @@ namespace Sayuri {
       /**
        * 基本コンストラクタ。
        * @param search_params 探索関数用パラメータ。
-       * @params eval_params 評価関数用パラメータ。
+       * @param eval_params 評価関数用パラメータ。
        */
       ChessEngine(const SearchParams& search_params,
       const EvalParams& eval_params);
       /**
        * コピーコンストラクタ。
-       * @params engine コピー元。
+       * @param engine コピー元。
        */
       ChessEngine(const ChessEngine& engine);
       /**
        * ムーブコンストラクタ。
-       * @params engine ムーブ元。
+       * @param engine ムーブ元。
        */
       ChessEngine(ChessEngine&& engine);
       /**
        * コピー代入演算子。
-       * @params engine コピー元。
+       * @param engine コピー元。
        */
       ChessEngine& operator=(const ChessEngine& engine);
       /**
        * ムーブ代入演算子。
-       * @params engine ムーブ元。
+       * @param engine ムーブ元。
        */
       ChessEngine& operator=(ChessEngine&& engine);
       /** デストラクタ。 */
