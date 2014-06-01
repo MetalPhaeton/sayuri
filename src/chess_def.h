@@ -25,7 +25,7 @@
  * @file chess_def.h
  * @author Hironori Ishibashi
  * 
- * Sayuriで使う定数の定義。
+ * @brief Sayuriで使う定数の定義。
  */
 
 
