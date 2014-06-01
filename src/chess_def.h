@@ -24,10 +24,8 @@
 /**
  * @file chess_def.h
  * @author Hironori Ishibashi
- * 
- * @brief Sayuriで使う定数の定義。
+ * @brief Sayuriで使う定義全般。
  */
-
 
 #ifndef CHESS_DEF_H
 #define CHESS_DEF_H
