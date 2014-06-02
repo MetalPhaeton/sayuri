@@ -76,6 +76,7 @@ namespace Sayuri {
   // ================== //
   // Utilクラスの初期化 //
   // ================== //
+  // static変数の初期化。
   void Util::InitUtil() {
     // num_bit16_table_[]を初期化する。
     InitNumBit16Table();

@@ -177,6 +177,7 @@ namespace Sayuri {
   // ========================= //
   // ChessEngineクラスの初期化 //
   // ========================= //
+  // static変数の初期化。
   void ChessEngine::InitChessEngine() {
   }
 

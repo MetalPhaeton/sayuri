@@ -47,7 +47,7 @@ namespace Sayuri {
       // ============ //
       // UTilの初期化 //
       // ============ //
-      /** Utilの初期化。 */
+      /** static変数の初期化。 */
       static void InitUtil();
 
       // ================== //
