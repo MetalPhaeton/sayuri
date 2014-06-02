@@ -146,7 +146,7 @@ namespace Sayuri {
       // 価値を計算する関数 //
       // ================== //
       /**
-       * 各駒のを計算する。
+       * 各駒の価値を計算する。
        * @param <Type> 駒の種類。
        * @param piece_square 駒のいるマス。
        * @param piece_side 駒のサイド。

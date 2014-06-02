@@ -1,28 +1,31 @@
-/*
-   evaluator.cpp: 局面を評価するクラスの実装。
+/* The MIT License (MIT)
+ *
+ * Copyright (c) 2014 Hironori Ishibashi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
-   The MIT License (MIT)
-
-   Copyright (c) 2014 Hironori Ishibashi
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to
-   deal in the Software without restriction, including without limitation the
-   rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-   sell copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-   IN THE SOFTWARE.
-*/
+/**
+ * @file evaluator.cpp
+ * @author Hironori Ishibashi
+ * @brief 評価関数クラスの実装。
+ */
 
 #include "evaluator.h"
 
@@ -31,10 +34,11 @@
 #include "chess_engine.h"
 #include "params.h"
 
+/** Sayuri 名前空間。 */
 namespace Sayuri {
-  /****************/
-  /* static変数。 */
-  /****************/
+  // ========== //
+  // static変数 //
+  // ========== //
   Bitboard Evaluator::start_position_[NUM_SIDES][NUM_PIECE_TYPES];
   Bitboard Evaluator::center_mask_;
   Bitboard Evaluator::sweet_center_mask_;
@@ -43,9 +47,9 @@ namespace Sayuri {
   Bitboard Evaluator::pawn_shield_mask_[NUM_SIDES][NUM_SQUARES];
   Bitboard Evaluator::weak_square_mask_[NUM_SIDES][NUM_SQUARES];
 
-  /**************************/
-  /* コンストラクタと代入。 */
-  /**************************/
+  // ==================== //
+  // コンストラクタと代入 //
+  // ==================== //
   // コンストラクタ。
   Evaluator::Evaluator(const ChessEngine& engine)
   : engine_ptr_(&engine) {
@@ -73,11 +77,12 @@ namespace Sayuri {
     return *this;
   }
 
-  /*****************************/
-  /* Evaluatorクラスの初期化。 */
-  /*****************************/
+  // ======================= //
+  // Evaluatorクラスの初期化 //
+  // ======================= //
+  // static変数の初期化。
   void Evaluator::InitEvaluator() {
-    // 駒の初期位置を初期化。
+    // start_position_[][]を初期化。
     InitStartPosition();
     // センターマスクを初期化する。
     InitCenterMask();
@@ -91,11 +96,10 @@ namespace Sayuri {
     InitWeakSquareMask();
   }
 
-  /********************/
-  /* パブリック関数。 */
-  /********************/
-
-  // 評価値を返す。
+  // ============== //
+  // パブリック関数 //
+  // ============== //
+  // 現在の局面の評価値を計算する。
   int Evaluator::Evaluate(int material) {
     // 価値の変数の初期化。
     for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
@@ -260,7 +264,7 @@ namespace Sayuri {
     return static_cast<int>(score);
   }
 
-  // 現在の局面を評価し、構造体にして返す。
+  // 現在の局面を評価し、構造体にして結果を返す。
   EvalResult Evaluator::GetEvalResult() {
     EvalResult result;
 
@@ -354,10 +358,10 @@ namespace Sayuri {
     return result;
   }
 
-  /****************************/
-  /* 局面評価に使用する関数。 */
-  /****************************/
-  // 勝つのに十分な駒があるかどうか調べる。
+  // ====================== //
+  // 局面評価に使用する関数 //
+  // ====================== //
+  // メイトに必要な駒があるかどうか調べる。
   bool Evaluator::HasEnoughPieces(Side side) const {
     // ポーンがあれば大丈夫。
     if (engine_ptr_->position()[side][PAWN]) return true;
@@ -385,10 +389,10 @@ namespace Sayuri {
     return false;
   }
 
-  /************************/
-  /* 価値を計算する関数。 */
-  /************************/
-  // 各駒での価値を計算する。
+  // ================== //
+  // 価値を計算する関数 //
+  // ================== //
+  // 各駒の価値を計算する。
   template<Piece Type>
   void Evaluator::CalValue(Square piece_square, Side piece_side) {
     // サイド。
@@ -469,6 +473,7 @@ namespace Sayuri {
         break;
     }
 
+    // --- 全駒共通 --- //
     // オープニング時の駒の配置を計算。
     if (piece_side == WHITE) {
       opening_position_value_[Type] += sign
@@ -527,6 +532,7 @@ namespace Sayuri {
       & Util::GetKingMove(engine_ptr_->king()[enemy_piece_side]));
     }
 
+    // --- ポーン --- //
     // ポーンの構成を計算。
     if (Type == PAWN) {
       // パスポーンを計算。
@@ -566,6 +572,7 @@ namespace Sayuri {
       }
     }
 
+    // --- ビショップ --- //
     if (Type == BISHOP) {
       // バッドビショップを計算。
       if ((Util::SQUARE[piece_square] & Util::SQCOLOR[WHITE])) {
@@ -613,7 +620,7 @@ namespace Sayuri {
       pin_knight_value_ += sign * value;
     }
 
-    // セミオープン、オープンファイルのルークを計算。
+    // --- ルーク --- //
     if (Type == ROOK) {
       Bitboard rook_fyle = Util::FYLE[Util::GetFyle(piece_square)];
       // セミオープン。
@@ -626,8 +633,9 @@ namespace Sayuri {
       }
     }
 
-    // クイーンの早過ぎる始動を計算。
+    // --- クイーン --- //
     if (Type == QUEEN) {
+      // クイーンの早過ぎる始動を計算。
       value = 0.0;
       if (!(Util::SQUARE[piece_square]
       & start_position_[piece_side][QUEEN])) {
@@ -639,7 +647,7 @@ namespace Sayuri {
       early_queen_launched_value_ += sign * value;
     }
 
-    // キングの守りを計算。
+    // --- キング --- //
     if (Type == KING) {
       // キング周りの弱いマスを計算。
       // 弱いマス。
@@ -686,10 +694,10 @@ namespace Sayuri {
   template void Evaluator::CalValue<KING>
   (Square piece_type, Side piece_side);
 
-  /******************************/
-  /* その他のプライベート関数。 */
-  /******************************/
-  // 駒の初期位置を初期化。
+  // ======================== //
+  // その他のプライベート関数 //
+  // ======================== //
+  // start_position[][]を初期化。
   void Evaluator::InitStartPosition() {
     // ポーン。
     start_position_[WHITE][PAWN] = Util::RANK[RANK_2];
@@ -716,7 +724,7 @@ namespace Sayuri {
     start_position_[BLACK][KING] = Util::SQUARE[E8];
   }
 
-  // センターマスクを初期化する。
+  // center_mask_、sweet_center_mask_を初期化する。
   void Evaluator::InitCenterMask() {
     // センター。
     center_mask_ = Util::SQUARE[C3] | Util::SQUARE[C4]
