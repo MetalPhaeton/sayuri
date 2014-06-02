@@ -113,13 +113,25 @@ namespace Sayuri {
       // ==================== //
       /** コンストラクタ。 */
       StopWatch();
-      /** コピーコンストラクタ。 */
+      /** 
+       * コピーコンストラクタ。
+       * @param watch コピー元。
+       */
       StopWatch(const StopWatch& watch);
-      /** ムーブコンストラクタ。 */
+      /** 
+       * ムーブコンストラクタ。
+       * @param watch ムーブ元。
+       */
       StopWatch(StopWatch&& watch);
-      /** コピー代入演算子。 */
+      /** 
+       * コピー代入演算子。
+       * @param watch コピー元。
+       */
       StopWatch& operator=(const StopWatch& watch);
-      /** ムーブ代入演算子。 */
+      /** 
+       * ムーブ代入演算子。
+       * @param watch ムーブ元。
+       */
       StopWatch& operator=(StopWatch&& watch);
       /** デストラクタ。 */
       virtual ~StopWatch() {}

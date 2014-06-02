@@ -48,13 +48,25 @@ namespace Sayuri {
       // ==================== //
       /** コンストラクタ。 */
       HelperQueue();
-      /** コピーコンストラクタ。 */
+      /**
+       * コピーコンストラクタ。
+       * @param queue コピー元。
+       */
       HelperQueue(const HelperQueue& queue);
-      /** ムーブコンストラクタ。 */
+      /**
+       * ムーブコンストラクタ。
+       * @param queue ムーブ元。
+       */
       HelperQueue(HelperQueue&& queue);
-      /** コピー代入演算子。 */
+      /**
+       * コピー代入演算子。
+       * @param queue コピー元。
+       */
       HelperQueue& operator=(const HelperQueue& queue);
-      /** ムーブ代入演算子。 */
+      /**
+       * ムーブ代入演算子。
+       * @param queue ムーブ元。
+       */
       HelperQueue& operator=(HelperQueue&& queue);
       /** デストラクタ。 */
       virtual ~HelperQueue() {}

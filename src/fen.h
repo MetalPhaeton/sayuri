@@ -52,13 +52,25 @@ namespace Sayuri {
       Fen(const std::string fen_str);
       /** コンストラクタ。 */
       Fen();
-      /** コピーコンストラクタ。 */
+      /**
+       * コピーコンストラクタ。
+       * @param fen コピー元。
+       */
       Fen(const Fen& fen);
-      /** ムーブコンストラクタ。 */
+      /**
+       * ムーブコンストラクタ。
+       * @param fen ムーブ元。
+       */
       Fen(Fen&& fen);
-      /** コピー代入演算子。 */
+      /**
+       * コピー代入演算子。
+       * @param fen コピー元。
+       */
       Fen& operator=(const Fen& fen);
-      /** ムーブ代入演算子。 */
+      /**
+       * ムーブ代入演算子。
+       * @param fen ムーブ元。
+       */
       Fen& operator=(Fen&& fen);
       /** デストラクタ。 */
       virtual ~Fen() {}

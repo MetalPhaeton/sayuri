@@ -103,13 +103,25 @@ namespace Sayuri {
        * @param engine 評価したいエンジン。
        */
       Evaluator(const ChessEngine& engine);
-      /** コピーコンストラクタ。 */
+      /** 
+       * コピーコンストラクタ。
+       * @param eval コピー元。
+       */
       Evaluator(const Evaluator& eval);
-      /** ムーブコンストラクタ。 */
+      /** 
+       * ムーブコンストラクタ。
+       * @param eval ムーブ元。
+       */
       Evaluator(Evaluator&& eval);
-      /** コピー代入演算子。 */
+      /** 
+       * コピー代入演算子。
+       * @param eval コピー元。
+       */
       Evaluator& operator=(const Evaluator& eval);
-      /** ムーブ代入演算子。 */
+      /** 
+       * ムーブ代入演算子。
+       * @param eval ムーブ元。
+       */
       Evaluator& operator=(Evaluator&& eval);
       /** コンストラクタ。 (削除) */
       Evaluator() = delete;
