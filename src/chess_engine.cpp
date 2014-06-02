@@ -1,28 +1,31 @@
-/*
-   chess_engine.cpp: チェスボードの基本的な実装。
+/* The MIT License (MIT)
+ *
+ * Copyright (c) 2014 Hironori Ishibashi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
-   The MIT License (MIT)
-
-   Copyright (c) 2014 Hironori Ishibashi
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to
-   deal in the Software without restriction, including without limitation the
-   rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-   sell copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-   IN THE SOFTWARE.
-*/
+/**
+ * @file chess_engine.cpp
+ * @author Hironori Ishibashi
+ * @brief チェスエンジンの本体の実装。
+ */
 
 #include "chess_engine.h"
 
@@ -47,9 +50,9 @@
 #include "params.h"
 
 namespace Sayuri {
-  /**************************/
-  /* コンストラクタと代入。 */
-  /***************************/
+  // ==================== //
+  // コンストラクタと代入 //
+  // ==================== //
   // コンストラクタ。
   ChessEngine::ChessEngine(const SearchParams& search_params,
   const EvalParams& eval_params) :
@@ -170,15 +173,16 @@ namespace Sayuri {
   ChessEngine::~ChessEngine() {
   }
 
-  /*******************************/
-  /* ChessEngineクラスの初期化。 */
-  /*******************************/
+  // ========================= //
+  // ChessEngineクラスの初期化 //
+  // ========================= //
   void ChessEngine::InitChessEngine() {
   }
 
-  /********************/
-  /* パブリック関数。 */
-  /********************/
+  // ============== //
+  // パブリック関数 //
+  // ============== //
+  // FEN文字列を読み込む。
   void ChessEngine::LoadFen(const Fen& fen) {
     // キングの数がおかしいならやめる。
     int num_white_king = Util::CountBits(fen.position()[WHITE][KING]);
@@ -230,7 +234,7 @@ namespace Sayuri {
     shared_st_ptr_->position_history_.push_back(PositionRecord(*this));
   }
 
-  // PositionRecordから読み込む。
+  // PositionRecordから局面読み込む。
   void ChessEngine::LoadRecord(const PositionRecord& record) {
     // 空にする。
     for (Square square = 0; square < NUM_SQUARES; square++) {
@@ -460,7 +464,7 @@ namespace Sayuri {
     ply_ = engine.ply_;
   }
 
-  // 思考を始める。
+  // 探索を開始する。
   PVLine ChessEngine::Calculate(int num_threads, TranspositionTable& table,
   const std::vector<Move>& moves_to_search, UCIShell& shell) {
     num_threads = num_threads >= 1 ? num_threads : 1;
@@ -468,7 +472,7 @@ namespace Sayuri {
     return std::move(SearchRoot(table, moves_to_search, shell));
   }
 
-  // 思考を停止する。
+  // 探索を終了させる。
   void ChessEngine::StopCalculation() {
     shared_st_ptr_->stop_now_ = true;
   }
@@ -517,7 +521,7 @@ namespace Sayuri {
     }
   }
 
-  // 手を戻す。
+  // 1手戻す。
   void ChessEngine::UndoMove() {
     if (shared_st_ptr_->move_history_.size() >= 1) {
       ply_--;
@@ -532,7 +536,7 @@ namespace Sayuri {
     }
   }
 
-  // キャスリングできるかどうか。
+  // キャスリング出来るかどうかを判定する。
   template<Castling Flag>
   bool ChessEngine::CanCastling() const {
     if (!(castling_rights_ & Flag)) return false;
@@ -583,7 +587,7 @@ namespace Sayuri {
   template bool ChessEngine::CanCastling<BLACK_SHORT_CASTLING>() const;
   template bool ChessEngine::CanCastling<BLACK_LONG_CASTLING>() const;
 
-  // 駒を動かす。
+  // 次の手を指す。
   void ChessEngine::MakeMove(Move& move) {
     // 動かす側のサイドを得る。
     Side side = to_move_;
@@ -604,7 +608,7 @@ namespace Sayuri {
     Piece promotion = move_promotion(move);
     MoveType move_type = move_move_type(move);
 
-    // NULL_MOVEならNull moveする。
+    // NULL_MOVEならNull Moveする。
     if (move_type == NULL_MOVE) {
       return;
     }
@@ -676,7 +680,7 @@ namespace Sayuri {
     }
   }
 
-  // 手を元に戻す。
+  // MakeMove()で動かした手を元に戻す。
   void ChessEngine::UnmakeMove(Move move) {
     // 相手のサイドを得る。
     Side enemy_side = to_move_;
@@ -731,7 +735,7 @@ namespace Sayuri {
     }
   }
 
-  // 攻撃されているかどうか調べる。
+  // その位置が他の位置の駒に攻撃されているかどうかチェックする。
   bool ChessEngine::IsAttacked(Square square, Side side) const {
     // ポーンに攻撃されているかどうか調べる。
     Bitboard attack = Util::GetPawnAttack(square, side ^ 0x3);
@@ -759,7 +763,7 @@ namespace Sayuri {
     return false;
   }
 
-  // マテリアルを得る。
+  // 現在のマテリアルを得る。
   int ChessEngine::GetMaterial(Side side) const {
     // 相手のサイド。
     Side enemy_side = side ^ 0x3;
@@ -774,7 +778,7 @@ namespace Sayuri {
     return material;
   }
 
-  // 次の局面の自分のマテリアルを得る。
+  // 次の局面の「自分」のマテリアルを得る。
   int ChessEngine::GetNextMyMaterial(int current_material, Move move) const {
     if (move_move_type(move) == EN_PASSANT) {
       // アンパッサン。
@@ -921,10 +925,10 @@ namespace Sayuri {
     return current_hash;
   }
 
-  /******************************/
-  /* その他のプライベート関数。 */
-  /******************************/
-  // 駒を置く。（駒の種類piece_typeにEMPTYをおけば、駒を削除できる。）
+  // ======================== //
+  // その他のプライベート関数 //
+  // ======================== //
+  // 駒を置く。
   void ChessEngine::PutPiece(Square square, Piece piece_type, Side side) {
     // 置く位置の現在の駒の種類を入手する。
     Piece placed_piece = piece_board_[square];
@@ -971,7 +975,7 @@ namespace Sayuri {
     }
   }
 
-  // 駒の位置を入れ替える。
+  // 駒の位置を変える。
   void ChessEngine::ReplacePiece(Square from, Square to) {
     // 移動する位置と移動先の位置が同じなら何もしない。
     if (from == to) return;
@@ -981,9 +985,9 @@ namespace Sayuri {
     PutPiece(from, EMPTY, NO_SIDE);
   }
 
-  /**********************/
-  /* 共有メンバ構造体。 */
-  /**********************/
+  // ================ //
+  // 共有メンバ構造体 //
+  // ================ //
   // コンストラクタ。
   ChessEngine::SharedStruct::SharedStruct() :
   history_max_(1),
@@ -1094,7 +1098,7 @@ namespace Sayuri {
     }
   }
 
-  // ハッシュの配列を初期化する。
+  // ハッシュ値のテーブルを初期化する。
   void ChessEngine::SharedStruct::InitHashValueTable() {
     // ダブリのないハッシュを生成。
     constexpr int LENGTH =
