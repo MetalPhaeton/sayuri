@@ -1,28 +1,31 @@
-/* 
-   move_maker.cpp: 候補手を展開するクラスの実装。
+/* The MIT License (MIT)
+ *
+ * Copyright (c) 2014 Hironori Ishibashi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
-   The MIT License (MIT)
-
-   Copyright (c) 2014 Hironori Ishibashi
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to
-   deal in the Software without restriction, including without limitation the
-   rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-   sell copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-   IN THE SOFTWARE.
-*/
+/**
+ * @file move_maker.h
+ * @author Hironori Ishibashi
+ * @brief 候補手を生成するクラスの実装。
+ */
 
 #include "move_maker.h"
 
@@ -34,10 +37,11 @@
 #include "common.h"
 #include "chess_engine.h"
 
+/** Sayuri 名前空間。 */
 namespace Sayuri {
-  /**************************/
-  /* コンストラクタと代入。 */
-  /**************************/
+  // ==================== //
+  // コンストラクタと代入 //
+  // ==================== //
   //コンストラクタ。
   MoveMaker::MoveMaker(const ChessEngine& engine) :
   engine_ptr_(&engine),
@@ -93,10 +97,10 @@ namespace Sayuri {
     return *this;
   }
 
-  /********************/
-  /* パブリック関数。 */
-  /********************/
-  // 手をスタックに展開する。
+  // ============== //
+  // パブリック関数 //
+  // ============== //
+  // スタックに候補手を生成する。
   template<GenMoveType Type> int MoveMaker::GenMoves(Move prev_best,
   Move iid_move, Move killer_1, Move killer_2) {
     // 初期化。
@@ -130,7 +134,7 @@ namespace Sayuri {
     return last_;
   }
 
-  // 次の手を返す。
+  // 次の候補手を取り出す。
   Move MoveMaker::PickMove() {
     std::unique_lock<std::mutex> lock(mutex_);
 
@@ -155,7 +159,7 @@ namespace Sayuri {
     return slot.move_;
   }
 
-  // 手を生成する。 内部用。
+  // スタックに候補手を生成する。 (内部用)
   template<GenMoveType Type>
   void MoveMaker::GenMovesCore(Move prev_best, Move iid_move,
   Move killer_1, Move killer_2) {
@@ -352,7 +356,7 @@ namespace Sayuri {
   template void MoveMaker::GenMovesCore<GenMoveType::CAPTURE>
   (Move prev_best, Move iid_move, Move killer_1, Move killer_2);
 
-  // 手に点数をつける。
+  // 候補手に点数をつける。
   template<GenMoveType Type>
   void MoveMaker::ScoreMoves(std::size_t start, Move prev_best, Move iid_move,
   Move killer_1, Move killer_2, Side side) {

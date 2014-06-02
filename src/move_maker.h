@@ -24,7 +24,7 @@
 /**
  * @file move_maker.h
  * @author Hironori Ishibashi
- * @brief 候補手を生成する。
+ * @brief 候補手を生成するクラス。
  */
 
 #ifndef MOVE_MAKER_H
