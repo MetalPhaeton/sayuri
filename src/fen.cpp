@@ -1,29 +1,31 @@
-/* 
-   fen.cpp: fenパーサの実装ファイル。
+/* The MIT License (MIT)
+ *
+ * Copyright (c) 2014 Hironori Ishibashi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
-   The MIT License (MIT)
-
-   Copyright (c) 2014 Hironori Ishibashi
-
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to
-   deal in the Software without restriction, including without limitation the
-   rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-   sell copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-   IN THE SOFTWARE.
-*/
+/**
+ * @file fen.cpp
+ * @author Hironori Ishibashi
+ * @brief FEN文字列のパーサの実装。
+ */
 
 #include "fen.h"
 
@@ -34,10 +36,11 @@
 #include <cstddef>
 #include "common.h"
 
+/** Sayuri 名前空間。 */
 namespace Sayuri {
-  /**************************/
-  /* コンストラクタと代入。 */
-  /**************************/
+  // ==================== //
+  // コンストラクタと代入 //
+  // ==================== //
   // コンストラクタ。
   Fen::Fen(const std::string fen_str) :
   en_passant_square_(0),
@@ -128,10 +131,10 @@ namespace Sayuri {
     return *this;
   }
 
-  /************/
-  /* 評価器。 */
-  /************/
-  // 駒の配置トークンを評価する。
+  // =========== //
+  // FEN評価関数 //
+  // =========== //
+  // 駒の配置文字列を評価する。
   void Fen::EvalPosition(const std::string& position_str) {
     // 駒の配置を初期化。
     for (Side side = 0; side < NUM_SIDES; side++) {
@@ -210,7 +213,7 @@ namespace Sayuri {
     }
   }
 
-  // 手番トークンを評価する。
+  // 手番文字列を評価する。
   void Fen::EvalToMove(const std::string& to_move_str) {
     switch (to_move_str[0]) {
       case 'w':
@@ -225,7 +228,7 @@ namespace Sayuri {
     }
   }
 
-  // キャスリングの権利トークンを評価する。
+  // キャスリングの権利文字列を評価する。
   void Fen::EvalCastlingRights(const std::string& castling_rights_str) {
     castling_rights_ = 0;
 
@@ -252,25 +255,25 @@ namespace Sayuri {
     }
   }
 
-  // アンパッサントークンを評価する。
-  void Fen::EvalEnPassant(const std::string& en_passant_str) {
+  // アンパッサン文字列を評価する。
+  void Fen::EvalEnPassant(const std::string& en_passant_square_str) {
     // アンパッサンがない。
-    if (en_passant_str[0] == '-') {
+    if (en_passant_square_str[0] == '-') {
       en_passant_square_ = 0;
       return;
     }
 
     // ファイルから評価。
-    int index = en_passant_str[0] - 'a';
+    int index = en_passant_square_str[0] - 'a';
     if ((index < 0) || (index > 7)) {
       throw SayuriError("FENを解析できません。");
     }
     Bitboard fyle = Util::FYLE[index];
 
     // ランクを評価。
-    if (en_passant_str[1] == '3') {
+    if (en_passant_square_str[1] == '3') {
       index = RANK_3;
-    } else if (en_passant_str[1] == '6') {
+    } else if (en_passant_square_str[1] == '6') {
       index = RANK_6;
     } else {
       throw SayuriError("FENを解析できません。");
@@ -280,7 +283,7 @@ namespace Sayuri {
     en_passant_square_ = Util::GetSquare(fyle & rank);
   }
 
-  // 50手ルールトークンを評価する。
+  // 50手ルールの手数文字列を評価する。
   void Fen::EvalPly100(const std::string& ply_100_str) {
     try {
       ply_100_ = std::stoi(ply_100_str);
@@ -288,7 +291,8 @@ namespace Sayuri {
       throw SayuriError("FENを解析できません。");
     }
   }
-  // 手数をバースする。
+
+  // 手数文字列を評価する。
   void Fen::EvalPly(const std::string& ply_str) {
     try {
       ply_ = std::stoi(ply_str) * 2;
@@ -300,8 +304,10 @@ namespace Sayuri {
     }
   }
 
-  /**********************/
-  /* プライベート関数。 */
+  // ================ //
+  // プライベート関数 //
+  // ================ //
+  // スタートポジションにセット。
   void Fen::SetStartPosition() {
     to_move_ = WHITE;
     castling_rights_ = ALL_CASTLING;
@@ -329,5 +335,4 @@ namespace Sayuri {
     position_[WHITE][KING] = Util::SQUARE[E1];
     position_[BLACK][KING] = Util::SQUARE[E8];
   }
-  /**********************/
 }  // namespace Sayuri
