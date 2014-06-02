@@ -95,13 +95,13 @@ namespace Sayuri {
     ScanMember(params);
   }
 
-  // コピー代入。
+  // コピー代入演算子。
   SearchParams& SearchParams::operator=(const SearchParams& params) {
     ScanMember(params);
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   SearchParams& SearchParams::operator=(SearchParams&& params) {
     ScanMember(params);
     return *this;
@@ -410,13 +410,13 @@ namespace Sayuri {
     ScanMember(params);
   }
 
-  // コピー代入。
+  // コピー代入演算子。
   EvalParams& EvalParams::operator=(const EvalParams& params) {
     ScanMember(params);
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   EvalParams& EvalParams::operator=(EvalParams&& params) {
     ScanMember(params);
     return *this;

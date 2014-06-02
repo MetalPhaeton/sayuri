@@ -57,7 +57,7 @@ namespace Sayuri {
     }
   }
 
-  // コピー代入。
+  // コピー代入演算子。
   PVLine& PVLine::operator=(const PVLine& pv_line) {
     score_ = pv_line.score_;
     mate_in_ = pv_line.mate_in_;
@@ -69,7 +69,7 @@ namespace Sayuri {
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   PVLine& PVLine::operator=(PVLine&& pv_line) {
     score_ = pv_line.score_;
     mate_in_ = pv_line.mate_in_;

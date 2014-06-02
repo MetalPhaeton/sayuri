@@ -149,7 +149,7 @@ namespace Sayuri {
     }
   }
 
-  // コピー代入。
+  // コピー代入演算子。
   ChessEngine& ChessEngine::operator=(const ChessEngine& engine) {
     // 基本メンバをコピー。
     ScanBasicMember(engine);
@@ -160,7 +160,7 @@ namespace Sayuri {
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   ChessEngine& ChessEngine::operator=(ChessEngine&& engine) {
     // 基本メンバをコピー。
     ScanBasicMember(engine);
@@ -1031,14 +1031,14 @@ namespace Sayuri {
     ScanMember(shared_st);
   }
 
-  // コピー代入。
+  // コピー代入演算子。
   ChessEngine::SharedStruct& ChessEngine::SharedStruct::operator=
   (const SharedStruct& shared_st) {
     ScanMember(shared_st);
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   ChessEngine::SharedStruct& ChessEngine::SharedStruct::operator=
   (SharedStruct&& shared_st) {
     ScanMember(shared_st);

@@ -148,7 +148,7 @@ namespace Sayuri {
   output_listeners_(std::move(shell.output_listeners_)) {
   }
 
-  // コピー代入。
+  // コピー代入演算子。
   UCIShell& UCIShell::operator=(const UCIShell& shell) {
     uci_command_ = shell.uci_command_;
     engine_ptr_ = shell.engine_ptr_;
@@ -162,7 +162,7 @@ namespace Sayuri {
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   UCIShell& UCIShell::operator=(UCIShell&& shell) {
     uci_command_ = std::move(shell.uci_command_);
     engine_ptr_ = shell.engine_ptr_;

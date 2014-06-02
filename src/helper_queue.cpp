@@ -50,7 +50,7 @@ namespace Sayuri {
   job_ptr_(queue.job_ptr_), no_more_help_(queue.no_more_help_),
   num_helpers_(queue.num_helpers_), is_root_client_waiting_(false) {}
 
-  // コピー代入。
+  // コピー代入演算子。
   HelperQueue& HelperQueue::operator=(const HelperQueue& queue) {
     job_ptr_ = queue.job_ptr_;
     no_more_help_ = queue.no_more_help_;
@@ -59,7 +59,7 @@ namespace Sayuri {
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   HelperQueue& HelperQueue::operator=(HelperQueue&& queue) {
     job_ptr_ = queue.job_ptr_;
     no_more_help_ = queue.no_more_help_;

@@ -405,7 +405,7 @@ namespace Sayuri {
       ending_weight_(weight.ending_weight_),
       slope_(weight.slope_),
       y_intercept_(weight.y_intercept_){}
-      // コピー代入。
+      // コピー代入演算子。
       Weight& operator=(const Weight& weight) {
         opening_weight_ = weight.opening_weight_;
         ending_weight_ = weight.ending_weight_;
@@ -413,7 +413,7 @@ namespace Sayuri {
         y_intercept_ = weight.y_intercept_;
         return *this;
       }
-      // ムーブ代入。
+      // ムーブ代入演算子。
       Weight& operator=(Weight&& weight) {
         opening_weight_ = weight.opening_weight_;
         ending_weight_ = weight.ending_weight_;

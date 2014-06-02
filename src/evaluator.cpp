@@ -61,13 +61,13 @@ namespace Sayuri {
   : engine_ptr_(eval.engine_ptr_) {
   }
 
-  // コピー代入。
+  // コピー代入演算子。
   Evaluator& Evaluator::operator=(const Evaluator& eval) {
     engine_ptr_ = eval.engine_ptr_;
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   Evaluator& Evaluator::operator=(Evaluator&& eval) {
     engine_ptr_ = eval.engine_ptr_;
     return *this;

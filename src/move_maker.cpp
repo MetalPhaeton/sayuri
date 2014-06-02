@@ -67,7 +67,7 @@ namespace Sayuri {
     }
   }
 
-  // コピー代入。
+  // コピー代入演算子。
   MoveMaker& MoveMaker::operator=
   (const MoveMaker& maker) {
     engine_ptr_ = maker.engine_ptr_;
@@ -80,7 +80,7 @@ namespace Sayuri {
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   MoveMaker& MoveMaker::operator=
   (MoveMaker&& maker) {
     engine_ptr_ = maker.engine_ptr_;

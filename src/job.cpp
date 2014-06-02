@@ -53,14 +53,14 @@ namespace Sayuri {
     ScanMember(job);
   }
 
-  // コピー代入。
+  // コピー代入演算子。
   Job& Job::operator=(const Job& job) {
     ScanMember(job);
 
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   Job& Job::operator=(Job&& job) {
     ScanMember(job);
 

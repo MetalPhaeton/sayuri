@@ -70,7 +70,7 @@ namespace Sayuri {
   entry_table_(std::move(table.entry_table_)),
   age_(table.age_) {}
 
-  // コピー代入。
+  // コピー代入演算子。
   TranspositionTable&
   TranspositionTable::operator=(const TranspositionTable& table) {
     num_entries_ = table.num_entries_;
@@ -84,7 +84,7 @@ namespace Sayuri {
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   TranspositionTable&
   TranspositionTable::operator=(TranspositionTable&& table) {
     num_entries_ = table.num_entries_;
@@ -175,7 +175,7 @@ namespace Sayuri {
   mate_in_(entry.mate_in_),
   table_age_(entry.table_age_) {}
 
-  // コピー代入。
+  // コピー代入演算子。
   TTEntry& TTEntry::operator=(const TTEntry& entry) {
     pos_hash_ = entry.pos_hash_;
     depth_ = entry.depth_;
@@ -188,7 +188,7 @@ namespace Sayuri {
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   TTEntry& TTEntry::operator=(TTEntry&& entry) {
     pos_hash_ = entry.pos_hash_;
     depth_ = entry.depth_;

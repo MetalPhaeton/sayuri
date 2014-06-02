@@ -94,7 +94,7 @@ namespace Sayuri {
     }
   }
 
-  // コピー代入。
+  // コピー代入演算子。
   Fen& Fen::operator=(const Fen& fen) {
     // メンバをコピー。
     to_move_ = fen.to_move_;
@@ -111,7 +111,7 @@ namespace Sayuri {
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   Fen& Fen::operator=(Fen&& fen) {
     // メンバをコピー。
     to_move_ = fen.to_move_;

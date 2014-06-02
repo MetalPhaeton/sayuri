@@ -1,28 +1,31 @@
-/* 
-   debug.cpp: Sayuriをデバッグする。
+/* The MIT License (MIT)
+ *
+ * Copyright (c) 2014 Hironori Ishibashi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
-   The MIT License (MIT)
-
-   Copyright (c) 2014 Hironori Ishibashi
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to
-   deal in the Software without restriction, including without limitation the
-   rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-   sell copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-   IN THE SOFTWARE.
-*/
+/**
+ * @file debug.cpp
+ * @author Hironori Ishibashi
+ * @brief Sayuriのデバッグツールの実装。
+ */
 
 #include "debug.h"
 
@@ -40,11 +43,11 @@
 
 #include "sayuri.h"
 
+/** Sayuri 名前空間。 */
 namespace Sayuri {
-  /**************************/
-  /* デバッグ用メイン関数。 */
-  /**************************/
-  // ==========================================================================
+  // ==================== //
+  // デバッグ用メイン関数 //
+  // ==================== //
   int DebugMain(int argc, char* argv[]) {
     // プログラムの起動。
     // 初期化。
@@ -66,9 +69,8 @@ namespace Sayuri {
 
     return 0;
   }
-  // ==========================================================================
 
-  // ビットボードを出力する。
+  // ビットボードの状態を出力する。
   void PrintBitboard(Bitboard bitboard) {
     // 出力する文字列ストリーム。
     std::ostringstream osstream;
@@ -106,7 +108,7 @@ namespace Sayuri {
     std::cout << osstream.str();
   }
 
-  // 手を出力する。
+  // Moveの状態を出力する。
   void PrintMove(Move move) {
     // ファイルとランクの文字の配列。
     constexpr char fyle_table[NUM_FYLES] = {
@@ -237,7 +239,7 @@ namespace Sayuri {
     std::cout << std::endl;
   }
 
-  //駒の配置を出力する。
+  // 駒の配置の状態を出力する。
   void PrintPosition(const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]) {
     // 出力する文字列ストリーム。
     std::ostringstream osstream;
@@ -298,7 +300,7 @@ namespace Sayuri {
     std::cout << osstream.str();
   }
 
-  // PositionRecordを出力。
+  // PositionRecordの状態を出力。
   void PrintPositionRecord(const PositionRecord& record) {
     PrintPosition(record.position());
     std::cout << "To Move: ";
@@ -361,7 +363,7 @@ namespace Sayuri {
     std::cout << "Current Hash: " << record.pos_hash() << std::endl;
   }
 
-  // EvalResultを出力する。
+  // EvalResultの状態を出力する。
   void PrintEvalResult(const EvalResult& result) {
     std::string piece_name[NUM_PIECE_TYPES] {
       "Empty", "Pawn", "Knight", "Bishop", "Rook","Queen", "King"
@@ -426,9 +428,9 @@ namespace Sayuri {
     << std::endl;
   }
 
-  /**********************/
-  /* ストップウォッチ。 */
-  /**********************/
+  // ================ //
+  // ストップウォッチ //
+  // ================ //
   // コンストラクタ。
   StopWatch::StopWatch() :
   start_point_(SysClock::now()),
@@ -444,31 +446,31 @@ namespace Sayuri {
   start_point_(std::move(watch.start_point_)),
   stop_point_(std::move(watch.stop_point_)) {}
 
-  // コピー代入。
+  // コピー代入演算子。
   StopWatch& StopWatch::operator=(const StopWatch& watch) {
     start_point_ = watch.start_point_;
     stop_point_ = watch.stop_point_;
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   StopWatch& StopWatch::operator=(StopWatch&& watch) {
     start_point_ = std::move(watch.start_point_);
     stop_point_ = std::move(watch.stop_point_);
     return *this;
   }
 
-  // ストップウォッチをスタートする。
+  // ストップウォッチをスタート。
   void StopWatch::Start() {
     start_point_ = SysClock::now();
   }
 
-  // ストップウォッチをストップする。
+  // ストップウォッチをストップ。
   void StopWatch::Stop() {
     stop_point_ = SysClock::now();
   }
 
-  // ストップウォッチで計測した秒数を得る。
+  // 計測時間を得る。
   int StopWatch::GetTime() {
     return Chrono::duration_cast<Chrono::milliseconds>
     (stop_point_ - start_point_).count();

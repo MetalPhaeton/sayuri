@@ -78,13 +78,13 @@ namespace Sayuri {
     ScanMember(record);
   }
 
-  // コピー代入。
+  // コピー代入演算子。
   PositionRecord& PositionRecord::operator=(const PositionRecord& record) {
     ScanMember(record);
     return *this;
   }
 
-  // ムーブ代入。
+  // ムーブ代入演算子。
   PositionRecord& PositionRecord::operator=(PositionRecord&& record) {
     ScanMember(record);
     return *this;
