@@ -1,28 +1,31 @@
-/*
-   job.cpp: マルチスレッド探索用の仕事クラスの実装。
+/* The MIT License (MIT)
+ *
+ * Copyright (c) 2014 Hironori Ishibashi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
-   The MIT License (MIT)
-
-   Copyright (c) 2014 Hironori Ishibashi
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to
-   deal in the Software without restriction, including without limitation the
-   rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-   sell copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-   IN THE SOFTWARE.
-*/
+/**
+ * @file job.cpp
+ * @author Hironori Ishibashi
+ * @brief 並列探索用仕事の実装。
+ */
 
 #include "job.h"
 
@@ -36,10 +39,11 @@
 #include "move_maker.h"
 #include "position_record.h"
 
+/** Sayuri 名前空間。 */
 namespace Sayuri {
-  /**************************/
-  /* コンストラクタと代入。 */
-  /**************************/
+  // ==================== //
+  // コンストラクタと代入 //
+  // ==================== //
   // コンストラクタ。
   Job::Job() : maker_ptr_(nullptr), helper_counter_(0), counter_(0) {}
 
@@ -67,28 +71,28 @@ namespace Sayuri {
     return *this;
   }
 
-  /********************/
-  /* パブリック関数。 */
-  /********************/
-  // 手を得る。
+  // ============== //
+  // パブリック関数 //
+  // ============== //
+  // 候補手を得る。
   Move Job::PickMove() {
     return maker_ptr_->PickMove();
   }
 
-  // ヘルパーのカウント数を増やす。
+  // この仕事を請け負っているヘルパーの数を増やす。
   void Job::CountHelper() {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
     helper_counter_++;
   }
 
-  // 仕事終了の合図を出す。
+  // 仕事終了を知らせる。
   void Job::FinishMyJob() {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
     helper_counter_--;
     cond_.notify_all();
   }
 
-  // ヘルパー全員の仕事終了まで待機する。
+  // ヘルパーが全員仕事を終えるまで待機する。
   void Job::WaitForHelpers() {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
     while (helper_counter_ > 0) {
@@ -96,16 +100,16 @@ namespace Sayuri {
     }
   }
 
-  // 数を数える。探索した手の数を数えるときに使う。
+  // 数を数える。
   int Job::Count() {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
     counter_++;
     return counter_;
   }
 
-  /**********************/
-  /* プライベート関数。 */
-  /**********************/
+  // ================ //
+  // プライベート関数 //
+  // ================ //
   // メンバーをコピーする。
   void Job::ScanMember(const Job& job) {
     mutex_ptr_ = job.mutex_ptr_;
