@@ -49,6 +49,7 @@
 #include "helper_queue.h"
 #include "params.h"
 
+/** Sayuri 名前空間。 */
 namespace Sayuri {
   // ==================== //
   // コンストラクタと代入 //

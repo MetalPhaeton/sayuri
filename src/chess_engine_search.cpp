@@ -1,28 +1,31 @@
-/* 
-   chess_engine_search.cpp: 探索の実装ファイル。
+/* The MIT License (MIT)
+ *
+ * Copyright (c) 2014 Hironori Ishibashi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
-   The MIT License (MIT)
-
-   Copyright (c) 2014 Hironori Ishibashi
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to
-   deal in the Software without restriction, including without limitation the
-   rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-   sell copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-   IN THE SOFTWARE.
-*/
+/**
+ * @file chess_engine_search.cpp
+ * @author Hironori Ishibashi
+ * @brief チェスエンジンの本体の実装。 (探索関数)
+ */
 
 #include "chess_engine.h"
 
@@ -46,6 +49,7 @@
 #include "helper_queue.h"
 #include "params.h"
 
+/** Sayuri 名前空間。 */
 namespace Sayuri {
   // クイース探索。
   int ChessEngine::Quiesce(int depth, std::uint32_t level, int alpha, int beta,
@@ -94,7 +98,7 @@ namespace Sayuri {
     // 探索する。
     int margin = GetMargin(depth);
 
-    // Futility Pruning。
+    // --- Futility Pruning --- //
     bool enable_futility_pruning =
     shared_st_ptr_->search_params_ptr_->enable_futility_pruning();
 
@@ -137,7 +141,7 @@ namespace Sayuri {
     return alpha;
   }
 
-  // 探索する。
+  // 通常の探索。
   template<NodeType Type>
   int ChessEngine::Search(Hash pos_hash, int depth, std::uint32_t level,
   int alpha, int beta, int material, TranspositionTable& table) {
@@ -160,7 +164,7 @@ namespace Sayuri {
     // PVLineをリセット。
     pv_line_table_[level].ResetLine();
 
-    // トランスポジションテーブルを調べる。
+    // --- トランスポジションテーブル --- //
     Move prev_best = 0;
     if (shared_st_ptr_->search_params_ptr_->enable_ttable()) {
       table.Lock();
@@ -257,7 +261,7 @@ namespace Sayuri {
       return Quiesce(depth, level, alpha, beta, material, table);
     }
 
-    // Internal Iterative Deepening。
+    // --- Internal Iterative Deepening --- //
     if (Type == NodeType::PV) {
       if (shared_st_ptr_->search_params_ptr_->enable_iid()) {
         // 前回の繰り返しの最善手があればIIDしない。
@@ -277,7 +281,7 @@ namespace Sayuri {
       }
     }
 
-    // Null Move Reduction。
+    // --- Null Move Reduction --- //
     int null_reduction = 0;
     if (Type == NodeType::NON_PV) {
       if (shared_st_ptr_->search_params_ptr_->enable_nmr()) {
@@ -319,7 +323,7 @@ namespace Sayuri {
     shared_st_ptr_->killer_stack_[level][0],
     shared_st_ptr_->killer_stack_[level][1]);
 
-    // ProbCut。
+    // --- ProbCut --- //
     if ((Type == NodeType::NON_PV)) {
       if (shared_st_ptr_->search_params_ptr_->enable_probcut()) {
         if (!is_null_searching_ && !is_checked && (depth
@@ -399,8 +403,7 @@ namespace Sayuri {
       }
     }
 
-    // PVSearch。
-    // Check Extension。
+    // --- Check Extension --- //
     if (is_checked) {
       depth += 1;
     }
@@ -513,7 +516,7 @@ namespace Sayuri {
 
       num_moves = job.Count();
 
-      // Futility Pruning。
+      // -- Futility Pruning --- //
       if (enable_futility_pruning) {
         if (depth <= futility_pruning_depth) {
           if ((next_my_material + margin) <= alpha) {
@@ -542,7 +545,7 @@ namespace Sayuri {
         is_hp_or_lmr_ok = true;
       }
 
-      // History Pruning。
+      // --- History Pruning --- //
       if (Type == NodeType::NON_PV) {
         if (enable_history_pruning) {
           if (is_hp_or_lmr_ok && (new_depth >= history_pruning_limit_depth)
@@ -554,8 +557,7 @@ namespace Sayuri {
         }
       }
 
-      // Late Move Reduction。
-      // ただし、Null Move Reductionされていれば実行しない。
+      // --- Late Move Reduction --- //
       if (enable_lmr) {
         if (is_hp_or_lmr_ok && (new_depth >= lmr_limit_depth)
         && (num_moves > lmr_threshold)) {
@@ -572,7 +574,7 @@ namespace Sayuri {
       }
 
       if (score > temp_alpha) {
-        // PVSearch。
+        // --- PVSearch --- //
         if ((num_moves <= 1) || (Type == NodeType::NON_PV)) {
           // フルウィンドウで探索。
           score = -Search<Type>(next_hash, new_depth - 1, level + 1,
@@ -704,7 +706,7 @@ namespace Sayuri {
   // 探索のルート。
   PVLine ChessEngine::SearchRoot(TranspositionTable& table,
   const std::vector<Move>& moves_to_search, UCIShell& shell) {
-    // 初期化。
+    // --- 初期化 --- //
     searched_level_ = 0;
     shared_st_ptr_->num_searched_nodes_ = 0;
     shared_st_ptr_->start_time_ = SysClock::now();
@@ -737,7 +739,7 @@ namespace Sayuri {
       std::thread(&ChessEngine::ThreadYBWC, this, std::ref(shell));
     }
 
-    // Iterative Deepening。
+    // --- Iterative Deepening --- //
     int level = 0;
     Hash pos_hash = GetCurrentHash();
     int material = GetMaterial(to_move_);
@@ -771,7 +773,7 @@ namespace Sayuri {
         continue;
       }
 
-      // Aspiration Windows。
+      // --- Aspiration Windows --- //
       int delta =
       shared_st_ptr_->search_params_ptr_->aspiration_windows_delta();
       // 探索窓の設定。
@@ -800,7 +802,7 @@ namespace Sayuri {
         table.Unlock();
       }
 
-      // Check Extension。
+      // --- Check Extension --- //
       int depth = shared_st_ptr_->i_depth_;
       if (is_checked) {
         depth += 1;
@@ -871,7 +873,7 @@ namespace Sayuri {
     return pv_line_table_[level];
   }
 
-  // 探索用子スレッド。
+  // YBWC探索用スレッド。
   void ChessEngine::ThreadYBWC(UCIShell& shell) {
     // 子エンジンを作る。
     mutex_.lock();
@@ -997,7 +999,7 @@ namespace Sayuri {
       // 合法手が見つかったのでフラグを立てる。
       *(job.has_legal_move_ptr_) = true;
 
-      // Futility Pruning。
+      // --- Futility Pruning --- //
       if (enable_futility_pruning) {
         if (job.depth_ <= futility_pruning_depth) {
           if ((next_my_material + margin) <= *(job.alpha_ptr_)) {
@@ -1026,7 +1028,7 @@ namespace Sayuri {
         is_hp_or_lmr_ok = true;
       }
 
-      // History Pruning。
+      // --- History Pruning --- //
       if (Type == NodeType::NON_PV) {
         if (enable_history_pruning) {
           if (is_hp_or_lmr_ok && (new_depth >= history_pruning_limit_depth)
@@ -1038,8 +1040,7 @@ namespace Sayuri {
         }
       }
 
-      // Late Move Reduction。
-      // ただし、Null Move Reductionされていれば実行しない。
+      // --- Late Move Reduction --- //
       if (enable_lmr) {
         if (is_hp_or_lmr_ok && (new_depth >= lmr_limit_depth)
         && (num_moves > lmr_threshold)) {
@@ -1057,7 +1058,7 @@ namespace Sayuri {
       }
 
       if (score > temp_alpha) {
-        // PVSearch。
+        // --- PVSearch --- //
         if ((num_moves <= 1) || (Type == NodeType::NON_PV)) {
           // フルウィンドウ探索。
           score = -Search<Type>(next_hash, new_depth - 1,
@@ -1155,7 +1156,7 @@ namespace Sayuri {
   template void ChessEngine::SearchParallel<NodeType::PV>(Job& job);
   template void ChessEngine::SearchParallel<NodeType::NON_PV>(Job& job);
 
-  // ルートノードで並列探索。
+  // ルートノードで呼び出される、別スレッド用探索関数。
   void ChessEngine::SearchRootParallel(Job& job, UCIShell& shell) {
     // 仕事ループ。
     Side side = to_move_;
@@ -1244,7 +1245,7 @@ namespace Sayuri {
       shell.PrintCurrentMoveInfo(move, num_moves);
       job.mutex_ptr_->unlock();  // ロック解除。
 
-      // PVSearch。
+      // --- PVSearch --- //
       int score = 0;
       int temp_alpha = *(job.alpha_ptr_);
       int temp_beta = *(job.beta_ptr_);
@@ -1295,8 +1296,7 @@ namespace Sayuri {
           job.mutex_ptr_->unlock();  // ロック解除。
         }
       } else {
-        // PV発見後。
-        // Late Move Reduction。
+        // --- Late Move Reduction --- //
         if (enable_lmr) {
           if (!(job.is_checked_)
           && (job.depth_ >= lmr_limit_depth)
@@ -1406,7 +1406,7 @@ namespace Sayuri {
     job.FinishMyJob();
   }
 
-  // SEE。
+  // SEEで候補手を評価する。
   int ChessEngine::SEE(Move move) const {
     int score = 0;
     if (!(shared_st_ptr_->search_params_ptr_->enable_see())) return score;
@@ -1455,7 +1455,7 @@ namespace Sayuri {
     return score;
   }
 
-  // SEEで使う次の手を得る。
+  // SEE()で使う、次の手を得る。
   Move ChessEngine::GetNextSEEMove(Square target) const {
     // キングがターゲットの時はなし。
     if (target == king_[to_move_ ^ 0x3]) {
@@ -1517,7 +1517,7 @@ namespace Sayuri {
     * depth;
   }
 
-  // ストップ条件を設定する。
+  // 探索のストップ条件を設定する。
   void ChessEngine::SetStopper(std::uint32_t max_depth,
   std::uint64_t max_nodes, Chrono::milliseconds thinking_time,
   bool infinite_thinking) {
@@ -1528,12 +1528,12 @@ namespace Sayuri {
     shared_st_ptr_->infinite_thinking_ = infinite_thinking;
   }
 
-  // 思考の無限時間フラグを設定する。
+  // 無限に思考するかどうかのフラグをセットする。
   void ChessEngine::EnableInfiniteThinking(bool enable) {
     shared_st_ptr_->infinite_thinking_ = enable;
   }
 
-  // 探索中止しなければいけないかどうか。
+  // 探索を中断しなければいけないかどうかを判断する。
   bool ChessEngine::ShouldBeStopped() {
     // 最低1手は考える。
     if (shared_st_ptr_->i_depth_ <= 1) return false;

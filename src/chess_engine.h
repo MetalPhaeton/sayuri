@@ -435,12 +435,12 @@ namespace Sayuri {
       void ThreadYBWC(UCIShell& shell);
       /**
        * 別スレッド用探索関数。
-       * @param job 並列探索用パラメータ。
+       * @param job 並列探索用仕事。
        */
       template<NodeType Type> void SearchParallel(Job& job);
       /**
        * ルートノードで呼び出される、別スレッド用探索関数。
-       * @param job 並列探索用パラメータ。
+       * @param job 並列探索用仕事。
        * @param shell Infoコマンドの出力用UCIShell。
        */
       void SearchRootParallel(Job& job, UCIShell& shell);
@@ -654,7 +654,7 @@ namespace Sayuri {
       std::unique_ptr<PVLine[]> pv_line_table_;
       /** 探索用Evaluator。 */
       Evaluator evaluator_;
-      /** 並列探索用パラメータのテーブル。 [探索レベル] */
+      /** 並列探索用仕事のテーブル。 [探索レベル] */
       std::unique_ptr<Job[]> job_table_;
       /** 並列探索用ミューテックス。 */
       std::mutex mutex_;
