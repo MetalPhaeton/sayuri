@@ -80,7 +80,7 @@ namespace Sayuri {
       }
 
       /**
-       * 2手目以降を挿入するする。
+       * 2手目以降を挿入する。
        * @param pv_line 2手目以降のPVライン。
        */
       void Insert(const PVLine& pv_line);
