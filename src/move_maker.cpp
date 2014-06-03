@@ -22,7 +22,7 @@
  */
 
 /**
- * @file move_maker.h
+ * @file move_maker.cpp
  * @author Hironori Ishibashi
  * @brief 候補手を生成するクラスの実装。
  */
