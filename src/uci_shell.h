@@ -1,28 +1,31 @@
-/*
-   uci_shell.h: UCIのチェスエンジン側インターフェイス。
+/* The MIT License (MIT)
+ *
+ * Copyright (c) 2014 Hironori Ishibashi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
-   The MIT License (MIT)
-
-   Copyright (c) 2014 Hironori Ishibashi
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to
-   deal in the Software without restriction, including without limitation the
-   rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-   sell copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-   IN THE SOFTWARE.
-*/
+/**
+ * @file uci_shell.h
+ * @author Hironori Ishibashi
+ * @brief エンジン側のUCIインターフェイス。
+ */
 
 #ifndef UCI_SHELL_H
 #define UCI_SHELL_H
@@ -38,206 +41,261 @@
 #include <utility>
 #include "common.h"
 
+/** Sayuri 名前空間。 */
 namespace Sayuri {
   class ChessEngine;
   class TranspositionTable;
   class PVLine;
 
-  // UCIコマンドラインのクラス。
+  /** UCIコマンドラインのパーサのクラス。 */
   class UCICommand {
     public:
-      // コマンド引数の型。
-      using CommandArgs =
-      std::map<std::string, std::vector<std::string>>;
+      /** コマンド引数の型。 */
+      using CommandArgs = std::map<std::string, std::vector<std::string>>;
 
-      /**************************/
-      /* コンストラクタと代入。 */
-      /**************************/
+      // ==================== //
+      // コンストラクタと代入 //
+      // ==================== //
+      /** コンストラクタ。 */
       UCICommand() : func_vec_(0) {}
+      /**
+       * コピーコンストラクタ。
+       * @param command コピー元。
+       */
       UCICommand(const UCICommand& command) :
       func_vec_(command.func_vec_) {}
+      /**
+       * ムーブコンストラクタ。
+       * @param command ムーブ元。
+       */
       UCICommand(UCICommand&& command) :
       func_vec_(std::move(command.func_vec_)) {}
+      /**
+       * コピー代入演算子。
+       * @param command コピー元。
+       */
       UCICommand& operator=(const UCICommand& command) {
         func_vec_ = command.func_vec_;
         return *this;
       }
+      /**
+       * ムーブ代入演算子。
+       * @param command ムーブ元。
+       */
       UCICommand& operator=(UCICommand&& command) {
         func_vec_ = std::move(command.func_vec_);
         return *this;
       }
+      /** デストラクタ。 */
       virtual ~UCICommand() {}
 
-      /********************/
-      /* パブリック関数。 */
-      /********************/
-      // コマンドに合わせたコールバック関数を登録する。
-      // [引数]
-      // command_name: コマンド名。 コマンドラインの先頭の単語。
-      // subcommand_name_vec: サブコマンド名の配列。
-      // func: そのコマンドを実行するための関数。
+      // ============== //
+      // パブリック関数 //
+      // ============== //
+      /**
+       * コマンドに対するコールバック関数を登録する。
+       * @param command_name コマンド名。
+       * @param subcommand_name_vec サブコマンド名の配列。
+       * @param func 「command_name」に対するコールバック関数。
+       */
       void Add(const std::string& command_name,
       const std::vector<std::string>& subcommand_name_vec,
       std::function<void(CommandArgs&)> func);
 
-      // コマンドを実行する。
-      // [引数]
-      // command_line: UCIコマンド。
+      /**
+       * コマンドを実行する。
+       * @param command_line 実行するコマンド。
+       */
       void operator()(const std::string& command_line);
 
     private:
-      // 登録されたコマンド関数。
+      /** 登録されたコマンドの構造体。 */
       struct CommandFunction {
         std::string command_name_;
         std::vector<std::string> subcommand_name_vec_;
         std::function<void(CommandArgs&)> func_;
       };
+      /** 登録されたコマンドの配列。 */
       std::vector<CommandFunction> func_vec_;
   };
 
-  // UCIのインターフェス。
+  /** UCIのインターフェス。 */
   class UCIShell {
     public:
-      /**************************/
-      /* コンストラクタと代入。 */
-      /**************************/
-      // [引数]
-      // engine: UCIで操作したいエンジン。
+      // ==================== //
+      // コンストラクタと代入 //
+      // ==================== //
+      /**
+       * コンストラクタ。
+       * @param engine 関連付けるChessEngine。
+       */
       UCIShell(ChessEngine& engine);
+      /**
+       * コピーコンストラクタ。
+       * @param shell コピー元。
+       */
       UCIShell(const UCIShell& shell);
+      /**
+       * ムーブコンストラクタ。
+       * @param shell ムーブ元。
+       */
       UCIShell(UCIShell&& shell);
+      /**
+       * コピー代入演算子。
+       * @param shell コピー元。
+       */
       UCIShell& operator=(const UCIShell& shell);
+      /**
+       * ムーブ代入演算子。
+       * @param shell ムーブ元。
+       */
       UCIShell& operator=(UCIShell&& shell);
+      /** デストラクタ。 */
       virtual ~UCIShell();
+      /** コンストラクタ。 (削除) */
       UCIShell() = delete;
 
-      /********************/
-      /* パブリック関数。 */
-      /********************/
-      // UCIコマンドを実行する。("quit"以外。)
-      // [引数]
-      // input: UCIコマンド入力。("quit"以外。)
+      // ============== //
+      // パブリック関数 //
+      // ============== //
+      /**
+       * UCIコマンドを実行する。 (「quit」コマンド以外。)
+       * @param input UCIコマンド。
+       */
       void InputCommand(const std::string input);
 
-      // UCI出力を受け取る関数を登録する。
-      // [引数]
-      // func: UCI出力を受け取る関数。void(std::string)型。
+      /**
+       * UCIShellからの出力を受け取るコールバック関数を登録する。
+       * @param func 出力を受け取る。コールバック関数。
+       */
       void AddOutputListener(std::function<void(const std::string&)> func);
 
-      // PV情報を標準出力に表示。
-      // [引数]
-      // depth: 基本の深さ。
-      // seldepth: Quiesceの深さ。
-      // score: 評価値。センチポーン。
-      // time: 思考時間。
-      // num_nodes: 探索したノード数。
-      // pv_line: PVライン。
+      /**
+       * PVライン情報を出力する。
+       * @param depth 繰り返しの深さ。
+       * @param seldepth Quiesce探索の深さ。
+       * @param score 評価値。
+       * @param time 思考時間。
+       * @param num_nodes 探索したノード数。
+       * @param pv_line PVライン。
+       */
       void PrintPVInfo(int depth, int seldepth, int score,
       Chrono::milliseconds time, std::uint64_t num_nodes, PVLine& pv_line);
 
-      // 深さ情報を標準出力に表示。
-      // [引数]
-      // depth: 基本の深さ。
+      /**
+       * 深さ情報を出力する。
+       * @param depth 繰り返しの深さ。
+       */
       void PrintDepthInfo(int depth);
 
-      // 現在探索している手の情報を標準出力に表示。
-      // [引数]
-      // move: 現在探索している手。
-      // move_num: 手の番号。
+      /**
+       * 現在探索している候補手の情報を出力する。
+       * @param move 現在探索している候補手。
+       * @param move_num 候補手の番号。
+       */
       void PrintCurrentMoveInfo(Move move, int move_num);
 
-      // その他の情報を標準出力に表示。
-      // [引数]
-      // time: 時間。
-      // num_nodes: 探索したノード数。
-      // hashfull: トランスポジションテーブルの使用量。
+      /**
+       * その他の情報を出力する。
+       * @param time 探索時間。
+       * @param num_nodes 探索したノード数。
+       * @param hashfull トランスポジションテーブルの使用率。
+       */
       void PrintOtherInfo(Chrono::milliseconds time,
       std::uint64_t num_nodes, int hashfull);
 
     private:
-      /**********************/
-      /* プライベート関数。 */
-      /**********************/
-      // 思考用スレッド。
+      // ================ //
+      // プライベート関数 //
+      // ================ //
+      /** 探索スレッド。 */
       void ThreadThinking();
 
-      /*********************/
-      /* UCIコマンド関数。 */
-      /*********************/
-      // uciコマンド。
-      // [引数]
-      // args: コマンド引数。
+      // =============== //
+      // UCIコマンド関数 //
+      // =============== //
+      /**
+       * 「uci」コマンドのコールバック関数。
+       * @param args コマンドライン。
+       */
       void CommandUCI(UCICommand::CommandArgs& args);
-      // isreadyコマンド。
-      // [引数]
-      // args: コマンド引数。
+      /**
+       * 「isready」コマンドのコールバック関数。
+       * @param args コマンドライン。
+       */
       void CommandIsReady(UCICommand::CommandArgs& args);
-      // setoptionコマンド。
-      // [引数]
-      // args: コマンド引数。
+      /**
+       * 「setoption」コマンドのコールバック関数。
+       * @param args コマンドライン。
+       */
       void CommandSetOption(UCICommand::CommandArgs& args);
-      // ucinewgameコマンド。
-      // [引数]
-      // args: コマンド引数。
+      /**
+       * 「ucinewgame」コマンドのコールバック関数。
+       * @param args コマンドライン。
+       */
       void CommandUCINewGame(UCICommand::CommandArgs& args);
-      // positionコマンド。
-      // [引数]
-      // args: コマンド引数。
+      /**
+       * 「position」コマンドのコールバック関数。
+       * @param args コマンドライン。
+       */
       void CommandPosition(UCICommand::CommandArgs& args);
-      // goコマンド。
-      // [引数]
-      // args: コマンド引数。
+      /**
+       * 「go」コマンドのコールバック関数。
+       * @param args コマンドライン。
+       */
       void CommandGo(UCICommand::CommandArgs& args);
-      // stopコマンド。
-      // [引数]
-      // args: コマンド引数。
+      /**
+       * 「stop」コマンドのコールバック関数。
+       * @param args コマンドライン。
+       */
       void CommandStop(UCICommand::CommandArgs& args);
-      // ponderhitコマンド。
-      // [引数]
-      // args: コマンド引数。
+      /**
+       * 「ponderhit」コマンドのコールバック関数。
+       * @param args コマンドライン。
+       */
       void CommandPonderHit(UCICommand::CommandArgs& args);
 
-      /**************/
-      /* 便利関数。 */
-      /**************/
-      // 手を文字に変換する。
-      // [引数]
-      // move: 変換する手。
-      // [戻り値]
-      // 手の文字列。
+      // ======== //
+      // 便利関数 //
+      // ======== //
+      /**
+       * Moveを文字列に変換する。
+       * @param move 文字列に変換するMove。
+       * @return 変換後の文字列。
+       */
       static std::string TransMoveToString(Move move);
-      // 文字列を手に変換する。
-      // [引数]
-      // move_str: 変換する文字列。
-      // [戻り値]
-      // 変換された手。
+      /**
+       * 文字列をMoveに変換する。
+       * @param move_str Moveに変換する文字列。
+       * @return 変換後のMove。
+       */
       static Move TransStringToMove(std::string move_str);
 
-      /****************/
-      /* メンバ変数。 */
-      /****************/
-      // UCIコマンドパーサ。
+      // ========== //
+      // メンバ変数 //
+      // ========== //
+      /** UCIコマンドのパーサ。 */
       UCICommand uci_command_;
 
-      // チェスエンジン。
+      /** 関連付けられたチェスエンジン。 */
       ChessEngine* engine_ptr_;
-      // トランスポジションテーブル。
+      /** トランスポジションテーブル。 */
       std::unique_ptr<TranspositionTable> table_ptr_;
-      // スレッド。
+      /** 探索スレッド。 */
       std::thread thinking_thread_;
-      // 思考すべき候補手のベクトル。
+      /** 探索する候補手のベクトル。 */
       std::vector<Move> moves_to_search_;
 
-      // オプション。トランスポジションテーブルのサイズ。
+      /** UCIオプション。 トランスポジションテーブルのサイズ。 */
       std::size_t table_size_;
-      // オプション。ポンダリングするかどうか。
+      /** UCIオプション。 ポンダリングするかどうかのフラグ。 */
       bool enable_pondering_;
-      // オプション。スレッドの数。
+      /** UCIオプション。 スレッドの数。 */
       int num_threads_;
-      // アナライズモード。
+      /** UCIオプション。 アナライズモード。 */
       bool analyse_mode_;
 
-      // UCI出力を受け取る関数のベクトル。
+      /** 出力を受け取るコールバック関数のベクトル。 */
       std::vector<std::function<void(const std::string&)>> output_listeners_;
   };
 }  // namespace Sayuri
