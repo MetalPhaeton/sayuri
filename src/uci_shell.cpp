@@ -1,28 +1,31 @@
-/*
-   uci_shell.cpp: UCIのチェスエンジン側インターフェイスの実装。
+/* The MIT License (MIT)
+ *
+ * Copyright (c) 2014 Hironori Ishibashi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
-   The MIT License (MIT)
-
-   Copyright (c) 2014 Hironori Ishibashi
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to
-   deal in the Software without restriction, including without limitation the
-   rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-   sell copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-   IN THE SOFTWARE.
-*/
+/**
+ * @file uci_shell.cpp
+ * @author Hironori Ishibashi
+ * @brief エンジン側のUCIインターフェイスの実装。
+ */
 
 #include "uci_shell.h"
 
@@ -46,10 +49,11 @@
 #include "pv_line.h"
 #include "fen.h"
 
+/** Sayuri 名前空間。 */
 namespace Sayuri {
-  /**************************/
-  /* コンストラクタと代入。 */
-  /**************************/
+  // ==================== //
+  // コンストラクタと代入 //
+  // ==================== //
   // コンストラクタ。
   UCIShell::UCIShell(ChessEngine& engine) :
   uci_command_(),
@@ -183,22 +187,22 @@ namespace Sayuri {
     }
   }
 
-  /********************/
-  /* パブリック関数。 */
-  /********************/
-  // UCIコマンドを実行する。("quit"以外。)
+  // ============== //
+  // パブリック関数 //
+  // ============== //
+  // UCIコマンドを実行する。
   void UCIShell::InputCommand(const std::string input) {
     // コマンド実行。
     uci_command_(input);
   }
 
-  // UCI出力を受け取る関数を登録する。
+  // UCIShell空の出力を受け取るコールバック関数を登録する。
   void UCIShell::AddOutputListener
   (std::function<void(const std::string&)> func) {
     output_listeners_.push_back(func);
   }
 
-  // PV情報を標準出力に送る。
+  // PVライン情報を出力する。
   void UCIShell::PrintPVInfo(int depth, int seldepth, int score,
   Chrono::milliseconds time, std::uint64_t num_nodes, PVLine& pv_line) {
     std::ostringstream sout;
@@ -234,7 +238,7 @@ namespace Sayuri {
     }
   }
 
-  // 深さ情報を標準出力に送る。
+  // 深さ情報を出力する。
   void UCIShell::PrintDepthInfo(int depth) {
     std::ostringstream sout;
     sout << "info depth " << depth;
@@ -244,7 +248,7 @@ namespace Sayuri {
     }
   }
 
-  // 現在探索している手の情報を標準出力に送る。
+  // 現在探索している候補手の情報を出力する。
   void UCIShell::PrintCurrentMoveInfo(Move move, int move_num) {
     std::ostringstream sout;
     // 手の情報を送る。
@@ -259,7 +263,7 @@ namespace Sayuri {
     }
   }
 
-  // その他の情報を標準出力に送る。
+  // その他の情報を出力する。
   void UCIShell::PrintOtherInfo(Chrono::milliseconds time,
   std::uint64_t num_nodes, int hashfull) {
     std::ostringstream sout;
@@ -277,7 +281,7 @@ namespace Sayuri {
     }
   }
 
-  // 思考スレッド。
+  // 探索スレッド。
   void UCIShell::ThreadThinking() {
     // アナライズモードならトランスポジションテーブルを初期化。
     if (analyse_mode_) {
@@ -311,10 +315,10 @@ namespace Sayuri {
     }
   }
 
-  /*********************/
-  /* UCIコマンド関数。 */
-  /*********************/
-  // uciコマンド。
+  // =============== //
+  // UCIコマンド関数 //
+  // =============== //
+  // 「uci」コマンドのコールバック関数。
   void UCIShell::CommandUCI(UCICommand::CommandArgs& args) {
     std::ostringstream sout;
 
@@ -395,17 +399,16 @@ namespace Sayuri {
     table_ptr_.reset(new TranspositionTable(table_size_));
     enable_pondering_ = UCI_DEFAULT_PONDER;
     num_threads_ = UCI_DEFAULT_THREADS;
-
   }
 
-  // isreadyコマンド。
+  // 「isready」コマンドのコールバック関数。
   void UCIShell::CommandIsReady(UCICommand::CommandArgs& args) {
     for (auto& func : output_listeners_) {
       func("readyok");
     }
   }
 
-  // setoptionコマンド。
+  // 「setoption」コマンドのコールバック関数。
   void UCIShell::CommandSetOption(UCICommand::CommandArgs& args) {
     // nameとvalueがあるかどうか。
     // なければ設定できない。
@@ -465,13 +468,13 @@ namespace Sayuri {
     }
   }
 
-  // ucinewgameコマンド。
+  // 「ucinewgame」コマンドのコールバック関数。
   void UCIShell::CommandUCINewGame(UCICommand::CommandArgs& args) {
     engine_ptr_->SetNewGame();
     table_ptr_.reset(new TranspositionTable(table_size_));
   }
 
-  // positionコマンド。
+  // 「position」コマンドのコールバック関数。
   void UCIShell::CommandPosition(UCICommand::CommandArgs& args) {
     // startposコマンド。
     if (args.find("startpos") != args.end()) {
@@ -501,7 +504,7 @@ namespace Sayuri {
     }
   }
 
-  // goコマンド。
+  // 「go」コマンドのコールバック関数。
   void UCIShell::CommandGo(UCICommand::CommandArgs& args) {
     // 準備。
     std::uint32_t max_depth = MAX_PLYS;
@@ -631,7 +634,7 @@ namespace Sayuri {
     std::thread(&UCIShell::ThreadThinking, this);
   }
 
-  // stopコマンド。
+  // 「stop」コマンドのコールバック関数。
   void UCIShell::CommandStop(UCICommand::CommandArgs& args) {
     // 思考スレッドを終了させる。
     if (thinking_thread_.joinable()) {
@@ -640,15 +643,15 @@ namespace Sayuri {
     }
   }
 
-  // ponderhitコマンド。
+  // 「ponderhit」コマンドのコールバック関数。
   void UCIShell::CommandPonderHit(UCICommand::CommandArgs& args) {
     engine_ptr_->EnableInfiniteThinking(false);
   }
 
-  /**************/
-  /* 便利関数。 */
-  /**************/
-  // 手を文字列に変換。
+  // ======== //
+  // 便利関数 //
+  // ======== //
+  // Moveを文字列に変換する。
   std::string UCIShell::TransMoveToString(Move move) {
     // 文字列ストリーム。
     std::ostringstream oss;
@@ -680,7 +683,7 @@ namespace Sayuri {
     return oss.str();
   }
 
-  // 文字列を手に変換。
+  // 文字列をMoveに変換する。
   Move UCIShell::TransStringToMove(std::string move_str) {
     Move move = 0;
 
@@ -733,10 +736,10 @@ namespace Sayuri {
     return move;
   }
 
-  /********************/
-  /* UCICommand関連。 */
-  /********************/
-  // コマンドごとのコールバック関数を登録する。
+  // ============== //
+  // パブリック関数 //
+  // ============== //
+  // コマンドに対するコールバック関数を登録する。
   void UCICommand::Add(const std::string& command_name,
   const std::vector<std::string>& subcommand_name_vec,
   std::function<void(CommandArgs&)> func) {
