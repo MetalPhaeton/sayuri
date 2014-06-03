@@ -1,28 +1,31 @@
-/*
-   params.h: 探索アルゴリズム、評価関数を変更するパラメータのクラス。
+/* The MIT License (MIT)
+ *
+ * Copyright (c) 2014 Hironori Ishibashi
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
 
-   The MIT License (MIT)
-
-   Copyright (c) 2014 Hironori Ishibashi
-
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to
-   deal in the Software without restriction, including without limitation the
-   rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-   sell copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-   IN THE SOFTWARE.
-*/
+/**
+ * @file params.h
+ * @author Hironori Ishibashi
+ * @brief 探索アルゴリズム、評価関数を変更するパラメータ。
+ */
 
 #ifndef PARAMS_H
 #define PARAMS_H
@@ -31,381 +34,666 @@
 #include <cstdint>
 #include "common.h"
 
+/** Sayuri 名前空間。 */
 namespace Sayuri {
-  // 探索関数用パラメータのクラス。
+  /** 探索関数用パラメータのクラス。 */
   class SearchParams {
     public:
-      /**************************/
-      /* コンストラクタと代入。 */
-      /**************************/
+      // ==================== //
+      // コンストラクタと代入 //
+      // ==================== //
+      /** コンストラクタ。 */
       SearchParams();
+      /**
+       * コピーコンストラクタ。
+       * @param params コピー元。
+       */
       SearchParams(const SearchParams& params);
+      /**
+       * ムーブコンストラクタ。
+       * @param params ムーブ元。
+       */
       SearchParams(SearchParams&& params);
+      /**
+       * コピー代入演算子。
+       * @param params コピー元。
+       */
       SearchParams& operator=(const SearchParams& params);
+      /**
+       * ムーブ代入演算子。
+       * @param params ムーブ元。
+       */
       SearchParams& operator=(SearchParams&& params);
+      /** デストラクタ。 */
       virtual ~SearchParams() {}
 
-      /**************/
-      /* アクセサ。 */
-      /**************/
-      // マテリアル。
+      // ======== //
+      // アクセサ //
+      // ======== //
+      /**
+       * アクセサ - マテリアル。 [駒の種類]
+       * @return マテリアル。
+       */
       const int (& material() const)[NUM_PIECE_TYPES] {return material_;}
 
-      // YBWC。
-      // 深さ制限。
+      // --- YBWC --- //
+      /**
+       * アクセサ - YBMC - 残り深さ制限。
+       * @return 残り深さ制限。
+       */
       int ybwc_limit_depth() const {return ybwc_limit_depth_;}
-      // 指定の候補手数以上で実行する。
-      int ybwc_after() const {return ybwc_after_;}
+      /**
+       * アクセサ - YBWC - 何手目以降の候補手で実行するか。
+       * @return 何手目以降の候補手で実行するか。
+       */
+      int ybwc_after_moves() const {return ybwc_after_moves_;}
 
-      // Aspiration Windows。
-      // 有効かどうか。
+      // --- Aspiration Windows --- //
+      /**
+       * アクセサ - Aspiration Windows - 有効無効。
+       * @return 有効無効。
+       */
       bool enable_aspiration_windows() const {
         return enable_aspiration_windows_;
       }
-      // 残り深さの制限。
+      /**
+       * アクセサ - Aspiration Windows - 残り深さ制限。
+       * @return 残り深さ制限。
+       */
       std::uint32_t aspiration_windows_limit_depth() const {
         return aspiration_windows_limit_depth_;
       }
-      // デルタ値。
+      /**
+       * アクセサ - Aspiration Windows - デルタ値。
+       * @return デルタ値。
+       */
       int aspiration_windows_delta() const {return aspiration_windows_delta_;}
 
-      // SEE。
-      // 有効かどうか。
+      // --- SEE --- //
+      /**
+       * アクセサ - SEE - 有効無効。
+       * @return 有効無効。
+       */
       bool enable_see() const {return enable_see_;}
 
-      // ヒストリー。
-      // 有効かどうか。
+      // --- ヒストリー --- //
+      /**
+       * アクセサ - ヒストリー - 有効無効。
+       * @return 有効無効。
+       */
       bool enable_history() const {return enable_history_;}
 
-      // キラームーブ。
-      // 有効かどうか。
+      // --- キラームーブ --- //
+      /**
+       * アクセサ - キラームーブ - 有効無効。
+       * @return 有効無効。
+       */
       bool enable_killer() const {return enable_killer_;}
-      // 2プライ先のキラームーブが有効かどうか。
+      /**
+       * アクセサ - キラームーブ - 2プライ先のキラームーブの有効無効。
+       * @return 2プライ先のキラームーブの有効無効。
+       */
       bool enable_killer_2() const {return enable_killer_2_;}
 
-      // トランスポジションテーブル。
-      // 有効かどうか。
+      // --- トランスポジションテーブル --- //
+      /**
+       * アクセサ - トランスポジションテーブル - 有効無効。
+       * @return 有効無効。
+       */
       bool enable_ttable() const {return enable_ttable_;}
 
-      // Internal Iterative Deepening。
-      // 有効かどうか。
+      // --- Internal Iterative Deepening --- //
+      /**
+       * アクセサ - Internal Iterative Deepening - 有効無効。
+       * @return 有効無効。
+       */
       bool enable_iid() const {return enable_iid_;}
-      // 残り深さの制限。
+      /**
+       * アクセサ - Internal Iterative Deepening - 残り深さ制限。
+       * @return 残り深さ制限。
+       */
       int iid_limit_depth() const {return iid_limit_depth_;}
-      // IIDで読む深さ。
+      /**
+       * アクセサ - Internal Iterative Deepening - 探索の深さ。
+       * @return 探索の深さ。
+       */
       int iid_search_depth() const {return iid_search_depth_;}
 
-      // Null Move Reduction。
-      // 有効かどうか。
+      // --- Null Move Reduction --- //
+      /**
+       * アクセサ - Null Move Reduction - 有効無効。
+       * @return 有効無効。
+       */
       bool enable_nmr() const {return enable_nmr_;}
-      // 残り深さの制限。
+      /**
+       * アクセサ - Null Move Reduction - 残り深さ制限。
+       * @return 残り深さ制限。
+       */
       int nmr_limit_depth() const {return nmr_limit_depth_;}
-      // 何プライ浅く読むか。
+      /**
+       * アクセサ - Null Move Reduction - 何プライ浅く探索するか。
+       * @return 何プライ浅く探索するか。
+       */
       int nmr_search_reduction() const {return nmr_search_reduction_;}
-      // リダクションする深さ。
+      /**
+       * アクセサ - Null Move Reduction - リダクションする深さ。
+       * @return リダクションする深さ。
+       */
       int nmr_reduction() const {return nmr_reduction_;}
 
-      // ProbCut。
-      // 有効かどうか。
+      // --- ProbCut --- //
+      /**
+       * アクセサ - ProbCut - 有効無効。
+       * @return 有効無効。
+       */
       bool enable_probcut() const {return enable_probcut_;}
-      // 残り深さの制限。
+      /**
+       * アクセサ - ProbCut - 残り深さ制限。
+       * @return 残り深さ制限。
+       */
       int probcut_limit_depth() const {return probcut_limit_depth_;}
-      // ベータ値増加分。
+      /**
+       * アクセサ - ProbCut - ベータ値の増分。
+       * @return ベータ値の増分。
+       */
       int probcut_margin() const {return probcut_margin_;}
-      // 何プライ浅く読むか。
+      /**
+       * アクセサ - ProbCut - 何プライ浅く探索するか。
+       * @return 何プライ浅く探索するか。
+       */
       int probcut_search_reduction() const {return probcut_search_reduction_;}
 
-      // History Pruning。
-      // (ヒストリーが無効の場合は設定にかかわらず無効になる。)
-      // 有効かどうか。
+      // --- History Pruning --- //
+      /**
+       * アクセサ - History Pruning - 有効無効。
+       * (ヒストリーが無効なら、無効。)
+       * @return 有効無効。
+       */
       bool enable_history_pruning() const {return enable_history_pruning_;}
-      // 残り深さの制限。
+      /**
+       * アクセサ - History Pruning - 残り深さ制限。
+       * @return 残り深さ制限。
+       */
       int history_pruning_limit_depth() const {
         return history_pruning_limit_depth_;
       }
-      // 全候補手中、枝刈りしない手数の閾値。 1.0から0.0。
+      /**
+       * アクセサ - History Pruning - 実行する候補手の閾値。
+       * (1.0 から 0.0)
+       * @return 実行する候補手の閾値。
+       */
       double history_pruning_move_threshold() const {
         return history_pruning_move_threshold_;
       }
-      // 指定の候補手数以上で実行する。
-      int history_pruning_after() const {
-        return history_pruning_after_;
+      /**
+       * アクセサ - History Pruning - 何手目以降の候補手で実行するか。
+       * @return 何手目以降の候補手で実行するか。
+       */
+      int history_pruning_after_moves() const {
+        return history_pruning_after_moves_;
       }
-      // 最大値に対する閾値。 1.0から0.0。
+      /**
+       * アクセサ - History Pruning - 最大ヒストリー値に対する閾値。 
+       * (1.0 から 00)
+       * @return 最大ヒストリー値に対する閾値。
+       */
       double history_pruning_threshold() const {
         return history_pruning_threshold_;
       }
-      // リダクションする深さ。
+      /**
+       * アクセサ - History Pruning - リダクションする深さ。
+       * @return リダクションする深さ。
+       */
       int history_pruning_reduction() const {
         return history_pruning_reduction_;
       }
 
-      // Late Move Reduction。
-      // 有効かどうか。
+      // --- Late Move Reduction --- //
+      /**
+       * アクセサ - Late Move Reduction - 有効無効。
+       * @return 有効無効。
+       */
       bool enable_lmr() const {return enable_lmr_;}
-      // 残り深さの制限。
+      /**
+       * アクセサ - Late Move Reduction - 残り深さ制限。
+       * @return 残り深さ制限。
+       */
       int lmr_limit_depth() const {return lmr_limit_depth_;}
-      // 全候補手中、リダクションしない手数の閾値。 1.0から0.0。
+      /**
+       * アクセサ - Late Move Reduction - 実行する候補手の閾値。
+       * (1.0 から 0.0)
+       * @return 実行する候補手の閾値。
+       */
       double lmr_threshold() const {return lmr_threshold_;}
-      // 指定の候補手数以上で実行する。
-      int lmr_after() const {return lmr_after_;}
-      // リダクションする深さ。
+      /**
+       * アクセサ - Late Move Reduction - 何手目以降の候補手で実行するか。
+       * @return 何手目以降の候補手で実行するか。
+       */
+      int lmr_after_moves() const {return lmr_after_moves_;}
+      /**
+       * アクセサ - Late Move Reduction - リダクションする深さ。
+       * @return リダクションする深さ。
+       */
       int lmr_search_reduction() const {return lmr_search_reduction_;}
 
-      // Futility Pruning。
-      // 有効かどうか。
+      // --- Futility Pruning --- //
+      /**
+       * アクセサ - Futility Pruning - 有効無効。
+       * @return 有効無効。
+       */
       bool enable_futility_pruning() const {return enable_futility_pruning_;}
-      // 有効にする残り深さ。
+      /**
+       * アクセサ - Futility Pruning - 有効にする残り深さ。
+       * @return 有効にする残り深さ。
+       */
       int futility_pruning_depth() const {return futility_pruning_depth_;}
-      // 1プライあたりのマージン。
+      /**
+       * アクセサ - Futility Pruning - 残り深さ1プライあたりのマージン。
+       * @return 残り深さ1プライあたりのマージン。
+       */
       int futility_pruning_margin() const {return futility_pruning_margin_;}
 
-      /******************/
-      /* ミューテータ。 */
-      /******************/
-      // マテリアル。
+      // ============ //
+      // ミューテータ //
+      // ============ //
+      /**
+       * ミューテータ - マテリアル。
+       * @param table マテリアル。
+       */
       void material(const int (& table)[NUM_PIECE_TYPES]);
 
-      // YBWC。
-      // 深さ制限。
+      // --- YBWC --- //
+      /**
+       * ミューテータ - YBMC - 残り深さ制限。
+       * @param depth 残り深さ制限。
+       */
       void ybwc_limit_depth(int depth) {ybwc_limit_depth_ = depth;}
-      // 指定の候補手数以上で実行する。
-      void ybwc_after(int num_moves) {ybwc_after_ = num_moves;}
+      /**
+       * ミューテータ - YBWC - 何手目以降の候補手で実行するか。
+       * @param num_moves 何手目以降の候補手で実行するか。
+       */
+      void ybwc_after_moves(int num_moves) {ybwc_after_moves_ = num_moves;}
 
-      // Aspiration Windows。
-      // 有効かどうか。
+      // --- Aspiration Windows --- //
+      /**
+       * ミューテータ - Aspiration Windows - 有効無効。
+       * @param enable 有効無効。
+       */
       void enable_aspiration_windows(bool enable) {
         enable_aspiration_windows_ = enable;
       }
-      // 残り深さの制限。
+      /**
+       * ミューテータ - Aspiration Windows - 残り深さ制限。
+       * @param depth 残り深さ制限。
+       */
       void aspiration_windows_limit_depth(std::uint32_t depth) {
         aspiration_windows_limit_depth_ = depth;
       }
-      // デルタ値。
+      /**
+       * ミューテータ - Aspiration Windows - デルタ値。
+       * @param delta デルタ値。
+       */
       void aspiration_windows_delta(int delta) {
         aspiration_windows_delta_ = delta;
       }
 
-      // SEE。
-      // 有効かどうか。
+      // --- SEE --- //
+      /**
+       * ミューテータ - SEE - 有効無効。
+       * @param enable 有効無効。
+       */
       void enable_see(bool enable) {enable_see_ = enable;}
 
-      // ヒストリー。
-      // 有効かどうか。
+      // --- ヒストリー --- //
+      /**
+       * ミューテータ - ヒストリー - 有効無効。
+       * @param enable 有効無効。
+       */
       void enable_history(bool enable) {enable_history_ = enable;}
 
-      // キラームーブ。
-      // 有効かどうか。
+      // --- キラームーブ --- //
+      /**
+       * ミューテータ - キラームーブ - 有効無効。
+       * @param enable 有効無効。
+       */
       void enable_killer(bool enable) {enable_killer_ = enable;}
-      // 2プライ先のキラームーブが有効かどうか。
+      /**
+       * ミューテータ - キラームーブ - 2プライ先のキラームーブの有効無効。
+       * @param enable 2プライ先のキラームーブの有効無効。
+       */
       void enable_killer_2(bool enable) {
         if (enable_killer_) enable_killer_2_ = enable;
         else enable_killer_2_ = false;
       }
 
-      // トランスポジションテーブル。
-      // 有効かどうか。
+      // --- トランスポジションテーブル --- //
+      /**
+       * ミューテータ - トランスポジションテーブル - 有効無効。
+       * @param enable 有効無効。
+       */
       void enable_ttable(bool enable) {enable_ttable_ = enable;}
 
-      // Internal Iterative Deepening。
-      // 有効かどうか。
+      // --- Internal Iterative Deepening --- //
+      /**
+       * ミューテータ - Internal Iterative Deepening - 有効無効。
+       * @param enable 有効無効。
+       */
       void enable_iid(bool enable) {enable_iid_ = enable;}
-      // 残り深さの制限。
+      /**
+       * ミューテータ - Internal Iterative Deepening - 残り深さ制限。
+       * @param depth 残り深さ制限。
+       */
       void iid_limit_depth(int depth) {iid_limit_depth_ = depth;}
-      // IIDで読む深さ。
+      /**
+       * ミューテータ - Internal Iterative Deepening - 探索の深さ。
+       * @param depth 探索の深さ。
+       */
       void iid_search_depth(int depth) {iid_search_depth_ = depth;}
 
-      // Null Move Reduction。
-      // 有効かどうか。
+      // --- Null Move Reduction --- //
+      /**
+       * ミューテータ - Null Move Reduction - 有効無効。
+       * @param enable 有効無効。
+       */
       void enable_nmr(bool enable) {enable_nmr_ = enable;}
-      // 残り深さの制限。
+      /**
+       * ミューテータ - Null Move Reduction - 残り深さ制限。
+       * @param depth 残り深さ制限。
+       */
       void nmr_limit_depth(int depth) {nmr_limit_depth_ = depth;}
-      // 何プライ浅く読むか。
+      /**
+       * ミューテータ - Null Move Reduction - 何プライ浅く探索するか。
+       * @param reduction 何プライ浅く探索するか。
+       */
       void nmr_search_reduction(int reduction) {
         nmr_search_reduction_ = reduction;
       }
-      // リダクションする深さ。
+      /**
+       * ミューテータ - Null Move Reduction - リダクションする深さ。
+       * @param reduction リダクションする深さ。
+       */
       void nmr_reduction(int reduction) {nmr_reduction_ = reduction;}
 
-      // ProbCut。
-      // 有効かどうか。
+      // --- ProbCut --- //
+      /**
+       * ミューテータ - ProbCut - 有効無効。
+       * @param enable 有効無効。
+       */
       void enable_probcut(bool enable) {enable_probcut_ = enable;}
-      // 残り深さの制限。
+      /**
+       * ミューテータ - ProbCut - 残り深さ制限。
+       * @param enable 残り深さ制限。
+       */
       void probcut_limit_depth(int depth) {probcut_limit_depth_ = depth;}
-      // ベータ値増加分。
+      /**
+       * ミューテータ - ProbCut - ベータ値の増分。
+       * @param margin ベータ値の増分。
+       */
       void probcut_margin(int margin) {probcut_margin_ = margin;}
-      // 何プライ浅く読むか。
+      /**
+       * ミューテータ - ProbCut - 何プライ浅く探索するか。
+       * @param reduction 何プライ浅く探索するか。
+       */
       void probcut_search_reduction(int reduction) {
         probcut_search_reduction_ = reduction;
       }
 
-      // History Pruning。
-      // (ヒストリーが無効の場合は設定にかかわらず無効になる。)
-      // 有効かどうか。
+      // --- History Pruning --- //
+      /**
+       * ミューテータ - History Pruning - 有効無効。
+       * (ヒストリーが無効なら、無効。)
+       * @param enable 有効無効。
+       */
       void enable_history_pruning(bool enable) {
         if (enable_history_) enable_history_pruning_ = enable;
         else enable_history_pruning_ = false;
       }
-      // 残り深さの制限。
+      /**
+       * ミューテータ - History Pruning - 残り深さ制限。
+       * @param depth 残り深さ制限。
+       */
       void history_pruning_limit_depth(int depth) {
         history_pruning_limit_depth_ = depth;
       }
-      // 全候補手中、枝刈りしない手数の閾値。 1.0から0.0。
+      /**
+       * ミューテータ - History Pruning - 実行する候補手の閾値。
+       * (1.0 から 0.0)
+       * @param threshold 実行する候補手の閾値。
+       */
       void history_pruning_move_threshold(double threshold) {
         history_pruning_move_threshold_ = threshold;
       }
-      // 指定の候補手数以上で実行する。
-      void history_pruning_after(int num_moves) {
-        history_pruning_after_ = num_moves;
+      /**
+       * ミューテータ - History Pruning - 何手目以降の候補手で実行するか。
+       * @param num_moves 何手目以降の候補手で実行するか。
+       */
+      void history_pruning_after_moves(int num_moves) {
+        history_pruning_after_moves_ = num_moves;
       }
-      // 最大値に対する閾値。 1.0から0.0。
+      /**
+       * ミューテータ - History Pruning - 最大ヒストリー値に対する閾値。 
+       * (1.0 から 00)
+       * @param threshold 最大ヒストリー値に対する閾値。
+       */
       void history_pruning_threshold(double threshold) {
         history_pruning_threshold_ = threshold;
       }
-      // リダクションする深さ。
+      /**
+       * ミューテータ - History Pruning - リダクションする深さ。
+       * @param reduction リダクションする深さ。
+       */
       void history_pruning_reduction(int reduction) {
         history_pruning_reduction_ = reduction;
       }
 
-      // Late Move Reduction。
-      // 有効かどうか。
+      // --- Late Move Reduction --- //
+      /**
+       * ミューテータ - Late Move Reduction - 有効無効。
+       * @param enable 有効無効。
+       */
       void enable_lmr(bool enable) {enable_lmr_ = enable;}
-      // 残り深さの制限。
+      /**
+       * ミューテータ - Late Move Reduction - 残り深さ制限。
+       * @param depth 残り深さ制限。
+       */
       void lmr_limit_depth(int depth) {lmr_limit_depth_ = depth;}
-      // 全候補手中、リダクションしない手数の閾値。 1.0から0.0。
+      /**
+       * ミューテータ - Late Move Reduction - 実行する候補手の閾値。
+       * (1.0 から 0.0)
+       * @param threshold 実行する候補手の閾値。
+       */
       void lmr_threshold(double threshold) {lmr_threshold_ = threshold;}
-      // 指定の候補手数以上で実行する。
-      void lmr_after(int num_moves) {lmr_after_ = num_moves;}
-      // リダクションする深さ。
+      /**
+       * ミューテータ - Late Move Reduction - 何手目以降の候補手で実行するか。
+       * @param num_moves 何手目以降の候補手で実行するか。
+       */
+      void lmr_after_moves(int num_moves) {lmr_after_moves_ = num_moves;}
+      /**
+       * ミューテータ - Late Move Reduction - リダクションする深さ。
+       * @param reduction リダクションする深さ。
+       */
       void lmr_search_reduction(int reduction) {
         lmr_search_reduction_ = reduction;
       }
 
-      // Futility Pruning。
-      // 有効かどうか。
+      // --- Futility Pruning --- //
+      /**
+       * ミューテータ - Futility Pruning - 有効無効。
+       * @param enable 有効無効。
+       */
       void enable_futility_pruning(bool enable) {
         enable_futility_pruning_ = enable;
       }
-      // 有効にする残り深さ。
+      /**
+       * ミューテータ - Futility Pruning - 有効にする残り深さ。
+       * @param depth 有効にする残り深さ。
+       */
       void futility_pruning_depth(int depth) {
         futility_pruning_depth_ = depth;
       }
-      // 1プライあたりのマージン。
+      /**
+       * ミューテータ - Futility Pruning - 残り深さ1プライあたりのマージン。
+       * @param margin 残り深さ1プライあたりのマージン。
+       */
       void futility_pruning_margin(int margin) {
         futility_pruning_margin_ = margin;
       }
 
     private:
-      /**********************/
-      /* プライベート関数。 */
-      /**********************/
-      // メンバをコピーする。
+      // ================ //
+      // プライベート関数 //
+      // ================ //
+      /**
+       * メンバをコピーする。
+       * @param params コピー元。
+       */
       void ScanMember(const SearchParams& params);
 
-      /****************/
-      /* メンバ変数。 */
-      /****************/
-      // マテリアル。
+      // ========== //
+      // メンバ変数 //
+      // ========== //
+      /** マテリアル。 */
       int material_[NUM_PIECE_TYPES];
 
-      // YBWC。
-      int ybwc_limit_depth_;  // 深さ制限。
-      int ybwc_after_;  // 指定の候補手数以上で実行する。
+      // --- YBWC --- //
+      /** YBWC - 残り深さ制限。 */
+      int ybwc_limit_depth_;
+      /** YBWC - 何手目以降の候補手で実行するか。 */
+      int ybwc_after_moves_;
 
-      // Aspiration Windows。
-      bool enable_aspiration_windows_;  // 有効かどうか。
-      std::uint32_t aspiration_windows_limit_depth_;  // 残り深さの制限。
-      int aspiration_windows_delta_;  // デルタ値。
+      // --- Aspiration Windows --- //
+      /** Aspiration Windows - 有効無効。 */
+      bool enable_aspiration_windows_;
+      /** Aspiration Windows - 残り深さ制限。 */
+      std::uint32_t aspiration_windows_limit_depth_;
+      /** Aspiration Windows - デルタ値。 */
+      int aspiration_windows_delta_;
 
-      // SEE。
-      bool enable_see_;  // 有効かどうか。
+      // --- SEE --- //
+      /** SEE - 有効無効。 */
+      bool enable_see_;
 
-      // ヒストリー。
-      bool enable_history_;  // 有効かどうか。
+      // --- ヒストリー --- //
+      /** ヒストリー - 有効無効。 */
+      bool enable_history_;
 
-      // キラームーブ。
-      bool enable_killer_;  // 有効かどうか。
-      bool enable_killer_2_;  // 2プライ先のキラームーブが有効かどうか。
+      // --- キラームーブ --- //
+      /** キラームーブ - 有効無効。 */
+      bool enable_killer_;
+      /** キラームーブ - 2プライ先のキラームーブの有効無効。 */
+      bool enable_killer_2_;
 
-      // トランスポジションテーブル。
-      bool enable_ttable_;  // 有効かどうか。
+      // --- トランスポジションテーブル --- //
+      /** トランスポジションテーブル - 有効無効。 */
+      bool enable_ttable_;
 
-      // Internal Iterative Deepening。
-      bool enable_iid_;  // 有効かどうか。
-      int iid_limit_depth_;  // 残り深さの制限。
-      int iid_search_depth_;  // IIDで読む深さ。
+      // --- Internal Iterative Deepening --- //
+      /** Internal Iterative Deepening - 有効無効。 */
+      bool enable_iid_;
+      /** Internal Iterative Deepening - 残り深さ制限。 */
+      int iid_limit_depth_;
+      /** Internal Iterative Deepening - 探索の深さ。 */
+      int iid_search_depth_;
 
-      // Null Move Reduction。
-      bool enable_nmr_;  // 有効かどうか。
-      int nmr_limit_depth_;  // 残り深さの制限。
-      int nmr_search_reduction_;  // 何プライ浅く読むか。
-      int nmr_reduction_;  // リダクションする深さ。
+      // --- Null Move Reduction --- //
+      /** Null Move Reduction - 有効無効。 */
+      bool enable_nmr_;
+      /** Null Move Reduction - 残り深さ制限。 */
+      int nmr_limit_depth_;
+      /** Null Move Reduction - 何プライ浅く探索するか。 */
+      int nmr_search_reduction_;
+      /** Null Move Reduction - リダクションする深さ。 */
+      int nmr_reduction_;
 
-      // ProbCut。
-      bool enable_probcut_;  // 有効かどうか。
-      int probcut_limit_depth_;  // 残り深さの制限。
-      int probcut_margin_;  // ベータ値増加分。
-      int probcut_search_reduction_; // 何プライ浅く読むか。
+      // --- ProbCut --- //
+      /** ProbCut - 有効無効。 */
+      bool enable_probcut_;
+      /** ProbCut - 残り深さ制限。 */
+      int probcut_limit_depth_;
+      /** ProbCut - ベータ値の増分。 */
+      int probcut_margin_;
+      /** ProbCut - 何プライ浅く探索するか。 */
+      int probcut_search_reduction_;
 
-      // History Pruning。
-      // (ヒストリーが無効の場合は設定にかかわらず無効になる。)
-      bool enable_history_pruning_;  // 有効かどうか。
-      int history_pruning_limit_depth_;  // 残り深さの制限。
-      // 全候補手中、枝刈りしない手数の閾値。 1.0から0.0。
+      // --- History Pruning --- //
+      /** History Pruning - 有効無効。 */
+      bool enable_history_pruning_;
+      /** History Pruning - 残り深さ制限。 */
+      int history_pruning_limit_depth_;
+      /** History Pruning - 実行する候補手の閾値。 */
       double history_pruning_move_threshold_;
-      // 指定の候補手数以上で実行する。
-      int history_pruning_after_;
-      // 最大値に対する閾値。 1.0 から 0.0。
+      /** History Pruning - 何手目以降の候補手で実行するか。 */
+      int history_pruning_after_moves_;
+      /** History Pruning - 最大ヒストリー値に対する閾値。 */
       double history_pruning_threshold_;
-      int history_pruning_reduction_;  // リダクションする深さ。
+      /** History Pruning - リダクションする深さ。 */
+      int history_pruning_reduction_;
 
-      // Late Move Reduction。
-      bool enable_lmr_;  // 有効かどうか。
-      int lmr_limit_depth_;  // 残り深さの制限。
-      // 全候補手中、リダクションしない手数の閾値。 1.0 から 0.0。
+      // --- Late Move Reduction --- //
+      /** Late Move Reduction - 有効無効。 */
+      bool enable_lmr_;
+      /** Late Move Reduction - 残り深さ制限。 */
+      int lmr_limit_depth_;
+      /** Late Move Reduction - 実行する候補手の閾値。 */
       double lmr_threshold_;
-      int lmr_after_;  // 指定の候補手数以上で実行する。
-      int lmr_search_reduction_;  // リダクションする深さ。
+      /** Late Move Reduction - 何手目以降の候補手で実行するか。 */
+      int lmr_after_moves_;
+      /** Late Move Reduction - リダクションする深さ。 */
+      int lmr_search_reduction_;
 
-      // Futility Pruning。
-      bool enable_futility_pruning_;  // 有効かどうか。
-      int futility_pruning_depth_;  // 有効にする残り深さ。
-      int futility_pruning_margin_;  // 1プライあたりのマージン。
+      // --- Futility Pruning --- //
+      /** Futility Pruning - 有効無効。 */
+      bool enable_futility_pruning_;
+      /** Futility Pruning - 有効にする残り深さ。 */
+      int futility_pruning_depth_;
+      /** Futility Pruning - 残り深さ1プライあたりのマージン。 */
+      int futility_pruning_margin_;
   };
 
-  // 評価関数用パラメータのウェイトのクラス。
+  /** 評価関数用パラメータのウェイトのクラス。 */
   class Weight {
     public:
-      /**************************/
-      /* コンストラクタと代入。 */
-      /**************************/
-      // [引数]
-      // openint_weight: 駒(キング以外)が30個の時のウェイト。
-      // ending_weight: 駒(キング以外)が0個の時のウェイト。
+      // ==================== //
+      // コンストラクタと代入 //
+      // ==================== //
+      /**
+       * コンストラクタ。
+       * @param opening_weight キング以外の駒が30個の時のウェイト。
+       * @param ending_weight キング以外の駒が0個の時のウェイト。
+       */
       Weight(double opening_weight, double ending_weight) :
       opening_weight_(opening_weight),
       ending_weight_(ending_weight) {
         SetLinearParams();
       }
-      // デフォルトコンストラクタ。
+      /** コンストラクタ。 */
       Weight() :
       opening_weight_(0.0),
       ending_weight_(0.0) {
         SetLinearParams();
       }
-      // コピーコンストラクタ。
+      /**
+       * コピーコンストラクタ。
+       * @param weight コピー元。
+       */
       Weight(const Weight& weight) :
       opening_weight_(weight.opening_weight_),
       ending_weight_(weight.ending_weight_),
       slope_(weight.slope_),
       y_intercept_(weight.y_intercept_){}
-      // ムーブコンストラクタ。
+      /**
+       * ムーブコンストラクタ。
+       * @param weight ムーブ元。
+       */
       Weight(Weight&& weight) :
       opening_weight_(weight.opening_weight_),
       ending_weight_(weight.ending_weight_),
       slope_(weight.slope_),
       y_intercept_(weight.y_intercept_){}
-      // コピー代入演算子。
+      /**
+       * コピー代入演算子。
+       * @param weight コピー元。
+       */
       Weight& operator=(const Weight& weight) {
         opening_weight_ = weight.opening_weight_;
         ending_weight_ = weight.ending_weight_;
@@ -413,7 +701,10 @@ namespace Sayuri {
         y_intercept_ = weight.y_intercept_;
         return *this;
       }
-      // ムーブ代入演算子。
+      /**
+       * ムーブ代入演算子。
+       * @param weight ムーブ元。
+       */
       Weight& operator=(Weight&& weight) {
         opening_weight_ = weight.opening_weight_;
         ending_weight_ = weight.ending_weight_;
@@ -421,318 +712,516 @@ namespace Sayuri {
         y_intercept_ = weight.y_intercept_;
         return *this;
       }
-      // デストラクタ。
+      /** デストラクタ。 */
       virtual ~Weight() {}
 
-      /************/
-      /* 演算子。 */
-      /************/
-      // ウェイトを返す。
-      // [引数]
-      // num_pieces: キング以外の全ての駒の数。
-      // [戻り値]
-      // ウェイト。
+      // ====== //
+      // 演算子 //
+      // ====== //
+      /**
+       * ウェイトを返す。
+       * @param num_pieces キング以外の駒の数。
+       * @return ウェイト。
+       */
       double operator()(double num_pieces) const {
         return (slope_ * num_pieces) + y_intercept_;
       }
 
-      /**************/
-      /* アクセサ。 */
-      /**************/
-      // オープニング時のウェイト。
+      // ======== //
+      // アクセサ //
+      // ======== //
+      /**
+       * アクセサ - オープニング時のウェイト。
+       * @return オープニング時のウェイト。
+       */
       double opening_weight() const {return opening_weight_;}
-      // エンディング時のウェイト。
+      /**
+       * アクセサ - エンディング時のウェイト。
+       * @return エンディング時のウェイト。
+       */
       double ending_weight() const {return ending_weight_;}
 
-      /******************/
-      /* ミューテータ。 */
-      /******************/
-      // オープニング時のウェイト。
+      // ============ //
+      // ミューテータ //
+      // ============ //
+      /**
+       * ミューテータ - オープニング時のウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       */
       void opening_weight(double opening_weight) {
         opening_weight_ = opening_weight;
         SetLinearParams();
       }
-      // エンディング時のウェイト。
+      /**
+       * ミューテータ - エンディング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
       void ending_weight(double ending_weight) {
         ending_weight_ = ending_weight;
         SetLinearParams();
       }
 
     private:
-      // 一次関数のパラメータをセットする。
+      /** 一次関数のパラメータをセットする。 */
       void SetLinearParams() {
         slope_ = (opening_weight_ - ending_weight_) / 30.0;
         y_intercept_ = ending_weight_;
       }
 
-      // オープニング時のウェイト。
+      /** オープニング時のウェイト。 */
       double opening_weight_;
-      // エンディング時のウェイト。
+      /** エンディング時のウェイト。 */
       double ending_weight_;
-      // 一次関数の傾き。
+      /** 一次関数の傾き。 */
       double slope_;
-      // 一次関数のy軸上の切片。
+      /** 一次関数のy軸上の切片。 */
       double y_intercept_;
   };
 
-  // 評価関数用パラメータのクラス。
+  /** 評価関数用パラメータのクラス。 */
   class EvalParams {
     public:
-      /**************************/
-      /* コンストラクタと代入。 */
-      /**************************/
+      // ==================== //
+      // コンストラクタと代入 //
+      // ==================== //
+      /** コンストラクタ。 */
       EvalParams();
+      /**
+       * コピーコンストラクタ。
+       * @param params コピー元。
+       */
       EvalParams(const EvalParams& params);
+      /**
+       * ムーブコンストラクタ。
+       * @param params ムーブ元。
+       */
       EvalParams(EvalParams&& params);
+      /**
+       * コピー代入演算子。
+       * @param params コピー元。
+       */
       EvalParams& operator=(const EvalParams& params);
+      /**
+       * ムーブ代入演算子。
+       * @param params ムーブ元。
+       */
       EvalParams& operator=(EvalParams&& params);
+      /** デストラクタ。 */
       virtual ~EvalParams() {}
 
-      /**************/
-      /* アクセサ。 */
-      /**************/
-      // オープニング時の駒の配置の価値テーブル。
+      // ======== //
+      // アクセサ //
+      // ======== //
+      // --- 価値テーブル --- //
+      /**
+       * アクセサ - オープニング時の配置の価値のテーブル。 [駒の種類][マス]
+       * @return オープニング時の配置の価値のテーブル。
+       */
       const double (& opening_position_value_table() const)
       [NUM_PIECE_TYPES][NUM_SQUARES] {return opening_position_value_table_;}
-      // エンディング時の駒の配置の価値テーブル。
+      /**
+       * アクセサ - エンディング時の配置の価値のテーブル。 [駒の種類][マス]
+       * @return エンディング時の配置の価値のテーブル。
+       */
       const double (& ending_position_value_table() const)
       [NUM_PIECE_TYPES][NUM_SQUARES] {return ending_position_value_table_;}
-      // 駒への攻撃の価値テーブル。
+      /**
+       * アクセサ - 駒への攻撃の価値のテーブル。
+       * [攻め駒の種類][ターゲットの種類]
+       * @return 駒への攻撃の価値のテーブル。
+       */
       const double (& attack_value_table() const)
       [NUM_PIECE_TYPES][NUM_PIECE_TYPES] {return attack_value_table_;}
-      // ポーンの盾の配置の価値テーブル。
+      /**
+       * アクセサ - ポーンの盾の配置の価値のテーブル。 [マス]
+       * @return ポーンの盾の配置の価値のテーブル。
+       */
       const double (& pawn_shield_value_table() const)
       [NUM_SQUARES] {return pawn_shield_value_table_;}
 
-      // オープニング時の駒の配置のウェイト。
+      // --- ウェイト --- //
+      /**
+       * アクセサ - オープニング時の配置のウェイト。 [駒の種類]
+       * @return オープニング時の配置のウェイト。
+       */
       const Weight (& weight_opening_position() const)[NUM_PIECE_TYPES] {
         return weight_opening_position_;
       }
-      // エンディング時の駒の配置のウェイト。
+      /**
+       * アクセサ - エンディング時の配置のウェイト。 [駒の種類]
+       * @return エンディング時の配置のウェイト。
+       */
       const Weight (& weight_ending_position() const)[NUM_PIECE_TYPES] {
         return weight_ending_position_;
       }
-      // 機動力のウェイト。
+      /**
+       * アクセサ - 機動力のウェイト。
+       * @return 機動力のウェイト。
+       */
       const Weight& weight_mobility() const {return weight_mobility_;}
-      // センターコントロールのウェイト。
+      /**
+       * アクセサ - センターコントロールのウェイト。
+       * @return センターコントロールのウェイト。
+       */
       const Weight& weight_center_control() const {
         return weight_center_control_;
       }
-      // スウィートセンターのコントロールのウェイト。
+      /**
+       * アクセサ - スウィートセンターコントロールのウェイト。
+       * @return スウィートセンターコントロールのウェイト。
+       */
       const Weight& weight_sweet_center_control() const {
         return weight_sweet_center_control_;
       }
-      // 駒の展開のウェイト。
+      /**
+       * アクセサ - 駒の展開のウェイト。
+       * @return 駒の展開のウェイト。
+       */
       const Weight& weight_development() const {return weight_development_;}
-      // 駒への攻撃のウェイト。
+      /**
+       * アクセサ - 駒への攻撃のウェイト。 [駒の種類]
+       * @return 駒への攻撃のウェイト。
+       */
       const Weight(& weight_attack() const)[NUM_PIECE_TYPES] {
         return weight_attack_;
       }
-      // 相手キング周辺への攻撃。
+      /**
+       * アクセサ - 相手キング周辺への攻撃のウェイト。
+       * @return 相手キング周辺への攻撃のウェイト。
+       */
       const Weight& weight_attack_around_king() const {
         return weight_attack_around_king_;
       }
-      // パスポーンのウェイト。
+      /**
+       * アクセサ - パスポーンのウェイト。
+       * @return パスポーンのウェイト。
+       */
       const Weight& weight_pass_pawn() const {return weight_pass_pawn_;}
-      // 守られたパスポーンのウェイト。
+      /**
+       * アクセサ - 守られたパスポーンのウェイト。
+       * @return 守られたパスポーンのウェイト。
+       */
       const Weight& weight_protected_pass_pawn() const {
         return weight_protected_pass_pawn_;
       }
-      // ダブルポーンのウェイト。
+      /**
+       * アクセサ - ダブルポーンのウェイト。
+       * @return ダブルポーンのウェイト。
+       */
       const Weight& weight_double_pawn() const {return weight_double_pawn_;}
-      // 孤立ポーン。
+      /**
+       * アクセサ - 孤立ポーンのウェイト。
+       * @return 孤立ポーンのウェイト。
+       */
       const Weight& weight_iso_pawn() const {return weight_iso_pawn_;}
-      // ポーンの盾のウェイト。
+      /**
+       * アクセサ - ポーンの盾のウェイト。
+       * @return ポーンの盾のウェイト。
+       */
       const Weight& weight_pawn_shield() const {return weight_pawn_shield_;}
-      // ビショップペアのウェイト。
+      /**
+       * アクセサ - ビショップペアのウェイト。
+       * @return ビショップペアのウェイト。
+       */
       const Weight& weight_bishop_pair() const {return weight_bishop_pair_;}
-      // バッドビショップのウェイト。
+      /**
+       * アクセサ - バッドビショップのウェイト。
+       * @return バッドビショップのウェイト。
+       */
       const Weight& weight_bad_bishop() const {return weight_bad_bishop_;}
-      // ビショップで相手のナイトをピンのウェイト。
+      /**
+       * アクセサ - ビショップで相手のナイトをピンのウェイト。
+       * @return ビショップで相手のナイトをピンのウェイト。
+       */
       const Weight& weight_pin_knight() const {return weight_pin_knight_;}
-      // ルークペアのウェイト。
+      /**
+       * アクセサ - ルークペアのウェイト。
+       * @return ルークペアのウェイト。
+       */
       const Weight& weight_rook_pair() const {return weight_rook_pair_;}
-      // セミオープンファイルのルークのウェイト。
+      /**
+       * アクセサ - セミオープンファイルのルークのウェイト。
+       * @return セミオープンファイルのルークのウェイト。
+       */
       const Weight& weight_rook_semiopen_fyle() const {
         return weight_rook_semiopen_fyle_;
       }
-      // オープンファイルのルーク。
+      /**
+       * アクセサ - オープンファイルのルークのウェイト。
+       * @return オープンファイルのルークのウェイト。
+       */
       const Weight& weight_rook_open_fyle() const {
         return weight_rook_open_fyle_;
       }
-      // 早すぎるクイーンの始動のウェイト。
+      /**
+       * アクセサ - 早すぎるクイーンの始動のウェイト。
+       * @return 早すぎるクイーンの始動のウェイト。
+       */
       const Weight& weight_early_queen_launched() const {
         return weight_early_queen_launched_;
       }
-      // キング周りの弱いマスのウェイト。
+      /**
+       * アクセサ - キング周りの弱いマスのウェイト。
+       * @return キング周りの弱いマスのウェイト。
+       */
       const Weight& weight_weak_square() const {return weight_weak_square_;}
-      // キャスリングのウェイト。
+      /**
+       * アクセサ - キャスリングのウェイト。
+       * @return キャスリングのウェイト。
+       */
       const Weight& weight_castling() const {return weight_castling_;}
-      // キャスリングの放棄のウェイト。
+      /**
+       * アクセサ - キャスリングの放棄のウェイト。
+       * @return キャスリングの放棄のウェイト。
+       */
       const Weight& weight_abandoned_castling() const {
         return weight_abandoned_castling_;
       }
 
-      /******************/
-      /* ミューテータ。 */
-      /******************/
-      // オープニング時の駒の配置の価値テーブル。
+      // ============ //
+      // ミューテータ //
+      // ============ //
+      // --- 価値テーブル --- //
+      /**
+       * ミューテータ - オープニング時の配置の価値のテーブル。
+       * @param table オープニング時の配置の価値のテーブル。
+       */
       void opening_position_value_table
       (const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES]);
-      // エンディング時の駒の配置の価値テーブル。
+      /**
+       * ミューテータ - エンディング時の配置の価値のテーブル。
+       * @param table エンディング時の配置の価値のテーブル。
+       */
       void ending_position_value_table
       (const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES]);
-      // 駒への攻撃の価値テーブル。
+      /**
+       * ミューテータ - 駒への攻撃の価値のテーブル。
+       * @param table 駒への攻撃の価値のテーブル。
+       */
       void attack_value_table
       (const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES]);
-      // ポーンの盾の配置の価値テーブル。
+      /**
+       * ミューテータ - ポーンの盾の配置の価値のテーブル。
+       * @param table ポーンの盾の配置の価値のテーブル。
+       */
       void pawn_shield_value_table(const double (& table)[NUM_SQUARES]);
 
-      // オープニング時の駒の配置のウェイト。
+      // --- ウェイト --- //
+      /**
+       * ミューテータ - オープニング時の配置のウェイト。
+       * @param weights オープニング時の配置のウェイト。
+       */
       void weight_opening_position(const Weight (& weights)[NUM_PIECE_TYPES]);
-      // エンディング時の駒の配置のウェイト。
+      /**
+       * ミューテータ - エンディング時の配置のウェイト。
+       * @param weights エンディング時の配置のウェイト。
+       */
       void weight_ending_position(const Weight (& weights)[NUM_PIECE_TYPES]);
-      // 機動力のウェイト。
+      /**
+       * ミューテータ - 機動力のウェイト。
+       * @param weight 機動力のウェイト。
+       */
       void weight_mobility(const Weight& weight) {weight_mobility_ = weight;}
-      // センターコントロールのウェイト。
+      /**
+       * ミューテータ - センターコントロールのウェイト。
+       * @param weight センターコントロールのウェイト。
+       */
       void weight_center_control(const Weight& weight) {
         weight_center_control_ = weight;
       }
-      // スウィートセンターのコントロールのウェイト。
+      /**
+       * ミューテータ - スウィートセンターコントロールのウェイト。
+       * @param weight スウィートセンターコントロールのウェイト。
+       */
       void weight_sweet_center_control(const Weight& weight) {
         weight_sweet_center_control_ = weight;
       }
-      // 駒の展開のウェイト。
+      /**
+       * ミューテータ - 駒の展開のウェイト。
+       * @param weight 駒の展開のウェイト。
+       */
       void weight_development(const Weight& weight) {
         weight_development_ = weight;
       }
-      // 駒への攻撃のウェイト。
+      /**
+       * ミューテータ - 駒への攻撃のウェイト。
+       * @param weights 駒への攻撃のウェイト。
+       */
       void weight_attack(const Weight (& weights)[NUM_PIECE_TYPES]);
-      // 相手キング周辺への攻撃のウェイト。
+      /**
+       * ミューテータ - 相手キング周辺への攻撃のウェイト。
+       * @param weight 相手キング周辺への攻撃のウェイト。
+       */
       void weight_attack_around_king(const Weight& weight) {
         weight_attack_around_king_ = weight;
       }
-      // パスポーンのウェイト。
+      /**
+       * ミューテータ - パスポーンのウェイト。
+       * @param weight パスポーンのウェイト。
+       */
       void weight_pass_pawn(const Weight& weight) {
         weight_pass_pawn_ = weight;
       }
-      // 守られたパスポーンのウェイト。
+      /**
+       * ミューテータ - 守られたパスポーンのウェイト。
+       * @param weight 守られたパスポーンのウェイト。
+       */
       void weight_protected_pass_pawn(const Weight& weight) {
         weight_protected_pass_pawn_ = weight;
       }
-      // ダブルポーンのウェイト。
+      /**
+       * ミューテータ - ダブルポーンのウェイト。
+       * @param weight ダブルポーンのウェイト。
+       */
       void weight_double_pawn(const Weight& weight) {
         weight_double_pawn_ = weight;
       }
-      // 孤立ポーンのウェイト。
+      /**
+       * ミューテータ - 孤立ポーンのウェイト。
+       * @param weight 孤立ポーンのウェイト。
+       */
       void weight_iso_pawn(const Weight& weight) {weight_iso_pawn_ = weight;}
-      // ポーンの盾のウェイト。
+      /**
+       * ミューテータ - ポーンの盾のウェイト。
+       * @param weight ポーンの盾のウェイト。
+       */
       void weight_pawn_shield(const Weight& weight) {
         weight_pawn_shield_ = weight;
       }
-      // ビショップペアのウェイト。
+      /**
+       * ミューテータ - ビショップペアのウェイト。
+       * @param weight ビショップペアのウェイト。
+       */
       void weight_bishop_pair(const Weight& weight) {
         weight_bishop_pair_ = weight;
       }
-      // バッドビショップのウェイト。
+      /**
+       * ミューテータ - バッドビショップのウェイト。
+       * @param weight バッドビショップのウェイト。
+       */
       void weight_bad_bishop(const Weight& weight) {
         weight_bad_bishop_ = weight;
       }
-      // ビショップで相手のナイトをピンのウェイト。
+      /**
+       * ミューテータ - ビショップで相手のナイトをピンのウェイト。
+       * @param weight ビショップで相手のナイトをピンのウェイト。
+       */
       void weight_pin_knight(const Weight& weight) {
         weight_pin_knight_ = weight;
       }
-      // ルークペアのウェイト。
+      /**
+       * ミューテータ - ルークペアのウェイト。
+       * @param weight ルークペアのウェイト。
+       */
       void weight_rook_pair(const Weight& weight) {weight_rook_pair_ = weight;}
-      // セミオープンファイルのルークのウェイト。
+      /**
+       * ミューテータ - セミオープンファイルのルークのウェイト。
+       * @param weight セミオープンファイルのルークのウェイト。
+       */
       void weight_rook_semiopen_fyle(const Weight& weight) {
         weight_rook_semiopen_fyle_ = weight;
       }
-      // オープンファイルのルークのウェイト。
+      /**
+       * ミューテータ - オープンファイルのルークのウェイト。
+       * @param weight オープンファイルのルークのウェイト。
+       */
       void weight_rook_open_fyle(const Weight& weight) {
         weight_rook_open_fyle_ = weight;
       }
-      // 早すぎるクイーンの始動のウェイト。
+      /**
+       * ミューテータ - 早すぎるクイーンの始動のウェイト。
+       * @param weight 早すぎるクイーンの始動のウェイト。
+       */
       void weight_early_queen_launched(const Weight& weight) {
         weight_early_queen_launched_ = weight;
       }
-      // キング周りの弱いマスのウェイト。
+      /**
+       * ミューテータ - キング周りの弱いマスのウェイト。
+       * @param weight キング周りの弱いマスのウェイト。
+       */
       void weight_weak_square(const Weight& weight) {
         weight_weak_square_ = weight;
       }
-      // キャスリングのウェイト。
+      /**
+       * ミューテータ - キャスリングのウェイト。
+       * @param weight キャスリングのウェイト。
+       */
       void weight_castling(const Weight& weight) {weight_castling_ = weight;}
-      // キャスリングの放棄のウェイト。
+      /**
+       * ミューテータ - キャスリングの放棄のウェイト。
+       * @param weight キャスリングの放棄のウェイト。
+       */
       void weight_abandoned_castling(const Weight& weight) {
         weight_abandoned_castling_ = weight;
       }
 
     private:
-      // メンバをコピーする。
-      // [引数]
-      // params: コピー元。
+      /**
+       * メンバをコピーする。
+       * @param params コピー元。
+       */
       void ScanMember(const EvalParams& params);
 
-      /********************/
-      /* 価値テーブル類。 */
-      /********************/
-      // オープニング時の駒の配置の価値テーブル。
+      // ============== //
+      // 価値テーブル類 //
+      // ============== //
+      /** オープニング時の配置の価値テーブル。 */
       double opening_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES];
-      // エンディング時の駒の配置の価値テーブル。
+      /** エンディング時の配置の価値テーブル。 */
       double ending_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES];
-      // 駒への攻撃の価値テーブル。
+      /** 駒への攻撃の価値テーブル。 */
       double attack_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
-      // ポーンの盾の配置の価値テーブル。
+      /** ポーンの盾の配置の価値テーブル。 */
       double pawn_shield_value_table_[NUM_SQUARES];
 
-      /**************/
-      /* ウェイト。 */
-      /**************/
-      // オープニング時の駒の配置。
+      // ======== //
+      // ウェイト //
+      // ======== //
+      /** オープニング時の配置のウェイト。 */
       Weight weight_opening_position_[NUM_PIECE_TYPES];
-      // エンディング時の駒の配置。
+      /** エンディング時の駒の配置のウェイト。 */
       Weight weight_ending_position_[NUM_PIECE_TYPES];
-      // 機動力。
+      /** 機動力のウェイト。 */
       Weight weight_mobility_;
-      // センターコントロール。
+      /** センターコントロールのウェイト。 */
       Weight weight_center_control_;
-      // スウィートセンターのコントロール。
+      /** スウィートセンターのコントロールのウェイト。 */
       Weight weight_sweet_center_control_;
-      // 駒の展開。
+      /** 駒の展開のウェイト。 */
       Weight weight_development_;
-      // 駒への攻撃。
+      /** 駒への攻撃のウェイト。 */
       Weight weight_attack_[NUM_PIECE_TYPES];
-      // 相手キング周辺への攻撃。
+      /** 相手キング周辺への攻撃のウェイト。 */
       Weight weight_attack_around_king_;
-      // パスポーン。
+      /** パスポーンのウェイト。 */
       Weight weight_pass_pawn_;
-      // 守られたパスポーン。
+      /** 守られたパスポーンのウェイト。 */
       Weight weight_protected_pass_pawn_;
-      // ダブルポーン。
+      /** ダブルポーンのウェイト。 */
       Weight weight_double_pawn_;
-      // 孤立ポーン。
+      /** 孤立ポーンのウェイト。 */
       Weight weight_iso_pawn_;
-      // ポーンの盾。
+      /** ポーンの盾のウェイト。 */
       Weight weight_pawn_shield_;
-      // ビショップペア。
+      /** ビショップペアのウェイト。 */
       Weight weight_bishop_pair_;
-      // バッドビショップ。
+      /** バッドビショップのウェイト。 */
       Weight weight_bad_bishop_;
-      // ビショップで相手のナイトをピン。
+      /** ビショップで相手のナイトをピンのウェイト。 */
       Weight weight_pin_knight_;
-      // ルークペア。
+      /** ルークペアのウェイト。 */
       Weight weight_rook_pair_;
-      // セミオープンファイルのルーク。
+      /** セミオープンファイルのルークのウェイト。 */
       Weight weight_rook_semiopen_fyle_;
-      // オープンファイルのルーク。
+      /** オープンファイルのルークのウェイト。 */
       Weight weight_rook_open_fyle_;
-      // 早すぎるクイーンの始動。
+      /** 早すぎるクイーンの始動のウェイト。 */
       Weight weight_early_queen_launched_;
-      // キング周りの弱いマス。
+      /** キング周りの弱いマスのウェイト。 */
       Weight weight_weak_square_;
-      // キャスリング。
+      /** キャスリングのウェイト。 */
       Weight weight_castling_;
-      // キャスリングの放棄。
+      /** キャスリングの放棄のウェイト。 */
       Weight weight_abandoned_castling_;
   };
 }  // namespace Sayuri

@@ -440,7 +440,8 @@ namespace Sayuri {
 
     // パラメータ保存。
     // YBWC。
-    int ybwc_after = shared_st_ptr_->search_params_ptr_->ybwc_after();
+    int ybwc_after_moves =
+    shared_st_ptr_->search_params_ptr_->ybwc_after_moves();
     int ybwc_limit_depth =
     shared_st_ptr_->search_params_ptr_->ybwc_limit_depth();
 
@@ -453,11 +454,11 @@ namespace Sayuri {
 
     int history_pruning_move_threshold = num_all_moves *
     shared_st_ptr_->search_params_ptr_->history_pruning_move_threshold();
-    int history_pruning_after =
-    shared_st_ptr_->search_params_ptr_->history_pruning_after();
+    int history_pruning_after_moves =
+    shared_st_ptr_->search_params_ptr_->history_pruning_after_moves();
     history_pruning_move_threshold =
-    history_pruning_move_threshold < history_pruning_after 
-    ? history_pruning_after : history_pruning_move_threshold;
+    history_pruning_move_threshold < history_pruning_after_moves 
+    ? history_pruning_after_moves : history_pruning_move_threshold;
 
     std::uint64_t history_pruning_threshold = shared_st_ptr_->history_max_
     * shared_st_ptr_->search_params_ptr_->history_pruning_threshold();
@@ -473,8 +474,10 @@ namespace Sayuri {
 
     int lmr_threshold = num_all_moves
     * shared_st_ptr_->search_params_ptr_->lmr_threshold();
-    int lmr_after = shared_st_ptr_->search_params_ptr_->lmr_after();
-    lmr_threshold = lmr_threshold < lmr_after ? lmr_after : lmr_threshold;
+    int lmr_after_moves =
+    shared_st_ptr_->search_params_ptr_->lmr_after_moves();
+    lmr_threshold =
+    lmr_threshold < lmr_after_moves ? lmr_after_moves : lmr_threshold;
 
     int lmr_search_reduction =
     shared_st_ptr_->search_params_ptr_->lmr_search_reduction();
@@ -493,7 +496,7 @@ namespace Sayuri {
       }
 
       // 別スレッドに助けを求める。(YBWC)
-      if ((depth >= ybwc_limit_depth) && (num_moves > ybwc_after)) {
+      if ((depth >= ybwc_limit_depth) && (num_moves > ybwc_after_moves)) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
@@ -923,7 +926,8 @@ namespace Sayuri {
 
     // パラメータ保存。
     // YBWC。
-    int ybwc_after = shared_st_ptr_->search_params_ptr_->ybwc_after();
+    int ybwc_after_moves =
+    shared_st_ptr_->search_params_ptr_->ybwc_after_moves();
     int ybwc_limit_depth =
     shared_st_ptr_->search_params_ptr_->ybwc_limit_depth();
 
@@ -936,11 +940,11 @@ namespace Sayuri {
 
     int history_pruning_move_threshold = job.num_all_moves_
     * shared_st_ptr_->search_params_ptr_->history_pruning_move_threshold();
-    int history_pruning_after =
-    shared_st_ptr_->search_params_ptr_->history_pruning_after();
+    int history_pruning_after_moves =
+    shared_st_ptr_->search_params_ptr_->history_pruning_after_moves();
     history_pruning_move_threshold =
-    history_pruning_move_threshold < history_pruning_after
-    ? history_pruning_after : history_pruning_move_threshold;
+    history_pruning_move_threshold < history_pruning_after_moves
+    ? history_pruning_after_moves : history_pruning_move_threshold;
 
     std::uint64_t history_pruning_threshold = shared_st_ptr_->history_max_
     * shared_st_ptr_->search_params_ptr_->history_pruning_threshold();
@@ -956,8 +960,10 @@ namespace Sayuri {
 
     int lmr_threshold = job.num_all_moves_
     * shared_st_ptr_->search_params_ptr_->lmr_threshold();
-    int lmr_after = shared_st_ptr_->search_params_ptr_->lmr_after();
-    lmr_threshold = lmr_threshold < lmr_after ? lmr_after : lmr_threshold;
+    int lmr_after_moves =
+    shared_st_ptr_->search_params_ptr_->lmr_after_moves();
+    lmr_threshold =
+    lmr_threshold < lmr_after_moves ? lmr_after_moves : lmr_threshold;
 
     int lmr_search_reduction =
     shared_st_ptr_->search_params_ptr_->lmr_search_reduction();
@@ -976,7 +982,7 @@ namespace Sayuri {
       }
 
       // 別スレッドに助けを求める。(YBWC)
-      if ((job.depth_ >= ybwc_limit_depth) && (num_moves > ybwc_after)) {
+      if ((job.depth_ >= ybwc_limit_depth) && (num_moves > ybwc_after_moves)) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
@@ -1165,7 +1171,8 @@ namespace Sayuri {
 
     // パラメータを保存。
     // YBWC。
-    int ybwc_after = shared_st_ptr_->search_params_ptr_->ybwc_after();
+    int ybwc_after_moves =
+    shared_st_ptr_->search_params_ptr_->ybwc_after_moves();
     int ybwc_limit_depth =
     shared_st_ptr_->search_params_ptr_->ybwc_limit_depth();
 
@@ -1177,8 +1184,10 @@ namespace Sayuri {
 
     int lmr_threshold = job.num_all_moves_
     * shared_st_ptr_->search_params_ptr_->lmr_threshold();
-    int lmr_after = shared_st_ptr_->search_params_ptr_->lmr_after();
-    lmr_threshold = lmr_threshold < lmr_after ? lmr_after : lmr_threshold;
+    int lmr_after_moves =
+    shared_st_ptr_->search_params_ptr_->lmr_after_moves();
+    lmr_threshold =
+    lmr_threshold < lmr_after_moves ? lmr_after_moves : lmr_threshold;
 
     int lmr_search_reduction =
     shared_st_ptr_->search_params_ptr_->lmr_search_reduction();
@@ -1217,7 +1226,7 @@ namespace Sayuri {
       }
 
       // 別スレッドに助けを求める。(YBWC)
-      if ((job.depth_ >= ybwc_limit_depth) && (num_moves > ybwc_after)) {
+      if ((job.depth_ >= ybwc_limit_depth) && (num_moves > ybwc_after_moves)) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
