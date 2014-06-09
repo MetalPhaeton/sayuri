@@ -140,116 +140,117 @@ $(document).ready(function(){initNavTree('readme-en_8md.html','');});
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        * For64Bit : For 64 bit machines.</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;* SayuriLogo : For the logo image files.</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;* SampleGames : For sample game files of Sayuri vs other chess engines.</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;###### Files ######</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;* README.md : This file.</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;* CMakeLists.txt : A configuration file <span class="keywordflow">for</span> CMake.</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;* LICENSE : The software license.</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;How To Build with CMake</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;-----------------------</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;To use CMake, you can build Sayuri easily.</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;It<span class="stringliteral">&#39;s default compiler is &amp;quot;clang++&amp;quot;.</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="stringliteral">(If you want to change a compiler, please change 26th line and 27th line</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="stringliteral">in &amp;quot;CMakeLists.txt&amp;quot;.)</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="stringliteral">###### To build in normal mode ######</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="stringliteral">1. Change directory to where &amp;quot;CMakeLists.txt&amp;quot; is placed in.</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="stringliteral">2. Run the following commands.</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="stringliteral">    1. $ mkdir build</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="stringliteral">    2. $ cd build</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="stringliteral">    3. $ cmake ..</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="stringliteral">    4. $ make</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="stringliteral">3. The following files or directories have created in &amp;quot;build&amp;quot; directory.</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="stringliteral">    * sayuri : A chess engine for UCI.</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="stringliteral">    * libsayurilib.a : A static library.</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="stringliteral">    * include : A directory for header files for &amp;quot;libsayurilib.a&amp;quot;.</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="stringliteral">###### To build in debug mode ######</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="stringliteral">To build in debug mode, you can build Sayuri with &amp;quot;No optimized&amp;quot; and</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="stringliteral">&amp;quot;Embedded the infomation for debugger&amp;quot;.</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="stringliteral">In the following 2-3, insert &amp;quot;-DCMAKE\_BUILD\_TYPE=Debug&amp;quot; only.</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="stringliteral">1. Change directory to where &amp;quot;CMakeLists.txt&amp;quot; is placed in.</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="stringliteral">2. Run the following commands.</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="stringliteral">    1. $ mkdir build</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="stringliteral">    2. $ cd build</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="stringliteral">    3. $ cmake -DCMAKE\_BUILD\_TYPE=Debug ..</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="stringliteral">    4. $ make</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="stringliteral">3. The following files or directories have created in &amp;quot;build&amp;quot; directory.</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="stringliteral">    * sayuri : A chess engine for UCI.</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="stringliteral">    * libsayurilib.a : A static library.</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="stringliteral">    * include : A directory for header files for &amp;quot;libsayurilib.a&amp;quot;.</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="stringliteral">###### About each file ######</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="stringliteral">&amp;quot;sayuri&amp;quot; is a chess engine for UCI.</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="stringliteral">When you use it, you don&#39;</span>t need &amp;quot;libsayurilib.a&amp;quot; and</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;&amp;quot;include&amp;quot;.</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;&amp;quot;libsayurilib.a&amp;quot; and &amp;quot;include&amp;quot; are files <span class="keywordflow">for</span> <span class="keyword">using</span> Sayuri as</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;a <span class="keyword">static</span> library.</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;When you use them, you don<span class="stringliteral">&#39;t need &amp;quot;sayuri&amp;quot;.</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="stringliteral">Please read</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="stringliteral">&amp;quot;[How to use Sayuri as static library](@ref use_as_static_library-en.md)&amp;quot; for details.</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="stringliteral">To Make Distributable Packages</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="stringliteral">------------------------------</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="stringliteral">After to make &amp;quot;Makefile&amp;quot; in &amp;quot;build&amp;quot; directory with CMake,</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="stringliteral">run &amp;quot;$ make dist&amp;quot; command.</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="stringliteral">If you do so, the following packages have created.</span></div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="stringliteral">* sayuri-xxxx.xx.xx.tar.Z</span></div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="stringliteral">* sayuri-xxxx.xx.xx.tar.bz2</span></div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="stringliteral">* sayuri-xxxx.xx.xx.tar.gz</span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="stringliteral">(Note: &amp;quot;xxxx.xx.xx&amp;quot; is the version number.)</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="stringliteral">UCI Options</span></div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="stringliteral">-----------</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="stringliteral">You can change Sayuri&#39;</span>s settings with the following commands.</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;* To change size of the hash table. (Default: 32 MB, Max: 8192 MB, Min: 8 MB)</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    * setoption name <a class="code" href="namespaceSayuri.html#a094a36775a7913ec297ba0a6ba04be39">Hash</a> value &lt;Size(MB)&gt;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;* To initialize the hash table.</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    * setoption name Clear <a class="code" href="namespaceSayuri.html#a094a36775a7913ec297ba0a6ba04be39">Hash</a></div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;* To enable Ponder. (Default: <span class="keyword">true</span>)</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    * setoption name Ponder value &lt;true or false&gt;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;* To change the number of threads. (Default: 1, Max: 64, Min: 1)</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    * setoption name Threads value &lt;Number of threads&gt;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;* To enable analyse mode. (Default: <span class="keyword">false</span>)</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    * setoption name UCI\_AnalyseMode value &lt;true or false&gt;</div>
-<div class="ttc" id="namespaceSayuri_html_a094a36775a7913ec297ba0a6ba04be39"><div class="ttname"><a href="namespaceSayuri.html#a094a36775a7913ec297ba0a6ba04be39">Sayuri::Hash</a></div><div class="ttdeci">std::uint64_t Hash</div><div class="ttdoc">ハッシュの型。 </div><div class="ttdef"><b>Definition:</b> <a href="chess__def_8h_source.html#l00503">chess_def.h:503</a></div></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;* Documents : Sayuri<span class="stringliteral">&#39;s documents generated by Doxygen.</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="stringliteral">###### Files ######</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="stringliteral">* README.md : README file.</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="stringliteral">* CMakeLists.txt : A configuration file for CMake.</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="stringliteral">* LICENSE : The software license.</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="stringliteral">How To Build with CMake</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="stringliteral">-----------------------</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="stringliteral">To use CMake, you can build Sayuri easily.</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="stringliteral">It&#39;</span>s <span class="keywordflow">default</span> compiler is &amp;quot;clang++&amp;quot;.</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;(If you want to change a compiler, please change 26th line and 27th line</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;in &amp;quot;CMakeLists.txt&amp;quot;.)</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">###### To build in normal mode ######</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;1. Change directory to where &amp;quot;CMakeLists.txt&amp;quot; is placed in.</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;2. <a class="code" href="main_8cpp.html#a9dfdc9002fd5e15d1f0271c26d8fc8fa">Run</a> the following commands.</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    1. $ mkdir build</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    2. $ cd build</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    3. $ cmake ..</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    4. $ make</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;3. The following files or directories have created in &amp;quot;build&amp;quot; directory.</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    * sayuri : A chess engine <span class="keywordflow">for</span> UCI.</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    * libsayurilib.a : A <span class="keyword">static</span> library.</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    * include : A directory <span class="keywordflow">for</span> header files <span class="keywordflow">for</span> &amp;quot;libsayurilib.a&amp;quot;.</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;###### To build in debug mode ######</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;To build in debug mode, you can build Sayuri with &amp;quot;No optimized&amp;quot; and</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;&amp;quot;Embedded the infomation <span class="keywordflow">for</span> debugger&amp;quot;.</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;In the following 2-3, insert &amp;quot;-DCMAKE\_BUILD\_TYPE=Debug&amp;quot; only.</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;1. Change directory to where &amp;quot;CMakeLists.txt&amp;quot; is placed in.</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;2. <a class="code" href="main_8cpp.html#a9dfdc9002fd5e15d1f0271c26d8fc8fa">Run</a> the following commands.</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    1. $ mkdir build</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    2. $ cd build</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    3. $ cmake -DCMAKE\_BUILD\_TYPE=Debug ..</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    4. $ make</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;3. The following files or directories have created in &amp;quot;build&amp;quot; directory.</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    * sayuri : A chess engine <span class="keywordflow">for</span> UCI.</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    * libsayurilib.a : A <span class="keyword">static</span> library.</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    * include : A directory <span class="keywordflow">for</span> header files <span class="keywordflow">for</span> &amp;quot;libsayurilib.a&amp;quot;.</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;###### About each file ######</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;&amp;quot;sayuri&amp;quot; is a chess engine <span class="keywordflow">for</span> UCI.</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;When you use it, you don<span class="stringliteral">&#39;t need &amp;quot;libsayurilib.a&amp;quot; and</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="stringliteral">&amp;quot;include&amp;quot;.</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="stringliteral">&amp;quot;libsayurilib.a&amp;quot; and &amp;quot;include&amp;quot; are files for using Sayuri as</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="stringliteral">a static library.</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="stringliteral">When you use them, you don&#39;</span>t need &amp;quot;sayuri&amp;quot;.</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;Please read</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;&amp;quot;[How to use Sayuri as <span class="keyword">static</span> library](@ref use_as_static_library-en.md)&amp;quot; <span class="keywordflow">for</span> details.</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;To Make Distributable Packages</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;------------------------------</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;After to make &amp;quot;Makefile&amp;quot; in &amp;quot;build&amp;quot; directory with CMake,</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;run &amp;quot;$ make dist&amp;quot; command.</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;If you <span class="keywordflow">do</span> so, the following packages have created.</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;* sayuri-xxxx.xx.xx.tar.Z</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;* sayuri-xxxx.xx.xx.tar.bz2</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;* sayuri-xxxx.xx.xx.tar.gz</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;(Note: &amp;quot;xxxx.xx.xx&amp;quot; is the version number.)</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;UCI Options</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;-----------</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;You can change Sayuri<span class="stringliteral">&#39;s settings with the following commands.</span></div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="stringliteral">* To change size of the hash table. (Default: 32 MB, Max: 8192 MB, Min: 8 MB)</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="stringliteral">    * setoption name Hash value &lt;Size(MB)&gt;</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="stringliteral">* To initialize the hash table.</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="stringliteral">    * setoption name Clear Hash</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="stringliteral">* To enable Ponder. (Default: true)</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="stringliteral">    * setoption name Ponder value &lt;true or false&gt;</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="stringliteral">* To change the number of threads. (Default: 1, Max: 64, Min: 1)</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="stringliteral">    * setoption name Threads value &lt;Number of threads&gt;</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="stringliteral">* To enable analyse mode. (Default: false)</span></div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="stringliteral">    * setoption name UCI\_AnalyseMode value &lt;true or false&gt;</span></div>
 <div class="ttc" id="classSayuri_1_1EvalParams_html"><div class="ttname"><a href="classSayuri_1_1EvalParams.html">Sayuri::EvalParams</a></div><div class="ttdoc">評価関数用パラメータのクラス。 </div><div class="ttdef"><b>Definition:</b> <a href="params_8h_source.html#l00782">params.h:782</a></div></div>
 <div class="ttc" id="classSayuri_1_1SearchParams_html"><div class="ttname"><a href="classSayuri_1_1SearchParams.html">Sayuri::SearchParams</a></div><div class="ttdoc">探索関数用パラメータのクラス。 </div><div class="ttdef"><b>Definition:</b> <a href="params_8h_source.html#l00040">params.h:40</a></div></div>
+<div class="ttc" id="main_8cpp_html_a9dfdc9002fd5e15d1f0271c26d8fc8fa"><div class="ttname"><a href="main_8cpp.html#a9dfdc9002fd5e15d1f0271c26d8fc8fa">Run</a></div><div class="ttdeci">void Run(Sayuri::UCIShell &amp;shell)</div><div class="ttdoc">実行ループ。 </div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00050">main.cpp:50</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>readme-en.md</b></li>
-    <li class="footer">Generated on Mon Jun 9 2014 21:27:05 for Sayuri by
+    <li class="footer">Generated on Mon Jun 9 2014 21:37:00 for Sayuri by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
   </ul>
