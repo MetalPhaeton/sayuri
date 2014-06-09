@@ -1,0 +1,28 @@
+var structSayuri_1_1EvalResult =
+[
+    [ "material_", "structSayuri_1_1EvalResult.html#a38bbf5c9a10b0706caa4333fc9f4e1f0", null ],
+    [ "score_", "structSayuri_1_1EvalResult.html#a76554cf940224bc358d9bb0fab702e6d", null ],
+    [ "score_abandoned_castling_", "structSayuri_1_1EvalResult.html#a217a626a4d5e356ec6b0e61d67eececa", null ],
+    [ "score_attack_", "structSayuri_1_1EvalResult.html#a493b903db0cc00e625f12fa77754d856", null ],
+    [ "score_attack_around_king_", "structSayuri_1_1EvalResult.html#a9244dd15e9a790125458a765b94395fc", null ],
+    [ "score_bad_bishop_", "structSayuri_1_1EvalResult.html#acd60a4593b26da59f73e0618ab9f9c18", null ],
+    [ "score_bishop_pair_", "structSayuri_1_1EvalResult.html#aa2a0d35a738a90113a35049692bfb6cf", null ],
+    [ "score_castling_", "structSayuri_1_1EvalResult.html#ab820c2f3d0a497894d633d658d29ca14", null ],
+    [ "score_center_control_", "structSayuri_1_1EvalResult.html#af06fb28ec59b01c9fce1bb34cb68f6d8", null ],
+    [ "score_development_", "structSayuri_1_1EvalResult.html#af9f8a689ac9208a99df681061263caeb", null ],
+    [ "score_double_pawn_", "structSayuri_1_1EvalResult.html#a75d0fde13adc377d17e039f5282adbc8", null ],
+    [ "score_early_queen_launched_", "structSayuri_1_1EvalResult.html#a99bdf6ecdd35441ed4a1f37b9a40aaf7", null ],
+    [ "score_ending_position_", "structSayuri_1_1EvalResult.html#a284a659f04d8fe5cad14c0ef5ccb8c3c", null ],
+    [ "score_iso_pawn_", "structSayuri_1_1EvalResult.html#a18cb3a5a49025e08bb203c276e897bb6", null ],
+    [ "score_mobility_", "structSayuri_1_1EvalResult.html#ad267645a738089398d712d79c54801e7", null ],
+    [ "score_opening_position_", "structSayuri_1_1EvalResult.html#a7a52392a8497996708080c3a53bcd1fa", null ],
+    [ "score_pass_pawn_", "structSayuri_1_1EvalResult.html#abe6f5e197e9bce181aa972d9355aa674", null ],
+    [ "score_pawn_shield_", "structSayuri_1_1EvalResult.html#aa74e5f7a8c00da5c9eb0c7fc747236c1", null ],
+    [ "score_pin_knight_", "structSayuri_1_1EvalResult.html#a28e7c6d85082ffeb703dd5766eb8a117", null ],
+    [ "score_protected_pass_pawn_", "structSayuri_1_1EvalResult.html#a33fe101d06acaee99fdd96deb300f77e", null ],
+    [ "score_rook_open_fyle_", "structSayuri_1_1EvalResult.html#a193139ec67077eed59c93df55ca197ff", null ],
+    [ "score_rook_pair_", "structSayuri_1_1EvalResult.html#a0374a87f5ae2647aeb0cfa46c5ad2266", null ],
+    [ "score_rook_semiopen_fyle_", "structSayuri_1_1EvalResult.html#ab41bf314528b613eda6da787de2e295e", null ],
+    [ "score_sweet_center_control_", "structSayuri_1_1EvalResult.html#a56be57e6bfc039272fa8703c6c51054f", null ],
+    [ "score_weak_square_", "structSayuri_1_1EvalResult.html#a4d2d23bac08d8adc3efb88423082f163", null ]
+];
