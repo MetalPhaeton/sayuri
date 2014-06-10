@@ -494,7 +494,7 @@ namespace Sayuri {
        * @return クイーンの動きのビットボード。
        */
       static Bitboard GetQueenMove(Square square) {
-        return bishop_move_[square] | rook_move_[square];
+        return queen_move_[square];
       }
       /**
        * キングの動きのビットボードを得る。
@@ -703,6 +703,8 @@ namespace Sayuri {
       static Bitboard bishop_move_[NUM_SQUARES];
       /** ルークの動きの配列。 [マス] */
       static Bitboard rook_move_[NUM_SQUARES];
+      /** クイーンの動きの配列。 [マス] */
+      static Bitboard queen_move_[NUM_SQUARES];
       /** キングの動きの配列。 [マス] */
       static Bitboard king_move_[NUM_SQUARES];
       /** line_[][]を初期化する。 */

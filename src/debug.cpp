@@ -370,7 +370,9 @@ namespace Sayuri {
     };
 
     std::cout << "Total Score: " << result.score_ << std::endl;
+
     std::cout << "Material: " << result.material_ << std::endl;
+
     std::ostringstream os;
     double total = 0.0;
     for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
@@ -380,6 +382,7 @@ namespace Sayuri {
     }
     std::cout << "Opening Position: " << total << std::endl;
     std::cout << os.str();
+
     os.str("");
     total = 0.0;
     for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
@@ -389,12 +392,47 @@ namespace Sayuri {
     }
     std::cout << "Ending Position: " << total << std::endl;
     std::cout << os.str();
-    std::cout << "Mobility: " << result.score_mobility_ << std::endl;
-    std::cout << "Center Control: " << result.score_center_control_
-    << std::endl;
-    std::cout << "Sweet Center Control: "
-    << result.score_sweet_center_control_ << std::endl;
-    std::cout << "Development: " << result.score_development_ << std::endl;
+
+    os.str("");
+    total = 0.0;
+    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+      os << "    " << piece_name[type] << ": "
+      << result.score_mobility_[type] << std::endl;
+      total += result.score_mobility_[type];
+    }
+    std::cout << "Mobility: " << total << std::endl;
+    std::cout << os.str();
+
+    os.str("");
+    total = 0.0;
+    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+      os << "    " << piece_name[type] << ": "
+      << result.score_center_control_[type] << std::endl;
+      total += result.score_center_control_[type];
+    }
+    std::cout << "Center Control: " << total << std::endl;
+    std::cout << os.str();
+
+    os.str("");
+    total = 0.0;
+    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+      os << "    " << piece_name[type] << ": "
+      << result.score_sweet_center_control_[type] << std::endl;
+      total += result.score_sweet_center_control_[type];
+    }
+    std::cout << "Sweet Center Control: " << total << std::endl;
+    std::cout << os.str();
+
+    os.str("");
+    total = 0.0;
+    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+      os << "    " << piece_name[type] << ": "
+      << result.score_development_[type] << std::endl;
+      total += result.score_development_[type];
+    }
+    std::cout << "Development: " << total << std::endl;
+    std::cout << os.str();
+
     os.str("");
     total = 0.0;
     for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
@@ -404,26 +442,67 @@ namespace Sayuri {
     }
     std::cout << "Attack: " << total << std::endl;
     std::cout << os.str();
-    std::cout << "Attack Around King: " << result.score_attack_around_king_
-    << std::endl;
+
+    os.str("");
+    total = 0.0;
+    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+      os << "    " << piece_name[type] << ": "
+      << result.score_defense_[type] << std::endl;
+      total += result.score_defense_[type];
+    }
+    std::cout << "Defense: " << total << std::endl;
+    std::cout << os.str();
+
+    os.str("");
+    total = 0.0;
+    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+      os << "    " << piece_name[type] << ": "
+      << result.score_pin_[type] << std::endl;
+      total += result.score_pin_[type];
+    }
+    std::cout << "Pin: " << total << std::endl;
+    std::cout << os.str();
+
+    os.str("");
+    total = 0.0;
+    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+      os << "    " << piece_name[type] << ": "
+      << result.score_attack_around_king_[type] << std::endl;
+      total += result.score_attack_around_king_[type];
+    }
+    std::cout << "Attack Around King: " << total << std::endl;
+    std::cout << os.str();
+
     std::cout << "Pass Pawn: " << result.score_pass_pawn_ << std::endl;
+
     std::cout << "Protected Pass Pawn: " << result.score_protected_pass_pawn_
     << std::endl;
+
     std::cout << "Double Pawn: " << result.score_double_pawn_ << std::endl;
+
     std::cout << "Iso Pawn: " << result.score_iso_pawn_ << std::endl;
+
     std::cout << "Pawn Shield: " << result.score_pawn_shield_ << std::endl;
+
     std::cout << "Bishop Pair: " << result.score_bishop_pair_ << std::endl;
+
     std::cout << "Bad Bishop: " << result.score_bad_bishop_ << std::endl;
-    std::cout << "Pin Knight: " << result.score_pin_knight_ << std::endl;
+
     std::cout << "Rook Pair: " << result.score_rook_pair_ << std::endl;
+
     std::cout << "Rook Semiopen Fyle: " << result.score_rook_semiopen_fyle_
     << std::endl;
+
     std::cout << "Rook Open Fyle: " << result.score_rook_open_fyle_
     << std::endl;
+
     std::cout << "Early Queen Launched: "
     << result.score_early_queen_launched_ << std::endl;
+
     std::cout << "Weak Square: " << result.score_weak_square_ << std::endl;
+
     std::cout << "Castling: " << result.score_castling_ << std::endl;
+
     std::cout << "Abandoned Castling: " << result.score_abandoned_castling_
     << std::endl;
   }

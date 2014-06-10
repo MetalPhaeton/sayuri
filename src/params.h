@@ -814,27 +814,42 @@ namespace Sayuri {
       // ======== //
       // --- 価値テーブル --- //
       /**
-       * アクセサ - オープニング時の配置の価値のテーブル。 [駒の種類][マス]
-       * @return オープニング時の配置の価値のテーブル。
+       * アクセサ - オープニング時の配置の価値テーブル。 [駒の種類][マス]
+       * @return オープニング時の配置の価値テーブル。
        */
       const double (& opening_position_value_table() const)
       [NUM_PIECE_TYPES][NUM_SQUARES] {return opening_position_value_table_;}
       /**
-       * アクセサ - エンディング時の配置の価値のテーブル。 [駒の種類][マス]
-       * @return エンディング時の配置の価値のテーブル。
+       * アクセサ - エンディング時の配置の価値テーブル。 [駒の種類][マス]
+       * @return エンディング時の配置の価値テーブル。
        */
       const double (& ending_position_value_table() const)
       [NUM_PIECE_TYPES][NUM_SQUARES] {return ending_position_value_table_;}
       /**
-       * アクセサ - 駒への攻撃の価値のテーブル。
+       * アクセサ - 相手への攻撃の価値テーブル。
        * [攻め駒の種類][ターゲットの種類]
-       * @return 駒への攻撃の価値のテーブル。
+       * @return 相手への攻撃の価値テーブル。
        */
       const double (& attack_value_table() const)
       [NUM_PIECE_TYPES][NUM_PIECE_TYPES] {return attack_value_table_;}
       /**
-       * アクセサ - ポーンの盾の配置の価値のテーブル。 [マス]
-       * @return ポーンの盾の配置の価値のテーブル。
+       * アクセサ - 味方への攻撃の価値テーブル。
+       * [守り駒の種類][ターゲットの種類]
+       * @return 味方への攻撃の価値テーブル。
+       */
+      const double (& defense_value_table() const)
+      [NUM_PIECE_TYPES][NUM_PIECE_TYPES] {return defense_value_table_;}
+      /**
+       * アクセサ - ピンの価値テーブル。
+       * [ピンをする駒の種類][ターゲットの種類][ターゲットの裏の駒の種類]
+       */
+      const double (& pin_value_table() const)
+      [NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES] {
+        return pin_value_table_;
+      }
+      /**
+       * アクセサ - ポーンの盾の配置の価値テーブル。 [マス]
+       * @return ポーンの盾の配置の価値テーブル。
        */
       const double (& pawn_shield_value_table() const)
       [NUM_SQUARES] {return pawn_shield_value_table_;}
@@ -855,41 +870,59 @@ namespace Sayuri {
         return weight_ending_position_;
       }
       /**
-       * アクセサ - 機動力のウェイト。
+       * アクセサ - 機動力のウェイト。 [駒の種類]
        * @return 機動力のウェイト。
        */
-      const Weight& weight_mobility() const {return weight_mobility_;}
+      const Weight (& weight_mobility() const)[NUM_PIECE_TYPES] {
+        return weight_mobility_;
+      }
       /**
-       * アクセサ - センターコントロールのウェイト。
+       * アクセサ - センターコントロールのウェイト。 [駒の種類]
        * @return センターコントロールのウェイト。
        */
-      const Weight& weight_center_control() const {
+      const Weight (& weight_center_control() const)[NUM_PIECE_TYPES] {
         return weight_center_control_;
       }
       /**
-       * アクセサ - スウィートセンターコントロールのウェイト。
+       * アクセサ - スウィートセンターコントロールのウェイト。 [駒の種類]
        * @return スウィートセンターコントロールのウェイト。
        */
-      const Weight& weight_sweet_center_control() const {
+      const Weight (& weight_sweet_center_control() const)[NUM_PIECE_TYPES] {
         return weight_sweet_center_control_;
       }
       /**
-       * アクセサ - 駒の展開のウェイト。
+       * アクセサ - 駒の展開のウェイト。 [駒の種類]
        * @return 駒の展開のウェイト。
        */
-      const Weight& weight_development() const {return weight_development_;}
+      const Weight (& weight_development() const)[NUM_PIECE_TYPES] {
+        return weight_development_;
+      }
       /**
-       * アクセサ - 駒への攻撃のウェイト。 [駒の種類]
-       * @return 駒への攻撃のウェイト。
+       * アクセサ - 相手への攻撃のウェイト。 [駒の種類]
+       * @return 相手への攻撃のウェイト。
        */
-      const Weight(& weight_attack() const)[NUM_PIECE_TYPES] {
+      const Weight (& weight_attack() const)[NUM_PIECE_TYPES] {
         return weight_attack_;
+      }
+      /**
+       * アクセサ - 味方への攻撃のウェイト。 [駒の種類]
+       * @return 味方への攻撃のウェイト。
+       */
+      const Weight (& weight_defense() const)[NUM_PIECE_TYPES] {
+        return weight_defense_;
+      }
+      /**
+       * アクセサ - ピンのウェイト。 [駒の種類]
+       * @return ピンのウェイト。
+       */
+      const Weight (& weight_pin() const)[NUM_PIECE_TYPES] {
+        return weight_pin_;
       }
       /**
        * アクセサ - 相手キング周辺への攻撃のウェイト。
        * @return 相手キング周辺への攻撃のウェイト。
        */
-      const Weight& weight_attack_around_king() const {
+      const Weight (& weight_attack_around_king() const)[NUM_PIECE_TYPES] {
         return weight_attack_around_king_;
       }
       /**
@@ -929,11 +962,6 @@ namespace Sayuri {
        * @return バッドビショップのウェイト。
        */
       const Weight& weight_bad_bishop() const {return weight_bad_bishop_;}
-      /**
-       * アクセサ - ビショップで相手のナイトをピンのウェイト。
-       * @return ビショップで相手のナイトをピンのウェイト。
-       */
-      const Weight& weight_pin_knight() const {return weight_pin_knight_;}
       /**
        * アクセサ - ルークペアのウェイト。
        * @return ルークペアのウェイト。
@@ -983,26 +1011,38 @@ namespace Sayuri {
       // ============ //
       // --- 価値テーブル --- //
       /**
-       * ミューテータ - オープニング時の配置の価値のテーブル。
-       * @param table オープニング時の配置の価値のテーブル。
+       * ミューテータ - オープニング時の配置の価値テーブル。
+       * @param table オープニング時の配置の価値テーブル。
        */
       void opening_position_value_table
       (const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES]);
       /**
-       * ミューテータ - エンディング時の配置の価値のテーブル。
-       * @param table エンディング時の配置の価値のテーブル。
+       * ミューテータ - エンディング時の配置の価値テーブル。
+       * @param table エンディング時の配置の価値テーブル。
        */
       void ending_position_value_table
       (const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES]);
       /**
-       * ミューテータ - 駒への攻撃の価値のテーブル。
-       * @param table 駒への攻撃の価値のテーブル。
+       * ミューテータ - 相手への攻撃の価値テーブル。
+       * @param table 相手への攻撃の価値テーブル。
        */
       void attack_value_table
       (const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES]);
       /**
-       * ミューテータ - ポーンの盾の配置の価値のテーブル。
-       * @param table ポーンの盾の配置の価値のテーブル。
+       * ミューテータ - 味方への攻撃の価値テーブル。
+       * @param table 味方への攻撃の価値テーブル。
+       */
+      void defense_value_table
+      (const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES]);
+      /**
+       * ミューテータ - ピンの価値テーブル。
+       * @param table ピンの価値テーブル。
+       */
+      void pin_value_table(const double (& table)
+      [NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES]);
+      /**
+       * ミューテータ - ポーンの盾の配置の価値テーブル。
+       * @param table ポーンの盾の配置の価値テーブル。
        */
       void pawn_shield_value_table(const double (& table)[NUM_SQUARES]);
 
@@ -1019,42 +1059,45 @@ namespace Sayuri {
       void weight_ending_position(const Weight (& weights)[NUM_PIECE_TYPES]);
       /**
        * ミューテータ - 機動力のウェイト。
-       * @param weight 機動力のウェイト。
+       * @param weights 機動力のウェイト。
        */
-      void weight_mobility(const Weight& weight) {weight_mobility_ = weight;}
+      void weight_mobility(const Weight (& weights)[NUM_PIECE_TYPES]);
       /**
        * ミューテータ - センターコントロールのウェイト。
-       * @param weight センターコントロールのウェイト。
+       * @param weights センターコントロールのウェイト。
        */
-      void weight_center_control(const Weight& weight) {
-        weight_center_control_ = weight;
-      }
+      void weight_center_control(const Weight(& weights)[NUM_PIECE_TYPES]);
       /**
        * ミューテータ - スウィートセンターコントロールのウェイト。
-       * @param weight スウィートセンターコントロールのウェイト。
+       * @param weights スウィートセンターコントロールのウェイト。
        */
-      void weight_sweet_center_control(const Weight& weight) {
-        weight_sweet_center_control_ = weight;
-      }
+      void weight_sweet_center_control
+      (const Weight (& weights)[NUM_PIECE_TYPES]);
       /**
        * ミューテータ - 駒の展開のウェイト。
-       * @param weight 駒の展開のウェイト。
+       * @param weights 駒の展開のウェイト。
        */
-      void weight_development(const Weight& weight) {
-        weight_development_ = weight;
-      }
+      void weight_development(const Weight (& weights)[NUM_PIECE_TYPES]);
       /**
        * ミューテータ - 駒への攻撃のウェイト。
        * @param weights 駒への攻撃のウェイト。
        */
       void weight_attack(const Weight (& weights)[NUM_PIECE_TYPES]);
       /**
-       * ミューテータ - 相手キング周辺への攻撃のウェイト。
-       * @param weight 相手キング周辺への攻撃のウェイト。
+       * ミューテータ - 味方への防御のウェイト。
+       * @param weights 味方への防御のウェイト。
        */
-      void weight_attack_around_king(const Weight& weight) {
-        weight_attack_around_king_ = weight;
-      }
+      void weight_defense(const Weight (& weights)[NUM_PIECE_TYPES]);
+      /**
+       * ミューテータ - ピンのウェイト。
+       * @param weights ピンのウェイト。
+       */
+      void weight_pin(const Weight (& weights)[NUM_PIECE_TYPES]);
+      /**
+       * ミューテータ - 相手キング周辺への攻撃のウェイト。
+       * @param weights 相手キング周辺への攻撃のウェイト。
+       */
+      void weight_attack_around_king(const Weight(& weight)[NUM_PIECE_TYPES]);
       /**
        * ミューテータ - パスポーンのウェイト。
        * @param weight パスポーンのウェイト。
@@ -1101,13 +1144,6 @@ namespace Sayuri {
        */
       void weight_bad_bishop(const Weight& weight) {
         weight_bad_bishop_ = weight;
-      }
-      /**
-       * ミューテータ - ビショップで相手のナイトをピンのウェイト。
-       * @param weight ビショップで相手のナイトをピンのウェイト。
-       */
-      void weight_pin_knight(const Weight& weight) {
-        weight_pin_knight_ = weight;
       }
       /**
        * ミューテータ - ルークペアのウェイト。
@@ -1169,8 +1205,13 @@ namespace Sayuri {
       double opening_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES];
       /** エンディング時の配置の価値テーブル。 */
       double ending_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES];
-      /** 駒への攻撃の価値テーブル。 */
+      /** 相手への攻撃の価値テーブル。 */
       double attack_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
+      /** 味方への防御の価値テーブル。 */
+      double defense_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
+      /** ピンの価値テーブル。 */
+      double pin_value_table_
+      [NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES];
       /** ポーンの盾の配置の価値テーブル。 */
       double pawn_shield_value_table_[NUM_SQUARES];
 
@@ -1182,17 +1223,21 @@ namespace Sayuri {
       /** エンディング時の駒の配置のウェイト。 */
       Weight weight_ending_position_[NUM_PIECE_TYPES];
       /** 機動力のウェイト。 */
-      Weight weight_mobility_;
+      Weight weight_mobility_[NUM_PIECE_TYPES];
       /** センターコントロールのウェイト。 */
-      Weight weight_center_control_;
+      Weight weight_center_control_[NUM_PIECE_TYPES];
       /** スウィートセンターのコントロールのウェイト。 */
-      Weight weight_sweet_center_control_;
+      Weight weight_sweet_center_control_[NUM_PIECE_TYPES];
       /** 駒の展開のウェイト。 */
-      Weight weight_development_;
-      /** 駒への攻撃のウェイト。 */
+      Weight weight_development_[NUM_PIECE_TYPES];
+      /** 相手への攻撃のウェイト。 */
       Weight weight_attack_[NUM_PIECE_TYPES];
+      /** 味方への防御のウェイト。 */
+      Weight weight_defense_[NUM_PIECE_TYPES];
+      /** ピンのウェイト。 */
+      Weight weight_pin_[NUM_PIECE_TYPES];
       /** 相手キング周辺への攻撃のウェイト。 */
-      Weight weight_attack_around_king_;
+      Weight weight_attack_around_king_[NUM_PIECE_TYPES];
       /** パスポーンのウェイト。 */
       Weight weight_pass_pawn_;
       /** 守られたパスポーンのウェイト。 */
@@ -1207,8 +1252,6 @@ namespace Sayuri {
       Weight weight_bishop_pair_;
       /** バッドビショップのウェイト。 */
       Weight weight_bad_bishop_;
-      /** ビショップで相手のナイトをピンのウェイト。 */
-      Weight weight_pin_knight_;
       /** ルークペアのウェイト。 */
       Weight weight_rook_pair_;
       /** セミオープンファイルのルークのウェイト。 */

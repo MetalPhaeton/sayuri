@@ -77,6 +77,7 @@ namespace Sayuri {
   // Utilクラスの初期化 //
   // ================== //
   // static変数の初期化。
+  Bitboard Util::queen_move_[NUM_SQUARES];
   void Util::InitUtil() {
     // num_bit16_table_[]を初期化する。
     InitNumBit16Table();
@@ -94,6 +95,10 @@ namespace Sayuri {
     InitBishopMove();
     // rook_move_[]を初期化する。
     InitRookMove();
+    // queen_move_[]を初期化する。
+    for (Square square = 0; square < NUM_SQUARES; square++) {
+      queen_move_[square] = bishop_move_[square] | rook_move_[square];
+    }
     // king_move_[]を初期化する。
     InitKingMove();
     // ランダム関連を初期化する。

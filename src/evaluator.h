@@ -48,18 +48,22 @@ namespace Sayuri {
     double score_opening_position_[NUM_PIECE_TYPES];
     /** エンディング時の駒の配置の評価値。 [駒の種類] */
     double score_ending_position_[NUM_PIECE_TYPES];
-    /** 機動力の評価値。 */
-    double score_mobility_;
-    /** センターコントロールの評価値。 */
-    double score_center_control_;
-    /** スウィートセンターのコントロールの評価値。 */
-    double score_sweet_center_control_;
-    /** 駒の展開の評価値。 */
-    double score_development_;
+    /** 機動力の評価値。 [駒の種類] */
+    double score_mobility_[NUM_PIECE_TYPES];
+    /** センターコントロールの評価値。 [駒の種類] */
+    double score_center_control_[NUM_PIECE_TYPES];
+    /** スウィートセンターのコントロールの評価値。 [駒の種類] */
+    double score_sweet_center_control_[NUM_PIECE_TYPES];
+    /** 駒の展開の評価値。 [駒の種類] */
+    double score_development_[NUM_PIECE_TYPES];
     /** 攻撃の評価値。 [駒の種類] */
     double score_attack_[NUM_PIECE_TYPES];
-    /** 相手キング周辺への攻撃の評価値。 */
-    double score_attack_around_king_;
+    /** 防御の評価値。 [駒の種類] */
+    double score_defense_[NUM_PIECE_TYPES];
+    /** ピンの評価値。 [駒の種類] */
+    double score_pin_[NUM_PIECE_TYPES];
+    /** 相手キング周辺への攻撃の評価値。 [駒の種類] */
+    double score_attack_around_king_[NUM_PIECE_TYPES];
     /** パスポーンの評価値。 */
     double score_pass_pawn_;
     /** 守られたパスポーンの評価値。 */
@@ -74,8 +78,6 @@ namespace Sayuri {
     double score_bishop_pair_;
     /** バッドビショップの評価値。 */
     double score_bad_bishop_;
-    /** 相手のナイトをビショップでピンの評価値。 */
-    double score_pin_knight_;
     /** ルークペアの評価値。 */
     double score_rook_pair_;
     /** セミオープンファイルのルークの評価値。 */
@@ -221,18 +223,22 @@ namespace Sayuri {
       double opening_position_value_[NUM_PIECE_TYPES];
       /** エンディング時の駒の配置の価値。 [駒の種類] */
       double ending_position_value_[NUM_PIECE_TYPES];
-      /** 機動力の価値。 */
-      double mobility_value_;
-      /** センターコントロールの価値。 */
-      double center_control_value_;
-      /** スウィートセンターコントロールの価値。 */
-      double sweet_center_control_value_;
-      /** 駒の展開の価値。 */
-      double development_value_;
+      /** 機動力の価値。 [駒の種類] */
+      double mobility_value_[NUM_PIECE_TYPES];
+      /** センターコントロールの価値。 [駒の種類] */
+      double center_control_value_[NUM_PIECE_TYPES];
+      /** スウィートセンターコントロールの価値。 [駒の種類] */
+      double sweet_center_control_value_[NUM_PIECE_TYPES];
+      /** 駒の展開の価値。 [駒の種類] */
+      double development_value_[NUM_PIECE_TYPES];
       /** 攻撃の価値。 [駒の種類] */
       double attack_value_[NUM_PIECE_TYPES];
-      /** 相手キング周辺への攻撃の価値。 */
-      double attack_around_king_value_;
+      /** 防御の価値。 [駒の種類] */
+      double defense_value_[NUM_PIECE_TYPES];
+      /** ピンの価値。 [駒の種類] */
+      double pin_value_[NUM_PIECE_TYPES];
+      /** 相手キング周辺への攻撃の価値。 [駒の種類] */
+      double attack_around_king_value_[NUM_PIECE_TYPES];
       /** パスポーンの価値。 */
       double pass_pawn_value_;
       /** 守られたパスポーンの価値。 */

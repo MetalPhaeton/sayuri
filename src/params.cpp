@@ -165,11 +165,6 @@ namespace Sayuri {
   // ========== //
   // コンストラクタ。
   EvalParams::EvalParams() :
-  weight_mobility_(1.0, 3.0),
-  weight_center_control_(0.5, 0.0),
-  weight_sweet_center_control_(0.5, 0.0),
-  weight_development_(2.5, 0.0),
-  weight_attack_around_king_(0.0, 3.0),
   weight_pass_pawn_(20.0, 30.0),
   weight_protected_pass_pawn_(10.0, 10.0),
   weight_double_pawn_(-10.0, -20.0),
@@ -177,7 +172,6 @@ namespace Sayuri {
   weight_pawn_shield_(1.0, 0.0),
   weight_bishop_pair_(60.0, 60.0),
   weight_bad_bishop_(-1.5, 0.0),
-  weight_pin_knight_(10.0, 0.0),
   weight_rook_pair_(10.0, 20.0),
   weight_rook_semiopen_fyle_(7.5, 7.5),
   weight_rook_open_fyle_(7.5, 7.5),
@@ -345,8 +339,9 @@ namespace Sayuri {
       }
     }
 
-    // 駒への攻撃の価値テーブルを初期化。
+    // 相手への攻撃の価値テーブルを初期化。
     constexpr double ATTACK[NUM_PIECE_TYPES][NUM_PIECE_TYPES] {
+      // 相手側:{Empty, ポーン, ナイト, ビショップ, ルーク, クイーン, キング}
       {0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0},  // 攻撃側: Empty。
       {0.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0},  // 攻撃側: ポーン。
       {0.0,  8.0, 10.0, 12.0, 14.0, 16.0, 18.0},  // 攻撃側: ナイト。
@@ -358,6 +353,105 @@ namespace Sayuri {
     for (Piece type_1 = 0; type_1 < NUM_PIECE_TYPES; type_1++) {
       for (Piece type_2 = 0; type_2 < NUM_PIECE_TYPES; type_2++) {
         attack_value_table_[type_1][type_2] = ATTACK[type_1][type_2];
+      }
+    }
+
+    // 味方への防御の価値テーブルを初期化。
+    constexpr double DEFENSE[NUM_PIECE_TYPES][NUM_PIECE_TYPES] {
+      // 相手側:{Empty, ポーン, ナイト, ビショップ, ルーク, クイーン, キング}
+      {0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // 守り側: Empty。
+      {0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // 守り側: ポーン。
+      {0.0,  7.5, 0.0, 0.0, 0.0, 0.0, 0.0},  // 守り側: ナイト。
+      {0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // 守り側: ビショップ。
+      {0.0,  5.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // 守り側: ルーク。
+      {0.0,  2.5, 0.0, 0.0, 0.0, 0.0, 0.0},  // 守り側: クイーン。
+      {0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0}   // 守り側: キング。
+    };
+    for (Piece type_1 = 0; type_1 < NUM_PIECE_TYPES; type_1++) {
+      for (Piece type_2 = 0; type_2 < NUM_PIECE_TYPES; type_2++) {
+        defense_value_table_[type_1][type_2] = DEFENSE[type_1][type_2];
+      }
+    }
+
+    // ピンの価値テーブルを初期化。
+    constexpr double PIN[NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES] {
+      {  // Emptyでピン。
+        // 裏の駒:{Empty, ポーン, ナイト, ビショップ, ルーク, クイーン, キング}
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: Empty。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ポーン。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ナイト。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ビショップ。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ルーク。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: クイーン。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}   // ピンされる駒: キング。
+      },
+      {  // ポーンでピン。
+        // 裏の駒:{Empty, ポーン, ナイト, ビショップ, ルーク, クイーン, キング}
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: Empty。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ポーン。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ナイト。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ビショップ。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ルーク。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: クイーン。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}   // ピンされる駒: キング。
+      },
+      {  // ナイトでピン。
+        // 裏の駒:{Empty, ポーン, ナイト, ビショップ, ルーク, クイーン, キング}
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: Empty。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ポーン。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ナイト。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ビショップ。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ルーク。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: クイーン。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}   // ピンされる駒: キング。
+      },
+      {  // ビショップでピン。
+        // 裏の駒:{Empty, ポーン, ナイト, ビショップ, ルーク, クイーン, キング}
+        {0.0, 0.0, 0.0, 0.0,  0.0,  0.0,  0.0},  // ピンされる駒: Empty。
+        {0.0, 0.0, 0.0, 0.0,  5.0,  5.0,  5.0},  // ピンされる駒: ポーン。
+        {0.0, 0.0, 0.0, 0.0, 10.0, 10.0, 10.0},  // ピンされる駒: ナイト。
+        {0.0, 0.0, 0.0, 0.0,  0.0,  0.0,  0.0},  // ピンされる駒: ビショップ。
+        {0.0, 0.0, 0.0, 0.0, 20.0, 30.0, 40.0},  // ピンされる駒: ルーク。
+        {0.0, 0.0, 0.0, 0.0, 30.0, 40.0, 50.0},  // ピンされる駒: クイーン。
+        {0.0, 0.0, 0.0, 0.0, 40.0, 50.0,  0.0}   // ピンされる駒: キング。
+      },
+      {  // ルークでピン。
+        // 裏の駒:{Empty, ポーン, ナイト, ビショップ, ルーク, クイーン, キング}
+        {0.0, 0.0, 0.0, 0.0, 0.0,  0.0,  0.0},  // ピンされる駒: Empty。
+        {0.0, 0.0, 0.0, 0.0, 0.0,  5.0,  5.0},  // ピンされる駒: ポーン。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 10.0, 10.0},  // ピンされる駒: ナイト。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 10.0, 10.0},  // ピンされる駒: ビショップ。
+        {0.0, 0.0, 0.0, 0.0, 0.0,  0.0,  0.0},  // ピンされる駒: ルーク。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 40.0, 50.0},  // ピンされる駒: クイーン。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 50.0,  0.0}   // ピンされる駒: キング。
+      },
+      {  // クイーンでピン。
+        // 裏の駒:{Empty, ポーン, ナイト, ビショップ, ルーク, クイーン, キング}
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: Empty。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ポーン。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ナイト。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ビショップ。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ルーク。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: クイーン。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}   // ピンされる駒: キング。
+      },
+      {  // キングでピン。
+        // 裏の駒:{Empty, ポーン, ナイト, ビショップ, ルーク, クイーン, キング}
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: Empty。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ポーン。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ナイト。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ビショップ。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: ルーク。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: クイーン。
+        {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}   // ピンされる駒: キング。
+      }
+    };
+    for (Piece type_1 = 0; type_1 < NUM_PIECE_TYPES; type_1++) {
+      for (Piece type_2 = 0; type_2 < NUM_PIECE_TYPES; type_2++) {
+        for (Piece type_3 = 0; type_3 < NUM_PIECE_TYPES; type_3++) {
+          pin_value_table_[type_1][type_2][type_3] =
+          PIN[type_1][type_2][type_3];
+        }
       }
     }
 
@@ -394,14 +488,77 @@ namespace Sayuri {
     weight_ending_position_[QUEEN] = Weight(0.0, 1.0);  // クイーン。
     weight_ending_position_[KING] = Weight(0.0, 1.0);  // キング。
 
-    // 駒への攻撃のウェイトを初期化。
+    // 機動力のウェイトを初期化。
+    weight_mobility_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
+    weight_mobility_[PAWN] = Weight(0.0, 0.0);  // ポーン。
+    weight_mobility_[KNIGHT] = Weight(1.0, 3.0);  // ナイト。
+    weight_mobility_[BISHOP] = Weight(1.0, 3.0);  // ビショップ。
+    weight_mobility_[ROOK] = Weight(1.0, 3.0);  // ルーク。
+    weight_mobility_[QUEEN] = Weight(1.0, 3.0);  // クイーン。
+    weight_mobility_[KING] = Weight(0.0, 0.0);  // キング。
+
+    // センターコントロールのウェイトを初期化。
+    weight_center_control_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
+    weight_center_control_[PAWN] = Weight(5.0, 0.0);  // ポーン。
+    weight_center_control_[KNIGHT] = Weight(5.0, 0.0);  //ナイト。
+    weight_center_control_[BISHOP] = Weight(5.0, 0.0);  // ビショップ。
+    weight_center_control_[ROOK] = Weight(5.0, 0.0);  // ルーク。
+    weight_center_control_[QUEEN] = Weight(5.0, 0.0);  // クイーン。
+    weight_center_control_[KING] = Weight(0.0, 0.0);  // キング。
+
+    // スウィートセンターのコントロールのウェイトを初期化。
+    weight_sweet_center_control_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
+    weight_sweet_center_control_[PAWN] = Weight(5.0, 0.0);  // ポーン。
+    weight_sweet_center_control_[KNIGHT] = Weight(5.0, 0.0);  //ナイト。
+    weight_sweet_center_control_[BISHOP] = Weight(5.0, 0.0);  // ビショップ。
+    weight_sweet_center_control_[ROOK] = Weight(5.0, 0.0);  // ルーク。
+    weight_sweet_center_control_[QUEEN] = Weight(5.0, 0.0);  // クイーン。
+    weight_sweet_center_control_[KING] = Weight(0.0, 0.0);  // キング。
+
+    // 展開のウェイトを初期化。
+    weight_development_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
+    weight_development_[PAWN] = Weight(0.0, 0.0);  // ポーン。
+    weight_development_[KNIGHT] = Weight(20.0, 0.0);  //ナイト。
+    weight_development_[BISHOP] = Weight(20.0, 0.0);  // ビショップ。
+    weight_development_[ROOK] = Weight(0.0, 0.0);  // ルーク。
+    weight_development_[QUEEN] = Weight(0.0, 0.0);  // クイーン。
+    weight_development_[KING] = Weight(0.0, 0.0);  // キング。
+
+    // 相手への攻撃のウェイトを初期化。
     weight_attack_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_attack_[PAWN] = Weight(1.0, 0.0);  // PAWN。
-    weight_attack_[KNIGHT] = Weight(1.0, 0.0);  // KNIGHT。
-    weight_attack_[BISHOP] = Weight(1.0, 0.0);  // BISHOP。
-    weight_attack_[ROOK] = Weight(1.0, 0.0);  // ROOK。
-    weight_attack_[QUEEN] = Weight(1.0, 0.0);  // QUEEN。
-    weight_attack_[KING] = Weight(1.0, 0.0);  // KING。
+    weight_attack_[PAWN] = Weight(1.0, 0.0);  // ポーン。
+    weight_attack_[KNIGHT] = Weight(1.0, 0.0);  //ナイト。
+    weight_attack_[BISHOP] = Weight(1.0, 0.0);  // ビショップ。
+    weight_attack_[ROOK] = Weight(1.0, 0.0);  // ルーク。
+    weight_attack_[QUEEN] = Weight(1.0, 0.0);  // クイーン。
+    weight_attack_[KING] = Weight(1.0, 0.0);  // キング。
+
+    // 味方への防御のウェイトを初期化。
+    weight_defense_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
+    weight_defense_[PAWN] = Weight(1.0, 1.0);  // ポーン。
+    weight_defense_[KNIGHT] = Weight(1.0, 0.0);  //ナイト。
+    weight_defense_[BISHOP] = Weight(1.0, 0.0);  // ビショップ。
+    weight_defense_[ROOK] = Weight(1.0, 0.0);  // ルーク。
+    weight_defense_[QUEEN] = Weight(1.0, 0.0);  // クイーン。
+    weight_defense_[KING] = Weight(1.0, 3.0);  // キング。
+
+    // ピンのウェイトを初期化。
+    weight_pin_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
+    weight_pin_[PAWN] = Weight(0.0, 0.0);  // ポーン。
+    weight_pin_[KNIGHT] = Weight(0.0, 0.0);  //ナイト。
+    weight_pin_[BISHOP] = Weight(1.0, 1.0);  // ビショップ。
+    weight_pin_[ROOK] = Weight(1.0, 1.0);  // ルーク。
+    weight_pin_[QUEEN] = Weight(1.0, 1.0);  // クイーン。
+    weight_pin_[KING] = Weight(0.0, 0.0);  // キング。
+
+    // 相手キング周辺への攻撃のウェイトを初期化。
+    weight_attack_around_king_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
+    weight_attack_around_king_[PAWN] = Weight(3.0, 0.0);  // ポーン。
+    weight_attack_around_king_[KNIGHT] = Weight(3.0, 0.0);  //ナイト。
+    weight_attack_around_king_[BISHOP] = Weight(3.0, 0.0);  // ビショップ。
+    weight_attack_around_king_[ROOK] = Weight(3.0, 0.0);  // ルーク。
+    weight_attack_around_king_[QUEEN] = Weight(3.0, 0.0);  // クイーン。
+    weight_attack_around_king_[KING] = Weight(0.0, 5.0);  // キング。
   }
 
   // コピーコンストラクタ。
@@ -448,12 +605,35 @@ namespace Sayuri {
     }
   }
 
-  // 駒への攻撃の価値テーブルのミューテータ。
+  // 相手への攻撃の価値テーブルのミューテータ。
   void EvalParams::attack_value_table
   (const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES]) {
     for (Piece type_1 = 0; type_1 < NUM_PIECE_TYPES; type_1++) {
       for (Piece type_2 = 0; type_2 < NUM_PIECE_TYPES; type_2++) {
         attack_value_table_[type_1][type_2] = table[type_1][type_2];
+      }
+    }
+  }
+
+  // 味方への防御の価値テーブルのミューテータ。
+  void EvalParams::defense_value_table
+  (const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES]) {
+    for (Piece type_1 = 0; type_1 < NUM_PIECE_TYPES; type_1++) {
+      for (Piece type_2 = 0; type_2 < NUM_PIECE_TYPES; type_2++) {
+        defense_value_table_[type_1][type_2] = table[type_1][type_2];
+      }
+    }
+  }
+
+  // ピンの価値テーブルのミューテータ。
+  void EvalParams::pin_value_table
+  (const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES]) {
+    for (Piece type_1 = 0; type_1 < NUM_PIECE_TYPES; type_1++) {
+      for (Piece type_2 = 0; type_2 < NUM_PIECE_TYPES; type_2++) {
+        for (Piece type_3 = 0; type_3 < NUM_PIECE_TYPES; type_3++) {
+          pin_value_table_[type_1][type_2][type_3] =
+          table[type_1][type_2][type_3];
+        }
       }
     }
   }
@@ -482,10 +662,64 @@ namespace Sayuri {
     }
   }
 
-  // 駒への攻撃のウェイトのミューテータ。
+  // 機動力のウェイトのミューテータ。
+  void EvalParams::weight_mobility
+  (const Weight (& weights)[NUM_PIECE_TYPES]) {
+    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      weight_mobility_[piece_type] = weights[piece_type];
+    }
+  }
+
+  // センターコントロールのウェイトのミューテータ。
+  void EvalParams::weight_center_control
+  (const Weight (& weights)[NUM_PIECE_TYPES]) {
+    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      weight_center_control_[piece_type] = weights[piece_type];
+    }
+  }
+
+  // スウィートセンターのコントロールのウェイトのミューテータ。
+  void EvalParams::weight_sweet_center_control
+  (const Weight (& weights)[NUM_PIECE_TYPES]) {
+    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      weight_sweet_center_control_[piece_type] = weights[piece_type];
+    }
+  }
+
+  // 展開のウェイトのミューテータ。
+  void EvalParams::weight_development
+  (const Weight (& weights)[NUM_PIECE_TYPES]) {
+    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      weight_development_[piece_type] = weights[piece_type];
+    }
+  }
+
+  // 相手への攻撃のウェイトのミューテータ。
   void EvalParams::weight_attack(const Weight (& weights)[NUM_PIECE_TYPES]) {
     for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
       weight_attack_[piece_type] = weights[piece_type];
+    }
+  }
+
+  // 味方への防御のウェイトのミューテータ。
+  void EvalParams::weight_defense(const Weight (& weights)[NUM_PIECE_TYPES]) {
+    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      weight_defense_[piece_type] = weights[piece_type];
+    }
+  }
+
+  // ピンのウェイトのミューテータ。
+  void EvalParams::weight_pin(const Weight (& weights)[NUM_PIECE_TYPES]) {
+    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      weight_pin_[piece_type] = weights[piece_type];
+    }
+  }
+
+  // 相手キング周辺への攻撃のウェイトのミューテータ。
+  void EvalParams::weight_attack_around_king
+  (const Weight (& weights)[NUM_PIECE_TYPES]) {
+    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      weight_attack_around_king_[piece_type] = weights[piece_type];
     }
   }
 
@@ -510,6 +744,20 @@ namespace Sayuri {
         params.attack_value_table_[type_1][type_2];
       }
     }
+    for (Piece type_1 = 0; type_1 < NUM_PIECE_TYPES; type_1++) {
+      for (Piece type_2 = 0; type_2 < NUM_PIECE_TYPES; type_2++) {
+        defense_value_table_[type_1][type_2] =
+        params.defense_value_table_[type_1][type_2];
+      }
+    }
+    for (Piece type_1 = 0; type_1 < NUM_PIECE_TYPES; type_1++) {
+      for (Piece type_2 = 0; type_2 < NUM_PIECE_TYPES; type_2++) {
+        for (Piece type_3 = 0; type_3 < NUM_PIECE_TYPES; type_3++) {
+          pin_value_table_[type_1][type_2][type_3] =
+          params.pin_value_table_[type_1][type_2][type_3];
+        }
+      }
+    }
     for (Square square = 0; square < NUM_SQUARES; square++) {
       pawn_shield_value_table_[square] =
       params.pawn_shield_value_table_[square];
@@ -519,19 +767,25 @@ namespace Sayuri {
     for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
       weight_opening_position_[piece_type] =
       params.weight_opening_position_[piece_type];
-    }
-    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+
       weight_ending_position_[piece_type] =
       params.weight_ending_position_[piece_type];
-    }
-    weight_mobility_ = params.weight_mobility_;
-    weight_center_control_ = params.weight_center_control_;
-    weight_sweet_center_control_ = params.weight_sweet_center_control_;
-    weight_development_ = params.weight_development_;
-    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+
+      weight_mobility_[piece_type] = params.weight_mobility_[piece_type];
+
+      weight_center_control_[piece_type] =
+      params.weight_center_control_[piece_type];
+
+      weight_sweet_center_control_[piece_type] =
+      params.weight_sweet_center_control_[piece_type];
+
+      weight_development_[piece_type] = params.weight_development_[piece_type];
+
       weight_attack_[piece_type] = params.weight_attack_[piece_type];
+
+      weight_attack_around_king_[piece_type] =
+      params.weight_attack_around_king_[piece_type];
     }
-    weight_attack_around_king_ = params.weight_attack_around_king_;
     weight_pass_pawn_ = params.weight_pass_pawn_;
     weight_protected_pass_pawn_ = params.weight_protected_pass_pawn_;
     weight_double_pawn_ = params.weight_double_pawn_;
@@ -539,7 +793,6 @@ namespace Sayuri {
     weight_pawn_shield_ = params.weight_pawn_shield_;
     weight_bishop_pair_ = params.weight_bishop_pair_;
     weight_bad_bishop_ = params.weight_bad_bishop_;
-    weight_pin_knight_ = params.weight_pin_knight_;
     weight_rook_pair_ = params.weight_rook_pair_;
     weight_rook_semiopen_fyle_ = params.weight_rook_semiopen_fyle_;
     weight_rook_open_fyle_ = params.weight_rook_open_fyle_;
