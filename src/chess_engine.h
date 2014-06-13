@@ -45,7 +45,7 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
-  class Fen;
+  class FEN;
   class TranspositionTable;
   class MoveMaker;
   class Evaluator;
@@ -121,7 +121,7 @@ namespace Sayuri {
        * FEN文字列を読み込む。
        * @param fen 読み込むFEN文字列。
        */
-      void LoadFen(const Fen& fen);
+      void LoadFEN(const FEN& fen);
 
       /**
        * PositionRecordから局面を読み込む。

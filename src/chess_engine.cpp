@@ -185,7 +185,7 @@ namespace Sayuri {
   // パブリック関数 //
   // ============== //
   // FEN文字列を読み込む。
-  void ChessEngine::LoadFen(const Fen& fen) {
+  void ChessEngine::LoadFEN(const FEN& fen) {
     // キングの数がおかしいならやめる。
     int num_white_king = Util::CountBits(fen.position()[WHITE][KING]);
     int num_black_king = Util::CountBits(fen.position()[BLACK][KING]);

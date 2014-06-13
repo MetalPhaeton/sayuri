@@ -491,7 +491,7 @@ namespace Sayuri {
       fen_str.pop_back();
 
       // エンジンに読み込む。
-      engine_ptr_->LoadFen(Fen(fen_str));
+      engine_ptr_->LoadFEN(FEN(fen_str));
     }
 
     // movesコマンド。

@@ -42,7 +42,7 @@ namespace Sayuri {
   // コンストラクタと代入 //
   // ==================== //
   // コンストラクタ。
-  Fen::Fen(const std::string fen_str) :
+  FEN::FEN(const std::string fen_str) :
   en_passant_square_(0),
   ply_100_(0),
   ply_(1) {
@@ -63,12 +63,12 @@ namespace Sayuri {
   }
 
   // デフォルトコンストラクタ。
-  Fen::Fen() {
+  FEN::FEN() {
     SetStartPosition();
   }
 
   // コピーコンストラクタ。
-  Fen::Fen(const Fen& fen) :
+  FEN::FEN(const FEN& fen) :
   to_move_(fen.to_move_),
   castling_rights_(fen.castling_rights_),
   en_passant_square_(fen.en_passant_square_),
@@ -83,7 +83,7 @@ namespace Sayuri {
   }
 
   // ムーブコンストラクタ。
-  Fen::Fen(Fen&& fen) :
+  FEN::FEN(FEN&& fen) :
   to_move_(fen.to_move_),
   castling_rights_(fen.castling_rights_),
   en_passant_square_(fen.en_passant_square_),
@@ -98,7 +98,7 @@ namespace Sayuri {
   }
 
   // コピー代入演算子。
-  Fen& Fen::operator=(const Fen& fen) {
+  FEN& FEN::operator=(const FEN& fen) {
     // メンバをコピー。
     to_move_ = fen.to_move_;
     castling_rights_ = fen.castling_rights_;
@@ -115,7 +115,7 @@ namespace Sayuri {
   }
 
   // ムーブ代入演算子。
-  Fen& Fen::operator=(Fen&& fen) {
+  FEN& FEN::operator=(FEN&& fen) {
     // メンバをコピー。
     to_move_ = fen.to_move_;
     castling_rights_ = fen.castling_rights_;
@@ -135,7 +135,7 @@ namespace Sayuri {
   // FEN評価関数 //
   // =========== //
   // 駒の配置文字列を評価する。
-  void Fen::EvalPosition(const std::string& position_str) {
+  void FEN::EvalPosition(const std::string& position_str) {
     // 駒の配置を初期化。
     for (Side side = 0; side < NUM_SIDES; side++) {
       for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
@@ -214,7 +214,7 @@ namespace Sayuri {
   }
 
   // 手番文字列を評価する。
-  void Fen::EvalToMove(const std::string& to_move_str) {
+  void FEN::EvalToMove(const std::string& to_move_str) {
     switch (to_move_str[0]) {
       case 'w':
         to_move_ = WHITE;
@@ -229,7 +229,7 @@ namespace Sayuri {
   }
 
   // キャスリングの権利文字列を評価する。
-  void Fen::EvalCastlingRights(const std::string& castling_rights_str) {
+  void FEN::EvalCastlingRights(const std::string& castling_rights_str) {
     castling_rights_ = 0;
 
     if (castling_rights_str[0] == '-') return;
@@ -256,7 +256,7 @@ namespace Sayuri {
   }
 
   // アンパッサン文字列を評価する。
-  void Fen::EvalEnPassant(const std::string& en_passant_square_str) {
+  void FEN::EvalEnPassant(const std::string& en_passant_square_str) {
     // アンパッサンがない。
     if (en_passant_square_str[0] == '-') {
       en_passant_square_ = 0;
@@ -284,7 +284,7 @@ namespace Sayuri {
   }
 
   // 50手ルールの手数文字列を評価する。
-  void Fen::EvalPly100(const std::string& ply_100_str) {
+  void FEN::EvalPly100(const std::string& ply_100_str) {
     try {
       ply_100_ = std::stoi(ply_100_str);
     } catch (...) {
@@ -293,7 +293,7 @@ namespace Sayuri {
   }
 
   // 手数文字列を評価する。
-  void Fen::EvalPly(const std::string& ply_str) {
+  void FEN::EvalPly(const std::string& ply_str) {
     try {
       ply_ = std::stoi(ply_str) * 2;
       if (to_move_ == WHITE) {
@@ -308,7 +308,7 @@ namespace Sayuri {
   // プライベート関数 //
   // ================ //
   // スタートポジションにセット。
-  void Fen::SetStartPosition() {
+  void FEN::SetStartPosition() {
     to_move_ = WHITE;
     castling_rights_ = ALL_CASTLING;
     en_passant_square_ = 0;

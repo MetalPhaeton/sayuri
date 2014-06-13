@@ -38,7 +38,7 @@
 /** Sayuri 名前空間。 */
 namespace Sayuri {
   /** FEN文字列のパーサ。 */
-  class Fen {
+  class FEN {
     public:
       // ==================== //
       // コンストラクタと代入 //
@@ -49,31 +49,31 @@ namespace Sayuri {
        * コンストラクタ。
        * @param fen_str FEN文字列。
        */
-      Fen(const std::string fen_str);
+      FEN(const std::string fen_str);
       /** コンストラクタ。 */
-      Fen();
+      FEN();
       /**
        * コピーコンストラクタ。
        * @param fen コピー元。
        */
-      Fen(const Fen& fen);
+      FEN(const FEN& fen);
       /**
        * ムーブコンストラクタ。
        * @param fen ムーブ元。
        */
-      Fen(Fen&& fen);
+      FEN(FEN&& fen);
       /**
        * コピー代入演算子。
        * @param fen コピー元。
        */
-      Fen& operator=(const Fen& fen);
+      FEN& operator=(const FEN& fen);
       /**
        * ムーブ代入演算子。
        * @param fen ムーブ元。
        */
-      Fen& operator=(Fen&& fen);
+      FEN& operator=(FEN&& fen);
       /** デストラクタ。 */
-      virtual ~Fen() {}
+      virtual ~FEN() {}
 
       // ======== //
       // アクセサ //
