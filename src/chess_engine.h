@@ -50,7 +50,7 @@ namespace Sayuri {
   class MoveMaker;
   class Evaluator;
   class PVLine;
-  class UCIShell;
+  class UciShell;
   class PositionRecord;
   class Job;
   class HelperQueue;
@@ -156,11 +156,11 @@ namespace Sayuri {
        * @param num_threads 探索用のスレッド数。
        * @param table 探索用トランスポジションテーブル。
        * @param moves_to_search 探索する候補手。 空ならすべての候補手を探索。
-       * @param shell Infoコマンドを出力するUCIShell。
+       * @param shell Infoコマンドを出力するUciShell。
        * @return 探索結果のPVライン。
        */
       PVLine Calculate(int num_threads, TranspositionTable& table,
-      const std::vector<Move>& moves_to_search, UCIShell& shell);
+      const std::vector<Move>& moves_to_search, UciShell& shell);
 
       /** 探索を終了させる。 */
       void StopCalculation();
@@ -423,16 +423,16 @@ namespace Sayuri {
        * 探索のルート。
        * @param table トランスポジションテーブル。
        * @param moves_to_search 探索する候補手。 空なら全ての候補手を探索。
-       * @param shell Infoコマンドの出力用UCIShell。
+       * @param shell Infoコマンドの出力用UciShell。
        * @return 探索結果のPVライン。
        */
       PVLine SearchRoot(TranspositionTable& table,
-      const std::vector<Move>& moves_to_search, UCIShell& shell);
+      const std::vector<Move>& moves_to_search, UciShell& shell);
       /**
        * YBWC探索用スレッド。
-       * @param shell Infoコマンドの出力用UCIShell。
+       * @param shell Infoコマンドの出力用UciShell。
        */
-      void ThreadYBWC(UCIShell& shell);
+      void ThreadYBWC(UciShell& shell);
       /**
        * 別スレッド用探索関数。
        * @param job 並列探索用仕事。
@@ -441,9 +441,9 @@ namespace Sayuri {
       /**
        * ルートノードで呼び出される、別スレッド用探索関数。
        * @param job 並列探索用仕事。
-       * @param shell Infoコマンドの出力用UCIShell。
+       * @param shell Infoコマンドの出力用UciShell。
        */
-      void SearchRootParallel(Job& job, UCIShell& shell);
+      void SearchRootParallel(Job& job, UciShell& shell);
       /**
        * Futility Pruningのマージンを計算する。
        * @param depth 現在の深さ。

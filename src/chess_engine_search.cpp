@@ -708,7 +708,7 @@ namespace Sayuri {
 
   // 探索のルート。
   PVLine ChessEngine::SearchRoot(TranspositionTable& table,
-  const std::vector<Move>& moves_to_search, UCIShell& shell) {
+  const std::vector<Move>& moves_to_search, UciShell& shell) {
     // --- 初期化 --- //
     searched_level_ = 0;
     shared_st_ptr_->num_searched_nodes_ = 0;
@@ -877,7 +877,7 @@ namespace Sayuri {
   }
 
   // YBWC探索用スレッド。
-  void ChessEngine::ThreadYBWC(UCIShell& shell) {
+  void ChessEngine::ThreadYBWC(UciShell& shell) {
     // 子エンジンを作る。
     mutex_.lock();
     std::unique_ptr<ChessEngine> child_ptr(new ChessEngine());
@@ -1163,7 +1163,7 @@ namespace Sayuri {
   template void ChessEngine::SearchParallel<NodeType::NON_PV>(Job& job);
 
   // ルートノードで呼び出される、別スレッド用探索関数。
-  void ChessEngine::SearchRootParallel(Job& job, UCIShell& shell) {
+  void ChessEngine::SearchRootParallel(Job& job, UciShell& shell) {
     // 仕事ループ。
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;

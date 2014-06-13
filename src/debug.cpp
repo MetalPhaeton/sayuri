@@ -63,8 +63,8 @@ namespace Sayuri {
     std::unique_ptr<ChessEngine>
     engine_ptr(new ChessEngine(*search_params_ptr, *eval_params_ptr));
 
-    std::unique_ptr<UCIShell>
-    shell_ptr(new UCIShell(*engine_ptr));
+    std::unique_ptr<UciShell>
+    shell_ptr(new UciShell(*engine_ptr));
   // ==========================================================================
 
     return 0;

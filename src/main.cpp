@@ -37,7 +37,7 @@
 
 /**
  * UCI出力を標準出力に出力するコールバック関数。
- * @param message UCIShellからのメッセージ。
+ * @param message UciShellからのメッセージ。
  */
 void Print(const std::string& message) {
   std::cout << message << std::endl;
@@ -45,9 +45,9 @@ void Print(const std::string& message) {
 
 /**
  * 実行ループ。
- * @param shell 実行するUCIShell。
+ * @param shell 実行するUciShell。
  */
-void Run(Sayuri::UCIShell& shell) {
+void Run(Sayuri::UciShell& shell) {
   while (true) {
     std::string input;
     std::getline(std::cin, input);
@@ -98,8 +98,8 @@ int main(int argc, char* argv[]) {
     std::unique_ptr<Sayuri::ChessEngine>
     engine_ptr(new Sayuri::ChessEngine(*search_params_ptr, *eval_params_ptr));
 
-    std::unique_ptr<Sayuri::UCIShell>
-    shell_ptr(new Sayuri::UCIShell(*engine_ptr));
+    std::unique_ptr<Sayuri::UciShell>
+    shell_ptr(new Sayuri::UciShell(*engine_ptr));
 
     shell_ptr->AddOutputListener(Print);
 
