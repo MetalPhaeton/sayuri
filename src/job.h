@@ -27,8 +27,8 @@
  * @brief 並列探索用仕事。
  */
 
-#ifndef JOB_H
-#define JOB_H
+#ifndef JOB_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
+#define JOB_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 
 #include <iostream>
 #include <mutex>

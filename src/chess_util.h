@@ -27,8 +27,8 @@
  * @brief Sayuri用便利ツール。
  */
 
-#ifndef CHESS_UTIL_H
-#define CHESS_UTIL_H
+#ifndef CHESS_UTIL_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
+#define CHESS_UTIL_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 
 #include <iostream>
 #include <string>

@@ -27,8 +27,8 @@
  * @brief Sayuriで使う定義全般。
  */
 
-#ifndef CHESS_DEF_H
-#define CHESS_DEF_H
+#ifndef CHESS_DEF_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
+#define CHESS_DEF_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 
 #include <cstdint>
 #include <cstddef>

@@ -27,8 +27,8 @@
  * @brief Sayuri用エラー。
  */
 
-#ifndef SAYURI_ERROR_H
-#define SAYURI_ERROR_H
+#ifndef SAYURI_ERROR_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
+#define SAYURI_ERROR_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 
 #include <iostream>
 #include <stdexcept>

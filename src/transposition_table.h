@@ -27,8 +27,8 @@
  * @brief トランスポジションテーブル。
  */
 
-#ifndef TRANSPOSITION_TABLE_H
-#define TRANSPOSITION_TABLE_H
+#ifndef TRANSPOSITION_TABLE_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
+#define TRANSPOSITION_TABLE_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 
 #include <iostream>
 #include <memory>

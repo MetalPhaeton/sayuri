@@ -27,8 +27,8 @@
  * @brief 共通で使うヘッダのまとめ。
  */
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef COMMON_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
+#define COMMON_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 
 #include "chess_def.h"  // チェスの定義。
 #include "chess_util.h"  // 便利ツール。

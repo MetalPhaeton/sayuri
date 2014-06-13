@@ -27,8 +27,8 @@
  * @brief Sayuriの初期化。
  */
 
-#ifndef INIT_H
-#define INIT_H
+#ifndef INIT_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
+#define INIT_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 
 #include <iostream>
 #include "common.h"
