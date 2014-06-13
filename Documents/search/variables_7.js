@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['h1',['H1',['../namespaceSayuri.html#a0224fc0f2de95d8d0b44e8f56a2cfd5f',1,'Sayuri']]],
+  ['h2',['H2',['../namespaceSayuri.html#a8d83c905c649bfaeed27033fbe0fe52e',1,'Sayuri']]],
+  ['h3',['H3',['../namespaceSayuri.html#a1259de4f4bc9d88ca47ccc301393b9d1',1,'Sayuri']]],
+  ['h4',['H4',['../namespaceSayuri.html#a5b58eda2452e947aeb5daed244e56dfa',1,'Sayuri']]],
+  ['h5',['H5',['../namespaceSayuri.html#a7c76b18648af253924ac71ac6c10149c',1,'Sayuri']]],
+  ['h6',['H6',['../namespaceSayuri.html#aab0bb12b37e61514e91932cce8b80994',1,'Sayuri']]],
+  ['h7',['H7',['../namespaceSayuri.html#ab4dd5b3e409d438ae7df76805637ec9e',1,'Sayuri']]],
+  ['h8',['H8',['../namespaceSayuri.html#a45c9f62cb2025f0522c743b81c08be28',1,'Sayuri']]],
+  ['has_5fcastled_5f',['has_castled_',['../classSayuri_1_1ChessEngine.html#adf3cb9cc54b615bf6b3a0c54661c89e4',1,'Sayuri::ChessEngine::has_castled_()'],['../classSayuri_1_1PositionRecord.html#ae32afb7d6fe477d32309bc0de2756f0f',1,'Sayuri::PositionRecord::has_castled_()']]],
+  ['has_5flegal_5fmove_5fptr_5f',['has_legal_move_ptr_',['../classSayuri_1_1Job.html#abf7fa1f0f9379ea036b1ae3049f5ae7b',1,'Sayuri::Job']]],
+  ['helper_5fcond_5f',['helper_cond_',['../classSayuri_1_1HelperQueue.html#a5bb41393adcab4fe68a4d11b29acfe67',1,'Sayuri::HelperQueue']]],
+  ['helper_5fcounter_5f',['helper_counter_',['../classSayuri_1_1Job.html#a26844a2709b39cbbad8834e781210a84',1,'Sayuri::Job']]],
+  ['helper_5fqueue_5fptr_5f',['helper_queue_ptr_',['../structSayuri_1_1ChessEngine_1_1SharedStruct.html#a12b1f73f825ffa4ea70b2f5024060b97',1,'Sayuri::ChessEngine::SharedStruct']]],
+  ['history_5f',['history_',['../structSayuri_1_1ChessEngine_1_1SharedStruct.html#a28c86afbcf523a92d3d467bb16b5757c',1,'Sayuri::ChessEngine::SharedStruct']]],
+  ['history_5fmax_5f',['history_max_',['../structSayuri_1_1ChessEngine_1_1SharedStruct.html#a9cd79de291d69b774640f7210e4a64d8',1,'Sayuri::ChessEngine::SharedStruct::history_max_()'],['../classSayuri_1_1MoveMaker.html#a27b02469139e7b29b2dca8c0643aafc5',1,'Sayuri::MoveMaker::history_max_()']]],
+  ['history_5fpruning_5fafter_5fmoves_5f',['history_pruning_after_moves_',['../classSayuri_1_1SearchParams.html#ab13b2d7c43058ae1f1007d4985143045',1,'Sayuri::SearchParams']]],
+  ['history_5fpruning_5flimit_5fdepth_5f',['history_pruning_limit_depth_',['../classSayuri_1_1SearchParams.html#abac96cc2739fefe6358a00466c33737b',1,'Sayuri::SearchParams']]],
+  ['history_5fpruning_5fmove_5fthreshold_5f',['history_pruning_move_threshold_',['../classSayuri_1_1SearchParams.html#a524b5d20af2a5dd41be33597b7f3b968',1,'Sayuri::SearchParams']]],
+  ['history_5fpruning_5freduction_5f',['history_pruning_reduction_',['../classSayuri_1_1SearchParams.html#af1d16bb7e222b0337a0d39c36bf50c19',1,'Sayuri::SearchParams']]],
+  ['history_5fpruning_5fthreshold_5f',['history_pruning_threshold_',['../classSayuri_1_1SearchParams.html#a4682ab02f4f75e68bd1176d370ca666f',1,'Sayuri::SearchParams']]]
+];
