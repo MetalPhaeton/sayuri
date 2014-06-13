@@ -1,0 +1,25 @@
+var classSayuri_1_1TTEntry =
+[
+    [ "TTEntry", "classSayuri_1_1TTEntry.html#a32ed964c5e5ea9f06546b7730b4b085f", null ],
+    [ "TTEntry", "classSayuri_1_1TTEntry.html#a1bf35b80acd285583c503fbf0bd675ac", null ],
+    [ "TTEntry", "classSayuri_1_1TTEntry.html#a3bb42c267fd56198bffcb397bfa7131b", null ],
+    [ "TTEntry", "classSayuri_1_1TTEntry.html#a143eb16186c329f2996a33369e23709a", null ],
+    [ "~TTEntry", "classSayuri_1_1TTEntry.html#a1b3074cccce780f8ee32667b392539c9", null ],
+    [ "best_move", "classSayuri_1_1TTEntry.html#a1818c23afb991c0e7d666cd789256c56", null ],
+    [ "depth", "classSayuri_1_1TTEntry.html#a8c44bc4c5915c8063c4d181db4ae0e88", null ],
+    [ "mate_in", "classSayuri_1_1TTEntry.html#aabcd97fbc778dce0c2bcbc46ede8cd6f", null ],
+    [ "operator bool", "classSayuri_1_1TTEntry.html#aa2f74fe0b3391706cddcef31ac3992ac", null ],
+    [ "operator=", "classSayuri_1_1TTEntry.html#a521cf30b553d6c3b97814a387085666a", null ],
+    [ "operator=", "classSayuri_1_1TTEntry.html#a211a9eaf3c81d88d2d42fa72db8c54ee", null ],
+    [ "pos_hash", "classSayuri_1_1TTEntry.html#a0572c4a01752be95dc0f84fb25fb1d7f", null ],
+    [ "score", "classSayuri_1_1TTEntry.html#a74f052774cdd9684070eec2dd6d2f22d", null ],
+    [ "score_type", "classSayuri_1_1TTEntry.html#aaa65f55176f09aedcafbbf4279eb606b", null ],
+    [ "table_age", "classSayuri_1_1TTEntry.html#adb370eec68e5e9f1c3946c94582fd16d", null ],
+    [ "best_move_", "classSayuri_1_1TTEntry.html#a6909d7420028a23ec2a8136b7e5182a1", null ],
+    [ "depth_", "classSayuri_1_1TTEntry.html#a86077076789de09134f12c99b2764400", null ],
+    [ "mate_in_", "classSayuri_1_1TTEntry.html#a6ab3148a1af3387b7cf644313729d5c8", null ],
+    [ "pos_hash_", "classSayuri_1_1TTEntry.html#a997672a32d3dfb84d9fec870b4683f23", null ],
+    [ "score_", "classSayuri_1_1TTEntry.html#a0ea58890d22393911f8ed94405224a6e", null ],
+    [ "score_type_", "classSayuri_1_1TTEntry.html#a630023d49ddd9409f4917a7604ec54c9", null ],
+    [ "table_age_", "classSayuri_1_1TTEntry.html#a1c74badfc772c3c0de885c14031668b2", null ]
+];
