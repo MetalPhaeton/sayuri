@@ -120,7 +120,7 @@ namespace Sayuri {
   };
 
   /** UCIのインターフェス。 */
-  class UciShell {
+  class UCIShell {
     public:
       // ==================== //
       // コンストラクタと代入 //
@@ -129,31 +129,31 @@ namespace Sayuri {
        * コンストラクタ。
        * @param engine 関連付けるChessEngine。
        */
-      UciShell(ChessEngine& engine);
+      UCIShell(ChessEngine& engine);
       /**
        * コピーコンストラクタ。
        * @param shell コピー元。
        */
-      UciShell(const UciShell& shell);
+      UCIShell(const UCIShell& shell);
       /**
        * ムーブコンストラクタ。
        * @param shell ムーブ元。
        */
-      UciShell(UciShell&& shell);
+      UCIShell(UCIShell&& shell);
       /**
        * コピー代入演算子。
        * @param shell コピー元。
        */
-      UciShell& operator=(const UciShell& shell);
+      UCIShell& operator=(const UCIShell& shell);
       /**
        * ムーブ代入演算子。
        * @param shell ムーブ元。
        */
-      UciShell& operator=(UciShell&& shell);
+      UCIShell& operator=(UCIShell&& shell);
       /** デストラクタ。 */
-      virtual ~UciShell();
+      virtual ~UCIShell();
       /** コンストラクタ。 (削除) */
-      UciShell() = delete;
+      UCIShell() = delete;
 
       // ============== //
       // パブリック関数 //
@@ -165,7 +165,7 @@ namespace Sayuri {
       void InputCommand(const std::string input);
 
       /**
-       * UciShellからの出力を受け取るコールバック関数を登録する。
+       * UCIShellからの出力を受け取るコールバック関数を登録する。
        * @param func 出力を受け取る。コールバック関数。
        */
       void AddOutputListener(std::function<void(const std::string&)> func);

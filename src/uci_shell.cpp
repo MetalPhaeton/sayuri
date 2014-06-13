@@ -55,7 +55,7 @@ namespace Sayuri {
   // コンストラクタと代入 //
   // ==================== //
   // コンストラクタ。
-  UciShell::UciShell(ChessEngine& engine) :
+  UCIShell::UCIShell(ChessEngine& engine) :
   uci_command_(),
   engine_ptr_(&engine),
   table_ptr_(new TranspositionTable(UCI_MIN_TABLE_SIZE)),
@@ -73,35 +73,35 @@ namespace Sayuri {
       "uci"
     };
     uci_command_.Add("uci", temp_1,
-    std::bind(&UciShell::CommandUCI, this, _1));
+    std::bind(&UCIShell::CommandUCI, this, _1));
 
     // isreadyコマンド。
     std::vector<std::string> temp_2 {
       "isready"
     };
     uci_command_.Add("isready", temp_2,
-    std::bind(&UciShell::CommandIsReady, this, _1));
+    std::bind(&UCIShell::CommandIsReady, this, _1));
 
     // setoptionコマンド。
     std::vector<std::string> temp_3 {
       "setoption", "name", "value"
     };
     uci_command_.Add("setoption", temp_3,
-    std::bind(&UciShell::CommandSetOption, this, _1));
+    std::bind(&UCIShell::CommandSetOption, this, _1));
 
     // ucinewgameコマンド。
     std::vector<std::string> temp_4 {
       "ucinewgame"
     };
     uci_command_.Add("ucinewgame", temp_4,
-    std::bind(&UciShell::CommandUCINewGame, this, _1));
+    std::bind(&UCIShell::CommandUCINewGame, this, _1));
 
     // positionコマンド。
     std::vector<std::string> temp_5 {
       "position", "startpos", "fen", "moves"
     };
     uci_command_.Add("position", temp_5,
-    std::bind(&UciShell::CommandPosition, this, _1));
+    std::bind(&UCIShell::CommandPosition, this, _1));
 
     // goコマンド。
     std::vector<std::string> temp_6 {
@@ -109,25 +109,25 @@ namespace Sayuri {
       "movestogo", "depth", "nodes", "mate", "movetime", "infinite"
     };
     uci_command_.Add("go", temp_6,
-    std::bind(&UciShell::CommandGo, this, _1));
+    std::bind(&UCIShell::CommandGo, this, _1));
 
     // stopコマンド。
     std::vector<std::string> temp_7 {
       "stop"
     };
     uci_command_.Add("stop", temp_7,
-    std::bind(&UciShell::CommandStop, this, _1));
+    std::bind(&UCIShell::CommandStop, this, _1));
 
     // ponderhitコマンド。
     std::vector<std::string> temp_8 {
       "ponderhit"
     };
     uci_command_.Add("ponderhit", temp_8,
-    std::bind(&UciShell::CommandPonderHit, this, _1));
+    std::bind(&UCIShell::CommandPonderHit, this, _1));
   }
 
   // コピーコンストラクタ。
-  UciShell::UciShell(const UciShell& shell) :
+  UCIShell::UCIShell(const UCIShell& shell) :
   uci_command_(shell.uci_command_),
   engine_ptr_(shell.engine_ptr_),
   table_ptr_(new TranspositionTable(*(shell.table_ptr_))),
@@ -140,7 +140,7 @@ namespace Sayuri {
   }
 
   // ムーブコンストラクタ。
-  UciShell::UciShell(UciShell&& shell) :
+  UCIShell::UCIShell(UCIShell&& shell) :
   uci_command_(std::move(shell.uci_command_)),
   engine_ptr_(shell.engine_ptr_),
   table_ptr_(std::move(shell.table_ptr_)),
@@ -153,7 +153,7 @@ namespace Sayuri {
   }
 
   // コピー代入演算子。
-  UciShell& UciShell::operator=(const UciShell& shell) {
+  UCIShell& UCIShell::operator=(const UCIShell& shell) {
     uci_command_ = shell.uci_command_;
     engine_ptr_ = shell.engine_ptr_;
     *table_ptr_ = *(shell.table_ptr_);
@@ -167,7 +167,7 @@ namespace Sayuri {
   }
 
   // ムーブ代入演算子。
-  UciShell& UciShell::operator=(UciShell&& shell) {
+  UCIShell& UCIShell::operator=(UCIShell&& shell) {
     uci_command_ = std::move(shell.uci_command_);
     engine_ptr_ = shell.engine_ptr_;
     table_ptr_ = std::move(shell.table_ptr_);
@@ -181,7 +181,7 @@ namespace Sayuri {
   }
 
   // デストラクタ。
-  UciShell::~UciShell() {
+  UCIShell::~UCIShell() {
     if (thinking_thread_.joinable()) {
       thinking_thread_.join();
     }
@@ -191,19 +191,19 @@ namespace Sayuri {
   // パブリック関数 //
   // ============== //
   // UCIコマンドを実行する。
-  void UciShell::InputCommand(const std::string input) {
+  void UCIShell::InputCommand(const std::string input) {
     // コマンド実行。
     uci_command_(input);
   }
 
-  // UciShell空の出力を受け取るコールバック関数を登録する。
-  void UciShell::AddOutputListener
+  // UCIShell空の出力を受け取るコールバック関数を登録する。
+  void UCIShell::AddOutputListener
   (std::function<void(const std::string&)> func) {
     output_listeners_.push_back(func);
   }
 
   // PVライン情報を出力する。
-  void UciShell::PrintPVInfo(int depth, int seldepth, int score,
+  void UCIShell::PrintPVInfo(int depth, int seldepth, int score,
   Chrono::milliseconds time, std::uint64_t num_nodes, PVLine& pv_line) {
     std::ostringstream sout;
     sout << "info";
@@ -239,7 +239,7 @@ namespace Sayuri {
   }
 
   // 深さ情報を出力する。
-  void UciShell::PrintDepthInfo(int depth) {
+  void UCIShell::PrintDepthInfo(int depth) {
     std::ostringstream sout;
     sout << "info depth " << depth;
     // 出力関数に送る。
@@ -249,7 +249,7 @@ namespace Sayuri {
   }
 
   // 現在探索している候補手の情報を出力する。
-  void UciShell::PrintCurrentMoveInfo(Move move, int move_num) {
+  void UCIShell::PrintCurrentMoveInfo(Move move, int move_num) {
     std::ostringstream sout;
     // 手の情報を送る。
     sout << "info currmove " << TransMoveToString(move);
@@ -264,7 +264,7 @@ namespace Sayuri {
   }
 
   // その他の情報を出力する。
-  void UciShell::PrintOtherInfo(Chrono::milliseconds time,
+  void UCIShell::PrintOtherInfo(Chrono::milliseconds time,
   std::uint64_t num_nodes, int hashfull) {
     std::ostringstream sout;
 
@@ -282,7 +282,7 @@ namespace Sayuri {
   }
 
   // 探索スレッド。
-  void UciShell::ThreadThinking() {
+  void UCIShell::ThreadThinking() {
     // アナライズモードならトランスポジションテーブルを初期化。
     if (analyse_mode_) {
       table_ptr_.reset(new TranspositionTable(table_size_));
@@ -319,7 +319,7 @@ namespace Sayuri {
   // UCIコマンド関数 //
   // =============== //
   // 「uci」コマンドのコールバック関数。
-  void UciShell::CommandUCI(UCICommand::CommandArgs& args) {
+  void UCIShell::CommandUCI(UCICommand::CommandArgs& args) {
     std::ostringstream sout;
 
     // IDを表示。
@@ -402,14 +402,14 @@ namespace Sayuri {
   }
 
   // 「isready」コマンドのコールバック関数。
-  void UciShell::CommandIsReady(UCICommand::CommandArgs& args) {
+  void UCIShell::CommandIsReady(UCICommand::CommandArgs& args) {
     for (auto& func : output_listeners_) {
       func("readyok");
     }
   }
 
   // 「setoption」コマンドのコールバック関数。
-  void UciShell::CommandSetOption(UCICommand::CommandArgs& args) {
+  void UCIShell::CommandSetOption(UCICommand::CommandArgs& args) {
     // nameとvalueがあるかどうか。
     // なければ設定できない。
     if ((args.find("name") == args.end())
@@ -469,13 +469,13 @@ namespace Sayuri {
   }
 
   // 「ucinewgame」コマンドのコールバック関数。
-  void UciShell::CommandUCINewGame(UCICommand::CommandArgs& args) {
+  void UCIShell::CommandUCINewGame(UCICommand::CommandArgs& args) {
     engine_ptr_->SetNewGame();
     table_ptr_.reset(new TranspositionTable(table_size_));
   }
 
   // 「position」コマンドのコールバック関数。
-  void UciShell::CommandPosition(UCICommand::CommandArgs& args) {
+  void UCIShell::CommandPosition(UCICommand::CommandArgs& args) {
     // startposコマンド。
     if (args.find("startpos") != args.end()) {
       engine_ptr_->SetStartPosition();
@@ -505,7 +505,7 @@ namespace Sayuri {
   }
 
   // 「go」コマンドのコールバック関数。
-  void UciShell::CommandGo(UCICommand::CommandArgs& args) {
+  void UCIShell::CommandGo(UCICommand::CommandArgs& args) {
     // 準備。
     std::uint32_t max_depth = MAX_PLYS;
     std::uint64_t max_nodes = MAX_NODES;
@@ -631,11 +631,11 @@ namespace Sayuri {
     engine_ptr_->SetStopper(max_depth, max_nodes, thinking_time,
     infinite_thinking);
     thinking_thread_ =
-    std::thread(&UciShell::ThreadThinking, this);
+    std::thread(&UCIShell::ThreadThinking, this);
   }
 
   // 「stop」コマンドのコールバック関数。
-  void UciShell::CommandStop(UCICommand::CommandArgs& args) {
+  void UCIShell::CommandStop(UCICommand::CommandArgs& args) {
     // 思考スレッドを終了させる。
     if (thinking_thread_.joinable()) {
       engine_ptr_->StopCalculation();
@@ -644,7 +644,7 @@ namespace Sayuri {
   }
 
   // 「ponderhit」コマンドのコールバック関数。
-  void UciShell::CommandPonderHit(UCICommand::CommandArgs& args) {
+  void UCIShell::CommandPonderHit(UCICommand::CommandArgs& args) {
     engine_ptr_->EnableInfiniteThinking(false);
   }
 
@@ -652,7 +652,7 @@ namespace Sayuri {
   // 便利関数 //
   // ======== //
   // Moveを文字列に変換する。
-  std::string UciShell::TransMoveToString(Move move) {
+  std::string UCIShell::TransMoveToString(Move move) {
     // 文字列ストリーム。
     std::ostringstream oss;
 
@@ -684,7 +684,7 @@ namespace Sayuri {
   }
 
   // 文字列をMoveに変換する。
-  Move UciShell::TransStringToMove(std::string move_str) {
+  Move UCIShell::TransStringToMove(std::string move_str) {
     Move move = 0;
 
     if (move_str.size() < 4) return 0;
