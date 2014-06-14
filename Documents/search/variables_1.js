@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['b1',['B1',['../namespaceSayuri.html#a037029855a340d04f9cc390714bf1603',1,'Sayuri']]],
+  ['b2',['B2',['../namespaceSayuri.html#a5cfd3d41d65fbb2d095300eb0cadfb76',1,'Sayuri']]],
+  ['b3',['B3',['../namespaceSayuri.html#a3774a7c2e3291eba3e5bc6946ee1b312',1,'Sayuri']]],
+  ['b4',['B4',['../namespaceSayuri.html#a5cd8a2afbe781da4ac66c1f1707422af',1,'Sayuri']]],
+  ['b5',['B5',['../namespaceSayuri.html#a53ca70e1536e595340f3daac5be12d08',1,'Sayuri']]],
+  ['b6',['B6',['../namespaceSayuri.html#a82c1d8194e0c62664076615fba043ee4',1,'Sayuri']]],
+  ['b7',['B7',['../namespaceSayuri.html#ad3172fe76e739c1278ae86b3d58c5639',1,'Sayuri']]],
+  ['b8',['B8',['../namespaceSayuri.html#a98b85830dd89fb657879366acad9c0a3',1,'Sayuri']]],
+  ['bad_5fbishop_5fvalue_5f',['bad_bishop_value_',['../classSayuri_1_1Evaluator.html#a77e831a597813d85c143ac3340ed0a45',1,'Sayuri::Evaluator']]],
+  ['base_5fmask',['BASE_MASK',['../namespaceSayuri.html#a4f84b01513b2e7b334e31e92ab1241b4',1,'Sayuri']]],
+  ['best_5fmove_5f',['best_move_',['../classSayuri_1_1TTEntry.html#a6909d7420028a23ec2a8136b7e5182a1',1,'Sayuri::TTEntry']]],
+  ['beta_5fptr_5f',['beta_ptr_',['../classSayuri_1_1Job.html#ae80b2467e1589747a95a2f61b106bbe8',1,'Sayuri::Job']]],
+  ['between_5f',['between_',['../classSayuri_1_1Util.html#a7241af61ff3fad2e0edec3f04da594e0',1,'Sayuri::Util']]],
+  ['bishop',['BISHOP',['../namespaceSayuri.html#a7140e875d12a2c14b7648bd85978fa03',1,'Sayuri']]],
+  ['bishop_5fmove_5f',['bishop_move_',['../classSayuri_1_1Util.html#af14316554ea2f1cd3eae16f36e62812f',1,'Sayuri::Util']]],
+  ['bishop_5fpair_5fvalue_5f',['bishop_pair_value_',['../classSayuri_1_1Evaluator.html#a11d6aa3effe1bb12a457d5f5a0a1c796',1,'Sayuri::Evaluator']]],
+  ['black',['BLACK',['../namespaceSayuri.html#a97973d74d3f0792202bde8d652a41f76',1,'Sayuri']]],
+  ['black_5fcastling',['BLACK_CASTLING',['../namespaceSayuri.html#a41560bbf0301dfed4519025547880e73',1,'Sayuri']]],
+  ['black_5flong_5fcastling',['BLACK_LONG_CASTLING',['../namespaceSayuri.html#a73c2be6dd58f27ea549cd90ff63f7724',1,'Sayuri']]],
+  ['black_5fshort_5fcastling',['BLACK_SHORT_CASTLING',['../namespaceSayuri.html#ab774bdb69874e693c84fdb32753d0657',1,'Sayuri']]],
+  ['blocker_5f0_5f',['blocker_0_',['../classSayuri_1_1ChessEngine.html#a9a3e2181deec132712ab2b5741aa46c9',1,'Sayuri::ChessEngine']]],
+  ['blocker_5f135_5f',['blocker_135_',['../classSayuri_1_1ChessEngine.html#a0085bc9a232a9441cef2fa0499d8be8a',1,'Sayuri::ChessEngine']]],
+  ['blocker_5f45_5f',['blocker_45_',['../classSayuri_1_1ChessEngine.html#a1db714e5fa82da4a8d03d46ee0b21f04',1,'Sayuri::ChessEngine']]],
+  ['blocker_5f90_5f',['blocker_90_',['../classSayuri_1_1ChessEngine.html#a6e0cc67b5a0f67031d3f9e7af4cb741e',1,'Sayuri::ChessEngine']]],
+  ['blocker_5fmap',['BLOCKER_MAP',['../classSayuri_1_1Util.html#a619cd9f7068a072fff9acf6867395d07',1,'Sayuri::Util']]]
+];

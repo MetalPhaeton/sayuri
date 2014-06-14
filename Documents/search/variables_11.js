@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['r_5frot135',['R_ROT135',['../classSayuri_1_1Util.html#a98f0c29fe8c72ac649d7d9c46355962e',1,'Sayuri::Util']]],
+  ['r_5frot45',['R_ROT45',['../classSayuri_1_1Util.html#a25f2ca3eae8f0ebac84751b91614fca2',1,'Sayuri::Util']]],
+  ['r_5frot90',['R_ROT90',['../classSayuri_1_1Util.html#ae5cabc6285e48d12d52babf2feaa06b0',1,'Sayuri::Util']]],
+  ['rank',['RANK',['../classSayuri_1_1Util.html#a9218a8567160908a62dc11806d5f9968',1,'Sayuri::Util']]],
+  ['rank_5f1',['RANK_1',['../namespaceSayuri.html#a7fb3c6a8d6003ecb91db6d812c47ff9e',1,'Sayuri']]],
+  ['rank_5f2',['RANK_2',['../namespaceSayuri.html#a4d2ed0036c7bf6f37db8884cac8dbaf3',1,'Sayuri']]],
+  ['rank_5f3',['RANK_3',['../namespaceSayuri.html#aebbbda460b67c6e75b21bcab893e27bf',1,'Sayuri']]],
+  ['rank_5f4',['RANK_4',['../namespaceSayuri.html#a853c3ee0f10247e798f1d574087222f3',1,'Sayuri']]],
+  ['rank_5f5',['RANK_5',['../namespaceSayuri.html#a6c2412b180dabef59fa91bc1cdcd62be',1,'Sayuri']]],
+  ['rank_5f6',['RANK_6',['../namespaceSayuri.html#a1efaa3a64805927074a853e607a8430c',1,'Sayuri']]],
+  ['rank_5f7',['RANK_7',['../namespaceSayuri.html#ae88bd7b0f7f1622bcc0e69fd7194df26',1,'Sayuri']]],
+  ['rank_5f8',['RANK_8',['../namespaceSayuri.html#ab895b6486924e4bc7a12714b3a55786c',1,'Sayuri']]],
+  ['record_5fptr_5f',['record_ptr_',['../classSayuri_1_1Job.html#a558bb7e4ff6ee816782fdddc3c37bc33',1,'Sayuri::Job']]],
+  ['rook',['ROOK',['../namespaceSayuri.html#afd013b6c13e71dfdc857f0f0576e42bc',1,'Sayuri']]],
+  ['rook_5fmove_5f',['rook_move_',['../classSayuri_1_1Util.html#a168ff5f4451090533cfe3eb5855eaedc',1,'Sayuri::Util']]],
+  ['rook_5fopen_5ffyle_5fvalue_5f',['rook_open_fyle_value_',['../classSayuri_1_1Evaluator.html#a9b9c60d90e1ac351acf4a3f75ecff304',1,'Sayuri::Evaluator']]],
+  ['rook_5fpair_5fvalue_5f',['rook_pair_value_',['../classSayuri_1_1Evaluator.html#a0674e3efa3257ab64a8334422a555edb',1,'Sayuri::Evaluator']]],
+  ['rook_5fsemiopen_5ffyle_5fvalue_5f',['rook_semiopen_fyle_value_',['../classSayuri_1_1Evaluator.html#ae140c01846c79229658b5d646ceec98c',1,'Sayuri::Evaluator']]],
+  ['rot135',['ROT135',['../classSayuri_1_1Util.html#afffe5ec0a4fbf58f49355a9b090c3da6',1,'Sayuri::Util']]],
+  ['rot45',['ROT45',['../classSayuri_1_1Util.html#a50594ebe9ca8ec24eb116cf4ddab1d53',1,'Sayuri::Util']]],
+  ['rot90',['ROT90',['../classSayuri_1_1Util.html#afd92419a868f38d9a51b7262f1c16b67',1,'Sayuri::Util']]]
+];
