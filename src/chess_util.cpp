@@ -78,11 +78,21 @@ namespace Sayuri {
   // ================== //
   // static変数の初期化。
   Bitboard Util::queen_move_[NUM_SQUARES];
+  Bitboard Util::between_[NUM_SQUARES][NUM_SQUARES];
   void Util::InitUtil() {
     // num_bit16_table_[]を初期化する。
     InitNumBit16Table();
     // attack_table_***_[][]を初期化する。
     InitAttackTable();
+    // line_[][]を初期化する。
+    InitLine();
+    // between_[][]を初期化する。
+    for (Square square_1 = 0; square_1 < NUM_SQUARES; square_1++) {
+      for (Square square_2 = 0; square_2 < NUM_SQUARES; square_2++) {
+        between_[square_1][square_2] =
+        line_[square_1][square_2] & ~(SQUARE[square_1] | SQUARE[square_2]);
+      }
+    }
     // pawn_move_[][]を初期化する。
     InitPawnMove();
     // pawn_2step_move_[][]を初期化する。

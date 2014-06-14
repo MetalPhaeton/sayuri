@@ -603,14 +603,13 @@ namespace Sayuri {
         Square pin_back_sq = Util::GetSquare(bb);
 
         // 裏駒と自分の間のビットボード。
-        Bitboard bitween = Util::GetLine(piece_square, pin_back_sq)
-        & ~(Util::SQUARE[piece_square] | Util::SQUARE[pin_back_sq]);
+        Bitboard between = Util::GetBetween(piece_square, pin_back_sq);
 
         // 下のif文によるピンの判定条件は、
         // 「裏駒と自分との間」に「ピンの対象」が一つのみだった場合。
-        if ((bitween & pin_target) && !(bitween & pin_back)) {
+        if ((between & pin_target) && !(between & pin_back)) {
           value += params.pin_value_table()[Type]
-          [engine_ptr_->piece_board()[Util::GetSquare(bitween & pin_target)]]
+          [engine_ptr_->piece_board()[Util::GetSquare(between & pin_target)]]
           [engine_ptr_->piece_board()[pin_back_sq]];
         }
       }

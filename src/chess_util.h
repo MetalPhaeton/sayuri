@@ -438,6 +438,15 @@ namespace Sayuri {
         return line_[point_1][point_2];
       }
       /**
+       * 2点を結ぶ直線のビットボードを得る。 (2点を除く。)
+       * @param point_1 端点1。
+       * @param point_2 端点2。
+       * @return 直線のビットボード。
+       */
+      static Bitboard GetBetween(Square point_1, Square point_2) {
+        return between_[point_1][point_2];
+      }
+      /**
        * ポーンの通常の動きのビットボードを得る。
        * @param square 基点。
        * @param side ポーンのサイド。
@@ -691,6 +700,8 @@ namespace Sayuri {
       // ================== //
       /** 直線の入った配列。 [端点][端点] */
       static Bitboard line_[NUM_SQUARES][NUM_SQUARES];
+      /** 直線の入った配列。 (端点を除く。) [端点][端点] */
+      static Bitboard between_[NUM_SQUARES][NUM_SQUARES];
       /** ポーンの通常の動きの配列。 [サイド][マス] */
       static Bitboard pawn_move_[NUM_SIDES][NUM_SQUARES];
       /** ポーンの2歩の動きの配列。 [サイド][マス] */
