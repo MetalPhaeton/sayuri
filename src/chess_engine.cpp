@@ -544,16 +544,12 @@ namespace Sayuri {
     if (!(castling_rights_ & Flag)) return false;
 
     if (Flag == WHITE_SHORT_CASTLING) {
-      if (king_[WHITE] != E1) return false;
-      if (!(position_[WHITE][ROOK] & Util::SQUARE[H1])) return false;
       if (IsAttacked(E1, BLACK)) return false;
       if (IsAttacked(F1, BLACK)) return false;
       if (IsAttacked(G1, BLACK)) return false;
       if (piece_board_[F1]) return false;
       if (piece_board_[G1]) return false;
     } else if (Flag == WHITE_LONG_CASTLING) {
-      if (king_[WHITE] != E1) return false;
-      if (!(position_[WHITE][ROOK] & Util::SQUARE[A1])) return false;
       if (IsAttacked(E1, BLACK)) return false;
       if (IsAttacked(D1, BLACK)) return false;
       if (IsAttacked(C1, BLACK)) return false;
@@ -561,24 +557,18 @@ namespace Sayuri {
       if (piece_board_[C1]) return false;
       if (piece_board_[B1]) return false;
     } else if (Flag == BLACK_SHORT_CASTLING) {
-      if (king_[BLACK] != E8) return false;
-      if (!(position_[BLACK][ROOK] & Util::SQUARE[H8])) return false;
       if (IsAttacked(E8, WHITE)) return false;
       if (IsAttacked(F8, WHITE)) return false;
       if (IsAttacked(G8, WHITE)) return false;
       if (piece_board_[F8]) return false;
       if (piece_board_[G8]) return false;
     } else if (Flag == BLACK_LONG_CASTLING){
-      if (king_[BLACK] != E8) return false;
-      if (!(position_[BLACK][ROOK] & Util::SQUARE[A8])) return false;
       if (IsAttacked(E8, WHITE)) return false;
       if (IsAttacked(D8, WHITE)) return false;
       if (IsAttacked(C8, WHITE)) return false;
       if (piece_board_[D8]) return false;
       if (piece_board_[C8]) return false;
       if (piece_board_[B8]) return false;
-    } else {
-      throw SayuriError("キャスリングのフラグが不正です。");
     }
 
     return true;
@@ -612,23 +602,23 @@ namespace Sayuri {
 
     // キャスリングの権利を更新。
     Piece piece = piece_board_[from];
-    if (side == WHITE) {
+    if ((castling_rights_ & WHITE_CASTLING) && (side == WHITE)) {
       if (piece == KING) {
         castling_rights_ &= ~WHITE_CASTLING;
       } else if (piece == ROOK) {
-        if (from == H1) {
+        if ((castling_rights_ & WHITE_SHORT_CASTLING) && (from == H1)) {
           castling_rights_ &= ~WHITE_SHORT_CASTLING;
-        } else if (from == A1) {
+        } else if ((castling_rights_ & WHITE_LONG_CASTLING) && (from == A1)) {
           castling_rights_ &= ~WHITE_LONG_CASTLING;
         }
       }
-    } else {
+    } else if ((castling_rights_ & BLACK_CASTLING) && (side == BLACK)) {
       if (piece == KING) {
         castling_rights_ &= ~BLACK_CASTLING;
       } else if (piece == ROOK) {
-        if (from == H8) {
+        if ((castling_rights_ & BLACK_SHORT_CASTLING) && (from == H8)) {
           castling_rights_ &= ~BLACK_SHORT_CASTLING;
-        } else if (from == A8) {
+        } else if ((castling_rights_ & BLACK_LONG_CASTLING) && (from == A8)) {
           castling_rights_ &= ~BLACK_LONG_CASTLING;
         }
       }

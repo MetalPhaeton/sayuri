@@ -203,11 +203,14 @@ namespace Sayuri {
 
       /**
        * キャスリング出来るかどうかを判定する。
-       * @param <Flag> 調べたいキャスリングの定数。
+       * @param <Flag> キャスリングの権利。
+       * - WHITE_SHORT_CASTLING: 白のショートキャスリング。
+       * - WHITE_LONG_CASTLING: 白のロングキャスリング。
+       * - BLACK_SHORT_CASTLING: 黒のショートキャスリング。
+       * - BLACK_LONG_CASTLING: 黒のロングキャスリング。
        * @return キャスリング可能ならtrue。
        */
       template<Castling Flag> bool CanCastling() const;
-
 
       /**
        * その位置が他の位置の駒に攻撃されているかどうかチェックする。
