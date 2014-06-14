@@ -34,6 +34,7 @@
 #include <string>
 #include <vector>
 #include <random>
+#include <set>
 
 #include "common.h"
 
@@ -528,6 +529,7 @@ namespace Sayuri {
         + num_bit16_table_[(bitboard >> 32) & 0xffff]
         + num_bit16_table_[(bitboard >> 48) & 0xffff];
       }
+
       /**
        * 最下位で連続しているゼロビットの数を数える。
        * @param bitboard 対象のビットボード。
@@ -536,6 +538,7 @@ namespace Sayuri {
       static int CountZero(Bitboard bitboard) {
         return CountBits((bitboard & (-bitboard)) - 1);
       }
+
       /**
        * ビットボードからマスを得る。 (A1に最も近いマス。)
        * @param bitboard 対象のビットボード。
@@ -544,6 +547,7 @@ namespace Sayuri {
       static Square GetSquare(Bitboard bitboard) {
         return CountZero(bitboard);
       }
+
       /**
        * マスからファイルを得る。
        * @param square 対象のマス。
@@ -552,6 +556,7 @@ namespace Sayuri {
       static Fyle GetFyle(Square square) {
         return square & 0x7;
       }
+
       /**
        * マスからランクを得る。
        * @param square 対象のマス。
@@ -560,15 +565,20 @@ namespace Sayuri {
       static Rank GetRank(Square square) {
         return square >> 3;
       }
+
       /**
-       * 文字列をトークンに切り分ける。
+       * 文字列を単語に切り分ける。
        * @param str 切り分ける文字列。
-       * @param delim 区切り文字。 (複数指定できる。)
-       * @param delim_kept トークンとして残す区切り文字。 (複数指定できる。)
-       * @return 文字列トークンのベクトル。
+       * @param delim 区切り文字のセット。
+       * @param delim_and_word 区切り文字のセット。 (単語として残す。)
+       * @return 単語のベクトル。
        */
-      static std::vector<std::string> Split(std::string str,
-      std::string delim, std::string delim_kept);
+      template<typename CharType>
+      static std::vector<std::basic_string<CharType>> Split
+      (const std::basic_string<CharType>& str,
+      const std::set<CharType>& delim,
+      const std::set<CharType>& delim_and_word);
+
       // ランダムな数値を得る。
       static Hash GetRandomHash() {return dist_(engine_);}
 

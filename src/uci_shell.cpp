@@ -43,6 +43,7 @@
 #include <cstdint>
 #include <cctype>
 #include <functional>
+#include <set>
 #include "common.h"
 #include "chess_engine.h"
 #include "transposition_table.h"
@@ -757,8 +758,8 @@ namespace Sayuri {
 
   // コマンドを実行する。
   void UCICommand::operator()(const std::string& command_line) {
-    // トークンに分ける。
-    std::vector<std::string> tokens = Util::Split(command_line, " ", "");
+    std::vector<std::string> tokens =
+    Util::Split<char>(command_line, {' '}, {});
 
     // コマンドを探す。
     CommandArgs args;

@@ -34,6 +34,7 @@
 #include <vector>
 #include <algorithm>
 #include <cstddef>
+#include <set>
 #include "common.h"
 
 /** Sayuri 名前空間。 */
@@ -47,7 +48,8 @@ namespace Sayuri {
   ply_100_(0),
   ply_(1) {
     // fen_strを分解。
-    std::vector<std::string> fen_tokens = Util::Split(fen_str, " ", "");
+    std::vector<std::string> fen_tokens =
+    Util::Split<char>(fen_str, {' '}, {});
 
     try {
       // FENを解析。
@@ -145,7 +147,8 @@ namespace Sayuri {
 
     // ランク毎に区切って、逆転。
     // fenは8ランクから始まるので、1ランクからに逆転する必要がある。
-    std::vector<std::string> position_vec = Util::Split(position_str, "/", "");
+    std::vector<std::string> position_vec =
+    Util::Split<char>(position_str, {'/'}, {});
     std::reverse(position_vec.begin(), position_vec.end());
 
     // 値を格納していく。

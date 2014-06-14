@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 #include <random>
+#include <set>
 #include "common.h"
 
 /** Sayuri 名前空間。 */
@@ -560,62 +561,48 @@ namespace Sayuri {
   // ================ //
   // その他の便利関数 //
   // ================ //
-  // 文字列をトークンに切り分ける。
-  std::vector<std::string> Util::Split(std::string str, std::string delim,
-  std::string delim_kept) {
-    std::vector<std::string> ret;  // 結果。
+  // 文字列を単語に切り分ける。
+  template<typename CharType>
+  std::vector<std::basic_string<CharType>> Util::Split
+  (const std::basic_string<CharType>& str,
+  const std::set<CharType>& delim,
+  const std::set<CharType>& delim_and_word) {
+    std::vector<std::basic_string<CharType>> ret(0);
 
-    // 一文字づつ処理する。
-    std::vector<char> c_vec;  // その他の文字を格納する。
-    for (char& str_c : str) {
-      // 区切り文字か検査。
-      bool is_delim = false;
-      for (char& delim_c : delim) {
-        if (str_c == delim_c) {
-          is_delim = true;
-          break;
+    std::basic_string<CharType> temp;
+    for (auto c : str) {
+      if (delim.find(c) != delim.end()) {
+        if (temp.size() > 0) {
+          ret.push_back(temp);
+          temp.clear();
         }
-      }
-
-      // 残す区切り文字か検査。
-      bool is_delim_kept = false;
-      for (char& delim_kept_c : delim_kept) {
-        if (str_c == delim_kept_c) {
-          is_delim_kept = true;
-          break;
+      } else if (delim_and_word.find(c) != delim_and_word.end()) {
+        if (temp.size() > 0) {
+          ret.push_back(temp);
+          temp.clear();
+          temp.push_back(c);
+          ret.push_back(temp);
+          temp.clear();
         }
-      }
-
-      if (is_delim) {
-        // 区切り文字。
-        if (c_vec.size() > 0) {
-          c_vec.push_back('\0');  // ヌル文字を追加。
-          ret.push_back(std::string(c_vec.data()));
-          c_vec.clear();
-        }
-      } else if (is_delim_kept) {
-        // 残す区切り文字。
-        if (c_vec.size() > 0) {
-          c_vec.push_back('\0');  // ヌル文字を追加。
-          ret.push_back(std::string(c_vec.data()));
-          c_vec.clear();
-        }
-        c_vec.push_back(str_c);
-        c_vec.push_back('\0');  // ヌル文字を追加。
-        ret.push_back(std::string(c_vec.data()));
-        c_vec.clear();
       } else {
-        // その他の文字。
-        c_vec.push_back(str_c);
+        temp.push_back(c);
       }
     }
-    if (c_vec.size() > 0) {
-      c_vec.push_back('\0');  // ヌル文字を追加。
-      ret.push_back(std::string(c_vec.data()));
+
+    if (temp.size() > 0) {
+      ret.push_back(temp);
+      temp.clear();
     }
 
-    return std::move(ret);
+    return ret;
   }
+  // インスタンス化。
+  template std::vector<std::basic_string<char>> Util::Split<char>
+  (const std::basic_string<char>& str,
+  const std::set<char>& delim, const std::set<char>& delim_and_word);
+  template std::vector<std::basic_string<wchar_t>> Util::Split<wchar_t>
+  (const std::basic_string<wchar_t>& str,
+  const std::set<wchar_t>& delim, const std::set<wchar_t>& delim_and_word);
 
   // --- ランダム関連 --- //
   std::mt19937 Util::engine_;
