@@ -203,7 +203,7 @@ namespace Sayuri {
 
       /**
        * キャスリング出来るかどうかを判定する。
-       * @param <Flag> キャスリングの権利。
+       * @param <Flag> キャスリングの指定。
        * - WHITE_SHORT_CASTLING: 白のショートキャスリング。
        * - WHITE_LONG_CASTLING: 白のロングキャスリング。
        * - BLACK_SHORT_CASTLING: 黒のショートキャスリング。
