@@ -318,23 +318,23 @@ namespace Sayuri {
   constexpr Move PIECE_MASK = 0x7;
   /** キャスリングのマスク。 4ビット。 */
   constexpr Move CASTLING_MASK = 0xf;
-  /** 手の種類のマスク。 2ビット。 */
-  constexpr Move MTYPE_MASK = 0x3;
+  /** 手の種類のマスク。 3ビット。 */
+  constexpr Move MTYPE_MASK = 0x7;
 
   /** 動かす駒の位置のビット位置。 */
-  constexpr std::uint32_t FROM_SHIFT = 0;
+  constexpr unsigned int FROM_SHIFT = 0;
   /** 移動先の位置のビット位置。 */
-  constexpr std::uint32_t TO_SHIFT = 6;
+  constexpr unsigned int TO_SHIFT = FROM_SHIFT + 6;
   /** 昇格する駒の種類のビット位置。 */
-  constexpr std::uint32_t PROMOTION_SHIFT = 12;
-  /** 駒の種類のビット位置。 */
-  constexpr std::uint32_t MOVE_TYPE_SHIFT = 15;
+  constexpr unsigned int PROMOTION_SHIFT = TO_SHIFT + 6;
+  /** 手の種類のビット位置。 */
+  constexpr unsigned int MOVE_TYPE_SHIFT = PROMOTION_SHIFT + 3;
   /** 取った駒の種類のビット位置。 */
-  constexpr std::uint32_t CAPTURED_PIECE_SHIFT = 17;
+  constexpr unsigned int CAPTURED_PIECE_SHIFT = MOVE_TYPE_SHIFT + 3;
   /** キャスリングの権利のビット位置。 */
-  constexpr std::uint32_t CASTLING_RIGHTS_SHIFT = 20;
+  constexpr unsigned int CASTLING_RIGHTS_SHIFT = CAPTURED_PIECE_SHIFT + 3;
   /** アンパッサンの位置のビット位置。 */
-  constexpr std::uint32_t EN_PASSANT_SQUARE_SHIFT = 24;
+  constexpr unsigned int EN_PASSANT_SQUARE_SHIFT = CASTLING_RIGHTS_SHIFT + 4;
 
   /** 動かす駒の位置のマスク。 */
   constexpr Move FROM_MASK = SQUARE_MASK << FROM_SHIFT;
@@ -358,15 +358,21 @@ namespace Sayuri {
 
   // --- 手の種類の定数 --- //
   /** 手の種類の型。 */
-  using MoveType = int;
-  /** ヌルムーブを表す。 */
+  using MoveType = unsigned int;
+  /** Null Moveを表す。 */
   constexpr MoveType NULL_MOVE = 0;
   /** 通常の手を表す。 (コマを取らない手。 駒をとる手。) */
   constexpr MoveType NORMAL = 1;
-  /** キャスリングを表す。 */
-  constexpr MoveType CASTLING = 2;
   /** アンパッサンを表す。 */
-  constexpr MoveType EN_PASSANT = 3;
+  constexpr MoveType EN_PASSANT = 2;
+  /** 白のショートキャスリングを表す。 */
+  constexpr MoveType CASTLE_WS = 3;
+  /** 白のロングキャスリングを表す。 */
+  constexpr MoveType CASTLE_WL = 4;
+  /** 黒のショートキャスリングを表す。 */
+  constexpr MoveType CASTLE_BS = 5;
+  /** 黒のロングキャスリングを表す。 */
+  constexpr MoveType CASTLE_BL = 6;
 
   // --- 手のビットフィールドのアクセサ --- //
   /**

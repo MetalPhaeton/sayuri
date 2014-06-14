@@ -291,14 +291,14 @@ namespace Sayuri {
           Move null_move = 0;
 
           is_null_searching_ = true;
-          MakeMove(null_move);
+          MakeNullMove(null_move);
 
           // Null Move Search。
           int score = -Search<NodeType::NON_PV>(pos_hash, depth
           - shared_st_ptr_->search_params_ptr_->nmr_search_reduction() - 1,
           level + 1, -(beta), -(beta - 1), -material, table);
 
-          UnmakeMove(null_move);
+          UnmakeNullMove(null_move);
           is_null_searching_ = false;
 
           if (score >= beta) {

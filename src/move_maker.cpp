@@ -334,13 +334,20 @@ namespace Sayuri {
         }
       }
 
-      // キャスリングを設定。
-      if (((side == WHITE) && (from == E1)
-      && ((to == G1) || (to == C1)))
-      || ((side == BLACK) && (from == E8)
-      && ((to == G8) || (to == C8)))) {
-        move_move_type(move, CASTLING);
+      if ((side == WHITE) && (from == E1) && (to == G1)) {
+        // 白のショートキャスリング。
+        move_move_type(move, CASTLE_WS);
+      } else if ((side == WHITE) && (from == E1) && (to == C1)) {
+        // 白のロングキャスリング。
+        move_move_type(move, CASTLE_WL);
+      } else if ((side == BLACK) && (from == E8) && (to == G8)) {
+        // 黒のショートキャスリング。
+        move_move_type(move, CASTLE_BS);
+      } else if ((side == BLACK) && (from == E8) && (to == C8)) {
+        // 黒のロングキャスリング。
+        move_move_type(move, CASTLE_BL);
       } else {
+        // キャスリングじゃない手。
         move_move_type(move, NORMAL);
       }
 

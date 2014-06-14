@@ -223,8 +223,17 @@ namespace Sayuri {
       case NORMAL:
         std::cout << "Normal";
         break;
-      case CASTLING:
-        std::cout << "Castling";
+      case CASTLE_WS:
+        std::cout << "White Short Castling";
+        break;
+      case CASTLE_WL:
+        std::cout << "White Long Castling";
+        break;
+      case CASTLE_BS:
+        std::cout << "Black Short Castling";
+        break;
+      case CASTLE_BL:
+        std::cout << "Black Long Castling";
         break;
       case EN_PASSANT:
         std::cout << "En Passant";

@@ -469,7 +469,6 @@ namespace Sayuri {
        * 次の一手を指す。
        * 取った駒、動かす前のキャスリングの権利、アンパッサンは
        * 「move」に記録される。
-       * 動かす駒の位置と移動先が同じならNull Moveとなる。 (手番が変わる。)
        * 「move」はUnmakeMove()で利用する。
        * @param move 候補手。
        */
@@ -479,6 +478,37 @@ namespace Sayuri {
        * @param move MakeMove()で使用した候補手。
        */
       void UnmakeMove(Move move);
+
+      /**
+       * Null Moveを指す。
+       * 動かす前のキャスリングの権利、アンパッサンは「move」に記録される。
+       * 「move」はUnmakeNullMove()で利用する。
+       * @param move 候補手。
+       */
+      void MakeNullMove(Move& move) {
+        // 手番を変える。
+        to_move_ = to_move_ ^ 0x3;
+
+        // 情報をメモ。
+        move_castling_rights(move, castling_rights_);
+        move_en_passant_square(move, en_passant_square_);
+
+        // アンパッサンの位置を削除。
+        en_passant_square_ = 0;
+      }
+
+      /**
+       * MakeNullMove()で動かした手を元に戻す。
+       * @param move MakeNullMove()で使用した候補手。
+       */
+      void UnmakeNullMove(Move move) {
+        // 手番を変える。
+        to_move_ = to_move_ ^ 0x3;
+
+        // 情報を戻す。
+        castling_rights_ = move_castling_rights(move);
+        en_passant_square_ = move_en_passant_square(move);
+      }
 
       /**
        * 駒を置く。

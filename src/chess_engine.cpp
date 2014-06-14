@@ -610,11 +610,6 @@ namespace Sayuri {
     Piece promotion = move_promotion(move);
     MoveType move_type = move_move_type(move);
 
-    // NULL_MOVEならNull Moveする。
-    if (move_type == NULL_MOVE) {
-      return;
-    }
-
     // キャスリングの権利を更新。
     Piece piece = piece_board_[from];
     if (side == WHITE) {
@@ -640,30 +635,7 @@ namespace Sayuri {
     }
 
     // 手の種類によって分岐する。
-    if (move_type == CASTLING) {  // キャスリングの場合。
-      // キングを動かす。
-      ReplacePiece(from, to);
-      // ルークを動かす。
-      if (to == G1) {
-        ReplacePiece(H1, F1);
-      } else if (to == C1) {
-        ReplacePiece(A1, D1);
-      } else if (to == G8) {
-        ReplacePiece(H8, F8);
-      } else if (to == C8) {
-        ReplacePiece(A8, D8);
-      }
-      has_castled_[side] = true;
-    } else if (move_type == EN_PASSANT) {  // アンパッサンの場合。
-      // 取った駒をボーンにする。
-      move_captured_piece(move, PAWN);
-      // 動かす。
-      ReplacePiece(from, to);
-      // アンパッサンのターゲットを消す。
-      Square en_passant_target =
-      side == WHITE ? to - 8 : to + 8;
-      PutPiece(en_passant_target, EMPTY);
-    } else {  // それ以外の場合。
+    if (move_type == NORMAL) {
       // 取る駒を登録する。
       move_captured_piece(move, piece_board_[to]);
       // 駒を動かす。
@@ -679,6 +651,49 @@ namespace Sayuri {
           en_passant_square_ = side == WHITE ? to - 8 : to + 8;
         }
       }
+    } else if (move_type == EN_PASSANT) {  // アンパッサンの場合。
+      // 取った駒をボーンにする。
+      move_captured_piece(move, PAWN);
+      // 動かす。
+      ReplacePiece(from, to);
+      // アンパッサンのターゲットを消す。
+      Square en_passant_target =
+      side == WHITE ? to - 8 : to + 8;
+      PutPiece(en_passant_target, EMPTY);
+    } else if (move_type == CASTLE_WS) {  // 白のショートキャスリング。
+      // キングを動かす。
+      ReplacePiece(from, to);
+
+      // ルークを動かす。
+      ReplacePiece(H1, F1);
+
+      has_castled_[WHITE] = true;
+    } else if (move_type == CASTLE_WL) {  // 白のロングキャスリング。
+      // キングを動かす。
+      ReplacePiece(from, to);
+
+      // ルークを動かす。
+      ReplacePiece(A1, D1);
+
+      has_castled_[WHITE] = true;
+    } else if (move_type == CASTLE_BS) {  // 黒のショートキャスリング。
+      // キングを動かす。
+      ReplacePiece(from, to);
+
+      // ルークを動かす。
+      ReplacePiece(H8, F8);
+
+      has_castled_[BLACK] = true;
+    } else if (move_type == CASTLE_BL) {  // 黒のロングキャスリング。
+      // キングを動かす。
+      ReplacePiece(from, to);
+
+      // ルークを動かす。
+      ReplacePiece(A8, D8);
+
+      has_castled_[BLACK] = true;
+    } else {  // それ以外の場合。 (Null Moveなど。)
+      return;
     }
   }
 
@@ -700,33 +715,11 @@ namespace Sayuri {
     Piece promotion = move_promotion(move);
     MoveType move_type = move_move_type(move);
 
-    // moveがNULL_MOVEなら返る。
-    if (move_type == NULL_MOVE) {
-      return;
-    }
-
     // 駒の位置を戻す。
     ReplacePiece(to, from);
 
     // 手の種類で分岐する。
-    if (move_type == CASTLING) {  // キャスリングの場合。
-      // ルークを戻す。
-      if (to == G1) {
-        ReplacePiece(F1, H1);
-      } else if (to == C1) {
-        ReplacePiece(D1, A1);
-      } else if (to == G8) {
-        ReplacePiece(F8, H8);
-      } else if (to == C8) {
-        ReplacePiece(D8, A8);
-      }
-      has_castled_[to_move_] = false;
-    } else if (move_type == EN_PASSANT) {  // アンパッサンの場合。
-      // アンパッサンのターゲットを戻す。
-      Square en_passant_target =
-      to_move_ == WHITE ? en_passant_square_ - 8 : en_passant_square_ + 8;
-      PutPiece(en_passant_target, PAWN, enemy_side);
-    } else {  // それ以外の場合。
+    if (move_type == NORMAL) {  // 普通の手の場合。
       // 取った駒を戻す。
       PutPiece(to, move_captured_piece(move), enemy_side);
 
@@ -734,6 +727,33 @@ namespace Sayuri {
       if (promotion) {
         PutPiece(from, PAWN, to_move_);
       }
+    } else if (move_type == CASTLE_WS) {  // 白のショートキャスリング。
+      // ルークを戻す。
+      ReplacePiece(F1, H1);
+
+      has_castled_[WHITE] = false;
+    } else if (move_type == CASTLE_WL) {  // 白のロングキャスリング。
+      // ルークを戻す。
+      ReplacePiece(D1, A1);
+
+      has_castled_[WHITE] = false;
+    } else if (move_type == CASTLE_BS) {  // 黒のショートキャスリング。
+      // ルークを戻す。
+      ReplacePiece(F8, H8);
+
+      has_castled_[BLACK] = false;
+    } else if (move_type == CASTLE_BL) {  // 黒のロングキャスリング。
+      // ルークを戻す。
+      ReplacePiece(D8, A8);
+
+      has_castled_[BLACK] = false;
+    } else if (move_type == EN_PASSANT) {  // アンパッサンの場合。
+      // アンパッサンのターゲットを戻す。
+      Square en_passant_target =
+      to_move_ == WHITE ? en_passant_square_ - 8 : en_passant_square_ + 8;
+      PutPiece(en_passant_target, PAWN, enemy_side);
+    } else {  // それ以外の場合。 (Null Moveなど。)
+      return;
     }
   }
 
