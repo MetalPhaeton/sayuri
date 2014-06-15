@@ -30,6 +30,7 @@
 #include "position_record.h"
 
 #include <iostream>
+#include <cstdint>
 #include "common.h"
 #include "chess_engine.h"
 
@@ -39,26 +40,11 @@ namespace Sayuri {
   // コンストラクタと代入 //
   // ==================== //
   // コンストラクタ。
-  PositionRecord::PositionRecord(const ChessEngine& engine) {
-    // 駒の配置をコピー。ついでにhas_castled_もコピー。
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      has_castled_[side] = engine.has_castled()[side];
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
-        position_[side][piece_type] = engine.position()[side][piece_type];
-      }
-    }
-
-    // それ以外をコピー。
-    to_move_ = engine.to_move();
-    castling_rights_ = engine.castling_rights();
-    en_passant_square_ = engine.en_passant_square();
-    ply_100_ = engine.ply_100();
-    ply_ = engine.ply();
-    pos_hash_ = engine.GetCurrentHash();
-  }
-
-  // コンストラクタ。
   PositionRecord::PositionRecord() :
+  blocker_0_(0),
+  blocker_45_(0),
+  blocker_90_(0),
+  blocker_135_(0),
   to_move_(NO_SIDE),
   castling_rights_(0),
   en_passant_square_(0),
@@ -66,10 +52,15 @@ namespace Sayuri {
   ply_(0),
   pos_hash_(0) {
     for (Side side = 0; side < NUM_SIDES; side++) {
-      has_castled_[side] = false;
       for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
         position_[side][piece_type] = 0;
       }
+      side_pieces_[side] = 0;
+      king_[side] = 0;
+      has_castled_[side] = false;
+    }
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      position_memo_[i] = 0;
     }
   }
 
@@ -171,13 +162,27 @@ namespace Sayuri {
   // ================ //
   // メンバをコピーする。
   void PositionRecord::ScanMember(const PositionRecord& record) {
-    // 駒の配置をコピー。
+    // サイド毎のコピー。
     for (Side side = 0; side < NUM_SIDES; side++) {
-      has_castled_[side] = record.has_castled_[side];
       for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
         position_[side][piece_type] = record.position_[side][piece_type];
       }
+      side_pieces_[side] = record.side_pieces_[side];
+      king_[side] = record.king_[side];
+      has_castled_[side] = record.has_castled_[side];
     }
+
+    // マス毎のコピー。
+    for (Square square = 0; square < NUM_SQUARES; square++) {
+      piece_board_[square] = record.piece_board_[square];
+      side_board_[square] = record.side_board_[square];
+    }
+
+    // 全駒のコピー。
+    blocker_0_ = record.blocker_0_;
+    blocker_45_ = record.blocker_45_;
+    blocker_90_ = record.blocker_90_;
+    blocker_135_ = record.blocker_135_;
 
     // その他をコピー。
     to_move_ = record.to_move_;
@@ -185,6 +190,45 @@ namespace Sayuri {
     en_passant_square_ = record.en_passant_square_;
     ply_100_ = record.ply_100_;
     ply_ = record.ply_;
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      position_memo_[i] = position_memo_[i];
+    }
     pos_hash_ = record.pos_hash_;
+  }
+
+  // メンバをエンジンからコピーする。
+  void PositionRecord::ScanMember(const ChessEngine& engine, Hash pos_hash) {
+    // サイド毎のコピー。
+    for (Side side = WHITE; side <= BLACK; side++) {
+      for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+        position_[side][piece_type] = engine.position()[side][piece_type];
+      }
+      side_pieces_[side] = engine.side_pieces()[side];
+      king_[side] = engine.king()[side];
+      has_castled_[side] = engine.has_castled()[side];
+    }
+
+    // マス毎のコピー。
+    for (Square square = A1; square <= H8; square++) {
+      piece_board_[square] = engine.piece_board()[square];
+      side_board_[square] = engine.side_board()[square];
+    }
+
+    // 全駒のコピー。
+    blocker_0_ = engine.blocker_0();
+    blocker_45_ = engine.blocker_45();
+    blocker_90_ = engine.blocker_90();
+    blocker_135_ = engine.blocker_135();
+
+    // その他のコピー。
+    to_move_ = engine.to_move();
+    castling_rights_ = engine.castling_rights();
+    en_passant_square_ = engine.en_passant_square();
+    ply_100_ = engine.ply_100();
+    ply_ = engine.ply();
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      position_memo_[i] = engine.position_memo()[i];
+    }
+    pos_hash_ = pos_hash;
   }
 }  // namespace Sayuri

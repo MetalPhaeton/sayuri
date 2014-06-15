@@ -344,6 +344,13 @@ namespace Sayuri {
        */
       const bool (& has_castled() const)[NUM_SIDES] {return has_castled_;}
       /**
+       * アクセサ - 探索中の配置のメモ。
+       * @return 探索中の配置のメモ。
+       */
+      const Hash (& position_memo() const)[MAX_PLYS + 1] {
+        return position_memo_;
+      }
+      /**
        * アクセサ - ヒストリー。
        * @return ヒストリー。 [サイド][from][to]。
        */
@@ -538,7 +545,9 @@ namespace Sayuri {
       // ========== //
       // メンバ変数 //
       // ========== //
-      // --- 基本メンバ --- //
+      // ========== //
+      // 基本メンバ //
+      // ========== //
       /** 駒の配置のビットボード。 [サイド][駒の種類] */
       Bitboard position_[NUM_SIDES][NUM_PIECE_TYPES];
       /** 駒の種類の配置。 [マス] */
@@ -569,6 +578,8 @@ namespace Sayuri {
       int ply_;
       /** 各サイドのキャスリングしたかどうかのフラグ。 [サイド] */
       bool has_castled_[NUM_SIDES];
+      /** 探索中の配置のメモ。 */
+      Hash position_memo_[MAX_PLYS + 1];
 
       // ================================================= //
       // 共有メンバ (指定した他のエンジンと共有するメンバ) //

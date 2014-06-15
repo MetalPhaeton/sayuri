@@ -164,6 +164,41 @@ namespace Sayuri {
     // PVLineをリセット。
     pv_line_table_[level].ResetLine();
 
+    // Repetition Checking。 (繰り返しなら0点。)
+    position_memo_[level] = pos_hash;
+    if (level <= 2) {
+      // お互いの初手。 (今までの配置を調べる。)
+      for (auto& position : shared_st_ptr_->position_history_) {
+        if (position == *this) {
+          int score = SCORE_DRAW;
+          if (score < alpha) return alpha;
+          if (score > beta) return beta;
+          return score;
+        }
+      }
+    } else if (!is_checked) {
+      // お互いの2手目以降。 (2手前のハッシュを比較するだけ。)
+      if (level <= 4) {
+        // お互いの2手目。
+        int index = shared_st_ptr_->position_history_.size() - (-level + 5);
+        if ((index >= 0)
+        && (shared_st_ptr_->position_history_[index].pos_hash() == pos_hash)) {
+          int score = SCORE_DRAW;
+          if (score < alpha) return alpha;
+          if (score > beta) return beta;
+          return score;
+        }
+      } else {
+        // お互いの3手目以降。
+        if (position_memo_[level - 4] == pos_hash) {
+          int score = SCORE_DRAW;
+          if (score < alpha) return alpha;
+          if (score > beta) return beta;
+          return score;
+        }
+      }
+    }
+
     // --- トランスポジションテーブル --- //
     Move prev_best = 0;
     if (shared_st_ptr_->search_params_ptr_->enable_ttable()) {
@@ -417,7 +452,7 @@ namespace Sayuri {
 
     // 仕事の生成。
     std::mutex mutex;
-    PositionRecord record(*this);
+    PositionRecord record(*this, pos_hash);
     Job& job = job_table_[level];
     job.Init(maker);
     job.mutex_ptr_ = &mutex;
@@ -597,16 +632,6 @@ namespace Sayuri {
         }
       }
 
-      // 同じ局面の繰り返しは0点。
-      if (level <= 1) {
-        for (auto& position : shared_st_ptr_->position_history_) {
-          if (position == *this) {
-            score = SCORE_DRAW;
-            break;
-          }
-        }
-      }
-
       UnmakeMove(move);
 
       mutex.lock();  // ロック。
@@ -721,6 +746,7 @@ namespace Sayuri {
       }
     }
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      position_memo_[i] = 0;
       shared_st_ptr_->iid_stack_[i] = 0;
       shared_st_ptr_->killer_stack_[i][0] = 0;
       shared_st_ptr_->killer_stack_[i][1] = 0;
@@ -744,7 +770,7 @@ namespace Sayuri {
 
     // --- Iterative Deepening --- //
     int level = 0;
-    Hash pos_hash = GetCurrentHash();
+    Hash pos_hash = position_memo_[level] = GetCurrentHash();
     int material = GetMaterial(to_move_);
     int alpha = -MAX_VALUE;
     int beta = MAX_VALUE;
@@ -813,7 +839,7 @@ namespace Sayuri {
 
       // 仕事を作る。
       std::mutex mutex;
-      PositionRecord record(*this);
+      PositionRecord record(*this, pos_hash);
       int num_all_moves = maker.GenMoves<GenMoveType::ALL>(prev_best,
       shared_st_ptr_->iid_stack_[level],
       shared_st_ptr_->killer_stack_[level][0],
@@ -1082,16 +1108,6 @@ namespace Sayuri {
             score = -Search<NodeType::PV>(next_hash, new_depth - 1,
             job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
             *(job.table_ptr_));
-          }
-        }
-      }
-
-      // 同じ局面の繰り返しは0点。
-      if (job.level_ <= 1) {
-        for (auto& position : shared_st_ptr_->position_history_) {
-          if (position == *this) {
-            score = SCORE_DRAW;
-            break;
           }
         }
       }
@@ -1366,14 +1382,6 @@ namespace Sayuri {
               job.mutex_ptr_->unlock();  // ロック解除。
             }
           }
-        }
-      }
-
-      // 同じ局面の繰り返しは0点。
-      for (auto& position : shared_st_ptr_->position_history_) {
-        if (position == *this) {
-          score = SCORE_DRAW;
-          break;
         }
       }
 

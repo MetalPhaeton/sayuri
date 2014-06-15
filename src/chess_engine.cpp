@@ -233,49 +233,43 @@ namespace Sayuri {
     shared_st_ptr_->ply_100_history_.clear();
     shared_st_ptr_->ply_100_history_.push_back(ply_100_);
     shared_st_ptr_->position_history_.clear();
-    shared_st_ptr_->position_history_.push_back(PositionRecord(*this));
+    shared_st_ptr_->position_history_.push_back
+    (PositionRecord(*this, GetCurrentHash()));
   }
 
   // PositionRecordから局面読み込む。
   void ChessEngine::LoadRecord(const PositionRecord& record) {
-    // 空にする。
-    for (Square square = 0; square < NUM_SQUARES; square++) {
-      piece_board_[square] = EMPTY;
-      side_board_[square] = NO_SIDE;
-    }
-    blocker_0_ = 0;
-    blocker_45_ = 0;
-    blocker_90_ = 0;
-    blocker_135_ = 0;
-
-    // 駒を配置する。
+    // サイド毎のコピー。
     for (Side side = WHITE; side <= BLACK; side++) {
-      has_castled_[side] = record.has_castled()[side];
-      side_pieces_[side] = 0;
       for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
         position_[side][piece_type] = record.position()[side][piece_type];
-        for (Bitboard bb = position_[side][piece_type]; bb; bb &= bb - 1) {
-          Square square = Util::GetSquare(bb);
-          side_board_[square] = side;
-          piece_board_[square] = piece_type;
-          side_pieces_[side] |= Util::SQUARE[square];
-          blocker_0_ |= Util::SQUARE[square];
-          blocker_45_ |= Util::SQUARE[Util::ROT45[square]];
-          blocker_90_ |= Util::SQUARE[Util::ROT90[square]];
-          blocker_135_ |= Util::SQUARE[Util::ROT135[square]];
-          if (piece_type == KING) {
-            king_[side] = square;
-          }
-        }
       }
+      side_pieces_[side] = record.side_pieces()[side];
+      king_[side] = record.king()[side];
+      has_castled_[side] = record.has_castled()[side];
     }
 
-    // 残りを設定。
+    // マス毎のコピー。
+    for (Square square = A1; square <= H8; square++) {
+      piece_board_[square] = record.piece_board()[square];
+      side_board_[square] = record.side_board()[square];
+    }
+
+    // 全駒のコピー。
+    blocker_0_ = record.blocker_0();
+    blocker_45_ = record.blocker_45();
+    blocker_90_ = record.blocker_90();
+    blocker_135_ = record.blocker_135();
+
+    // その他のコピー。
     to_move_ = record.to_move();
     castling_rights_ = record.castling_rights();
     en_passant_square_ = record.en_passant_square();
     ply_100_ = record.ply_100();
     ply_ = record.ply();
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      position_memo_[i] = record.position_memo()[i];
+    }
   }
 
   // 駒を初期配置にセットする。
@@ -382,6 +376,11 @@ namespace Sayuri {
       has_castled_[side] = false;
     }
 
+    // 駒の配置のメモを初期化。
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      position_memo_[i] = 0;
+    }
+
     if (shared_st_ptr_) {
       // 50手ルールの履歴を初期化。
       shared_st_ptr_->ply_100_history_.clear();
@@ -389,7 +388,8 @@ namespace Sayuri {
 
       // 駒の配置の履歴を初期化。
       shared_st_ptr_->position_history_.clear();
-      shared_st_ptr_->position_history_.push_back(PositionRecord(*this));
+      shared_st_ptr_->position_history_.push_back
+      (PositionRecord(*this, GetCurrentHash()));
     }
   }
 
@@ -413,7 +413,8 @@ namespace Sayuri {
     shared_st_ptr_->ply_100_history_.push_back(0);
 
     // 駒の配置の履歴を初期化。
-    shared_st_ptr_->position_history_.push_back(PositionRecord(*this));
+    shared_st_ptr_->position_history_.push_back
+    (PositionRecord(*this, GetCurrentHash()));
   }
 
   // 他のエンジンの基本メンバをコピーする。
@@ -464,6 +465,11 @@ namespace Sayuri {
 
     // 手数のコピー。
     ply_ = engine.ply_;
+
+    // 駒の配置のメモをコピー。
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+      position_memo_[i] = engine.position_memo_[i];
+    }
   }
 
   // 探索を開始する。
@@ -519,7 +525,8 @@ namespace Sayuri {
       shared_st_ptr_->move_history_.push_back(move);
       shared_st_ptr_->ply_100_history_.push_back(ply_100_);
       MakeMove(move);
-      shared_st_ptr_->position_history_.push_back(PositionRecord(*this));
+      shared_st_ptr_->position_history_.push_back
+      (PositionRecord(*this, GetCurrentHash()));
     }
   }
 

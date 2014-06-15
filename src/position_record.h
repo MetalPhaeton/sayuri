@@ -46,8 +46,11 @@ namespace Sayuri {
       /**
        * コンストラクタ。
        * @param engine 記録するエンジン。
+       * @param pos_hash 現在のハッシュ。
        */
-      PositionRecord(const ChessEngine& engine);
+      PositionRecord(const ChessEngine& engine, Hash pos_hash) {
+        ScanMember(engine, pos_hash);
+      }
       /** コンストラクタ。 */
       PositionRecord();
       /**
@@ -112,6 +115,52 @@ namespace Sayuri {
         return position_;
       }
       /**
+       * アクセサ - 駒の種類の配置。
+       * @return 駒の種類の配置。 [マス]
+       */
+      const Piece (& piece_board() const)[NUM_SQUARES] {
+        return piece_board_;
+      }
+      /**
+       * アクセサ - サイドの配置。
+       * @return サイドの配置。 [マス]
+       */
+      const Side (& side_board() const)[NUM_SQUARES] {
+        return side_board_;
+      }
+      /**
+       * アクセサ - 各サイドの駒の配置のビットボード。
+       * @return 各サイドの駒の配置のビットボード。 [サイド]
+       */
+      const Bitboard (& side_pieces() const)[NUM_SIDES] {
+        return side_pieces_;
+      }
+      /**
+       * アクセサ - 全駒の配置のビットボード。 角度0度。
+       * @return 全駒の配置のビットボード。 角度0度。
+       */
+      Bitboard blocker_0() const {return blocker_0_;}
+      /**
+       * アクセサ - 全駒の配置のビットボード。 角度45度。
+       * @return 全駒の配置のビットボード。 角度45度。
+       */
+      Bitboard blocker_45() const {return blocker_45_;}
+      /**
+       * アクセサ - 全駒の配置のビットボード。 角度90度。
+       * @return 全駒の配置のビットボード。 角度90度。
+       */
+      Bitboard blocker_90() const {return blocker_90_;}
+      /**
+       * アクセサ - 全駒の配置のビットボード。 角度135度。
+       * @return 全駒の配置のビットボード。 角度135度。
+       */
+      Bitboard blocker_135() const {return blocker_135_;}
+      /**
+       * アクセサ - 各サイドのキングの位置。
+       * @return 各サイドのキングの位置。 [サイド]
+       */
+      const Square (& king() const)[NUM_SIDES] {return king_;}
+      /**
        * アクセサ - 手番。
        * @return 手番。
        */
@@ -146,6 +195,13 @@ namespace Sayuri {
        * @return 現在の局面のハッシュ。
        */
       Hash pos_hash() const {return pos_hash_;}
+      /**
+       * アクセサ - 探索中の配置のメモ。
+       * @return 探索中の配置のメモ。
+       */
+      const Hash (& position_memo() const)[MAX_PLYS + 1] {
+        return position_memo_;
+      }
 
     private:
       // ================ //
@@ -156,12 +212,34 @@ namespace Sayuri {
        * @param record コピー元。
        */
       void ScanMember(const PositionRecord& record);
+      /**
+       * メンバをエンジンからコピーする。
+       * @param engine コピー元。
+       * @param pos_hash 現在の配置のハッシュ。
+       */
+      void ScanMember(const ChessEngine& engine, Hash pos_hash);
 
       // ========== //
       // メンバ変数 //
       // ========== //
       /** 駒の配置のビットボード。 */
       Bitboard position_[NUM_SIDES][NUM_PIECE_TYPES];
+      /** 駒の種類の配置。 [マス] */
+      Piece piece_board_[NUM_SQUARES];
+      /** サイドの配置。 [マス] */
+      Side side_board_[NUM_SQUARES];
+      /** 各サイドの駒の配置のビットボード。 [サイド] */
+      Bitboard side_pieces_[NUM_SIDES];
+      /** 全駒の配置のビットボード。 角度0度。 */
+      Bitboard blocker_0_;
+      /** 全駒の配置のビットボード。 角度45度。 */
+      Bitboard blocker_45_;
+      /** 全駒の配置のビットボード。 角度90度。 */
+      Bitboard blocker_90_;
+      /** 全駒の配置のビットボード。 角度135度。 */
+      Bitboard blocker_135_;
+      /** 各サイドのキングの位置。 [サイド] */
+      Square king_[NUM_SIDES];
       /** 手番。 */
       Side to_move_;
       /** キャスリングの権利。 */
@@ -174,6 +252,8 @@ namespace Sayuri {
       int ply_;
       /** キャスリングしたかどうかのフラグ。 */
       bool has_castled_[NUM_SIDES];
+      /** 探索中の配置のメモ。 */
+      Hash position_memo_[MAX_PLYS + 1];
       /** 現在の局面のハッシュ。 */
       Hash pos_hash_;
   };
