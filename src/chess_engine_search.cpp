@@ -177,8 +177,7 @@ namespace Sayuri {
             return score;
           }
         }
-      } else if (!is_checked
-      && shared_st_ptr_->search_params_ptr_->
+      } else if (shared_st_ptr_->search_params_ptr_->
       enable_repetition_check_after_2nd()) {
         // お互いの2手目以降。 (2手前のハッシュを比較するだけ。)
         if (level <= 4) {
