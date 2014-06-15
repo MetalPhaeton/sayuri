@@ -76,6 +76,36 @@ namespace Sayuri {
        */
       const int (& material() const)[NUM_PIECE_TYPES] {return material_;}
 
+      // --- Quiescence Search --- //
+      /**
+       * アクセサ - Quiescence Search - 有効無効。
+       * @return 有効無効。
+       */
+      bool enable_quiesce_search() const {return enable_quiesce_search_;}
+
+      // --- 繰り返しチェック --- //
+      /**
+       * アクセサ - 繰り返しチェック - 有効無効。
+       * @return 有効無効。
+       */
+      bool enable_repetition_check() const {
+        return enable_repetition_check_;
+      }
+      /**
+       * アクセサ - 繰り返しチェック - 2手目以降のチェックの有効無効。
+       * @return 2手目以降のチェックの有効無効。
+       */
+      bool enable_repetition_check_after_2nd() const {
+        return enable_repetition_check_after_2nd_;
+      }
+
+      // --- Check Extension --- //
+      /**
+       * アクセサ - Check Extension - 有効無効。
+       * @return 有効無効。
+       */
+      bool enable_check_extension() const {return enable_check_extension_;}
+
       // --- YBWC --- //
       /**
        * アクセサ - YBMC - 残り深さ制限。
@@ -100,7 +130,7 @@ namespace Sayuri {
        * アクセサ - Aspiration Windows - 残り深さ制限。
        * @return 残り深さ制限。
        */
-      std::uint32_t aspiration_windows_limit_depth() const {
+      int aspiration_windows_limit_depth() const {
         return aspiration_windows_limit_depth_;
       }
       /**
@@ -302,6 +332,40 @@ namespace Sayuri {
        */
       void material(const int (& table)[NUM_PIECE_TYPES]);
 
+      // --- Quiescence Search --- //
+      /**
+       * ミューテータ - Quiescence Search - 有効無効。
+       * @param enable 有効無効。
+       */
+      void enable_quiesce_search(bool enable) {
+        enable_quiesce_search_ = enable;
+      }
+
+      // --- 繰り返しチェック --- //
+      /**
+       * ミューテータ - 繰り返しチェック - 有効無効。
+       * @param enable 有効無効。
+       */
+      void enable_repetition_check(bool enable) {
+        enable_repetition_check_= enable;
+      }
+      /**
+       * ミューテータ - 繰り返しチェック - 2手目以降のチェックの有効無効。
+       * @param enable 2手目以降のチェックの有効無効。
+       */
+      void enable_repetition_check_after_2nd(bool enable) {
+        enable_repetition_check_after_2nd_ = enable;
+      }
+
+      // --- Check Extension --- //
+      /**
+       * ミューテータ - Check Extension - 有効無効。
+       * @param enable 有効無効。
+       */
+      void enable_check_extension(bool enable) {
+        enable_check_extension_ = enable;
+      }
+
       // --- YBWC --- //
       /**
        * ミューテータ - YBMC - 残り深さ制限。
@@ -326,7 +390,7 @@ namespace Sayuri {
        * ミューテータ - Aspiration Windows - 残り深さ制限。
        * @param depth 残り深さ制限。
        */
-      void aspiration_windows_limit_depth(std::uint32_t depth) {
+      void aspiration_windows_limit_depth(int depth) {
         aspiration_windows_limit_depth_ = depth;
       }
       /**
@@ -555,6 +619,20 @@ namespace Sayuri {
       /** マテリアル。 */
       int material_[NUM_PIECE_TYPES];
 
+      // --- Quiescence Search --- //
+      /** Quiescence Search - 有効無効。 */
+      bool enable_quiesce_search_;
+
+      // --- 繰り返しチェック --- //
+      /** 繰り返しチェック - 初手のチェックの有効無効。 */
+      bool enable_repetition_check_;
+      /** 繰り返しチェック - 2手目以降のチェックの有効無効。 */
+      bool enable_repetition_check_after_2nd_;
+
+      // --- Check Extension --- //
+      /** Check Extension - 有効無効。 */
+      bool enable_check_extension_;
+
       // --- YBWC --- //
       /** YBWC - 残り深さ制限。 */
       int ybwc_limit_depth_;
@@ -565,7 +643,7 @@ namespace Sayuri {
       /** Aspiration Windows - 有効無効。 */
       bool enable_aspiration_windows_;
       /** Aspiration Windows - 残り深さ制限。 */
-      std::uint32_t aspiration_windows_limit_depth_;
+      int aspiration_windows_limit_depth_;
       /** Aspiration Windows - デルタ値。 */
       int aspiration_windows_delta_;
 

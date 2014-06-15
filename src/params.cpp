@@ -40,6 +40,10 @@ namespace Sayuri {
   // ============ //
   // コンストラクタ。
   SearchParams::SearchParams() :
+  enable_quiesce_search_(true),
+  enable_repetition_check_(true),
+  enable_repetition_check_after_2nd_(true),
+  enable_check_extension_(true),
   ybwc_limit_depth_(4),
   ybwc_after_moves_(3),
   enable_aspiration_windows_(true),
@@ -116,6 +120,11 @@ namespace Sayuri {
     for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
       material_[piece_type] = params.material_[piece_type];
     }
+    enable_quiesce_search_ = params.enable_quiesce_search_;
+    enable_repetition_check_= params.enable_repetition_check_;
+    enable_repetition_check_after_2nd_ =
+    params.enable_repetition_check_after_2nd_;
+    enable_check_extension_ = params.enable_check_extension_;
     ybwc_limit_depth_ = params.ybwc_limit_depth_;
     ybwc_after_moves_ = params.ybwc_after_moves_;
     enable_aspiration_windows_ = params.enable_aspiration_windows_;

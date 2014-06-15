@@ -164,37 +164,42 @@ namespace Sayuri {
     // PVLineをリセット。
     pv_line_table_[level].ResetLine();
 
-    // Repetition Checking。 (繰り返しなら0点。)
+    // --- 繰り返しチェック (繰り返しなら0点。) --- //
     position_memo_[level] = pos_hash;
-    if (level <= 2) {
-      // お互いの初手。 (今までの配置を調べる。)
-      for (auto& position : shared_st_ptr_->position_history_) {
-        if (position == *this) {
-          int score = SCORE_DRAW;
-          if (score < alpha) return alpha;
-          if (score > beta) return beta;
-          return score;
+    if (shared_st_ptr_->search_params_ptr_->enable_repetition_check()) {
+      if (level <= 2) {
+        // お互いの初手。 (今までの配置を調べる。)
+        for (auto& position : shared_st_ptr_->position_history_) {
+          if (position == *this) {
+            int score = SCORE_DRAW;
+            if (score < alpha) return alpha;
+            if (score > beta) return beta;
+            return score;
+          }
         }
-      }
-    } else if (!is_checked) {
-      // お互いの2手目以降。 (2手前のハッシュを比較するだけ。)
-      if (level <= 4) {
-        // お互いの2手目。
-        int index = shared_st_ptr_->position_history_.size() - (-level + 5);
-        if ((index >= 0)
-        && (shared_st_ptr_->position_history_[index].pos_hash() == pos_hash)) {
-          int score = SCORE_DRAW;
-          if (score < alpha) return alpha;
-          if (score > beta) return beta;
-          return score;
-        }
-      } else {
-        // お互いの3手目以降。
-        if (position_memo_[level - 4] == pos_hash) {
-          int score = SCORE_DRAW;
-          if (score < alpha) return alpha;
-          if (score > beta) return beta;
-          return score;
+      } else if (!is_checked
+      && shared_st_ptr_->search_params_ptr_->
+      enable_repetition_check_after_2nd()) {
+        // お互いの2手目以降。 (2手前のハッシュを比較するだけ。)
+        if (level <= 4) {
+          // お互いの2手目。
+          int index = shared_st_ptr_->position_history_.size() - (-level + 5);
+          if ((index >= 0)
+          && (shared_st_ptr_->position_history_[index].pos_hash()
+          == pos_hash)) {
+            int score = SCORE_DRAW;
+            if (score < alpha) return alpha;
+            if (score > beta) return beta;
+            return score;
+          }
+        } else {
+          // お互いの3手目以降。
+          if (position_memo_[level - 4] == pos_hash) {
+            int score = SCORE_DRAW;
+            if (score < alpha) return alpha;
+            if (score > beta) return beta;
+            return score;
+          }
         }
       }
     }
@@ -288,12 +293,19 @@ namespace Sayuri {
       table.Unlock();
     }
 
-    // 深さが0ならクイース。
+    // 深さが0ならクイース。 (無効なら評価値を返す。)
     // 限界探索数を超えていてもクイース。
     if ((depth <= 0) || (level >= MAX_PLYS)) {
-      // クイース探索ノードに移行するため、ノード数を減らしておく。
-      shared_st_ptr_->num_searched_nodes_--;
-      return Quiesce(depth, level, alpha, beta, material, table);
+      if (shared_st_ptr_->search_params_ptr_->enable_quiesce_search()) {
+        // クイース探索ノードに移行するため、ノード数を減らしておく。
+        shared_st_ptr_->num_searched_nodes_--;
+        return Quiesce(depth, level, alpha, beta, material, table);
+      } else {
+        int score = evaluator_.Evaluate(material);
+        if (score < alpha) return alpha;
+        if (score > beta) return beta;
+        return score;
+      }
     }
 
     // --- Internal Iterative Deepening --- //
@@ -342,9 +354,17 @@ namespace Sayuri {
 
             depth -= null_reduction;
             if ((depth <= 0)) {
-              // クイース探索ノードに移行するため、ノード数を減らしておく。
-              shared_st_ptr_->num_searched_nodes_--;
-              return Quiesce(depth, level, alpha, beta, material, table);
+              if (shared_st_ptr_->search_params_ptr_->
+              enable_quiesce_search()) {
+                // クイース探索ノードに移行するため、ノード数を減らしておく。
+                shared_st_ptr_->num_searched_nodes_--;
+                return Quiesce(depth, level, alpha, beta, material, table);
+              } else {
+                int score = evaluator_.Evaluate(material);
+                if (score < alpha) return alpha;
+                if (score > beta) return beta;
+                return score;
+              }
             }
           }
         }
@@ -439,7 +459,8 @@ namespace Sayuri {
     }
 
     // --- Check Extension --- //
-    if (is_checked) {
+    if (shared_st_ptr_->search_params_ptr_->enable_check_extension()
+    && is_checked) {
       depth += 1;
     }
 
@@ -786,6 +807,8 @@ namespace Sayuri {
       // 探索終了。
       if (ShouldBeStopped()) break;
 
+      int depth = shared_st_ptr_->i_depth_;
+
       // ノードを加算。
       shared_st_ptr_->num_searched_nodes_++;
 
@@ -795,8 +818,7 @@ namespace Sayuri {
         Chrono::duration_cast<Chrono::milliseconds>
         (SysClock::now() - shared_st_ptr_->start_time_);
 
-        shell.PrintPVInfo(shared_st_ptr_->i_depth_, 0,
-        pv_line_table_[level].score(), time,
+        shell.PrintPVInfo(depth, 0, pv_line_table_[level].score(), time,
         shared_st_ptr_->num_searched_nodes_, pv_line_table_[level]);
 
         continue;
@@ -807,7 +829,7 @@ namespace Sayuri {
       shared_st_ptr_->search_params_ptr_->aspiration_windows_delta();
       // 探索窓の設定。
       if (shared_st_ptr_->search_params_ptr_->enable_aspiration_windows()
-      && (shared_st_ptr_->i_depth_ >= shared_st_ptr_->search_params_ptr_->
+      && (depth >= shared_st_ptr_->search_params_ptr_->
       aspiration_windows_limit_depth())) {
         beta = alpha + delta;
         alpha -= delta;
@@ -817,14 +839,13 @@ namespace Sayuri {
       }
 
       // 標準出力に深さ情報を送る。
-      shell.PrintDepthInfo(shared_st_ptr_->i_depth_);
+      shell.PrintDepthInfo(depth);
 
       // 前回の繰り返しの最善手を得る。
       Move prev_best = 0;
       if (shared_st_ptr_->search_params_ptr_->enable_ttable()) {
         table.Lock();
-        const TTEntry& prev_entry =
-        table.GetEntry(pos_hash, shared_st_ptr_->i_depth_ - 1);
+        const TTEntry& prev_entry = table.GetEntry(pos_hash, depth - 1);
         if (prev_entry && (prev_entry.score_type() != ScoreType::ALPHA)) {
           prev_best = prev_entry.best_move();
         }
@@ -832,8 +853,8 @@ namespace Sayuri {
       }
 
       // --- Check Extension --- //
-      int depth = shared_st_ptr_->i_depth_;
-      if (is_checked) {
+      if (shared_st_ptr_->search_params_ptr_->enable_check_extension()
+      && is_checked) {
         depth += 1;
       }
 
