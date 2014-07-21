@@ -580,10 +580,9 @@ namespace Sayuri {
         if (temp.size() > 0) {
           ret.push_back(temp);
           temp.clear();
-          temp.push_back(c);
-          ret.push_back(temp);
-          temp.clear();
         }
+        CharType cs[2] {c, 0};
+        ret.push_back(cs);
       } else {
         temp.push_back(c);
       }
