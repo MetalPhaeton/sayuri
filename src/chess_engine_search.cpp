@@ -74,7 +74,7 @@ namespace Sayuri {
 
     // アルファ値、ベータ値を調べる。
     if (stand_pad >= beta) {
-      return beta;
+      return stand_pad;
     }
     if (stand_pad > alpha) {
       alpha = stand_pad;
@@ -132,8 +132,7 @@ namespace Sayuri {
       if (score > alpha) {
         alpha = score;
       }
-      if (score >= beta) {
-        alpha = beta;
+      if (alpha >= beta) {
         break;
       }
     }
@@ -171,10 +170,7 @@ namespace Sayuri {
         // お互いの初手。 (今までの配置を調べる。)
         for (auto& position : shared_st_ptr_->position_history_) {
           if (position == *this) {
-            int score = SCORE_DRAW;
-            if (score < alpha) return alpha;
-            if (score > beta) return beta;
-            return score;
+            return SCORE_DRAW;
           }
         }
       } else if (shared_st_ptr_->search_params_ptr_->
@@ -186,18 +182,12 @@ namespace Sayuri {
           if ((index >= 0)
           && (shared_st_ptr_->position_history_[index].pos_hash()
           == pos_hash)) {
-            int score = SCORE_DRAW;
-            if (score < alpha) return alpha;
-            if (score > beta) return beta;
-            return score;
+            return SCORE_DRAW;
           }
         } else {
           // お互いの3手目以降。
           if (position_memo_[level - 4] == pos_hash) {
-            int score = SCORE_DRAW;
-            if (score < alpha) return alpha;
-            if (score > beta) return beta;
-            return score;
+            return SCORE_DRAW;
           }
         }
       }
@@ -233,31 +223,18 @@ namespace Sayuri {
               }
             }
 
-            pv_line_table_[level].mate_in(tt_entry.mate_in());
-
-            if (score >= beta) {
-              pv_line_table_[level].score(beta);
-              table.Unlock();
-              return beta;
-            }
-
-            if (score <= alpha) {
-              pv_line_table_[level].score(alpha);
-              table.Unlock();
-              return alpha;
-            }
-
             pv_line_table_[level].score(score);
+            pv_line_table_[level].mate_in(tt_entry.mate_in());
             table.Unlock();
             return score;
           } else if (tt_entry.score_type() == ScoreType::ALPHA) {
             // エントリーがアルファ値。
             if (score <= alpha) {
               // アルファ値以下が確定。
-              pv_line_table_[level].score(alpha);
+              pv_line_table_[level].score(score);
               pv_line_table_[level].mate_in(tt_entry.mate_in());
               table.Unlock();
-              return alpha;
+              return score;
             }
 
             // ベータ値を下げられる。
@@ -278,10 +255,10 @@ namespace Sayuri {
 
             if (score >= beta) {
               // ベータ値以上が確定。
-              pv_line_table_[level].score(beta);
+              pv_line_table_[level].score(score);
               pv_line_table_[level].mate_in(tt_entry.mate_in());
               table.Unlock();
-              return beta;
+              return score;
             }
 
             // アルファ値を上げられる。
@@ -300,10 +277,7 @@ namespace Sayuri {
         shared_st_ptr_->num_searched_nodes_--;
         return Quiesce(depth, level, alpha, beta, material, table);
       } else {
-        int score = evaluator_.Evaluate(material);
-        if (score < alpha) return alpha;
-        if (score > beta) return beta;
-        return score;
+        return evaluator_.Evaluate(material);
       }
     }
 
@@ -359,10 +333,7 @@ namespace Sayuri {
                 shared_st_ptr_->num_searched_nodes_--;
                 return Quiesce(depth, level, alpha, beta, material, table);
               } else {
-                int score = evaluator_.Evaluate(material);
-                if (score < alpha) return alpha;
-                if (score > beta) return beta;
-                return score;
+                return evaluator_.Evaluate(material);
               }
             }
           }
@@ -378,6 +349,7 @@ namespace Sayuri {
     shared_st_ptr_->killer_stack_[level][1]);
 
     // --- ProbCut --- //
+    // ProbCutでは、Betaカットの時、Beta値を返す。
     if ((Type == NodeType::NON_PV)) {
       if (shared_st_ptr_->search_params_ptr_->enable_probcut()) {
         if (!is_null_searching_ && !is_checked && (depth
@@ -666,12 +638,13 @@ namespace Sayuri {
         // PVライン。
         pv_line_table_[level].SetMove(move);
         pv_line_table_[level].Insert(pv_line_table_[level + 1]);
+        pv_line_table_[level].score(score);
 
         alpha = score;
       }
 
       // ベータ値を調べる。
-      if (score >= beta) {
+      if (alpha >= beta) {
         // 評価値の種類をセット。
         score_type = ScoreType::BETA;
 
@@ -698,7 +671,6 @@ namespace Sayuri {
 
         // ベータカット。
         mutex.unlock();  // ロック解除。
-        alpha = beta;
         break;
       }
 
@@ -714,16 +686,12 @@ namespace Sayuri {
       if (is_checked) {
         // チェックメイト。
         int score = SCORE_LOSE;
-        if (score < alpha) score = alpha;
-        if (score > beta) score = beta;
         pv_line_table_[level].score(score);
         pv_line_table_[level].mate_in(level);
         return score;
       } else {
         // ステールメイト。
         int score = SCORE_DRAW;
-        if (score < alpha) score = alpha;
-        if (score > beta) score = beta;
         pv_line_table_[level].score(score);
         return score;
       }
@@ -1151,12 +1119,13 @@ namespace Sayuri {
         // PVラインをセット。
         job.pv_line_ptr_->SetMove(move);
         job.pv_line_ptr_->Insert(pv_line_table_[job.level_ + 1]);
+        job.pv_line_ptr_->score(score);
 
         *(job.alpha_ptr_) = score;
       }
 
       // ベータ値を調べる。
-      if (score >= *(job.beta_ptr_)) {
+      if (*(job.alpha_ptr_) >= *(job.beta_ptr_)) {
         // 評価値の種類をセット。
         *(job.score_type_ptr_) = ScoreType::BETA;
 
@@ -1183,7 +1152,6 @@ namespace Sayuri {
         }
 
         // ベータカット。
-        *(job.alpha_ptr_) = *(job.beta_ptr_);
         job.mutex_ptr_->unlock();  // ロック解除。
         break;
       }
