@@ -124,19 +124,19 @@ namespace Sayuri {
 
     // 動かす駒の位置を出力する。
     std::cout << "From: ";
-    fyle = Util::GetFyle(move_from(move));
-    rank = Util::GetRank(move_from(move));
+    fyle = Util::GetFyle(GET_FROM(move));
+    rank = Util::GetRank(GET_FROM(move));
     std::cout << fyle_table[fyle] << rank_table[rank] << std::endl;
 
     // 移動先の位置を出力する。
     std::cout << "To: ";
-    fyle = Util::GetFyle(move_to(move));
-    rank = Util::GetRank(move_to(move));
+    fyle = Util::GetFyle(GET_TO(move));
+    rank = Util::GetRank(GET_TO(move));
     std::cout << fyle_table[fyle] << rank_table[rank] << std::endl;
 
     // 取った駒の種類を出力する。
     std::cout << "Captured Piece: ";
-    switch (move_captured_piece(move)) {
+    switch (GET_CAPTURED_PIECE(move)) {
       case EMPTY:
         std::cout << "None";
         break;
@@ -166,7 +166,7 @@ namespace Sayuri {
 
     // 昇格する駒の種類を出力する。
     std::cout << "Promotion: ";
-    switch (move_promotion(move)) {
+    switch (GET_PROMOTION(move)) {
       case EMPTY:
         std::cout << "None";
         break;
@@ -195,7 +195,7 @@ namespace Sayuri {
     std::cout << std::endl;
 
     // キャスリングを出力する。
-    Castling castling = move_castling_rights(move);
+    Castling castling = GET_CASTLING_RIGHTS(move);
     std::cout << "Castling Rights: ";
     if (castling & WHITE_SHORT_CASTLING)
       std::cout << "K";
@@ -208,7 +208,7 @@ namespace Sayuri {
     std::cout << std::endl;
 
     // アンパッサンのターゲットを出力する。
-    if (Square en_passant_square = move_en_passant_square(move)) {
+    if (Square en_passant_square = GET_EN_PASSANT_SQUARE(move)) {
       fyle = Util::GetFyle(en_passant_square);
       rank = Util::GetRank(en_passant_square);
       std::cout << "En Passant Square: "
@@ -219,7 +219,7 @@ namespace Sayuri {
 
     // 手の種類を出力する。
     std::cout << "Move Type: ";
-    switch (move_move_type(move)) {
+    switch (GET_MOVE_TYPE(move)) {
       case NORMAL:
         std::cout << "Normal";
         break;

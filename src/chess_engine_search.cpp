@@ -391,8 +391,8 @@ namespace Sayuri {
               // 取らない手。
               if (!(move & CAPTURED_PIECE_MASK)) {
                 // 手の情報を得る。
-                Square from = move_from(move);
-                Square to = move_to(move);
+                Square from = GET_FROM(move);
+                Square to = GET_TO(move);
 
                 // キラームーブ。
                 if (shared_st_ptr_->search_params_ptr_->enable_killer()) {
@@ -557,8 +557,8 @@ namespace Sayuri {
       }
 
       // 手の情報を得る。
-      Square from = move_from(move);
-      Square to = move_to(move);
+      Square from = GET_FROM(move);
+      Square to = GET_TO(move);
 
       // 探索。
       int score = 0;
@@ -570,8 +570,8 @@ namespace Sayuri {
       bool is_hp_or_lmr_ok = false;
       if (!is_checked && !null_reduction
       && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
-      && !EqualMove(move, shared_st_ptr_->killer_stack_[level][0])
-      && !EqualMove(move, shared_st_ptr_->killer_stack_[level][1])) {
+      && !EQUAL_MOVE(move, shared_st_ptr_->killer_stack_[level][0])
+      && !EQUAL_MOVE(move, shared_st_ptr_->killer_stack_[level][1])) {
         is_hp_or_lmr_ok = true;
       }
 
@@ -1030,8 +1030,8 @@ namespace Sayuri {
       }
 
       // 手の情報を得る。
-      Square from = move_from(move);
-      Square to = move_to(move);
+      Square from = GET_FROM(move);
+      Square to = GET_TO(move);
 
       // 探索。
       int score = 0;
@@ -1043,8 +1043,8 @@ namespace Sayuri {
       bool is_hp_or_lmr_ok = false;
       if (!(job.is_checked_) && !(job.null_reduction_)
       && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
-      && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][0])
-      && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][1])) {
+      && !EQUAL_MOVE(move, shared_st_ptr_->killer_stack_[job.level_][0])
+      && !EQUAL_MOVE(move, shared_st_ptr_->killer_stack_[job.level_][1])) {
         is_hp_or_lmr_ok = true;
       }
 
@@ -1216,7 +1216,7 @@ namespace Sayuri {
         bool hit = false;
         const std::vector<Move>& vec = *(job.moves_to_search_ptr_);
         for (auto move_2 : vec) {
-          if (EqualMove(move_2, move)) {
+          if (EQUAL_MOVE(move_2, move)) {
             // 探索すべき手だった。
             hit = true;
             break;
@@ -1418,8 +1418,8 @@ namespace Sayuri {
 
     if (move) {
       // 手の情報を得る。
-      Square to = move_to(move);
-      MoveType move_type = move_move_type(move);
+      Square to = GET_TO(move);
+      MoveType move_type = GET_MOVE_TYPE(move);
 
       // キングを取る手なら無視。
       if (piece_board_[to] == KING) {
@@ -1439,7 +1439,7 @@ namespace Sayuri {
       // ポーンの昇格。
       if ((move & PROMOTION_MASK)) {
         capture_value +=
-        shared_st_ptr_->search_params_ptr_->material()[move_promotion(move)]
+        shared_st_ptr_->search_params_ptr_->material()[GET_PROMOTION(move)]
         - shared_st_ptr_->search_params_ptr_->material()[PAWN];
       }
 
@@ -1502,10 +1502,10 @@ namespace Sayuri {
       }
       if (attackers) {
         Move move = 0;
-        move_from(move, Util::GetSquare(attackers));
-        move_to(move, target);
-        move_promotion(move, promotion);
-        move_move_type(move, NORMAL);
+        SET_FROM(move, Util::GetSquare(attackers));
+        SET_TO(move, target);
+        SET_PROMOTION(move, promotion);
+        SET_MOVE_TYPE(move, NORMAL);
         return move;
       }
     }

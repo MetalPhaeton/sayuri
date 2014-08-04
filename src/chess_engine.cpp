@@ -505,7 +505,7 @@ namespace Sayuri {
         continue;
       }
       // temp_moveと同じ手かどうか調べる。
-      if (EqualMove(move, temp_move)) {
+      if (EQUAL_MOVE(move, temp_move)) {
         UnmakeMove(temp_move);
         move = temp_move;
         is_legal = true;
@@ -516,8 +516,8 @@ namespace Sayuri {
 
     if (is_legal) {
       ply_++;
-      if ((piece_board_[move_from(move)] == PAWN)
-      || (piece_board_[move_to(move)] != EMPTY)) {
+      if ((piece_board_[GET_FROM(move)] == PAWN)
+      || (piece_board_[GET_TO(move)] != EMPTY)) {
         ply_100_ = 0;
       } else {
         ply_100_++;
@@ -595,17 +595,17 @@ namespace Sayuri {
     to_move_ = to_move_ ^ 0x3;
 
     // 動かす前のキャスリングの権利とアンパッサンを記録する。
-    move_castling_rights(move, castling_rights_);
-    move_en_passant_square(move, en_passant_square_);
+    SET_CASTLING_RIGHTS(move, castling_rights_);
+    SET_EN_PASSANT_SQUARE(move, en_passant_square_);
 
     // アンパッサンを解除。
     en_passant_square_ = 0;
 
     // 手の要素を得る。
-    Square from = move_from(move);
-    Square to = move_to(move);
-    Piece promotion = move_promotion(move);
-    MoveType move_type = move_move_type(move);
+    Square from = GET_FROM(move);
+    Square to = GET_TO(move);
+    Piece promotion = GET_PROMOTION(move);
+    MoveType move_type = GET_MOVE_TYPE(move);
 
     // キャスリングの権利を更新。
     Piece piece = piece_board_[from];
@@ -634,7 +634,7 @@ namespace Sayuri {
     // 手の種類によって分岐する。
     if (move_type == NORMAL) {
       // 取る駒を登録する。
-      move_captured_piece(move, piece_board_[to]);
+      SET_CAPTURED_PIECE(move, piece_board_[to]);
       // 駒を動かす。
       ReplacePiece(from, to);
       // 駒を昇格させるなら、駒を昇格させる。
@@ -650,7 +650,7 @@ namespace Sayuri {
       }
     } else if (move_type == EN_PASSANT) {  // アンパッサンの場合。
       // 取った駒をボーンにする。
-      move_captured_piece(move, PAWN);
+      SET_CAPTURED_PIECE(move, PAWN);
       // 動かす。
       ReplacePiece(from, to);
       // アンパッサンのターゲットを消す。
@@ -703,14 +703,14 @@ namespace Sayuri {
     to_move_ ^=  0x3;
 
     // 動かす前のキャスリングの権利とアンパッサンを復元する。
-    castling_rights_ = move_castling_rights(move);
-    en_passant_square_ = move_en_passant_square(move);
+    castling_rights_ = GET_CASTLING_RIGHTS(move);
+    en_passant_square_ = GET_EN_PASSANT_SQUARE(move);
 
     // 手の情報を得る。
-    Square from = move_from(move);
-    Square to = move_to(move);
-    Piece promotion = move_promotion(move);
-    MoveType move_type = move_move_type(move);
+    Square from = GET_FROM(move);
+    Square to = GET_TO(move);
+    Piece promotion = GET_PROMOTION(move);
+    MoveType move_type = GET_MOVE_TYPE(move);
 
     // 駒の位置を戻す。
     ReplacePiece(to, from);
@@ -718,7 +718,7 @@ namespace Sayuri {
     // 手の種類で分岐する。
     if (move_type == NORMAL) {  // 普通の手の場合。
       // 取った駒を戻す。
-      PutPiece(to, move_captured_piece(move), enemy_side);
+      PutPiece(to, GET_CAPTURED_PIECE(move), enemy_side);
 
       // 昇格ならポーンに戻す。
       if (promotion) {
@@ -799,20 +799,20 @@ namespace Sayuri {
 
   // 次の局面の「自分」のマテリアルを得る。
   int ChessEngine::GetNextMyMaterial(int current_material, Move move) const {
-    if (move_move_type(move) == EN_PASSANT) {
+    if (GET_MOVE_TYPE(move) == EN_PASSANT) {
       // アンパッサン。
       return current_material
       + shared_st_ptr_->search_params_ptr_->material()[PAWN];
-    } else if (Piece promotion = move_promotion(move)) {
+    } else if (Piece promotion = GET_PROMOTION(move)) {
       // プロモーション。
       return current_material + shared_st_ptr_->search_params_ptr_->
-      material()[piece_board_[move_to(move)]]
+      material()[piece_board_[GET_TO(move)]]
       + shared_st_ptr_->search_params_ptr_->material()[promotion]
       - shared_st_ptr_->search_params_ptr_->material()[PAWN];
     } else {
       // その他の手。
       return current_material + shared_st_ptr_->search_params_ptr_->
-      material()[piece_board_[move_to(move)]];
+      material()[piece_board_[GET_TO(move)]];
     }
   }
 
@@ -847,9 +847,9 @@ namespace Sayuri {
   // 次の局面のハッシュを得る。
   Hash ChessEngine::GetNextHash(Hash current_hash, Move move) const {
     // 駒の情報を得る。
-    Square from = move_from(move);
-    Square to = move_to(move);
-    Piece promotion = move_promotion(move);
+    Square from = GET_FROM(move);
+    Square to = GET_TO(move);
+    Piece promotion = GET_PROMOTION(move);
 
     // 駒の位置の種類とサイドを得る。
     Piece piece_type = piece_board_[from];

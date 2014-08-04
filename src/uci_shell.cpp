@@ -658,13 +658,13 @@ namespace Sayuri {
     std::ostringstream oss;
 
     // ストリームに流しこむ。
-    Square from = move_from(move);
-    Square to = move_to(move);
+    Square from = GET_FROM(move);
+    Square to = GET_TO(move);
     oss << static_cast<char>(Util::GetFyle(from) + 'a');
     oss << static_cast<char>(Util::GetRank(from) + '1');
     oss << static_cast<char>(Util::GetFyle(to) + 'a');
     oss << static_cast<char>(Util::GetRank(to) + '1');
-    switch (move_promotion(move)) {
+    switch (GET_PROMOTION(move)) {
       case KNIGHT:
         oss << 'n';
         break;
@@ -700,7 +700,7 @@ namespace Sayuri {
       return 0;
     }
     from |= (move_str[1] - '1') << 3;
-    move_from(move, from);
+    SET_FROM(move, from);
 
     // toをパース。
     Square to = 0;
@@ -712,22 +712,22 @@ namespace Sayuri {
       return 0;
     }
     to |= (move_str[3] - '1') << 3;
-    move_to(move, to);
+    SET_TO(move, to);
 
     // 昇格をパース。
     if (move_str.size() >= 5) {
       switch (move_str[4]) {
         case 'n':
-          move_promotion(move, KNIGHT);
+          SET_PROMOTION(move, KNIGHT);
           break;
         case 'b':
-          move_promotion(move, BISHOP);
+          SET_PROMOTION(move, BISHOP);
           break;
         case 'r':
-          move_promotion(move, ROOK);
+          SET_PROMOTION(move, ROOK);
           break;
         case 'q':
-          move_promotion(move, QUEEN);
+          SET_PROMOTION(move, QUEEN);
           break;
         default:
           break;
