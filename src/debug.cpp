@@ -67,6 +67,13 @@ namespace Sayuri {
     shell_ptr(new UCIShell(*engine_ptr));
   // ==========================================================================
 
+    Side side = BLACK;
+    Square square = H7;
+    Bitboard blocker_90 = Util::SQUARE[Util::ROT90[A6]];
+
+    PrintBitboard(Util::SQUARE[square]);
+    PrintBitboard(Util::GetPawnMovable(side, square, blocker_90));
+
     return 0;
   }
 

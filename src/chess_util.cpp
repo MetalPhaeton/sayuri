@@ -72,7 +72,7 @@ namespace Sayuri {
   constexpr int Util::MAGIC_SHIFT_D[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK_V[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK_D[NUM_SQUARES];
-  constexpr int Util::BLOCKER_MAP;
+  constexpr unsigned int Util::BLOCKER_MAP;
 
   // ================== //
   // Utilクラスの初期化 //
@@ -84,7 +84,7 @@ namespace Sayuri {
     // num_bit16_table_[]を初期化する。
     InitNumBit16Table();
     // attack_table_***_[][]を初期化する。
-    InitAttackTable();
+    InitMagicTable();
     // line_[][]を初期化する。
     InitLine();
     // between_[][]を初期化する。
@@ -132,20 +132,22 @@ namespace Sayuri {
   // マジック //
   // ======== //
   // 0度方向への攻撃の配列。 [マス][ブロッカーのパターン8ビット]
-  Bitboard Util::attack_table_0_[NUM_SQUARES][BLOCKER_MAP + 1];  // 0度。
+  Bitboard Util::attack_table_0_[NUM_SQUARES][BLOCKER_MAP + 1];
   // 45度方向への攻撃の配列。 [マス][ブロッカーのパターン8ビット]
-  Bitboard Util::attack_table_45_[NUM_SQUARES][BLOCKER_MAP + 1];  // 45度。
+  Bitboard Util::attack_table_45_[NUM_SQUARES][BLOCKER_MAP + 1];
   // 90度方向への攻撃の配列。 [マス][ブロッカーのパターン8ビット]
-  Bitboard Util::attack_table_90_[NUM_SQUARES][BLOCKER_MAP + 1];  // 90度。
+  Bitboard Util::attack_table_90_[NUM_SQUARES][BLOCKER_MAP + 1];
   // 135度方向への攻撃の配列。 [マス][ブロッカーのパターン8ビット]
-  Bitboard Util::attack_table_135_[NUM_SQUARES][BLOCKER_MAP + 1];  // 135度。
+  Bitboard Util::attack_table_135_[NUM_SQUARES][BLOCKER_MAP + 1];
+  // ポーンの動ける位置の配列。
+  Bitboard Util::pawn_movable_table_[NUM_SIDES][NUM_SQUARES][BLOCKER_MAP + 1];
   // attack_table_***_[][]を初期化する。
-  void Util::InitAttackTable() {
+  void Util::InitMagicTable() {
     // 0度のマップを作成。
     for (Square square = 0; square < NUM_SQUARES; square++) {
       Bitboard point = SQUARE[square];
       point >>= MAGIC_SHIFT_V[square];
-      for (int map = 0; map <= BLOCKER_MAP; map++) {
+      for (unsigned int map = 0; map <= BLOCKER_MAP; map++) {
         Bitboard attack = 0;
         // 右側を作る。
         Bitboard temp = point;
@@ -167,11 +169,12 @@ namespace Sayuri {
         attack_table_0_[square][map] = attack;
       }
     }
+
     // 45度のマップを作成。
     for (Square square = 0; square < NUM_SQUARES; square++) {
       Bitboard point = SQUARE[ROT45[square]];
       point >>= MAGIC_SHIFT_D[ROT45[square]];
-      for (int map = 0; map <= BLOCKER_MAP; map++) {
+      for (unsigned int map = 0; map <= BLOCKER_MAP; map++) {
         Bitboard attack = 0;
         // 右側を作る。
         Bitboard temp = point;
@@ -195,11 +198,12 @@ namespace Sayuri {
         attack_table_45_[square][map] = attack;
       }
     }
+
     // 90度のマップを作成。
     for (Square square = 0; square < NUM_SQUARES; square++) {
       Bitboard point = SQUARE[ROT90[square]];
       point >>= MAGIC_SHIFT_V[ROT90[square]];
-      for (int map = 0; map <= BLOCKER_MAP; map++) {
+      for (unsigned int map = 0; map <= BLOCKER_MAP; map++) {
         Bitboard attack = 0;
         // 右側を作る。
         Bitboard temp = point;
@@ -223,11 +227,12 @@ namespace Sayuri {
         attack_table_90_[square][map] = attack;
       }
     }
+
     // 135度のマップを作成。
     for (Square square = 0; square < NUM_SQUARES; square++) {
       Bitboard point = SQUARE[ROT135[square]];
       point >>= MAGIC_SHIFT_D[ROT135[square]];
-      for (int map = 0; map <= BLOCKER_MAP; map++) {
+      for (unsigned int map = 0; map <= BLOCKER_MAP; map++) {
         Bitboard attack = 0;
         // 右側を作る。
         Bitboard temp = point;
@@ -249,6 +254,81 @@ namespace Sayuri {
         attack = Reverse135(attack);
         // 利き筋をマップに入れる。
         attack_table_135_[square][map] = attack;
+      }
+    }
+
+    // ポーンの動ける位置の配列を作成。
+    for (Side side = 0; side < NUM_SIDES; side++) {
+      for (Square square = 0; square < NUM_SQUARES; square++) {
+        for (unsigned int map = 0; map <= BLOCKER_MAP; map++) {
+          if (side == WHITE) {
+            if (GetRank(square) == RANK_2) {
+              // 初期配置のポーンの位置。
+              Bitboard front_bit =
+              SQUARE[ROT90[square + 8]] >> MAGIC_SHIFT_V[ROT90[square + 8]];
+              if (!(front_bit & map)) {
+                // 1歩目。
+                pawn_movable_table_[side][square][map] = SQUARE[square + 8];
+
+                // 2歩目。
+                front_bit = SQUARE[ROT90[square + 16]] >>
+                MAGIC_SHIFT_V[ROT90[square + 16]];
+                if (!(front_bit & map)) {
+                  pawn_movable_table_[side][square][map] |=
+                  SQUARE[square + 16];
+                }
+              } else {
+                pawn_movable_table_[side][square][map] = 0;
+              }
+            } else if (GetRank(square) == RANK_8) {
+              // 最上ランク。
+              pawn_movable_table_[side][square][map] = 0;
+            } else {
+              // その他のランク。
+              Bitboard front_bit =
+              SQUARE[ROT90[square + 8]] >> MAGIC_SHIFT_V[ROT90[square + 8]];
+              if (!(front_bit & map)) {
+                pawn_movable_table_[side][square][map] = SQUARE[square + 8];
+              } else {
+                pawn_movable_table_[side][square][map] = 0;
+              }
+            }
+          } else if (side == BLACK) {
+            if (GetRank(square) == RANK_7) {
+              // 初期配置のポーンの位置。
+              Bitboard front_bit =
+              SQUARE[ROT90[square - 8]] >> MAGIC_SHIFT_V[ROT90[square - 8]];
+              if (!(front_bit & map)) {
+                // 1歩目。
+                pawn_movable_table_[side][square][map] = SQUARE[square - 8];
+
+                // 2歩目。
+                front_bit = SQUARE[ROT90[square - 16]] >>
+                MAGIC_SHIFT_V[ROT90[square - 16]];
+                if (!(front_bit & map)) {
+                  pawn_movable_table_[side][square][map] |=
+                  SQUARE[square - 16];
+                }
+              } else {
+                pawn_movable_table_[side][square][map] = 0;
+              }
+            } else if (GetRank(square) == RANK_1) {
+              // 最上ランク。
+              pawn_movable_table_[side][square][map] = 0;
+            } else {
+              // その他のランク。
+              Bitboard front_bit =
+              SQUARE[ROT90[square - 8]] >> MAGIC_SHIFT_V[ROT90[square - 8]];
+              if (!(front_bit & map)) {
+                pawn_movable_table_[side][square][map] = SQUARE[square - 8];
+              } else {
+                pawn_movable_table_[side][square][map] = 0;
+              }
+            }
+          } else {
+            pawn_movable_table_[side][square][map] = 0;
+          }
+        }
       }
     }
   }
