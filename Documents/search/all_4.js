@@ -58,7 +58,7 @@ var searchData=
   ['engine_5f',['engine_',['../classSayuri_1_1Util.html#afd38ed32b462046e8e13ef254a6cf467',1,'Sayuri::Util']]],
   ['engine_5fptr_5f',['engine_ptr_',['../classSayuri_1_1Evaluator.html#ab000a11104722ded24e815b3b5803b75',1,'Sayuri::Evaluator::engine_ptr_()'],['../classSayuri_1_1MoveMaker.html#a7bcb997438a3528352ff8464be024ac2',1,'Sayuri::MoveMaker::engine_ptr_()'],['../classSayuri_1_1UCIShell.html#a1c00556421cf8750f72dd78007be1da9',1,'Sayuri::UCIShell::engine_ptr_()']]],
   ['entry_5ftable_5f',['entry_table_',['../classSayuri_1_1TranspositionTable.html#a493753de1c7ab1fb6b0e1109df9c52db',1,'Sayuri::TranspositionTable']]],
-  ['equalmove',['EqualMove',['../namespaceSayuri.html#ac2075b4a679c5046b4581194d3c41d77',1,'Sayuri']]],
+  ['equal_5fmove',['EQUAL_MOVE',['../chess__def_8h.html#a9564147367c55423feae14bab9515109',1,'chess_def.h']]],
   ['error_2eh',['error.h',['../error_8h.html',1,'']]],
   ['eval_5fparams',['eval_params',['../classSayuri_1_1ChessEngine.html#a660f9833252f0871b037005a50402bb1',1,'Sayuri::ChessEngine']]],
   ['eval_5fparams_5fptr_5f',['eval_params_ptr_',['../structSayuri_1_1ChessEngine_1_1SharedStruct.html#a65f2da5549d4d13796eb6e27632fccf3',1,'Sayuri::ChessEngine::SharedStruct']]],

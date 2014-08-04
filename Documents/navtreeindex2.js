@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"classSayuri_1_1Job.html#a02f609a81a57ad7473d2f95f0d25475c":[10,0,0,8,26],
 "classSayuri_1_1Job.html#a03fb350bc5486d61dd6fc80fe7567239":[10,0,0,8,16],
 "classSayuri_1_1Job.html#a0cb40f763609795cf81b8ac5c65b1bfe":[10,0,0,8,11],
 "classSayuri_1_1Job.html#a0ee860cdf9dff8e13d6934c799ff4d7b":[10,0,0,8,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX2 =
 "classSayuri_1_1SearchParams.html#aeab151e3d3d90219663c4af0d8fad6de":[10,0,0,10,73],
 "classSayuri_1_1SearchParams.html#aec8b8eeeb93e24fcf0175b7be1255aa4":[10,0,0,10,26],
 "classSayuri_1_1SearchParams.html#aed2bba4620564b20314a79c77ac51c2b":[10,0,0,10,61],
-"classSayuri_1_1SearchParams.html#aeda313a1f70a60685a390ef9462227b2":[10,0,0,10,6],
-"classSayuri_1_1SearchParams.html#aee1dc60614e030e218154f05d59cb3d6":[10,0,0,10,102]
+"classSayuri_1_1SearchParams.html#aeda313a1f70a60685a390ef9462227b2":[10,0,0,10,6]
 };

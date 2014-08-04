@@ -23,6 +23,7 @@ var classSayuri_1_1ChessEngine =
     [ "GetNextHash", "classSayuri_1_1ChessEngine.html#a7e8b4b7a7a3520176b025bc6776ad9b3", null ],
     [ "GetNextMyMaterial", "classSayuri_1_1ChessEngine.html#a2f5a30e39ceb33d59e7258e55b1b87a8", null ],
     [ "GetNextSEEMove", "classSayuri_1_1ChessEngine.html#a8ed26f51d27391d76bccbfb0d8dfdb61", null ],
+    [ "GetPawnStep", "classSayuri_1_1ChessEngine.html#ab307ed224e36a336b912df91e5356504", null ],
     [ "GetQueenAttack", "classSayuri_1_1ChessEngine.html#a523747ee3b5ff5e302886496216e7083", null ],
     [ "GetRookAttack", "classSayuri_1_1ChessEngine.html#abacab5219a53c6595be0881aa93c72fa", null ],
     [ "has_castled", "classSayuri_1_1ChessEngine.html#a80757e4971685f2a3dc6a463fed85908", null ],

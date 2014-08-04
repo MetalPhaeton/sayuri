@@ -24,5 +24,5 @@ var searchData=
   ['blocker_5f135_5f',['blocker_135_',['../classSayuri_1_1ChessEngine.html#a0085bc9a232a9441cef2fa0499d8be8a',1,'Sayuri::ChessEngine::blocker_135_()'],['../classSayuri_1_1PositionRecord.html#aa29b681c414b36a0afdc7b0cb42734f3',1,'Sayuri::PositionRecord::blocker_135_()']]],
   ['blocker_5f45_5f',['blocker_45_',['../classSayuri_1_1ChessEngine.html#a1db714e5fa82da4a8d03d46ee0b21f04',1,'Sayuri::ChessEngine::blocker_45_()'],['../classSayuri_1_1PositionRecord.html#aa8c008be1a3e3f9a88e9de216ee8b389',1,'Sayuri::PositionRecord::blocker_45_()']]],
   ['blocker_5f90_5f',['blocker_90_',['../classSayuri_1_1ChessEngine.html#a6e0cc67b5a0f67031d3f9e7af4cb741e',1,'Sayuri::ChessEngine::blocker_90_()'],['../classSayuri_1_1PositionRecord.html#a1ea9e6a8722500436224424e92b65c23',1,'Sayuri::PositionRecord::blocker_90_()']]],
-  ['blocker_5fmap',['BLOCKER_MAP',['../classSayuri_1_1Util.html#a619cd9f7068a072fff9acf6867395d07',1,'Sayuri::Util']]]
+  ['blocker_5fmap',['BLOCKER_MAP',['../classSayuri_1_1Util.html#a8ce102375afc70eba011c8173378fb1d',1,'Sayuri::Util']]]
 ];

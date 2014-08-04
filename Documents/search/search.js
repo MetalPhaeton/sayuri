@@ -17,7 +17,8 @@ var indexSectionsWithContent =
   7: "gns",
   8: "abcenp",
   9: "d",
-  10: "chrsæè"
+  10: "egs",
+  11: "chrsæè"
 };
 
 var indexSectionNames =
@@ -32,7 +33,8 @@ var indexSectionNames =
   7: "enums",
   8: "enumvalues",
   9: "related",
-  10: "pages"
+  10: "defines",
+  11: "pages"
 };
 
 function convertToId(search)

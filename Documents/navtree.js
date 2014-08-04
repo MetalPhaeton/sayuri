@@ -37,7 +37,8 @@ var NAVTREE =
       [ "File List", "files.html", "files" ],
       [ "File Members", "globals.html", [
         [ "All", "globals.html", null ],
-        [ "Functions", "globals_func.html", null ]
+        [ "Functions", "globals_func.html", null ],
+        [ "Macros", "globals_defs.html", null ]
       ] ]
     ] ]
   ] ]
@@ -47,9 +48,9 @@ var NAVTREEINDEX =
 [
 "annotated.html",
 "classSayuri_1_1ChessEngine.html#a7301a2506b3ff852c3f1d56ffdfb06fa",
-"classSayuri_1_1Job.html#a03fb350bc5486d61dd6fc80fe7567239",
-"classSayuri_1_1SearchParams.html#aefb1fc529fbb3e9021832702db7bc7f0",
-"fen_8cpp_source.html"
+"classSayuri_1_1Job.html#a02f609a81a57ad7473d2f95f0d25475c",
+"classSayuri_1_1SearchParams.html#aee1dc60614e030e218154f05d59cb3d6",
+"evaluator_8h.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

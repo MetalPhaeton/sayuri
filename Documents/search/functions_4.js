@@ -20,7 +20,6 @@ var searchData=
   ['enableinfinitethinking',['EnableInfiniteThinking',['../classSayuri_1_1ChessEngine.html#a8b31b097bc09387ec19a2603146beedb',1,'Sayuri::ChessEngine']]],
   ['ending_5fposition_5fvalue_5ftable',['ending_position_value_table',['../classSayuri_1_1EvalParams.html#a5a5a0641c363469a5e44d3cc52226dc8',1,'Sayuri::EvalParams::ending_position_value_table() const)[NUM_PIECE_TYPES]'],['../classSayuri_1_1EvalParams.html#a6bddf5d981ecdff526bd286e6401b416',1,'Sayuri::EvalParams::ending_position_value_table(const double(&amp;table)[NUM_PIECE_TYPES][NUM_SQUARES])']]],
   ['ending_5fweight',['ending_weight',['../classSayuri_1_1Weight.html#a53dfd09350584d15073ea566c8425596',1,'Sayuri::Weight::ending_weight() const '],['../classSayuri_1_1Weight.html#ab035a3e99b46b0e599e975166dac5bb2',1,'Sayuri::Weight::ending_weight(double ending_weight)']]],
-  ['equalmove',['EqualMove',['../namespaceSayuri.html#ac2075b4a679c5046b4581194d3c41d77',1,'Sayuri']]],
   ['eval_5fparams',['eval_params',['../classSayuri_1_1ChessEngine.html#a660f9833252f0871b037005a50402bb1',1,'Sayuri::ChessEngine']]],
   ['evalcastlingrights',['EvalCastlingRights',['../classSayuri_1_1FEN.html#aa13da83b1829f8eb9ba04a1fd48a1eec',1,'Sayuri::FEN']]],
   ['evalenpassant',['EvalEnPassant',['../classSayuri_1_1FEN.html#acc054b394550148069622e2ed0de48ce',1,'Sayuri::FEN']]],

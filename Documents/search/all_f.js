@@ -7,6 +7,7 @@ var searchData=
   ['pawn',['PAWN',['../namespaceSayuri.html#a45dbc6ce3a8aad524995ca8a2ace1474',1,'Sayuri']]],
   ['pawn_5f2step_5fmove_5f',['pawn_2step_move_',['../classSayuri_1_1Util.html#ad273c2df399084315cb3416eb3b35bbb',1,'Sayuri::Util']]],
   ['pawn_5fattack_5f',['pawn_attack_',['../classSayuri_1_1Util.html#a82b2f42efe66e9630289987625d9aa83',1,'Sayuri::Util']]],
+  ['pawn_5fmovable_5ftable_5f',['pawn_movable_table_',['../classSayuri_1_1Util.html#a194f1bfc4b5e0b402ce59eb4ca951baf',1,'Sayuri::Util']]],
   ['pawn_5fmove_5f',['pawn_move_',['../classSayuri_1_1Util.html#ac0103d3b43cb4e199d72074829dc3d4c',1,'Sayuri::Util']]],
   ['pawn_5fshield_5fmask_5f',['pawn_shield_mask_',['../classSayuri_1_1Evaluator.html#ae9cc5fbb5018a534c5aa1743cafba4eb',1,'Sayuri::Evaluator']]],
   ['pawn_5fshield_5fvalue_5f',['pawn_shield_value_',['../classSayuri_1_1Evaluator.html#a3152796c93f13318eeb3ec88dbac7651',1,'Sayuri::Evaluator']]],
