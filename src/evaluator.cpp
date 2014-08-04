@@ -445,19 +445,8 @@ namespace Sayuri {
     switch (Type) {
       case PAWN:
         // 通常の動き。
-        pawn_moves = Util::GetPawnMove(piece_square, piece_side)
-        & ~(engine_ptr_->blocker_0());
-        // 2歩の動き。
-        if (pawn_moves) {
-          if (((piece_side == WHITE)
-          && (Util::GetRank(piece_square) == RANK_2))
-          || ((piece_side == BLACK)
-          && (Util::GetRank(piece_square) == RANK_7))) {
-            // ポーンの2歩の動き。
-            pawn_moves |= Util::GetPawn2StepMove(piece_square, piece_side)
-            & ~(engine_ptr_->blocker_0());
-          }
-        }
+        pawn_moves = engine_ptr_->GetPawnStep(piece_side, piece_square);
+
         // 攻撃。
         attacks = Util::GetPawnAttack(piece_square, piece_side);
 

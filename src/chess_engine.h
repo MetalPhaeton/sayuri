@@ -200,6 +200,15 @@ namespace Sayuri {
       Bitboard GetQueenAttack(Square square) const {
         return GetBishopAttack(square) | GetRookAttack(square);
       }
+      /**
+       * ボードの状態からポーンの動ける位置を作る。
+       * @param side ポーンのサイド。
+       * @param square 基点のマス。
+       * @return ポーンの動ける位置。
+       */
+      Bitboard GetPawnStep(Side side, Square square) const {
+        return Util::GetPawnMovable(side, square, blocker_90_);
+      }
 
       /**
        * キャスリング出来るかどうかを判定する。

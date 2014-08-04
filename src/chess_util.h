@@ -428,7 +428,7 @@ namespace Sayuri {
       /**
        * ポーンの動ける位置を得る。
        * @param side ポーンのサイド。
-       * @param square ポーンの位置。
+       * @param square 基点。
        * @param blocker_90 全駒の配置のビットボード。 角度90度。
        * @return ポーン動ける位置。
        */
@@ -462,20 +462,20 @@ namespace Sayuri {
       }
       /**
        * ポーンの通常の動きのビットボードを得る。
-       * @param square 基点。
        * @param side ポーンのサイド。
+       * @param square 基点。
        * @return ポーンの通常の動きのビットボード。
        */
-      static Bitboard GetPawnMove(Square square, Side side) {
+      static Bitboard GetPawnMove(Side side, Square square) {
         return pawn_move_[side][square];
       }
       /**
        * ポーンの2歩の動きのビットボードを得る。
-       * @param square 基点。
        * @param side ポーンのサイド。
+       * @param square 基点。
        * @return ポーンの2歩の動きのビットボード。
        */
-      static Bitboard GetPawn2StepMove(Square square, Side side) {
+      static Bitboard GetPawn2StepMove(Side side, Square square) {
         return pawn_2step_move_[side][square];
       }
       /**

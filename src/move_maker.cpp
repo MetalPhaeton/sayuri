@@ -236,17 +236,7 @@ namespace Sayuri {
       Bitboard move_bitboard = 0;
       if (Type == GenMoveType::NON_CAPTURE) {
         // キャプチャーじゃない手。
-        // ポーンの一歩の動き。
-        move_bitboard = Util::GetPawnMove(from, side)
-        & ~(engine_ptr_->blocker_0());
-        if (move_bitboard) {
-          if (((side == WHITE) && (Util::GetRank(from) == RANK_2))
-          || ((side == BLACK) && (Util::GetRank(from) == RANK_7))) {
-            // ポーンの2歩の動き。
-            move_bitboard |= Util::GetPawn2StepMove(from, side)
-            & ~(engine_ptr_->blocker_0());
-          }
-        }
+        move_bitboard = engine_ptr_->GetPawnStep(side, from);
       } else {
         // キャプチャーの手。
         move_bitboard = Util::GetPawnAttack(from, side)
