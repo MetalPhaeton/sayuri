@@ -752,8 +752,7 @@ namespace Sayuri {
     // スレッドの準備。
     shared_st_ptr_->helper_queue_ptr_.reset(new HelperQueue());
     for (auto& thread : thread_vec_) {
-      thread =
-      std::thread(&ChessEngine::ThreadYBWC, this, std::ref(shell));
+      thread = std::thread([this, &shell]() {this->ThreadYBWC(shell);});
     }
 
     // --- Iterative Deepening --- //

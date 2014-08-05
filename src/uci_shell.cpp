@@ -607,8 +607,7 @@ namespace Sayuri {
     // 別スレッドで思考開始。
     engine_ptr_->SetStopper(max_depth, max_nodes, thinking_time,
     infinite_thinking);
-    thinking_thread_ =
-    std::thread(&UCIShell::ThreadThinking, this);
+    thinking_thread_ = std::thread([this]() {this->ThreadThinking();});
   }
 
   // 「stop」コマンドのコールバック関数。
