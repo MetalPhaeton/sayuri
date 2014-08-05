@@ -66,65 +66,41 @@ namespace Sayuri {
   num_threads_(UCI_DEFAULT_THREADS),
   analyse_mode_(UCI_DEFAULT_ANALYSE_MODE),
   output_listeners_(0) {
-    using namespace std::placeholders;
-
     // コマンドを登録する。
     // uciコマンド。
-    std::vector<std::string> temp_1 {
-      "uci"
-    };
-    uci_command_.Add("uci", temp_1,
-    std::bind(&UCIShell::CommandUCI, this, _1));
+    uci_command_.Add("uci", {"uci"},
+    [this](UCICommand::CommandArgs& args) {this->CommandUCI(args);});
 
     // isreadyコマンド。
-    std::vector<std::string> temp_2 {
-      "isready"
-    };
-    uci_command_.Add("isready", temp_2,
-    std::bind(&UCIShell::CommandIsReady, this, _1));
+    uci_command_.Add("isready", {"isready"},
+    [this](UCICommand::CommandArgs& args) {this->CommandIsReady(args);});
 
     // setoptionコマンド。
-    std::vector<std::string> temp_3 {
-      "setoption", "name", "value"
-    };
-    uci_command_.Add("setoption", temp_3,
-    std::bind(&UCIShell::CommandSetOption, this, _1));
+    uci_command_.Add("setoption", {"setoption", "name", "value"},
+    [this](UCICommand::CommandArgs& args) {this->CommandSetOption(args);});
 
     // ucinewgameコマンド。
-    std::vector<std::string> temp_4 {
-      "ucinewgame"
-    };
-    uci_command_.Add("ucinewgame", temp_4,
-    std::bind(&UCIShell::CommandUCINewGame, this, _1));
+    uci_command_.Add("ucinewgame", {"ucinewgame"},
+    [this](UCICommand::CommandArgs& args) {this->CommandUCINewGame(args);});
 
     // positionコマンド。
-    std::vector<std::string> temp_5 {
-      "position", "startpos", "fen", "moves"
-    };
-    uci_command_.Add("position", temp_5,
-    std::bind(&UCIShell::CommandPosition, this, _1));
+    uci_command_.Add("position", {"position", "startpos", "fen", "moves"},
+    [this](UCICommand::CommandArgs& args) {this->CommandPosition(args);});
 
     // goコマンド。
-    std::vector<std::string> temp_6 {
+    uci_command_.Add("go", {
       "go", "searchmoves", "ponder", "wtime", "btime", "winc", "binc",
       "movestogo", "depth", "nodes", "mate", "movetime", "infinite"
-    };
-    uci_command_.Add("go", temp_6,
-    std::bind(&UCIShell::CommandGo, this, _1));
+    },
+    [this](UCICommand::CommandArgs& args) {this->CommandGo(args);});
 
     // stopコマンド。
-    std::vector<std::string> temp_7 {
-      "stop"
-    };
-    uci_command_.Add("stop", temp_7,
-    std::bind(&UCIShell::CommandStop, this, _1));
+    uci_command_.Add("stop", {"stop"},
+    [this](UCICommand::CommandArgs& args) {this->CommandStop(args);});
 
     // ponderhitコマンド。
-    std::vector<std::string> temp_8 {
-      "ponderhit"
-    };
-    uci_command_.Add("ponderhit", temp_8,
-    std::bind(&UCIShell::CommandPonderHit, this, _1));
+    uci_command_.Add("ponderhit", {"ponderhit"},
+    [this](UCICommand::CommandArgs& args) {this->CommandPonderHit(args);});
   }
 
   // コピーコンストラクタ。
