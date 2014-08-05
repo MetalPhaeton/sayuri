@@ -47,7 +47,7 @@ namespace Sayuri {
      */
     int GetNumBits(unsigned int bits) {
       int num = 0;
-      for (; bits; bits &= bits - 1) {
+      for (; bits; NEXT(bits)) {
         num++;
       }
       return num;
@@ -337,7 +337,7 @@ namespace Sayuri {
   Bitboard Util::Reverse45(Bitboard bitboard45) {
     // 通常座標に変換する。
     Bitboard bitboard = 0;
-    for (;bitboard45; bitboard45 &= bitboard45 - 1) {
+    for (;bitboard45; NEXT(bitboard45)) {
       // 45度座標の位置を得る。
       Square square45 = CountZero(bitboard45);
       // 変換して追加。
@@ -351,7 +351,7 @@ namespace Sayuri {
   Bitboard Util::Reverse90(Bitboard bitboard90) {
     // 通常座標に変換する。
     Bitboard bitboard = 0;
-    for (;bitboard90; bitboard90 &= bitboard90 - 1) {
+    for (;bitboard90; NEXT(bitboard90)) {
       // 90度座標の位置を得る。
       Square square90 = CountZero(bitboard90);
       // 変換して追加。
@@ -365,7 +365,7 @@ namespace Sayuri {
   Bitboard Util::Reverse135(Bitboard bitboard135) {
     // 通常座標に変換する。
     Bitboard bitboard = 0;
-    for (;bitboard135; bitboard135 &= bitboard135 - 1) {
+    for (;bitboard135; NEXT(bitboard135)) {
       // 135度座標の位置を得る。
       Square square135 = CountZero(bitboard135);
       // 変換して追加。

@@ -174,7 +174,7 @@ namespace Sayuri {
     for (Piece piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
       Bitboard pieces = engine_ptr_->position()[side][piece_type];
 
-      for (; pieces; pieces &= pieces - 1) {
+      for (; pieces; NEXT(pieces)) {
         Square from = Util::GetSquare(pieces);
 
         // 各ピースの動き。
@@ -206,7 +206,7 @@ namespace Sayuri {
           move_bitboard &= engine_ptr_->side_pieces()[enemy_side];
         }
 
-        for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
+        for (; move_bitboard; NEXT(move_bitboard)) {
           // 手を作る。
           Move move = 0;
           SET_FROM(move, from);
@@ -230,7 +230,7 @@ namespace Sayuri {
 
     // ポーンの動きを作る。
     Bitboard pieces = engine_ptr_->position()[side][PAWN];
-    for (; pieces; pieces &= pieces - 1) {
+    for (; pieces; NEXT(pieces)) {
       Square from = Util::GetSquare(pieces);
 
       Bitboard move_bitboard = 0;
@@ -248,7 +248,7 @@ namespace Sayuri {
         }
       } 
 
-      for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
+      for (; move_bitboard; NEXT(move_bitboard)) {
         // 手を作る。
         Move move = 0;
         SET_FROM(move, from);
@@ -311,7 +311,7 @@ namespace Sayuri {
       // キャプチャーの手。
       move_bitboard &= engine_ptr_->side_pieces()[enemy_side];
     }
-    for (; move_bitboard; move_bitboard &= move_bitboard - 1) {
+    for (; move_bitboard; NEXT(move_bitboard)) {
       Move move = 0;
       SET_FROM(move, from);
       Square to = Util::GetSquare(move_bitboard);

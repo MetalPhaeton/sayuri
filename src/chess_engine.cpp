@@ -206,7 +206,7 @@ namespace Sayuri {
       side_pieces_[side] = 0;
       for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
         position_[side][piece_type] = fen.position()[side][piece_type];
-        for (Bitboard bb = position_[side][piece_type]; bb; bb &= bb - 1) {
+        for (Bitboard bb = position_[side][piece_type]; bb; NEXT(bb)) {
           Square square = Util::GetSquare(bb);
           side_board_[square] = side;
           piece_board_[square] = piece_type;
@@ -310,7 +310,7 @@ namespace Sayuri {
     blocker_45_ = 0;
     blocker_90_ = 0;
     blocker_135_ = 0;
-    for (Bitboard copy = blocker_0_; copy; copy &= copy - 1) {
+    for (Bitboard copy = blocker_0_; copy; NEXT(copy)) {
       Square square = Util::GetSquare(copy);
 
       blocker_45_ |= Util::SQUARE[Util::ROT45[square]];

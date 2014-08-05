@@ -157,7 +157,7 @@ namespace Sayuri {
 
     // 各駒毎に価値を計算する。
     Bitboard all_pieces = engine_ptr_->blocker_0();
-    for (Bitboard pieces = all_pieces; pieces; pieces &= pieces - 1) {
+    for (Bitboard pieces = all_pieces; pieces; NEXT(pieces)) {
       Square piece_square = Util::GetSquare(pieces);
       Side piece_side = engine_ptr_->side_board()[piece_square];
       switch (engine_ptr_->piece_board()[piece_square]) {
@@ -542,7 +542,7 @@ namespace Sayuri {
     value = 0.0;
     const double (& table_1)[NUM_PIECE_TYPES][NUM_PIECE_TYPES] =
     params.attack_value_table();
-    for (; attacked; attacked &= attacked - 1) {
+    for (; attacked; NEXT(attacked)) {
       value +=
       table_1[Type][engine_ptr_->piece_board()[Util::GetSquare(attacked)]];
     }
@@ -556,7 +556,7 @@ namespace Sayuri {
     value = 0.0;
     const double (& table_2)[NUM_PIECE_TYPES][NUM_PIECE_TYPES] =
     params.defense_value_table();
-    for (; defensed; defensed &= defensed - 1) {
+    for (; defensed; NEXT(defensed)) {
       value +=
       table_2[Type][engine_ptr_->piece_board()[Util::GetSquare(defensed)]];
     }
@@ -587,7 +587,7 @@ namespace Sayuri {
       }
 
       // ピンを判定。
-      for (Bitboard bb = pin_back; bb; bb &= bb - 1) {
+      for (Bitboard bb = pin_back; bb; NEXT(bb)) {
         // 裏駒のマス。
         Square pin_back_sq = Util::GetSquare(bb);
 
