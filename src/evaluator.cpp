@@ -134,11 +134,6 @@ namespace Sayuri {
     Side side = engine_ptr_->to_move();
     Side enemy_side = side ^ 0x3;
 
-    // 十分な駒がない場合は引き分け。
-    if (!HasEnoughPieces(side) && !HasEnoughPieces(enemy_side)) {
-      return SCORE_DRAW;
-    }
-
     // 全体計算。
     // ビショップペア。
     if (Util::CountBits(engine_ptr_->position()[side][BISHOP]) >= 2) {
@@ -388,37 +383,6 @@ namespace Sayuri {
     (num_pieces) * abandoned_castling_value_;
 
     return result;
-  }
-
-  // ====================== //
-  // 局面評価に使用する関数 //
-  // ====================== //
-  // メイトに必要な駒があるかどうか調べる。
-  bool Evaluator::HasEnoughPieces(Side side) const {
-    // ポーンがあれば大丈夫。
-    if (engine_ptr_->position()[side][PAWN]) return true;
-
-    // ルークがあれば大丈夫。
-    if (engine_ptr_->position()[side][ROOK]) return true;
-
-    // クイーンがあれば大丈夫。
-    if (engine_ptr_->position()[side][QUEEN]) return true;
-
-    // ビショップが2つあれば大丈夫。
-    if (Util::CountBits(engine_ptr_->position()[side][BISHOP]) >= 2)
-      return true;
-
-    // ナイトが2つあれば大丈夫。
-    if (Util::CountBits(engine_ptr_->position()[side][KNIGHT]) >= 2)
-      return true;
-
-    // ナイトとビショップの合計が2つあれば大丈夫。
-    if (Util::CountBits(engine_ptr_->position()[side][KNIGHT]
-    | engine_ptr_->position()[side][BISHOP]) >= 2)
-      return true;
-
-    // それ以外はダメ。
-    return false;
   }
 
   // ================== //

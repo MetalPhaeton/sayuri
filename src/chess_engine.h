@@ -246,6 +246,31 @@ namespace Sayuri {
       int GetNextMyMaterial(int current_material, Move move) const;
 
       /**
+       * 勝敗を決めるのに十分な駒があるかどうかをチェックする。
+       * @return 十分な駒があればtrue。
+       */
+      bool HasSufficientMaterial() const {
+        // キング以外の駒のビットボード。
+        Bitboard bb =
+        blocker_0_ & ~(position_[WHITE][KING] | position_[BLACK][KING]);
+
+        if (!bb) {
+          // キングのみだった場合。
+          return false;
+        } else if (!(bb & (bb - 1))) {
+          // キング以外の、残りの駒が1つのとき。
+          // 残った駒がビショップやナイトだった時は十分な駒がない。
+          Piece piece_type = piece_board_[Util::GetSquare(bb)];
+          if ((piece_type == KNIGHT) || (piece_type == BISHOP)) {
+            return false;
+          }
+        }
+
+        // 十分な駒がある。
+        return true;
+      }
+
+      /**
        * SEEで候補手を評価する。
        * @param move 評価したい手。
        * @return 候補手の評価。

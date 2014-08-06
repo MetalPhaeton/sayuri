@@ -65,6 +65,11 @@ namespace Sayuri {
       searched_level_ = level;
     }
 
+    // 勝負に十分な駒がなければ0点。
+    if (!HasSufficientMaterial()) {
+      return SCORE_DRAW;
+    }
+
     // サイド。
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
@@ -162,6 +167,11 @@ namespace Sayuri {
 
     // PVLineをリセット。
     pv_line_table_[level].ResetLine();
+
+    // 勝負に十分な駒がなければ0点。
+    if (!HasSufficientMaterial()) {
+      return SCORE_DRAW;
+    }
 
     // --- 繰り返しチェック (繰り返しなら0点。) --- //
     position_memo_[level] = pos_hash;
@@ -722,6 +732,8 @@ namespace Sayuri {
   // 探索のルート。
   PVLine ChessEngine::SearchRoot(TranspositionTable& table,
   const std::vector<Move>& moves_to_search, UCIShell& shell) {
+    constexpr int level = 0;
+
     // --- 初期化 --- //
     searched_level_ = 0;
     shared_st_ptr_->num_searched_nodes_ = 0;
@@ -749,6 +761,11 @@ namespace Sayuri {
     shared_st_ptr_->i_depth_ = 1;
     is_null_searching_ = false;
 
+    // PVLineに最初の候補手を入れておく。
+    MoveMaker temp_maker(*this);
+    temp_maker.GenMoves<GenMoveType::ALL>(0, 0, 0, 0);
+    pv_line_table_[level].SetMove(temp_maker.PickMove());
+
     // スレッドの準備。
     shared_st_ptr_->helper_queue_ptr_.reset(new HelperQueue());
     for (auto& thread : thread_vec_) {
@@ -756,7 +773,6 @@ namespace Sayuri {
     }
 
     // --- Iterative Deepening --- //
-    int level = 0;
     Hash pos_hash = position_memo_[level] = GetCurrentHash();
     int material = GetMaterial(to_move_);
     int alpha = -MAX_VALUE;
@@ -777,6 +793,20 @@ namespace Sayuri {
 
       // ノードを加算。
       shared_st_ptr_->num_searched_nodes_++;
+
+      // 勝負に十分な駒がなければ探索しない。
+      if (!HasSufficientMaterial()) {
+        pv_line_table_[level].score(SCORE_DRAW);
+
+        Chrono::milliseconds time =
+        Chrono::duration_cast<Chrono::milliseconds>
+        (SysClock::now() - shared_st_ptr_->start_time_);
+
+        shell.PrintPVInfo(depth, 0, pv_line_table_[level].score(), time,
+        shared_st_ptr_->num_searched_nodes_, pv_line_table_[level]);
+
+        continue;
+      }
 
       // メイトをすでに見つけていたら探索しない。
       if (found_mate) {

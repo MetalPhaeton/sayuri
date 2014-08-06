@@ -168,16 +168,6 @@ namespace Sayuri {
       template<Piece Type>
       void CalValue(Square piece_square, Side piece_side);
 
-      // ====================== //
-      // 局面評価に使用する関数 //
-      // ====================== //
-      /**
-       * メイトに必要な駒があるかどうか調べる。
-       * @param side 調べるサイド。
-       * @return 必要な駒があればtrue。
-       */
-      bool HasEnoughPieces(Side side) const;
-
       // ========== //
       // 局面分析用 //
       // ========== //
