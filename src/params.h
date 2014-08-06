@@ -99,6 +99,15 @@ namespace Sayuri {
         return enable_repetition_check_after_2nd_;
       }
 
+      // --- 50手ルールのチェック --- //
+      /**
+       * アクセサ - 50手ルールを考慮して、評価しを補正する。 - 有効無効。
+       * @return 有効無効。
+       */
+      bool enable_ply_100_adjustment() const {
+        return enable_ply_100_adjustment_;
+      }
+
       // --- Check Extension --- //
       /**
        * アクセサ - Check Extension - 有効無効。
@@ -355,6 +364,15 @@ namespace Sayuri {
        */
       void enable_repetition_check_after_2nd(bool enable) {
         enable_repetition_check_after_2nd_ = enable;
+      }
+
+      // --- 50手ルールのチェック --- //
+      /**
+       * ミューテータ - 50手ルールを考慮して、評価しを補正する。 - 有効無効。
+       * @param enable 有効無効。
+       */
+      void enable_ply_100_adjustment(bool enable) {
+        enable_ply_100_adjustment_ = enable;
       }
 
       // --- Check Extension --- //
@@ -628,6 +646,10 @@ namespace Sayuri {
       bool enable_repetition_check_;
       /** 繰り返しチェック - 2手目以降のチェックの有効無効。 */
       bool enable_repetition_check_after_2nd_;
+
+      // --- 50手ルールチェック --- //
+      /** 50手ルールを考慮して、評価値を補正する。 */
+      bool enable_ply_100_adjustment_;
 
       // --- Check Extension --- //
       /** Check Extension - 有効無効。 */

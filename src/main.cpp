@@ -60,6 +60,9 @@ void Run(Sayuri::UCIShell& shell) {
   }
 }
 
+// デバッグスイッチ。
+// #define SAYURI_DEBUG_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
+
 /**
  * メイン関数。
  * @param argc コマンドの引数の数。
@@ -67,6 +70,11 @@ void Run(Sayuri::UCIShell& shell) {
  * @return 終了コード。
  */
 int main(int argc, char* argv[]) {
+#if defined(SAYURI_DEBUG_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063)
+  // デバッグ用。
+  return Sayuri::DebugMain(argc, argv);
+
+#else
   if ((argc >= 2)
   && (std::strcmp(argv[1], "--help") == 0)) {
     // ヘルプの表示。
@@ -111,5 +119,5 @@ int main(int argc, char* argv[]) {
   }
 
   return EXIT_SUCCESS;
-  // return Sayuri::DebugMain(argc, argv);
+#endif
 }

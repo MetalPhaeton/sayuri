@@ -38,6 +38,7 @@
 #include <memory>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include "common.h"
 #include "transposition_table.h"
 #include "move_maker.h"
@@ -773,6 +774,7 @@ namespace Sayuri {
     }
 
     // --- Iterative Deepening --- //
+    Move prev_best = 0;
     Hash pos_hash = position_memo_[level] = GetCurrentHash();
     int material = GetMaterial(to_move_);
     int alpha = -MAX_VALUE;
@@ -837,17 +839,6 @@ namespace Sayuri {
       // 標準出力に深さ情報を送る。
       shell.PrintDepthInfo(depth);
 
-      // 前回の繰り返しの最善手を得る。
-      Move prev_best = 0;
-      if (shared_st_ptr_->search_params_ptr_->enable_ttable()) {
-        table.Lock();
-        const TTEntry& prev_entry = table.GetEntry(pos_hash, depth - 1);
-        if (prev_entry && (prev_entry.score_type() != ScoreType::ALPHA)) {
-          prev_best = prev_entry.best_move();
-        }
-        table.Unlock();
-      }
-
       // --- Check Extension --- //
       if (shared_st_ptr_->search_params_ptr_->enable_check_extension()
       && is_checked) {
@@ -890,6 +881,9 @@ namespace Sayuri {
       shared_st_ptr_->helper_queue_ptr_->HelpRoot(job);
       job.WaitForHelpers();
 
+      // 最善手を記録する。
+      prev_best = pv_line_table_[level][0];
+
       // メイトを見つけたらフラグを立てる。
       // 直接ループを抜けない理由は、depth等の終了条件対策。
       if (pv_line_table_[level].mate_in() >= 0) {
@@ -923,7 +917,7 @@ namespace Sayuri {
   void ChessEngine::ThreadYBWC(UCIShell& shell) {
     // 子エンジンを作る。
     mutex_.lock();
-    std::unique_ptr<ChessEngine> child_ptr(new ChessEngine());
+    std::unique_ptr<ChessEngine> child_ptr(new ChessEngine(*this));
     child_ptr->shared_st_ptr_ = shared_st_ptr_;
     mutex_.unlock();
 
@@ -1197,6 +1191,27 @@ namespace Sayuri {
 
   // ルートノードで呼び出される、別スレッド用探索関数。
   void ChessEngine::SearchRootParallel(Job& job, UCIShell& shell) {
+    // 50手ルール用倍率の作成。
+    // ply_100_が100以上の時、引き分けと判断する。
+    double phase = (-((Util::CountBits(blocker_0_) - 2) / 30.0)) + 1;
+    double ply_100_rate = (-((ply_100_ * phase) / 100.0)) + 1;
+    ply_100_rate = ply_100_rate < 0.0 ? 0.0 : ply_100_rate;
+    // 50手ルール用に得点を変換する関数。
+    std::function<int(int, Move)> AdjustScoreForPly100 =
+    [this, ply_100_rate](int score, Move move) -> int {
+      if (this->shared_st_ptr_->search_params_ptr_->
+      enable_ply_100_adjustment()) {
+        if (score > 0) {
+          if ((this->piece_board_[GET_TO(move)] != PAWN)
+          && (!GET_CAPTURED_PIECE(move))) {
+            return score * ply_100_rate;
+          }
+        }
+      }
+
+      return score;
+    };
+
     // 仕事ループ。
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
@@ -1300,6 +1315,9 @@ namespace Sayuri {
           score = -Search<NodeType::PV> (next_hash, job.depth_ - 1,
           job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
           *(job.table_ptr_));
+          
+          // 50手ルール用に評価値を変換。
+          score = AdjustScoreForPly100(score, move);
 
           // アルファ値、ベータ値を調べる。
           job.mutex_ptr_->lock();  // ロック。
@@ -1349,6 +1367,10 @@ namespace Sayuri {
             job.depth_ - lmr_search_reduction - 1, job.level_ + 1,
             -(temp_alpha + 1), -temp_alpha, -next_my_material,
             *(job.table_ptr_));
+
+            // 50手ルール用に評価値を変換。
+            score = AdjustScoreForPly100(score, move);
+
           } else {
             // 普通に探索するためにscoreをalphaより大きくしておく。
             score = temp_alpha + 1;
@@ -1365,6 +1387,9 @@ namespace Sayuri {
           job.level_ + 1, -(temp_alpha + 1), -temp_alpha,
           -next_my_material, *(job.table_ptr_));
 
+          // 50手ルール用に評価値を変換。
+          score = AdjustScoreForPly100(score, move);
+
           if (score > temp_alpha) {
             while (true) {
               // 探索終了。
@@ -1374,6 +1399,9 @@ namespace Sayuri {
               score = -Search<NodeType::PV>(next_hash, job.depth_ - 1,
               job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
               *(job.table_ptr_));
+
+              // 50手ルール用に評価値を変換。
+              score = AdjustScoreForPly100(score, move);
 
               // ベータ値を調べる。
               job.mutex_ptr_->lock();  // ロック。
@@ -1414,13 +1442,6 @@ namespace Sayuri {
         job.pv_line_ptr_->SetMove(move);
         job.pv_line_ptr_->Insert(pv_line_table_[job.level_ + 1]);
         job.pv_line_ptr_->score(score);
-
-        // トランスポジションテーブルに登録。
-        if (shared_st_ptr_->search_params_ptr_->enable_ttable()) {
-          job.table_ptr_->Add(job.pos_hash_, job.depth_, score,
-          ScoreType::EXACT, (*(job.pv_line_ptr_))[0],
-          job.pv_line_ptr_->mate_in());
-        }
 
         // 標準出力にPV情報を表示。
         now = SysClock::now();

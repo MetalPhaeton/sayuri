@@ -43,6 +43,7 @@ namespace Sayuri {
   enable_quiesce_search_(true),
   enable_repetition_check_(true),
   enable_repetition_check_after_2nd_(true),
+  enable_ply_100_adjustment_(true),
   enable_check_extension_(true),
   ybwc_limit_depth_(4),
   ybwc_after_moves_(3),
@@ -124,6 +125,7 @@ namespace Sayuri {
     enable_repetition_check_= params.enable_repetition_check_;
     enable_repetition_check_after_2nd_ =
     params.enable_repetition_check_after_2nd_;
+    enable_ply_100_adjustment_ = params.enable_ply_100_adjustment_;
     enable_check_extension_ = params.enable_check_extension_;
     ybwc_limit_depth_ = params.ybwc_limit_depth_;
     ybwc_after_moves_ = params.ybwc_after_moves_;
