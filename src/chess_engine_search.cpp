@@ -1196,15 +1196,20 @@ namespace Sayuri {
     double phase = (-((Util::CountBits(blocker_0_) - 2) / 30.0)) + 1;
     double ply_100_rate = (-((ply_100_ * phase) / 100.0)) + 1;
     ply_100_rate = ply_100_rate < 0.0 ? 0.0 : ply_100_rate;
-    // 50手ルール用に得点を変換する関数。
+    // 50手ルール用に得点を補正する関数。
     std::function<int(int, Move)> AdjustScoreForPly100 =
     [this, ply_100_rate](int score, Move move) -> int {
       if (this->shared_st_ptr_->search_params_ptr_->
       enable_ply_100_adjustment()) {
-        if (score > 0) {
+        // 閾値。
+        int threshold = this->shared_st_ptr_->search_params_ptr_->
+        ply_100_adjustment_threshold();
+
+        if (score >= threshold) {
           if ((this->piece_board_[GET_TO(move)] != PAWN)
           && (!GET_CAPTURED_PIECE(move))) {
-            return score * ply_100_rate;
+            score = score * ply_100_rate;
+            return score < threshold ? threshold : score;
           }
         }
       }
