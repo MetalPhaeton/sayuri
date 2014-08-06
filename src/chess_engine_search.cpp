@@ -1191,32 +1191,6 @@ namespace Sayuri {
 
   // ルートノードで呼び出される、別スレッド用探索関数。
   void ChessEngine::SearchRootParallel(Job& job, UCIShell& shell) {
-    // 50手ルール用倍率の作成。
-    // ply_100_が100以上の時、引き分けと判断する。
-    double phase = (-((Util::CountBits(blocker_0_) - 2) / 30.0)) + 1;
-    double ply_100_rate = (-((ply_100_ * phase) / 100.0)) + 1;
-    ply_100_rate = ply_100_rate < 0.0 ? 0.0 : ply_100_rate;
-    // 50手ルール用に得点を補正する関数。
-    std::function<int(int, Move)> AdjustScoreForPly100 =
-    [this, ply_100_rate](int score, Move move) -> int {
-      if (this->shared_st_ptr_->search_params_ptr_->
-      enable_ply_100_adjustment()) {
-        // 閾値。
-        int threshold = this->shared_st_ptr_->search_params_ptr_->
-        ply_100_adjustment_threshold();
-
-        if (score >= threshold) {
-          if ((this->piece_board_[GET_TO(move)] != PAWN)
-          && (!GET_CAPTURED_PIECE(move))) {
-            score = score * ply_100_rate;
-            return score < threshold ? threshold : score;
-          }
-        }
-      }
-
-      return score;
-    };
-
     // 仕事ループ。
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
@@ -1321,9 +1295,6 @@ namespace Sayuri {
           job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
           *(job.table_ptr_));
           
-          // 50手ルール用に評価値を変換。
-          score = AdjustScoreForPly100(score, move);
-
           // アルファ値、ベータ値を調べる。
           job.mutex_ptr_->lock();  // ロック。
           if (score >= temp_beta) {
@@ -1372,10 +1343,6 @@ namespace Sayuri {
             job.depth_ - lmr_search_reduction - 1, job.level_ + 1,
             -(temp_alpha + 1), -temp_alpha, -next_my_material,
             *(job.table_ptr_));
-
-            // 50手ルール用に評価値を変換。
-            score = AdjustScoreForPly100(score, move);
-
           } else {
             // 普通に探索するためにscoreをalphaより大きくしておく。
             score = temp_alpha + 1;
@@ -1392,9 +1359,6 @@ namespace Sayuri {
           job.level_ + 1, -(temp_alpha + 1), -temp_alpha,
           -next_my_material, *(job.table_ptr_));
 
-          // 50手ルール用に評価値を変換。
-          score = AdjustScoreForPly100(score, move);
-
           if (score > temp_alpha) {
             while (true) {
               // 探索終了。
@@ -1404,9 +1368,6 @@ namespace Sayuri {
               score = -Search<NodeType::PV>(next_hash, job.depth_ - 1,
               job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
               *(job.table_ptr_));
-
-              // 50手ルール用に評価値を変換。
-              score = AdjustScoreForPly100(score, move);
 
               // ベータ値を調べる。
               job.mutex_ptr_->lock();  // ロック。
