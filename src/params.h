@@ -758,7 +758,7 @@ namespace Sayuri {
       opening_weight_(weight.opening_weight_),
       ending_weight_(weight.ending_weight_),
       slope_(weight.slope_),
-      y_intercept_(weight.y_intercept_){}
+      y_intercept_(weight.y_intercept_) {}
       /**
        * ムーブコンストラクタ。
        * @param weight ムーブ元。
@@ -767,7 +767,7 @@ namespace Sayuri {
       opening_weight_(weight.opening_weight_),
       ending_weight_(weight.ending_weight_),
       slope_(weight.slope_),
-      y_intercept_(weight.y_intercept_){}
+      y_intercept_(weight.y_intercept_) {}
       /**
        * コピー代入演算子。
        * @param weight コピー元。
