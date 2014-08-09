@@ -47,22 +47,25 @@ namespace Sayuri {
   // ============= //
   // UCIオプション //
   // ============= //
-  /** トランスポジションテーブルのデフォルトサイズ。 (メガバイト) */
+  /** トランスポジションテーブルのデフォルトサイズ。 */
   constexpr std::size_t UCI_DEFAULT_TABLE_SIZE = 32ULL * 1024ULL * 1024ULL;
 
-  /** トランスポジションテーブルの最小サイズ。 (メガバイト) */
+  /** トランスポジションテーブルの最小サイズ。 */
   constexpr std::size_t UCI_MIN_TABLE_SIZE = 8ULL * 1024ULL * 1024ULL;
 
-#if defined(__arm__)  // スマホのCPU用定数。
-  /** トランスポジションテーブルの最大サイズ。 (メガバイト) (スマホ用) */
+#if defined(__arm__)  // ARMのCPU用定数。
+  /** トランスポジションテーブルの最大サイズ。 (ARM用) */
   constexpr std::size_t UCI_MAX_TABLE_SIZE = 1024ULL * 1024ULL * 1024ULL;
+
 #elif defined(__i386__) || defined(_M_IX86)  // 32ビットCPU用定数。
-  /** トランスポジションテーブルの最大サイズ。 (メガバイト) (32ビットCPU) */
+  /** トランスポジションテーブルの最大サイズ。 (32ビットCPU) */
   constexpr std::size_t UCI_MAX_TABLE_SIZE = 1024ULL * 1024ULL * 1024ULL;
+
 #else  // 64ビットCPU用定数。
-  /** トランスポジションテーブルの最大サイズ。 (メガバイト) (64ビットCPU) */
+  /** トランスポジションテーブルの最大サイズ。 (64ビットCPU) */
   constexpr std::size_t UCI_MAX_TABLE_SIZE =
   8ULL * 1024ULL * 1024ULL * 1024ULL;
+
 #endif
 
   /** Ponder機能のデフォルト設定。 */
