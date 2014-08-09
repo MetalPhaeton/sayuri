@@ -49,7 +49,7 @@ namespace Sayuri {
   ply_(1) {
     // fen_strを分解。
     std::vector<std::string> fen_tokens =
-    Util::Split<char>(fen_str, {' '}, {});
+    Util::Split<char>(fen_str, {' '}, std::set<char> {});
 
     try {
       // FENを解析。
@@ -148,7 +148,7 @@ namespace Sayuri {
     // ランク毎に区切って、逆転。
     // fenは8ランクから始まるので、1ランクからに逆転する必要がある。
     std::vector<std::string> position_vec =
-    Util::Split<char>(position_str, {'/'}, {});
+    Util::Split<char>(position_str, {'/'}, std::set<char> {});
     std::reverse(position_vec.begin(), position_vec.end());
 
     // 値を格納していく。

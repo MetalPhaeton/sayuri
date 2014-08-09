@@ -734,7 +734,7 @@ namespace Sayuri {
   // コマンドを実行する。
   void UCICommand::operator()(const std::string& command_line) {
     std::vector<std::string> tokens =
-    Util::Split<char>(command_line, {' '}, {});
+    Util::Split<char>(command_line, {' '}, std::set<char> {});
 
     // コマンドを探す。
     CommandArgs args;

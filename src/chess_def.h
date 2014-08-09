@@ -53,7 +53,10 @@ namespace Sayuri {
   /** トランスポジションテーブルの最小サイズ。 (メガバイト) */
   constexpr std::size_t UCI_MIN_TABLE_SIZE = 8ULL * 1024ULL * 1024ULL;
 
-#if defined(__i386__) || defined(_M_IX86)  // 32ビットCPU用定数。
+#if defined(__arm__)  // スマホのCPU用定数。
+  /** トランスポジションテーブルの最大サイズ。 (メガバイト) (スマホ用) */
+  constexpr std::size_t UCI_MAX_TABLE_SIZE = 1024ULL * 1024ULL * 1024ULL;
+#elif defined(__i386__) || defined(_M_IX86)  // 32ビットCPU用定数。
   /** トランスポジションテーブルの最大サイズ。 (メガバイト) (32ビットCPU) */
   constexpr std::size_t UCI_MAX_TABLE_SIZE = 1024ULL * 1024ULL * 1024ULL;
 #else  // 64ビットCPU用定数。
