@@ -626,8 +626,9 @@ namespace Sayuri {
           score = -Search<NodeType::NON_PV>(next_hash, new_depth - 1,
           level + 1, -(temp_alpha + 1), -temp_alpha, -next_my_material, table);
 
-          if (score > temp_alpha) {
-            // fail lowならず。
+          if ((score > temp_alpha) && (score < temp_beta)) {
+            // Fail Lowならず。
+            // Fail-Softなので、Beta値以上も探索しない。
             // フルウィンドウで再探索。
             score = -Search<NodeType::PV>(next_hash, new_depth - 1, level + 1,
             -temp_beta, -temp_alpha, -next_my_material, table);
@@ -638,6 +639,12 @@ namespace Sayuri {
       UnmakeMove(move);
 
       mutex.lock();  // ロック。
+
+      // すでにベータカットされていればループを抜ける。
+      if (alpha >= beta) {
+        mutex.unlock();  // ロック解除。
+        break;
+      }
 
       // アルファ値を更新。
       if (score > alpha) {
@@ -1013,7 +1020,7 @@ namespace Sayuri {
     shared_st_ptr_->search_params_ptr_->futility_pruning_depth();
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
-      // すでにベータカットされていれば仕事をしない。
+      // すでにベータカットされていれば。
       if (*(job.alpha_ptr_) >= *(job.beta_ptr_)) {
         break;
       }
@@ -1114,8 +1121,9 @@ namespace Sayuri {
           job.level_ + 1, -(temp_alpha + 1), -temp_alpha,
           -next_my_material, *(job.table_ptr_));
 
-          if (score > temp_alpha) {
-            // fail lowならず。
+          if ((score > temp_alpha) && (score < temp_beta)) {
+            // Fail Lowならず。
+            // Fail-Softなので、ベータ値以上も探索しない。
             score = -Search<NodeType::PV>(next_hash, new_depth - 1,
             job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
             *(job.table_ptr_));
@@ -1126,6 +1134,12 @@ namespace Sayuri {
       UnmakeMove(move);
 
       job.mutex_ptr_->lock();  // ロック。
+
+      // すでにベータカットされていればループを抜ける。
+      if (*(job.alpha_ptr_) >= *(job.beta_ptr_)) {
+        job.mutex_ptr_->unlock();  // ロック解除。
+        break;
+      }
 
       // 探索した深さを更新。
       if (searched_level_ > job.client_ptr_->searched_level_) {
@@ -1300,31 +1314,45 @@ namespace Sayuri {
           if (score >= temp_beta) {
             // 探索失敗。
             // ベータ値を広げる。
+            *(job.delta_ptr_) *= 2;
+            temp_beta = score + *(job.delta_ptr_);
+            if (*(job.beta_ptr_) >= temp_beta) {
+              temp_beta = *(job.beta_ptr_);
+            } else {
+              *(job.beta_ptr_) = temp_beta;
+            }
+
             if ((pv_line_table_[job.level_ + 1].mate_in() >= 0)
             && ((pv_line_table_[job.level_ + 1].mate_in() % 2) == 1)) {
               // メイトっぽかった場合。
               *(job.beta_ptr_) = MAX_VALUE;
-            } else {
-              *(job.delta_ptr_) *= 2;
-              *(job.beta_ptr_) += *(job.delta_ptr_);
+              temp_beta = MAX_VALUE;
             }
-            temp_beta = *(job.beta_ptr_);
+
             job.mutex_ptr_->unlock();  // ロック解除。
             continue;
+
           } else if (score <= temp_alpha) {
             // 探索失敗。
             // アルファ値を広げる。
+            *(job.delta_ptr_) *= 2;
+            temp_alpha = score - *(job.delta_ptr_);
+            if (*(job.alpha_ptr_) <= temp_alpha) {
+              temp_alpha = *(job.alpha_ptr_);
+            } else {
+              *(job.alpha_ptr_) = temp_alpha;
+            }
+
             if ((pv_line_table_[job.level_ + 1].mate_in() >= 0)
             && ((pv_line_table_[job.level_ + 1].mate_in() % 2) == 0)) {
               // メイトされていたかもしれない場合。
               *(job.alpha_ptr_) = -MAX_VALUE;
-            } else {
-              *(job.delta_ptr_) *= 2;
-              *(job.alpha_ptr_) -= *(job.delta_ptr_);
+              temp_alpha = -MAX_VALUE;
             }
-            temp_alpha = *(job.alpha_ptr_);
+
             job.mutex_ptr_->unlock();  // ロック解除。
             continue;
+
           } else {
             job.mutex_ptr_->unlock();  // ロック解除。
             break;
@@ -1374,18 +1402,24 @@ namespace Sayuri {
               if (score >= temp_beta) {
                 // 探索失敗。
                 // ベータ値を広げる。
+                *(job.delta_ptr_) *= 2;
+                temp_beta = score + *(job.delta_ptr_);
+                if (*(job.beta_ptr_) >= temp_beta) {
+                  temp_beta = *(job.beta_ptr_);
+                } else {
+                  *(job.beta_ptr_) = temp_beta;
+                }
+
                 if ((pv_line_table_[job.level_ + 1].mate_in() >= 0)
                 && ((pv_line_table_[job.level_ + 1].mate_in() % 2) == 1)) {
                   // メイトっぽかった場合。
                   *(job.beta_ptr_) = MAX_VALUE;
-                  job.mutex_ptr_->unlock();
-                } else {
-                  *(job.delta_ptr_) *= 2;
-                  *(job.beta_ptr_) += *(job.delta_ptr_);
+                  temp_beta = MAX_VALUE;
                 }
-                temp_beta = *(job.beta_ptr_);
+
                 job.mutex_ptr_->unlock();  // ロック解除。
                 continue;
+
               } else {
                 job.mutex_ptr_->unlock();  // ロック解除。
                 break;
