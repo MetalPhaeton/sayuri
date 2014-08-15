@@ -641,8 +641,8 @@ namespace Sayuri {
 
       job.Lock();  // ロック。
 
-      // すでにベータカットされていればループを抜ける。
-      if (job.alpha_ >= job.beta_) {
+      // 探索終了ならループを抜ける。
+      if (ShouldBeStopped() || is_job_ended_ || (job.alpha_ >= job.beta_)) {
         job.Unlock();  // ロック解除。
         break;
       }
@@ -1164,8 +1164,8 @@ namespace Sayuri {
 
       job.Lock();  // ロック。
 
-      // すでにベータカットされていればループを抜ける。
-      if (job.alpha_ >= job.beta_) {
+      // 探索終了ならループを抜ける。
+      if (ShouldBeStopped() || is_job_ended_ || (job.alpha_ >= job.beta_)) {
         job.Unlock();  // ロック解除。
         break;
       }
