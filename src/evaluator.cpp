@@ -175,7 +175,7 @@ namespace Sayuri {
           CalValue<KING>(piece_square, piece_side);
           break;
         default:
-          throw SayuriError("駒の種類が不正です。");
+          throw SayuriError("駒の種類が不正です。 in Evaluator::Evaluate()");
           break;
       }
     }
@@ -454,7 +454,7 @@ namespace Sayuri {
         }
         break;
       default:
-        throw SayuriError("駒の種類が不正です。");
+        throw SayuriError("駒の種類が不正です。 in Evaluator::CalValue()");
         break;
     }
 

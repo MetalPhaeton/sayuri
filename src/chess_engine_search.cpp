@@ -57,6 +57,7 @@ namespace Sayuri {
   int material, TranspositionTable& table) {
     // 探索中止の時。
     if (ShouldBeStopped()) return alpha;
+    if (is_job_ended_) return alpha;
 
     // ノード数を加算。
     shared_st_ptr_->num_searched_nodes_++;
@@ -152,6 +153,7 @@ namespace Sayuri {
   int alpha, int beta, int material, TranspositionTable& table) {
     // 探索中止の時。
     if (ShouldBeStopped()) return alpha;
+    if (is_job_ended_) return alpha;
 
     // ノード数を加算。
     shared_st_ptr_->num_searched_nodes_++;
@@ -455,6 +457,7 @@ namespace Sayuri {
     Job& job = job_table_[level];
     job.Init(maker_table_[level]);
     job.client_ptr_ = this;
+    job.record_ = PositionRecord(*this, pos_hash);
     job.node_type_ = Type;
     job.pos_hash_ = pos_hash;
     job.depth_ = depth;
@@ -523,13 +526,13 @@ namespace Sayuri {
     shared_st_ptr_->search_params_ptr_->futility_pruning_depth();
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
-      // すでにベータカットされていればループを抜ける。
-      if (job.alpha_ >= job.beta_) {
+      // 探索終了ならループを抜ける。
+      if (ShouldBeStopped() || is_job_ended_ || (job.alpha_ >= job.beta_)) {
         break;
       }
 
       // 別スレッドに助けを求める。(YBWC)
-      if ((depth >= ybwc_limit_depth) && (num_moves > ybwc_after_moves)) {
+      if ((job.depth_ >= ybwc_limit_depth) && (num_moves > ybwc_after_moves)) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
 
@@ -554,7 +557,7 @@ namespace Sayuri {
 
       // -- Futility Pruning --- //
       if (enable_futility_pruning) {
-        if (depth <= futility_pruning_depth) {
+        if (job.depth_ <= futility_pruning_depth) {
           if ((next_my_material + margin) <= job.alpha_) {
             UnmakeMove(move);
             continue;
@@ -687,6 +690,7 @@ namespace Sayuri {
         }
 
         // ベータカット。
+        job.NotifyBetaCut();
         job.Unlock();  // ロック解除。
         break;
       }
@@ -775,8 +779,14 @@ namespace Sayuri {
 
     // スレッドの準備。
     shared_st_ptr_->helper_queue_ptr_.reset(new HelperQueue());
-    for (auto& thread : thread_vec_) {
-      thread = std::thread([this, &shell]() {this->ThreadYBWC(shell);});
+    std::vector<std::unique_ptr<ChessEngine>> child_vec(thread_vec_.size());
+    for (unsigned int i = 0; i < thread_vec_.size(); i++) {
+      child_vec[i].reset(new ChessEngine(*this));
+      child_vec[i]->shared_st_ptr_ = shared_st_ptr_;
+      ChessEngine* child_ptr = child_vec[i].get();
+      thread_vec_[i] = std::thread([child_ptr, &shell]() {
+          child_ptr->ThreadYBWC(shell);
+      });
     }
 
     // --- Iterative Deepening --- //
@@ -857,6 +867,7 @@ namespace Sayuri {
       Job& job = job_table_[level];
       job.Init(maker_table_[level]);
       job.client_ptr_ = this;
+      job.record_ = PositionRecord(*this, pos_hash);
       job.node_type_ = NodeType::PV;
       job.pos_hash_ = pos_hash;
       job.depth_ = depth;
@@ -919,37 +930,58 @@ namespace Sayuri {
 
   // YBWC探索用スレッド。
   void ChessEngine::ThreadYBWC(UCIShell& shell) {
-    // 子エンジンを作る。
-    mutex_.lock();
-    std::unique_ptr<ChessEngine> child_ptr(new ChessEngine(*this));
-    child_ptr->shared_st_ptr_ = shared_st_ptr_;
-    mutex_.unlock();
-
     // 仕事ループ。
     while (true) {
       if (ShouldBeStopped()) break;
 
-      // 仕事を拾う。
-      Job* job_ptr = child_ptr->shared_st_ptr_->helper_queue_ptr_->GetJob();
+      // 準備。
+      my_job_ptr_ = nullptr;
+      is_job_ended_ = false;
 
-      if (!job_ptr) {
+      // 仕事を拾う。
+      my_job_ptr_ = shared_st_ptr_->helper_queue_ptr_->GetJob();
+
+      if (!my_job_ptr_ || !(my_job_ptr_->client_ptr_)) {
         break;
       } else {
+        // お知らせ関数を登録。
+        my_job_ptr_->AddNotifier([this](Job& job) {
+          if (&job == this->my_job_ptr_) {
+            this->is_job_ended_ = true;
+            for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+              this->job_table_[i].NotifyBetaCut();
+            }
+          }
+        });
+
+        my_job_ptr_->Lock();  // ロック。
+
+        // お知らせを受け取る間もなく、
+        // すでに仕事が終了しているかチェックする。
+        if (my_job_ptr_->alpha_ >= my_job_ptr_->beta_) {
+          is_job_ended_ = true;
+          my_job_ptr_->Unlock();
+          my_job_ptr_->FinishMyJob();
+          continue;
+        }
+
         // 駒の配置を読み込む。
-        child_ptr->ScanBasicMember(*(job_ptr->client_ptr_));
+        LoadRecord(my_job_ptr_->record_);
 
         // Null Move探索中かどうかをセット。
-        child_ptr->is_null_searching_ = job_ptr->is_null_searching_;
+        is_null_searching_ = my_job_ptr_->is_null_searching_;
 
-        if (job_ptr->level_ <= 0) {
+        my_job_ptr_->Unlock();  // ロック解除。
+
+        if (my_job_ptr_->level_ <= 0) {
           // ルートノード。
-          child_ptr->SearchRootParallel(*job_ptr, shell);
+          SearchRootParallel(*my_job_ptr_, shell);
         } else {
           // ルートではないノード。
-          if (job_ptr->node_type_ == NodeType::PV) {
-            child_ptr->SearchParallel<NodeType::PV>(*job_ptr);
+          if (my_job_ptr_->node_type_ == NodeType::PV) {
+            SearchParallel<NodeType::PV>(*my_job_ptr_);
           } else {
-            child_ptr->SearchParallel<NodeType::NON_PV>(*job_ptr);
+            SearchParallel<NodeType::NON_PV>(*my_job_ptr_);
           }
         }
       }
@@ -1017,8 +1049,8 @@ namespace Sayuri {
     shared_st_ptr_->search_params_ptr_->futility_pruning_depth();
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
-      // すでにベータカットされていれば。
-      if (job.alpha_ >= job.beta_) {
+      // 探索終了ならループを抜ける。
+      if (ShouldBeStopped() || is_job_ended_ || (job.alpha_ >= job.beta_)) {
         break;
       }
 
@@ -1186,6 +1218,7 @@ namespace Sayuri {
         }
 
         // ベータカット。
+        job.NotifyBetaCut();
         job.Unlock();  // ロック解除。
         break;
       }
@@ -1542,7 +1575,8 @@ namespace Sayuri {
           attackers = Util::GetKingMove(target) & position_[to_move_][KING];
           break;
         default:
-          throw SayuriError("駒の種類が不正です。");
+          throw SayuriError
+          ("駒の種類が不正です。in ChessEngine::GetNextSEEMove()");
           break;
       }
       if (attackers) {

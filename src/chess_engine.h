@@ -726,6 +726,10 @@ namespace Sayuri {
       bool is_null_searching_;
       /** 探索したレベル。 */
       std::uint32_t searched_level_;
+      /** 現在請け負っている仕事のポインタ。 */
+      Job* my_job_ptr_;
+      /** 現在請け負っている仕事から探索中止依頼が来たかどうか。 */
+      bool is_job_ended_;
       /** 探索用MoveMakerのテーブル。 [探索レベル] */
       std::unique_ptr<MoveMaker[]> maker_table_;
       /** 探索用PVLineのテーブル。 [探索レベル] */

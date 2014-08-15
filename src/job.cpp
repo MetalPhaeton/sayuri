@@ -32,6 +32,7 @@
 #include <iostream>
 #include <mutex>
 #include <condition_variable>
+#include <functional>
 #include "common.h"
 #include "chess_engine.h"
 #include "transposition_table.h"
@@ -45,7 +46,8 @@ namespace Sayuri {
   // コンストラクタと代入 //
   // ==================== //
   // コンストラクタ。
-  Job::Job() : maker_ptr_(nullptr), helper_counter_(0), counter_(0) {}
+  Job::Job() : maker_ptr_(nullptr), helper_counter_(0),
+  notifier_vec_(0), counter_(0) {}
 
   // コピーコンストラクタ。
   Job::Job(const Job& job) {
@@ -76,6 +78,7 @@ namespace Sayuri {
   // ============== //
   // 候補手を得る。
   Move Job::PickMove() {
+    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
     return maker_ptr_->PickMove();
   }
 
@@ -98,6 +101,14 @@ namespace Sayuri {
     while (helper_counter_ > 0) {
       cond_.wait(lock);
     }
+  }
+
+  // ヘルパーにベータカットが発生したことを知らせる。
+  void Job::NotifyBetaCut() {
+    for (auto& func : notifier_vec_) {
+      func(*this);
+    }
+    notifier_vec_.resize(0);
   }
 
   // 数を数える。
@@ -133,6 +144,7 @@ namespace Sayuri {
     next_print_info_time_ = job.next_print_info_time_;
     maker_ptr_ = job.maker_ptr_;
     helper_counter_ = job.helper_counter_;
+    notifier_vec_ = job.notifier_vec_;
     counter_ = job.counter_;
   }
 }  // namespace Sayuri

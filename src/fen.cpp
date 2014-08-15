@@ -205,12 +205,12 @@ namespace Sayuri {
             position_[BLACK][KING] |= Util::SQUARE[square];
             break;
           default:
-            throw SayuriError("FENを解析できません。");
+            throw SayuriError("FENを解析できません。 in FEN::EvalPosition()");
             break;
         }
         square++;
         if (square > 64) {
-          throw SayuriError("FENを解析できません。");
+          throw SayuriError("FENを解析できません。 in FEN::EvalPosition()");
         }
       }
     }
@@ -226,7 +226,7 @@ namespace Sayuri {
         to_move_ = BLACK;
         break;
       default:
-        throw SayuriError("FENを解析できません。");
+        throw SayuriError("FENを解析できません。 in FEN::EvalToMove()");
         break;
     }
   }
@@ -252,7 +252,8 @@ namespace Sayuri {
           castling_rights_ |= BLACK_LONG_CASTLING;
           break;
         default:
-          throw SayuriError("FENを解析できません。");
+          throw SayuriError
+          ("FENを解析できません。 in FEN::EvalCastlingRights()");
           break;
       }
     }
@@ -269,7 +270,7 @@ namespace Sayuri {
     // ファイルから評価。
     int index = en_passant_square_str[0] - 'a';
     if ((index < 0) || (index > 7)) {
-      throw SayuriError("FENを解析できません。");
+      throw SayuriError("FENを解析できません。 in FEN::EvalEnPassant()");
     }
     Bitboard fyle = Util::FYLE[index];
 
@@ -279,7 +280,7 @@ namespace Sayuri {
     } else if (en_passant_square_str[1] == '6') {
       index = RANK_6;
     } else {
-      throw SayuriError("FENを解析できません。");
+      throw SayuriError("FENを解析できません。 in FEN::EvalEnPassant()");
     }
     Bitboard rank = Util::RANK[index];
 
@@ -291,7 +292,7 @@ namespace Sayuri {
     try {
       ply_100_ = std::stoi(ply_100_str);
     } catch (...) {
-      throw SayuriError("FENを解析できません。");
+      throw SayuriError("FENを解析できません。 in FEN::EvalPly100()");
     }
   }
 
@@ -303,7 +304,7 @@ namespace Sayuri {
         ply_ -= 1;
       }
     } catch (...) {
-      throw SayuriError("FENを解析できません。");
+      throw SayuriError("FENを解析できません。 in FEN::EvalPly()");
     }
   }
 

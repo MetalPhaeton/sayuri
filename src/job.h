@@ -35,7 +35,9 @@
 #include <chrono>
 #include <condition_variable>
 #include <memory>
+#include <functional>
 #include "common.h"
+#include "position_record.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -84,9 +86,11 @@ namespace Sayuri {
        * @param maker 使用するMoveMaker。
        */
       void Init(MoveMaker& maker) {
+        std::unique_lock<std::mutex> lock(mutex_);  // ロック。
         maker_ptr_ = &maker;
         helper_counter_ = 0;
         counter_ = 0;
+        notifier_vec_.resize(0);
       }
 
       /**
@@ -98,11 +102,20 @@ namespace Sayuri {
       /** この仕事を請け負っているヘルパーの数を増やす。 */
       void CountHelper();
 
+      /** 探索終了お知らせ関数を登録する。 */
+      void AddNotifier(const std::function<void(Job&)>& func) {
+        std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+        notifier_vec_.push_back(func);
+      }
+
       /** 仕事終了を知らせる。 */
       void FinishMyJob();
 
       /** ヘルパーが全員仕事を終えるまで待機する。 */
       void WaitForHelpers();
+
+      /** ヘルパーにベータカットが発生したことを知らせる。 */
+      void NotifyBetaCut();
 
       /**
        *  数を数える。 探索した手の数を数えるときに使う。
@@ -110,16 +123,18 @@ namespace Sayuri {
        */
       int Count();
 
-      /** 共有ノードをロックする。 */
-      void Lock() {shared_mutex_.lock();}
-      /** 共有ノードのロックを解除する。 */
-      void Unlock() {shared_mutex_.unlock();}
+      /** ロックする。 */
+      void Lock() {mutex_.lock();}
+      /** ロックを解除する。 */
+      void Unlock() {mutex_.unlock();}
 
       // ==================== //
       // 仕事用パブリック変数 //
       // ==================== //
       /** クライアントのポインタ。 */
       ChessEngine* client_ptr_;
+      /** ポジションの記録。 */
+      PositionRecord record_;
       /** 共有ノードのノードタイプ。 */
       NodeType node_type_;
       /** 共有ノードのハッシュ。 */
@@ -172,11 +187,11 @@ namespace Sayuri {
       // ========== //
       /** 仕事用MoveMakerのポインタ。 */
       MoveMaker* maker_ptr_;
-      /** 共有ノード用ミューテックス。 */
-      std::mutex shared_mutex_;
       /** 請け負っているヘルパーの数。 */
       volatile int helper_counter_;
-      /** 自分用ミューテックス。 */
+      /** 探索終了のお知らせ関数のベクトル。 */
+      std::vector<std::function<void(Job&)>> notifier_vec_;
+      /** ミューテックス。 */
       std::mutex mutex_;
       /** 自分用コンディション。 */
       std::condition_variable cond_;
