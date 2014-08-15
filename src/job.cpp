@@ -112,27 +112,25 @@ namespace Sayuri {
   // ================ //
   // メンバーをコピーする。
   void Job::ScanMember(const Job& job) {
-    mutex_ptr_ = job.mutex_ptr_;
     client_ptr_ = job.client_ptr_;
-    record_ptr_ = job.record_ptr_;
     node_type_ = job.node_type_;
     pos_hash_ = job.pos_hash_;
     depth_ = job.depth_;
     level_ = job.level_;
-    alpha_ptr_ = job.alpha_ptr_;
-    beta_ptr_ = job.beta_ptr_;
-    delta_ptr_ = job.delta_ptr_;
+    alpha_ = job.alpha_;
+    beta_ = job.beta_;
+    delta_ = job.delta_;
     table_ptr_ = job.table_ptr_;
     pv_line_ptr_ = job.pv_line_ptr_;
     is_null_searching_ = job.is_null_searching_;
     null_reduction_ = job.null_reduction_;
-    score_type_ptr_ = job.score_type_ptr_;
+    score_type_ = job.score_type_;
     material_ = job.material_;
     is_checked_ = job.is_checked_;
     num_all_moves_ = job.num_all_moves_;
-    has_legal_move_ptr_ = job.has_legal_move_ptr_;
+    has_legal_move_ = job.has_legal_move_;
     moves_to_search_ptr_ = job.moves_to_search_ptr_;
-    next_print_info_time_ptr_ = job.next_print_info_time_ptr_;
+    next_print_info_time_ = job.next_print_info_time_;
     maker_ptr_ = job.maker_ptr_;
     helper_counter_ = job.helper_counter_;
     counter_ = job.counter_;

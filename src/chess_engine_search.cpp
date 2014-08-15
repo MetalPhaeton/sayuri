@@ -353,8 +353,7 @@ namespace Sayuri {
     }
 
     // 手を作る。
-    MoveMaker& maker = maker_table_[level];
-    maker.GenMoves<GenMoveType::ALL>(prev_best,
+    maker_table_[level].GenMoves<GenMoveType::ALL>(prev_best,
     shared_st_ptr_->iid_stack_[level],
     shared_st_ptr_->killer_stack_[level][0],
     shared_st_ptr_->killer_stack_[level][1]);
@@ -366,7 +365,7 @@ namespace Sayuri {
         if (!is_null_searching_ && !is_checked && (depth
         >= shared_st_ptr_->search_params_ptr_->probcut_limit_depth())) {
           // 手を作る。
-          maker.RegenMoves();
+          maker_table_[level].RegenMoves();
 
           // 浅読みパラメータ。
           int prob_beta =
@@ -375,7 +374,8 @@ namespace Sayuri {
           - shared_st_ptr_->search_params_ptr_->probcut_search_reduction();
 
           // 探索。
-          for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
+          for (Move move = maker_table_[level].PickMove(); move;
+          move = maker_table_[level].PickMove()) {
             // 次のノードへの準備。
             Hash next_hash = GetNextHash(pos_hash, move);
             int next_my_material = GetNextMyMaterial(material, move);
@@ -447,34 +447,29 @@ namespace Sayuri {
     }
 
     // 準備。
-    int num_all_moves = maker.RegenMoves();
+    int num_all_moves = maker_table_[level].RegenMoves();
     int num_moves = 0;
-    ScoreType score_type = ScoreType::ALPHA;
-    bool has_legal_move = false;
     int margin = GetMargin(depth);
 
     // 仕事の生成。
-    std::mutex mutex;
-    PositionRecord record(*this, pos_hash);
     Job& job = job_table_[level];
-    job.Init(maker);
-    job.mutex_ptr_ = &mutex;
-    job.record_ptr_ = &record;
+    job.Init(maker_table_[level]);
+    job.client_ptr_ = this;
     job.node_type_ = Type;
     job.pos_hash_ = pos_hash;
     job.depth_ = depth;
     job.level_ = level;
-    job.alpha_ptr_ = &alpha;
-    job.beta_ptr_ = &beta;
+    job.alpha_ = alpha;
+    job.beta_ = beta;
     job.table_ptr_ = &table;
     job.pv_line_ptr_ = &pv_line_table_[level];
     job.is_null_searching_ = is_null_searching_;
     job.null_reduction_ = null_reduction;
-    job.score_type_ptr_ = &score_type;
+    job.score_type_ = ScoreType::ALPHA;
     job.material_ = material;
     job.is_checked_ = is_checked;
     job.num_all_moves_ = num_all_moves;
-    job.has_legal_move_ptr_ = &has_legal_move;
+    job.has_legal_move_ = false;
 
     // パラメータ保存。
     // YBWC。
@@ -527,9 +522,9 @@ namespace Sayuri {
     int futility_pruning_depth =
     shared_st_ptr_->search_params_ptr_->futility_pruning_depth();
 
-    for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
+    for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // すでにベータカットされていればループを抜ける。
-      if (alpha >= beta) {
+      if (job.alpha_ >= job.beta_) {
         break;
       }
 
@@ -539,10 +534,10 @@ namespace Sayuri {
       }
 
       // 次のハッシュ。
-      Hash next_hash = GetNextHash(pos_hash, move);
+      Hash next_hash = GetNextHash(job.pos_hash_, move);
 
       // 次の自分のマテリアル。
-      int next_my_material = GetNextMyMaterial(material, move);
+      int next_my_material = GetNextMyMaterial(job.material_, move);
 
       MakeMove(move);
 
@@ -553,14 +548,14 @@ namespace Sayuri {
       }
 
       // 合法手があったのでフラグを立てる。
-      has_legal_move = true;
+      job.has_legal_move_ = true;
 
       num_moves = job.Count();
 
       // -- Futility Pruning --- //
       if (enable_futility_pruning) {
         if (depth <= futility_pruning_depth) {
-          if ((next_my_material + margin) <= alpha) {
+          if ((next_my_material + margin) <= job.alpha_) {
             UnmakeMove(move);
             continue;
           }
@@ -573,13 +568,13 @@ namespace Sayuri {
 
       // 探索。
       int score = 0;
-      int temp_alpha = alpha;
-      int temp_beta = beta;
-      int new_depth = depth;
+      int temp_alpha = job.alpha_;
+      int temp_beta = job.beta_;
+      int new_depth = job.depth_;
 
       // History PruningとLate Move Reductionの共通条件。
       bool is_hp_or_lmr_ok = false;
-      if (!is_checked && !null_reduction
+      if (!(job.is_checked_) && !(job.null_reduction_)
       && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
       && !EQUAL_MOVE(move, shared_st_ptr_->killer_stack_[level][0])
       && !EQUAL_MOVE(move, shared_st_ptr_->killer_stack_[level][1])) {
@@ -603,8 +598,9 @@ namespace Sayuri {
         if (is_hp_or_lmr_ok && (new_depth >= lmr_limit_depth)
         && (num_moves > lmr_threshold)) {
           score = -Search<NodeType::NON_PV>(next_hash,
-          new_depth - lmr_search_reduction - 1, level + 1, -(temp_alpha + 1),
-          -temp_alpha, -next_my_material, table);
+          new_depth - lmr_search_reduction - 1, job.level_ + 1,
+          -(temp_alpha + 1), -temp_alpha, -next_my_material,
+          *(job.table_ptr_));
         } else {
           // PVSearchをするためにtemp_alphaより大きくしておく。
           score = temp_alpha + 1;
@@ -618,53 +614,55 @@ namespace Sayuri {
         // --- PVSearch --- //
         if ((num_moves <= 1) || (Type == NodeType::NON_PV)) {
           // フルウィンドウで探索。
-          score = -Search<Type>(next_hash, new_depth - 1, level + 1,
-          -temp_beta, -temp_alpha, -next_my_material, table);
+          score = -Search<Type>(next_hash, new_depth - 1, job.level_ + 1,
+          -temp_beta, -temp_alpha, -next_my_material, *(job.table_ptr_));
         } else {
           // PV発見後のPVノード。
           // ゼロウィンドウ探索。
           score = -Search<NodeType::NON_PV>(next_hash, new_depth - 1,
-          level + 1, -(temp_alpha + 1), -temp_alpha, -next_my_material, table);
+          job.level_ + 1, -(temp_alpha + 1), -temp_alpha, -next_my_material,
+          *(job.table_ptr_));
 
           if ((score > temp_alpha) && (score < temp_beta)) {
             // Fail Lowならず。
             // Fail-Softなので、Beta値以上も探索しない。
             // フルウィンドウで再探索。
-            score = -Search<NodeType::PV>(next_hash, new_depth - 1, level + 1,
-            -temp_beta, -temp_alpha, -next_my_material, table);
+            score = -Search<NodeType::PV>(next_hash, new_depth - 1,
+            job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
+            *(job.table_ptr_));
           }
         }
       }
 
       UnmakeMove(move);
 
-      mutex.lock();  // ロック。
+      job.Lock();  // ロック。
 
       // すでにベータカットされていればループを抜ける。
-      if (alpha >= beta) {
-        mutex.unlock();  // ロック解除。
+      if (job.alpha_ >= job.beta_) {
+        job.Unlock();  // ロック解除。
         break;
       }
 
       // アルファ値を更新。
-      if (score > alpha) {
+      if (score > job.alpha_) {
         // 評価値のタイプをセット。
-        if (score_type == ScoreType::ALPHA) {
-          score_type = ScoreType::EXACT;
+        if (job.score_type_ == ScoreType::ALPHA) {
+          job.score_type_ = ScoreType::EXACT;
         }
 
         // PVライン。
-        pv_line_table_[level].SetMove(move);
-        pv_line_table_[level].Insert(pv_line_table_[level + 1]);
-        pv_line_table_[level].score(score);
+        job.pv_line_ptr_->SetMove(move);
+        job.pv_line_ptr_->Insert(pv_line_table_[level + 1]);
+        job.pv_line_ptr_->score(score);
 
-        alpha = score;
+        job.alpha_ = score;
       }
 
       // ベータ値を調べる。
-      if (alpha >= beta) {
+      if (job.alpha_ >= job.beta_) {
         // 評価値の種類をセット。
-        score_type = ScoreType::BETA;
+        job.score_type_ = ScoreType::BETA;
 
         // 取らない手。
         if (!(move & CAPTURED_PIECE_MASK)) {
@@ -678,7 +676,8 @@ namespace Sayuri {
 
           // ヒストリー。
           if (shared_st_ptr_->search_params_ptr_->enable_history()) {
-            shared_st_ptr_->history_[side][from][to] += depth * depth;
+            shared_st_ptr_->history_[side][from][to] +=
+            job.depth_ * job.depth_;
             if (shared_st_ptr_->history_[side][from][to]
             > shared_st_ptr_->history_max_) {
               shared_st_ptr_->history_max_ =
@@ -688,11 +687,11 @@ namespace Sayuri {
         }
 
         // ベータカット。
-        mutex.unlock();  // ロック解除。
+        job.Unlock();  // ロック解除。
         break;
       }
 
-      mutex.unlock();  // ロック解除。
+      job.Unlock();  // ロック解除。
     }
 
     // スレッドを合流。
@@ -700,7 +699,7 @@ namespace Sayuri {
 
 
     // このノードでゲーム終了だった場合。
-    if (!has_legal_move) {
+    if (!(job.has_legal_move_)) {
       if (is_checked) {
         // チェックメイト。
         int score = SCORE_LOSE;
@@ -720,14 +719,14 @@ namespace Sayuri {
     // Null Move Reductionされていた場合、容量節約のため登録しない。
     if (shared_st_ptr_->search_params_ptr_->enable_ttable()) {
       if (!is_null_searching_ && !null_reduction && !ShouldBeStopped()) {
-        table.Add(pos_hash, depth, alpha, score_type,
+        table.Add(pos_hash, depth, job.alpha_, job.score_type_,
         pv_line_table_[level][0], pv_line_table_[level].mate_in());
       }
     }
 
     // 探索結果を返す。
-    pv_line_table_[level].score(alpha);
-    return alpha;
+    pv_line_table_[level].score(job.alpha_);
+    return job.alpha_;
   }
   // 実体化。
   template int ChessEngine::Search<NodeType::PV>(Hash pos_hash,
@@ -788,9 +787,6 @@ namespace Sayuri {
     int beta = MAX_VALUE;
     Side side = to_move_;
     Side enemy_side = side ^ 0x3;
-    TimePoint now = SysClock::now();
-    TimePoint next_print_info_time = now + Chrono::milliseconds(1000);
-    MoveMaker& maker = maker_table_[level];
     bool is_checked = IsAttacked(king_[side], enemy_side);
     bool found_mate = false;
     for (shared_st_ptr_->i_depth_ = 1; shared_st_ptr_->i_depth_ <= MAX_PLYS;
@@ -853,36 +849,33 @@ namespace Sayuri {
       }
 
       // 仕事を作る。
-      std::mutex mutex;
-      PositionRecord record(*this, pos_hash);
-      int num_all_moves = maker.GenMoves<GenMoveType::ALL>(prev_best,
+      int num_all_moves =
+      maker_table_[level].GenMoves<GenMoveType::ALL>(prev_best,
       shared_st_ptr_->iid_stack_[level],
       shared_st_ptr_->killer_stack_[level][0],
       shared_st_ptr_->killer_stack_[level][1]);
-      ScoreType score_type = ScoreType::EXACT;
-      bool has_legal_move = false;
       Job& job = job_table_[level];
-      job.Init(maker);
-      job.mutex_ptr_ = &mutex;
-      job.record_ptr_ = &record;
+      job.Init(maker_table_[level]);
+      job.client_ptr_ = this;
       job.node_type_ = NodeType::PV;
       job.pos_hash_ = pos_hash;
       job.depth_ = depth;
       job.level_ = level;
-      job.alpha_ptr_ = &alpha;
-      job.beta_ptr_ = &beta;
-      job.delta_ptr_ = &delta;
+      job.alpha_ = alpha;
+      job.beta_ = beta;
+      job.delta_ = delta;
       job.table_ptr_ = &table;
       job.pv_line_ptr_ = &pv_line_table_[level];
       job.is_null_searching_ = is_null_searching_;
       job.null_reduction_ = 0;
-      job.score_type_ptr_ = &score_type;
+      job.score_type_ = ScoreType::EXACT;
       job.material_ = material;
       job.is_checked_ = is_checked;
       job.num_all_moves_ = num_all_moves;
-      job.has_legal_move_ptr_ = &has_legal_move;
+      job.has_legal_move_ = false;
       job.moves_to_search_ptr_ = &moves_to_search;
-      job.next_print_info_time_ptr_ = &next_print_info_time;
+      job.next_print_info_time_ =
+      SysClock::now() + Chrono::milliseconds(1000);
 
       // ヘルプして待つ。
       shared_st_ptr_->helper_queue_ptr_->HelpRoot(job);
@@ -890,6 +883,11 @@ namespace Sayuri {
 
       // 最善手を記録する。
       prev_best = pv_line_table_[level][0];
+
+      // アルファ、ベータ、デルタを更新。
+      alpha = job.alpha_;
+      beta = job.beta_;
+      delta = job.delta_;
 
       // メイトを見つけたらフラグを立てる。
       // 直接ループを抜けない理由は、depth等の終了条件対策。
@@ -907,10 +905,9 @@ namespace Sayuri {
     }
 
     // 最後に情報を送る。
-    now = SysClock::now();
     shell.PrintOtherInfo
     (Chrono::duration_cast<Chrono::milliseconds>
-    (now - (shared_st_ptr_->start_time_)),
+    (SysClock::now() - (shared_st_ptr_->start_time_)),
     shared_st_ptr_->num_searched_nodes_, table.GetUsedPermill());
 
 
@@ -939,7 +936,7 @@ namespace Sayuri {
         break;
       } else {
         // 駒の配置を読み込む。
-        child_ptr->LoadRecord(*(job_ptr->record_ptr_));
+        child_ptr->ScanBasicMember(*(job_ptr->client_ptr_));
 
         // Null Move探索中かどうかをセット。
         child_ptr->is_null_searching_ = job_ptr->is_null_searching_;
@@ -1021,7 +1018,7 @@ namespace Sayuri {
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // すでにベータカットされていれば。
-      if (*(job.alpha_ptr_) >= *(job.beta_ptr_)) {
+      if (job.alpha_ >= job.beta_) {
         break;
       }
 
@@ -1047,12 +1044,12 @@ namespace Sayuri {
       num_moves = job.Count();
 
       // 合法手が見つかったのでフラグを立てる。
-      *(job.has_legal_move_ptr_) = true;
+      job.has_legal_move_ = true;
 
       // --- Futility Pruning --- //
       if (enable_futility_pruning) {
         if (job.depth_ <= futility_pruning_depth) {
-          if ((next_my_material + margin) <= *(job.alpha_ptr_)) {
+          if ((next_my_material + margin) <= job.alpha_) {
             UnmakeMove(move);
             continue;
           }
@@ -1065,8 +1062,8 @@ namespace Sayuri {
 
       // 探索。
       int score = 0;
-      int temp_alpha = *(job.alpha_ptr_);
-      int temp_beta = *(job.beta_ptr_);
+      int temp_alpha = job.alpha_;
+      int temp_beta = job.beta_;
       int new_depth = job.depth_;
 
       // History PruningとLate Move Reductionの共通条件。
@@ -1133,11 +1130,11 @@ namespace Sayuri {
 
       UnmakeMove(move);
 
-      job.mutex_ptr_->lock();  // ロック。
+      job.Lock();  // ロック。
 
       // すでにベータカットされていればループを抜ける。
-      if (*(job.alpha_ptr_) >= *(job.beta_ptr_)) {
-        job.mutex_ptr_->unlock();  // ロック解除。
+      if (job.alpha_ >= job.beta_) {
+        job.Unlock();  // ロック解除。
         break;
       }
 
@@ -1147,10 +1144,10 @@ namespace Sayuri {
       }
 
       // アルファ値を更新。
-      if (score > *(job.alpha_ptr_)) {
+      if (score > job.alpha_) {
         // 評価値のタイプをセット。
-        if (*(job.score_type_ptr_) == ScoreType::ALPHA) {
-          *(job.score_type_ptr_) = ScoreType::EXACT;
+        if (job.score_type_ == ScoreType::ALPHA) {
+          job.score_type_ = ScoreType::EXACT;
         }
 
         // PVラインをセット。
@@ -1158,13 +1155,13 @@ namespace Sayuri {
         job.pv_line_ptr_->Insert(pv_line_table_[job.level_ + 1]);
         job.pv_line_ptr_->score(score);
 
-        *(job.alpha_ptr_) = score;
+        job.alpha_ = score;
       }
 
       // ベータ値を調べる。
-      if (*(job.alpha_ptr_) >= *(job.beta_ptr_)) {
+      if (job.alpha_ >= job.beta_) {
         // 評価値の種類をセット。
-        *(job.score_type_ptr_) = ScoreType::BETA;
+        job.score_type_ = ScoreType::BETA;
 
         // 取らない手。
         if (!(move & CAPTURED_PIECE_MASK)) {
@@ -1189,11 +1186,11 @@ namespace Sayuri {
         }
 
         // ベータカット。
-        job.mutex_ptr_->unlock();  // ロック解除。
+        job.Unlock();  // ロック解除。
         break;
       }
 
-      job.mutex_ptr_->unlock();  // ロック解除。
+      job.Unlock();  // ロック解除。
     }
 
     // 仕事終了。
@@ -1237,22 +1234,21 @@ namespace Sayuri {
       if (ShouldBeStopped()) break;
 
       // 定時(1秒)報告の情報を送る。
-      job.mutex_ptr_->lock();  // ロック。
+      job.Lock();  // ロック。
       TimePoint now = SysClock::now();
-      if (now > *(job.next_print_info_time_ptr_)) {
+      if (now > job.next_print_info_time_) {
         shell.PrintOtherInfo(Chrono::duration_cast<Chrono::milliseconds>
         (now - shared_st_ptr_->start_time_),
         shared_st_ptr_->num_searched_nodes_, job.table_ptr_->GetUsedPermill());
 
-        *(job.next_print_info_time_ptr_) = now + Chrono::milliseconds(1000);
+        job.next_print_info_time_ = now + Chrono::milliseconds(1000);
       }
-      job.mutex_ptr_->unlock();  // ロック解除。
+      job.Unlock();  // ロック解除。
 
       // 探索すべき手が指定されていれば、今の手がその手かどうか調べる。
       if (!(job.moves_to_search_ptr_->empty())) {
         bool hit = false;
-        const std::vector<Move>& vec = *(job.moves_to_search_ptr_);
-        for (auto move_2 : vec) {
+        for (auto move_2 : *(job.moves_to_search_ptr_)) {
           if (EQUAL_MOVE(move_2, move)) {
             // 探索すべき手だった。
             hit = true;
@@ -1291,14 +1287,14 @@ namespace Sayuri {
       num_moves = job.Count();
 
       // 現在探索している手の情報を表示。
-      job.mutex_ptr_->lock();  // ロック。
+      job.Lock();  // ロック。
       shell.PrintCurrentMoveInfo(move, num_moves);
-      job.mutex_ptr_->unlock();  // ロック解除。
+      job.Unlock();  // ロック解除。
 
       // --- PVSearch --- //
       int score = 0;
-      int temp_alpha = *(job.alpha_ptr_);
-      int temp_beta = *(job.beta_ptr_);
+      int temp_alpha = job.alpha_;
+      int temp_beta = job.beta_;
       if (num_moves <= 1) {
         while (true) {
           // 探索終了。
@@ -1310,54 +1306,54 @@ namespace Sayuri {
           *(job.table_ptr_));
           
           // アルファ値、ベータ値を調べる。
-          job.mutex_ptr_->lock();  // ロック。
+          job.Lock();  // ロック。
           if (score >= temp_beta) {
             // 探索失敗。
             // ベータ値を広げる。
-            *(job.delta_ptr_) *= 2;
-            temp_beta = score + *(job.delta_ptr_);
-            if (*(job.beta_ptr_) >= temp_beta) {
-              temp_beta = *(job.beta_ptr_);
+            job.delta_ *= 2;
+            temp_beta = score + job.delta_;
+            if (job.beta_ >= temp_beta) {
+              temp_beta = job.beta_;
             } else {
-              *(job.beta_ptr_) = temp_beta;
+              job.beta_ = temp_beta;
             }
 
             if ((pv_line_table_[job.level_ + 1].mate_in() >= 0)
             && ((pv_line_table_[job.level_ + 1].mate_in() % 2) == 1)) {
               // メイトっぽかった場合。
-              *(job.beta_ptr_) = MAX_VALUE;
+              job.beta_ = MAX_VALUE;
               temp_beta = MAX_VALUE;
             }
 
-            job.mutex_ptr_->unlock();  // ロック解除。
+            job.Unlock();  // ロック解除。
             continue;
 
           } else if (score <= temp_alpha) {
             // 探索失敗。
             // アルファ値を広げる。
-            *(job.delta_ptr_) *= 2;
-            temp_alpha = score - *(job.delta_ptr_);
-            if (*(job.alpha_ptr_) <= temp_alpha) {
-              temp_alpha = *(job.alpha_ptr_);
+            job.delta_ *= 2;
+            temp_alpha = score - job.delta_;
+            if (job.alpha_ <= temp_alpha) {
+              temp_alpha = job.alpha_;
             } else {
-              *(job.alpha_ptr_) = temp_alpha;
+              job.alpha_ = temp_alpha;
             }
 
             if ((pv_line_table_[job.level_ + 1].mate_in() >= 0)
             && ((pv_line_table_[job.level_ + 1].mate_in() % 2) == 0)) {
               // メイトされていたかもしれない場合。
-              *(job.alpha_ptr_) = -MAX_VALUE;
+              job.alpha_ = -MAX_VALUE;
               temp_alpha = -MAX_VALUE;
             }
 
-            job.mutex_ptr_->unlock();  // ロック解除。
+            job.Unlock();  // ロック解除。
             continue;
 
           } else {
-            job.mutex_ptr_->unlock();  // ロック解除。
+            job.Unlock();  // ロック解除。
             break;
           }
-          job.mutex_ptr_->unlock();  // ロック解除。
+          job.Unlock();  // ロック解除。
         }
       } else {
         // --- Late Move Reduction --- //
@@ -1398,33 +1394,33 @@ namespace Sayuri {
               *(job.table_ptr_));
 
               // ベータ値を調べる。
-              job.mutex_ptr_->lock();  // ロック。
+              job.Lock();  // ロック。
               if (score >= temp_beta) {
                 // 探索失敗。
                 // ベータ値を広げる。
-                *(job.delta_ptr_) *= 2;
-                temp_beta = score + *(job.delta_ptr_);
-                if (*(job.beta_ptr_) >= temp_beta) {
-                  temp_beta = *(job.beta_ptr_);
+                job.delta_ *= 2;
+                temp_beta = score + job.delta_;
+                if (job.beta_ >= temp_beta) {
+                  temp_beta = job.beta_;
                 } else {
-                  *(job.beta_ptr_) = temp_beta;
+                  job.beta_ = temp_beta;
                 }
 
                 if ((pv_line_table_[job.level_ + 1].mate_in() >= 0)
                 && ((pv_line_table_[job.level_ + 1].mate_in() % 2) == 1)) {
                   // メイトっぽかった場合。
-                  *(job.beta_ptr_) = MAX_VALUE;
+                  job.beta_ = MAX_VALUE;
                   temp_beta = MAX_VALUE;
                 }
 
-                job.mutex_ptr_->unlock();  // ロック解除。
+                job.Unlock();  // ロック解除。
                 continue;
 
               } else {
-                job.mutex_ptr_->unlock();  // ロック解除。
+                job.Unlock();  // ロック解除。
                 break;
               }
-              job.mutex_ptr_->unlock();  // ロック解除。
+              job.Unlock();  // ロック解除。
             }
           }
         }
@@ -1436,25 +1432,24 @@ namespace Sayuri {
       if (ShouldBeStopped()) break;
 
       // 最善手を見つけた。
-      job.mutex_ptr_->lock();  // ロック。
-      if (score > *(job.alpha_ptr_)) {
+      job.Lock();  // ロック。
+      if (score > job.alpha_) {
         // PVラインにセット。
         job.pv_line_ptr_->SetMove(move);
         job.pv_line_ptr_->Insert(pv_line_table_[job.level_ + 1]);
         job.pv_line_ptr_->score(score);
 
         // 標準出力にPV情報を表示。
-        now = SysClock::now();
         Chrono::milliseconds time =
         Chrono::duration_cast<Chrono::milliseconds>
-        (now - shared_st_ptr_->start_time_);
+        (SysClock::now() - shared_st_ptr_->start_time_);
 
         shell.PrintPVInfo(job.depth_, searched_level_, score,
         time, shared_st_ptr_->num_searched_nodes_, *(job.pv_line_ptr_));
 
-        *(job.alpha_ptr_) = score;
+        job.alpha_ = score;
       }
-      job.mutex_ptr_->unlock();  // ロック解除。
+      job.Unlock();  // ロック解除。
     }
 
     // 仕事終了。

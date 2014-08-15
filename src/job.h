@@ -88,32 +88,38 @@ namespace Sayuri {
         helper_counter_ = 0;
         counter_ = 0;
       }
+
       /**
        * 候補手を得る。
        * @return 候補手。
        */
       Move PickMove();
+
       /** この仕事を請け負っているヘルパーの数を増やす。 */
       void CountHelper();
+
       /** 仕事終了を知らせる。 */
       void FinishMyJob();
+
       /** ヘルパーが全員仕事を終えるまで待機する。 */
       void WaitForHelpers();
+
       /**
        *  数を数える。 探索した手の数を数えるときに使う。
        * @return 次の数字。
        */
       int Count();
 
+      /** 共有ノードをロックする。 */
+      void Lock() {shared_mutex_.lock();}
+      /** 共有ノードのロックを解除する。 */
+      void Unlock() {shared_mutex_.unlock();}
+
       // ==================== //
       // 仕事用パブリック変数 //
       // ==================== //
       /** クライアントのポインタ。 */
       ChessEngine* client_ptr_;
-      /** 共有ノード用ミューテックス。 */
-      std::mutex* mutex_ptr_;
-      /** クライアントの配置の記録のポインタ。 */
-      PositionRecord* record_ptr_;
       /** 共有ノードのノードタイプ。 */
       NodeType node_type_;
       /** 共有ノードのハッシュ。 */
@@ -122,12 +128,12 @@ namespace Sayuri {
       int depth_;
       /** 共有ノードのレベル。 */
       int level_;
-      /** 共有ノードのアルファ値のポインタ。 */
-      int* alpha_ptr_;
-      /** 共有ノードのベータ値のポインタ。 */
-      int* beta_ptr_;
-      /** 共有ノードのデルタ値のポンタ。 */
-      int* delta_ptr_;
+      /** 共有ノードのアルファ値。 */
+      int alpha_;
+      /** 共有ノードのベータ値。 */
+      int beta_;
+      /** 共有ノードのデルタ値。 */
+      int delta_;
       /** トランスポジションテーブルのポインタ。 */
       TranspositionTable* table_ptr_;
       /** 共有ノードのPVラインのポインタ。 */
@@ -136,20 +142,20 @@ namespace Sayuri {
       bool is_null_searching_;
       /** 共有ノードでのNull Move Reductionの結果。 */
       int null_reduction_;
-      /** 共有ノードの評価値の種類のポインタ。 */
-      ScoreType* score_type_ptr_;
+      /** 共有ノードの評価値の種類。 */
+      ScoreType score_type_;
       /** 共有ノードでのマテリアル。 */
       int material_;
       /** 共有ノードでチェックされているかどうかのフラグ。 */
       bool is_checked_;
       /** 共有ノードでの候補手の数。 */
       int num_all_moves_;
-      /** 共有ノードで合法手が見つかったかどうかのフラグのポインタ。 */
-      bool* has_legal_move_ptr_;
+      /** 共有ノードで合法手が見つかったかどうかのフラグ。 */
+      bool has_legal_move_;
       /** 探索する候補手のベクトルのポインタ。 */
       const std::vector<Move>* moves_to_search_ptr_;
       /** 次にinfoコマンドを送る時間のポインタ。 */
-      TimePoint* next_print_info_time_ptr_;
+      TimePoint next_print_info_time_;
 
     private:
       // ================ //
@@ -166,6 +172,8 @@ namespace Sayuri {
       // ========== //
       /** 仕事用MoveMakerのポインタ。 */
       MoveMaker* maker_ptr_;
+      /** 共有ノード用ミューテックス。 */
+      std::mutex shared_mutex_;
       /** 請け負っているヘルパーの数。 */
       volatile int helper_counter_;
       /** 自分用ミューテックス。 */

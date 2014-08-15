@@ -104,6 +104,9 @@ namespace Sayuri {
        */
       bool operator!=(const PositionRecord& record) const;
 
+      // ============== //
+      // パブリック関数 //
+      // ============== //
       // ======== //
       // アクセサ //
       // ======== //
@@ -212,6 +215,7 @@ namespace Sayuri {
        * @param record コピー元。
        */
       void ScanMember(const PositionRecord& record);
+
       /**
        * メンバをエンジンからコピーする。
        * @param engine コピー元。
