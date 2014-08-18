@@ -83,6 +83,9 @@ namespace Sayuri {
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
       job_table_[i].client_ptr_ = this;
     }
+
+    // PositionRecord。
+    record_table_.reset(new PositionRecord[MAX_PLYS + 1]);
   }
 
   // プライベートコンストラクタ。
@@ -108,6 +111,9 @@ namespace Sayuri {
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
       job_table_[i].client_ptr_ = this;
     }
+
+    // PositionRecord。
+    record_table_.reset(new PositionRecord[MAX_PLYS + 1]);
   }
 
   // コピーコンストラクタ。
@@ -137,6 +143,9 @@ namespace Sayuri {
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
       job_table_[i].client_ptr_ = this;
     }
+
+    // PositionRecord。
+    record_table_.reset(new PositionRecord[MAX_PLYS + 1]);
   }
 
   // ムーブコンストラクタ。
@@ -166,6 +175,9 @@ namespace Sayuri {
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
       job_table_[i].client_ptr_ = this;
     }
+
+    // PositionRecord。
+    record_table_.reset(new PositionRecord[MAX_PLYS + 1]);
   }
 
   // コピー代入演算子。

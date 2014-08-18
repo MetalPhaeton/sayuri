@@ -457,7 +457,7 @@ namespace Sayuri {
     Job& job = job_table_[level];
     job.Init(maker_table_[level]);
     job.client_ptr_ = this;
-    job.record_ = PositionRecord(*this, pos_hash);
+    job.record_ptr_ = nullptr;
     job.node_type_ = Type;
     job.pos_hash_ = pos_hash;
     job.depth_ = depth;
@@ -766,6 +766,7 @@ namespace Sayuri {
       maker_table_[i].ResetStack();
       pv_line_table_[i].ResetLine();
       job_table_[i] = Job();
+      record_table_[i] = PositionRecord();
     }
     shared_st_ptr_->history_max_ = 1;
     shared_st_ptr_->stop_now_ = false;
@@ -867,7 +868,7 @@ namespace Sayuri {
       Job& job = job_table_[level];
       job.Init(maker_table_[level]);
       job.client_ptr_ = this;
-      job.record_ = PositionRecord(*this, pos_hash);
+      job.record_ptr_ = nullptr;
       job.node_type_ = NodeType::PV;
       job.pos_hash_ = pos_hash;
       job.depth_ = depth;
@@ -966,7 +967,7 @@ namespace Sayuri {
         }
 
         // 駒の配置を読み込む。
-        LoadRecord(my_job_ptr_->record_);
+        LoadRecord(*(my_job_ptr_->record_ptr_));
 
         // Null Move探索中かどうかをセット。
         is_null_searching_ = my_job_ptr_->is_null_searching_;

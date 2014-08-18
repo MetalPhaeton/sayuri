@@ -291,6 +291,17 @@ namespace Sayuri {
        */
       Hash GetNextHash(Hash current_hash, Move move) const;
 
+      /**
+       * 現在の局面のPositionRecordの参照を配列から得る。
+       * @param level 配列のインデックス。 (探索深さのレベル)
+       * @param pos_hash 現在の局面のハッシュ。
+       * @return PositionRecordの参照。
+       */
+      const PositionRecord& GetRecord(std::uint32_t level, Hash pos_hash) {
+        record_table_[level] = PositionRecord(*this, pos_hash);
+        return record_table_[level];
+      }
+
       // ======== //
       // アクセサ //
       // ======== //
@@ -734,6 +745,8 @@ namespace Sayuri {
       std::unique_ptr<MoveMaker[]> maker_table_;
       /** 探索用PVLineのテーブル。 [探索レベル] */
       std::unique_ptr<PVLine[]> pv_line_table_;
+      /** 探索用PositionRecordのテーブル。 [探索レベル] */
+      std::unique_ptr<PositionRecord[]> record_table_;
       /** 探索用Evaluator。 */
       Evaluator evaluator_;
       /** 並列探索用仕事のテーブル。 [探索レベル] */

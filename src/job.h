@@ -34,10 +34,8 @@
 #include <mutex>
 #include <chrono>
 #include <condition_variable>
-#include <memory>
 #include <functional>
 #include "common.h"
-#include "position_record.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -133,8 +131,8 @@ namespace Sayuri {
       // ==================== //
       /** クライアントのポインタ。 */
       ChessEngine* client_ptr_;
-      /** ポジションの記録。 */
-      PositionRecord record_;
+      /** ポジションの記録のポインタ。 */
+      const PositionRecord* record_ptr_;
       /** 共有ノードのノードタイプ。 */
       NodeType node_type_;
       /** 共有ノードのハッシュ。 */

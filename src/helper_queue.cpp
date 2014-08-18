@@ -31,8 +31,10 @@
 
 #include <iostream>
 #include <mutex>
+#include <memory>
 #include <condition_variable>
 #include "common.h"
+#include "chess_engine.h"
 #include "job.h"
 
 /** Sayuri 名前空間。 */
@@ -120,6 +122,11 @@ namespace Sayuri {
     
     // ヘルパーがいれば仕事を依頼。
     if (num_helpers_ > 0) {
+      if (!(job.record_ptr_)) {
+        job.record_ptr_ =
+        &(job.client_ptr_->GetRecord(job.level_, job.pos_hash_));
+      }
+
       job_ptr_ = &job;
       helper_cond_.notify_one();
 
@@ -131,6 +138,11 @@ namespace Sayuri {
   // スレッドに仕事を依頼する。 (ルートノード用)
   void HelperQueue::HelpRoot(Job& job) {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+
+    if (!(job.record_ptr_)) {
+      job.record_ptr_ =
+      &(job.client_ptr_->GetRecord(job.level_, job.pos_hash_));
+    }
 
     job_ptr_ = &job;
     helper_cond_.notify_one();
