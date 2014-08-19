@@ -132,7 +132,7 @@ namespace Sayuri {
 
     // サイド。
     Side side = engine_ptr_->to_move();
-    Side enemy_side = side ^ 0x3;
+    Side enemy_side = OPPOSITE_SIDE(side);
 
     // 全体計算。
     // ビショップペア。
@@ -392,7 +392,7 @@ namespace Sayuri {
   template<Piece Type>
   void Evaluator::CalValue(Square piece_square, Side piece_side) {
     // サイド。
-    Side enemy_piece_side = piece_side ^ 0x3;
+    Side enemy_piece_side = OPPOSITE_SIDE(piece_side);
 
     // 値と符号。自分の駒ならプラス。敵の駒ならマイナス。
     double value;

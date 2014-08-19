@@ -52,7 +52,7 @@ namespace Sayuri {
   age_(0) {
     // エントリーをいくつ作るか計算する。
     num_entries_ = table_size / sizeof(TTEntry);
-    num_entries_ = num_entries_ >= 1 ? num_entries_ : 1;
+    num_entries_ = MAX(num_entries_, 1);
 
     // テーブルを作成。
     entry_table_.reset(new TTEntry[num_entries_]);

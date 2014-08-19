@@ -409,12 +409,8 @@ namespace Sayuri {
       // トランスポジションテーブルのサイズ変更。
       try {
         table_size_ = std::stoull(args["value"][1]) * 1024ULL * 1024ULL;
-
-        table_size_ = table_size_ >= UCI_MIN_TABLE_SIZE
-        ? table_size_ : UCI_MIN_TABLE_SIZE;
-
-        table_size_ = table_size_ <= UCI_MAX_TABLE_SIZE
-        ? table_size_ : UCI_MAX_TABLE_SIZE;
+        table_size_ = MAX(table_size_, UCI_MIN_TABLE_SIZE);
+        table_size_ = MIN(table_size_, UCI_MAX_TABLE_SIZE);
 
         table_ptr_.reset(new TranspositionTable(table_size_));
       } catch (...) {
@@ -432,9 +428,8 @@ namespace Sayuri {
       try {
         num_threads_ = std::stoi(args["value"][1]);
 
-        num_threads_ = num_threads_ >= 1 ? num_threads_ : 1;
-        num_threads_ = num_threads_ <= UCI_MAX_THREADS
-        ?  num_threads_ : UCI_MAX_THREADS;
+        num_threads_ = MAX(num_threads_, 1);
+        num_threads_ = MIN(num_threads_, UCI_MAX_THREADS);
       } catch (...) {
         // 無視。
       }
@@ -564,7 +559,7 @@ namespace Sayuri {
     if (args.find("depth") != args.end()) {
       try {
         max_depth = std::stoi(args["depth"][1]);
-        if (max_depth > MAX_PLYS) max_depth = MAX_PLYS;
+        max_depth = MIN(max_depth, MAX_PLYS);
       } catch (...) {
         // 無視。
       }
@@ -574,7 +569,7 @@ namespace Sayuri {
     if (args.find("nodes") != args.end()) {
       try {
         max_nodes = std::stoull(args["nodes"][1]);
-        if (max_nodes > MAX_NODES) max_nodes = MAX_NODES;
+        max_nodes = MIN(max_nodes, MAX_NODES);
       } catch (...) {
         // 無視。
       }
@@ -584,7 +579,7 @@ namespace Sayuri {
     if (args.find("mate") != args.end()) {
       try {
         max_depth = (std::stoi(args["mate"][1]) * 2) - 1;
-        if (max_depth > MAX_PLYS) max_depth = MAX_PLYS;
+        max_depth = MIN(max_depth, MAX_PLYS);
       } catch (...) {
         // 無視。
       }

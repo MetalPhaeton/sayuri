@@ -48,7 +48,7 @@ namespace Sayuri {
         /** 候補手。 */
         Move move_;
         /** 候補手の評価。 */
-        int score_;
+        std::int64_t score_;
       };
 
     public:

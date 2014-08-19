@@ -165,7 +165,7 @@ namespace Sayuri {
   Move killer_1, Move killer_2) {
     // サイド。
     Side side = engine_ptr_->to_move();
-    Side enemy_side = side ^ 0x3;
+    Side enemy_side = OPPOSITE_SIDE(side);
 
     // 生成開始時のポインタ。
     std::size_t start = last_;
@@ -358,24 +358,25 @@ namespace Sayuri {
   template<GenMoveType Type>
   void MoveMaker::ScoreMoves(std::size_t start, Move prev_best, Move iid_move,
   Move killer_1, Move killer_2, Side side) {
-    // 評価値の定義。
-    // 前回の繰り返しでトランスポジションテーブルから得た最善手の点数。
-    constexpr int BEST_MOVE_SCORE = MAX_VALUE;
-    // IIDで得た最善手の点数。
-    constexpr int IID_MOVE_SCORE = BEST_MOVE_SCORE - 1;
-    // 相手キングをチェックする手の点数。
-    constexpr int CHECKING_MOVE_SCORE = IID_MOVE_SCORE - 1;
-    // 駒を取る手の下限値。20 * 20を目安に設定。
-    constexpr int MIN_CAPTURE_SCORE = 403;
+    // --- 評価値の定義 --- //
+    // ヒストリーの点数の最大値のビット桁数。 (つまり、最大値は 0x200 )
+    constexpr int MAX_HISTORY_SCORE_SHIFT = 9;
     // キラームーブの点数。
-    constexpr int KILLER_1_MOVE_SCORE = MIN_CAPTURE_SCORE - 1;
-    constexpr int KILLER_2_MOVE_SCORE = KILLER_1_MOVE_SCORE - 1;
-    // ヒストリーの点数の最大値。
-    constexpr std::uint64_t MAX_HISTORY_SCORE = KILLER_2_MOVE_SCORE - 1;
+    constexpr std::int64_t KILLER_2_MOVE_SCORE = 0x400LL;
+    constexpr std::int64_t KILLER_1_MOVE_SCORE = KILLER_2_MOVE_SCORE << 1;
+    // 駒を取る手のビットシフト。
+    constexpr int CAPTURE_SCORE_SHIFT = 13;
+    // 相手キングをチェックする手の点数。
+    constexpr std::int64_t CHECKING_MOVE_SCORE = 1LL << 32;
+    // IIDで得た最善手の点数。
+    constexpr std::int64_t IID_MOVE_SCORE = CHECKING_MOVE_SCORE << 1;
+    // 前回の繰り返しでトランスポジションテーブルから得た最善手の点数。
+    constexpr std::int64_t BEST_MOVE_SCORE = IID_MOVE_SCORE << 1;
     // 悪い取る手の点数。
-    constexpr int BAD_CAPTURE_SCORE = -1;
+    constexpr std::int64_t BAD_CAPTURE_SCORE = -1LL;
 
-    Bitboard enemy_king_bb = Util::SQUARE[engine_ptr_->king()[side ^ 0x3]];
+    Bitboard enemy_king_bb =
+    Util::SQUARE[engine_ptr_->king()[OPPOSITE_SIDE(side)]];
     for (std::size_t i = start; i < last_; i++) {
       // 手の情報を得る。
       Square from = GET_FROM(move_stack_[i].move_);
@@ -435,13 +436,13 @@ namespace Sayuri {
         if ((Type == GenMoveType::CAPTURE)
         || (move_stack_[i].move_ & PROMOTION_MASK)) {
           // SEEで点数をつけていく。
-          move_stack_[i].score_ = engine_ptr_->SEE(move_stack_[i].move_);
-          move_stack_[i].score_ = move_stack_[i].score_ >= 0
-          ? move_stack_[i].score_ + MIN_CAPTURE_SCORE : BAD_CAPTURE_SCORE;
+          std::int64_t temp =
+          (engine_ptr_->SEE(move_stack_[i].move_)) << CAPTURE_SCORE_SHIFT;
+          move_stack_[i].score_ = MAX(temp, BAD_CAPTURE_SCORE);
         } else {
           // ヒストリーを使って点数をつけていく。
           move_stack_[i].score_ = (engine_ptr_->history()[side][from][to]
-          * MAX_HISTORY_SCORE) / history_max_;
+          << MAX_HISTORY_SCORE_SHIFT) / history_max_;
         }
       }
     }

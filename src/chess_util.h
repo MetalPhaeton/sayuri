@@ -51,6 +51,39 @@ namespace Sayuri {
       /** static変数の初期化。 */
       static void InitUtil();
 
+      // ====== //
+      // マクロ //
+      // ====== //
+      /**
+       * 大きい方の数を返す。
+       * @param a 値1。
+       * @param b 値2。
+       * @return 大きい方の数。
+       */
+#define MAX(a, b) (a > b ? a : b)
+      /**
+       * 小さい方の数を返す。
+       * @param a 値1。
+       * @param b 値2。
+       * @return 小さい方の数。
+       */
+#define MIN(a, b) (a < b ? a : b)
+
+
+      /**
+       * 探索深さをヒストリー値にする。
+       * @param depth 探索深さ。
+       * @return ヒストリー値。
+       */
+#define TO_HISTORY(depth) (depth * depth)
+
+      /**
+       * 逆サイドを得る。
+       * @param side 元のサイド。
+       * @return 逆サイド。
+       */
+#define OPPOSITE_SIDE(side) (side ^ 0x3)
+
       // ================== //
       // ビットボードの配列 //
       // ================== //

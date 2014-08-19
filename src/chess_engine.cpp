@@ -506,7 +506,8 @@ namespace Sayuri {
   // 探索を開始する。
   PVLine ChessEngine::Calculate(int num_threads, TranspositionTable& table,
   const std::vector<Move>& moves_to_search, UCIShell& shell) {
-    num_threads = num_threads >= 1 ? num_threads : 1;
+    num_threads = MAX(num_threads, 1);
+    num_threads = MIN(num_threads, UCI_MAX_THREADS);
     thread_vec_.resize(num_threads);
     return std::move(SearchRoot(table, moves_to_search, shell));
   }
@@ -526,7 +527,7 @@ namespace Sayuri {
     // 合法手かどうか調べる。
     bool is_legal = false;
     Side side = to_move_;
-    Side enemy_side = side ^ 0x3;
+    Side enemy_side = OPPOSITE_SIDE(side);
     for (Move temp_move = maker.PickMove(); temp_move;
     temp_move = maker.PickMove()) {
       MakeMove(temp_move);
@@ -623,7 +624,7 @@ namespace Sayuri {
     Side side = to_move_;
 
     // 手番を反転させる。
-    to_move_ = to_move_ ^ 0x3;
+    to_move_ = OPPOSITE_SIDE(to_move_);
 
     // 動かす前のキャスリングの権利とアンパッサンを記録する。
     SET_CASTLING_RIGHTS(move, castling_rights_);
@@ -788,7 +789,7 @@ namespace Sayuri {
   // その位置が他の位置の駒に攻撃されているかどうかチェックする。
   bool ChessEngine::IsAttacked(Square square, Side side) const {
     // ポーンに攻撃されているかどうか調べる。
-    Bitboard attack = Util::GetPawnAttack(square, side ^ 0x3);
+    Bitboard attack = Util::GetPawnAttack(square, OPPOSITE_SIDE(side));
     if (attack & position_[side][PAWN]) return true;
 
     // ナイトに攻撃されているかどうか調べる。
@@ -816,7 +817,7 @@ namespace Sayuri {
   // 現在のマテリアルを得る。
   int ChessEngine::GetMaterial(Side side) const {
     // 相手のサイド。
-    Side enemy_side = side ^ 0x3;
+    Side enemy_side = OPPOSITE_SIDE(side);
 
     int material = 0;
     for (Piece piece_type = PAWN; piece_type <= QUEEN; piece_type++) {
@@ -922,7 +923,8 @@ namespace Sayuri {
     current_hash ^= shared_st_ptr_->to_move_hash_value_table_[to_move_];
 
     // 次の手番のハッシュを追加。
-    current_hash ^= shared_st_ptr_->to_move_hash_value_table_[to_move_ ^ 0x3];
+    current_hash ^=
+    shared_st_ptr_->to_move_hash_value_table_[OPPOSITE_SIDE(to_move_)];
 
     // キャスリングのハッシュをセット。
     Castling loss_rights = 0;
