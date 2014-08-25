@@ -675,9 +675,9 @@ namespace Sayuri {
       }
       // ポーンの2歩の動きの場合はアンパッサンできるようにする。
       if (piece_board_[to] == PAWN) {
-        if (((side == WHITE) && ((from + 16) == to))
-        || ((side == BLACK) && ((from - 16) == to))) {
-          en_passant_square_ = side == WHITE ? to - 8 : to + 8;
+        int move_diff = to - from;
+        if ((move_diff == 16) || (move_diff == -16)) {
+          en_passant_square_ = Util::EN_PASSANT_SQUARE[side][to];
         }
       }
     } else if (move_type == EN_PASSANT) {  // アンパッサンの場合。
@@ -686,9 +686,7 @@ namespace Sayuri {
       // 動かす。
       ReplacePiece(from, to);
       // アンパッサンのターゲットを消す。
-      Square en_passant_target =
-      side == WHITE ? to - 8 : to + 8;
-      PutPiece(en_passant_target, EMPTY);
+      PutPiece(Util::EN_PASSANT_TARGET[side][to], EMPTY);
     } else if (move_type == CASTLE_WS) {  // 白のショートキャスリング。
       // キングを動かす。
       ReplacePiece(from, to);
@@ -778,9 +776,8 @@ namespace Sayuri {
       has_castled_[BLACK] = false;
     } else if (move_type == EN_PASSANT) {  // アンパッサンの場合。
       // アンパッサンのターゲットを戻す。
-      Square en_passant_target =
-      to_move_ == WHITE ? en_passant_square_ - 8 : en_passant_square_ + 8;
-      PutPiece(en_passant_target, PAWN, enemy_side);
+      PutPiece(Util::EN_PASSANT_TARGET[to_move_][en_passant_square_],
+      PAWN, enemy_side);
     } else {  // それ以外の場合。 (Null Moveなど。)
       return;
     }
@@ -894,12 +891,7 @@ namespace Sayuri {
     if ((piece_type == PAWN) && en_passant_square_
     && (to == en_passant_square_)) {
       // アンパッサンの時。
-      if (piece_side == WHITE) {
-        target_square = to - 8;
-      } else {
-        target_square = to + 8;
-      }
-      target_type = piece_board_[target_square];
+      target_type = piece_board_[Util::EN_PASSANT_TARGET[piece_side][to]];
     }
 
     // 移動する駒のハッシュを削除する。
@@ -967,9 +959,11 @@ namespace Sayuri {
     if (piece_type == PAWN) {
       int move_diff = to - from;
       if (move_diff == 16) {
-        current_hash ^= shared_st_ptr_->en_passant_hash_value_table_[to - 8];
+        current_hash ^= shared_st_ptr_->en_passant_hash_value_table_
+        [Util::EN_PASSANT_SQUARE[WHITE][to]];
       } else if (move_diff == -16) {
-        current_hash ^= shared_st_ptr_->en_passant_hash_value_table_[to + 8];
+        current_hash ^= shared_st_ptr_->en_passant_hash_value_table_
+        [Util::EN_PASSANT_SQUARE[BLACK][to]];
       }
     }
 

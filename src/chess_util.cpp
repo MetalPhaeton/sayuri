@@ -68,6 +68,8 @@ namespace Sayuri {
   constexpr Square Util::R_ROT90[NUM_SQUARES];
   constexpr Square Util::R_ROT135[NUM_SQUARES];
   constexpr Square Util::FLIP[NUM_SQUARES];
+  constexpr Square Util::EN_PASSANT_TARGET[NUM_SIDES][NUM_SQUARES];
+  constexpr Square Util::EN_PASSANT_SQUARE[NUM_SIDES][NUM_SQUARES];
   constexpr int Util::MAGIC_SHIFT_V[NUM_SQUARES];
   constexpr int Util::MAGIC_SHIFT_D[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK_V[NUM_SQUARES];
