@@ -709,7 +709,7 @@ namespace Sayuri {
       };
       if (piece_board_[to] == PAWN) {
         if (temp[side][from] == to) {
-          en_passant_square_ = Util::EN_PASSANT_SQUARE[side][to];
+          en_passant_square_ = Util::TO_EN_PASSANT_SQUARE[side][to];
         }
       }
     } else if (move_type == EN_PASSANT) {  // アンパッサンの場合。
@@ -718,7 +718,7 @@ namespace Sayuri {
       // 動かす。
       ReplacePiece(from, to);
       // アンパッサンのターゲットを消す。
-      PutPiece(Util::EN_PASSANT_TARGET[side][to], EMPTY);
+      PutPiece(Util::TO_EN_PASSANT_TARGET[side][to], EMPTY);
     } else if (move_type == CASTLE_WS) {  // 白のショートキャスリング。
       // キングを動かす。
       ReplacePiece(from, to);
@@ -808,7 +808,7 @@ namespace Sayuri {
       has_castled_[BLACK] = false;
     } else if (move_type == EN_PASSANT) {  // アンパッサンの場合。
       // アンパッサンのターゲットを戻す。
-      PutPiece(Util::EN_PASSANT_TARGET[to_move_][en_passant_square_],
+      PutPiece(Util::TO_EN_PASSANT_TARGET[to_move_][en_passant_square_],
       PAWN, enemy_side);
     } else {  // それ以外の場合。 (Null Moveなど。)
       return;
@@ -923,7 +923,7 @@ namespace Sayuri {
     if ((piece_type == PAWN) && en_passant_square_
     && (to == en_passant_square_)) {
       // アンパッサンの時。
-      target_type = piece_board_[Util::EN_PASSANT_TARGET[piece_side][to]];
+      target_type = piece_board_[Util::TO_EN_PASSANT_TARGET[piece_side][to]];
     }
 
     // 移動する駒のハッシュを削除する。
@@ -1024,7 +1024,7 @@ namespace Sayuri {
     if (piece_type == PAWN) {
       if (temp[piece_side][from] == to) {
         current_hash ^= shared_st_ptr_->en_passant_hash_value_table_
-        [Util::EN_PASSANT_SQUARE[piece_side][to]];
+        [Util::TO_EN_PASSANT_SQUARE[piece_side][to]];
       }
     }
 

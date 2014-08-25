@@ -589,9 +589,8 @@ namespace Sayuri {
       }
 
       // ダブルポーンを計算。
-      int fyle = Util::GetFyle(piece_square);
       if (Util::CountBits(engine_ptr_->position()[piece_side][PAWN]
-      & Util::FYLE[fyle]) >= 2) {
+      & Util::FYLE[Util::SQUARE_TO_FYLE[piece_square]]) >= 2) {
         double_pawn_value_ += sign * 1.0;
       }
 
@@ -628,7 +627,7 @@ namespace Sayuri {
 
     // --- ルーク --- //
     if (Type == ROOK) {
-      Bitboard rook_fyle = Util::FYLE[Util::GetFyle(piece_square)];
+      Bitboard rook_fyle = Util::FYLE[Util::SQUARE_TO_FYLE[piece_square]];
       // セミオープン。
       if (!(engine_ptr_->position()[piece_side][PAWN] & rook_fyle)) {
         rook_semiopen_fyle_value_ += sign * 1.0;
@@ -757,7 +756,7 @@ namespace Sayuri {
           pass_pawn_mask_[side][square] = 0;
         } else {
           // 自分のファイルと隣のファイルのマスクを作る。
-          Fyle fyle = Util::GetFyle(square);
+          Fyle fyle = Util::SQUARE_TO_FYLE[square];
           mask |= Util::FYLE[fyle];
           if (fyle == FYLE_A) {  // aファイルのときはbファイルが隣り。
             mask |= Util::FYLE[fyle + 1];
@@ -771,11 +770,11 @@ namespace Sayuri {
           // 自分の位置より手前のランクは消す。
           if (side == WHITE) {
             Bitboard temp = (Util::SQUARE[square] - 1)
-            | Util::RANK[Util::GetRank(square)];
+            | Util::RANK[Util::SQUARE_TO_RANK[square]];
             mask &= ~temp;
           } else {
             Bitboard temp = ~(Util::SQUARE[square] - 1)
-            | Util::RANK[Util::GetRank(square)];
+            | Util::RANK[Util::SQUARE_TO_RANK[square]];
             mask &= ~temp;
           }
 
@@ -789,7 +788,7 @@ namespace Sayuri {
   // iso_pawn_mask_[]を初期化する。
   void Evaluator::InitIsoPawnMask() {
     for (Square square = 0; square < NUM_SQUARES; square++) {
-      Fyle fyle = Util::GetFyle(square);
+      Fyle fyle = Util::SQUARE_TO_FYLE[square];
       if (fyle == FYLE_A) {
         iso_pawn_mask_[square] = Util::FYLE[fyle + 1];
       } else if (fyle == FYLE_H) {

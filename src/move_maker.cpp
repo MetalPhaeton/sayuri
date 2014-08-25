@@ -270,8 +270,8 @@ namespace Sayuri {
           SET_MOVE_TYPE(move, NORMAL);
         }
 
-        if (((side == WHITE) && (Util::GetRank(to) == RANK_8))
-        || ((side == BLACK) && (Util::GetRank(to) == RANK_1))) {
+        if (((side == WHITE) && (Util::SQUARE_TO_RANK[to] == RANK_8))
+        || ((side == BLACK) && (Util::SQUARE_TO_RANK[to] == RANK_1))) {
           // 昇格を設定。
           for (Piece piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
             SET_PROMOTION(move, piece_type);

@@ -124,14 +124,14 @@ namespace Sayuri {
 
     // 動かす駒の位置を出力する。
     std::cout << "From: ";
-    fyle = Util::GetFyle(GET_FROM(move));
-    rank = Util::GetRank(GET_FROM(move));
+    fyle = Util::SQUARE_TO_FYLE[GET_FROM(move)];
+    rank = Util::SQUARE_TO_RANK[GET_FROM(move)];
     std::cout << fyle_table[fyle] << rank_table[rank] << std::endl;
 
     // 移動先の位置を出力する。
     std::cout << "To: ";
-    fyle = Util::GetFyle(GET_TO(move));
-    rank = Util::GetRank(GET_TO(move));
+    fyle = Util::SQUARE_TO_FYLE[GET_TO(move)];
+    rank = Util::SQUARE_TO_RANK[GET_TO(move)];
     std::cout << fyle_table[fyle] << rank_table[rank] << std::endl;
 
     // 取った駒の種類を出力する。
@@ -209,8 +209,8 @@ namespace Sayuri {
 
     // アンパッサンのターゲットを出力する。
     if (Square en_passant_square = GET_EN_PASSANT_SQUARE(move)) {
-      fyle = Util::GetFyle(en_passant_square);
-      rank = Util::GetRank(en_passant_square);
+      fyle = Util::SQUARE_TO_FYLE[en_passant_square];
+      rank = Util::SQUARE_TO_RANK[en_passant_square];
       std::cout << "En Passant Square: "
       << fyle_table[fyle] << rank_table[rank] << std::endl;
     } else {
@@ -355,8 +355,8 @@ namespace Sayuri {
       std::string rank_str[NUM_RANKS] {
         "1", "2", "3", "4", "5", "6", "7", "8"
       };
-      std::cout << fyle_str[Util::GetFyle(en_passant)];
-      std::cout << rank_str[Util::GetRank(en_passant)] << std::endl;
+      std::cout << fyle_str[Util::SQUARE_TO_FYLE[en_passant]];
+      std::cout << rank_str[Util::SQUARE_TO_RANK[en_passant]] << std::endl;
     } else {
       std::cout << "No Square" << std::endl;
     }

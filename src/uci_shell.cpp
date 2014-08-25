@@ -630,10 +630,10 @@ namespace Sayuri {
     // ストリームに流しこむ。
     Square from = GET_FROM(move);
     Square to = GET_TO(move);
-    oss << static_cast<char>(Util::GetFyle(from) + 'a');
-    oss << static_cast<char>(Util::GetRank(from) + '1');
-    oss << static_cast<char>(Util::GetFyle(to) + 'a');
-    oss << static_cast<char>(Util::GetRank(to) + '1');
+    oss << static_cast<char>(Util::SQUARE_TO_FYLE[from] + 'a');
+    oss << static_cast<char>(Util::SQUARE_TO_RANK[from] + '1');
+    oss << static_cast<char>(Util::SQUARE_TO_FYLE[to] + 'a');
+    oss << static_cast<char>(Util::SQUARE_TO_RANK[to] + '1');
     switch (GET_PROMOTION(move)) {
       case KNIGHT:
         oss << 'n';

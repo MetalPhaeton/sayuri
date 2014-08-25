@@ -406,7 +406,8 @@ namespace Sayuri {
 
                 // ヒストリー。
                 if (params.enable_history()) {
-                  shared_st_ptr_->history_[side][from][to] += TO_HISTORY(depth);
+                  shared_st_ptr_->history_[side][from][to] +=
+                  TO_HISTORY(depth);
                   if (shared_st_ptr_->history_[side][from][to]
                   > shared_st_ptr_->history_max_) {
                     shared_st_ptr_->history_max_ =
@@ -1504,8 +1505,10 @@ namespace Sayuri {
         case PAWN:
           attackers = Util::GetPawnAttack(target, OPPOSITE_SIDE(to_move_))
           & position_[to_move_][PAWN];
-          if (((to_move_ == WHITE) && (Util::GetRank(target) == RANK_8))
-          || ((to_move_ == BLACK) && (Util::GetRank(target) == RANK_1))) {
+          if (((to_move_ == WHITE)
+          && (Util::SQUARE_TO_RANK[target] == RANK_8))
+          || ((to_move_ == BLACK)
+          && (Util::SQUARE_TO_RANK[target] == RANK_1))) {
             promotion = QUEEN;
           }
           break;

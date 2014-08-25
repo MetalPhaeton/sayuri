@@ -68,8 +68,11 @@ namespace Sayuri {
   constexpr Square Util::R_ROT90[NUM_SQUARES];
   constexpr Square Util::R_ROT135[NUM_SQUARES];
   constexpr Square Util::FLIP[NUM_SQUARES];
-  constexpr Square Util::EN_PASSANT_TARGET[NUM_SIDES][NUM_SQUARES];
-  constexpr Square Util::EN_PASSANT_SQUARE[NUM_SIDES][NUM_SQUARES];
+  constexpr Fyle Util::SQUARE_TO_FYLE[NUM_SQUARES];
+  constexpr Rank Util::SQUARE_TO_RANK[NUM_SQUARES];
+  constexpr Square Util::COORD_TO_SQUARE[NUM_FYLES][NUM_RANKS];
+  constexpr Square Util::TO_EN_PASSANT_TARGET[NUM_SIDES][NUM_SQUARES];
+  constexpr Square Util::TO_EN_PASSANT_SQUARE[NUM_SIDES][NUM_SQUARES];
   constexpr int Util::MAGIC_SHIFT_V[NUM_SQUARES];
   constexpr int Util::MAGIC_SHIFT_D[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK_V[NUM_SQUARES];
@@ -264,7 +267,7 @@ namespace Sayuri {
       for (Square square = 0; square < NUM_SQUARES; square++) {
         for (unsigned int map = 0; map <= BLOCKER_MAP; map++) {
           if (side == WHITE) {
-            if (GetRank(square) == RANK_2) {
+            if (SQUARE_TO_RANK[square] == RANK_2) {
               // 初期配置のポーンの位置。
               Bitboard front_bit =
               SQUARE[ROT90[square + 8]] >> MAGIC_SHIFT_V[ROT90[square + 8]];
@@ -282,7 +285,7 @@ namespace Sayuri {
               } else {
                 pawn_movable_table_[side][square][map] = 0;
               }
-            } else if (GetRank(square) == RANK_8) {
+            } else if (SQUARE_TO_RANK[square] == RANK_8) {
               // 最上ランク。
               pawn_movable_table_[side][square][map] = 0;
             } else {
@@ -296,7 +299,7 @@ namespace Sayuri {
               }
             }
           } else if (side == BLACK) {
-            if (GetRank(square) == RANK_7) {
+            if (SQUARE_TO_RANK[square] == RANK_7) {
               // 初期配置のポーンの位置。
               Bitboard front_bit =
               SQUARE[ROT90[square - 8]] >> MAGIC_SHIFT_V[ROT90[square - 8]];
@@ -314,7 +317,7 @@ namespace Sayuri {
               } else {
                 pawn_movable_table_[side][square][map] = 0;
               }
-            } else if (GetRank(square) == RANK_1) {
+            } else if (SQUARE_TO_RANK[square] == RANK_1) {
               // 最上ランク。
               pawn_movable_table_[side][square][map] = 0;
             } else {
