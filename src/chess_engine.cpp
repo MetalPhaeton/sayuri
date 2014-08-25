@@ -674,9 +674,41 @@ namespace Sayuri {
         PutPiece(to, promotion, side);
       }
       // ポーンの2歩の動きの場合はアンパッサンできるようにする。
+      // temp[][]は計算時間の省略のための、2歩の動きの判定用テーブル。
+      static const Square temp[NUM_SIDES][NUM_SQUARES] {
+        {
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U
+        },
+        {
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          A4, B4, C4, D4, E4, F4, G4, H4,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U
+        },
+        {
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          A5, B5, C5, D5, E5, F5, G5, H5,
+          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U
+        }
+      };
       if (piece_board_[to] == PAWN) {
-        int move_diff = to - from;
-        if ((move_diff == 16) || (move_diff == -16)) {
+        if (temp[side][from] == to) {
           en_passant_square_ = Util::EN_PASSANT_SQUARE[side][to];
         }
       }
@@ -956,14 +988,43 @@ namespace Sayuri {
     shared_st_ptr_->en_passant_hash_value_table_[en_passant_square_];
 
     // ポーンの2歩の動きの場合はアンパッサンハッシュを追加。
+    // temp[][]は計算時間の省略のための、2歩の動きの判定用テーブル。
+    static const Square temp[NUM_SIDES][NUM_SQUARES] {
+      {
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U
+      },
+      {
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        A4, B4, C4, D4, E4, F4, G4, H4,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U
+      },
+      {
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        A5, B5, C5, D5, E5, F5, G5, H5,
+        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U
+      }
+    };
     if (piece_type == PAWN) {
-      int move_diff = to - from;
-      if (move_diff == 16) {
+      if (temp[piece_side][from] == to) {
         current_hash ^= shared_st_ptr_->en_passant_hash_value_table_
-        [Util::EN_PASSANT_SQUARE[WHITE][to]];
-      } else if (move_diff == -16) {
-        current_hash ^= shared_st_ptr_->en_passant_hash_value_table_
-        [Util::EN_PASSANT_SQUARE[BLACK][to]];
+        [Util::EN_PASSANT_SQUARE[piece_side][to]];
       }
     }
 
