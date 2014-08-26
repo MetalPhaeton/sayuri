@@ -77,8 +77,8 @@ namespace Sayuri {
   ply_100_(fen.ply_100_),
   ply_(fen.ply_) {
     // 駒の配置をコピー。
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
+      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
         position_[side][piece_type] = fen.position_[side][piece_type];
       }
     }
@@ -92,8 +92,8 @@ namespace Sayuri {
   ply_100_(fen.ply_100_),
   ply_(fen.ply_) {
     // 駒の配置をコピー。
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
+      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
         position_[side][piece_type] = fen.position_[side][piece_type];
       }
     }
@@ -107,8 +107,8 @@ namespace Sayuri {
     en_passant_square_ = fen.en_passant_square_;
     ply_100_ = fen.ply_100_;
     ply_ = fen.ply_;
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
+      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
         position_[side][piece_type] = fen.position_[side][piece_type];
       }
     }
@@ -124,8 +124,8 @@ namespace Sayuri {
     en_passant_square_ = fen.en_passant_square_;
     ply_100_ = fen.ply_100_;
     ply_ = fen.ply_;
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
+      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
         position_[side][piece_type] = fen.position_[side][piece_type];
       }
     }
@@ -139,8 +139,8 @@ namespace Sayuri {
   // 駒の配置文字列を評価する。
   void FEN::EvalPosition(const std::string& position_str) {
     // 駒の配置を初期化。
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
+      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
         position_[side][piece_type] = 0;
       }
     }
@@ -208,7 +208,7 @@ namespace Sayuri {
             throw SayuriError("FENを解析できません。 in FEN::EvalPosition()");
             break;
         }
-        square++;
+        ++square;
         if (square > 64) {
           throw SayuriError("FENを解析できません。 in FEN::EvalPosition()");
         }

@@ -46,7 +46,7 @@ namespace Sayuri {
   last_(pv_line.last_),
   score_(pv_line.score_),
   mate_in_(pv_line.mate_in_) {
-    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); i++) {
+    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); ++i) {
       line_[i] = pv_line.line_[i];
     }
   }
@@ -56,7 +56,7 @@ namespace Sayuri {
   last_(pv_line.last_),
   score_(pv_line.score_),
   mate_in_(pv_line.mate_in_) {
-    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); i++) {
+    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); ++i) {
       line_[i] = pv_line.line_[i];
     }
   }
@@ -66,7 +66,7 @@ namespace Sayuri {
     score_ = pv_line.score_;
     mate_in_ = pv_line.mate_in_;
     last_ = pv_line.last_;
-    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); i++) {
+    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); ++i) {
       line_[i] = pv_line.line_[i];
     }
 
@@ -78,7 +78,7 @@ namespace Sayuri {
     score_ = pv_line.score_;
     mate_in_ = pv_line.mate_in_;
     last_ = pv_line.last_;
-    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); i++) {
+    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); ++i) {
       line_[i] = pv_line.line_[i];
     }
 
@@ -92,7 +92,7 @@ namespace Sayuri {
   void PVLine::Insert(const PVLine& pv_line) {
     // PVラインをコピー。
     last_ = pv_line.last_ + 1;
-    for (std::size_t i = 1; i < last_; i++) {
+    for (std::size_t i = 1; i < last_; ++i) {
       line_[i] = pv_line.line_[i - 1];
     }
 

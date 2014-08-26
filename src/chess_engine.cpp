@@ -70,7 +70,7 @@ namespace Sayuri {
 
     // ムーブメーカー。
     maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       maker_table_[i] = MoveMaker(*this);
     }
 
@@ -79,7 +79,7 @@ namespace Sayuri {
 
     // Job。
     job_table_.reset(new Job[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       job_table_[i].client_ptr_ = this;
     }
 
@@ -97,7 +97,7 @@ namespace Sayuri {
 
     // ムーブメーカー。
     maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       maker_table_[i] = MoveMaker(*this);
     }
 
@@ -106,7 +106,7 @@ namespace Sayuri {
 
     // Job。
     job_table_.reset(new Job[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       job_table_[i].client_ptr_ = this;
     }
 
@@ -128,7 +128,7 @@ namespace Sayuri {
 
     // ムーブメーカー。
     maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       maker_table_[i] = MoveMaker(*this);
     }
 
@@ -137,7 +137,7 @@ namespace Sayuri {
 
     // Job。
     job_table_.reset(new Job[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       job_table_[i].client_ptr_ = this;
     }
 
@@ -159,7 +159,7 @@ namespace Sayuri {
 
     // ムーブメーカー。
     maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       maker_table_[i] = MoveMaker(*this);
     }
 
@@ -168,7 +168,7 @@ namespace Sayuri {
 
     // Job。
     job_table_.reset(new Job[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       job_table_[i].client_ptr_ = this;
     }
 
@@ -219,7 +219,7 @@ namespace Sayuri {
     if ((num_white_king != 1) || (num_black_king != 1)) return;
 
     // 空にする。
-    for (Square square = 0; square < NUM_SQUARES; square++) {
+    for (Square square = 0; square < NUM_SQUARES; ++square) {
       piece_board_[square] = EMPTY;
       side_board_[square] = NO_SIDE;
     }
@@ -229,9 +229,9 @@ namespace Sayuri {
     blocker_135_ = 0;
 
     // 駒を配置する。
-    for (Side side = WHITE; side <= BLACK; side++) {
+    for (Side side = WHITE; side <= BLACK; ++side) {
       side_pieces_[side] = 0;
-      for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+      for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
         position_[side][piece_type] = fen.position()[side][piece_type];
         for (Bitboard bb = position_[side][piece_type]; bb; NEXT(bb)) {
           Square square = Util::GetSquare(bb);
@@ -267,8 +267,8 @@ namespace Sayuri {
   // PositionRecordから局面読み込む。
   void ChessEngine::LoadRecord(const PositionRecord& record) {
     // サイド毎のコピー。
-    for (Side side = WHITE; side <= BLACK; side++) {
-      for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+    for (Side side = WHITE; side <= BLACK; ++side) {
+      for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
         position_[side][piece_type] = record.position()[side][piece_type];
       }
       side_pieces_[side] = record.side_pieces()[side];
@@ -277,7 +277,7 @@ namespace Sayuri {
     }
 
     // マス毎のコピー。
-    for (Square square = A1; square <= H8; square++) {
+    for (Square square = A1; square <= H8; ++square) {
       piece_board_[square] = record.piece_board()[square];
       side_board_[square] = record.side_board()[square];
     }
@@ -294,7 +294,7 @@ namespace Sayuri {
     en_passant_square_ = record.en_passant_square();
     ply_100_ = record.ply_100();
     ply_ = record.ply();
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       position_memo_[i] = record.position_memo()[i];
     }
   }
@@ -303,7 +303,7 @@ namespace Sayuri {
   void ChessEngine::SetStartPosition() {
     // 駒の配置を作る。
     // どちらでもない。
-    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
       position_[NO_SIDE][piece_type] = 0;
     }
     // 白の駒。
@@ -327,7 +327,7 @@ namespace Sayuri {
     side_pieces_[NO_SIDE] = 0;
     side_pieces_[WHITE] = 0;
     side_pieces_[BLACK] = 0;
-    for (Piece piece_type = PAWN; piece_type < NUM_PIECE_TYPES; piece_type++) {
+    for (Piece piece_type = PAWN; piece_type < NUM_PIECE_TYPES; ++piece_type) {
       side_pieces_[WHITE] |= position_[WHITE][piece_type];
       side_pieces_[BLACK] |= position_[BLACK][piece_type];
     }
@@ -347,7 +347,7 @@ namespace Sayuri {
 
     // 駒の種類とサイドの配置を作る。
     Bitboard point = 1;
-    for (Square square = 0; square < NUM_SQUARES; square++) {
+    for (Square square = 0; square < NUM_SQUARES; ++square) {
       // サイドの配置。
       if (side_pieces_[WHITE] & point) side_board_[square] = WHITE;
       else if (side_pieces_[BLACK] & point) side_board_[square] = BLACK;
@@ -399,12 +399,12 @@ namespace Sayuri {
     ply_ = 1;
 
     // キャスリングしたかどうかの初期化。
-    for (Side side = 0; side < NUM_SIDES; side++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
       has_castled_[side] = false;
     }
 
     // 駒の配置のメモを初期化。
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       position_memo_[i] = 0;
     }
 
@@ -447,9 +447,9 @@ namespace Sayuri {
   // 他のエンジンの基本メンバをコピーする。
   void ChessEngine::ScanBasicMember(const ChessEngine& engine) {
     // サイド毎のコピー。
-    for (Side side = 0; side < NUM_SIDES; side++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
       // 駒の配置をコピー。
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
         position_[side][piece_type] = engine.position_[side][piece_type];
       }
 
@@ -464,7 +464,7 @@ namespace Sayuri {
     }
 
     // マス毎のコピー。
-    for (Square square = 0; square < NUM_SQUARES; square++) {
+    for (Square square = 0; square < NUM_SQUARES; ++square) {
       // 駒の種類の配置のコピー。
       piece_board_[square] = engine.piece_board_[square];
 
@@ -494,7 +494,7 @@ namespace Sayuri {
     ply_ = engine.ply_;
 
     // 駒の配置のメモをコピー。
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       position_memo_[i] = engine.position_memo_[i];
     }
   }
@@ -543,12 +543,12 @@ namespace Sayuri {
     }
 
     if (is_legal) {
-      ply_++;
+      ++ply_;
       if ((piece_board_[GET_FROM(move)] == PAWN)
       || (piece_board_[GET_TO(move)] != EMPTY)) {
         ply_100_ = 0;
       } else {
-        ply_100_++;
+        ++ply_100_;
       }
       shared_st_ptr_->move_history_.push_back(move);
       shared_st_ptr_->ply_100_history_.push_back(ply_100_);
@@ -561,7 +561,7 @@ namespace Sayuri {
   // 1手戻す。
   void ChessEngine::UndoMove() {
     if (shared_st_ptr_->move_history_.size() >= 1) {
-      ply_--;
+      --ply_;
       Move move = shared_st_ptr_->move_history_.back();
       ply_100_ = shared_st_ptr_->ply_100_history_.back();
       shared_st_ptr_->move_history_.pop_back();
@@ -845,7 +845,7 @@ namespace Sayuri {
     Side enemy_side = OPPOSITE_SIDE(side);
 
     int material = 0;
-    for (Piece piece_type = PAWN; piece_type <= QUEEN; piece_type++) {
+    for (Piece piece_type = PAWN; piece_type <= QUEEN; ++piece_type) {
       material += shared_st_ptr_->search_params_ptr_->material()[piece_type]
       * (Util::CountBits(position_[side][piece_type])
       - Util::CountBits(position_[enemy_side][piece_type]));
@@ -878,7 +878,7 @@ namespace Sayuri {
     Hash hash = 0;
 
     // 駒の情報からハッシュを得る。
-    for (Square square = 0; square < NUM_SQUARES; square++) {
+    for (Square square = 0; square < NUM_SQUARES; ++square) {
       hash ^= shared_st_ptr_->piece_hash_value_table_
       [side_board_[square]][piece_board_[square]][square];
     }
@@ -888,7 +888,7 @@ namespace Sayuri {
 
     // キャスリングの権利からハッシュを得る。
     Castling bit = 1;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; ++i) {
       if (castling_rights_ & bit) {
         hash ^= shared_st_ptr_->castling_hash_value_table_[i];
       }
@@ -972,7 +972,7 @@ namespace Sayuri {
     Castling castling_diff =
     (castling_rights_ & ~(loss_rights)) ^ castling_rights_;
     Castling bit = 1;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; ++i) {
       if (castling_diff & bit) {
         current_hash ^= shared_st_ptr_->castling_hash_value_table_[i];
       }
@@ -1106,14 +1106,14 @@ namespace Sayuri {
   ply_100_history_(0),
   position_history_(0),
   eval_params_ptr_(nullptr) {
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Square from = 0; from < NUM_SQUARES; from++) {
-        for (Square to = 0; to < NUM_SQUARES; to++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
+      for (Square from = 0; from < NUM_SQUARES; ++from) {
+        for (Square to = 0; to < NUM_SQUARES; ++to) {
           history_[side][from][to] = 0;
         }
       }
     }
-    for (unsigned int i = 0; i < (MAX_PLYS + 1); i++) {
+    for (unsigned int i = 0; i < (MAX_PLYS + 1); ++i) {
       iid_stack_[i] = 0;
       killer_stack_[i][0] = 0;
       killer_stack_[i][1] = 0;
@@ -1150,15 +1150,15 @@ namespace Sayuri {
 
   // メンバをコピーする。
   void ChessEngine::SharedStruct::ScanMember(const SharedStruct& shared_st) {
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Square from = 0; from < NUM_SQUARES; from++) {
-        for (Square to = 0; to < NUM_SQUARES; to++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
+      for (Square from = 0; from < NUM_SQUARES; ++from) {
+        for (Square to = 0; to < NUM_SQUARES; ++to) {
           history_[side][from][to] = shared_st.history_[side][from][to];
         }
       }
     }
     history_max_ = shared_st.history_max_;
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       iid_stack_[i] = shared_st.iid_stack_[i];
       killer_stack_[i][0] = shared_st.killer_stack_[i][0];
       killer_stack_[i][0] = shared_st.killer_stack_[i][0];
@@ -1182,22 +1182,22 @@ namespace Sayuri {
     eval_params_ptr_ = shared_st.eval_params_ptr_;
 
     // ハッシュ関連。
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
-        for (Square square = 0; square < NUM_SQUARES; square++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
+      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+        for (Square square = 0; square < NUM_SQUARES; ++square) {
           piece_hash_value_table_[side][piece_type][square] =
           shared_st.piece_hash_value_table_[side][piece_type][square];
         }
       }
     }
-    for (Side side = 0; side < NUM_SIDES; side++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
       to_move_hash_value_table_[side] =
       shared_st.to_move_hash_value_table_[side];
     }
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; ++i) {
       castling_hash_value_table_[i] = shared_st.castling_hash_value_table_[i];
     }
-    for (Square square = 0; square < NUM_SQUARES; square++) {
+    for (Square square = 0; square < NUM_SQUARES; ++square) {
       en_passant_hash_value_table_[square] =
       shared_st.en_passant_hash_value_table_[square];
     }
@@ -1210,7 +1210,7 @@ namespace Sayuri {
     (NUM_SIDES * NUM_PIECE_TYPES * NUM_SQUARES) + 1 + 4 + NUM_SQUARES;
     Hash temp_table[LENGTH];
     int temp_count = 0;
-    for (int i = 0; i < LENGTH; i++) {
+    for (int i = 0; i < LENGTH; ++i) {
       // ダブリを調べる。
       bool loop = true;
       Hash hash = 0;
@@ -1221,7 +1221,7 @@ namespace Sayuri {
           loop = true;
           continue;
         }
-        for (int j = 0; j < i; j++) {
+        for (int j = 0; j < i; ++j) {
           if (hash == temp_table[j]) {
             loop = true;
             break;
@@ -1233,16 +1233,16 @@ namespace Sayuri {
     }
 
     // 駒の情報の配列を初期化。
-    for (Side side = 0; side < NUM_SIDES; side++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
       for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES;
-      piece_type++) {
-        for (Square square = 0; square < NUM_SQUARES; square++) {
+      ++piece_type) {
+        for (Square square = 0; square < NUM_SQUARES; ++square) {
           if ((side == NO_SIDE) || (piece_type == EMPTY)) {
             piece_hash_value_table_[side][piece_type][square] = 0;
           } else {
             piece_hash_value_table_[side][piece_type][square] =
             temp_table[temp_count];
-            temp_count++;
+            ++temp_count;
           }
         }
       }
@@ -1252,23 +1252,23 @@ namespace Sayuri {
     to_move_hash_value_table_[NO_SIDE] = 0;
     to_move_hash_value_table_[WHITE] = 0;
     to_move_hash_value_table_[BLACK] = temp_table[temp_count];
-    temp_count++;
+    ++temp_count;
 
     // キャスリングの配列を初期化。
     // 0: 白のショートキャスリング。
     // 1: 白のロングキャスリング。
     // 2: 黒のショートキャスリング。
     // 3: 黒のロングキャスリング。
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; ++i) {
       castling_hash_value_table_[i] = temp_table[temp_count];
-      temp_count++;
+      ++temp_count;
     }
 
     // アンパッサンの配列を初期化。
     en_passant_hash_value_table_[0] = 0;
-    for (Square square = 1; square < NUM_SQUARES; square++) {
+    for (Square square = 1; square < NUM_SQUARES; ++square) {
       en_passant_hash_value_table_[square] = temp_table[temp_count];
-      temp_count++;
+      ++temp_count;
     }
   }
 }  // namespace Sayuri

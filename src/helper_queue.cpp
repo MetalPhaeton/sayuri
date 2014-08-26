@@ -90,9 +90,9 @@ namespace Sayuri {
     // ルートノードのクライアントが待っていれば待たない。
     if (!is_root_client_waiting_) {
       while (!job_ptr_) {
-        num_helpers_++;
+        ++num_helpers_;
         helper_cond_.wait(lock);
-        num_helpers_--;
+        --num_helpers_;
         // 待っている間にno_more_help_が立っているかもしれないので、
         // もう一度確認。
         // ヘルパーが必要なければnullptrを返す。

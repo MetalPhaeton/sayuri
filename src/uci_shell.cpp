@@ -203,7 +203,7 @@ namespace Sayuri {
     sout << " nodes " << num_nodes;
     // PVラインを送る。
     sout << " pv";
-    for (std::size_t i = 0; i < pv_line.length(); i++) {
+    for (std::size_t i = 0; i < pv_line.length(); ++i) {
       if (!(pv_line[i])) break;
 
       sout << " " << TransMoveToString(pv_line[i]);
@@ -396,7 +396,7 @@ namespace Sayuri {
 
     // nameの文字列をくっつける。
     std::string name_str = "";
-    for (unsigned int i = 1; i < args["name"].size(); i++) {
+    for (unsigned int i = 1; i < args["name"].size(); ++i) {
       name_str += args["name"][i] + " ";
     }
     name_str.pop_back();
@@ -457,7 +457,7 @@ namespace Sayuri {
     if (args.find("fen") != args.end()) {
       // fenコマンドをくっつける。
       std::string fen_str = "";
-      for (unsigned int i = 1; i < args["fen"].size(); i++) {
+      for (unsigned int i = 1; i < args["fen"].size(); ++i) {
         fen_str += args["fen"][i] + " ";
       }
       fen_str.pop_back();
@@ -469,7 +469,7 @@ namespace Sayuri {
     // movesコマンド。
     if (args.find("moves") != args.end()) {
       // 手を指していく。
-      for (unsigned int i = 1; i < args["moves"].size(); i++) {
+      for (unsigned int i = 1; i < args["moves"].size(); ++i) {
         Move move = TransStringToMove(args["moves"][i]);
         if (move) engine_ptr_->PlayMove(move);
       }
@@ -493,7 +493,7 @@ namespace Sayuri {
 
     // searchmovesコマンド。
     if (args.find("searchmoves") != args.end()) {
-      for (unsigned int i = 1; i < args["searchmoves"].size(); i++) {
+      for (unsigned int i = 1; i < args["searchmoves"].size(); ++i) {
         Move move = TransStringToMove(args["searchmoves"][i]);
         if (move) moves_to_search_.push_back(move);
       }

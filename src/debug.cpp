@@ -84,9 +84,9 @@ namespace Sayuri {
     // ビットボードを出力。
     Bitboard bit = 0x1ULL << (8 * 7);  // 初期位置a8へシフト。
     char c = '8';  // ランクの文字。
-    for (Rank rank = 0; rank < NUM_RANKS; rank++) {
+    for (Rank rank = 0; rank < NUM_RANKS; ++rank) {
       osstream << c << "| ";
-      for (Fyle fyle = 0; fyle < NUM_FYLES; fyle++) {
+      for (Fyle fyle = 0; fyle < NUM_FYLES; ++fyle) {
         if (bitboard & bit) {
           osstream << "@ ";
         } else {
@@ -97,7 +97,7 @@ namespace Sayuri {
       // 一つ下のランクへ。
       bit >>= (7 + 8);
       osstream << "|" << std::endl;
-      c--;
+      --c;
     }
 
     // 下部分を書く。
@@ -262,9 +262,9 @@ namespace Sayuri {
     // 駒の配置を出力。
     Bitboard bit = 0x1ULL << (8 * 7);  // 初期位置a8へシフト。
     char c = '8';  // ランクの文字。
-    for (Rank rank = 0; rank < NUM_RANKS; rank++) {
+    for (Rank rank = 0; rank < NUM_RANKS; ++rank) {
       osstream << c << "| ";
-      for (Fyle fyle = 0; fyle < NUM_FYLES; fyle++) {
+      for (Fyle fyle = 0; fyle < NUM_FYLES; ++fyle) {
         if (position[WHITE][PAWN] & bit) {
           osstream << "P ";
         } else if (position[WHITE][KNIGHT] & bit) {
@@ -298,7 +298,7 @@ namespace Sayuri {
       // 一つ下のランクへ。
       bit >>= (7 + 8);
       osstream << "|" << std::endl;
-      c--;
+      --c;
     }
 
     // 下部分を書く。
@@ -384,7 +384,7 @@ namespace Sayuri {
 
     std::ostringstream os;
     double total = 0.0;
-    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+    for (Piece type = 0; type < NUM_PIECE_TYPES; ++type) {
       os << "    " << piece_name[type] << ": "
       << result.score_opening_position_[type] << std::endl;
       total += result.score_opening_position_[type];
@@ -394,7 +394,7 @@ namespace Sayuri {
 
     os.str("");
     total = 0.0;
-    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+    for (Piece type = 0; type < NUM_PIECE_TYPES; ++type) {
       os << "    " << piece_name[type] << ": "
       << result.score_ending_position_[type] << std::endl;
       total += result.score_ending_position_[type];
@@ -404,7 +404,7 @@ namespace Sayuri {
 
     os.str("");
     total = 0.0;
-    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+    for (Piece type = 0; type < NUM_PIECE_TYPES; ++type) {
       os << "    " << piece_name[type] << ": "
       << result.score_mobility_[type] << std::endl;
       total += result.score_mobility_[type];
@@ -414,7 +414,7 @@ namespace Sayuri {
 
     os.str("");
     total = 0.0;
-    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+    for (Piece type = 0; type < NUM_PIECE_TYPES; ++type) {
       os << "    " << piece_name[type] << ": "
       << result.score_center_control_[type] << std::endl;
       total += result.score_center_control_[type];
@@ -424,7 +424,7 @@ namespace Sayuri {
 
     os.str("");
     total = 0.0;
-    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+    for (Piece type = 0; type < NUM_PIECE_TYPES; ++type) {
       os << "    " << piece_name[type] << ": "
       << result.score_sweet_center_control_[type] << std::endl;
       total += result.score_sweet_center_control_[type];
@@ -434,7 +434,7 @@ namespace Sayuri {
 
     os.str("");
     total = 0.0;
-    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+    for (Piece type = 0; type < NUM_PIECE_TYPES; ++type) {
       os << "    " << piece_name[type] << ": "
       << result.score_development_[type] << std::endl;
       total += result.score_development_[type];
@@ -444,7 +444,7 @@ namespace Sayuri {
 
     os.str("");
     total = 0.0;
-    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+    for (Piece type = 0; type < NUM_PIECE_TYPES; ++type) {
       os << "    " << piece_name[type] << ": "
       << result.score_attack_[type] << std::endl;
       total += result.score_attack_[type];
@@ -454,7 +454,7 @@ namespace Sayuri {
 
     os.str("");
     total = 0.0;
-    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+    for (Piece type = 0; type < NUM_PIECE_TYPES; ++type) {
       os << "    " << piece_name[type] << ": "
       << result.score_defense_[type] << std::endl;
       total += result.score_defense_[type];
@@ -464,7 +464,7 @@ namespace Sayuri {
 
     os.str("");
     total = 0.0;
-    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+    for (Piece type = 0; type < NUM_PIECE_TYPES; ++type) {
       os << "    " << piece_name[type] << ": "
       << result.score_pin_[type] << std::endl;
       total += result.score_pin_[type];
@@ -474,7 +474,7 @@ namespace Sayuri {
 
     os.str("");
     total = 0.0;
-    for (Piece type = 0; type < NUM_PIECE_TYPES; type++) {
+    for (Piece type = 0; type < NUM_PIECE_TYPES; ++type) {
       os << "    " << piece_name[type] << ": "
       << result.score_attack_around_king_[type] << std::endl;
       total += result.score_attack_around_king_[type];

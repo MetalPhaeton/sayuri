@@ -80,7 +80,7 @@ namespace Sayuri {
     num_entries_ = table.num_entries_;
     num_used_entries_ = table.num_used_entries_;
     entry_table_.reset(new TTEntry[num_entries_]);
-    for (std::size_t i = 0; i < num_entries_; i++) {
+    for (std::size_t i = 0; i < num_entries_; ++i) {
       entry_table_[i] = table.entry_table_[i];
     }
     age_ = table.age_;
@@ -109,7 +109,7 @@ namespace Sayuri {
 
     // 空いているエントリーへの登録なら使用済みエントリー数をカウント。
     if (entry_table_[index].depth() <= -MAX_VALUE) {
-      num_used_entries_++;
+      ++num_used_entries_;
     }
 
     // テーブルが若い時にに登録されているものなら上書き。

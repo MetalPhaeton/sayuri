@@ -85,13 +85,13 @@ namespace Sayuri {
   // この仕事を請け負っているヘルパーの数を増やす。
   void Job::CountHelper() {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
-    helper_counter_++;
+    ++helper_counter_;
   }
 
   // 仕事終了を知らせる。
   void Job::FinishMyJob() {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
-    helper_counter_--;
+    --helper_counter_;
     cond_.notify_all();
   }
 
@@ -114,7 +114,7 @@ namespace Sayuri {
   // 数を数える。
   int Job::Count() {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
-    counter_++;
+    ++counter_;
     return counter_;
   }
 

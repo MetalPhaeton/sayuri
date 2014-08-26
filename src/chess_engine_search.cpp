@@ -60,7 +60,7 @@ namespace Sayuri {
     if (is_job_ended_) return alpha;
 
     // ノード数を加算。
-    shared_st_ptr_->searched_nodes_++;
+    ++(shared_st_ptr_->searched_nodes_);
 
     // 最大探索数。
     shared_st_ptr_->searched_level_ =
@@ -151,7 +151,7 @@ namespace Sayuri {
     if (is_job_ended_) return alpha;
 
     // ノード数を加算。
-    shared_st_ptr_->searched_nodes_++;
+    ++(shared_st_ptr_->searched_nodes_);
 
     // 最大探索数。
     shared_st_ptr_->searched_level_ =
@@ -284,7 +284,7 @@ namespace Sayuri {
     if ((depth <= 0) || (level >= MAX_PLYS)) {
       if (params.enable_quiesce_search()) {
         // クイース探索ノードに移行するため、ノード数を減らしておく。
-        shared_st_ptr_->searched_nodes_--;
+        --(shared_st_ptr_->searched_nodes_);
         return Quiesce(depth, level, alpha, beta, material, table);
       } else {
         return evaluator_.Evaluate(material);
@@ -336,7 +336,7 @@ namespace Sayuri {
             if ((depth <= 0)) {
               if (params.enable_quiesce_search()) {
                 // クイース探索ノードに移行するため、ノード数を減らしておく。
-                shared_st_ptr_->searched_nodes_--;
+                --(shared_st_ptr_->searched_nodes_);
                 return Quiesce(depth, level, alpha, beta, material, table);
               } else {
                 return evaluator_.Evaluate(material);
@@ -723,14 +723,14 @@ namespace Sayuri {
     shared_st_ptr_->searched_nodes_ = 0;
     shared_st_ptr_->searched_level_ = 0;
     shared_st_ptr_->start_time_ = SysClock::now();
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Square from = 0; from < NUM_SQUARES; from++) {
-        for (Square to = 0; to < NUM_SQUARES; to++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
+      for (Square from = 0; from < NUM_SQUARES; ++from) {
+        for (Square to = 0; to < NUM_SQUARES; ++to) {
           shared_st_ptr_->history_[side][from][to] = 0;
         }
       }
     }
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       position_memo_[i] = 0;
       shared_st_ptr_->iid_stack_[i] = 0;
       shared_st_ptr_->killer_stack_[i][0] = 0;
@@ -755,7 +755,7 @@ namespace Sayuri {
     // スレッドの準備。
     shared_st_ptr_->helper_queue_ptr_.reset(new HelperQueue());
     std::vector<std::unique_ptr<ChessEngine>> child_vec(thread_vec_.size());
-    for (unsigned int i = 0; i < thread_vec_.size(); i++) {
+    for (unsigned int i = 0; i < thread_vec_.size(); ++i) {
       child_vec[i].reset(new ChessEngine(*this));
       child_vec[i]->shared_st_ptr_ = shared_st_ptr_;
       ChessEngine* child_ptr = child_vec[i].get();
@@ -777,14 +777,14 @@ namespace Sayuri {
     // 可読性のため、参照を定義。
     const SearchParams& params = *(shared_st_ptr_->search_params_ptr_);
     for (shared_st_ptr_->i_depth_ = 1; shared_st_ptr_->i_depth_ <= MAX_PLYS;
-    shared_st_ptr_->i_depth_++) {
+    ++(shared_st_ptr_->i_depth_)) {
       // 探索終了。
       if (ShouldBeStopped()) break;
 
       int depth = shared_st_ptr_->i_depth_;
 
       // ノードを加算。
-      shared_st_ptr_->searched_nodes_++;
+      ++(shared_st_ptr_->searched_nodes_);
 
       // 探索したレベルをリセット。
       shared_st_ptr_->searched_level_ = 0;
@@ -925,7 +925,7 @@ namespace Sayuri {
         my_job_ptr_->AddNotifier([this](Job& job) {
           if (&job == this->my_job_ptr_) {
             this->is_job_ended_ = true;
-            for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+            for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
               this->job_table_[i].NotifyBetaCut();
             }
           }
@@ -1496,7 +1496,7 @@ namespace Sayuri {
     }
 
     // 価値の低いものから調べる。
-    for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+    for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
       Bitboard attackers = 0;
       Piece promotion = EMPTY;
       switch (piece_type) {

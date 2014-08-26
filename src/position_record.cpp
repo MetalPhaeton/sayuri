@@ -51,15 +51,15 @@ namespace Sayuri {
   ply_100_(0),
   ply_(0),
   pos_hash_(0) {
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
+      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
         position_[side][piece_type] = 0;
       }
       side_pieces_[side] = 0;
       king_[side] = 0;
       has_castled_[side] = false;
     }
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       position_memo_[i] = 0;
     }
   }
@@ -94,8 +94,8 @@ namespace Sayuri {
     if (to_move_ != engine.to_move()) return false;
     if (castling_rights_ != engine.castling_rights()) return false;
     if (en_passant_square_ != engine.en_passant_square()) return false;
-    for (Side side = WHITE; side <= BLACK; side++) {
-      for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+    for (Side side = WHITE; side <= BLACK; ++side) {
+      for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
         if (position_[side][piece_type]
         != engine.position()[side][piece_type]) {
           return false;
@@ -111,8 +111,8 @@ namespace Sayuri {
     if (to_move_ != engine.to_move()) return true;
     if (castling_rights_ != engine.castling_rights()) return true;
     if (en_passant_square_ != engine.en_passant_square()) return true;
-    for (Side side = WHITE; side <= BLACK; side++) {
-      for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+    for (Side side = WHITE; side <= BLACK; ++side) {
+      for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
         if (position_[side][piece_type]
         != engine.position()[side][piece_type]) {
           return true;
@@ -128,8 +128,8 @@ namespace Sayuri {
     if (to_move_ != record.to_move_) return false;
     if (castling_rights_ != record.castling_rights_) return false;
     if (en_passant_square_ != record.en_passant_square_) return false;
-    for (Side side = WHITE; side <= BLACK; side++) {
-      for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+    for (Side side = WHITE; side <= BLACK; ++side) {
+      for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
         if (position_[side][piece_type]
         != record.position_[side][piece_type]) {
           return false;
@@ -145,8 +145,8 @@ namespace Sayuri {
     if (to_move_ != record.to_move_) return true;
     if (castling_rights_ != record.castling_rights_) return true;
     if (en_passant_square_ != record.en_passant_square_) return true;
-    for (Side side = WHITE; side <= BLACK; side++) {
-      for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+    for (Side side = WHITE; side <= BLACK; ++side) {
+      for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
         if (position_[side][piece_type]
         != record.position_[side][piece_type]) {
           return true;
@@ -163,8 +163,8 @@ namespace Sayuri {
   // メンバをコピーする。
   void PositionRecord::ScanMember(const PositionRecord& record) {
     // サイド毎のコピー。
-    for (Side side = 0; side < NUM_SIDES; side++) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; piece_type++) {
+    for (Side side = 0; side < NUM_SIDES; ++side) {
+      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
         position_[side][piece_type] = record.position_[side][piece_type];
       }
       side_pieces_[side] = record.side_pieces_[side];
@@ -173,7 +173,7 @@ namespace Sayuri {
     }
 
     // マス毎のコピー。
-    for (Square square = 0; square < NUM_SQUARES; square++) {
+    for (Square square = 0; square < NUM_SQUARES; ++square) {
       piece_board_[square] = record.piece_board_[square];
       side_board_[square] = record.side_board_[square];
     }
@@ -190,7 +190,7 @@ namespace Sayuri {
     en_passant_square_ = record.en_passant_square_;
     ply_100_ = record.ply_100_;
     ply_ = record.ply_;
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       position_memo_[i] = position_memo_[i];
     }
     pos_hash_ = record.pos_hash_;
@@ -199,8 +199,8 @@ namespace Sayuri {
   // メンバをエンジンからコピーする。
   void PositionRecord::ScanMember(const ChessEngine& engine, Hash pos_hash) {
     // サイド毎のコピー。
-    for (Side side = WHITE; side <= BLACK; side++) {
-      for (Piece piece_type = PAWN; piece_type <= KING; piece_type++) {
+    for (Side side = WHITE; side <= BLACK; ++side) {
+      for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
         position_[side][piece_type] = engine.position()[side][piece_type];
       }
       side_pieces_[side] = engine.side_pieces()[side];
@@ -209,7 +209,7 @@ namespace Sayuri {
     }
 
     // マス毎のコピー。
-    for (Square square = A1; square <= H8; square++) {
+    for (Square square = A1; square <= H8; ++square) {
       piece_board_[square] = engine.piece_board()[square];
       side_board_[square] = engine.side_board()[square];
     }
@@ -226,7 +226,7 @@ namespace Sayuri {
     en_passant_square_ = engine.en_passant_square();
     ply_100_ = engine.ply_100();
     ply_ = engine.ply();
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); i++) {
+    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       position_memo_[i] = engine.position_memo()[i];
     }
     pos_hash_ = pos_hash;

@@ -210,7 +210,7 @@ namespace Sayuri {
       const TTEntry& GetEntry(Hash pos_hash, int depth) const;
 
       /** 年を取る。 */
-      void GrowOld() {age_++;}
+      void GrowOld() {++age_;}
 
       /**
        * テーブルのサイズを返す。 (バイト)

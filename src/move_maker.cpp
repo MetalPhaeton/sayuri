@@ -55,7 +55,7 @@ namespace Sayuri {
   last_(maker.last_),
   max_(maker.max_),
   history_max_(maker.history_max_) {
-    for (std::size_t i = 0; i < (MAX_CANDIDATES + 1); i++) {
+    for (std::size_t i = 0; i < (MAX_CANDIDATES + 1); ++i) {
       move_stack_[i] = maker.move_stack_[i];
     }
   }
@@ -66,7 +66,7 @@ namespace Sayuri {
   last_(maker.last_),
   max_(maker.max_),
   history_max_(maker.history_max_) {
-    for (std::size_t i = 0; i < (MAX_CANDIDATES + 1); i++) {
+    for (std::size_t i = 0; i < (MAX_CANDIDATES + 1); ++i) {
       move_stack_[i] = maker.move_stack_[i];
     }
   }
@@ -78,7 +78,7 @@ namespace Sayuri {
     history_max_ = maker.history_max_;
     last_ = maker.last_;
     max_ = maker.max_;
-    for (std::size_t i = 0; i < (MAX_CANDIDATES + 1); i++) {
+    for (std::size_t i = 0; i < (MAX_CANDIDATES + 1); ++i) {
       move_stack_[i] = maker.move_stack_[i];
     }
     return *this;
@@ -91,7 +91,7 @@ namespace Sayuri {
     history_max_ = maker.history_max_;
     last_ = maker.last_;
     max_ = maker.max_;
-    for (std::size_t i = 0; i < (MAX_CANDIDATES + 1); i++) {
+    for (std::size_t i = 0; i < (MAX_CANDIDATES + 1); ++i) {
       move_stack_[i] = maker.move_stack_[i];
     }
     return *this;
@@ -146,11 +146,10 @@ namespace Sayuri {
     }
 
     // とりあえず最後の手をポップ。
-    last_--;
-    slot = move_stack_[last_];
+    slot = move_stack_[--last_];
 
     // 一番高い手を探し、スワップ。
-    for (int i = last_ - 1; i >= 0; i--) {
+    for (int i = last_ - 1; i >= 0; --i) {
       if (move_stack_[i].score_ > slot.score_) {
         std::swap(slot, move_stack_[i]);
       }
@@ -171,7 +170,7 @@ namespace Sayuri {
     std::size_t start = last_;
 
     // ナイト、ビショップ、ルーク、クイーンの候補手を作る。
-    for (Piece piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
+    for (Piece piece_type = KNIGHT; piece_type <= QUEEN; ++piece_type) {
       Bitboard pieces = engine_ptr_->position()[side][piece_type];
 
       for (; pieces; NEXT(pieces)) {
@@ -223,8 +222,7 @@ namespace Sayuri {
           }
 
           // スタックに登録。
-          move_stack_[last_].move_ = move;
-          last_++;
+          move_stack_[last_++].move_ = move;
         }
       }
     }
@@ -273,15 +271,13 @@ namespace Sayuri {
         if (((side == WHITE) && (Util::SQUARE_TO_RANK[to] == RANK_8))
         || ((side == BLACK) && (Util::SQUARE_TO_RANK[to] == RANK_1))) {
           // 昇格を設定。
-          for (Piece piece_type = KNIGHT; piece_type <= QUEEN; piece_type++) {
+          for (Piece piece_type = KNIGHT; piece_type <= QUEEN; ++piece_type) {
             SET_PROMOTION(move, piece_type);
-            move_stack_[last_].move_ = move;
-            last_++;
+            move_stack_[last_++].move_ = move;
           }
         } else {
           // 昇格しない場合。
-          move_stack_[last_].move_ = move;
-          last_++;
+          move_stack_[last_++].move_ = move;
         }
       }
     }
@@ -342,8 +338,7 @@ namespace Sayuri {
         SET_MOVE_TYPE(move, NORMAL);
       }
 
-      move_stack_[last_].move_ = move;
-      last_++;
+      move_stack_[last_++].move_ = move;
     }
 
     ScoreMoves<Type>(start, prev_best, iid_move, killer_1, killer_2, side);
@@ -377,7 +372,7 @@ namespace Sayuri {
 
     Bitboard enemy_king_bb =
     Util::SQUARE[engine_ptr_->king()[OPPOSITE_SIDE(side)]];
-    for (std::size_t i = start; i < last_; i++) {
+    for (std::size_t i = start; i < last_; ++i) {
       // 手の情報を得る。
       Square from = GET_FROM(move_stack_[i].move_);
       Square to = GET_TO(move_stack_[i].move_);
