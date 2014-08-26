@@ -642,7 +642,9 @@ namespace Sayuri {
         /** 現在のIterative Deepeningの深さ。 */
         std::uint32_t i_depth_;
         /** 探索したノード数。 */
-        std::uint64_t num_searched_nodes_;
+        std::uint64_t searched_nodes_;
+        /** 探索したレベル。 */
+        std::uint32_t searched_level_;
         /** 探索開始時間。 */
         TimePoint start_time_;
         /** 探索ストップ条件: 何が何でも探索を中断。 */
@@ -735,8 +737,6 @@ namespace Sayuri {
       // ===================================================== //
       /** 今ヌルムーブのサーチ中かどうかのフラグ。 */
       bool is_null_searching_;
-      /** 探索したレベル。 */
-      std::uint32_t searched_level_;
       /** 現在請け負っている仕事のポインタ。 */
       Job* my_job_ptr_;
       /** 現在請け負っている仕事から探索中止依頼が来たかどうか。 */

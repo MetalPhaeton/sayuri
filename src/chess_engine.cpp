@@ -58,7 +58,6 @@ namespace Sayuri {
   ChessEngine::ChessEngine(const SearchParams& search_params,
   const EvalParams& eval_params) :
   is_null_searching_(false),
-  searched_level_(0),
   my_job_ptr_(nullptr),
   is_job_ended_(false),
   evaluator_(*this) {
@@ -91,7 +90,6 @@ namespace Sayuri {
   // プライベートコンストラクタ。
   ChessEngine::ChessEngine() : 
   is_null_searching_(false),
-  searched_level_(0),
   my_job_ptr_(nullptr),
   is_job_ended_(false),
   evaluator_(*this) {
@@ -119,7 +117,6 @@ namespace Sayuri {
   // コピーコンストラクタ。
   ChessEngine::ChessEngine(const ChessEngine& engine) :
   is_null_searching_(false),
-  searched_level_(0),
   my_job_ptr_(nullptr),
   is_job_ended_(false),
   evaluator_(*this) {
@@ -151,7 +148,6 @@ namespace Sayuri {
   // ムーブコンストラクタ。
   ChessEngine::ChessEngine(ChessEngine&& engine) :
   is_null_searching_(false),
-  searched_level_(0),
   my_job_ptr_(nullptr),
   is_job_ended_(false),
   evaluator_(*this) {
@@ -1099,7 +1095,8 @@ namespace Sayuri {
   ChessEngine::SharedStruct::SharedStruct() :
   history_max_(1),
   i_depth_(1),
-  num_searched_nodes_(0),
+  searched_nodes_(0),
+  searched_level_(0),
   stop_now_(false),
   max_nodes_(-1ULL),
   max_depth_(MAX_PLYS),
@@ -1169,7 +1166,8 @@ namespace Sayuri {
       killer_stack_[i + 2][1] = shared_st.killer_stack_[i + 2][1];
     }
     i_depth_ = shared_st.i_depth_;
-    num_searched_nodes_ = shared_st.num_searched_nodes_;
+    searched_nodes_ = shared_st.searched_nodes_;
+    searched_level_ = shared_st.searched_level_;
     start_time_ = shared_st.start_time_;
     stop_now_ = shared_st.stop_now_;
     max_nodes_ = shared_st.max_nodes_;

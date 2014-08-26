@@ -60,10 +60,11 @@ namespace Sayuri {
     if (is_job_ended_) return alpha;
 
     // ノード数を加算。
-    shared_st_ptr_->num_searched_nodes_++;
+    shared_st_ptr_->searched_nodes_++;
 
     // 最大探索数。
-    searched_level_ = MAX(searched_level_, level);
+    shared_st_ptr_->searched_level_ =
+    MAX(shared_st_ptr_->searched_level_, level);
 
     // 勝負に十分な駒がなければ0点。
     if (!HasSufficientMaterial()) {
@@ -150,10 +151,11 @@ namespace Sayuri {
     if (is_job_ended_) return alpha;
 
     // ノード数を加算。
-    shared_st_ptr_->num_searched_nodes_++;
+    shared_st_ptr_->searched_nodes_++;
 
     // 最大探索数。
-    searched_level_ = MAX(searched_level_, level);
+    shared_st_ptr_->searched_level_ =
+    MAX(shared_st_ptr_->searched_level_, level);
 
     // サイドとチェックされているか。
     Side side = to_move_;
@@ -282,7 +284,7 @@ namespace Sayuri {
     if ((depth <= 0) || (level >= MAX_PLYS)) {
       if (params.enable_quiesce_search()) {
         // クイース探索ノードに移行するため、ノード数を減らしておく。
-        shared_st_ptr_->num_searched_nodes_--;
+        shared_st_ptr_->searched_nodes_--;
         return Quiesce(depth, level, alpha, beta, material, table);
       } else {
         return evaluator_.Evaluate(material);
@@ -334,7 +336,7 @@ namespace Sayuri {
             if ((depth <= 0)) {
               if (params.enable_quiesce_search()) {
                 // クイース探索ノードに移行するため、ノード数を減らしておく。
-                shared_st_ptr_->num_searched_nodes_--;
+                shared_st_ptr_->searched_nodes_--;
                 return Quiesce(depth, level, alpha, beta, material, table);
               } else {
                 return evaluator_.Evaluate(material);
@@ -718,8 +720,8 @@ namespace Sayuri {
     constexpr int level = 0;
 
     // --- 初期化 --- //
-    searched_level_ = 0;
-    shared_st_ptr_->num_searched_nodes_ = 0;
+    shared_st_ptr_->searched_nodes_ = 0;
+    shared_st_ptr_->searched_level_ = 0;
     shared_st_ptr_->start_time_ = SysClock::now();
     for (Side side = 0; side < NUM_SIDES; side++) {
       for (Square from = 0; from < NUM_SQUARES; from++) {
@@ -782,7 +784,10 @@ namespace Sayuri {
       int depth = shared_st_ptr_->i_depth_;
 
       // ノードを加算。
-      shared_st_ptr_->num_searched_nodes_++;
+      shared_st_ptr_->searched_nodes_++;
+
+      // 探索したレベルをリセット。
+      shared_st_ptr_->searched_level_ = 0;
 
       // 勝負に十分な駒がなければ探索しない。
       if (!HasSufficientMaterial()) {
@@ -793,7 +798,7 @@ namespace Sayuri {
         (SysClock::now() - shared_st_ptr_->start_time_);
 
         shell.PrintPVInfo(depth, 0, pv_line_table_[level].score(), time,
-        shared_st_ptr_->num_searched_nodes_, pv_line_table_[level]);
+        shared_st_ptr_->searched_nodes_, pv_line_table_[level]);
 
         continue;
       }
@@ -805,7 +810,7 @@ namespace Sayuri {
         (SysClock::now() - shared_st_ptr_->start_time_);
 
         shell.PrintPVInfo(depth, 0, pv_line_table_[level].score(), time,
-        shared_st_ptr_->num_searched_nodes_, pv_line_table_[level]);
+        shared_st_ptr_->searched_nodes_, pv_line_table_[level]);
 
         continue;
       }
@@ -891,7 +896,7 @@ namespace Sayuri {
     shell.PrintOtherInfo
     (Chrono::duration_cast<Chrono::milliseconds>
     (SysClock::now() - (shared_st_ptr_->start_time_)),
-    shared_st_ptr_->num_searched_nodes_, table.GetUsedPermill());
+    shared_st_ptr_->searched_nodes_, table.GetUsedPermill());
 
 
     // 探索終了したけど、まだ思考を止めてはいけない場合、関数を終了しない。
@@ -1129,10 +1134,6 @@ namespace Sayuri {
         break;
       }
 
-      // 探索した深さを更新。
-      job.client_ptr_->searched_level_ =
-      MAX(job.client_ptr_->searched_level_, searched_level_);
-
       // アルファ値を更新。
       if (score > job.alpha_) {
         // 評価値のタイプをセット。
@@ -1224,7 +1225,7 @@ namespace Sayuri {
       if (now > job.next_print_info_time_) {
         shell.PrintOtherInfo(Chrono::duration_cast<Chrono::milliseconds>
         (now - shared_st_ptr_->start_time_),
-        shared_st_ptr_->num_searched_nodes_, job.table_ptr_->GetUsedPermill());
+        shared_st_ptr_->searched_nodes_, job.table_ptr_->GetUsedPermill());
 
         job.next_print_info_time_ = now + Chrono::milliseconds(1000);
       }
@@ -1251,9 +1252,6 @@ namespace Sayuri {
       if ((job.depth_ >= ybwc_limit_depth) && (num_moves > ybwc_after_moves)) {
         shared_st_ptr_->helper_queue_ptr_->Help(job);
       }
-
-      // 探索したレベルをリセット。
-      searched_level_ = 0;
 
       // 次のハッシュ。
       Hash next_hash = GetNextHash(job.pos_hash_, move);
@@ -1429,8 +1427,8 @@ namespace Sayuri {
         Chrono::duration_cast<Chrono::milliseconds>
         (SysClock::now() - shared_st_ptr_->start_time_);
 
-        shell.PrintPVInfo(job.depth_, searched_level_, score,
-        time, shared_st_ptr_->num_searched_nodes_, *(job.pv_line_ptr_));
+        shell.PrintPVInfo(job.depth_, shared_st_ptr_->searched_level_, score,
+        time, shared_st_ptr_->searched_nodes_, *(job.pv_line_ptr_));
 
         job.alpha_ = score;
       }
@@ -1581,7 +1579,7 @@ namespace Sayuri {
       shared_st_ptr_->stop_now_ = true;
       return true;
     }
-    if (shared_st_ptr_->num_searched_nodes_ >= shared_st_ptr_->max_nodes_) {
+    if (shared_st_ptr_->searched_nodes_ >= shared_st_ptr_->max_nodes_) {
       shared_st_ptr_->stop_now_ = true;
       return true;
     }
