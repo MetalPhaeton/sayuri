@@ -705,24 +705,6 @@ namespace Sayuri {
       }
 
       /**
-       * マスからファイルを得る。
-       * @param square 対象のマス。
-       * @return ファイル。
-       */
-      static Fyle GetFyle(Square square) {
-        return square & 0x7;
-      }
-
-      /**
-       * マスからランクを得る。
-       * @param square 対象のマス。
-       * @return ランク。
-       */
-      static Rank GetRank(Square square) {
-        return square >> 3;
-      }
-
-      /**
        * 文字列を単語に切り分ける。
        * @param str 切り分ける文字列。
        * @param delim 区切り文字のセット。
