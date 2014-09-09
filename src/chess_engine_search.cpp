@@ -208,10 +208,8 @@ namespace Sayuri {
       table.Lock();  // ロック。
 
       // 前回の繰り返しの最善手を得る。
-      const TTEntry& prev_entry = table.GetEntry(pos_hash, depth - 1);
-      if (prev_entry && (prev_entry.score_type() != ScoreType::ALPHA)) {
-        prev_best = prev_entry.best_move();
-      }
+      prev_best = table.GetPrevBest(pos_hash, depth);
+
       // 局面の繰り返し対策などのため、
       // 自分の初手と相手の初手の場合(level < 2の場合)は参照しない。
       // 前回の繰り返しの最善手を得る。
