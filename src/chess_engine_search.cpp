@@ -207,19 +207,25 @@ namespace Sayuri {
     if (params.enable_ttable()) {
       table.Lock();  // ロック。
 
-      // 前回の繰り返しの最善手を得る。
-      prev_best = table.GetPrevBest(pos_hash, depth);
+      // 前回の繰り返しの最善手を含めたエントリーを得る。
+      const TTEntry& tt_entry = table.GetEntry(pos_hash, depth - 1);
+      if (tt_entry) {
+        ScoreType score_type = tt_entry.score_type();
 
-      // 局面の繰り返し対策などのため、
-      // 自分の初手と相手の初手の場合(level < 2の場合)は参照しない。
-      // 前回の繰り返しの最善手を得る。
-      if (level >= 2) {
-        const TTEntry& tt_entry = table.GetEntry(pos_hash, depth);
-        if (tt_entry) {
+        // 前回の最善手を得る。
+        if (score_type != ScoreType::ALPHA) {
+          prev_best = tt_entry.best_move();
+        }
+
+        // 探索済み局面をチェック。
+        // 局面の繰り返し対策などのため、
+        // 自分の初手と相手の初手の場合(level < 2の場合)は参照しない。
+        if ((level >= 2) && (tt_entry.depth() >= depth)) {
+          Move best_move = prev_best;
           int score = tt_entry.score();
+
           if (tt_entry.score_type() == ScoreType::EXACT) {
             // エントリーが正確な値。
-            Move best_move = tt_entry.best_move();
             if (!(tt_entry.best_move() & CAPTURED_PIECE_MASK)
             && (level < MAX_PLYS)) {
               // キラームーブをセット。
@@ -233,7 +239,7 @@ namespace Sayuri {
 
             pv_line_table_[level].score(score);
             pv_line_table_[level].mate_in(tt_entry.mate_in());
-            table.Unlock();
+            table.Unlock();  // ロック解除。
             return score;
           } else if (tt_entry.score_type() == ScoreType::ALPHA) {
             // エントリーがアルファ値。
@@ -241,7 +247,7 @@ namespace Sayuri {
               // アルファ値以下が確定。
               pv_line_table_[level].score(score);
               pv_line_table_[level].mate_in(tt_entry.mate_in());
-              table.Unlock();
+              table.Unlock();  // ロック解除。
               return score;
             }
 
@@ -265,7 +271,7 @@ namespace Sayuri {
               // ベータ値以上が確定。
               pv_line_table_[level].score(score);
               pv_line_table_[level].mate_in(tt_entry.mate_in());
-              table.Unlock();
+              table.Unlock();  // ロック解除。
               return score;
             }
 
@@ -274,7 +280,7 @@ namespace Sayuri {
           }
         }
       }
-      table.Unlock();
+      table.Unlock();  // ロック解除。
     }
 
     // 深さが0ならクイース。 (無効なら評価値を返す。)

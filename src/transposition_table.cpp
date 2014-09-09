@@ -134,17 +134,6 @@ namespace Sayuri {
     return null_entry_;
   }
 
-  // 前回の最善手を得る。
-  Move TranspositionTable::GetPrevBest(Hash pos_hash, int depth) const {
-    std::size_t index = GetTableIndex(pos_hash);
-    if ((entry_table_[index].depth() >= (depth - 1))
-    && (entry_table_[index].pos_hash() == pos_hash)
-    && (entry_table_[index].score_type() != ScoreType::ALPHA)) {
-      return entry_table_[index].best_move();
-    }
-    return 0;
-  }
-
   // ================== //
   // エントリーのクラス //
   // ================== //

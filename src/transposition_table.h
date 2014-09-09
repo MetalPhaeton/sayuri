@@ -209,14 +209,6 @@ namespace Sayuri {
        */
       const TTEntry& GetEntry(Hash pos_hash, int depth) const;
 
-      /**
-       * 前回の最善手を得る。
-       * @param pos_hash 現在のハッシュ。
-       * @param depth 現在の残り深さ。
-       * @return 条件を満たすエントリー。
-       */
-      Move GetPrevBest(Hash pos_hash, int depth) const;
-
       /** 年を取る。 */
       void GrowOld() {++age_;}
 
