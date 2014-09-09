@@ -88,7 +88,7 @@ namespace Sayuri {
         maker_ptr_ = &maker;
         helper_counter_ = 0;
         counter_ = 0;
-        notifier_vec_.resize(0);
+        betacut_listener_vec_.resize(0);
       }
 
       /**
@@ -100,10 +100,13 @@ namespace Sayuri {
       /** この仕事を請け負っているヘルパーの数を増やす。 */
       void CountHelper();
 
-      /** 探索終了お知らせ関数を登録する。 */
-      void AddNotifier(const std::function<void(Job&)>& func) {
+      /** 
+       * ベータカットのお知らせを受け取る関数を登録する。
+       * @param listener ベータカットのお知らせを受け取る関数オブジェクト。
+       */
+      void AddBetaCutListener(const std::function<void(Job&)>& listener) {
         std::unique_lock<std::mutex> lock(mutex_);  // ロック。
-        notifier_vec_.push_back(func);
+        betacut_listener_vec_.push_back(listener);
       }
 
       /** 仕事終了を知らせる。 */
@@ -187,8 +190,8 @@ namespace Sayuri {
       MoveMaker* maker_ptr_;
       /** 請け負っているヘルパーの数。 */
       volatile int helper_counter_;
-      /** 探索終了のお知らせ関数のベクトル。 */
-      std::vector<std::function<void(Job&)>> notifier_vec_;
+      /** ベータカットのお知らせを受け取る関数のベクトル。 */
+      std::vector<std::function<void(Job&)>> betacut_listener_vec_;
       /** ミューテックス。 */
       std::mutex mutex_;
       /** 自分用コンディション。 */

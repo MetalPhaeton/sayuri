@@ -922,7 +922,7 @@ namespace Sayuri {
         break;
       } else {
         // お知らせ関数を登録。
-        my_job_ptr_->AddNotifier([this](Job& job) {
+        my_job_ptr_->AddBetaCutListener([this](Job& job) {
           if (&job == this->my_job_ptr_) {
             this->is_job_ended_ = true;
             for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
