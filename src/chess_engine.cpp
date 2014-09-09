@@ -1161,8 +1161,8 @@ namespace Sayuri {
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       iid_stack_[i] = shared_st.iid_stack_[i];
       killer_stack_[i][0] = shared_st.killer_stack_[i][0];
-      killer_stack_[i][0] = shared_st.killer_stack_[i][0];
-      killer_stack_[i + 2][1] = shared_st.killer_stack_[i + 2][1];
+      killer_stack_[i][1] = shared_st.killer_stack_[i][1];
+      killer_stack_[i + 2][0] = shared_st.killer_stack_[i + 2][0];
       killer_stack_[i + 2][1] = shared_st.killer_stack_[i + 2][1];
     }
     i_depth_ = shared_st.i_depth_;
