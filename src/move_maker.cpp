@@ -299,10 +299,10 @@ namespace Sayuri {
         for (; move_bitboard; NEXT(move_bitboard)) {
           // 手を作る。
           Move move = 0;
-          SET_FROM(move, from);
+          SetFrom(move, from);
           Square to = Util::GetSquare(move_bitboard);
-          SET_TO(move, to);
-          SET_MOVE_TYPE(move, NORMAL);
+          SetTo(move, to);
+          SetMoveType(move, NORMAL);
 
           // ヒストリーの最大値を更新。 (テンプレート部品)
           UpdateMaxHistory<Type>::F(*this, side, from, to);
@@ -326,25 +326,25 @@ namespace Sayuri {
       for (; move_bitboard; NEXT(move_bitboard)) {
         // 手を作る。
         Move move = 0;
-        SET_FROM(move, from);
+        SetFrom(move, from);
         Square to = Util::GetSquare(move_bitboard);
-        SET_TO(move, to);
+        SetTo(move, to);
 
         // ヒストリーの最大値を更新。 (テンプレート部品)
         UpdateMaxHistory<Type>::F(*this, side, from, to);
 
         if (engine_ptr_->en_passant_square()
         && (to == engine_ptr_->en_passant_square())) {
-          SET_MOVE_TYPE(move, EN_PASSANT);
+          SetMoveType(move, EN_PASSANT);
         } else {
-          SET_MOVE_TYPE(move, NORMAL);
+          SetMoveType(move, NORMAL);
         }
 
         if (((side == WHITE) && (Util::SQUARE_TO_RANK[to] == RANK_8))
         || ((side == BLACK) && (Util::SQUARE_TO_RANK[to] == RANK_1))) {
           // 昇格を設定。
           for (Piece piece_type = KNIGHT; piece_type <= QUEEN; ++piece_type) {
-            SET_PROMOTION(move, piece_type);
+            SetPromotion(move, piece_type);
             move_stack_[last_++].move_ = move;
           }
         } else {
@@ -363,28 +363,28 @@ namespace Sayuri {
 
     for (; move_bitboard; NEXT(move_bitboard)) {
       Move move = 0;
-      SET_FROM(move, from);
+      SetFrom(move, from);
       Square to = Util::GetSquare(move_bitboard);
-      SET_TO(move, to);
+      SetTo(move, to);
 
       // ヒストリーの最大値を更新。 (テンプレート部品)
       UpdateMaxHistory<Type>::F(*this, side, from, to);
 
       if ((side == WHITE) && (from == E1) && (to == G1)) {
         // 白のショートキャスリング。
-        SET_MOVE_TYPE(move, CASTLE_WS);
+        SetMoveType(move, CASTLE_WS);
       } else if ((side == WHITE) && (from == E1) && (to == C1)) {
         // 白のロングキャスリング。
-        SET_MOVE_TYPE(move, CASTLE_WL);
+        SetMoveType(move, CASTLE_WL);
       } else if ((side == BLACK) && (from == E8) && (to == G8)) {
         // 黒のショートキャスリング。
-        SET_MOVE_TYPE(move, CASTLE_BS);
+        SetMoveType(move, CASTLE_BS);
       } else if ((side == BLACK) && (from == E8) && (to == C8)) {
         // 黒のロングキャスリング。
-        SET_MOVE_TYPE(move, CASTLE_BL);
+        SetMoveType(move, CASTLE_BL);
       } else {
         // キャスリングじゃない手。
-        SET_MOVE_TYPE(move, NORMAL);
+        SetMoveType(move, NORMAL);
       }
 
       move_stack_[last_++].move_ = move;
@@ -457,8 +457,8 @@ namespace Sayuri {
     Util::SQUARE[engine_ptr_->king()[OPPOSITE_SIDE(side)]];
     for (std::size_t i = start; i < last_; ++i) {
       // 手の情報を得る。
-      Square from = GET_FROM(move_stack_[i].move_);
-      Square to = GET_TO(move_stack_[i].move_);
+      Square from = GetFrom(move_stack_[i].move_);
+      Square to = GetTo(move_stack_[i].move_);
 
       // 相手キングをチェックする手かどうか調べる。
       bool is_checking_move = false;
@@ -494,19 +494,19 @@ namespace Sayuri {
       }
 
       // 特殊な手の点数をつける。
-      if (EQUAL_MOVE(move_stack_[i].move_, prev_best)) {
+      if (EqualMove(move_stack_[i].move_, prev_best)) {
         // 前回の最善手。
         move_stack_[i].score_ = BEST_MOVE_SCORE;
-      } else if (EQUAL_MOVE(move_stack_[i].move_, iid_move)) {
+      } else if (EqualMove(move_stack_[i].move_, iid_move)) {
         // IIDムーブ。
         move_stack_[i].score_ = IID_MOVE_SCORE;
       } else if (is_checking_move) {
         // 相手キングをチェックする手。
         move_stack_[i].score_ = CHECKING_MOVE_SCORE;
-      } else if (EQUAL_MOVE(move_stack_[i].move_, killer_1)) {
+      } else if (EqualMove(move_stack_[i].move_, killer_1)) {
         // キラームーブ。
         move_stack_[i].score_ = KILLER_1_MOVE_SCORE;
-      } else if (EQUAL_MOVE(move_stack_[i].move_, killer_2)) {
+      } else if (EqualMove(move_stack_[i].move_, killer_2)) {
         // キラームーブ。
         move_stack_[i].score_ = KILLER_2_MOVE_SCORE;
       } else {

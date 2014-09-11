@@ -561,8 +561,8 @@ namespace Sayuri {
         to_move_ = OPPOSITE_SIDE(to_move_);
 
         // 情報をメモ。
-        SET_CASTLING_RIGHTS(move, castling_rights_);
-        SET_EN_PASSANT_SQUARE(move, en_passant_square_);
+        SetCastlingRights(move, castling_rights_);
+        SetEnPassantSquare(move, en_passant_square_);
 
         // アンパッサンの位置を削除。
         en_passant_square_ = 0;
@@ -577,8 +577,8 @@ namespace Sayuri {
         to_move_ = OPPOSITE_SIDE(to_move_);
 
         // 情報を戻す。
-        castling_rights_ = GET_CASTLING_RIGHTS(move);
-        en_passant_square_ = GET_EN_PASSANT_SQUARE(move);
+        castling_rights_ = GetCastlingRights(move);
+        en_passant_square_ = GetEnPassantSquare(move);
       }
 
       /**

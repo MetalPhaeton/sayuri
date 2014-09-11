@@ -386,46 +386,63 @@ namespace Sayuri {
    * @param move 対象のオブジェクト。
    * @return 動かす駒の位置。
    */
-#define GET_FROM(move) (((move) & FROM_MASK) >> FROM_SHIFT)
+  inline Square GetFrom(const Move& move) {
+    return (move & FROM_MASK) >> FROM_SHIFT;
+  }
+
   /**
    * アクセサ - 移動先の位置。
    * @param move 対象のオブジェクト。
    * @return 移動先の位置。
    */
-#define GET_TO(move) (((move) & TO_MASK) >> TO_SHIFT)
+  inline Square GetTo(const Move& move) {
+    return (move & TO_MASK) >> TO_SHIFT;
+  }
+
   /**
    * アクセサ - 昇格する駒の種類。
    * @param move 対象のオブジェクト。
    * @return 昇格する駒の種類。
    */
-#define GET_PROMOTION(move) (((move) & PROMOTION_MASK) >> PROMOTION_SHIFT)
+  inline Piece GetPromotion(const Move& move) {
+    return (move & PROMOTION_MASK) >> PROMOTION_SHIFT;
+  }
+
   /**
    * アクセサ - 手の種類。
    * @param move 対象のオブジェクト。
    * @return 手の種類。
    */
-#define GET_MOVE_TYPE(move) (((move) & MOVE_TYPE_MASK) >> MOVE_TYPE_SHIFT)
+  inline MoveType GetMoveType(const Move& move) {
+    return (move & MOVE_TYPE_MASK) >> MOVE_TYPE_SHIFT;
+  }
+
   /**
    * アクセサ - 取った駒の種類。
    * @param move 対象のオブジェクト。
    * @return 取った駒の種類。
    */
-#define GET_CAPTURED_PIECE(move) \
-(((move) & CAPTURED_PIECE_MASK) >> CAPTURED_PIECE_SHIFT)
+  inline Piece GetCapturedPiece(const Move& move) {
+    return (move & CAPTURED_PIECE_MASK) >> CAPTURED_PIECE_SHIFT;
+  }
+
   /**
    * アクセサ - キャスリングの権利。
    * @param move 対象のオブジェクト。
    * @return キャスリングの権利。
    */
-#define GET_CASTLING_RIGHTS(move) \
-(((move) & CASTLING_RIGHTS_MASK) >> CASTLING_RIGHTS_SHIFT)
+  inline Castling GetCastlingRights(const Move& move) {
+    return (move & CASTLING_RIGHTS_MASK) >> CASTLING_RIGHTS_SHIFT;
+  }
+
   /**
    * アクセサ - アンパッサンの位置。
    * @param move 対象のオブジェクト。
    * @return アンパッサンの位置。
    */
-#define GET_EN_PASSANT_SQUARE(move) \
-(((move) & EN_PASSANT_SQUARE_MASK) >> EN_PASSANT_SQUARE_SHIFT)
+  inline Square GetEnPassantSquare(const Move& move) {
+    return (move & EN_PASSANT_SQUARE_MASK) >> EN_PASSANT_SQUARE_SHIFT;
+  }
 
   // --- 手のビットフィールドのミューテータ --- //
   /**
@@ -433,55 +450,68 @@ namespace Sayuri {
    * @param move 対象のオブジェクト。
    * @param from 動かす駒の位置。
    */
-#define SET_FROM(move, from) \
-(move = (move & ~FROM_MASK) | (((from) & SQUARE_MASK) << FROM_SHIFT))
+  inline void SetFrom(Move& move, const Square& from) {
+    move = (move & ~FROM_MASK) | ((from & SQUARE_MASK) << FROM_SHIFT);
+  }
+
   /**
    * ミューテータ - 移動先の位置。
    * @param move 対象のオブジェクト。
    * @param to 移動先の位置。
    */
-#define SET_TO(move, to) \
-(move = (move & ~TO_MASK) | (((to) & SQUARE_MASK) << TO_SHIFT))
+  inline void SetTo(Move& move, const Square& to) {
+    move = (move & ~TO_MASK) | ((to & SQUARE_MASK) << TO_SHIFT);
+  }
+
   /**
    * ミューテータ - 昇格する駒の種類。
    * @param move 対象のオブジェクト。
    * @param promotion 昇格する駒の種類。
    */
-#define SET_PROMOTION(move, promotion) \
-(move = (move & ~PROMOTION_MASK) \
-| (((promotion) & PIECE_MASK) << PROMOTION_SHIFT))
+  inline void SetPromotion(Move& move, const Piece& promotion) {
+    move = (move & ~PROMOTION_MASK)
+    | ((promotion & PIECE_MASK) << PROMOTION_SHIFT);
+  }
+
   /**
    * ミューテータ - 手の種類。
    * @param move 対象のオブジェクト。
    * @param move_type 手の種類。
    */
-#define SET_MOVE_TYPE(move, move_type) \
-(move = (move & ~MOVE_TYPE_MASK) \
-| (((move_type) & MTYPE_MASK) << MOVE_TYPE_SHIFT))
+  inline void SetMoveType(Move& move, const MoveType& move_type) {
+    move = (move & ~MOVE_TYPE_MASK)
+    | ((move_type & MTYPE_MASK) << MOVE_TYPE_SHIFT);
+  }
+
   /**
    * ミューテータ - 取った駒の種類。
    * @param move 対象のオブジェクト。
    * @param captured_piece 取った駒の種類。
    */
-#define SET_CAPTURED_PIECE(move, captured_piece) \
-(move = (move & ~CAPTURED_PIECE_MASK) \
-| (((captured_piece) & PIECE_MASK) << CAPTURED_PIECE_SHIFT))
+  inline void SetCapturedPiece(Move& move, const Piece& captured_piece) {
+    move = (move & ~CAPTURED_PIECE_MASK)
+    | ((captured_piece & PIECE_MASK) << CAPTURED_PIECE_SHIFT);
+  }
+
   /**
    * ミューテータ - キャスリングの権利。
    * @param move 対象のオブジェクト。
    * @param castling_rights キャスリングの権利。
    */
-#define SET_CASTLING_RIGHTS(move, castling_rights) \
-(move = (move & ~CASTLING_RIGHTS_MASK) \
-| (((castling_rights) & CASTLING_MASK) << CASTLING_RIGHTS_SHIFT))
+  inline void SetCastlingRights(Move& move, const Castling& castling_rights) {
+    move = (move & ~CASTLING_RIGHTS_MASK)
+    | ((castling_rights & CASTLING_MASK) << CASTLING_RIGHTS_SHIFT);
+  }
+
   /**
    * ミューテータ - アンパッサンの位置。
    * @param move 対象のオブジェクト。
    * @param en_passant_square アンパッサンの位置。
    */
-#define SET_EN_PASSANT_SQUARE(move, en_passant_square) \
-(move = (move & ~EN_PASSANT_SQUARE_MASK) \
-| (((en_passant_square) & SQUARE_MASK) << EN_PASSANT_SQUARE_SHIFT))
+  inline void SetEnPassantSquare(Move& move, const Square& en_passant_square) {
+    move = (move & ~EN_PASSANT_SQUARE_MASK)
+    | ((en_passant_square & SQUARE_MASK) << EN_PASSANT_SQUARE_SHIFT);
+  }
 
   /**
    * 手を比較する。
@@ -489,8 +519,9 @@ namespace Sayuri {
    * @param move_2 比較対象。 その2。
    * @return 同じならtrue。
    */
-#define EQUAL_MOVE(move_1, move_2) \
-(((move_1) & BASE_MASK) == ((move_2) & BASE_MASK))
+  inline bool EqualMove(const Move& move_1, const Move& move_2) {
+    return (move_1 & BASE_MASK) == (move_2 & BASE_MASK);
+  }
 
   /** ハッシュの型。 */
   using Hash = std::uint64_t;
