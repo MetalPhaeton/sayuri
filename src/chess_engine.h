@@ -42,6 +42,7 @@
 #include "evaluator.h"
 #include "position_record.h"
 #include "helper_queue.h"
+#include "params.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -143,7 +144,7 @@ namespace Sayuri {
        * @param infinite_thinking 無限に思考するかどうかのフラグ。
        */
       void SetStopper(std::uint32_t max_depth, std::uint64_t max_nodes,
-      Chrono::milliseconds thinking_time, bool infinite_thinking);
+      const Chrono::milliseconds& thinking_time, bool infinite_thinking);
 
       /**
        * 無限に思考するかどうかのフラグをセットする。
@@ -170,6 +171,7 @@ namespace Sayuri {
        * @param move 指し手。
        */
       void PlayMove(Move move);
+
       /** 1手戻す。 */
       void UndoMove();
 
@@ -244,7 +246,28 @@ namespace Sayuri {
        * @param move 次の局面への候補手。
        * @return 次の局面の「自分」のマテリアル。
        */
-      int GetNextMyMaterial(int current_material, Move move) const;
+      int GetNextMyMaterial(int current_material, Move move) const {
+        if (GetMoveType(move) == NORMAL) {
+          if ((move & PROMOTION_MASK)) {
+            // プロモーション。
+            return current_material + shared_st_ptr_->search_params_ptr_->
+            material()[piece_board_[GetTo(move)]]
+            + shared_st_ptr_->search_params_ptr_->
+            material()[GetPromotion(move)]
+            - shared_st_ptr_->search_params_ptr_->material()[PAWN];
+          }
+
+          return current_material + shared_st_ptr_->search_params_ptr_->
+          material()[piece_board_[GetTo(move)]];
+
+        } else if (GetMoveType(move) == EN_PASSANT) {
+          // アンパッサン。
+          return current_material
+          + shared_st_ptr_->search_params_ptr_->material()[PAWN];
+        }
+
+        return current_material;
+      }
 
       /**
        * 勝敗を決めるのに十分な駒があるかどうかをチェックする。
@@ -408,7 +431,9 @@ namespace Sayuri {
        * アクセサ - ヒストリーの最大値。
        * @return ヒストリーの最大値。
        */
-      std::uint64_t history_max() const {return shared_st_ptr_->history_max_;}
+      std::uint64_t history_max() const {
+        return shared_st_ptr_->history_max_;
+      }
       /**
        * アクセサ - IIDでの最善手のスタック。
        * @return IIDでの最善手のスタック。 [探索レベル]
@@ -519,7 +544,14 @@ namespace Sayuri {
        * @param depth 現在の深さ。
        * @return マージン。
        */
-      int GetMargin(int depth);
+      int GetMargin(int depth) {
+        if (depth < 1) {
+          return shared_st_ptr_->search_params_ptr_->futility_pruning_margin();
+        }
+
+        return shared_st_ptr_->search_params_ptr_->futility_pruning_margin()
+        * depth;
+      }
 
       /**
        * 探索を中断しなければならないかどうかを判断する。
@@ -756,7 +788,7 @@ namespace Sayuri {
       /** 現在請け負っている仕事のポインタ。 */
       Job* my_job_ptr_;
       /** 現在請け負っている仕事から探索中止依頼が来たかどうか。 */
-      bool is_job_ended_;
+      volatile bool is_job_ended_;
       /** 探索用MoveMakerのテーブル。 [探索レベル] */
       std::unique_ptr<MoveMaker[]> maker_table_;
       /** 探索用PVLineのテーブル。 [探索レベル] */

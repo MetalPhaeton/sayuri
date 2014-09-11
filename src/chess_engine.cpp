@@ -501,8 +501,9 @@ namespace Sayuri {
   }
 
   // 探索を開始する。
-  PVLine ChessEngine::Calculate(int num_threads, TranspositionTable& table,
-  const std::vector<Move>& moves_to_search, UCIShell& shell) {
+  PVLine ChessEngine::Calculate(int num_threads,
+  TranspositionTable& table, const std::vector<Move>& moves_to_search,
+  UCIShell& shell) {
     Util::UpdateMax(num_threads, 1);
     Util::UpdateMin(num_threads, UCI_MAX_THREADS);
     thread_vec_.resize(num_threads);
@@ -813,25 +814,6 @@ namespace Sayuri {
     }
 
     return material;
-  }
-
-  // 次の局面の「自分」のマテリアルを得る。
-  int ChessEngine::GetNextMyMaterial(int current_material, Move move) const {
-    if (GetMoveType(move) == EN_PASSANT) {
-      // アンパッサン。
-      return current_material
-      + shared_st_ptr_->search_params_ptr_->material()[PAWN];
-    } else if (Piece promotion = GetPromotion(move)) {
-      // プロモーション。
-      return current_material + shared_st_ptr_->search_params_ptr_->
-      material()[piece_board_[GetTo(move)]]
-      + shared_st_ptr_->search_params_ptr_->material()[promotion]
-      - shared_st_ptr_->search_params_ptr_->material()[PAWN];
-    } else {
-      // その他の手。
-      return current_material + shared_st_ptr_->search_params_ptr_->
-      material()[piece_board_[GetTo(move)]];
-    }
   }
 
   // 現在の局面のハッシュを計算する。

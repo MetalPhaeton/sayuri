@@ -648,7 +648,7 @@ namespace Sayuri {
        * @return val_1とval_2の大きい方。
        */
       template<typename T>
-      constexpr static T GetMax(const T& val_1, const T& val_2) {
+      constexpr static T GetMax(T val_1, T val_2) {
         return val_1 > val_2 ? val_1 : val_2;
       }
 
@@ -659,7 +659,7 @@ namespace Sayuri {
        * @return val_1とval_2の小さい方。
        */
       template<typename T>
-      constexpr static T GetMin(const T& val_1, const T& val_2) {
+      constexpr static T GetMin(T val_1, T val_2) {
         return val_1 < val_2 ? val_1 : val_2;
       }
 
@@ -669,7 +669,7 @@ namespace Sayuri {
        * @param value 更新元の数値。
        */
       template<typename T>
-      static void UpdateMax(T& dst, const T& value) {
+      static void UpdateMax(T& dst, T value) {
         if (value > dst) dst = value;
       }
 
@@ -679,7 +679,7 @@ namespace Sayuri {
        * @param value 更新元の数値。
        */
       template<typename T>
-      static void UpdateMin(T& dst, const T& value) {
+      static void UpdateMin(T& dst, T value) {
         if (value < dst) dst = value;
       }
 
@@ -718,7 +718,7 @@ namespace Sayuri {
        * @param depth 探索深さ。
        * @return ヒストリー値。
        */
-      constexpr static int TransDepthToHistory(const int& depth) {
+      constexpr static int TransDepthToHistory(int depth) {
         return depth * depth;
       }
 
@@ -727,7 +727,7 @@ namespace Sayuri {
        * @param side 元のサイド。
        * @return 逆サイド。
        */
-      constexpr static Side SwitchOppositeSide(const Side& side) {
+      constexpr static Side SwitchOppositeSide(Side side) {
         return side ^ 0x3;
       }
 

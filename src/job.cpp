@@ -78,26 +78,26 @@ namespace Sayuri {
   // ============== //
   // 候補手を得る。
   Move Job::PickMove() {
-    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+    std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
     return maker_ptr_->PickMove();
   }
 
   // この仕事を請け負っているヘルパーの数を増やす。
   void Job::CountHelper() {
-    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+    std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
     ++helper_counter_;
   }
 
   // 仕事終了を知らせる。
   void Job::FinishMyJob() {
-    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+    std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
     --helper_counter_;
     cond_.notify_all();
   }
 
   // ヘルパーが全員仕事を終えるまで待機する。
   void Job::WaitForHelpers() {
-    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+    std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
     while (helper_counter_ > 0) {
       cond_.wait(lock);
     }
@@ -105,15 +105,18 @@ namespace Sayuri {
 
   // ヘルパーにベータカットが発生したことを知らせる。
   void Job::NotifyBetaCut() {
+    std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+
     for (auto& listener : betacut_listener_vec_) {
       listener(*this);
     }
-    betacut_listener_vec_.resize(0);
+    betacut_listener_vec_.clear();
   }
 
   // 数を数える。
   int Job::Count() {
-    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+    std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+
     ++counter_;
     return counter_;
   }
@@ -123,6 +126,8 @@ namespace Sayuri {
   // ================ //
   // メンバーをコピーする。
   void Job::ScanMember(const Job& job) {
+    std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+
     client_ptr_ = job.client_ptr_;
     record_ptr_ = job.record_ptr_;
     node_type_ = job.node_type_;

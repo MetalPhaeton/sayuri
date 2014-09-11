@@ -88,7 +88,7 @@ namespace Sayuri {
         maker_ptr_ = &maker;
         helper_counter_ = 0;
         counter_ = 0;
-        betacut_listener_vec_.resize(0);
+        betacut_listener_vec_.clear();
       }
 
       /**
@@ -196,6 +196,8 @@ namespace Sayuri {
       std::mutex mutex_;
       /** 自分用コンディション。 */
       std::condition_variable cond_;
+      /** 自分用ミューテックス。 */
+      std::mutex my_mutex_;
       /** 数を数えるためのカウンター。 */
       volatile int counter_;
   };

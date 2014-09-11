@@ -144,17 +144,15 @@ namespace Sayuri {
   // Internal Iterative Deepeningをする。 (Search()用テンプレート部品)
   template<NodeType Type>
   struct DoIID {
-    static void F(ChessEngine& engine, const bool& is_checked,
-    const Move& prev_best, const Hash& pos_hash, const int& depth,
-    const std::uint32_t& level, const int& alpha, const int& beta,
-    const int& material, TranspositionTable& table) {}
+    static void F(ChessEngine& engine, bool is_checked, Move prev_best,
+    Hash pos_hash, int depth, std::uint32_t level, int alpha, int beta,
+    int material, TranspositionTable& table) {}
   };
   template<>
   struct DoIID<NodeType::PV> {
-    static void F(ChessEngine& engine, const bool& is_checked,
-    const Move& prev_best, const Hash& pos_hash, const int& depth,
-    const std::uint32_t& level, const int& alpha, const int& beta,
-    const int& material, TranspositionTable& table) {
+    static void F(ChessEngine& engine, bool is_checked, Move prev_best,
+    Hash pos_hash, int depth, std::uint32_t level, int alpha, int beta,
+    int material, TranspositionTable& table) {
       const SearchParams& params =
       *(engine.shared_st_ptr_->search_params_ptr_);
 
@@ -180,17 +178,15 @@ namespace Sayuri {
   // Null Move Reductionをする。 (Search()用テンプレート部品)
   template<NodeType Type>
   struct DoNMR {
-    static void F(ChessEngine& engine, const bool& is_checked,
-    const Hash& pos_hash, int& depth, const std::uint32_t& level,
-    const int& beta, const int& material, TranspositionTable& table,
-    int& null_reduction) {}
+    static void F(ChessEngine& engine, bool is_checked, Hash pos_hash,
+    int& depth, std::uint32_t level, int beta, int material,
+    TranspositionTable& table, int& null_reduction) {}
   };
   template<>
   struct DoNMR<NodeType::NON_PV> {
-    static void F(ChessEngine& engine, const bool& is_checked,
-    const Hash& pos_hash, int& depth, const std::uint32_t& level,
-    const int& beta, const int& material, TranspositionTable& table,
-    int& null_reduction) {
+    static void F(ChessEngine& engine, bool is_checked, Hash pos_hash,
+    int& depth, std::uint32_t level, int beta, int material,
+    TranspositionTable& table, int& null_reduction) {
       const SearchParams& params =
       *(engine.shared_st_ptr_->search_params_ptr_);
 
@@ -224,18 +220,16 @@ namespace Sayuri {
   // ProbCutをする。 (Search()用テンプレート部品)
   template<NodeType Type>
   struct DoProbCut {
-    static void F(ChessEngine& engine, const Side& side,
-    const Side& enemy_side, const bool& is_checked, ScoreType& score_type,
-    const Hash& pos_hash, const int& depth, const std::uint32_t& level,
-    int& alpha, const int& beta, const int& material,
+    static void F(ChessEngine& engine, Side side, Side enemy_side,
+    bool is_checked, ScoreType& score_type, Hash pos_hash,
+    int depth, std::uint32_t level, int& alpha, int beta, int material,
     TranspositionTable& table) {}
   };
   template<>
   struct DoProbCut<NodeType::NON_PV> {
-    static void F(ChessEngine& engine, const Side& side,
-    const Side& enemy_side, const bool& is_checked, ScoreType& score_type,
-    const Hash& pos_hash, const int& depth, const std::uint32_t& level,
-    int& alpha, const int& beta, const int& material,
+    static void F(ChessEngine& engine, Side side, Side enemy_side,
+    bool is_checked, ScoreType& score_type, Hash pos_hash,
+    int depth, std::uint32_t level, int& alpha, int beta, int material,
     TranspositionTable& table) {
       const SearchParams& params =
       *(engine.shared_st_ptr_->search_params_ptr_);
@@ -761,11 +755,11 @@ namespace Sayuri {
     return job.alpha_;
   }
   // 実体化。
-  template int ChessEngine::Search<NodeType::PV>(Hash pos_hash,
-  int depth, std::uint32_t level, int alpha, int beta, int material,
+  template int ChessEngine::Search<NodeType::PV>(Hash pos_hash, int depth,
+  std::uint32_t level, int alpha, int beta, int material,
   TranspositionTable& table);
-  template int ChessEngine::Search<NodeType::NON_PV>(Hash pos_hash,
-  int depth, std::uint32_t level, int alpha, int beta, int material,
+  template int ChessEngine::Search<NodeType::NON_PV>(Hash pos_hash, int depth,
+  std::uint32_t level, int alpha, int beta, int material,
   TranspositionTable& table);
 
   // 探索のルート。
@@ -808,11 +802,15 @@ namespace Sayuri {
 
     // スレッドの準備。
     shared_st_ptr_->helper_queue_ptr_.reset(new HelperQueue());
-    std::vector<std::unique_ptr<ChessEngine>> child_vec(thread_vec_.size());
+    std::vector<std::unique_ptr<ChessEngine>> child_vec(0);
     for (unsigned int i = 0; i < thread_vec_.size(); ++i) {
-      child_vec[i].reset(new ChessEngine(*this));
-      child_vec[i]->shared_st_ptr_ = shared_st_ptr_;
-      ChessEngine* child_ptr = child_vec[i].get();
+      child_vec.push_back
+      (std::unique_ptr<ChessEngine>(new ChessEngine(*this)));
+
+      child_vec.back()->shared_st_ptr_ = shared_st_ptr_;
+
+      ChessEngine* child_ptr = child_vec.back().get();
+
       thread_vec_[i] = std::thread([child_ptr, &shell]() {
           child_ptr->ThreadYBWC(shell);
       });
@@ -1596,19 +1594,10 @@ namespace Sayuri {
 
     return 0;
   }
-  // Futility Pruningのマージンを計算する。
-  int ChessEngine::GetMargin(int depth) {
-    if (depth < 1) {
-      return shared_st_ptr_->search_params_ptr_->futility_pruning_margin();
-    }
-
-    return shared_st_ptr_->search_params_ptr_->futility_pruning_margin()
-    * depth;
-  }
 
   // 探索のストップ条件を設定する。
   void ChessEngine::SetStopper(std::uint32_t max_depth,
-  std::uint64_t max_nodes, Chrono::milliseconds thinking_time,
+  std::uint64_t max_nodes, const Chrono::milliseconds& thinking_time,
   bool infinite_thinking) {
     shared_st_ptr_->max_depth_ = Util::GetMin(max_depth, MAX_PLYS);
     shared_st_ptr_->max_nodes_ = Util::GetMin(max_nodes, MAX_NODES);

@@ -161,13 +161,11 @@ namespace Sayuri {
   // ヒストリーの最大値を更新する。 (GenMovesCore()用テンプレート部品)
   template<GenMoveType Type>
   struct UpdateMaxHistory {
-    static void F(MoveMaker& maker, const Side& side, const Square& from,
-    const Square& to) {}
+    static void F(MoveMaker& maker, Side side, Square from, Square to) {}
   };
   template <>
   struct UpdateMaxHistory<GenMoveType::NON_CAPTURE> {
-    static void F(MoveMaker& maker, const Side& side, const Square& from,
-    const Square& to) {
+    static void F(MoveMaker& maker, Side side, Square from, Square to) {
       Util::UpdateMax(maker.history_max_,
       maker.engine_ptr_->history()[side][from][to]);
     }
@@ -177,17 +175,17 @@ namespace Sayuri {
   // (GenMovesCore()用テンプレート部品)
   template<GenMoveType Type>
   struct GenPieceBitboard {
-    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side) {}
+    static void F(MoveMaker& maker, Bitboard& bitboard, Side side) {}
   };
   template<>
   struct GenPieceBitboard<GenMoveType::NON_CAPTURE> {
-    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side) {
+    static void F(MoveMaker& maker, Bitboard& bitboard, Side side) {
       bitboard &= ~(maker.engine_ptr_->blocker_0());
     }
   };
   template<>
   struct GenPieceBitboard<GenMoveType::CAPTURE> {
-    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side) {
+    static void F(MoveMaker& maker, Bitboard& bitboard, Side side) {
       bitboard &=
       maker.engine_ptr_->side_pieces()[Util::SwitchOppositeSide(side)];
     }
@@ -196,20 +194,20 @@ namespace Sayuri {
   // ポーンの動きのビットボードを作成する。 (GenMovesCore()用テンプレート部品)
   template<GenMoveType Type>
   struct GenPawnBitboard {
-    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side,
-    const Square& from) {}
+    static void F(MoveMaker& maker, Bitboard& bitboard, Side side,
+    Square from) {}
   };
   template<>
   struct GenPawnBitboard<GenMoveType::NON_CAPTURE> {
-    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side,
-    const Square& from) {
+    static void F(MoveMaker& maker, Bitboard& bitboard, Side side,
+    Square from) {
       bitboard = maker.engine_ptr_->GetPawnStep(side, from);
     }
   };
   template<>
   struct GenPawnBitboard<GenMoveType::CAPTURE> {
-    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side,
-    const Square& from) {
+    static void F(MoveMaker& maker, Bitboard& bitboard, Side side,
+    Square from) {
       bitboard = Util::GetPawnAttack(side, from)
       & maker.engine_ptr_->side_pieces()[Util::SwitchOppositeSide(side)];
 
@@ -224,11 +222,11 @@ namespace Sayuri {
   // キングの動きのビットボードを作成する。 (GenMovesCore()用テンプレート部品)
   template<GenMoveType Type>
   struct GenKingBitboard {
-    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side) {}
+    static void F(MoveMaker& maker, Bitboard& bitboard, Side side) {}
   };
   template<>
   struct GenKingBitboard<GenMoveType::NON_CAPTURE> {
-    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side) {
+    static void F(MoveMaker& maker, Bitboard& bitboard, Side side) {
       bitboard &= ~(maker.engine_ptr_->blocker_0());
 
       // キャスリングの動きを追加。
@@ -251,7 +249,7 @@ namespace Sayuri {
   };
   template<>
   struct GenKingBitboard<GenMoveType::CAPTURE> {
-    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side) {
+    static void F(MoveMaker& maker, Bitboard& bitboard, Side side) {
       bitboard &=
       maker.engine_ptr_->side_pieces()[Util::SwitchOppositeSide(side)];
     }
@@ -404,13 +402,13 @@ namespace Sayuri {
   // 点数をセットする。 (ScoreMoves()用テンプレート部品)
   template<GenMoveType Type>
   struct SetScore {
-    static void F(MoveMaker& maker, std::int64_t& score, const Move& move,
-    const Side& side, const Square& from, const Square& to) {}
+    static void F(MoveMaker& maker, std::int64_t& score, Move move,
+    Side side, Square from, Square to) {}
   };
   template<>
   struct SetScore<GenMoveType::NON_CAPTURE> {
-    static void F(MoveMaker& maker, std::int64_t& score, const Move& move,
-    const Side& side, const Square& from, const Square& to) {
+    static void F(MoveMaker& maker, std::int64_t& score, Move move,
+    Side side, Square from, Square to) {
       // ヒストリーの点数の最大値のビット桁数。 (つまり、最大値は 0x200 )
       constexpr int MAX_HISTORY_SCORE_SHIFT = 9;
 
@@ -421,8 +419,8 @@ namespace Sayuri {
   };
   template<>
   struct SetScore<GenMoveType::CAPTURE> {
-    static void F(MoveMaker& maker, std::int64_t& score, const Move& move,
-    const Side& side, const Square& from, const Square& to) {
+    static void F(MoveMaker& maker, std::int64_t& score, Move move,
+    Side side, Square from, Square to) {
       // 駒を取る手のビットシフト。
       constexpr int CAPTURE_SCORE_SHIFT = 13;
       // 悪い取る手の点数。

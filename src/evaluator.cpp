@@ -42,17 +42,17 @@ namespace Sayuri {
   // 白番なら加算、黒番なら減算するテンプレート部品。
   template<Side PSide>
   struct AddOrSub {
-    static void F(double& dst, const double& value) {}
+    static void F(double& dst, double value) {}
   };
   template<>
   struct AddOrSub<WHITE> {
-    static void F(double& dst, const double& value) {
+    static void F(double& dst, double value) {
       dst += value;
     }
   };
   template<>
   struct AddOrSub<BLACK> {
-    static void F(double& dst, const double& value) {
+    static void F(double& dst, double value) {
       dst -= value;
     }
   };
@@ -60,13 +60,13 @@ namespace Sayuri {
   // 評価用ビットボードを作成するテンプレート部品。
   template<Side PSide, Piece PType>
   struct GenBitboards {
-    static void F(Evaluator& evaluator, const Square& square,
+    static void F(Evaluator& evaluator, Square square,
     Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
     Bitboard& castling_moves) {}
   };
   template<Side PSide>
   struct GenBitboards<PSide, PAWN> {
-    static void F(Evaluator& evaluator, const Square& square,
+    static void F(Evaluator& evaluator, Square square,
     Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
     Bitboard& castling_moves) {
       // 通常の動き。
@@ -85,7 +85,7 @@ namespace Sayuri {
   };
   template<Side PSide>
   struct GenBitboards<PSide, KNIGHT> {
-    static void F(Evaluator& evaluator, const Square& square,
+    static void F(Evaluator& evaluator, Square square,
     Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
     Bitboard& castling_moves) {
       attacks = Util::GetKnightMove(square);
@@ -93,7 +93,7 @@ namespace Sayuri {
   };
   template<Side PSide>
   struct GenBitboards<PSide, BISHOP> {
-    static void F(Evaluator& evaluator, const Square& square,
+    static void F(Evaluator& evaluator, Square square,
     Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
     Bitboard& castling_moves) {
       attacks = evaluator.engine_ptr_->GetBishopAttack(square);
@@ -101,7 +101,7 @@ namespace Sayuri {
   };
   template<Side PSide>
   struct GenBitboards<PSide, ROOK> {
-    static void F(Evaluator& evaluator, const Square& square,
+    static void F(Evaluator& evaluator, Square square,
     Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
     Bitboard& castling_moves) {
       attacks = evaluator.engine_ptr_->GetRookAttack(square);
@@ -109,7 +109,7 @@ namespace Sayuri {
   };
   template<Side PSide>
   struct GenBitboards<PSide, QUEEN> {
-    static void F(Evaluator& evaluator, const Square& square,
+    static void F(Evaluator& evaluator, Square square,
     Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
     Bitboard& castling_moves) {
       attacks = evaluator.engine_ptr_->GetQueenAttack(square);
@@ -117,7 +117,7 @@ namespace Sayuri {
   };
   template<>
   struct GenBitboards<WHITE, KING> {
-    static void F(Evaluator& evaluator, const Square& square,
+    static void F(Evaluator& evaluator, Square square,
     Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
     Bitboard& castling_moves) {
       attacks = Util::GetKingMove(square);
@@ -134,7 +134,7 @@ namespace Sayuri {
   };
   template<>
   struct GenBitboards<BLACK, KING> {
-    static void F(Evaluator& evaluator, const Square& square,
+    static void F(Evaluator& evaluator, Square square,
     Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
     Bitboard& castling_moves) {
       attacks = Util::GetKingMove(square);
@@ -153,11 +153,11 @@ namespace Sayuri {
   // 駒の配置価値を計算するテンプレート部品。
   template<Side PSide, Piece PType>
   struct CalPosition {
-    static void F(Evaluator& evaluator, const Square& square) {}
+    static void F(Evaluator& evaluator, Square square) {}
   };
   template<Piece PType>
   struct CalPosition<WHITE, PType> {
-    static void F(Evaluator& evaluator, const Square& square) {
+    static void F(Evaluator& evaluator, Square square) {
       // オープニング。
       evaluator.opening_position_value_[PType] +=
       evaluator.engine_ptr_->eval_params().
@@ -171,7 +171,7 @@ namespace Sayuri {
   };
   template<Piece PType>
   struct CalPosition<BLACK, PType> {
-    static void F(Evaluator& evaluator, const Square& square) {
+    static void F(Evaluator& evaluator, Square square) {
       // オープニング。
       evaluator.opening_position_value_[PType] -=
       evaluator.engine_ptr_->eval_params().
@@ -187,8 +187,8 @@ namespace Sayuri {
   // 駒の機動力を計算するテンプレート部品。
   template<Side PSide, Piece PType>
   struct CalMobility {
-    static void F(Evaluator& evaluator, const Bitboard& attacks,
-    const Bitboard& pawn_moves, const Bitboard& en_passant) {
+    static void F(Evaluator& evaluator, Bitboard attacks, Bitboard pawn_moves,
+    Bitboard en_passant) {
       AddOrSub<PSide>::F(evaluator.mobility_value_[PType],
       Util::CountBits(attacks
       & ~(evaluator.engine_ptr_->side_pieces()[PSide])));
@@ -196,8 +196,8 @@ namespace Sayuri {
   };
   template<Side PSide>
   struct CalMobility<PSide, PAWN> {
-    static void F(Evaluator& evaluator, const Bitboard& attacks,
-    const Bitboard& pawn_moves, const Bitboard& en_passant) {
+    static void F(Evaluator& evaluator, Bitboard attacks, Bitboard pawn_moves,
+    Bitboard en_passant) {
       constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
 
       AddOrSub<PSide>::F(evaluator.mobility_value_[PAWN],
@@ -210,13 +210,13 @@ namespace Sayuri {
   // ピンのターゲットや裏駒を抽出するテンプレート部品。
   template<Side PSide, Piece PType>
   struct GenPinTargets {
-    static void F(Evaluator& evaluator, const Square& square,
-    const Bitboard& attacks, Bitboard& target, Bitboard& back) {}
+    static void F(Evaluator& evaluator, Square square, Bitboard attacks,
+    Bitboard& target, Bitboard& back) {}
   };
   template<Side PSide>
   struct GenPinTargets<PSide, BISHOP> {
-    static void F(Evaluator& evaluator, const Square& square,
-    const Bitboard& attacks, Bitboard& target, Bitboard& back) {
+    static void F(Evaluator& evaluator, Square square, Bitboard attacks,
+    Bitboard& target, Bitboard& back) {
       constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
 
       target = attacks & evaluator.engine_ptr_->side_board()[EnemySide];
@@ -227,8 +227,8 @@ namespace Sayuri {
   };
   template<Side PSide>
   struct GenPinTargets<PSide, ROOK> {
-    static void F(Evaluator& evaluator, const Square& square,
-    const Bitboard& attacks, Bitboard& target, Bitboard& back) {
+    static void F(Evaluator& evaluator, Square square, Bitboard attacks,
+    Bitboard& target, Bitboard& back) {
       constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
 
       target = attacks & evaluator.engine_ptr_->side_board()[EnemySide];
@@ -239,8 +239,8 @@ namespace Sayuri {
   };
   template<Side PSide>
   struct GenPinTargets<PSide, QUEEN> {
-    static void F(Evaluator& evaluator, const Square& square,
-    const Bitboard& attacks, Bitboard& target, Bitboard& back) {
+    static void F(Evaluator& evaluator, Square square, Bitboard attacks,
+    Bitboard& target, Bitboard& back) {
       constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
 
       target = attacks & evaluator.engine_ptr_->side_board()[EnemySide];
@@ -253,11 +253,11 @@ namespace Sayuri {
   // 各駒専用の価値を計算するテンプレート部品。
   template<Side PSide, Piece PType>
   struct CalSpecial {
-    static void F(Evaluator& evaluator, const Square& square) {}
+    static void F(Evaluator& evaluator, Square square) {}
   };
   template<Side PSide>
   struct CalSpecial<PSide, PAWN> {
-    static void F(Evaluator& evaluator, const Square& square) {
+    static void F(Evaluator& evaluator, Square square) {
       constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
 
       // パスポーンを計算。
@@ -302,7 +302,7 @@ namespace Sayuri {
   };
   template<Side PSide>
   struct CalSpecial<PSide, BISHOP> {
-    static void F(Evaluator& evaluator, const Square& square) {
+    static void F(Evaluator& evaluator, Square square) {
       // バッドビショップを計算。
       if ((Util::SQUARE[square] & Util::SQCOLOR[WHITE])) {
         AddOrSub<PSide>::F(evaluator.bad_bishop_value_,
@@ -317,7 +317,7 @@ namespace Sayuri {
   };
   template<Side PSide>
   struct CalSpecial<PSide, ROOK> {
-    static void F(Evaluator& evaluator, const Square& square) {
+    static void F(Evaluator& evaluator, Square square) {
       constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
 
       // オープンファイルとセミオープンファイルを計算。
@@ -335,7 +335,7 @@ namespace Sayuri {
   };
   template<Side PSide>
   struct CalSpecial<PSide, QUEEN> {
-    static void F(Evaluator& evaluator, const Square& square) {
+    static void F(Evaluator& evaluator, Square square) {
       // クイーンの早過ぎる始動を計算。
       double value = 0.0;
       if (!(Util::SQUARE[square] & evaluator.start_position_[PSide][QUEEN])) {
@@ -353,7 +353,7 @@ namespace Sayuri {
   };
   template<Side PSide>
   struct CalSpecial<PSide, KING> {
-    static void F(Evaluator& evaluator, const Square& square) {
+    static void F(Evaluator& evaluator, Square square) {
       constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
 
       // --- キング周りの弱いマスを計算 --- //
