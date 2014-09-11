@@ -161,12 +161,27 @@ namespace Sayuri {
       // ================== //
       /**
        * 各駒の価値を計算する。
+       * @param <Side> 駒のサイド。
        * @param <Type> 駒の種類。
        * @param piece_square 駒のいるマス。
        * @param piece_side 駒のサイド。
        */
-      template<Piece Type>
-      void CalValue(Square piece_square, Side piece_side);
+      template<Side PSide, Piece PType>
+      void CalValue(Square piece_square);
+
+      // --- テンプレート部品 --- //
+      template<Side PSide>
+      friend struct AddOrSub;
+      template<Side PSide, Piece PType>
+      friend struct GenBitboards;
+      template<Side PSide, Piece PType>
+      friend struct CalPosition;
+      template<Side PSide, Piece PType>
+      friend struct CalMobility;
+      template<Side PSide, Piece PType>
+      friend struct GenPinTargets;
+      template<Side PSide, Piece PType>
+      friend struct CalSpecial;
 
       // ========== //
       // 局面分析用 //

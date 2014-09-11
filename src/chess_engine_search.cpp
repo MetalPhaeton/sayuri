@@ -142,6 +142,179 @@ namespace Sayuri {
     return alpha;
   }
 
+  // Internal Iterative Deepeningをする。 (Search()用テンプレート部品)
+  template<NodeType Type>
+  struct DoIID {
+    static void F(ChessEngine& engine, const bool& is_checked,
+    const Move& prev_best, const Hash& pos_hash, const int& depth,
+    const std::uint32_t& level, const int& alpha, const int& beta,
+    const int& material, TranspositionTable& table) {}
+  };
+  template<>
+  struct DoIID<NodeType::PV> {
+    static void F(ChessEngine& engine, const bool& is_checked,
+    const Move& prev_best, const Hash& pos_hash, const int& depth,
+    const std::uint32_t& level, const int& alpha, const int& beta,
+    const int& material, TranspositionTable& table) {
+      const SearchParams& params =
+      *(engine.shared_st_ptr_->search_params_ptr_);
+
+      if (params.enable_iid()) {
+        // 前回の繰り返しの最善手があればIIDしない。
+        if (prev_best) {
+          engine.shared_st_ptr_->iid_stack_[level] = prev_best;
+        } else {
+          if (!is_checked
+          && (depth >= params.iid_limit_depth())) {
+            // Internal Iterative Deepening。
+            engine.Search<NodeType::PV>(pos_hash, params.iid_search_depth(),
+            level, alpha, beta, material, table);
+
+            engine.shared_st_ptr_->iid_stack_[level] =
+            engine.pv_line_table_[level][0];
+          }
+        }
+      }
+    }
+  };
+
+  // Null Move Reductionをする。 (Search()用テンプレート部品)
+  template<NodeType Type>
+  struct DoNMR {
+    static void F(ChessEngine& engine, const bool& is_checked,
+    const Hash& pos_hash, int& depth, const std::uint32_t& level,
+    const int& beta, const int& material, TranspositionTable& table,
+    int& null_reduction) {}
+  };
+  template<>
+  struct DoNMR<NodeType::NON_PV> {
+    static void F(ChessEngine& engine, const bool& is_checked,
+    const Hash& pos_hash, int& depth, const std::uint32_t& level,
+    const int& beta, const int& material, TranspositionTable& table,
+    int& null_reduction) {
+      const SearchParams& params =
+      *(engine.shared_st_ptr_->search_params_ptr_);
+
+      if (params.enable_nmr()) {
+        if (!(engine.is_null_searching_) && !is_checked
+        && (depth >= params.nmr_limit_depth())) {
+          // Null Move Reduction。
+          Move null_move = 0;
+
+          engine.is_null_searching_ = true;
+          engine.MakeNullMove(null_move);
+
+          // Null Move Search。
+          int score = -(engine.Search<NodeType::NON_PV>(pos_hash,
+          depth - params.nmr_search_reduction() - 1, level + 1, -(beta),
+          -(beta - 1), -material, table));
+
+          engine.UnmakeNullMove(null_move);
+          engine.is_null_searching_ = false;
+
+          if (score >= beta) {
+            null_reduction = params.nmr_reduction();
+
+            depth = Util::GetMax(depth - null_reduction, 1);
+          }
+        }
+      }
+    }
+  };
+
+  // ProbCutをする。 (Search()用テンプレート部品)
+  template<NodeType Type>
+  struct DoProbCut {
+    static void F(ChessEngine& engine, const Side& side,
+    const Side& enemy_side, const bool& is_checked, ScoreType& score_type,
+    const Hash& pos_hash, const int& depth, const std::uint32_t& level,
+    int& alpha, const int& beta, const int& material,
+    TranspositionTable& table) {}
+  };
+  template<>
+  struct DoProbCut<NodeType::NON_PV> {
+    static void F(ChessEngine& engine, const Side& side,
+    const Side& enemy_side, const bool& is_checked, ScoreType& score_type,
+    const Hash& pos_hash, const int& depth, const std::uint32_t& level,
+    int& alpha, const int& beta, const int& material,
+    TranspositionTable& table) {
+      const SearchParams& params =
+      *(engine.shared_st_ptr_->search_params_ptr_);
+
+      MoveMaker& maker = engine.maker_table_[level];
+
+      if (params.enable_probcut()) {
+        if (!(engine.is_null_searching_) && !is_checked
+        && (depth >= params.probcut_limit_depth())) {
+          // 手を作る。
+          maker.RegenMoves();
+
+          // 浅読みパラメータ。
+          int prob_beta = beta + params.probcut_margin();
+          int prob_depth = depth - params.probcut_search_reduction();
+
+          // 探索。
+          for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
+            // 次のノードへの準備。
+            Hash next_hash = engine.GetNextHash(pos_hash, move);
+            int next_my_material = engine.GetNextMyMaterial(material, move);
+
+            engine.MakeMove(move);
+
+            // 合法手じゃなければ次の手へ。
+            if (engine.IsAttacked(engine.king_[side], enemy_side)) {
+              engine.UnmakeMove(move);
+              continue;
+            }
+
+            int score = -(engine.Search<NodeType::NON_PV>(next_hash,
+            prob_depth - 1, level + 1, -prob_beta, -(prob_beta - 1),
+            -next_my_material, table));
+
+            engine.UnmakeMove(move);
+
+            // ベータカット。
+            if (score >= prob_beta) {
+              // PVライン。
+              engine.pv_line_table_[level].SetMove(move);
+              engine.pv_line_table_[level].
+              Insert(engine.pv_line_table_[level + 1]);
+
+              // 取らない手。
+              if (!(move & CAPTURED_PIECE_MASK)) {
+                // 手の情報を得る。
+                Square from = GET_FROM(move);
+                Square to = GET_TO(move);
+
+                // キラームーブ。
+                if (params.enable_killer()) {
+                  engine.shared_st_ptr_->killer_stack_[level][0] = move;
+                  if (params.enable_killer_2()) {
+                    engine.shared_st_ptr_->killer_stack_[level + 2][1] = move;
+                  }
+                }
+
+                // ヒストリー。
+                if (params.enable_history()) {
+                  engine.shared_st_ptr_->history_[side][from][to] +=
+                  TO_HISTORY(depth);
+
+                  Util::UpdateMax
+                  (engine.shared_st_ptr_->history_[side][from][to],
+                  engine.shared_st_ptr_->history_max_);
+                }
+              }
+
+              score_type = ScoreType::BETA;
+              alpha = beta;
+              break;
+            }
+          }
+        }
+      }
+    }
+  };
+
   // 通常の探索。
   template<NodeType Type>
   int ChessEngine::Search(Hash pos_hash, int depth, std::uint32_t level,
@@ -296,60 +469,15 @@ namespace Sayuri {
     }
 
     // --- Internal Iterative Deepening --- //
-    if (Type == NodeType::PV) {
-      if (params.enable_iid()) {
-        // 前回の繰り返しの最善手があればIIDしない。
-        if (prev_best) {
-          shared_st_ptr_->iid_stack_[level] = prev_best;
-        } else {
-          if (!is_checked && (depth >= params.iid_limit_depth())) {
-            // Internal Iterative Deepening。
-            Search<NodeType::PV>(pos_hash, params.iid_search_depth(), level,
-            alpha, beta, material, table);
-
-            shared_st_ptr_->iid_stack_[level] = pv_line_table_[level][0];
-          }
-        }
-      }
-    }
+    // テンプレート部品。
+    DoIID<Type>::F(*this, is_checked, prev_best, pos_hash, depth, level,
+    alpha, beta, material, table);
 
     // --- Null Move Reduction --- //
     int null_reduction = 0;
-    if (Type == NodeType::NON_PV) {
-      if (params.enable_nmr()) {
-        if (!is_null_searching_ && !is_checked
-        && (depth >= params.nmr_limit_depth())) {
-          // Null Move Reduction。
-          Move null_move = 0;
-
-          is_null_searching_ = true;
-          MakeNullMove(null_move);
-
-          // Null Move Search。
-          int score = -Search<NodeType::NON_PV>(pos_hash,
-          depth - params.nmr_search_reduction() - 1, level + 1, -(beta),
-          -(beta - 1), -material, table);
-
-          UnmakeNullMove(null_move);
-          is_null_searching_ = false;
-
-          if (score >= beta) {
-            null_reduction = params.nmr_reduction();
-
-            depth -= null_reduction;
-            if ((depth <= 0)) {
-              if (params.enable_quiesce_search()) {
-                // クイース探索ノードに移行するため、ノード数を減らしておく。
-                --(shared_st_ptr_->searched_nodes_);
-                return Quiesce(depth, level, alpha, beta, material, table);
-              } else {
-                return evaluator_.Evaluate(material);
-              }
-            }
-          }
-        }
-      }
-    }
+    // テンプレート部品。
+    DoNMR<Type>::F(*this, is_checked, pos_hash, depth, level, beta, material,
+    table, null_reduction);
 
     // 手を作る。
     maker_table_[level].GenMoves<GenMoveType::ALL>(prev_best,
@@ -357,86 +485,12 @@ namespace Sayuri {
     shared_st_ptr_->killer_stack_[level][0],
     shared_st_ptr_->killer_stack_[level][1]);
 
+    ScoreType score_type = ScoreType::ALPHA;
+
     // --- ProbCut --- //
-    // ProbCutでは、Betaカットの時、Beta値を返す。
-    if ((Type == NodeType::NON_PV)) {
-      if (params.enable_probcut()) {
-        if (!is_null_searching_ && !is_checked
-        && (depth >= params.probcut_limit_depth())) {
-          // 手を作る。
-          maker_table_[level].RegenMoves();
-
-          // 浅読みパラメータ。
-          int prob_beta = beta + params.probcut_margin();
-          int prob_depth = depth - params.probcut_search_reduction();
-
-          // 探索。
-          for (Move move = maker_table_[level].PickMove(); move;
-          move = maker_table_[level].PickMove()) {
-            // 次のノードへの準備。
-            Hash next_hash = GetNextHash(pos_hash, move);
-            int next_my_material = GetNextMyMaterial(material, move);
-
-            MakeMove(move);
-
-            // 合法手じゃなければ次の手へ。
-            if (IsAttacked(king_[side], enemy_side)) {
-              UnmakeMove(move);
-              continue;
-            }
-
-            int score = -Search<NodeType::NON_PV>(next_hash, prob_depth - 1,
-            level + 1, -prob_beta, -(prob_beta - 1), -next_my_material, table);
-
-            UnmakeMove(move);
-
-            // ベータカット。
-            if (score >= prob_beta) {
-              // PVライン。
-              pv_line_table_[level].SetMove(move);
-              pv_line_table_[level].Insert(pv_line_table_[level + 1]);
-
-              // 取らない手。
-              if (!(move & CAPTURED_PIECE_MASK)) {
-                // 手の情報を得る。
-                Square from = GET_FROM(move);
-                Square to = GET_TO(move);
-
-                // キラームーブ。
-                if (params.enable_killer()) {
-                  shared_st_ptr_->killer_stack_[level][0] = move;
-                  if (params.enable_killer_2()) {
-                    shared_st_ptr_->killer_stack_[level + 2][1] = move;
-                  }
-                }
-
-                // ヒストリー。
-                if (params.enable_history()) {
-                  shared_st_ptr_->history_[side][from][to] +=
-                  TO_HISTORY(depth);
-                  if (shared_st_ptr_->history_[side][from][to]
-                  > shared_st_ptr_->history_max_) {
-                    shared_st_ptr_->history_max_ =
-                    shared_st_ptr_->history_[side][from][to];
-                  }
-                }
-              }
-
-              // トランスポジションテーブルに登録。
-              // Null Move Reductionされていた場合、容量節約のため登録しない。
-              if (params.enable_ttable()) {
-                if (!null_reduction && !ShouldBeStopped()) {
-                  table.Add(pos_hash, depth, beta, ScoreType::BETA,
-                  pv_line_table_[level][0], pv_line_table_[level].mate_in());
-                }
-              }
-
-              return beta;
-            }
-          }
-        }
-      }
-    }
+    // テンプレート部品。
+    DoProbCut<Type>::F(*this, side, enemy_side, is_checked, score_type,
+    pos_hash, depth, level, alpha, beta, material, table);
 
     // --- Check Extension --- //
     if (params.enable_check_extension() && is_checked) {
@@ -463,7 +517,7 @@ namespace Sayuri {
     job.pv_line_ptr_ = &pv_line_table_[level];
     job.is_null_searching_ = is_null_searching_;
     job.null_reduction_ = null_reduction;
-    job.score_type_ = ScoreType::ALPHA;
+    job.score_type_ = score_type;
     job.material_ = material;
     job.is_checked_ = is_checked;
     job.num_all_moves_ = num_all_moves;
@@ -1505,7 +1559,7 @@ namespace Sayuri {
       Piece promotion = EMPTY;
       switch (piece_type) {
         case PAWN:
-          attackers = Util::GetPawnAttack(target, OPPOSITE_SIDE(to_move_))
+          attackers = Util::GetPawnAttack(OPPOSITE_SIDE(to_move_), target)
           & position_[to_move_][PAWN];
           if (((to_move_ == WHITE)
           && (Util::SQUARE_TO_RANK[target] == RANK_8))

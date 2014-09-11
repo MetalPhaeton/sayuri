@@ -573,47 +573,6 @@ namespace Sayuri {
     }
   }
 
-  // キャスリング出来るかどうかを判定する。
-  template<Castling Flag>
-  bool ChessEngine::CanCastling() const {
-    if (!(castling_rights_ & Flag)) return false;
-
-    if (Flag == WHITE_SHORT_CASTLING) {
-      if (IsAttacked(E1, BLACK)) return false;
-      if (IsAttacked(F1, BLACK)) return false;
-      if (IsAttacked(G1, BLACK)) return false;
-      if (piece_board_[F1]) return false;
-      if (piece_board_[G1]) return false;
-    } else if (Flag == WHITE_LONG_CASTLING) {
-      if (IsAttacked(E1, BLACK)) return false;
-      if (IsAttacked(D1, BLACK)) return false;
-      if (IsAttacked(C1, BLACK)) return false;
-      if (piece_board_[D1]) return false;
-      if (piece_board_[C1]) return false;
-      if (piece_board_[B1]) return false;
-    } else if (Flag == BLACK_SHORT_CASTLING) {
-      if (IsAttacked(E8, WHITE)) return false;
-      if (IsAttacked(F8, WHITE)) return false;
-      if (IsAttacked(G8, WHITE)) return false;
-      if (piece_board_[F8]) return false;
-      if (piece_board_[G8]) return false;
-    } else if (Flag == BLACK_LONG_CASTLING){
-      if (IsAttacked(E8, WHITE)) return false;
-      if (IsAttacked(D8, WHITE)) return false;
-      if (IsAttacked(C8, WHITE)) return false;
-      if (piece_board_[D8]) return false;
-      if (piece_board_[C8]) return false;
-      if (piece_board_[B8]) return false;
-    }
-
-    return true;
-  }
-  // 実体化。
-  template bool ChessEngine::CanCastling<WHITE_SHORT_CASTLING>() const;
-  template bool ChessEngine::CanCastling<WHITE_LONG_CASTLING>() const;
-  template bool ChessEngine::CanCastling<BLACK_SHORT_CASTLING>() const;
-  template bool ChessEngine::CanCastling<BLACK_LONG_CASTLING>() const;
-
   // 次の手を指す。
   void ChessEngine::MakeMove(Move& move) {
     // 動かす側のサイドを得る。
@@ -814,7 +773,7 @@ namespace Sayuri {
   // その位置が他の位置の駒に攻撃されているかどうかチェックする。
   bool ChessEngine::IsAttacked(Square square, Side side) const {
     // ポーンに攻撃されているかどうか調べる。
-    Bitboard attack = Util::GetPawnAttack(square, OPPOSITE_SIDE(side));
+    Bitboard attack = Util::GetPawnAttack(OPPOSITE_SIDE(side), square);
     if (attack & position_[side][PAWN]) return true;
 
     // ナイトに攻撃されているかどうか調べる。

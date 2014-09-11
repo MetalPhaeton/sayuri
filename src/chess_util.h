@@ -623,11 +623,11 @@ namespace Sayuri {
       }
       /**
        * ポーンの攻撃の動きのビットボードを得る。
-       * @param square 基点。
        * @param side ポーンのサイド。
+       * @param square 基点。
        * @return ポーンの攻撃の動きのビットボード。
        */
-      static Bitboard GetPawnAttack(Square square, Side side) {
+      static Bitboard GetPawnAttack(Side side, Square square) {
         return pawn_attack_[side][square];
       }
       /**
@@ -674,6 +674,48 @@ namespace Sayuri {
       // ================ //
       // その他の便利関数 //
       // ================ //
+      /**
+       * 最大値を返す。
+       * @param val_1 値1。
+       * @param val_2 値2。
+       * @return val_1とval_2の大きい方。
+       */
+      template<typename T>
+      constexpr static T GetMax(const T& val_1, const T& val_2) {
+        return val_1 > val_2 ? val_1 : val_2;
+      }
+
+      /**
+       * 最小値を返す。
+       * @param val_1 値1。
+       * @param val_2 値2。
+       * @return val_1とval_2の小さい方。
+       */
+      template<typename T>
+      constexpr static T GetMin(const T& val_1, const T& val_2) {
+        return val_1 < val_2 ? val_1 : val_2;
+      }
+
+      /**
+       * 変数を最大値に更新する。
+       * @param from 更新元の数値。
+       * @param to 更新したい変数。
+       */
+      template<typename T>
+      static void UpdateMax(const T& from, T& to) {
+        if (from > to) to = from;
+      }
+
+      /**
+       * 変数を最小値に更新する。
+       * @param from 更新元の数値。
+       * @param to 更新したい変数。
+       */
+      template<typename T>
+      static void UpdateMin(const T& from, T& to) {
+        if (from < to) to = from;
+      }
+
       /**
        * 立っているビットの数を数える。
        * @param bitboard 対象のビットボード。

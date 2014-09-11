@@ -158,13 +158,109 @@ namespace Sayuri {
     return slot.move_;
   }
 
+  // ヒストリーの最大値を更新する。 (GenMovesCore()用テンプレート部品)
+  template<GenMoveType Type>
+  struct UpdateMaxHistory {
+    static void F(MoveMaker& maker, const Side& side, const Square& from,
+    const Square& to) {}
+  };
+  template <>
+  struct UpdateMaxHistory<GenMoveType::NON_CAPTURE> {
+    static void F(MoveMaker& maker, const Side& side, const Square& from,
+    const Square& to) {
+      Util::UpdateMax(maker.engine_ptr_->history()[side][from][to],
+      maker.history_max_);
+    }
+  };
+
+  // ポーン、キング以外の駒の動きのビットボードを作成する。
+  // (GenMovesCore()用テンプレート部品)
+  template<GenMoveType Type>
+  struct GenPieceBitboard {
+    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side) {}
+  };
+  template<>
+  struct GenPieceBitboard<GenMoveType::NON_CAPTURE> {
+    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side) {
+      bitboard &= ~(maker.engine_ptr_->blocker_0());
+    }
+  };
+  template<>
+  struct GenPieceBitboard<GenMoveType::CAPTURE> {
+    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side) {
+      bitboard &= maker.engine_ptr_->side_pieces()[OPPOSITE_SIDE(side)];
+    }
+  };
+
+  // ポーンの動きのビットボードを作成する。 (GenMovesCore()用テンプレート部品)
+  template<GenMoveType Type>
+  struct GenPawnBitboard {
+    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side,
+    const Square& from) {}
+  };
+  template<>
+  struct GenPawnBitboard<GenMoveType::NON_CAPTURE> {
+    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side,
+    const Square& from) {
+      bitboard = maker.engine_ptr_->GetPawnStep(side, from);
+    }
+  };
+  template<>
+  struct GenPawnBitboard<GenMoveType::CAPTURE> {
+    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side,
+    const Square& from) {
+      bitboard = Util::GetPawnAttack(side, from)
+      & maker.engine_ptr_->side_pieces()[OPPOSITE_SIDE(side)];
+
+      // アンパッサンがある場合。
+      if (maker.engine_ptr_->en_passant_square()) {
+        bitboard |= Util::SQUARE[maker.engine_ptr_->en_passant_square()]
+        & Util::GetPawnAttack(side, from);
+      }
+    }
+  };
+
+  // キングの動きのビットボードを作成する。 (GenMovesCore()用テンプレート部品)
+  template<GenMoveType Type>
+  struct GenKingBitboard {
+    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side) {}
+  };
+  template<>
+  struct GenKingBitboard<GenMoveType::NON_CAPTURE> {
+    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side) {
+      bitboard &= ~(maker.engine_ptr_->blocker_0());
+
+      // キャスリングの動きを追加。
+      if (side == WHITE) {
+        if (maker.engine_ptr_->CanCastling<WHITE_SHORT_CASTLING>()) {
+          bitboard |= Util::SQUARE[G1];
+        }
+        if (maker.engine_ptr_->CanCastling<WHITE_LONG_CASTLING>()) {
+          bitboard |= Util::SQUARE[C1];
+        }
+      } else {
+        if (maker.engine_ptr_->CanCastling<BLACK_SHORT_CASTLING>()) {
+          bitboard |= Util::SQUARE[G8];
+        }
+        if (maker.engine_ptr_->CanCastling<BLACK_LONG_CASTLING>()) {
+          bitboard |= Util::SQUARE[C8];
+        }
+      }
+    }
+  };
+  template<>
+  struct GenKingBitboard<GenMoveType::CAPTURE> {
+    static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side) {
+      bitboard &= maker.engine_ptr_->side_pieces()[OPPOSITE_SIDE(side)];
+    }
+  };
+
   // スタックに候補手を生成する。 (内部用)
   template<GenMoveType Type>
   void MoveMaker::GenMovesCore(Move prev_best, Move iid_move,
   Move killer_1, Move killer_2) {
     // サイド。
     Side side = engine_ptr_->to_move();
-    Side enemy_side = OPPOSITE_SIDE(side);
 
     // 生成開始時のポインタ。
     std::size_t start = last_;
@@ -197,14 +293,8 @@ namespace Sayuri {
             break;
         }
 
-        // 展開するタイプによって候補手を選り分ける。。
-        if (Type == GenMoveType::NON_CAPTURE) {
-          // キャプチャーじゃない手。
-          move_bitboard &= ~(engine_ptr_->blocker_0());
-        } else {
-          // キャプチャーの手。
-          move_bitboard &= engine_ptr_->side_pieces()[enemy_side];
-        }
+        // 展開するタイプによって候補手を選り分ける。 (テンプレート部品)
+        GenPieceBitboard<Type>::F(*this, move_bitboard, side);
 
         for (; move_bitboard; NEXT(move_bitboard)) {
           // 手を作る。
@@ -214,12 +304,8 @@ namespace Sayuri {
           SET_TO(move, to);
           SET_MOVE_TYPE(move, NORMAL);
 
-          // ヒストリーの最大値を更新。
-          if (Type == GenMoveType::NON_CAPTURE) {
-            if (engine_ptr_->history()[side][from][to] > history_max_) {
-              history_max_ = engine_ptr_->history()[side][from][to];
-            }
-          }
+          // ヒストリーの最大値を更新。 (テンプレート部品)
+          UpdateMaxHistory<Type>::F(*this, side, from, to);
 
           // スタックに登録。
           move_stack_[last_++].move_ = move;
@@ -233,19 +319,9 @@ namespace Sayuri {
       Square from = Util::GetSquare(pieces);
 
       Bitboard move_bitboard = 0;
-      if (Type == GenMoveType::NON_CAPTURE) {
-        // キャプチャーじゃない手。
-        move_bitboard = engine_ptr_->GetPawnStep(side, from);
-      } else {
-        // キャプチャーの手。
-        move_bitboard = Util::GetPawnAttack(from, side)
-        & engine_ptr_->side_pieces()[enemy_side];
-        // アンパッサンがある場合。
-        if (engine_ptr_->en_passant_square()) {
-          move_bitboard |= Util::SQUARE[engine_ptr_->en_passant_square()]
-          & Util::GetPawnAttack(from, side);
-        }
-      } 
+
+      // (テンプレート部品)
+      GenPawnBitboard<Type>::F(*this, move_bitboard, side, from);
 
       for (; move_bitboard; NEXT(move_bitboard)) {
         // 手を作る。
@@ -254,12 +330,8 @@ namespace Sayuri {
         Square to = Util::GetSquare(move_bitboard);
         SET_TO(move, to);
 
-        // ヒストリーの最大値を更新。
-        if (Type == GenMoveType::NON_CAPTURE) {
-          if (engine_ptr_->history()[side][from][to] > history_max_) {
-            history_max_ = engine_ptr_->history()[side][from][to];
-          }
-        }
+        // ヒストリーの最大値を更新。 (テンプレート部品)
+        UpdateMaxHistory<Type>::F(*this, side, from, to);
 
         if (engine_ptr_->en_passant_square()
         && (to == engine_ptr_->en_passant_square())) {
@@ -285,41 +357,18 @@ namespace Sayuri {
     // キングの動きを作る。
     Square from = engine_ptr_->king()[side];
     Bitboard move_bitboard = Util::GetKingMove(from);
-    if (Type == GenMoveType::NON_CAPTURE) {
-      // キャプチャーじゃない手。
-      move_bitboard &= ~(engine_ptr_->blocker_0());
-      // キャスリングの動きを追加。
-      if (side == WHITE) {
-        if (engine_ptr_->CanCastling<WHITE_SHORT_CASTLING>()) {
-          move_bitboard |= Util::SQUARE[G1];
-        }
-        if (engine_ptr_->CanCastling<WHITE_LONG_CASTLING>()) {
-          move_bitboard |= Util::SQUARE[C1];
-        }
-      } else {
-        if (engine_ptr_->CanCastling<BLACK_SHORT_CASTLING>()) {
-          move_bitboard |= Util::SQUARE[G8];
-        }
-        if (engine_ptr_->CanCastling<BLACK_LONG_CASTLING>()) {
-          move_bitboard |= Util::SQUARE[C8];
-        }
-      }
-    } else {
-      // キャプチャーの手。
-      move_bitboard &= engine_ptr_->side_pieces()[enemy_side];
-    }
+
+    // (テンプレート部品)
+    GenKingBitboard<Type>::F(*this, move_bitboard, side);
+
     for (; move_bitboard; NEXT(move_bitboard)) {
       Move move = 0;
       SET_FROM(move, from);
       Square to = Util::GetSquare(move_bitboard);
       SET_TO(move, to);
 
-      // ヒストリーの最大値を更新。
-      if (Type == GenMoveType::NON_CAPTURE) {
-        if (engine_ptr_->history()[side][from][to] > history_max_) {
-          history_max_ = engine_ptr_->history()[side][from][to];
-        }
-      }
+      // ヒストリーの最大値を更新。 (テンプレート部品)
+      UpdateMaxHistory<Type>::F(*this, side, from, to);
 
       if ((side == WHITE) && (from == E1) && (to == G1)) {
         // 白のショートキャスリング。
@@ -343,24 +392,58 @@ namespace Sayuri {
 
     ScoreMoves<Type>(start, prev_best, iid_move, killer_1, killer_2, side);
   }
+
   // 実体化。
   template void MoveMaker::GenMovesCore<GenMoveType::NON_CAPTURE>
   (Move prev_best, Move iid_move, Move killer_1, Move killer_2);
   template void MoveMaker::GenMovesCore<GenMoveType::CAPTURE>
   (Move prev_best, Move iid_move, Move killer_1, Move killer_2);
 
+  // 点数をセットする。 (ScoreMoves()用テンプレート部品)
+  template<GenMoveType Type>
+  struct SetScore {
+    static void F(MoveMaker& maker, std::int64_t& score, const Move& move,
+    const Side& side, const Square& from, const Square& to) {}
+  };
+  template<>
+  struct SetScore<GenMoveType::NON_CAPTURE> {
+    static void F(MoveMaker& maker, std::int64_t& score, const Move& move,
+    const Side& side, const Square& from, const Square& to) {
+      // ヒストリーの点数の最大値のビット桁数。 (つまり、最大値は 0x200 )
+      constexpr int MAX_HISTORY_SCORE_SHIFT = 9;
+
+      // ヒストリーを使って点数をつけていく。
+      score = (maker.engine_ptr_->history()[side][from][to]
+      << MAX_HISTORY_SCORE_SHIFT) / maker.history_max_;
+    }
+  };
+  template<>
+  struct SetScore<GenMoveType::CAPTURE> {
+    static void F(MoveMaker& maker, std::int64_t& score, const Move& move,
+    const Side& side, const Square& from, const Square& to) {
+      // 駒を取る手のビットシフト。
+      constexpr int CAPTURE_SCORE_SHIFT = 13;
+      // 悪い取る手の点数。
+      constexpr std::int64_t BAD_CAPTURE_SCORE = -1LL;
+
+      // SEEで点数をつけていく。
+      std::int64_t temp =
+      (maker.engine_ptr_->SEE(move)) << CAPTURE_SCORE_SHIFT;
+
+      score = MAX(temp, BAD_CAPTURE_SCORE);
+    }
+  };
+
   // 候補手に点数をつける。
   template<GenMoveType Type>
   void MoveMaker::ScoreMoves(std::size_t start, Move prev_best, Move iid_move,
   Move killer_1, Move killer_2, Side side) {
     // --- 評価値の定義 --- //
-    // ヒストリーの点数の最大値のビット桁数。 (つまり、最大値は 0x200 )
-    constexpr int MAX_HISTORY_SCORE_SHIFT = 9;
     // キラームーブの点数。
     constexpr std::int64_t KILLER_2_MOVE_SCORE = 0x400LL;
     constexpr std::int64_t KILLER_1_MOVE_SCORE = KILLER_2_MOVE_SCORE << 1;
     // 駒を取る手のビットシフト。
-    constexpr int CAPTURE_SCORE_SHIFT = 13;
+    // constexpr int CAPTURE_SCORE_SHIFT = 13;
     // 相手キングをチェックする手の点数。
     constexpr std::int64_t CHECKING_MOVE_SCORE = 1LL << 32;
     // IIDで得た最善手の点数。
@@ -368,7 +451,7 @@ namespace Sayuri {
     // 前回の繰り返しでトランスポジションテーブルから得た最善手の点数。
     constexpr std::int64_t BEST_MOVE_SCORE = IID_MOVE_SCORE << 1;
     // 悪い取る手の点数。
-    constexpr std::int64_t BAD_CAPTURE_SCORE = -1LL;
+    // constexpr std::int64_t BAD_CAPTURE_SCORE = -1LL;
 
     Bitboard enemy_king_bb =
     Util::SQUARE[engine_ptr_->king()[OPPOSITE_SIDE(side)]];
@@ -381,7 +464,7 @@ namespace Sayuri {
       bool is_checking_move = false;
       switch (engine_ptr_->piece_board()[from]) {
         case PAWN:
-          if ((enemy_king_bb & Util::GetPawnAttack(to, side))) {
+          if ((enemy_king_bb & Util::GetPawnAttack(side, to))) {
             is_checking_move = true;
           }
           break;
@@ -428,20 +511,18 @@ namespace Sayuri {
         move_stack_[i].score_ = KILLER_2_MOVE_SCORE;
       } else {
         // その他の手を各候補手のタイプに分ける。
-        if ((Type == GenMoveType::CAPTURE)
-        || (move_stack_[i].move_ & PROMOTION_MASK)) {
-          // SEEで点数をつけていく。
-          std::int64_t temp =
-          (engine_ptr_->SEE(move_stack_[i].move_)) << CAPTURE_SCORE_SHIFT;
-          move_stack_[i].score_ = MAX(temp, BAD_CAPTURE_SCORE);
+        if ((move_stack_[i].move_ & PROMOTION_MASK)) {
+          SetScore<GenMoveType::CAPTURE>::F(*this, move_stack_[i].score_,
+          move_stack_[i].move_, side, from, to);
+          // SEEで点数をつけて= MAX(temp, BAD_CAPTURE_SCORE);
         } else {
-          // ヒストリーを使って点数をつけていく。
-          move_stack_[i].score_ = (engine_ptr_->history()[side][from][to]
-          << MAX_HISTORY_SCORE_SHIFT) / history_max_;
+          SetScore<Type>::F(*this, move_stack_[i].score_, move_stack_[i].move_,
+          side, from, to);
         }
       }
     }
   }
+
   // 実体化。
   template void MoveMaker::ScoreMoves<GenMoveType::NON_CAPTURE>
   (std::size_t start, Move best_move, Move iid_move, Move killer_1,

@@ -219,7 +219,8 @@ namespace Sayuri {
        * - BLACK_LONG_CASTLING: 黒のロングキャスリング。
        * @return キャスリング可能ならtrue。
        */
-      template<Castling Flag> bool CanCastling() const;
+      template<Castling Flag>
+      bool CanCastling() const {}
 
       /**
        * その位置が他の位置の駒に攻撃されているかどうかチェックする。
@@ -447,6 +448,14 @@ namespace Sayuri {
       // ======== //
       // 探索関数 //
       // ======== //
+      // --- テンプレート部品 --- //
+      template<NodeType Type>
+      friend struct DoIID;
+      template<NodeType Type>
+      friend struct DoNMR;
+      template<NodeType Type>
+      friend struct DoProbCut;
+
       /**
        * クイース探索。
        * @param depth 現在の深さ。
@@ -459,6 +468,7 @@ namespace Sayuri {
        */
       int Quiesce(int depth, std::uint32_t level, int alpha, int beta,
       int material, TranspositionTable& table);
+
       /**
        * 通常の探索。
        * @param <Type> ノードの種類。
@@ -474,6 +484,7 @@ namespace Sayuri {
       template<NodeType Type>
       int Search(Hash pos_hash, int depth, std::uint32_t level, int alpha,
       int beta, int material, TranspositionTable& table);
+
       /**
        * 探索のルート。
        * @param table トランスポジションテーブル。
@@ -483,28 +494,33 @@ namespace Sayuri {
        */
       PVLine SearchRoot(TranspositionTable& table,
       const std::vector<Move>& moves_to_search, UCIShell& shell);
+
       /**
        * YBWC探索用スレッド。
        * @param shell Infoコマンドの出力用UCIShell。
        */
       void ThreadYBWC(UCIShell& shell);
+
       /**
        * 別スレッド用探索関数。
        * @param job 並列探索用仕事。
        */
       template<NodeType Type> void SearchParallel(Job& job);
+
       /**
        * ルートノードで呼び出される、別スレッド用探索関数。
        * @param job 並列探索用仕事。
        * @param shell Infoコマンドの出力用UCIShell。
        */
       void SearchRootParallel(Job& job, UCIShell& shell);
+
       /**
        * Futility Pruningのマージンを計算する。
        * @param depth 現在の深さ。
        * @return マージン。
        */
       int GetMargin(int depth);
+
       /**
        * 探索を中断しなければならないかどうかを判断する。
        * @return 中断しなければいけない時はtrue。
@@ -756,6 +772,57 @@ namespace Sayuri {
       /** 並列探索用スレッドのベクトル。 */
       std::vector<std::thread> thread_vec_;
   };
+
+  // ==================== //
+  // テンプレートの特殊化 //
+  // ==================== //
+  // --- キャスリング出来るかどうかの関数 --- //
+  template<>
+  inline bool ChessEngine::CanCastling<WHITE_SHORT_CASTLING>() const {
+    if (!(castling_rights_ & WHITE_SHORT_CASTLING)) return false;
+    if (IsAttacked(E1, BLACK)) return false;
+    if (IsAttacked(F1, BLACK)) return false;
+    if (IsAttacked(G1, BLACK)) return false;
+    if (piece_board_[F1]) return false;
+    if (piece_board_[G1]) return false;
+
+    return true;
+  }
+  template<>
+  inline bool ChessEngine::CanCastling<WHITE_LONG_CASTLING>() const {
+    if (!(castling_rights_ & WHITE_LONG_CASTLING)) return false;
+    if (IsAttacked(E1, BLACK)) return false;
+    if (IsAttacked(D1, BLACK)) return false;
+    if (IsAttacked(C1, BLACK)) return false;
+    if (piece_board_[D1]) return false;
+    if (piece_board_[C1]) return false;
+    if (piece_board_[B1]) return false;
+
+    return true;
+  }
+  template<>
+  inline bool ChessEngine::CanCastling<BLACK_SHORT_CASTLING>() const {
+    if (!(castling_rights_ & BLACK_SHORT_CASTLING)) return false;
+    if (IsAttacked(E8, WHITE)) return false;
+    if (IsAttacked(F8, WHITE)) return false;
+    if (IsAttacked(G8, WHITE)) return false;
+    if (piece_board_[F8]) return false;
+    if (piece_board_[G8]) return false;
+
+    return true;
+  }
+  template<>
+  inline bool ChessEngine::CanCastling<BLACK_LONG_CASTLING>() const {
+    if (!(castling_rights_ & BLACK_LONG_CASTLING)) return false;
+    if (IsAttacked(E8, WHITE)) return false;
+    if (IsAttacked(D8, WHITE)) return false;
+    if (IsAttacked(C8, WHITE)) return false;
+    if (piece_board_[D8]) return false;
+    if (piece_board_[C8]) return false;
+    if (piece_board_[B8]) return false;
+
+    return true;
+  }
 }  // namespace Sayuri
 
 #endif
