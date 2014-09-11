@@ -233,7 +233,8 @@ namespace Sayuri {
       side_pieces_[side] = 0;
       for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
         position_[side][piece_type] = fen.position()[side][piece_type];
-        for (Bitboard bb = position_[side][piece_type]; bb; NEXT(bb)) {
+        for (Bitboard bb = position_[side][piece_type]; bb;
+        Util::SetNext(bb)) {
           Square square = Util::GetSquare(bb);
           side_board_[square] = side;
           piece_board_[square] = piece_type;
@@ -337,7 +338,7 @@ namespace Sayuri {
     blocker_45_ = 0;
     blocker_90_ = 0;
     blocker_135_ = 0;
-    for (Bitboard copy = blocker_0_; copy; NEXT(copy)) {
+    for (Bitboard copy = blocker_0_; copy; Util::SetNext(copy)) {
       Square square = Util::GetSquare(copy);
 
       blocker_45_ |= Util::SQUARE[Util::ROT45[square]];
@@ -523,7 +524,7 @@ namespace Sayuri {
     // 合法手かどうか調べる。
     bool is_legal = false;
     Side side = to_move_;
-    Side enemy_side = OPPOSITE_SIDE(side);
+    Side enemy_side = Util::SwitchOppositeSide(side);
     for (Move temp_move = maker.PickMove(); temp_move;
     temp_move = maker.PickMove()) {
       MakeMove(temp_move);
@@ -579,7 +580,7 @@ namespace Sayuri {
     Side side = to_move_;
 
     // 手番を反転させる。
-    to_move_ = OPPOSITE_SIDE(to_move_);
+    to_move_ = Util::SwitchOppositeSide(to_move_);
 
     // 動かす前のキャスリングの権利とアンパッサンを記録する。
     SetCastlingRights(move, castling_rights_);
@@ -773,7 +774,8 @@ namespace Sayuri {
   // その位置が他の位置の駒に攻撃されているかどうかチェックする。
   bool ChessEngine::IsAttacked(Square square, Side side) const {
     // ポーンに攻撃されているかどうか調べる。
-    Bitboard attack = Util::GetPawnAttack(OPPOSITE_SIDE(side), square);
+    Bitboard attack =
+    Util::GetPawnAttack(Util::SwitchOppositeSide(side), square);
     if (attack & position_[side][PAWN]) return true;
 
     // ナイトに攻撃されているかどうか調べる。
@@ -801,7 +803,7 @@ namespace Sayuri {
   // 現在のマテリアルを得る。
   int ChessEngine::GetMaterial(Side side) const {
     // 相手のサイド。
-    Side enemy_side = OPPOSITE_SIDE(side);
+    Side enemy_side = Util::SwitchOppositeSide(side);
 
     int material = 0;
     for (Piece piece_type = PAWN; piece_type <= QUEEN; ++piece_type) {
@@ -902,8 +904,8 @@ namespace Sayuri {
     current_hash ^= shared_st_ptr_->to_move_hash_value_table_[to_move_];
 
     // 次の手番のハッシュを追加。
-    current_hash ^=
-    shared_st_ptr_->to_move_hash_value_table_[OPPOSITE_SIDE(to_move_)];
+    current_hash ^= shared_st_ptr_->to_move_hash_value_table_
+    [Util::SwitchOppositeSide(to_move_)];
 
     // キャスリングのハッシュをセット。
     Castling loss_rights = 0;

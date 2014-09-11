@@ -51,23 +51,6 @@ namespace Sayuri {
       /** static変数の初期化。 */
       static void InitUtil();
 
-      // ====== //
-      // マクロ //
-      // ====== //
-      /**
-       * 探索深さをヒストリー値にする。
-       * @param depth 探索深さ。
-       * @return ヒストリー値。
-       */
-#define TO_HISTORY(depth) ((depth) * (depth))
-
-      /**
-       * 逆サイドを得る。
-       * @param side 元のサイド。
-       * @return 逆サイド。
-       */
-#define OPPOSITE_SIDE(side) ((side) ^ 0x3)
-
       // ================== //
       // ビットボードの配列 //
       // ================== //
@@ -728,6 +711,33 @@ namespace Sayuri {
        */
       static Square GetSquare(Bitboard bitboard) {
         return CountZero(bitboard);
+      }
+
+      /**
+       * 探索深さをヒストリー値にする。
+       * @param depth 探索深さ。
+       * @return ヒストリー値。
+       */
+      constexpr static int TransDepthToHistory(const int& depth) {
+        return depth * depth;
+      }
+
+      /**
+       * 逆サイドを得る。
+       * @param side 元のサイド。
+       * @return 逆サイド。
+       */
+      constexpr static Side SwitchOppositeSide(const Side& side) {
+        return side ^ 0x3;
+      }
+
+      /**
+       * 次のマスを指定するビットボードをセットする。
+       * (1のビットの一番下位のビットを0にする。)
+       * @param bitboard 対象のビットボード。
+       */
+      static void SetNext(Bitboard& bitboard) {
+        bitboard &= bitboard - 1;
       }
 
       /**

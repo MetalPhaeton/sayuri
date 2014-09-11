@@ -188,7 +188,8 @@ namespace Sayuri {
   template<>
   struct GenPieceBitboard<GenMoveType::CAPTURE> {
     static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side) {
-      bitboard &= maker.engine_ptr_->side_pieces()[OPPOSITE_SIDE(side)];
+      bitboard &=
+      maker.engine_ptr_->side_pieces()[Util::SwitchOppositeSide(side)];
     }
   };
 
@@ -210,7 +211,7 @@ namespace Sayuri {
     static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side,
     const Square& from) {
       bitboard = Util::GetPawnAttack(side, from)
-      & maker.engine_ptr_->side_pieces()[OPPOSITE_SIDE(side)];
+      & maker.engine_ptr_->side_pieces()[Util::SwitchOppositeSide(side)];
 
       // アンパッサンがある場合。
       if (maker.engine_ptr_->en_passant_square()) {
@@ -251,7 +252,8 @@ namespace Sayuri {
   template<>
   struct GenKingBitboard<GenMoveType::CAPTURE> {
     static void F(MoveMaker& maker, Bitboard& bitboard, const Side& side) {
-      bitboard &= maker.engine_ptr_->side_pieces()[OPPOSITE_SIDE(side)];
+      bitboard &=
+      maker.engine_ptr_->side_pieces()[Util::SwitchOppositeSide(side)];
     }
   };
 
@@ -269,7 +271,7 @@ namespace Sayuri {
     for (Piece piece_type = KNIGHT; piece_type <= QUEEN; ++piece_type) {
       Bitboard pieces = engine_ptr_->position()[side][piece_type];
 
-      for (; pieces; NEXT(pieces)) {
+      for (; pieces; Util::SetNext(pieces)) {
         Square from = Util::GetSquare(pieces);
 
         // 各ピースの動き。
@@ -296,7 +298,7 @@ namespace Sayuri {
         // 展開するタイプによって候補手を選り分ける。 (テンプレート部品)
         GenPieceBitboard<Type>::F(*this, move_bitboard, side);
 
-        for (; move_bitboard; NEXT(move_bitboard)) {
+        for (; move_bitboard; Util::SetNext(move_bitboard)) {
           // 手を作る。
           Move move = 0;
           SetFrom(move, from);
@@ -315,7 +317,7 @@ namespace Sayuri {
 
     // ポーンの動きを作る。
     Bitboard pieces = engine_ptr_->position()[side][PAWN];
-    for (; pieces; NEXT(pieces)) {
+    for (; pieces; Util::SetNext(pieces)) {
       Square from = Util::GetSquare(pieces);
 
       Bitboard move_bitboard = 0;
@@ -323,7 +325,7 @@ namespace Sayuri {
       // (テンプレート部品)
       GenPawnBitboard<Type>::F(*this, move_bitboard, side, from);
 
-      for (; move_bitboard; NEXT(move_bitboard)) {
+      for (; move_bitboard; Util::SetNext(move_bitboard)) {
         // 手を作る。
         Move move = 0;
         SetFrom(move, from);
@@ -361,7 +363,7 @@ namespace Sayuri {
     // (テンプレート部品)
     GenKingBitboard<Type>::F(*this, move_bitboard, side);
 
-    for (; move_bitboard; NEXT(move_bitboard)) {
+    for (; move_bitboard; Util::SetNext(move_bitboard)) {
       Move move = 0;
       SetFrom(move, from);
       Square to = Util::GetSquare(move_bitboard);
@@ -453,7 +455,7 @@ namespace Sayuri {
     // constexpr std::int64_t BAD_CAPTURE_SCORE = -1LL;
 
     Bitboard enemy_king_bb =
-    Util::SQUARE[engine_ptr_->king()[OPPOSITE_SIDE(side)]];
+    Util::SQUARE[engine_ptr_->king()[Util::SwitchOppositeSide(side)]];
     for (std::size_t i = start; i < last_; ++i) {
       // 手の情報を得る。
       Square from = GetFrom(move_stack_[i].move_);

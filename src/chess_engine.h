@@ -558,7 +558,7 @@ namespace Sayuri {
        */
       void MakeNullMove(Move& move) {
         // 手番を変える。
-        to_move_ = OPPOSITE_SIDE(to_move_);
+        to_move_ = Util::SwitchOppositeSide(to_move_);
 
         // 情報をメモ。
         SetCastlingRights(move, castling_rights_);
@@ -574,7 +574,7 @@ namespace Sayuri {
        */
       void UnmakeNullMove(Move move) {
         // 手番を変える。
-        to_move_ = OPPOSITE_SIDE(to_move_);
+        to_move_ = Util::SwitchOppositeSide(to_move_);
 
         // 情報を戻す。
         castling_rights_ = GetCastlingRights(move);
