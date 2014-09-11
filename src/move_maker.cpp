@@ -228,23 +228,6 @@ namespace Sayuri {
   struct GenKingBitboard<GenMoveType::NON_CAPTURE> {
     static void F(MoveMaker& maker, Bitboard& bitboard, Side side) {
       bitboard &= ~(maker.engine_ptr_->blocker_0());
-
-      // キャスリングの動きを追加。
-      if (side == WHITE) {
-        if (maker.engine_ptr_->CanCastling<WHITE_SHORT_CASTLING>()) {
-          bitboard |= Util::SQUARE[G1];
-        }
-        if (maker.engine_ptr_->CanCastling<WHITE_LONG_CASTLING>()) {
-          bitboard |= Util::SQUARE[C1];
-        }
-      } else {
-        if (maker.engine_ptr_->CanCastling<BLACK_SHORT_CASTLING>()) {
-          bitboard |= Util::SQUARE[G8];
-        }
-        if (maker.engine_ptr_->CanCastling<BLACK_LONG_CASTLING>()) {
-          bitboard |= Util::SQUARE[C8];
-        }
-      }
     }
   };
   template<>
@@ -358,6 +341,31 @@ namespace Sayuri {
     Square from = engine_ptr_->king()[side];
     Bitboard move_bitboard = Util::GetKingMove(from);
 
+    // キャスリングの動きを作る。
+    constexpr Move WS_CASTLING_MOVE = E1 | (G1 << TO_SHIFT)
+    | (CASTLE_WS << MOVE_TYPE_SHIFT);
+    constexpr Move WL_CASTLING_MOVE = E1 | (C1 << TO_SHIFT)
+    | (CASTLE_WL << MOVE_TYPE_SHIFT);
+    constexpr Move BS_CASTLING_MOVE = E8 | (G8 << TO_SHIFT)
+    | (CASTLE_BS << MOVE_TYPE_SHIFT);
+    constexpr Move BL_CASTLING_MOVE = E8 | (C8 << TO_SHIFT)
+    | (CASTLE_BL << MOVE_TYPE_SHIFT);
+    if (side == WHITE) {
+      if (engine_ptr_->CanCastling<WHITE_SHORT_CASTLING>()) {
+        move_stack_[last_++].move_ = WS_CASTLING_MOVE;
+      }
+      if (engine_ptr_->CanCastling<WHITE_LONG_CASTLING>()) {
+        move_stack_[last_++].move_ = WL_CASTLING_MOVE;
+      }
+    } else {
+      if (engine_ptr_->CanCastling<BLACK_SHORT_CASTLING>()) {
+        move_stack_[last_++].move_ = BS_CASTLING_MOVE;
+      }
+      if (engine_ptr_->CanCastling<BLACK_LONG_CASTLING>()) {
+        move_stack_[last_++].move_ = BL_CASTLING_MOVE;
+      }
+    }
+
     // (テンプレート部品)
     GenKingBitboard<Type>::F(*this, move_bitboard, side);
 
@@ -366,26 +374,10 @@ namespace Sayuri {
       SetFrom(move, from);
       Square to = Util::GetSquare(move_bitboard);
       SetTo(move, to);
+      SetMoveType(move, NORMAL);
 
       // ヒストリーの最大値を更新。 (テンプレート部品)
       UpdateMaxHistory<Type>::F(*this, side, from, to);
-
-      if ((side == WHITE) && (from == E1) && (to == G1)) {
-        // 白のショートキャスリング。
-        SetMoveType(move, CASTLE_WS);
-      } else if ((side == WHITE) && (from == E1) && (to == C1)) {
-        // 白のロングキャスリング。
-        SetMoveType(move, CASTLE_WL);
-      } else if ((side == BLACK) && (from == E8) && (to == G8)) {
-        // 黒のショートキャスリング。
-        SetMoveType(move, CASTLE_BS);
-      } else if ((side == BLACK) && (from == E8) && (to == C8)) {
-        // 黒のロングキャスリング。
-        SetMoveType(move, CASTLE_BL);
-      } else {
-        // キャスリングじゃない手。
-        SetMoveType(move, NORMAL);
-      }
 
       move_stack_[last_++].move_ = move;
     }
