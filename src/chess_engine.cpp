@@ -502,8 +502,8 @@ namespace Sayuri {
   // 探索を開始する。
   PVLine ChessEngine::Calculate(int num_threads, TranspositionTable& table,
   const std::vector<Move>& moves_to_search, UCIShell& shell) {
-    num_threads = MAX(num_threads, 1);
-    num_threads = MIN(num_threads, UCI_MAX_THREADS);
+    Util::UpdateMax(num_threads, 1);
+    Util::UpdateMin(num_threads, UCI_MAX_THREADS);
     thread_vec_.resize(num_threads);
     return std::move(SearchRoot(table, moves_to_search, shell));
   }

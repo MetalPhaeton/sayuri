@@ -372,14 +372,14 @@ namespace Sayuri {
        * @param depth 残り深さ制限。
        */
       void ybwc_limit_depth(int depth) {
-        ybwc_limit_depth_ = MAX(depth, 0);
+        ybwc_limit_depth_ = Util::GetMax(depth, 0);
       }
       /**
        * ミューテータ - YBWC - 何手目以降の候補手で実行するか。
        * @param num_moves 何手目以降の候補手で実行するか。
        */
       void ybwc_after_moves(int num_moves) {
-        ybwc_after_moves_ = MAX(num_moves, 0);
+        ybwc_after_moves_ = Util::GetMax(num_moves, 0);
       }
 
       // --- Aspiration Windows --- //
@@ -395,7 +395,7 @@ namespace Sayuri {
        * @param depth 残り深さ制限。
        */
       void aspiration_windows_limit_depth(int depth) {
-        aspiration_windows_limit_depth_ = MAX(depth, 0);
+        aspiration_windows_limit_depth_ = Util::GetMax(depth, 0);
       }
       /**
        * ミューテータ - Aspiration Windows - デルタ値。
@@ -448,12 +448,16 @@ namespace Sayuri {
        * ミューテータ - Internal Iterative Deepening - 残り深さ制限。
        * @param depth 残り深さ制限。
        */
-      void iid_limit_depth(int depth) {iid_limit_depth_ = MAX(depth, 0);}
+      void iid_limit_depth(int depth) {
+        iid_limit_depth_ = Util::GetMax(depth, 0);
+      }
       /**
        * ミューテータ - Internal Iterative Deepening - 探索の深さ。
        * @param depth 探索の深さ。
        */
-      void iid_search_depth(int depth) {iid_search_depth_ = MAX(depth, 0);}
+      void iid_search_depth(int depth) {
+        iid_search_depth_ = Util::GetMax(depth, 0);
+      }
 
       // --- Null Move Reduction --- //
       /**
@@ -465,19 +469,23 @@ namespace Sayuri {
        * ミューテータ - Null Move Reduction - 残り深さ制限。
        * @param depth 残り深さ制限。
        */
-      void nmr_limit_depth(int depth) {nmr_limit_depth_ = MAX(depth, 0);}
+      void nmr_limit_depth(int depth) {
+        nmr_limit_depth_ = Util::GetMax(depth, 0);
+      }
       /**
        * ミューテータ - Null Move Reduction - 何プライ浅く探索するか。
        * @param reduction 何プライ浅く探索するか。
        */
       void nmr_search_reduction(int reduction) {
-        nmr_search_reduction_ = MAX(reduction, 0);
+        nmr_search_reduction_ = Util::GetMax(reduction, 0);
       }
       /**
        * ミューテータ - Null Move Reduction - リダクションする深さ。
        * @param reduction リダクションする深さ。
        */
-      void nmr_reduction(int reduction) {nmr_reduction_ = MAX(reduction, 0);}
+      void nmr_reduction(int reduction) {
+        nmr_reduction_ = Util::GetMax(reduction, 0);
+      }
 
       // --- ProbCut --- //
       /**
@@ -490,7 +498,7 @@ namespace Sayuri {
        * @param enable 残り深さ制限。
        */
       void probcut_limit_depth(int depth) {
-        probcut_limit_depth_ = MAX(depth, 0);
+        probcut_limit_depth_ = Util::GetMax(depth, 0);
       }
       /**
        * ミューテータ - ProbCut - ベータ値の増分。
@@ -502,7 +510,7 @@ namespace Sayuri {
        * @param reduction 何プライ浅く探索するか。
        */
       void probcut_search_reduction(int reduction) {
-        probcut_search_reduction_ = MAX(reduction, 0);
+        probcut_search_reduction_ = Util::GetMax(reduction, 0);
       }
 
       // --- History Pruning --- //
@@ -520,7 +528,7 @@ namespace Sayuri {
        * @param depth 残り深さ制限。
        */
       void history_pruning_limit_depth(int depth) {
-        history_pruning_limit_depth_ = MAX(depth, 0);
+        history_pruning_limit_depth_ = Util::GetMax(depth, 0);
       }
       /**
        * ミューテータ - History Pruning - 実行する候補手の閾値。
@@ -528,16 +536,15 @@ namespace Sayuri {
        * @param threshold 実行する候補手の閾値。
        */
       void history_pruning_move_threshold(double threshold) {
-        history_pruning_move_threshold_ = MAX(threshold, 0.0);
-        history_pruning_move_threshold_ =
-        MIN(history_pruning_move_threshold_, 1.0);
+        history_pruning_move_threshold_ = Util::GetMax(threshold, 0.0);
+        Util::UpdateMin(history_pruning_move_threshold_, 1.0);
       }
       /**
        * ミューテータ - History Pruning - 何手目以降の候補手で実行するか。
        * @param num_moves 何手目以降の候補手で実行するか。
        */
       void history_pruning_after_moves(int num_moves) {
-        history_pruning_after_moves_ = MAX(num_moves, 0);
+        history_pruning_after_moves_ = Util::GetMax(num_moves, 0);
       }
       /**
        * ミューテータ - History Pruning - 最大ヒストリー値に対する閾値。 
@@ -545,15 +552,15 @@ namespace Sayuri {
        * @param threshold 最大ヒストリー値に対する閾値。
        */
       void history_pruning_threshold(double threshold) {
-        history_pruning_threshold_ = MAX(threshold, 0.0);
-        history_pruning_threshold_ = MIN(history_pruning_threshold_, 1.0);
+        history_pruning_threshold_ = Util::GetMax(threshold, 0.0);
+        Util::UpdateMin(history_pruning_threshold_, 1.0);
       }
       /**
        * ミューテータ - History Pruning - リダクションする深さ。
        * @param reduction リダクションする深さ。
        */
       void history_pruning_reduction(int reduction) {
-        history_pruning_reduction_ = MAX(reduction, 0);
+        history_pruning_reduction_ = Util::GetMax(reduction, 0);
       }
 
       // --- Late Move Reduction --- //
@@ -566,29 +573,31 @@ namespace Sayuri {
        * ミューテータ - Late Move Reduction - 残り深さ制限。
        * @param depth 残り深さ制限。
        */
-      void lmr_limit_depth(int depth) {lmr_limit_depth_ = MAX(depth, 0);}
+      void lmr_limit_depth(int depth) {
+        lmr_limit_depth_ = Util::GetMax(depth, 0);
+      }
       /**
        * ミューテータ - Late Move Reduction - 実行する候補手の閾値。
        * (1.0 から 0.0)
        * @param threshold 実行する候補手の閾値。
        */
       void lmr_threshold(double threshold) {
-        lmr_threshold_ = MAX(threshold, 0.0);
-        lmr_threshold_ = MIN(lmr_threshold_, 1.0);
+        lmr_threshold_ = Util::GetMax(threshold, 0.0);
+        Util::UpdateMin(lmr_threshold_, 1.0);
       }
       /**
        * ミューテータ - Late Move Reduction - 何手目以降の候補手で実行するか。
        * @param num_moves 何手目以降の候補手で実行するか。
        */
       void lmr_after_moves(int num_moves) {
-        lmr_after_moves_ = MAX(num_moves, 0);
+        lmr_after_moves_ = Util::GetMax(num_moves, 0);
       }
       /**
        * ミューテータ - Late Move Reduction - リダクションする深さ。
        * @param reduction リダクションする深さ。
        */
       void lmr_search_reduction(int reduction) {
-        lmr_search_reduction_ = MAX(reduction, 0);
+        lmr_search_reduction_ = Util::GetMax(reduction, 0);
       }
 
       // --- Futility Pruning --- //
@@ -604,7 +613,7 @@ namespace Sayuri {
        * @param depth 有効にする残り深さ。
        */
       void futility_pruning_depth(int depth) {
-        futility_pruning_depth_ = MAX(depth, 0);
+        futility_pruning_depth_ = Util::GetMax(depth, 0);
       }
       /**
        * ミューテータ - Futility Pruning - 残り深さ1プライあたりのマージン。

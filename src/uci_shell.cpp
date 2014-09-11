@@ -408,9 +408,11 @@ namespace Sayuri {
     if (name_str == "hash") {
       // トランスポジションテーブルのサイズ変更。
       try {
-        table_size_ = std::stoull(args["value"][1]) * 1024ULL * 1024ULL;
-        table_size_ = MAX(table_size_, UCI_MIN_TABLE_SIZE);
-        table_size_ = MIN(table_size_, UCI_MAX_TABLE_SIZE);
+        table_size_ =
+        Util::GetMax(static_cast<std::size_t>(std::stoull(args["value"][1])
+        * 1024ULL * 1024ULL), UCI_MIN_TABLE_SIZE);
+
+        Util::UpdateMin(table_size_, UCI_MAX_TABLE_SIZE);
 
         table_ptr_.reset(new TranspositionTable(table_size_));
       } catch (...) {
@@ -426,10 +428,8 @@ namespace Sayuri {
     } else if (name_str == "threads") {
       // スレッドの数の変更。
       try {
-        num_threads_ = std::stoi(args["value"][1]);
-
-        num_threads_ = MAX(num_threads_, 1);
-        num_threads_ = MIN(num_threads_, UCI_MAX_THREADS);
+        num_threads_ = Util::GetMax(std::stoi(args["value"][1]), 1);
+        Util::UpdateMin(num_threads_, UCI_MAX_THREADS);
       } catch (...) {
         // 無視。
       }
@@ -558,8 +558,9 @@ namespace Sayuri {
     // depthコマンド。
     if (args.find("depth") != args.end()) {
       try {
-        max_depth = std::stoi(args["depth"][1]);
-        max_depth = MIN(max_depth, MAX_PLYS);
+        max_depth =
+        Util::GetMin(static_cast<std::uint32_t>(std::stoul(args["depth"][1])),
+        MAX_PLYS);
       } catch (...) {
         // 無視。
       }
@@ -568,8 +569,9 @@ namespace Sayuri {
     // nodesコマンド。
     if (args.find("nodes") != args.end()) {
       try {
-        max_nodes = std::stoull(args["nodes"][1]);
-        max_nodes = MIN(max_nodes, MAX_NODES);
+        max_nodes =
+        Util::GetMin(static_cast<std::uint64_t>(std::stoull(args["nodes"][1])),
+        MAX_NODES);
       } catch (...) {
         // 無視。
       }
@@ -578,8 +580,9 @@ namespace Sayuri {
     // mateコマンド。
     if (args.find("mate") != args.end()) {
       try {
-        max_depth = (std::stoi(args["mate"][1]) * 2) - 1;
-        max_depth = MIN(max_depth, MAX_PLYS);
+        max_depth =
+        Util::GetMin(static_cast<std::uint32_t>((std::stoul(args["mate"][1])
+        * 2) - 1), MAX_PLYS);
       } catch (...) {
         // 無視。
       }

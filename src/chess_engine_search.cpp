@@ -63,8 +63,7 @@ namespace Sayuri {
     ++(shared_st_ptr_->searched_nodes_);
 
     // 最大探索数。
-    shared_st_ptr_->searched_level_ =
-    MAX(shared_st_ptr_->searched_level_, level);
+    Util::UpdateMax(shared_st_ptr_->searched_level_, level);
 
     // 勝負に十分な駒がなければ0点。
     if (!HasSufficientMaterial()) {
@@ -82,7 +81,7 @@ namespace Sayuri {
     if (stand_pad >= beta) {
       return stand_pad;
     }
-    alpha = MAX(stand_pad, alpha);
+    Util::UpdateMax(alpha, stand_pad);
 
     // 探索できる限界を超えているか。
     // 超えていればこれ以上探索しない。
@@ -133,7 +132,7 @@ namespace Sayuri {
       UnmakeMove(move);
 
       // アルファ値、ベータ値を調べる。
-      alpha = MAX(score, alpha);
+      Util::UpdateMax(alpha, score);
       if (alpha >= beta) {
         break;
       }
@@ -327,8 +326,7 @@ namespace Sayuri {
     ++(shared_st_ptr_->searched_nodes_);
 
     // 最大探索数。
-    shared_st_ptr_->searched_level_ =
-    MAX(shared_st_ptr_->searched_level_, level);
+    Util::UpdateMax(shared_st_ptr_->searched_level_, level);
 
     // サイドとチェックされているか。
     Side side = to_move_;
@@ -533,9 +531,9 @@ namespace Sayuri {
 
     int history_pruning_limit_depth = params.history_pruning_limit_depth();
 
-    int temp_1 = num_all_moves * params.history_pruning_move_threshold();
-    int temp_2 = params.history_pruning_after_moves();
-    int history_pruning_move_threshold = MAX(temp_1, temp_2);
+    int history_pruning_move_threshold = Util::GetMax(static_cast<int>
+    (num_all_moves * params.history_pruning_move_threshold()),
+    params.history_pruning_after_moves());
 
     std::uint64_t history_pruning_threshold = shared_st_ptr_->history_max_
     * params.history_pruning_threshold();
@@ -547,9 +545,8 @@ namespace Sayuri {
 
     int lmr_limit_depth = params.lmr_limit_depth();
 
-    temp_1 = num_all_moves * params.lmr_threshold();
-    temp_2 = params.lmr_after_moves();
-    int lmr_threshold = MAX(temp_1, temp_2);
+    int lmr_threshold = Util::GetMax(static_cast<int>
+    (num_all_moves * params.lmr_threshold()), params.lmr_after_moves());
 
     int lmr_search_reduction = params.lmr_search_reduction();
 
@@ -1045,9 +1042,9 @@ namespace Sayuri {
 
     int history_pruning_limit_depth = params.history_pruning_limit_depth();
 
-    int temp_1 = job.num_all_moves_ * params.history_pruning_move_threshold();
-    int temp_2 = params.history_pruning_after_moves();
-    int history_pruning_move_threshold = MAX(temp_1, temp_2);
+    int history_pruning_move_threshold = Util::GetMax(static_cast<int>
+    (job.num_all_moves_ * params.history_pruning_move_threshold()),
+    params.history_pruning_after_moves());
 
     std::uint64_t history_pruning_threshold =
     shared_st_ptr_->history_max_ * params.history_pruning_threshold();
@@ -1059,9 +1056,9 @@ namespace Sayuri {
 
     int lmr_limit_depth = params.lmr_limit_depth();
 
-    temp_1 = job.num_all_moves_ * params.lmr_threshold();
-    temp_2 = params.lmr_after_moves();
-    int lmr_threshold = MAX(temp_1, temp_2);
+    int lmr_threshold = Util::GetMax
+    (static_cast<int>(job.num_all_moves_ * params.lmr_threshold()),
+    params.lmr_after_moves());
 
     int lmr_search_reduction = params.lmr_search_reduction();
 
@@ -1268,9 +1265,8 @@ namespace Sayuri {
 
     int lmr_limit_depth = params.lmr_limit_depth();
 
-    int temp_1 = job.num_all_moves_ * params.lmr_threshold();
-    int temp_2 = params.lmr_after_moves();
-    int lmr_threshold = MAX(temp_1, temp_2);
+    int lmr_threshold = Util::GetMax(static_cast<int>
+    (job.num_all_moves_ * params.lmr_threshold()), params.lmr_after_moves());
 
     int lmr_search_reduction = params.lmr_search_reduction();
 
@@ -1615,8 +1611,8 @@ namespace Sayuri {
   void ChessEngine::SetStopper(std::uint32_t max_depth,
   std::uint64_t max_nodes, Chrono::milliseconds thinking_time,
   bool infinite_thinking) {
-    shared_st_ptr_->max_depth_ = MIN(max_depth, MAX_PLYS);
-    shared_st_ptr_->max_nodes_ = MIN(max_nodes, MAX_NODES);
+    shared_st_ptr_->max_depth_ = Util::GetMin(max_depth, MAX_PLYS);
+    shared_st_ptr_->max_nodes_ = Util::GetMin(max_nodes, MAX_NODES);
     shared_st_ptr_->thinking_time_ = thinking_time;
     shared_st_ptr_->infinite_thinking_ = infinite_thinking;
   }

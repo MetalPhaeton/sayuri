@@ -55,22 +55,6 @@ namespace Sayuri {
       // マクロ //
       // ====== //
       /**
-       * 大きい方の数を返す。
-       * @param a 値1。
-       * @param b 値2。
-       * @return 大きい方の数。
-       */
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-      /**
-       * 小さい方の数を返す。
-       * @param a 値1。
-       * @param b 値2。
-       * @return 小さい方の数。
-       */
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-
-
-      /**
        * 探索深さをヒストリー値にする。
        * @param depth 探索深さ。
        * @return ヒストリー値。
@@ -698,22 +682,22 @@ namespace Sayuri {
 
       /**
        * 変数を最大値に更新する。
-       * @param from 更新元の数値。
-       * @param to 更新したい変数。
+       * @param dst 更新したい変数。
+       * @param value 更新元の数値。
        */
       template<typename T>
-      static void UpdateMax(const T& from, T& to) {
-        if (from > to) to = from;
+      static void UpdateMax(T& dst, const T& value) {
+        if (value > dst) dst = value;
       }
 
       /**
        * 変数を最小値に更新する。
-       * @param from 更新元の数値。
-       * @param to 更新したい変数。
+       * @param dst 更新したい変数。
+       * @param value 更新元の数値。
        */
       template<typename T>
-      static void UpdateMin(const T& from, T& to) {
-        if (from < to) to = from;
+      static void UpdateMin(T& dst, const T& value) {
+        if (value < dst) dst = value;
       }
 
       /**

@@ -168,8 +168,8 @@ namespace Sayuri {
   struct UpdateMaxHistory<GenMoveType::NON_CAPTURE> {
     static void F(MoveMaker& maker, const Side& side, const Square& from,
     const Square& to) {
-      Util::UpdateMax(maker.engine_ptr_->history()[side][from][to],
-      maker.history_max_);
+      Util::UpdateMax(maker.history_max_,
+      maker.engine_ptr_->history()[side][from][to]);
     }
   };
 
@@ -427,10 +427,9 @@ namespace Sayuri {
       constexpr std::int64_t BAD_CAPTURE_SCORE = -1LL;
 
       // SEEで点数をつけていく。
-      std::int64_t temp =
-      (maker.engine_ptr_->SEE(move)) << CAPTURE_SCORE_SHIFT;
-
-      score = MAX(temp, BAD_CAPTURE_SCORE);
+      score =
+      Util::GetMax(static_cast<std::int64_t>(maker.engine_ptr_->SEE(move))
+      << CAPTURE_SCORE_SHIFT, BAD_CAPTURE_SCORE);
     }
   };
 
@@ -514,7 +513,6 @@ namespace Sayuri {
         if ((move_stack_[i].move_ & PROMOTION_MASK)) {
           SetScore<GenMoveType::CAPTURE>::F(*this, move_stack_[i].score_,
           move_stack_[i].move_, side, from, to);
-          // SEEで点数をつけて= MAX(temp, BAD_CAPTURE_SCORE);
         } else {
           SetScore<Type>::F(*this, move_stack_[i].score_, move_stack_[i].move_,
           side, from, to);

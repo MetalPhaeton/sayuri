@@ -46,14 +46,11 @@ namespace Sayuri {
   // コンストラクタ。
   TranspositionTable::TranspositionTable(std::size_t table_size) :
   null_entry_(),
-  num_entries_(0),
+  num_entries_(Util::GetMax(table_size / sizeof(TTEntry),
+  static_cast<std::size_t>(1))),
   num_used_entries_(0),
   entry_table_(nullptr),
   age_(0) {
-    // エントリーをいくつ作るか計算する。
-    num_entries_ = table_size / sizeof(TTEntry);
-    num_entries_ = MAX(num_entries_, 1);
-
     // テーブルを作成。
     entry_table_.reset(new TTEntry[num_entries_]);
   }
