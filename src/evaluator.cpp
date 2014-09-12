@@ -90,14 +90,12 @@ namespace Sayuri {
   template<Side PSide, Piece PType>
   struct GenBitboards {
     static void F(Evaluator& evaluator, Square square,
-    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
-    Bitboard& castling_moves) {}
+    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant) {}
   };
   template<Side PSide>
   struct GenBitboards<PSide, PAWN> {
     static void F(Evaluator& evaluator, Square square,
-    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
-    Bitboard& castling_moves) {
+    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant) {
       // 通常の動き。
       pawn_moves = evaluator.engine_ptr_->GetPawnStep(PSide, square);
 
@@ -115,67 +113,36 @@ namespace Sayuri {
   template<Side PSide>
   struct GenBitboards<PSide, KNIGHT> {
     static void F(Evaluator& evaluator, Square square,
-    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
-    Bitboard& castling_moves) {
+    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant) {
       attacks = Util::GetKnightMove(square);
     }
   };
   template<Side PSide>
   struct GenBitboards<PSide, BISHOP> {
     static void F(Evaluator& evaluator, Square square,
-    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
-    Bitboard& castling_moves) {
+    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant) {
       attacks = evaluator.engine_ptr_->GetBishopAttack(square);
     }
   };
   template<Side PSide>
   struct GenBitboards<PSide, ROOK> {
     static void F(Evaluator& evaluator, Square square,
-    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
-    Bitboard& castling_moves) {
+    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant) {
       attacks = evaluator.engine_ptr_->GetRookAttack(square);
     }
   };
   template<Side PSide>
   struct GenBitboards<PSide, QUEEN> {
     static void F(Evaluator& evaluator, Square square,
-    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
-    Bitboard& castling_moves) {
+    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant) {
       attacks = evaluator.engine_ptr_->GetQueenAttack(square);
     }
   };
-  template<>
-  struct GenBitboards<WHITE, KING> {
+  template<Side PSide>
+  struct GenBitboards<PSide, KING> {
     static void F(Evaluator& evaluator, Square square,
-    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
-    Bitboard& castling_moves) {
+    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant) {
       attacks = Util::GetKingMove(square);
-
-      // キャスリング。
-      castling_moves = 0;
-      if (evaluator.engine_ptr_->CanCastling<WHITE_SHORT_CASTLING>()) {
-        castling_moves |= Util::SQUARE[G1];
-      }
-      if (evaluator.engine_ptr_->CanCastling<WHITE_LONG_CASTLING>()) {
-        castling_moves |= Util::SQUARE[C1];
-      }
-    }
-  };
-  template<>
-  struct GenBitboards<BLACK, KING> {
-    static void F(Evaluator& evaluator, Square square,
-    Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant,
-    Bitboard& castling_moves) {
-      attacks = Util::GetKingMove(square);
-
-      // キャスリング。
-      castling_moves = 0;
-      if (evaluator.engine_ptr_->CanCastling<BLACK_SHORT_CASTLING>()) {
-        castling_moves |= Util::SQUARE[G8];
-      }
-      if (evaluator.engine_ptr_->CanCastling<BLACK_LONG_CASTLING>()) {
-        castling_moves |= Util::SQUARE[C8];
-      }
     }
   };
 
@@ -448,27 +415,37 @@ namespace Sayuri {
   // コンストラクタ。
   Evaluator::Evaluator(const ChessEngine& engine)
   : engine_ptr_(&engine) {
+    std::memset(value_table_, 0,
+    sizeof(double) * TABLE_SIZE * NUM_PIECE_TYPES);
   }
 
   // コピーコンストラクタ。
   Evaluator::Evaluator(const Evaluator& eval)
   : engine_ptr_(eval.engine_ptr_) {
+    std::memcpy(value_table_, eval.value_table_,
+    sizeof(double) * TABLE_SIZE * NUM_PIECE_TYPES);
   }
 
   // ムーブコンストラクタ。
   Evaluator::Evaluator(Evaluator&& eval)
   : engine_ptr_(eval.engine_ptr_) {
+    std::memcpy(value_table_, eval.value_table_,
+    sizeof(double) * TABLE_SIZE * NUM_PIECE_TYPES);
   }
 
   // コピー代入演算子。
   Evaluator& Evaluator::operator=(const Evaluator& eval) {
     engine_ptr_ = eval.engine_ptr_;
+    std::memcpy(value_table_, eval.value_table_,
+    sizeof(double) * TABLE_SIZE * NUM_PIECE_TYPES);
     return *this;
   }
 
   // ムーブ代入演算子。
   Evaluator& Evaluator::operator=(Evaluator&& eval) {
     engine_ptr_ = eval.engine_ptr_;
+    std::memcpy(value_table_, eval.value_table_,
+    sizeof(double) * TABLE_SIZE * NUM_PIECE_TYPES);
     return *this;
   }
 
@@ -718,9 +695,8 @@ namespace Sayuri {
     Bitboard attacks = 0;
     Bitboard pawn_moves = 0;
     Bitboard en_passant = 0;
-    Bitboard castling_moves = 0;
-    GenBitboards<PSide, PType>::F(*this, piece_square, attacks,
-    pawn_moves, en_passant, castling_moves);
+    GenBitboards<PSide, PType>::F(*this, piece_square, attacks, pawn_moves,
+    en_passant);
 
     // --- 全駒共通 --- //
     // オープニング、エンディング時の駒の配置を計算。

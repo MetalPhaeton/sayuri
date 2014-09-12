@@ -148,6 +148,9 @@ namespace Sayuri {
       /** フレンドのデバッグ用関数。 */
       friend int DebugMain(int argc, char* argv[]);
 
+      /** フレンドのデバッグ用関数。 */
+      friend void PrintValueTable(const Evaluator& evaluator);
+
       // ================== //
       // 価値を計算する関数 //
       // ================== //

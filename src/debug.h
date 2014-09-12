@@ -36,6 +36,7 @@
 /** Sayuri 名前空間。 */
 namespace Sayuri {
   class PositionRecord;
+  class Evaluator;
 
   /**
    * デバッグ用メイン関数。
@@ -94,6 +95,12 @@ namespace Sayuri {
    * @param record 対象のPositionRecord。
    */
   void PrintPositionRecord(const PositionRecord& record);
+
+  /**
+   * Evaluatorのvalue_table_の中身を出力する。
+   * @param evaluator 調べたいEvaluator。
+   */
+  void PrintValueTable(const Evaluator& evaluator);
 
   // ================ //
   // ストップウォッチ //

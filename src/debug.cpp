@@ -372,6 +372,118 @@ namespace Sayuri {
     std::cout << "Current Hash: " << record.pos_hash() << std::endl;
   }
 
+  // Evaluatorのvalue_table_の中身を表示する。
+  void PrintValueTable(const Evaluator& evaluator) {
+    const double (& table)[Evaluator::TABLE_SIZE][NUM_PIECE_TYPES] =
+    evaluator.value_table_;
+
+    std::function<void(unsigned int)> print = [&table](unsigned int index) {
+      std::cout << "    EMPTY: " << table[index][EMPTY] << std::endl;
+      std::cout << "    PAWN: " << table[index][PAWN] << std::endl;
+      std::cout << "    KNIGHT: " << table[index][KNIGHT] << std::endl;
+      std::cout << "    BISHOP: " << table[index][BISHOP] << std::endl;
+      std::cout << "    ROOK: " << table[index][ROOK] << std::endl;
+      std::cout << "    QUEEN: " << table[index][QUEEN] << std::endl;
+      std::cout << "    KING: " << table[index][KING] << std::endl;
+    };
+
+    // オープニングの配置。
+    std::cout << "OPENING_POSITION:" << std::endl;
+    print(Evaluator::OPENING_POSITION);
+
+    // エンディングの配置。
+    std::cout << "ENDING_POSITION:" << std::endl;
+    print(Evaluator::ENDING_POSITION);
+
+    // 機動力。
+    std::cout << "MOBILITY:" << std::endl;
+    print(Evaluator::MOBILITY);
+
+    // センターコントロール。
+    std::cout << "CENTER_CONTROL:" << std::endl;
+    print(Evaluator::CENTER_CONTROL);
+
+    // スウィートセンターのコントロール。
+    std::cout << "SWEET_CENTER_CONTROL:" << std::endl;
+    print(Evaluator::SWEET_CENTER_CONTROL);
+
+    // ピースの展開。
+    std::cout << "DEVELOPMENT:" << std::endl;
+    print(Evaluator::DEVELOPMENT);
+
+    // 攻撃。
+    std::cout << "ATTACK:" << std::endl;
+    print(Evaluator::ATTACK);
+
+    // 防御。
+    std::cout << "DEFENSE:" << std::endl;
+    print(Evaluator::DEFENSE);
+
+    // ピン。
+    std::cout << "PIN:" << std::endl;
+    print(Evaluator::PIN);
+
+    // キング周辺への攻撃。
+    std::cout << "ATTACK_AROUND_KING:" << std::endl;
+    print(Evaluator::ATTACK_AROUND_KING);
+
+    // パスポーン。
+    std::cout << "PASS_PAWN:" << std::endl;
+    print(Evaluator::PASS_PAWN);
+
+    // 守られたパスポーン。
+    std::cout << "PROTECTED_PASS_PAWN:" << std::endl;
+    print(Evaluator::PROTECTED_PASS_PAWN);
+
+    // ダブルポーン。
+    std::cout << "DOUBLE_PAWN:" << std::endl;
+    print(Evaluator::DOUBLE_PAWN);
+
+    // 孤立ポーン。
+    std::cout << "ISO_PAWN:" << std::endl;
+    print(Evaluator::ISO_PAWN);
+
+    // ポーンの盾。
+    std::cout << "PAWN_SHIELD:" << std::endl;
+    print(Evaluator::PAWN_SHIELD);
+
+    // ビショップペア。
+    std::cout << "BISHOP_PAIR:" << std::endl;
+    print(Evaluator::BISHOP_PAIR);
+
+    // バッドビショップ。
+    std::cout << "BAD_BISHOP:" << std::endl;
+    print(Evaluator::BAD_BISHOP);
+
+    // ルークペア。
+    std::cout << "ROOK_PAIR:" << std::endl;
+    print(Evaluator::ROOK_PAIR);
+
+    // セミオープンファイルのルーク。
+    std::cout << "ROOK_SEMIOPEN_FYLE:" << std::endl;
+    print(Evaluator::ROOK_SEMIOPEN_FYLE);
+
+    // オープンファイルのルーク。
+    std::cout << "ROOK_OPEN_FYLE:" << std::endl;
+    print(Evaluator::ROOK_OPEN_FYLE);
+
+    // 早すぎるクイーンの始動。
+    std::cout << "EARLY_QUEEN_LAUNCHED:" << std::endl;
+    print(Evaluator::EARLY_QUEEN_LAUNCHED);
+
+    // キング周りの弱いマス。
+    std::cout << "WEAK_SQUARE:" << std::endl;
+    print(Evaluator::WEAK_SQUARE);
+
+    // キャスリング。
+    std::cout << "CASTLING:" << std::endl;
+    print(Evaluator::CASTLING);
+
+    // キャスリングの放棄。
+    std::cout << "ABANDONED_CASTLING:" << std::endl;
+    print(Evaluator::ABANDONED_CASTLING);
+  }
+
   // ================ //
   // ストップウォッチ //
   // ================ //
