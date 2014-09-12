@@ -34,6 +34,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <utility>
+#include <cstring>
 #include "common.h"
 #include "chess_engine.h"
 
@@ -55,9 +56,8 @@ namespace Sayuri {
   last_(maker.last_),
   max_(maker.max_),
   history_max_(maker.history_max_) {
-    for (std::size_t i = 0; i < (MAX_CANDIDATES + 1); ++i) {
-      move_stack_[i] = maker.move_stack_[i];
-    }
+    std::memcpy(move_stack_, maker.move_stack_,
+    sizeof(MoveSlot) * (MAX_CANDIDATES + 1));
   }
 
   // ムーブコンストラクタ。
@@ -66,9 +66,8 @@ namespace Sayuri {
   last_(maker.last_),
   max_(maker.max_),
   history_max_(maker.history_max_) {
-    for (std::size_t i = 0; i < (MAX_CANDIDATES + 1); ++i) {
-      move_stack_[i] = maker.move_stack_[i];
-    }
+    std::memcpy(move_stack_, maker.move_stack_,
+    sizeof(MoveSlot) * (MAX_CANDIDATES + 1));
   }
 
   // コピー代入演算子。
@@ -78,9 +77,8 @@ namespace Sayuri {
     history_max_ = maker.history_max_;
     last_ = maker.last_;
     max_ = maker.max_;
-    for (std::size_t i = 0; i < (MAX_CANDIDATES + 1); ++i) {
-      move_stack_[i] = maker.move_stack_[i];
-    }
+    std::memcpy(move_stack_, maker.move_stack_,
+    sizeof(MoveSlot) * (MAX_CANDIDATES + 1));
     return *this;
   }
 
@@ -91,9 +89,8 @@ namespace Sayuri {
     history_max_ = maker.history_max_;
     last_ = maker.last_;
     max_ = maker.max_;
-    for (std::size_t i = 0; i < (MAX_CANDIDATES + 1); ++i) {
-      move_stack_[i] = maker.move_stack_[i];
-    }
+    std::memcpy(move_stack_, maker.move_stack_,
+    sizeof(MoveSlot) * (MAX_CANDIDATES + 1));
     return *this;
   }
 

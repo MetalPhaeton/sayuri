@@ -31,71 +31,69 @@
 #define EVALUATOR_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 
 #include <iostream>
+#include <cstring>
 #include "common.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
   class ChessEngine;
 
-  /** 評価した結果を格納する構造体。 */
-  struct EvalResult {
-    /** 総合評価値。 */
-    double score_;
-
-    /** マテリアル。 */
-    double material_;
-    /** オープニング時の駒の配置の評価値。 [駒の種類] */
-    double score_opening_position_[NUM_PIECE_TYPES];
-    /** エンディング時の駒の配置の評価値。 [駒の種類] */
-    double score_ending_position_[NUM_PIECE_TYPES];
-    /** 機動力の評価値。 [駒の種類] */
-    double score_mobility_[NUM_PIECE_TYPES];
-    /** センターコントロールの評価値。 [駒の種類] */
-    double score_center_control_[NUM_PIECE_TYPES];
-    /** スウィートセンターのコントロールの評価値。 [駒の種類] */
-    double score_sweet_center_control_[NUM_PIECE_TYPES];
-    /** 駒の展開の評価値。 [駒の種類] */
-    double score_development_[NUM_PIECE_TYPES];
-    /** 攻撃の評価値。 [駒の種類] */
-    double score_attack_[NUM_PIECE_TYPES];
-    /** 防御の評価値。 [駒の種類] */
-    double score_defense_[NUM_PIECE_TYPES];
-    /** ピンの評価値。 [駒の種類] */
-    double score_pin_[NUM_PIECE_TYPES];
-    /** 相手キング周辺への攻撃の評価値。 [駒の種類] */
-    double score_attack_around_king_[NUM_PIECE_TYPES];
-    /** パスポーンの評価値。 */
-    double score_pass_pawn_;
-    /** 守られたパスポーンの評価値。 */
-    double score_protected_pass_pawn_;
-    /** ダブルポーンの評価値。 */
-    double score_double_pawn_;
-    /** 孤立ポーンの評価値。 */
-    double score_iso_pawn_;
-    /** ポーンの盾の評価値。 */
-    double score_pawn_shield_;
-    /** ビショップペアの評価値。 */
-    double score_bishop_pair_;
-    /** バッドビショップの評価値。 */
-    double score_bad_bishop_;
-    /** ルークペアの評価値。 */
-    double score_rook_pair_;
-    /** セミオープンファイルのルークの評価値。 */
-    double score_rook_semiopen_fyle_;
-    /** オープンファイルのルークの評価値。 */
-    double score_rook_open_fyle_;
-    /** 早すぎるクイーンの始動の評価値。 */
-    double score_early_queen_launched_;
-    /** キング周りの弱いマスの評価値。 */
-    double score_weak_square_;
-    /** キャスリングの評価値。 */
-    double score_castling_;
-    /** キャスリングの放棄の評価値。 */
-    double score_abandoned_castling_;
-  };
-
   /** 評価関数クラス。 */
   class Evaluator {
+    private:
+      // --- クラス内で使う定数 --- //
+      /** 価値テーブルのインデックス - オープニングの配置。 */
+      constexpr static unsigned int OPENING_POSITION = 0;
+      /** 価値テーブルのインデックス - エンディングの配置。 */
+      constexpr static unsigned int ENDING_POSITION = 1;
+      /** 価値テーブルのインデックス - 機動力。 */
+      constexpr static unsigned int MOBILITY = 2;
+      /** 価値テーブルのインデックス - センターコントロール。 */
+      constexpr static unsigned int CENTER_CONTROL = 3;
+      /** 価値テーブルのインデックス - スウィートセンターのコントロール。 */
+      constexpr static unsigned int SWEET_CENTER_CONTROL = 4;
+      /** 価値テーブルのインデックス - ピースの展開。 */
+      constexpr static unsigned int DEVELOPMENT = 5;
+      /** 価値テーブルのインデックス - 攻撃。 */
+      constexpr static unsigned int ATTACK = 6;
+      /** 価値テーブルのインデックス - 防御。 */
+      constexpr static unsigned int DEFENSE = 7;
+      /** 価値テーブルのインデックス - ピン。 */
+      constexpr static unsigned int PIN = 8;
+      /** 価値テーブルのインデックス - キング周辺への攻撃。 */
+      constexpr static unsigned int ATTACK_AROUND_KING = 9;
+      /** 価値テーブルのインデックス - パスポーン。 */
+      constexpr static unsigned int PASS_PAWN = 10;
+      /** 価値テーブルのインデックス - 守られたパスポーン。 */
+      constexpr static unsigned int PROTECTED_PASS_PAWN = 11;
+      /** 価値テーブルのインデックス - ダブルポーン。 */
+      constexpr static unsigned int DOUBLE_PAWN = 12;
+      /** 価値テーブルのインデックス - 孤立ポーン。 */
+      constexpr static unsigned int ISO_PAWN = 13;
+      /** 価値テーブルのインデックス - ポーンの盾。 */
+      constexpr static unsigned int PAWN_SHIELD = 14;
+      /** 価値テーブルのインデックス - ビショップペア。 */
+      constexpr static unsigned int BISHOP_PAIR = 15;
+      /** 価値テーブルのインデックス - バッドビショップ。 */
+      constexpr static unsigned int BAD_BISHOP = 16;
+      /** 価値テーブルのインデックス - ルークペア。 */
+      constexpr static unsigned int ROOK_PAIR = 17;
+      /** 価値テーブルのインデックス - セミオープンファイルのルーク。 */
+      constexpr static unsigned int ROOK_SEMIOPEN_FYLE = 18;
+      /** 価値テーブルのインデックス - オープンファイルのルーク。 */
+      constexpr static unsigned int ROOK_OPEN_FYLE = 19;
+      /** 価値テーブルのインデックス - 早すぎるクイーンの始動。 */
+      constexpr static unsigned int EARLY_QUEEN_LAUNCHED = 20;
+      /** 価値テーブルのインデックス - キング周りの弱いマス。 */
+      constexpr static unsigned int WEAK_SQUARE = 21;
+      /** 価値テーブルのインデックス - キャスリング。 */
+      constexpr static unsigned int CASTLING = 22;
+      /** 価値テーブルのインデックス - キャスリングの放棄。 */
+      constexpr static unsigned int ABANDONED_CASTLING = 23;
+
+      /** 価値テーブルのサイズ。 */
+      constexpr static std::size_t TABLE_SIZE = ABANDONED_CASTLING + 1;
+
     public:
       // ==================== //
       // コンストラクタと代入 //
@@ -145,12 +143,6 @@ namespace Sayuri {
        * @return 評価値。
        */
       int Evaluate(int material);
-
-      /**
-       * 現在の局面を評価し、構造体にして結果を返す。
-       * @return 評価結果の構造体。
-       */
-      EvalResult GetEvalResult();
 
     private:
       /** フレンドのデバッグ用関数。 */
@@ -223,57 +215,9 @@ namespace Sayuri {
       // ========== //
       /** 使用するチェスエンジン。 */
       const ChessEngine* engine_ptr_;
-      // --- 価値の変数 --- //
-      /** オープニング時の駒の配置の価値。 [駒の種類] */
-      double opening_position_value_[NUM_PIECE_TYPES];
-      /** エンディング時の駒の配置の価値。 [駒の種類] */
-      double ending_position_value_[NUM_PIECE_TYPES];
-      /** 機動力の価値。 [駒の種類] */
-      double mobility_value_[NUM_PIECE_TYPES];
-      /** センターコントロールの価値。 [駒の種類] */
-      double center_control_value_[NUM_PIECE_TYPES];
-      /** スウィートセンターコントロールの価値。 [駒の種類] */
-      double sweet_center_control_value_[NUM_PIECE_TYPES];
-      /** 駒の展開の価値。 [駒の種類] */
-      double development_value_[NUM_PIECE_TYPES];
-      /** 攻撃の価値。 [駒の種類] */
-      double attack_value_[NUM_PIECE_TYPES];
-      /** 防御の価値。 [駒の種類] */
-      double defense_value_[NUM_PIECE_TYPES];
-      /** ピンの価値。 [駒の種類] */
-      double pin_value_[NUM_PIECE_TYPES];
-      /** 相手キング周辺への攻撃の価値。 [駒の種類] */
-      double attack_around_king_value_[NUM_PIECE_TYPES];
-      /** パスポーンの価値。 */
-      double pass_pawn_value_;
-      /** 守られたパスポーンの価値。 */
-      double protected_pass_pawn_value_;
-      /** ダブルポーンの価値。 */
-      double double_pawn_value_;
-      /** 孤立ポーンの価値。 */
-      double iso_pawn_value_;
-      /** ポーンの盾の価値。 */
-      double pawn_shield_value_;
-      /** ビショップペアの価値。 */
-      double bishop_pair_value_;
-      /** バッドビショップの価値。 */
-      double bad_bishop_value_;
-      /** ビショップで相手のナイトをピンの価値。 */
-      double pin_knight_value_;
-      /** ルークペアの価値。 */
-      double rook_pair_value_;
-      /** セミオープンファイルのルークの価値。 */
-      double rook_semiopen_fyle_value_;
-      /** オープンファイルのルークの価値。 */
-      double rook_open_fyle_value_;
-      /** 早すぎるクイーンの始動の価値。 */
-      double early_queen_launched_value_;
-      /** キング周りの弱いマスの価値。 */
-      double weak_square_value_;
-      /** キャスリングの価値。 */
-      double castling_value_;
-      /** キャスリングの放棄の価値。 */
-      double abandoned_castling_value_;
+
+      /** 評価関数で使う価値テーブル。 */
+      double value_table_[TABLE_SIZE][NUM_PIECE_TYPES];
   };
 }  // namespace Sayuri
 

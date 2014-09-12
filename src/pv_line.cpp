@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include <cstddef>
+#include <cstring>
 #include "common.h"
 
 /** Sayuri 名前空間。 */
@@ -46,9 +47,7 @@ namespace Sayuri {
   last_(pv_line.last_),
   score_(pv_line.score_),
   mate_in_(pv_line.mate_in_) {
-    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); ++i) {
-      line_[i] = pv_line.line_[i];
-    }
+    std::memcpy(line_, pv_line.line_, sizeof(Move) * (MAX_PLYS + 1 + 1));
   }
 
   // ムーブコンストラクタ。
@@ -56,9 +55,7 @@ namespace Sayuri {
   last_(pv_line.last_),
   score_(pv_line.score_),
   mate_in_(pv_line.mate_in_) {
-    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); ++i) {
-      line_[i] = pv_line.line_[i];
-    }
+    std::memcpy(line_, pv_line.line_, sizeof(Move) * (MAX_PLYS + 1 + 1));
   }
 
   // コピー代入演算子。
@@ -66,9 +63,7 @@ namespace Sayuri {
     score_ = pv_line.score_;
     mate_in_ = pv_line.mate_in_;
     last_ = pv_line.last_;
-    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); ++i) {
-      line_[i] = pv_line.line_[i];
-    }
+    std::memcpy(line_, pv_line.line_, sizeof(Move) * (MAX_PLYS + 1 + 1));
 
     return *this;
   }
@@ -78,9 +73,7 @@ namespace Sayuri {
     score_ = pv_line.score_;
     mate_in_ = pv_line.mate_in_;
     last_ = pv_line.last_;
-    for (std::size_t i = 0; i < (MAX_PLYS + 1 + 1); ++i) {
-      line_[i] = pv_line.line_[i];
-    }
+    std::memcpy(line_, pv_line.line_, sizeof(Move) * (MAX_PLYS + 1 + 1));
 
     return *this;
   }
@@ -92,9 +85,7 @@ namespace Sayuri {
   void PVLine::Insert(const PVLine& pv_line) {
     // PVラインをコピー。
     last_ = pv_line.last_ + 1;
-    for (std::size_t i = 1; i < last_; ++i) {
-      line_[i] = pv_line.line_[i - 1];
-    }
+    std::memcpy(&line_[1], pv_line.line_, sizeof(Move) * pv_line.last_);
 
     // メイトまでのプライをコピー。
     mate_in_ = pv_line.mate_in_;

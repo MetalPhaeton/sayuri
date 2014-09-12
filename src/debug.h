@@ -36,7 +36,6 @@
 /** Sayuri 名前空間。 */
 namespace Sayuri {
   class PositionRecord;
-  struct EvalResult;
 
   /**
    * デバッグ用メイン関数。
@@ -95,12 +94,6 @@ namespace Sayuri {
    * @param record 対象のPositionRecord。
    */
   void PrintPositionRecord(const PositionRecord& record);
-
-  /**
-   * EvalResultの状態を出力する。
-   * @param result 対象のEvalResult。
-   */
-  void PrintEvalResult(const EvalResult& result);
 
   // ================ //
   // ストップウォッチ //
