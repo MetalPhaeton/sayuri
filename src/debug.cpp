@@ -48,6 +48,32 @@ namespace Sayuri {
   // ==================== //
   // デバッグ用メイン関数 //
   // ==================== //
+  // 繰り返しテスト。
+  void DoRepeatTest(UCIShell& shell) {
+    volatile bool loop = true;
+
+    shell.AddOutputListener
+    ([&loop](const std::string& message) mutable {
+      std::vector<std::string> words =
+      Util::Split<char>(message, {' '}, std::set<char> {});
+
+      if (words[0] == "bestmove") {
+        std::cout << message << std::endl;
+        loop = false;
+      }
+    });
+
+    shell.InputCommand("setoption name threads value 8");
+    shell.InputCommand("setoption name hash value 256");
+    for (int i = 0; i < 30; ++i) {
+      loop = true;
+      shell.InputCommand("ucinewgame");
+      shell.InputCommand("position startpos");
+      shell.InputCommand("go movetime 10000");
+      while (loop) continue;
+    }
+  }
+
   int DebugMain(int argc, char* argv[]) {
     // プログラムの起動。
     // 初期化。
@@ -66,6 +92,8 @@ namespace Sayuri {
     std::unique_ptr<UCIShell>
     shell_ptr(new UCIShell(*engine_ptr));
     // ========================================================================
+
+    DoRepeatTest(*shell_ptr);
 
     return 0;
   }

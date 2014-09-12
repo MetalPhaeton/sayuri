@@ -84,7 +84,7 @@ namespace Sayuri {
        * @param maker 使用するMoveMaker。
        */
       void Init(MoveMaker& maker) {
-        std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
         maker_ptr_ = &maker;
         helper_counter_ = 0;
         counter_ = 0;
@@ -105,7 +105,7 @@ namespace Sayuri {
        * @param listener ベータカットのお知らせを受け取る関数オブジェクト。
        */
       void AddBetaCutListener(const std::function<void(Job&)>& listener) {
-        std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
         betacut_listener_vec_.push_back(listener);
       }
 
