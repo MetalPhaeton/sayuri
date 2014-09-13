@@ -80,6 +80,21 @@ namespace Sayuri {
   /** アナライズモードのデフォルト設定。 */
   constexpr bool UCI_DEFAULT_ANALYSE_MODE = false;
 
+  // ====== //
+  // マクロ //
+  // ====== //
+  /**
+   * std::memset()で配列を初期化。
+   * @param array 初期化する配列。
+   */
+#define INIT_ARRAY(array) (std::memset((array), 0, sizeof(array)))
+  /**
+   * std::memcpy()で配列をコピーする。
+   * @param dst コピー先。
+   * @param src コピー元。
+   */
+#define COPY_ARRAY(dst, src) (std::memcpy((dst), (src), sizeof(dst)))
+
   // ========== //
   // 基本の定数 //
   // ========== //

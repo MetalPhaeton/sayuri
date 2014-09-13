@@ -268,16 +268,13 @@ namespace Sayuri {
 
   // PositionRecordから局面読み込む。
   void ChessEngine::LoadRecord(const PositionRecord& record) {
-    std::memcpy(position_, record.position(),
-    sizeof(Bitboard) * NUM_SIDES * NUM_PIECE_TYPES);
+    COPY_ARRAY(position_, record.position());
 
-    std::memcpy(piece_board_, record.piece_board(),
-    sizeof(Piece) * NUM_SQUARES);
+    COPY_ARRAY(piece_board_, record.piece_board());
 
-    std::memcpy(side_board_, record.side_board(), sizeof(Side) * NUM_SQUARES);
+    COPY_ARRAY(side_board_, record.side_board());
 
-    std::memcpy(side_pieces_, record.side_pieces(),
-    sizeof(Bitboard) * NUM_SIDES);
+    COPY_ARRAY(side_pieces_, record.side_pieces());
 
     // 全駒のコピー。
     blocker_0_ = record.blocker_0();
@@ -286,15 +283,14 @@ namespace Sayuri {
     blocker_135_ = record.blocker_135();
 
     // その他のコピー。
-    std::memcpy(king_, record.king(), sizeof(Square) * NUM_SIDES);
+    COPY_ARRAY(king_, record.king());
     to_move_ = record.to_move();
     castling_rights_ = record.castling_rights();
     en_passant_square_ = record.en_passant_square();
     ply_100_ = record.ply_100();
     ply_ = record.ply();
-    std::memcpy(has_castled_, record.has_castled(), sizeof(bool) * NUM_SIDES);
-    std::memcpy(position_memo_, record.position_memo(),
-    sizeof(Hash) * (MAX_PLYS + 1));
+    COPY_ARRAY(has_castled_, record.has_castled());
+    COPY_ARRAY(position_memo_, record.position_memo());
   }
 
   constexpr int MyCountBits(Bitboard bitboard) {
@@ -344,8 +340,7 @@ namespace Sayuri {
         Util::SQUARE[E8]
       }
     };
-    std::memcpy(position_, STARTING_POSITION,
-    sizeof(Bitboard) * NUM_SIDES * NUM_PIECE_TYPES);
+    COPY_ARRAY(position_, STARTING_POSITION);
 
     // 各サイドの駒の配置を作る。
     side_pieces_[NO_SIDE] = 0;
@@ -386,10 +381,8 @@ namespace Sayuri {
       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,
       BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK
     };
-    std::memcpy(piece_board_, STARTING_PIECE_BOARD,
-    sizeof(Piece) * NUM_SQUARES);
-    std::memcpy(side_board_, STARTING_SIDE_BOARD,
-    sizeof(Side) * NUM_SQUARES);
+    COPY_ARRAY(piece_board_, STARTING_PIECE_BOARD);
+    COPY_ARRAY(side_board_, STARTING_SIDE_BOARD);
 
     // キングを入れる。
     king_[NO_SIDE] = 0;
@@ -417,7 +410,7 @@ namespace Sayuri {
     }
 
     // 駒の配置のメモを初期化。
-    std::memset(position_memo_, 0, sizeof(Hash) * (MAX_PLYS + 1));
+    INIT_ARRAY(position_memo_);
 
     if (shared_st_ptr_) {
       // 50手ルールの履歴を初期化。
@@ -458,19 +451,16 @@ namespace Sayuri {
   // 他のエンジンの基本メンバをコピーする。
   void ChessEngine::ScanBasicMember(const ChessEngine& engine) {
     // 駒の配置のコピー。
-    std::memcpy(position_, engine.position_,
-    sizeof(Bitboard) * NUM_SIDES * NUM_PIECE_TYPES);
+    COPY_ARRAY(position_, engine.position_);
 
     // 駒の種類の配置のコピー。
-    std::memcpy(piece_board_, engine.piece_board_,
-    sizeof(Piece) * NUM_SQUARES);
+    COPY_ARRAY(piece_board_, engine.piece_board_);
 
     // サイドの配置のコピー。
-    std::memcpy(side_board_, engine.side_board_, sizeof(Side) * NUM_SQUARES);
+    COPY_ARRAY(side_board_, engine.side_board_);
 
     // 各サイドの駒の配置のコピー。
-    std::memcpy(side_pieces_, engine.side_pieces_,
-    sizeof(Bitboard) * NUM_SIDES);
+    COPY_ARRAY(side_pieces_, engine.side_pieces_);
 
     // ブロッカーのコピー。
     blocker_0_ = engine.blocker_0_;
@@ -479,7 +469,7 @@ namespace Sayuri {
     blocker_135_ = engine.blocker_135_;
 
     // キングの位置のコピー。
-    std::memcpy(king_, engine.king_, sizeof(Square) * NUM_SIDES);
+    COPY_ARRAY(king_, engine.king_);
 
     // 手番のコピー。
     to_move_ = engine.to_move_;
@@ -497,11 +487,10 @@ namespace Sayuri {
     ply_ = engine.ply_;
 
     // キャスリングしたかどうかのコピー。
-    std::memcpy(has_castled_, engine.has_castled_, sizeof(bool) * NUM_SIDES);
+    COPY_ARRAY(has_castled_, engine.has_castled_);
 
     // 駒の配置のメモをコピー。
-    std::memcpy(position_memo_, engine.position_memo_,
-    sizeof(Hash) * (MAX_PLYS + 1));
+    COPY_ARRAY(position_memo_, engine.position_memo_);
   }
 
   // 探索を開始する。
@@ -1053,10 +1042,9 @@ namespace Sayuri {
   ply_100_history_(0),
   position_history_(0),
   eval_params_ptr_(nullptr) {
-    std::memset(history_, 0,
-    sizeof(std::uint64_t) * NUM_SIDES * NUM_SQUARES * NUM_SQUARES);
-    std::memset(iid_stack_, 0, sizeof(Move) * (MAX_PLYS + 1));
-    std::memset(killer_stack_, 0, sizeof(Move) * (MAX_PLYS + 2 + 1) * 2);
+    INIT_ARRAY(history_);
+    INIT_ARRAY(iid_stack_);
+    INIT_ARRAY(killer_stack_);
     helper_queue_ptr_.reset(new HelperQueue());
     InitHashValueTable();
   }
@@ -1087,12 +1075,9 @@ namespace Sayuri {
 
   // メンバをコピーする。
   void ChessEngine::SharedStruct::ScanMember(const SharedStruct& shared_st) {
-    std::memcpy(history_, shared_st.history_,
-    sizeof(std::uint64_t) * NUM_SIDES * NUM_SQUARES * NUM_SQUARES);
-    std::memcpy(iid_stack_, shared_st.iid_stack_,
-    sizeof(Move) * (MAX_PLYS + 1));
-    std::memcpy(killer_stack_, shared_st.killer_stack_,
-    sizeof(Move) * (MAX_PLYS + 2 + 1) * 2);
+    COPY_ARRAY(history_, shared_st.history_);
+    COPY_ARRAY(iid_stack_, shared_st.iid_stack_);
+    COPY_ARRAY(killer_stack_, shared_st.killer_stack_);
     i_depth_ = shared_st.i_depth_;
     searched_nodes_ = shared_st.searched_nodes_;
     searched_level_ = shared_st.searched_level_;
@@ -1110,17 +1095,15 @@ namespace Sayuri {
     eval_params_ptr_ = shared_st.eval_params_ptr_;
 
     // ハッシュ関連。
-    std::memcpy(piece_hash_value_table_, shared_st.piece_hash_value_table_,
-    sizeof(Hash) * NUM_SIDES * NUM_PIECE_TYPES * NUM_SQUARES);
+    COPY_ARRAY(piece_hash_value_table_, shared_st.piece_hash_value_table_);
 
-    std::memcpy(to_move_hash_value_table_, shared_st.to_move_hash_value_table_,
-    sizeof(Hash) * NUM_SIDES);
+    COPY_ARRAY(to_move_hash_value_table_, shared_st.to_move_hash_value_table_);
 
-    std::memcpy(castling_hash_value_table_,
-    shared_st.castling_hash_value_table_, sizeof(Hash) * 4);
+    COPY_ARRAY(castling_hash_value_table_,
+    shared_st.castling_hash_value_table_);
 
-    std::memcpy(en_passant_hash_value_table_,
-    shared_st.en_passant_hash_value_table_, sizeof(Hash) * NUM_SQUARES);
+    COPY_ARRAY(en_passant_hash_value_table_,
+    shared_st.en_passant_hash_value_table_);
   }
 
   // ハッシュ値のテーブルを初期化する。

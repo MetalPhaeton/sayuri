@@ -415,37 +415,32 @@ namespace Sayuri {
   // コンストラクタ。
   Evaluator::Evaluator(const ChessEngine& engine)
   : engine_ptr_(&engine) {
-    std::memset(value_table_, 0,
-    sizeof(double) * TABLE_SIZE * NUM_PIECE_TYPES);
+    INIT_ARRAY(value_table_);
   }
 
   // コピーコンストラクタ。
   Evaluator::Evaluator(const Evaluator& eval)
   : engine_ptr_(eval.engine_ptr_) {
-    std::memcpy(value_table_, eval.value_table_,
-    sizeof(double) * TABLE_SIZE * NUM_PIECE_TYPES);
+    COPY_ARRAY(value_table_, eval.value_table_);
   }
 
   // ムーブコンストラクタ。
   Evaluator::Evaluator(Evaluator&& eval)
   : engine_ptr_(eval.engine_ptr_) {
-    std::memcpy(value_table_, eval.value_table_,
-    sizeof(double) * TABLE_SIZE * NUM_PIECE_TYPES);
+    COPY_ARRAY(value_table_, eval.value_table_);
   }
 
   // コピー代入演算子。
   Evaluator& Evaluator::operator=(const Evaluator& eval) {
     engine_ptr_ = eval.engine_ptr_;
-    std::memcpy(value_table_, eval.value_table_,
-    sizeof(double) * TABLE_SIZE * NUM_PIECE_TYPES);
+    COPY_ARRAY(value_table_, eval.value_table_);
     return *this;
   }
 
   // ムーブ代入演算子。
   Evaluator& Evaluator::operator=(Evaluator&& eval) {
     engine_ptr_ = eval.engine_ptr_;
-    std::memcpy(value_table_, eval.value_table_,
-    sizeof(double) * TABLE_SIZE * NUM_PIECE_TYPES);
+    COPY_ARRAY(value_table_, eval.value_table_);
     return *this;
   }
 
@@ -474,8 +469,7 @@ namespace Sayuri {
   // 現在の局面の評価値を計算する。
   int Evaluator::Evaluate(int material) {
     // 価値の変数の初期化。
-    std::memset(value_table_, 0,
-    sizeof(double) * TABLE_SIZE * NUM_PIECE_TYPES);
+    INIT_ARRAY(value_table_);
 
     // サイド。
     Side side = engine_ptr_->to_move();

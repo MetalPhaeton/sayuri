@@ -40,14 +40,16 @@ namespace Sayuri {
   // コンストラクタと代入 //
   // ==================== //
   // コンストラクタ。
-  PVLine::PVLine() : last_(0), score_(0), mate_in_(-1) {}
+  PVLine::PVLine() : last_(0), score_(0), mate_in_(-1) {
+    INIT_ARRAY(line_);
+  }
 
   // コピーコンストラクタ。
   PVLine::PVLine(const PVLine& pv_line) :
   last_(pv_line.last_),
   score_(pv_line.score_),
   mate_in_(pv_line.mate_in_) {
-    std::memcpy(line_, pv_line.line_, sizeof(Move) * (MAX_PLYS + 1 + 1));
+    COPY_ARRAY(line_, pv_line.line_);
   }
 
   // ムーブコンストラクタ。
@@ -55,7 +57,7 @@ namespace Sayuri {
   last_(pv_line.last_),
   score_(pv_line.score_),
   mate_in_(pv_line.mate_in_) {
-    std::memcpy(line_, pv_line.line_, sizeof(Move) * (MAX_PLYS + 1 + 1));
+    COPY_ARRAY(line_, pv_line.line_);
   }
 
   // コピー代入演算子。
@@ -63,7 +65,7 @@ namespace Sayuri {
     score_ = pv_line.score_;
     mate_in_ = pv_line.mate_in_;
     last_ = pv_line.last_;
-    std::memcpy(line_, pv_line.line_, sizeof(Move) * (MAX_PLYS + 1 + 1));
+    COPY_ARRAY(line_, pv_line.line_);
 
     return *this;
   }
@@ -73,7 +75,7 @@ namespace Sayuri {
     score_ = pv_line.score_;
     mate_in_ = pv_line.mate_in_;
     last_ = pv_line.last_;
-    std::memcpy(line_, pv_line.line_, sizeof(Move) * (MAX_PLYS + 1 + 1));
+    COPY_ARRAY(line_, pv_line.line_);
 
     return *this;
   }

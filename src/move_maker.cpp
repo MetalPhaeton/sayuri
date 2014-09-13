@@ -56,8 +56,7 @@ namespace Sayuri {
   last_(maker.last_),
   max_(maker.max_),
   history_max_(maker.history_max_) {
-    std::memcpy(move_stack_, maker.move_stack_,
-    sizeof(MoveSlot) * (MAX_CANDIDATES + 1));
+    COPY_ARRAY(move_stack_, maker.move_stack_);
   }
 
   // ムーブコンストラクタ。
@@ -66,8 +65,7 @@ namespace Sayuri {
   last_(maker.last_),
   max_(maker.max_),
   history_max_(maker.history_max_) {
-    std::memcpy(move_stack_, maker.move_stack_,
-    sizeof(MoveSlot) * (MAX_CANDIDATES + 1));
+    COPY_ARRAY(move_stack_, maker.move_stack_);
   }
 
   // コピー代入演算子。
@@ -77,8 +75,7 @@ namespace Sayuri {
     history_max_ = maker.history_max_;
     last_ = maker.last_;
     max_ = maker.max_;
-    std::memcpy(move_stack_, maker.move_stack_,
-    sizeof(MoveSlot) * (MAX_CANDIDATES + 1));
+    COPY_ARRAY(move_stack_, maker.move_stack_);
     return *this;
   }
 
@@ -89,8 +86,7 @@ namespace Sayuri {
     history_max_ = maker.history_max_;
     last_ = maker.last_;
     max_ = maker.max_;
-    std::memcpy(move_stack_, maker.move_stack_,
-    sizeof(MoveSlot) * (MAX_CANDIDATES + 1));
+    COPY_ARRAY(move_stack_, maker.move_stack_);
     return *this;
   }
 

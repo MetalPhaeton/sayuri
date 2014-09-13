@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include <cstdint>
+#include <cstring>
 #include "common.h"
 
 /** Sayuri 名前空間。 */
@@ -189,7 +190,7 @@ namespace Sayuri {
   weight_castling_(20.0, 0.0),
   weight_abandoned_castling_(-110.0, 0.0) {
     // オープニング時の駒の配置の価値テーブルの初期化。
-    constexpr double OPENING_POSITION[NUM_PIECE_TYPES][NUM_SQUARES] {
+    static const double OPENING_POSITION[NUM_PIECE_TYPES][NUM_SQUARES] {
       {  // EMPTY。
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -261,15 +262,10 @@ namespace Sayuri {
         -80.0, -80.0, -80.0, -80.0, -80.0, -80.0, -80.0, -80.0
       }
     };
-    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
-      for (Square square = 0; square < NUM_SQUARES; ++square) {
-        opening_position_value_table_[piece_type][square] =
-        OPENING_POSITION[piece_type][square];
-      }
-    }
+    COPY_ARRAY(opening_position_value_table_, OPENING_POSITION);
 
     // エンディング時の駒の配置の価値テーブルを初期化。
-    constexpr double ENDING_POSITION[NUM_PIECE_TYPES][NUM_SQUARES] {
+    static const double ENDING_POSITION[NUM_PIECE_TYPES][NUM_SQUARES] {
       {  // 何もなし。
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -341,15 +337,10 @@ namespace Sayuri {
         -30.0, -15.0,  0.0, 15.0, 15.0,  0.0, -15.0, -30.0
       }
     };
-    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
-      for (Square square = 0; square < NUM_SQUARES; ++square) {
-        ending_position_value_table_[piece_type][square] =
-        ENDING_POSITION[piece_type][square];
-      }
-    }
+    COPY_ARRAY(ending_position_value_table_, ENDING_POSITION);
 
     // 相手への攻撃の価値テーブルを初期化。
-    constexpr double ATTACK[NUM_PIECE_TYPES][NUM_PIECE_TYPES] {
+    static const double ATTACK[NUM_PIECE_TYPES][NUM_PIECE_TYPES] {
       // 相手側:{Empty, ポーン, ナイト, ビショップ, ルーク, クイーン, キング}
       {0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0},  // 攻撃側: Empty。
       {0.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0},  // 攻撃側: ポーン。
@@ -359,14 +350,10 @@ namespace Sayuri {
       {0.0,  2.0,  4.0,  6.0,  8.0, 10.0, 12.0},  // 攻撃側: クイーン。
       {0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}   // 攻撃側: キング。
     };
-    for (Piece type_1 = 0; type_1 < NUM_PIECE_TYPES; ++type_1) {
-      for (Piece type_2 = 0; type_2 < NUM_PIECE_TYPES; ++type_2) {
-        attack_value_table_[type_1][type_2] = ATTACK[type_1][type_2];
-      }
-    }
+    COPY_ARRAY(attack_value_table_, ATTACK);
 
     // 味方への防御の価値テーブルを初期化。
-    constexpr double DEFENSE[NUM_PIECE_TYPES][NUM_PIECE_TYPES] {
+    static const double DEFENSE[NUM_PIECE_TYPES][NUM_PIECE_TYPES] {
       // 相手側:{Empty, ポーン, ナイト, ビショップ, ルーク, クイーン, キング}
       {0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // 守り側: Empty。
       {0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // 守り側: ポーン。
@@ -376,14 +363,11 @@ namespace Sayuri {
       {0.0,  2.5, 0.0, 0.0, 0.0, 0.0, 0.0},  // 守り側: クイーン。
       {0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0}   // 守り側: キング。
     };
-    for (Piece type_1 = 0; type_1 < NUM_PIECE_TYPES; ++type_1) {
-      for (Piece type_2 = 0; type_2 < NUM_PIECE_TYPES; ++type_2) {
-        defense_value_table_[type_1][type_2] = DEFENSE[type_1][type_2];
-      }
-    }
+    COPY_ARRAY(defense_value_table_, DEFENSE);
 
     // ピンの価値テーブルを初期化。
-    constexpr double PIN[NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES] {
+    static const double
+    PIN[NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES] {
       {  // Emptyでピン。
         // 裏の駒:{Empty, ポーン, ナイト, ビショップ, ルーク, クイーン, キング}
         {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},  // ピンされる駒: Empty。
@@ -455,17 +439,10 @@ namespace Sayuri {
         {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}   // ピンされる駒: キング。
       }
     };
-    for (Piece type_1 = 0; type_1 < NUM_PIECE_TYPES; ++type_1) {
-      for (Piece type_2 = 0; type_2 < NUM_PIECE_TYPES; ++type_2) {
-        for (Piece type_3 = 0; type_3 < NUM_PIECE_TYPES; ++type_3) {
-          pin_value_table_[type_1][type_2][type_3] =
-          PIN[type_1][type_2][type_3];
-        }
-      }
-    }
+    COPY_ARRAY(pin_value_table_, PIN);
 
     // ポーンの盾の配置の価値テーブルを初期化。
-    constexpr double PAWN_SHIELD[NUM_SQUARES] {
+    static const double PAWN_SHIELD[NUM_SQUARES] {
         0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
        30.0,  30.0,  30.0,  30.0,  30.0,  30.0,  30.0,  30.0,
         0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
@@ -475,9 +452,7 @@ namespace Sayuri {
       -60.0, -60.0, -60.0, -60.0, -60.0, -60.0, -60.0, -60.0,
       -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0, -30.0
     };
-    for (Square square = 0; square < NUM_SQUARES; ++square) {
-      pawn_shield_value_table_[square] = PAWN_SHIELD[square];
-    }
+    COPY_ARRAY(pawn_shield_value_table_, PAWN_SHIELD);
 
     // オープニング時の駒の配置のウェイトを初期化。
     weight_opening_position_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。

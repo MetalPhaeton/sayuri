@@ -51,17 +51,13 @@ namespace Sayuri {
   ply_100_(0),
   ply_(0),
   pos_hash_(0) {
-    for (Side side = 0; side < NUM_SIDES; ++side) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
-        position_[side][piece_type] = 0;
-      }
-      side_pieces_[side] = 0;
-      king_[side] = 0;
-      has_castled_[side] = false;
-    }
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
-      position_memo_[i] = 0;
-    }
+    INIT_ARRAY(position_);
+    INIT_ARRAY(piece_board_);
+    INIT_ARRAY(side_board_);
+    INIT_ARRAY(side_pieces_);
+    INIT_ARRAY(king_);
+    INIT_ARRAY(has_castled_);
+    INIT_ARRAY(position_memo_);
   }
 
   // コピーコンストラクタ。
@@ -162,16 +158,13 @@ namespace Sayuri {
   // ================ //
   // メンバをコピーする。
   void PositionRecord::ScanMember(const PositionRecord& record) {
-    std::memcpy(position_, record.position_,
-    sizeof(Bitboard) * NUM_SIDES * NUM_PIECE_TYPES);
+    COPY_ARRAY(position_, record.position_);
 
-    std::memcpy(piece_board_, record.piece_board_,
-    sizeof(Piece) * NUM_SQUARES);
+    COPY_ARRAY(piece_board_, record.piece_board_);
 
-    std::memcpy(side_board_, record.side_board_, sizeof(Side) * NUM_SQUARES);
+    COPY_ARRAY(side_board_, record.side_board_);
 
-    std::memcpy(side_pieces_, record.side_pieces_,
-    sizeof(Bitboard) * NUM_SIDES);
+    COPY_ARRAY(side_pieces_, record.side_pieces_);
 
     // 全駒のコピー。
     blocker_0_ = record.blocker_0_;
@@ -180,30 +173,26 @@ namespace Sayuri {
     blocker_135_ = record.blocker_135_;
 
     // その他をコピー。
-    std::memcpy(king_, record.king_, sizeof(Square) * NUM_SIDES);
+    COPY_ARRAY(king_, record.king_);
     to_move_ = record.to_move_;
     castling_rights_ = record.castling_rights_;
     en_passant_square_ = record.en_passant_square_;
     ply_100_ = record.ply_100_;
     ply_ = record.ply_;
-    std::memcpy(has_castled_, record.has_castled_, sizeof(bool) * NUM_SIDES);
-    std::memcpy(position_memo_, record.position_memo_,
-    sizeof(Hash) * (MAX_PLYS + 1));
+    COPY_ARRAY(has_castled_, record.has_castled_);
+    COPY_ARRAY(position_memo_, record.position_memo_);
     pos_hash_ = record.pos_hash_;
   }
 
   // メンバをエンジンからコピーする。
   void PositionRecord::ScanMember(const ChessEngine& engine, Hash pos_hash) {
-    std::memcpy(position_, engine.position(),
-    sizeof(Bitboard) * NUM_SIDES * NUM_PIECE_TYPES);
+    COPY_ARRAY(position_, engine.position());
 
-    std::memcpy(piece_board_, engine.piece_board(),
-    sizeof(Piece) * NUM_SQUARES);
+    COPY_ARRAY(piece_board_, engine.piece_board());
 
-    std::memcpy(side_board_, engine.side_board(), sizeof(Side) * NUM_SQUARES);
+    COPY_ARRAY(side_board_, engine.side_board());
 
-    std::memcpy(side_pieces_, engine.side_pieces(),
-    sizeof(Bitboard) * NUM_SIDES);
+    COPY_ARRAY(side_pieces_, engine.side_pieces());
 
 
     // 全駒のコピー。
@@ -213,15 +202,14 @@ namespace Sayuri {
     blocker_135_ = engine.blocker_135();
 
     // その他のコピー。
-    std::memcpy(king_, engine.king(), sizeof(Square) * NUM_SIDES);
+    COPY_ARRAY(king_, engine.king());
     to_move_ = engine.to_move();
     castling_rights_ = engine.castling_rights();
     en_passant_square_ = engine.en_passant_square();
     ply_100_ = engine.ply_100();
     ply_ = engine.ply();
-    std::memcpy(has_castled_, engine.has_castled(), sizeof(bool) * NUM_SIDES);
-    std::memcpy(position_memo_, engine.position_memo(),
-    sizeof(Hash) * (MAX_PLYS + 1));
+    COPY_ARRAY(has_castled_, engine.has_castled());
+    COPY_ARRAY(position_memo_, engine.position_memo());
     pos_hash_ = pos_hash;
   }
 }  // namespace Sayuri
