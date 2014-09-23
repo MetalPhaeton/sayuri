@@ -225,23 +225,13 @@ namespace Sayuri {
   /** 手の比較に使うマスク。 */
   constexpr Move BASE_MASK = FROM_MASK | TO_MASK | PROMOTION_MASK;
 
-  // --- 手の種類の定数 --- //
+  // --- 手の種類の定義 --- //
   /** 手の種類の型。 */
   using MoveType = unsigned int;
-  /** Null Moveを表す。 */
-  constexpr MoveType NULL_MOVE = 0;
-  /** 通常の手を表す。 (コマを取らない手。 駒をとる手。) */
-  constexpr MoveType NORMAL = 1;
-  /** アンパッサンを表す。 */
-  constexpr MoveType EN_PASSANT = 2;
-  /** 白のショートキャスリングを表す。 */
-  constexpr MoveType CASTLE_WS = 3;
-  /** 白のロングキャスリングを表す。 */
-  constexpr MoveType CASTLE_WL = 4;
-  /** 黒のショートキャスリングを表す。 */
-  constexpr MoveType CASTLE_BS = 5;
-  /** 黒のロングキャスリングを表す。 */
-  constexpr MoveType CASTLE_BL = 6;
+  /** 手の種類の定数。 */
+  enum : MoveType {
+    NULL_MOVE, NORMAL, EN_PASSANT, CASTLE_WS, CASTLE_WL, CASTLE_BS, CASTLE_BL
+  };
 
   // --- 手のビットフィールドのアクセサ --- //
   /**
