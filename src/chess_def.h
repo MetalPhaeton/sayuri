@@ -105,7 +105,7 @@ namespace Sayuri {
   /** マスの型。 */
   using Square = std::uint32_t;
   /** マスの定数。 */
-  enum {
+  enum : Square {
     A1, B1, C1, D1, E1, F1, G1, H1,
     A2, B2, C2, D2, E2, F2, G2, H2,
     A3, B3, C3, D3, E3, F3, G3, H3,
@@ -122,7 +122,7 @@ namespace Sayuri {
   /** ファイルの型。 */
   using Fyle = std::uint32_t;
   /** ファイルの定数。 */
-  enum {
+  enum : Fyle {
     FYLE_A, FYLE_B, FYLE_C, FYLE_D, FYLE_E, FYLE_F, FYLE_G, FYLE_H
   };
   /** ファイルの数。 */
@@ -132,7 +132,7 @@ namespace Sayuri {
   /** ランクの型。 */
   using Rank = std::uint32_t;
   /** ランクの定数。 */
-  enum {
+  enum : Rank {
     RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8
   };
   /** ランクの数。 */
@@ -142,7 +142,7 @@ namespace Sayuri {
   /** サイドの型。 */
   using Side = std::uint32_t;
   /** サイドの定数。 */
-  enum {
+  enum : Side {
     NO_SIDE, WHITE, BLACK
   };
   /** サイドの数。 */
@@ -152,7 +152,7 @@ namespace Sayuri {
   /** 駒の型。 */
   using Piece = std::uint32_t;
   /** 駒の定数 */
-  enum {
+  enum : Piece {
     EMPTY, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING
   };
   /** 駒の種類の数。 */
