@@ -101,214 +101,62 @@ namespace Sayuri {
   /** ビットボードの型。 */
   using Bitboard = std::uint64_t;
 
+  // --- マスの定義 --- //
   /** マスの型。 */
   using Square = std::uint32_t;
-  /** マス A1 の定数。 */
-  constexpr Square A1 = 0;
-  /** マス B1 の定数。 */
-  constexpr Square B1 = 1;
-  /** マス C1 の定数。 */
-  constexpr Square C1 = 2;
-  /** マス D1 の定数。 */
-  constexpr Square D1 = 3;
-  /** マス E1 の定数。 */
-  constexpr Square E1 = 4;
-  /** マス F1 の定数。 */
-  constexpr Square F1 = 5;
-  /** マス G1 の定数。 */
-  constexpr Square G1 = 6;
-  /** マス H1 の定数。 */
-  constexpr Square H1 = 7;
-  /** マス A2 の定数。 */
-  constexpr Square A2 = 8;
-  /** マス B2 の定数。 */
-  constexpr Square B2 = 9;
-  /** マス C2 の定数。 */
-  constexpr Square C2 = 10;
-  /** マス D2 の定数。 */
-  constexpr Square D2 = 11;
-  /** マス E2 の定数。 */
-  constexpr Square E2 = 12;
-  /** マス F2 の定数。 */
-  constexpr Square F2 = 13;
-  /** マス G2 の定数。 */
-  constexpr Square G2 = 14;
-  /** マス H2 の定数。 */
-  constexpr Square H2 = 15;
-  /** マス A3 の定数。 */
-  constexpr Square A3 = 16;
-  /** マス B3 の定数。 */
-  constexpr Square B3 = 17;
-  /** マス C3 の定数。 */
-  constexpr Square C3 = 18;
-  /** マス D3 の定数。 */
-  constexpr Square D3 = 19;
-  /** マス E3 の定数。 */
-  constexpr Square E3 = 20;
-  /** マス F3 の定数。 */
-  constexpr Square F3 = 21;
-  /** マス G3 の定数。 */
-  constexpr Square G3 = 22;
-  /** マス H3 の定数。 */
-  constexpr Square H3 = 23;
-  /** マス A4 の定数。 */
-  constexpr Square A4 = 24;
-  /** マス B4 の定数。 */
-  constexpr Square B4 = 25;
-  /** マス C4 の定数。 */
-  constexpr Square C4 = 26;
-  /** マス D4 の定数。 */
-  constexpr Square D4 = 27;
-  /** マス E4 の定数。 */
-  constexpr Square E4 = 28;
-  /** マス F4 の定数。 */
-  constexpr Square F4 = 29;
-  /** マス G4 の定数。 */
-  constexpr Square G4 = 30;
-  /** マス H4 の定数。 */
-  constexpr Square H4 = 31;
-  /** マス A5 の定数。 */
-  constexpr Square A5 = 32;
-  /** マス B5 の定数。 */
-  constexpr Square B5 = 33;
-  /** マス C5 の定数。 */
-  constexpr Square C5 = 34;
-  /** マス D5 の定数。 */
-  constexpr Square D5 = 35;
-  /** マス E5 の定数。 */
-  constexpr Square E5 = 36;
-  /** マス F5 の定数。 */
-  constexpr Square F5 = 37;
-  /** マス G5 の定数。 */
-  constexpr Square G5 = 38;
-  /** マス H5 の定数。 */
-  constexpr Square H5 = 39;
-  /** マス A6 の定数。 */
-  constexpr Square A6 = 40;
-  /** マス B6 の定数。 */
-  constexpr Square B6 = 41;
-  /** マス C6 の定数。 */
-  constexpr Square C6 = 42;
-  /** マス D6 の定数。 */
-  constexpr Square D6 = 43;
-  /** マス E6 の定数。 */
-  constexpr Square E6 = 44;
-  /** マス F6 の定数。 */
-  constexpr Square F6 = 45;
-  /** マス G6 の定数。 */
-  constexpr Square G6 = 46;
-  /** マス H6 の定数。 */
-  constexpr Square H6 = 47;
-  /** マス A7 の定数。 */
-  constexpr Square A7 = 48;
-  /** マス B7 の定数。 */
-  constexpr Square B7 = 49;
-  /** マス C7 の定数。 */
-  constexpr Square C7 = 50;
-  /** マス D7 の定数。 */
-  constexpr Square D7 = 51;
-  /** マス E7 の定数。 */
-  constexpr Square E7 = 52;
-  /** マス F7 の定数。 */
-  constexpr Square F7 = 53;
-  /** マス G7 の定数。 */
-  constexpr Square G7 = 54;
-  /** マス H7 の定数。 */
-  constexpr Square H7 = 55;
-  /** マス A8 の定数。 */
-  constexpr Square A8 = 56;
-  /** マス B8 の定数。 */
-  constexpr Square B8 = 57;
-  /** マス C8 の定数。 */
-  constexpr Square C8 = 58;
-  /** マス D8 の定数。 */
-  constexpr Square D8 = 59;
-  /** マス E8 の定数。 */
-  constexpr Square E8 = 60;
-  /** マス F8 の定数。 */
-  constexpr Square F8 = 61;
-  /** マス G8 の定数。 */
-  constexpr Square G8 = 62;
-  /** マス H8 の定数。 */
-  constexpr Square H8 = 63;
+  /** マスの定数。 */
+  enum {
+    A1, B1, C1, D1, E1, F1, G1, H1,
+    A2, B2, C2, D2, E2, F2, G2, H2,
+    A3, B3, C3, D3, E3, F3, G3, H3,
+    A4, B4, C4, D4, E4, F4, G4, H4,
+    A5, B5, C5, D5, E5, F5, G5, H5,
+    A6, B6, C6, D6, E6, F6, G6, H6,
+    A7, B7, C7, D7, E7, F7, G7, H7,
+    A8, B8, C8, D8, E8, F8, G8, H8
+  };
+  /** マスの数。 */
+  constexpr Square NUM_SQUARES = H8 + 1;
 
+  // --- ファイルの定義 --- //
   /** ファイルの型。 */
   using Fyle = std::uint32_t;
-  /** ファイル A の定数。 */
-  constexpr Fyle FYLE_A = 0;
-  /** ファイル B の定数。 */
-  constexpr Fyle FYLE_B = 1;
-  /** ファイル C の定数。 */
-  constexpr Fyle FYLE_C = 2;
-  /** ファイル D の定数。 */
-  constexpr Fyle FYLE_D = 3;
-  /** ファイル E の定数。 */
-  constexpr Fyle FYLE_E = 4;
-  /** ファイル F の定数。 */
-  constexpr Fyle FYLE_F = 5;
-  /** ファイル G の定数。 */
-  constexpr Fyle FYLE_G = 6;
-  /** ファイル H の定数。 */
-  constexpr Fyle FYLE_H = 7;
+  /** ファイルの定数。 */
+  enum {
+    FYLE_A, FYLE_B, FYLE_C, FYLE_D, FYLE_E, FYLE_F, FYLE_G, FYLE_H
+  };
+  /** ファイルの数。 */
+  constexpr Fyle NUM_FYLES = FYLE_H + 1;
 
+  // --- ランクの定義 --- //
   /** ランクの型。 */
   using Rank = std::uint32_t;
-  /** ランク 1 の定数。 */
-  constexpr Rank RANK_1 = 0;
-  /** ランク 2 の定数。 */
-  constexpr Rank RANK_2 = 1;
-  /** ランク 3 の定数。 */
-  constexpr Rank RANK_3 = 2;
-  /** ランク 4 の定数。 */
-  constexpr Rank RANK_4 = 3;
-  /** ランク 5 の定数。 */
-  constexpr Rank RANK_5 = 4;
-  /** ランク 6 の定数。 */
-  constexpr Rank RANK_6 = 5;
-  /** ランク 7 の定数。 */
-  constexpr Rank RANK_7 = 6;
-  /** ランク 8 の定数。 */
-  constexpr Rank RANK_8 = 7;
+  /** ランクの定数。 */
+  enum {
+    RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8
+  };
+  /** ランクの数。 */
+  constexpr Rank NUM_RANKS = RANK_8 + 1;
 
+  // --- サイドの定義 --- //
   /** サイドの型。 */
   using Side = std::uint32_t;
-  /** どちらのサイドでもない。 */
-  constexpr Side NO_SIDE = 0;
-  /** 白側の定数。 */
-  constexpr Side WHITE = 1;
-  /** 黒側の定数。 */
-  constexpr Side BLACK = 2;
+  /** サイドの定数。 */
+  enum {
+    NO_SIDE, WHITE, BLACK
+  };
+  /** サイドの数。 */
+  constexpr Side NUM_SIDES = BLACK + 1;
 
+  // --- 駒の定義 --- //
   /** 駒の型。 */
   using Piece = std::uint32_t;
-  /** どの駒でもない。 */
-  constexpr Piece EMPTY = 0;
-  /** ポーンの定数。 */
-  constexpr Piece PAWN = 1;
-  /** ナイトの定数。 */
-  constexpr Piece KNIGHT = 2;
-  /** ビショップの定数。 */
-  constexpr Piece BISHOP = 3;
-  /** ルークの定数。 */
-  constexpr Piece ROOK = 4;
-  /** クイーンの定数。 */
-  constexpr Piece QUEEN = 5;
-  /** キングの定数。 */
-  constexpr Piece KING = 6;
-
-  // --- 数の定義 --- //
-  /** マスの数。 */
-  constexpr Square NUM_SQUARES = 64;
-  /** ファイルの数。 */
-  constexpr Fyle NUM_FYLES = 8;
-  /** ランクの数。 */
-  constexpr Rank NUM_RANKS = 8;
-  /** サイドの数。(NO_SIDEを含む。) */
-  constexpr Side NUM_SIDES = 3;
-  /** 駒の種類の数。(EMPTYを含む。) */
-  constexpr Piece NUM_PIECE_TYPES = 7;
-  /** とても大きな数。 */
-  constexpr int MAX_VALUE = 9999999;
+  /** 駒の定数 */
+  enum {
+    EMPTY, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING
+  };
+  /** 駒の種類の数。 */
+  constexpr Piece NUM_PIECE_TYPES = KING + 1;
 
   /** キャスリングのフラグの型。 */
   using Castling = std::uint8_t;
@@ -589,6 +437,9 @@ namespace Sayuri {
   // ================ //
   // 探索エンジン関連 //
   // ================ //
+  /** とても大きな数。 */
+  constexpr int MAX_VALUE = 9999999;
+
   /** 最大探索手数。 */
   constexpr std::uint32_t MAX_PLYS = 100;
 
