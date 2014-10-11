@@ -165,16 +165,22 @@ namespace Sayuri {
       void CalValue(Square piece_square);
 
       // --- テンプレート部品 --- //
+      /** 評価関数で使うテンプレート部品。 */
       template<Side PSide>
       friend struct AddOrSub;
+      /** 評価関数で使うテンプレート部品。 */
       template<Side PSide, Piece PType>
       friend struct GenBitboards;
+      /** 評価関数で使うテンプレート部品。 */
       template<Side PSide, Piece PType>
       friend struct CalPosition;
+      /** 評価関数で使うテンプレート部品。 */
       template<Side PSide, Piece PType>
       friend struct CalMobility;
+      /** 評価関数で使うテンプレート部品。 */
       template<Side PSide, Piece PType>
       friend struct GenPinTargets;
+      /** 評価関数で使うテンプレート部品。 */
       template<Side PSide, Piece PType>
       friend struct CalSpecial;
 

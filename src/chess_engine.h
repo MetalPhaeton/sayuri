@@ -467,6 +467,27 @@ namespace Sayuri {
       /** フレンドのデバッグ用関数。 */
       friend int DebugMain(int argc, char* argv[]);
 
+      /** 評価関数はフレンド。 */
+      friend class Evaluator;
+      /** 評価関数で使うテンプレート部品。 */
+      template<Side PSide>
+      friend struct AddOrSub;
+      /** 評価関数で使うテンプレート部品。 */
+      template<Side PSide, Piece PType>
+      friend struct GenBitboards;
+      /** 評価関数で使うテンプレート部品。 */
+      template<Side PSide, Piece PType>
+      friend struct CalPosition;
+      /** 評価関数で使うテンプレート部品。 */
+      template<Side PSide, Piece PType>
+      friend struct CalMobility;
+      /** 評価関数で使うテンプレート部品。 */
+      template<Side PSide, Piece PType>
+      friend struct GenPinTargets;
+      /** 評価関数で使うテンプレート部品。 */
+      template<Side PSide, Piece PType>
+      friend struct CalSpecial;
+
       /** プライベート用コンストラクタ。 */
       ChessEngine();
 
@@ -474,10 +495,13 @@ namespace Sayuri {
       // 探索関数 //
       // ======== //
       // --- テンプレート部品 --- //
+      /** 探索関数で使うテンプレート部品。 */
       template<NodeType Type>
       friend struct DoIID;
+      /** 探索関数で使うテンプレート部品。 */
       template<NodeType Type>
       friend struct DoNMR;
+      /** 探索関数で使うテンプレート部品。 */
       template<NodeType Type>
       friend struct DoProbCut;
 

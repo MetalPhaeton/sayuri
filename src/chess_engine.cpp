@@ -801,7 +801,7 @@ namespace Sayuri {
 
     int material = 0;
     for (Piece piece_type = PAWN; piece_type <= QUEEN; ++piece_type) {
-      material += shared_st_ptr_->search_params_ptr_->material()[piece_type]
+      material += shared_st_ptr_->search_params_ptr_->material_[piece_type]
       * (Util::CountBits(position_[side][piece_type])
       - Util::CountBits(position_[enemy_side][piece_type]));
     }
