@@ -330,7 +330,6 @@ namespace Sayuri {
     // PVLineをリセット。
     pv_line_table_[level].ResetLine();
 
-    // 可読性のため、参照を定義。
     const SearchParams& params = *(shared_st_ptr_->search_params_ptr_);
 
     // 勝負に十分な駒がなければ0点。
@@ -826,8 +825,8 @@ namespace Sayuri {
     Side enemy_side = Util::SwitchOppositeSide(side);
     bool is_checked = IsAttacked(king_[side], enemy_side);
     bool found_mate = false;
-    // 可読性のため、参照を定義。
     const SearchParams& params = *(shared_st_ptr_->search_params_ptr_);
+
     for (shared_st_ptr_->i_depth_ = 1; shared_st_ptr_->i_depth_ <= MAX_PLYS;
     ++(shared_st_ptr_->i_depth_)) {
       // 探索終了。
@@ -1026,7 +1025,6 @@ namespace Sayuri {
     int num_moves = 0;
     int margin = GetMargin(job.depth_);
 
-    // 可読性のため、参照を定義。
     const SearchParams& params = *(shared_st_ptr_->search_params_ptr_);
 
     // パラメータ保存。
@@ -1248,7 +1246,7 @@ namespace Sayuri {
     Side side = to_move_;
     Side enemy_side = Util::SwitchOppositeSide(side);
     int num_moves = 0;
-    // 可読性のため、参照を定義。
+
     const SearchParams& params = *(shared_st_ptr_->search_params_ptr_);
 
     // パラメータを保存。

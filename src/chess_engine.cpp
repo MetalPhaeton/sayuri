@@ -268,29 +268,29 @@ namespace Sayuri {
 
   // PositionRecordから局面読み込む。
   void ChessEngine::LoadRecord(const PositionRecord& record) {
-    COPY_ARRAY(position_, record.position());
+    COPY_ARRAY(position_, record.position_);
 
-    COPY_ARRAY(piece_board_, record.piece_board());
+    COPY_ARRAY(piece_board_, record.piece_board_);
 
-    COPY_ARRAY(side_board_, record.side_board());
+    COPY_ARRAY(side_board_, record.side_board_);
 
-    COPY_ARRAY(side_pieces_, record.side_pieces());
+    COPY_ARRAY(side_pieces_, record.side_pieces_);
 
     // 全駒のコピー。
-    blocker_0_ = record.blocker_0();
-    blocker_45_ = record.blocker_45();
-    blocker_90_ = record.blocker_90();
-    blocker_135_ = record.blocker_135();
+    blocker_0_ = record.blocker_0_;
+    blocker_45_ = record.blocker_45_;
+    blocker_90_ = record.blocker_90_;
+    blocker_135_ = record.blocker_135_;
 
     // その他のコピー。
-    COPY_ARRAY(king_, record.king());
-    to_move_ = record.to_move();
-    castling_rights_ = record.castling_rights();
-    en_passant_square_ = record.en_passant_square();
-    ply_100_ = record.ply_100();
-    ply_ = record.ply();
-    COPY_ARRAY(has_castled_, record.has_castled());
-    COPY_ARRAY(position_memo_, record.position_memo());
+    COPY_ARRAY(king_, record.king_);
+    to_move_ = record.to_move_;
+    castling_rights_ = record.castling_rights_;
+    en_passant_square_ = record.en_passant_square_;
+    ply_100_ = record.ply_100_;
+    ply_ = record.ply_;
+    COPY_ARRAY(has_castled_, record.has_castled_);
+    COPY_ARRAY(position_memo_, record.position_memo_);
   }
 
   constexpr int MyCountBits(Bitboard bitboard) {

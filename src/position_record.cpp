@@ -87,13 +87,13 @@ namespace Sayuri {
   // ========== //
   bool PositionRecord::operator==(const ChessEngine& engine) const {
     if (pos_hash_ != engine.GetCurrentHash()) return false;
-    if (to_move_ != engine.to_move()) return false;
-    if (castling_rights_ != engine.castling_rights()) return false;
-    if (en_passant_square_ != engine.en_passant_square()) return false;
+    if (to_move_ != engine.to_move_) return false;
+    if (castling_rights_ != engine.castling_rights_) return false;
+    if (en_passant_square_ != engine.en_passant_square_) return false;
     for (Side side = WHITE; side <= BLACK; ++side) {
       for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
         if (position_[side][piece_type]
-        != engine.position()[side][piece_type]) {
+        != engine.position_[side][piece_type]) {
           return false;
         }
       }
@@ -104,13 +104,13 @@ namespace Sayuri {
 
   bool PositionRecord::operator!=(const ChessEngine& engine) const {
     if (pos_hash_ != engine.GetCurrentHash()) return true;
-    if (to_move_ != engine.to_move()) return true;
-    if (castling_rights_ != engine.castling_rights()) return true;
-    if (en_passant_square_ != engine.en_passant_square()) return true;
+    if (to_move_ != engine.to_move_) return true;
+    if (castling_rights_ != engine.castling_rights_) return true;
+    if (en_passant_square_ != engine.en_passant_square_) return true;
     for (Side side = WHITE; side <= BLACK; ++side) {
       for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
         if (position_[side][piece_type]
-        != engine.position()[side][piece_type]) {
+        != engine.position_[side][piece_type]) {
           return true;
         }
       }
@@ -186,30 +186,30 @@ namespace Sayuri {
 
   // メンバをエンジンからコピーする。
   void PositionRecord::ScanMember(const ChessEngine& engine, Hash pos_hash) {
-    COPY_ARRAY(position_, engine.position());
+    COPY_ARRAY(position_, engine.position_);
 
-    COPY_ARRAY(piece_board_, engine.piece_board());
+    COPY_ARRAY(piece_board_, engine.piece_board_);
 
-    COPY_ARRAY(side_board_, engine.side_board());
+    COPY_ARRAY(side_board_, engine.side_board_);
 
-    COPY_ARRAY(side_pieces_, engine.side_pieces());
+    COPY_ARRAY(side_pieces_, engine.side_pieces_);
 
 
     // 全駒のコピー。
-    blocker_0_ = engine.blocker_0();
-    blocker_45_ = engine.blocker_45();
-    blocker_90_ = engine.blocker_90();
-    blocker_135_ = engine.blocker_135();
+    blocker_0_ = engine.blocker_0_;
+    blocker_45_ = engine.blocker_45_;
+    blocker_90_ = engine.blocker_90_;
+    blocker_135_ = engine.blocker_135_;
 
     // その他のコピー。
-    COPY_ARRAY(king_, engine.king());
-    to_move_ = engine.to_move();
-    castling_rights_ = engine.castling_rights();
-    en_passant_square_ = engine.en_passant_square();
-    ply_100_ = engine.ply_100();
-    ply_ = engine.ply();
-    COPY_ARRAY(has_castled_, engine.has_castled());
-    COPY_ARRAY(position_memo_, engine.position_memo());
+    COPY_ARRAY(king_, engine.king_);
+    to_move_ = engine.to_move_;
+    castling_rights_ = engine.castling_rights_;
+    en_passant_square_ = engine.en_passant_square_;
+    ply_100_ = engine.ply_100_;
+    ply_ = engine.ply_;
+    COPY_ARRAY(has_castled_, engine.has_castled_);
+    COPY_ARRAY(position_memo_, engine.position_memo_);
     pos_hash_ = pos_hash;
   }
 }  // namespace Sayuri

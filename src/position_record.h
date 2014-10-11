@@ -207,6 +207,9 @@ namespace Sayuri {
       }
 
     private:
+      /** ChessEngineはフレンド。 */
+      friend class ChessEngine;
+
       // ================ //
       // プライベート関数 //
       // ================ //

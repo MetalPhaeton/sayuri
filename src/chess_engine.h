@@ -488,6 +488,9 @@ namespace Sayuri {
       template<Side PSide, Piece PType>
       friend struct CalSpecial;
 
+      /** PositionRecordはフレンド。 */
+      friend class PositionRecord;
+
       /** プライベート用コンストラクタ。 */
       ChessEngine();
 
