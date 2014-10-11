@@ -33,6 +33,7 @@
 #include <utility>
 #include <mutex>
 #include <cstddef>
+#include <cstdint>
 #include "common.h"
 
 /** Sayuri 名前空間。 */
@@ -46,11 +47,37 @@ namespace Sayuri {
   // コンストラクタ。
   TranspositionTable::TranspositionTable(std::size_t table_size) :
   null_entry_(),
-  num_entries_(Util::GetMax(table_size / sizeof(TTEntry),
-  static_cast<std::size_t>(1))),
+  num_entries_(1),
   num_used_entries_(0),
   entry_table_(nullptr),
+  index_mask_(0),
   age_(0) {
+    // エントリーをいくつ作るか決める。
+    std::uint64_t temp = table_size / sizeof(TTEntry);
+    temp = temp < 1 ? 1 : temp;
+
+    // 以下は最上位ビットだけを残し、他のビットをゼロにするアルゴリズム。
+    temp = (temp & 0xffffffff00000000ULL)
+    ? (temp & 0xffffffff00000000ULL) : temp;
+
+    temp = (temp & 0xffff0000ffff0000ULL)
+    ? (temp & 0xffff0000ffff0000ULL) : temp;
+
+    temp = (temp & 0xff00ff00ff00ff00ULL)
+    ? (temp & 0xff00ff00ff00ff00ULL) : temp;
+
+    temp = (temp & 0xf0f0f0f0f0f0f0f0ULL)
+    ? (temp & 0xf0f0f0f0f0f0f0f0ULL) : temp;
+
+    temp = (temp & 0xccccccccccccccccULL)
+    ? (temp & 0xccccccccccccccccULL) : temp;
+
+    temp = (temp & 0xaaaaaaaaaaaaaaaaULL)
+    ? (temp & 0xaaaaaaaaaaaaaaaaULL) : temp;
+
+    num_entries_ = temp;
+    index_mask_ = temp - 1;
+
     // テーブルを作成。
     entry_table_.reset(new TTEntry[num_entries_]);
   }
@@ -61,6 +88,7 @@ namespace Sayuri {
   num_entries_(table.num_entries_),
   num_used_entries_(table.num_used_entries_),
   entry_table_(new TTEntry[table.num_entries_]),
+  index_mask_(table.index_mask_),
   age_(table.age_) {}
 
   // ムーブコンストラクタ。
@@ -69,6 +97,7 @@ namespace Sayuri {
   num_entries_(table.num_entries_),
   num_used_entries_(table.num_used_entries_),
   entry_table_(std::move(table.entry_table_)),
+  index_mask_(table.index_mask_),
   age_(table.age_) {}
 
   // コピー代入演算子。
@@ -80,6 +109,7 @@ namespace Sayuri {
     for (std::size_t i = 0; i < num_entries_; ++i) {
       entry_table_[i] = table.entry_table_[i];
     }
+    index_mask_ = table.index_mask_;
     age_ = table.age_;
 
     return *this;
@@ -91,6 +121,7 @@ namespace Sayuri {
     num_entries_ = table.num_entries_;
     num_used_entries_ = table.num_used_entries_;
     entry_table_ = std::move(table.entry_table_);
+    index_mask_ = table.index_mask_;
     age_ = table.age_;
 
     return *this;
@@ -102,26 +133,32 @@ namespace Sayuri {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
 
     // テーブルのインデックスを得る。
-    std::size_t index = GetTableIndex(pos_hash);
+    std::size_t index = pos_hash & index_mask_;
 
     // 空いているエントリーへの登録なら使用済みエントリー数をカウント。
-    if (entry_table_[index].depth() <= -MAX_VALUE) {
+    if (entry_table_[index].depth_ <= TTEntry::MIN_DEPTH) {
       ++num_used_entries_;
     }
 
     // テーブルが若い時にに登録されているものなら上書き。
     // depthがすでに登録されているエントリー以上なら登録。
-    if ((entry_table_[index].table_age() < age_)
-    || (depth >= entry_table_[index].depth())) {
-      entry_table_[index] =
-      TTEntry(pos_hash, depth, score, score_type, best_move, mate_in, age_);
+    if ((entry_table_[index].table_age_ < age_)
+    || (entry_table_[index].depth_ <= depth)) {
+      entry_table_[index].pos_hash_ = pos_hash;
+      entry_table_[index].depth_ = depth;
+      entry_table_[index].score_ = score;
+      entry_table_[index].score_type_ = score_type;
+      entry_table_[index].best_move_ = best_move;
+      entry_table_[index].mate_in_ = mate_in;
+      entry_table_[index].table_age_ = age_;
     }
   }
 
   // 条件を満たすエントリーを返す。
   const TTEntry& TranspositionTable::GetEntry(Hash pos_hash, int depth) const {
     // エントリーを得る。
-    std::size_t index = GetTableIndex(pos_hash);
+    std::size_t index = pos_hash & index_mask_;
+
     if ((entry_table_[index].depth() >= depth)
     && (entry_table_[index].pos_hash() == pos_hash)) {
       return entry_table_[index];
@@ -134,6 +171,9 @@ namespace Sayuri {
   // ================== //
   // エントリーのクラス //
   // ================== //
+  // --- static定数 --- //
+  constexpr std::int16_t TTEntry::MIN_DEPTH;
+
   // ==================== //
   // コンストラクタと代入 //
   // ==================== //
@@ -146,12 +186,12 @@ namespace Sayuri {
   score_type_(score_type),
   best_move_(best_move),
   mate_in_(mate_in),
-  table_age_(table_age) {}
+  table_age_(table_age) {} 
 
   // コンストラクタ。
   TTEntry::TTEntry() :
   pos_hash_(0),
-  depth_(-MAX_VALUE),
+  depth_(MIN_DEPTH),
   score_(0),
   score_type_(ScoreType::ALPHA),
   best_move_(0),

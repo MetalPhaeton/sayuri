@@ -34,6 +34,7 @@
 #include <memory>
 #include <mutex>
 #include <cstddef>
+#include <cstdint>
 #include "common.h"
 
 /** Sayuri 名前空間。 */
@@ -42,6 +43,11 @@ namespace Sayuri {
 
   /** トランスポジションテーブルのエントリー。 */
   class TTEntry {
+    private:
+      /** 最小探索深さ。 */
+      constexpr static std::int16_t MIN_DEPTH =
+      -(static_cast<std::int16_t>(MAX_PLYS + 1));
+
     public:
       // ==================== //
       // コンストラクタと代入 //
@@ -89,7 +95,7 @@ namespace Sayuri {
       /**
        * 内容が有効かどうか。
        */
-      explicit operator bool() const {return depth_ > -MAX_VALUE;}
+      explicit operator bool() const {return depth_ > MIN_DEPTH;}
 
       // ======== //
       // アクセサ //
@@ -131,23 +137,26 @@ namespace Sayuri {
       int table_age() const {return table_age_;}
 
     private:
+      /** TranspositionTableはフレンド。 */
+      friend class TranspositionTable;
+
       // ========== //
       // メンバ変数 //
       // ========== //
       /** ポジションのハッシュ。 */
       Hash pos_hash_;
       /** 残り深さ。 */
-      int depth_;
+      std::int16_t depth_;
       /** 評価値。 */
-      int score_;
+      std::int32_t score_;
       /** 評価値の種類。 */
       ScoreType score_type_;
       /** 最善手。 */
       Move best_move_;
       /** メイトまでの手数。 */
-      int mate_in_;
+      std::int16_t mate_in_;
       /** 記録時のトランスポジションテーブルの年齢。 */
-      int table_age_;
+      std::int16_t table_age_;
   };
 
   /** トランスポジションテーブルのクラス。 */
@@ -246,18 +255,6 @@ namespace Sayuri {
       /** フレンドのデバッグ用関数。 */
       friend int DebugMain(int argc, char* argv[]);
 
-      // ================ //
-      // プライベート関数 //
-      // ================ //
-      /**
-       * テーブルのインデックスを得る。
-       * @param ポジションのハッシュ。
-       * @return テーブルのインデックス。
-       */
-      std::size_t GetTableIndex(Hash pos_hash) const {
-        return pos_hash % num_entries_;
-      }
-
       // ========== //
       // メンバ変数 //
       // ========== //
@@ -269,6 +266,8 @@ namespace Sayuri {
       std::size_t num_used_entries_;
       /** エントリーを登録するテーブル。 */
       std::unique_ptr<TTEntry[]> entry_table_;
+      /** エントリーのインデックスを得るためのマスク。 */
+      Hash index_mask_;
       /** 年齢。 */
       int age_;
       /** ミューテックス。 */
