@@ -51,7 +51,7 @@ namespace Sayuri {
   num_used_entries_(0),
   entry_table_(nullptr),
   index_mask_(0),
-  age_(0) {
+  age_(0x00010000UL) {
     // エントリーをいくつ作るか決める。
     std::uint64_t temp = table_size / sizeof(TTEntry);
     temp = temp < 1 ? 1 : temp;
@@ -136,21 +136,22 @@ namespace Sayuri {
     std::size_t index = pos_hash & index_mask_;
 
     // 空いているエントリーへの登録なら使用済みエントリー数をカウント。
-    if (entry_table_[index].depth_ <= TTEntry::MIN_DEPTH) {
+    if (entry_table_[index].depth() <= TTEntry::MIN_DEPTH) {
       ++num_used_entries_;
     }
 
     // テーブルが若い時にに登録されているものなら上書き。
     // depthがすでに登録されているエントリー以上なら登録。
-    if ((entry_table_[index].table_age_ < age_)
-    || (entry_table_[index].depth_ <= depth)) {
+    if ((entry_table_[index].age_matein_depth_ < age_)
+    || (entry_table_[index].depth() <= depth)) {
       entry_table_[index].pos_hash_ = pos_hash;
-      entry_table_[index].depth_ = depth;
+      entry_table_[index].age_matein_depth_ = (age_
+      | ((static_cast<std::uint32_t>(mate_in) << TTEntry::MATE_IN_SHIFT)
+      & TTEntry::MATE_IN_MASK)
+      | (static_cast<std::uint32_t>(depth) & TTEntry::DEPTH_MASK));
       entry_table_[index].score_ = score;
       entry_table_[index].score_type_ = score_type;
       entry_table_[index].best_move_ = best_move;
-      entry_table_[index].mate_in_ = mate_in;
-      entry_table_[index].table_age_ = age_;
     }
   }
 
@@ -160,7 +161,7 @@ namespace Sayuri {
     std::size_t index = pos_hash & index_mask_;
 
     if ((entry_table_[index].depth() >= depth)
-    && (entry_table_[index].pos_hash() == pos_hash)) {
+    && (entry_table_[index].pos_hash_ == pos_hash)) {
       return entry_table_[index];
     }
 
@@ -172,61 +173,60 @@ namespace Sayuri {
   // エントリーのクラス //
   // ================== //
   // --- static定数 --- //
-  constexpr std::int16_t TTEntry::MIN_DEPTH;
+  constexpr std::uint32_t TTEntry::DEPTH_MASK;
+  constexpr std::uint32_t TTEntry::MATE_IN_MASK;
+  constexpr std::uint32_t TTEntry::AGE_MASK;
+  constexpr int TTEntry::DEPTH_SHIFT;
+  constexpr int TTEntry::MATE_IN_SHIFT;
+  constexpr int TTEntry::AGE_SHIFT;
+  constexpr std::int8_t TTEntry::MIN_DEPTH;
 
   // ==================== //
   // コンストラクタと代入 //
   // ==================== //
   // コンストラクタ。
-  TTEntry::TTEntry(Hash pos_hash, int depth, int score, ScoreType score_type,
-  Move best_move, int mate_in, int table_age) :
+  TTEntry::TTEntry(Hash pos_hash, int depth, int score,
+  ScoreType score_type, Move best_move, int mate_in,
+  std::uint32_t table_age) :
   pos_hash_(pos_hash),
-  depth_(depth),
+  age_matein_depth_((table_age & AGE_MASK)
+  | ((static_cast<std::uint32_t>(mate_in) << MATE_IN_SHIFT) & MATE_IN_MASK)
+  | (static_cast<std::uint32_t>(depth) & DEPTH_MASK)),
   score_(score),
   score_type_(score_type),
-  best_move_(best_move),
-  mate_in_(mate_in),
-  table_age_(table_age) {} 
+  best_move_(best_move) {}
 
   // コンストラクタ。
   TTEntry::TTEntry() :
   pos_hash_(0),
-  depth_(MIN_DEPTH),
+  age_matein_depth_(static_cast<std::uint32_t>(MIN_DEPTH) & DEPTH_MASK),
   score_(0),
   score_type_(ScoreType::ALPHA),
-  best_move_(0),
-  mate_in_(-1),
-  table_age_(-1) {}
+  best_move_(0) {}
 
   // コピーコンストラクタ。
   TTEntry::TTEntry(const TTEntry& entry) :
   pos_hash_(entry.pos_hash_),
-  depth_(entry.depth_),
+  age_matein_depth_(entry.age_matein_depth_),
   score_(entry.score_),
   score_type_(entry.score_type_),
-  best_move_(entry.best_move_),
-  mate_in_(entry.mate_in_),
-  table_age_(entry.table_age_) {}
+  best_move_(entry.best_move_) {}
 
   // ムーブコンストラクタ。
   TTEntry::TTEntry(TTEntry&& entry) :
   pos_hash_(entry.pos_hash_),
-  depth_(entry.depth_),
+  age_matein_depth_(entry.age_matein_depth_),
   score_(entry.score_),
   score_type_(entry.score_type_),
-  best_move_(entry.best_move_),
-  mate_in_(entry.mate_in_),
-  table_age_(entry.table_age_) {}
+  best_move_(entry.best_move_) {}
 
   // コピー代入演算子。
   TTEntry& TTEntry::operator=(const TTEntry& entry) {
     pos_hash_ = entry.pos_hash_;
-    depth_ = entry.depth_;
+    age_matein_depth_ = entry.age_matein_depth_;
     score_ = entry.score_;
     score_type_ = entry.score_type_;
     best_move_ = entry.best_move_;
-    mate_in_ = entry.mate_in_;
-    table_age_ = entry.table_age_;
 
     return *this;
   }
@@ -234,12 +234,10 @@ namespace Sayuri {
   // ムーブ代入演算子。
   TTEntry& TTEntry::operator=(TTEntry&& entry) {
     pos_hash_ = entry.pos_hash_;
-    depth_ = entry.depth_;
+    age_matein_depth_ = entry.age_matein_depth_;
     score_ = entry.score_;
     score_type_ = entry.score_type_;
     best_move_ = entry.best_move_;
-    mate_in_ = entry.mate_in_;
-    table_age_ = entry.table_age_;
 
     return *this;
   }
