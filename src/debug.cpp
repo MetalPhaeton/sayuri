@@ -80,6 +80,7 @@ namespace Sayuri {
     Init();
 
     // エンジン準備。
+    /*
     std::unique_ptr<SearchParams>
     search_params_ptr(new SearchParams());
 
@@ -91,9 +92,15 @@ namespace Sayuri {
 
     std::unique_ptr<UCIShell>
     shell_ptr(new UCIShell(*engine_ptr));
+    */
     // ========================================================================
 
-    DoRepeatTest(*shell_ptr);
+    std::unique_ptr<TranspositionTable>
+    table_ptr(new TranspositionTable(256ULL * 1024ULL * 1024ULL));
+    std::cout << "TTEntry size: " << sizeof(TTEntry) << " bytes." << std::endl;
+    std::cout << "Table size: " << table_ptr->num_entries_ << std::endl;
+    std::cout << "Real size: " << table_ptr->num_entries_ * sizeof(TTEntry)
+    << std::endl;
 
     return 0;
   }

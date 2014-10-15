@@ -94,6 +94,14 @@ namespace Sayuri {
    * @param src コピー元。
    */
 #define COPY_ARRAY(dst, src) (std::memcpy((dst), (src), sizeof(dst)))
+  /**
+   * maskで指定のビットフィールドを更新する。
+   * @param origin_data 更新したいデータ。
+   * @param new_data 新しいデータ。
+   * @param mask 更新したい場所。
+   */
+#define UPDATE_FIELD(origin_data, new_data, mask) \
+((origin_data) ^= ((mask) & ((origin_data) ^ (new_data))))
 
   // ========== //
   // 基本の定数 //
@@ -304,7 +312,7 @@ namespace Sayuri {
    * @param from 動かす駒の位置。
    */
   inline void SetFrom(Move& move, Square from) {
-    move = (move & ~FROM_MASK) | ((from & SQUARE_MASK) << FROM_SHIFT);
+    UPDATE_FIELD(move, from << FROM_SHIFT, FROM_MASK);
   }
 
   /**
@@ -313,7 +321,7 @@ namespace Sayuri {
    * @param to 移動先の位置。
    */
   inline void SetTo(Move& move, Square to) {
-    move = (move & ~TO_MASK) | ((to & SQUARE_MASK) << TO_SHIFT);
+    UPDATE_FIELD(move, to << TO_SHIFT, TO_MASK);
   }
 
   /**
@@ -322,8 +330,7 @@ namespace Sayuri {
    * @param promotion 昇格する駒の種類。
    */
   inline void SetPromotion(Move& move, Piece promotion) {
-    move = (move & ~PROMOTION_MASK)
-    | ((promotion & PIECE_MASK) << PROMOTION_SHIFT);
+    UPDATE_FIELD(move, promotion << PROMOTION_SHIFT, PROMOTION_MASK);
   }
 
   /**
@@ -332,8 +339,7 @@ namespace Sayuri {
    * @param move_type 手の種類。
    */
   inline void SetMoveType(Move& move, MoveType move_type) {
-    move = (move & ~MOVE_TYPE_MASK)
-    | ((move_type & MTYPE_MASK) << MOVE_TYPE_SHIFT);
+    UPDATE_FIELD(move, move_type << MOVE_TYPE_SHIFT, MOVE_TYPE_MASK);
   }
 
   /**
@@ -342,8 +348,8 @@ namespace Sayuri {
    * @param captured_piece 取った駒の種類。
    */
   inline void SetCapturedPiece(Move& move, Piece captured_piece) {
-    move = (move & ~CAPTURED_PIECE_MASK)
-    | ((captured_piece & PIECE_MASK) << CAPTURED_PIECE_SHIFT);
+    UPDATE_FIELD(move, captured_piece << CAPTURED_PIECE_SHIFT,
+    CAPTURED_PIECE_MASK);
   }
 
   /**
@@ -352,8 +358,8 @@ namespace Sayuri {
    * @param castling_rights キャスリングの権利。
    */
   inline void SetCastlingRights(Move& move, Castling castling_rights) {
-    move = (move & ~CASTLING_RIGHTS_MASK)
-    | ((castling_rights & CASTLING_MASK) << CASTLING_RIGHTS_SHIFT);
+    UPDATE_FIELD(move, castling_rights << CASTLING_RIGHTS_SHIFT,
+    CASTLING_RIGHTS_MASK);
   }
 
   /**
@@ -362,8 +368,8 @@ namespace Sayuri {
    * @param en_passant_square アンパッサンの位置。
    */
   inline void SetEnPassantSquare(Move& move, Square en_passant_square) {
-    move = (move & ~EN_PASSANT_SQUARE_MASK)
-    | ((en_passant_square & SQUARE_MASK) << EN_PASSANT_SQUARE_SHIFT);
+    UPDATE_FIELD(move, en_passant_square << EN_PASSANT_SQUARE_SHIFT,
+    EN_PASSANT_SQUARE_MASK);
   }
 
   /**
