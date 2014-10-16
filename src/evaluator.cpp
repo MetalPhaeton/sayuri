@@ -576,8 +576,7 @@ namespace Sayuri {
 
     // ウェイトを付けて評価値を得る。
     double score = 0.0;
-    constexpr double NUM_KINGS = 2.0;
-    double num_pieces = Util::CountBits(engine_ptr_->blocker_0_) - NUM_KINGS;
+    unsigned int num_pieces = Util::CountBits(engine_ptr_->blocker_0_);
     const EvalParams& params = engine_ptr_->eval_params();
 
     // 配列型のウェイトの評価。
@@ -585,43 +584,43 @@ namespace Sayuri {
       score +=
 
       // オープニング時の駒の配置。
-      (params.weight_opening_position_[piece_type](num_pieces)
+      (params.weight_opening_position_[piece_type][num_pieces]
       * value_table_[OPENING_POSITION][piece_type])
 
       // エンディング時の駒の配置。
-      + (params.weight_ending_position_[piece_type](num_pieces)
+      + (params.weight_ending_position_[piece_type][num_pieces]
       * value_table_[ENDING_POSITION][piece_type])
 
       // 機動力。
-      + (params.weight_mobility_[piece_type](num_pieces)
+      + (params.weight_mobility_[piece_type][num_pieces]
       * value_table_[MOBILITY][piece_type])
 
       // センターコントロール。
-      + (params.weight_center_control_[piece_type](num_pieces)
+      + (params.weight_center_control_[piece_type][num_pieces]
       * value_table_[CENTER_CONTROL][piece_type])
 
       // スウィートセンターのコントロール。
-      + (params.weight_sweet_center_control_[piece_type](num_pieces)
+      + (params.weight_sweet_center_control_[piece_type][num_pieces]
       * value_table_[SWEET_CENTER_CONTROL][piece_type])
 
       // 駒の展開。
-      + (params.weight_development_[piece_type](num_pieces)
+      + (params.weight_development_[piece_type][num_pieces]
       * value_table_[DEVELOPMENT][piece_type])
 
       // 攻撃。
-      + (params.weight_attack_[piece_type](num_pieces)
+      + (params.weight_attack_[piece_type][num_pieces]
       * value_table_[ATTACK][piece_type])
 
       // 防御。
-      + (params.weight_defense_[piece_type](num_pieces)
+      + (params.weight_defense_[piece_type][num_pieces]
       * value_table_[DEFENSE][piece_type])
 
       // ピン。
-      + (params.weight_pin_[piece_type](num_pieces)
+      + (params.weight_pin_[piece_type][num_pieces]
       * value_table_[PIN][piece_type])
 
       // 相手キング周辺への攻撃。
-      + (params.weight_attack_around_king_[piece_type](num_pieces)
+      + (params.weight_attack_around_king_[piece_type][num_pieces]
       * value_table_[ATTACK_AROUND_KING][piece_type]);
     }
 
@@ -629,50 +628,50 @@ namespace Sayuri {
     score +=
 
     // パスポーン。
-    + (params.weight_pass_pawn_(num_pieces) * value_table_[PASS_PAWN][0])
+    + (params.weight_pass_pawn_[num_pieces] * value_table_[PASS_PAWN][0])
 
     // 守られたパスポーン。
-    + (params.weight_protected_pass_pawn_(num_pieces)
+    + (params.weight_protected_pass_pawn_[num_pieces]
     * value_table_[PROTECTED_PASS_PAWN][0])
 
     // ダブルポーン。
-    + (params.weight_double_pawn_(num_pieces) * value_table_[DOUBLE_PAWN][0])
+    + (params.weight_double_pawn_[num_pieces] * value_table_[DOUBLE_PAWN][0])
 
     // 孤立ポーン。
-    + (params.weight_iso_pawn_(num_pieces) * value_table_[ISO_PAWN][0])
+    + (params.weight_iso_pawn_[num_pieces] * value_table_[ISO_PAWN][0])
 
     // ポーンの盾。
-    + (params.weight_pawn_shield_(num_pieces) * value_table_[PAWN_SHIELD][0])
+    + (params.weight_pawn_shield_[num_pieces] * value_table_[PAWN_SHIELD][0])
 
     // ビショップペア。
-    + (params.weight_bishop_pair_(num_pieces) * value_table_[BISHOP_PAIR][0])
+    + (params.weight_bishop_pair_[num_pieces] * value_table_[BISHOP_PAIR][0])
 
     // バッドビショップ。
-    + (params.weight_bad_bishop_(num_pieces) * value_table_[BAD_BISHOP][0])
+    + (params.weight_bad_bishop_[num_pieces] * value_table_[BAD_BISHOP][0])
 
     // ルークペア。
-    + (params.weight_rook_pair_(num_pieces) * value_table_[ROOK_PAIR][0])
+    + (params.weight_rook_pair_[num_pieces] * value_table_[ROOK_PAIR][0])
 
     // セミオープンファイルのルーク。
-    + (params.weight_rook_semiopen_fyle_(num_pieces)
+    + (params.weight_rook_semiopen_fyle_[num_pieces]
     * value_table_[ROOK_SEMIOPEN_FYLE][0])
 
     // オープンファイルのルーク。
-    + (params.weight_rook_open_fyle_(num_pieces)
+    + (params.weight_rook_open_fyle_[num_pieces]
     * value_table_[ROOK_OPEN_FYLE][0])
 
     // 早すぎるクイーンの始動。
-    + (params.weight_early_queen_launched_(num_pieces)
+    + (params.weight_early_queen_launched_[num_pieces]
     * value_table_[EARLY_QUEEN_LAUNCHED][0])
 
     // キング周りの弱いマス。
-    + (params.weight_weak_square_(num_pieces) * value_table_[WEAK_SQUARE][0])
+    + (params.weight_weak_square_[num_pieces] * value_table_[WEAK_SQUARE][0])
 
     // キャスリング。
-    + (params.weight_castling_(num_pieces) * value_table_[CASTLING][0])
+    + (params.weight_castling_[num_pieces] * value_table_[CASTLING][0])
 
     // キャスリングの放棄。
-    + (params.weight_abandoned_castling_(num_pieces)
+    + (params.weight_abandoned_castling_[num_pieces]
     * value_table_[ABANDONED_CASTLING][0]);
 
     return side == WHITE ? static_cast<int>(material + score)

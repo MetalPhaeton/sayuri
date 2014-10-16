@@ -788,18 +788,18 @@ namespace Sayuri {
        */
       Weight(const Weight& weight) :
       opening_weight_(weight.opening_weight_),
-      ending_weight_(weight.ending_weight_),
-      slope_(weight.slope_),
-      y_intercept_(weight.y_intercept_) {}
+      ending_weight_(weight.ending_weight_) {
+        COPY_ARRAY(table_, weight.table_);
+      }
       /**
        * ムーブコンストラクタ。
        * @param weight ムーブ元。
        */
       Weight(Weight&& weight) :
       opening_weight_(weight.opening_weight_),
-      ending_weight_(weight.ending_weight_),
-      slope_(weight.slope_),
-      y_intercept_(weight.y_intercept_) {}
+      ending_weight_(weight.ending_weight_) {
+        COPY_ARRAY(table_, weight.table_);
+      }
       /**
        * コピー代入演算子。
        * @param weight コピー元。
@@ -807,8 +807,7 @@ namespace Sayuri {
       Weight& operator=(const Weight& weight) {
         opening_weight_ = weight.opening_weight_;
         ending_weight_ = weight.ending_weight_;
-        slope_ = weight.slope_;
-        y_intercept_ = weight.y_intercept_;
+        COPY_ARRAY(table_, weight.table_);
         return *this;
       }
       /**
@@ -818,8 +817,7 @@ namespace Sayuri {
       Weight& operator=(Weight&& weight) {
         opening_weight_ = weight.opening_weight_;
         ending_weight_ = weight.ending_weight_;
-        slope_ = weight.slope_;
-        y_intercept_ = weight.y_intercept_;
+        COPY_ARRAY(table_, weight.table_);
         return *this;
       }
       /** デストラクタ。 */
@@ -833,8 +831,8 @@ namespace Sayuri {
        * @param num_pieces キング以外の駒の数。
        * @return ウェイト。
        */
-      double operator()(double num_pieces) const {
-        return (slope_ * num_pieces) + y_intercept_;
+      double operator[](unsigned int num_pieces) const {
+        return table_[num_pieces];
       }
 
       // ======== //
@@ -874,18 +872,19 @@ namespace Sayuri {
     private:
       /** 一次関数のパラメータをセットする。 */
       void SetLinearParams() {
-        slope_ = (opening_weight_ - ending_weight_) / 30.0;
-        y_intercept_ = ending_weight_;
+        double slope = (opening_weight_ - ending_weight_) / 30.0;
+
+        for (unsigned int i = 0; i < (NUM_SQUARES + 1); ++i) {
+          table_[i] = slope * (i - 2) + ending_weight_;
+        }
       }
 
       /** オープニング時のウェイト。 */
       double opening_weight_;
       /** エンディング時のウェイト。 */
       double ending_weight_;
-      /** 一次関数の傾き。 */
-      double slope_;
-      /** 一次関数のy軸上の切片。 */
-      double y_intercept_;
+      /** ウェイト配列。 インデックスは「キングを含めた」駒の数(0..32)。 */
+      double table_[NUM_SQUARES + 1];
   };
 
   /** 評価関数用パラメータのクラス。 */

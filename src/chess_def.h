@@ -32,6 +32,7 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <cstring>
 #include <chrono>
 
 /** Sayuri 名前空間。 */
