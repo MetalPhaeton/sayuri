@@ -558,9 +558,7 @@ namespace Sayuri {
     // depthコマンド。
     if (args.find("depth") != args.end()) {
       try {
-        max_depth =
-        Util::GetMin(static_cast<std::uint32_t>(std::stoul(args["depth"][1])),
-        MAX_PLYS);
+        max_depth = Util::GetMin(std::stoul(args["depth"][1]), MAX_PLYS);
       } catch (...) {
         // 無視。
       }
@@ -569,9 +567,7 @@ namespace Sayuri {
     // nodesコマンド。
     if (args.find("nodes") != args.end()) {
       try {
-        max_nodes =
-        Util::GetMin(static_cast<std::uint64_t>(std::stoull(args["nodes"][1])),
-        MAX_NODES);
+        max_nodes = Util::GetMin(std::stoull(args["nodes"][1]), MAX_NODES);
       } catch (...) {
         // 無視。
       }
@@ -581,8 +577,7 @@ namespace Sayuri {
     if (args.find("mate") != args.end()) {
       try {
         max_depth =
-        Util::GetMin(static_cast<std::uint32_t>((std::stoul(args["mate"][1])
-        * 2) - 1), MAX_PLYS);
+        Util::GetMin(((std::stoul(args["mate"][1]) * 2) - 1), MAX_PLYS);
       } catch (...) {
         // 無視。
       }
