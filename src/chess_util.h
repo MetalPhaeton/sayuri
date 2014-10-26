@@ -647,8 +647,9 @@ namespace Sayuri {
        * @param val_2 値2。
        * @return val_1とval_2の大きい方。
        */
-      template<typename T>
-      constexpr static T GetMax(T val_1, T val_2) {
+      template<typename T, typename S>
+      constexpr static auto GetMax(T val_1, S val_2)
+      -> decltype(val_1 + val_2) {
         return val_1 > val_2 ? val_1 : val_2;
       }
 
@@ -658,8 +659,9 @@ namespace Sayuri {
        * @param val_2 値2。
        * @return val_1とval_2の小さい方。
        */
-      template<typename T>
-      constexpr static T GetMin(T val_1, T val_2) {
+      template<typename T, typename S>
+      constexpr static auto GetMin(T val_1, S val_2)
+      -> decltype(val_1 + val_2) {
         return val_1 < val_2 ? val_1 : val_2;
       }
 
@@ -668,8 +670,8 @@ namespace Sayuri {
        * @param dst 更新したい変数。
        * @param value 更新元の数値。
        */
-      template<typename T>
-      static void UpdateMax(T& dst, T value) {
+      template<typename T, typename S>
+      static void UpdateMax(T& dst, S value) {
         if (value > dst) dst = value;
       }
 
@@ -678,8 +680,8 @@ namespace Sayuri {
        * @param dst 更新したい変数。
        * @param value 更新元の数値。
        */
-      template<typename T>
-      static void UpdateMin(T& dst, T value) {
+      template<typename T, typename S>
+      static void UpdateMin(T& dst, S value) {
         if (value < dst) dst = value;
       }
 

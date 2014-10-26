@@ -409,8 +409,8 @@ namespace Sayuri {
       // トランスポジションテーブルのサイズ変更。
       try {
         table_size_ =
-        Util::GetMax(static_cast<std::size_t>(std::stoull(args["value"][1])
-        * 1024ULL * 1024ULL), UCI_MIN_TABLE_SIZE);
+        Util::GetMax(std::stoull(args["value"][1]) * 1024ULL * 1024ULL,
+        UCI_MIN_TABLE_SIZE);
 
         Util::UpdateMin(table_size_, UCI_MAX_TABLE_SIZE);
 

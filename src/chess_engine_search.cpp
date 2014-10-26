@@ -524,8 +524,8 @@ namespace Sayuri {
 
     int history_pruning_limit_depth = params.history_pruning_limit_depth_;
 
-    int history_pruning_move_threshold = Util::GetMax(static_cast<int>
-    (num_all_moves * params.history_pruning_move_threshold_),
+    int history_pruning_move_threshold =
+    Util::GetMax(num_all_moves * params.history_pruning_move_threshold_,
     params.history_pruning_after_moves_);
 
     std::uint64_t history_pruning_threshold = shared_st_ptr_->history_max_
@@ -538,8 +538,8 @@ namespace Sayuri {
 
     int lmr_limit_depth = params.lmr_limit_depth_;
 
-    int lmr_threshold = Util::GetMax(static_cast<int>
-    (num_all_moves * params.lmr_threshold_), params.lmr_after_moves_);
+    int lmr_threshold = Util::GetMax(num_all_moves * params.lmr_threshold_,
+    params.lmr_after_moves_);
 
     int lmr_search_reduction = params.lmr_search_reduction_;
 
@@ -1037,8 +1037,8 @@ namespace Sayuri {
 
     int history_pruning_limit_depth = params.history_pruning_limit_depth_;
 
-    int history_pruning_move_threshold = Util::GetMax(static_cast<int>
-    (job.num_all_moves_ * params.history_pruning_move_threshold_),
+    int history_pruning_move_threshold =
+    Util::GetMax(job.num_all_moves_ * params.history_pruning_move_threshold_,
     params.history_pruning_after_moves_);
 
     std::uint64_t history_pruning_threshold =
@@ -1051,8 +1051,8 @@ namespace Sayuri {
 
     int lmr_limit_depth = params.lmr_limit_depth_;
 
-    int lmr_threshold = Util::GetMax
-    (static_cast<int>(job.num_all_moves_ * params.lmr_threshold_),
+    int lmr_threshold =
+    Util::GetMax(job.num_all_moves_ * params.lmr_threshold_,
     params.lmr_after_moves_);
 
     int lmr_search_reduction = params.lmr_search_reduction_;
@@ -1259,8 +1259,9 @@ namespace Sayuri {
 
     int lmr_limit_depth = params.lmr_limit_depth_;
 
-    int lmr_threshold = Util::GetMax(static_cast<int>
-    (job.num_all_moves_ * params.lmr_threshold_), params.lmr_after_moves_);
+    int lmr_threshold =
+    Util::GetMax(job.num_all_moves_ * params.lmr_threshold_,
+    params.lmr_after_moves_);
 
     int lmr_search_reduction = params.lmr_search_reduction_;
 
