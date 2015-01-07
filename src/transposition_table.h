@@ -112,8 +112,7 @@ namespace Sayuri {
        * 内容が有効かどうか。
        */
       explicit operator bool() const {
-        return static_cast<std::int8_t>(age_matein_depth_ & DEPTH_MASK)
-        > MIN_DEPTH;
+        return age_matein_depth_ != 0;
       }
 
       // ======== //
