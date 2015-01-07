@@ -136,7 +136,7 @@ namespace Sayuri {
     std::size_t index = pos_hash & index_mask_;
 
     // 空いているエントリーへの登録なら使用済みエントリー数をカウント。
-    if (entry_table_[index].depth() <= TTEntry::MIN_DEPTH) {
+    if (entry_table_[index].depth() == 0) {
       ++num_used_entries_;
     }
 
