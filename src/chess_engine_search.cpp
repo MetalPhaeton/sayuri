@@ -53,7 +53,7 @@
 /** Sayuri 名前空間。 */
 namespace Sayuri {
   // クイース探索。
-  int ChessEngine::Quiesce(int depth, std::uint32_t level, int alpha, int beta,
+  int ChessEngine::Quiesce(std::uint32_t level, int alpha, int beta,
   int material, TranspositionTable& table) {
     // 探索中止の時。
     if (ShouldBeStopped()) return alpha;
@@ -99,7 +99,7 @@ namespace Sayuri {
     }
 
     // 探索する。
-    int margin = GetMargin(depth);
+    int margin = GetMargin(0);
 
     // --- Futility Pruning --- //
     bool enable_futility_pruning =
@@ -126,7 +126,7 @@ namespace Sayuri {
       }
 
       // 次の手を探索。
-      int score = -Quiesce(depth - 1, level + 1, -beta, -alpha,
+      int score = -Quiesce(level + 1, -beta, -alpha,
       -next_my_material, table);
 
       UnmakeMove(move);
@@ -453,7 +453,7 @@ namespace Sayuri {
       if (params.enable_quiesce_search_) {
         // クイース探索ノードに移行するため、ノード数を減らしておく。
         --(shared_st_ptr_->searched_nodes_);
-        return Quiesce(depth, level, alpha, beta, material, table);
+        return Quiesce(level, alpha, beta, material, table);
       } else {
         return evaluator_.Evaluate(material);
       }
@@ -469,6 +469,17 @@ namespace Sayuri {
     // テンプレート部品。
     DoNMR<Type>::F(*this, is_checked, pos_hash, depth, level, beta, material,
     table, null_reduction);
+
+    // NMRで深さが変更されている可能性があるので、その場合はクイース。
+    if (null_reduction && (depth <= 0)) {
+      if (params.enable_quiesce_search_) {
+        // クイース探索ノードに移行するため、ノード数を減らしておく。
+        --(shared_st_ptr_->searched_nodes_);
+        return Quiesce(level, alpha, beta, material, table);
+      } else {
+        return evaluator_.Evaluate(material);
+      }
+    }
 
     // 手を作る。
     maker_table_[level].GenMoves<GenMoveType::ALL>(prev_best,

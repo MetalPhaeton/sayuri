@@ -142,8 +142,8 @@ namespace Sayuri {
 
     // テーブルが若い時にに登録されているものなら上書き。
     // depthがすでに登録されているエントリー以上なら登録。
-    if ((entry_table_[index].age_matein_depth_ < age_)
-    || (entry_table_[index].depth() <= depth)) {
+    if ((entry_table_[index].age_matein_depth_ & TTEntry::AGE_DEPTH_MASK)
+    <= (age_ | depth)) {
       entry_table_[index].pos_hash_ = pos_hash;
       entry_table_[index].age_matein_depth_ = (age_
       | ((static_cast<std::uint32_t>(mate_in) << TTEntry::MATE_IN_SHIFT)

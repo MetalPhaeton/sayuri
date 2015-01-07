@@ -50,6 +50,8 @@ namespace Sayuri {
       constexpr static std::uint32_t MATE_IN_MASK = 0x0000ff00UL;
       /** テーブルの年齢のマスク。 **/
       constexpr static std::uint32_t AGE_MASK = 0xffff0000UL;
+      /** テーブルの年齢と残り探索深さのマスク。 **/
+      constexpr static std::uint32_t AGE_DEPTH_MASK = DEPTH_MASK | AGE_MASK;
 
       /** 残り探索深さシフト。 */
       constexpr static int DEPTH_SHIFT = 0;

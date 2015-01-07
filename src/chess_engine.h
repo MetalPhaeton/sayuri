@@ -510,7 +510,6 @@ namespace Sayuri {
 
       /**
        * クイース探索。
-       * @param depth 現在の深さ。
        * @param level 現在のレベル。
        * @param alpha アルファ値。
        * @param beta ベータ値。
@@ -518,7 +517,7 @@ namespace Sayuri {
        * @param table トランスポジションテーブル。
        * @return 評価値。
        */
-      int Quiesce(int depth, std::uint32_t level, int alpha, int beta,
+      int Quiesce(std::uint32_t level, int alpha, int beta,
       int material, TranspositionTable& table);
 
       /**
