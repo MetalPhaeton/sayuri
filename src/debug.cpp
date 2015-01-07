@@ -99,8 +99,7 @@ namespace Sayuri {
     table_ptr(new TranspositionTable(256ULL * 1024ULL * 1024ULL));
     std::cout << "TTEntry size: " << sizeof(TTEntry) << " bytes." << std::endl;
     std::cout << "Table size: " << table_ptr->num_entries_ << std::endl;
-    std::cout << "Real size: " << table_ptr->num_entries_ * sizeof(TTEntry)
-    << std::endl;
+    std::cout << "Real size: " << table_ptr->GetSizeBytes() << std::endl;
 
     return 0;
   }
