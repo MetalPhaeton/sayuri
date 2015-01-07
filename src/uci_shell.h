@@ -204,6 +204,20 @@ namespace Sayuri {
       void PrintOtherInfo(Chrono::milliseconds time,
       std::uint64_t num_nodes, int hashfull);
 
+      // ======== //
+      // アクセサ //
+      // ======== //
+      /**
+       * アクセサ - 登録されているエンジン。
+       * @return 登録されているエンジン。
+       */
+      const ChessEngine& engine() const {return *engine_ptr_;}
+      /**
+       * アクセサ - トランスポジションテーブル。
+       * @return トランスポジションテーブル。
+       */
+      const TranspositionTable& table() const {return *table_ptr_;}
+
     private:
       // ================ //
       // プライベート関数 //

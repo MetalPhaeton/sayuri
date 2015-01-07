@@ -176,6 +176,7 @@ namespace Sayuri {
   constexpr std::uint32_t TTEntry::DEPTH_MASK;
   constexpr std::uint32_t TTEntry::MATE_IN_MASK;
   constexpr std::uint32_t TTEntry::AGE_MASK;
+  constexpr std::uint32_t TTEntry::AGE_DEPTH_MASK;
   constexpr int TTEntry::DEPTH_SHIFT;
   constexpr int TTEntry::MATE_IN_SHIFT;
   constexpr int TTEntry::AGE_SHIFT;
@@ -199,7 +200,7 @@ namespace Sayuri {
   // コンストラクタ。
   TTEntry::TTEntry() :
   pos_hash_(0),
-  age_matein_depth_(static_cast<std::uint32_t>(MIN_DEPTH) & DEPTH_MASK),
+  age_matein_depth_(0),
   score_(0),
   score_type_(ScoreType::ALPHA),
   best_move_(0) {}
