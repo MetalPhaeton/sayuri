@@ -34,6 +34,7 @@
 #include <cstdint>
 #include <memory>
 #include <utility>
+#include <string>
 #include "common.h"
 #include "params.h"
 #include "chess_engine.h"
@@ -51,6 +52,33 @@ namespace Sayuri {
 
   /** Sayulisp用エンジンセット。 */
   class EngineSuite {
+    private:
+      // 定数配列。
+      /** 各マスのシンボルのテーブル。 */
+      static const std::string square_symbol_table_[NUM_SQUARES];
+
+      /** 各ファイルのシンボルテーブル。 */
+      static const std::string fyle_symbol_table_[NUM_FYLES];
+
+      /** 各ランクのシンボルテーブル。 */
+      static const std::string rank_symbol_table_[NUM_RANKS];
+
+      /** 各サイドのシンボルテーブル。 */
+      static const std::string side_symbol_table_[NUM_SIDES];
+
+      /** 各駒のシンボルテーブル。 */
+      static const std::string piece_symbol_table_[NUM_PIECE_TYPES];
+
+      /**
+       * 各キャスリングのシンボルテーブル。
+       * - NO_CASTLING : 0
+       * - WHITE_SHORT_CASTLING : 1
+       * - WHITE_LONG_CASTLING : 2
+       * - BLACK_SHORT_CASTLING : 3
+       * - BLACK_LONG_CASTLING : 4
+       */
+      static const std::string castling_symbol_table_[5];
+
     public:
       // ==================== //
       // コンストラクタと代入 //
@@ -79,6 +107,84 @@ namespace Sayuri {
       EngineSuite& operator=(EngineSuite&& suite);
       /** デストラクタ。 */
       virtual ~EngineSuite() {}
+
+      // ============== //
+      // パブリック関数 //
+      // ============== //
+      /**
+       * 関数オブジェクト。
+       * @param self 自分自身。
+       * @param caller 呼び出し元の関数オブジェクト。
+       * @param list 呼び出しに使用されたリスト。
+       * @return 戻り値オブジェクト。
+       */
+      LispObjectPtr operator()
+      (LispObjectPtr self, const LispObject& caller, const LispObject& list);
+
+      /**
+       * 間違ったマスの指定のエラーを作成する。
+       * @param func_name 関数名。
+       * @param square 間違ったマス。
+       * @return エラーオブジェクト。
+       */
+      static LispObjectPtr GenWrongSquareError
+      (const std::string& func_name, Square square) {
+        return LispObject::GenError("@not-square", "The value '"
+        + std::to_string(square) + "' given to (" + func_name
+        + ") does not exist on chess board.");
+      }
+
+      /**
+       * 間違ったファイルの指定のエラーを作成する。
+       * @param func_name 関数名。
+       * @param fyle 間違ったファイル。
+       * @return エラーオブジェクト。
+       */
+      static LispObjectPtr GenWrongFyleError
+      (const std::string& func_name, Fyle fyle) {
+        return LispObject::GenError("@not-fyle", "The value '"
+        + std::to_string(fyle) + "' given to (" + func_name
+        + ") does not exist on chess board.");
+      }
+
+      /**
+       * 間違ったランクの指定のエラーを作成する。
+       * @param func_name 関数名。
+       * @param rank 間違ったファイル。
+       * @return エラーオブジェクト。
+       */
+      static LispObjectPtr GenWrongRankError
+      (const std::string& func_name, Rank rank) {
+        return LispObject::GenError("@not-rank", "The value '"
+        + std::to_string(rank) + "' given to (" + func_name
+        + ") does not exist on chess board.");
+      }
+
+      /**
+       * 間違ったサイドの指定のエラーを作成する。
+       * @param func_name 関数名。
+       * @param side 間違ったサイド。
+       * @return エラーオブジェクト。
+       */
+      static LispObjectPtr GenWrongSideError
+      (const std::string& func_name, Side side) {
+        return LispObject::GenError("@not-side", "The value '"
+        + std::to_string(side) + "' given to (" + func_name
+        + ") is not side.");
+      }
+
+      /**
+       * 間違ったキャスリングの指定のエラーを作成する。
+       * @param func_name 関数名。
+       * @param castling 間違ったサイド。
+       * @return エラーオブジェクト。
+       */
+      static LispObjectPtr GenWrongCastlingError
+      (const std::string& func_name, int castling) {
+        return LispObject::GenError("@not-castling", "The value '"
+        + std::to_string(castling) + "' given to (" + func_name
+        + ") does not indicate any castlings.");
+      }
 
       // ======== //
       // アクセサ //
@@ -110,6 +216,126 @@ namespace Sayuri {
       const UCIShell& shell() const {return *shell_ptr_;}
 
     private:
+      // ==================================== //
+      // Lispオブジェクトを作成するメンバ関数 //
+      // ==================================== //
+      // --- エンジンの状態にアクセス --- //
+      /**
+       * 白ポーンの配置を得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetWhitePawn() const;
+      /**
+       * 白ナイトの配置を得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetWhiteKnight() const;
+      /**
+       * 白ビショップの配置を得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetWhiteBishop() const;
+      /**
+       * 白ルークの配置を得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetWhiteRook() const;
+      /**
+       * 白クイーンの配置を得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetWhiteQueen() const;
+      /**
+       * 白キングの配置を得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetWhiteKing() const;
+      /**
+       * 黒ポーンの配置を得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetBlackPawn() const;
+      /**
+       * 黒ナイトの配置を得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetBlackKnight() const;
+      /**
+       * 黒ビショップの配置を得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetBlackBishop() const;
+      /**
+       * 黒ルークの配置を得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetBlackRook() const;
+      /**
+       * 黒クイーンの配置を得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetBlackQueen() const;
+      /**
+       * 黒キングの配置を得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetBlackKing() const;
+      /**
+       * 空のマスの配置を得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetEmptySquare() const;
+
+      /**
+       * その位置の駒を得る。
+       * @param func_name 関数名。
+       * @param square マスを表す定数。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetPiece(const std::string& func_name,
+      const LispObject& square) const;
+
+      /**
+       * 手番を得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetToMove() const;
+
+      /**
+       * キャスリングの権利を得る。
+       */
+      LispObjectPtr GetCastlingRights() const;
+
+      /**
+       * アンパッサンのマスを得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetEnPassantSquare() const;
+
+      /**
+       * 手数を得る。
+       */
+      LispObjectPtr GetPly() const;
+
+      /**
+       * 50手ルールの手数を得る。
+       */
+      LispObjectPtr GetPly100() const;
+
+      /**
+       * 白がキャスリングしたかどうかのフラグを得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetWhiteHasCastled() const;
+      /**
+       * 黒がキャスリングしたかどうかのフラグを得る。
+       * @return 戻り値のオブジェクト。
+       */
+      LispObjectPtr GetBlackHasCastled() const;
+
+      // ========== //
+      // メンバ変数 //
+      // ========== //
       /** 探索関数用パラメータのポインタ。 */
       std::unique_ptr<SearchParams> search_params_ptr_;
       /** 評価関数用パラメータのポインタ。 */
