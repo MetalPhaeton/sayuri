@@ -1281,6 +1281,6 @@ namespace Sayuri {
       /** 現在文字列中かどうか。 */
       bool in_string_;
   };
-}
+}  // namespace Sayuri
 
 #endif

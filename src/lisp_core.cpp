@@ -5258,4 +5258,4 @@ __Example__
 
   // デストラクタ。
   LispIterator::~LispIterator() {}
-}
+}  // namespace Sayuri
