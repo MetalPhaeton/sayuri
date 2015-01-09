@@ -237,6 +237,12 @@ namespace Sayuri {
       Move best_move, int mate_in);
 
       /**
+       * テーブルにエントリーを追加。
+       * @param entry 登録するエントリー。
+       */
+      void Add(const TTEntry& entry);
+
+      /**
        * 条件を満たすエントリーを得る。
        * @param pos_hash 条件のハッシュ。
        * @param depth 条件の残り深さ。
@@ -246,6 +252,54 @@ namespace Sayuri {
 
       /** 年を取る。 */
       void GrowOld() {age_ += 0x00010000UL;}
+
+      /**
+       * テーブル内容をクリアする。
+       */
+      void Clear() {
+        age_ = 0x00010000UL;
+        num_used_entries_ = 0;
+        entry_table_.reset(new TTEntry[num_entries_]);
+      }
+
+      /**
+       * テーブルのサイズを変更する。 内容は初期化される。
+       * @param table_size 新しいサイズ。
+       */
+      void SetSize(std::size_t table_size) {
+        // 初期化のため、値を変更。
+        age_ = 0x00010000UL;
+        num_used_entries_ = 0;
+
+        // エントリーをいくつ作るか決める。
+        std::uint64_t temp = table_size / sizeof(TTEntry);
+        temp = temp < 1 ? 1 : temp;
+
+        // 以下は最上位ビットだけを残し、他のビットをゼロにするアルゴリズム。
+        temp = (temp & 0xffffffff00000000ULL)
+        ? (temp & 0xffffffff00000000ULL) : temp;
+
+        temp = (temp & 0xffff0000ffff0000ULL)
+        ? (temp & 0xffff0000ffff0000ULL) : temp;
+
+        temp = (temp & 0xff00ff00ff00ff00ULL)
+        ? (temp & 0xff00ff00ff00ff00ULL) : temp;
+
+        temp = (temp & 0xf0f0f0f0f0f0f0f0ULL)
+        ? (temp & 0xf0f0f0f0f0f0f0f0ULL) : temp;
+
+        temp = (temp & 0xccccccccccccccccULL)
+        ? (temp & 0xccccccccccccccccULL) : temp;
+
+        temp = (temp & 0xaaaaaaaaaaaaaaaaULL)
+        ? (temp & 0xaaaaaaaaaaaaaaaaULL) : temp;
+
+        num_entries_ = temp;
+        index_mask_ = temp - 1;
+
+        // テーブルを作成。
+        entry_table_.reset(new TTEntry[num_entries_]);
+      }
 
       /**
        * テーブルのサイズを返す。 (バイト)

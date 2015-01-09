@@ -462,6 +462,40 @@ namespace Sayuri {
       const EvalParams& eval_params() const {
         return *(shared_st_ptr_->eval_params_ptr_);
       }
+      /**
+       * アクセサ - 駒の情報のハッシュ値のテーブル。
+       * [サイド][駒の種類][駒の位置]
+       * @return 駒の情報ハッシュ値のテーブル。
+       */
+      const Hash (& piece_hash_value_table() const)
+      [NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES] {
+        return shared_st_ptr_->piece_hash_value_table_;
+      }
+      /**
+       * アクセサ - 手番のハッシュ値のテーブル。 [サイド]
+       * @return 手番のハッシュ値のテーブル。
+       */
+      const Hash (& to_move_hash_value_table() const)[NUM_SIDES] {
+        return shared_st_ptr_->to_move_hash_value_table_;
+      }
+      /**
+       * アクセサ - キャスリングの権利のハッシュ値のテーブル。
+       * - 0: 白のショートキャスリング。
+       * - 1: 白のロングキャスリング。
+       * - 2: 黒のショートキャスリング。
+       * - 3: 黒のロングキャスリング。
+       * @return キャスリングの権利のハッシュ値のテーブル。
+       */
+      const Hash (& castling_hash_value_table() const)[4] {
+        return shared_st_ptr_->castling_hash_value_table_;
+      }
+      /**
+       * アクセサ - アンパッサンのハッシュ値のテーブル。 [マス]
+       * @return アンパッサンのハッシュ値のテーブル。
+       */
+      const Hash (& en_passant_hash_value_table() const)[NUM_SQUARES] {
+        return shared_st_ptr_->en_passant_hash_value_table_;
+      }
 
     private:
       /** フレンドのデバッグ用関数。 */

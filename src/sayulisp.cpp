@@ -27,6 +27,64 @@
  * @brief Sayuri用Lispライブラリの実装。
  */
 
+#include "sayulisp.h"
+
+#include <iostream>
+#include <memory>
+#include <utility>
+#include "common.h"
+#include "params.h"
+#include "chess_engine.h"
+#include "transposition_table.h"
+#include "uci_shell.h"
+#include "lisp_core.h"
+
 /** Sayuri 名前空間。 */
 namespace Sayuri {
+  // =========== //
+  // EngineSuite //
+  // =========== //
+  // コンストラクタ。
+  EngineSuite::EngineSuite() :
+  search_params_ptr_(new SearchParams()),
+  eval_params_ptr_(new EvalParams()),
+  engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_)),
+  table_ptr_(new TranspositionTable(UCI_DEFAULT_TABLE_SIZE)),
+  shell_ptr_(new UCIShell(*engine_ptr_, *table_ptr_)) {}
+
+  // コピーコンストラクタ。
+  EngineSuite::EngineSuite(const EngineSuite& suite) :
+  search_params_ptr_(new SearchParams(*(suite.search_params_ptr_))),
+  eval_params_ptr_(new EvalParams(*(suite.eval_params_ptr_))),
+  engine_ptr_(new ChessEngine(*(suite.engine_ptr_))),
+  table_ptr_(new TranspositionTable(*(suite.table_ptr_))),
+  shell_ptr_(new UCIShell(*(suite.shell_ptr_))) {}
+
+  // ムーブコンストラクタ。
+  EngineSuite::EngineSuite(EngineSuite&& suite) :
+  search_params_ptr_(std::move(suite.search_params_ptr_)),
+  eval_params_ptr_(std::move(suite.eval_params_ptr_)),
+  engine_ptr_(std::move(suite.engine_ptr_)),
+  table_ptr_(std::move(suite.table_ptr_)),
+  shell_ptr_(std::move(suite.shell_ptr_)) {}
+
+  // コピー代入演算子。
+  EngineSuite& EngineSuite::operator=(const EngineSuite& suite) {
+    search_params_ptr_.reset(new SearchParams(*(suite.search_params_ptr_)));
+    eval_params_ptr_.reset(new EvalParams(*(suite.eval_params_ptr_)));
+    engine_ptr_.reset(new ChessEngine(*(suite.engine_ptr_)));
+    table_ptr_.reset(new TranspositionTable(*(suite.table_ptr_)));
+    shell_ptr_.reset(new UCIShell(*(suite.shell_ptr_)));
+    return *this;
+  }
+
+  // ムーブ代入演算子。
+  EngineSuite& EngineSuite::operator=(EngineSuite&& suite) {
+    search_params_ptr_ = std::move(suite.search_params_ptr_);
+    eval_params_ptr_ = std::move(suite.eval_params_ptr_);
+    engine_ptr_ = std::move(suite.engine_ptr_);
+    table_ptr_ = std::move(suite.table_ptr_);
+    shell_ptr_ = std::move(suite.shell_ptr_);
+    return *this;
+  }
 }  // namespace Sayuri

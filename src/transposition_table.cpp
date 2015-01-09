@@ -155,6 +155,22 @@ namespace Sayuri {
     }
   }
 
+  // エントリーを登録。
+  void TranspositionTable::Add(const TTEntry& entry) {
+    std::unique_lock<std::mutex> lock(mutex_);  // ロック。
+
+    // テーブルのインデックスを得る。
+    std::size_t index = entry.pos_hash_ & index_mask_;
+
+    // 空いているエントリーへの登録なら使用済みエントリー数をカウント。
+    if (entry_table_[index].depth() == 0) {
+      ++num_used_entries_;
+    }
+
+    // 登録。
+    entry_table_[index] = entry;
+  }
+
   // 条件を満たすエントリーを返す。
   const TTEntry& TranspositionTable::GetEntry(Hash pos_hash, int depth) const {
     // エントリーを得る。

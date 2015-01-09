@@ -128,8 +128,9 @@ namespace Sayuri {
       /**
        * コンストラクタ。
        * @param engine 関連付けるChessEngine。
+       * @param table 関連付けるTranspositionTable。
        */
-      UCIShell(ChessEngine& engine);
+      UCIShell(ChessEngine& engine, TranspositionTable& table);
       /**
        * コピーコンストラクタ。
        * @param shell コピー元。
@@ -293,15 +294,14 @@ namespace Sayuri {
 
       /** 関連付けられたチェスエンジン。 */
       ChessEngine* engine_ptr_;
-      /** トランスポジションテーブル。 */
-      std::unique_ptr<TranspositionTable> table_ptr_;
+      /** 関連付けられたトランスポジションテーブル。 */
+      TranspositionTable* table_ptr_;
+
       /** 探索スレッド。 */
       std::thread thinking_thread_;
       /** 探索する候補手のベクトル。 */
       std::vector<Move> moves_to_search_;
 
-      /** UCIオプション。 トランスポジションテーブルのサイズ。 */
-      std::size_t table_size_;
       /** UCIオプション。 ポンダリングするかどうかのフラグ。 */
       bool enable_pondering_;
       /** UCIオプション。 スレッドの数。 */
