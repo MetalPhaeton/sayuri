@@ -1767,7 +1767,7 @@ __Usage__
 
 __Description__
 
-* Print `<Object>` on standard output.
+* Print `<Object>` on Standard Output.
 
 __Example__
 
@@ -1793,6 +1793,9 @@ __Example__
       func_ptr->atom_.native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
+        // ストリームが閉じていたらNilを返す。
+        if (!(std::cin)) return LispObject::NewNil();
+
         // 準備。
         LispIterator list_itr(&list);
         std::string func_name = (list_itr++)->ToString();
@@ -1833,25 +1836,26 @@ R"...(### stdin ###
 
 __Usage__
 
-* `(stdin <Message symbol>)`
+* `(stdin <Message Symbol>)`
 
 __Description__
 
-* Return String from standard input.
-* `<Message symbol>` is a message to the input stream.
+* Return String from Standard Input.
+* `<Message Symbol>` is a message to the input stream.
     + `@get` : Read one charactor.
     + `@read-line` : Read one line. ('LF(CR+LF)' is omitted.)
     + `@read` : Read all.
+* If Standard Input is already closed, it returns Nil.
 
 __Example__
 
-    ;; Read and show one charactor from standard input.
+    ;; Read and show one charactor from Standard Input.
     (display (stdin '@get))
     
-    ;; Read and show one line from standard input.
+    ;; Read and show one line from Standard Input.
     (display (stdin '@read-line))
     
-    ;; Read and show all from standard input.
+    ;; Read and show all from Standard Input.
     (display (stdin '@read)))...";
     }
 
@@ -1891,7 +1895,7 @@ __Usage__
 
 __Description__
 
-* Print `<String>` on standard output.
+* Print `<String>` on Standard Output.
 
 __Example__
 
@@ -1939,7 +1943,7 @@ __Usage__
 
 __Description__
 
-* Print `<String>` on standard error.
+* Print `<String>` on Standard Error.
 
 __Example__
 
@@ -2756,6 +2760,9 @@ __Example__
         ret_ptr->native_function
         ([stream_ptr](LispObjectPtr self, const LispObject& caller,
         const LispObject& list) -> LispObjectPtr {
+          // ストリームが閉じていたらNilを返す。
+          if (!(*stream_ptr)) return LispObject::NewNil();
+
           // 準備。
           LispIterator list_itr(&list);
           std::string func_name = (list_itr++)->ToString();
@@ -2770,7 +2777,7 @@ __Example__
           if (message_ptr->IsNil()) {
             // Nilの場合は閉じる。
             stream_ptr->close();
-            return LispObject::NewString("");
+            return LispObject::NewNil();
           }
           if (!(message_ptr->IsSymbol())) {
             throw LispObject::GenWrongTypeError
@@ -2805,18 +2812,18 @@ R"...(### input-stream ###
 __Usage__
 
 1. `(input-stream <File name : String>)`
-2. `((input-stream <File name : String>) <Message symbol : Symbol>)`
+2. `((input-stream <File name : String>) <Message Symbol : Symbol>)`
 
 __Description__
 
 * 1: Return Native Function as an input stream of `<File name>`.
 * 2: Return String from `<File name>`.
-* 2: `<Message symbol>` is a message to the input stream.
+* 2: `<Message Symbol>` is a message to the input stream.
     + `@get` : Read one charactor.
     + `@read-line` : Read one line. ('LF(CR+LF)' is omitted.)
     + `@read` : Read all.
 * If you give Nil to the stream, it will be closed.
-* If the stream already closed, it returns empty string.
+* If the stream already closed, it returns Nil.
 
 __Example__
 

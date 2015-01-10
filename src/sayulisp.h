@@ -52,22 +52,22 @@ namespace Sayuri {
 
   /** Sayulisp用エンジンセット。 */
   class EngineSuite {
-    private:
+    public:
       // 定数配列。
       /** 各マスのシンボルのテーブル。 */
-      static const std::string square_symbol_table_[NUM_SQUARES];
+      static const std::string SQUARE_SYMBOL[NUM_SQUARES];
 
       /** 各ファイルのシンボルテーブル。 */
-      static const std::string fyle_symbol_table_[NUM_FYLES];
+      static const std::string FYLE_SYMBOL[NUM_FYLES];
 
       /** 各ランクのシンボルテーブル。 */
-      static const std::string rank_symbol_table_[NUM_RANKS];
+      static const std::string RANK_SYMBOL[NUM_RANKS];
 
       /** 各サイドのシンボルテーブル。 */
-      static const std::string side_symbol_table_[NUM_SIDES];
+      static const std::string SIDE_SYMBOL[NUM_SIDES];
 
       /** 各駒のシンボルテーブル。 */
-      static const std::string piece_symbol_table_[NUM_PIECE_TYPES];
+      static const std::string PIECE_SYMBOL[NUM_PIECE_TYPES];
 
       /**
        * 各キャスリングのシンボルテーブル。
@@ -77,9 +77,8 @@ namespace Sayuri {
        * - BLACK_SHORT_CASTLING : 3
        * - BLACK_LONG_CASTLING : 4
        */
-      static const std::string castling_symbol_table_[5];
+      static const std::string CASTLING_SYMBOL[5];
 
-    public:
       // ==================== //
       // コンストラクタと代入 //
       // ==================== //
@@ -389,6 +388,14 @@ namespace Sayuri {
       void Run(std::istream* stream_ptr);
 
     private:
+      // ================ //
+      // プライベート関数 //
+      // ================ //
+      /**
+       * ヘルプを作成する。
+       */
+      void SetHelp();
+
       // ========================== //
       // Lisp関数オブジェクト用関数 //
       // ========================== //

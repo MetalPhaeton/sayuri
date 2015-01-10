@@ -45,7 +45,7 @@ namespace Sayuri {
   // ========== //
   // static定数 //
   // ========== //
-  const std::string EngineSuite::square_symbol_table_[NUM_SQUARES] {
+  const std::string EngineSuite::SQUARE_SYMBOL[NUM_SQUARES] {
     "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1",
     "A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2",
     "A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3",
@@ -55,21 +55,21 @@ namespace Sayuri {
     "A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7",
     "A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"
   };
-  const std::string EngineSuite::fyle_symbol_table_[NUM_FYLES] {
+  const std::string EngineSuite::FYLE_SYMBOL[NUM_FYLES] {
     "FYLE_A", "FYLE_B", "FYLE_C", "FYLE_D",
     "FYLE_E", "FYLE_F", "FYLE_G", "FYLE_H"
   };
-  const std::string EngineSuite::rank_symbol_table_[NUM_RANKS] {
+  const std::string EngineSuite::RANK_SYMBOL[NUM_RANKS] {
     "RANK_1", "RANK_2", "RANK_3", "RANK_4",
     "RANK_5", "RANK_6", "RANK_7", "RANK_8"
   };
-  const std::string EngineSuite::side_symbol_table_[NUM_SIDES] {
+  const std::string EngineSuite::SIDE_SYMBOL[NUM_SIDES] {
     "NO_SIDE", "WHITE", "BLACK"
   };
-  const std::string EngineSuite::piece_symbol_table_[NUM_PIECE_TYPES] {
+  const std::string EngineSuite::PIECE_SYMBOL[NUM_PIECE_TYPES] {
     "EMPTY", "PAWN", "KNIGHT", "BISHOP", "ROOK", "QUEEN", "KING"
   };
-  const std::string EngineSuite::castling_symbol_table_[5] {
+  const std::string EngineSuite::CASTLING_SYMBOL[5] {
     "NO_CASTLING",
     "WHITE_SHORT_CASTLING", "WHITE_LONG_CASTLING",
     "BLACK_SHORT_CASTLING", "BLACK_LONG_CASTLING"
@@ -238,7 +238,7 @@ namespace Sayuri {
     for (Bitboard bb = engine_ptr_->position()[WHITE][PAWN];
     bb; Util::SetNext(bb)) {
       LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(square_symbol_table_[Util::GetSquare(bb)]),
+      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
 
       ret_ptr->Append(temp);
@@ -252,7 +252,7 @@ namespace Sayuri {
     for (Bitboard bb = engine_ptr_->position()[WHITE][KNIGHT];
     bb; Util::SetNext(bb)) {
       LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(square_symbol_table_[Util::GetSquare(bb)]),
+      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
 
       ret_ptr->Append(temp);
@@ -266,7 +266,7 @@ namespace Sayuri {
     for (Bitboard bb = engine_ptr_->position()[WHITE][BISHOP];
     bb; Util::SetNext(bb)) {
       LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(square_symbol_table_[Util::GetSquare(bb)]),
+      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
 
       ret_ptr->Append(temp);
@@ -280,7 +280,7 @@ namespace Sayuri {
     for (Bitboard bb = engine_ptr_->position()[WHITE][ROOK];
     bb; Util::SetNext(bb)) {
       LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(square_symbol_table_[Util::GetSquare(bb)]),
+      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
 
       ret_ptr->Append(temp);
@@ -294,7 +294,7 @@ namespace Sayuri {
     for (Bitboard bb = engine_ptr_->position()[WHITE][QUEEN];
     bb; Util::SetNext(bb)) {
       LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(square_symbol_table_[Util::GetSquare(bb)]),
+      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
 
       ret_ptr->Append(temp);
@@ -308,7 +308,7 @@ namespace Sayuri {
     for (Bitboard bb = engine_ptr_->position()[WHITE][KING];
     bb; Util::SetNext(bb)) {
       LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(square_symbol_table_[Util::GetSquare(bb)]),
+      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
 
       ret_ptr->Append(temp);
@@ -322,7 +322,7 @@ namespace Sayuri {
     for (Bitboard bb = engine_ptr_->position()[BLACK][PAWN];
     bb; Util::SetNext(bb)) {
       LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(square_symbol_table_[Util::GetSquare(bb)]),
+      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
 
       ret_ptr->Append(temp);
@@ -336,7 +336,7 @@ namespace Sayuri {
     for (Bitboard bb = engine_ptr_->position()[BLACK][KNIGHT];
     bb; Util::SetNext(bb)) {
       LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(square_symbol_table_[Util::GetSquare(bb)]),
+      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
 
       ret_ptr->Append(temp);
@@ -350,7 +350,7 @@ namespace Sayuri {
     for (Bitboard bb = engine_ptr_->position()[BLACK][BISHOP];
     bb; Util::SetNext(bb)) {
       LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(square_symbol_table_[Util::GetSquare(bb)]),
+      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
 
       ret_ptr->Append(temp);
@@ -364,7 +364,7 @@ namespace Sayuri {
     for (Bitboard bb = engine_ptr_->position()[BLACK][ROOK];
     bb; Util::SetNext(bb)) {
       LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(square_symbol_table_[Util::GetSquare(bb)]),
+      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
 
       ret_ptr->Append(temp);
@@ -378,7 +378,7 @@ namespace Sayuri {
     for (Bitboard bb = engine_ptr_->position()[BLACK][QUEEN];
     bb; Util::SetNext(bb)) {
       LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(square_symbol_table_[Util::GetSquare(bb)]),
+      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
 
       ret_ptr->Append(temp);
@@ -392,7 +392,7 @@ namespace Sayuri {
     for (Bitboard bb = engine_ptr_->position()[BLACK][KING];
     bb; Util::SetNext(bb)) {
       LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(square_symbol_table_[Util::GetSquare(bb)]),
+      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
 
       ret_ptr->Append(temp);
@@ -406,7 +406,7 @@ namespace Sayuri {
     for (Bitboard bb = ~(engine_ptr_->blocker_0());
     bb; Util::SetNext(bb)) {
       LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(square_symbol_table_[Util::GetSquare(bb)]),
+      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
 
       ret_ptr->Append(temp);
@@ -424,17 +424,17 @@ namespace Sayuri {
     }
 
     ret_ptr->car(LispObject::NewSymbol
-    (side_symbol_table_[engine_ptr_->side_board()[square]]));
+    (SIDE_SYMBOL[engine_ptr_->side_board()[square]]));
 
     ret_ptr->cdr()->car(LispObject::NewSymbol
-    (piece_symbol_table_[engine_ptr_->piece_board()[square]]));
+    (PIECE_SYMBOL[engine_ptr_->piece_board()[square]]));
 
     return ret_ptr;
   }
 
   // 手番にアクセス。
   LispObjectPtr EngineSuite::GetToMove() const {
-    return LispObject::NewSymbol(side_symbol_table_[engine_ptr_->to_move()]);
+    return LispObject::NewSymbol(SIDE_SYMBOL[engine_ptr_->to_move()]);
   }
 
   // キャスリングの権利にアクセス。
@@ -444,22 +444,22 @@ namespace Sayuri {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     if ((rights & WHITE_SHORT_CASTLING)) {
       ret_ptr->Append(LispObject::NewPair
-      (LispObject::NewSymbol(castling_symbol_table_[1]),
+      (LispObject::NewSymbol(CASTLING_SYMBOL[1]),
       LispObject::NewNil()));
     }
     if ((rights & WHITE_LONG_CASTLING)) {
       ret_ptr->Append(LispObject::NewPair
-      (LispObject::NewSymbol(castling_symbol_table_[2]),
+      (LispObject::NewSymbol(CASTLING_SYMBOL[2]),
       LispObject::NewNil()));
     }
     if ((rights & BLACK_SHORT_CASTLING)) {
       ret_ptr->Append(LispObject::NewPair
-      (LispObject::NewSymbol(castling_symbol_table_[3]),
+      (LispObject::NewSymbol(CASTLING_SYMBOL[3]),
       LispObject::NewNil()));
     }
     if ((rights & BLACK_LONG_CASTLING)) {
       ret_ptr->Append(LispObject::NewPair
-      (LispObject::NewSymbol(castling_symbol_table_[4]),
+      (LispObject::NewSymbol(CASTLING_SYMBOL[4]),
       LispObject::NewNil()));
     }
 
@@ -471,7 +471,7 @@ namespace Sayuri {
     Square en_passant_square = engine_ptr_->en_passant_square();
 
     if (en_passant_square) {
-      return LispObject::NewSymbol(square_symbol_table_[en_passant_square]);
+      return LispObject::NewSymbol(SQUARE_SYMBOL[en_passant_square]);
     }
 
     return LispObject::NewNil();
@@ -506,6 +506,7 @@ namespace Sayuri {
   Sayulisp::Sayulisp() :
   dict_ptr_(new HelpDict()),
   global_ptr_(LispObject::GenGlobal(dict_ptr_)) {
+    // EngineSuiteを作成する関数を作成。
     LispObject::SetBasicFunctions(global_ptr_, dict_ptr_);
 
     LispObjectPtr func_ptr = LispObject::NewNativeFunction();
@@ -517,6 +518,40 @@ namespace Sayuri {
     });
 
     global_ptr_->BindSymbol("gen-engine", func_ptr);
+
+    // 定数をバインドしていく。
+    // マスの定数をバインド。
+    for (Square square = 0; square < NUM_SQUARES; ++square) {
+      global_ptr_->BindSymbol(EngineSuite::SQUARE_SYMBOL[square],
+      LispObject::NewNumber(square));
+    }
+
+    // ファイルの定数をバインド。
+    for (Fyle fyle = 0; fyle < NUM_FYLES; ++fyle) {
+      global_ptr_->BindSymbol(EngineSuite::FYLE_SYMBOL[fyle],
+      LispObject::NewNumber(fyle));
+    }
+
+    // ランクの定数をバインド。
+    for (Rank rank = 0; rank < NUM_RANKS; ++rank) {
+      global_ptr_->BindSymbol(EngineSuite::RANK_SYMBOL[rank],
+      LispObject::NewNumber(rank));
+    }
+
+    // サイドの定数をバインド。
+    for (Side side = 0; side < NUM_SIDES; ++side) {
+      global_ptr_->BindSymbol(EngineSuite::SIDE_SYMBOL[side],
+      LispObject::NewNumber(side));
+    }
+
+    // 駒の定数をバインド。
+    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+      global_ptr_->BindSymbol(EngineSuite::PIECE_SYMBOL[piece_type],
+      LispObject::NewNumber(piece_type));
+    }
+
+    // ヘルプ辞書を作成。
+    SetHelp();
   }
   // コピーコンストラクタ。
   Sayulisp::Sayulisp(const Sayulisp& sayulisp) :
@@ -585,5 +620,118 @@ namespace Sayuri {
     });
 
     return ret_ptr;
+  }
+
+  // ヘルプを作成する。
+  void Sayulisp::SetHelp() {
+    // %%% gen-engine
+    (*dict_ptr_)["gen-engine"] =
+R"...(### gen-engine ###
+
+__Usage__
+
+1. `(gen-engine)`
+2. `((gen-engine) <Message Symbol> [<Arguments>...])`
+
+__Description__
+
+* 1: Generate chess engine.
+* 2: The engine executes something according to `<Message Symbol>`.
+* 2: Some `<Message Symbol>` require `<Argument>...`.
+* 2: `<Message Symbol>` are...
+    + `@get-white-pawn-position`
+        - Return List of Symbols of square placed White Pawn.
+
+    + `@get-white-knight-position`
+        - Return List of Symbols of square placed White Knight.
+
+    + `@get-white-bishop-position`
+        - Return List of Symbols of square placed White Bishop.
+
+    + `@get-white-rook-position`
+        - Return List of Symbols of square placed White Rook.
+
+    + `@get-white-queen-position`
+        - Return List of Symbols of square placed White Queen.
+
+    + `@get-white-king-position`
+        - Return List of Symbols of square placed White King.
+
+    + `@get-black-pawn-position`
+        - Return List of Symbols of square placed Black Pawn.
+
+    + `@get-black-knight-position`
+        - Return List of Symbols of square placed Black Knight.
+
+    + `@get-black-bishop-position`
+        - Return List of Symbols of square placed Black Bishop.
+
+    + `@get-black-rook-position`
+        - Return List of Symbols of square placed Black Rook.
+
+    + `@get-black-queen-position`
+        - Return List of Symbols of square placed Black Queen.
+
+    + `@get-black-king-position`
+        - Return List of Symbols of square placed Black King.
+
+    + `@get-empty-square-position`
+        - Return List of Symbols of empty square.
+
+    + `@get-piece`
+        - This needs one argument.
+            - A constant value that indicates one square.
+        - Return what kind of piece is placed at the square
+          as `(<Side : Symbol> <Piece : Symbol>)`.
+
+    + `@get-to-move`
+        - Return Symbol of side which has its turn to move.
+
+    + `@get-castling-rights`
+        - Return what castling rights exist as List of Symbols.
+
+    + `@get-en-passant-square`
+        - Return Symbol of En Passant Square.
+
+    + `@get-ply`
+        - Return how many moves have played as plies. (1 move = 2 plies)
+
+    + `@get-ply-100`
+        - Return moves for 50 Moves Rule as plies. (1 move = 2 plies)
+
+    + `@get-white-has-castled`
+        - Return #t if White has castled. If not, it returns #f.
+
+    + `@get-black-has-castled`
+        - Return #t if Black has castled. If not, it returns #f.
+
+__Example__
+
+    ;; Generate chess engine and bind to 'my-engine'.
+    (define my-engine (gen-engine))
+    
+    ;; List squares placed White Pawn.
+    (display (my-engine '@get-white-pawn-position))
+    
+    ;; Output
+    ;;
+    ;; > (A2 B2 C2 D2 E2 F2 G2 H2))...";
+
+    // %%% @get-white-pawn-position
+    (*dict_ptr_)["@get-white-pawn-position"] =
+R"...(### @get-white-pawn-position ###
+
+__Usage__
+
+* `(gen-engine)`
+
+__Description__
+
+* Generate chess engine.
+
+__Example__
+
+    ;; Generate chess engine and bind to 'my-engine'.
+    (define my-engine (gen-engine)))...";
   }
 }  // namespace Sayuri
