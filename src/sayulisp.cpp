@@ -397,4 +397,94 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::GetBlackHasCastled() const {
     return LispObject::NewBoolean(engine_ptr_->has_castled()[BLACK]);
   }
+
+  // ======== //
+  // Sayulisp //
+  // ======== //
+  // ==================== //
+  // コンストラクタと代入 //
+  // ==================== //
+  // コンストラクタ。
+  Sayulisp::Sayulisp() :
+  dict_ptr_(new HelpDict()),
+  global_ptr_(LispObject::GenGlobal(dict_ptr_)) {
+    LispObject::SetBasicFunctions(global_ptr_, dict_ptr_);
+
+    LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+    func_ptr->scope_chain(global_ptr_->scope_chain());
+    func_ptr->native_function([this]
+    (LispObjectPtr self, const LispObject& caller, const LispObject& list)
+    -> LispObjectPtr {
+      return this->GenEngine();
+    });
+
+    global_ptr_->BindSymbol("gen-engine", func_ptr);
+  }
+  // コピーコンストラクタ。
+  Sayulisp::Sayulisp(const Sayulisp& sayulisp) :
+  dict_ptr_(sayulisp.dict_ptr_), global_ptr_(sayulisp.global_ptr_) {}
+  // ムーブコンストラクタ。
+  Sayulisp::Sayulisp(Sayulisp&& sayulisp) :
+  dict_ptr_(std::move(sayulisp.dict_ptr_)),
+  global_ptr_(std::move(sayulisp.global_ptr_)) {}
+  // コピー代入演算子。
+  Sayulisp& Sayulisp::operator=(const Sayulisp& sayulisp) {
+    dict_ptr_ = sayulisp.dict_ptr_;
+    global_ptr_ = sayulisp.global_ptr_;
+    return *this;
+  }
+  // ムーブ代入演算子。
+  Sayulisp& Sayulisp::operator=(Sayulisp&& sayulisp) {
+    dict_ptr_ = std::move(sayulisp.dict_ptr_);
+    global_ptr_ = std::move(sayulisp.global_ptr_);
+    return *this;
+  }
+
+  // Sayulispを開始する。
+  void Sayulisp::Run(std::istream* stream_ptr) {
+    SyntaxChecker checker;
+
+    try {
+      std::string input;
+      while (std::getline(*(stream_ptr), input)) {
+        input += "\n";
+        int count = checker.Input(input);
+        if (count == 0) {
+          LispObjectPtr lisp_obj_ptr =
+          LispObject::Parse(checker.no_comment_str());
+
+          global_ptr_->Evaluate(*lisp_obj_ptr);
+
+          checker.Reset();
+        } else if (count < 0) {
+          throw LispObject::GenError("@parse-error", "Too many parentheses.");
+        }
+      }
+    } catch (LispObjectPtr error) {
+      if (error->IsList() && (error->Length() == 2)
+      && (error->car()->IsSymbol()) && (error->cdr()->car()->IsString())) {
+        std::cout << "Error: " << error->car()->symbol_value() << std::endl;
+        std::cout << error->cdr()->car()->string_value() << std::endl;
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  // エンジンを生成する。
+  LispObjectPtr Sayulisp::GenEngine() {
+    // スイートを作成。
+    std::shared_ptr<EngineSuite> suite_ptr(new EngineSuite());
+
+    // ネイティブ関数オブジェクトを作成。
+    LispObjectPtr ret_ptr = LispObject::NewNativeFunction();
+    ret_ptr->scope_chain(global_ptr_->scope_chain());
+    ret_ptr->native_function([suite_ptr]
+    (LispObjectPtr self, const LispObject& caller, const LispObject& list)
+    -> LispObjectPtr {
+      return (*suite_ptr)(self, caller, list);
+    });
+
+    return ret_ptr;
+  }
 }  // namespace Sayuri

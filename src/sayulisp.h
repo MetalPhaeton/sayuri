@@ -347,6 +347,65 @@ namespace Sayuri {
       /** UCIShellのポインタ。 */
       std::unique_ptr<UCIShell> shell_ptr_;
   };
+
+  /** Sayulisp実行クラス。 */
+  class Sayulisp {
+    public:
+      // ==================== //
+      // コンストラクタと代入 //
+      // ==================== //
+      /** コンストラクタ。 */
+      Sayulisp();
+      /**
+       * コピーコンストラクタ。
+       * @param sayulisp コピー元。
+       */
+      Sayulisp(const Sayulisp& sayulisp);
+      /**
+       * ムーブコンストラクタ。
+       * @param sayulisp ムーブ元。
+       */
+      Sayulisp(Sayulisp&& sayulisp);
+      /**
+       * コピー代入演算子。
+       * @param sayulisp コピー元。
+       */
+      Sayulisp& operator=(const Sayulisp& sayulisp);
+      /**
+       * ムーブ代入演算子。
+       * @param sayulisp ムーブ元。
+       */
+      Sayulisp& operator=(Sayulisp&& sayulisp);
+      /** デストラクタ。 */
+      virtual ~Sayulisp() {}
+
+      // ============== //
+      // パブリック関数 //
+      // ============== //
+      /**
+       * Sayulispを開始する。
+       * @param stream_ptr 入力に使うストリームのポインタ。
+       */
+      void Run(std::istream* stream_ptr);
+
+    private:
+      // ========================== //
+      // Lisp関数オブジェクト用関数 //
+      // ========================== //
+      /**
+       * エンジン関数オブジェクトを生成する。
+       * @return エンジン関数オブジェクト。
+       */
+      LispObjectPtr GenEngine();
+
+      // ========== //
+      // メンバ変数 //
+      // ========== //
+      /** ヘルプ辞書。 */
+      std::shared_ptr<HelpDict> dict_ptr_;
+      /** グローバル関数オブジェクト。 */
+      LispObjectPtr global_ptr_;
+  };
 }  // namespace Sayuri
 
 #endif
