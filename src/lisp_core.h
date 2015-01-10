@@ -161,14 +161,15 @@ namespace Sayuri {
   struct Atom {
     /** Atomのタイプ。 */
     AtomType type_;
-    /** シンボル。 */
-    std::string symbol_value_;
-    /** 実数データ。 */
-    double number_value_;
-    /** 真偽値データ。 */
-    bool boolean_value_;
-    /** 文字列データ。 */
-    std::string string_value_;
+    /** プリミティブデータ。 */
+    union {
+      /** 実数データ。 */
+      double number_value_;
+      /** 真偽値データ。 */
+      bool boolean_value_;
+    };
+    /** シンボル・文字列データ。 */
+    std::string str_value_;
     /** 関数オブジェクト。 **/
     LispFunction function_;
     /** ネイティブ関数オブジェクト。 **/
@@ -546,7 +547,7 @@ namespace Sayuri {
         LispObjectPtr ret_ptr(new LispObject());
         ret_ptr->type_ = LispObjectType::ATOM;
         ret_ptr->atom_.type_ = AtomType::SYMBOL;
-        ret_ptr->atom_.symbol_value_ = value;
+        ret_ptr->atom_.str_value_ = value;
         return ret_ptr;
       }
 
@@ -585,7 +586,7 @@ namespace Sayuri {
         LispObjectPtr ret_ptr(new LispObject());
         ret_ptr->type_ = LispObjectType::ATOM;
         ret_ptr->atom_.type_ = AtomType::STRING;
-        ret_ptr->atom_.string_value_ = value;
+        ret_ptr->atom_.str_value_ = value;
         return ret_ptr;
       }
 
@@ -842,7 +843,7 @@ namespace Sayuri {
        * アクセサ - Atomのシンボルの値。
        * @return Atomのシンボルの値。
        */
-      std::string symbol_value() const {return atom_.symbol_value_;}
+      std::string symbol_value() const {return atom_.str_value_;}
       /**
        * アクセサ - Atomの数字の値。
        * @return Atomの数字の値。
@@ -857,7 +858,7 @@ namespace Sayuri {
        * アクセサ - Atomの文字列の値。
        * @return Atomの文字列の値。
        */
-      std::string string_value() const {return atom_.string_value_;}
+      std::string string_value() const {return atom_.str_value_;}
       /**
        * アクセサ - Atomの関数オブジェクト。
        * @return Atomの関数オブジェクト。
@@ -920,7 +921,7 @@ namespace Sayuri {
        * @param value Atomのシンボルの値。
        */
       void symbol_value(const std::string& value) {
-        atom_.symbol_value_ = value;
+        atom_.str_value_ = value;
       }
       /**
        * ミューテータ - Atomの数字の値。
@@ -937,7 +938,7 @@ namespace Sayuri {
        * @param value Atomの文字列の値。
        */
       void string_value(const std::string& value) {
-        atom_.string_value_ = value;
+        atom_.str_value_ = value;
       }
       /**
        * ミューテータ - Atomの関数オブジェクト。

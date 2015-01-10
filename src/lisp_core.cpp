@@ -117,18 +117,14 @@ namespace Sayuri {
   // コンストラクタ。
   Atom::Atom() :
   type_(AtomType::NIL),
-  symbol_value_(""),
   number_value_(0.0),
-  boolean_value_(false),
-  string_value_("") {}
+  str_value_("") {}
 
   // コピーコンストラクタ。
   Atom::Atom(const Atom& atom) :
   type_(atom.type_),
-  symbol_value_(atom.symbol_value_),
   number_value_(atom.number_value_),
-  boolean_value_(atom.boolean_value_),
-  string_value_(atom.string_value_),
+  str_value_(atom.str_value_),
   function_(atom.function_),
   native_function_(atom.native_function_),
   scope_chain_(atom.scope_chain_) {}
@@ -136,10 +132,8 @@ namespace Sayuri {
   // ムーブコンストラクタ。
   Atom::Atom(Atom&& atom) :
   type_(atom.type_),
-  symbol_value_(std::move(atom.symbol_value_)),
   number_value_(atom.number_value_),
-  boolean_value_(atom.boolean_value_),
-  string_value_(std::move(atom.string_value_)),
+  str_value_(std::move(atom.str_value_)),
   function_(std::move(atom.function_)),
   native_function_(std::move(atom.native_function_)),
   scope_chain_(std::move(atom.scope_chain_)) {}
@@ -147,10 +141,8 @@ namespace Sayuri {
   // コピー代入演算子。
   Atom& Atom::operator=(const Atom& atom) {
     type_ = atom.type_;
-    symbol_value_ = atom.symbol_value_;
     number_value_ = atom.number_value_;
-    boolean_value_ = atom.boolean_value_;
-    string_value_ = atom.string_value_;
+    str_value_ = atom.str_value_;
     function_ = atom.function_;
     native_function_ = atom.native_function_;
     scope_chain_ = atom.scope_chain_;
@@ -160,10 +152,8 @@ namespace Sayuri {
   // ムーブ代入演算子。
   Atom& Atom::operator=(Atom&& atom) {
     type_ =atom.type_;
-    symbol_value_ = std::move(atom.symbol_value_);
     number_value_ = atom.number_value_;
-    boolean_value_ = atom.boolean_value_;
-    string_value_ = std::move(atom.string_value_);
+    str_value_ = std::move(atom.str_value_);
     function_ = std::move(atom.function_);
     native_function_ = std::move(atom.native_function_);
     scope_chain_ = std::move(atom.scope_chain_);
@@ -215,7 +205,7 @@ namespace Sayuri {
       stream << "()";
     } else if (IsSymbol()) {
       // Symbol。
-      stream << atom_.symbol_value_;
+      stream << atom_.str_value_;
     } else if (IsNumber()) {
       // Number。
       stream << atom_.number_value_;
@@ -229,7 +219,7 @@ namespace Sayuri {
     } else if (IsString()) {
       // String。
       stream << "\"";
-      for (auto c : atom_.string_value_) {
+      for (auto c : atom_.str_value_) {
         if (c == '\n') stream << "\\n";
         else if (c == '\t') stream << "\\t";
         else stream << c;
@@ -285,7 +275,7 @@ namespace Sayuri {
       if (target.IsSymbol()) {
         // シンボルの場合。
         LispObjectPtr ret_ptr =
-        ReferSymbol(target.atom_.symbol_value_)->Clone();
+        ReferSymbol(target.atom_.str_value_)->Clone();
 
         return ret_ptr;
       } else {
@@ -517,7 +507,7 @@ namespace Sayuri {
           }
         }
         my_obj_ptr->atom_.type_ = AtomType::STRING;
-        my_obj_ptr->atom_.string_value_ = str;
+        my_obj_ptr->atom_.str_value_ = str;
       } else if ((front == "#t") || (front == "#T")){
         // BOOLEAN::true。
         my_obj_ptr->atom_.type_ = AtomType::BOOLEAN;
@@ -545,7 +535,7 @@ namespace Sayuri {
         } catch (...) {
           // SYMBOL。
           my_obj_ptr->atom_.type_ = AtomType::SYMBOL;
-          my_obj_ptr->atom_.symbol_value_ = front;
+          my_obj_ptr->atom_.str_value_ = front;
         }
       }
     }
