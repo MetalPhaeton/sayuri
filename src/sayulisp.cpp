@@ -149,32 +149,45 @@ namespace Sayuri {
     std::string message_symbol = message_ptr->symbol_value();
 
     // メッセージシンボルに合わせて分岐する。
-    if (message_symbol == "@get-white-pawn-posision") {
+    if (message_symbol == "@get-white-pawn-position") {
       return GetWhitePawnPosition();
+
     } else if (message_symbol == "@get-white-knight-position") {
       return GetWhiteKnightPosition();
+
     } else if (message_symbol == "@get-white-bishop-position") {
       return GetWhiteBishopPosition();
+
     } else if (message_symbol == "@get-white-rook-position") {
       return GetWhiteRookPosition();
+
     } else if (message_symbol == "@get-white-queen-position") {
       return GetWhiteQueenPosition();
+
     } else if (message_symbol == "@get-white-king-position") {
       return GetWhiteKingPosition();
+
     } else if (message_symbol == "@get-black-pawn-position") {
-      return GetBlackKingPosition();
+      return GetBlackPawnPosition();
+
     } else if (message_symbol == "@get-black-knight-position") {
       return GetBlackKnightPosition();
+
     } else if (message_symbol == "@get-black-bishop-position") {
       return GetBlackBishopPosition();
+
     } else if (message_symbol == "@get-black-rook-position") {
       return GetBlackRookPosition();
+
     } else if (message_symbol == "@get-black-queen-position") {
       return GetBlackQueenPosition();
+
     } else if (message_symbol == "@get-black-king-position") {
       return GetBlackKingPosition();
+
     } else if (message_symbol == "@get-empty-square-position") {
       return GetEmptySquarePosition();
+
     } else if (message_symbol == "@get-piece") {
       // 駒を得る。
       required_args = 2;
@@ -191,20 +204,28 @@ namespace Sayuri {
       Square square = square_ptr->number_value();
 
       return GetPiece(func_name, square);
+
     } else if (message_symbol == "@get-to-move") {
       return GetToMove();
+
     } else if (message_symbol == "@get-castling-rights") {
       return GetCastlingRights();
+
     } else if (message_symbol == "@get-en-passant-square") {
       return GetEnPassantSquare();
+
     } else if (message_symbol == "@get-ply") {
       return GetPly();
+
     } else if (message_symbol == "@get-ply-100") {
       return GetPly100();
+
     } else if (message_symbol == "@get-white-has-castled") {
       return GetWhiteHasCastled();
+
     } else if (message_symbol == "@get-black-has-castled") {
       return GetBlackHasCastled();
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
@@ -402,11 +423,11 @@ namespace Sayuri {
       throw GenWrongSquareError(func_name, square);
     }
 
-    (*ret_ptr)[0] = *(LispObject::NewSymbol
+    ret_ptr->car(LispObject::NewSymbol
     (side_symbol_table_[engine_ptr_->side_board()[square]]));
 
-    (*ret_ptr)[1] = *(LispObject::NewSymbol
-    (side_symbol_table_[engine_ptr_->piece_board()[square]]));
+    ret_ptr->cdr()->car(LispObject::NewSymbol
+    (piece_symbol_table_[engine_ptr_->piece_board()[square]]));
 
     return ret_ptr;
   }
@@ -540,8 +561,9 @@ namespace Sayuri {
     } catch (LispObjectPtr error) {
       if (error->IsList() && (error->Length() == 2)
       && (error->car()->IsSymbol()) && (error->cdr()->car()->IsString())) {
-        std::cout << "Error: " << error->car()->symbol_value() << std::endl;
-        std::cout << error->cdr()->car()->string_value() << std::endl;
+        std::cerr << "Error: " << error->car()->symbol_value() << std::endl;
+        std::cerr << error->cdr()->car()->string_value() << std::endl;
+        throw error;
       } else {
         throw error;
       }

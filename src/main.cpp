@@ -32,6 +32,7 @@
 #include <cstdlib>
 #include <string>
 #include <memory>
+#include <fstream>
 
 #include "sayuri.h"
 
@@ -78,19 +79,66 @@ int main(int argc, char* argv[]) {
   if ((argc >= 2)
   && (std::strcmp(argv[1], "--help") == 0)) {
     // ヘルプの表示。
-    std::cout << "使い方:" << std::endl;
-    std::cout << "\tsayuri [オプション]" << std::endl;
-    std::cout << "------------------------------" << std::endl;
-    std::cout << "オプション:" << std::endl;
-    std::cout << "\t--version" << std::endl;
-    std::cout << "\t\tバージョンを表示。" << std::endl;
-    std::cout << "\t--help" << std::endl;
-    std::cout << "\t\tヘルプを表示。" << std::endl;
-    
+    std::string usage_str =
+R"...(Usage:
+    $ sayuri [option]
+
+[option]:
+    --version
+        Show version.
+
+    --help
+        Show help.
+
+    --sayulisp <file name>
+        Run Sayuri as Sayulisp Interpreter.
+        <file name> is Sayulisp script.
+        If <file name> is '-', Sayuri reads script from standard input.)...";
+    std::cout << usage_str << std::endl;
   } else if ((argc >= 2)
   && (std::strcmp(argv[1], "--version") == 0)) {
     // バージョン番号の表示。
     std::cout << Sayuri::ID_NAME << std::endl;
+  } else if ((argc >= 2)
+  && (std::strcmp(argv[1], "--sayulisp") == 0)) {
+    // Sayulispモード。
+    // 引数がもう一つ必要。
+    if (argc < 3) {
+      std::cerr << "Insufficient arguments. '--sayulisp' needs <file name>."
+      << std::endl;
+      return 1;
+    }
+
+    // エンジン初期化。
+    Sayuri::Init();
+
+    // Sayurlispを作成。
+    std::unique_ptr<Sayuri::Sayulisp>
+    sayulisp_ptr(new Sayuri::Sayulisp());
+
+    // 入力ストリームを得る。
+    std::istream* stream_ptr = nullptr;
+    std::ifstream file;
+    if (std::strcmp(argv[2], "-") == 0) {
+      stream_ptr = &(std::cin);
+    } else {
+      file.open(argv[2]);
+      if (!file) {
+        std::cerr << "Couldn't open '" << argv[2] << "'." << std::endl;
+        return 1;
+      }
+      stream_ptr = &file;
+    }
+
+    // 実行。
+    try {
+      sayulisp_ptr->Run(stream_ptr);
+    } catch (Sayuri::LispObjectPtr error) {
+      return 1;
+    }
+
+    // 終了。
+    if (file) file.close();
   } else {
     // プログラムの起動。
     // 初期化。

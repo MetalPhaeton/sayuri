@@ -47,5 +47,6 @@
 #include "uci_shell.h"
 #include "params.h"
 #include "lisp_core.h"
+#include "sayulisp.h"
 
 #endif
