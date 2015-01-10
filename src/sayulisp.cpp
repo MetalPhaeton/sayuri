@@ -550,6 +550,12 @@ namespace Sayuri {
       LispObject::NewNumber(piece_type));
     }
 
+    // キャスリングの権利の定数をバインド。
+    for (int i = 0; i < 5; ++i) {
+      global_ptr_->BindSymbol(EngineSuite::CASTLING_SYMBOL[i],
+      LispObject::NewNumber(i));
+    }
+
     // ヘルプ辞書を作成。
     SetHelp();
   }
