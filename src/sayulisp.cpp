@@ -123,18 +123,96 @@ namespace Sayuri {
     return *this;
   }
 
-  // ================================== //
-  // Lispオブジェクトとしてのメンバ関数 //
-  // ================================== //
+  // ========================== //
+  // Lisp関数オブジェクト用関数 //
+  // ========================== //
   // 関数オブジェクト。
   LispObjectPtr EngineSuite::operator()
   (LispObjectPtr self, const LispObject& caller, const LispObject& list) {
     // 準備。
-    return LispObject::NewNil();
+    LispIterator list_itr(&list);
+    std::string func_name = (list_itr++)->ToString();
+    int required_args = 1;
+
+    // 引数チェック。
+    if (!list_itr) {
+      throw LispObject::GenInsufficientArgumentsError
+      (func_name, required_args, true, list.Length() - 1);
+    }
+
+    // メッセージシンボルを得る。
+    LispObjectPtr message_ptr = caller.Evaluate(*(list_itr++));
+    if (!(message_ptr->IsSymbol())) {
+      throw LispObject::GenWrongTypeError
+      (func_name, "Symbol", std::vector<int> {1}, true);
+    }
+    std::string message_symbol = message_ptr->symbol_value();
+
+    // メッセージシンボルに合わせて分岐する。
+    if (message_symbol == "@get-white-pawn-posision") {
+      return GetWhitePawnPosition();
+    } else if (message_symbol == "@get-white-knight-position") {
+      return GetWhiteKnightPosition();
+    } else if (message_symbol == "@get-white-bishop-position") {
+      return GetWhiteBishopPosition();
+    } else if (message_symbol == "@get-white-rook-position") {
+      return GetWhiteRookPosition();
+    } else if (message_symbol == "@get-white-queen-position") {
+      return GetWhiteQueenPosition();
+    } else if (message_symbol == "@get-white-king-position") {
+      return GetWhiteKingPosition();
+    } else if (message_symbol == "@get-black-pawn-position") {
+      return GetBlackKingPosition();
+    } else if (message_symbol == "@get-black-knight-position") {
+      return GetBlackKnightPosition();
+    } else if (message_symbol == "@get-black-bishop-position") {
+      return GetBlackBishopPosition();
+    } else if (message_symbol == "@get-black-rook-position") {
+      return GetBlackRookPosition();
+    } else if (message_symbol == "@get-black-queen-position") {
+      return GetBlackQueenPosition();
+    } else if (message_symbol == "@get-black-king-position") {
+      return GetBlackKingPosition();
+    } else if (message_symbol == "@get-empty-square-position") {
+      return GetEmptySquarePosition();
+    } else if (message_symbol == "@get-piece") {
+      // 駒を得る。
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr square_ptr = caller.Evaluate(*list_itr);
+      if (!(square_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2}, true);
+      }
+
+      Square square = square_ptr->number_value();
+
+      return GetPiece(func_name, square);
+    } else if (message_symbol == "@get-to-move") {
+      return GetToMove();
+    } else if (message_symbol == "@get-castling-rights") {
+      return GetCastlingRights();
+    } else if (message_symbol == "@get-en-passant-square") {
+      return GetEnPassantSquare();
+    } else if (message_symbol == "@get-ply") {
+      return GetPly();
+    } else if (message_symbol == "@get-ply-100") {
+      return GetPly100();
+    } else if (message_symbol == "@get-white-has-castled") {
+      return GetWhiteHasCastled();
+    } else if (message_symbol == "@get-black-has-castled") {
+      return GetBlackHasCastled();
+    }
+
+    throw LispObject::GenError("@engine-error", "(" + func_name
+    + ") couldn't understand '" + message_symbol + "'.");
   }
 
   // 白ポーンの配置にアクセス。
-  LispObjectPtr EngineSuite::GetWhitePawn() const {
+  LispObjectPtr EngineSuite::GetWhitePawnPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[WHITE][PAWN];
     bb; Util::SetNext(bb)) {
@@ -148,7 +226,7 @@ namespace Sayuri {
     return ret_ptr;
   }
   // 白ナイトの配置にアクセス。
-  LispObjectPtr EngineSuite::GetWhiteKnight() const {
+  LispObjectPtr EngineSuite::GetWhiteKnightPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[WHITE][KNIGHT];
     bb; Util::SetNext(bb)) {
@@ -162,7 +240,7 @@ namespace Sayuri {
     return ret_ptr;
   }
   // 白ビショップの配置にアクセス。
-  LispObjectPtr EngineSuite::GetWhiteBishop() const {
+  LispObjectPtr EngineSuite::GetWhiteBishopPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[WHITE][BISHOP];
     bb; Util::SetNext(bb)) {
@@ -176,7 +254,7 @@ namespace Sayuri {
     return ret_ptr;
   }
   // 白ルークの配置にアクセス。
-  LispObjectPtr EngineSuite::GetWhiteRook() const {
+  LispObjectPtr EngineSuite::GetWhiteRookPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[WHITE][ROOK];
     bb; Util::SetNext(bb)) {
@@ -190,7 +268,7 @@ namespace Sayuri {
     return ret_ptr;
   }
   // 白クイーンの配置にアクセス。
-  LispObjectPtr EngineSuite::GetWhiteQueen() const {
+  LispObjectPtr EngineSuite::GetWhiteQueenPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[WHITE][QUEEN];
     bb; Util::SetNext(bb)) {
@@ -204,7 +282,7 @@ namespace Sayuri {
     return ret_ptr;
   }
   // 白キングの配置にアクセス。
-  LispObjectPtr EngineSuite::GetWhiteKing() const {
+  LispObjectPtr EngineSuite::GetWhiteKingPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[WHITE][KING];
     bb; Util::SetNext(bb)) {
@@ -218,7 +296,7 @@ namespace Sayuri {
     return ret_ptr;
   }
   // 黒ポーンの配置にアクセス。
-  LispObjectPtr EngineSuite::GetBlackPawn() const {
+  LispObjectPtr EngineSuite::GetBlackPawnPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[BLACK][PAWN];
     bb; Util::SetNext(bb)) {
@@ -232,7 +310,7 @@ namespace Sayuri {
     return ret_ptr;
   }
   // 黒ナイトの配置にアクセス。
-  LispObjectPtr EngineSuite::GetBlackKnight() const {
+  LispObjectPtr EngineSuite::GetBlackKnightPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[BLACK][KNIGHT];
     bb; Util::SetNext(bb)) {
@@ -246,7 +324,7 @@ namespace Sayuri {
     return ret_ptr;
   }
   // 黒ビショップの配置にアクセス。
-  LispObjectPtr EngineSuite::GetBlackBishop() const {
+  LispObjectPtr EngineSuite::GetBlackBishopPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[BLACK][BISHOP];
     bb; Util::SetNext(bb)) {
@@ -260,7 +338,7 @@ namespace Sayuri {
     return ret_ptr;
   }
   // 黒ルークの配置にアクセス。
-  LispObjectPtr EngineSuite::GetBlackRook() const {
+  LispObjectPtr EngineSuite::GetBlackRookPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[BLACK][ROOK];
     bb; Util::SetNext(bb)) {
@@ -274,7 +352,7 @@ namespace Sayuri {
     return ret_ptr;
   }
   // 黒クイーンの配置にアクセス。
-  LispObjectPtr EngineSuite::GetBlackQueen() const {
+  LispObjectPtr EngineSuite::GetBlackQueenPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[BLACK][QUEEN];
     bb; Util::SetNext(bb)) {
@@ -288,7 +366,7 @@ namespace Sayuri {
     return ret_ptr;
   }
   // 黒キングの配置にアクセス。
-  LispObjectPtr EngineSuite::GetBlackKing() const {
+  LispObjectPtr EngineSuite::GetBlackKingPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[BLACK][KING];
     bb; Util::SetNext(bb)) {
@@ -302,7 +380,7 @@ namespace Sayuri {
     return ret_ptr;
   }
   // 空のマスの配置にアクセス。
-  LispObjectPtr EngineSuite::GetEmptySquare() const {
+  LispObjectPtr EngineSuite::GetEmptySquarePosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = ~(engine_ptr_->blocker_0());
     bb; Util::SetNext(bb)) {
@@ -318,18 +396,17 @@ namespace Sayuri {
 
   // 駒を得る。
   LispObjectPtr EngineSuite::GetPiece(const std::string& func_name,
-  const LispObject& square) const {
+  Square square) const {
     LispObjectPtr ret_ptr = LispObject::NewList(2);
-    int square_2 = square.number_value();
-    if ((square_2 < 0) || (square_2 >= static_cast<int>(NUM_SQUARES))) {
-      throw GenWrongSquareError(func_name, square_2);
+    if (square >= NUM_SQUARES) {
+      throw GenWrongSquareError(func_name, square);
     }
 
     (*ret_ptr)[0] = *(LispObject::NewSymbol
-    (side_symbol_table_[engine_ptr_->side_board()[square_2]]));
+    (side_symbol_table_[engine_ptr_->side_board()[square]]));
 
     (*ret_ptr)[1] = *(LispObject::NewSymbol
-    (side_symbol_table_[engine_ptr_->piece_board()[square_2]]));
+    (side_symbol_table_[engine_ptr_->piece_board()[square]]));
 
     return ret_ptr;
   }

@@ -216,75 +216,75 @@ namespace Sayuri {
       const UCIShell& shell() const {return *shell_ptr_;}
 
     private:
-      // ==================================== //
-      // Lispオブジェクトを作成するメンバ関数 //
-      // ==================================== //
+      // ========================== //
+      // Lisp関数オブジェクト用関数 //
+      // ========================== //
       // --- エンジンの状態にアクセス --- //
       /**
        * 白ポーンの配置を得る。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetWhitePawn() const;
+      LispObjectPtr GetWhitePawnPosition() const;
       /**
        * 白ナイトの配置を得る。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetWhiteKnight() const;
+      LispObjectPtr GetWhiteKnightPosition() const;
       /**
        * 白ビショップの配置を得る。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetWhiteBishop() const;
+      LispObjectPtr GetWhiteBishopPosition() const;
       /**
        * 白ルークの配置を得る。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetWhiteRook() const;
+      LispObjectPtr GetWhiteRookPosition() const;
       /**
        * 白クイーンの配置を得る。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetWhiteQueen() const;
+      LispObjectPtr GetWhiteQueenPosition() const;
       /**
        * 白キングの配置を得る。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetWhiteKing() const;
+      LispObjectPtr GetWhiteKingPosition() const;
       /**
        * 黒ポーンの配置を得る。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetBlackPawn() const;
+      LispObjectPtr GetBlackPawnPosition() const;
       /**
        * 黒ナイトの配置を得る。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetBlackKnight() const;
+      LispObjectPtr GetBlackKnightPosition() const;
       /**
        * 黒ビショップの配置を得る。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetBlackBishop() const;
+      LispObjectPtr GetBlackBishopPosition() const;
       /**
        * 黒ルークの配置を得る。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetBlackRook() const;
+      LispObjectPtr GetBlackRookPosition() const;
       /**
        * 黒クイーンの配置を得る。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetBlackQueen() const;
+      LispObjectPtr GetBlackQueenPosition() const;
       /**
        * 黒キングの配置を得る。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetBlackKing() const;
+      LispObjectPtr GetBlackKingPosition() const;
       /**
        * 空のマスの配置を得る。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetEmptySquare() const;
+      LispObjectPtr GetEmptySquarePosition() const;
 
       /**
        * その位置の駒を得る。
@@ -292,8 +292,8 @@ namespace Sayuri {
        * @param square マスを表す定数。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetPiece(const std::string& func_name,
-      const LispObject& square) const;
+      LispObjectPtr GetPiece
+      (const std::string& func_name, Square square) const;
 
       /**
        * 手番を得る。
