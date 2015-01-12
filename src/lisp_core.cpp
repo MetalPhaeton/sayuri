@@ -528,12 +528,14 @@ namespace Sayuri {
         // 妙な所にドット対発見。 CarはNilとする。
         my_obj_ptr->atom_.type_ = AtomType::NIL;
       } else {
-        try {
-          // NUMBER。
+        char* end;
+        double number = std::strtod(front.c_str(), &end);
+        if (*end == '\0') {
+          // Number。
           my_obj_ptr->atom_.type_ = AtomType::NUMBER;
-          my_obj_ptr->atom_.number_value_ = std::stod(front);
-        } catch (...) {
-          // SYMBOL。
+          my_obj_ptr->atom_.number_value_ = number;
+        } else {
+          // Symbol。
           my_obj_ptr->atom_.type_ = AtomType::SYMBOL;
           my_obj_ptr->atom_.str_value_ = front;
         }
