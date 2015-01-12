@@ -35,6 +35,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <set>
+#include <cstdlib>
 #include "common.h"
 
 /** Sayuri 名前空間。 */
@@ -290,7 +291,7 @@ namespace Sayuri {
   // 50手ルールの手数文字列を評価する。
   void FEN::EvalPly100(const std::string& ply_100_str) {
     try {
-      ply_100_ = std::stoi(ply_100_str);
+      ply_100_ = std::strtol(ply_100_str.c_str(), NULL, 0);
     } catch (...) {
       throw SayuriError("FENを解析できません。 in FEN::EvalPly100()");
     }
@@ -299,7 +300,7 @@ namespace Sayuri {
   // 手数文字列を評価する。
   void FEN::EvalPly(const std::string& ply_str) {
     try {
-      ply_ = std::stoi(ply_str) * 2;
+      ply_ = std::strtol(ply_str.c_str(), NULL, 0) * 2;
       if (to_move_ == WHITE) {
         ply_ -= 1;
       }
