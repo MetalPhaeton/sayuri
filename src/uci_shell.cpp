@@ -403,7 +403,8 @@ namespace Sayuri {
       // トランスポジションテーブルのサイズ変更。
       try {
         std::size_t table_size =
-        Util::GetMax(std::stoull(args["value"][1]) * 1024ULL * 1024ULL,
+        Util::GetMax
+        (std::strtol(args["value"][1].c_str(), NULL, 0) * 1024ULL * 1024ULL,
         UCI_MIN_TABLE_SIZE);
 
         Util::UpdateMin(table_size, UCI_MAX_TABLE_SIZE);
@@ -422,7 +423,8 @@ namespace Sayuri {
     } else if (name_str == "threads") {
       // スレッドの数の変更。
       try {
-        num_threads_ = Util::GetMax(std::stoi(args["value"][1]), 1);
+        num_threads_ =
+        Util::GetMax(std::strtol(args["value"][1].c_str(), NULL, 0), 1);
         Util::UpdateMin(num_threads_, UCI_MAX_THREADS);
       } catch (...) {
         // 無視。
@@ -503,8 +505,8 @@ namespace Sayuri {
       // 10分以上あるなら1分考える。5分未満なら持ち時間の10分の1。
       if (engine_ptr_->to_move() == WHITE) {
         try {
-          Chrono::milliseconds time_control =
-          Chrono::milliseconds(std::stoull(args["wtime"][1]));
+          Chrono::milliseconds time_control = Chrono::milliseconds
+          (std::strtol(args["wtime"][1].c_str(), NULL, 0));
           if (time_control.count() >= 600000) {
             thinking_time = Chrono::milliseconds(60000);
           } else {
@@ -521,8 +523,8 @@ namespace Sayuri {
       // 10分以上あるなら1分考える。5分未満なら持ち時間の10分の1。
       if (engine_ptr_->to_move() == BLACK) {
         try {
-          Chrono::milliseconds time_control =
-          Chrono::milliseconds(std::stoull(args["btime"][1]));
+          Chrono::milliseconds time_control = Chrono::milliseconds
+          (std::strtol(args["btime"][1].c_str(), NULL, 0));
           if (time_control.count() >= 600000) {
             thinking_time = Chrono::milliseconds(60000);
           } else {
@@ -552,7 +554,8 @@ namespace Sayuri {
     // depthコマンド。
     if (args.find("depth") != args.end()) {
       try {
-        max_depth = Util::GetMin(std::stoul(args["depth"][1]), MAX_PLYS);
+        max_depth = Util::GetMin
+        (std::strtol(args["depth"][1].c_str(), NULL, 0), MAX_PLYS);
       } catch (...) {
         // 無視。
       }
@@ -561,7 +564,8 @@ namespace Sayuri {
     // nodesコマンド。
     if (args.find("nodes") != args.end()) {
       try {
-        max_nodes = Util::GetMin(std::stoull(args["nodes"][1]), MAX_NODES);
+        max_nodes = Util::GetMin(std::strtoul
+        (args["nodes"][1].c_str(), NULL, 0), MAX_NODES);
       } catch (...) {
         // 無視。
       }
@@ -570,8 +574,9 @@ namespace Sayuri {
     // mateコマンド。
     if (args.find("mate") != args.end()) {
       try {
-        max_depth =
-        Util::GetMin(((std::stoul(args["mate"][1]) * 2) - 1), MAX_PLYS);
+        max_depth = Util::GetMin
+        (((std::strtol(args["mate"][1].c_str(), NULL, 0) * 2) - 1),
+        MAX_PLYS);
       } catch (...) {
         // 無視。
       }
@@ -580,7 +585,8 @@ namespace Sayuri {
     // movetimeコマンド。
     if (args.find("movetime") != args.end()) {
       try {
-        thinking_time = Chrono::milliseconds(std::stoull(args["movetime"][1]));
+        thinking_time = Chrono::milliseconds
+        (std::strtol(args["movetime"][1].c_str(), NULL, 0));
       } catch (...) {
         // 無視。
       }

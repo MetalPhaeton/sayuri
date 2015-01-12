@@ -41,7 +41,7 @@ namespace Sayuri {
   // エンジン情報 //
   // ============ //
   /** Sayuriのバージョン番号。 */
-  constexpr const char* ID_NAME = "Sayuri 2015.01.08 devel";
+  constexpr const char* ID_NAME = "Sayuri 2015.01.12 devel";
   /** Sayuriの作者名。 */
   constexpr const char* ID_AUTHOR = "Hironori Ishibashi";
 
@@ -56,7 +56,8 @@ namespace Sayuri {
 
 #if defined(__arm__)  // ARMのCPU用定数。
   /** トランスポジションテーブルの最大サイズ。 (ARM用) */
-  constexpr std::size_t UCI_MAX_TABLE_SIZE = 1024ULL * 1024ULL * 1024ULL;
+  constexpr std::size_t UCI_MAX_TABLE_SIZE =
+  2ULL * 1024ULL * 1024ULL * 1024ULL;
 
 #elif defined(__i386__) || defined(_M_IX86)  // 32ビットCPU用定数。
   /** トランスポジションテーブルの最大サイズ。 (32ビットCPU) */

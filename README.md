@@ -39,6 +39,8 @@ Sayuri - UCI用チェスエンジン
         * `For64Bit` : 64ビットCPU向けのバイナリファイルのディレクトリ。
     * `Windows` : Windows用バイナリファイル。 (Linux版MinGWで作成。)
         * `For64Bit` : 64ビットCPU向けのバイナリファイルのディレクトリ。
+    * `Android` : Android用バイナリファイル。
+        * `For64Bit` : 64ビットCPU向けのバイナリファイルのディレクトリ。
 * `SayuriLogo` : ロゴ画像ファイルのディレクトリ。
 * `SampleGames` : Sayuriとその他のエンジンによるサンプルゲームの
   ファイルのディレクトリ。
@@ -182,6 +184,8 @@ Files and Directories
     * `Linux` : For binary files for Linux.
         * `For64Bit` : For 64 bit machines.
     * `Windows` : For binary files for Windows. (Created by Linux MinGW.)
+        * `For64Bit` : For 64 bit machines.
+    * `Android` : For binary files for Android.
         * `For64Bit` : For 64 bit machines.
 * `SayuriLogo` : For the logo image files.
 * `SampleGames` : For sample game files of Sayuri vs other chess engines.
