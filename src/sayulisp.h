@@ -35,6 +35,7 @@
 #include <memory>
 #include <utility>
 #include <string>
+#include <sstream>
 #include "common.h"
 #include "params.h"
 #include "chess_engine.h"
@@ -128,9 +129,11 @@ namespace Sayuri {
        */
       static LispObjectPtr GenWrongSquareError
       (const std::string& func_name, Square square) {
-        return LispObject::GenError("@not-square", "The value '"
-        + std::to_string(square) + "' given to (" + func_name
-        + ") does not exist on chess board.");
+        std::ostringstream message_stream;
+        message_stream << "The value '" << square << "' given to ("
+        << func_name << ") does not exist on chess board.";
+
+        return LispObject::GenError("@not-square",message_stream.str());
       }
 
       /**
@@ -141,9 +144,11 @@ namespace Sayuri {
        */
       static LispObjectPtr GenWrongFyleError
       (const std::string& func_name, Fyle fyle) {
-        return LispObject::GenError("@not-fyle", "The value '"
-        + std::to_string(fyle) + "' given to (" + func_name
-        + ") does not exist on chess board.");
+        std::ostringstream message_stream;
+        message_stream << "The value '" << fyle
+        << "' given to (" << func_name << ") does not exist on chess board.";
+
+        return LispObject::GenError("@not-fyle", message_stream.str());
       }
 
       /**
@@ -154,9 +159,11 @@ namespace Sayuri {
        */
       static LispObjectPtr GenWrongRankError
       (const std::string& func_name, Rank rank) {
-        return LispObject::GenError("@not-rank", "The value '"
-        + std::to_string(rank) + "' given to (" + func_name
-        + ") does not exist on chess board.");
+        std::ostringstream message_stream;
+        message_stream << "The value '" << rank
+        << "' given to (" << func_name << ") does not exist on chess board.";
+
+        return LispObject::GenError("@not-rank", message_stream.str());
       }
 
       /**
@@ -167,9 +174,11 @@ namespace Sayuri {
        */
       static LispObjectPtr GenWrongSideError
       (const std::string& func_name, Side side) {
-        return LispObject::GenError("@not-side", "The value '"
-        + std::to_string(side) + "' given to (" + func_name
-        + ") is not side.");
+        std::ostringstream message_stream;
+        message_stream << "The value '" << side << "' given to ("
+        << func_name << ") is not side.";
+
+        return LispObject::GenError("@not-side", message_stream.str());
       }
 
       /**
@@ -180,9 +189,13 @@ namespace Sayuri {
        */
       static LispObjectPtr GenWrongCastlingError
       (const std::string& func_name, int castling) {
-        return LispObject::GenError("@not-castling", "The value '"
-        + std::to_string(castling) + "' given to (" + func_name
-        + ") does not indicate any castlings.");
+        std::string aaa = "123";
+        double val = std::stod(aaa);
+        std::cout << val << std::endl;
+        std::ostringstream message_stream;
+        message_stream << "The value '" << castling << "' given to ("
+        << func_name << ") does not indicate any castlings.";
+        return LispObject::GenError("@not-castling", message_stream.str());
       }
 
       // ======== //

@@ -36,6 +36,7 @@
 #include <set>
 #include <queue>
 #include <map>
+#include <sstream>
 
 #ifndef LISP_CORE_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 #define LISP_CORE_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
@@ -659,23 +660,22 @@ namespace Sayuri {
       (const std::string& func_name, int require, bool is_and_more,
       int given) {
         // 必要な引数の数。
-        std::string message = "(" + func_name + ") needs "
-        + std::to_string(require);
-        if (require <= 1) message += " argument";
-        else message += " arguments";
+        std::ostringstream message_stream;
+        message_stream << "(" << func_name << ") needs " << require;
+        if (require <= 1) message_stream << " argument";
+        else message_stream << " arguments";
 
         // 以上かどうか。
-        if (is_and_more) message += " and more. ";
-        else message += ". ";
+        if (is_and_more) message_stream << " and more. ";
+        else message_stream << ". ";
 
         // 実際与えられた引数の数。
-        message += "Given " + std::to_string(given);
-        if (given <= 1) message += " argument.";
-        else message += " arguments.";
+        message_stream << "Given " << given;
+        if (given <= 1) message_stream << " argument.";
+        else message_stream << " arguments.";
 
-        return GenError("@insufficient-arguments", message);
+        return GenError("@insufficient-arguments", message_stream.str());
       }
-
 
       /**
        * タイプ違いのエラーリストを作成する。
@@ -723,42 +723,42 @@ namespace Sayuri {
 
         // エラーメッセージを作成。
         // どの要素かを作成。
-        std::string message = "";
+        std::ostringstream message_stream;
         bool first = true;
         for (; index_vec.size() > 0; index_vec.pop_back()) {
           // 冠詞。
           if (first) {
-            message += "The ";
+            message_stream << "The ";
             first = false;
           } else {
-            message += "the ";
+            message_stream << "the ";
           }
 
           // 何番目か。
-          message += std::to_string(index_vec.back());
+          message_stream << index_vec.back();
           int column_1 = index_vec.back() % 10;
-          if (column_1 == 1) message += "st ";
-          else if (column_1 == 2) message += "nd ";
-          else if (column_1 == 3) message += "rd ";
-          else message += "th ";
+          if (column_1 == 1) message_stream << "st ";
+          else if (column_1 == 2) message_stream << "nd ";
+          else if (column_1 == 3) message_stream << "rd ";
+          else message_stream << "th ";
 
           // 要素。
           if (index_vec.size() == 1) {
-            message += "argument of ";
+            message_stream << "argument of ";
           } else {
-            message += "element of ";
+            message_stream << "element of ";
           }
         }
 
         // どの関数かを作成。
-        message += "(" + func_name + ") ";
-        if (has_evaluated) message += "didn't return ";
-        else message += "is not ";
+        message_stream << "(" << func_name << ") ";
+        if (has_evaluated) message_stream << "didn't return ";
+        else message_stream << "is not ";
 
         // 要求されたタイプを作成。
-        message += required_type_str + ".";
+        message_stream << required_type_str << ".";
 
-        return GenError(error_symbol, message);
+        return GenError(error_symbol, message_stream.str());
       }
 
       /**
