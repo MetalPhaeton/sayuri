@@ -528,13 +528,11 @@ namespace Sayuri {
         // 妙な所にドット対発見。 CarはNilとする。
         my_obj_ptr->atom_.type_ = AtomType::NIL;
       } else {
-        char* end;
-        double number = std::strtod(front.c_str(), &end);
-        if (*end == '\0') {
+        try {
           // Number。
           my_obj_ptr->atom_.type_ = AtomType::NUMBER;
-          my_obj_ptr->atom_.number_value_ = number;
-        } else {
+          my_obj_ptr->atom_.number_value_ = std::stod(front);
+        } catch (...) {
           // Symbol。
           my_obj_ptr->atom_.type_ = AtomType::SYMBOL;
           my_obj_ptr->atom_.str_value_ = front;
@@ -2030,8 +2028,9 @@ __Example__
                   return true;
                 }
               case AtomType::NATIVE_FUNCTION:
-                return left.native_function().target_type()
-                == right.native_function().target_type();
+                throw LispObject::GenError("@runtime-error",
+                "Native Function can't be compared,"
+                " because there are many types of function.");
               default :
                 return false;
             }
