@@ -39,6 +39,7 @@
 #include <vector>
 #include <array>
 #include <cstring>
+#include <climits>
 #include "common.h"
 #include "transposition_table.h"
 #include "fen.h"
@@ -627,34 +628,56 @@ namespace Sayuri {
       // temp[][]は計算時間の省略のための、2歩の動きの判定用テーブル。
       static const Square temp[NUM_SIDES][NUM_SQUARES] {
         {
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX
         },
         {
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
           A4, B4, C4, D4, E4, F4, G4, H4,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX
         },
         {
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
           A5, B5, C5, D5, E5, F5, G5, H5,
-          -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX
         }
       };
       if (piece_board_[to] == PAWN) {
@@ -923,34 +946,56 @@ namespace Sayuri {
     // temp[][]は計算時間の省略のための、2歩の動きの判定用テーブル。
     static const Square temp[NUM_SIDES][NUM_SQUARES] {
       {
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX
       },
       {
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
         A4, B4, C4, D4, E4, F4, G4, H4,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX
       },
       {
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
         A5, B5, C5, D5, E5, F5, G5, H5,
-        -1U, -1U, -1U, -1U, -1U, -1U, -1U, -1U
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
+        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX
       }
     };
     if (piece_type == PAWN) {
@@ -1034,9 +1079,9 @@ namespace Sayuri {
   searched_nodes_(0),
   searched_level_(0),
   stop_now_(false),
-  max_nodes_(-1ULL),
+  max_nodes_(ULLONG_MAX),
   max_depth_(MAX_PLYS),
-  thinking_time_(-1U >> 1),
+  thinking_time_(INT_MAX),
   infinite_thinking_(false),
   move_history_(0),
   ply_100_history_(0),

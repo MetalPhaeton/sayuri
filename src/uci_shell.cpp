@@ -44,6 +44,7 @@
 #include <cctype>
 #include <functional>
 #include <set>
+#include <climits>
 #include "common.h"
 #include "chess_engine.h"
 #include "transposition_table.h"
@@ -482,7 +483,7 @@ namespace Sayuri {
     // 準備。
     std::uint32_t max_depth = MAX_PLYS;
     std::uint64_t max_nodes = MAX_NODES;
-    Chrono::milliseconds thinking_time(-1U >> 1);
+    Chrono::milliseconds thinking_time(INT_MAX);
     bool infinite_thinking = false;
     moves_to_search_.clear();
 
