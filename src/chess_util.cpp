@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 #include <random>
+#include <climits>
 #include <set>
 #include "common.h"
 
@@ -694,6 +695,6 @@ namespace Sayuri {
   void Util::InitRandom() {
     // メルセンヌツイスターの準備。
     engine_ = std::mt19937(SysClock::to_time_t(SysClock::now()));
-    dist_ = std::uniform_int_distribution<Hash>(0, -1ULL);
+    dist_ = std::uniform_int_distribution<Hash>(0, ULLONG_MAX);
   }
 }  // namespace Sayuri

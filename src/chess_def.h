@@ -34,6 +34,7 @@
 #include <cstddef>
 #include <cstring>
 #include <chrono>
+#include <climits>
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -442,7 +443,7 @@ namespace Sayuri {
   constexpr std::uint32_t MAX_PLYS = 100;
 
   /** 最大探索ノード数。 */
-  constexpr std::uint64_t MAX_NODES = -1ULL;
+  constexpr std::uint64_t MAX_NODES = ULLONG_MAX;
 
   /** 探索するノードの種類。 */
   enum class NodeType {
