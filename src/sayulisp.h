@@ -337,6 +337,19 @@ namespace Sayuri {
        */
       LispObjectPtr GetBlackHasCastled() const;
 
+      /**
+       * ボードを式状態にする。
+       * @return trueのBooleanオブジェクト。
+       */
+      LispObjectPtr SetStartPosition();
+
+      /**
+       * FENの駒の配置にする。
+       * @param fen_str_ptr FEN文字列の入ったStringオブジェクト。
+       * @return trueのBooleanオブジェクト。
+       */
+      LispObjectPtr SetFEN(LispObjectPtr fen_str_ptr);
+
       // ========== //
       // メンバ変数 //
       // ========== //

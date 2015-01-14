@@ -226,6 +226,22 @@ namespace Sayuri {
     } else if (message_symbol == "@get-black-has-castled") {
       return GetBlackHasCastled();
 
+    } else if (message_symbol == "@set-new-game") {
+      return SetNewGame();
+
+    } else if (message_symbol == "@set-fen") {
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr fen_str_ptr = caller.Evaluate(*list_itr);
+      if (!(fen_str_ptr->IsString())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "String", std::vector<int> {2}, true);
+      }
+      return SetFEN(fen_str_ptr);
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
@@ -496,6 +512,34 @@ namespace Sayuri {
     return LispObject::NewBoolean(engine_ptr_->has_castled()[BLACK]);
   }
 
+  // ボードを初期状態にする。
+  LispObjectPtr EngineSuite::SetNewGame() {
+    engine_ptr_->SetNewGame();
+    return LispObject::NewBoolean(true);
+  }
+
+  // FENの配置にする。
+  LispObjectPtr EngineSuite::SetFEN(LispObjectPtr fen_str_ptr) {
+    FEN fen();
+    try {
+      fen = FEN(fen_str_ptr->string_value());
+    } catch (SayuriError error) {
+      throw LispObject::GenError("@engine-error", "Couldn't parse FEN.");
+    }
+
+    // 必ずそれぞれキングが1つずつでなくてはならない。
+    // そうでなければ配置失敗。
+    int num_white_king = Util::CountBits(fen.position()[WHITE][KING]);
+    int num_black_king = Util::CountBits(fen.position()[BLACK][KING]);
+    if ((num_white_king != 1) || (num_black_king != 1)) {
+      throw LispObject::GenError("@engine-error",
+      "This FEN indicates invalid position.");
+    }
+
+    engine_ptr_->LoadFEN(fen);
+    return LispObject::NewBoolean(true);
+  }
+
   // ======== //
   // Sayulisp //
   // ======== //
@@ -711,6 +755,14 @@ __Description__
     + `@get-black-has-castled`
         - Return #t if Black has castled. If not, it returns #f.
 
+    + `@set-new-game`
+        - Set starting position and state.
+        - Return #t.
+
+    + `@set-fen`
+        - Set position and state into indicated position by FEN.
+        - Return #t.
+
 __Example__
 
     ;; Generate chess engine and bind to 'my-engine'.
@@ -722,22 +774,4 @@ __Example__
     ;; Output
     ;;
     ;; > (A2 B2 C2 D2 E2 F2 G2 H2))...";
-
-    // %%% @get-white-pawn-position
-    (*dict_ptr_)["@get-white-pawn-position"] =
-R"...(### @get-white-pawn-position ###
-
-__Usage__
-
-* `(gen-engine)`
-
-__Description__
-
-* Generate chess engine.
-
-__Example__
-
-    ;; Generate chess engine and bind to 'my-engine'.
-    (define my-engine (gen-engine)))...";
-  }
 }  // namespace Sayuri
