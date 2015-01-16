@@ -409,13 +409,13 @@ namespace Sayuri {
     if (name_str == "hash") {
       // トランスポジションテーブルのサイズ変更。
       try {
-        std::size_t table_size = Util::GetMax
+        table_size_ = Util::GetMax
         (std::stoull(args["value"][1]) * 1024ULL * 1024ULL,
         UCI_MIN_TABLE_SIZE);
 
-        Util::UpdateMin(table_size, UCI_MAX_TABLE_SIZE);
+        Util::UpdateMin(table_size_, UCI_MAX_TABLE_SIZE);
 
-        table_ptr_.reset(new TranspositionTable(table_size));
+        table_ptr_.reset(new TranspositionTable(table_size_));
       } catch (...) {
         // 無視。
       }
