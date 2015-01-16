@@ -381,12 +381,16 @@ namespace Sayuri {
           prev_best = tt_entry.best_move();
         }
 
-        // 探索済み局面をチェック。
-        // 局面の繰り返し対策などのため、
-        // 自分の初手と相手の初手の場合(level < 2の場合)は参照しない。
-        if ((level >= 2) && (tt_entry.depth() >= depth)) {
+        // 探索省略のための探索済み局面をチェック。
+        // (注 1) 局面の繰り返し対策などのため、
+        // 自分の初手と相手の初手の場合(level < 2の場合)は探索省略しない。
+        // (注 2) チェックメイトを見つけていた時
+        // (SCORE_WIN以上、SCORE_LOSE以下)は、
+        // 「チェックメイト遠回り問題」を避けるため、探索省略しない。。
+        int score = tt_entry.score();
+        if ((level >= 2) && (tt_entry.depth() >= depth)
+        && (score < SCORE_WIN) && (score > SCORE_LOSE)) {
           Move best_move = prev_best;
-          int score = tt_entry.score();
 
           if (tt_entry.score_type() == ScoreType::EXACT) {
             // エントリーが正確な値。
