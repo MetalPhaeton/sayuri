@@ -45,24 +45,14 @@ namespace Sayuri {
   class TTEntry {
     private:
       /** 残り探索深さのマスク。 **/
-      constexpr static std::uint32_t DEPTH_MASK = 0x000000ffUL;
-      /** メイトまでの手数のマスク。 **/
-      constexpr static std::uint32_t MATE_IN_MASK = 0x0000ff00UL;
+      constexpr static std::uint32_t DEPTH_MASK = 0x0000ffffUL;
       /** テーブルの年齢のマスク。 **/
       constexpr static std::uint32_t AGE_MASK = 0xffff0000UL;
-      /** テーブルの年齢と残り探索深さのマスク。 **/
-      constexpr static std::uint32_t AGE_DEPTH_MASK = DEPTH_MASK | AGE_MASK;
 
       /** 残り探索深さシフト。 */
       constexpr static int DEPTH_SHIFT = 0;
-      /** メイトまでの手数シフト。 */
-      constexpr static int MATE_IN_SHIFT = 8;
       /** テーブルの年齢シフト。 */
       constexpr static int AGE_SHIFT = 16;
-
-      /** 最小探索深さ。 */
-      constexpr static std::int8_t MIN_DEPTH =
-      -(static_cast<std::int8_t>(MAX_PLYS + 1));
 
     public:
       // ==================== //
@@ -75,11 +65,10 @@ namespace Sayuri {
        * @param score 評価値。
        * @param score_type 評価値の種類。
        * @param best_move 最善手。
-       * @param mate_in メイトまでの手数。 -1はメイトなし。
        * @param table_age トランスポジションテーブルの年齢。
        */
       TTEntry(Hash pos_hash, int depth, int score, ScoreType score_type,
-      Move best_move, int mate_in,  std::uint32_t table_age);
+      Move best_move,  std::uint32_t table_age);
       /** コンストラクタ。 */
       TTEntry();
       /**
@@ -112,7 +101,7 @@ namespace Sayuri {
        * 内容が有効かどうか。
        */
       explicit operator bool() const {
-        return age_matein_depth_ != 0;
+        return age_depth_ != 0;
       }
 
       // ======== //
@@ -128,7 +117,7 @@ namespace Sayuri {
        * @return 残り深さ。
        */
       int depth() const {
-        return static_cast<std::int8_t>(age_matein_depth_ & DEPTH_MASK);
+        return age_depth_ & DEPTH_MASK;
       }
       /**
        * アクセサ - 評価値。
@@ -146,19 +135,11 @@ namespace Sayuri {
        */
       Move best_move() const {return best_move_;}
       /**
-       * アクセサ - メイトまでの手数。 -1はメイトなし。
-       * @return メイトまでの手数。
-       */
-      int mate_in() const {
-        return static_cast<std::int8_t>
-        ((age_matein_depth_ & MATE_IN_MASK) >> MATE_IN_SHIFT);
-      }
-      /**
        * アクセサ - トランスポジションテーブルの年齢。
        * @return トランスポジションテーブルの年齢。
        */
       std::uint32_t table_age() const {
-        return age_matein_depth_ & AGE_MASK;
+        return age_depth_ & AGE_MASK;
       }
 
     private:
@@ -172,11 +153,10 @@ namespace Sayuri {
       Hash pos_hash_;
       /**
        * ビットフィールド。
-       * - テーブルの年齢(16 bits)。
-       * - メイトまでの手数(8 bits)。
-       * - 残り探索深さ(8 bits)。
+       * - テーブルの年齢(上位16 bits)。
+       * - 残り探索深さ(下位16 bits)。
        */
-      std::uint32_t age_matein_depth_;
+      std::uint32_t age_depth_;
       /** 評価値。 */
       std::int32_t score_;
       /** 評価値の種類。 */
@@ -231,10 +211,9 @@ namespace Sayuri {
        * @param score 評価値。
        * @param score_type 評価値の種類。
        * @param best_move 最善手。
-       * @param mate_in メイトまでの手数。 -1はメイトなし。
        */
       void Add(Hash pos_hash, int depth, int score, ScoreType score_type,
-      Move best_move, int mate_in);
+      Move best_move);
 
       /**
        * テーブルにエントリーを追加。
