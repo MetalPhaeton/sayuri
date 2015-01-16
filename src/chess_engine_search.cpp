@@ -402,7 +402,6 @@ namespace Sayuri {
             }
 
             pv_line_table_[level].score(score);
-            pv_line_table_[level].mate_in(tt_entry.mate_in());
             table.Unlock();  // ロック解除。
             return score;
           } else if (tt_entry.score_type() == ScoreType::ALPHA) {
@@ -410,7 +409,6 @@ namespace Sayuri {
             if (score <= alpha) {
               // アルファ値以下が確定。
               pv_line_table_[level].score(score);
-              pv_line_table_[level].mate_in(tt_entry.mate_in());
               table.Unlock();  // ロック解除。
               return score;
             }
@@ -434,7 +432,6 @@ namespace Sayuri {
             if (score >= beta) {
               // ベータ値以上が確定。
               pv_line_table_[level].score(score);
-              pv_line_table_[level].mate_in(tt_entry.mate_in());
               table.Unlock();  // ロック解除。
               return score;
             }
@@ -756,7 +753,7 @@ namespace Sayuri {
     if (params.enable_ttable_) {
       if (!is_null_searching_ && !null_reduction && !ShouldBeStopped()) {
         table.Add(pos_hash, depth, job.alpha_, job.score_type_,
-        pv_line_table_[level][0], pv_line_table_[level].mate_in());
+        pv_line_table_[level][0]);
       }
     }
 

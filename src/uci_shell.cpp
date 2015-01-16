@@ -44,6 +44,7 @@
 #include <cctype>
 #include <functional>
 #include <set>
+#include <climits>
 #include "common.h"
 #include "chess_engine.h"
 #include "transposition_table.h"
@@ -408,13 +409,13 @@ namespace Sayuri {
     if (name_str == "hash") {
       // トランスポジションテーブルのサイズ変更。
       try {
-        std::size_t table_size = Util::GetMax
+        table_size_ = Util::GetMax
         (std::stoull(args["value"][1]) * 1024ULL * 1024ULL,
         UCI_MIN_TABLE_SIZE);
 
-        Util::UpdateMin(table_size, UCI_MAX_TABLE_SIZE);
+        Util::UpdateMin(table_size_, UCI_MAX_TABLE_SIZE);
 
-        table_ptr_.reset(new TranspositionTable(table_size));
+        table_ptr_.reset(new TranspositionTable(table_size_));
       } catch (...) {
         // 無視。
       }
@@ -482,7 +483,7 @@ namespace Sayuri {
     // 準備。
     std::uint32_t max_depth = MAX_PLYS;
     std::uint64_t max_nodes = MAX_NODES;
-    Chrono::milliseconds thinking_time(-1U >> 1);
+    Chrono::milliseconds thinking_time(INT_MAX);
     bool infinite_thinking = false;
     moves_to_search_.clear();
 
