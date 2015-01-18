@@ -290,7 +290,7 @@ namespace Sayuri {
                 // ヒストリー。
                 if (params.enable_history_) {
                   engine.shared_st_ptr_->history_[side][from][to] +=
-                  Util::TransDepthToHistory(depth);
+                  Util::DepthToHistory(depth);
 
                   Util::UpdateMax
                   (engine.shared_st_ptr_->history_[side][from][to],
@@ -715,7 +715,7 @@ namespace Sayuri {
           // ヒストリー。
           if (params.enable_history_) {
             shared_st_ptr_->history_[side][from][to] += 
-            Util::TransDepthToHistory(job.depth_);
+            Util::DepthToHistory(job.depth_);
 
             Util::UpdateMax(shared_st_ptr_->history_max_,
             shared_st_ptr_->history_[side][from][to]);
@@ -1229,7 +1229,7 @@ namespace Sayuri {
           // ヒストリー。
           if (params.enable_history_) {
             shared_st_ptr_->history_[side][from][to] +=
-            Util::TransDepthToHistory(job.depth_);
+            Util::DepthToHistory(job.depth_);
 
             Util::UpdateMax(shared_st_ptr_->history_max_,
             shared_st_ptr_->history_[side][from][to]);

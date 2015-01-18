@@ -39,6 +39,7 @@
 #include "transposition_table.h"
 #include "uci_shell.h"
 #include "lisp_core.h"
+#include "fen.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -520,7 +521,7 @@ namespace Sayuri {
 
   // FENの配置にする。
   LispObjectPtr EngineSuite::SetFEN(LispObjectPtr fen_str_ptr) {
-    FEN fen();
+    FEN fen;
     try {
       fen = FEN(fen_str_ptr->string_value());
     } catch (SayuriError error) {
@@ -774,4 +775,5 @@ __Example__
     ;; Output
     ;;
     ;; > (A2 B2 C2 D2 E2 F2 G2 H2))...";
+  }
 }  // namespace Sayuri

@@ -278,13 +278,13 @@ namespace Sayuri {
        * @param move 文字列に変換するMove。
        * @return 変換後の文字列。
        */
-      static std::string TransMoveToString(Move move);
+      static std::string MoveToString(Move move);
       /**
        * 文字列をMoveに変換する。
        * @param move_str Moveに変換する文字列。
        * @return 変換後のMove。
        */
-      static Move TransStringToMove(std::string move_str);
+      static Move StringToMove(std::string move_str);
 
       // ========== //
       // メンバ変数 //

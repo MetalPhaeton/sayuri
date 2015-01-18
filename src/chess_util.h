@@ -720,7 +720,7 @@ namespace Sayuri {
        * @param depth 探索深さ。
        * @return ヒストリー値。
        */
-      constexpr static int TransDepthToHistory(int depth) {
+      constexpr static int DepthToHistory(int depth) {
         return depth * depth;
       }
 

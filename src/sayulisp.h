@@ -190,36 +190,6 @@ namespace Sayuri {
         return LispObject::GenError("@not-castling", message);
       }
 
-      // ======== //
-      // アクセサ //
-      // ======== //
-      /**
-       * アクセサ - 探索関数用パラメータ。
-       * @return 探索関数用パラメータ。
-       */
-      const SearchParams& search_params() const {return *search_params_ptr_;}
-      /**
-       * アクセサ - 評価関数用パラメータ。
-       * @return 評価関数用パラメータ。
-       */
-      const EvalParams& eval_params() const {return *eval_params_ptr_;}
-      /**
-       * アクセサ - チェスエンジン。
-       * @return チェスエンジン。
-       */
-      const ChessEngine& engine() const {return *engine_ptr_;}
-      /**
-       * アクセサ - トランスポジションテーブル。
-       * @return トランスポジションテーブル。
-       */
-      const TranspositionTable& table() const {return *table_ptr_;}
-      /**
-       * アクセサ - UCIShell。
-       * @return UCIShell。
-       */
-      const UCIShell& shell() const {return *shell_ptr_;}
-
-    private:
       // ========================== //
       // Lisp関数オブジェクト用関数 //
       // ========================== //
@@ -338,10 +308,10 @@ namespace Sayuri {
       LispObjectPtr GetBlackHasCastled() const;
 
       /**
-       * ボードを式状態にする。
+       * ボードを初期状態にする。
        * @return trueのBooleanオブジェクト。
        */
-      LispObjectPtr SetStartPosition();
+      LispObjectPtr SetNewGame();
 
       /**
        * FENの駒の配置にする。
@@ -350,6 +320,36 @@ namespace Sayuri {
        */
       LispObjectPtr SetFEN(LispObjectPtr fen_str_ptr);
 
+      // ======== //
+      // アクセサ //
+      // ======== //
+      /**
+       * アクセサ - 探索関数用パラメータ。
+       * @return 探索関数用パラメータ。
+       */
+      const SearchParams& search_params() const {return *search_params_ptr_;}
+      /**
+       * アクセサ - 評価関数用パラメータ。
+       * @return 評価関数用パラメータ。
+       */
+      const EvalParams& eval_params() const {return *eval_params_ptr_;}
+      /**
+       * アクセサ - チェスエンジン。
+       * @return チェスエンジン。
+       */
+      const ChessEngine& engine() const {return *engine_ptr_;}
+      /**
+       * アクセサ - トランスポジションテーブル。
+       * @return トランスポジションテーブル。
+       */
+      const TranspositionTable& table() const {return *table_ptr_;}
+      /**
+       * アクセサ - UCIShell。
+       * @return UCIShell。
+       */
+      const UCIShell& shell() const {return *shell_ptr_;}
+
+    private:
       // ========== //
       // メンバ変数 //
       // ========== //

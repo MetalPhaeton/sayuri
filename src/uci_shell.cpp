@@ -202,7 +202,7 @@ namespace Sayuri {
     for (std::size_t i = 0; i < pv_line.length(); ++i) {
       if (!(pv_line[i])) break;
 
-      sout << " " << TransMoveToString(pv_line[i]);
+      sout << " " << MoveToString(pv_line[i]);
     }
 
     // 出力関数に送る。
@@ -225,7 +225,7 @@ namespace Sayuri {
   void UCIShell::PrintCurrentMoveInfo(Move move, int move_num) {
     std::ostringstream sout;
     // 手の情報を送る。
-    sout << "info currmove " << TransMoveToString(move);
+    sout << "info currmove " << MoveToString(move);
 
     // 手の番号を送る。
     sout << " currmovenumber " << move_num;
@@ -273,12 +273,12 @@ namespace Sayuri {
 
     sout << "bestmove ";
     if (pv_line.length() >= 1) {
-      std::string move_str = TransMoveToString(pv_line[0]);
+      std::string move_str = MoveToString(pv_line[0]);
       sout << move_str;
 
       // 2手目があるならponderで表示。
       if (pv_line.length() >= 2) {
-        move_str = TransMoveToString(pv_line[1]);
+        move_str = MoveToString(pv_line[1]);
         sout << " ponder " << move_str;
       }
     }
@@ -466,7 +466,7 @@ namespace Sayuri {
     if (args.find("moves") != args.end()) {
       // 手を指していく。
       for (unsigned int i = 1; i < args["moves"].size(); ++i) {
-        Move move = TransStringToMove(args["moves"][i]);
+        Move move = StringToMove(args["moves"][i]);
         if (move) engine_ptr_->PlayMove(move);
       }
     }
@@ -490,7 +490,7 @@ namespace Sayuri {
     // searchmovesコマンド。
     if (args.find("searchmoves") != args.end()) {
       for (unsigned int i = 1; i < args["searchmoves"].size(); ++i) {
-        Move move = TransStringToMove(args["searchmoves"][i]);
+        Move move = StringToMove(args["searchmoves"][i]);
         if (move) moves_to_search_.push_back(move);
       }
     }
@@ -617,7 +617,7 @@ namespace Sayuri {
   // 便利関数 //
   // ======== //
   // Moveを文字列に変換する。
-  std::string UCIShell::TransMoveToString(Move move) {
+  std::string UCIShell::MoveToString(Move move) {
     // 文字列ストリーム。
     std::ostringstream oss;
 
@@ -649,7 +649,7 @@ namespace Sayuri {
   }
 
   // 文字列をMoveに変換する。
-  Move UCIShell::TransStringToMove(std::string move_str) {
+  Move UCIShell::StringToMove(std::string move_str) {
     Move move = 0;
 
     if (move_str.size() < 4) return 0;
