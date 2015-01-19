@@ -191,7 +191,7 @@ namespace Sayuri {
   struct CalMobility<PSide, PAWN> {
     static void F(Evaluator& evaluator, Bitboard attacks, Bitboard pawn_moves,
     Bitboard en_passant) {
-      constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
+      constexpr Side EnemySide = Util::GetOppositeSide(PSide);
 
       AddOrSub<PSide>::F(evaluator.value_table_[Evaluator::MOBILITY][PAWN],
       Util::CountBits((attacks
@@ -210,7 +210,7 @@ namespace Sayuri {
   struct GenPinTargets<PSide, BISHOP> {
     static void F(Evaluator& evaluator, Square square, Bitboard attacks,
     Bitboard& target, Bitboard& back) {
-      constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
+      constexpr Side EnemySide = Util::GetOppositeSide(PSide);
       const ChessEngine& engine = *(evaluator.engine_ptr_);
 
       target = attacks & engine.side_board_[EnemySide];
@@ -223,7 +223,7 @@ namespace Sayuri {
   struct GenPinTargets<PSide, ROOK> {
     static void F(Evaluator& evaluator, Square square, Bitboard attacks,
     Bitboard& target, Bitboard& back) {
-      constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
+      constexpr Side EnemySide = Util::GetOppositeSide(PSide);
       const ChessEngine& engine = *(evaluator.engine_ptr_);
 
       target = attacks & engine.side_board_[EnemySide];
@@ -236,7 +236,7 @@ namespace Sayuri {
   struct GenPinTargets<PSide, QUEEN> {
     static void F(Evaluator& evaluator, Square square, Bitboard attacks,
     Bitboard& target, Bitboard& back) {
-      constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
+      constexpr Side EnemySide = Util::GetOppositeSide(PSide);
       const ChessEngine& engine = *(evaluator.engine_ptr_);
 
       target = attacks & engine.side_board_[EnemySide];
@@ -254,7 +254,7 @@ namespace Sayuri {
   template<Side PSide>
   struct CalSpecial<PSide, PAWN> {
     static void F(Evaluator& evaluator, Square square) {
-      constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
+      constexpr Side EnemySide = Util::GetOppositeSide(PSide);
       const ChessEngine& engine = *(evaluator.engine_ptr_);
 
       // パスポーンを計算。
@@ -316,7 +316,7 @@ namespace Sayuri {
   template<Side PSide>
   struct CalSpecial<PSide, ROOK> {
     static void F(Evaluator& evaluator, Square square) {
-      constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
+      constexpr Side EnemySide = Util::GetOppositeSide(PSide);
       const ChessEngine& engine = *(evaluator.engine_ptr_);
 
       // オープンファイルとセミオープンファイルを計算。
@@ -358,7 +358,7 @@ namespace Sayuri {
   template<Side PSide>
   struct CalSpecial<PSide, KING> {
     static void F(Evaluator& evaluator, Square square) {
-      constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
+      constexpr Side EnemySide = Util::GetOppositeSide(PSide);
       const ChessEngine& engine = *(evaluator.engine_ptr_);
 
       // --- キング周りの弱いマスを計算 --- //
@@ -475,7 +475,7 @@ namespace Sayuri {
 
     // サイド。
     Side side = engine_ptr_->to_move_;
-    Side enemy_side = Util::SwitchOppositeSide(side);
+    Side enemy_side = Util::GetOppositeSide(side);
 
     const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES] =
     engine_ptr_->position_;
@@ -684,7 +684,7 @@ namespace Sayuri {
   // 各駒の価値を計算する。
   template<Side PSide, Piece PType>
   void Evaluator::CalValue(Square piece_square) {
-    constexpr Side EnemySide = Util::SwitchOppositeSide(PSide);
+    constexpr Side EnemySide = Util::GetOppositeSide(PSide);
 
     // 評価関数用パラメータを得る。
     const EvalParams& params = engine_ptr_->eval_params();

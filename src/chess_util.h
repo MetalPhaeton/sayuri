@@ -729,7 +729,7 @@ namespace Sayuri {
        * @param side 元のサイド。
        * @return 逆サイド。
        */
-      constexpr static Side SwitchOppositeSide(Side side) {
+      constexpr static Side GetOppositeSide(Side side) {
         return side ^ 0x3;
       }
 

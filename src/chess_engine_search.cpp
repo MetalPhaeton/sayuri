@@ -72,7 +72,7 @@ namespace Sayuri {
 
     // サイド。
     Side side = to_move_;
-    Side enemy_side = Util::SwitchOppositeSide(side);
+    Side enemy_side = Util::GetOppositeSide(side);
 
     // stand_pad。
     int stand_pad = evaluator_.Evaluate(material);
@@ -324,7 +324,7 @@ namespace Sayuri {
 
     // サイドとチェックされているか。
     Side side = to_move_;
-    Side enemy_side = Util::SwitchOppositeSide(side);
+    Side enemy_side = Util::GetOppositeSide(side);
     bool is_checked = IsAttacked(king_[side], enemy_side);
 
     // PVLineをリセット。
@@ -834,7 +834,7 @@ namespace Sayuri {
     int alpha = -MAX_VALUE;
     int beta = MAX_VALUE;
     Side side = to_move_;
-    Side enemy_side = Util::SwitchOppositeSide(side);
+    Side enemy_side = Util::GetOppositeSide(side);
     bool is_checked = IsAttacked(king_[side], enemy_side);
     bool found_mate = false;
     const SearchParams& params = *(shared_st_ptr_->search_params_ptr_);
@@ -1033,7 +1033,7 @@ namespace Sayuri {
   void ChessEngine::SearchParallel(Job& job) {
     // 仕事ループ。
     Side side = to_move_;
-    Side enemy_side = Util::SwitchOppositeSide(side);
+    Side enemy_side = Util::GetOppositeSide(side);
     int num_moves = 0;
     int margin = GetMargin(job.depth_);
 
@@ -1256,7 +1256,7 @@ namespace Sayuri {
   void ChessEngine::SearchRootParallel(Job& job, UCIShell& shell) {
     // 仕事ループ。
     Side side = to_move_;
-    Side enemy_side = Util::SwitchOppositeSide(side);
+    Side enemy_side = Util::GetOppositeSide(side);
     int num_moves = 0;
 
     const SearchParams& params = *(shared_st_ptr_->search_params_ptr_);
@@ -1538,7 +1538,7 @@ namespace Sayuri {
       self->MakeMove(move);
 
       // 違法な手なら計算しない。
-      if (!(IsAttacked(king_[side], Util::SwitchOppositeSide(side)))) {
+      if (!(IsAttacked(king_[side], Util::GetOppositeSide(side)))) {
         // 再帰して次の局面の評価値を得る。
         score = capture_value - self->SEE(GetNextSEEMove(to));
       }
@@ -1552,7 +1552,7 @@ namespace Sayuri {
   // SEE()で使う、次の手を得る。
   Move ChessEngine::GetNextSEEMove(Square target) const {
     // キングがターゲットの時はなし。
-    if (target == king_[Util::SwitchOppositeSide(to_move_)]) {
+    if (target == king_[Util::GetOppositeSide(to_move_)]) {
       return 0;
     }
 
@@ -1563,7 +1563,7 @@ namespace Sayuri {
       switch (piece_type) {
         case PAWN:
           attackers =
-          Util::GetPawnAttack(Util::SwitchOppositeSide(to_move_), target)
+          Util::GetPawnAttack(Util::GetOppositeSide(to_move_), target)
           & position_[to_move_][PAWN];
           if (((to_move_ == WHITE)
           && (Util::SQUARE_TO_RANK[target] == RANK_8))

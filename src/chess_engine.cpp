@@ -511,34 +511,7 @@ namespace Sayuri {
 
   // 手を指す。
   void ChessEngine::PlayMove(Move move) {
-    // 合法手かどうか調べる。
-    // 手を展開する。
-    shared_st_ptr_->history_max_ = 1;  // makerが0の除算をしないように。
-    MoveMaker maker(*this);
-    maker.GenMoves<GenMoveType::ALL>(0, 0, 0, 0);
-    // 合法手かどうか調べる。
-    bool is_legal = false;
-    Side side = to_move_;
-    Side enemy_side = Util::SwitchOppositeSide(side);
-    for (Move temp_move = maker.PickMove(); temp_move;
-    temp_move = maker.PickMove()) {
-      MakeMove(temp_move);
-      // temp_moveが合法手かどうか調べる。
-      if (IsAttacked(king_[side], enemy_side)) {
-        UnmakeMove(temp_move);
-        continue;
-      }
-      // temp_moveと同じ手かどうか調べる。
-      if (EqualMove(move, temp_move)) {
-        UnmakeMove(temp_move);
-        move = temp_move;
-        is_legal = true;
-        break;
-      }
-      UnmakeMove(temp_move);
-    }
-
-    if (is_legal) {
+    if (IsLegalMove(move)) {
       ++ply_;
       if ((piece_board_[GetFrom(move)] == PAWN)
       || (piece_board_[GetTo(move)] != EMPTY)) {
@@ -552,6 +525,69 @@ namespace Sayuri {
       shared_st_ptr_->position_history_.push_back
       (PositionRecord(*this, GetCurrentHash()));
     }
+  }
+
+  // 合法手かどうか判定。
+  bool ChessEngine::IsLegalMove(Move& move) {
+    // 合法手かどうか調べる。
+    // 手を展開する。
+    shared_st_ptr_->history_max_ = 1;  // makerが0の除算をしないように。
+    MoveMaker maker(*this);
+    maker.GenMoves<GenMoveType::ALL>(0, 0, 0, 0);
+
+    // 合法手かどうか調べる。
+    bool is_legal = false;
+    Side side = to_move_;
+    Side enemy_side = Util::GetOppositeSide(side);
+    for (Move temp_move = maker.PickMove(); temp_move;
+    temp_move = maker.PickMove()) {
+      MakeMove(temp_move);
+      // temp_moveが合法手かどうか調べる。
+      if (IsAttacked(king_[side], enemy_side)) {
+        UnmakeMove(temp_move);
+        continue;
+      }
+
+      // temp_moveと同じ手かどうか調べる。
+      if (EqualMove(move, temp_move)) {
+        UnmakeMove(temp_move);
+        move = temp_move;
+        is_legal = true;
+        break;
+      }
+      UnmakeMove(temp_move);
+    }
+
+    return is_legal;
+  }
+
+  // 合法手のベクトルを得る。
+  std::vector<Move> ChessEngine::GetLegalMoves() {
+    // 手を展開する。
+    shared_st_ptr_->history_max_ = 1;  // makerが0の除算をしないように。
+    MoveMaker maker(*this);
+    maker.GenMoves<GenMoveType::ALL>(0, 0, 0, 0);
+
+    // 合法手かどうか調べながらベクトルに格納していく。
+    std::vector<Move> ret_vec;
+    Side side = to_move_;
+    Side enemy_side = Util::GetOppositeSide(side);
+    for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
+      MakeMove(move);
+
+      // 動かした結果、チェックされているかどうか。
+      if (IsAttacked(king_[side], enemy_side)) {
+        // チェックされていれば違法。
+        UnmakeMove(move);
+        continue;
+      }
+
+      // 合法手。
+      ret_vec.push_back(move);
+      UnmakeMove(move);
+    }
+
+    return ret_vec;
   }
 
   // 1手戻す。
@@ -575,7 +611,7 @@ namespace Sayuri {
     Side side = to_move_;
 
     // 手番を反転させる。
-    to_move_ = Util::SwitchOppositeSide(to_move_);
+    to_move_ = Util::GetOppositeSide(to_move_);
 
     // 動かす前のキャスリングの権利とアンパッサンを記録する。
     SetCastlingRights(move, castling_rights_);
@@ -792,7 +828,7 @@ namespace Sayuri {
   bool ChessEngine::IsAttacked(Square square, Side side) const {
     // ポーンに攻撃されているかどうか調べる。
     Bitboard attack =
-    Util::GetPawnAttack(Util::SwitchOppositeSide(side), square);
+    Util::GetPawnAttack(Util::GetOppositeSide(side), square);
     if (attack & position_[side][PAWN]) return true;
 
     // ナイトに攻撃されているかどうか調べる。
@@ -820,7 +856,7 @@ namespace Sayuri {
   // 現在のマテリアルを得る。
   int ChessEngine::GetMaterial(Side side) const {
     // 相手のサイド。
-    Side enemy_side = Util::SwitchOppositeSide(side);
+    Side enemy_side = Util::GetOppositeSide(side);
 
     int material = 0;
     for (Piece piece_type = PAWN; piece_type <= QUEEN; ++piece_type) {
@@ -903,7 +939,7 @@ namespace Sayuri {
 
     // 次の手番のハッシュを追加。
     current_hash ^= shared_st_ptr_->to_move_hash_value_table_
-    [Util::SwitchOppositeSide(to_move_)];
+    [Util::GetOppositeSide(to_move_)];
 
     // キャスリングのハッシュをセット。
     Castling loss_rights = 0;

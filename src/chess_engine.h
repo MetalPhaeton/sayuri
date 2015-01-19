@@ -175,6 +175,20 @@ namespace Sayuri {
       /** 1手戻す。 */
       void UndoMove();
 
+      /**
+       * 合法手かどうか判定する。
+       * もし合法手なら、その手を引数moveに代入する。
+       * @param move 判定したい手。
+       * @return 判定結果。 合法手ならtrue。
+       */
+      bool IsLegalMove(Move& move);
+
+      /**
+       * 合法手のベクトルを得る。
+       * @return 合法手のベクトル。
+       */
+      std::vector<Move> GetLegalMoves();
+
       // --- 利き筋関連 --- //
       /**
        * ボードの状態からビショップの利き筋を作る。
@@ -650,7 +664,7 @@ namespace Sayuri {
        */
       void MakeNullMove(Move& move) {
         // 手番を変える。
-        to_move_ = Util::SwitchOppositeSide(to_move_);
+        to_move_ = Util::GetOppositeSide(to_move_);
 
         // 情報をメモ。
         SetCastlingRights(move, castling_rights_);
@@ -666,7 +680,7 @@ namespace Sayuri {
        */
       void UnmakeNullMove(Move move) {
         // 手番を変える。
-        to_move_ = Util::SwitchOppositeSide(to_move_);
+        to_move_ = Util::GetOppositeSide(to_move_);
 
         // 情報を戻す。
         castling_rights_ = GetCastlingRights(move);

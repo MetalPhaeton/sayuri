@@ -541,6 +541,22 @@ namespace Sayuri {
     return LispObject::NewBoolean(true);
   }
 
+  // 候補手のリストを得る。
+  LispObjectPtr EngineSuite::GetCandidateMoves() {
+    LispObjectPtr ret_ptr = LispObject::NewNil();
+
+    // 手の生成。
+    std::vector<Move> move_vec = engine_ptr_->GetLegalMoves();
+
+    // 手をリストに追加していく。
+    for (auto move : move_vec) {
+      ret_ptr->Append
+      (LispObject::NewPair(MoveToList(move), LispObject::NewNil()));
+    }
+
+    return ret_ptr;
+  }
+
   // ======== //
   // Sayulisp //
   // ======== //

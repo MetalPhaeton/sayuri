@@ -180,7 +180,7 @@ namespace Sayuri {
   struct GenPieceBitboard<GenMoveType::CAPTURE> {
     static void F(MoveMaker& maker, Bitboard& bitboard, Side side) {
       bitboard &=
-      maker.engine_ptr_->side_pieces()[Util::SwitchOppositeSide(side)];
+      maker.engine_ptr_->side_pieces()[Util::GetOppositeSide(side)];
     }
   };
 
@@ -202,7 +202,7 @@ namespace Sayuri {
     static void F(MoveMaker& maker, Bitboard& bitboard, Side side,
     Square from) {
       bitboard = Util::GetPawnAttack(side, from)
-      & maker.engine_ptr_->side_pieces()[Util::SwitchOppositeSide(side)];
+      & maker.engine_ptr_->side_pieces()[Util::GetOppositeSide(side)];
 
       // アンパッサンがある場合。
       if (maker.engine_ptr_->en_passant_square()) {
@@ -227,7 +227,7 @@ namespace Sayuri {
   struct GenKingBitboard<GenMoveType::CAPTURE> {
     static void F(MoveMaker& maker, Bitboard& bitboard, Side side) {
       bitboard &=
-      maker.engine_ptr_->side_pieces()[Util::SwitchOppositeSide(side)];
+      maker.engine_ptr_->side_pieces()[Util::GetOppositeSide(side)];
     }
   };
 
@@ -438,7 +438,7 @@ namespace Sayuri {
     // constexpr std::int64_t BAD_CAPTURE_SCORE = -1LL;
 
     Bitboard enemy_king_bb =
-    Util::SQUARE[engine_ptr_->king()[Util::SwitchOppositeSide(side)]];
+    Util::SQUARE[engine_ptr_->king()[Util::GetOppositeSide(side)]];
     for (std::size_t i = start; i < last_; ++i) {
       // 手の情報を得る。
       Square from = GetFrom(move_stack_[i].move_);

@@ -190,6 +190,25 @@ namespace Sayuri {
         return LispObject::GenError("@not-castling", message);
       }
 
+      /**
+       * Moveをリストに変換する。
+       * @param move 変換したいMove。
+       * @return 変換結果のリスト。
+       */
+      static LispObjectPtr MoveToList(Move move) {
+        LispObjectPtr ret_ptr = LispObject::NewList(3);
+
+        ret_ptr->car(LispObject::NewSymbol(SQUARE_SYMBOL[GetFrom(move)]));
+
+        ret_ptr->cdr()->car
+        (LispObject::NewSymbol(SQUARE_SYMBOL[GetTo(move)]));
+
+        ret_ptr->cdr()->cdr()->car
+        (LispObject::NewSymbol(PIECE_SYMBOL[GetPromotion(move)]));
+
+        return ret_ptr;
+      }
+
       // ========================== //
       // Lisp関数オブジェクト用関数 //
       // ========================== //
@@ -319,6 +338,12 @@ namespace Sayuri {
        * @return trueのBooleanオブジェクト。
        */
       LispObjectPtr SetFEN(LispObjectPtr fen_str_ptr);
+
+      /**
+       * 現在のボードの候補手のリストを得る。
+       * @return 候補手のリスト。
+       */
+      LispObjectPtr GetCandidateMoves();
 
       // ======== //
       // アクセサ //
