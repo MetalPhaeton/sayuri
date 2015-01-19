@@ -1202,6 +1202,7 @@ namespace Sayuri {
        * - return > 0 : 閉じ括弧が足りない。
        */
       int Input(const std::string& input_str) {
+        bool escape_c = false;
         for (auto c : input_str) {
           if (in_comment_) {
             // コメント中。
@@ -1212,8 +1213,16 @@ namespace Sayuri {
           } else if (in_string_) {
             // 文字列中。
             no_comment_str_.push_back(c);
-            if (c == '"') {
-              in_string_ = false;
+            if (escape_c) {
+              // エスケープ文字。
+              escape_c = false;
+            } else {
+              if (c == '"') {
+                in_string_ = false;
+              } else if (c == '\\') {
+                // バックスラッシュ。 次の文字はエスケープ文字。
+                escape_c = true;
+              }
             }
           } else {
             // 通常状態。

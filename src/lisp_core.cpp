@@ -222,6 +222,7 @@ namespace Sayuri {
       for (auto c : atom_.str_value_) {
         if (c == '\n') stream << "\\n";
         else if (c == '\t') stream << "\\t";
+        else if (c == '"') stream << "\\\"";
         else stream << c;
       }
       stream << "\"";
@@ -472,38 +473,49 @@ namespace Sayuri {
       if (front == "\"") {
         // STRING。
         std::string str = "";
-        while (str_queue.size() > 0) {
-          if (str_queue.front() == "\"") {
-            str_queue.pop();
-            break;
-          } else if ((str_queue.front() == "\t")
-          || (str_queue.front() == "\n")) {
-            str_queue.pop();
-          } else {
-            // \nと\tを改行とタブに変換。 \\はバックスラッシュ。
-            std::string temp = str_queue.front();
-            std::string::iterator itr = temp.begin();
-            while (itr != temp.end()) {
-              if (*itr == '\\') {
-                temp.erase(itr);
-                if (itr != temp.end()) {
-                  switch (*itr) {
-                    case 'n':
-                      *itr = '\n';
-                      break;
-                    case 't':
-                      *itr = '\t';
-                      break;
-                    case '\\':
-                      *itr = '\\';
-                      break;
-                  }
-                }
+
+        // 一文字づつ調べる。
+        bool loop = true;
+        bool escape_c = false;  // エスケープ文字かどうか。
+        while (loop && (str_queue.size() > 0)) {
+          front = str_queue.front();
+          str_queue.pop();
+          for (auto c : front) {
+            if (escape_c) {
+              // エスケープ文字の判定。
+              escape_c = false;
+              switch (c) {
+                case 'n':  // 改行。
+                  str.push_back('\n');
+                  break;
+                case 't':  // タブ。
+                  str.push_back('\t');
+                  break;
+                case '"':  // クオート。
+                  str.push_back('"');
+                  break;
+                default:  // それ以外。
+                  str.push_back(c);
+                  break;
               }
-              ++itr;
+            } else {
+              if (c == '"') {
+                // 終了。
+                loop = false;
+                break;
+              } else if (c == '\\') {
+                // エスケープ文字。
+                escape_c = true;
+              } else if (c == '\n') {
+                // 改行だった場合。
+                // 何もしない。
+              } else if (c == '\t') {
+                // タブだった場合。 空白に置き換える。
+                str.push_back(' ');
+              } else {
+                str.push_back(c);
+              }
             }
-            str += temp;
-            str_queue.pop();
           }
         }
         my_obj_ptr->atom_.type_ = AtomType::STRING;
