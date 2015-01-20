@@ -220,10 +220,38 @@ namespace Sayuri {
       // String。
       stream << "\"";
       for (auto c : atom_.str_value_) {
-        if (c == '\n') stream << "\\n";
-        else if (c == '\t') stream << "\\t";
-        else if (c == '"') stream << "\\\"";
-        else stream << c;
+        switch (c) {
+          case '\n':
+            stream << "\\n";
+            break;
+          case '\r':
+            stream << "\\r";
+            break;
+          case '\t':
+            stream << "\\t";
+            break;
+          case '\b':
+            stream << "\\b";
+            break;
+          case '\a':
+            stream << "\\a";
+            break;
+          case '\f':
+            stream << "\\f";
+            break;
+          case '\0':
+            stream << "\\0";
+            break;
+          case '\"':
+            stream << "\\\"";
+            break;
+          case '\\':
+            stream << "\\\\";
+            break;
+          default:
+            stream << c;
+            break;
+        }
       }
       stream << "\"";
     } else if (IsFunction()) {
