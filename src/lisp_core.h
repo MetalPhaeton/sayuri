@@ -677,6 +677,7 @@ namespace Sayuri {
         return GenError("@insufficient-arguments", message);
       }
 
+
       /**
        * タイプ違いのエラーリストを作成する。
        * @param func_name 関数名。
@@ -763,44 +764,11 @@ namespace Sayuri {
 
       /**
        * S式をパースする。
-       * @param s_expr_str S式の文字列。
-       * @return パース結果のポインタ。
-       * @throw LispObjectPtr エラーメッセージ。
+       * @param トークンのキュー。
+       * @return パース結果のベクトル。
        */
-      static LispObjectPtr Parse(const std::string& s_expr_str);
-
-      /**
-       * S式をトークンに分ける。
-       * @param s_expr_str S式の文字列。
-       * @return 切り分けられた文字列。
-       */
-      static std::vector<std::string> Split(const std::string& s_expr_str) {
-        static const std::set<char> delim {
-          ' ', '\n', '\t', '(', ')', '"', '\'', ';'
-        };
-        std::vector<std::string> ret(0);
-
-        std::string temp;
-        for (auto c : s_expr_str) {
-          if (delim.find(c) != delim.end()) {
-            if (temp.size() > 0) {
-              ret.push_back(temp);
-              temp.clear();
-            }
-            char cs[2] {c, 0};
-            ret.push_back(cs);
-          } else {
-            temp.push_back(c);
-          }
-        }
-
-        if (temp.size() > 0) {
-          ret.push_back(temp);
-          temp.clear();
-        }
-
-        return ret;
-      }
+      static std::vector<LispObjectPtr>
+      Parse(std::queue<std::string>& token_queue);
 
       /**
        * LispObjectを標準出力に表示する。
@@ -920,9 +888,7 @@ namespace Sayuri {
        * ミューテータ - Atomのシンボルの値。
        * @param value Atomのシンボルの値。
        */
-      void symbol_value(const std::string& value) {
-        atom_.str_value_ = value;
-      }
+      void symbol_value(const std::string& value) {atom_.str_value_ = value;}
       /**
        * ミューテータ - Atomの数字の値。
        * @param value Atomの数字の値。
@@ -937,9 +903,7 @@ namespace Sayuri {
        * ミューテータ - Atomの文字列の値。
        * @param value Atomの文字列の値。
        */
-      void string_value(const std::string& value) {
-        atom_.str_value_ = value;
-      }
+      void string_value(const std::string& value) {atom_.str_value_ = value;}
       /**
        * ミューテータ - Atomの関数オブジェクト。
        * @param obj Atomの関数オブジェクト。
@@ -977,11 +941,11 @@ namespace Sayuri {
     private:
       /**
        * Parse()の本体。
-       * @param my_obj_ptr パース結果を格納するオブジェクト。
-       * @param str_queue パースする残りの文字列。
+       * @param ret_obj パース結果を格納するオブジェクト。
+       * @param token_queue パースする残りの文字列。
        */
-      static void ParseCore(LispObjectPtr my_obj_ptr,
-      std::queue<std::string>& str_queue);
+      static void ParseCore(LispObject& ret_obj,
+      std::queue<std::string>& token_queue);
 
       /**
        * 絶対必要なコア関数を登録する。
@@ -1130,136 +1094,214 @@ namespace Sayuri {
       const LispObject* current_ptr_;
   };
 
-  /** 文法をチェックするクラス。 */
-  class SyntaxChecker {
+  /** 字句解析するクラス。 */
+  class LispTokenizer {
     public:
       // ==================== //
       // コンストラクタと代入 //
       // ==================== //
       /** コンストラクタ。 */
-      SyntaxChecker() :
-      input_str_(""),
-      no_comment_str_(""),
-      count_(0),
+      LispTokenizer() :
+      parentheses_(0),
       in_comment_(false),
       in_string_(false) {}
       /**
        * コピーコンストラクタ。
-       * @param checker コピー元。
+       * @param tokenizer コピー元。
        */
-      SyntaxChecker(const SyntaxChecker& checker) :
-      input_str_(checker.input_str_),
-      no_comment_str_(checker.no_comment_str_),
-      count_(checker.count_),
-      in_comment_(checker.in_comment_),
-      in_string_(checker.in_string_) {}
+      LispTokenizer(const LispTokenizer& tokenizer) :
+      token_queue_(tokenizer.token_queue_),
+      stream_(tokenizer.stream_.str()),
+      parentheses_(tokenizer.parentheses_),
+      in_comment_(tokenizer.in_comment_),
+      in_string_(tokenizer.in_string_) {}
       /**
        * ムーブコンストラクタ。
-       * @param checker ムーブ元。
+       * @param tokenizer ムーブ元。
        */
-      SyntaxChecker(SyntaxChecker&& checker) :
-      input_str_(std::move(checker.input_str_)),
-      no_comment_str_(std::move(checker.no_comment_str_)),
-      count_(checker.count_),
-      in_comment_(checker.in_comment_),
-      in_string_(checker.in_string_) {}
+      LispTokenizer(LispTokenizer&& tokenizer) :
+      token_queue_(std::move(tokenizer.token_queue_)),
+      stream_(tokenizer.stream_.str()),
+      parentheses_(tokenizer.parentheses_),
+      in_comment_(tokenizer.in_comment_),
+      in_string_(tokenizer.in_string_) {}
       /**
        * コピー代入演算子。
-       * @param checker コピー元。
+       * @param tokenizer コピー元。
        */
-      SyntaxChecker& operator=(const SyntaxChecker& checker) {
-        input_str_ = checker.input_str_;
-        no_comment_str_ = checker.no_comment_str_;
-        count_ = checker.count_;
-        in_comment_ = checker.in_comment_;
-        in_string_ = checker.in_string_;
+      LispTokenizer& operator=(const LispTokenizer& tokenizer) {
+        token_queue_ = tokenizer.token_queue_;
+        stream_.str(tokenizer.stream_.str());
+        parentheses_ = tokenizer.parentheses_;
+        in_comment_ = tokenizer.in_comment_;
+        in_string_ = tokenizer.in_string_;
         return *this;
       }
       /**
        * ムーブ代入演算子。
-       * @param checker ムーブ元。
+       * @param tokenizer ムーブ元。
        */
-      SyntaxChecker& operator=(SyntaxChecker&& checker) {
-        input_str_ = std::move(checker.input_str_);
-        no_comment_str_ = std::move(checker.no_comment_str_);
-        count_ = checker.count_;
-        in_comment_ = checker.in_comment_;
-        in_string_ = checker.in_string_;
+      LispTokenizer& operator=(LispTokenizer&& tokenizer) {
+        token_queue_ = std::move(tokenizer.token_queue_);
+        stream_.str(tokenizer.stream_.str());
+        parentheses_ = tokenizer.parentheses_;
+        in_comment_ = tokenizer.in_comment_;
+        in_string_ = tokenizer.in_string_;
         return *this;
       }
       /** デストラクタ。 */
-      virtual ~SyntaxChecker() {}
+      virtual ~LispTokenizer() {}
 
       // ============== //
       // パブリック関数 //
       // ============== //
       /**
-       * チェックする文字を入力する。
-       * @param input_str チェックしたい文字列。
+       * 文字列を字句解析する。
+       * @param input_str 解析したい文字列。
        * @return
        * - return == 0 : 括弧の対応関係が正しい。
        * - return < 0 : 閉じ括弧が多すぎる。
        * - return > 0 : 閉じ括弧が足りない。
        */
-      int Input(const std::string& input_str) {
-        bool escape_c = false;
+      int Analyse(const std::string& input_str) {
+        // 区切り時の処理。
+        auto pause = [this](char c) {
+          if (!(stream_.str().empty())) {
+            // トークンキューに今までの文字をプッシュ。
+            this->token_queue_.push(stream_.str());
+            // ストリームをクリア。
+            stream_.str("");
+          }
+
+          // 文字をストリームへ。
+          stream_ << c;
+          // トークンキューに文字をプッシュ。
+          this->token_queue_.push(stream_.str());
+          // ストリームをクリア。
+          stream_.str("");
+        };
+
+        // 空白文字。
+        static const std::set<char> empty_c_set {
+          ' ', '\n', '\r', '\t', '\b', '\a', '\f', '\0'
+        };
+
+        // 一文字ずつ調べる。
+        bool escape_c = false;  // エスケープ文字フラグ。
         for (auto c : input_str) {
           if (in_comment_) {
             // コメント中。
             if (c == '\n') {
-              no_comment_str_.push_back(c);
               in_comment_ = false;
             }
           } else if (in_string_) {
             // 文字列中。
-            no_comment_str_.push_back(c);
+            // 空白文字なら無視。 ただし、スペースは無視しない。
+            if ((empty_c_set.find(c) != empty_c_set.end()) && (c != ' ')) {
+              continue;
+            }
+
             if (escape_c) {
               // エスケープ文字。
               escape_c = false;
+              switch (c) {
+                case 'n':
+                  // 改行指定。
+                  stream_ << '\n';
+                  break;
+                case 'r':
+                  // キャリッジリターン指定。
+                  stream_ << '\r';
+                  break;
+                case 't':
+                  // タブ指定。
+                  stream_ << '\t';
+                  break;
+                case 'b':
+                  // バックスペース指定。
+                  stream_ << '\b';
+                  break;
+                case 'a':
+                  // ビープ音指定。
+                  stream_ << '\a';
+                  break;
+                case 'f':
+                  // 改ページ指定。
+                  stream_ << '\f';
+                  break;
+                case '0':
+                  // ヌル文字指定。
+                  stream_ << '\0';
+                  break;
+                default:
+                  // それ以外。 クォート、バックスラッシュも含む。
+                  stream_ << c;
+                  break;
+              }
             } else {
               if (c == '"') {
+                // 文字列終了。
                 in_string_ = false;
+                pause(c);  // 区切り。
               } else if (c == '\\') {
                 // バックスラッシュ。 次の文字はエスケープ文字。
                 escape_c = true;
+              } else {
+                stream_ << c;
               }
             }
           } else {
-            // 通常状態。
-            switch (c) {
-              case '(':
-                no_comment_str_.push_back(c);
-                ++count_;
-                break;
-              case ')':
-                no_comment_str_.push_back(c);
-                --count_;
-                break;
-              case ';':
-                in_comment_ = true;
-                break;
-              case '"':
-                no_comment_str_.push_back(c);
-                in_string_ = true;
-                break;
-              default:
-                no_comment_str_.push_back(c);
-                break;
+            // コメント中でも文字列中でもない。
+            if (empty_c_set.find(c) != empty_c_set.end()) {
+              // 空白文字。
+              if (!(stream_.str().empty())) {
+                token_queue_.push(stream_.str());
+                stream_.str("");
+              }
+            } else if (c == '(') {
+              // 開き括弧。
+              pause(c);
+              ++parentheses_;
+            } else if (c == ')') {
+              // 閉じ括弧。
+              pause(c);
+              --parentheses_;
+            } else if (c == ';') {
+              // コメント開始文字。
+              if (!(stream_.str().empty())) {
+                token_queue_.push(stream_.str());
+                stream_.str("");
+              }
+              in_comment_ = true;
+            } else if (c == '"') {
+              // 文字列開始文字。
+              pause(c);
+              in_string_ = true;
+            } else {
+              // それ以外。
+              stream_ << c;
             }
           }
         }
 
-        input_str_ += input_str;
-        return count_;
+        // 最後にストリームの残りをキューにプッシュ。
+        // ただし、文字列中やコメント中の時は、
+        // トークンが完成していないのでプッシュしない。
+        if (!in_string_ && !in_comment_ && !(stream_.str().empty())) {
+          token_queue_.push(stream_.str());
+          stream_.str("");
+        }
+
+        return parentheses_;
       }
 
       /**
        * 状態を初期状態にリセットする。
        */
       void Reset() {
-        input_str_ = "";
-        no_comment_str_ = "";
-        count_ = 0;
+        token_queue_ = std::queue<std::string>();
+        stream_.str("");
+        parentheses_ = 0;
         in_comment_ = false;
         in_string_ = false;
       }
@@ -1268,24 +1310,21 @@ namespace Sayuri {
       // アクセサ //
       // ======== //
       /**
-       * アクセサ - 蓄積された文字列。
-       * @return 蓄積された文字列。
+       * アクセサ - 蓄積されたトークンキュー。
+       * @return 蓄積されたトークンキュー。
        */
-      std::string input_str() const {return input_str_;}
+      std::queue<std::string> token_queue() const {return token_queue_;}
 
-      /**
-       * アクセサ - コメントを削除した、蓄積された文字列。
-       * @return コメントを削除した、蓄積された文字列。
-       */
-      std::string no_comment_str() const {return no_comment_str_;}
+      // 括弧の対応関係の数。
+      int parentheses() const {return parentheses_;}
 
     private:
-      /** 入力した文字列。 */
-      std::string input_str_;
-      /** コメントを削除した文字列。 */
-      std::string no_comment_str_;
+      /** トークンを入れるキュー。 */
+      std::queue<std::string> token_queue_;
+      /** 解析用ストリーム。 */
+      std::ostringstream stream_;
       /** 括弧の対応関係の数。 */
-      int count_;
+      int parentheses_;
       /** 現在コメント中かどうか。 */
       bool in_comment_;
       /** 現在文字列中かどうか。 */

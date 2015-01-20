@@ -642,21 +642,23 @@ namespace Sayuri {
 
   // Sayulispを開始する。
   void Sayulisp::Run(std::istream* stream_ptr) {
-    SyntaxChecker checker;
+    LispTokenizer tokenizer;
 
     try {
       std::string input;
       while (std::getline(*(stream_ptr), input)) {
         input += "\n";
-        int count = checker.Input(input);
-        if (count == 0) {
-          LispObjectPtr lisp_obj_ptr =
-          LispObject::Parse(checker.no_comment_str());
+        int parentheses = tokenizer.Analyse(input);
+        if (parentheses == 0) {
+          std::queue<std::string> token_queue = tokenizer.token_queue();
+          std::vector<LispObjectPtr> ptr_vec = LispObject::Parse(token_queue);
 
-          global_ptr_->Evaluate(*lisp_obj_ptr);
+          for (auto& ptr : ptr_vec) {
+            global_ptr_->Evaluate(*ptr);
+          }
 
-          checker.Reset();
-        } else if (count < 0) {
+          tokenizer.Reset();
+        } else if (parentheses < 0) {
           throw LispObject::GenError("@parse-error", "Too many parentheses.");
         }
       }
