@@ -48,37 +48,6 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
-  // ============ //
-  // LispPair関連 //
-  // ============ //
-  // コンストラクタ。
-  LispPair::LispPair() : car_(nullptr), cdr_(nullptr) {}
-
-  // コピーコンストラクタ。
-  LispPair::LispPair(const LispPair& cons) :
-  car_(cons.car_), cdr_(cons.cdr_) {}
-
-  // ムーブコンストラクタ。
-  LispPair::LispPair(LispPair&& cons) :
-  car_(std::move(cons.car_)), cdr_(std::move(cons.cdr_)) {}
-
-  // コピー代入演算子。
-  LispPair& LispPair::operator=(const LispPair& cons) {
-    car_ = cons.car_;
-    cdr_ = cons.cdr_;
-    return *this;
-  }
-
-  // ムーブ代入演算子。
-  LispPair& LispPair::operator=(LispPair&& cons) {
-    car_ = std::move(cons.car_);
-    cdr_ = std::move(cons.cdr_);
-    return *this;
-  }
-
-  // デストラクタ。
-  LispPair::~LispPair() {}
-
   // ============= //
   // LispFunction関連 //
   // ============= //
@@ -111,85 +80,62 @@ namespace Sayuri {
   // デストラクタ。
   LispFunction::~LispFunction() {}
 
-  // ======== //
-  // Atom関連 //
-  // ======== //
-  // コンストラクタ。
-  Atom::Atom() :
-  type_(AtomType::NIL),
-  number_value_(0.0),
-  str_value_("") {}
-
-  // コピーコンストラクタ。
-  Atom::Atom(const Atom& atom) :
-  type_(atom.type_),
-  number_value_(atom.number_value_),
-  str_value_(atom.str_value_),
-  function_(atom.function_),
-  native_function_(atom.native_function_),
-  scope_chain_(atom.scope_chain_) {}
-
-  // ムーブコンストラクタ。
-  Atom::Atom(Atom&& atom) :
-  type_(atom.type_),
-  number_value_(atom.number_value_),
-  str_value_(std::move(atom.str_value_)),
-  function_(std::move(atom.function_)),
-  native_function_(std::move(atom.native_function_)),
-  scope_chain_(std::move(atom.scope_chain_)) {}
-
-  // コピー代入演算子。
-  Atom& Atom::operator=(const Atom& atom) {
-    type_ = atom.type_;
-    number_value_ = atom.number_value_;
-    str_value_ = atom.str_value_;
-    function_ = atom.function_;
-    native_function_ = atom.native_function_;
-    scope_chain_ = atom.scope_chain_;
-    return *this;
-  }
-
-  // ムーブ代入演算子。
-  Atom& Atom::operator=(Atom&& atom) {
-    type_ =atom.type_;
-    number_value_ = atom.number_value_;
-    str_value_ = std::move(atom.str_value_);
-    function_ = std::move(atom.function_);
-    native_function_ = std::move(atom.native_function_);
-    scope_chain_ = std::move(atom.scope_chain_);
-    return *this;
-  }
-
-  // デストラクタ。
-  Atom::~Atom() {}
-
   // =========== //
   // LispObject関連 //
   // =========== //
   // コンストラクタ。
-  LispObject::LispObject() : type_(LispObjectType::ATOM) {}
+  LispObject::LispObject() :
+  type_(LispObjectType::NIL),
+  car_(nullptr),
+  cdr_(nullptr),
+  number_value_(0.0),
+  str_value_("") {}
 
   // コピーコンストラクタ。
-  LispObject::LispObject(const LispObject& obj) : type_(obj.type_),
-  pair_(obj.pair_), atom_(obj.atom_) {}
+  LispObject::LispObject(const LispObject& obj) :
+  type_(obj.type_),
+  car_(obj.car_),
+  cdr_(obj.cdr_),
+  number_value_(obj.number_value_),
+  str_value_(obj.str_value_),
+  function_(obj.function_),
+  native_function_(obj.native_function_),
+  scope_chain_(obj.scope_chain_) {}
 
   // ムーブコンストラクタ。
-  LispObject::LispObject(LispObject&& obj) : type_(obj.type_),
-  pair_(std::move(obj.pair_)), atom_(std::move(obj.atom_)){}
+  LispObject::LispObject(LispObject&& obj) :
+  type_(obj.type_),
+  car_(std::move(obj.car_)),
+  cdr_(std::move(obj.cdr_)),
+  number_value_(obj.number_value_),
+  str_value_(std::move(obj.str_value_)),
+  function_(std::move(obj.function_)),
+  native_function_(std::move(obj.native_function_)),
+  scope_chain_(std::move(obj.scope_chain_)) {}
 
   // コピー代入演算子。
   LispObject& LispObject::operator=(const LispObject& obj) {
     type_ = obj.type_;
-    pair_ = obj.pair_;
-    atom_ = obj.atom_;
+    car_ = obj.car_;
+    cdr_ = obj.cdr_;
+    number_value_ = obj.number_value_;
+    str_value_ = obj.str_value_;
+    function_ = obj.function_;
+    native_function_ = obj.native_function_;
+    scope_chain_ = obj.scope_chain_;
     return *this;
   }
 
   // ムーブ代入演算子。
   LispObject& LispObject::operator=(LispObject&& obj) {
     type_ = obj.type_;
-    pair_ = std::move(obj.pair_);
-    atom_ = std::move(obj.atom_);
+    car_ = std::move(obj.car_);
+    cdr_ = std::move(obj.cdr_);
+    number_value_ = obj.number_value_;
+    str_value_ = std::move(obj.str_value_);
+    function_ = std::move(obj.function_);
+    native_function_ = std::move(obj.native_function_);
+    scope_chain_ = std::move(obj.scope_chain_);
     return *this;
   }
 
@@ -205,13 +151,13 @@ namespace Sayuri {
       stream << "()";
     } else if (IsSymbol()) {
       // Symbol。
-      stream << atom_.str_value_;
+      stream << str_value_;
     } else if (IsNumber()) {
       // Number。
-      stream << atom_.number_value_;
+      stream << number_value_;
     } else if (IsBoolean()) {
       // Boolean。
-      if (atom_.boolean_value_) {
+      if (boolean_value_) {
         stream << "#t";
       } else {
         stream << "#f";
@@ -219,7 +165,7 @@ namespace Sayuri {
     } else if (IsString()) {
       // String。
       stream << "\"";
-      for (auto c : atom_.str_value_) {
+      for (auto c : str_value_) {
         switch (c) {
           case '\n':
             stream << "\\n";
@@ -260,14 +206,14 @@ namespace Sayuri {
 
       // 引数を書き込む。
       std::string temp = "";
-      for (auto& name : atom_.function_.arg_name_vec_) {
+      for (auto& name : function_.arg_name_vec_) {
         temp += name + " ";
       }
       temp.pop_back();
       stream << temp << ") ";
 
       // 定義を書き込む。
-      for (auto& obj : atom_.function_.def_vec_) {
+      for (auto& obj : function_.def_vec_) {
         stream << obj->ToString();
       }
       stream << ")";
@@ -303,7 +249,7 @@ namespace Sayuri {
       // Listではない場合。
       if (target.IsSymbol()) {
         // シンボルの場合。
-        LispObjectPtr ret_ptr = ReferSymbol(target.atom_.str_value_)->Clone();
+        LispObjectPtr ret_ptr = ReferSymbol(target.str_value_)->Clone();
 
         return ret_ptr;
       } else {
@@ -331,7 +277,7 @@ namespace Sayuri {
 
         // 引数リストをシンボルマップにバインド。
         std::vector<std::string>& arg_name_vec =
-        func_obj->atom_.function_.arg_name_vec_;
+        func_obj->function_.arg_name_vec_;
         for (auto& arg_name : arg_name_vec) {
           if (!target_itr) {
             throw GenInsufficientArgumentsError
@@ -343,7 +289,7 @@ namespace Sayuri {
 
         // 関数を評価。
         LispObjectPtr ret_ptr;
-        for (auto& def : func_obj->atom_.function_.def_vec_) {
+        for (auto& def : func_obj->function_.def_vec_) {
           // 評価。
           ret_ptr = func_obj->Evaluate(*def);
         }
@@ -352,23 +298,20 @@ namespace Sayuri {
       } else if (func_obj->IsNativeFunction()) {
         // ネイティブ関数オブジェクトの場合。
         LispObjectPtr ret_ptr =
-        func_obj->atom_.native_function_(func_obj, *this, target);
+        func_obj->native_function_(func_obj, *this, target);
 
         return ret_ptr;
       } else {
         // 関数オブジェクトじゃないので、エラー。
+        static const std::string type_str[] {
+          "Pair", "Nil.", "Symbol.", "Number.", "Boolean.", "String.",
+          "Function.", "Native Function."
+        };
         std::string error_symbol = "@not-procedure";
+
         std::string message =
-        "'" + func_name + "' is not bound with Procedure. This is ";
-        if (func_obj->IsPair()) {
-          message += "Pair.";
-        } else {
-          static const std::string atom_type_str[] {
-            "Nil.", "Symbol.", "Number.", "Boolean.", "String.",
-            "Function.", "Native Function."
-          };
-          message += atom_type_str[static_cast<int>(func_obj->atom_.type_)];
-        }
+        "'" + func_name + "' is not bound with Procedure."
+        " This is " + type_str[static_cast<int>(func_obj->type_)];
 
         throw GenError(error_symbol, message);
       } 
@@ -408,8 +351,7 @@ namespace Sayuri {
       // リストの場合。
       // 空のリストならNil。
       if (token_queue.front() == ")") {
-        ret_obj.type_ = LispObjectType::ATOM;
-        ret_obj.atom_.type_ = AtomType::NIL;
+        ret_obj.type_ = LispObjectType::NIL;
 
         token_queue.pop();
         return;
@@ -419,13 +361,13 @@ namespace Sayuri {
       LispObject* current = &ret_obj;
       while (!(token_queue.empty())) {
         current->type_ = LispObjectType::PAIR;
-        current->pair_.car_ = LispObject::NewNil();
-        current->pair_.cdr_ = LispObject::NewNil();
+        current->car_ = LispObject::NewNil();
+        current->cdr_ = LispObject::NewNil();
 
         // Carの処理。
         // なぜか次の文字がドットだったら、CarはNilのまま。
         if (token_queue.front() != ".") {
-          ParseCore(*(current->pair_.car_), token_queue);
+          ParseCore(*(current->car_), token_queue);
         }
 
         // Cdrの処理。
@@ -437,7 +379,7 @@ namespace Sayuri {
 
           // Cdrにパース。 なぜか次の文字が閉じ括弧だったら、CdrはNilのまま。
           if (token_queue.front() != ")") {
-            ParseCore(*(current->pair_.cdr_), token_queue);
+            ParseCore(*(current->cdr_), token_queue);
           }
 
           // リストの終端まで読み飛ばして終了。
@@ -455,18 +397,15 @@ namespace Sayuri {
           return;
         } else {
           // まだ続きがある。
-          current = current->pair_.cdr_.get();
+          current = current->cdr_.get();
         }
       }
     } else {
-      // S式のAtom。
-      ret_obj.type_ = LispObjectType::ATOM;
-
       if (front == "\"") {
         // String。
         if (token_queue.empty()) return;
-        ret_obj.atom_.type_ = AtomType::STRING;
-        ret_obj.atom_.str_value_ = token_queue.front();
+        ret_obj.type_ = LispObjectType::STRING;
+        ret_obj.str_value_ = token_queue.front();
         token_queue.pop();
 
         // 次の'"'までポップ。
@@ -479,32 +418,32 @@ namespace Sayuri {
         }
       } else if ((front == "#t") || (front == "#T")){
         // Boolean::true。
-        ret_obj.atom_.type_ = AtomType::BOOLEAN;
-        ret_obj.atom_.boolean_value_ = true;
+        ret_obj.type_ = LispObjectType::BOOLEAN;
+        ret_obj.boolean_value_ = true;
       } else if ((front == "#f") || (front == "#F")){
         // Boolean::false。
-        ret_obj.atom_.type_ = AtomType::BOOLEAN;
-        ret_obj.atom_.boolean_value_ = false;
+        ret_obj.type_ = LispObjectType::BOOLEAN;
+        ret_obj.boolean_value_ = false;
       } else if (front == "'") {
         // quoteの糖衣構文。
         ret_obj.type_ = LispObjectType::PAIR;
-        ret_obj.pair_.car_ = NewSymbol("quote");
-        ret_obj.pair_.cdr_ = NewPair();
+        ret_obj.car_ = NewSymbol("quote");
+        ret_obj.cdr_ = NewPair();
 
         // 第1引数(Cdr->Car)をパース。
-        ParseCore(*(ret_obj.pair_.cdr_->pair_.car_), token_queue);
+        ParseCore(*(ret_obj.cdr_->car_), token_queue);
       } else if (front == ".") {
         // 妙な所にドット対発見。 CarはNilとする。
-        ret_obj.atom_.type_ = AtomType::NIL;
+        ret_obj.type_ = LispObjectType::NIL;
       } else {
         try {
           // Number。
-          ret_obj.atom_.type_ = AtomType::NUMBER;
-          ret_obj.atom_.number_value_ = std::stod(front);
+          ret_obj.type_ = LispObjectType::NUMBER;
+          ret_obj.number_value_ = std::stod(front);
         } catch (...) {
           // Symbol。
-          ret_obj.atom_.type_ = AtomType::SYMBOL;
-          ret_obj.atom_.str_value_ = front;
+          ret_obj.type_ = LispObjectType::SYMBOL;
+          ret_obj.str_value_ = front;
         }
       }
     }
@@ -516,8 +455,8 @@ namespace Sayuri {
     // %%% help
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [dict_ptr]
       (LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
@@ -599,8 +538,8 @@ namespace Sayuri {
     // %%% eval
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -643,8 +582,8 @@ namespace Sayuri {
     // %%% parse
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -711,8 +650,8 @@ namespace Sayuri {
     // %%% to-string
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -773,8 +712,8 @@ namespace Sayuri {
     // %%% try
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -858,8 +797,8 @@ namespace Sayuri {
     // %%% throw
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -902,8 +841,8 @@ namespace Sayuri {
     // %%% car
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -953,8 +892,8 @@ namespace Sayuri {
     // %%% cdr
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -1004,8 +943,8 @@ namespace Sayuri {
     // %%% cons
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -1063,8 +1002,8 @@ namespace Sayuri {
     // %%% quote
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -1120,8 +1059,8 @@ namespace Sayuri {
     // %%% define
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -1233,8 +1172,8 @@ namespace Sayuri {
     // %%% set!
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -1304,8 +1243,8 @@ namespace Sayuri {
     // %%% lambda
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -1387,8 +1326,8 @@ namespace Sayuri {
     // %%% let
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -1481,8 +1420,8 @@ namespace Sayuri {
     // %%% if
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -1547,8 +1486,8 @@ namespace Sayuri {
     // %%% cond
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -1628,8 +1567,8 @@ namespace Sayuri {
     // %%% begin
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -1672,8 +1611,8 @@ namespace Sayuri {
     // %%% display
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -1755,8 +1694,8 @@ namespace Sayuri {
     // %%% stdin
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // ストリームが閉じていたらNilを返す。
@@ -1828,8 +1767,8 @@ namespace Sayuri {
     // %%% stdout
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -1876,8 +1815,8 @@ namespace Sayuri {
     // %%% stderr
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -1924,8 +1863,8 @@ namespace Sayuri {
     // %%% equal?
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -1939,25 +1878,20 @@ namespace Sayuri {
         (const LispObject& left, const LispObject& right) -> bool {
           if (left.type() != right.type()) return false;
 
-          if (left.type() == LispObjectType::ATOM) {
+          if (!(left.IsPair())) {
             // Atomの場合。
-            if (left.atom_type() != right.atom_type()) {
-              return false;
-
-            }
-
-            switch (left.atom_type()) {
-              case AtomType::NIL:
+            switch (left.type()) {
+              case LispObjectType::NIL:
                 return true;
-              case AtomType::SYMBOL:
+              case LispObjectType::SYMBOL:
                 return left.symbol_value() == right.symbol_value();
-              case AtomType::NUMBER:
+              case LispObjectType::NUMBER:
                 return left.number_value() == right.number_value();
-              case AtomType::BOOLEAN:
+              case LispObjectType::BOOLEAN:
                 return left.boolean_value() == right.boolean_value();
-              case AtomType::STRING:
+              case LispObjectType::STRING:
                 return left.string_value() == right.string_value();
-              case AtomType::FUNCTION:
+              case LispObjectType::FUNCTION:
                 {
                   const std::vector<std::string>&
                   left_arg_name_vec = left.arg_name_vec();
@@ -2003,7 +1937,7 @@ namespace Sayuri {
                   }
                   return true;
                 }
-              case AtomType::NATIVE_FUNCTION:
+              case LispObjectType::NATIVE_FUNCTION:
                 throw LispObject::GenError("@runtime-error",
                 "Native Function can't be compared,"
                 " because there are many types of function.");
@@ -2066,8 +2000,8 @@ namespace Sayuri {
     // %%% pair?
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -2117,8 +2051,8 @@ namespace Sayuri {
     // %%% list?
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -2169,8 +2103,8 @@ namespace Sayuri {
     // %%% null?
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -2225,8 +2159,8 @@ namespace Sayuri {
     // %%% symbol?
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -2277,8 +2211,8 @@ namespace Sayuri {
     // %%% number?
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -2329,8 +2263,8 @@ namespace Sayuri {
     // %%% boolean?
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -2381,8 +2315,8 @@ namespace Sayuri {
     // %%% string?
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -2433,8 +2367,8 @@ namespace Sayuri {
     // %%% function?
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -2486,8 +2420,8 @@ namespace Sayuri {
     // %%% native-function?
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -2538,8 +2472,8 @@ namespace Sayuri {
     // %%% procedure?
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -2597,8 +2531,8 @@ namespace Sayuri {
     // %%% output-stream
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -2693,8 +2627,8 @@ namespace Sayuri {
     // %%% input-stream
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -2817,8 +2751,8 @@ namespace Sayuri {
     // %%% append
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -2878,8 +2812,8 @@ namespace Sayuri {
     // %%% list
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -2924,8 +2858,8 @@ namespace Sayuri {
     // %%% list-ref
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -3000,8 +2934,8 @@ namespace Sayuri {
     // %%% list-replace
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -3082,8 +3016,8 @@ namespace Sayuri {
     // %%% list-remove
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -3156,8 +3090,8 @@ namespace Sayuri {
     // %%% length
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -3172,8 +3106,8 @@ namespace Sayuri {
         LispObjectPtr result = caller.Evaluate(*list_itr);
 
         // Atomの場合。
-        if (result->type() == LispObjectType::ATOM) {
-          if (result->atom_type() == AtomType::NIL) {
+        if (!(result->IsPair())) {
+          if (result->IsNil()) {
             return LispObject::NewNumber(0);
           }
           return LispObject::NewNumber(1);
@@ -3216,8 +3150,8 @@ namespace Sayuri {
     // %%% =
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -3281,8 +3215,8 @@ namespace Sayuri {
     // %%% <
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -3348,8 +3282,8 @@ namespace Sayuri {
     // %%% <=
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -3415,8 +3349,8 @@ namespace Sayuri {
     // %%% >
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -3482,8 +3416,8 @@ namespace Sayuri {
     // %%% >=
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -3549,8 +3483,8 @@ namespace Sayuri {
     // %%% not
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -3595,8 +3529,8 @@ namespace Sayuri {
     // %%% and
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -3648,8 +3582,8 @@ namespace Sayuri {
     // %%% or
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -3701,8 +3635,8 @@ namespace Sayuri {
     // %%% +
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       -> LispObjectPtr {
         // 準備。
@@ -3747,8 +3681,8 @@ namespace Sayuri {
     // %%% -
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -3801,8 +3735,8 @@ namespace Sayuri {
     // %%% *
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -3847,8 +3781,8 @@ namespace Sayuri {
     // %%% /
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -3901,8 +3835,8 @@ namespace Sayuri {
     // %%% string-append
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -3947,8 +3881,8 @@ namespace Sayuri {
     // %%% string-ref
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4013,8 +3947,8 @@ namespace Sayuri {
     // %%% string-split
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4127,8 +4061,8 @@ namespace Sayuri {
     // %%% sin
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4174,8 +4108,8 @@ namespace Sayuri {
     // %%% cos
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4221,8 +4155,8 @@ namespace Sayuri {
     // %%% tan
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4268,8 +4202,8 @@ namespace Sayuri {
     // %%% asin
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4315,8 +4249,8 @@ namespace Sayuri {
     // %%% acos
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4362,8 +4296,8 @@ namespace Sayuri {
     // %%% atan
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4409,8 +4343,8 @@ namespace Sayuri {
     // %%% sqrt
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4456,8 +4390,8 @@ namespace Sayuri {
     // %%% abs
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4502,8 +4436,8 @@ namespace Sayuri {
     // %%% ceil
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4548,8 +4482,8 @@ namespace Sayuri {
     // %%% floor
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4594,8 +4528,8 @@ namespace Sayuri {
     // %%% round
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4646,8 +4580,8 @@ namespace Sayuri {
     // %%% trunc
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4698,8 +4632,8 @@ namespace Sayuri {
     // %%% exp
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4744,8 +4678,8 @@ namespace Sayuri {
     // %%% expt
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4802,8 +4736,8 @@ namespace Sayuri {
     // %%% log
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4848,8 +4782,8 @@ namespace Sayuri {
     // %%% log2
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4894,8 +4828,8 @@ namespace Sayuri {
     // %%% log10
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -4943,8 +4877,8 @@ namespace Sayuri {
       std::shared_ptr<std::mt19937>
       engine_ptr(new std::mt19937(Time::to_time_t(Time::now())));
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [engine_ptr](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
@@ -4996,8 +4930,8 @@ namespace Sayuri {
     // %%% max
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -5055,8 +4989,8 @@ namespace Sayuri {
     // %%% min
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->atom_.scope_chain_ = root_ptr->atom_.scope_chain_;
-      func_ptr->atom_.native_function_ =
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
       [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
       ->LispObjectPtr {
         // 準備。
@@ -5120,31 +5054,27 @@ namespace Sayuri {
     }
 
     std::string type_str[] {
-      "PAIR", "ATOM"
-    };
-    std::string atom_type_str[] {
-      "NIL", "SYMBOL", "NUMBER", "BOOLEAN", "STRING",
+      "PAIR", "NIL", "SYMBOL", "NUMBER", "BOOLEAN", "STRING",
       "FUNCTION", "NATIVE_FUNCTION"
     };
 
-    std::cout << type_str[static_cast<int>(obj_ptr->type())] << " : "
-    << atom_type_str[static_cast<int>(obj_ptr->atom_type())];
+    std::cout << type_str[static_cast<int>(obj_ptr->type())];
 
-    switch (obj_ptr->atom_type()) {
-      case AtomType::SYMBOL:
+    switch (obj_ptr->type()) {
+      case LispObjectType::SYMBOL:
         std::cout << " : " << obj_ptr->symbol_value();
         break;
-      case AtomType::NUMBER:
+      case LispObjectType::NUMBER:
         std::cout << " : " << obj_ptr->number_value();
         break;
-      case AtomType::BOOLEAN:
+      case LispObjectType::BOOLEAN:
         if (obj_ptr->boolean_value()) {
           std::cout << " : #t";
         } else {
           std::cout << " : #f";
         }
         break;
-      case AtomType::STRING:
+      case LispObjectType::STRING:
         std::cout << " : " << obj_ptr->string_value();
         break;
       default:
@@ -5164,31 +5094,27 @@ namespace Sayuri {
     }
 
     std::string type_str[] {
-      "PAIR", "ATOM"
-    };
-    std::string atom_type_str[] {
-      "NIL", "SYMBOL", "NUMBER", "BOOLEAN", "STRING",
+      "PAIR", "NIL", "SYMBOL", "NUMBER", "BOOLEAN", "STRING",
       "FUNCTION", "NATIVE_FUNCTION"
     };
 
-    std::cout << type_str[static_cast<int>(obj_ptr->type())] << " : "
-    << atom_type_str[static_cast<int>(obj_ptr->atom_type())];
+    std::cout << type_str[static_cast<int>(obj_ptr->type())];
 
-    switch (obj_ptr->atom_type()) {
-      case AtomType::SYMBOL:
+    switch (obj_ptr->type()) {
+      case LispObjectType::SYMBOL:
         std::cout << " : " << obj_ptr->symbol_value();
         break;
-      case AtomType::NUMBER:
+      case LispObjectType::NUMBER:
         std::cout << " : " << obj_ptr->number_value();
         break;
-      case AtomType::BOOLEAN:
+      case LispObjectType::BOOLEAN:
         if (obj_ptr->boolean_value()) {
           std::cout << " : #t";
         } else {
           std::cout << " : #f";
         }
         break;
-      case AtomType::STRING:
+      case LispObjectType::STRING:
         std::cout << " : " << obj_ptr->string_value();
         break;
       default:
@@ -5196,8 +5122,8 @@ namespace Sayuri {
     }
     std::cout << std::endl;
 
-    PrintTree(obj_ptr->pair_.car_.get(), pre_str + "  Car | ");
-    PrintTree(obj_ptr->pair_.cdr_.get(), pre_str + "  --- | ");
+    PrintTree(obj_ptr->car_.get(), pre_str + "  Car | ");
+    PrintTree(obj_ptr->cdr_.get(), pre_str + "  --- | ");
   }
 
   // ============= //

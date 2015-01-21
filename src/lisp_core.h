@@ -43,9 +43,7 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
-  struct LispPair;
   struct LispFunction;
-  struct Atom;
   class LispObject;
   using LispObjectPtr = std::shared_ptr<LispObject>;
   using SymbolMap = std::map<std::string, LispObjectPtr>;
@@ -62,14 +60,8 @@ namespace Sayuri {
 
   /** Lispオブジェクトのタイプ。 */
   enum class LispObjectType {
-    /** LispPair。 */
+    /** Pair。 */
     PAIR,
-    /** Atom。 */
-    ATOM
-  };
-
-  /** Atomのタイプ。 */
-  enum class AtomType {
     /** Nil。 */
     NIL,
     /** シンボル。 */
@@ -84,42 +76,6 @@ namespace Sayuri {
     FUNCTION,
     /** ネイティブ関数オブジェクト。 */
     NATIVE_FUNCTION
-  };
-
-  /** LispPairの構造体。 */
-  struct LispPair {
-    /** Carへのポインタ。 */
-    LispObjectPtr car_;
-    /** Carへのポインタ。 */
-    LispObjectPtr cdr_;
-
-    // ==================== //
-    // コンストラクタと代入 //
-    // ==================== //
-    /** コンストラクタ。 */
-    LispPair();
-    /**
-     * コピーコンストラクタ。
-     * @param cons コピー元。
-     */
-    LispPair(const LispPair& cons);
-    /**
-     * ムーブコンストラクタ。
-     * @param cons ムーブ元。
-     */
-    LispPair(LispPair&& cons);
-    /**
-     * コピー代入演算子。
-     * @param cons コピー元。
-     */
-    LispPair& operator=(const LispPair& cons);
-    /**
-     * ムーブ代入演算子。
-     * @param cons ムーブ元。
-     */
-    LispPair& operator=(LispPair&& cons);
-    /** デストラクタ。 */
-    virtual ~LispPair();
   };
 
   /** 関数オブジェクト構造体。 */
@@ -156,55 +112,6 @@ namespace Sayuri {
     LispFunction& operator=(LispFunction&& func);
     /** デストラクタ。 */
     virtual ~LispFunction();
-  };
-
-  /** Atomデータ構造体。 */
-  struct Atom {
-    /** Atomのタイプ。 */
-    AtomType type_;
-    /** プリミティブデータ。 */
-    union {
-      /** 実数データ。 */
-      double number_value_;
-      /** 真偽値データ。 */
-      bool boolean_value_;
-    };
-    /** シンボル・文字列データ。 */
-    std::string str_value_;
-    /** 関数オブジェクト。 **/
-    LispFunction function_;
-    /** ネイティブ関数オブジェクト。 **/
-    NativeFunction native_function_;
-    /** スコープチェーン。 */
-    ScopeChain scope_chain_;
-
-    // ==================== //
-    // コンストラクタと代入 //
-    // ==================== //
-    /** コンストラクタ。 */
-    Atom();
-    /**
-     * コピーコンストラクタ。
-     * @param atom コピー元。
-     */
-    Atom(const Atom& atom);
-    /**
-     * ムーブコンストラクタ。
-     * @param atom ムーブ元。
-     */
-    Atom(Atom&& atom);
-    /**
-     * コピー代入演算子。
-     * @param atom コピー元。
-     */
-    Atom& operator=(const Atom& atom);
-    /**
-     * ムーブ代入演算子。
-     * @param atom ムーブ元。
-     */
-    Atom& operator=(Atom&& atom);
-    /** デストラクタ。 */
-    virtual ~Atom();
   };
 
   /** Lispオブジェクト構造体。 */
@@ -246,16 +153,15 @@ namespace Sayuri {
        * @return 自分のコピーのポインタ。
        */
       LispObjectPtr Clone() const {
-        LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = type_;
+        // 先ず自分のコピーを作る。
+        LispObjectPtr ret_ptr(new LispObject(*this));
 
-        ret_ptr->atom_ = atom_;
-
-        if (pair_.car_) {
-          ret_ptr->pair_.car_ = pair_.car_->Clone();
+        // 子ノードをクローンする。
+        if (car_) {
+          ret_ptr->car_ = car_->Clone();
         }
-        if (pair_.cdr_) {
-          ret_ptr->pair_.cdr_ = pair_.cdr_->Clone();
+        if (cdr_) {
+          ret_ptr->cdr_ = cdr_->Clone();
         }
 
         return ret_ptr;
@@ -271,7 +177,7 @@ namespace Sayuri {
         // *(scope_chain_.back()) : SymbolMap
         // (*(scope_chain_.back()))[symbol] : LispObjectPtr
         // *((*(scope_chain_.back()))[symbol]) : LispObject
-        (*(atom_.scope_chain_.back()))[symbol] = obj_ptr;
+        (*(scope_chain_.back()))[symbol] = obj_ptr;
       }
 
       /**
@@ -282,20 +188,19 @@ namespace Sayuri {
       void RewriteSymbol(const std::string& symbol, LispObjectPtr obj_ptr)
       const {
         // スコープチェーンを検索する。
-        ScopeChain::const_reverse_iterator citr =
-        atom_.scope_chain_.crbegin();
+        ScopeChain::const_reverse_iterator citr = scope_chain_.crbegin();
 
         // *citr : SymbolMapPtr
         // **citr : SymbolMap
         // (**citr)[symbol] : LispObjectPtr
         // *((**citr)[symbol]) : LispObject
-        for (; citr != atom_.scope_chain_.rend(); ++citr) {
+        for (; citr != scope_chain_.rend(); ++citr) {
           if ((**citr).find(symbol) != (**citr).end()) {
             (**citr)[symbol] = obj_ptr;
           }
         }
 
-        (*(atom_.scope_chain_.back()))[symbol] = obj_ptr;
+        (*(scope_chain_.back()))[symbol] = obj_ptr;
       }
 
       /**
@@ -307,14 +212,13 @@ namespace Sayuri {
       LispObjectPtr ReferSymbol(const std::string& symbol) const
       throw (LispObjectPtr) {
         // スコープチェーンを検索する。
-        ScopeChain::const_reverse_iterator citr =
-        atom_.scope_chain_.crbegin();
+        ScopeChain::const_reverse_iterator citr = scope_chain_.crbegin();
 
         // *citr : SymbolMapPtr
         // **citr : SymbolMap
         // (**citr)[symbol] : LispObjectPtr
         // *((**citr)[symbol]) : LispObject
-        for (; citr != atom_.scope_chain_.rend(); ++citr) {
+        for (; citr != scope_chain_.rend(); ++citr) {
           if ((**citr).find(symbol) != (**citr).end()) {
             return (**citr)[symbol];
           }
@@ -334,7 +238,7 @@ namespace Sayuri {
         // ペアの数を数える。
         for (const LispObject* ptr = this;
         ptr && (ptr->type_ ==  LispObjectType::PAIR);
-        ptr = ptr->pair_.cdr_.get()) {
+        ptr = ptr->cdr_.get()) {
           ++count;
         }
 
@@ -360,8 +264,7 @@ namespace Sayuri {
        * @return Nilならtrue。
        */
       bool IsNil() const {
-        return (type_ == LispObjectType::ATOM)
-        && (atom_.type_ == AtomType::NIL);
+        return type_ == LispObjectType::NIL;
       }
 
       /**
@@ -369,8 +272,7 @@ namespace Sayuri {
        * @return Symbolならtrue。
        */
       bool IsSymbol() const {
-        return (type_ == LispObjectType::ATOM)
-        && (atom_.type_ == AtomType::SYMBOL);
+        return type_ == LispObjectType::SYMBOL;
       }
 
       /**
@@ -378,8 +280,7 @@ namespace Sayuri {
        * @return Numberならtrue。
        */
       bool IsNumber() const {
-        return (type_ == LispObjectType::ATOM)
-        && (atom_.type_ == AtomType::NUMBER);
+        return type_ == LispObjectType::NUMBER;
       }
 
       /**
@@ -387,8 +288,7 @@ namespace Sayuri {
        * @return Booleanならtrue。
        */
       bool IsBoolean() const {
-        return (type_ == LispObjectType::ATOM)
-        && (atom_.type_ == AtomType::BOOLEAN);
+        return type_ == LispObjectType::BOOLEAN;
       }
 
       /**
@@ -396,8 +296,7 @@ namespace Sayuri {
        * @return Stringならtrue。
        */
       bool IsString() const {
-        return (type_ == LispObjectType::ATOM)
-        && (atom_.type_ == AtomType::STRING);
+        return type_ == LispObjectType::STRING;
       }
 
       /**
@@ -405,8 +304,7 @@ namespace Sayuri {
        * @return Functionならtrue。
        */
       bool IsFunction() const {
-        return (type_ == LispObjectType::ATOM)
-        && (atom_.type_ == AtomType::FUNCTION);
+        return type_ == LispObjectType::FUNCTION;
       }
 
       /**
@@ -414,8 +312,7 @@ namespace Sayuri {
        * @return Native Functionならtrue。
        */
       bool IsNativeFunction() const {
-        return (type_ == LispObjectType::ATOM)
-        && (atom_.type_ == AtomType::NATIVE_FUNCTION);
+        return type_ == LispObjectType::NATIVE_FUNCTION;
       }
 
       /**
@@ -424,7 +321,7 @@ namespace Sayuri {
        */
       bool IsList() const {
         const LispObject* ptr = this;
-        for (; ptr && ptr->IsPair(); ptr = ptr->pair_.cdr_.get()) continue;
+        for (; ptr && ptr->IsPair(); ptr = ptr->cdr_.get()) continue;
 
         if (ptr->IsNil()) return true;
         return false;
@@ -440,8 +337,8 @@ namespace Sayuri {
         index = index < 0 ? Length() + index : index;
         const LispObject* ptr = this;
         for (int i = 0; ptr && ptr->IsPair();
-        ptr = ptr->pair_.cdr_.get(),  ++i) {
-          if (i == index) return *(ptr->pair_.car_);
+        ptr = ptr->cdr_.get(),  ++i) {
+          if (i == index) return *(ptr->car_);
         }
 
         throw LispObject::GenError
@@ -460,7 +357,7 @@ namespace Sayuri {
        * 新しいローカルスコープを生成する。
        */
       void NewLocalScope() {
-        atom_.scope_chain_.push_back(SymbolMapPtr(new SymbolMap()));
+        scope_chain_.push_back(SymbolMapPtr(new SymbolMap()));
       }
 
       /**
@@ -469,7 +366,7 @@ namespace Sayuri {
        */
       void Append(LispObjectPtr obj) {
         LispObject* ptr = this;
-        for (; ptr && ptr->IsPair(); ptr = ptr->pair_.cdr_.get()) continue;
+        for (; ptr && ptr->IsPair(); ptr = ptr->cdr_.get()) continue;
 
         if (ptr->IsNil()) *ptr = *obj;
       }
@@ -488,10 +385,8 @@ namespace Sayuri {
        * @return グローバルオブジェクト。
        */
       static LispObjectPtr GenGlobal(std::shared_ptr<HelpDict> dict_ptr) {
-        LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::ATOM;
-        ret_ptr->atom_.type_ = AtomType::FUNCTION;
-        ret_ptr->atom_.scope_chain_.push_back(SymbolMapPtr(new SymbolMap()));
+        LispObjectPtr ret_ptr = NewFunction();
+        ret_ptr->NewLocalScope();
         SetCoreFunctions(ret_ptr, dict_ptr);
         return ret_ptr;
       }
@@ -505,8 +400,8 @@ namespace Sayuri {
       static LispObjectPtr NewPair(LispObjectPtr car, LispObjectPtr cdr) {
         LispObjectPtr ret_ptr(new LispObject());
         ret_ptr->type_ = LispObjectType::PAIR;
-        ret_ptr->pair_.car_ = car;
-        ret_ptr->pair_.cdr_ = cdr;
+        ret_ptr->car_ = car;
+        ret_ptr->cdr_ = cdr;
 
         return ret_ptr;
       }
@@ -518,12 +413,12 @@ namespace Sayuri {
       static LispObjectPtr NewPair() {
         LispObjectPtr ret_ptr(new LispObject());
         ret_ptr->type_ = LispObjectType::PAIR;
-        ret_ptr->pair_.car_.reset(new LispObject());
-        ret_ptr->pair_.car_->type_ = LispObjectType::ATOM;
-        ret_ptr->pair_.car_->atom_.type_ = AtomType::NIL;
-        ret_ptr->pair_.cdr_.reset(new LispObject());
-        ret_ptr->pair_.cdr_->type_ = LispObjectType::ATOM;
-        ret_ptr->pair_.cdr_->atom_.type_ = AtomType::NIL;
+
+        ret_ptr->car_.reset(new LispObject());
+        ret_ptr->car_->type_ = LispObjectType::NIL;
+
+        ret_ptr->cdr_.reset(new LispObject());
+        ret_ptr->cdr_->type_ = LispObjectType::NIL;
 
         return ret_ptr;
       }
@@ -534,8 +429,7 @@ namespace Sayuri {
        */
       static LispObjectPtr NewNil() {
         LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::ATOM;
-        ret_ptr->atom_.type_ = AtomType::NIL;
+        ret_ptr->type_ = LispObjectType::NIL;
         return ret_ptr;
       }
 
@@ -546,9 +440,8 @@ namespace Sayuri {
        */
       static LispObjectPtr NewSymbol(const std::string& value) {
         LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::ATOM;
-        ret_ptr->atom_.type_ = AtomType::SYMBOL;
-        ret_ptr->atom_.str_value_ = value;
+        ret_ptr->type_ = LispObjectType::SYMBOL;
+        ret_ptr->str_value_ = value;
         return ret_ptr;
       }
 
@@ -559,9 +452,8 @@ namespace Sayuri {
        */
       static LispObjectPtr NewNumber(double value) {
         LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::ATOM;
-        ret_ptr->atom_.type_ = AtomType::NUMBER;
-        ret_ptr->atom_.number_value_ = value;
+        ret_ptr->type_ = LispObjectType::NUMBER;
+        ret_ptr->number_value_ = value;
         return ret_ptr;
       }
 
@@ -572,9 +464,8 @@ namespace Sayuri {
        */
       static LispObjectPtr NewBoolean(bool value) {
         LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::ATOM;
-        ret_ptr->atom_.type_ = AtomType::BOOLEAN;
-        ret_ptr->atom_.boolean_value_ = value;
+        ret_ptr->type_ = LispObjectType::BOOLEAN;
+        ret_ptr->boolean_value_ = value;
         return ret_ptr;
       }
 
@@ -585,9 +476,8 @@ namespace Sayuri {
        */
       static LispObjectPtr NewString(const std::string& value) {
         LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::ATOM;
-        ret_ptr->atom_.type_ = AtomType::STRING;
-        ret_ptr->atom_.str_value_ = value;
+        ret_ptr->type_ = LispObjectType::STRING;
+        ret_ptr->str_value_ = value;
         return ret_ptr;
       }
 
@@ -597,8 +487,7 @@ namespace Sayuri {
        */
       static LispObjectPtr NewFunction() {
         LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::ATOM;
-        ret_ptr->atom_.type_ = AtomType::FUNCTION;
+        ret_ptr->type_ = LispObjectType::FUNCTION;
         return ret_ptr;
       }
 
@@ -608,8 +497,7 @@ namespace Sayuri {
        */
       static LispObjectPtr NewNativeFunction() {
         LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::ATOM;
-        ret_ptr->atom_.type_ = AtomType::NATIVE_FUNCTION;
+        ret_ptr->type_ = LispObjectType::NATIVE_FUNCTION;
         return ret_ptr;
       }
 
@@ -623,10 +511,10 @@ namespace Sayuri {
         LispObject* ptr = ret_ptr.get();
         for (unsigned int i = 0; i < length; ++i) {
           ptr->type_ = LispObjectType::PAIR;
-          ptr->pair_.car_ = NewNil();
-          ptr->pair_.cdr_ = NewNil();
+          ptr->car_ = NewNil();
+          ptr->cdr_ = NewNil();
 
-          ptr = ptr->pair_.cdr_.get();
+          ptr = ptr->cdr_.get();
         }
 
         return ret_ptr;
@@ -642,8 +530,8 @@ namespace Sayuri {
       const std::string& message) {
         LispObjectPtr ret_ptr = NewList(2);
 
-        ret_ptr->pair_.car_ = NewSymbol(error_symbol);
-        ret_ptr->pair_.cdr_->pair_.car_ = NewString(message);
+        ret_ptr->car_ = NewSymbol(error_symbol);
+        ret_ptr->cdr_->car_ = NewString(message);
 
         return ret_ptr;
       }
@@ -796,69 +684,64 @@ namespace Sayuri {
        * アクセサ - Car。
        * @return Car。
        */
-      LispObjectPtr car() const {return pair_.car_;}
+      LispObjectPtr car() const {return car_;}
       /**
        * アクセサ - Cdr。
        * @return Cdr。
        */
-      LispObjectPtr cdr() const {return pair_.cdr_;}
-      /**
-       * アクセサ - Atomのタイプ。
-       * @return Atomのタイプ。
-       */
-      AtomType atom_type() const {return atom_.type_;}
+      LispObjectPtr cdr() const {return cdr_;}
       /**
        * アクセサ - Atomのシンボルの値。
        * @return Atomのシンボルの値。
        */
-      std::string symbol_value() const {return atom_.str_value_;}
+      std::string symbol_value() const {return str_value_;}
       /**
        * アクセサ - Atomの数字の値。
        * @return Atomの数字の値。
        */
-      double number_value() const {return atom_.number_value_;}
+      double number_value() const {return number_value_;}
       /**
        * アクセサ - Atomの真偽値の値。
        * @return Atomの真偽値の値。
        */
-      bool boolean_value() const {return atom_.boolean_value_; }
+      bool boolean_value() const {return boolean_value_; }
       /**
        * アクセサ - Atomの文字列の値。
        * @return Atomの文字列の値。
        */
-      std::string string_value() const {return atom_.str_value_;}
+      std::string string_value() const {return str_value_;}
       /**
        * アクセサ - Atomの関数オブジェクト。
        * @return Atomの関数オブジェクト。
        */
-      const LispFunction& function_() const {return atom_.function_;} 
+      const LispFunction& function() const {return function_;} 
       /**
        * アクセサ - Atomの関数オブジェクトの引数名ベクトル。
        * @return Atomの関数オブジェクトの引数名ベクトル。
        */
       const std::vector<std::string>& arg_name_vec() const {
-        return atom_.function_.arg_name_vec_;
+        return function_.arg_name_vec_;
       }
       /**
        * アクセサ - Atomの関数オブジェクトの関数定義ベクトル。
        * @return Atomの関数オブジェクトの関数定義ベクトル。
        */
       const std::vector<LispObjectPtr> def_vec() const {
-        return atom_.function_.def_vec_;
+        return function_.def_vec_;
       }
       /**
        * アクセサ - Atomのネイティブ関数オブジェクト。
        * @return Atomのネイティブ関数オブジェクト。
        */
       const NativeFunction& native_function() const {
-        return atom_.native_function_;
+        return native_function_;
       }
       /**
        * アクセサ - スコープチェーン。
        * @return スコープチェーン。
        */
       const ScopeChain& scope_chain() const {
-        return atom_.scope_chain_;
+        return scope_chain_;
       }
 
       // ============ //
@@ -873,69 +756,64 @@ namespace Sayuri {
        * ミューテータ - Car。
        * @param ptr Car。
        */
-      void car(LispObjectPtr ptr) {pair_.car_ = ptr;}
+      void car(LispObjectPtr ptr) {car_ = ptr;}
       /**
        * ミューテータ - Cdr。
        * @param ptr Cdr。
        */
-      void cdr(LispObjectPtr ptr) {pair_.cdr_ = ptr;}
-      /**
-       * ミューテータ - Atomのタイプ。
-       * @param type Atomのタイプ。
-       */
-      void atom_type(AtomType type) {atom_.type_ = type;}
+      void cdr(LispObjectPtr ptr) {cdr_ = ptr;}
       /**
        * ミューテータ - Atomのシンボルの値。
        * @param value Atomのシンボルの値。
        */
-      void symbol_value(const std::string& value) {atom_.str_value_ = value;}
+      void symbol_value(const std::string& value) {str_value_ = value;}
       /**
        * ミューテータ - Atomの数字の値。
        * @param value Atomの数字の値。
        */
-      void number_value(double value) {atom_.number_value_ = value;}
+      void number_value(double value) {number_value_ = value;}
       /**
        * ミューテータ - Atomの真偽値の値。
        * @param value Atomの真偽値の値。
        */
-      void boolean_value(bool value) {atom_.boolean_value_ = value; }
+      void boolean_value(bool value) {boolean_value_ = value; }
       /**
        * ミューテータ - Atomの文字列の値。
        * @param value Atomの文字列の値。
        */
-      void string_value(const std::string& value) {atom_.str_value_ = value;}
+      void string_value(const std::string& value) {str_value_ = value;}
       /**
        * ミューテータ - Atomの関数オブジェクト。
        * @param obj Atomの関数オブジェクト。
        */
-      void function(const LispFunction& obj) {atom_.function_ = obj;} 
+      void function(const LispFunction& obj) {function_ = obj;} 
       /**
        * ミューテータ - Atomの関数オブジェクトの引数名ベクトル。
        * @param vec Atomの関数オブジェクトの引数名ベクトル。
        */
       void arg_name_vec(const std::vector<std::string>& vec) {
-        atom_.function_.arg_name_vec_ = vec;
+        function_.arg_name_vec_ = vec;
       }
       /**
        * ミューテータ - Atomの関数オブジェクトの関数定義ベクトル。
        * @param vec Atomの関数オブジェクトの関数定義ベクトル。
        */
       void def_vec(const std::vector<LispObjectPtr>& vec) {
-        atom_.function_.def_vec_ = vec;
+        function_.def_vec_ = vec;
       }
       /**
        * ミューテータ - Atomのネイティブ関数オブジェクト。
        * @param obj Atomのネイティブ関数オブジェクト。
        */
       void native_function(const NativeFunction& obj) {
-        atom_.native_function_ = obj;
+        native_function_ = obj;
       }
       /**
        * ミューテータ - スコープチェーン。
        * @param chain スコープチェーン。
        */
       void scope_chain(const ScopeChain& chain) {
-        atom_.scope_chain_ = chain;
+        scope_chain_ = chain;
       }
 
     private:
@@ -961,11 +839,30 @@ namespace Sayuri {
       /** オブジェクトのタイプ。 */
       LispObjectType type_;
 
-      /** LispPairデータ。*/
-      LispPair pair_;
-      /** Atomデータ。 */
-      Atom atom_;
+      /** Car。 */
+      LispObjectPtr car_;
+      /** Cdr。 */
+      LispObjectPtr cdr_;
 
+      /** プリミティブデータ。 */
+      union {
+        /** 実数データ。 */
+        double number_value_;
+        /** 真偽値データ。 */
+        bool boolean_value_;
+      };
+
+      /** シンボル・文字列データ。 */
+      std::string str_value_;
+
+      /** 関数オブジェクト。 **/
+      LispFunction function_;
+
+      /** ネイティブ関数オブジェクト。 **/
+      NativeFunction native_function_;
+
+      /** スコープチェーン。 */
+      ScopeChain scope_chain_;
   };
 
   /** List用イテレータ。 */
