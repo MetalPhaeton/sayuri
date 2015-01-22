@@ -242,7 +242,7 @@ namespace Sayuri {
     std::size_t start = last_;
 
     // ナイト、ビショップ、ルーク、クイーンの候補手を作る。
-    for (Piece piece_type = KNIGHT; piece_type <= QUEEN; ++piece_type) {
+    for (PieceType piece_type = KNIGHT; piece_type <= QUEEN; ++piece_type) {
       Bitboard pieces = engine_ptr_->position()[side][piece_type];
 
       for (; pieces; Util::SetNext(pieces)) {
@@ -319,7 +319,7 @@ namespace Sayuri {
         if (((side == WHITE) && (Util::SQUARE_TO_RANK[to] == RANK_8))
         || ((side == BLACK) && (Util::SQUARE_TO_RANK[to] == RANK_1))) {
           // 昇格を設定。
-          for (Piece piece_type = KNIGHT; piece_type <= QUEEN; ++piece_type) {
+          for (PieceType piece_type = KNIGHT; piece_type <= QUEEN; ++piece_type) {
             SetPromotion(move, piece_type);
             move_stack_[last_++].move_ = move;
           }

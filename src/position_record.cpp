@@ -91,7 +91,7 @@ namespace Sayuri {
     if (castling_rights_ != engine.castling_rights_) return false;
     if (en_passant_square_ != engine.en_passant_square_) return false;
     for (Side side = WHITE; side <= BLACK; ++side) {
-      for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
+      for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
         if (position_[side][piece_type]
         != engine.position_[side][piece_type]) {
           return false;
@@ -108,7 +108,7 @@ namespace Sayuri {
     if (castling_rights_ != engine.castling_rights_) return true;
     if (en_passant_square_ != engine.en_passant_square_) return true;
     for (Side side = WHITE; side <= BLACK; ++side) {
-      for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
+      for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
         if (position_[side][piece_type]
         != engine.position_[side][piece_type]) {
           return true;
@@ -125,7 +125,7 @@ namespace Sayuri {
     if (castling_rights_ != record.castling_rights_) return false;
     if (en_passant_square_ != record.en_passant_square_) return false;
     for (Side side = WHITE; side <= BLACK; ++side) {
-      for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
+      for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
         if (position_[side][piece_type]
         != record.position_[side][piece_type]) {
           return false;
@@ -142,7 +142,7 @@ namespace Sayuri {
     if (castling_rights_ != record.castling_rights_) return true;
     if (en_passant_square_ != record.en_passant_square_) return true;
     for (Side side = WHITE; side <= BLACK; ++side) {
-      for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
+      for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
         if (position_[side][piece_type]
         != record.position_[side][piece_type]) {
           return true;

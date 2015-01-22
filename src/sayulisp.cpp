@@ -606,7 +606,7 @@ namespace Sayuri {
     }
 
     // 駒の定数をバインド。
-    for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
       global_ptr_->BindSymbol(EngineSuite::PIECE_SYMBOL[piece_type],
       LispObject::NewNumber(piece_type));
     }
@@ -751,7 +751,7 @@ __Description__
         - This needs one argument.
             - A constant value that indicates one square.
         - Return what kind of piece is placed at the square
-          as `(<Side : Symbol> <Piece : Symbol>)`.
+          as `(<Side : Symbol> <PieceType : Symbol>)`.
 
     + `@get-to-move`
         - Return Symbol of side which has its turn to move.

@@ -161,13 +161,13 @@ namespace Sayuri {
 
   // --- 駒の定義 --- //
   /** 駒の型。 */
-  using Piece = std::uint32_t;
+  using PieceType = std::uint32_t;
   /** 駒の定数 */
-  enum : Piece {
+  enum : PieceType {
     EMPTY, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING
   };
   /** 駒の種類の数。 */
-  constexpr Piece NUM_PIECE_TYPES = KING + 1;
+  constexpr PieceType NUM_PIECE_TYPES = KING + 1;
 
   /** キャスリングのフラグの型。 */
   using Castling = std::uint8_t;
@@ -268,7 +268,7 @@ namespace Sayuri {
    * @param move 対象のオブジェクト。
    * @return 昇格する駒の種類。
    */
-  constexpr inline Piece GetPromotion(Move move) {
+  constexpr inline PieceType GetPromotion(Move move) {
     return (move & PROMOTION_MASK) >> PROMOTION_SHIFT;
   }
 
@@ -286,7 +286,7 @@ namespace Sayuri {
    * @param move 対象のオブジェクト。
    * @return 取った駒の種類。
    */
-  constexpr inline Piece GetCapturedPiece(Move move) {
+  constexpr inline PieceType GetCapturedPiece(Move move) {
     return (move & CAPTURED_PIECE_MASK) >> CAPTURED_PIECE_SHIFT;
   }
 
@@ -332,7 +332,7 @@ namespace Sayuri {
    * @param move 対象のオブジェクト。
    * @param promotion 昇格する駒の種類。
    */
-  inline void SetPromotion(Move& move, Piece promotion) {
+  inline void SetPromotion(Move& move, PieceType promotion) {
     UPDATE_FIELD(move, promotion << PROMOTION_SHIFT, PROMOTION_MASK);
   }
 
@@ -350,7 +350,7 @@ namespace Sayuri {
    * @param move 対象のオブジェクト。
    * @param captured_piece 取った駒の種類。
    */
-  inline void SetCapturedPiece(Move& move, Piece captured_piece) {
+  inline void SetCapturedPiece(Move& move, PieceType captured_piece) {
     UPDATE_FIELD(move, captured_piece << CAPTURED_PIECE_SHIFT,
     CAPTURED_PIECE_MASK);
   }

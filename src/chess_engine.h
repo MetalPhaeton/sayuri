@@ -298,7 +298,7 @@ namespace Sayuri {
         } else if (!(bb & (bb - 1))) {
           // キング以外の、残りの駒が1つのとき。
           // 残った駒がビショップやナイトだった時は十分な駒がない。
-          Piece piece_type = piece_board_[Util::GetSquare(bb)];
+          PieceType piece_type = piece_board_[Util::GetSquare(bb)];
           if ((piece_type == KNIGHT) || (piece_type == BISHOP)) {
             return false;
           }
@@ -354,7 +354,7 @@ namespace Sayuri {
        * アクセサ - 駒の種類の配置。
        * @return 駒の種類の配置。 [マス]
        */
-      const Piece (& piece_board() const)[NUM_SQUARES] {
+      const PieceType (& piece_board() const)[NUM_SQUARES] {
         return piece_board_;
       }
       /**
@@ -521,19 +521,19 @@ namespace Sayuri {
       template<Side PSide>
       friend struct AddOrSub;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, Piece PType>
+      template<Side PSide, PieceType PType>
       friend struct GenBitboards;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, Piece PType>
+      template<Side PSide, PieceType PType>
       friend struct CalPosition;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, Piece PType>
+      template<Side PSide, PieceType PType>
       friend struct CalMobility;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, Piece PType>
+      template<Side PSide, PieceType PType>
       friend struct GenPinTargets;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, Piece PType>
+      template<Side PSide, PieceType PType>
       friend struct CalSpecial;
 
       /** PositionRecordはフレンド。 */
@@ -693,7 +693,7 @@ namespace Sayuri {
        * @param piece_type 置きたい駒の種類。
        * @param side 置きたい駒のサイド。
        */
-      void PutPiece(Square square, Piece piece_type, Side side=NO_SIDE);
+      void PutPiece(Square square, PieceType piece_type, Side side=NO_SIDE);
 
       /**
        * 駒の位置を変える。 (移動先の駒は上書きされる。)
@@ -718,7 +718,7 @@ namespace Sayuri {
       /** 駒の配置のビットボード。 [サイド][駒の種類] */
       Bitboard position_[NUM_SIDES][NUM_PIECE_TYPES];
       /** 駒の種類の配置。 [マス] */
-      Piece piece_board_[NUM_SQUARES];
+      PieceType piece_board_[NUM_SQUARES];
       /** サイドの配置。 [マス] */
       Side side_board_[NUM_SQUARES];
       /** 各サイドの駒の配置のビットボード。 [サイド] */

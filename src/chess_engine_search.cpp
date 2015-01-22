@@ -1557,9 +1557,9 @@ namespace Sayuri {
     }
 
     // 価値の低いものから調べる。
-    for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
+    for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
       Bitboard attackers = 0;
-      Piece promotion = EMPTY;
+      PieceType promotion = EMPTY;
       switch (piece_type) {
         case PAWN:
           attackers =

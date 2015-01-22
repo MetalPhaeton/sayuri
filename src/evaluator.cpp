@@ -87,7 +87,7 @@ namespace Sayuri {
   };
 
   // 評価用ビットボードを作成するテンプレート部品。
-  template<Side PSide, Piece PType>
+  template<Side PSide, PieceType PType>
   struct GenBitboards {
     static void F(Evaluator& evaluator, Square square,
     Bitboard& attacks, Bitboard& pawn_moves, Bitboard& en_passant) {}
@@ -146,11 +146,11 @@ namespace Sayuri {
   };
 
   // 駒の配置価値を計算するテンプレート部品。
-  template<Side PSide, Piece PType>
+  template<Side PSide, PieceType PType>
   struct CalPosition {
     static void F(Evaluator& evaluator, Square square) {}
   };
-  template<Piece PType>
+  template<PieceType PType>
   struct CalPosition<WHITE, PType> {
     static void F(Evaluator& evaluator, Square square) {
       const EvalParams& params = evaluator.engine_ptr_->eval_params();
@@ -163,7 +163,7 @@ namespace Sayuri {
       params.ending_position_value_table_[PType][square];
     }
   };
-  template<Piece PType>
+  template<PieceType PType>
   struct CalPosition<BLACK, PType> {
     static void F(Evaluator& evaluator, Square square) {
       const EvalParams& params = evaluator.engine_ptr_->eval_params();
@@ -178,7 +178,7 @@ namespace Sayuri {
   };
 
   // 駒の機動力を計算するテンプレート部品。
-  template<Side PSide, Piece PType>
+  template<Side PSide, PieceType PType>
   struct CalMobility {
     static void F(Evaluator& evaluator, Bitboard attacks, Bitboard pawn_moves,
     Bitboard en_passant) {
@@ -201,7 +201,7 @@ namespace Sayuri {
   };
 
   // ピンのターゲットや裏駒を抽出するテンプレート部品。
-  template<Side PSide, Piece PType>
+  template<Side PSide, PieceType PType>
   struct GenPinTargets {
     static void F(Evaluator& evaluator, Square square, Bitboard attacks,
     Bitboard& target, Bitboard& back) {}
@@ -247,7 +247,7 @@ namespace Sayuri {
   };
 
   // 各駒専用の価値を計算するテンプレート部品。
-  template<Side PSide, Piece PType>
+  template<Side PSide, PieceType PType>
   struct CalSpecial {
     static void F(Evaluator& evaluator, Square square) {}
   };
@@ -580,7 +580,7 @@ namespace Sayuri {
     const EvalParams& params = engine_ptr_->eval_params();
 
     // 配列型のウェイトの評価。
-    for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
+    for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
       score +=
 
       // オープニング時の駒の配置。
@@ -682,7 +682,7 @@ namespace Sayuri {
   // 価値を計算する関数 //
   // ================== //
   // 各駒の価値を計算する。
-  template<Side PSide, Piece PType>
+  template<Side PSide, PieceType PType>
   void Evaluator::CalValue(Square piece_square) {
     constexpr Side EnemySide = Util::GetOppositeSide(PSide);
 

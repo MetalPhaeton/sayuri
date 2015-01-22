@@ -169,7 +169,7 @@ namespace Sayuri {
     std::cout << fyle_table[fyle] << rank_table[rank] << std::endl;
 
     // 取った駒の種類を出力する。
-    std::cout << "Captured Piece: ";
+    std::cout << "Captured PieceType: ";
     switch (GetCapturedPiece(move)) {
       case EMPTY:
         std::cout << "None";

@@ -161,7 +161,7 @@ namespace Sayuri {
        * @param piece_square 駒のいるマス。
        * @param piece_side 駒のサイド。
        */
-      template<Side PSide, Piece PType>
+      template<Side PSide, PieceType PType>
       void CalValue(Square piece_square);
 
       // --- テンプレート部品 --- //
@@ -169,19 +169,19 @@ namespace Sayuri {
       template<Side PSide>
       friend struct AddOrSub;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, Piece PType>
+      template<Side PSide, PieceType PType>
       friend struct GenBitboards;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, Piece PType>
+      template<Side PSide, PieceType PType>
       friend struct CalPosition;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, Piece PType>
+      template<Side PSide, PieceType PType>
       friend struct CalMobility;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, Piece PType>
+      template<Side PSide, PieceType PType>
       friend struct GenPinTargets;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, Piece PType>
+      template<Side PSide, PieceType PType>
       friend struct CalSpecial;
 
       // ========== //

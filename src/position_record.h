@@ -121,7 +121,7 @@ namespace Sayuri {
        * アクセサ - 駒の種類の配置。
        * @return 駒の種類の配置。 [マス]
        */
-      const Piece (& piece_board() const)[NUM_SQUARES] {
+      const PieceType (& piece_board() const)[NUM_SQUARES] {
         return piece_board_;
       }
       /**
@@ -232,7 +232,7 @@ namespace Sayuri {
       /** 駒の配置のビットボード。 */
       Bitboard position_[NUM_SIDES][NUM_PIECE_TYPES];
       /** 駒の種類の配置。 [マス] */
-      Piece piece_board_[NUM_SQUARES];
+      PieceType piece_board_[NUM_SQUARES];
       /** サイドの配置。 [マス] */
       Side side_board_[NUM_SQUARES];
       /** 各サイドの駒の配置のビットボード。 [サイド] */

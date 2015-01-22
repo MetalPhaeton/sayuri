@@ -233,7 +233,7 @@ namespace Sayuri {
     // 駒を配置する。
     for (Side side = WHITE; side <= BLACK; ++side) {
       side_pieces_[side] = 0;
-      for (Piece piece_type = PAWN; piece_type <= KING; ++piece_type) {
+      for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
         position_[side][piece_type] = fen.position()[side][piece_type];
         for (Bitboard bb = position_[side][piece_type]; bb;
         Util::SetNext(bb)) {
@@ -362,7 +362,7 @@ namespace Sayuri {
     blocker_135_ = STARTING_BLOCKER_135;
 
     // 駒の種類とサイドの配置を作る。
-    constexpr static const Piece STARTING_PIECE_BOARD[NUM_SQUARES] {
+    constexpr static const PieceType STARTING_PIECE_BOARD[NUM_SQUARES] {
       ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK,
       PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN,
       EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
@@ -623,11 +623,11 @@ namespace Sayuri {
     // 手の要素を得る。
     Square from = GetFrom(move);
     Square to = GetTo(move);
-    Piece promotion = GetPromotion(move);
+    PieceType promotion = GetPromotion(move);
     MoveType move_type = GetMoveType(move);
 
     // キャスリングの権利を更新。
-    Piece piece = piece_board_[from];
+    PieceType piece = piece_board_[from];
     if ((castling_rights_ & WHITE_CASTLING) && (side == WHITE)) {
       if (piece == KING) {
         castling_rights_ &= ~WHITE_CASTLING;
@@ -780,7 +780,7 @@ namespace Sayuri {
     // 手の情報を得る。
     Square from = GetFrom(move);
     Square to = GetTo(move);
-    Piece promotion = GetPromotion(move);
+    PieceType promotion = GetPromotion(move);
     MoveType move_type = GetMoveType(move);
 
     // 駒の位置を戻す。
@@ -859,7 +859,7 @@ namespace Sayuri {
     Side enemy_side = Util::GetOppositeSide(side);
 
     int material = 0;
-    for (Piece piece_type = PAWN; piece_type <= QUEEN; ++piece_type) {
+    for (PieceType piece_type = PAWN; piece_type <= QUEEN; ++piece_type) {
       material += shared_st_ptr_->search_params_ptr_->material_[piece_type]
       * (Util::CountBits(position_[side][piece_type])
       - Util::CountBits(position_[enemy_side][piece_type]));
@@ -901,14 +901,14 @@ namespace Sayuri {
     // 駒の情報を得る。
     Square from = GetFrom(move);
     Square to = GetTo(move);
-    Piece promotion = GetPromotion(move);
+    PieceType promotion = GetPromotion(move);
 
     // 駒の位置の種類とサイドを得る。
-    Piece piece_type = piece_board_[from];
+    PieceType piece_type = piece_board_[from];
     Side piece_side = side_board_[from];
 
     // 取る駒の種類とサイドを得る。
-    Piece target_type = piece_board_[to];
+    PieceType target_type = piece_board_[to];
     Side target_side = side_board_[to];
     Square target_square = to;
     if ((piece_type == PAWN) && en_passant_square_
@@ -1049,9 +1049,9 @@ namespace Sayuri {
   // その他のプライベート関数 //
   // ======================== //
   // 駒を置く。
-  void ChessEngine::PutPiece(Square square, Piece piece_type, Side side) {
+  void ChessEngine::PutPiece(Square square, PieceType piece_type, Side side) {
     // 置く位置の現在の駒の種類を入手する。
-    Piece placed_piece = piece_board_[square];
+    PieceType placed_piece = piece_board_[square];
 
     // 置く位置の現在の駒のサイドを得る。
     Side placed_side = side_board_[square];
@@ -1218,7 +1218,7 @@ namespace Sayuri {
 
     // 駒の情報の配列を初期化。
     for (Side side = 0; side < NUM_SIDES; ++side) {
-      for (Piece piece_type = 0; piece_type < NUM_PIECE_TYPES;
+      for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES;
       ++piece_type) {
         for (Square square = 0; square < NUM_SQUARES; ++square) {
           if ((side == NO_SIDE) || (piece_type == EMPTY)) {
