@@ -118,7 +118,7 @@ namespace Sayuri {
 
   // メンバをコピーする。
   void SearchParams::ScanMember(const SearchParams& params) {
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    FOR_PIECE_TYPES(piece_type) {
       material_[piece_type] = params.material_[piece_type];
     }
     enable_quiesce_search_ = params.enable_quiesce_search_;
@@ -165,7 +165,7 @@ namespace Sayuri {
 
   // マテリアルのミューテータ。
   void SearchParams::material(const int (& table)[NUM_PIECE_TYPES]) {
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    FOR_PIECE_TYPES(piece_type) {
       material_[piece_type] = table[piece_type];
     }
   }
@@ -570,70 +570,43 @@ namespace Sayuri {
   // オープニング時の駒の配置の価値テーブルのミューテータ。
   void EvalParams::opening_position_value_table
   (const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES]) {
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
-      for (Square square = 0; square < NUM_SQUARES; ++square) {
-        opening_position_value_table_[piece_type][square] =
-        table[piece_type][square];
-      }
-    }
+    COPY_ARRAY(opening_position_value_table_, table);
   }
 
   // エンディング時の駒の配置の価値テーブルのミューテータ。
   void EvalParams::ending_position_value_table
   (const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES]) {
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
-      for (Square square = 0; square < NUM_SQUARES; ++square) {
-        ending_position_value_table_[piece_type][square] =
-        table[piece_type][square];
-      }
-    }
+    COPY_ARRAY(ending_position_value_table_, table);
   }
 
   // 相手への攻撃の価値テーブルのミューテータ。
   void EvalParams::attack_value_table
   (const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES]) {
-    for (PieceType type_1 = 0; type_1 < NUM_PIECE_TYPES; ++type_1) {
-      for (PieceType type_2 = 0; type_2 < NUM_PIECE_TYPES; ++type_2) {
-        attack_value_table_[type_1][type_2] = table[type_1][type_2];
-      }
-    }
+    COPY_ARRAY(attack_value_table_, table);
   }
 
   // 味方への防御の価値テーブルのミューテータ。
   void EvalParams::defense_value_table
   (const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES]) {
-    for (PieceType type_1 = 0; type_1 < NUM_PIECE_TYPES; ++type_1) {
-      for (PieceType type_2 = 0; type_2 < NUM_PIECE_TYPES; ++type_2) {
-        defense_value_table_[type_1][type_2] = table[type_1][type_2];
-      }
-    }
+    COPY_ARRAY(defense_value_table_, table);
   }
 
   // ピンの価値テーブルのミューテータ。
   void EvalParams::pin_value_table
   (const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES]) {
-    for (PieceType type_1 = 0; type_1 < NUM_PIECE_TYPES; ++type_1) {
-      for (PieceType type_2 = 0; type_2 < NUM_PIECE_TYPES; ++type_2) {
-        for (PieceType type_3 = 0; type_3 < NUM_PIECE_TYPES; ++type_3) {
-          pin_value_table_[type_1][type_2][type_3] =
-          table[type_1][type_2][type_3];
-        }
-      }
-    }
+    COPY_ARRAY(pin_value_table_, table);
   }
 
   // ポーンの盾の配置の価値テーブルのミューテータ。
   void EvalParams::pawn_shield_value_table
   (const double (& table)[NUM_SQUARES]) {
-    for (Square square = 0; square < NUM_SQUARES; ++square) {
-      pawn_shield_value_table_[square] = table[square];
-    }
+    COPY_ARRAY(pawn_shield_value_table_, table);
   }
 
   // オープニング時の駒の配置のウェイトのミューテータ。
   void EvalParams::weight_opening_position
   (const Weight (& weights)[NUM_PIECE_TYPES]) {
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    FOR_PIECE_TYPES(piece_type) {
       weight_opening_position_[piece_type] = weights[piece_type];
     }
   }
@@ -641,7 +614,7 @@ namespace Sayuri {
   // オープニング時の駒の配置のウェイトのミューテータ。
   void EvalParams::weight_ending_position
   (const Weight (& weights)[NUM_PIECE_TYPES]) {
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    FOR_PIECE_TYPES(piece_type) {
       weight_ending_position_[piece_type] = weights[piece_type];
     }
   }
@@ -649,7 +622,7 @@ namespace Sayuri {
   // 機動力のウェイトのミューテータ。
   void EvalParams::weight_mobility
   (const Weight (& weights)[NUM_PIECE_TYPES]) {
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    FOR_PIECE_TYPES(piece_type) {
       weight_mobility_[piece_type] = weights[piece_type];
     }
   }
@@ -657,7 +630,7 @@ namespace Sayuri {
   // センターコントロールのウェイトのミューテータ。
   void EvalParams::weight_center_control
   (const Weight (& weights)[NUM_PIECE_TYPES]) {
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    FOR_PIECE_TYPES(piece_type) {
       weight_center_control_[piece_type] = weights[piece_type];
     }
   }
@@ -665,7 +638,7 @@ namespace Sayuri {
   // スウィートセンターのコントロールのウェイトのミューテータ。
   void EvalParams::weight_sweet_center_control
   (const Weight (& weights)[NUM_PIECE_TYPES]) {
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    FOR_PIECE_TYPES(piece_type) {
       weight_sweet_center_control_[piece_type] = weights[piece_type];
     }
   }
@@ -673,28 +646,28 @@ namespace Sayuri {
   // 展開のウェイトのミューテータ。
   void EvalParams::weight_development
   (const Weight (& weights)[NUM_PIECE_TYPES]) {
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    FOR_PIECE_TYPES(piece_type) {
       weight_development_[piece_type] = weights[piece_type];
     }
   }
 
   // 相手への攻撃のウェイトのミューテータ。
   void EvalParams::weight_attack(const Weight (& weights)[NUM_PIECE_TYPES]) {
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    FOR_PIECE_TYPES(piece_type) {
       weight_attack_[piece_type] = weights[piece_type];
     }
   }
 
   // 味方への防御のウェイトのミューテータ。
   void EvalParams::weight_defense(const Weight (& weights)[NUM_PIECE_TYPES]) {
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    FOR_PIECE_TYPES(piece_type) {
       weight_defense_[piece_type] = weights[piece_type];
     }
   }
 
   // ピンのウェイトのミューテータ。
   void EvalParams::weight_pin(const Weight (& weights)[NUM_PIECE_TYPES]) {
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    FOR_PIECE_TYPES(piece_type) {
       weight_pin_[piece_type] = weights[piece_type];
     }
   }
@@ -702,7 +675,7 @@ namespace Sayuri {
   // 相手キング周辺への攻撃のウェイトのミューテータ。
   void EvalParams::weight_attack_around_king
   (const Weight (& weights)[NUM_PIECE_TYPES]) {
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    FOR_PIECE_TYPES(piece_type) {
       weight_attack_around_king_[piece_type] = weights[piece_type];
     }
   }
@@ -710,45 +683,26 @@ namespace Sayuri {
   // メンバをコピーする。
   void EvalParams::ScanMember(const EvalParams& params) {
     // 価値テーブルをコピー。
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
-      for (Square square = 0; square < NUM_SQUARES; ++square) {
-        opening_position_value_table_[piece_type][square] =
-        params.opening_position_value_table_[piece_type][square];
-      }
-    }
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
-      for (Square square = 0; square < NUM_SQUARES; ++square) {
-        ending_position_value_table_[piece_type][square] =
-        params.ending_position_value_table_[piece_type][square];
-      }
-    }
-    for (PieceType type_1 = 0; type_1 < NUM_PIECE_TYPES; ++type_1) {
-      for (PieceType type_2 = 0; type_2 < NUM_PIECE_TYPES; ++type_2) {
-        attack_value_table_[type_1][type_2] =
-        params.attack_value_table_[type_1][type_2];
-      }
-    }
-    for (PieceType type_1 = 0; type_1 < NUM_PIECE_TYPES; ++type_1) {
-      for (PieceType type_2 = 0; type_2 < NUM_PIECE_TYPES; ++type_2) {
-        defense_value_table_[type_1][type_2] =
-        params.defense_value_table_[type_1][type_2];
-      }
-    }
-    for (PieceType type_1 = 0; type_1 < NUM_PIECE_TYPES; ++type_1) {
-      for (PieceType type_2 = 0; type_2 < NUM_PIECE_TYPES; ++type_2) {
-        for (PieceType type_3 = 0; type_3 < NUM_PIECE_TYPES; ++type_3) {
-          pin_value_table_[type_1][type_2][type_3] =
-          params.pin_value_table_[type_1][type_2][type_3];
-        }
-      }
-    }
-    for (Square square = 0; square < NUM_SQUARES; ++square) {
-      pawn_shield_value_table_[square] =
-      params.pawn_shield_value_table_[square];
-    }
+    COPY_ARRAY(opening_position_value_table_,
+    params.opening_position_value_table_);
+
+    COPY_ARRAY(ending_position_value_table_,
+    params.ending_position_value_table_);
+
+    COPY_ARRAY(attack_value_table_,
+    params.attack_value_table_);
+
+    COPY_ARRAY(defense_value_table_,
+    params.defense_value_table_);
+
+    COPY_ARRAY(pin_value_table_,
+    params.pin_value_table_);
+
+    COPY_ARRAY(pawn_shield_value_table_,
+    params.pawn_shield_value_table_);
 
     // ウェイトをコピー。
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    FOR_PIECE_TYPES(piece_type) {
       weight_opening_position_[piece_type] =
       params.weight_opening_position_[piece_type];
 

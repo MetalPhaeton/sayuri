@@ -91,12 +91,14 @@ namespace Sayuri {
    * @param array 初期化する配列。
    */
 #define INIT_ARRAY(array) (std::memset((array), 0, sizeof(array)))
+
   /**
    * std::memcpy()で配列をコピーする。
    * @param dst コピー先。
    * @param src コピー元。
    */
 #define COPY_ARRAY(dst, src) (std::memcpy((dst), (src), sizeof(dst)))
+
   /**
    * maskで指定のビットフィールドを更新する。
    * @param origin_data 更新したいデータ。
@@ -105,6 +107,41 @@ namespace Sayuri {
    */
 #define UPDATE_FIELD(origin_data, new_data, mask) \
 ((origin_data) ^= ((mask) & ((origin_data) ^ (new_data))))
+
+  /**
+   * 全マスをループ。
+   * @param val_name 変数名。
+   */
+#define FOR_SQUARES(val_name) \
+for (Square val_name = 0; val_name < NUM_SQUARES; ++val_name)
+
+  /**
+   * 全ファイルをループ。
+   * @param val_name 変数名。
+   */
+#define FOR_FYLES(val_name) \
+for (Fyle val_name = 0; val_name < NUM_FYLES; ++val_name)
+
+  /**
+   * 全ランクをループ。
+   * @param val_name 変数名。
+   */
+#define FOR_RANKS(val_name) \
+for (Rank val_name = 0; val_name < NUM_RANKS; ++val_name)
+
+  /**
+   * 全サイドの種類をループ。
+   * @param val_name 変数名。
+   */
+#define FOR_SIDES(val_name) \
+for (Side val_name = 0; val_name < NUM_SIDES; ++val_name)
+
+  /**
+   * 全駒の種類をループ。
+   * @param val_name 変数名。
+   */
+#define FOR_PIECE_TYPES(val_name) \
+for (PieceType val_name = 0; val_name < NUM_PIECE_TYPES; ++val_name)
 
   // ========== //
   // 基本の定数 //

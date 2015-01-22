@@ -221,7 +221,7 @@ namespace Sayuri {
     if ((num_white_king != 1) || (num_black_king != 1)) return;
 
     // 空にする。
-    for (Square square = 0; square < NUM_SQUARES; ++square) {
+    FOR_SQUARES(square) {
       piece_board_[square] = EMPTY;
       side_board_[square] = NO_SIDE;
     }
@@ -406,7 +406,7 @@ namespace Sayuri {
     ply_ = 1;
 
     // キャスリングしたかどうかの初期化。
-    for (Side side = 0; side < NUM_SIDES; ++side) {
+    FOR_SIDES(side) {
       has_castled_[side] = false;
     }
 
@@ -873,7 +873,7 @@ namespace Sayuri {
     Hash hash = 0;
 
     // 駒の情報からハッシュを得る。
-    for (Square square = 0; square < NUM_SQUARES; ++square) {
+    FOR_SQUARES(square) {
       hash ^= shared_st_ptr_->piece_hash_value_table_
       [side_board_[square]][piece_board_[square]][square];
     }
@@ -1217,10 +1217,9 @@ namespace Sayuri {
     }
 
     // 駒の情報の配列を初期化。
-    for (Side side = 0; side < NUM_SIDES; ++side) {
-      for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES;
-      ++piece_type) {
-        for (Square square = 0; square < NUM_SQUARES; ++square) {
+    FOR_SIDES(side) {
+      FOR_PIECE_TYPES(piece_type) {
+        FOR_SQUARES(square) {
           if ((side == NO_SIDE) || (piece_type == EMPTY)) {
             piece_hash_value_table_[side][piece_type][square] = 0;
           } else {

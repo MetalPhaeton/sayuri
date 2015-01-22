@@ -582,31 +582,31 @@ namespace Sayuri {
 
     // 定数をバインドしていく。
     // マスの定数をバインド。
-    for (Square square = 0; square < NUM_SQUARES; ++square) {
+    FOR_SQUARES(square) {
       global_ptr_->BindSymbol(EngineSuite::SQUARE_SYMBOL[square],
       LispObject::NewNumber(square));
     }
 
     // ファイルの定数をバインド。
-    for (Fyle fyle = 0; fyle < NUM_FYLES; ++fyle) {
+    FOR_FYLES(fyle) {
       global_ptr_->BindSymbol(EngineSuite::FYLE_SYMBOL[fyle],
       LispObject::NewNumber(fyle));
     }
 
     // ランクの定数をバインド。
-    for (Rank rank = 0; rank < NUM_RANKS; ++rank) {
+    FOR_RANKS(rank) {
       global_ptr_->BindSymbol(EngineSuite::RANK_SYMBOL[rank],
       LispObject::NewNumber(rank));
     }
 
     // サイドの定数をバインド。
-    for (Side side = 0; side < NUM_SIDES; ++side) {
+    FOR_SIDES(side) {
       global_ptr_->BindSymbol(EngineSuite::SIDE_SYMBOL[side],
       LispObject::NewNumber(side));
     }
 
     // 駒の定数をバインド。
-    for (PieceType piece_type = 0; piece_type < NUM_PIECE_TYPES; ++piece_type) {
+    FOR_PIECE_TYPES(piece_type) {
       global_ptr_->BindSymbol(EngineSuite::PIECE_SYMBOL[piece_type],
       LispObject::NewNumber(piece_type));
     }

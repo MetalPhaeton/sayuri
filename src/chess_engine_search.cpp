@@ -782,9 +782,9 @@ namespace Sayuri {
     shared_st_ptr_->searched_nodes_ = 0;
     shared_st_ptr_->searched_level_ = 0;
     shared_st_ptr_->start_time_ = SysClock::now();
-    for (Side side = 0; side < NUM_SIDES; ++side) {
-      for (Square from = 0; from < NUM_SQUARES; ++from) {
-        for (Square to = 0; to < NUM_SQUARES; ++to) {
+    FOR_SIDES(side) {
+      FOR_SQUARES(from) {
+        FOR_SQUARES(to) {
           shared_st_ptr_->history_[side][from][to] = 0;
         }
       }
