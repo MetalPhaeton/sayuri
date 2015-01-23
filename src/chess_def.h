@@ -110,38 +110,38 @@ namespace Sayuri {
 
   /**
    * 全マスをループ。
-   * @param val_name 変数名。
+   * @param var_name 変数名。
    */
-#define FOR_SQUARES(val_name) \
-for (Square val_name = 0; val_name < NUM_SQUARES; ++val_name)
+#define FOR_SQUARES(var_name) \
+for (Square var_name = 0; var_name < NUM_SQUARES; ++var_name)
 
   /**
    * 全ファイルをループ。
-   * @param val_name 変数名。
+   * @param var_name 変数名。
    */
-#define FOR_FYLES(val_name) \
-for (Fyle val_name = 0; val_name < NUM_FYLES; ++val_name)
+#define FOR_FYLES(var_name) \
+for (Fyle var_name = 0; var_name < NUM_FYLES; ++var_name)
 
   /**
    * 全ランクをループ。
-   * @param val_name 変数名。
+   * @param var_name 変数名。
    */
-#define FOR_RANKS(val_name) \
-for (Rank val_name = 0; val_name < NUM_RANKS; ++val_name)
+#define FOR_RANKS(var_name) \
+for (Rank var_name = 0; var_name < NUM_RANKS; ++var_name)
 
   /**
    * 全サイドの種類をループ。
-   * @param val_name 変数名。
+   * @param var_name 変数名。
    */
-#define FOR_SIDES(val_name) \
-for (Side val_name = 0; val_name < NUM_SIDES; ++val_name)
+#define FOR_SIDES(var_name) \
+for (Side var_name = 0; var_name < NUM_SIDES; ++var_name)
 
   /**
    * 全駒の種類をループ。
-   * @param val_name 変数名。
+   * @param var_name 変数名。
    */
-#define FOR_PIECE_TYPES(val_name) \
-for (PieceType val_name = 0; val_name < NUM_PIECE_TYPES; ++val_name)
+#define FOR_PIECE_TYPES(var_name) \
+for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
 
   // ========== //
   // 基本の定数 //
