@@ -67,7 +67,7 @@ namespace Sayuri {
   const std::string EngineSuite::SIDE_SYMBOL[NUM_SIDES] {
     "NO_SIDE", "WHITE", "BLACK"
   };
-  const std::string EngineSuite::PIECE_SYMBOL[NUM_PIECE_TYPES] {
+  const std::string EngineSuite::PIECE_TYPE_SYMBOL[NUM_PIECE_TYPES] {
     "EMPTY", "PAWN", "KNIGHT", "BISHOP", "ROOK", "QUEEN", "KING"
   };
   const std::string EngineSuite::CASTLING_SYMBOL[5] {
@@ -242,6 +242,115 @@ namespace Sayuri {
         (func_name, "String", std::vector<int> {2}, true);
       }
       return SetFEN(fen_str_ptr);
+
+    } else if (message_symbol == "@get-candidate-moves") {
+      return GetCandidateMoves();
+
+    } else if (message_symbol == "@place-piece") {
+      required_args = 4;
+      // 駒の位置を得る。
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr square_ptr = caller.Evaluate(*(list_itr++));
+      if (!(square_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2}, true);
+      }
+
+      // 駒の種類を得る。
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr type_ptr = caller.Evaluate(*(list_itr++));
+      if (!(type_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {3}, true);
+      }
+
+      // 駒のサイドを得る。
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr side_ptr = caller.Evaluate(*(list_itr));
+      if (!(side_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {4}, true);
+      }
+
+      return PlacePiece(square_ptr, type_ptr, side_ptr);
+    } else if (message_symbol == "@set-to-move") {
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr to_move_ptr = caller.Evaluate(*list_itr);
+      if (!(to_move_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2}, true);
+      }
+
+      return SetToMove(to_move_ptr);
+
+    } else if (message_symbol == "@set-castling-rights") {
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr castling_rights_ptr = caller.Evaluate(*list_itr);
+      if (!(castling_rights_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2}, true);
+      }
+
+      return SetCastlingRights(castling_rights_ptr);
+
+    } else if (message_symbol == "@set-en-passant-square") {
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr en_passant_square_ptr = caller.Evaluate(*list_itr);
+      if (!(en_passant_square_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2}, true);
+      }
+
+      return SetEnPassantSquare(en_passant_square_ptr);
+
+    } else if (message_symbol == "@set-ply") {
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr ply_ptr = caller.Evaluate(*list_itr);
+      if (!(ply_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2}, true);
+      }
+
+      return SetPly(ply_ptr);
+
+    } else if (message_symbol == "@set-ply-100") {
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr ply_100_ptr = caller.Evaluate(*list_itr);
+      if (!(ply_100_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2}, true);
+      }
+
+      return SetPly100(ply_100_ptr);
 
     }
 
@@ -444,7 +553,7 @@ namespace Sayuri {
     (SIDE_SYMBOL[engine_ptr_->side_board()[square]]));
 
     ret_ptr->cdr()->car(LispObject::NewSymbol
-    (PIECE_SYMBOL[engine_ptr_->piece_board()[square]]));
+    (PIECE_TYPE_SYMBOL[engine_ptr_->piece_board()[square]]));
 
     return ret_ptr;
   }
@@ -557,6 +666,186 @@ namespace Sayuri {
     return ret_ptr;
   }
 
+  // 駒を置く。
+  LispObjectPtr EngineSuite::PlacePiece(LispObjectPtr square_ptr,
+  LispObjectPtr type_ptr, LispObjectPtr side_ptr) {
+    // 準備。
+    Square square = square_ptr->number_value();
+    PieceType piece_type = type_ptr->number_value();
+    Side side = side_ptr->number_value();
+
+    // 引数チェック。
+    if (square >= NUM_SQUARES) {
+      throw LispObject::GenError("@engine_error",
+      "The square value '" + std::to_string(square_ptr->number_value())
+      + "' doesn't indicate any square.");
+    }
+    if (piece_type >= NUM_PIECE_TYPES) {
+      throw LispObject::GenError("@engine_error",
+      "The piece type value '" + std::to_string(type_ptr->number_value())
+      +  "' doesn't indicate any piece type.");
+    }
+    if (side >= NUM_SIDES) {
+      throw LispObject::GenError("@engine_error",
+      "The side value '" + std::to_string(side_ptr->number_value())
+      + "' doesn't indicate any side.");
+    }
+    if ((piece_type && !side) || (!piece_type && side)) {
+      throw LispObject::GenError("@engine_error",
+      "'" + SIDE_SYMBOL[side] + " " + PIECE_TYPE_SYMBOL[piece_type]
+      + "' doesn't exist in the world.");
+    }
+
+    // 元の駒の種類とサイドを得る。
+    PieceType origin_type = engine_ptr_->piece_board()[square];
+    Side origin_side = engine_ptr_->side_board()[square];
+
+    // もし置き換える前の駒がキングなら置き換えられない。
+    if (origin_type == KING) {
+      throw LispObject::GenError("@engine_error",
+      "Couldn't place the piece, because " + SIDE_SYMBOL[origin_side]
+      + " " + PIECE_TYPE_SYMBOL[origin_type] + " is placed there."
+      " Each side must have just one King.");
+    }
+
+    // チェック終了したので置き換える。
+    engine_ptr_->PlacePiece(square, piece_type, side);
+
+    // 戻り値を作る。
+    LispObjectPtr ret_ptr = LispObject::NewList(2);
+    ret_ptr->car(LispObject::NewSymbol(SIDE_SYMBOL[origin_side]));
+    ret_ptr->cdr()->car
+    (LispObject::NewSymbol(PIECE_TYPE_SYMBOL[origin_type]));
+
+    return ret_ptr;
+  }
+
+  // 手番をセットする。
+  LispObjectPtr EngineSuite::SetToMove(LispObjectPtr to_move_ptr) {
+    Side to_move = to_move_ptr->number_value();
+    if (to_move >= NUM_SIDES) {
+      throw LispObject::GenError("@engine_error",
+      "The side value '" + std::to_string(to_move_ptr->number_value())
+      + "' doesn't indicate any side.");
+    }
+    if (!to_move) {
+      throw LispObject::GenError("@engine_error", "'NO_SIDE' is not allowed.");
+    }
+
+    Side origin = engine_ptr_->to_move();
+    engine_ptr_->to_move(to_move);
+
+    return LispObject::NewSymbol(SIDE_SYMBOL[origin]);
+  }
+
+  // キャスリングの権利をセットする。
+  LispObjectPtr EngineSuite::SetCastlingRights
+  (LispObjectPtr castling_rights_ptr) {
+    Castling rights = 0;
+    for (LispIterator itr(castling_rights_ptr.get()); itr; ++itr) {
+      int num = itr->number_value();
+      if (num == 1) rights |= WHITE_SHORT_CASTLING;
+      else if (num == 2) rights |= WHITE_LONG_CASTLING;
+      else if (num == 3) rights |= BLACK_SHORT_CASTLING;
+      else if (num == 4) rights |= BLACK_LONG_CASTLING;
+    }
+
+    Castling origin = engine_ptr_->castling_rights();
+    LispObjectPtr ret_ptr = LispObject::NewNil();
+    if ((origin & WHITE_SHORT_CASTLING)) {
+      ret_ptr->Append(LispObject::NewPair
+      (LispObject::NewSymbol(CASTLING_SYMBOL[1]), LispObject::NewNil()));
+    }
+    if ((origin & WHITE_LONG_CASTLING)) {
+      ret_ptr->Append(LispObject::NewPair
+      (LispObject::NewSymbol(CASTLING_SYMBOL[2]), LispObject::NewNil()));
+    }
+    if ((origin & BLACK_SHORT_CASTLING)) {
+      ret_ptr->Append(LispObject::NewPair
+      (LispObject::NewSymbol(CASTLING_SYMBOL[3]), LispObject::NewNil()));
+    }
+    if ((origin & BLACK_LONG_CASTLING)) {
+      ret_ptr->Append(LispObject::NewPair
+      (LispObject::NewSymbol(CASTLING_SYMBOL[4]), LispObject::NewNil()));
+    }
+
+    engine_ptr_->castling_rights(rights);
+    return ret_ptr;
+  }
+
+  // アンパッサンの位置をセットする。
+  LispObjectPtr EngineSuite::SetEnPassantSquare
+  (LispObjectPtr en_passant_square_ptr) {
+    Square square = en_passant_square_ptr->number_value();
+
+    // 引数をチェック。
+    if (square >= NUM_SQUARES) {
+      throw LispObject::GenError("@engine_error", "The square value '"
+      + std::to_string(en_passant_square_ptr->number_value())
+      + "' doesn't indicate any square.");
+    }
+    if ((engine_ptr_->blocker_0() & Util::SQUARE[square])) {
+      throw LispObject::GenError("@engine_error",
+      "'" + SQUARE_SYMBOL[square] + "' is not empty.");
+    }
+    Rank rank = Util::SQUARE_TO_RANK[square];
+    if (!((rank == RANK_3) || (rank == RANK_6))) {
+      throw LispObject::GenError("@engine_error",
+      "The rank of square must be 'RANK_3' or 'RANK_6'. you indicated '"
+      + RANK_SYMBOL[rank] + "'.");
+    }
+    if (rank == RANK_3) {
+      Square target = square + 8;
+      if (!(engine_ptr_->position()[WHITE][PAWN] & Util::SQUARE[target])) {
+        throw LispObject::GenError("@engine_error",
+        "White Pawn doesn't exist on '" + SQUARE_SYMBOL[target] + "' .");
+      }
+    } else if (rank == RANK_6) {
+      Square target = square - 8;
+      if (!(engine_ptr_->position()[BLACK][PAWN] & Util::SQUARE[target])) {
+        throw LispObject::GenError("@engine_error",
+        "Black Pawn doesn't exist on '" + SQUARE_SYMBOL[target] + "' .");
+      }
+    }
+
+    Square origin = engine_ptr_->en_passant_square();
+    LispObjectPtr ret_ptr = LispObject::NewNil();
+    if (origin) {
+      ret_ptr = LispObject::NewSymbol(SQUARE_SYMBOL[origin]);
+    }
+    engine_ptr_->en_passant_square(square);
+
+    return ret_ptr;
+  }
+
+  // 手数をセット。
+  LispObjectPtr EngineSuite::SetPly(LispObjectPtr ply_ptr) {
+    int ply = ply_ptr->number_value();
+    if (ply < 1) {
+      throw LispObject::GenError("@engine_error",
+      "Minimum ply number is '1'. you indicated '"
+      + std::to_string(ply_ptr->number_value()) + "'.");
+    }
+
+    int origin = engine_ptr_->ply();
+    engine_ptr_->ply(ply);
+    return LispObject::NewNumber(origin);
+  }
+
+  // 50手ルールの手数をセット。
+  LispObjectPtr EngineSuite::SetPly100(LispObjectPtr ply_100_ptr) {
+    int ply_100 = ply_100_ptr->number_value();
+    if (ply_100 < 0) {
+      throw LispObject::GenError("@engine_error",
+      "Minimum ply-100 number is '0'. you indicated '"
+      + std::to_string(ply_100_ptr->number_value()) + "'.");
+    }
+
+    int origin = engine_ptr_->ply_100();
+    engine_ptr_->ply_100(ply_100);
+    return LispObject::NewNumber(origin);
+  }
+
   // ======== //
   // Sayulisp //
   // ======== //
@@ -607,7 +896,7 @@ namespace Sayuri {
 
     // 駒の定数をバインド。
     FOR_PIECE_TYPES(piece_type) {
-      global_ptr_->BindSymbol(EngineSuite::PIECE_SYMBOL[piece_type],
+      global_ptr_->BindSymbol(EngineSuite::PIECE_TYPE_SYMBOL[piece_type],
       LispObject::NewNumber(piece_type));
     }
 
@@ -778,10 +1067,62 @@ __Description__
         - Set starting position and state.
         - Return #t.
 
-    + `@set-fen`
-        - Set position and state into indicated position by FEN.
+    + `@set-fen <FEN : String>`
+        - Set position and state into indicated position by `<FEN>`.
         - Return #t.
 
+    + `@get-candidate-moves`
+        - Return List that contains the candidate moves.
+
+    + `@place-piece <Square : Number> <Piece type : Number>
+      <Piece side : Number>`
+        - Place a `<Piece side>` `<Piece type>` onto `<Square>`.
+        - If `<Piece side>` is `EMPTY` and `<Piece side>` is `NO_SIDE`,
+          a piece on `<Square>` is deleted.
+        - Each side must have just one King,
+            - If you try to place a piece onto a square where King is placed,
+              Sayulisp will throw error.
+            - If you place a new King, the old King will be deleted.
+
+    + `@set-to-move <Side : Number>`
+        - Change turn to move into `<Side>`.
+        - Return the previous value.
+        - `<Side>` must be White or Black.
+
+    + `@set-castling_rights <Castling rights : List>`
+        - Change castling rights into `<List>`.
+        - Return the previous value.
+        - `<List>` is consist of constant values that are
+          'WHITE_SHORT_CASTLING' or 'WHITE_LONG_CASTLING'
+          or 'BLACK_SHORT_CASTLING' or 'BLACK_LONG_CASTLING'.
+        - After calling this function,
+          castling rights is updated by position of King or Rook.
+            - If King is not on starting square,
+              its castling rights are deleted.
+            - If Rook is not on starting square,
+              its King Side or Queen Side of castling rights is deleted.
+
+    + `@set-en-passant-square <Square : Number>`
+        - Change en passant square into `<Square>`.
+        - Return the previous value.
+        - But it change it into '0' by following conditions.
+            - `<Square>` is not empty.
+            - `<Square>` is not on 'RANK_3' or 'RANK_6'.
+            - `<Square>` is on 'RANK_3' and
+              White Pawn is not on directly above.
+            - `<Square>` is on 'RANK_6' and
+              Black Pawn is not on directly below.
+
+    + `@set-ply <Ply : Number>`
+        - Change ply(0.5 moves) into `<Ply>`.
+        - Return the previous value.
+        - `<Ply>` must be '1' and more.
+      
+    + `@set-ply-100 <Ply : Number>`
+        - Change ply(0.5 moves) of 50 moves rule into `<Ply>`.
+        - Return the previous value.
+        - `<Ply>` must be '0' and more.
+      
 __Example__
 
     ;; Generate chess engine and bind to 'my-engine'.

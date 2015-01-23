@@ -189,6 +189,18 @@ namespace Sayuri {
        */
       std::vector<Move> GetLegalMoves();
 
+      /**
+       * 駒を配置する。
+       * (注) お互いのキングは必ず1つになるように配置される。
+       * - キングの場所に他の駒を配置できない。
+       * - もう一つキングを配置すると、すでにあるキングはなくなる。
+       * @param square 配置する位置。
+       * @param piece_type 配置する駒の種類。
+       * @param piece_side 配置する駒のサイド。
+       */
+      void PlacePiece(Square square, PieceType piece_type,
+      Side piece_side=NO_SIDE);
+
       // --- 利き筋関連 --- //
       /**
        * ボードの状態からビショップの利き筋を作る。
@@ -237,6 +249,35 @@ namespace Sayuri {
        */
       template<Castling Flag>
       bool CanCastling() const {}
+
+      /**
+       * キャスリングの権利を更新。
+       */
+      void UpdateCastlingRights() {
+        // 白のキャスリングの権利。
+        if (king_[WHITE] != E1) {
+          castling_rights_ &= ~WHITE_CASTLING;
+        } else {
+          if (!(position_[WHITE][ROOK] & Util::SQUARE[H1])) {
+            castling_rights_ &= ~WHITE_SHORT_CASTLING;
+          }
+          if (!(position_[WHITE][ROOK] & Util::SQUARE[A1])) {
+            castling_rights_ &= ~WHITE_LONG_CASTLING;
+          }
+        }
+
+        // 黒のキャスリングの権利。
+        if (king_[BLACK] != E8) {
+          castling_rights_ &= ~BLACK_CASTLING;
+        } else {
+          if (!(position_[WHITE][ROOK] & Util::SQUARE[H8])) {
+            castling_rights_ &= ~BLACK_SHORT_CASTLING;
+          }
+          if (!(position_[WHITE][ROOK] & Util::SQUARE[A8])) {
+            castling_rights_ &= ~BLACK_LONG_CASTLING;
+          }
+        }
+      }
 
       /**
        * その位置が他の位置の駒に攻撃されているかどうかチェックする。
@@ -509,6 +550,73 @@ namespace Sayuri {
        */
       const Hash (& en_passant_hash_value_table() const)[NUM_SQUARES] {
         return shared_st_ptr_->en_passant_hash_value_table_;
+      }
+
+      // ============ //
+      // ミューテータ //
+      // ============ //
+      /**
+       * ミューテータ - 手番。
+       * @param to_move 手番。
+       */
+      void to_move(Side to_move) {
+        if (!to_move) return;
+        if (to_move >= NUM_SIDES) return;
+        to_move_ = to_move;
+      }
+      /**
+       * ミューテータ - キャスリングの権利。
+       * @param castling_rights キャスリングの権利。
+       */
+      void castling_rights(Castling castling_rights) {
+        castling_rights_ = castling_rights;
+
+        UpdateCastlingRights();
+      }
+      /**
+       * ミューテータ - アンパッサンの位置。
+       * @param en_passant_square アンパッサンの位置。
+       */
+      void en_passant_square(Square en_passant_square) {
+        if ((blocker_0_ & Util::SQUARE[en_passant_square])) {
+          // 駒があるのでアンパッサンの位置に指定できない。
+          en_passant_square_ = 0;
+          return;
+        }
+
+        Rank rank = Util::SQUARE_TO_RANK[en_passant_square];
+        if (rank == RANK_3) {
+          // すぐ上に白ポーンがいなければならない。
+          Square en_passant_target = en_passant_square + 8;
+          if ((position_[WHITE][PAWN] & Util::SQUARE[en_passant_target])) {
+            en_passant_square_ = en_passant_square;
+            return;
+          }
+        } else if (rank == RANK_6) {
+          // すぐ下に黒ポーンがいなければならない。
+          Square en_passant_target = en_passant_square - 8;
+          if ((position_[BLACK][PAWN] & Util::SQUARE[en_passant_target])) {
+            en_passant_square_ = en_passant_square;
+            return;
+          }
+        }
+
+        en_passant_square_ = 0;
+      }
+      /**
+       * ミューテータ - 50手ルールの手数。
+       * @param ply_100 50手ルールの手数。
+       */
+      void ply_100(int ply_100) {
+        ply_100_ = ply_100 < 0 ? 0 : ply_100;
+        shared_st_ptr_->ply_100_history_.back() = ply_100_;
+      }
+      /**
+       * ミューテータ - 現在の手数。
+       * @param ply_100 現在の手数。
+       */
+      void ply(int ply) {
+        ply_ = ply < 1 ? 1 : ply;
       }
 
     private:

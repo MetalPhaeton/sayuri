@@ -265,6 +265,9 @@ namespace Sayuri {
     shared_st_ptr_->position_history_.clear();
     shared_st_ptr_->position_history_.push_back
     (PositionRecord(*this, GetCurrentHash()));
+
+    // キャスリングの権利を更新。
+    UpdateCastlingRights();
   }
 
   // PositionRecordから局面読み込む。
@@ -588,6 +591,34 @@ namespace Sayuri {
     }
 
     return ret_vec;
+  }
+
+  // 駒を配置する。
+  void ChessEngine::PlacePiece(Square square, PieceType piece_type,
+  Side piece_side) {
+    // 各引数をチェック。
+    if (square >= NUM_SQUARES) return;
+    if (piece_type >= NUM_PIECE_TYPES) return;
+    if (piece_side >= NUM_SIDES) return;
+    if (piece_type && !piece_side) return;
+    if (!piece_type && piece_side) return;
+
+    // 元の位置にあったもの。
+    PieceType origin_type = piece_board_[square];
+
+    // 元の位置にあるものがキングだった時は実行しない。
+    if (origin_type == KING) return;
+
+    // とりあえず置く。
+    PutPiece(square, piece_type, piece_side);
+
+    // 置いた駒がキングだった時は、元のキングを削除する。
+    if (piece_type == KING) {
+      PutPiece(king_[piece_side], EMPTY);
+    }
+
+    // キャスリングの権利を更新。
+    UpdateCastlingRights();
   }
 
   // 1手戻す。

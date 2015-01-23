@@ -68,7 +68,7 @@ namespace Sayuri {
       static const std::string SIDE_SYMBOL[NUM_SIDES];
 
       /** 各駒のシンボルテーブル。 */
-      static const std::string PIECE_SYMBOL[NUM_PIECE_TYPES];
+      static const std::string PIECE_TYPE_SYMBOL[NUM_PIECE_TYPES];
 
       /**
        * 各キャスリングのシンボルテーブル。
@@ -204,7 +204,7 @@ namespace Sayuri {
         (LispObject::NewSymbol(SQUARE_SYMBOL[GetTo(move)]));
 
         ret_ptr->cdr()->cdr()->car
-        (LispObject::NewSymbol(PIECE_SYMBOL[GetPromotion(move)]));
+        (LispObject::NewSymbol(PIECE_TYPE_SYMBOL[GetPromotion(move)]));
 
         return ret_ptr;
       }
@@ -344,6 +344,47 @@ namespace Sayuri {
        * @return 候補手のリスト。
        */
       LispObjectPtr GetCandidateMoves();
+
+      /**
+       * 駒を置く。
+       * @param square_ptr 駒を置くマスのNumberオブジェクト。
+       * @param type_ptr 置く駒の種類のNumberオブジェクト。
+       * @param side_ptr 置く駒のサイドのNumberオブジェクト。
+       * @return 元の位置にあった駒の種類とサイドのリスト。
+       */
+      LispObjectPtr PlacePiece(LispObjectPtr square_ptr,
+      LispObjectPtr type_ptr, LispObjectPtr side_ptr);
+
+      /**
+       * 手番をセットする。
+       * @param to_move_ptr 手番。
+       * @return 変更前の値。
+       */
+      LispObjectPtr SetToMove(LispObjectPtr to_move_ptr);
+      /**
+       * キャスリングの権利をセットする。
+       * @param castling_rights_ptr キャスリングの権利のリスト。
+       * @return 変更前の値。
+       */
+      LispObjectPtr SetCastlingRights(LispObjectPtr castling_rights_ptr);
+      /**
+       * アンパッサンの位置をセットする。
+       * @param en_passant_square_ptr アンパッサンの位置。
+       * @return 変更前の値。
+       */
+      LispObjectPtr SetEnPassantSquare(LispObjectPtr castling_rights_ptr);
+      /**
+       * 手数をセットする。
+       * @param ply_ptr 手数。
+       * @return 変更前の値。
+       */
+      LispObjectPtr SetPly(LispObjectPtr ply_ptr);
+      /**
+       * 50手ルールの手数をセットする。
+       * @param ply_100_ptr 50手ルールの手数。
+       * @return 変更前の値。
+       */
+      LispObjectPtr SetPly100(LispObjectPtr ply_100_ptr);
 
       // ======== //
       // アクセサ //
