@@ -317,9 +317,10 @@ namespace Sayuri {
         (func_name, required_args, false, list.Length() - 1);
       }
       LispObjectPtr en_passant_square_ptr = caller.Evaluate(*list_itr);
-      if (!(en_passant_square_ptr->IsNumber())) {
+      if (!((en_passant_square_ptr->IsNumber())
+      || (en_passant_square_ptr->IsNil()))) {
         throw LispObject::GenWrongTypeError
-        (func_name, "Number", std::vector<int> {2}, true);
+        (func_name, "Number or Nil", std::vector<int> {2}, true);
       }
 
       return SetEnPassantSquare(en_passant_square_ptr);
@@ -776,6 +777,18 @@ namespace Sayuri {
   // アンパッサンの位置をセットする。
   LispObjectPtr EngineSuite::SetEnPassantSquare
   (LispObjectPtr en_passant_square_ptr) {
+    // 引数がNilだった場合、アンパッサンの位置を無効にする。
+    if (en_passant_square_ptr->IsNil()) {
+      Square origin = engine_ptr_->en_passant_square();
+      LispObjectPtr ret_ptr = LispObject::NewNil();
+      if (origin) {
+        ret_ptr = LispObject::NewSymbol(SQUARE_SYMBOL[origin]);
+      }
+      engine_ptr_->en_passant_square(0);
+
+      return ret_ptr;
+    }
+
     Square square = en_passant_square_ptr->number_value();
 
     // 引数をチェック。
@@ -784,6 +797,8 @@ namespace Sayuri {
       + std::to_string(en_passant_square_ptr->number_value())
       + "' doesn't indicate any square.");
     }
+
+    // 位置が0でなければフィルタリング。
     if ((engine_ptr_->blocker_0() & Util::SQUARE[square])) {
       throw LispObject::GenError("@engine_error",
       "'" + SQUARE_SYMBOL[square] + "' is not empty.");
@@ -1102,12 +1117,13 @@ __Description__
             - If Rook is not on starting square,
               its King Side or Queen Side of castling rights is deleted.
 
-    + `@set-en-passant-square <Square : Number>`
+    + `@set-en-passant-square <<Square : Number> or <Nil>>`
         - Change en passant square into `<Square>`.
+        - If argument is `<Nil>`, it changes into no en passant square.
         - Return the previous value.
-        - But it change it into '0' by following conditions.
+        - But it doesn't change by following conditions.
+            - `<Square>` is not on 'RANK_3' or on 'RANK_6'.
             - `<Square>` is not empty.
-            - `<Square>` is not on 'RANK_3' or 'RANK_6'.
             - `<Square>` is on 'RANK_3' and
               White Pawn is not on directly above.
             - `<Square>` is on 'RANK_6' and

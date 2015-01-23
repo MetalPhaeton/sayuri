@@ -578,9 +578,14 @@ namespace Sayuri {
        * @param en_passant_square アンパッサンの位置。
        */
       void en_passant_square(Square en_passant_square) {
+        // 0の場合は0。
+        if (!en_passant_square) {
+          en_passant_square_ = en_passant_square;
+          return;
+        }
+
         if ((blocker_0_ & Util::SQUARE[en_passant_square])) {
           // 駒があるのでアンパッサンの位置に指定できない。
-          en_passant_square_ = 0;
           return;
         }
 
@@ -600,8 +605,6 @@ namespace Sayuri {
             return;
           }
         }
-
-        en_passant_square_ = 0;
       }
       /**
        * ミューテータ - 50手ルールの手数。
