@@ -1174,6 +1174,9 @@ namespace Sayuri {
               // 文字列開始文字。
               pause(c);
               in_string_ = true;
+            } else if (c == '\'') {
+              // (quote)の糖衣構文。
+              pause(c);
             } else {
               // それ以外。
               stream_ << c;

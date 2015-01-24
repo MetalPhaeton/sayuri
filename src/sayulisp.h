@@ -364,9 +364,11 @@ namespace Sayuri {
       /**
        * キャスリングの権利をセットする。
        * @param castling_rights_ptr キャスリングの権利のリスト。
+       * @param func_name 例外で使う関数名。
        * @return 変更前の値。
        */
-      LispObjectPtr SetCastlingRights(LispObjectPtr castling_rights_ptr);
+      LispObjectPtr SetCastlingRights(LispObjectPtr castling_rights_ptr,
+      const std::string& func_name);
       /**
        * アンパッサンの位置をセットする。
        * @param en_passant_square_ptr アンパッサンの位置。

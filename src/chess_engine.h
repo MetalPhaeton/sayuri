@@ -270,10 +270,10 @@ namespace Sayuri {
         if (king_[BLACK] != E8) {
           castling_rights_ &= ~BLACK_CASTLING;
         } else {
-          if (!(position_[WHITE][ROOK] & Util::SQUARE[H8])) {
+          if (!(position_[BLACK][ROOK] & Util::SQUARE[H8])) {
             castling_rights_ &= ~BLACK_SHORT_CASTLING;
           }
-          if (!(position_[WHITE][ROOK] & Util::SQUARE[A8])) {
+          if (!(position_[BLACK][ROOK] & Util::SQUARE[A8])) {
             castling_rights_ &= ~BLACK_LONG_CASTLING;
           }
         }

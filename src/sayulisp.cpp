@@ -303,12 +303,12 @@ namespace Sayuri {
         (func_name, required_args, false, list.Length() - 1);
       }
       LispObjectPtr castling_rights_ptr = caller.Evaluate(*list_itr);
-      if (!(castling_rights_ptr->IsNumber())) {
+      if (!(castling_rights_ptr->IsList())) {
         throw LispObject::GenWrongTypeError
-        (func_name, "Number", std::vector<int> {2}, true);
+        (func_name, "List", std::vector<int> {2}, true);
       }
 
-      return SetCastlingRights(castling_rights_ptr);
+      return SetCastlingRights(castling_rights_ptr, func_name);
 
     } else if (message_symbol == "@set-en-passant-square") {
       required_args = 2;
@@ -741,9 +741,14 @@ namespace Sayuri {
 
   // キャスリングの権利をセットする。
   LispObjectPtr EngineSuite::SetCastlingRights
-  (LispObjectPtr castling_rights_ptr) {
+  (LispObjectPtr castling_rights_ptr, const std::string& func_name) {
     Castling rights = 0;
-    for (LispIterator itr(castling_rights_ptr.get()); itr; ++itr) {
+    int index = 1;
+    for (LispIterator itr(castling_rights_ptr.get()); itr; ++itr, ++index) {
+      if (!(itr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2, index}, true);
+      }
       int num = itr->number_value();
       if (num == 1) rights |= WHITE_SHORT_CASTLING;
       else if (num == 2) rights |= WHITE_LONG_CASTLING;
@@ -838,7 +843,7 @@ namespace Sayuri {
     int ply = ply_ptr->number_value();
     if (ply < 1) {
       throw LispObject::GenError("@engine_error",
-      "Minimum ply number is '1'. you indicated '"
+      "Minimum ply number is '1'. Given '"
       + std::to_string(ply_ptr->number_value()) + "'.");
     }
 
@@ -852,7 +857,7 @@ namespace Sayuri {
     int ply_100 = ply_100_ptr->number_value();
     if (ply_100 < 0) {
       throw LispObject::GenError("@engine_error",
-      "Minimum ply-100 number is '0'. you indicated '"
+      "Minimum ply-100 number is '0'. Given '"
       + std::to_string(ply_100_ptr->number_value()) + "'.");
     }
 
@@ -1856,7 +1861,7 @@ __Description__
     + `@place-piece <Square : Number> <Piece type : Number>
       <Piece side : Number>`
         - Place a `<Piece side>` `<Piece type>` onto `<Square>`.
-        - If `<Piece side>` is `EMPTY` and `<Piece side>` is `NO_SIDE`,
+        - If `<Piece type>` is `EMPTY` and `<Piece side>` is `NO_SIDE`,
           a piece on `<Square>` is deleted.
         - Each side must have just one King,
             - If you try to place a piece onto a square where King is placed,
@@ -1868,7 +1873,7 @@ __Description__
         - Return the previous value.
         - `<Side>` must be White or Black.
 
-    + `@set-castling_rights <Castling rights : List>`
+    + `@set-castling-rights <Castling rights : List>`
         - Change castling rights into `<List>`.
         - Return the previous value.
         - `<List>` is consist of constant values that are

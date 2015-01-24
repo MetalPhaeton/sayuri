@@ -609,13 +609,13 @@ namespace Sayuri {
     // 元の位置にあるものがキングだった時は実行しない。
     if (origin_type == KING) return;
 
-    // とりあえず置く。
-    PutPiece(square, piece_type, piece_side);
-
-    // 置いた駒がキングだった時は、元のキングを削除する。
+    // 置きたい駒がキングだった時は、先ず元のキングを削除する。
     if (piece_type == KING) {
       PutPiece(king_[piece_side], EMPTY);
     }
+
+    // 駒を置く。
+    PutPiece(square, piece_type, piece_side);
 
     // キャスリングの権利を更新。
     UpdateCastlingRights();
