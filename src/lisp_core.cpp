@@ -496,43 +496,43 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("help", func_ptr);
       (*dict_ptr)["help"] =
-  R"...(### help ###
+R"...(### help ###
 
-  __Usage__
+__Usage__
 
-  1. `(help)`
-  2. `(help <Symbol>)`
+1. `(help)`
+2. `(help <Symbol>)`
 
-  __Description__
+__Description__
 
-  * 1: Return descriptions of all symbols.
-  * 2: Return a description of `<Symbol>`.
-  * All descriptions are Markdown format.
+* 1: Return descriptions of all symbols.
+* 2: Return a description of `<Symbol>`.
+* All descriptions are Markdown format.
 
-  __Example__
+__Example__
 
-      (display (help 'car))
-      
-      ;; Output
-      ;;
-      ;; > ### car ###
-      ;; >
-      ;; > __Usage__
-      ;; >
-      ;; >
-      ;; > * `(car <List>)`
-      ;; >
-      ;; > __Description__
-      ;; >
-      ;; > * Return the 1st element of `<List>`.
-      ;; >
-      ;; > __Example__
-      ;; >
-      ;; >     (display (car (list 111 222 333)))
-      ;; >     
-      ;; >     ;; Output
-      ;; >     ;;
-      ;; >     ;; > 111)...";
+    (display (help 'car))
+    
+    ;; Output
+    ;;
+    ;; > ### car ###
+    ;; >
+    ;; > __Usage__
+    ;; >
+    ;; >
+    ;; > * `(car <List>)`
+    ;; >
+    ;; > __Description__
+    ;; >
+    ;; > * Return the 1st element of `<List>`.
+    ;; >
+    ;; > __Example__
+    ;; >
+    ;; >     (display (car (list 111 222 333)))
+    ;; >     
+    ;; >     ;; Output
+    ;; >     ;;
+    ;; >     ;; > 111)...";
     }
 
     // %%% eval
@@ -557,26 +557,26 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("eval", func_ptr);
       (*dict_ptr)["eval"] =
-  R"...(### eval ###
+R"...(### eval ###
 
-  __Usage__
+__Usage__
 
-  * `(eval <Object>)`
+* `(eval <Object>)`
 
-  __Description__
+__Description__
 
-  * Evaluate `<Object>`.
+* Evaluate `<Object>`.
 
-  __Example__
+__Example__
 
-      (define x '(+ 1 2 3))
-      (display x)
-      (display (eval x))
-      
-      ;; Output
-      ;;
-      ;; > (+ 1 2 3)
-      ;; > 6)...";
+    (define x '(+ 1 2 3))
+    (display x)
+    (display (eval x))
+    
+    ;; Output
+    ;;
+    ;; > (+ 1 2 3)
+    ;; > 6)...";
     }
 
     // %%% parse
@@ -619,27 +619,27 @@ namespace Sayuri {
       root_ptr->BindSymbol("string->boolean", func_ptr);
       root_ptr->BindSymbol("string->list", func_ptr);
       std::string temp =
-  R"...(### parse ###
+R"...(### parse ###
 
-  __Usage__
+__Usage__
 
-  * `(parse <S-Expression : String>)`
-  * `(string->symbol <S-Expression : String>)`
-  * `(string->number <S-Expression : String>)`
-  * `(string->boolean <S-Expression : String>)`
-  * `(string->list <S-Expression : String>)`
+* `(parse <S-Expression : String>)`
+* `(string->symbol <S-Expression : String>)`
+* `(string->number <S-Expression : String>)`
+* `(string->boolean <S-Expression : String>)`
+* `(string->list <S-Expression : String>)`
 
-  __Description__
+__Description__
 
-  * Parse `<S-Expression>` and generate a object.
+* Parse `<S-Expression>` and generate a object.
 
-  __Example__
+__Example__
 
-      (display (parse "(1 2 3)"))
-      
-      ;; Output
-      ;;
-      ;; > (1 2 3))...";
+    (display (parse "(1 2 3)"))
+    
+    ;; Output
+    ;;
+    ;; > (1 2 3))...";
       (*dict_ptr)["parse"] = temp;
       (*dict_ptr)["string->symbol"] = temp;
       (*dict_ptr)["string->number"] = temp;
@@ -674,34 +674,34 @@ namespace Sayuri {
       root_ptr->BindSymbol("boolean->string", func_ptr);
       root_ptr->BindSymbol("list->string", func_ptr);
       std::string temp =
-  R"...(### to-string ###
+R"...(### to-string ###
 
-  __Usage__
+__Usage__
 
-  * `(to-string <Object>)`
-  * `(symbol->string <Object>)`
-  * `(number->string <Object>)`
-  * `(boolean->string <Object>)`
-  * `(list->string <Object>)`
+* `(to-string <Object>)`
+* `(symbol->string <Object>)`
+* `(number->string <Object>)`
+* `(boolean->string <Object>)`
+* `(list->string <Object>)`
 
-  __Description__
+__Description__
 
-  * Convert `<Object>` to S-Expression as String.
+* Convert `<Object>` to S-Expression as String.
 
-  __Example__
+__Example__
 
-      (display (to-string '(1 2 3)))
-      
-      ;; Output
-      ;;
-      ;; > (1 2 3)
-      ;;
-      
-      (display (string? (to-string '(1 2 3))))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (to-string '(1 2 3)))
+    
+    ;; Output
+    ;;
+    ;; > (1 2 3)
+    ;;
+    
+    (display (string? (to-string '(1 2 3))))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
       (*dict_ptr)["to-string"] = temp;
       (*dict_ptr)["symbol->string"] = temp;
       (*dict_ptr)["number->string"] = temp;
@@ -760,38 +760,38 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("try", func_ptr);
       (*dict_ptr)["try"] =
-  R"...(### try ###
+R"...(### try ###
 
-  __Usage__
+__Usage__
 
-  * `(try (<Try Expr>...) <Catch Expr>...)`
+* `(try (<Try Expr>...) <Catch Expr>...)`
 
-  __Description__
+__Description__
 
-  * This is Special Form.
-      * `<Catch Expr>...` is evaluated if an error have been occurred
-        in `<Try Expr>...`.
-  * Handle exceptions.
-  * If an exception occurs in `<Try Expr>...`, then
-    it stops `<Try Expr>...` and executes `<Catch Expr>...`.
-  * In a scope of `<Catch Expr>...`, 'exception' symbol is defined.
-  * Return a object evaluated at the end.
+* This is Special Form.
+    * `<Catch Expr>...` is evaluated if an error have been occurred
+      in `<Try Expr>...`.
+* Handle exceptions.
+* If an exception occurs in `<Try Expr>...`, then
+  it stops `<Try Expr>...` and executes `<Catch Expr>...`.
+* In a scope of `<Catch Expr>...`, 'exception' symbol is defined.
+* Return a object evaluated at the end.
 
-  __Example__
+__Example__
 
-      (try ((+ 1 "Hello"))
-           (display "Error Occured!!"))
-      
-      ;; Output
-      ;;
-      ;; > Error Occured!!
-      
-      (try ((+ 1 "Hello"))
-           (display exception))
-      
-      ;; Output
-      ;;
-      ;; > (@not-number "The 2nd argument of (+) didn't return Number."))...";
+    (try ((+ 1 "Hello"))
+         (display "Error Occured!!"))
+    
+    ;; Output
+    ;;
+    ;; > Error Occured!!
+    
+    (try ((+ 1 "Hello"))
+         (display exception))
+    
+    ;; Output
+    ;;
+    ;; > (@not-number "The 2nd argument of (+) didn't return Number."))...";
     }
 
     // %%% throw
@@ -816,26 +816,26 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("throw", func_ptr);
       (*dict_ptr)["throw"] =
-  R"...(### throw ###
+R"...(### throw ###
 
-  __Usage__
+__Usage__
 
-  * `(throw <Object>)`
+* `(throw <Object>)`
 
-  __Description__
+__Description__
 
-  * Throw an exception.
-  * If you use this in (try) function,
-    `<Object>` is bound to 'exception' symbol.
+* Throw an exception.
+* If you use this in (try) function,
+  `<Object>` is bound to 'exception' symbol.
 
-  __Example__
+__Example__
 
-      (try ((throw 123))
-           (display exception))
-      
-      ;; Output
-      ;;
-      ;; > 123)...";
+    (try ((throw 123))
+         (display exception))
+    
+    ;; Output
+    ;;
+    ;; > 123)...";
     }
 
     // %%% car
@@ -864,29 +864,29 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("car", func_ptr);
       (*dict_ptr)["car"] =
-  R"...(### car ###
+R"...(### car ###
 
-  __Usage__
+__Usage__
 
-  * `(car <Pair or List>)`
+* `(car <Pair or List>)`
 
-  __Description__
+__Description__
 
-  * Return Car value of `<Pair or List>`
-  * Return the 1st element of `<Pair or List>`.
+* Return Car value of `<Pair or List>`
+* Return the 1st element of `<Pair or List>`.
 
-  __Example__
+__Example__
 
-      (display (car '(111 . 222)))
-      ;; Output
-      ;;
-      ;; > 111
-      
-      (display (car (list 111 222 333)))
-      
-      ;; Output
-      ;;
-      ;; > 111)...";
+    (display (car '(111 . 222)))
+    ;; Output
+    ;;
+    ;; > 111
+    
+    (display (car (list 111 222 333)))
+    
+    ;; Output
+    ;;
+    ;; > 111)...";
     }
 
     // %%% cdr
@@ -915,29 +915,29 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("cdr", func_ptr);
       (*dict_ptr)["cdr"] =
-  R"...(### cdr ###
+R"...(### cdr ###
 
-  __Usage__
+__Usage__
 
-  * `(cdr <Pair or List>)`
+* `(cdr <Pair or List>)`
 
-  __Description__
+__Description__
 
-  * Return Cdr value of `<Pair or List>`
-  * Return List consists of after the 1st element of `<Pair or List>`.
+* Return Cdr value of `<Pair or List>`
+* Return List consists of after the 1st element of `<Pair or List>`.
 
-  __Example__
+__Example__
 
-      (display (cdr '(111 . 222)))
-      ;; Output
-      ;;
-      ;; > 222
-      
-      (display (cdr (list 111 222 333)))
-      
-      ;; Output
-      ;;
-      ;; > (222 333))...";
+    (display (cdr '(111 . 222)))
+    ;; Output
+    ;;
+    ;; > 222
+    
+    (display (cdr (list 111 222 333)))
+    
+    ;; Output
+    ;;
+    ;; > (222 333))...";
     }
 
     // %%% cons
@@ -967,36 +967,36 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("cons", func_ptr);
       (*dict_ptr)["cons"] =
-  R"...(### cons ###
+R"...(### cons ###
 
-  __Usage__
+__Usage__
 
-  * `(cons <Object 1> <Object 2>)`
+* `(cons <Object 1> <Object 2>)`
 
-  __Description__
+__Description__
 
-  * Return Pair. Car is `<Object 1>`, Cdr is `<Object 2>`.
+* Return Pair. Car is `<Object 1>`, Cdr is `<Object 2>`.
 
-  __Example__
+__Example__
 
 
-      (display (cons 111 222))
-      
-      ;; Output
-      ;;
-      ;; > (111 . 222)
-      
-      (display (cons 111 '(222 333)))
-      
-      ;; Output
-      ;;
-      ;; > (111 222 333)
-      
-      (display (cons 444 (cons 555 (cons 666 ()))))
-      
-      ;; Output
-      ;;
-      ;; > (444 555 666))...";
+    (display (cons 111 222))
+    
+    ;; Output
+    ;;
+    ;; > (111 . 222)
+    
+    (display (cons 111 '(222 333)))
+    
+    ;; Output
+    ;;
+    ;; > (111 222 333)
+    
+    (display (cons 444 (cons 555 (cons 666 ()))))
+    
+    ;; Output
+    ;;
+    ;; > (444 555 666))...";
     }
 
     // %%% quote
@@ -1019,41 +1019,41 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("quote", func_ptr);
       (*dict_ptr)["quote"] =
-  R"...(### quote ###
+R"...(### quote ###
 
-  __Usage__
+__Usage__
 
-  * `(quote <Object>)`
+* `(quote <Object>)`
 
-  __Description__
+__Description__
 
-  * This is Special Form.
-      + `<Object>` is not Evaluated.
-  * Return `<Object>` as is.
-  * Syntactic suger is `'<Object>`
+* This is Special Form.
+    + `<Object>` is not Evaluated.
+* Return `<Object>` as is.
+* Syntactic suger is `'<Object>`
 
-  __Example__
+__Example__
 
-      (display (quote (111 222 333)))
-      
-      ;; Output
-      ;;
-      ;; > (111 222 333)
-      
-      (display '(444 555 666))
-      
-      ;; Output
-      ;;
-      ;; > (444 555 666)
-      
-      (define x 123)
-      (display x)
-      (display 'x)
-      
-      ;; Output
-      ;;
-      ;; > 123
-      ;; > Symbol: x)...";
+    (display (quote (111 222 333)))
+    
+    ;; Output
+    ;;
+    ;; > (111 222 333)
+    
+    (display '(444 555 666))
+    
+    ;; Output
+    ;;
+    ;; > (444 555 666)
+    
+    (define x 123)
+    (display x)
+    (display 'x)
+    
+    ;; Output
+    ;;
+    ;; > 123
+    ;; > Symbol: x)...";
     }
 
     // %%% define
@@ -1135,38 +1135,38 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("define", func_ptr);
       (*dict_ptr)["define"] =
-  R"...(### define ###
+R"...(### define ###
 
-  __Usage__
+__Usage__
 
-  1. `(define <Symbol> <Object>)`
-  2. `(define (<Name : Symbol> <Args : Symbol>...) <S-Expression>...)`
+1. `(define <Symbol> <Object>)`
+2. `(define (<Name : Symbol> <Args : Symbol>...) <S-Expression>...)`
 
-  __Description__
+__Description__
 
-  * This is Special Form.
-      + 1: `<Symbol>` isn't evaluated.
-      + 2: All arguments isn't evaluated.
-  * Bind something to its scope.
-  * 1: Bind `<Object>` to `<Symbol>`.
-  * 2: Define `<S-Expression>` as Function named `<Name>`,
-       and `<Args>...` is names of its arguments.
+* This is Special Form.
+    + 1: `<Symbol>` isn't evaluated.
+    + 2: All arguments isn't evaluated.
+* Bind something to its scope.
+* 1: Bind `<Object>` to `<Symbol>`.
+* 2: Define `<S-Expression>` as Function named `<Name>`,
+     and `<Args>...` is names of its arguments.
 
-  __Example__
+__Example__
 
-      (define x 123)
-      (display x)
-      
-      ;; Output
-      ;;
-      ;; > 123
-      
-      (define (myfunc x) (+ x 10))
-      (display (myfunc 5))
-      
-      ;; Output
-      ;;
-      ;; > 15)...";
+    (define x 123)
+    (display x)
+    
+    ;; Output
+    ;;
+    ;; > 123
+    
+    (define (myfunc x) (+ x 10))
+    (display (myfunc 5))
+    
+    ;; Output
+    ;;
+    ;; > 15)...";
     }
 
     // %%% set!
@@ -1206,38 +1206,38 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("set!", func_ptr);
       (*dict_ptr)["set!"] =
-  R"...(### set! ###
+R"...(### set! ###
 
-  __Usage__
+__Usage__
 
-  * `(set! <Symbol> <Object>)`
+* `(set! <Symbol> <Object>)`
 
-  __Description__
+__Description__
 
-  * This is Special Form.
-      + `<Symbol>` isn't evaluated.
-  * Update `<Symbol>` to `<Object>` on the local scope.
+* This is Special Form.
+    + `<Symbol>` isn't evaluated.
+* Update `<Symbol>` to `<Object>` on the local scope.
 
-  __Example__
+__Example__
 
-      (define x 123)
-      (set! x 456)
-      (display x)
-      
-      ;; Output
-      ;;
-      ;; > 456
-      
-      (define myfunc (let ((x 1)) (lambda () (set! x (+ x 1)) x)))
-      (display (myfunc))
-      (display (myfunc))
-      (display (myfunc))
-      
-      ;; Output
-      ;;
-      ;; > 2
-      ;; > 3
-      ;; > 4)...";
+    (define x 123)
+    (set! x 456)
+    (display x)
+    
+    ;; Output
+    ;;
+    ;; > 456
+    
+    (define myfunc (let ((x 1)) (lambda () (set! x (+ x 1)) x)))
+    (display (myfunc))
+    (display (myfunc))
+    (display (myfunc))
+    
+    ;; Output
+    ;;
+    ;; > 2
+    ;; > 3
+    ;; > 4)...";
     }
 
     // %%% lambda
@@ -1290,37 +1290,37 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("lambda", func_ptr);
       (*dict_ptr)["lambda"] =
-  R"...(### lambda ###
+R"...(### lambda ###
 
-  __Usage__
+__Usage__
 
-  * `(lambda (<Args : Symbol>...) <S-Expression>...)`
+* `(lambda (<Args : Symbol>...) <S-Expression>...)`
 
-  __Description__
+__Description__
 
-  * This is Special Form.
-      + All arguments isn't evaluated.
-  * Return Function defined by `<S-Expression>...`.
-  * (lambda) inherits parent's scope and creates its own local scope.
-    So using (lambda) in (lambda), you can create closure function.
-  * `<Args>...` is Symbols as name of arguments.
+* This is Special Form.
+    + All arguments isn't evaluated.
+* Return Function defined by `<S-Expression>...`.
+* (lambda) inherits parent's scope and creates its own local scope.
+  So using (lambda) in (lambda), you can create closure function.
+* `<Args>...` is Symbols as name of arguments.
 
-  __Example__
+__Example__
 
-      (define myfunc (lambda (x) (+ x 100)))
-      (display (myfunc 5))
-      
-      ;; Output
-      ;;
-      ;; > 105
-      
-      (define gen-func (lambda (x) (lambda () (+ x 100))))
-      (define myfunc2 (gen-func 50))
-      (display (myfunc2))
-      
-      ;; Output
-      ;;
-      ;; > 150)...";
+    (define myfunc (lambda (x) (+ x 100)))
+    (display (myfunc 5))
+    
+    ;; Output
+    ;;
+    ;; > 105
+    
+    (define gen-func (lambda (x) (lambda () (+ x 100))))
+    (define myfunc2 (gen-func 50))
+    (display (myfunc2))
+    
+    ;; Output
+    ;;
+    ;; > 150)...";
     }
 
     // %%% let
@@ -1389,32 +1389,32 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("let", func_ptr);
       (*dict_ptr)["let"] =
-  R"...(### let ###
+R"...(### let ###
 
-  __Usage__
+__Usage__
 
-  * `(let ((<Name : Symbol> <Object>)...) <S-Expression>...)`
+* `(let ((<Name : Symbol> <Object>)...) <S-Expression>...)`
 
-  __Description__
+__Description__
 
-  * This is Special Form.
-      + `<Name : Symbol>` isn't evaluated.
-      + But `<Object>` and `<S-Expression>` are evaluated.
-  * Execute `<S-Expression>...` in new local scope.
-  * (let) inherits parent's scope and creates its own local scope.
-    So using (lambda) in (let), you can create closure function.
-  * `(<Name> <Object>)...` is local values on (let)'s local scope.
+* This is Special Form.
+    + `<Name : Symbol>` isn't evaluated.
+    + But `<Object>` and `<S-Expression>` are evaluated.
+* Execute `<S-Expression>...` in new local scope.
+* (let) inherits parent's scope and creates its own local scope.
+  So using (lambda) in (let), you can create closure function.
+* `(<Name> <Object>)...` is local values on (let)'s local scope.
 
-  __Example__
+__Example__
 
-      (define (gen-func x y) (let ((a x) (b y))
-                (lambda () (+ a b))))
-      (define myfunc (gen-func 10 20))
-      (display (myfunc))
-      
-      ;; Output
-      ;;
-      ;; > 30)...";
+    (define (gen-func x y) (let ((a x) (b y))
+              (lambda () (+ a b))))
+    (define myfunc (gen-func 10 20))
+    (display (myfunc))
+    
+    ;; Output
+    ;;
+    ;; > 30)...";
     }
 
     // %%% if
@@ -1461,26 +1461,26 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("if", func_ptr);
       (*dict_ptr)["if"] =
-  R"...(### if ###
+R"...(### if ###
 
-  __Usage__
+__Usage__
 
-  * `(if <Condition : Boolean> <Then> <Else>)`
+* `(if <Condition : Boolean> <Then> <Else>)`
 
-  __Description__
+__Description__
 
-  * This is Special Form.
-      + Either of `<Then>` and `<Else>` are evaluated.
-  * If `<Condition>` is true, then (if) evaluates `<Then>`.
-    If false, then it evaluates `<Else>`.
+* This is Special Form.
+    + Either of `<Then>` and `<Else>` are evaluated.
+* If `<Condition>` is true, then (if) evaluates `<Then>`.
+  If false, then it evaluates `<Else>`.
 
-  __Example__
+__Example__
 
-      (display (if (< 1 2) (+ 3 4) (+ 5 6)))
-      
-      ;; Output
-      ;;
-      ;; > 7)...";
+    (display (if (< 1 2) (+ 3 4) (+ 5 6)))
+    
+    ;; Output
+    ;;
+    ;; > 7)...";
     }
 
     // %%% cond
@@ -1537,31 +1537,31 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("cond", func_ptr);
       (*dict_ptr)["cond"] =
-  R"...(### cond ###
+R"...(### cond ###
 
-  __Usage__
+__Usage__
 
-  * `(cond (<Condition : Boolean> <Then>)... (else <Else>))`
+* `(cond (<Condition : Boolean> <Then>)... (else <Else>))`
 
-  __Description__
+__Description__
 
-  * This is Special Form.
-      + Only one of `<Then>` or `<Else>` are evaluated.
-      + `(else <Else>)` is a special list.
-  * If `<Condition>` is true, then (cond) returns `<Then>`.
-    If false, then it evaluates next `<Condition>`.
-  * If all `<Condition>` are false, then (cond) returns `<Else>`.
+* This is Special Form.
+    + Only one of `<Then>` or `<Else>` are evaluated.
+    + `(else <Else>)` is a special list.
+* If `<Condition>` is true, then (cond) returns `<Then>`.
+  If false, then it evaluates next `<Condition>`.
+* If all `<Condition>` are false, then (cond) returns `<Else>`.
 
-  __Example__
+__Example__
 
-      (cond
-          ((> 1 2) (display "Hello"))
-          ((< 3 4) (display "World"))
-          (else "Else!!"))
-      
-      ;; Output
-      ;;
-      ;; > World)...";
+    (cond
+        ((> 1 2) (display "Hello"))
+        ((< 3 4) (display "World"))
+        (else "Else!!"))
+    
+    ;; Output
+    ;;
+    ;; > World)...";
     }
 
     // %%% begin
@@ -1585,27 +1585,27 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("begin", func_ptr);
       (*dict_ptr)["begin"] =
-  R"...(### begin ###
+R"...(### begin ###
 
-  __Usage__
+__Usage__
 
-  * `(begin <S-Expression>...)`
+* `(begin <S-Expression>...)`
 
-  __Description__
+__Description__
 
-  * Execute `<S-Expression>...` in turns and return last.
+* Execute `<S-Expression>...` in turns and return last.
 
-  __Example__
+__Example__
 
-      (display (begin
-                   (display "Hello")
-                   (display "World")))
-      
-      ;; Output
-      ;;
-      ;; > Hello
-      ;; > World
-      ;; > World)...";
+    (display (begin
+                 (display "Hello")
+                 (display "World")))
+    
+    ;; Output
+    ;;
+    ;; > Hello
+    ;; > World
+    ;; > World)...";
     }
 
     // %%% display
@@ -1664,31 +1664,31 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("display", func_ptr);
       (*dict_ptr)["display"] =
-  R"...(### display ###
+R"...(### display ###
 
-  __Usage__
+__Usage__
 
-  * `(display <Object>...)`
+* `(display <Object>...)`
 
-  __Description__
+__Description__
 
-  * Print `<Object>` on Standard Output.
+* Print `<Object>` on Standard Output.
 
-  __Example__
+__Example__
 
-      (define x 123)
-      (display x)
-      
-      ;; Output
-      ;;
-      ;; > 123
-      
-      (define x 123)
-      (display "x is " x)
-      
-      ;; Output
-      ;;
-      ;; > x is 123)...";
+    (define x 123)
+    (display x)
+    
+    ;; Output
+    ;;
+    ;; > 123
+    
+    (define x 123)
+    (display "x is " x)
+    
+    ;; Output
+    ;;
+    ;; > x is 123)...";
     }
 
     // %%% stdin
@@ -1737,31 +1737,31 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("stdin", func_ptr);
       (*dict_ptr)["stdin"] =
-  R"...(### stdin ###
+R"...(### stdin ###
 
-  __Usage__
+__Usage__
 
-  * `(stdin <Message Symbol>)`
+* `(stdin <Message Symbol>)`
 
-  __Description__
+__Description__
 
-  * Return String from Standard Input.
-  * `<Message Symbol>` is a message to the input stream.
-      + `@get` : Read one charactor.
-      + `@read-line` : Read one line. ('LF(CR+LF)' is omitted.)
-      + `@read` : Read all.
-  * If Standard Input is already closed, it returns Nil.
+* Return String from Standard Input.
+* `<Message Symbol>` is a message to the input stream.
+    + `@get` : Read one charactor.
+    + `@read-line` : Read one line. ('LF(CR+LF)' is omitted.)
+    + `@read` : Read all.
+* If Standard Input is already closed, it returns Nil.
 
-  __Example__
+__Example__
 
-      ;; Read and show one charactor from Standard Input.
-      (display (stdin '@get))
-      
-      ;; Read and show one line from Standard Input.
-      (display (stdin '@read-line))
-      
-      ;; Read and show all from Standard Input.
-      (display (stdin '@read)))...";
+    ;; Read and show one charactor from Standard Input.
+    (display (stdin '@get))
+    
+    ;; Read and show one line from Standard Input.
+    (display (stdin '@read-line))
+    
+    ;; Read and show all from Standard Input.
+    (display (stdin '@read)))...";
     }
 
     // %%% stdout
@@ -1792,24 +1792,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("stdout", func_ptr);
       (*dict_ptr)["stdout"] =
-  R"...(### stdout ###
+R"...(### stdout ###
 
-  __Usage__
+__Usage__
 
-  * `(stdout <String>)`
+* `(stdout <String>)`
 
-  __Description__
+__Description__
 
-  * Print `<String>` on Standard Output.
+* Print `<String>` on Standard Output.
 
-  __Example__
+__Example__
 
-      (stdout (to-string 123))
-      (stdout "\n")
-      
-      ;; Output
-      ;;
-      ;; > 123)...";
+    (stdout (to-string 123))
+    (stdout "\n")
+    
+    ;; Output
+    ;;
+    ;; > 123)...";
     }
 
     // %%% stderr
@@ -1840,24 +1840,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("stderr", func_ptr);
       (*dict_ptr)["stderr"] =
-  R"...(### stderr ###
+R"...(### stderr ###
 
-  __Usage__
+__Usage__
 
-  * `(stderr <String>)`
+* `(stderr <String>)`
 
-  __Description__
+__Description__
 
-  * Print `<String>` on Standard Error.
+* Print `<String>` on Standard Error.
 
-  __Example__
+__Example__
 
-      (stderr (to-string 123))
-      (stderr "\n")
-      
-      ;; Output
-      ;;
-      ;; > 123)...";
+    (stderr (to-string 123))
+    (stderr "\n")
+    
+    ;; Output
+    ;;
+    ;; > 123)...";
     }
 
     // %%% equal?
@@ -1977,20 +1977,20 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("equal?", func_ptr);
       (*dict_ptr)["equal?"] =
-  R"...(### equal? ###
+R"...(### equal? ###
 
-  __Usage__
+__Usage__
 
-  * `(equal? <Object>...)`
+* `(equal? <Object>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if all `<Object>...` are same structure.
-    If not, return #f.
+* Return #t if all `<Object>...` are same structure.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (equal? '(1 2 (3 4) 5) '(1 2 (3 4) 5))))
+    (display (equal? '(1 2 (3 4) 5) '(1 2 (3 4) 5))))
       
       ;; Output
       ;;
@@ -2028,24 +2028,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("pair?", func_ptr);
       (*dict_ptr)["pair?"] =
-  R"...(### pair? ###
+R"...(### pair? ###
 
-  __Usage__
+__Usage__
 
-  * `(pair? <Object>...)`
+* `(pair? <Object>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if all `<Object>...` are Pair.
-    If not, return #f.
+* Return #t if all `<Object>...` are Pair.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (pair? '(1 2 3) '(4 5 6)))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (pair? '(1 2 3) '(4 5 6)))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% list?
@@ -2079,24 +2079,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("list?", func_ptr);
       (*dict_ptr)["list?"] =
-  R"...(### list? ###
+R"...(### list? ###
 
-  __Usage__
+__Usage__
 
-  * `(list? <Object>...)`
+* `(list? <Object>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if all `<Object>...` are List.
-    If not, return #f.
+* Return #t if all `<Object>...` are List.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (list? '(1 2 3) '(4 5 6) ()))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (list? '(1 2 3) '(4 5 6) ()))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% nil?
@@ -2133,25 +2133,25 @@ namespace Sayuri {
       root_ptr->BindSymbol("nil?", func_ptr);
       root_ptr->BindSymbol("null?", func_ptr);
       std::string temp =
-  R"...(### nil? ###
+R"...(### nil? ###
 
-  __Usage__
+__Usage__
 
-  * `(nil? <Object>...)`
-  * `(null? <Object>...)`
+* `(nil? <Object>...)`
+* `(null? <Object>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if all `<Object>...` are Nil.
-    If not, return #f.
+* Return #t if all `<Object>...` are Nil.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (nil? ()))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (nil? ()))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
       (*dict_ptr)["nil?"] = temp;
       (*dict_ptr)["null?"] = temp;
     }
@@ -2188,24 +2188,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("symbol?", func_ptr);
       (*dict_ptr)["symbol?"] =
-  R"...(### symbol? ###
+R"...(### symbol? ###
 
-  __Usage__
+__Usage__
 
-  * `(symbol? <Object>...)`
+* `(symbol? <Object>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if all `<Object>...` are Symbol.
-    If not, return #f.
+* Return #t if all `<Object>...` are Symbol.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (symbol? 'x))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (symbol? 'x))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% number?
@@ -2240,24 +2240,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("number?", func_ptr);
       (*dict_ptr)["number?"] =
-  R"...(### number? ###
+R"...(### number? ###
 
-  __Usage__
+__Usage__
 
-  * `(number? <Object>...)`
+* `(number? <Object>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if all `<Object>...` are Number.
-    If not, return #f.
+* Return #t if all `<Object>...` are Number.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (number? 123))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (number? 123))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% boolean?
@@ -2292,24 +2292,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("boolean?", func_ptr);
       (*dict_ptr)["boolean?"] =
-  R"...(### boolean? ###
+R"...(### boolean? ###
 
-  __Usage__
+__Usage__
 
-  * `(boolean? <Object>...)`
+* `(boolean? <Object>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if all `<Object>...` are Boolean.
-    If not, return #f.
+* Return #t if all `<Object>...` are Boolean.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (boolean? #f))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (boolean? #f))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% string?
@@ -2344,24 +2344,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("string?", func_ptr);
       (*dict_ptr)["string?"] =
-  R"...(### string? ###
+R"...(### string? ###
 
-  __Usage__
+__Usage__
 
-  * `(string? <Object>...)`
+* `(string? <Object>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if all `<Object>...` are String.
-    If not, return #f.
+* Return #t if all `<Object>...` are String.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (string? "Hello"))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (string? "Hello"))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% function?
@@ -2396,25 +2396,25 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("function?", func_ptr);
       (*dict_ptr)["function?"] =
-  R"...(### function? ###
+R"...(### function? ###
 
-  __Usage__
+__Usage__
 
-  * `(function? <Object>...)`
+* `(function? <Object>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if all `<Object>...` are Function.
-    If not, return #f.
+* Return #t if all `<Object>...` are Function.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (define myfunc (lambda (x) (+ x 1)))
-      (display (function? myfunc))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (define myfunc (lambda (x) (+ x 1)))
+    (display (function? myfunc))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% native-function?
@@ -2449,24 +2449,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("native-function?", func_ptr);
       (*dict_ptr)["native-function?"] =
-  R"...(### native-function? ###
+R"...(### native-function? ###
 
-  __Usage__
+__Usage__
 
-  * `(native-function? <Object>...)`
+* `(native-function? <Object>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if all `<Object>...` are Native Function.
-    If not, return #f.
+* Return #t if all `<Object>...` are Native Function.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (native-function? +))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (native-function? +))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% procedure?
@@ -2501,31 +2501,31 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("procedure?", func_ptr);
       (*dict_ptr)["procedure?"] =
-  R"...(### procedure? ###
+R"...(### procedure? ###
 
-  __Usage__
+__Usage__
 
-  * `(procedure? <Object>...)`
+* `(procedure? <Object>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if all `<Object>...` are Function or Native Function.
-    If not, return #f.
+* Return #t if all `<Object>...` are Function or Native Function.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (define myfunc (lambda (x) (+ x 1)))
-      (display (procedure? myfunc))
-      
-      ;; Output
-      ;;
-      ;; > #t
-      
-      (display (procedure? +))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (define myfunc (lambda (x) (+ x 1)))
+    (display (procedure? myfunc))
+    
+    ;; Output
+    ;;
+    ;; > #t
+    
+    (display (procedure? +))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% output-stream
@@ -2599,29 +2599,29 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("output-stream", func_ptr);
       (*dict_ptr)["output-stream"] =
-  R"...(### output-stream ###
+R"...(### output-stream ###
 
-  __Usage__
+__Usage__
 
-  1. `(output-stream <File name : String>)`
-  2. `((output-stream <File name : String>) <String>)`
+1. `(output-stream <File name : String>)`
+2. `((output-stream <File name : String>) <String>)`
 
-  __Description__
+__Description__
 
-  * 1: Return Native Function as an output stream of `<File name>`.
-  * 2: Write `<String>` to `<File name>` and return itself.
-  * If you give Nil to the Function, the stream will be closed.
+* 1: Return Native Function as an output stream of `<File name>`.
+* 2: Write `<String>` to `<File name>` and return itself.
+* If you give Nil to the Function, the stream will be closed.
 
-  __Example__
+__Example__
 
-      ;; Open "hello.txt".
-      (define myfile (output-stream "hello.txt"))
-      
-      ;; Write "Hello World" to "hello.txt".
-      (myfile "Hello World\n")
-      
-      ;; Close "hello.txt".
-      (myfile ()))...";
+    ;; Open "hello.txt".
+    (define myfile (output-stream "hello.txt"))
+    
+    ;; Write "Hello World" to "hello.txt".
+    (myfile "Hello World\n")
+    
+    ;; Close "hello.txt".
+    (myfile ()))...";
     }
 
     // %%% input-stream
@@ -2708,40 +2708,40 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("input-stream", func_ptr);
       (*dict_ptr)["input-stream"] =
-  R"...(### input-stream ###
+R"...(### input-stream ###
 
-  __Usage__
+__Usage__
 
-  1. `(input-stream <File name : String>)`
-  2. `((input-stream <File name : String>) <Message Symbol : Symbol>)`
+1. `(input-stream <File name : String>)`
+2. `((input-stream <File name : String>) <Message Symbol : Symbol>)`
 
-  __Description__
+__Description__
 
-  * 1: Return Native Function as an input stream of `<File name>`.
-  * 2: Return String from `<File name>`.
-  * 2: `<Message Symbol>` is a message to the input stream.
-      + `@get` : Read one charactor.
-      + `@read-line` : Read one line. ('LF(CR+LF)' is omitted.)
-      + `@read` : Read all.
-  * If you give Nil to the stream, it will be closed.
-  * If the stream already closed, it returns empty string.
+* 1: Return Native Function as an input stream of `<File name>`.
+* 2: Return String from `<File name>`.
+* 2: `<Message Symbol>` is a message to the input stream.
+    + `@get` : Read one charactor.
+    + `@read-line` : Read one line. ('LF(CR+LF)' is omitted.)
+    + `@read` : Read all.
+* If you give Nil to the stream, it will be closed.
+* If the stream already closed, it returns empty string.
 
-  __Example__
+__Example__
 
-      ;; Open "hello.txt".
-      (define myfile (input-stream "hello.txt"))
-      
-      ;; Read and show one charactor from "hello.txt".
-      (display (myfile '@get))
-      
-      ;; Read and show one line from "hello.txt".
-      (display (myfile '@read-line))
-      
-      ;; Read and show all from "hello.txt".
-      (display (myfile '@read))
-      
-      ;; Close "hello.txt".
-      (myfile ()))...";
+    ;; Open "hello.txt".
+    (define myfile (input-stream "hello.txt"))
+    
+    ;; Read and show one charactor from "hello.txt".
+    (display (myfile '@get))
+    
+    ;; Read and show one line from "hello.txt".
+    (display (myfile '@read-line))
+    
+    ;; Read and show all from "hello.txt".
+    (display (myfile '@read))
+    
+    ;; Close "hello.txt".
+    (myfile ()))...";
     }
   }
 
@@ -2782,31 +2782,31 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("append", func_ptr);
       (*dict_ptr)["append"] =
-  R"...(### append ###
+R"...(### append ###
 
-  __Usage__
+__Usage__
 
-  * `(append <List 1> <List 2>)`
+* `(append <List 1> <List 2>)`
 
-  __Description__
+__Description__
 
-  * Append `<List 2>` after the end of `<List 1>`.
-  * In other words,
-    (append) replaces last Cdr of `<List 1>` from Nil to `<List 2>`.
+* Append `<List 2>` after the end of `<List 1>`.
+* In other words,
+  (append) replaces last Cdr of `<List 1>` from Nil to `<List 2>`.
 
-  __Example__
+__Example__
 
-      (display (append '(111 222 333) '(444 555 666)))
-      
-      ;; Output
-      ;;
-      ;; > (111 222 333 444 555 666)
-      
-      (display (append '(111 222 333) "Not List"))
-      
-      ;; Output
-      ;;
-      ;; > (111 222 333 . "Not List"))...";
+    (display (append '(111 222 333) '(444 555 666)))
+    
+    ;; Output
+    ;;
+    ;; > (111 222 333 444 555 666)
+    
+    (display (append '(111 222 333) "Not List"))
+    
+    ;; Output
+    ;;
+    ;; > (111 222 333 . "Not List"))...";
     }
 
     // %%% list
@@ -2835,24 +2835,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("list", func_ptr);
       (*dict_ptr)["list"] =
-  R"...(### list ###
+R"...(### list ###
 
 
-  __Usage__
+__Usage__
 
-  * `(list <Object>...)`
+* `(list <Object>...)`
 
-  __Description__
+__Description__
 
-  * Return List consists of `<Object>...`.
+* Return List consists of `<Object>...`.
 
-  __Example__
+__Example__
 
-      (display (list 111 222 333))
-      
-      ;; Output
-      ;;
-      ;; > (111 222 333))...";
+    (display (list 111 222 333))
+    
+    ;; Output
+    ;;
+    ;; > (111 222 333))...";
     }
 
     // %%% list-ref
@@ -2904,31 +2904,31 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("list-ref", func_ptr);
       (*dict_ptr)["list-ref"] =
-  R"...(### list-ref ###
+R"...(### list-ref ###
 
-  __Usage__
+__Usage__
 
-  * `(list-ref <List> <Index : Number>)`
+* `(list-ref <List> <Index : Number>)`
 
-  __Description__
+__Description__
 
-  * Return a element of `<Index>` of `<List>`.
-  * The 1st element of `<List>` is '0'.
-  * If `<Index>` is negative number," It counts from the tail of `<List>`.
+* Return a element of `<Index>` of `<List>`.
+* The 1st element of `<List>` is '0'.
+* If `<Index>` is negative number," It counts from the tail of `<List>`.
 
-  __Example__
+__Example__
 
-      (display (list-ref (111 222 333) 1))
-      
-      ;; Output
-      ;;
-      ;; > 222
-      
-      (display (list-ref (111 222 333) -1))
-      
-      ;; Output
-      ;;
-      ;; > 333)...";
+    (display (list-ref (111 222 333) 1))
+    
+    ;; Output
+    ;;
+    ;; > 222
+    
+    (display (list-ref (111 222 333) -1))
+    
+    ;; Output
+    ;;
+    ;; > 333)...";
     }
 
     // %%% list-replace
@@ -2990,27 +2990,27 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("list-replace", func_ptr);
       (*dict_ptr)["list-replace"] =
-  R"...(### list-replace ###
+R"...(### list-replace ###
 
-  __Usage__
+__Usage__
 
-  * `(list-replace <List> <Index : Number> <Object>)`
+* `(list-replace <List> <Index : Number> <Object>)`
 
-  __Description__
+__Description__
 
-  * Return List which has replaced the `<Index>`th element of
-    `<List>` for `<Object>`.
-  * The 1st element of `<List>` is '0'.
-  * If `<Index>` is negative number," It counts from the tail of `<List>`.
+* Return List which has replaced the `<Index>`th element of
+  `<List>` for `<Object>`.
+* The 1st element of `<List>` is '0'.
+* If `<Index>` is negative number," It counts from the tail of `<List>`.
 
-  __Example__
+__Example__
 
-      (define lst (list 111 222 333))
-      (display (list-replace lst 1 "Hello"))
-      
-      ;; Output
-      ;;
-      ;; > (111 "Hello" 333))...";
+    (define lst (list 111 222 333))
+    (display (list-replace lst 1 "Hello"))
+    
+    ;; Output
+    ;;
+    ;; > (111 "Hello" 333))...";
     }
 
     // %%% list-remove
@@ -3065,26 +3065,26 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("list-remove", func_ptr);
       (*dict_ptr)["list-remove"] =
-  R"...(### list-remove ###
+R"...(### list-remove ###
 
-  __Usage__
+__Usage__
 
-  * `(list-remove <List> <Index : Number>)`
+* `(list-remove <List> <Index : Number>)`
 
-  __Description__
+__Description__
 
-  * Return List which has removed the `<Index>`th element of `<List>`.
-  * The 1st element of `<List>` is '0'.
-  * If `<Index>` is negative number," It counts from the tail of `<List>`.
+* Return List which has removed the `<Index>`th element of `<List>`.
+* The 1st element of `<List>` is '0'.
+* If `<Index>` is negative number," It counts from the tail of `<List>`.
 
-  __Example__
+__Example__
 
-      (define lst (list 111 222 333))
-      (display (list-remove lst 1))
-      
-      ;; Output
-      ;;
-      ;; > (111 333))...";
+    (define lst (list 111 222 333))
+    (display (list-remove lst 1))
+    
+    ;; Output
+    ;;
+    ;; > (111 333))...";
     }
 
     // %%% length
@@ -3127,24 +3127,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("length", func_ptr);
       (*dict_ptr)["length"] =
-  R"...(### length ###
+R"...(### length ###
 
-  __Usage__
+__Usage__
 
-  * `(length <List>)`
+* `(length <List>)`
 
-  __Description__
+__Description__
 
-  * Return number of `<List>`.
-  * If you input Atom, it returns '1'. `()` returns '0'.
+* Return number of `<List>`.
+* If you input Atom, it returns '1'. `()` returns '0'.
 
-  __Example__
+__Example__
 
-      (display (length '(111 222 333 444 555 666)))
-      
-      ;; Output
-      ;;
-      ;; > 6)...";
+    (display (length '(111 222 333 444 555 666)))
+    
+    ;; Output
+    ;;
+    ;; > 6)...";
     }
 
     // %%% =
@@ -3192,24 +3192,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("=", func_ptr);
       (*dict_ptr)["="] =
-  R"...(### = ###
+R"...(### = ###
 
-  __Usage__
+__Usage__
 
-  * `(= <Number>...)`
+* `(= <Number>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if all `<Number>...` are same.
-    If not, return #f.
+* Return #t if all `<Number>...` are same.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (= 111 111 111))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (= 111 111 111))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% <
@@ -3259,24 +3259,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("<", func_ptr);
       (*dict_ptr)["<"] =
-  R"...(### < ###
+R"...(### < ###
 
-  __Usage__
+__Usage__
 
-  * `(< <Number>...)`
+* `(< <Number>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if a Number is less than next Number.
-    If not, return #f.
+* Return #t if a Number is less than next Number.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (< 111 222 333))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (< 111 222 333))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% <=
@@ -3326,24 +3326,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("<=", func_ptr);
       (*dict_ptr)["<"] =
-  R"...(### <= ###
+R"...(### <= ###
 
-  __Usage__
+__Usage__
 
-  * `(<= <Number>...)`
+* `(<= <Number>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if a Number is less or equal than next Number.
-    If not, return #f.
+* Return #t if a Number is less or equal than next Number.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (< 111 222 333))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (< 111 222 333))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% >
@@ -3393,24 +3393,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol(">", func_ptr);
       (*dict_ptr)[">"] =
-  R"...(### > ###
+R"...(### > ###
 
-  __Usage__
+__Usage__
 
-  * `(> <Number>...)`
+* `(> <Number>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if a Number is more than next Number.
-    If not, return #f.
+* Return #t if a Number is more than next Number.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (> 333 222 111))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (> 333 222 111))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% >=
@@ -3460,24 +3460,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol(">=", func_ptr);
       (*dict_ptr)[">="] =
-  R"...(### >= ###
+R"...(### >= ###
 
-  __Usage__
+__Usage__
 
-  * `(>= <Number>...)`
+* `(>= <Number>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if a Number is more or equal than next Number.
-    If not, return #f.
+* Return #t if a Number is more or equal than next Number.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (>= 333 222 111))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (>= 333 222 111))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% not
@@ -3507,23 +3507,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("not", func_ptr);
       (*dict_ptr)["not"] =
-  R"...(### not ###
+R"...(### not ###
 
-  __Usage__
+__Usage__
 
-  * `(not <Boolean>)`
+* `(not <Boolean>)`
 
-  __Description__
+__Description__
 
-  * Turn `<Boolean>` to opposite value. #t to #f, #f to #t.
+* Turn `<Boolean>` to opposite value. #t to #f, #f to #t.
 
-  __Example__
+__Example__
 
-      (display (not (= 111 111)))
-      
-      ;; Output
-      ;;
-      ;; > #f)...";
+    (display (not (= 111 111)))
+    
+    ;; Output
+    ;;
+    ;; > #f)...";
     }
 
     // %%% and
@@ -3559,24 +3559,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("and", func_ptr);
       (*dict_ptr)["and"] =
-  R"...(### and ###
+R"...(### and ###
 
-  __Usage__
+__Usage__
 
-  * `(and <Boolean>...)`
+* `(and <Boolean>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if all `<Boolean>...` are #t.
-    If not, return #f.
+* Return #t if all `<Boolean>...` are #t.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (and (= 111 111) (= 222 222)))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (and (= 111 111) (= 222 222)))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% or
@@ -3612,24 +3612,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("or", func_ptr);
       (*dict_ptr)["or"] =
-  R"...(### or ###
+R"...(### or ###
 
-  __Usage__
+__Usage__
 
-  * `(or <Boolean>...)`
+* `(or <Boolean>...)`
 
-  __Description__
+__Description__
 
-  * Return #t if one of `<Boolean>...` is #t.
-    If not, return #f.
+* Return #t if one of `<Boolean>...` is #t.
+  If not, return #f.
 
-  __Example__
+__Example__
 
-      (display (or (= 111 111) (= 222 333)))
-      
-      ;; Output
-      ;;
-      ;; > #t)...";
+    (display (or (= 111 111) (= 222 333)))
+    
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% +
@@ -3659,23 +3659,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("+", func_ptr);
       (*dict_ptr)["+"] =
-  R"...(### + ###
+R"...(### + ###
 
-  __Usage__
+__Usage__
 
-  * `(+ <Number>...)`
+* `(+ <Number>...)`
 
-  __Description__
+__Description__
 
-  * Sum up all `<Number>...`.
+* Sum up all `<Number>...`.
 
-  __Example__
+__Example__
 
-      (display (+ 1 2 3))
-      
-      ;; Output
-      ;;
-      ;; > 6)...";
+    (display (+ 1 2 3))
+    
+    ;; Output
+    ;;
+    ;; > 6)...";
     }
 
     // %%% -
@@ -3713,23 +3713,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("-", func_ptr);
       (*dict_ptr)["-"] =
-  R"...(### - ###
+R"...(### - ###
 
-  __Usage__
+__Usage__
 
-  * `(- <1st number> <Number>...)`
+* `(- <1st number> <Number>...)`
 
-  __Description__
+__Description__
 
-  * Subtract `<Number>...` from `<1st number>`.
+* Subtract `<Number>...` from `<1st number>`.
 
-  __Example__
+__Example__
 
-      (display (- 5 4 3))
-      
-      ;; Output
-      ;;
-      ;; > -2)...";
+    (display (- 5 4 3))
+    
+    ;; Output
+    ;;
+    ;; > -2)...";
     }
 
     // %%% *
@@ -3759,23 +3759,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("*", func_ptr);
       (*dict_ptr)["*"] =
-  R"...(### * ###
+R"...(### * ###
 
-  __Usage__
+__Usage__
 
-  * `(* <Number>...)`
+* `(* <Number>...)`
 
-  __Description__
+__Description__
 
-  * Multiply all `<Number>...`.
+* Multiply all `<Number>...`.
 
-  __Example__
+__Example__
 
-      (display (* 2 3 4))
-      
-      ;; Output
-      ;;
-      ;; > 24)...";
+    (display (* 2 3 4))
+    
+    ;; Output
+    ;;
+    ;; > 24)...";
     }
 
     // %%% /
@@ -3813,23 +3813,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("/", func_ptr);
       (*dict_ptr)["/"] =
-  R"...(### / ###
+R"...(### / ###
 
-  __Usage__
+__Usage__
 
-  * `(/ <1st number> <Number>...)`
+* `(/ <1st number> <Number>...)`
 
-  __Description__
+__Description__
 
-  * Divide `<1st number>` with `<Number>...`.
+* Divide `<1st number>` with `<Number>...`.
 
-  __Example__
+__Example__
 
-      (display (/ 32 2 4))
-      
-      ;; Output
-      ;;
-      ;; > 4)...";
+    (display (/ 32 2 4))
+    
+    ;; Output
+    ;;
+    ;; > 4)...";
     }
 
     // %%% string-append
@@ -3859,23 +3859,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("string-append", func_ptr);
       (*dict_ptr)["string-append"] =
-  R"...(### string-append ###
+R"...(### string-append ###
 
-  __Usage__
+__Usage__
 
-  * `(string-append <String>...)`
+* `(string-append <String>...)`
 
-  __Description__
+__Description__
 
-  * Concatenate `<String>...`.
+* Concatenate `<String>...`.
 
-  __Example__
+__Example__
 
-      (display (string-append "Hello" " " "World"))
-      
-      ;; Output
-      ;;
-      ;; > Hello World)...";
+    (display (string-append "Hello" " " "World"))
+    
+    ;; Output
+    ;;
+    ;; > Hello World)...";
     }
 
     // %%% string-ref
@@ -3924,24 +3924,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("string-ref", func_ptr);
       (*dict_ptr)["string-ref"] =
-  R"...(### string-ref ###
+R"...(### string-ref ###
 
-  __Usage__
+__Usage__
 
-  * `(string-ref <String> <index>)`
+* `(string-ref <String> <index>)`
 
-  __Description__
+__Description__
 
-  * Return the `<index>`th letter of `<String>`.
-  * `<index>` of the 1st letter is '0'.
+* Return the `<index>`th letter of `<String>`.
+* `<index>` of the 1st letter is '0'.
 
-  __Example__
+__Example__
 
-      (display (string-ref "Hello World" 6))
-      
-      ;; Output
-      ;;
-      ;; > W)...";
+    (display (string-ref "Hello World" 6))
+    
+    ;; Output
+    ;;
+    ;; > W)...";
     }
 
     // %%% string-split
@@ -4005,58 +4005,58 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("string-split", func_ptr);
       (*dict_ptr)["string-split"] =
-  R"...(### string-split ###
+R"...(### string-split ###
 
-  __Usage__
+__Usage__
 
-  * `(string-split <String> <Delim String>)`
+* `(string-split <String> <Delim String>)`
 
-  __Description__
+__Description__
 
-  * Return List consist of String splited `<String>` by `<Delim String>`.
+* Return List consist of String splited `<String>` by `<Delim String>`.
 
-  __Example__
+__Example__
 
-      (display (string-split "aaaaSplit!bbbSplit!ccc" "Split!"))
-      
-      ;; Outpu
-      ;;
-      ;; > ("aaa" "bbb" "ccc"))...";
+    (display (string-split "aaaaSplit!bbbSplit!ccc" "Split!"))
+    
+    ;; Outpu
+    ;;
+    ;; > ("aaa" "bbb" "ccc"))...";
     }
 
     // %%% PI
     root_ptr->BindSymbol("PI", NewNumber(3.141592653589793));
     (*dict_ptr)["PI"] =
-  R"...(### PI ###
+R"...(### PI ###
 
-  __Description__
+__Description__
 
-  * Circular constant.
+* Circular constant.
 
-  __Example__
+__Example__
 
-      (display (* 1 PI))
-      
-      ;; Output
-      ;;
-      ;; > 3.14159)...";
+    (display (* 1 PI))
+    
+    ;; Output
+    ;;
+    ;; > 3.14159)...";
 
     // %%% E
     root_ptr->BindSymbol("E", NewNumber(2.718281828459045));
     (*dict_ptr)["E"] =
-  R"...(### E ###
+R"...(### E ###
 
-  __Description__
+__Description__
 
-  * Napier's constant.
+* Napier's constant.
 
-  __Example__
+__Example__
 
-      (display (* 1 E))
-      
-      ;; Output
-      ;;
-      ;; > 2.71828)...";
+    (display (* 1 E))
+    
+    ;; Output
+    ;;
+    ;; > 2.71828)...";
 
     // %%% sin
     {
@@ -4085,24 +4085,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("sin", func_ptr);
       (*dict_ptr)["sin"] =
-  R"...(### sin ###
+R"...(### sin ###
 
-  __Usage__
+__Usage__
 
-  * `(sin <Number>)`
+* `(sin <Number>)`
 
-  __Description__
+__Description__
 
-  * Sine. A trigonometric function.
-  * `<Number>` is radian.
+* Sine. A trigonometric function.
+* `<Number>` is radian.
 
-  __Example__
+__Example__
 
-      (display (sin (/ PI 2)))
-      
-      ;; Output
-      ;;
-      ;; > 1)...";
+    (display (sin (/ PI 2)))
+    
+    ;; Output
+    ;;
+    ;; > 1)...";
     }
 
     // %%% cos
@@ -4132,24 +4132,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("cos", func_ptr);
       (*dict_ptr)["cos"] =
-  R"...(### cos ###
+R"...(### cos ###
 
-  __Usage__
+__Usage__
 
-  * `(cos <Number>)`
+* `(cos <Number>)`
 
-  __Description__
+__Description__
 
-  * Cosine. A trigonometric function.
-  * `<Number>` is radian.
+* Cosine. A trigonometric function.
+* `<Number>` is radian.
 
-  __Example__
+__Example__
 
-      (display (cos PI))
-      
-      ;; Output
-      ;;
-      ;; > -1)...";
+    (display (cos PI))
+    
+    ;; Output
+    ;;
+    ;; > -1)...";
     }
 
     // %%% tan
@@ -4179,24 +4179,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("tan", func_ptr);
       (*dict_ptr)["tan"] =
-  R"...(### tan ###
+R"...(### tan ###
 
-  __Usage__
+__Usage__
 
-  * `(tan <Number>)`
+* `(tan <Number>)`
 
-  __Description__
+__Description__
 
-  * Tangent. A trigonometric function.
-  * `<Number>` is radian.
+* Tangent. A trigonometric function.
+* `<Number>` is radian.
 
-  __Example__
+__Example__
 
-      (display (tan (/ PI 4)))
-      
-      ;; Output
-      ;;
-      ;; > 1)...";
+    (display (tan (/ PI 4)))
+    
+    ;; Output
+    ;;
+    ;; > 1)...";
     }
 
     // %%% asin
@@ -4226,24 +4226,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("asin", func_ptr);
       (*dict_ptr)["asin"] =
-  R"...(### asin ###
+R"...(### asin ###
 
-  __Usage__
+__Usage__
 
-  * `(asin <Number>)`
+* `(asin <Number>)`
 
-  __Description__
+__Description__
 
-  * Arc sine. A trigonometric function.
-  * `<Number>` is sine.
+* Arc sine. A trigonometric function.
+* `<Number>` is sine.
 
-  __Example__
+__Example__
 
-      (display (asin 0))
-      
-      ;; Output
-      ;;
-      ;; > 0)...";
+    (display (asin 0))
+    
+    ;; Output
+    ;;
+    ;; > 0)...";
     }
 
     // %%% acos
@@ -4273,24 +4273,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("acos", func_ptr);
       (*dict_ptr)["acos"] =
-  R"...(### acos ###
+R"...(### acos ###
 
-  __Usage__
+__Usage__
 
-  * `(acos <Number>)`
+* `(acos <Number>)`
 
-  __Description__
+__Description__
 
-  * Arc cosine. A trigonometric function.
-  * `<Number>` is cosine.
+* Arc cosine. A trigonometric function.
+* `<Number>` is cosine.
 
-  __Example__
+__Example__
 
-      (display (acos 1))
-      
-      ;; Output
-      ;;
-      ;; > 0)...";
+    (display (acos 1))
+    
+    ;; Output
+    ;;
+    ;; > 0)...";
     }
 
     // %%% atan
@@ -4320,24 +4320,24 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("atan", func_ptr);
       (*dict_ptr)["atan"] =
-  R"...(### atan ###
+R"...(### atan ###
 
-  __Usage__
+__Usage__
 
-  * `(atan <Number>)`
+* `(atan <Number>)`
 
-  __Description__
+__Description__
 
-  * Arc tangent. A trigonometric function.
-  * `<Number>` is tangent.
+* Arc tangent. A trigonometric function.
+* `<Number>` is tangent.
 
-  __Example__
+__Example__
 
-      (display (atan 0))
-      
-      ;; Output
-      ;;
-      ;; > 0)...";
+    (display (atan 0))
+    
+    ;; Output
+    ;;
+    ;; > 0)...";
     }
 
     // %%% sqrt
@@ -4368,23 +4368,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("sqrt", func_ptr);
       (*dict_ptr)["sqrt"] =
-  R"...(### sqrt ###
+R"...(### sqrt ###
 
-  __Usage__
+__Usage__
 
-  * `(sqrt <Number>)`
+* `(sqrt <Number>)`
 
-  __Description__
+__Description__
 
-  * Return square root of `<Number>`.
+* Return square root of `<Number>`.
 
-  __Example__
+__Example__
 
-      (display (sqrt 4))
-      
-      ;; Output
-      ;;
-      ;; > 2)...";
+    (display (sqrt 4))
+    
+    ;; Output
+    ;;
+    ;; > 2)...";
     }
 
     // %%% abs
@@ -4414,23 +4414,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("abs", func_ptr);
       (*dict_ptr)["abs"] =
-  R"...(### abs ###
+R"...(### abs ###
 
-  __Usage__
+__Usage__
 
-  * `(abs <Number>)`
+* `(abs <Number>)`
 
-  __Description__
+__Description__
 
-  * Return absolute value of `<Number>`.
+* Return absolute value of `<Number>`.
 
-  __Example__
+__Example__
 
-      (display (abs -111))
-      
-      ;; Output
-      ;;
-      ;; > 111)...";
+    (display (abs -111))
+    
+    ;; Output
+    ;;
+    ;; > 111)...";
     }
 
     // %%% ceil
@@ -4460,23 +4460,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("ceil", func_ptr);
       (*dict_ptr)["ceil"] =
-  R"...(### ceil ###
+R"...(### ceil ###
 
-  __Usage__
+__Usage__
 
-  * `(ceil <Number>)`
+* `(ceil <Number>)`
 
-  __Description__
+__Description__
 
-  * Round up `<Number>` into integral value.
+* Round up `<Number>` into integral value.
 
-  __Example__
+__Example__
 
-      (display (ceil 1.3))
-      
-      ;; Output
-      ;;
-      ;; > 2)...";
+    (display (ceil 1.3))
+    
+    ;; Output
+    ;;
+    ;; > 2)...";
     }
 
     // %%% floor
@@ -4506,23 +4506,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("floor", func_ptr);
       (*dict_ptr)["floor"] =
-  R"...(### floor ###
+R"...(### floor ###
 
-  __Usage__
+__Usage__
 
-  * `(floor <Number>)`
+* `(floor <Number>)`
 
-  __Description__
+__Description__
 
-  * Round down `<Number>` into integral value.
+* Round down `<Number>` into integral value.
 
-  __Example__
+__Example__
 
-      (display (floor 1.3))
-      
-      ;; Output
-      ;;
-      ;; > 1)...";
+    (display (floor 1.3))
+    
+    ;; Output
+    ;;
+    ;; > 1)...";
     }
 
     // %%% round
@@ -4552,29 +4552,29 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("round", func_ptr);
       (*dict_ptr)["round"] =
-  R"...(### round ###
+R"...(### round ###
 
-  __Usage__
+__Usage__
 
-  * `(round <Number>)`
+* `(round <Number>)`
 
-  __Description__
+__Description__
 
-  * Round `<Number>` into nearest integral value.
+* Round `<Number>` into nearest integral value.
 
-  __Example__
+__Example__
 
-      (display (round 1.5))
-      
-      ;; Output
-      ;;
-      ;; > 2
-      
-      (display (round 1.49))
-      
-      ;; Output
-      ;;
-      ;; > 1)...";
+    (display (round 1.5))
+    
+    ;; Output
+    ;;
+    ;; > 2
+    
+    (display (round 1.49))
+    
+    ;; Output
+    ;;
+    ;; > 1)...";
     }
 
     // %%% trunc
@@ -4604,29 +4604,29 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("trunc", func_ptr);
       (*dict_ptr)["trunc"] =
-  R"...(### trunc ###
+R"...(### trunc ###
 
-  __Usage__
+__Usage__
 
-  * `(trunc <Number>)`
+* `(trunc <Number>)`
 
-  __Description__
+__Description__
 
-  * Truncate after decimal point of `<Number>`.
+* Truncate after decimal point of `<Number>`.
 
-  __Example__
+__Example__
 
-      (display (trunc 1.234))
-      
-      ;; Output
-      ;;
-      ;; > 1
-      
-      (display (trunc -1.234))
-      
-      ;; Output
-      ;;
-      ;; > -1)...";
+    (display (trunc 1.234))
+    
+    ;; Output
+    ;;
+    ;; > 1
+    
+    (display (trunc -1.234))
+    
+    ;; Output
+    ;;
+    ;; > -1)...";
     }
 
     // %%% exp
@@ -4656,23 +4656,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("exp", func_ptr);
       (*dict_ptr)["exp"] =
-  R"...(### exp ###
+R"...(### exp ###
 
-  __Usage__
+__Usage__
 
-  * `(exp <Number>)`
+* `(exp <Number>)`
 
-  __Description__
+__Description__
 
-  * Exponent function of `<Number>`. The base is Napier's constant.
+* Exponent function of `<Number>`. The base is Napier's constant.
 
-  __Example__
+__Example__
 
-      (display (exp 1))
-      
-      ;; Output
-      ;;
-      ;; > 2.71828)...";
+    (display (exp 1))
+    
+    ;; Output
+    ;;
+    ;; > 2.71828)...";
     }
 
     // %%% expt
@@ -4714,23 +4714,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("expt", func_ptr);
       (*dict_ptr)["expt"] =
-  R"...(### expt ###
+R"...(### expt ###
 
-  __Usage__
+__Usage__
 
-  * `(expt <Base> <Exponent>)`
+* `(expt <Base> <Exponent>)`
 
-  __Description__
+__Description__
 
-  * Exponent function of `<Exponent>`. The base is `<Base>`.
+* Exponent function of `<Exponent>`. The base is `<Base>`.
 
-  __Example__
+__Example__
 
-      (display (expt 2 3))
-      
-      ;; Output
-      ;;
-      ;; > 8)...";
+    (display (expt 2 3))
+    
+    ;; Output
+    ;;
+    ;; > 8)...";
     }
 
     // %%% log
@@ -4760,23 +4760,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("log", func_ptr);
       (*dict_ptr)["log"] =
-  R"...(### log ###
+R"...(### log ###
 
-  __Usage__
+__Usage__
 
-  * `(log <Number>)`
+* `(log <Number>)`
 
-  __Description__
+__Description__
 
-  * Logarithmic function of `<Number>`. The base is Napier's constant.
+* Logarithmic function of `<Number>`. The base is Napier's constant.
 
-  __Example__
+__Example__
 
-      (display (log E))
-      
-      ;; Output
-      ;;
-      ;; > 1)...";
+    (display (log E))
+    
+    ;; Output
+    ;;
+    ;; > 1)...";
     }
 
     // %%% log2
@@ -4806,23 +4806,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("log2", func_ptr);
       (*dict_ptr)["log2"] =
-  R"...(### log2 ###
+R"...(### log2 ###
 
-  __Usage__
+__Usage__
 
-  * `(log2 <Number>)`
+* `(log2 <Number>)`
 
-  __Description__
+__Description__
 
-  * Logarithmic function of `<Number>`. The base is 2.
+* Logarithmic function of `<Number>`. The base is 2.
 
-  __Example__
+__Example__
 
-      (display (log2 8))
-      
-      ;; Output
-      ;;
-      ;; > 3)...";
+    (display (log2 8))
+    
+    ;; Output
+    ;;
+    ;; > 3)...";
     }
 
     // %%% log10
@@ -4852,23 +4852,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("log10", func_ptr);
       (*dict_ptr)["log10"] =
-  R"...(### log10 ###
+R"...(### log10 ###
 
-  __Usage__
+__Usage__
 
-  * `(log10 <Number>)`
+* `(log10 <Number>)`
 
-  __Description__
+__Description__
 
-  * Logarithmic function of `<Number>`. The base is 10.
+* Logarithmic function of `<Number>`. The base is 10.
 
-  __Example__
+__Example__
 
-      (display (log10 100))
-      
-      ;; Output
-      ;;
-      ;; > 2)...";
+    (display (log10 100))
+    
+    ;; Output
+    ;;
+    ;; > 2)...";
     }
 
     // %%% random
@@ -4902,29 +4902,29 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("random", func_ptr);
       (*dict_ptr)["random"] =
-  R"...(### random ###
+R"...(### random ###
 
-  __Usage__
+__Usage__
 
-  * `(random <Number>)`
+* `(random <Number>)`
 
-  __Description__
+__Description__
 
-  * Return random number from 0 to `<Number>`.
+* Return random number from 0 to `<Number>`.
 
-  __Example__
+__Example__
 
-      (display (random 10))
-      
-      ;; Output
-      ;;
-      ;; > 2.42356
-      
-      (display (random -10))
-      
-      ;; Output
-      ;;
-      ;; > -7.13453)...";
+    (display (random 10))
+    
+    ;; Output
+    ;;
+    ;; > 2.42356
+    
+    (display (random -10))
+    
+    ;; Output
+    ;;
+    ;; > -7.13453)...";
     }
 
     // %%% max
@@ -4967,23 +4967,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("max", func_ptr);
       (*dict_ptr)["max"] =
-  R"...(### max ###
+R"...(### max ###
 
-  __Usage__
+__Usage__
 
-  * `(max <Number>...)`
+* `(max <Number>...)`
 
-  __Description__
+__Description__
 
-  * Return maximum number of `<Number>...`.
+* Return maximum number of `<Number>...`.
 
-  __Example__
+__Example__
 
-      (display (max 1 2 3 4 3 2 1))
-      
-      ;; Output
-      ;;
-      ;; > 4)...";
+    (display (max 1 2 3 4 3 2 1))
+    
+    ;; Output
+    ;;
+    ;; > 4)...";
     }
 
     // %%% min
@@ -5026,23 +5026,23 @@ namespace Sayuri {
       };
       root_ptr->BindSymbol("min", func_ptr);
       (*dict_ptr)["min"] =
-  R"...(### min ###
+R"...(### min ###
 
-  __Usage__
+__Usage__
 
-  * `(min <Number>...)`
+* `(min <Number>...)`
 
-  __Description__
+__Description__
 
-  * Return minimum number of `<Number>...`.
+* Return minimum number of `<Number>...`.
 
-  __Example__
+__Example__
 
-      (display (min 4 3 2 1 2 3 4))
-      
-      ;; Output
-      ;;
-      ;; > 1)...";
+    (display (min 4 3 2 1 2 3 4))
+    
+    ;; Output
+    ;;
+    ;; > 1)...";
     }
   }
 
