@@ -1990,11 +1990,11 @@ __Description__
 
 __Example__
 
-    (display (equal? '(1 2 (3 4) 5) '(1 2 (3 4) 5))))
+    (display (equal? '(1 2 (3 4) 5) '(1 2 (3 4) 5)))
       
-      ;; Output
-      ;;
-      ;; > #t)...";
+    ;; Output
+    ;;
+    ;; > #t)...";
     }
 
     // %%% pair?
