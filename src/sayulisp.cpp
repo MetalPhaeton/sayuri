@@ -997,6 +997,770 @@ namespace Sayuri {
 
   // ヘルプを作成する。
   void Sayulisp::SetHelp() {
+    // --- 定数 --- //
+    (*dict_ptr_)["A1"] =
+R"...(### A1 ###
+
+__Description__
+
+* Constant value of Number that indicates A1 square.
+* Value is '0'.)...";
+
+    (*dict_ptr_)["B1"] =
+R"...(### B1 ###
+
+__Description__
+
+* Constant value of Number that indicates B1 square.
+* Value is '1'.)...";
+
+    (*dict_ptr_)["C1"] =
+R"...(### C1 ###
+
+__Description__
+
+* Constant value of Number that indicates C1 square.
+* Value is '2'.)...";
+
+    (*dict_ptr_)["D1"] =
+R"...(### D1 ###
+
+__Description__
+
+* Constant value of Number that indicates D1 square.
+* Value is '3'.)...";
+
+    (*dict_ptr_)["E1"] =
+R"...(### E1 ###
+
+__Description__
+
+* Constant value of Number that indicates E1 square.
+* Value is '4'.)...";
+
+    (*dict_ptr_)["F1"] =
+R"...(### F1 ###
+
+__Description__
+
+* Constant value of Number that indicates F1 square.
+* Value is '5'.)...";
+
+    (*dict_ptr_)["G1"] =
+R"...(### G1 ###
+
+__Description__
+
+* Constant value of Number that indicates G1 square.
+* Value is '6'.)...";
+
+    (*dict_ptr_)["H1"] =
+R"...(### H1 ###
+
+__Description__
+
+* Constant value of Number that indicates H1 square.
+* Value is '7'.)...";
+    (*dict_ptr_)["A2"] =
+R"...(### A2 ###
+
+__Description__
+
+* Constant value of Number that indicates A2 square.
+* Value is '8'.)...";
+
+    (*dict_ptr_)["B2"] =
+R"...(### B2 ###
+
+__Description__
+
+* Constant value of Number that indicates B2 square.
+* Value is '9'.)...";
+
+    (*dict_ptr_)["C2"] =
+R"...(### C2 ###
+
+__Description__
+
+* Constant value of Number that indicates C2 square.
+* Value is '10'.)...";
+
+    (*dict_ptr_)["D2"] =
+R"...(### D2 ###
+
+__Description__
+
+* Constant value of Number that indicates D2 square.
+* Value is '11'.)...";
+
+    (*dict_ptr_)["E2"] =
+R"...(### E2 ###
+
+__Description__
+
+* Constant value of Number that indicates E2 square.
+* Value is '12'.)...";
+
+    (*dict_ptr_)["F2"] =
+R"...(### F2 ###
+
+__Description__
+
+* Constant value of Number that indicates F2 square.
+* Value is '13'.)...";
+
+    (*dict_ptr_)["G2"] =
+R"...(### G2 ###
+
+__Description__
+
+* Constant value of Number that indicates G2 square.
+* Value is '14'.)...";
+
+    (*dict_ptr_)["H2"] =
+R"...(### H2 ###
+
+__Description__
+
+* Constant value of Number that indicates H2 square.
+* Value is '15'.)...";
+
+    (*dict_ptr_)["A3"] =
+R"...(### A3 ###
+
+__Description__
+
+* Constant value of Number that indicates A3 square.
+* Value is '16'.)...";
+
+    (*dict_ptr_)["B3"] =
+R"...(### B3 ###
+
+__Description__
+
+* Constant value of Number that indicates B3 square.
+* Value is '17'.)...";
+
+    (*dict_ptr_)["C3"] =
+R"...(### C3 ###
+
+__Description__
+
+* Constant value of Number that indicates C3 square.
+* Value is '18'.)...";
+
+    (*dict_ptr_)["D3"] =
+R"...(### D3 ###
+
+__Description__
+
+* Constant value of Number that indicates D3 square.
+* Value is '19'.)...";
+
+    (*dict_ptr_)["E3"] =
+R"...(### E3 ###
+
+__Description__
+
+* Constant value of Number that indicates E3 square.
+* Value is '20'.)...";
+
+    (*dict_ptr_)["F3"] =
+R"...(### F3 ###
+
+__Description__
+
+* Constant value of Number that indicates F3 square.
+* Value is '21'.)...";
+
+    (*dict_ptr_)["G3"] =
+R"...(### G3 ###
+
+__Description__
+
+* Constant value of Number that indicates G3 square.
+* Value is '22'.)...";
+
+    (*dict_ptr_)["H3"] =
+R"...(### H3 ###
+
+__Description__
+
+* Constant value of Number that indicates H3 square.
+* Value is '23'.)...";
+
+    (*dict_ptr_)["A4"] =
+R"...(### A4 ###
+
+__Description__
+
+* Constant value of Number that indicates A4 square.
+* Value is '24'.)...";
+
+    (*dict_ptr_)["B4"] =
+R"...(### B4 ###
+
+__Description__
+
+* Constant value of Number that indicates B4 square.
+* Value is '25'.)...";
+
+    (*dict_ptr_)["C4"] =
+R"...(### C4 ###
+
+__Description__
+
+* Constant value of Number that indicates C4 square.
+* Value is '26'.)...";
+
+    (*dict_ptr_)["D4"] =
+R"...(### D4 ###
+
+__Description__
+
+* Constant value of Number that indicates D4 square.
+* Value is '27'.)...";
+
+    (*dict_ptr_)["E4"] =
+R"...(### E4 ###
+
+__Description__
+
+* Constant value of Number that indicates E4 square.
+* Value is '28'.)...";
+
+    (*dict_ptr_)["F4"] =
+R"...(### F4 ###
+
+__Description__
+
+* Constant value of Number that indicates F4 square.
+* Value is '29'.)...";
+
+    (*dict_ptr_)["G4"] =
+R"...(### G4 ###
+
+__Description__
+
+* Constant value of Number that indicates G4 square.
+* Value is '30'.)...";
+
+    (*dict_ptr_)["H4"] =
+R"...(### H4 ###
+
+__Description__
+
+* Constant value of Number that indicates H4 square.
+* Value is '31'.)...";
+
+    (*dict_ptr_)["A5"] =
+R"...(### A5 ###
+
+__Description__
+
+* Constant value of Number that indicates A5 square.
+* Value is '32'.)...";
+
+    (*dict_ptr_)["B5"] =
+R"...(### B5 ###
+
+__Description__
+
+* Constant value of Number that indicates B5 square.
+* Value is '33'.)...";
+
+    (*dict_ptr_)["C5"] =
+R"...(### C5 ###
+
+__Description__
+
+* Constant value of Number that indicates C5 square.
+* Value is '34'.)...";
+
+    (*dict_ptr_)["D5"] =
+R"...(### D5 ###
+
+__Description__
+
+* Constant value of Number that indicates D5 square.
+* Value is '35'.)...";
+
+    (*dict_ptr_)["E5"] =
+R"...(### E5 ###
+
+__Description__
+
+* Constant value of Number that indicates E5 square.
+* Value is '36'.)...";
+
+    (*dict_ptr_)["F5"] =
+R"...(### F5 ###
+
+__Description__
+
+* Constant value of Number that indicates F5 square.
+* Value is '37'.)...";
+
+    (*dict_ptr_)["G5"] =
+R"...(### G5 ###
+
+__Description__
+
+* Constant value of Number that indicates G5 square.
+* Value is '38'.)...";
+
+    (*dict_ptr_)["H5"] =
+R"...(### H5 ###
+
+__Description__
+
+* Constant value of Number that indicates H5 square.
+* Value is '39'.)...";
+
+    (*dict_ptr_)["A6"] =
+R"...(### A6 ###
+
+__Description__
+
+* Constant value of Number that indicates A6 square.
+* Value is '40'.)...";
+
+    (*dict_ptr_)["B6"] =
+R"...(### B6 ###
+
+__Description__
+
+* Constant value of Number that indicates B6 square.
+* Value is '41'.)...";
+
+    (*dict_ptr_)["C6"] =
+R"...(### C6 ###
+
+__Description__
+
+* Constant value of Number that indicates C6 square.
+* Value is '42'.)...";
+
+    (*dict_ptr_)["D6"] =
+R"...(### D6 ###
+
+__Description__
+
+* Constant value of Number that indicates D6 square.
+* Value is '43'.)...";
+
+    (*dict_ptr_)["E6"] =
+R"...(### E6 ###
+
+__Description__
+
+* Constant value of Number that indicates E6 square.
+* Value is '44'.)...";
+
+    (*dict_ptr_)["F6"] =
+R"...(### F6 ###
+
+__Description__
+
+* Constant value of Number that indicates F6 square.
+* Value is '45'.)...";
+
+    (*dict_ptr_)["G6"] =
+R"...(### G6 ###
+
+__Description__
+
+* Constant value of Number that indicates G6 square.
+* Value is '46'.)...";
+
+    (*dict_ptr_)["H6"] =
+R"...(### H6 ###
+
+__Description__
+
+* Constant value of Number that indicates H6 square.
+* Value is '47'.)...";
+
+    (*dict_ptr_)["A7"] =
+R"...(### A7 ###
+
+__Description__
+
+* Constant value of Number that indicates A7 square.
+* Value is '48'.)...";
+
+    (*dict_ptr_)["B7"] =
+R"...(### B7 ###
+
+__Description__
+
+* Constant value of Number that indicates B7 square.
+* Value is '49'.)...";
+
+    (*dict_ptr_)["C7"] =
+R"...(### C7 ###
+
+__Description__
+
+* Constant value of Number that indicates C7 square.
+* Value is '50'.)...";
+
+    (*dict_ptr_)["D7"] =
+R"...(### D7 ###
+
+__Description__
+
+* Constant value of Number that indicates D7 square.
+* Value is '51'.)...";
+
+    (*dict_ptr_)["E7"] =
+R"...(### E7 ###
+
+__Description__
+
+* Constant value of Number that indicates E7 square.
+* Value is '52'.)...";
+
+    (*dict_ptr_)["F7"] =
+R"...(### F7 ###
+
+__Description__
+
+* Constant value of Number that indicates F7 square.
+* Value is '53'.)...";
+
+    (*dict_ptr_)["G7"] =
+R"...(### G7 ###
+
+__Description__
+
+* Constant value of Number that indicates G7 square.
+* Value is '54'.)...";
+
+    (*dict_ptr_)["H7"] =
+R"...(### H7 ###
+
+__Description__
+
+* Constant value of Number that indicates H7 square.
+* Value is '55'.)...";
+
+    (*dict_ptr_)["A8"] =
+R"...(### A8 ###
+
+__Description__
+
+* Constant value of Number that indicates A8 square.
+* Value is '56'.)...";
+
+    (*dict_ptr_)["B8"] =
+R"...(### B8 ###
+
+__Description__
+
+* Constant value of Number that indicates B8 square.
+* Value is '57'.)...";
+
+    (*dict_ptr_)["C8"] =
+R"...(### C8 ###
+
+__Description__
+
+* Constant value of Number that indicates C8 square.
+* Value is '58'.)...";
+
+    (*dict_ptr_)["D8"] =
+R"...(### D8 ###
+
+__Description__
+
+* Constant value of Number that indicates D8 square.
+* Value is '59'.)...";
+
+    (*dict_ptr_)["E8"] =
+R"...(### E8 ###
+
+__Description__
+
+* Constant value of Number that indicates E8 square.
+* Value is '60'.)...";
+
+    (*dict_ptr_)["F8"] =
+R"...(### F8 ###
+
+__Description__
+
+* Constant value of Number that indicates F8 square.
+* Value is '61'.)...";
+
+    (*dict_ptr_)["G8"] =
+R"...(### G8 ###
+
+__Description__
+
+* Constant value of Number that indicates G8 square.
+* Value is '62'.)...";
+
+    (*dict_ptr_)["H8"] =
+R"...(### H8 ###
+
+__Description__
+
+* Constant value of Number that indicates H8 square.
+* Value is '63'.)...";
+
+    (*dict_ptr_)["FYLE_A"] =
+R"...(### FYLE_A ###
+
+__Description__
+
+* Constant value of Number that indicates A-fyle.
+* Value is '0'.)...";
+
+    (*dict_ptr_)["FYLE_B"] =
+R"...(### FYLE_B ###
+
+__Description__
+
+* Constant value of Number that indicates B-fyle.
+* Value is '1'.)...";
+
+    (*dict_ptr_)["FYLE_C"] =
+R"...(### FYLE_C ###
+
+__Description__
+
+* Constant value of Number that indicates C-fyle.
+* Value is '2'.)...";
+
+    (*dict_ptr_)["FYLE_D"] =
+R"...(### FYLE_D ###
+
+__Description__
+
+* Constant value of Number that indicates D-fyle.
+* Value is '3'.)...";
+
+    (*dict_ptr_)["FYLE_E"] =
+R"...(### FYLE_E ###
+
+__Description__
+
+* Constant value of Number that indicates E-fyle.
+* Value is '4'.)...";
+
+    (*dict_ptr_)["FYLE_F"] =
+R"...(### FYLE_F ###
+
+__Description__
+
+* Constant value of Number that indicates F-fyle.
+* Value is '5'.)...";
+
+    (*dict_ptr_)["FYLE_G"] =
+R"...(### FYLE_G ###
+
+__Description__
+
+* Constant value of Number that indicates G-fyle.
+* Value is '6'.)...";
+
+    (*dict_ptr_)["FYLE_H"] =
+R"...(### FYLE_H ###
+
+__Description__
+
+* Constant value of Number that indicates H-fyle.
+* Value is '7'.)...";
+
+    (*dict_ptr_)["RANK_1"] =
+R"...(### RANK_1 ###
+
+__Description__
+
+* Constant value of Number that indicates the 1st rank.
+* Value is '0'.)...";
+
+    (*dict_ptr_)["RANK_2"] =
+R"...(### RANK_2 ###
+
+__Description__
+
+* Constant value of Number that indicates the 2nd rank.
+* Value is '1'.)...";
+
+    (*dict_ptr_)["RANK_3"] =
+R"...(### RANK_3 ###
+
+__Description__
+
+* Constant value of Number that indicates the 3rd rank.
+* Value is '2'.)...";
+
+    (*dict_ptr_)["RANK_4"] =
+R"...(### RANK_4 ###
+
+__Description__
+
+* Constant value of Number that indicates the 4th rank.
+* Value is '3'.)...";
+
+    (*dict_ptr_)["RANK_5"] =
+R"...(### RANK_5 ###
+
+__Description__
+
+* Constant value of Number that indicates the 5th rank.
+* Value is '4'.)...";
+
+    (*dict_ptr_)["RANK_6"] =
+R"...(### RANK_6 ###
+
+__Description__
+
+* Constant value of Number that indicates the 6th rank.
+* Value is '5'.)...";
+
+    (*dict_ptr_)["RANK_7"] =
+R"...(### RANK_7 ###
+
+__Description__
+
+* Constant value of Number that indicates the 7th rank.
+* Value is '6'.)...";
+
+    (*dict_ptr_)["RANK_8"] =
+R"...(### RANK_8 ###
+
+__Description__
+
+* Constant value of Number that indicates the 8th rank.
+* Value is '7'.)...";
+
+    (*dict_ptr_)["NO_SIDE"] =
+R"...(### NO_SIDE ###
+
+__Description__
+
+* Constant value of Number that indicates neither of sides.
+* Value is '0'.)...";
+
+    (*dict_ptr_)["WHITE"] =
+R"...(### WHITE ###
+
+__Description__
+
+* Constant value of Number that indicates White.
+* Value is '1'.)...";
+
+    (*dict_ptr_)["BLACK"] =
+R"...(### BLACK ###
+
+__Description__
+
+* Constant value of Number that indicates Black.
+* Value is '2'.)...";
+
+    (*dict_ptr_)["EMPTY"] =
+R"...(### EMPTY ###
+
+__Description__
+
+* Constant value of Number that indicates no piece.
+* Value is '0'.)...";
+
+    (*dict_ptr_)["PAWN"] =
+R"...(### PAWN ###
+
+__Description__
+
+* Constant value of Number that indicates Pawn.
+* Value is '1'.)...";
+
+    (*dict_ptr_)["KNIGHT"] =
+R"...(### KNIGHT ###
+
+__Description__
+
+* Constant value of Number that indicates Knight.
+* Value is '2'.)...";
+
+    (*dict_ptr_)["BISHOP"] =
+R"...(### BISHOP ###
+
+__Description__
+
+* Constant value of Number that indicates Bishop.
+* Value is '3'.)...";
+
+    (*dict_ptr_)["ROOK"] =
+R"...(### ROOK ###
+
+__Description__
+
+* Constant value of Number that indicates Rook.
+* Value is '4'.)...";
+
+    (*dict_ptr_)["QUEEN"] =
+R"...(### QUEEN ###
+
+__Description__
+
+* Constant value of Number that indicates Queen.
+* Value is '5'.)...";
+
+    (*dict_ptr_)["KING"] =
+R"...(### KING ###
+
+__Description__
+
+* Constant value of Number that indicates King.
+* Value is '6'.)...";
+
+    (*dict_ptr_)["NO_CASTLING"] =
+R"...(### NO_CASTLING ###
+
+__Description__
+
+* Constant value of Number that indicates no one to castle.
+* Value is '0'.)...";
+
+    (*dict_ptr_)["WHITE_SHORT_CASTLING"] =
+R"...(### WHITE_SHORT_CASTLING ###
+
+__Description__
+
+* Constant value of Number that indicates White's Short Castling.
+* Value is '1'.)...";
+
+    (*dict_ptr_)["WHITE_LONG_CASTLING"] =
+R"...(### WHITE_LONG_CASTLING ###
+
+__Description__
+
+* Constant value of Number that indicates White's Long Castling.
+* Value is '2'.)...";
+
+    (*dict_ptr_)["BLACK_SHORT_CASTLING"] =
+R"...(### BLACK_SHORT_CASTLING ###
+
+__Description__
+
+* Constant value of Number that indicates Black's Short Castling.
+* Value is '3'.)...";
+
+    (*dict_ptr_)["BLACK_LONG_CASTLING"] =
+R"...(### BLACK_LONG_CASTLING ###
+
+__Description__
+
+* Constant value of Number that indicates Black's Long Castling.
+* Value is '4'.)...";
+
+    // %%% gen-engine
+    (*dict_ptr_)["gen-engine"] =
+R"...(### gen-engine ###
+
     // %%% gen-engine
     (*dict_ptr_)["gen-engine"] =
 R"...(### gen-engine ###

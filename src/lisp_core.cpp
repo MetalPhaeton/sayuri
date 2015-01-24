@@ -3136,7 +3136,7 @@ __Usage__
 __Description__
 
 * Return number of `<List>`.
-* If you input Atom, it returns '1'. `()` returns '0'.
+* If you input Atom, it returns '1'. If Nil, it returns '0'.
 
 __Example__
 
@@ -4560,7 +4560,7 @@ __Usage__
 
 __Description__
 
-* Round `<Number>` into nearest integral value.
+* Round `<Number>` into the nearest integral value.
 
 __Example__
 
