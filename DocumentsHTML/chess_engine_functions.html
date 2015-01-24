@@ -300,7 +300,7 @@
 <li><code>@place-piece &lt;Square : Number&gt; &lt;Piece type : Number&gt;   &lt;Piece side : Number&gt;</code>
 <ul>
 <li>Place a <code>&lt;Piece side&gt;</code> <code>&lt;Piece type&gt;</code> onto <code>&lt;Square&gt;</code>.</li>
-<li>If <code>&lt;Piece side&gt;</code> is <code>EMPTY</code> and <code>&lt;Piece side&gt;</code> is <code>NO_SIDE</code>, a piece on <code>&lt;Square&gt;</code> is deleted.</li>
+<li>If <code>&lt;Piece type&gt;</code> is <code>EMPTY</code> and <code>&lt;Piece side&gt;</code> is <code>NO_SIDE</code>, a piece on <code>&lt;Square&gt;</code> is deleted.</li>
 <li>Each side must have just one King,
 <ul>
 <li>If you try to place a piece onto a square where King is placed, Sayulisp will throw error.</li>
@@ -313,7 +313,7 @@
 <li>Return the previous value.</li>
 <li><code>&lt;Side&gt;</code> must be White or Black.</li>
 </ul></li>
-<li><code>@set-castling_rights &lt;Castling rights : List&gt;</code>
+<li><code>@set-castling-rights &lt;Castling rights : List&gt;</code>
 <ul>
 <li>Change castling rights into <code>&lt;List&gt;</code>.</li>
 <li>Return the previous value.</li>
