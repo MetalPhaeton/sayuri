@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=1" />
+<link rel="stylesheet" type="text/css" href="res/common.css" />
+<script type="text/javascript" src="res/jquery-2.1.0.js"></script>
+<script type="text/javascript" src="res/common.js"></script>
+<title>Sayuri - UCI Chess Engine</title>
+</head>
+<body>
+<header>
+<h1>Sayuri - UCI Chess Engine</h1>
+<a href="index.html">&gt;&gt; Go to Top Page</a>
+</header>
+<div class="root_div">
+<section class="main_contents">
+<h1 id="sayulisp---lisp-interpreter">Sayulisp - Lisp Interpreter</h1>
+<h2 id="sayulisp-is-...">Sayulisp is ...</h2>
+<ul>
+<li>Lisp interpreter based on Scheme.</li>
+<li><em>API</em> for operating chess engines.
+<ul>
+<li>It can generate and operate Chess Engine. (unfinished)</li>
+<li>It can customize algorithm of Search Function. (unfinished)</li>
+<li>It can customize values of Evaluation Function. (unfinished)</li>
+<li>Not only using Lisp file, but also you can input Lisp code from Standard Input.
+<ul>
+<li>It means, using Pipe, you can use any programming language.</li>
+</ul></li>
+</ul></li>
+</ul>
+<h2 id="run-sayuri-with-sayulisp-mode">Run Sayuri with Sayulisp Mode</h2>
+<p>Run the following command.</p>
+<pre><code>$ sayuri --sayulisp &lt;file name&gt;</code></pre>
+<p>If you give '<code>-</code>' to '<code>&lt;file name&gt;</code>', Sayulisp reads code from Standard Input.</p>
+<h2 id="basic-of-sayulisp">Basic of Sayulisp</h2>
+<ul>
+<li>Sayulisp is based on Scheme. You can use many features of Scheme.
+<ul>
+<li>Sayulisp is equipped Lexical Scope and Lexical Closure.
+<ul>
+<li>It means, you can write code like Object Oriented, if you devise it.</li>
+</ul></li>
+</ul></li>
+<li>Sayulisp doesn't print output automatically. If you want output, you can use <code>(display)</code> function.</li>
+</ul>
+<h3 id="object-type-of-sayulisp">Object Type of Sayulisp</h3>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Type</th>
+<th align="left">Definition</th>
+<th align="left">Form</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Pair</td>
+<td align="left">Data structure consist of Car and Cdr.</td>
+<td align="left"><code>(&quot;Hello&quot; . &quot;World&quot;)</code></td>
+</tr>
+<tr class="even">
+<td align="left">Nil</td>
+<td align="left">&quot;Nothing&quot; or empty list.</td>
+<td align="left"><code>()</code></td>
+</tr>
+<tr class="odd">
+<td align="left">Symbol</td>
+<td align="left">Name of an object.</td>
+<td align="left"><code>hello-world</code></td>
+</tr>
+<tr class="even">
+<td align="left">Number</td>
+<td align="left">Real number value.</td>
+<td align="left"><code>111.11</code></td>
+</tr>
+<tr class="odd">
+<td align="left">Boolean</td>
+<td align="left">&quot;True&quot; or &quot;False&quot;</td>
+<td align="left"><code>#t</code> <code>#f</code></td>
+</tr>
+<tr class="even">
+<td align="left">String</td>
+<td align="left">String value.</td>
+<td align="left"><code>&quot;Hello World&quot;</code></td>
+</tr>
+<tr class="odd">
+<td align="left">Function</td>
+<td align="left">Function object defined by Lisp.</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Native Function</td>
+<td align="left">Function object defined by native code.</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Procedure</td>
+<td align="left">It means Function or Native Function.</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">List</td>
+<td align="left">List created by Pair and Nil.</td>
+<td align="left"><code>(&quot;Hello&quot; 111 &quot;World&quot;)</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="message-symbol-semantics">Message Symbol Semantics</h3>
+<p>Some functions use <em>Message Symbol</em>.</p>
+<ul>
+<li>Initial letter of Message Symbol is '<code>@</code>'.</li>
+<li>Message Symbol is not special Symbol. It is just ordinary Symbol.</li>
+<li>Message Symbol is used as a message to switch behavior of Function Object.
+<ul>
+<li><code>(stdin '@get)</code> : This means to get one letter from Standard Input.</li>
+<li><code>(stdin '@read-line)</code> : This means to get one line from Standard Input.</li>
+<li><code>(stdin '@read)</code> : This means to get all strings until EOF from Standard Input.</li>
+</ul></li>
+</ul>
+<h2 id="index-of-reference-for-sayulisp-functions">Index of Reference for Sayulisp Functions</h2>
+<ul>
+<li><a href="core_functions.html">Core Functions</a></li>
+<li><a href="basic_functions.html">Basic Functions</a></li>
+<li><a href="chess_engine_functions.html">Chess Engine Functions</a> (unfinished)</li>
+</ul>
+
+</section>
+</div>
+<footer>Copyright &copy; Hironori Ishibashi</footer>
+</body>
+</html>

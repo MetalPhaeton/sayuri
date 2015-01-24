@@ -1,0 +1,519 @@
+/* PC用。 */
+@media only screen and (min-device-width: 481px) {
+    /* 全体。 */
+    * {
+        margin: 0px;
+        padding: 0px;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    /* テンプレート用。 */
+    body {
+        width: 90%;
+        padding: 15px 0px;
+        margin: 0% auto;
+        background-color: #666;
+    }
+
+    header {
+        width: auto;
+        margin: 0px 0px 15px;
+        padding: 1.5em 2em;
+        background-color: #66a;
+        border-radius: 20px;
+        border-style: solid;
+        border-width: 4px;
+        border-color: #fff;
+    }
+    header h1 {
+        margin: 0em 0em 0.2em;
+        color: #223;
+        text-align: center;
+        font-family: Georgia, serif;
+        font-size: 5em;
+        font-weight: bold;
+    }
+    header a {
+        color: #223;
+        font-size: 2em;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: normal;
+        text-decoration: none;
+    }
+
+    div.root_div {
+        margin: 0px 0px 15px;
+        width: auto;
+    }
+    section.main_contents {
+        width: auto;
+        margin: 0em;
+        padding: 1.5em 2em;
+        background-color: #fff;
+        border-radius: 20px;
+        line-height: 150%;
+    }
+    footer {
+        width: auto;
+        margin: 0px;
+        padding: 0.5em 2em;
+        background-color: #66a;
+        color: #223;
+        font-size: 2em;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: normal;
+        text-align: center;
+        border-radius: 20px;
+        border-style: solid;
+        border-width: 4px;
+        border-color: #fff;
+    }
+
+    /* Markdown用。 */
+    section.main_contents * {
+        margin: 0em 0em 1em;
+    }
+    section.main_contents strong {
+        font-weight: bold;
+        color: #c00;
+    }
+    section.main_contents em {
+        font-style: italic;
+        color: #00c;
+    }
+    section.main_contents del {
+        color: #666;
+    }
+    section.main_contents *.math * {
+        color: #000;
+        font-style: normal;
+        font-family: "Courier New", Courier, monospace;
+    }
+    section.main_contents h1,
+    section.main_contents h2,
+    section.main_contents h3,
+    section.main_contents h4,
+    section.main_contents h5,
+    section.main_contents h6 {
+        width: auto;
+        margin: 4em 0em 0.5em 0em;
+        padding: 0em 0.3em 0em 0.3em;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        color: #000;
+        line-height: 125%;
+        border-style: none none none solid;
+        border-width: 0.3em;
+        border-color: #800;
+    }
+    section.main_contents h1 {
+        width: auto;
+        margin: 0em 0em 0.5em 0em;
+        padding: 0.2em 0.5em;
+        background-color: #800;
+        border-radius: 0.3em;
+        border-width: 4px;
+        border-style: solid;
+        border-color: #400;
+        color: #fff;
+        font-size: 3em;
+    }
+    section.main_contents h2 {
+        width: auto;
+        margin: 1.5em 0em 0.5em 0em;
+        padding: 0em 0.2em 0em 0.2em;
+        font-size: 2.5em;
+        border-style: none none solid solid;
+        border-width: 0.0em 0em 0.1em 0.3em;
+    }
+    section.main_contents h3 {
+        margin: 1.5em 0em 0.5em 0em;
+        font-size: 2.0em;
+    }
+    section.main_contents h4 {
+        margin: 1.5em 0em 0.5em 0em;
+        font-size: 1.6em;
+    }
+    section.main_contents h5 {
+        margin: 1.5em 0em 0.5em 0em;
+        font-size: 1.3em;
+    }
+    section.main_contents h6 {
+        margin: 1.5em 0em 0.5em 0em;
+        font-size: 1em;
+    }
+    section.main_contents hr {
+        width: auto;
+        height: 0em;
+        margin: 2em 0em;
+        border-style: dotted none none;
+        border-color: #666;
+        border-width: 0.2em;
+    }
+    section.main_contents table {
+        table-layout: auto;
+        border-collapse: collapse;
+    }
+    section.main_contents table th,
+    section.main_contents table td {
+        padding: 0.25em 0.5em;
+        border-style: solid;
+        border-width: 0.1em;
+    }
+    section.main_contents table th{
+        background-color: #ccc;
+    }
+    section.main_contents ul,
+    section.main_contents ol {
+        margin: 0em 0em 0.5em 1.3em;
+        line-height: 125%;
+    }
+    section.main_contents li {
+        margin: 0em 0em 0.5em;
+    }
+    section.main_contents pre {
+        width: auto;
+        padding: 1em 1em;
+        background-color: #444;
+        color: #fff;
+        line-height: 110%;
+        overflow: scroll;
+    }
+    section.main_contents code {
+        font-family: "Courier New", Courier, monospace;
+        line-height: 110%;
+    }
+    section.main_contents code * {
+        font-family: "Courier New", Courier, monospace;
+        line-height: 110%;
+    }
+    section.main_contents code > span.kw {
+        color: #3f6;
+        font-weight: bold;
+    }
+    section.main_contents code > span.dt {
+        color: #f63;
+    }
+    section.main_contents code > span.dv {
+        color: #6fc;
+    }
+    section.main_contents code > span.bn {
+        color: #6fc;
+    }
+    section.main_contents code > span.fl {
+        color: #6fc;
+    }
+    section.main_contents code > span.ch {
+        color: #6cf;
+    }
+    section.main_contents code > span.st {
+        color: #6cf;
+    }
+    section.main_contents code > span.co {
+        color: #ccf;
+    }
+    section.main_contents code > span.ot {
+        color: #3f6;
+    }
+    section.main_contents code > span.al {
+        color: #f66;
+        font-weight: bold;
+    }
+    section.main_contents code > span.fu {
+        color: #36f
+    }
+    section.main_contents code > span.er {
+        color: #f66;
+        font-weight: bold;
+    }
+    section.main_contents dl dt {
+        margin: 0em;
+        font-weight: bold;
+    }
+    section.main_contents dl dd {
+        display: block;
+        padding: 0em 0.5em;
+        border-style: none none none solid;
+        border-color: #ccc;
+        border-width: 0.2em;
+    }
+    section.main_contents div.figure img {
+        display: block;
+        margin: 0em auto;
+    }
+    section.main_contents div.figure p.caption {
+        margin: 0em;
+        width: auto;
+        padding: 0.1em 0.5em;
+        background-color: #ccc;
+        border-style: solid none none;
+        border-width: 0.1em;
+    }
+    section.main_contents blockquote {
+        border-style: none none none double;
+        border-width: 0.5em;
+        border-color: #ccc;
+        padding: 0em 0em 0em 0.5em;
+    }
+}
+
+
+/* スマホ用。 */
+@media only screen and (max-device-width: 480px) {
+    /* 全体。 */
+    * {
+        margin: 0px;
+        padding: 0px;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    /* テンプレート用。 */
+    body {
+        width: 90%;
+        padding: 15px 0px;
+        margin: 0% auto;
+        background-color: #666;
+    }
+
+    header {
+        width: auto;
+        margin: 0px 0px 15px;
+        padding: 1em 1.5em;
+        background-color: #66a;
+        border-radius: 20px;
+        border-style: solid;
+        border-width: 4px;
+        border-color: #fff;
+    }
+    header h1 {
+        margin: 0em 0em 0.5em;
+        color: #223;
+        font-family: Georgia, serif;
+        font-size: 2em;
+        font-weight: bold;
+    }
+    header a {
+        color: #223;
+        font-size: 1.5em;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: normal;
+        text-decoration: none;
+    }
+
+    div.root_div {
+        margin: 0px 0px 15px;
+        width: auto;
+    }
+    section.main_contents {
+        width: auto;
+        margin: 0px;
+        padding: 1em 1.5em;
+        background-color: #fff;
+        border-radius: 20px;
+        line-height: 150%;
+    }
+    footer {
+        width: auto;
+        margin: 0px;
+        padding: 0.5em 2em;
+        background-color: #66a;
+        color: #223;
+        font-size: 1em;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: normal;
+        text-align: center;
+        border-radius: 20px;
+        border-style: solid;
+        border-width: 4px;
+        border-color: #fff;
+    }
+
+    /* Markdown用。 */
+    section.main_contents * {
+        margin: 0em 0em 0.5em;
+    }
+    section.main_contents strong {
+        font-weight: bold;
+        color: #c00;
+    }
+    section.main_contents em {
+        font-style: italic;
+        color: #00c;
+    }
+    section.main_contents del {
+        color: #666;
+    }
+    section.main_contents *.math * {
+        color: #000;
+        font-style: normal;
+        font-family: "Courier New", Courier, monospace;
+    }
+    section.main_contents h1,
+    section.main_contents h2,
+    section.main_contents h3,
+    section.main_contents h4,
+    section.main_contents h5,
+    section.main_contents h6 {
+        width: auto;
+        margin: 4em 0em 0.5em 0em;
+        padding: 0em 0.3em 0em 0.3em;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        color: #000;
+        line-height: 125%;
+        border-style: none none none solid;
+        border-width: 0.3em;
+        border-color: #800;
+    }
+    section.main_contents h1 {
+        width: auto;
+        margin: 0em 0em 0.5em 0em;
+        padding: 0.2em 0.5em;
+        background-color: #c03;
+        border-radius: 0.3em;
+        border-width: 0.1em;
+        border-style: solid;
+        border-color: #303;
+        color: #fff;
+        font-weight: bold;
+        font-size: 2em;
+    }
+    section.main_contents h2 {
+        width: auto;
+        margin: 1.5em 0em 0.5em 0em;
+        padding: 0em 0.2em 0em 0.2em;
+        font-size: 2em;
+        border-style: none none solid solid;
+        border-width: 0.0em 0em 0.1em 0.3em;
+    }
+    section.main_contents h3 {
+        margin: 1.5em 0em 0.5em 0em;
+        font-size: 1.5em;
+    }
+    section.main_contents h4 {
+        margin: 1.5em 0em 0.5em 0em;
+        font-size: 1.3em;
+    }
+    section.main_contents h5 {
+        margin: 1.5em 0em 0.5em 0em;
+        font-size: 1.1em;
+    }
+    section.main_contents h6 {
+        margin: 1.5em 0em 0.5em 0em;
+        font-size: 1em;
+    }
+    section.main_contents hr {
+        width: auto;
+        height: 0em;
+        margin: 2em 0em;
+        border-style: dotted none none;
+        border-color: #666;
+        border-width: 0.2em;
+    }
+    section.main_contents table {
+        table-layout: auto;
+        border-collapse: collapse;
+    }
+    section.main_contents table th,
+    section.main_contents table td {
+        padding: 0.25em 0.5em;
+        border-style: solid;
+        border-width: 0.1em;
+    }
+    section.main_contents table th{
+        background-color: #ccc;
+    }
+    section.main_contents ul,
+    section.main_contents ol {
+        margin: 0em 0em 0.5em 1.3em;
+        line-height: 125%;
+    }
+    section.main_contents ul li,
+    section.main_contents ol li {
+    }
+    section.main_contents pre {
+        width: auto;
+        padding: 1em 1em;
+        background-color: #444;
+        color: #fff;
+        line-height: 110%;
+        overflow: scroll;
+    }
+    section.main_contents code * {
+        font-family: "Courier New", Courier, monospace;
+        line-height: 110%;
+    }
+    section.main_contents code * {
+        font-family: "Courier New", Courier, monospace;
+        line-height: 110%;
+    }
+    section.main_contents code > span.kw {
+        color: #3f6;
+        font-weight: bold;
+    }
+    section.main_contents code > span.dt {
+        color: #f63;
+    }
+    section.main_contents code > span.dv {
+        color: #6fc;
+    }
+    section.main_contents code > span.bn {
+        color: #6fc;
+    }
+    section.main_contents code > span.fl {
+        color: #6fc;
+    }
+    section.main_contents code > span.ch {
+        color: #6cf;
+    }
+    section.main_contents code > span.st {
+        color: #6cf;
+    }
+    section.main_contents code > span.co {
+        color: #ccf;
+    }
+    section.main_contents code > span.ot {
+        color: #3f6;
+    }
+    section.main_contents code > span.al {
+        color: #f66;
+        font-weight: bold;
+    }
+    section.main_contents code > span.fu {
+        color: #36f
+    }
+    section.main_contents code > span.er {
+        color: #f66;
+        font-weight: bold;
+    }
+    section.main_contents dl dt {
+        margin: 0em;
+        font-weight: bold;
+    }
+    section.main_contents dl dd {
+        display: block;
+        padding: 0em 0.5em;
+        border-style: none none none solid;
+        border-color: #ccc;
+        border-width: 0.2em;
+    }
+    section.main_contents div.figure img {
+        display: block;
+        margin: 0em auto;
+    }
+    section.main_contents div.figure p.caption {
+        margin: 0em;
+        width: auto;
+        padding: 0.1em 0.5em;
+        background-color: #ccc;
+        border-style: solid none none;
+        border-width: 0.1em;
+    }
+    section.main_contents blockquote {
+        border-style: none none none double;
+        border-width: 0.5em;
+        border-color: #ccc;
+        padding: 0em 0em 0em 0.5em;
+    }
+}
+

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=1" />
+<link rel="stylesheet" type="text/css" href="res/common.css" />
+<script type="text/javascript" src="res/jquery-2.1.0.js"></script>
+<script type="text/javascript" src="res/common.js"></script>
+<title>Sayuri - UCI Chess Engine</title>
+</head>
+<body>
+<header>
+<h1>Sayuri - UCI Chess Engine</h1>
+<a href="index.html">&gt;&gt; Go to Top Page</a>
+</header>
+<div class="root_div">
+<section class="main_contents">
+<h1 id="chess-engine-functions">Chess Engine Functions</h1>
+<p><a href="sayulisp.html">&gt;&gt;Back to Sayulisp page</a></p>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#constant-values">Constant Values</a>
+<ul>
+<li><a href="#squares">Squares</a></li>
+<li><a href="#fyles">Fyles</a></li>
+<li><a href="#ranks">Ranks</a></li>
+<li><a href="#sides">Sides</a></li>
+<li><a href="#piece-types">Piece Types</a></li>
+<li><a href="#castling">Castling</a></li>
+</ul></li>
+<li><a href="#engine-functions">Engine Functions</a>
+<ul>
+<li><a href="#gen-engine"><code>gen-engine</code></a> : Generate a chess engine.
+<ul>
+<li><code>@get-white-pawn-position</code></li>
+<li><code>@get-white-knight-position</code></li>
+<li><code>@get-white-bishop-position</code></li>
+<li><code>@get-white-rook-position</code></li>
+<li><code>@get-white-queen-position</code></li>
+<li><code>@get-white-king-position</code></li>
+<li><code>@get-black-pawn-position</code></li>
+<li><code>@get-black-knight-position</code></li>
+<li><code>@get-black-bishop-position</code></li>
+<li><code>@get-black-rook-position</code></li>
+<li><code>@get-black-queen-position</code></li>
+<li><code>@get-black-king-position</code></li>
+<li><code>@get-empty-square-position</code></li>
+<li><code>@get-piece</code></li>
+<li><code>@get-to-move</code></li>
+<li><code>@get-castling-rights</code></li>
+<li><code>@get-en-passant-square</code></li>
+<li><code>@get-ply</code></li>
+<li><code>@get-ply-100</code></li>
+<li><code>@get-white-has-castled</code></li>
+<li><code>@get-black-has-castled</code></li>
+<li><code>@set-new-game</code></li>
+<li><code>@set-fen &lt;FEN : String&gt;</code></li>
+<li><code>@get-candidate-moves</code></li>
+<li><code>@place-piece &lt;Square : Number&gt; &lt;Piece type : Number&gt;   &lt;Piece side : Number&gt;</code></li>
+<li><code>@set-to-move &lt;Side : Number&gt;</code></li>
+<li><code>@set-castling_rights &lt;Castling rights : List&gt;</code></li>
+<li><code>@set-en-passant-square &lt;&lt;Square : Number&gt; or &lt;Nil&gt;&gt;</code></li>
+<li><code>@set-ply &lt;Ply : Number&gt;</code></li>
+<li><code>@set-ply-100 &lt;Ply : Number&gt;</code></li>
+</ul></li>
+</ul></li>
+<li><a href="#utility-functions">Utility Functions</a></li>
+</ul>
+<hr />
+<h2 id="constant-values">Constant Values</h2>
+<h3 id="squares">Squares</h3>
+<ul>
+<li><code>A1</code> : Number. It indicates A1 square. Value is '0'.</li>
+<li><code>B1</code> : Number. It indicates B1 square. Value is '1'.</li>
+<li><code>C1</code> : Number. It indicates C1 square. Value is '2'.</li>
+<li><code>D1</code> : Number. It indicates D1 square. Value is '3'.</li>
+<li><code>E1</code> : Number. It indicates E1 square. Value is '4'.</li>
+<li><code>F1</code> : Number. It indicates F1 square. Value is '5'.</li>
+<li><code>G1</code> : Number. It indicates G1 square. Value is '6'.</li>
+<li><code>H1</code> : Number. It indicates H1 square. Value is '7'.</li>
+<li><code>A2</code> : Number. It indicates A2 square. Value is '8'.</li>
+<li><code>B2</code> : Number. It indicates B2 square. Value is '9'.</li>
+<li><code>C2</code> : Number. It indicates C2 square. Value is '10'.</li>
+<li><code>D2</code> : Number. It indicates D2 square. Value is '11'.</li>
+<li><code>E2</code> : Number. It indicates E2 square. Value is '12'.</li>
+<li><code>F2</code> : Number. It indicates F2 square. Value is '13'.</li>
+<li><code>G2</code> : Number. It indicates G2 square. Value is '14'.</li>
+<li><code>H2</code> : Number. It indicates H2 square. Value is '15'.</li>
+<li><code>A3</code> : Number. It indicates A3 square. Value is '16'.</li>
+<li><code>B3</code> : Number. It indicates B3 square. Value is '17'.</li>
+<li><code>C3</code> : Number. It indicates C3 square. Value is '18'.</li>
+<li><code>D3</code> : Number. It indicates D3 square. Value is '19'.</li>
+<li><code>E3</code> : Number. It indicates E3 square. Value is '20'.</li>
+<li><code>F3</code> : Number. It indicates F3 square. Value is '21'.</li>
+<li><code>G3</code> : Number. It indicates G3 square. Value is '22'.</li>
+<li><code>H3</code> : Number. It indicates H3 square. Value is '23'.</li>
+<li><code>A4</code> : Number. It indicates A4 square. Value is '24'.</li>
+<li><code>B4</code> : Number. It indicates B4 square. Value is '25'.</li>
+<li><code>C4</code> : Number. It indicates C4 square. Value is '26'.</li>
+<li><code>D4</code> : Number. It indicates D4 square. Value is '27'.</li>
+<li><code>E4</code> : Number. It indicates E4 square. Value is '28'.</li>
+<li><code>F4</code> : Number. It indicates F4 square. Value is '29'.</li>
+<li><code>G4</code> : Number. It indicates G4 square. Value is '30'.</li>
+<li><code>H4</code> : Number. It indicates H4 square. Value is '31'.</li>
+<li><code>A5</code> : Number. It indicates A5 square. Value is '32'.</li>
+<li><code>B5</code> : Number. It indicates B5 square. Value is '33'.</li>
+<li><code>C5</code> : Number. It indicates C5 square. Value is '34'.</li>
+<li><code>D5</code> : Number. It indicates D5 square. Value is '35'.</li>
+<li><code>E5</code> : Number. It indicates E5 square. Value is '36'.</li>
+<li><code>F5</code> : Number. It indicates F5 square. Value is '37'.</li>
+<li><code>G5</code> : Number. It indicates G5 square. Value is '38'.</li>
+<li><code>H5</code> : Number. It indicates H5 square. Value is '39'.</li>
+<li><code>A6</code> : Number. It indicates A6 square. Value is '40'.</li>
+<li><code>B6</code> : Number. It indicates B6 square. Value is '41'.</li>
+<li><code>C6</code> : Number. It indicates C6 square. Value is '42'.</li>
+<li><code>D6</code> : Number. It indicates D6 square. Value is '43'.</li>
+<li><code>E6</code> : Number. It indicates E6 square. Value is '44'.</li>
+<li><code>F6</code> : Number. It indicates F6 square. Value is '45'.</li>
+<li><code>G6</code> : Number. It indicates G6 square. Value is '46'.</li>
+<li><code>H6</code> : Number. It indicates H6 square. Value is '47'.</li>
+<li><code>A7</code> : Number. It indicates A7 square. Value is '48'.</li>
+<li><code>B7</code> : Number. It indicates B7 square. Value is '49'.</li>
+<li><code>C7</code> : Number. It indicates C7 square. Value is '50'.</li>
+<li><code>D7</code> : Number. It indicates D7 square. Value is '51'.</li>
+<li><code>E7</code> : Number. It indicates E7 square. Value is '52'.</li>
+<li><code>F7</code> : Number. It indicates F7 square. Value is '53'.</li>
+<li><code>G7</code> : Number. It indicates G7 square. Value is '54'.</li>
+<li><code>H7</code> : Number. It indicates H7 square. Value is '55'.</li>
+<li><code>A8</code> : Number. It indicates A8 square. Value is '56'.</li>
+<li><code>B8</code> : Number. It indicates B8 square. Value is '57'.</li>
+<li><code>C8</code> : Number. It indicates C8 square. Value is '58'.</li>
+<li><code>D8</code> : Number. It indicates D8 square. Value is '59'.</li>
+<li><code>E8</code> : Number. It indicates E8 square. Value is '60'.</li>
+<li><code>F8</code> : Number. It indicates F8 square. Value is '61'.</li>
+<li><code>G8</code> : Number. It indicates G8 square. Value is '62'.</li>
+<li><code>H8</code> : Number. It indicates H8 square. Value is '63'.</li>
+</ul>
+<h3 id="fyles">Fyles</h3>
+<ul>
+<li><code>FYLE_A</code> : Number. It indicates A-Fyle. Value is '0'.</li>
+<li><code>FYLE_B</code> : Number. It indicates B-Fyle. Value is '1'.</li>
+<li><code>FYLE_C</code> : Number. It indicates C-Fyle. Value is '2'.</li>
+<li><code>FYLE_D</code> : Number. It indicates D-Fyle. Value is '3'.</li>
+<li><code>FYLE_E</code> : Number. It indicates E-Fyle. Value is '4'.</li>
+<li><code>FYLE_F</code> : Number. It indicates F-Fyle. Value is '5'.</li>
+<li><code>FYLE_G</code> : Number. It indicates G-Fyle. Value is '6'.</li>
+<li><code>FYLE_H</code> : Number. It indicates H-Fyle. Value is '7'.</li>
+</ul>
+<h3 id="ranks">Ranks</h3>
+<ul>
+<li><code>RANK_1</code> : Number. It indicates 1st rank. Value is '0'.</li>
+<li><code>RANK_2</code> : Number. It indicates 2nd rank. Value is '1'.</li>
+<li><code>RANK_3</code> : Number. It indicates 3rd rank. Value is '2'.</li>
+<li><code>RANK_4</code> : Number. It indicates 4th rank. Value is '3'.</li>
+<li><code>RANK_5</code> : Number. It indicates 5th rank. Value is '4'.</li>
+<li><code>RANK_6</code> : Number. It indicates 6th rank. Value is '5'.</li>
+<li><code>RANK_7</code> : Number. It indicates 7th rank. Value is '6'.</li>
+<li><code>RANK_8</code> : Number. It indicates 8th rank. Value is '7'.</li>
+</ul>
+<h3 id="sides">Sides</h3>
+<ul>
+<li><code>NO_SIDE</code> : Number. It indicates neither of sides. Value is '0'.</li>
+<li><code>WHITE</code> : Number. It indicates White. Value is '1'.</li>
+<li><code>BLACK</code> : Number. It indicates Black. Value is '2'.</li>
+</ul>
+<h3 id="piece-types">Piece Types</h3>
+<ul>
+<li><code>EMPTY</code> : Number. It indicates no piece. Value is '0'.</li>
+<li><code>PAWN</code> : Number. It indicates Pawn. Value is '1'.</li>
+<li><code>KNIGHT</code> : Number. It indicates Knight. Value is '2'.</li>
+<li><code>BISHOP</code> : Number. It indicates Bishop. Value is '3'.</li>
+<li><code>ROOK</code> : Number. It indicates Rook. Value is '4'.</li>
+<li><code>QUEEN</code> : Number. It indicates Queen. Value is '5'.</li>
+<li><code>KING</code> : Number. It indicates King. Value is '6'.</li>
+</ul>
+<h3 id="castling">Castling</h3>
+<ul>
+<li><code>NO_CASTLING</code> : Number. It indicates no one to castle. Value is '0'.</li>
+<li><code>WHITE_SHORT_CASTLING</code> : Number. It indicates White's Short Castling. Value is '1'.</li>
+<li><code>WHITE_LONG_CASTLING</code> : Number. It indicates White's Long Castling. Value is '2'.</li>
+<li><code>BLACK_SHORT_CASTLING</code> : Number. It indicates Black's Short Castling. Value is '3'.</li>
+<li><code>BLACK_LONG_CASTLING</code> : Number. It indicates Black's Long Castling. Value is '4'.</li>
+</ul>
+<h2 id="engine-functions">Engine Functions</h2>
+<h3 id="gen-engine">gen-engine</h3>
+<p><strong>Usage</strong></p>
+<ol style="list-style-type: decimal">
+<li><code>(gen-engine)</code></li>
+<li><code>((gen-engine) &lt;Message Symbol&gt; [&lt;Arguments&gt;...])</code></li>
+</ol>
+<p><strong>Description</strong></p>
+<ul>
+<li>1: Generate chess engine.</li>
+<li>2: The engine executes something according to <code>&lt;Message Symbol&gt;</code>.</li>
+<li>2: Some <code>&lt;Message Symbol&gt;</code> require <code>&lt;Argument&gt;...</code>.</li>
+<li>2: <code>&lt;Message Symbol&gt;</code> are...
+<ul>
+<li><code>@get-white-pawn-position</code>
+<ul>
+<li>Return List of Symbols of square placed White Pawn.</li>
+</ul></li>
+<li><code>@get-white-knight-position</code>
+<ul>
+<li>Return List of Symbols of square placed White Knight.</li>
+</ul></li>
+<li><code>@get-white-bishop-position</code>
+<ul>
+<li>Return List of Symbols of square placed White Bishop.</li>
+</ul></li>
+<li><code>@get-white-rook-position</code>
+<ul>
+<li>Return List of Symbols of square placed White Rook.</li>
+</ul></li>
+<li><code>@get-white-queen-position</code>
+<ul>
+<li>Return List of Symbols of square placed White Queen.</li>
+</ul></li>
+<li><code>@get-white-king-position</code>
+<ul>
+<li>Return List of Symbols of square placed White King.</li>
+</ul></li>
+<li><code>@get-black-pawn-position</code>
+<ul>
+<li>Return List of Symbols of square placed Black Pawn.</li>
+</ul></li>
+<li><code>@get-black-knight-position</code>
+<ul>
+<li>Return List of Symbols of square placed Black Knight.</li>
+</ul></li>
+<li><code>@get-black-bishop-position</code>
+<ul>
+<li>Return List of Symbols of square placed Black Bishop.</li>
+</ul></li>
+<li><code>@get-black-rook-position</code>
+<ul>
+<li>Return List of Symbols of square placed Black Rook.</li>
+</ul></li>
+<li><code>@get-black-queen-position</code>
+<ul>
+<li>Return List of Symbols of square placed Black Queen.</li>
+</ul></li>
+<li><code>@get-black-king-position</code>
+<ul>
+<li>Return List of Symbols of square placed Black King.</li>
+</ul></li>
+<li><code>@get-empty-square-position</code>
+<ul>
+<li>Return List of Symbols of empty square.</li>
+</ul></li>
+<li><code>@get-piece</code>
+<ul>
+<li>This needs one argument.
+<ul>
+<li>A constant value that indicates one square.</li>
+</ul></li>
+<li>Return what kind of piece is placed at the square as <code>(&lt;Side : Symbol&gt; &lt;PieceType : Symbol&gt;)</code>.</li>
+</ul></li>
+<li><code>@get-to-move</code>
+<ul>
+<li>Return Symbol of side which has its turn to move.</li>
+</ul></li>
+<li><code>@get-castling-rights</code>
+<ul>
+<li>Return what castling rights exist as List of Symbols.</li>
+</ul></li>
+<li><code>@get-en-passant-square</code>
+<ul>
+<li>Return Symbol of En Passant Square.</li>
+</ul></li>
+<li><code>@get-ply</code>
+<ul>
+<li>Return how many moves have played as plies. (1 move = 2 plies)</li>
+</ul></li>
+<li><code>@get-ply-100</code>
+<ul>
+<li>Return moves for 50 Moves Rule as plies. (1 move = 2 plies)</li>
+</ul></li>
+<li><code>@get-white-has-castled</code>
+<ul>
+<li>Return #t if White has castled. If not, it returns #f.</li>
+</ul></li>
+<li><code>@get-black-has-castled</code>
+<ul>
+<li>Return #t if Black has castled. If not, it returns #f.</li>
+</ul></li>
+<li><code>@set-new-game</code>
+<ul>
+<li>Set starting position and state.</li>
+<li>Return #t.</li>
+</ul></li>
+<li><code>@set-fen &lt;FEN : String&gt;</code>
+<ul>
+<li>Set position and state into indicated position by <code>&lt;FEN&gt;</code>.</li>
+<li>Return #t.</li>
+</ul></li>
+<li><code>@get-candidate-moves</code>
+<ul>
+<li>Return List that contains the candidate moves.</li>
+</ul></li>
+<li><code>@place-piece &lt;Square : Number&gt; &lt;Piece type : Number&gt;   &lt;Piece side : Number&gt;</code>
+<ul>
+<li>Place a <code>&lt;Piece side&gt;</code> <code>&lt;Piece type&gt;</code> onto <code>&lt;Square&gt;</code>.</li>
+<li>If <code>&lt;Piece side&gt;</code> is <code>EMPTY</code> and <code>&lt;Piece side&gt;</code> is <code>NO_SIDE</code>, a piece on <code>&lt;Square&gt;</code> is deleted.</li>
+<li>Each side must have just one King,
+<ul>
+<li>If you try to place a piece onto a square where King is placed, Sayulisp will throw error.</li>
+<li>If you place a new King, the old King will be deleted.</li>
+</ul></li>
+</ul></li>
+<li><code>@set-to-move &lt;Side : Number&gt;</code>
+<ul>
+<li>Change turn to move into <code>&lt;Side&gt;</code>.</li>
+<li>Return the previous value.</li>
+<li><code>&lt;Side&gt;</code> must be White or Black.</li>
+</ul></li>
+<li><code>@set-castling_rights &lt;Castling rights : List&gt;</code>
+<ul>
+<li>Change castling rights into <code>&lt;List&gt;</code>.</li>
+<li>Return the previous value.</li>
+<li><code>&lt;List&gt;</code> is consist of constant values that are 'WHITE_SHORT_CASTLING' or 'WHITE_LONG_CASTLING' or 'BLACK_SHORT_CASTLING' or 'BLACK_LONG_CASTLING'.</li>
+<li>After calling this function, castling rights is updated by position of King or Rook.
+<ul>
+<li>If King is not on starting square, its castling rights are deleted.</li>
+<li>If Rook is not on starting square, its King Side or Queen Side of castling rights is deleted.</li>
+</ul></li>
+</ul></li>
+<li><code>@set-en-passant-square &lt;&lt;Square : Number&gt; or &lt;Nil&gt;&gt;</code>
+<ul>
+<li>Change en passant square into <code>&lt;Square&gt;</code>.</li>
+<li>If argument is <code>&lt;Nil&gt;</code>, it changes into no en passant square.</li>
+<li>Return the previous value.</li>
+<li>But it doesn't change by following conditions.
+<ul>
+<li><code>&lt;Square&gt;</code> is not on 'RANK_3' or on 'RANK_6'.</li>
+<li><code>&lt;Square&gt;</code> is not empty.</li>
+<li><code>&lt;Square&gt;</code> is on 'RANK_3' and White Pawn is not on directly above.</li>
+<li><code>&lt;Square&gt;</code> is on 'RANK_6' and Black Pawn is not on directly below.</li>
+</ul></li>
+</ul></li>
+<li><code>@set-ply &lt;Ply : Number&gt;</code>
+<ul>
+<li>Change ply(0.5 moves) into <code>&lt;Ply&gt;</code>.</li>
+<li>Return the previous value.</li>
+<li><code>&lt;Ply&gt;</code> must be '1' and more.</li>
+</ul></li>
+<li><code>@set-ply-100 &lt;Ply : Number&gt;</code>
+<ul>
+<li>Change ply(0.5 moves) of 50 moves rule into <code>&lt;Ply&gt;</code>.</li>
+<li>Return the previous value.</li>
+<li><code>&lt;Ply&gt;</code> must be '0' and more.</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>;; Generate chess engine and bind to &#39;my-engine&#39;.
+(define my-engine (gen-engine))
+
+;; List squares placed White Pawn.
+(display (my-engine &#39;@get-white-pawn-position))
+
+;; Output
+;;
+;; &gt; (A2 B2 C2 D2 E2 F2 G2 H2)</code></pre>
+<h2 id="utility-functions">Utility Functions</h2>
+
+</section>
+</div>
+<footer>Copyright &copy; Hironori Ishibashi</footer>
+</body>
+</html>

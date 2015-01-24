@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=1" />
+<link rel="stylesheet" type="text/css" href="res/common.css" />
+<script type="text/javascript" src="res/jquery-2.1.0.js"></script>
+<script type="text/javascript" src="res/common.js"></script>
+<title>Sayuri - UCI Chess Engine</title>
+</head>
+<body>
+<header>
+<h1>Sayuri - UCI Chess Engine</h1>
+<a href="index.html">&gt;&gt; Go to Top Page</a>
+</header>
+<div class="root_div">
+<section class="main_contents">
+<h1 id="basic-functions">Basic Functions</h1>
+<p><a href="sayulisp.html">&gt;&gt;Back to Sayulisp page</a></p>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#vector-value-functions">Vector Value Functions</a>
+<ul>
+<li><a href="#append"><code>append</code></a> : Append an object to the tail of List.</li>
+<li><a href="#length"><code>length</code></a> : Get size of an object.</li>
+<li><a href="#list"><code>list</code></a> : Generate List.</li>
+<li><a href="#list-ref"><code>list-ref</code></a> : Pull out an element of List.</li>
+<li><a href="#list-replace"><code>list-replace</code></a> : Replace an element of List for an object.</li>
+<li><a href="#list-remove"><code>list-remove</code></a> : Remove an element of List.</li>
+<li><a href="#string-append"><code>string-append</code></a> : Concatenate Strings.</li>
+<li><a href="#string-ref"><code>string-ref</code></a> : Pull out a letter from String.</li>
+<li><a href="#string-split"><code>string-split</code></a> : Split String.</li>
+</ul></li>
+<li><a href="#boolean-equation-function">Boolean Equation Function</a>
+<ul>
+<li><a href="#not"><code>not</code></a> : Convert &quot;True&quot; to &quot;False&quot;, &quot;False&quot; to &quot;True&quot;.</li>
+<li><a href="#and"><code>and</code></a> : Judge if all Booleans are &quot;True&quot; or not.</li>
+<li><a href="#or"><code>or</code></a> : Judge if one of all Booleans is &quot;True&quot; or not.</li>
+</ul></li>
+<li><a href="#comparision-function">Comparision Function</a>
+<ul>
+<li><a href="#same"><code>=</code></a> : Judge if all Numbers are same or not.</li>
+<li><a href="#less-than"><code>&lt;</code></a> : Judge if a Number is less than the next Number.</li>
+<li><a href="#less-equal"><code>&lt;=</code></a> : Judge if a Number is the next Number and less.</li>
+<li><a href="#greater-than"><code>&gt;</code></a> : Judge if a Number is greater than the next Number.</li>
+<li><a href="#greater-equal"><code>&gt;=</code></a> : Judge if a Number is the next Number and more.</li>
+<li><a href="#max"><code>max</code></a> : Find the maximum Number.</li>
+<li><a href="#min"><code>min</code></a> : Find the minimum Number.</li>
+</ul></li>
+<li><a href="#arithmetic-operation-function">Arithmetic Operation Function</a>
+<ul>
+<li><a href="#add"><code>+</code></a> : Calculate addition.</li>
+<li><a href="#sub"><code>-</code></a> : Calculate subtraction.</li>
+<li><a href="#mul"><code>*</code></a> : Calculate multiplication.</li>
+<li><a href="#div"><code>/</code></a> : Calculate division.</li>
+</ul></li>
+<li><a href="#mathematics-function">Mathematics Function</a>
+<ul>
+<li><a href="#pi"><code>PI</code></a> : Not Function. Circular constant.</li>
+<li><a href="#e"><code>E</code></a> : Not Function. Napier's constant.</li>
+<li><a href="#sin"><code>sin</code></a> : Calculate sine. A trigonometric function.</li>
+<li><a href="#cos"><code>cos</code></a> : Calculate coine. A trigonometric function.</li>
+<li><a href="#tan"><code>tan</code></a> : Calculate tangent. A trigonometric function.</li>
+<li><a href="#asin"><code>asin</code></a> : Calculate arcsine. A trigonometric function.</li>
+<li><a href="#acos"><code>acos</code></a> : Calculate arccoine. A trigonometric function.</li>
+<li><a href="#atan"><code>atan</code></a> : Calculate arctangent. A trigonometric function.</li>
+<li><a href="#sqrt"><code>sqrt</code></a> : Calculate square root.</li>
+<li><a href="#abs"><code>abs</code></a> : Calculate abusolute value.</li>
+<li><a href="#ceil"><code>ceil</code></a> : Round up Number.</li>
+<li><a href="#floor"><code>floor</code></a> : Round down Number.</li>
+<li><a href="#round"><code>round</code></a> : Round Number into the nearest integral value.</li>
+<li><a href="#trunc"><code>trunc</code></a> : Truncate after decimal point of Number.</li>
+<li><a href="#exp"><code>exp</code></a> : Calculate exponent.</li>
+<li><a href="#expt"><code>expt</code></a> : Calculate exponent with a base Number.</li>
+<li><a href="#log"><code>log</code></a> : Calculate logarithm.</li>
+<li><a href="#log2"><code>log2</code></a> : Calculate logarithm with 2.</li>
+<li><a href="#log10"><code>log10</code></a> : Calculate logarithm with 10.</li>
+<li><a href="#random"><code>random</code></a> : Get a random Number.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="vector-value-functions">Vector Value Functions</h2>
+<h3 id="append">append</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(append &lt;List 1&gt; &lt;List 2&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Append <code>&lt;List 2&gt;</code> after the end of <code>&lt;List 1&gt;</code>.</li>
+<li>In other words, (append) replaces last Cdr of <code>&lt;List 1&gt;</code> from Nil to <code>&lt;List 2&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (append &#39;(111 222 333) &#39;(444 555 666)))
+
+;; Output
+;;
+;; &gt; (111 222 333 444 555 666)
+
+(display (append &#39;(111 222 333) &quot;Not List&quot;))
+
+;; Output
+;;
+;; &gt; (111 222 333 . &quot;Not List&quot;)</code></pre>
+<h3 id="length">length</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(length &lt;List&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return number of <code>&lt;List&gt;</code>.</li>
+<li>If you input Atom, it returns '1'. If Nil, it returns '0'.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (length &#39;(111 222 333 444 555 666)))
+
+;; Output
+;;
+;; &gt; 6</code></pre>
+<h3 id="list">list</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(list &lt;Object&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return List consists of <code>&lt;Object&gt;...</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (list 111 222 333))
+
+;; Output
+;;
+;; &gt; (111 222 333)</code></pre>
+<h3 id="list-ref">list-ref</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(list-ref &lt;List&gt; &lt;Index : Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return a element of <code>&lt;Index&gt;</code> of <code>&lt;List&gt;</code>.</li>
+<li>The 1st element of <code>&lt;List&gt;</code> is '0'.</li>
+<li>If <code>&lt;Index&gt;</code> is negative number,&quot; It counts from the tail of <code>&lt;List&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (list-ref (111 222 333) 1))
+
+;; Output
+;;
+;; &gt; 222
+
+(display (list-ref (111 222 333) -1))
+
+;; Output
+;;
+;; &gt; 333</code></pre>
+<h3 id="list-replace">list-replace</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(list-replace &lt;List&gt; &lt;Index : Number&gt; &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return List which has replaced the <code>&lt;Index&gt;</code>th element of <code>&lt;List&gt;</code> for <code>&lt;Object&gt;</code>.</li>
+<li>The 1st element of <code>&lt;List&gt;</code> is '0'.</li>
+<li>If <code>&lt;Index&gt;</code> is negative number,&quot; It counts from the tail of <code>&lt;List&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define lst (list 111 222 333))
+(display (list-replace lst 1 &quot;Hello&quot;))
+
+;; Output
+;;
+;; &gt; (111 &quot;Hello&quot; 333)</code></pre>
+<h3 id="list-remove">list-remove</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(list-remove &lt;List&gt; &lt;Index : Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return List which has removed the <code>&lt;Index&gt;</code>th element of <code>&lt;List&gt;</code>.</li>
+<li>The 1st element of <code>&lt;List&gt;</code> is '0'.</li>
+<li>If <code>&lt;Index&gt;</code> is negative number,&quot; It counts from the tail of <code>&lt;List&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define lst (list 111 222 333))
+(display (list-remove lst 1))
+
+;; Output
+;;
+;; &gt; (111 333)</code></pre>
+<h3 id="string-append">string-append</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(string-append &lt;String&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Concatenate <code>&lt;String&gt;...</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (string-append &quot;Hello&quot; &quot; &quot; &quot;World&quot;))
+
+;; Output
+;;
+;; &gt; Hello World</code></pre>
+<h3 id="string-ref">string-ref</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(string-ref &lt;String&gt; &lt;index&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return the <code>&lt;index&gt;</code>th letter of <code>&lt;String&gt;</code>.</li>
+<li><code>&lt;index&gt;</code> of the 1st letter is '0'.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (string-ref &quot;Hello World&quot; 6))
+
+;; Output
+;;
+;; &gt; W</code></pre>
+<h3 id="string-split">string-split</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(string-split &lt;String&gt; &lt;Delim String&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return List consist of String splited <code>&lt;String&gt;</code> by <code>&lt;Delim String&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (string-split &quot;aaaaSplit!bbbSplit!ccc&quot; &quot;Split!&quot;))
+
+;; Outpu
+;;
+;; &gt; (&quot;aaa&quot; &quot;bbb&quot; &quot;ccc&quot;)</code></pre>
+<h2 id="boolean-equation-function">Boolean Equation Function</h2>
+<h3 id="not">not</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(not &lt;Boolean&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Turn <code>&lt;Boolean&gt;</code> to opposite value. #t to #f, #f to #t.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (not (= 111 111)))
+
+;; Output
+;;
+;; &gt; #f</code></pre>
+<h3 id="and">and</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(and &lt;Boolean&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return #t if all <code>&lt;Boolean&gt;...</code> are #t. If not, return #f.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (and (= 111 111) (= 222 222)))
+
+;; Output
+;;
+;; &gt; #t</code></pre>
+<h3 id="or">or</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(or &lt;Boolean&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return #t if one of <code>&lt;Boolean&gt;...</code> is #t. If not, return #f.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (or (= 111 111) (= 222 333)))
+
+;; Output
+;;
+;; &gt; #t</code></pre>
+<h2 id="comparision-function">Comparision Function</h2>
+<h3 id="same">=</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(= &lt;Number&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return #t if all <code>&lt;Number&gt;...</code> are same. If not, return #f.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (= 111 111 111))
+
+;; Output
+;;
+;; &gt; #t</code></pre>
+<h3 id="less-than">&lt;</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(&lt; &lt;Number&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return #t if a Number is less than next Number. If not, return #f.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (&lt; 111 222 333))
+
+;; Output
+;;
+;; &gt; #t</code></pre>
+<h3 id="less-equal">&lt;=</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(&lt;= &lt;Number&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return #t if a Number is less or equal than next Number. If not, return #f.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (&lt; 111 222 333))
+
+;; Output
+;;
+;; &gt; #t</code></pre>
+<h3 id="greater-than">&gt;</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(&gt; &lt;Number&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return #t if a Number is more than next Number. If not, return #f.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (&gt; 333 222 111))
+
+;; Output
+;;
+;; &gt; #t</code></pre>
+<h3 id="greater-equal">&gt;=</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(&gt;= &lt;Number&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return #t if a Number is more or equal than next Number. If not, return #f.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (&gt;= 333 222 111))
+
+;; Output
+;;
+;; &gt; #t</code></pre>
+<h3 id="max">max</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(max &lt;Number&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return maximum number of <code>&lt;Number&gt;...</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (max 1 2 3 4 3 2 1))
+
+;; Output
+;;
+;; &gt; 4</code></pre>
+<h3 id="min">min</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(min &lt;Number&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return minimum number of <code>&lt;Number&gt;...</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (min 4 3 2 1 2 3 4))
+
+;; Output
+;;
+;; &gt; 1</code></pre>
+<h2 id="arithmetic-operation-function">Arithmetic Operation Function</h2>
+<h3 id="add">+</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(+ &lt;Number&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Sum up all <code>&lt;Number&gt;...</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (+ 1 2 3))
+
+;; Output
+;;
+;; &gt; 6</code></pre>
+<h3 id="sub">-</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(- &lt;1st number&gt; &lt;Number&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Subtract <code>&lt;Number&gt;...</code> from <code>&lt;1st number&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (- 5 4 3))
+
+;; Output
+;;
+;; &gt; -2</code></pre>
+<h3 id="mul">*</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(* &lt;Number&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Multiply all <code>&lt;Number&gt;...</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (* 2 3 4))
+
+;; Output
+;;
+;; &gt; 24</code></pre>
+<h3 id="div">/</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(/ &lt;1st number&gt; &lt;Number&gt;...)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Divide <code>&lt;1st number&gt;</code> with <code>&lt;Number&gt;...</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (/ 32 2 4))
+
+;; Output
+;;
+;; &gt; 4</code></pre>
+<h2 id="mathematics-function">Mathematics Function</h2>
+<h3 id="pi">PI</h3>
+<p><strong>Description</strong></p>
+<ul>
+<li>Circular constant.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (* 1 PI))
+
+;; Output
+;;
+;; &gt; 3.14159</code></pre>
+<h3 id="e">E</h3>
+<p><strong>Description</strong></p>
+<ul>
+<li>Napier's constant.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (* 1 E))
+
+;; Output
+;;
+;; &gt; 2.71828</code></pre>
+<h3 id="sin">sin</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(sin &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Sine. A trigonometric function.</li>
+<li><code>&lt;Number&gt;</code> is radian.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (sin (/ PI 2)))
+
+;; Output
+;;
+;; &gt; 1</code></pre>
+<h3 id="cos">cos</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(cos &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Cosine. A trigonometric function.</li>
+<li><code>&lt;Number&gt;</code> is radian.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (cos PI))
+
+;; Output
+;;
+;; &gt; -1</code></pre>
+<h3 id="tan">tan</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(tan &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Tangent. A trigonometric function.</li>
+<li><code>&lt;Number&gt;</code> is radian.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (tan (/ PI 4)))
+
+;; Output
+;;
+;; &gt; 1</code></pre>
+<h3 id="asin">asin</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(asin &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Arc sine. A trigonometric function.</li>
+<li><code>&lt;Number&gt;</code> is sine.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (asin 0))
+
+;; Output
+;;
+;; &gt; 0</code></pre>
+<h3 id="acos">acos</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(acos &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Arc cosine. A trigonometric function.</li>
+<li><code>&lt;Number&gt;</code> is cosine.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (acos 1))
+
+;; Output
+;;
+;; &gt; 0</code></pre>
+<h3 id="atan">atan</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(atan &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Arc tangent. A trigonometric function.</li>
+<li><code>&lt;Number&gt;</code> is tangent.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (atan 0))
+
+;; Output
+;;
+;; &gt; 0</code></pre>
+<h3 id="sqrt">sqrt</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(sqrt &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return square root of <code>&lt;Number&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (sqrt 4))
+
+;; Output
+;;
+;; &gt; 2</code></pre>
+<h3 id="abs">abs</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(abs &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return absolute value of <code>&lt;Number&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (abs -111))
+
+;; Output
+;;
+;; &gt; 111</code></pre>
+<h3 id="ceil">ceil</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(ceil &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Round up <code>&lt;Number&gt;</code> into integral value.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (ceil 1.3))
+
+;; Output
+;;
+;; &gt; 2</code></pre>
+<h3 id="floor">floor</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(floor &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Round down <code>&lt;Number&gt;</code> into integral value.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (floor 1.3))
+
+;; Output
+;;
+;; &gt; 1</code></pre>
+<h3 id="round">round</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(round &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Round <code>&lt;Number&gt;</code> into the nearest integral value.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (round 1.5))
+
+;; Output
+;;
+;; &gt; 2
+
+(display (round 1.49))
+
+;; Output
+;;
+;; &gt; 1</code></pre>
+<h3 id="trunc">trunc</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(trunc &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Truncate after decimal point of <code>&lt;Number&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (trunc 1.234))
+
+;; Output
+;;
+;; &gt; 1
+
+(display (trunc -1.234))
+
+;; Output
+;;
+;; &gt; -1</code></pre>
+<h3 id="exp">exp</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(exp &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Exponent function of <code>&lt;Number&gt;</code>. The base is Napier's constant.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (exp 1))
+
+;; Output
+;;
+;; &gt; 2.71828</code></pre>
+<h3 id="expt">expt</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(expt &lt;Base&gt; &lt;Exponent&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Exponent function of <code>&lt;Exponent&gt;</code>. The base is <code>&lt;Base&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (expt 2 3))
+
+;; Output
+;;
+;; &gt; 8</code></pre>
+<h3 id="log">log</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(log &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Logarithmic function of <code>&lt;Number&gt;</code>. The base is Napier's constant.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (log E))
+
+;; Output
+;;
+;; &gt; 1</code></pre>
+<h3 id="log2">log2</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(log2 &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Logarithmic function of <code>&lt;Number&gt;</code>. The base is 2.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (log2 8))
+
+;; Output
+;;
+;; &gt; 3</code></pre>
+<h3 id="log10">log10</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(log10 &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Logarithmic function of <code>&lt;Number&gt;</code>. The base is 10.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (log10 100))
+
+;; Output
+;;
+;; &gt; 2</code></pre>
+<h3 id="random">random</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(random &lt;Number&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Return random number from 0 to <code>&lt;Number&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (random 10))
+
+;; Output
+;;
+;; &gt; 2.42356
+
+(display (random -10))
+
+;; Output
+;;
+;; &gt; -7.13453</code></pre>
+
+</section>
+</div>
+<footer>Copyright &copy; Hironori Ishibashi</footer>
+</body>
+</html>
