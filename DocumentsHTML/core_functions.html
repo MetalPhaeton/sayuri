@@ -21,6 +21,7 @@
 <ul>
 <li><a href="#most-important-functions">Most Important Functions</a>
 <ul>
+<li><a href="#exit"><code>exit</code></a> : Exit from Sayulisp.</li>
 <li><a href="#help"><code>help</code></a> : Show descriptions.</li>
 <li><a href="#eval"><code>eval</code></a> : Evaluate an expression.</li>
 <li><a href="#quote"><code>quote</code></a> : Don't evaluate an expression.</li>
@@ -83,6 +84,22 @@
 </ul>
 <hr />
 <h2 id="most-important-functions">Most Important Functions</h2>
+<h3 id="exit">exit</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(exit [&lt;Status : Number&gt;])</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Exit from Sayulisp.</li>
+<li><code>&lt;Status&gt;</code> is Exit Status. Default is '0'.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>;; Exit from Sayulisp.
+(exit)
+
+;; Exit with EXIT_FAILURE.
+(exit 1)</code></pre>
 <h3 id="help">help</h3>
 <p><strong>Usage</strong></p>
 <ol style="list-style-type: decimal">
