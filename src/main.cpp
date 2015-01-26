@@ -131,14 +131,16 @@ R"...(Usage:
     }
 
     // 実行。
+    int status = 0;
     try {
-      sayulisp_ptr->Run(stream_ptr);
+      status = sayulisp_ptr->Run(stream_ptr);
     } catch (Sayuri::LispObjectPtr error) {
       return 1;
     }
 
     // 終了。
     if (file) file.close();
+    return status;
   } else {
     // プログラムの起動。
     // 初期化。

@@ -470,8 +470,9 @@ namespace Sayuri {
       /**
        * Sayulispを開始する。
        * @param stream_ptr 入力に使うストリームのポインタ。
+       * @return 終了ステータス。
        */
-      void Run(std::istream* stream_ptr);
+      int Run(std::istream* stream_ptr);
 
     private:
       // ================ //

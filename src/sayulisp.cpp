@@ -950,7 +950,39 @@ namespace Sayuri {
   }
 
   // Sayulispを開始する。
-  void Sayulisp::Run(std::istream* stream_ptr) {
+  int Sayulisp::Run(std::istream* stream_ptr) {
+    // 終了ステータス。
+    int status = 0;
+
+    // (exit)関数を作成。
+    bool loop = true;
+    LispObjectPtr exit_func_ptr = LispObject::NewNativeFunction();
+    exit_func_ptr->scope_chain(global_ptr_->scope_chain());
+    exit_func_ptr->native_function([&status, &loop]
+    (LispObjectPtr self, const LispObject& caller, const LispObject& list)
+    -> LispObjectPtr {
+      // 準備。
+      LispIterator list_itr(&list);
+      std::string func_name = (list_itr++)->ToString();
+
+      // ループをセット。
+      loop = false;
+
+      // 引数があった場合は終了ステータスあり。
+      if (list_itr) {
+        LispObjectPtr status_ptr = caller.Evaluate(*list_itr);
+        if (!(status_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {1}, true);
+        }
+
+        status = status_ptr->number_value();
+      }
+
+      return LispObject::NewNumber(status);
+    });
+    global_ptr_->BindSymbol("exit", exit_func_ptr);
+
     LispTokenizer tokenizer;
 
     try {
@@ -964,12 +996,15 @@ namespace Sayuri {
 
           for (auto& ptr : ptr_vec) {
             global_ptr_->Evaluate(*ptr);
+            if (!loop) break;
           }
 
           tokenizer.Reset();
         } else if (parentheses < 0) {
           throw LispObject::GenError("@parse-error", "Too many parentheses.");
         }
+
+        if (!loop) break;
       }
     } catch (LispObjectPtr error) {
       if (error->IsList() && (error->Length() == 2)
@@ -981,6 +1016,8 @@ namespace Sayuri {
         throw error;
       }
     }
+
+    return status;
   }
 
   // エンジンを生成する。
@@ -1762,9 +1799,26 @@ __Description__
 * Constant value of Number that indicates Black's Long Castling.
 * Value is '4'.)...";
 
-    // %%% gen-engine
-    (*dict_ptr_)["gen-engine"] =
-R"...(### gen-engine ###
+    // %%% exit
+    (*dict_ptr_)["exit"] =
+R"...(### exit ###
+
+__Usage__
+
+* `(exit [<Status : Number>])`
+
+__Description__
+
+* Exit from Sayulisp.
+* `<Status>` is Exit Status. Default is '0'.
+
+__Example__
+
+    ;; Exit from Sayulisp.
+    (exit)
+    
+    ;; Exit with EXIT_FAILURE.
+    (exit 1))...";
 
     // %%% gen-engine
     (*dict_ptr_)["gen-engine"] =
