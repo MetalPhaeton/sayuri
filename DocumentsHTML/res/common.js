@@ -8,9 +8,10 @@ $(function() {
             }
         });
 
-        // .figureの幅を画像の幅にする。
+        // .figureの幅を画像の幅にする。 ついでにセンター表示。
         $("div.figure").each(function(i) {
             $(this).width($("img", this).width());
+            $(this).css("margin", "0% auto");
         });
     });
 });
