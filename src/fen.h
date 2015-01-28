@@ -104,7 +104,7 @@ namespace Sayuri {
        * アクセサ - 50手ルールの手数。
        * @return 50手ルールの手数。
        */
-      int ply_100() const {return ply_100_;}
+      int clock() const {return clock_;}
       /**
        * アクセサ - 現在の手数。
        * @return 現在の手数。
@@ -137,9 +137,9 @@ namespace Sayuri {
       void EvalEnPassant(const std::string& en_passant_square_str);
       /**
        * 50手ルールの手数文字列を評価する。
-       * @param ply_100_str 50手ルールの手数文字列。
+       * @param clock_str 50手ルールの手数文字列。
        */
-      void EvalPly100(const std::string& ply_100_str);
+      void EvalClock(const std::string& clock_str);
       /**
        * 手数文字列を評価する。
        * @param ply_str 手数文字列。
@@ -164,7 +164,7 @@ namespace Sayuri {
       /** アンパッサンの位置。アンパッサンできなければ0。 */
       Square en_passant_square_;
       /** 50手ルールの手数。 */
-      int ply_100_;
+      int clock_;
       /** 現在の手数。 */
       int ply_;
   };

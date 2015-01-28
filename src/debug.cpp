@@ -394,7 +394,7 @@ namespace Sayuri {
     } else {
       std::cout << "No Square" << std::endl;
     }
-    std::cout << "Ply 100 Rule: " << record.ply_100() << std::endl;
+    std::cout << "Ply 100 Rule: " << record.clock() << std::endl;
     std::cout << "Ply: " << record.ply() << std::endl;
     std::cout << "Has Castled:" << std::endl;
     std::cout << "    White: ";

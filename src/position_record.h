@@ -182,7 +182,7 @@ namespace Sayuri {
        * アクセサ - 50手ルールの手数。
        * @return 50手ルールの手数。
        */
-      int ply_100() const {return ply_100_;}
+      int clock() const {return clock_;}
       /**
        * アクセサ - 手数。
        * @return 手数。
@@ -254,7 +254,7 @@ namespace Sayuri {
       /** アンパッサンの位置。 */
       Square en_passant_square_;
       /** 50手ルールの手数。 */
-      int ply_100_;
+      int clock_;
       /** 手数。 */
       int ply_;
       /** キャスリングしたかどうかのフラグ。 */

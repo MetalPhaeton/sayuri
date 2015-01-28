@@ -218,8 +218,8 @@ namespace Sayuri {
     } else if (message_symbol == "@get-ply") {
       return GetPly();
 
-    } else if (message_symbol == "@get-ply-100") {
-      return GetPly100();
+    } else if (message_symbol == "@get-clock") {
+      return GetClock();
 
     } else if (message_symbol == "@get-white-has-castled") {
       return GetWhiteHasCastled();
@@ -339,19 +339,19 @@ namespace Sayuri {
 
       return SetPly(ply_ptr);
 
-    } else if (message_symbol == "@set-ply-100") {
+    } else if (message_symbol == "@set-clock") {
       required_args = 2;
       if (!list_itr) {
         throw LispObject::GenInsufficientArgumentsError
         (func_name, required_args, false, list.Length() - 1);
       }
-      LispObjectPtr ply_100_ptr = caller.Evaluate(*list_itr);
-      if (!(ply_100_ptr->IsNumber())) {
+      LispObjectPtr clock_ptr = caller.Evaluate(*list_itr);
+      if (!(clock_ptr->IsNumber())) {
         throw LispObject::GenWrongTypeError
         (func_name, "Number", std::vector<int> {2}, true);
       }
 
-      return SetPly100(ply_100_ptr);
+      return SetClock(clock_ptr);
 
     }
 
@@ -610,8 +610,8 @@ namespace Sayuri {
   }
 
   // 50手ルールの手数にアクセス。
-  LispObjectPtr EngineSuite::GetPly100() const {
-    return LispObject::NewNumber(engine_ptr_->ply_100());
+  LispObjectPtr EngineSuite::GetClock() const {
+    return LispObject::NewNumber(engine_ptr_->clock());
   }
 
   // 白がキャスリングしたかどうかのフラグにアクセス。
@@ -853,16 +853,16 @@ namespace Sayuri {
   }
 
   // 50手ルールの手数をセット。
-  LispObjectPtr EngineSuite::SetPly100(LispObjectPtr ply_100_ptr) {
-    int ply_100 = ply_100_ptr->number_value();
-    if (ply_100 < 0) {
+  LispObjectPtr EngineSuite::SetClock(LispObjectPtr clock_ptr) {
+    int clock = clock_ptr->number_value();
+    if (clock < 0) {
       throw LispObject::GenError("@engine_error",
-      "Minimum ply-100 number is '0'. Given '"
-      + std::to_string(ply_100_ptr->number_value()) + "'.");
+      "Minimum clock number is '0'. Given '"
+      + std::to_string(clock_ptr->number_value()) + "'.");
     }
 
-    int origin = engine_ptr_->ply_100();
-    engine_ptr_->ply_100(ply_100);
+    int origin = engine_ptr_->clock();
+    engine_ptr_->clock(clock);
     return LispObject::NewNumber(origin);
   }
 
@@ -1892,7 +1892,7 @@ __Description__
     + `@get-ply`
         - Return how many moves have played as plies. (1 move = 2 plies)
 
-    + `@get-ply-100`
+    + `@get-clock`
         - Return moves for 50 Moves Rule as plies. (1 move = 2 plies)
 
     + `@get-white-has-castled`
@@ -1957,7 +1957,7 @@ __Description__
         - Return the previous value.
         - `<Ply>` must be '1' and more.
       
-    + `@set-ply-100 <Ply : Number>`
+    + `@set-clock <Ply : Number>`
         - Change ply(0.5 moves) of 50 moves rule into `<Ply>`.
         - Return the previous value.
         - `<Ply>` must be '0' and more.

@@ -456,7 +456,7 @@ namespace Sayuri {
        * アクセサ - 50手ルールの手数。
        * @return 50手ルールの手数。
        */
-      int ply_100() const {return ply_100_;}
+      int clock() const {return clock_;}
       /**
        * アクセサ - 現在の手数。
        * @return 現在の手数。
@@ -608,15 +608,15 @@ namespace Sayuri {
       }
       /**
        * ミューテータ - 50手ルールの手数。
-       * @param ply_100 50手ルールの手数。
+       * @param clock 50手ルールの手数。
        */
-      void ply_100(int ply_100) {
-        ply_100_ = ply_100 < 0 ? 0 : ply_100;
-        shared_st_ptr_->ply_100_history_.back() = ply_100_;
+      void clock(int clock) {
+        clock_ = clock < 0 ? 0 : clock;
+        shared_st_ptr_->clock_history_.back() = clock_;
       }
       /**
        * ミューテータ - 現在の手数。
-       * @param ply_100 現在の手数。
+       * @param ply 現在の手数。
        */
       void ply(int ply) {
         ply_ = ply < 1 ? 1 : ply;
@@ -851,7 +851,7 @@ namespace Sayuri {
       /** アンパッサンの位置。アンパッサンできなければ0。 */
       Square en_passant_square_;
       /** 50手ルールの手数。 */
-      int ply_100_;
+      int clock_;
       /** 現在の手数。 */
       int ply_;
       /** 各サイドのキャスリングしたかどうかのフラグ。 [サイド] */
@@ -893,7 +893,7 @@ namespace Sayuri {
         /** 指し手の履歴。 */
         std::vector<Move> move_history_;
         /** 50手ルールの手数の履歴。 */
-        std::vector<int> ply_100_history_;
+        std::vector<int> clock_history_;
         /** 局面の履歴。 */
         std::vector<PositionRecord> position_history_;
         /** スレッドのキュー。 */

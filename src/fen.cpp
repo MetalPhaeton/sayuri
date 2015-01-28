@@ -46,7 +46,7 @@ namespace Sayuri {
   // コンストラクタ。
   FEN::FEN(const std::string fen_str) :
   en_passant_square_(0),
-  ply_100_(0),
+  clock_(0),
   ply_(1) {
     // fen_strを分解。
     std::vector<std::string> fen_tokens =
@@ -58,7 +58,7 @@ namespace Sayuri {
       EvalToMove(fen_tokens[1]);
       EvalCastlingRights(fen_tokens[2]);
       if (fen_tokens.size() >= 4) EvalEnPassant(fen_tokens[3]);
-      if (fen_tokens.size() >= 5) EvalPly100(fen_tokens[4]);
+      if (fen_tokens.size() >= 5) EvalClock(fen_tokens[4]);
       if (fen_tokens.size() >= 6) EvalPly(fen_tokens[5]);
     } catch (...) {
       SetStartPosition();
@@ -75,7 +75,7 @@ namespace Sayuri {
   to_move_(fen.to_move_),
   castling_rights_(fen.castling_rights_),
   en_passant_square_(fen.en_passant_square_),
-  ply_100_(fen.ply_100_),
+  clock_(fen.clock_),
   ply_(fen.ply_) {
     // 駒の配置をコピー。
     COPY_ARRAY(position_, fen.position_);
@@ -86,7 +86,7 @@ namespace Sayuri {
   to_move_(fen.to_move_),
   castling_rights_(fen.castling_rights_),
   en_passant_square_(fen.en_passant_square_),
-  ply_100_(fen.ply_100_),
+  clock_(fen.clock_),
   ply_(fen.ply_) {
     // 駒の配置をコピー。
     COPY_ARRAY(position_, fen.position_);
@@ -98,7 +98,7 @@ namespace Sayuri {
     to_move_ = fen.to_move_;
     castling_rights_ = fen.castling_rights_;
     en_passant_square_ = fen.en_passant_square_;
-    ply_100_ = fen.ply_100_;
+    clock_ = fen.clock_;
     ply_ = fen.ply_;
     COPY_ARRAY(position_, fen.position_);
 
@@ -111,7 +111,7 @@ namespace Sayuri {
     to_move_ = fen.to_move_;
     castling_rights_ = fen.castling_rights_;
     en_passant_square_ = fen.en_passant_square_;
-    ply_100_ = fen.ply_100_;
+    clock_ = fen.clock_;
     ply_ = fen.ply_;
     COPY_ARRAY(position_, fen.position_);
 
@@ -273,11 +273,11 @@ namespace Sayuri {
   }
 
   // 50手ルールの手数文字列を評価する。
-  void FEN::EvalPly100(const std::string& ply_100_str) {
+  void FEN::EvalClock(const std::string& clock_str) {
     try {
-      ply_100_ = std::stoi(ply_100_str);
+      clock_ = std::stoi(clock_str);
     } catch (...) {
-      throw SayuriError("FENを解析できません。 in FEN::EvalPly100()");
+      throw SayuriError("FENを解析できません。 in FEN::EvalClock()");
     }
   }
 
@@ -301,7 +301,7 @@ namespace Sayuri {
     to_move_ = WHITE;
     castling_rights_ = ALL_CASTLING;
     en_passant_square_ = 0;
-    ply_100_ = 0;
+    clock_ = 0;
     ply_ = 1;
 
     // 駒を初期配置にする。

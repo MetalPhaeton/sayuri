@@ -48,7 +48,7 @@ namespace Sayuri {
   to_move_(NO_SIDE),
   castling_rights_(0),
   en_passant_square_(0),
-  ply_100_(0),
+  clock_(0),
   ply_(0),
   pos_hash_(0) {
     INIT_ARRAY(position_);
@@ -177,7 +177,7 @@ namespace Sayuri {
     to_move_ = record.to_move_;
     castling_rights_ = record.castling_rights_;
     en_passant_square_ = record.en_passant_square_;
-    ply_100_ = record.ply_100_;
+    clock_ = record.clock_;
     ply_ = record.ply_;
     COPY_ARRAY(has_castled_, record.has_castled_);
     COPY_ARRAY(position_memo_, record.position_memo_);
@@ -206,7 +206,7 @@ namespace Sayuri {
     to_move_ = engine.to_move_;
     castling_rights_ = engine.castling_rights_;
     en_passant_square_ = engine.en_passant_square_;
-    ply_100_ = engine.ply_100_;
+    clock_ = engine.clock_;
     ply_ = engine.ply_;
     COPY_ARRAY(has_castled_, engine.has_castled_);
     COPY_ARRAY(position_memo_, engine.position_memo_);

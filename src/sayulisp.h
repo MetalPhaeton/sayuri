@@ -313,7 +313,7 @@ namespace Sayuri {
       /**
        * 50手ルールの手数を得る。
        */
-      LispObjectPtr GetPly100() const;
+      LispObjectPtr GetClock() const;
 
       /**
        * 白がキャスリングしたかどうかのフラグを得る。
@@ -383,10 +383,10 @@ namespace Sayuri {
       LispObjectPtr SetPly(LispObjectPtr ply_ptr);
       /**
        * 50手ルールの手数をセットする。
-       * @param ply_100_ptr 50手ルールの手数。
+       * @param clock_ptr 50手ルールの手数。
        * @return 変更前の値。
        */
-      LispObjectPtr SetPly100(LispObjectPtr ply_100_ptr);
+      LispObjectPtr SetClock(LispObjectPtr clock_ptr);
 
       // ======== //
       // アクセサ //

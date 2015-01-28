@@ -256,12 +256,12 @@ namespace Sayuri {
     to_move_ = fen.to_move();
     castling_rights_ = fen.castling_rights();
     en_passant_square_ = fen.en_passant_square();
-    ply_100_ = fen.ply_100();
+    clock_ = fen.clock();
     ply_ = fen.ply();
 
     // 履歴を設定。
-    shared_st_ptr_->ply_100_history_.clear();
-    shared_st_ptr_->ply_100_history_.push_back(ply_100_);
+    shared_st_ptr_->clock_history_.clear();
+    shared_st_ptr_->clock_history_.push_back(clock_);
     shared_st_ptr_->position_history_.clear();
     shared_st_ptr_->position_history_.push_back
     (PositionRecord(*this, GetCurrentHash()));
@@ -291,7 +291,7 @@ namespace Sayuri {
     to_move_ = record.to_move_;
     castling_rights_ = record.castling_rights_;
     en_passant_square_ = record.en_passant_square_;
-    ply_100_ = record.ply_100_;
+    clock_ = record.clock_;
     ply_ = record.ply_;
     COPY_ARRAY(has_castled_, record.has_castled_);
     COPY_ARRAY(position_memo_, record.position_memo_);
@@ -403,7 +403,7 @@ namespace Sayuri {
     en_passant_square_ = 0;
 
     // 50手ルールを初期化。
-    ply_100_ = 0;
+    clock_ = 0;
 
     // 手数を初期化。
     ply_ = 1;
@@ -418,8 +418,8 @@ namespace Sayuri {
 
     if (shared_st_ptr_) {
       // 50手ルールの履歴を初期化。
-      shared_st_ptr_->ply_100_history_.clear();
-      shared_st_ptr_->ply_100_history_.push_back(0);
+      shared_st_ptr_->clock_history_.clear();
+      shared_st_ptr_->clock_history_.push_back(0);
 
       // 駒の配置の履歴を初期化。
       shared_st_ptr_->position_history_.clear();
@@ -445,7 +445,7 @@ namespace Sayuri {
     shared_st_ptr_->eval_params_ptr_ = temp_ep_ptr;  // 復帰。
 
     // 50手ルールの履歴を初期化。
-    shared_st_ptr_->ply_100_history_.push_back(0);
+    shared_st_ptr_->clock_history_.push_back(0);
 
     // 駒の配置の履歴を初期化。
     shared_st_ptr_->position_history_.push_back
@@ -485,7 +485,7 @@ namespace Sayuri {
     en_passant_square_ = engine.en_passant_square_;
 
     // 50手ルールの手数のコピー。
-    ply_100_ = engine.ply_100_;
+    clock_ = engine.clock_;
 
     // 手数のコピー。
     ply_ = engine.ply_;
@@ -518,12 +518,12 @@ namespace Sayuri {
       ++ply_;
       if ((piece_board_[GetFrom(move)] == PAWN)
       || (piece_board_[GetTo(move)] != EMPTY)) {
-        ply_100_ = 0;
+        clock_ = 0;
       } else {
-        ++ply_100_;
+        ++clock_;
       }
       shared_st_ptr_->move_history_.push_back(move);
-      shared_st_ptr_->ply_100_history_.push_back(ply_100_);
+      shared_st_ptr_->clock_history_.push_back(clock_);
       MakeMove(move);
       shared_st_ptr_->position_history_.push_back
       (PositionRecord(*this, GetCurrentHash()));
@@ -626,9 +626,9 @@ namespace Sayuri {
     if (shared_st_ptr_->move_history_.size() >= 1) {
       --ply_;
       Move move = shared_st_ptr_->move_history_.back();
-      ply_100_ = shared_st_ptr_->ply_100_history_.back();
+      clock_ = shared_st_ptr_->clock_history_.back();
       shared_st_ptr_->move_history_.pop_back();
-      shared_st_ptr_->ply_100_history_.pop_back();
+      shared_st_ptr_->clock_history_.pop_back();
       shared_st_ptr_->position_history_.pop_back();
       UnmakeMove(move);
     } else {
@@ -1151,7 +1151,7 @@ namespace Sayuri {
   thinking_time_(INT_MAX),
   infinite_thinking_(false),
   move_history_(0),
-  ply_100_history_(0),
+  clock_history_(0),
   position_history_(0),
   eval_params_ptr_(nullptr) {
     INIT_ARRAY(history_);
@@ -1200,7 +1200,7 @@ namespace Sayuri {
     thinking_time_ = shared_st.thinking_time_;
     infinite_thinking_ = shared_st.infinite_thinking_;
     move_history_ = shared_st.move_history_;
-    ply_100_history_ = shared_st.ply_100_history_;
+    clock_history_ = shared_st.clock_history_;
     position_history_ = shared_st.position_history_;
     helper_queue_ptr_.reset(new HelperQueue(*(shared_st.helper_queue_ptr_)));
     search_params_ptr_ = shared_st.search_params_ptr_;
