@@ -33,6 +33,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include "common.h"
 
 /** Sayuri 名前空間。 */
@@ -112,45 +113,19 @@ namespace Sayuri {
       int ply() const {return ply_;}
 
     private:
-      // =========== //
-      // FEN評価関数 //
-      // =========== //
-      /**
-       * 駒の配置文字列を評価する。
-       * @param position_str 駒の配置文字列。
-       */
-      void EvalPosition(const std::string& position_str);
-      /**
-       * 手番文字列を評価する。
-       * @param to_move_str 手番文字列。
-       */
-      void EvalToMove(const std::string& to_move_str);
-      /**
-       * キャスリングの権利文字列を評価する。
-       * @param castling_rights_str キャスリングの権利文字列。
-       */
-      void EvalCastlingRights(const std::string& castling_rights_str);
-      /**
-       * アンパッサンの位置文字列を評価する。
-       * @param en_passant_square_str アンパッサンの位置文字列。
-       */
-      void EvalEnPassant(const std::string& en_passant_square_str);
-      /**
-       * 50手ルールの手数文字列を評価する。
-       * @param clock_str 50手ルールの手数文字列。
-       */
-      void EvalClock(const std::string& clock_str);
-      /**
-       * 手数文字列を評価する。
-       * @param ply_str 手数文字列。
-       */
-      void EvalPly(const std::string& ply_str);
-
       // ================ //
       // プライベート関数 //
       // ================ //
       /** スタートポジションにセット。 */
       void SetStartPosition();
+
+      /**
+       * 構文木を作る。
+       * @param fen_str FEN文字列。
+       * @return 構文木。
+       */
+      static std::map<std::string, std::string>
+      ParseFEN(const std::string& fen_str);
 
       // ========== //
       // メンバ変数 //
