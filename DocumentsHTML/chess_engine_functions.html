@@ -50,7 +50,7 @@
 <li><code>@get-castling-rights</code></li>
 <li><code>@get-en-passant-square</code></li>
 <li><code>@get-ply</code></li>
-<li><code>@get-ply-100</code></li>
+<li><code>@get-clock</code></li>
 <li><code>@get-white-has-castled</code></li>
 <li><code>@get-black-has-castled</code></li>
 <li><code>@set-new-game</code></li>
@@ -61,7 +61,7 @@
 <li><code>@set-castling_rights &lt;Castling rights : List&gt;</code></li>
 <li><code>@set-en-passant-square &lt;&lt;Square : Number&gt; or &lt;Nil&gt;&gt;</code></li>
 <li><code>@set-ply &lt;Ply : Number&gt;</code></li>
-<li><code>@set-ply-100 &lt;Ply : Number&gt;</code></li>
+<li><code>@set-clock &lt;Ply : Number&gt;</code></li>
 </ul></li>
 </ul></li>
 <li><a href="#utility-functions">Utility Functions</a></li>
@@ -271,7 +271,7 @@
 <ul>
 <li>Return how many moves have played as plies. (1 move = 2 plies)</li>
 </ul></li>
-<li><code>@get-ply-100</code>
+<li><code>@get-clock</code>
 <ul>
 <li>Return moves for 50 Moves Rule as plies. (1 move = 2 plies)</li>
 </ul></li>
@@ -343,7 +343,7 @@
 <li>Return the previous value.</li>
 <li><code>&lt;Ply&gt;</code> must be '1' and more.</li>
 </ul></li>
-<li><code>@set-ply-100 &lt;Ply : Number&gt;</code>
+<li><code>@set-clock &lt;Ply : Number&gt;</code>
 <ul>
 <li>Change ply(0.5 moves) of 50 moves rule into <code>&lt;Ply&gt;</code>.</li>
 <li>Return the previous value.</li>
