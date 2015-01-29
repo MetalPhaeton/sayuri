@@ -62,6 +62,11 @@
 <li><code>@set-en-passant-square &lt;&lt;Square : Number&gt; or &lt;Nil&gt;&gt;</code></li>
 <li><code>@set-ply &lt;Ply : Number&gt;</code></li>
 <li><code>@set-clock &lt;Ply : Number&gt;</code></li>
+<li><code>@correct-position?</code></li>
+<li><code>@white-checked?</code></li>
+<li><code>@black-checked?</code></li>
+<li><code>@checkmated?</code></li>
+<li><code>@stalemated?</code></li>
 </ul></li>
 </ul></li>
 <li><a href="#utility-functions">Utility Functions</a></li>
@@ -348,6 +353,32 @@
 <li>Change ply(0.5 moves) of 50 moves rule into <code>&lt;Ply&gt;</code>.</li>
 <li>Return the previous value.</li>
 <li><code>&lt;Ply&gt;</code> must be '0' and more.</li>
+</ul></li>
+<li><code>@correct-position?</code>
+<ul>
+<li>Judge if the position is correct or not.
+<ul>
+<li>If Pawn is on RANK_1 or RANK_8, then it returns <code>#f</code>.</li>
+<li>If White's turn and Black King is checked, then it returns <code>#f</code>.</li>
+<li>If Black's turn and White King is checked, then it returns <code>#f</code>.</li>
+<li>Otherwise it returns <code>#t</code>.</li>
+</ul></li>
+</ul></li>
+<li><code>@white-checked?</code>
+<ul>
+<li>Judge if White King is checked or not.</li>
+</ul></li>
+<li><code>@black-checked?</code>
+<ul>
+<li>Judge if Black King is checked or not.</li>
+</ul></li>
+<li><code>@checkmated?</code>
+<ul>
+<li>Judge if either King is checkmated or not.</li>
+</ul></li>
+<li><code>@stalemated?</code>
+<ul>
+<li>Judge if either King is stalemated or not.</li>
 </ul></li>
 </ul></li>
 </ul>
