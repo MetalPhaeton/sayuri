@@ -201,6 +201,32 @@ namespace Sayuri {
       void PlacePiece(Square square, PieceType piece_type,
       Side piece_side=NO_SIDE);
 
+      /**
+       * ボードが正しい状態かどうか調べる。
+       * @return 正しければtrue。
+       */
+      bool IsCorrectPosition() const {
+        // ポーンの配置を調べる。 第1ランクと第8ランクのポーンは間違い。
+        if (((position_[WHITE][PAWN] | position_[BLACK][PAWN])
+        & (Util::RANK[RANK_1] | Util::RANK[RANK_8]))) {
+          return false;
+        }
+
+        // キングの個数を調べる。
+        if (Util::CountBits(position_[WHITE][KING]) != 1) return false;
+        if (Util::CountBits(position_[BLACK][KING]) != 1) return false;
+
+        // キングのチェックを調べる。
+        if (to_move_ == WHITE) {
+          if (IsAttacked(king_[BLACK], WHITE)) return false;
+        } else {
+          if (IsAttacked(king_[WHITE], BLACK)) return false;
+        }
+
+        // 全てクリア。
+        return true;
+      }
+
       // --- 利き筋関連 --- //
       /**
        * ボードの状態からビショップの利き筋を作る。

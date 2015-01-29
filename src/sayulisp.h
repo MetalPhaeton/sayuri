@@ -387,6 +387,55 @@ namespace Sayuri {
        * @return 変更前の値。
        */
       LispObjectPtr SetClock(LispObjectPtr clock_ptr);
+      /**
+       * 正しい駒の配置かどうか。
+       * @return 正しければ#t。
+       */
+      LispObjectPtr IsCorrectPosition() const {
+        return LispObject::NewBoolean(engine_ptr_->IsCorrectPosition());
+      }
+      /**
+       * 白キングがチェックされているかどうか。
+       * @return チェックされていれば#t。
+       */
+      LispObjectPtr IsWhiteChecked() const {
+        return LispObject::NewBoolean
+        (engine_ptr_->IsAttacked(engine_ptr_->king()[WHITE], BLACK));
+      }
+      /**
+       * 黒キングがチェックされているかどうか。
+       * @return チェックされていれば#t。
+       */
+      LispObjectPtr IsBlackChecked() const {
+        return LispObject::NewBoolean
+        (engine_ptr_->IsAttacked(engine_ptr_->king()[BLACK], WHITE));
+      }
+      /**
+       * チェックメイトかどうか。
+       * @return チェックメイトなら#t。
+       */
+      LispObjectPtr IsCheckmated() {
+        Side side = engine_ptr_->to_move();
+        if (engine_ptr_->IsAttacked
+        (engine_ptr_->king()[side], Util::GetOppositeSide(side))) {
+          std::vector<Move> move = engine_ptr_->GetLegalMoves();
+          if (move.size() == 0) return LispObject::NewBoolean(true);
+        }
+        return LispObject::NewBoolean(false);
+      }
+      /**
+       * ステールメイトかどうか。
+       * @return ステールメイトなら#t。
+       */
+      LispObjectPtr IsStalemated() {
+        Side side = engine_ptr_->to_move();
+        if (!(engine_ptr_->IsAttacked
+        (engine_ptr_->king()[side], Util::GetOppositeSide(side)))) {
+          std::vector<Move> move = engine_ptr_->GetLegalMoves();
+          if (move.size() == 0) return LispObject::NewBoolean(true);
+        }
+        return LispObject::NewBoolean(false);
+      }
 
       // ======== //
       // アクセサ //

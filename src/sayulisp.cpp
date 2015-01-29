@@ -353,6 +353,21 @@ namespace Sayuri {
 
       return SetClock(clock_ptr);
 
+    } else if (message_symbol == "@correct-position?") {
+      return IsCorrectPosition();
+
+    } else if (message_symbol == "@white-checked?") {
+      return IsWhiteChecked();
+
+    } else if (message_symbol == "@black-checked?") {
+      return IsBlackChecked();
+
+    } else if (message_symbol == "@checkmated?") {
+      return IsCheckmated();
+
+    } else if (message_symbol == "@stalemated?") {
+      return IsStalemated();
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
@@ -1961,6 +1976,25 @@ __Description__
         - Change ply(0.5 moves) of 50 moves rule into `<Ply>`.
         - Return the previous value.
         - `<Ply>` must be '0' and more.
+
+    + `@correct-position?`
+        - Judge if the position is correct or not.
+            - If Pawn is on RANK_1 or RANK_8, then it returns `#f`.
+            - If White's turn and Black King is checked, then it returns `#f`.
+            - If Black's turn and White King is checked, then it returns `#f`.
+            - Otherwise it returns `#t`.
+
+    + `@white-checked?`
+        - Judge if White King is checked or not.
+      
+    + `@black-checked?`
+        - Judge if Black King is checked or not.
+      
+    + `@checkmated?`
+        - Judge if either King is checkmated or not.
+      
+    + `@stalemated?`
+        - Judge if either King is stalemated or not.
       
 __Example__
 
