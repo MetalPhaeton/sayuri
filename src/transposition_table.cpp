@@ -89,7 +89,11 @@ namespace Sayuri {
   num_used_entries_(table.num_used_entries_),
   entry_table_(new TTEntry[table.num_entries_]),
   index_mask_(table.index_mask_),
-  age_(table.age_) {}
+  age_(table.age_) {
+    for (std::size_t i = 0; i < num_entries_; ++i) {
+      entry_table_[i] = table.entry_table_[i];
+    }
+  }
 
   // ムーブコンストラクタ。
   TranspositionTable::TranspositionTable( TranspositionTable&& table) :

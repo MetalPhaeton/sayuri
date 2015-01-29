@@ -40,6 +40,7 @@
 #include "uci_shell.h"
 #include "lisp_core.h"
 #include "fen.h"
+#include "position_record.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -92,9 +93,12 @@ namespace Sayuri {
   EngineSuite::EngineSuite(const EngineSuite& suite) :
   search_params_ptr_(new SearchParams(*(suite.search_params_ptr_))),
   eval_params_ptr_(new EvalParams(*(suite.eval_params_ptr_))),
-  engine_ptr_(new ChessEngine(*(suite.engine_ptr_))),
-  table_ptr_(new TranspositionTable(*(suite.table_ptr_))),
-  shell_ptr_(new UCIShell(*(suite.shell_ptr_))) {}
+  engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_)),
+  table_ptr_(new TranspositionTable(suite.table_ptr_->GetSizeBytes())),
+  shell_ptr_(new UCIShell(*engine_ptr_, *table_ptr_)) {
+    PositionRecord record(*(suite.engine_ptr_), 0);
+    engine_ptr_->LoadRecord(record);
+  }
 
   // ムーブコンストラクタ。
   EngineSuite::EngineSuite(EngineSuite&& suite) :
@@ -108,9 +112,13 @@ namespace Sayuri {
   EngineSuite& EngineSuite::operator=(const EngineSuite& suite) {
     search_params_ptr_.reset(new SearchParams(*(suite.search_params_ptr_)));
     eval_params_ptr_.reset(new EvalParams(*(suite.eval_params_ptr_)));
-    engine_ptr_.reset(new ChessEngine(*(suite.engine_ptr_)));
-    table_ptr_.reset(new TranspositionTable(*(suite.table_ptr_)));
-    shell_ptr_.reset(new UCIShell(*(suite.shell_ptr_)));
+    engine_ptr_.reset(new ChessEngine(*search_params_ptr_, *eval_params_ptr_));
+    table_ptr_.reset(new TranspositionTable(suite.table_ptr_->GetSizeBytes()));
+    shell_ptr_.reset(new UCIShell(*engine_ptr_, *table_ptr_));
+
+    PositionRecord record(*(suite.engine_ptr_), 0);
+    engine_ptr_->LoadRecord(record);
+
     return *this;
   }
 
