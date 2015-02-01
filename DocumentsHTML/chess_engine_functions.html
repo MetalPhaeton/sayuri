@@ -67,6 +67,9 @@
 <li><code>@black-checked?</code></li>
 <li><code>@checkmated?</code></li>
 <li><code>@stalemated?</code></li>
+<li><code>@play-move</code></li>
+<li><code>@undo-move</code></li>
+<li><code>@input-uci-command</code></li>
 </ul></li>
 </ul></li>
 <li><a href="#utility-functions">Utility Functions</a></li>
@@ -379,6 +382,26 @@
 <li><code>@stalemated?</code>
 <ul>
 <li>Judge if either King is stalemated or not.</li>
+</ul></li>
+<li><code>@play-move &lt;Move : List&gt;</code>
+<ul>
+<li>Play one move.</li>
+<li><code>&lt;Move&gt;</code> is <code>(&lt;From : Number&gt; &lt;To : Number&gt; &lt;Promotion : Number)</code>.
+<ul>
+<li>If it doesn't promote the piece, <code>&lt;Promotion&gt;</code> is 'Empty'.</li>
+</ul></li>
+<li>If <code>&lt;Move&gt;</code> is illegal, it throws an exception.</li>
+</ul></li>
+<li><code>@undo-move</code>
+<ul>
+<li>Undo the previous move.</li>
+<li>If theres no previous move in the engine's move history table, it throws an exception.</li>
+</ul></li>
+<li><code>@input-uci-command &lt;UCI command : String&gt;</code>
+<ul>
+<li>Execute UCI command.</li>
+<li>If the command has succeeded, it returns '#t'. Otherwise '#f'.</li>
+<li>The output from engine is put into Standard Output.</li>
 </ul></li>
 </ul></li>
 </ul>

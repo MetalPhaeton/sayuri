@@ -119,6 +119,31 @@
 <li><code>(stdin '@read)</code> : This means to get all strings until EOF from Standard Input.</li>
 </ul></li>
 </ul>
+<h3 id="exception-handling">Exception Handling</h3>
+<p>Some functions throws an exception.<br />If you don't do anything, Sayulisp shows the error message and interpreter is stopped.</p>
+<p>But you can catch exception using <a href="core_functions.html#try"><code>(try)</code></a> function.</p>
+<p><strong>Example</strong></p>
+<pre><code>(try ((+ 1 &quot;Hello&quot;))
+     (display &quot;Error Occured!!&quot;))
+
+;; Output
+;;
+;; &gt; Error Occured!!
+
+(try ((+ 1 &quot;Hello&quot;))
+     (display exception))
+
+;; Output
+;;
+;; &gt; (@not-number &quot;The 2nd argument of (+) didn&#39;t return Number.&quot;)</code></pre>
+<p>You can also throw an exception using <a href="core_functions.html#throw"><code>(throw)</code></a> function.</p>
+<p><strong>Example</strong></p>
+<pre><code>(try ((throw 123))
+     (display exception))
+
+;; Output
+;;
+;; &gt; 123</code></pre>
 <h3 id="warning">Warning!!!!</h3>
 <p>Sayuri always works on the major premises that are <strong>&quot;King is never taken&quot;</strong> and <strong>&quot;Each side must have just one King&quot;</strong>.</p>
 <p>If you set an engine's board to be able to take King by a piece, the engine will work unexpectedly.<br />If you are unlucky, segment fault error will be occurred.</p>
