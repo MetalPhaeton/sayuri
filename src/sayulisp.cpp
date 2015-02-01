@@ -376,6 +376,22 @@ namespace Sayuri {
     } else if (message_symbol == "@stalemated?") {
       return IsStalemated();
 
+    } else if (message_symbol == "@play-move") {
+      // 引数をチェック。
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      if (!(list_itr->IsList())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "List", std::vector<int> {2}, true);
+      }
+      return PlayMove(caller, func_name, caller.Evaluate(*list_itr));
+
+    } else if (message_symbol == "@undo-move") {
+      return UndoMove();
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
@@ -701,17 +717,17 @@ namespace Sayuri {
     // 引数チェック。
     if (square >= NUM_SQUARES) {
       throw LispObject::GenError("@engine_error",
-      "The square value '" + std::to_string(square_ptr->number_value())
+      "The square value '" + std::to_string(square)
       + "' doesn't indicate any square.");
     }
     if (piece_type >= NUM_PIECE_TYPES) {
       throw LispObject::GenError("@engine_error",
-      "The piece type value '" + std::to_string(type_ptr->number_value())
+      "The piece type value '" + std::to_string(piece_type)
       +  "' doesn't indicate any piece type.");
     }
     if (side >= NUM_SIDES) {
       throw LispObject::GenError("@engine_error",
-      "The side value '" + std::to_string(side_ptr->number_value())
+      "The side value '" + std::to_string(side)
       + "' doesn't indicate any side.");
     }
     if ((piece_type && !side) || (!piece_type && side)) {
@@ -749,7 +765,7 @@ namespace Sayuri {
     Side to_move = to_move_ptr->number_value();
     if (to_move >= NUM_SIDES) {
       throw LispObject::GenError("@engine_error",
-      "The side value '" + std::to_string(to_move_ptr->number_value())
+      "The side value '" + std::to_string(to_move)
       + "' doesn't indicate any side.");
     }
     if (!to_move) {
@@ -822,7 +838,7 @@ namespace Sayuri {
     // 引数をチェック。
     if (square >= NUM_SQUARES) {
       throw LispObject::GenError("@engine_error", "The square value '"
-      + std::to_string(en_passant_square_ptr->number_value())
+      + std::to_string(square)
       + "' doesn't indicate any square.");
     }
 
@@ -861,32 +877,93 @@ namespace Sayuri {
     return ret_ptr;
   }
 
-  // 手数をセット。
-  LispObjectPtr EngineSuite::SetPly(LispObjectPtr ply_ptr) {
-    int ply = ply_ptr->number_value();
-    if (ply < 1) {
-      throw LispObject::GenError("@engine_error",
-      "Minimum ply number is '1'. Given '"
-      + std::to_string(ply_ptr->number_value()) + "'.");
+  // 1手指す。
+  LispObjectPtr EngineSuite::PlayMove(const LispObject& caller,
+  const std::string& func_name, LispObjectPtr move_ptr) {
+    LispIterator itr(move_ptr.get());
+
+    // 引数をチェック。
+    // fromをチェック。
+    if (!itr) {
+      throw LispObject::GenError
+      ("@engine_error", "Couldn't find 'From' value.");
+    }
+    LispObjectPtr from_ptr = caller.Evaluate(*(itr++));
+    if (!(from_ptr->IsNumber())) {
+      throw LispObject::GenWrongTypeError
+      (func_name, "Number", std::vector<int> {2, 1}, true);
+    }
+    Square from = from_ptr->number_value();
+    if (from >= NUM_SQUARES) {
+      throw LispObject::GenError("@engine_error", "The 'From' value '"
+      + std::to_string(from) + "' doesn't indicate any square.");
     }
 
-    int origin = engine_ptr_->ply();
-    engine_ptr_->ply(ply);
-    return LispObject::NewNumber(origin);
+    // toをチェック。
+    if (!itr) {
+      throw LispObject::GenError
+      ("@engine_error", "Couldn't find 'To' value.");
+    }
+    LispObjectPtr to_ptr = caller.Evaluate(*(itr++));
+    if (!(to_ptr->IsNumber())) {
+      throw LispObject::GenWrongTypeError
+      (func_name, "Number", std::vector<int> {2, 2}, true);
+    }
+    Square to = to_ptr->number_value();
+    if (to >= NUM_SQUARES) {
+      throw LispObject::GenError("@engine_error", "The 'To' value '"
+      + std::to_string(to) + "' doesn't indicate any square.");
+    }
+
+    // promotionをチェック。
+    if (!itr) {
+      throw LispObject::GenError
+      ("@engine_error", "Couldn't find 'Promotion' value.");
+    }
+    LispObjectPtr promotion_ptr = caller.Evaluate(*itr);
+    if (!(promotion_ptr->IsNumber())) {
+      throw LispObject::GenWrongTypeError
+      (func_name, "Number", std::vector<int> {2, 3}, true);
+    }
+    PieceType promotion = promotion_ptr->number_value();
+    if (promotion >= NUM_PIECE_TYPES) {
+      throw LispObject::GenError("@engine_error", "The 'Promotion' value '"
+      + std::to_string(promotion) + "' doesn't indicate any piece type.");
+    }
+
+    Move move = 0;
+    SetFrom(move, from);
+    SetTo(move, to);
+    SetPromotion(move, promotion);
+
+    try {
+      engine_ptr_->PlayMove(move);
+    } catch (SayuriError error) {
+      throw LispObject::GenError("@engine_error",
+      "'(" + SQUARE_SYMBOL[from] + " " + SQUARE_SYMBOL[to] + " "
+      + PIECE_TYPE_SYMBOL[promotion] + ")' is not legal move.");
+    }
+
+    return LispObject::NewBoolean(true);
   }
 
-  // 50手ルールの手数をセット。
-  LispObjectPtr EngineSuite::SetClock(LispObjectPtr clock_ptr) {
-    int clock = clock_ptr->number_value();
-    if (clock < 0) {
-      throw LispObject::GenError("@engine_error",
-      "Minimum clock number is '0'. Given '"
-      + std::to_string(clock_ptr->number_value()) + "'.");
+  // 手を戻す。
+  LispObjectPtr EngineSuite::UndoMove() {
+    Move move = 0;
+    try {
+      move = engine_ptr_->UndoMove();
+    } catch (SayuriError error) {
+      throw LispObject::GenError("@engine_error", "Couldn't undo,"
+      " because there are no moves in the engine's move history table.");
     }
 
-    int origin = engine_ptr_->clock();
-    engine_ptr_->clock(clock);
-    return LispObject::NewNumber(origin);
+    LispObjectPtr ret_ptr = LispObject::NewList(3);
+    ret_ptr->car(LispObject::NewSymbol(SQUARE_SYMBOL[GetFrom(move)]));
+    ret_ptr->cdr()->car(LispObject::NewSymbol(SQUARE_SYMBOL[GetTo(move)]));
+    ret_ptr->cdr()->cdr()->car
+    (LispObject::NewSymbol(PIECE_TYPE_SYMBOL[GetPromotion(move)]));
+
+    return ret_ptr;
   }
 
   // ======== //
@@ -2003,6 +2080,17 @@ __Description__
       
     + `@stalemated?`
         - Judge if either King is stalemated or not.
+
+    + `@play-move <Move : List>`
+        - Play one move.
+        - `<Move>` is `(<From : Number> <To : Number> <Promotion : Number)`.
+            - If it doesn't promote the piece, `<Promotion>` is 'Empty'.
+        - If `<Move>` is illegal, it throws an exception.
+
+    + `@undo-move`
+        - Undo the previous move.
+        - If theres no previous move in the engine's move history table,
+          it throws an exception.
       
 __Example__
 

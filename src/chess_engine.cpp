@@ -512,24 +512,6 @@ namespace Sayuri {
     shared_st_ptr_->stop_now_ = true;
   }
 
-  // 手を指す。
-  void ChessEngine::PlayMove(Move move) {
-    if (IsLegalMove(move)) {
-      ++ply_;
-      if ((piece_board_[GetFrom(move)] == PAWN)
-      || (piece_board_[GetTo(move)] != EMPTY)) {
-        clock_ = 0;
-      } else {
-        ++clock_;
-      }
-      shared_st_ptr_->move_history_.push_back(move);
-      shared_st_ptr_->clock_history_.push_back(clock_);
-      MakeMove(move);
-      shared_st_ptr_->position_history_.push_back
-      (PositionRecord(*this, GetCurrentHash()));
-    }
-  }
-
   // 合法手かどうか判定。
   bool ChessEngine::IsLegalMove(Move& move) {
     // 合法手かどうか調べる。
@@ -621,19 +603,46 @@ namespace Sayuri {
     UpdateCastlingRights();
   }
 
-  // 1手戻す。
-  void ChessEngine::UndoMove() {
-    if (shared_st_ptr_->move_history_.size() >= 1) {
-      --ply_;
-      Move move = shared_st_ptr_->move_history_.back();
-      clock_ = shared_st_ptr_->clock_history_.back();
-      shared_st_ptr_->move_history_.pop_back();
-      shared_st_ptr_->clock_history_.pop_back();
-      shared_st_ptr_->position_history_.pop_back();
-      UnmakeMove(move);
-    } else {
-      throw SayuriError("手を戻すことができません。 ChessEngine::UndoMove()");
+  // 手を指す。
+  void ChessEngine::PlayMove(Move move) throw (SayuriError) {
+    if (IsLegalMove(move)) {
+      ++ply_;
+      if ((piece_board_[GetFrom(move)] == PAWN)
+      || (piece_board_[GetTo(move)] != EMPTY)) {
+        clock_ = 0;
+      } else {
+        ++clock_;
+      }
+      shared_st_ptr_->move_history_.push_back(move);
+      shared_st_ptr_->clock_history_.push_back(clock_);
+      MakeMove(move);
+      shared_st_ptr_->position_history_.push_back
+      (PositionRecord(*this, GetCurrentHash()));
+
+      return;
     }
+
+    // 違法手。
+    throw SayuriError("合法手ではありません。 at ChessEngine::PlayMove()");
+  }
+
+  // 1手戻す。
+  Move ChessEngine::UndoMove() throw (SayuriError) {
+    // エラー。
+    if (shared_st_ptr_->move_history_.size() <= 0) {
+      throw SayuriError
+      ("手を戻すことができません。 at ChessEngine::UndoMove()");
+    }
+
+    --ply_;
+    Move move = shared_st_ptr_->move_history_.back();
+    clock_ = shared_st_ptr_->clock_history_.back();
+    shared_st_ptr_->move_history_.pop_back();
+    shared_st_ptr_->clock_history_.pop_back();
+    shared_st_ptr_->position_history_.pop_back();
+    UnmakeMove(move);
+
+    return move;
   }
 
   // 次の手を指す。

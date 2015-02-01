@@ -380,13 +380,35 @@ namespace Sayuri {
        * @param ply_ptr 手数。
        * @return 変更前の値。
        */
-      LispObjectPtr SetPly(LispObjectPtr ply_ptr);
+      LispObjectPtr SetPly(LispObjectPtr ply_ptr) {
+        int ply = ply_ptr->number_value();
+        if (ply < 1) {
+          throw LispObject::GenError("@engine_error",
+          "Minimum ply number is '1'. Given '"
+          + std::to_string(ply_ptr->number_value()) + "'.");
+        }
+
+        int origin = engine_ptr_->ply();
+        engine_ptr_->ply(ply);
+        return LispObject::NewNumber(origin);
+      }
       /**
        * 50手ルールの手数をセットする。
        * @param clock_ptr 50手ルールの手数。
        * @return 変更前の値。
        */
-      LispObjectPtr SetClock(LispObjectPtr clock_ptr);
+      LispObjectPtr SetClock(LispObjectPtr clock_ptr) {
+        int clock = clock_ptr->number_value();
+        if (clock < 0) {
+          throw LispObject::GenError("@engine_error",
+          "Minimum clock number is '0'. Given '"
+          + std::to_string(clock_ptr->number_value()) + "'.");
+        }
+
+        int origin = engine_ptr_->clock();
+        engine_ptr_->clock(clock);
+        return LispObject::NewNumber(origin);
+      }
       /**
        * 正しい駒の配置かどうか。
        * @return 正しければ#t。
@@ -436,6 +458,21 @@ namespace Sayuri {
         }
         return LispObject::NewBoolean(false);
       }
+
+      /**
+       * 1手指す。
+       * @param caller 呼び出し元の関数。
+       * @param func_name 呼びだされた関数名。
+       * @param move_ptr (From To Promotion) のリストのポインタ。
+       * @return きちんと指せれば#t。
+       */
+      LispObjectPtr PlayMove(const LispObject& caller,
+      const std::string& func_name, LispObjectPtr move_ptr);
+      /**
+       * 手を戻す。
+       * @return 戻された手のリスト。
+       */
+      LispObjectPtr UndoMove();
 
       // ======== //
       // アクセサ //

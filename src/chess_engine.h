@@ -169,11 +169,16 @@ namespace Sayuri {
       /**
        * 手を指す。
        * @param move 指し手。
+       * @exception SayuriError 合法手でない。
        */
-      void PlayMove(Move move);
+      void PlayMove(Move move) throw (SayuriError);
 
-      /** 1手戻す。 */
-      void UndoMove();
+      /**
+       * 1手戻す。
+       * @return 戻された手。
+       * @exception SayuriError 手を戻せなかった。
+       */
+      Move UndoMove() throw (SayuriError);
 
       /**
        * 合法手かどうか判定する。
