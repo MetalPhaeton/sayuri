@@ -464,7 +464,7 @@ namespace Sayuri {
        * @param caller 呼び出し元の関数。
        * @param func_name 呼びだされた関数名。
        * @param move_ptr (From To Promotion) のリストのポインタ。
-       * @return きちんと指せれば#t。
+       * @return #t。
        */
       LispObjectPtr PlayMove(const LispObject& caller,
       const std::string& func_name, LispObjectPtr move_ptr);
@@ -473,6 +473,13 @@ namespace Sayuri {
        * @return 戻された手のリスト。
        */
       LispObjectPtr UndoMove();
+
+      /**
+       * UCIコマンドを入力する。
+       * @param command_ptr UCIコマンドの文字列。
+       * @return コマンドが実行されれば#t。
+       */
+      LispObjectPtr InputUCICommand(LispObjectPtr command_ptr);
 
       // ======== //
       // アクセサ //

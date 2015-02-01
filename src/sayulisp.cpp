@@ -87,7 +87,11 @@ namespace Sayuri {
   eval_params_ptr_(new EvalParams()),
   engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_)),
   table_ptr_(new TranspositionTable(UCI_DEFAULT_TABLE_SIZE)),
-  shell_ptr_(new UCIShell(*engine_ptr_, *table_ptr_)) {}
+  shell_ptr_(new UCIShell(*engine_ptr_, *table_ptr_)) {
+    // 出力リスナー。
+    shell_ptr_->AddOutputListener
+    ([](const std::string& message) {std::cout << message << std::endl;});
+  }
 
   // コピーコンストラクタ。
   EngineSuite::EngineSuite(const EngineSuite& suite) :
@@ -98,6 +102,10 @@ namespace Sayuri {
   shell_ptr_(new UCIShell(*engine_ptr_, *table_ptr_)) {
     PositionRecord record(*(suite.engine_ptr_), 0);
     engine_ptr_->LoadRecord(record);
+
+    // 出力リスナー。
+    shell_ptr_->AddOutputListener
+    ([](const std::string& message) {std::cout << message << std::endl;});
   }
 
   // ムーブコンストラクタ。
@@ -118,6 +126,10 @@ namespace Sayuri {
 
     PositionRecord record(*(suite.engine_ptr_), 0);
     engine_ptr_->LoadRecord(record);
+
+    // 出力リスナー。
+    shell_ptr_->AddOutputListener
+    ([](const std::string& message) {std::cout << message << std::endl;});
 
     return *this;
   }
@@ -383,14 +395,28 @@ namespace Sayuri {
         throw LispObject::GenInsufficientArgumentsError
         (func_name, required_args, false, list.Length() - 1);
       }
-      if (!(list_itr->IsList())) {
+      LispObjectPtr move_obj = caller.Evaluate(*list_itr);
+      if (!(move_obj->IsList())) {
         throw LispObject::GenWrongTypeError
         (func_name, "List", std::vector<int> {2}, true);
       }
-      return PlayMove(caller, func_name, caller.Evaluate(*list_itr));
+      return PlayMove(caller, func_name, move_obj);
 
     } else if (message_symbol == "@undo-move") {
       return UndoMove();
+
+    } else if (message_symbol == "@input-uci-command") {
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr command_ptr = caller.Evaluate(*list_itr);
+      if (!(list_itr->IsString())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "String", std::vector<int> {2}, true);
+      }
+      return InputUCICommand(command_ptr);
 
     }
 
@@ -964,6 +990,12 @@ namespace Sayuri {
     (LispObject::NewSymbol(PIECE_TYPE_SYMBOL[GetPromotion(move)]));
 
     return ret_ptr;
+  }
+
+  // UCIコマンドを入力する。
+  LispObjectPtr EngineSuite::InputUCICommand(LispObjectPtr command_ptr) {
+    return LispObject::NewBoolean
+    (shell_ptr_->InputCommand(command_ptr->string_value()));
   }
 
   // ======== //
@@ -2091,6 +2123,11 @@ __Description__
         - Undo the previous move.
         - If theres no previous move in the engine's move history table,
           it throws an exception.
+
+    + `@input-uci-command <UCI command : String>`
+        - Execute UCI command.
+        - If the command has succeeded, it returns '#t'. Otherwise '#f'.
+        - The output from engine is put into Standard Output.
       
 __Example__
 

@@ -105,8 +105,9 @@ namespace Sayuri {
       /**
        * コマンドを実行する。
        * @param command_line 実行するコマンド。
+       * @return コマンドが実行されればtrue。
        */
-      void operator()(const std::string& command_line);
+      bool operator()(const std::string& command_line);
 
     private:
       /** 登録されたコマンドの構造体。 */
@@ -162,8 +163,9 @@ namespace Sayuri {
       /**
        * UCIコマンドを実行する。 (「quit」コマンド以外。)
        * @param input UCIコマンド。
+       * @return コマンドが実行されればtrue。
        */
-      void InputCommand(const std::string input);
+      bool InputCommand(const std::string input);
 
       /**
        * UCIShellからの出力を受け取るコールバック関数を登録する。

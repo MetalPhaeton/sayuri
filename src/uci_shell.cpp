@@ -164,9 +164,9 @@ namespace Sayuri {
   // パブリック関数 //
   // ============== //
   // UCIコマンドを実行する。
-  void UCIShell::InputCommand(const std::string input) {
+  bool UCIShell::InputCommand(const std::string input) {
     // コマンド実行。
-    uci_command_(input);
+    return uci_command_(input);
   }
 
   // UCIShell空の出力を受け取るコールバック関数を登録する。
@@ -721,7 +721,7 @@ namespace Sayuri {
   }
 
   // コマンドを実行する。
-  void UCICommand::operator()(const std::string& command_line) {
+  bool UCICommand::operator()(const std::string& command_line) {
     std::vector<std::string> tokens =
     Util::Split<char>(command_line, {' '}, std::set<char> {});
 
@@ -744,8 +744,10 @@ namespace Sayuri {
 
         // コマンドを実行。
         command_func.func_(args);
-        return;
+        return true;
       }
     }
+
+    return false;
   }
 }  // namespace Sayuri
