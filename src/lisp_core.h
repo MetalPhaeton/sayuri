@@ -1070,12 +1070,9 @@ namespace Sayuri {
             stream_.str("");
           }
 
-          // 文字をストリームへ。
-          stream_ << c;
           // トークンキューに文字をプッシュ。
-          this->token_queue_.push(stream_.str());
-          // ストリームをクリア。
-          stream_.str("");
+          char one_letter[] {c, '\0'};
+          this->token_queue_.push(one_letter);
         };
 
         // 空白文字。
