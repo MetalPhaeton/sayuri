@@ -339,7 +339,7 @@ namespace Sayuri {
   }
 
   // Parse()の本体。
-  void LispObject::ParseCore(LispObject& ret_obj,
+  void LispObject::ParseCore(LispObject& target,
   std::queue<std::string>& token_queue) {
     if (token_queue.empty()) return;
 
@@ -351,14 +351,14 @@ namespace Sayuri {
       // リストの場合。
       // 空のリストならNil。
       if (token_queue.front() == ")") {
-        ret_obj.type_ = LispObjectType::NIL;
+        target.type_ = LispObjectType::NIL;
 
         token_queue.pop();
         return;
       }
 
       // 空のリストでない。
-      LispObject* current = &ret_obj;
+      LispObject* current = &target;
       while (!(token_queue.empty())) {
         current->type_ = LispObjectType::PAIR;
         current->car_ = LispObject::NewNil();
@@ -404,8 +404,8 @@ namespace Sayuri {
       if (front == "\"") {
         // String。
         if (token_queue.empty()) return;
-        ret_obj.type_ = LispObjectType::STRING;
-        ret_obj.str_value_ = token_queue.front();
+        target.type_ = LispObjectType::STRING;
+        target.str_value_ = token_queue.front();
         token_queue.pop();
 
         // 次の'"'までポップ。
@@ -418,32 +418,32 @@ namespace Sayuri {
         }
       } else if ((front == "#t") || (front == "#T")){
         // Boolean::true。
-        ret_obj.type_ = LispObjectType::BOOLEAN;
-        ret_obj.boolean_value_ = true;
+        target.type_ = LispObjectType::BOOLEAN;
+        target.boolean_value_ = true;
       } else if ((front == "#f") || (front == "#F")){
         // Boolean::false。
-        ret_obj.type_ = LispObjectType::BOOLEAN;
-        ret_obj.boolean_value_ = false;
+        target.type_ = LispObjectType::BOOLEAN;
+        target.boolean_value_ = false;
       } else if (front == "'") {
         // quoteの糖衣構文。
-        ret_obj.type_ = LispObjectType::PAIR;
-        ret_obj.car_ = NewSymbol("quote");
-        ret_obj.cdr_ = NewPair();
+        target.type_ = LispObjectType::PAIR;
+        target.car_ = NewSymbol("quote");
+        target.cdr_ = NewPair();
 
         // 第1引数(Cdr->Car)をパース。
-        ParseCore(*(ret_obj.cdr_->car_), token_queue);
+        ParseCore(*(target.cdr_->car_), token_queue);
       } else if (front == ".") {
         // 妙な所にドット対発見。 CarはNilとする。
-        ret_obj.type_ = LispObjectType::NIL;
+        target.type_ = LispObjectType::NIL;
       } else {
         try {
           // Number。
-          ret_obj.type_ = LispObjectType::NUMBER;
-          ret_obj.number_value_ = std::stod(front);
+          target.type_ = LispObjectType::NUMBER;
+          target.number_value_ = std::stod(front);
         } catch (...) {
           // Symbol。
-          ret_obj.type_ = LispObjectType::SYMBOL;
-          ret_obj.str_value_ = front;
+          target.type_ = LispObjectType::SYMBOL;
+          target.str_value_ = front;
         }
       }
     }
