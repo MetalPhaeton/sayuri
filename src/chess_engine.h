@@ -756,20 +756,6 @@ namespace Sayuri {
       void SearchRootParallel(Job& job, UCIShell& shell);
 
       /**
-       * Futility Pruningのマージンを計算する。
-       * @param depth 現在の深さ。
-       * @return マージン。
-       */
-      int GetMargin(int depth) {
-        if (depth < 1) {
-          return shared_st_ptr_->search_params_ptr_->futility_pruning_margin();
-        }
-
-        return shared_st_ptr_->search_params_ptr_->futility_pruning_margin()
-        * depth;
-      }
-
-      /**
        * 探索を中断しなければならないかどうかを判断する。
        * @return 中断しなければいけない時はtrue。
        */
@@ -903,6 +889,11 @@ namespace Sayuri {
         Move iid_stack_[MAX_PLYS + 1];
         /** キラームーブスタック。[探索レベル][index * 2 プライ前] */
         Move killer_stack_[MAX_PLYS + 2 + 1][2];
+        /**
+         * Futility Pruningのマージンテーブル。 [残り探索深さ]
+         * マージンが0の時はFutility Pruningしない。
+         */
+        int futility_pruning_margin_table_[MAX_PLYS + 1];
         /** 現在のIterative Deepeningの深さ。 */
         std::uint32_t i_depth_;
         /** 探索したノード数。 */
