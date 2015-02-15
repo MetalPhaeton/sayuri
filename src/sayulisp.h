@@ -36,6 +36,7 @@
 #include <utility>
 #include <string>
 #include <sstream>
+#include <functional>
 #include "common.h"
 #include "params.h"
 #include "chess_engine.h"
@@ -481,6 +482,15 @@ namespace Sayuri {
        */
       LispObjectPtr InputUCICommand(LispObjectPtr command_ptr);
 
+      /**
+       * UCIのアウトプットリスナーを登録する。
+       * @param caller 関数呼び出し元。
+       * @param symbol リスナーのシンボル。
+       * @return #t。
+       */
+      LispObjectPtr AddUCIOutputListener(const LispObject& caller,
+      const LispObject& symbol);
+
       // ======== //
       // アクセサ //
       // ======== //
@@ -511,6 +521,19 @@ namespace Sayuri {
       const UCIShell& shell() const {return *shell_ptr_;}
 
     private:
+      // ================ //
+      // プライベート関数 //
+      // ================ //
+      /**
+       * UCIのアウトプットリスナー。
+       * @param message アウトプット。
+       */
+      void ListenUCIOutput(const std::string& message) {
+        for (auto& callback : callback_vec_) {
+          callback(message);
+        }
+      }
+
       // ========== //
       // メンバ変数 //
       // ========== //
@@ -524,6 +547,8 @@ namespace Sayuri {
       std::unique_ptr<TranspositionTable> table_ptr_;
       /** UCIShellのポインタ。 */
       std::unique_ptr<UCIShell> shell_ptr_;
+      /** UCIのアウトプットリスナー。 */
+      std::vector<std::function<void(const std::string&)>> callback_vec_;
   };
 
   /** Sayulisp実行クラス。 */
