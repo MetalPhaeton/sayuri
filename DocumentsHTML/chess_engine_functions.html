@@ -70,6 +70,7 @@
 <li><code>@play-move</code></li>
 <li><code>@undo-move</code></li>
 <li><code>@input-uci-command</code></li>
+<li><code>@add-uci-output-listener</code></li>
 </ul></li>
 </ul></li>
 <li><a href="#utility-functions">Utility Functions</a></li>
@@ -401,7 +402,12 @@
 <ul>
 <li>Execute UCI command.</li>
 <li>If the command has succeeded, it returns '#t'. Otherwise '#f'.</li>
-<li>The output from engine is put into Standard Output.</li>
+<li>The output from engine is put into the callback registered by <code>@add-uci-output-listener</code>.</li>
+</ul></li>
+<li><code>@add-uci-output-listener &lt;Callback : Function&gt;</code>
+<ul>
+<li>Register a callback to listen the UCI engine's output.</li>
+<li><code>&lt;Callback&gt;</code> must recieve 1 argument that is UCI output as String.</li>
 </ul></li>
 </ul></li>
 </ul>
