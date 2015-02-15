@@ -962,15 +962,15 @@ namespace Sayuri {
       }
     }
 
-    // 最後に情報を送る。
-    shell.PrintOtherInfo
-    (Chrono::duration_cast<Chrono::milliseconds>
-    (SysClock::now() - (shared_st_ptr_->start_time_)),
-    shared_st_ptr_->searched_nodes_, table.GetUsedPermill());
-
-
     // 探索終了したけど、まだ思考を止めてはいけない場合、関数を終了しない。
     while (!ShouldBeStopped()) continue;
+
+    // 最後に情報を送る。
+    shell.PrintFinalInfo
+    (Chrono::duration_cast<Chrono::milliseconds>
+    (SysClock::now() - (shared_st_ptr_->start_time_)),
+    shared_st_ptr_->searched_nodes_, table.GetUsedPermill(),
+    pv_line_table_[level].score(), pv_line_table_[level]);
 
     return pv_line_table_[level];
   }

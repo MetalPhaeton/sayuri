@@ -254,6 +254,45 @@ namespace Sayuri {
     }
   }
 
+  // 探索後の最終出力を出力する。
+  void UCIShell::PrintFinalInfo(Chrono::milliseconds time,
+  std::uint64_t num_nodes, int hashfull, int score, PVLine& pv_line) {
+    std::ostringstream sout;
+
+    int time_2 = time.count();
+    if (time_2 <= 0) time_2 = 1;
+    sout << "info time " << time_2;
+    sout << " nodes " << num_nodes;
+    sout << " hashfull " << hashfull;
+    sout << " nps " << (num_nodes * 1000) / time_2;
+    sout << " score ";
+    if (pv_line.mate_in() >= 0) {
+      int winner = pv_line.mate_in() % 2;
+      if (winner == 1) {
+        // エンジンがメイトした。
+        sout << "mate " << (pv_line.mate_in() / 2) + 1;
+      } else {
+        // エンジンがメイトされた。
+        sout << "mate -" << pv_line.mate_in() / 2;
+      }
+    } else {
+      sout << "cp " << score;
+    }
+
+    // PVラインを送る。
+    sout << " pv";
+    for (std::size_t i = 0; i < pv_line.length(); ++i) {
+      if (!(pv_line[i])) break;
+
+      sout << " " << MoveToString(pv_line[i]);
+    }
+
+    // 出力関数に送る。
+    for (auto& func : output_listeners_) {
+      func(sout.str());
+    }
+  }
+
   // 探索スレッド。
   void UCIShell::ThreadThinking() {
     // アナライズモードならトランスポジションテーブルを初期化。
