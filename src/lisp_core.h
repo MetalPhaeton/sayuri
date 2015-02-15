@@ -819,10 +819,10 @@ namespace Sayuri {
     private:
       /**
        * Parse()の本体。
-       * @param ret_obj パース結果を格納するオブジェクト。
+       * @param target パース結果を格納するオブジェクト。
        * @param token_queue パースする残りの文字列。
        */
-      static void ParseCore(LispObject& ret_obj,
+      static void ParseCore(LispObject& target,
       std::queue<std::string>& token_queue);
 
       /**
@@ -1070,12 +1070,9 @@ namespace Sayuri {
             stream_.str("");
           }
 
-          // 文字をストリームへ。
-          stream_ << c;
           // トークンキューに文字をプッシュ。
-          this->token_queue_.push(stream_.str());
-          // ストリームをクリア。
-          stream_.str("");
+          char one_letter[] {c, '\0'};
+          this->token_queue_.push(one_letter);
         };
 
         // 空白文字。

@@ -99,11 +99,8 @@ namespace Sayuri {
     }
 
     // 探索する。
-    int margin = GetMargin(0);
-
     // --- Futility Pruning --- //
-    bool enable_futility_pruning =
-    shared_st_ptr_->search_params_ptr_->enable_futility_pruning_;
+    int margin = shared_st_ptr_->futility_pruning_margin_table_[0];
 
     for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
       // 次の自分のマテリアル。
@@ -118,7 +115,7 @@ namespace Sayuri {
       }
 
       // Futility Pruning。
-      if (enable_futility_pruning) {
+      if (margin) {
         if ((next_my_material + margin) <= alpha) {
           UnmakeMove(move);
           continue;
@@ -503,7 +500,7 @@ namespace Sayuri {
     // 準備。
     int num_all_moves = maker_table_[level].RegenMoves();
     int num_moves = 0;
-    int margin = GetMargin(depth);
+    int margin = shared_st_ptr_->futility_pruning_margin_table_[depth];
 
     // 仕事の生成。
     Job& job = job_table_[level];
@@ -555,11 +552,6 @@ namespace Sayuri {
 
     int lmr_search_reduction = params.lmr_search_reduction_;
 
-    // Futility Pruning。
-    bool enable_futility_pruning = params.enable_futility_pruning_;
-
-    int futility_pruning_depth = params.futility_pruning_depth_;
-
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // 探索終了ならループを抜ける。
       if (ShouldBeStopped() || is_job_ended_ || (job.alpha_ >= job.beta_)) {
@@ -591,12 +583,10 @@ namespace Sayuri {
       num_moves = job.Count();
 
       // -- Futility Pruning --- //
-      if (enable_futility_pruning) {
-        if (job.depth_ <= futility_pruning_depth) {
-          if ((next_my_material + margin) <= job.alpha_) {
-            UnmakeMove(move);
-            continue;
-          }
+      if (margin) {
+        if ((next_my_material + margin) <= job.alpha_) {
+          UnmakeMove(move);
+          continue;
         }
       }
 
@@ -796,6 +786,23 @@ namespace Sayuri {
       shared_st_ptr_->killer_stack_[i][1] = 0;
       shared_st_ptr_->killer_stack_[i + 2][0] = 0;
       shared_st_ptr_->killer_stack_[i + 2][1] = 0;
+      if (shared_st_ptr_->search_params_ptr_->enable_futility_pruning_) {
+        int i_2 = static_cast<int>(i);
+        if (i_2
+        <= shared_st_ptr_->search_params_ptr_->futility_pruning_depth_) {
+          if (i_2 == 0) {
+            shared_st_ptr_->futility_pruning_margin_table_[i_2] =
+            shared_st_ptr_->search_params_ptr_->futility_pruning_margin_;
+          } else {
+            shared_st_ptr_->futility_pruning_margin_table_[i_2] =
+            shared_st_ptr_->search_params_ptr_->futility_pruning_margin_ * i_2;
+          }
+        } else {
+          shared_st_ptr_->futility_pruning_margin_table_[i_2] = 0;
+        }
+      } else {
+        shared_st_ptr_->futility_pruning_margin_table_[i] = 0;
+      }
       maker_table_[i].ResetStack();
       pv_line_table_[i].ResetLine();
       job_table_[i] = Job();
@@ -955,15 +962,15 @@ namespace Sayuri {
       }
     }
 
-    // 最後に情報を送る。
-    shell.PrintOtherInfo
-    (Chrono::duration_cast<Chrono::milliseconds>
-    (SysClock::now() - (shared_st_ptr_->start_time_)),
-    shared_st_ptr_->searched_nodes_, table.GetUsedPermill());
-
-
     // 探索終了したけど、まだ思考を止めてはいけない場合、関数を終了しない。
     while (!ShouldBeStopped()) continue;
+
+    // 最後に情報を送る。
+    shell.PrintFinalInfo
+    (Chrono::duration_cast<Chrono::milliseconds>
+    (SysClock::now() - (shared_st_ptr_->start_time_)),
+    shared_st_ptr_->searched_nodes_, table.GetUsedPermill(),
+    pv_line_table_[level].score(), pv_line_table_[level]);
 
     return pv_line_table_[level];
   }
@@ -1035,7 +1042,7 @@ namespace Sayuri {
     Side side = to_move_;
     Side enemy_side = Util::GetOppositeSide(side);
     int num_moves = 0;
-    int margin = GetMargin(job.depth_);
+    int margin = shared_st_ptr_->futility_pruning_margin_table_[job.depth_];
 
     const SearchParams& params = *(shared_st_ptr_->search_params_ptr_);
 
@@ -1069,11 +1076,6 @@ namespace Sayuri {
 
     int lmr_search_reduction = params.lmr_search_reduction_;
 
-    // Futility Pruning。
-    bool enable_futility_pruning = params.enable_futility_pruning_;
-
-    int futility_pruning_depth = params.futility_pruning_depth_;
-
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // 探索終了ならループを抜ける。
       if (ShouldBeStopped() || is_job_ended_ || (job.alpha_ >= job.beta_)) {
@@ -1105,12 +1107,10 @@ namespace Sayuri {
       job.has_legal_move_ = true;
 
       // --- Futility Pruning --- //
-      if (enable_futility_pruning) {
-        if (job.depth_ <= futility_pruning_depth) {
-          if ((next_my_material + margin) <= job.alpha_) {
-            UnmakeMove(move);
-            continue;
-          }
+      if (margin) {
+        if ((next_my_material + margin) <= job.alpha_) {
+          UnmakeMove(move);
+          continue;
         }
       }
 

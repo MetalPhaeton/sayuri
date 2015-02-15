@@ -33,6 +33,7 @@
 #include <memory>
 #include <utility>
 #include <string>
+#include <functional>
 #include "common.h"
 #include "params.h"
 #include "chess_engine.h"
@@ -90,7 +91,7 @@ namespace Sayuri {
   shell_ptr_(new UCIShell(*engine_ptr_, *table_ptr_)) {
     // 出力リスナー。
     shell_ptr_->AddOutputListener
-    ([](const std::string& message) {std::cout << message << std::endl;});
+    ([this](const std::string& message) {this->ListenUCIOutput(message);});
   }
 
   // コピーコンストラクタ。
@@ -105,7 +106,7 @@ namespace Sayuri {
 
     // 出力リスナー。
     shell_ptr_->AddOutputListener
-    ([](const std::string& message) {std::cout << message << std::endl;});
+    ([this](const std::string& message) {this->ListenUCIOutput(message);});
   }
 
   // ムーブコンストラクタ。
@@ -129,7 +130,7 @@ namespace Sayuri {
 
     // 出力リスナー。
     shell_ptr_->AddOutputListener
-    ([](const std::string& message) {std::cout << message << std::endl;});
+    ([this](const std::string& message) {this->ListenUCIOutput(message);});
 
     return *this;
   }
@@ -412,11 +413,32 @@ namespace Sayuri {
         (func_name, required_args, false, list.Length() - 1);
       }
       LispObjectPtr command_ptr = caller.Evaluate(*list_itr);
-      if (!(list_itr->IsString())) {
+      if (!(command_ptr->IsString())) {
         throw LispObject::GenWrongTypeError
         (func_name, "String", std::vector<int> {2}, true);
       }
       return InputUCICommand(command_ptr);
+
+    } else if (message_symbol == "@add-uci-output-listener") {
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr func_ptr = caller.Evaluate(*list_itr);
+      if (!(func_ptr->IsFunction())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Function", std::vector<int> {2}, true);
+      }
+      int num_args = func_ptr->function().arg_name_vec_.size();
+      if (num_args != 1) {
+        throw LispObject::GenError("@engine_error",
+        "The number of argument of callback must be 1. ("
+        + list_itr->ToString() + ") requires "
+        + std::to_string(num_args) + " arguments.");
+      }
+
+      return AddUCIOutputListener(caller, *list_itr);
 
     }
 
@@ -996,6 +1018,29 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::InputUCICommand(LispObjectPtr command_ptr) {
     return LispObject::NewBoolean
     (shell_ptr_->InputCommand(command_ptr->string_value()));
+  }
+
+  // UCIアウトプットリスナーを登録する。
+  LispObjectPtr EngineSuite::AddUCIOutputListener(const LispObject& caller,
+  const LispObject& symbol) {
+    // コールバック用S式を作成。
+    LispObjectPtr s_expr = LispObject::NewList(2);
+    s_expr->car(symbol.Clone());
+    s_expr->cdr()->car(LispObject::NewString(""));
+
+    // 呼び出し元のポインタ。
+    LispObjectPtr caller_ptr = caller.Clone();
+
+    // リスナーを作成。
+    std::function<void(const std::string&)> callback =
+    [this, s_expr, caller_ptr](const std::string& message) {
+      s_expr->cdr()->car()->string_value(message);
+      caller_ptr->Evaluate(*s_expr);
+    };
+
+    callback_vec_.push_back(callback);
+
+    return LispObject::NewBoolean(true);
   }
 
   // ======== //
@@ -2127,7 +2172,12 @@ __Description__
     + `@input-uci-command <UCI command : String>`
         - Execute UCI command.
         - If the command has succeeded, it returns '#t'. Otherwise '#f'.
-        - The output from engine is put into Standard Output.
+        - The output from engine is put into the callback registered
+          by `@add-uci-output-listener`.
+      
+    + `@add-uci-output-listener <Callback : Function>`
+        - Register a callback to listen the UCI engine's output.
+        - `<Callback>` must recieve 1 argument that is UCI output as String.
       
 __Example__
 
