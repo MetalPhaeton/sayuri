@@ -472,27 +472,23 @@ namespace Sayuri {
     // 価値の変数の初期化。
     INIT_ARRAY(value_table_);
 
-    // サイド。
-    Side side = engine_ptr_->to_move_;
-    Side enemy_side = Util::GetOppositeSide(side);
-
     const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES] =
     engine_ptr_->position_;
 
     // 全体計算。
     // ビショップペア。
-    if (Util::CountBits(position[side][BISHOP]) >= 2) {
+    if (Util::CountBits(position[WHITE][BISHOP]) >= 2) {
       value_table_[BISHOP_PAIR][0] += 1.0;
     }
-    if (Util::CountBits(position[enemy_side][BISHOP]) >= 2) {
+    if (Util::CountBits(position[BLACK][BISHOP]) >= 2) {
       value_table_[BISHOP_PAIR][0] -= 1.0;
     }
 
     // ルークペア。
-    if (Util::CountBits(position[side][ROOK]) >= 2) {
+    if (Util::CountBits(position[WHITE][ROOK]) >= 2) {
       value_table_[ROOK_PAIR][0] += 1.0;
     }
-    if (Util::CountBits(position[enemy_side][ROOK]) >= 2) {
+    if (Util::CountBits(position[BLACK][ROOK]) >= 2) {
       value_table_[ROOK_PAIR][0] -= 1.0;
     }
 
@@ -673,7 +669,7 @@ namespace Sayuri {
     + (params.weight_abandoned_castling_[num_pieces]
     * value_table_[ABANDONED_CASTLING][0]);
 
-    return side == WHITE ? static_cast<int>(material + score)
+    return engine_ptr_->to_move_ == WHITE ? static_cast<int>(material + score)
     : static_cast<int>(material - score);
   }
 
