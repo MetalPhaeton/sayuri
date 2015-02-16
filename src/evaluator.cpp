@@ -494,36 +494,36 @@ namespace Sayuri {
 
     // 各駒毎に価値を計算する。
     // 白のポーン。
-    for (Bitboard pieces = position[WHITE][PAWN];
-    pieces; Util::SetNext(pieces)) {
+    for (Bitboard pieces = position[WHITE][PAWN]; pieces;
+    NEXT_BITBOARD(pieces)) {
       Square piece_square = Util::GetSquare(pieces);
       CalValue<WHITE, PAWN>(piece_square);
     }
 
     // 白のナイト。
-    for (Bitboard pieces = position[WHITE][KNIGHT];
-    pieces; Util::SetNext(pieces)) {
+    for (Bitboard pieces = position[WHITE][KNIGHT]; pieces;
+    NEXT_BITBOARD(pieces)) {
       Square piece_square = Util::GetSquare(pieces);
       CalValue<WHITE, KNIGHT>(piece_square);
     }
 
     // 白のビショップ。
-    for (Bitboard pieces = position[WHITE][BISHOP];
-    pieces; Util::SetNext(pieces)) {
+    for (Bitboard pieces = position[WHITE][BISHOP]; pieces;
+    NEXT_BITBOARD(pieces)) {
       Square piece_square = Util::GetSquare(pieces);
       CalValue<WHITE, BISHOP>(piece_square);
     }
 
     // 白のルーク。
-    for (Bitboard pieces = position[WHITE][ROOK];
-    pieces; Util::SetNext(pieces)) {
+    for (Bitboard pieces = position[WHITE][ROOK]; pieces;
+    NEXT_BITBOARD(pieces)) {
       Square piece_square = Util::GetSquare(pieces);
       CalValue<WHITE, ROOK>(piece_square);
     }
 
     // 白のクイーン。
-    for (Bitboard pieces = position[WHITE][QUEEN];
-    pieces; Util::SetNext(pieces)) {
+    for (Bitboard pieces = position[WHITE][QUEEN]; pieces;
+    NEXT_BITBOARD(pieces)) {
       Square piece_square = Util::GetSquare(pieces);
       CalValue<WHITE, QUEEN>(piece_square);
     }
@@ -532,36 +532,36 @@ namespace Sayuri {
     CalValue<WHITE, KING>(engine_ptr_->king_[WHITE]);
 
     // 黒のポーン。
-    for (Bitboard pieces = position[BLACK][PAWN];
-    pieces; Util::SetNext(pieces)) {
+    for (Bitboard pieces = position[BLACK][PAWN]; pieces;
+    NEXT_BITBOARD(pieces)) {
       Square piece_square = Util::GetSquare(pieces);
       CalValue<BLACK, PAWN>(piece_square);
     }
 
     // 黒のナイト。
-    for (Bitboard pieces = position[BLACK][KNIGHT];
-    pieces; Util::SetNext(pieces)) {
+    for (Bitboard pieces = position[BLACK][KNIGHT]; pieces;
+    NEXT_BITBOARD(pieces)) {
       Square piece_square = Util::GetSquare(pieces);
       CalValue<BLACK, KNIGHT>(piece_square);
     }
 
     // 黒のビショップ。
-    for (Bitboard pieces = position[BLACK][BISHOP];
-    pieces; Util::SetNext(pieces)) {
+    for (Bitboard pieces = position[BLACK][BISHOP]; pieces;
+    NEXT_BITBOARD(pieces)) {
       Square piece_square = Util::GetSquare(pieces);
       CalValue<BLACK, BISHOP>(piece_square);
     }
 
     // 黒のルーク。
-    for (Bitboard pieces = position[BLACK][ROOK];
-    pieces; Util::SetNext(pieces)) {
+    for (Bitboard pieces = position[BLACK][ROOK]; pieces;
+    NEXT_BITBOARD(pieces)) {
       Square piece_square = Util::GetSquare(pieces);
       CalValue<BLACK, ROOK>(piece_square);
     }
 
     // 黒のクイーン。
-    for (Bitboard pieces = position[BLACK][QUEEN];
-    pieces; Util::SetNext(pieces)) {
+    for (Bitboard pieces = position[BLACK][QUEEN]; pieces;
+    NEXT_BITBOARD(pieces)) {
       Square piece_square = Util::GetSquare(pieces);
       CalValue<BLACK, QUEEN>(piece_square);
     }
@@ -718,7 +718,7 @@ namespace Sayuri {
       const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES] =
       params.attack_value_table_;
 
-      for (; attacked; Util::SetNext(attacked)) {
+      for (; attacked; NEXT_BITBOARD(attacked)) {
         value +=
         table[PType][engine_ptr_->piece_board_[Util::GetSquare(attacked)]];
       }
@@ -737,7 +737,7 @@ namespace Sayuri {
       const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES] =
       params.defense_value_table_;
 
-      for (; defensed; Util::SetNext(defensed)) {
+      for (; defensed; NEXT_BITBOARD(defensed)) {
         value +=
         table[PType][engine_ptr_->piece_board_[Util::GetSquare(defensed)]];
       }
@@ -756,7 +756,7 @@ namespace Sayuri {
       attacks, pin_target, pin_back);
 
       // ピンを判定。
-      for (Bitboard bb = pin_back; bb; Util::SetNext(bb)) {
+      for (Bitboard bb = pin_back; bb; NEXT_BITBOARD(bb)) {
         // 裏駒のマス。
         Square pin_back_sq = Util::GetSquare(bb);
 

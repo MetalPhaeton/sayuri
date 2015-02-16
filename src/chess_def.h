@@ -109,6 +109,12 @@ namespace Sayuri {
 ((origin_data) ^= ((mask) & ((origin_data) ^ (new_data))))
 
   /**
+   * 次のマスのビットボードに更新する。
+   * @param bitboard 更新したいビットボード。
+   */
+#define NEXT_BITBOARD(bitboard) ((bitboard) &= (bitboard) - 1)
+
+  /**
    * 全マスをループ。
    * @param var_name 変数名。
    */

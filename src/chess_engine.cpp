@@ -236,7 +236,7 @@ namespace Sayuri {
       for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
         position_[side][piece_type] = fen.position()[side][piece_type];
         for (Bitboard bb = position_[side][piece_type]; bb;
-        Util::SetNext(bb)) {
+        NEXT_BITBOARD(bb)) {
           Square square = Util::GetSquare(bb);
           side_board_[square] = side;
           piece_board_[square] = piece_type;

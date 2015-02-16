@@ -734,15 +734,6 @@ namespace Sayuri {
       }
 
       /**
-       * 次のマスを指定するビットボードをセットする。
-       * (1のビットの一番下位のビットを0にする。)
-       * @param bitboard 対象のビットボード。
-       */
-      static void SetNext(Bitboard& bitboard) {
-        bitboard &= bitboard - 1;
-      }
-
-      /**
        * 文字列を単語に切り分ける。
        * @param str 切り分ける文字列。
        * @param delim 区切り文字のセット。

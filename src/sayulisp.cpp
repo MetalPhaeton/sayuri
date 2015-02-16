@@ -450,7 +450,7 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::GetWhitePawnPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[WHITE][PAWN];
-    bb; Util::SetNext(bb)) {
+    bb; NEXT_BITBOARD(bb)) {
       LispObjectPtr temp = LispObject::NewPair
       (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
@@ -464,7 +464,7 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::GetWhiteKnightPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[WHITE][KNIGHT];
-    bb; Util::SetNext(bb)) {
+    bb; NEXT_BITBOARD(bb)) {
       LispObjectPtr temp = LispObject::NewPair
       (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
@@ -478,7 +478,7 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::GetWhiteBishopPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[WHITE][BISHOP];
-    bb; Util::SetNext(bb)) {
+    bb; NEXT_BITBOARD(bb)) {
       LispObjectPtr temp = LispObject::NewPair
       (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
@@ -492,7 +492,7 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::GetWhiteRookPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[WHITE][ROOK];
-    bb; Util::SetNext(bb)) {
+    bb; NEXT_BITBOARD(bb)) {
       LispObjectPtr temp = LispObject::NewPair
       (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
@@ -506,7 +506,7 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::GetWhiteQueenPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[WHITE][QUEEN];
-    bb; Util::SetNext(bb)) {
+    bb; NEXT_BITBOARD(bb)) {
       LispObjectPtr temp = LispObject::NewPair
       (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
@@ -520,7 +520,7 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::GetWhiteKingPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[WHITE][KING];
-    bb; Util::SetNext(bb)) {
+    bb; NEXT_BITBOARD(bb)) {
       LispObjectPtr temp = LispObject::NewPair
       (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
@@ -534,7 +534,7 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::GetBlackPawnPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[BLACK][PAWN];
-    bb; Util::SetNext(bb)) {
+    bb; NEXT_BITBOARD(bb)) {
       LispObjectPtr temp = LispObject::NewPair
       (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
@@ -548,7 +548,7 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::GetBlackKnightPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[BLACK][KNIGHT];
-    bb; Util::SetNext(bb)) {
+    bb; NEXT_BITBOARD(bb)) {
       LispObjectPtr temp = LispObject::NewPair
       (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
@@ -562,7 +562,7 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::GetBlackBishopPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[BLACK][BISHOP];
-    bb; Util::SetNext(bb)) {
+    bb; NEXT_BITBOARD(bb)) {
       LispObjectPtr temp = LispObject::NewPair
       (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
@@ -576,7 +576,7 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::GetBlackRookPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[BLACK][ROOK];
-    bb; Util::SetNext(bb)) {
+    bb; NEXT_BITBOARD(bb)) {
       LispObjectPtr temp = LispObject::NewPair
       (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
@@ -590,7 +590,7 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::GetBlackQueenPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[BLACK][QUEEN];
-    bb; Util::SetNext(bb)) {
+    bb; NEXT_BITBOARD(bb)) {
       LispObjectPtr temp = LispObject::NewPair
       (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
@@ -604,7 +604,7 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::GetBlackKingPosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = engine_ptr_->position()[BLACK][KING];
-    bb; Util::SetNext(bb)) {
+    bb; NEXT_BITBOARD(bb)) {
       LispObjectPtr temp = LispObject::NewPair
       (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
@@ -618,7 +618,7 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::GetEmptySquarePosition() const {
     LispObjectPtr ret_ptr = LispObject::NewNil();
     for (Bitboard bb = ~(engine_ptr_->blocker_0());
-    bb; Util::SetNext(bb)) {
+    bb; NEXT_BITBOARD(bb)) {
       LispObjectPtr temp = LispObject::NewPair
       (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
       LispObject::NewNil());
