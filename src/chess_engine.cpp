@@ -982,21 +982,22 @@ namespace Sayuri {
     [Util::GetOppositeSide(to_move_)];
 
     // キャスリングのハッシュをセット。
+    // 失われるキャスリングの権利。
     Castling loss_rights = 0;
-    if (piece_side == WHITE) {
-      if (piece_type == KING) {
+    if (piece_type == KING) {
+      if (piece_side == WHITE) {
         loss_rights |= WHITE_CASTLING;
-      } else if (piece_type == ROOK) {
+      } else {
+        loss_rights |= BLACK_CASTLING;
+      }
+    } else if (piece_type == ROOK) {
+      if (piece_side == WHITE) {
         if (from == H1) {
           loss_rights |= WHITE_SHORT_CASTLING;
         } else if (from == A1) {
           loss_rights |= WHITE_LONG_CASTLING;
         }
-      }
-    } else {
-      if (piece_type == KING) {
-        loss_rights |= BLACK_CASTLING;
-      } else if (piece_type == ROOK) {
+      } else {
         if (from == H8) {
           loss_rights |= BLACK_SHORT_CASTLING;
         } else if (from == A8) {
@@ -1004,15 +1005,13 @@ namespace Sayuri {
         }
       }
     }
-    Castling castling_diff =
-    (castling_rights_ & ~(loss_rights)) ^ castling_rights_;
-    Castling bit = 1;
-    for (int i = 0; i < 4; ++i) {
-      if (castling_diff & bit) {
-        current_hash ^= shared_st_ptr_->castling_hash_value_table_[i];
-      }
-      bit <<= 1;
-    }
+    Castling next_rights = castling_rights_ & ~loss_rights;
+    // 現在のキャスリングのハッシュを消す。
+    current_hash ^= shared_st_ptr_->castling_hash_value_table_
+    [castling_rights_ & ALL_CASTLING];
+    // 次のキャスリングのハッシュをセット。
+    current_hash ^= shared_st_ptr_->castling_hash_value_table_
+    [next_rights & ALL_CASTLING];
 
     // とりあえずアンパッサンのハッシュを削除。
     current_hash ^=
@@ -1231,7 +1230,7 @@ namespace Sayuri {
   void ChessEngine::SharedStruct::InitHashValueTable() {
     // ダブリのないハッシュを生成。
     constexpr int LENGTH =
-    (NUM_SIDES * NUM_PIECE_TYPES * NUM_SQUARES) + 1 + 4 + NUM_SQUARES;
+    (NUM_SIDES * NUM_PIECE_TYPES * NUM_SQUARES) + 1 + 16 + NUM_SQUARES;
     Hash temp_table[LENGTH];
     int temp_count = 0;
     for (int i = 0; i < LENGTH; ++i) {
@@ -1264,8 +1263,7 @@ namespace Sayuri {
             piece_hash_value_table_[side][piece_type][square] = 0;
           } else {
             piece_hash_value_table_[side][piece_type][square] =
-            temp_table[temp_count];
-            ++temp_count;
+            temp_table[temp_count++];
           }
         }
       }
@@ -1274,24 +1272,17 @@ namespace Sayuri {
     // 手番の配列を初期化。
     to_move_hash_value_table_[NO_SIDE] = 0;
     to_move_hash_value_table_[WHITE] = 0;
-    to_move_hash_value_table_[BLACK] = temp_table[temp_count];
-    ++temp_count;
+    to_move_hash_value_table_[BLACK] = temp_table[temp_count++];
 
     // キャスリングの配列を初期化。
-    // 0: 白のショートキャスリング。
-    // 1: 白のロングキャスリング。
-    // 2: 黒のショートキャスリング。
-    // 3: 黒のロングキャスリング。
-    for (int i = 0; i < 4; ++i) {
-      castling_hash_value_table_[i] = temp_table[temp_count];
-      ++temp_count;
+    for (int i = 0; i < 16; ++i) {
+      castling_hash_value_table_[i] = temp_table[temp_count++];
     }
 
     // アンパッサンの配列を初期化。
     en_passant_hash_value_table_[0] = 0;
     for (Square square = 1; square < NUM_SQUARES; ++square) {
-      en_passant_hash_value_table_[square] = temp_table[temp_count];
-      ++temp_count;
+      en_passant_hash_value_table_[square] = temp_table[temp_count++];
     }
   }
 }  // namespace Sayuri

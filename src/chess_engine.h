@@ -566,13 +566,9 @@ namespace Sayuri {
       }
       /**
        * アクセサ - キャスリングの権利のハッシュ値のテーブル。
-       * - 0: 白のショートキャスリング。
-       * - 1: 白のロングキャスリング。
-       * - 2: 黒のショートキャスリング。
-       * - 3: 黒のロングキャスリング。
        * @return キャスリングの権利のハッシュ値のテーブル。
        */
-      const Hash (& castling_hash_value_table() const)[4] {
+      const Hash (& castling_hash_value_table() const)[16] {
         return shared_st_ptr_->castling_hash_value_table_;
       }
       /**
@@ -932,14 +928,8 @@ namespace Sayuri {
         Hash piece_hash_value_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
         /** 手番のハッシュ値のテーブル。 [サイド] */
         Hash to_move_hash_value_table_[NUM_SIDES];
-        /**
-         * キャスリングの権利のハッシュ値のテーブル。
-         * - 0: 白のショートキャスリング。
-         * - 1: 白のロングキャスリング。
-         * - 2: 黒のショートキャスリング。
-         * - 3: 黒のロングキャスリング。
-         */
-        Hash castling_hash_value_table_[4];
+        /** キャスリングの権利のハッシュ値のテーブル。 */
+        Hash castling_hash_value_table_[16];
         /** アンパッサンの位置のハッシュ値のテーブル。 */
         Hash en_passant_hash_value_table_[NUM_SQUARES];
 
