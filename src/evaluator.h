@@ -166,9 +166,6 @@ namespace Sayuri {
 
       // --- テンプレート部品 --- //
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide>
-      friend struct AddOrSub;
-      /** 評価関数で使うテンプレート部品。 */
       template<Side PSide, PieceType PType>
       friend struct GenBitboards;
       /** 評価関数で使うテンプレート部品。 */
