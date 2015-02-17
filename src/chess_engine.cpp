@@ -922,13 +922,7 @@ namespace Sayuri {
     hash ^= shared_st_ptr_->to_move_hash_value_table_[to_move_];
 
     // キャスリングの権利からハッシュを得る。
-    Castling bit = 1;
-    for (int i = 0; i < 4; ++i) {
-      if (castling_rights_ & bit) {
-        hash ^= shared_st_ptr_->castling_hash_value_table_[i];
-      }
-      bit <<= 1;
-    }
+    hash ^= shared_st_ptr_->castling_hash_value_table_[castling_rights_];
 
     // アンパッサンからハッシュを得る。
     hash ^= shared_st_ptr_->en_passant_hash_value_table_[en_passant_square_];
@@ -958,28 +952,24 @@ namespace Sayuri {
     }
 
     // 移動する駒のハッシュを削除する。
-    current_hash ^=
-    shared_st_ptr_->piece_hash_value_table_[piece_side][piece_type][from];
+    current_hash ^= piece_hash_value_table_[piece_side][piece_type][from];
 
     // 取る駒のハッシュを削除する。
-    current_hash ^= shared_st_ptr_->piece_hash_value_table_
-    [target_side][target_type][target_square];
+    current_hash ^=
+    piece_hash_value_table_[target_side][target_type][target_square];
 
     // 移動する駒の移動先のハッシュを追加する。
     if (promotion) {
-      current_hash ^=
-      shared_st_ptr_->piece_hash_value_table_[piece_side][promotion][to];
+      current_hash ^= piece_hash_value_table_[piece_side][promotion][to];
     } else {
-      current_hash ^=
-      shared_st_ptr_->piece_hash_value_table_[piece_side][piece_type][to];
+      current_hash ^= piece_hash_value_table_[piece_side][piece_type][to];
     }
 
     // 現在の手番のハッシュを削除。
-    current_hash ^= shared_st_ptr_->to_move_hash_value_table_[to_move_];
+    current_hash ^= to_move_hash_value_table_[to_move_];
 
     // 次の手番のハッシュを追加。
-    current_hash ^= shared_st_ptr_->to_move_hash_value_table_
-    [Util::GetOppositeSide(to_move_)];
+    current_hash ^= to_move_hash_value_table_[Util::GetOppositeSide(to_move_)];
 
     // キャスリングのハッシュをセット。
     // 失われるキャスリングの権利。
@@ -1007,15 +997,13 @@ namespace Sayuri {
     }
     Castling next_rights = castling_rights_ & ~loss_rights;
     // 現在のキャスリングのハッシュを消す。
-    current_hash ^= shared_st_ptr_->castling_hash_value_table_
-    [castling_rights_ & ALL_CASTLING];
+    current_hash ^=
+    castling_hash_value_table_[castling_rights_ & ALL_CASTLING];
     // 次のキャスリングのハッシュをセット。
-    current_hash ^= shared_st_ptr_->castling_hash_value_table_
-    [next_rights & ALL_CASTLING];
+    current_hash ^= castling_hash_value_table_[next_rights & ALL_CASTLING];
 
     // とりあえずアンパッサンのハッシュを削除。
-    current_hash ^=
-    shared_st_ptr_->en_passant_hash_value_table_[en_passant_square_];
+    current_hash ^= en_passant_hash_value_table_[en_passant_square_];
 
     // ポーンの2歩の動きの場合はアンパッサンハッシュを追加。
     // temp[][]は計算時間の省略のための、2歩の動きの判定用テーブル。
@@ -1075,73 +1063,13 @@ namespace Sayuri {
     };
     if (piece_type == PAWN) {
       if (temp[piece_side][from] == to) {
-        current_hash ^= shared_st_ptr_->en_passant_hash_value_table_
+        current_hash ^= en_passant_hash_value_table_
         [Util::TO_EN_PASSANT_SQUARE[piece_side][to]];
       }
     }
 
     // 次の局面のハッシュを返す。
     return current_hash;
-  }
-
-  // ======================== //
-  // その他のプライベート関数 //
-  // ======================== //
-  // 駒を置く。
-  void ChessEngine::PutPiece(Square square, PieceType piece_type, Side side) {
-    // 置く位置の現在の駒の種類を入手する。
-    PieceType placed_piece = piece_board_[square];
-
-    // 置く位置の現在の駒のサイドを得る。
-    Side placed_side = side_board_[square];
-
-    // 置く位置のメンバを消す。
-    if (placed_piece) {
-      position_[placed_side][placed_piece] &= ~Util::SQUARE[square];
-      side_pieces_[placed_side] &= ~Util::SQUARE[square];
-    }
-
-    // 置く駒がEMPTYか置くサイドがNO_SIDEなら
-    // その位置のメンバを消して返る。
-    if ((!piece_type) || (!side)) {
-      piece_board_[square] = EMPTY;
-      side_board_[square] = NO_SIDE;
-      if (placed_piece) {
-        blocker_0_ &= ~Util::SQUARE[square];
-        blocker_45_ &= ~Util::SQUARE[Util::ROT45[square]];
-        blocker_90_ &= ~Util::SQUARE[Util::ROT90[square]];
-        blocker_135_ &= ~Util::SQUARE[Util::ROT135[square]];
-      }
-      return;
-    }
-
-    // 置く位置の駒の種類を書き変える。
-    piece_board_[square] = piece_type;
-    // 置く位置のサイドを書き変える。
-    side_board_[square] = side;
-
-    // 置く位置のビットボードをセットする。
-    position_[side][piece_type] |= Util::SQUARE[square];
-    side_pieces_[side] |= Util::SQUARE[square];
-    blocker_0_ |= Util::SQUARE[square];
-    blocker_45_ |= Util::SQUARE[Util::ROT45[square]];
-    blocker_90_ |= Util::SQUARE[Util::ROT90[square]];
-    blocker_135_ |= Util::SQUARE[Util::ROT135[square]];
-
-    // キングの位置を更新する。
-    if (piece_type == KING) {
-      king_[side] = square;
-    }
-  }
-
-  // 駒の位置を変える。
-  void ChessEngine::ReplacePiece(Square from, Square to) {
-    // 移動する位置と移動先の位置が同じなら何もしない。
-    if (from == to) return;
-
-    // 移動。
-    PutPiece(to, piece_board_[from], side_board_[from]);
-    PutPiece(from, EMPTY, NO_SIDE);
   }
 
   // ================ //
@@ -1284,5 +1212,65 @@ namespace Sayuri {
     for (Square square = 1; square < NUM_SQUARES; ++square) {
       en_passant_hash_value_table_[square] = temp_table[temp_count++];
     }
+  }
+
+  // キャッシュする。
+  void ChessEngine::CacheSearchParams() {
+    if (!shared_st_ptr_) return;
+    if (!(shared_st_ptr_->search_params_ptr_)) return;
+
+    const SearchParams& params = *(shared_st_ptr_->search_params_ptr_);
+
+    // キャッシュする。
+    COPY_ARRAY(material_, params.material_);
+    enable_quiesce_search_ = params.enable_quiesce_search_;
+    enable_repetition_check_ = params.enable_repetition_check_;
+    enable_repetition_check_after_2nd_ =
+    params.enable_repetition_check_after_2nd_;
+    enable_check_extension_ = params.enable_check_extension_;
+    ybwc_limit_depth_ = params.ybwc_limit_depth_;
+    ybwc_after_moves_ = params.ybwc_after_moves_;
+    enable_aspiration_windows_ = params.enable_aspiration_windows_;
+    aspiration_windows_limit_depth_ = params.aspiration_windows_limit_depth_;
+    aspiration_windows_delta_ = params.aspiration_windows_delta_;
+    enable_see_ = params.enable_see_;
+    enable_history_ = params.enable_history_;
+    enable_killer_ = params.enable_killer_;
+    enable_killer_2_ = params.enable_killer_2_;
+    enable_ttable_ = params.enable_ttable_;
+    enable_iid_ = params.enable_iid_;
+    iid_limit_depth_ = params.iid_limit_depth_;
+    iid_search_depth_ = params.iid_search_depth_;
+    enable_nmr_ = params.enable_nmr_;
+    nmr_limit_depth_ = params.nmr_limit_depth_;
+    nmr_search_reduction_ = params.nmr_search_reduction_;
+    nmr_reduction_ = params.nmr_reduction_;
+    enable_probcut_ = params.enable_probcut_;
+    probcut_limit_depth_ = params.probcut_limit_depth_;
+    probcut_margin_ = params.probcut_margin_;
+    probcut_search_reduction_ = params.probcut_search_reduction_;
+    enable_history_pruning_ = params.enable_history_pruning_;
+    history_pruning_limit_depth_ = params.history_pruning_limit_depth_;
+    history_pruning_move_threshold_ = params.history_pruning_move_threshold_;
+    history_pruning_after_moves_ = params.history_pruning_after_moves_;
+    history_pruning_threshold_ = params.history_pruning_threshold_;
+    history_pruning_reduction_ = params.history_pruning_reduction_;
+    enable_lmr_ = params.enable_lmr_;
+    lmr_limit_depth_ = params.lmr_limit_depth_;
+    lmr_threshold_ = params.lmr_threshold_;
+    lmr_after_moves_ = params.lmr_after_moves_;
+    lmr_search_reduction_ = params.lmr_search_reduction_;
+    enable_futility_pruning_ = params.enable_futility_pruning_;
+    futility_pruning_depth_ = params.futility_pruning_depth_;
+    futility_pruning_margin_ = params.futility_pruning_margin_;
+
+    COPY_ARRAY(piece_hash_value_table_,
+    shared_st_ptr_->piece_hash_value_table_);
+    COPY_ARRAY(to_move_hash_value_table_,
+    shared_st_ptr_->to_move_hash_value_table_);
+    COPY_ARRAY(castling_hash_value_table_,
+    shared_st_ptr_->castling_hash_value_table_);
+    COPY_ARRAY(en_passant_hash_value_table_,
+    shared_st_ptr_->en_passant_hash_value_table_);
   }
 }  // namespace Sayuri

@@ -336,20 +336,15 @@ namespace Sayuri {
         if (GetMoveType(move) == NORMAL) {
           if ((move & PROMOTION_MASK)) {
             // プロモーション。
-            return current_material + shared_st_ptr_->search_params_ptr_->
-            material()[piece_board_[GetTo(move)]]
-            + shared_st_ptr_->search_params_ptr_->
-            material()[GetPromotion(move)]
-            - shared_st_ptr_->search_params_ptr_->material()[PAWN];
+            return current_material + material_[piece_board_[GetTo(move)]]
+            + material_[GetPromotion(move)] - material_[PAWN];
           }
 
-          return current_material + shared_st_ptr_->search_params_ptr_->
-          material()[piece_board_[GetTo(move)]];
+          return current_material + material_[piece_board_[GetTo(move)]];
 
         } else if (GetMoveType(move) == EN_PASSANT) {
           // アンパッサン。
-          return current_material
-          + shared_st_ptr_->search_params_ptr_->material()[PAWN];
+          return current_material + material_[PAWN];
         }
 
         return current_material;
@@ -814,14 +809,65 @@ namespace Sayuri {
        * @param piece_type 置きたい駒の種類。
        * @param side 置きたい駒のサイド。
        */
-      void PutPiece(Square square, PieceType piece_type, Side side=NO_SIDE);
+      void PutPiece(Square square, PieceType piece_type, Side side=NO_SIDE) {
+        // 置く位置の現在の駒の種類を入手する。
+        PieceType placed_piece = piece_board_[square];
+
+        // 置く位置の現在の駒のサイドを得る。
+        Side placed_side = side_board_[square];
+
+        // 置く位置のメンバを消す。
+        if (placed_piece) {
+          position_[placed_side][placed_piece] &= ~Util::SQUARE[square];
+          side_pieces_[placed_side] &= ~Util::SQUARE[square];
+        }
+
+        // 置く駒がEMPTYか置くサイドがNO_SIDEなら
+        // その位置のメンバを消して返る。
+        if ((!piece_type) || (!side)) {
+          piece_board_[square] = EMPTY;
+          side_board_[square] = NO_SIDE;
+          if (placed_piece) {
+            blocker_0_ &= ~Util::SQUARE[square];
+            blocker_45_ &= ~Util::SQUARE[Util::ROT45[square]];
+            blocker_90_ &= ~Util::SQUARE[Util::ROT90[square]];
+            blocker_135_ &= ~Util::SQUARE[Util::ROT135[square]];
+          }
+          return;
+        }
+
+        // 置く位置の駒の種類を書き変える。
+        piece_board_[square] = piece_type;
+        // 置く位置のサイドを書き変える。
+        side_board_[square] = side;
+
+        // 置く位置のビットボードをセットする。
+        position_[side][piece_type] |= Util::SQUARE[square];
+        side_pieces_[side] |= Util::SQUARE[square];
+        blocker_0_ |= Util::SQUARE[square];
+        blocker_45_ |= Util::SQUARE[Util::ROT45[square]];
+        blocker_90_ |= Util::SQUARE[Util::ROT90[square]];
+        blocker_135_ |= Util::SQUARE[Util::ROT135[square]];
+
+        // キングの位置を更新する。
+        if (piece_type == KING) {
+          king_[side] = square;
+        }
+      }
 
       /**
        * 駒の位置を変える。 (移動先の駒は上書きされる。)
        * @param from 位置を変えたい駒のマス。
        * @param to 移動先。
        */
-      void ReplacePiece(Square from, Square to);
+      void ReplacePiece(Square from, Square to) {
+        // 移動する位置と移動先の位置が同じなら何もしない。
+        if (from == to) return;
+
+        // 移動。
+        PutPiece(to, piece_board_[from], side_board_[from]);
+        PutPiece(from, EMPTY, NO_SIDE);
+      }
 
       /**
        * SEE()で使う、次の手を得る。
@@ -927,7 +973,7 @@ namespace Sayuri {
         Hash to_move_hash_value_table_[NUM_SIDES];
         /** キャスリングの権利のハッシュ値のテーブル。 */
         Hash castling_hash_value_table_[16];
-        /** アンパッサンの位置のハッシュ値のテーブル。 */
+        /** アンパッサンのハッシュ値のテーブル。 */
         Hash en_passant_hash_value_table_[NUM_SQUARES];
 
         // ==================== //
@@ -997,6 +1043,256 @@ namespace Sayuri {
       std::mutex mutex_;
       /** 並列探索用スレッドのベクトル。 */
       std::vector<std::thread> thread_vec_;
+
+      // ==================== //
+      // 探索関数用キャッシュ //
+      // ==================== //
+      /**
+       * 探索関数用パラメータをキャッシュする。
+       */
+      void CacheSearchParams();
+      /** 
+       * 探索関数用キャッシュ。
+       * マテリアル。
+       */
+      int material_[NUM_PIECE_TYPES];
+      /**
+       * 探索関数用キャッシュ。
+       * Quiescence Search - 有効無効。
+       */
+      bool enable_quiesce_search_;
+      /**
+       * 探索関数用キャッシュ。
+       * 繰り返しチェック - 初手のチェックの有効無効。
+       */
+      bool enable_repetition_check_;
+      /**
+       * 探索関数用キャッシュ。
+       * 繰り返しチェック - 2手目以降のチェックの有効無効。
+       */
+      bool enable_repetition_check_after_2nd_;
+      /**
+       * 探索関数用キャッシュ。
+       * Check Extension - 有効無効。
+       */
+      bool enable_check_extension_;
+      /**
+       * 探索関数用キャッシュ。
+       * YBWC - 残り深さ制限。
+       */
+      int ybwc_limit_depth_;
+      /**
+       * 探索関数用キャッシュ。
+       * YBWC - 何手目以降の候補手で実行するか。
+       */
+      int ybwc_after_moves_;
+      /**
+       * 探索関数用キャッシュ。
+       * Aspiration Windows - 有効無効。
+       */
+      bool enable_aspiration_windows_;
+      /**
+       * 探索関数用キャッシュ。
+       * Aspiration Windows - 残り深さ制限。
+       */
+      int aspiration_windows_limit_depth_;
+      /**
+       * 探索関数用キャッシュ。
+       * Aspiration Windows - デルタ値。
+       */
+      int aspiration_windows_delta_;
+      /**
+       * 探索関数用キャッシュ。
+       * SEE - 有効無効。
+       */
+      bool enable_see_;
+      /**
+       * 探索関数用キャッシュ。
+       * ヒストリー - 有効無効。
+       */
+      bool enable_history_;
+      /**
+       * 探索関数用キャッシュ。
+       * キラームーブ - 有効無効。
+       */
+      bool enable_killer_;
+      /**
+       * 探索関数用キャッシュ。
+       * キラームーブ - 2プライ先のキラームーブの有効無効。
+       */
+      bool enable_killer_2_;
+      /**
+       * 探索関数用キャッシュ。
+       * トランスポジションテーブル - 有効無効。
+       */
+      bool enable_ttable_;
+      /**
+       * 探索関数用キャッシュ。
+       * Internal Iterative Deepening - 有効無効。
+       */
+      bool enable_iid_;
+      /**
+       * 探索関数用キャッシュ。
+       * Internal Iterative Deepening - 残り深さ制限。
+       */
+      int iid_limit_depth_;
+      /**
+       * 探索関数用キャッシュ。
+       * Internal Iterative Deepening - 探索の深さ。
+       */
+      int iid_search_depth_;
+      /**
+       * 探索関数用キャッシュ。
+       * Null Move Reduction - 有効無効。
+       */
+      bool enable_nmr_;
+      /**
+       * 探索関数用キャッシュ。
+       * Null Move Reduction - 残り深さ制限。
+       */
+      int nmr_limit_depth_;
+      /**
+       * 探索関数用キャッシュ。
+       * Null Move Reduction - 何プライ浅く探索するか。
+       */
+      int nmr_search_reduction_;
+      /**
+       * 探索関数用キャッシュ。
+       * Null Move Reduction - リダクションする深さ。
+       */
+      int nmr_reduction_;
+      /**
+       * 探索関数用キャッシュ。
+       * ProbCut - 有効無効。
+       */
+      bool enable_probcut_;
+      /**
+       * 探索関数用キャッシュ。
+       * ProbCut - 残り深さ制限。
+       */
+      int probcut_limit_depth_;
+      /**
+       * 探索関数用キャッシュ。
+       * ProbCut - ベータ値の増分。
+       */
+      int probcut_margin_;
+      /**
+       * 探索関数用キャッシュ。
+       * ProbCut - 何プライ浅く探索するか。
+       */
+      int probcut_search_reduction_;
+      /**
+       * 探索関数用キャッシュ。
+       * History Pruning - 有効無効。
+       */
+      bool enable_history_pruning_;
+      /**
+       * 探索関数用キャッシュ。
+       * History Pruning - 残り深さ制限。
+       */
+      int history_pruning_limit_depth_;
+      /**
+       * 探索関数用キャッシュ。
+       * History Pruning - 実行する候補手の閾値。
+       */
+      double history_pruning_move_threshold_;
+      /**
+       * 探索関数用キャッシュ。
+       * History Pruning - 何手目以降の候補手で実行するか。
+       */
+      int history_pruning_after_moves_;
+      /**
+       * 探索関数用キャッシュ。
+       * History Pruning - 最大ヒストリー値に対する閾値。
+       */
+      double history_pruning_threshold_;
+      /**
+       * 探索関数用キャッシュ。
+       * History Pruning - リダクションする深さ。
+       */
+      int history_pruning_reduction_;
+      /**
+       * 探索関数用キャッシュ。
+       * Late Move Reduction - 有効無効。
+       */
+      bool enable_lmr_;
+      /**
+       * 探索関数用キャッシュ。
+       * Late Move Reduction - 残り深さ制限。
+       */
+      int lmr_limit_depth_;
+      /**
+       * 探索関数用キャッシュ。
+       * Late Move Reduction - 実行する候補手の閾値。
+       */
+      double lmr_threshold_;
+      /**
+       * 探索関数用キャッシュ。
+       * Late Move Reduction - 何手目以降の候補手で実行するか。
+       */
+      double lmr_after_moves_;
+      /**
+       * 探索関数用キャッシュ。
+       * Late Move Reduction - リダクションする深さ。
+       */
+      int lmr_search_reduction_;
+      /**
+       * 探索関数用キャッシュ。
+       * Futility Pruning - 有効無効。
+       */
+      bool enable_futility_pruning_;
+      /**
+       * 探索関数用キャッシュ。
+       * Futility Pruning - 有効にする残り深さ。
+       */
+      int futility_pruning_depth_;
+      /**
+       * 探索関数用キャッシュ。
+       * Futility Pruning - 残り深さ1プライあたりのマージン。
+       */
+      int futility_pruning_margin_;
+      /**
+       * 探索関数用キャッシュ。
+       * 駒の情報のハッシュ値のテーブル。
+       */
+      Hash piece_hash_value_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
+      /**
+       * 探索関数用キャッシュ。
+       * 手番のハッシュ値のテーブル。
+       */
+      Hash to_move_hash_value_table_[NUM_SIDES];
+      /**
+       * 探索関数用キャッシュ。
+       * キャスリングの権利のハッシュ値のテーブル。
+       */
+      Hash castling_hash_value_table_[16];
+      /**
+       * 探索関数用キャッシュ。
+       * アンパッサンのハッシュ値のテーブル。
+       */
+      Hash en_passant_hash_value_table_[NUM_SQUARES];
+
+      // ========================== //
+      // 探索関数用テンプレート部品 //
+      // ========================== //
+      /** Internal Iterative Deepeningする部品。 */
+      template<NodeType Type>
+      void DoIID(bool is_checked, Move prev_best,
+      Hash pos_hash, int depth, std::uint32_t level, int alpha, int beta,
+      int material, TranspositionTable& table);
+
+      /** Null Move Reductionする部品。 */
+      template<NodeType Type>
+      void DoNMR(bool is_checked, Hash pos_hash,
+      int& depth, std::uint32_t level, int beta, int material,
+      TranspositionTable& table, int& null_reduction);
+
+      /** ProbCutする部品。 */
+      template<NodeType Type>
+      void DoProbCut(Side side, Side enemy_side,
+      bool is_checked, ScoreType& score_type, Hash pos_hash,
+      int depth, std::uint32_t level, int& alpha, int beta, int material,
+      TranspositionTable& table);
   };
 
   // ==================== //
