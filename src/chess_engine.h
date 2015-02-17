@@ -675,17 +675,6 @@ namespace Sayuri {
       // ======== //
       // 探索関数 //
       // ======== //
-      // --- テンプレート部品 --- //
-      /** 探索関数で使うテンプレート部品。 */
-      template<NodeType Type>
-      friend struct DoIID;
-      /** 探索関数で使うテンプレート部品。 */
-      template<NodeType Type>
-      friend struct DoNMR;
-      /** 探索関数で使うテンプレート部品。 */
-      template<NodeType Type>
-      friend struct DoProbCut;
-
       /**
        * クイース探索。
        * @param level 現在のレベル。
