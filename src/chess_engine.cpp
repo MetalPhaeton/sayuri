@@ -1272,5 +1272,9 @@ namespace Sayuri {
     shared_st_ptr_->castling_hash_value_table_);
     COPY_ARRAY(en_passant_hash_value_table_,
     shared_st_ptr_->en_passant_hash_value_table_);
+
+    max_depth_ = shared_st_ptr_->max_depth_;
+    max_nodes_ = shared_st_ptr_->max_nodes_;
+    thinking_time_ = shared_st_ptr_->thinking_time_;
   }
 }  // namespace Sayuri

@@ -1260,6 +1260,21 @@ namespace Sayuri {
        * アンパッサンのハッシュ値のテーブル。
        */
       Hash en_passant_hash_value_table_[NUM_SQUARES];
+      /**
+       * 探索関数用キャッシュ。
+       * 探索ストップ条件 - 最大探索ノード数。
+       */
+      std::uint64_t max_nodes_;
+      /**
+       * 探索関数用キャッシュ。
+       * 探索ストップ条件 - 最大探索深さ。
+       */
+      std::uint32_t max_depth_;
+      /**
+       * 探索関数用キャッシュ。
+       * 探索ストップ条件 - 思考時間。
+       */
+      Chrono::milliseconds thinking_time_;
 
       // ========================== //
       // 探索関数用テンプレート部品 //

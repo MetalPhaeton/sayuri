@@ -1557,17 +1557,16 @@ namespace Sayuri {
 
     if (shared_st_ptr_->stop_now_) return true;
     if (shared_st_ptr_->infinite_thinking_) return false;
-    if (shared_st_ptr_->i_depth_ > shared_st_ptr_->max_depth_) {
+    if (shared_st_ptr_->i_depth_ > max_depth_) {
       shared_st_ptr_->stop_now_ = true;
       return true;
     }
-    if (shared_st_ptr_->searched_nodes_ >= shared_st_ptr_->max_nodes_) {
+    if (shared_st_ptr_->searched_nodes_ >= max_nodes_) {
       shared_st_ptr_->stop_now_ = true;
       return true;
     }
     TimePoint now = SysClock::now();
-    if ((now - (shared_st_ptr_->start_time_))
-    >= shared_st_ptr_->thinking_time_) {
+    if ((now - (shared_st_ptr_->start_time_)) >= thinking_time_) {
       shared_st_ptr_->stop_now_ = true;
       return true;
     }
