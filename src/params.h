@@ -848,6 +848,11 @@ namespace Sayuri {
        * @return エンディング時のウェイト。
        */
       double ending_weight() const {return ending_weight_;}
+      /**
+       * アクセサ - ウェイトの配列。
+       * @return ウェイトの配列。
+       */
+      const double (& table() const)[NUM_SQUARES + 1] {return table_;}
 
       // ============ //
       // ミューテータ //
@@ -883,7 +888,7 @@ namespace Sayuri {
       double opening_weight_;
       /** エンディング時のウェイト。 */
       double ending_weight_;
-      /** ウェイト配列。 インデックスは「キングを含めた」駒の数(0..32)。 */
+      /** ウェイト配列。 インデックスは「キングを含めた」駒の数(0..64)。 */
       double table_[NUM_SQUARES + 1];
   };
 

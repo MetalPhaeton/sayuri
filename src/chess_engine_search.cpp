@@ -731,6 +731,9 @@ namespace Sayuri {
     // 探索関数用パラメータをキャッシュ。
     CacheSearchParams();
 
+    // 評価関数用パラメータをキャッシュ。
+    evaluator_.CacheEvalParams();
+
     shared_st_ptr_->searched_nodes_ = 0;
     shared_st_ptr_->searched_level_ = 0;
     shared_st_ptr_->start_time_ = SysClock::now();
@@ -789,6 +792,7 @@ namespace Sayuri {
       ChessEngine* child_ptr = child_vec.back().get();
       child_ptr->shared_st_ptr_ = shared_st_ptr_;
       child_ptr->CacheSearchParams();
+      child_ptr->evaluator_.CacheEvalParams();
 
       thread_vec_[i] = std::thread([child_ptr, &shell]() {
           child_ptr->ThreadYBWC(shell);

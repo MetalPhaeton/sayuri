@@ -42,56 +42,58 @@ namespace Sayuri {
   class Evaluator {
     private:
       // --- クラス内で使う定数 --- //
-      /** 価値テーブルのインデックス - オープニングの配置。 */
-      constexpr static unsigned int OPENING_POSITION = 0;
-      /** 価値テーブルのインデックス - エンディングの配置。 */
-      constexpr static unsigned int ENDING_POSITION = 1;
-      /** 価値テーブルのインデックス - 機動力。 */
-      constexpr static unsigned int MOBILITY = 2;
-      /** 価値テーブルのインデックス - センターコントロール。 */
-      constexpr static unsigned int CENTER_CONTROL = 3;
-      /** 価値テーブルのインデックス - スウィートセンターのコントロール。 */
-      constexpr static unsigned int SWEET_CENTER_CONTROL = 4;
-      /** 価値テーブルのインデックス - ピースの展開。 */
-      constexpr static unsigned int DEVELOPMENT = 5;
-      /** 価値テーブルのインデックス - 攻撃。 */
-      constexpr static unsigned int ATTACK = 6;
-      /** 価値テーブルのインデックス - 防御。 */
-      constexpr static unsigned int DEFENSE = 7;
-      /** 価値テーブルのインデックス - ピン。 */
-      constexpr static unsigned int PIN = 8;
-      /** 価値テーブルのインデックス - キング周辺への攻撃。 */
-      constexpr static unsigned int ATTACK_AROUND_KING = 9;
-      /** 価値テーブルのインデックス - パスポーン。 */
-      constexpr static unsigned int PASS_PAWN = 10;
-      /** 価値テーブルのインデックス - 守られたパスポーン。 */
-      constexpr static unsigned int PROTECTED_PASS_PAWN = 11;
-      /** 価値テーブルのインデックス - ダブルポーン。 */
-      constexpr static unsigned int DOUBLE_PAWN = 12;
-      /** 価値テーブルのインデックス - 孤立ポーン。 */
-      constexpr static unsigned int ISO_PAWN = 13;
-      /** 価値テーブルのインデックス - ポーンの盾。 */
-      constexpr static unsigned int PAWN_SHIELD = 14;
-      /** 価値テーブルのインデックス - ビショップペア。 */
-      constexpr static unsigned int BISHOP_PAIR = 15;
-      /** 価値テーブルのインデックス - バッドビショップ。 */
-      constexpr static unsigned int BAD_BISHOP = 16;
-      /** 価値テーブルのインデックス - ルークペア。 */
-      constexpr static unsigned int ROOK_PAIR = 17;
-      /** 価値テーブルのインデックス - セミオープンファイルのルーク。 */
-      constexpr static unsigned int ROOK_SEMIOPEN_FYLE = 18;
-      /** 価値テーブルのインデックス - オープンファイルのルーク。 */
-      constexpr static unsigned int ROOK_OPEN_FYLE = 19;
-      /** 価値テーブルのインデックス - 早すぎるクイーンの始動。 */
-      constexpr static unsigned int EARLY_QUEEN_LAUNCHED = 20;
-      /** 価値テーブルのインデックス - キング周りの弱いマス。 */
-      constexpr static unsigned int WEAK_SQUARE = 21;
-      /** 価値テーブルのインデックス - キャスリング。 */
-      constexpr static unsigned int CASTLING = 22;
-      /** 価値テーブルのインデックス - キャスリングの放棄。 */
-      constexpr static unsigned int ABANDONED_CASTLING = 23;
+      enum {
+        /** テーブルのインデックス - オープニングの配置。 */
+        OPENING_POSITION,
+        /** テーブルのインデックス - エンディングの配置。 */
+        ENDING_POSITION,
+        /** テーブルのインデックス - 機動力。 */
+        MOBILITY,
+        /** テーブルのインデックス - センターコントロール。 */
+        CENTER_CONTROL,
+        /** テーブルのインデックス - スウィートセンターのコントロール。 */
+        SWEET_CENTER_CONTROL,
+        /** テーブルのインデックス - ピースの展開。 */
+        DEVELOPMENT,
+        /** テーブルのインデックス - 攻撃。 */
+        ATTACK,
+        /** テーブルのインデックス - 防御。 */
+        DEFENSE,
+        /** テーブルのインデックス - ピン。 */
+        PIN,
+        /** テーブルのインデックス - キング周辺への攻撃。 */
+        ATTACK_AROUND_KING,
+        /** テーブルのインデックス - パスポーン。 */
+        PASS_PAWN,
+        /** テーブルのインデックス - 守られたパスポーン。 */
+        PROTECTED_PASS_PAWN,
+        /** テーブルのインデックス - ダブルポーン。 */
+        DOUBLE_PAWN,
+        /** テーブルのインデックス - 孤立ポーン。 */
+        ISO_PAWN,
+        /** テーブルのインデックス - ポーンの盾。 */
+        PAWN_SHIELD,
+        /** テーブルのインデックス - ビショップペア。 */
+        BISHOP_PAIR,
+        /** テーブルのインデックス - バッドビショップ。 */
+        BAD_BISHOP,
+        /** テーブルのインデックス - ルークペア。 */
+        ROOK_PAIR,
+        /** テーブルのインデックス - セミオープンファイルのルーク。 */
+        ROOK_SEMIOPEN_FYLE,
+        /** テーブルのインデックス - オープンファイルのルーク。 */
+        ROOK_OPEN_FYLE,
+        /** テーブルのインデックス - 早すぎるクイーンの始動。 */
+        EARLY_QUEEN_LAUNCHED,
+        /** テーブルのインデックス - キング周りの弱いマス。 */
+        WEAK_SQUARE,
+        /** テーブルのインデックス - キャスリング。 */
+        CASTLING,
+        /** テーブルのインデックス - キャスリングの放棄。 */
+        ABANDONED_CASTLING,
+      };
 
-      /** 価値テーブルのサイズ。 */
+      /** テーブルのインデックスの種類のサイズ。 */
       constexpr static std::size_t TABLE_SIZE = ABANDONED_CASTLING + 1;
 
     public:
@@ -143,6 +145,11 @@ namespace Sayuri {
        * @return 評価値。
        */
       int Evaluate(int material);
+
+      /**
+       * EvalParamsをキャッシュする。
+       */
+      void CacheEvalParams();
 
     private:
       /** フレンドのデバッグ用関数。 */
@@ -224,6 +231,46 @@ namespace Sayuri {
 
       /** 評価関数で使う価値テーブル。 */
       double value_table_[TABLE_SIZE][NUM_PIECE_TYPES];
+
+      // ========================== //
+      // 評価パラメータのキャッシュ //
+      // ========================== //
+      /**
+       * 評価パラメータのキャッシュ。
+       * オープニング時の配置の価値テーブル。
+       */
+      double opening_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES];
+      /**
+       * 評価パラメータのキャッシュ。
+       * エンディング時の配置の価値テーブル。
+       */
+      double ending_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES];
+      /**
+       * 評価パラメータのキャッシュ。
+       * 相手への攻撃の価値テーブル。
+       */
+      double attack_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
+      /**
+       * 評価パラメータのキャッシュ。
+       * 味方への防御の価値テーブル。
+       */
+      double defense_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
+      /**
+       * 評価パラメータのキャッシュ。
+       * ピンの価値テーブル。
+       */
+      double pin_value_table_
+      [NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES];
+      /**
+       * 評価パラメータのキャッシュ。
+       * ポーンの盾の配置の価値テーブル。
+       */
+      double pawn_shield_value_table_[NUM_SQUARES];
+      /**
+       * 評価パラメータのキャッシュ。
+       * 各種ウェイト。
+       */
+      double weight_cache_table_[TABLE_SIZE][NUM_PIECE_TYPES][NUM_SQUARES + 1];
   };
 }  // namespace Sayuri
 
