@@ -689,7 +689,7 @@ namespace Sayuri {
 
       /**
        * 通常の探索。
-       * @param <Type> ノードの種類。
+       * @param node_type ノードの種類。
        * @param pos_hash 現在のハッシュ。
        * @param depth 現在の深さ。
        * @param level 現在のレベル。
@@ -699,9 +699,9 @@ namespace Sayuri {
        * @param table トランスポジションテーブル。
        * @return 評価値。
        */
-      template<NodeType Type>
-      int Search(Hash pos_hash, int depth, std::uint32_t level, int alpha,
-      int beta, int material, TranspositionTable& table);
+      int Search(NodeType node_type, Hash pos_hash, int depth,
+      std::uint32_t level, int alpha, int beta, int material,
+      TranspositionTable& table);
 
       /**
        * 探索のルート。
@@ -721,9 +721,10 @@ namespace Sayuri {
 
       /**
        * 別スレッド用探索関数。
+       * @param node_type ノードの種類。
        * @param job 並列探索用仕事。
        */
-      template<NodeType Type> void SearchParallel(Job& job);
+      void SearchParallel(NodeType node_type, Job& job);
 
       /**
        * ルートノードで呼び出される、別スレッド用探索関数。
@@ -1279,24 +1280,7 @@ namespace Sayuri {
       // ========================== //
       // 探索関数用テンプレート部品 //
       // ========================== //
-      /** Internal Iterative Deepeningする部品。 */
-      template<NodeType Type>
-      void DoIID(bool is_checked, Move prev_best,
-      Hash pos_hash, int depth, std::uint32_t level, int alpha, int beta,
-      int material, TranspositionTable& table);
-
-      /** Null Move Reductionする部品。 */
-      template<NodeType Type>
-      void DoNMR(bool is_checked, Hash pos_hash,
-      int& depth, std::uint32_t level, int beta, int material,
-      TranspositionTable& table, int& null_reduction);
-
-      /** ProbCutする部品。 */
-      template<NodeType Type>
-      void DoProbCut(Side side, Side enemy_side,
-      bool is_checked, ScoreType& score_type, Hash pos_hash,
-      int depth, std::uint32_t level, int& alpha, int beta, int material,
-      TranspositionTable& table);
+      // TODO : 探索関数をテンプレート化する。
   };
 
   // ==================== //
