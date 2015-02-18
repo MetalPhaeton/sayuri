@@ -145,11 +145,11 @@ namespace Sayuri {
       /** 共有ノードのレベル。 */
       int level_;
       /** 共有ノードのアルファ値。 */
-      int alpha_;
+      volatile int alpha_;
       /** 共有ノードのベータ値。 */
-      int beta_;
+      volatile int beta_;
       /** 共有ノードのデルタ値。 */
-      int delta_;
+      volatile int delta_;
       /** トランスポジションテーブルのポインタ。 */
       TranspositionTable* table_ptr_;
       /** 共有ノードのPVラインのポインタ。 */
@@ -159,7 +159,7 @@ namespace Sayuri {
       /** 共有ノードでのNull Move Reductionの結果。 */
       int null_reduction_;
       /** 共有ノードの評価値の種類。 */
-      ScoreType score_type_;
+      volatile ScoreType score_type_;
       /** 共有ノードでのマテリアル。 */
       int material_;
       /** 共有ノードでチェックされているかどうかのフラグ。 */
@@ -167,7 +167,7 @@ namespace Sayuri {
       /** 共有ノードでの候補手の数。 */
       int num_all_moves_;
       /** 共有ノードで合法手が見つかったかどうかのフラグ。 */
-      bool has_legal_move_;
+      volatile bool has_legal_move_;
       /** 探索する候補手のベクトルのポインタ。 */
       const std::vector<Move>* moves_to_search_ptr_;
       /** 次にinfoコマンドを送る時間のポインタ。 */

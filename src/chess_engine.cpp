@@ -1090,9 +1090,21 @@ namespace Sayuri {
   clock_history_(0),
   position_history_(0),
   eval_params_ptr_(nullptr) {
-    INIT_ARRAY(history_);
-    INIT_ARRAY(iid_stack_);
-    INIT_ARRAY(killer_stack_);
+    // volatileは 'void*' にできない。
+    FOR_SIDES(side) {
+      FOR_SQUARES(from) {
+        FOR_SQUARES(to) {
+          history_[side][from][to] = 0;
+        }
+      }
+    }
+    for (unsigned int i = 0; i < (MAX_PLYS + 1); ++i) {
+      iid_stack_[i] = 0;
+      killer_stack_[i][0] = 0;
+      killer_stack_[i][1] = 0;
+      killer_stack_[i + 2][0] = 0;
+      killer_stack_[i + 2][1] = 0;
+    }
     helper_queue_ptr_.reset(new HelperQueue());
     InitHashValueTable();
   }
@@ -1123,9 +1135,22 @@ namespace Sayuri {
 
   // メンバをコピーする。
   void ChessEngine::SharedStruct::ScanMember(const SharedStruct& shared_st) {
-    COPY_ARRAY(history_, shared_st.history_);
-    COPY_ARRAY(iid_stack_, shared_st.iid_stack_);
-    COPY_ARRAY(killer_stack_, shared_st.killer_stack_);
+    // volatileは 'void*' にできない。
+    FOR_SIDES(side) {
+      FOR_SQUARES(from) {
+        FOR_SQUARES(to) {
+          history_[side][from][to] = shared_st.history_[side][from][to];
+        }
+      }
+    }
+    for (unsigned int i = 0; i < (MAX_PLYS + 1); ++i) {
+      iid_stack_[i] = shared_st.iid_stack_[i];
+      killer_stack_[i][0] = shared_st.killer_stack_[i][0];
+      killer_stack_[i][1] = shared_st.killer_stack_[i][1];
+      killer_stack_[i + 2][0] = shared_st.killer_stack_[i + 2][0];
+      killer_stack_[i + 2][1] = shared_st.killer_stack_[i + 2][1];
+    }
+
     i_depth_ = shared_st.i_depth_;
     searched_nodes_ = shared_st.searched_nodes_;
     searched_level_ = shared_st.searched_level_;

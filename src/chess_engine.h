@@ -506,7 +506,8 @@ namespace Sayuri {
        */
       const std::uint64_t
       (& history() const)[NUM_SIDES][NUM_SQUARES][NUM_SQUARES] {
-        return shared_st_ptr_->history_;
+        return const_cast<const std::uint64_t (&)
+        [NUM_SIDES][NUM_SQUARES][NUM_SQUARES]>(shared_st_ptr_->history_);
       }
       /**
        * アクセサ - ヒストリーの最大値。
@@ -520,14 +521,16 @@ namespace Sayuri {
        * @return IIDでの最善手のスタック。 [探索レベル]
        */
       const Move (& iid_stack() const)[MAX_PLYS + 1] {
-        return shared_st_ptr_->iid_stack_;
+        return const_cast<const Move (&) [MAX_PLYS + 1]>
+        (shared_st_ptr_->iid_stack_);
       }
       /**
        * アクセサ - キラームーブのスタック。
        * @return キラームーブのスタック。 [探索レベル][index * 2 プライ前]
        */
       const Move (& killer_stack() const)[MAX_PLYS + 2 + 1][2] {
-        return shared_st_ptr_->killer_stack_;
+        return const_cast<const Move (&) [MAX_PLYS + 2 + 1][2]>
+        (shared_st_ptr_->killer_stack_);
       }
       /**
        * アクセサ - 探索関数用パラメータ。
@@ -911,28 +914,28 @@ namespace Sayuri {
       /** 共有メンバの構造体。 */
       struct SharedStruct {
         /** ヒストリー。 [サイド][from][to]。 */
-        std::uint64_t history_[NUM_SIDES][NUM_SQUARES][NUM_SQUARES];
+        volatile std::uint64_t history_[NUM_SIDES][NUM_SQUARES][NUM_SQUARES];
         /** ヒストリーの最大値。 */
-        std::uint64_t history_max_;
+        volatile std::uint64_t history_max_;
         /** IIDでの最善手スタック。 [探索レベル] */
-        Move iid_stack_[MAX_PLYS + 1];
+        volatile Move iid_stack_[MAX_PLYS + 1];
         /** キラームーブスタック。[探索レベル][index * 2 プライ前] */
-        Move killer_stack_[MAX_PLYS + 2 + 1][2];
+        volatile Move killer_stack_[MAX_PLYS + 2 + 1][2];
         /**
          * Futility Pruningのマージンテーブル。 [残り探索深さ]
          * マージンが0の時はFutility Pruningしない。
          */
         int futility_pruning_margin_table_[MAX_PLYS + 1];
         /** 現在のIterative Deepeningの深さ。 */
-        std::uint32_t i_depth_;
+        volatile std::uint32_t i_depth_;
         /** 探索したノード数。 */
-        std::uint64_t searched_nodes_;
+        volatile std::uint64_t searched_nodes_;
         /** 探索したレベル。 */
-        std::uint32_t searched_level_;
+        volatile std::uint32_t searched_level_;
         /** 探索開始時間。 */
         TimePoint start_time_;
         /** 探索ストップ条件: 何が何でも探索を中断。 */
-        bool stop_now_;
+        volatile bool stop_now_;
         /** 探索ストップ条件: 最大探索ノード数。 */
         std::uint64_t max_nodes_;
         /** 探索ストップ条件: 最大探索深さ。 */
@@ -940,7 +943,7 @@ namespace Sayuri {
         /** 探索ストップ条件: 思考時間。 */
         Chrono::milliseconds thinking_time_;
         /** 探索ストップ条件: trueなら無限に考える。 */
-        bool infinite_thinking_;
+        volatile bool infinite_thinking_;
         /** 指し手の履歴。 */
         std::vector<Move> move_history_;
         /** 50手ルールの手数の履歴。 */
