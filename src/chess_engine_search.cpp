@@ -434,7 +434,7 @@ namespace Sayuri {
     }
 
     // --- Check Extension --- //
-    if (enable_check_extension_ && is_checked) {
+    if (is_checked && enable_check_extension_) {
       depth += 1;
     }
 
@@ -824,7 +824,7 @@ namespace Sayuri {
       shell.PrintDepthInfo(depth);
 
       // --- Check Extension --- //
-      if (enable_check_extension_ && is_checked) {
+      if (is_checked && enable_check_extension_) {
         depth += 1;
       }
 
