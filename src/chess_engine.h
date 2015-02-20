@@ -38,6 +38,8 @@
 #include <mutex>
 #include <cstddef>
 #include <cstdint>
+#include <climits>
+#include <queue>
 #include "common.h"
 #include "evaluator.h"
 #include "position_record.h"
@@ -167,6 +169,15 @@ namespace Sayuri {
       void StopCalculation();
 
       /**
+       * メールボックスにベータカットしたノードのレベルをポストする。
+       * @param level ポストするレベル。
+       */
+      void PostBetaCutNodeLevel(int level) {
+        std::unique_lock<std::mutex> lock(mailbox_.mutex_);  // ロック。
+        mailbox_.betacut_level_tray_.push(level);
+      }
+
+      /**
        * 手を指す。
        * @param move 指し手。
        * @exception SayuriError 合法手でない。
@@ -279,7 +290,7 @@ namespace Sayuri {
        * @return キャスリング可能ならtrue。
        */
       template<Castling Flag>
-      bool CanCastling() const {}
+      bool CanCastling() const {return false;}
 
       /**
        * キャスリングの権利を更新。
@@ -740,7 +751,14 @@ namespace Sayuri {
        * 探索を中断しなければならないかどうかを判断する。
        * @return 中断しなければいけない時はtrue。
        */
-      bool ShouldBeStopped();
+      // bool ShouldBeStopped();
+
+      /**
+       * 現在のノードの探索を中止すべきかどうか判断する。
+       * @param level 現在のノードのレベル。
+       * @return 中止すべきならtrue。
+       */
+      bool JudgeToStop(int level);
 
       // ======================== //
       // その他のプライベート関数 //
@@ -1018,10 +1036,6 @@ namespace Sayuri {
       // ===================================================== //
       /** 今ヌルムーブのサーチ中かどうかのフラグ。 */
       bool is_null_searching_;
-      /** 現在請け負っている仕事のポインタ。 */
-      Job* my_job_ptr_;
-      /** 現在請け負っている仕事から探索中止依頼が来たかどうか。 */
-      volatile bool is_job_ended_;
       /** 探索用MoveMakerのテーブル。 [探索レベル] */
       std::unique_ptr<MoveMaker[]> maker_table_;
       /** 探索用PVLineのテーブル。 [探索レベル] */
@@ -1036,6 +1050,14 @@ namespace Sayuri {
       std::mutex mutex_;
       /** 並列探索用スレッドのベクトル。 */
       std::vector<std::thread> thread_vec_;
+
+      /** スレッド間通信用メールボックス。 */
+      struct Mailbox {
+        /** ベータカットされたJobのポインタ。 (メッセージ) */
+        std::queue<int> betacut_level_tray_;
+        /** メールボックス用ミューテックス。 */
+        std::mutex mutex_;
+      } mailbox_;
 
       // ==================== //
       // 探索関数用キャッシュ //

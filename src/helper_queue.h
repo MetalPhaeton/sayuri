@@ -76,9 +76,10 @@ namespace Sayuri {
       // ============== //
       /**
        * スレッドが仕事を得る。 得るまで待機。
+       * @param helper_ptr 得ようとしているヘルパーのポインタ。
        * @return 仕事へのポインタ。 なければnullptr。
        */
-      Job* GetJob();
+      Job* GetJob(ChessEngine* helper_ptr);
 
       /**
        * 待機中のスレッドの数を得る。

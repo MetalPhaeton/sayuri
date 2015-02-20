@@ -34,7 +34,7 @@
 #include <mutex>
 #include <chrono>
 #include <condition_variable>
-#include <functional>
+#include <list>
 #include "common.h"
 
 /** Sayuri 名前空間。 */
@@ -85,10 +85,10 @@ namespace Sayuri {
        */
       void Init(MoveMaker& maker) {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+        record_ptr_ = nullptr;
         maker_ptr_ = &maker;
-        helper_counter_ = 0;
+        helper_ptr_list_.clear();
         counter_ = 0;
-        betacut_listener_vec_.clear();
       }
 
       /**
@@ -97,32 +97,70 @@ namespace Sayuri {
        */
       Move PickMove();
 
-      /** この仕事を請け負っているヘルパーの数を増やす。 */
-      void CountHelper();
-
-      /** 
-       * ベータカットのお知らせを受け取る関数を登録する。
-       * @param listener ベータカットのお知らせを受け取る関数オブジェクト。
-       */
-      void AddBetaCutListener(const std::function<void(Job&)>& listener) {
+      /** ヘルパーが全員仕事を終えるまで待機する。 */
+      void WaitForHelpers() {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-        betacut_listener_vec_.push_back(listener);
+        while (helper_ptr_list_.size() > 0) {
+          cond_.wait(lock);
+        }
       }
 
-      /** 仕事終了を知らせる。 */
-      void FinishMyJob();
+      /** 
+       * ヘルパーにベータカットが発生したことを知らせる。
+       * @param caller_ptr 呼び出したエンジンのポインタ。
+       * 呼び出した人にメセージを送らないようにするためのもの。
+       */
+      void NotifyBetaCut(ChessEngine* caller_ptr);
 
-      /** ヘルパーが全員仕事を終えるまで待機する。 */
-      void WaitForHelpers();
+      /**
+       * ジョブにヘルパー登録をする。
+       * @param helper_ptr 登録するヘルパーのポインタ。
+       */
+      void AddHelperPtr(ChessEngine* helper_ptr) {
+        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
 
-      /** ヘルパーにベータカットが発生したことを知らせる。 */
-      void NotifyBetaCut();
+        for (auto ptr : helper_ptr_list_) {
+          if (ptr == helper_ptr) return;
+        }
+        helper_ptr_list_.push_back(helper_ptr);
+      }
+
+      /**
+       * ジョブからヘルパーを削除する。
+       * @param helper_ptr 削除するヘルパーのポインタ。
+       */
+      void RemoveHelperPtr(ChessEngine* helper_ptr) {
+        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+
+        std::list<ChessEngine*>::iterator itr = helper_ptr_list_.begin();
+        for (; itr != helper_ptr_list_.end(); ++itr) {
+          if (*itr == helper_ptr) {
+            helper_ptr_list_.erase(itr);
+
+            // WaitForHelpers()で待っている人にお知らせ。
+            cond_.notify_all();
+            return;
+          }
+        }
+      }
+
+      /**
+       * 登録されているヘルパーの数を返す。
+       * @return 登録されているヘルパーの数。
+       */
+      std::size_t CountHelpers() {
+        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+        return helper_ptr_list_.size();
+      }
 
       /**
        *  数を数える。 探索した手の数を数えるときに使う。
        * @return 次の数字。
        */
-      int Count();
+      int Count() {
+        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+        return ++counter_;
+      }
 
       /** ロックする。 */
       void Lock() {mutex_.lock();}
@@ -188,10 +226,8 @@ namespace Sayuri {
       // ========== //
       /** 仕事用MoveMakerのポインタ。 */
       MoveMaker* maker_ptr_;
-      /** 請け負っているヘルパーの数。 */
-      volatile int helper_counter_;
-      /** ベータカットのお知らせを受け取る関数のベクトル。 */
-      std::vector<std::function<void(Job&)>> betacut_listener_vec_;
+      /** ヘルパーのポインタのリスト。 */
+      std::list<ChessEngine*> helper_ptr_list_;
       /** ミューテックス。 */
       std::mutex mutex_;
       /** 自分用コンディション。 */

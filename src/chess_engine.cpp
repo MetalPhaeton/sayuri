@@ -60,8 +60,6 @@ namespace Sayuri {
   ChessEngine::ChessEngine(const SearchParams& search_params,
   const EvalParams& eval_params) :
   is_null_searching_(false),
-  my_job_ptr_(nullptr),
-  is_job_ended_(false),
   evaluator_(*this) {
     SetNewGame();
 
@@ -92,8 +90,6 @@ namespace Sayuri {
   // プライベートコンストラクタ。
   ChessEngine::ChessEngine() : 
   is_null_searching_(false),
-  my_job_ptr_(nullptr),
-  is_job_ended_(false),
   evaluator_(*this) {
     SetNewGame();
 
@@ -119,8 +115,6 @@ namespace Sayuri {
   // コピーコンストラクタ。
   ChessEngine::ChessEngine(const ChessEngine& engine) :
   is_null_searching_(false),
-  my_job_ptr_(nullptr),
-  is_job_ended_(false),
   evaluator_(*this) {
     // 基本メンバをコピー。
     ScanBasicMember(engine);
@@ -150,8 +144,6 @@ namespace Sayuri {
   // ムーブコンストラクタ。
   ChessEngine::ChessEngine(ChessEngine&& engine) :
   is_null_searching_(false),
-  my_job_ptr_(nullptr),
-  is_job_ended_(false),
   evaluator_(*this) {
     // 基本メンバをコピー。
     ScanBasicMember(engine);

@@ -51,13 +51,15 @@ namespace Sayuri {
   // 繰り返しテスト。
   void DoRepeatTest(UCIShell& shell) {
     volatile bool loop = true;
+    volatile int count = 0;
 
     shell.AddOutputListener
-    ([&loop](const std::string& message) mutable {
+    ([&loop, &count](const std::string& message) {
       std::vector<std::string> words =
       Util::Split<char>(message, {' '}, std::set<char> {});
 
       if (words[0] == "bestmove") {
+        std::cout << "----- " << count++ << " -----" << std::endl;
         std::cout << message << std::endl;
         loop = false;
       }
@@ -70,7 +72,9 @@ namespace Sayuri {
       shell.InputCommand("ucinewgame");
       shell.InputCommand("position startpos");
       shell.InputCommand("go movetime 10000");
-      while (loop) continue;
+      while (loop) {
+        std::this_thread::sleep_for(Chrono::milliseconds(500));
+      }
     }
   }
 
@@ -78,28 +82,25 @@ namespace Sayuri {
     // プログラムの起動。
     // 初期化。
     Init();
-
     // エンジン準備。
-    /*
-    std::unique_ptr<SearchParams>
-    search_params_ptr(new SearchParams());
+    std::unique_ptr<Sayuri::SearchParams>
+    search_params_ptr(new Sayuri::SearchParams());
 
-    std::unique_ptr<EvalParams>
-    eval_params_ptr(new EvalParams());
+    std::unique_ptr<Sayuri::EvalParams>
+    eval_params_ptr(new Sayuri::EvalParams());
 
-    std::unique_ptr<ChessEngine>
-    engine_ptr(new ChessEngine(*search_params_ptr, *eval_params_ptr));
+    std::unique_ptr<Sayuri::ChessEngine>
+    engine_ptr(new Sayuri::ChessEngine(*search_params_ptr, *eval_params_ptr));
 
-    std::unique_ptr<UCIShell>
-    shell_ptr(new UCIShell(*engine_ptr));
-    */
+    std::unique_ptr<Sayuri::TranspositionTable>
+    table_ptr(new Sayuri::TranspositionTable(Sayuri::UCI_DEFAULT_TABLE_SIZE));
+
+    std::unique_ptr<Sayuri::UCIShell>
+    shell_ptr(new Sayuri::UCIShell(*engine_ptr, *table_ptr));
+
     // ========================================================================
 
-    std::unique_ptr<TranspositionTable>
-    table_ptr(new TranspositionTable(256ULL * 1024ULL * 1024ULL));
-    std::cout << "TTEntry size: " << sizeof(TTEntry) << " bytes." << std::endl;
-    std::cout << "Table size: " << table_ptr->num_entries_ << std::endl;
-    std::cout << "Real size: " << table_ptr->GetSizeBytes() << std::endl;
+    DoRepeatTest(*shell_ptr);
 
     return 0;
   }

@@ -46,8 +46,7 @@ namespace Sayuri {
   // コンストラクタと代入 //
   // ==================== //
   // コンストラクタ。
-  Job::Job() : maker_ptr_(nullptr), helper_counter_(0),
-  betacut_listener_vec_(0), counter_(0) {}
+  Job::Job() : maker_ptr_(nullptr), counter_(0) {}
 
   // コピーコンストラクタ。
   Job::Job(const Job& job) {
@@ -82,43 +81,16 @@ namespace Sayuri {
     return maker_ptr_->PickMove();
   }
 
-  // この仕事を請け負っているヘルパーの数を増やす。
-  void Job::CountHelper() {
-    std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-    ++helper_counter_;
-  }
-
-  // 仕事終了を知らせる。
-  void Job::FinishMyJob() {
-    std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-    --helper_counter_;
-    cond_.notify_all();
-  }
-
-  // ヘルパーが全員仕事を終えるまで待機する。
-  void Job::WaitForHelpers() {
-    std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-    while (helper_counter_ > 0) {
-      cond_.wait(lock);
-    }
-  }
-
   // ヘルパーにベータカットが発生したことを知らせる。
-  void Job::NotifyBetaCut() {
+  void Job::NotifyBetaCut(ChessEngine* caller_ptr) {
     std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
 
-    for (auto& listener : betacut_listener_vec_) {
-      listener(*this);
+    if (client_ptr_ && (client_ptr_ != caller_ptr)) {
+      client_ptr_->PostBetaCutNodeLevel(level_);
     }
-    betacut_listener_vec_.clear();
-  }
-
-  // 数を数える。
-  int Job::Count() {
-    std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-
-    ++counter_;
-    return counter_;
+    for (auto ptr : helper_ptr_list_) {
+      if (ptr != caller_ptr) ptr->PostBetaCutNodeLevel(level_);
+    }
   }
 
   // ================ //
@@ -148,9 +120,8 @@ namespace Sayuri {
     has_legal_move_ = job.has_legal_move_;
     moves_to_search_ptr_ = job.moves_to_search_ptr_;
     next_print_info_time_ = job.next_print_info_time_;
+
     maker_ptr_ = job.maker_ptr_;
-    helper_counter_ = job.helper_counter_;
-    betacut_listener_vec_ = job.betacut_listener_vec_;
     counter_ = job.counter_;
   }
 }  // namespace Sayuri

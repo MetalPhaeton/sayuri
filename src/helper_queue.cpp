@@ -77,7 +77,7 @@ namespace Sayuri {
   // パブリック関数 //
   // ============== //
   // スレッドが仕事を得る。
-  Job* HelperQueue::GetJob() {
+  Job* HelperQueue::GetJob(ChessEngine* helper_ptr) {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
 
     // ヘルパーが必要なければnullptrを返す。
@@ -106,7 +106,7 @@ namespace Sayuri {
 
 
     // 仕事の準備。
-    job_ptr_->CountHelper();
+    job_ptr_->AddHelperPtr(helper_ptr);
     Job* temp = job_ptr_;
     job_ptr_ = nullptr;
 
@@ -122,12 +122,14 @@ namespace Sayuri {
     
     // ヘルパーがいれば仕事を依頼。
     if (num_helpers_ > 0) {
+      job.Lock();
       if (!(job.record_ptr_)) {
         job.record_ptr_ =
         &(job.client_ptr_->GetRecord(job.level_, job.pos_hash_));
       }
 
       job_ptr_ = &job;
+      job.Unlock();
       helper_cond_.notify_one();
 
       // ヘルパーの準備が完了するまで待つ。
@@ -139,12 +141,14 @@ namespace Sayuri {
   void HelperQueue::HelpRoot(Job& job) {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
 
+    job.Lock();
     if (!(job.record_ptr_)) {
       job.record_ptr_ =
       &(job.client_ptr_->GetRecord(job.level_, job.pos_hash_));
     }
 
     job_ptr_ = &job;
+    job.Unlock();
     helper_cond_.notify_one();
 
     // ヘルパーがやってきて、準備が完了するまで待つ。
