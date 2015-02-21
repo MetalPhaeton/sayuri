@@ -55,7 +55,7 @@
 namespace Sayuri {
   // クイース探索。
   int ChessEngine::Quiesce(std::uint32_t level, int alpha, int beta,
-  int material, TranspositionTable& table) {
+  int material) {
     // 探索中止。
     if (JudgeToStop(level)) return alpha;
 
@@ -123,8 +123,7 @@ namespace Sayuri {
       }
 
       // 次の手を探索。
-      int score = -Quiesce(level + 1, -beta, -alpha,
-      -next_my_material, table);
+      int score = -Quiesce(level + 1, -beta, -alpha, -next_my_material);
 
       UnmakeMove(move);
 
@@ -137,9 +136,6 @@ namespace Sayuri {
 
     return alpha;
   }
-
-  // --- 探索関数用テンプレート部品 --- //
-  // TODO : 探索関数をテンプレート化する。
 
   // 通常の探索。
   int ChessEngine::Search(NodeType node_type, Hash pos_hash, int depth,
@@ -284,7 +280,7 @@ namespace Sayuri {
       if (enable_quiesce_search_) {
         // クイース探索ノードに移行するため、ノード数を減らしておく。
         --(shared_st_ptr_->searched_nodes_);
-        return Quiesce(level, alpha, beta, material, table);
+        return Quiesce(level, alpha, beta, material);
       } else {
         return evaluator_.Evaluate(material);
       }
@@ -332,17 +328,16 @@ namespace Sayuri {
 
           if (score >= beta) {
             null_reduction = nmr_reduction_;
-
-            depth = Util::GetMax(depth - null_reduction, 1);
+            depth = depth - null_reduction;
             if (depth <= 0) {
               if (enable_quiesce_search_) {
                 // クイース探索ノードに移行するため、ノード数を減らしておく。
                 --(shared_st_ptr_->searched_nodes_);
-                return Quiesce(level, alpha, beta, material, table);
+                return Quiesce(level, alpha, beta, material);
               } else {
                 return evaluator_.Evaluate(material);
               }
-            }
+    }
           }
         }
       }
@@ -373,7 +368,7 @@ namespace Sayuri {
 
           // 探索。
           for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
-            if (JudgeToStop(level)) break;
+            if (JudgeToStop(level)) return alpha;
 
             // 次のノードへの準備。
             Hash next_hash = GetNextHash(pos_hash, move);

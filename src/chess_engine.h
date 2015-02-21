@@ -695,11 +695,9 @@ namespace Sayuri {
        * @param alpha アルファ値。
        * @param beta ベータ値。
        * @param material 現在のマテリアル。
-       * @param table トランスポジションテーブル。
        * @return 評価値。
        */
-      int Quiesce(std::uint32_t level, int alpha, int beta,
-      int material, TranspositionTable& table);
+      int Quiesce(std::uint32_t level, int alpha, int beta, int material);
 
       /**
        * 通常の探索。
