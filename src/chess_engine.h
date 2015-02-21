@@ -748,12 +748,6 @@ namespace Sayuri {
       void SearchRootParallel(Job& job, UCIShell& shell);
 
       /**
-       * 探索を中断しなければならないかどうかを判断する。
-       * @return 中断しなければいけない時はtrue。
-       */
-      // bool ShouldBeStopped();
-
-      /**
        * 現在のノードの探索を中止すべきかどうか判断する。
        * @param level 現在のノードのレベル。
        * @return 中止すべきならtrue。

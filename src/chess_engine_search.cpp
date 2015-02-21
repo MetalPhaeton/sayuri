@@ -56,9 +56,7 @@ namespace Sayuri {
   // クイース探索。
   int ChessEngine::Quiesce(std::uint32_t level, int alpha, int beta,
   int material, TranspositionTable& table) {
-    // 探索中止の時。
-    // %%% test
-    // if (ShouldBeStopped()) return alpha;
+    // 探索中止。
     if (JudgeToStop(level)) return alpha;
 
     // ノード数を加算。
@@ -147,9 +145,7 @@ namespace Sayuri {
   int ChessEngine::Search(NodeType node_type, Hash pos_hash, int depth,
   std::uint32_t level, int alpha, int beta, int material,
   TranspositionTable& table) {
-    // 探索中止の時。
-    // %%% test
-    // if (ShouldBeStopped()) return alpha;
+    // 探索中止。
     if (JudgeToStop(level)) return alpha;
 
     // ノード数を加算。
@@ -485,9 +481,7 @@ namespace Sayuri {
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // 探索終了ならループを抜ける。
-      // %%% test
-      // if (ShouldBeStopped() || is_job_ended_ || (job.alpha_ >= job.beta_)) {
-      if (JudgeToStop(level) || (job.alpha_ >= job.beta_)) return job.alpha_;
+      if (JudgeToStop(level)) return job.alpha_;
 
       // 別スレッドに助けを求める。(YBWC)
       if ((job.depth_ >= ybwc_limit_depth_)
@@ -670,8 +664,6 @@ namespace Sayuri {
     // Null Move探索中の局面は登録しない。
     // Null Move Reductionされていた場合、容量節約のため登録しない。
     if (enable_ttable_) {
-      // %%% test
-      // if (!is_null_searching_ && !null_reduction && !ShouldBeStopped()) {
       if (!is_null_searching_ && !null_reduction && !JudgeToStop(level)) {
         table.Add(pos_hash, depth, job.alpha_, job.score_type_,
         pv_line_table_[level][0]);
@@ -774,8 +766,6 @@ namespace Sayuri {
     for (shared_st_ptr_->i_depth_ = 1; shared_st_ptr_->i_depth_ <= MAX_PLYS;
     ++(shared_st_ptr_->i_depth_)) {
       // 探索終了。
-      // %%% test
-      // if (ShouldBeStopped()) break;
       if (JudgeToStop(level)) break;
 
       int depth = shared_st_ptr_->i_depth_;
@@ -892,9 +882,9 @@ namespace Sayuri {
     }
 
     // 探索終了したけど、まだ思考を止めてはいけない場合、関数を終了しない。
-    // %%% test
-    // while (!ShouldBeStopped()) continue;
-    while (!JudgeToStop(level)) continue;
+    while (!JudgeToStop(level)) {
+      std::this_thread::sleep_for(Chrono::milliseconds(1));
+    }
 
     // 最後に情報を送る。
     shell.PrintFinalInfo
@@ -969,11 +959,7 @@ namespace Sayuri {
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // 探索終了ならループを抜ける。
-      // %%% test
-      // if (ShouldBeStopped() || is_job_ended_ || (job.alpha_ >= job.beta_)) {
-      if (JudgeToStop(job.level_) || (job.alpha_ >= job.beta_)) {
-        break;
-      }
+      if (JudgeToStop(job.level_)) break;
 
       // 次のハッシュ。
       Hash next_hash = GetNextHash(job.pos_hash_, move);
@@ -1143,13 +1129,6 @@ namespace Sayuri {
     Util::GetMax(job.num_all_moves_ * lmr_threshold_, lmr_after_moves_);
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
-      // ベータカットトレイをクリア。
-      mailbox_.mutex_.lock();
-      mailbox_.betacut_level_tray_ = std::queue<int>();
-      mailbox_.mutex_.unlock();
-
-      // %%% test
-      // if (ShouldBeStopped()) break;
       if (JudgeToStop(job.level_)) break;
 
       // 定時(1秒)報告の情報を送る。
@@ -1217,7 +1196,6 @@ namespace Sayuri {
       if (num_moves <= 1) {
         while (true) {
           // 探索終了。
-          // %%% test
           if (JudgeToStop(job.level_)) break;
 
           // フルでPVを探索。
@@ -1306,8 +1284,6 @@ namespace Sayuri {
           if (score > temp_alpha) {
             while (true) {
               // 探索終了。
-              // %%% test
-              // if (ShouldBeStopped()) break;
               if (JudgeToStop(job.level_)) break;
 
               // フルウィンドウで再探索。
@@ -1351,8 +1327,6 @@ namespace Sayuri {
       UnmakeMove(move);
 
       // ストップがかかっていたらループを抜ける。
-      // %%% test
-      // if (ShouldBeStopped()) break;
       if (JudgeToStop(job.level_)) break;
 
       // 最善手を見つけた。
@@ -1498,30 +1472,6 @@ namespace Sayuri {
     shared_st_ptr_->infinite_thinking_ = enable;
   }
 
-  // 探索を中断しなければいけないかどうかを判断する。
-  /*
-  bool ChessEngine::ShouldBeStopped() {
-    // 最低1手は考える。
-    if (shared_st_ptr_->i_depth_ <= 1) return false;
-
-    if (shared_st_ptr_->stop_now_) return true;
-    if (shared_st_ptr_->infinite_thinking_) return false;
-    if (shared_st_ptr_->i_depth_ > max_depth_) {
-      shared_st_ptr_->stop_now_ = true;
-      return true;
-    }
-    if (shared_st_ptr_->searched_nodes_ >= max_nodes_) {
-      shared_st_ptr_->stop_now_ = true;
-      return true;
-    }
-    TimePoint now = SysClock::now();
-    if ((now - (shared_st_ptr_->start_time_)) >= thinking_time_) {
-      shared_st_ptr_->stop_now_ = true;
-      return true;
-    }
-    return false;
-  }
-  */
   // 現在のノードの探索を中止すべきかどうか判断する。
   bool ChessEngine::JudgeToStop(int level) {
     // 今すぐ終了すべき。
