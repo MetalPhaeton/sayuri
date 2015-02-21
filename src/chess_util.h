@@ -647,7 +647,7 @@ namespace Sayuri {
        * @param val_2 値2。
        * @return val_1とval_2の大きい方。
        */
-      template<typename T, typename S>
+      template<class T, class S>
       constexpr static auto GetMax(T val_1, S val_2)
       -> decltype(val_1 + val_2) {
         return val_1 > val_2 ? val_1 : val_2;
@@ -659,7 +659,7 @@ namespace Sayuri {
        * @param val_2 値2。
        * @return val_1とval_2の小さい方。
        */
-      template<typename T, typename S>
+      template<class T, class S>
       constexpr static auto GetMin(T val_1, S val_2)
       -> decltype(val_1 + val_2) {
         return val_1 < val_2 ? val_1 : val_2;
@@ -670,7 +670,7 @@ namespace Sayuri {
        * @param dst 更新したい変数。
        * @param value 更新元の数値。
        */
-      template<typename T, typename S>
+      template<class T, class S>
       static void UpdateMax(T& dst, S value) {
         if (value > dst) dst = value;
       }
@@ -680,7 +680,7 @@ namespace Sayuri {
        * @param dst 更新したい変数。
        * @param value 更新元の数値。
        */
-      template<typename T, typename S>
+      template<class T, class S>
       static void UpdateMin(T& dst, S value) {
         if (value < dst) dst = value;
       }
@@ -740,7 +740,7 @@ namespace Sayuri {
        * @param delim_and_word 区切り文字のセット。 (単語として残す。)
        * @return 単語のベクトル。
        */
-      template<typename CharType>
+      template<class CharType>
       static std::vector<std::basic_string<CharType>> Split
       (const std::basic_string<CharType>& str,
       const std::set<CharType>& delim,

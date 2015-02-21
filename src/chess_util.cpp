@@ -648,7 +648,7 @@ namespace Sayuri {
   // その他の便利関数 //
   // ================ //
   // 文字列を単語に切り分ける。
-  template<typename CharType>
+  template<class CharType>
   std::vector<std::basic_string<CharType>> Util::Split
   (const std::basic_string<CharType>& str,
   const std::set<CharType>& delim,
