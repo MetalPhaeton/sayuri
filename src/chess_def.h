@@ -506,6 +506,15 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
     ALL
   };
 
+  /**
+   * 制限時間から思考時間を計算する。
+   * @param time_limit 制限時間。
+   * @return 思考時間。
+   */
+  constexpr inline int TimeLimitToMoveTime(int time_limit) {
+    return time_limit >= 600000 ? 60000 : (time_limit / 10);
+  }
+
   // ====== //
   // その他 //
   // ====== //

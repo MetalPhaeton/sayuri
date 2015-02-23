@@ -97,9 +97,9 @@ namespace Sayuri {
       // ======== //
       /**
        * アクセサ - ライン。
-       * @return ライン。
+       * @return ラインの手。
        */
-      const Move& operator[](int index) const {return line_[index];}
+      Move operator[](int index) const {return line_[index];}
       /**
        * アクセサ - ラインの長さ。
        * @return ラインの長さ。

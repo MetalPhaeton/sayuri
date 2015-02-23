@@ -756,6 +756,90 @@ namespace Sayuri {
       const std::set<CharType>& delim,
       const std::set<CharType>& delim_and_word);
 
+      /**
+       * MoveをPure Coordination Notationに変換。
+       * @param move 変換したい手。
+       * @return Pure Coordination Notation。
+       */
+      static std::string MoveToString(Move move) {
+        // 準備。
+        std::string ret = "";
+        Square from = GetFrom(move);
+        Square to = GetTo(move);
+        PieceType promotion = GetPromotion(move);
+
+        // 文字列を作成。
+        ret.push_back(Util::SQUARE_TO_FYLE[from] + 'a');
+        ret.push_back(Util::SQUARE_TO_RANK[from] + '1');
+        ret.push_back(Util::SQUARE_TO_FYLE[to] + 'a');
+        ret.push_back(Util::SQUARE_TO_RANK[to] + '1');
+        switch (promotion) {
+          case KNIGHT:
+            ret.push_back('n');
+            break;
+          case BISHOP:
+            ret.push_back('b');
+            break;
+          case ROOK:
+            ret.push_back('r');
+            break;
+          case QUEEN:
+            ret.push_back('q');
+            break;
+          default:
+            break;
+        }
+
+        return ret;
+      }
+
+      /**
+       * Pure Coordination NotationをMoveに変換。
+       * @param str Pure Coordination Notation。
+       * @return 変換後の手。
+       */
+      static Move StringToMove(const std::string& str) {
+        if (str.size() < 4) return 0;
+
+        Move ret = 0;
+
+        // fromをパース。
+        Fyle fyle = str[0] - 'a';
+        if (fyle >= NUM_FYLES) return 0;
+        Rank rank = str[1] - '1';
+        if (rank >= NUM_RANKS) return 0;
+        SetFrom(ret, COORD_TO_SQUARE[fyle][rank]);
+
+        // toをパース。
+        fyle = str[2] - 'a';
+        if (fyle >= NUM_FYLES) return 0;
+        rank = str[3] - '1';
+        if (rank >= NUM_RANKS) return 0;
+        SetTo(ret, COORD_TO_SQUARE[fyle][rank]);
+
+        // 昇格をパース。
+        if (str.size() >= 5) {
+          switch (str[4]) {
+            case 'n':
+              SetPromotion(ret, KNIGHT);
+              break;
+            case 'b':
+              SetPromotion(ret, BISHOP);
+              break;
+            case 'r':
+              SetPromotion(ret, ROOK);
+              break;
+            case 'q':
+              SetPromotion(ret, QUEEN);
+              break;
+            default:
+              break;
+          }
+        }
+
+        return ret;
+      }
+
       // ランダムな数値を得る。
       static Hash GetRandomHash() {return dist_(engine_);}
 

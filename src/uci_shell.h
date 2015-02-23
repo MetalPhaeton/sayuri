@@ -231,6 +231,11 @@ namespace Sayuri {
        * @return トランスポジションテーブル。
        */
       const TranspositionTable& table() const {return *table_ptr_;}
+      /**
+       * アクセサ - スレッドの数。
+       * @return スレッドの数。
+       */
+      int num_threads() const {return num_threads_;}
 
     private:
       // ================ //

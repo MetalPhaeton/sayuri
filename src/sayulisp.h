@@ -491,6 +491,35 @@ namespace Sayuri {
       LispObjectPtr AddUCIOutputListener(const LispObject& caller,
       const LispObject& symbol);
 
+      /**
+       * move_timeミリ秒間思考する。 最善手が見つかるまで戻らない。
+       * 思考中の出力はAddUCIOutputListener()で登録した関数で得られる。
+       * @param move_time 思考時間。 (ミリ秒)
+       * @return 最善手。
+       */
+      LispObjectPtr GoMoveTime(const LispObject& move_time);
+      /**
+       * 持ち時間time(ミリ秒)で思考する。 最善手が見つかるまで戻らない。
+       * 思考中の出力はAddUCIOutputListener()で登録した関数で得られる。
+       * @param time 持ち時間。 (ミリ秒)
+       * @return 最善手。
+       */
+      LispObjectPtr GoTimeLimit(const LispObject& time);
+      /**
+       * 深さdepthまで思考する。 最善手が見つかるまで戻らない。
+       * 思考中の出力はAddUCIOutputListener()で登録した関数で得られる。
+       * @param depth 深さ。
+       * @return 最善手。
+       */
+      LispObjectPtr GoDepth(const LispObject& depth);
+      /**
+       * nodesのノード数まで思考する。 最善手が見つかるまで戻らない。
+       * 思考中の出力はAddUCIOutputListener()で登録した関数で得られる。
+       * @param nodes ノード数。
+       * @return 最善手。
+       */
+      LispObjectPtr GoNodes(const LispObject& nodes);
+
       // ======== //
       // アクセサ //
       // ======== //
@@ -533,6 +562,17 @@ namespace Sayuri {
           callback(message);
         }
       }
+
+      /**
+       * 最善手を得る。
+       * @param depth 探索する深さ。
+       * @param nodes 探索するノード数。
+       * @param thinking_time 思考時間。 (ミリ秒)
+       * @retrun 最善手のリスト。
+       */
+      LispObjectPtr GetBestMove(std::uint32_t depth, std::uint64_t nodes,
+      int thinking_time);
+
 
       // ========== //
       // メンバ変数 //

@@ -34,6 +34,8 @@
 #include <utility>
 #include <string>
 #include <functional>
+#include <climits>
+#include <sstream>
 #include "common.h"
 #include "params.h"
 #include "chess_engine.h"
@@ -42,6 +44,7 @@
 #include "lisp_core.h"
 #include "fen.h"
 #include "position_record.h"
+#include "pv_line.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -440,10 +443,112 @@ namespace Sayuri {
 
       return AddUCIOutputListener(caller, *list_itr);
 
+    } else if (message_symbol == "@go-movetime") {
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr move_time_ptr = caller.Evaluate(*list_itr);
+      if (!(move_time_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2}, true);
+      }
+
+      return GoMoveTime(*move_time_ptr);
+
+    } else if (message_symbol == "@go-timelimit") {
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr time_limit_ptr = caller.Evaluate(*list_itr);
+      if (!(time_limit_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2}, true);
+      }
+
+      return GoTimeLimit(*time_limit_ptr);
+
+    } else if (message_symbol == "@go-depth") {
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr depth_ptr = caller.Evaluate(*list_itr);
+      if (!(depth_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2}, true);
+      }
+
+      return GoDepth(*depth_ptr);
+
+    } else if (message_symbol == "@go-nodes") {
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr nodes_ptr = caller.Evaluate(*list_itr);
+      if (!(nodes_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2}, true);
+      }
+
+      return GoNodes(*nodes_ptr);
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
     + ") couldn't understand '" + message_symbol + "'.");
+  }
+
+  LispObjectPtr EngineSuite::GetBestMove(std::uint32_t depth,
+  std::uint64_t nodes, int thinking_time) {
+    // ストッパーを登録。
+    engine_ptr_->SetStopper(Util::GetMin(depth, MAX_PLYS),
+    Util::GetMin(nodes, MAX_NODES),
+    Chrono::milliseconds(thinking_time), false);
+
+    // テーブルの年齢を上げる。
+    table_ptr_->GrowOld();
+
+    // 思考開始。
+    PVLine pv_line = engine_ptr_->Calculate(shell_ptr_->num_threads(),
+    *table_ptr_, std::vector<Move>(), *shell_ptr_);
+    Move best_move = pv_line.length() >= 1 ? pv_line[0] : 0;
+
+    std::ostringstream stream;
+    if (best_move) {
+      stream << "bestmove "<< Util::MoveToString(best_move);
+
+      // 2手目があるならponderで表示。
+      if (pv_line.length() >= 2) {
+        stream << " ponder " << Util::MoveToString(pv_line[1]);
+      }
+    }
+
+    // UCIアウトプットリスナーに最善手を送る。
+    for (auto& callback : callback_vec_) {
+      callback(stream.str());
+    }
+
+    // 戻り値の最善手を作る。
+    if (best_move) {
+      LispObjectPtr ret_ptr = LispObject::NewList(3);
+      ret_ptr->car
+      (LispObject::NewSymbol(SQUARE_SYMBOL[GetFrom(best_move)]));
+      ret_ptr->cdr()->car
+      (LispObject::NewSymbol(SQUARE_SYMBOL[GetTo(best_move)]));
+      ret_ptr->cdr()->cdr()->car
+      (LispObject::NewSymbol(PIECE_TYPE_SYMBOL[GetPromotion(best_move)]));
+
+      return ret_ptr;
+    }
+
+    return LispObject::NewNil();
   }
 
   // 白ポーンの配置にアクセス。
@@ -1041,6 +1146,54 @@ namespace Sayuri {
     callback_vec_.push_back(callback);
 
     return LispObject::NewBoolean(true);
+  }
+
+  // move_timeミリ秒間思考する。 最善手が見つかるまで戻らない。
+  LispObjectPtr EngineSuite::GoMoveTime(const LispObject& move_time) {
+    int move_time_2 = move_time.number_value();
+    if (move_time_2 < 0) {
+      throw LispObject::GenError("@engine_error",
+      "Move time must be 0 milliseconds and more. Given "
+      + std::to_string(move_time_2) + " milliseconds.");
+    }
+
+    return GetBestMove(MAX_PLYS, MAX_NODES, move_time_2);
+  }
+
+  // 持ち時間time(ミリ秒)で思考する。 最善手が見つかるまで戻らない。
+  LispObjectPtr EngineSuite::GoTimeLimit(const LispObject& time) {
+    int time_2 = time.number_value();
+    if (time_2 < 0) {
+      throw LispObject::GenError("@engine_error",
+      "Time limit must be 0 milliseconds and more. Given "
+      + std::to_string(time_2) + " milliseconds.");
+    }
+
+    return GetBestMove(MAX_PLYS, MAX_NODES, TimeLimitToMoveTime(time_2));
+  }
+
+  // 深さdepthまで思考する。 最善手が見つかるまで戻らない。
+  LispObjectPtr EngineSuite::GoDepth(const LispObject& depth) {
+    int depth_2 = depth.number_value();
+    if (depth_2 < 0) {
+      throw LispObject::GenError("@engine_error",
+      "Depth must be 0 and more. Given "
+      + std::to_string(depth_2) + ".");
+    }
+
+    return GetBestMove(depth_2, MAX_NODES, INT_MAX);
+  }
+
+  // nodesのノード数まで思考する。 最善手が見つかるまで戻らない。
+  LispObjectPtr EngineSuite::GoNodes(const LispObject& nodes) {
+    long long nodes_2 = nodes.number_value();
+    if (nodes_2 < 0) {
+      throw LispObject::GenError("@engine_error",
+      "Nodes must be 0 and more. Given "
+      + std::to_string(nodes_2) + ".");
+    }
+
+    return GetBestMove(MAX_PLYS, nodes_2, INT_MAX);
   }
 
   // ======== //

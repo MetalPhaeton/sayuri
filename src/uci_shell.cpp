@@ -202,7 +202,7 @@ namespace Sayuri {
     for (std::size_t i = 0; i < pv_line.length(); ++i) {
       if (!(pv_line[i])) break;
 
-      sout << " " << MoveToString(pv_line[i]);
+      sout << " " << Util::MoveToString(pv_line[i]);
     }
 
     // 出力関数に送る。
@@ -225,7 +225,7 @@ namespace Sayuri {
   void UCIShell::PrintCurrentMoveInfo(Move move, int move_num) {
     std::ostringstream sout;
     // 手の情報を送る。
-    sout << "info currmove " << MoveToString(move);
+    sout << "info currmove " << Util::MoveToString(move);
 
     // 手の番号を送る。
     sout << " currmovenumber " << move_num;
@@ -279,12 +279,12 @@ namespace Sayuri {
       sout << "cp " << score;
     }
 
-    // PVラインを送る。
+    // pvラインを送る。
     sout << " pv";
     for (std::size_t i = 0; i < pv_line.length(); ++i) {
       if (!(pv_line[i])) break;
 
-      sout << " " << MoveToString(pv_line[i]);
+      sout << " " << Util::MoveToString(pv_line[i]);
     }
 
     // 出力関数に送る。
@@ -304,7 +304,7 @@ namespace Sayuri {
     table_ptr_->GrowOld();
 
     // 思考開始。
-    PVLine pv_line = engine_ptr_->Calculate (num_threads_,
+    PVLine pv_line = engine_ptr_->Calculate(num_threads_,
     *table_ptr_, moves_to_search_, *this);
 
     // 最善手を表示。
@@ -312,12 +312,12 @@ namespace Sayuri {
 
     sout << "bestmove ";
     if (pv_line.length() >= 1) {
-      std::string move_str = MoveToString(pv_line[0]);
+      std::string move_str = Util::MoveToString(pv_line[0]);
       sout << move_str;
 
       // 2手目があるならponderで表示。
       if (pv_line.length() >= 2) {
-        move_str = MoveToString(pv_line[1]);
+        move_str = Util::MoveToString(pv_line[1]);
         sout << " ponder " << move_str;
       }
     }
@@ -328,13 +328,13 @@ namespace Sayuri {
   }
 
   // =============== //
-  // UCIコマンド関数 //
+  // uciコマンド関数 //
   // =============== //
   // 「uci」コマンドのコールバック関数。
   void UCIShell::CommandUCI(UCICommand::CommandArgs& args) {
     std::ostringstream sout;
 
-    // IDを表示。
+    // idを表示。
     sout << "id name " << ID_NAME;
     // 出力関数に送る。
     for (auto& func : output_listeners_) {
@@ -443,7 +443,7 @@ namespace Sayuri {
       // トランスポジションテーブルのサイズ変更。
       try {
         std::size_t table_size = Util::GetMax
-        (std::stoull(args["value"][1]) * 1024ULL * 1024ULL,
+        (std::stoull(args["value"][1]) * 1024ull * 1024ull,
         UCI_MIN_TABLE_SIZE);
 
         Util::UpdateMin(table_size, UCI_MAX_TABLE_SIZE);
@@ -456,7 +456,7 @@ namespace Sayuri {
       // トランスポジションテーブルの初期化。
       table_ptr_->Clear();
     } else if (name_str == "ponder") {
-      // Ponderの有効化、無効化。
+      // ponderの有効化、無効化。
       if (args["value"][1] == "true") enable_pondering_ = true;
       else if (args["value"][1] == "false") enable_pondering_ = false;
     } else if (name_str == "threads") {
@@ -492,8 +492,8 @@ namespace Sayuri {
     if (args.find("fen") != args.end()) {
       // fenコマンドをくっつける。
       std::string fen_str = "";
-      for (unsigned int i = 1; i < args["fen"].size(); ++i) {
-        fen_str += args["fen"][i] + " ";
+      for (auto& token : args["fen"]) {
+        fen_str += token + " ";
       }
       fen_str.pop_back();
 
@@ -504,8 +504,8 @@ namespace Sayuri {
     // movesコマンド。
     if (args.find("moves") != args.end()) {
       // 手を指していく。
-      for (unsigned int i = 1; i < args["moves"].size(); ++i) {
-        Move move = StringToMove(args["moves"][i]);
+      for (auto& token : args["moves"]) {
+        Move move = Util::StringToMove(token);
         if (move) engine_ptr_->PlayMove(move);
       }
     }
@@ -528,8 +528,8 @@ namespace Sayuri {
 
     // searchmovesコマンド。
     if (args.find("searchmoves") != args.end()) {
-      for (unsigned int i = 1; i < args["searchmoves"].size(); ++i) {
-        Move move = StringToMove(args["searchmoves"][i]);
+      for (auto& token : args["searchmoves"]) {
+        Move move = Util::StringToMove(token);
         if (move) moves_to_search_.push_back(move);
       }
     }
@@ -544,13 +544,8 @@ namespace Sayuri {
       // 10分以上あるなら1分考える。5分未満なら持ち時間の10分の1。
       if (engine_ptr_->to_move() == WHITE) {
         try {
-          Chrono::milliseconds time_control = Chrono::milliseconds
-          (std::stol(args["wtime"][1]));
-          if (time_control.count() >= 600000) {
-            thinking_time = Chrono::milliseconds(60000);
-          } else {
-            thinking_time = time_control / 10;
-          }
+          thinking_time = Chrono::milliseconds
+          (TimeLimitToMoveTime(std::stol(args["wtime"][1])));
         } catch (...) {
           // 無視。
         }
@@ -562,13 +557,8 @@ namespace Sayuri {
       // 10分以上あるなら1分考える。5分未満なら持ち時間の10分の1。
       if (engine_ptr_->to_move() == BLACK) {
         try {
-          Chrono::milliseconds time_control = Chrono::milliseconds
-          (std::stol(args["btime"][1]));
-          if (time_control.count() >= 600000) {
-            thinking_time = Chrono::milliseconds(60000);
-          } else {
-            thinking_time = time_control / 10;
-          }
+          thinking_time = Chrono::milliseconds
+          (TimeLimitToMoveTime(std::stol(args["btime"][1])));
         } catch (...) {
           // 無視。
         }
@@ -650,94 +640,6 @@ namespace Sayuri {
   // 「ponderhit」コマンドのコールバック関数。
   void UCIShell::CommandPonderHit(UCICommand::CommandArgs& args) {
     engine_ptr_->EnableInfiniteThinking(false);
-  }
-
-  // ======== //
-  // 便利関数 //
-  // ======== //
-  // Moveを文字列に変換する。
-  std::string UCIShell::MoveToString(Move move) {
-    // 文字列ストリーム。
-    std::ostringstream oss;
-
-    // ストリームに流しこむ。
-    Square from = GetFrom(move);
-    Square to = GetTo(move);
-    oss << static_cast<char>(Util::SQUARE_TO_FYLE[from] + 'a');
-    oss << static_cast<char>(Util::SQUARE_TO_RANK[from] + '1');
-    oss << static_cast<char>(Util::SQUARE_TO_FYLE[to] + 'a');
-    oss << static_cast<char>(Util::SQUARE_TO_RANK[to] + '1');
-    switch (GetPromotion(move)) {
-      case KNIGHT:
-        oss << 'n';
-        break;
-      case BISHOP:
-        oss << 'b';
-        break;
-      case ROOK:
-        oss << 'r';
-        break;
-      case QUEEN:
-        oss << 'q';
-        break;
-      default:
-        break;
-    }
-
-    return oss.str();
-  }
-
-  // 文字列をMoveに変換する。
-  Move UCIShell::StringToMove(std::string move_str) {
-    Move move = 0;
-
-    if (move_str.size() < 4) return 0;
-
-    // fromをパース。
-    Square from = 0;
-    if ((move_str[0] < 'a') || (move_str[0] > 'h')) {
-      return 0;
-    }
-    from |= move_str[0] - 'a';
-    if ((move_str[1] < '1') || (move_str[1] > '8')) {
-      return 0;
-    }
-    from |= (move_str[1] - '1') << 3;
-    SetFrom(move, from);
-
-    // toをパース。
-    Square to = 0;
-    if ((move_str[2] < 'a') || (move_str[2] > 'h')) {
-      return 0;
-    }
-    to |= move_str[2] - 'a';
-    if ((move_str[3] < '1') || (move_str[3] > '8')) {
-      return 0;
-    }
-    to |= (move_str[3] - '1') << 3;
-    SetTo(move, to);
-
-    // 昇格をパース。
-    if (move_str.size() >= 5) {
-      switch (move_str[4]) {
-        case 'n':
-          SetPromotion(move, KNIGHT);
-          break;
-        case 'b':
-          SetPromotion(move, BISHOP);
-          break;
-        case 'r':
-          SetPromotion(move, ROOK);
-          break;
-        case 'q':
-          SetPromotion(move, QUEEN);
-          break;
-        default:
-          break;
-      }
-    }
-
-    return move;
   }
 
   // ============== //
