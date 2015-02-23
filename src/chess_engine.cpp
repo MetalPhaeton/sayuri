@@ -692,64 +692,10 @@ namespace Sayuri {
       if (promotion) {
         PutPiece(to, promotion, side);
       }
+
       // ポーンの2歩の動きの場合はアンパッサンできるようにする。
-      // temp[][]は計算時間の省略のための、2歩の動きの判定用テーブル。
-      static const Square temp[NUM_SIDES][NUM_SQUARES] {
-        {
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX
-        },
-        {
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          A4, B4, C4, D4, E4, F4, G4, H4,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX
-        },
-        {
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          A5, B5, C5, D5, E5, F5, G5, H5,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-          UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX
-        }
-      };
       if (piece_board_[to] == PAWN) {
-        if (temp[side][from] == to) {
+        if (Util::GetDistance(from, to) == 2) {
           en_passant_square_ = Util::TO_EN_PASSANT_SQUARE[side][to];
         }
       }
@@ -998,63 +944,8 @@ namespace Sayuri {
     current_hash ^= en_passant_hash_value_table_[en_passant_square_];
 
     // ポーンの2歩の動きの場合はアンパッサンハッシュを追加。
-    // temp[][]は計算時間の省略のための、2歩の動きの判定用テーブル。
-    static const Square temp[NUM_SIDES][NUM_SQUARES] {
-      {
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX
-      },
-      {
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        A4, B4, C4, D4, E4, F4, G4, H4,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX
-      },
-      {
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        A5, B5, C5, D5, E5, F5, G5, H5,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX,
-        UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX
-      }
-    };
     if (piece_type == PAWN) {
-      if (temp[piece_side][from] == to) {
+      if (Util::GetDistance(from, to) == 2) {
         current_hash ^= en_passant_hash_value_table_
         [Util::TO_EN_PASSANT_SQUARE[piece_side][to]];
       }
