@@ -716,6 +716,16 @@ namespace Sayuri {
       }
 
       /**
+       * マス間の距離を得る。 (キングの歩数)
+       * @param square_1 マス1。
+       * @param square_1 マス2。
+       * @return 距離。
+       */
+      static int GetDistance(Square square_1, Square square_2) {
+        return distance_table_[square_1][square_2];
+      }
+
+      /**
        * 探索深さをヒストリー値にする。
        * @param depth 探索深さ。
        * @return ヒストリー値。
@@ -916,6 +926,14 @@ namespace Sayuri {
       static void InitRookMove();
       /** king_move_[]を初期化する。 */
       static void InitKingMove();
+
+      // ============ //
+      // その他の配列 //
+      // ============ //
+      /** マス間の距離の配列。 [マス1][マス2] */
+      static int distance_table_[NUM_SQUARES][NUM_SQUARES];
+      /** distance_table_[][]を初期化する。 */
+      static void InitDistanceTable();
 
       // ================== //
       // その他のstatic変数 //

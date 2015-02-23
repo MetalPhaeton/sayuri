@@ -116,6 +116,8 @@ namespace Sayuri {
     FOR_SQUARES(square) {
       queen_move_[square] = bishop_move_[square] | rook_move_[square];
     }
+    // distance_table_[][]を初期化する。
+    InitDistanceTable();
     // king_move_[]を初期化する。
     InitKingMove();
     // ランダム関連を初期化する。
@@ -688,6 +690,26 @@ namespace Sayuri {
   template std::vector<std::basic_string<wchar_t>> Util::Split<wchar_t>
   (const std::basic_string<wchar_t>& str,
   const std::set<wchar_t>& delim, const std::set<wchar_t>& delim_and_word);
+
+  // マス間の距離の配列。
+  int Util::distance_table_[NUM_SQUARES][NUM_SQUARES];
+  void Util::InitDistanceTable() {
+    FOR_SQUARES(square_1) {
+      FOR_SQUARES(square_2) {
+        Fyle fyle_1 = SQUARE_TO_FYLE[square_1];
+        Rank rank_1 = SQUARE_TO_RANK[square_1];
+        Fyle fyle_2 = SQUARE_TO_FYLE[square_2];
+        Rank rank_2 = SQUARE_TO_RANK[square_2];
+
+        int fyle_diff = fyle_1 >= fyle_2
+        ? (fyle_1 - fyle_2) : (fyle_2 - fyle_1);
+        int rank_diff = rank_1 >= rank_2
+        ? (rank_1 - rank_2) : (rank_2 - rank_1);
+
+        distance_table_[square_1][square_2] = GetMax(fyle_diff, rank_diff);
+      }
+    }
+  }
 
   // --- ランダム関連 --- //
   std::mt19937 Util::engine_;
