@@ -2406,7 +2406,7 @@ __Description__
 
     + `@play-move <Move : List>`
         - Play one move.
-        - `<Move>` is `(<From : Number> <To : Number> <Promotion : Number)`.
+        - `<Move>` is `(<From : Number> <To : Number> <Promotion : Number>)`.
             - If it doesn't promote the piece, `<Promotion>` is 'Empty'.
         - If `<Move>` is illegal, it throws an exception.
 
@@ -2420,10 +2420,47 @@ __Description__
         - If the command has succeeded, it returns '#t'. Otherwise '#f'.
         - The output from engine is put into the callback registered
           by `@add-uci-output-listener`.
+        - If you input "go" command, the thinking process runs on other thread.
+          (It means the engine returns your control immediately.)
       
     + `@add-uci-output-listener <Callback : Function>`
         - Register a callback to listen the UCI engine's output.
         - `<Callback>` must recieve 1 argument that is UCI output as String.
+
+    + `@go-movetime <Milliseconds : Number> [<Candidate moves list : List>]`
+        - Think for `<Milliseconds>` and return the best move.
+        - Unless "go movetime ..." with `@input-uci-command`,
+          the thinking process waits until the engine to return best move.
+        - `<Candidate moves list>` is a list composed of
+          `(<From : Number> <To : Number> <Promotion : Number>)`.
+            - If it doesn't promote the piece, `<Promotion>` is 'Empty'.
+
+    + `@go-timelimit <Milliseconds : Number> [<Candidate moves list : List>]`
+        - Think by `<Milliseconds>` and return the best move.
+            - If `<Milliseconds>` is less than '600000' (10 minutes.),
+              the engine thinks for '`<Milliseconds>` / 10'.
+              Otherwise '60000' milliseconds (1 minute).
+        - Unless "go wtime (or btime) ..." with `@input-uci-command`,
+          the thinking process waits until the engine to return best move.
+        - `<Candidate moves list>` is a list composed of
+          `(<From : Number> <To : Number> <Promotion : Number>)`.
+            - If it doesn't promote the piece, `<Promotion>` is 'Empty'.
+
+    + `@go-depth <Ply : Number> [<Candidate moves list : List>]`
+        - Think until to reach `<Ply>`th depth and return the best move.
+        - Unless "go depth ..." with `@input-uci-command`,
+          the thinking process waits until the engine to return best move.
+        - `<Candidate moves list>` is a list composed of
+          `(<From : Number> <To : Number> <Promotion : Number>)`.
+            - If it doesn't promote the piece, `<Promotion>` is 'Empty'.
+
+    + `@go-nodes <Nodes : Number> [<Candidate moves list : List>]`
+        - Think for `<Nodes>` nodes and return the best move.
+        - Unless "go nodes ..." with `@input-uci-command`,
+          the thinking process waits until the engine to return best move.
+        - `<Candidate moves list>` is a list composed of
+          `(<From : Number> <To : Number> <Promotion : Number>)`.
+            - If it doesn't promote the piece, `<Promotion>` is 'Empty'.
       
 __Example__
 
