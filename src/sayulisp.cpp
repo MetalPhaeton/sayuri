@@ -33,6 +33,7 @@
 #include <memory>
 #include <utility>
 #include <string>
+#include <vector>
 #include <functional>
 #include <climits>
 #include <sstream>
@@ -449,13 +450,17 @@ namespace Sayuri {
         throw LispObject::GenInsufficientArgumentsError
         (func_name, required_args, false, list.Length() - 1);
       }
-      LispObjectPtr move_time_ptr = caller.Evaluate(*list_itr);
+      LispObjectPtr move_time_ptr = caller.Evaluate(*(list_itr++));
       if (!(move_time_ptr->IsNumber())) {
         throw LispObject::GenWrongTypeError
         (func_name, "Number", std::vector<int> {2}, true);
       }
 
-      return GoMoveTime(*move_time_ptr);
+      LispObjectPtr move_list_ptr = LispObject::NewNil();
+      if (list_itr) {
+        move_list_ptr = caller.Evaluate(*list_itr);
+      }
+      return GoMoveTime(func_name, *move_time_ptr, *move_list_ptr);
 
     } else if (message_symbol == "@go-timelimit") {
       required_args = 2;
@@ -463,13 +468,17 @@ namespace Sayuri {
         throw LispObject::GenInsufficientArgumentsError
         (func_name, required_args, false, list.Length() - 1);
       }
-      LispObjectPtr time_limit_ptr = caller.Evaluate(*list_itr);
+      LispObjectPtr time_limit_ptr = caller.Evaluate(*(list_itr++));
       if (!(time_limit_ptr->IsNumber())) {
         throw LispObject::GenWrongTypeError
         (func_name, "Number", std::vector<int> {2}, true);
       }
 
-      return GoTimeLimit(*time_limit_ptr);
+      LispObjectPtr move_list_ptr = LispObject::NewNil();
+      if (list_itr) {
+        move_list_ptr = caller.Evaluate(*list_itr);
+      }
+      return GoTimeLimit(func_name, *time_limit_ptr, *move_list_ptr);
 
     } else if (message_symbol == "@go-depth") {
       required_args = 2;
@@ -477,13 +486,17 @@ namespace Sayuri {
         throw LispObject::GenInsufficientArgumentsError
         (func_name, required_args, false, list.Length() - 1);
       }
-      LispObjectPtr depth_ptr = caller.Evaluate(*list_itr);
+      LispObjectPtr depth_ptr = caller.Evaluate(*(list_itr++));
       if (!(depth_ptr->IsNumber())) {
         throw LispObject::GenWrongTypeError
         (func_name, "Number", std::vector<int> {2}, true);
       }
 
-      return GoDepth(*depth_ptr);
+      LispObjectPtr move_list_ptr = LispObject::NewNil();
+      if (list_itr) {
+        move_list_ptr = caller.Evaluate(*list_itr);
+      }
+      return GoDepth(func_name, *depth_ptr, *move_list_ptr);
 
     } else if (message_symbol == "@go-nodes") {
       required_args = 2;
@@ -491,13 +504,17 @@ namespace Sayuri {
         throw LispObject::GenInsufficientArgumentsError
         (func_name, required_args, false, list.Length() - 1);
       }
-      LispObjectPtr nodes_ptr = caller.Evaluate(*list_itr);
+      LispObjectPtr nodes_ptr = caller.Evaluate(*(list_itr++));
       if (!(nodes_ptr->IsNumber())) {
         throw LispObject::GenWrongTypeError
         (func_name, "Number", std::vector<int> {2}, true);
       }
 
-      return GoNodes(*nodes_ptr);
+      LispObjectPtr move_list_ptr = LispObject::NewNil();
+      if (list_itr) {
+        move_list_ptr = caller.Evaluate(*list_itr);
+      }
+      return GoNodes(func_name, *nodes_ptr, *move_list_ptr);
 
     }
 
@@ -506,7 +523,7 @@ namespace Sayuri {
   }
 
   LispObjectPtr EngineSuite::GetBestMove(std::uint32_t depth,
-  std::uint64_t nodes, int thinking_time) {
+  std::uint64_t nodes, int thinking_time, const std::vector<Move>& move_vec) {
     // ストッパーを登録。
     engine_ptr_->SetStopper(Util::GetMin(depth, MAX_PLYS),
     Util::GetMin(nodes, MAX_NODES),
@@ -517,7 +534,7 @@ namespace Sayuri {
 
     // 思考開始。
     PVLine pv_line = engine_ptr_->Calculate(shell_ptr_->num_threads(),
-    *table_ptr_, std::vector<Move>(), *shell_ptr_);
+    *table_ptr_, move_vec, *shell_ptr_);
     Move best_move = pv_line.length() >= 1 ? pv_line[0] : 0;
 
     std::ostringstream stream;
@@ -549,6 +566,74 @@ namespace Sayuri {
     }
 
     return LispObject::NewNil();
+  }
+
+  // 手のリストから手のベクトルを作る。
+  std::vector<Move> EngineSuite::MoveListToVec
+  (const std::string& func_name, const LispObject& move_list) {
+    if (!(move_list.IsList())) {
+      throw LispObject::GenWrongTypeError
+      (func_name, "List", std::vector<int> {3}, true);
+    }
+
+    std::vector<Move> ret;
+
+    LispIterator list_itr(&move_list);
+    for (int index = 1; list_itr; ++list_itr, ++index) {
+      // リストかどうか。
+      if (!(list_itr->IsList())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "List", std::vector<int> {3, index}, true);
+      }
+
+      // 長さは3?。
+      if (list_itr->Length() != 3) {
+        throw LispObject::GenError("@engine_error",
+        "The " + std::to_string(index) + "th move of move list of ("
+        + func_name + ") must be 3 elements. Given "
+        + std::to_string(list_itr->Length()) + ".");
+      }
+
+      Move move = 0;
+      // from。
+      if (!(list_itr->car()->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {3, index, 1}, true);
+      }
+      int square = list_itr->car()->number_value();
+      if ((square < static_cast<int>(A1))
+      || (square > static_cast<int>(H8))) {
+        throw GenWrongSquareError(func_name, square);
+      }
+      SetFrom(move, square);
+      // to。
+      if (!(list_itr->cdr()->car()->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {3, index, 2}, true);
+      }
+      square = list_itr->cdr()->car()->number_value();
+      if ((square < static_cast<int>(A1))
+      || (square > static_cast<int>(H8))) {
+        throw GenWrongSquareError(func_name, square);
+      }
+      SetTo(move, square);
+      // promotion。
+      if (!(list_itr->cdr()->cdr()->car()->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {3, index, 3}, true);
+      }
+      int piece_type = list_itr->cdr()->cdr()->car()->number_value();
+      if ((piece_type < static_cast<int>(EMPTY))
+      || (piece_type > static_cast<int>(KING))) {
+        throw GenWrongPieceTypeError(func_name, piece_type);
+      }
+      SetPromotion(move, piece_type);
+
+      // ベクトルにプッシュ。
+      ret.push_back(move);
+    }
+
+    return ret;
   }
 
   // 白ポーンの配置にアクセス。
@@ -1149,7 +1234,8 @@ namespace Sayuri {
   }
 
   // move_timeミリ秒間思考する。 最善手が見つかるまで戻らない。
-  LispObjectPtr EngineSuite::GoMoveTime(const LispObject& move_time) {
+  LispObjectPtr EngineSuite::GoMoveTime(const std::string& func_name,
+  const LispObject& move_time, const LispObject& move_list) {
     int move_time_2 = move_time.number_value();
     if (move_time_2 < 0) {
       throw LispObject::GenError("@engine_error",
@@ -1157,11 +1243,13 @@ namespace Sayuri {
       + std::to_string(move_time_2) + " milliseconds.");
     }
 
-    return GetBestMove(MAX_PLYS, MAX_NODES, move_time_2);
+    return GetBestMove(MAX_PLYS, MAX_NODES, move_time_2,
+    MoveListToVec(func_name, move_list));
   }
 
   // 持ち時間time(ミリ秒)で思考する。 最善手が見つかるまで戻らない。
-  LispObjectPtr EngineSuite::GoTimeLimit(const LispObject& time) {
+  LispObjectPtr EngineSuite::GoTimeLimit(const std::string& func_name,
+  const LispObject& time, const LispObject& move_list) {
     int time_2 = time.number_value();
     if (time_2 < 0) {
       throw LispObject::GenError("@engine_error",
@@ -1169,11 +1257,13 @@ namespace Sayuri {
       + std::to_string(time_2) + " milliseconds.");
     }
 
-    return GetBestMove(MAX_PLYS, MAX_NODES, TimeLimitToMoveTime(time_2));
+    return GetBestMove(MAX_PLYS, MAX_NODES, TimeLimitToMoveTime(time_2),
+    MoveListToVec(func_name, move_list));
   }
 
   // 深さdepthまで思考する。 最善手が見つかるまで戻らない。
-  LispObjectPtr EngineSuite::GoDepth(const LispObject& depth) {
+  LispObjectPtr EngineSuite::GoDepth(const std::string& func_name,
+  const LispObject& depth, const LispObject& move_list) {
     int depth_2 = depth.number_value();
     if (depth_2 < 0) {
       throw LispObject::GenError("@engine_error",
@@ -1181,11 +1271,13 @@ namespace Sayuri {
       + std::to_string(depth_2) + ".");
     }
 
-    return GetBestMove(depth_2, MAX_NODES, INT_MAX);
+    return GetBestMove(depth_2, MAX_NODES, INT_MAX,
+    MoveListToVec(func_name, move_list));
   }
 
   // nodesのノード数まで思考する。 最善手が見つかるまで戻らない。
-  LispObjectPtr EngineSuite::GoNodes(const LispObject& nodes) {
+  LispObjectPtr EngineSuite::GoNodes(const std::string& func_name,
+  const LispObject& nodes, const LispObject& move_list) {
     long long nodes_2 = nodes.number_value();
     if (nodes_2 < 0) {
       throw LispObject::GenError("@engine_error",
@@ -1193,7 +1285,8 @@ namespace Sayuri {
       + std::to_string(nodes_2) + ".");
     }
 
-    return GetBestMove(MAX_PLYS, nodes_2, INT_MAX);
+    return GetBestMove(MAX_PLYS, nodes_2, INT_MAX,
+    MoveListToVec(func_name, move_list));
   }
 
   // ======== //

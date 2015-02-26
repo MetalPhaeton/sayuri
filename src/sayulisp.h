@@ -35,6 +35,7 @@
 #include <memory>
 #include <utility>
 #include <string>
+#include <vector>
 #include <sstream>
 #include <functional>
 #include "common.h"
@@ -134,6 +135,20 @@ namespace Sayuri {
         + "' given to (" + func_name + ") does not exist on chess board.";
 
         return LispObject::GenError("@not-square", message);
+      }
+
+      /**
+       * 間違った駒の種類の指定のエラーを作成する。
+       * @param func_name 関数名。
+       * @param piece_type 間違ったマス。
+       * @return エラーオブジェクト。
+       */
+      static LispObjectPtr GenWrongPieceTypeError
+      (const std::string& func_name, PieceType piece_type) {
+        std::string message = "The value '" + std::to_string(piece_type)
+        + "' given to (" + func_name + ") is not a piece type.";
+
+        return LispObject::GenError("@not-piece-type", message);
       }
 
       /**
@@ -494,31 +509,43 @@ namespace Sayuri {
       /**
        * move_timeミリ秒間思考する。 最善手が見つかるまで戻らない。
        * 思考中の出力はAddUCIOutputListener()で登録した関数で得られる。
+       * @param func_name 関数名。
        * @param move_time 思考時間。 (ミリ秒)
+       * @param move_list 探索したい候補手。
        * @return 最善手。
        */
-      LispObjectPtr GoMoveTime(const LispObject& move_time);
+      LispObjectPtr GoMoveTime(const std::string& func_name,
+      const LispObject& move_time, const LispObject& move_list);
       /**
        * 持ち時間time(ミリ秒)で思考する。 最善手が見つかるまで戻らない。
        * 思考中の出力はAddUCIOutputListener()で登録した関数で得られる。
+       * @param func_name 関数名。
        * @param time 持ち時間。 (ミリ秒)
+       * @param move_list 探索したい候補手。
        * @return 最善手。
        */
-      LispObjectPtr GoTimeLimit(const LispObject& time);
+      LispObjectPtr GoTimeLimit(const std::string& func_name,
+      const LispObject& time, const LispObject& move_list);
       /**
        * 深さdepthまで思考する。 最善手が見つかるまで戻らない。
        * 思考中の出力はAddUCIOutputListener()で登録した関数で得られる。
+       * @param func_name 関数名。
        * @param depth 深さ。
+       * @param move_list 探索したい候補手。
        * @return 最善手。
        */
-      LispObjectPtr GoDepth(const LispObject& depth);
+      LispObjectPtr GoDepth(const std::string& func_name,
+      const LispObject& depth, const LispObject& move_list);
       /**
        * nodesのノード数まで思考する。 最善手が見つかるまで戻らない。
        * 思考中の出力はAddUCIOutputListener()で登録した関数で得られる。
+       * @param func_name 関数名。
        * @param nodes ノード数。
+       * @param move_list 探索したい候補手。
        * @return 最善手。
        */
-      LispObjectPtr GoNodes(const LispObject& nodes);
+      LispObjectPtr GoNodes(const std::string& func_name,
+      const LispObject& nodes, const LispObject& move_list);
 
       // ======== //
       // アクセサ //
@@ -568,11 +595,20 @@ namespace Sayuri {
        * @param depth 探索する深さ。
        * @param nodes 探索するノード数。
        * @param thinking_time 思考時間。 (ミリ秒)
+       * @param move_vec 探索したい候補手。
        * @retrun 最善手のリスト。
        */
       LispObjectPtr GetBestMove(std::uint32_t depth, std::uint64_t nodes,
-      int thinking_time);
+      int thinking_time, const std::vector<Move>& move_vec);
 
+      /**
+       * 手のリストから手のベクトルを作る。
+       * @param func_name 関数名。
+       * @param move_list 手のリスト。
+       * @return 手のベクトル。
+       */
+      static std::vector<Move> MoveListToVec(const std::string& func_name,
+      const LispObject& move_list);
 
       // ========== //
       // メンバ変数 //
