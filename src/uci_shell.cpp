@@ -493,6 +493,7 @@ namespace Sayuri {
       // fenコマンドをくっつける。
       std::string fen_str = "";
       for (auto& token : args["fen"]) {
+        if (token == "fen") continue;
         fen_str += token + " ";
       }
       fen_str.pop_back();
@@ -505,6 +506,7 @@ namespace Sayuri {
     if (args.find("moves") != args.end()) {
       // 手を指していく。
       for (auto& token : args["moves"]) {
+        if (token == "moves") continue;
         Move move = Util::StringToMove(token);
         if (move) engine_ptr_->PlayMove(move);
       }
@@ -529,6 +531,7 @@ namespace Sayuri {
     // searchmovesコマンド。
     if (args.find("searchmoves") != args.end()) {
       for (auto& token : args["searchmoves"]) {
+        if (token == "searchmoves") continue;
         Move move = Util::StringToMove(token);
         if (move) moves_to_search_.push_back(move);
       }

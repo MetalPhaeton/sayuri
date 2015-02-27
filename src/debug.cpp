@@ -83,7 +83,6 @@ namespace Sayuri {
     // 初期化。
     Init();
     // エンジン準備。
-    /*
     std::unique_ptr<Sayuri::SearchParams>
     search_params_ptr(new Sayuri::SearchParams());
 
@@ -98,20 +97,10 @@ namespace Sayuri {
 
     std::unique_ptr<Sayuri::UCIShell>
     shell_ptr(new Sayuri::UCIShell(*engine_ptr, *table_ptr));
-    */
 
     // ========================================================================
 
-    // DoRepeatTest(*shell_ptr);
-
-    std::cout << Util::GetDistance(E4, E7) << std::endl;
-    std::cout << Util::GetDistance(E4, E1) << std::endl;
-    std::cout << Util::GetDistance(E4, B4) << std::endl;
-    std::cout << Util::GetDistance(E4, H4) << std::endl;
-    std::cout << Util::GetDistance(E4, H7) << std::endl;
-    std::cout << Util::GetDistance(E4, B7) << std::endl;
-    std::cout << Util::GetDistance(E4, H1) << std::endl;
-    std::cout << Util::GetDistance(E4, B1) << std::endl;
+    DoRepeatTest(*shell_ptr);
 
     return 0;
   }
