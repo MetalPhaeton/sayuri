@@ -416,7 +416,7 @@
 <li><code>@go-movetime &lt;Milliseconds : Number&gt; [&lt;Candidate moves list : List&gt;]</code>
 <ul>
 <li>Think for <code>&lt;Milliseconds&gt;</code> and return the best move.</li>
-<li>Unless &quot;go movetime ...&quot; with <code>@input-uci-command</code>, the thinking process waits until the engine to return best move.</li>
+<li>Different from &quot;go movetime ...&quot; with <code>@input-uci-command</code>, the thinking process waits until the engine to return best move.</li>
 <li><code>&lt;Candidate moves list&gt;</code> is a list composed of <code>(&lt;From : Number&gt; &lt;To : Number&gt; &lt;Promotion : Number&gt;)</code>.
 <ul>
 <li>If it doesn't promote the piece, <code>&lt;Promotion&gt;</code> is 'Empty'.</li>
@@ -428,7 +428,7 @@
 <ul>
 <li>If <code>&lt;Milliseconds&gt;</code> is less than '600000' (10 minutes.), the engine thinks for '<code>&lt;Milliseconds&gt;</code> / 10'. Otherwise '60000' milliseconds (1 minute).</li>
 </ul></li>
-<li>Unless &quot;go wtime (or btime) ...&quot; with <code>@input-uci-command</code>, the thinking process waits until the engine to return best move.</li>
+<li>Different from &quot;go wtime (or btime) ...&quot; with <code>@input-uci-command</code>, the thinking process waits until the engine to return best move.</li>
 <li><code>&lt;Candidate moves list&gt;</code> is a list composed of <code>(&lt;From : Number&gt; &lt;To : Number&gt; &lt;Promotion : Number&gt;)</code>.
 <ul>
 <li>If it doesn't promote the piece, <code>&lt;Promotion&gt;</code> is 'Empty'.</li>
@@ -437,7 +437,7 @@
 <li><code>@go-depth &lt;Ply : Number&gt; [&lt;Candidate moves list : List&gt;]</code>
 <ul>
 <li>Think until to reach <code>&lt;Ply&gt;</code>th depth and return the best move.</li>
-<li>Unless &quot;go depth ...&quot; with <code>@input-uci-command</code>, the thinking process waits until the engine to return best move.</li>
+<li>Different from &quot;go depth ...&quot; with <code>@input-uci-command</code>, the thinking process waits until the engine to return best move.</li>
 <li><code>&lt;Candidate moves list&gt;</code> is a list composed of <code>(&lt;From : Number&gt; &lt;To : Number&gt; &lt;Promotion : Number&gt;)</code>.
 <ul>
 <li>If it doesn't promote the piece, <code>&lt;Promotion&gt;</code> is 'Empty'.</li>
@@ -446,7 +446,7 @@
 <li><code>@go-nodes &lt;Nodes : Number&gt; [&lt;Candidate moves list : List&gt;]</code>
 <ul>
 <li>Think for <code>&lt;Nodes&gt;</code> nodes and return the best move.</li>
-<li>Unless &quot;go nodes ...&quot; with <code>@input-uci-command</code>, the thinking process waits until the engine to return best move.</li>
+<li>Different from &quot;go nodes ...&quot; with <code>@input-uci-command</code>, the thinking process waits until the engine to return best move.</li>
 <li><code>&lt;Candidate moves list&gt;</code> is a list composed of <code>(&lt;From : Number&gt; &lt;To : Number&gt; &lt;Promotion : Number&gt;)</code>.
 <ul>
 <li>If it doesn't promote the piece, <code>&lt;Promotion&gt;</code> is 'Empty'.</li>

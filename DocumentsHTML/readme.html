@@ -84,6 +84,12 @@
 </ol></li>
 <li><em>&quot;sayuri&quot;</em> is built.</li>
 </ol>
+<h2 id="how-to-build-without-cmake">How To Build without CMake</h2>
+<p>If you don't have CMake, you can build &quot;sayuri&quot; by the following commands in &quot;src&quot; directory.</p>
+<p>If you have &quot;clang&quot; :</p>
+<pre><code>clang++ -std=c++11 -O3 -march=native -pthread -o sayuri *.cpp</code></pre>
+<p>If you have &quot;gcc&quot; :</p>
+<pre><code>g++ -std=c++11 -O3 -march=native -pthread -o sayuri *.cpp</code></pre>
 <h2 id="how-to-make-distributable-packages">How To Make Distributable Packages</h2>
 <p>After building Sayuri with CMake, run &quot;<code>$ make dist</code>&quot; command.</p>
 <p>The following packages will be created.</p>

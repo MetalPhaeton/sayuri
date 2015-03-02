@@ -73,6 +73,21 @@ in "CMakeLists.txt".)
 
 
 
+How To Build without CMake
+--------------------------
+
+If you don't have CMake, you can build "sayuri" by the following commands
+in "src" directory.
+
+If you have "clang" :
+
+    clang++ -std=c++11 -O3 -march=native -pthread -o sayuri *.cpp
+
+If you have "gcc" :
+
+    g++ -std=c++11 -O3 -march=native -pthread -o sayuri *.cpp
+
+
 
 How To Make Distributable Packages
 ------------------------------
