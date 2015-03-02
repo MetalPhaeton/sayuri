@@ -451,18 +451,20 @@ namespace Sayuri {
 
     // 全体計算。
     // ビショップペア。
-    if (Util::CountBits(position[WHITE][BISHOP]) >= 2) {
+    if ((position[WHITE][BISHOP] & Util::SQCOLOR[WHITE])
+    && (position[WHITE][BISHOP] & Util::SQCOLOR[BLACK])) {
       value_table_[BISHOP_PAIR][0] += 1.0;
     }
-    if (Util::CountBits(position[BLACK][BISHOP]) >= 2) {
+    if ((position[BLACK][BISHOP] & Util::SQCOLOR[WHITE])
+    && (position[BLACK][BISHOP] & Util::SQCOLOR[BLACK])) {
       value_table_[BISHOP_PAIR][0] -= 1.0;
     }
 
     // ルークペア。
-    if (Util::CountBits(position[WHITE][ROOK]) >= 2) {
+    if ((position[WHITE][ROOK] & (position[WHITE][ROOK] - 1))) {
       value_table_[ROOK_PAIR][0] += 1.0;
     }
-    if (Util::CountBits(position[BLACK][ROOK]) >= 2) {
+    if ((position[BLACK][ROOK] & (position[BLACK][ROOK] - 1))) {
       value_table_[ROOK_PAIR][0] -= 1.0;
     }
 

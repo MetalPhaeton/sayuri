@@ -2429,7 +2429,7 @@ __Description__
 
     + `@go-movetime <Milliseconds : Number> [<Candidate moves list : List>]`
         - Think for `<Milliseconds>` and return the best move.
-        - Unless "go movetime ..." with `@input-uci-command`,
+        - Different from "go movetime ..." with `@input-uci-command`,
           the thinking process waits until the engine to return best move.
         - `<Candidate moves list>` is a list composed of
           `(<From : Number> <To : Number> <Promotion : Number>)`.
@@ -2440,7 +2440,7 @@ __Description__
             - If `<Milliseconds>` is less than '600000' (10 minutes.),
               the engine thinks for '`<Milliseconds>` / 10'.
               Otherwise '60000' milliseconds (1 minute).
-        - Unless "go wtime (or btime) ..." with `@input-uci-command`,
+        - Different from "go wtime (or btime) ..." with `@input-uci-command`,
           the thinking process waits until the engine to return best move.
         - `<Candidate moves list>` is a list composed of
           `(<From : Number> <To : Number> <Promotion : Number>)`.
@@ -2448,7 +2448,7 @@ __Description__
 
     + `@go-depth <Ply : Number> [<Candidate moves list : List>]`
         - Think until to reach `<Ply>`th depth and return the best move.
-        - Unless "go depth ..." with `@input-uci-command`,
+        - Different from "go depth ..." with `@input-uci-command`,
           the thinking process waits until the engine to return best move.
         - `<Candidate moves list>` is a list composed of
           `(<From : Number> <To : Number> <Promotion : Number>)`.
@@ -2456,7 +2456,7 @@ __Description__
 
     + `@go-nodes <Nodes : Number> [<Candidate moves list : List>]`
         - Think for `<Nodes>` nodes and return the best move.
-        - Unless "go nodes ..." with `@input-uci-command`,
+        - Different from "go nodes ..." with `@input-uci-command`,
           the thinking process waits until the engine to return best move.
         - `<Candidate moves list>` is a list composed of
           `(<From : Number> <To : Number> <Promotion : Number>)`.
