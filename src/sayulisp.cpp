@@ -516,6 +516,32 @@ namespace Sayuri {
       }
       return GoNodes(func_name, *nodes_ptr, *move_list_ptr);
 
+    } else if (message_symbol == "@set-hash-size") {
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr hash_size_ptr = caller.Evaluate(*(list_itr++));
+      if (!(hash_size_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2}, true);
+      }
+      return SetHashSize(*hash_size_ptr);
+
+    } else if (message_symbol == "@set-threads") {
+      required_args = 2;
+      if (!list_itr) {
+        throw LispObject::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr num_threads_ptr = caller.Evaluate(*(list_itr++));
+      if (!(num_threads_ptr->IsNumber())) {
+        throw LispObject::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2}, true);
+      }
+      return SetThreads(*num_threads_ptr);
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name

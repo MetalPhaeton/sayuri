@@ -462,8 +462,7 @@ namespace Sayuri {
     } else if (name_str == "threads") {
       // スレッドの数の変更。
       try {
-        num_threads_ =
-        Util::GetMax(std::stol(args["value"][1]), 1);
+        num_threads_ = Util::GetMax(std::stol(args["value"][1]), 1);
         Util::UpdateMin(num_threads_, UCI_MAX_THREADS);
       } catch (...) {
         // 無視。

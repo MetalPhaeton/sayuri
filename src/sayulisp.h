@@ -547,6 +547,32 @@ namespace Sayuri {
       LispObjectPtr GoNodes(const std::string& func_name,
       const LispObject& nodes, const LispObject& move_list);
 
+      /**
+       * トランスポジションテーブルのサイズを変更する。
+       * @param hash_size テーブルのサイズ。
+       * @return 変更前のテーブルのサイズ。
+       */
+      LispObjectPtr SetHashSize(const LispObject& hash_size) {
+        std::size_t old_size = table_ptr_->GetSizeBytes();
+
+        table_ptr_->SetSize(hash_size.number_value());
+
+        return LispObject::NewNumber(old_size);
+      }
+
+      /**
+       * スレッドの数を変更する。
+       * @param hash_size スレッドの数。
+       * @return 変更前のスレッドの数。
+       */
+      LispObjectPtr SetThreads(const LispObject& num_threads) {
+        int old_threads = shell_ptr_->num_threads();
+
+        shell_ptr_->num_threads(num_threads.number_value());
+
+        return LispObject::NewNumber(old_threads);
+      }
+
       // ======== //
       // アクセサ //
       // ======== //

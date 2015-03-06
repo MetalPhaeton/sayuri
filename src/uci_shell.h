@@ -237,6 +237,17 @@ namespace Sayuri {
        */
       int num_threads() const {return num_threads_;}
 
+      // ============ //
+      // ミューテータ //
+      // ============ //
+      /**
+       * ミューテータ - スレッドの数。
+       * @param num_threads スレッドの数。
+       */
+      void num_threads(int num_threads) {
+        num_threads_ = Util::GetMax(num_threads, 1);
+      }
+
     private:
       // ================ //
       // プライベート関数 //
