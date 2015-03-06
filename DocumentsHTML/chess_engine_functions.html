@@ -75,6 +75,8 @@
 <li><code>@go-timelimit &lt;Milliseconds : Number&gt; [&lt;Candidate move list : List&gt;]</code></li>
 <li><code>@go-depth &lt;Ply : Number&gt; [&lt;Candidate move list : List&gt;]</code></li>
 <li><code>@go-nodes &lt;Nodes : Number&gt; [&lt;Candidate move list : List&gt;]</code></li>
+<li><code>@set-hash-size &lt;Size : Number&gt;</code></li>
+<li><code>@set-threads &lt;Number of Threads : Number&gt;</code></li>
 </ul></li>
 </ul></li>
 <li><a href="#utility-functions">Utility Functions</a></li>
@@ -451,6 +453,14 @@
 <ul>
 <li>If it doesn't promote the piece, <code>&lt;Promotion&gt;</code> is 'Empty'.</li>
 </ul></li>
+</ul></li>
+<li><code>@set-hash-size &lt;Size : Number&gt;</code>
+<ul>
+<li>Set size of Transposition Table(Hash Table) and return previous size.</li>
+</ul></li>
+<li><code>@set-threads &lt;Number of Threads : Number&gt;</code>
+<ul>
+<li>Set number of threads and return previous number.</li>
 </ul></li>
 </ul></li>
 </ul>
