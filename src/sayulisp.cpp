@@ -2487,6 +2487,12 @@ __Description__
         - `<Candidate moves list>` is a list composed of
           `(<From : Number> <To : Number> <Promotion : Number>)`.
             - If it doesn't promote the piece, `<Promotion>` is 'Empty'.
+
+    + `@set-hash-size <Size : Number>`
+        - Set size of Transposition Table(Hash Table) and return previous size.
+      
+    + `@set-threads <Number of Threads : Number>`
+        - Set number of threads and return previous number.
       
 __Example__
 
