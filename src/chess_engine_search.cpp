@@ -861,6 +861,36 @@ namespace Sayuri {
       beta = job.beta_;
       delta = job.delta_;
 
+      // 最善手が取らない手の場合、ヒストリー、キラームーブをセット。
+      if (!(prev_best & CAPTURED_PIECE_MASK)) {
+        // キラームーブ。
+        if (enable_killer_) {
+          shared_st_ptr_->killer_stack_[level][0] = prev_best;
+          if (enable_killer_2_) {
+            shared_st_ptr_->killer_stack_[level + 2][1] = prev_best;
+          }
+        }
+
+        // ヒストリー。
+        if (enable_history_) {
+          // 手の情報を得る。
+          Square from = GetFrom(prev_best);
+          Square to = GetTo(prev_best);
+
+          shared_st_ptr_->history_[side][from][to] +=
+          Util::DepthToHistory(job.depth_);
+
+          Util::UpdateMax(shared_st_ptr_->history_[side][from][to],
+          shared_st_ptr_->history_max_);
+        }
+      }
+
+      // 最善手をトランスポジションテーブルに登録。
+      if (enable_ttable_) {
+        table.Add(job.pos_hash_, job.depth_, job.alpha_, ScoreType::EXACT,
+        prev_best);
+      }
+
       // メイトを見つけたらフラグを立てる。
       // 直接ループを抜けない理由は、depth等の終了条件対策。
       if (pv_line_table_[level].mate_in() >= 0) {
