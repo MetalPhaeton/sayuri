@@ -230,7 +230,7 @@ namespace Sayuri {
       const ChessEngine* engine_ptr_;
 
       /** 評価関数で使う価値テーブル。 */
-      double value_table_[TABLE_SIZE][NUM_PIECE_TYPES];
+      int value_table_[TABLE_SIZE][NUM_PIECE_TYPES];
 
       // ========================== //
       // 評価パラメータのキャッシュ //
@@ -239,38 +239,38 @@ namespace Sayuri {
        * 評価パラメータのキャッシュ。
        * オープニング時の配置の価値テーブル。
        */
-      double opening_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES];
+      int opening_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES];
       /**
        * 評価パラメータのキャッシュ。
        * エンディング時の配置の価値テーブル。
        */
-      double ending_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES];
+      int ending_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES];
       /**
        * 評価パラメータのキャッシュ。
        * 相手への攻撃の価値テーブル。
        */
-      double attack_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
+      int attack_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
       /**
        * 評価パラメータのキャッシュ。
        * 味方への防御の価値テーブル。
        */
-      double defense_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
+      int defense_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
       /**
        * 評価パラメータのキャッシュ。
        * ピンの価値テーブル。
        */
-      double pin_value_table_
+      int pin_value_table_
       [NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES];
       /**
        * 評価パラメータのキャッシュ。
        * ポーンの盾の配置の価値テーブル。
        */
-      double pawn_shield_value_table_[NUM_SQUARES];
+      int pawn_shield_value_table_[NUM_SQUARES];
       /**
        * 評価パラメータのキャッシュ。
        * 各種ウェイト。
        */
-      double weight_cache_table_[TABLE_SIZE][NUM_PIECE_TYPES][NUM_SQUARES + 1];
+      int weight_cache_table_[TABLE_SIZE][NUM_PIECE_TYPES][NUM_SQUARES];
   };
 }  // namespace Sayuri
 

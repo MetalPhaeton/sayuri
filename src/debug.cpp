@@ -409,7 +409,7 @@ namespace Sayuri {
 
   // Evaluatorのvalue_table_の中身を表示する。
   void PrintValueTable(const Evaluator& evaluator) {
-    const double (& table)[Evaluator::TABLE_SIZE][NUM_PIECE_TYPES] =
+    const int (& table)[Evaluator::TABLE_SIZE][NUM_PIECE_TYPES] =
     evaluator.value_table_;
 
     std::function<void(unsigned int)> print = [&table](unsigned int index) {

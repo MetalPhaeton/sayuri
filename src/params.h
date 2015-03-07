@@ -774,32 +774,29 @@ namespace Sayuri {
       Weight(double opening_weight, double ending_weight) :
       opening_weight_(opening_weight),
       ending_weight_(ending_weight) {
-        SetLinearParams();
+        SetSlope();
       }
       /** コンストラクタ。 */
       Weight() :
       opening_weight_(0.0),
-      ending_weight_(0.0) {
-        SetLinearParams();
-      }
+      ending_weight_(0.0),
+      slope_(0.0) {}
       /**
        * コピーコンストラクタ。
        * @param weight コピー元。
        */
       Weight(const Weight& weight) :
       opening_weight_(weight.opening_weight_),
-      ending_weight_(weight.ending_weight_) {
-        COPY_ARRAY(table_, weight.table_);
-      }
+      ending_weight_(weight.ending_weight_),
+      slope_(weight.slope_) {}
       /**
        * ムーブコンストラクタ。
        * @param weight ムーブ元。
        */
       Weight(Weight&& weight) :
       opening_weight_(weight.opening_weight_),
-      ending_weight_(weight.ending_weight_) {
-        COPY_ARRAY(table_, weight.table_);
-      }
+      ending_weight_(weight.ending_weight_),
+      slope_(weight.slope_) {}
       /**
        * コピー代入演算子。
        * @param weight コピー元。
@@ -807,7 +804,8 @@ namespace Sayuri {
       Weight& operator=(const Weight& weight) {
         opening_weight_ = weight.opening_weight_;
         ending_weight_ = weight.ending_weight_;
-        COPY_ARRAY(table_, weight.table_);
+        slope_ = weight.slope_;
+
         return *this;
       }
       /**
@@ -817,7 +815,8 @@ namespace Sayuri {
       Weight& operator=(Weight&& weight) {
         opening_weight_ = weight.opening_weight_;
         ending_weight_ = weight.ending_weight_;
-        COPY_ARRAY(table_, weight.table_);
+        slope_ = weight.slope_;
+
         return *this;
       }
       /** デストラクタ。 */
@@ -828,11 +827,11 @@ namespace Sayuri {
       // ====== //
       /**
        * ウェイトを返す。
-       * @param num_pieces キング以外の駒の数。
+       * @param num_pieces 駒の数。
        * @return ウェイト。
        */
-      double operator[](unsigned int num_pieces) const {
-        return table_[num_pieces];
+      double operator()(unsigned int num_pieces) const {
+        return (slope_ * (num_pieces - 2)) + ending_weight_;
       }
 
       // ======== //
@@ -848,11 +847,6 @@ namespace Sayuri {
        * @return エンディング時のウェイト。
        */
       double ending_weight() const {return ending_weight_;}
-      /**
-       * アクセサ - ウェイトの配列。
-       * @return ウェイトの配列。
-       */
-      const double (& table() const)[NUM_SQUARES + 1] {return table_;}
 
       // ============ //
       // ミューテータ //
@@ -863,7 +857,7 @@ namespace Sayuri {
        */
       void opening_weight(double opening_weight) {
         opening_weight_ = opening_weight;
-        SetLinearParams();
+        SetSlope();
       }
       /**
        * ミューテータ - エンディング時のウェイト。
@@ -871,25 +865,21 @@ namespace Sayuri {
        */
       void ending_weight(double ending_weight) {
         ending_weight_ = ending_weight;
-        SetLinearParams();
+        SetSlope();
       }
 
     private:
-      /** 一次関数のパラメータをセットする。 */
-      void SetLinearParams() {
-        double slope = (opening_weight_ - ending_weight_) / 30.0;
-
-        for (unsigned int i = 0; i < (NUM_SQUARES + 1); ++i) {
-          table_[i] = slope * (i - 2) + ending_weight_;
-        }
+      /** 傾きをセットする。 */
+      void SetSlope() {
+        slope_ = (opening_weight_ - ending_weight_) / 30.0;
       }
-
-      /** オープニング時のウェイト。 */
+      /** オープニング時のウェイト。 (駒の数 32個) */
       double opening_weight_;
-      /** エンディング時のウェイト。 */
+      /** エンディング時のウェイト。 (駒の数 2個) */
       double ending_weight_;
-      /** ウェイト配列。 インデックスは「キングを含めた」駒の数(0..64)。 */
-      double table_[NUM_SQUARES + 1];
+
+      /** 傾き。 */
+      double slope_;
   };
 
   /** 評価関数用パラメータのクラス。 */

@@ -44,17 +44,10 @@ namespace Sayuri {
   // ================ //
   // テンプレート部品 //
   // ================ //
-  // 白番なら加算、黒番なら減算するテンプレート部品。
-  template<Side PSide>
-  inline void AddOrSub(double& dst, double value) {}
-  template<>
-  inline void AddOrSub<WHITE>(double& dst, double value) {
-    dst += value;
-  }
-  template<>
-  inline void AddOrSub<BLACK>(double& dst, double value) {
-    dst -= value;
-  }
+  // 白番ならプラス、黒番ならマイナスにするテンプレート部品。
+  template<Side PSide> inline int Sign(int value) {return value;}
+  template<> inline int Sign<WHITE>(int value) {return value;}
+  template<> inline int Sign<BLACK>(int value) {return -value;}
 
   // 評価用ビットボードを作成するテンプレート部品。
   template<Side PSide, PieceType PType>
@@ -156,9 +149,9 @@ namespace Sayuri {
   struct CalMobility {
     static void F(Evaluator& evaluator, Bitboard attacks, Bitboard pawn_moves,
     Bitboard en_passant) {
-      AddOrSub<PSide>(evaluator.value_table_[Evaluator::MOBILITY][PType],
-      Util::CountBits(attacks
-      & ~(evaluator.engine_ptr_->side_pieces_[PSide])));
+      evaluator.value_table_[Evaluator::MOBILITY][PType] +=
+      Sign<PSide>(Util::CountBits
+      (attacks & ~(evaluator.engine_ptr_->side_pieces_[PSide])));
     }
   };
   template<Side PSide>
@@ -166,9 +159,8 @@ namespace Sayuri {
     static void F(Evaluator& evaluator, Bitboard attacks, Bitboard pawn_moves,
     Bitboard en_passant) {
       constexpr Side EnemySide = Util::GetOppositeSide(PSide);
-
-      AddOrSub<PSide>(evaluator.value_table_[Evaluator::MOBILITY][PAWN],
-      Util::CountBits((attacks
+      evaluator.value_table_[Evaluator::MOBILITY][PAWN] +=
+      Sign<PSide>(Util::CountBits((attacks
       & evaluator.engine_ptr_->side_pieces_[EnemySide]) | pawn_moves
       | en_passant));
     }
@@ -232,29 +224,26 @@ namespace Sayuri {
       // パスポーンを計算。
       if (!(engine.position_[EnemySide][PAWN]
       & evaluator.pass_pawn_mask_[PSide][square])) {
-        AddOrSub<PSide>(evaluator.value_table_[Evaluator::PASS_PAWN][0],
-        1.0);
+        evaluator.value_table_[Evaluator::PASS_PAWN][0] += Sign<PSide>(1);
 
         // 守られたパスポーン。
         if (engine.position_[PSide][PAWN]
         & Util::GetPawnAttack(EnemySide, square)) {
-          AddOrSub<PSide>
-          (evaluator.value_table_[Evaluator::PROTECTED_PASS_PAWN][0], 1.0);
+          evaluator.value_table_[Evaluator::PROTECTED_PASS_PAWN][0] +=
+          Sign<PSide>(1);
         }
       }
 
       // ダブルポーンを計算。
       if (Util::CountBits(engine.position_[PSide][PAWN]
       & Util::FYLE[Util::SQUARE_TO_FYLE[square]]) >= 2) {
-        AddOrSub<PSide>(evaluator.value_table_[Evaluator::DOUBLE_PAWN][0],
-        1.0);
+        evaluator.value_table_[Evaluator::DOUBLE_PAWN][0] += Sign<PSide>(1);
       }
 
       // 孤立ポーンを計算。
       if (!(engine.position_[PSide][PAWN]
       & evaluator.iso_pawn_mask_[square])) {
-        AddOrSub<PSide>(evaluator.value_table_[Evaluator::ISO_PAWN][0],
-        1.0);
+        evaluator.value_table_[Evaluator::ISO_PAWN][0] += Sign<PSide>(1);
       }
 
       // ポーンの盾を計算。
@@ -276,12 +265,13 @@ namespace Sayuri {
     Square square) {
       // バッドビショップを計算。
       if ((Util::SQUARE[square] & Util::SQCOLOR[WHITE])) {
-        AddOrSub<PSide>(evaluator.value_table_[Evaluator::BAD_BISHOP][0],
-        Util::CountBits(engine.position_[PSide][PAWN] & Util::SQCOLOR[WHITE]));
+        evaluator.value_table_[Evaluator::BAD_BISHOP][0] +=
+        Sign<PSide>(Util::CountBits
+        (engine.position_[PSide][PAWN] & Util::SQCOLOR[WHITE]));
       } else {
-        AddOrSub<PSide>(evaluator.value_table_[Evaluator::BAD_BISHOP][0],
-        Util::CountBits(engine.position_[PSide][PAWN]
-        & Util::SQCOLOR[BLACK]));
+        evaluator.value_table_[Evaluator::BAD_BISHOP][0] +=
+        Sign<PSide>(Util::CountBits
+        (engine.position_[PSide][PAWN] & Util::SQCOLOR[BLACK]));
       }
     }
   };
@@ -295,13 +285,12 @@ namespace Sayuri {
       Bitboard rook_fyle = Util::FYLE[Util::SQUARE_TO_FYLE[square]];
       if (!(engine.position_[PSide][PAWN] & rook_fyle)) {
         // セミオープン。
-        AddOrSub<PSide>
-        (evaluator.value_table_[Evaluator::ROOK_SEMIOPEN_FYLE][0], 1.0);
-        if (!(engine.position_[EnemySide][PAWN]
-        & rook_fyle)) {
+        evaluator.value_table_[Evaluator::ROOK_SEMIOPEN_FYLE][0] +=
+        Sign<PSide>(1);
+        if (!(engine.position_[EnemySide][PAWN] & rook_fyle)) {
           // オープン。
-          AddOrSub<PSide>
-          (evaluator.value_table_[Evaluator::ROOK_OPEN_FYLE][0], 1.0);
+          evaluator.value_table_[Evaluator::ROOK_OPEN_FYLE][0] +=
+          Sign<PSide>(1);
         }
       }
     }
@@ -312,19 +301,17 @@ namespace Sayuri {
     Square square) {
 
       // クイーンの早過ぎる始動を計算。
-      double value = 0.0;
+      int value = 0;
       if (!(Util::SQUARE[square] & evaluator.start_position_[PSide][QUEEN])) {
-        value +=
-        Util::CountBits(engine.position_[PSide][KNIGHT]
+        value += Util::CountBits(engine.position_[PSide][KNIGHT]
         & evaluator.start_position_[PSide][KNIGHT]);
 
-        value +=
-        Util::CountBits(engine.position_[PSide][BISHOP]
+        value += Util::CountBits(engine.position_[PSide][BISHOP]
         & evaluator.start_position_[PSide][BISHOP]);
       }
 
-      AddOrSub<PSide>
-      (evaluator.value_table_[Evaluator::EARLY_QUEEN_LAUNCHED][0], value);
+      evaluator.value_table_[Evaluator::EARLY_QUEEN_LAUNCHED][0] +=
+      Sign<PSide>(value);
     }
   };
   template<Side PSide>
@@ -334,39 +321,35 @@ namespace Sayuri {
       constexpr Side EnemySide = Util::GetOppositeSide(PSide);
 
       // --- キング周りの弱いマスを計算 --- //
-      double value = 0.0;
+      int value = 0;
 
       // 弱いマス。
       Bitboard weak = (~(engine.position_[PSide][PAWN]))
       & evaluator.weak_square_mask_[PSide][square];
 
-      // それぞれの色のマスの弱いマスの数。
-      int white_weak = Util::CountBits(weak & Util::SQCOLOR[WHITE]);
-      int black_weak = Util::CountBits(weak & Util::SQCOLOR[BLACK]);
+      // 相手の白マスビショップに対する弱いマス。
+      if ((engine.position_[EnemySide][BISHOP] & Util::SQCOLOR[WHITE])) {
+        value += Util::CountBits(weak & Util::SQCOLOR[WHITE]);
+      }
 
-      // 相手の白マスビショップの数と弱い白マスの数を掛け算。
-      value += Util::CountBits(engine.position_[EnemySide][BISHOP]
-      & Util::SQCOLOR[WHITE]) * white_weak;
-
-      // 相手の黒マスビショップの数と弱い黒マスの数を掛け算。
-      value += Util::CountBits(engine.position_[EnemySide][BISHOP]
-      & Util::SQCOLOR[BLACK]) * black_weak;
+      // 相手の黒マスビショップに対する弱いマス。
+      if ((engine.position_[EnemySide][BISHOP] & Util::SQCOLOR[BLACK])) {
+        value += Util::CountBits(weak & Util::SQCOLOR[BLACK]);
+      }
 
       // 評価値にする。
-      AddOrSub<PSide>(evaluator.value_table_[Evaluator::WEAK_SQUARE][0],
-      value);
+      evaluator.value_table_[Evaluator::WEAK_SQUARE][0] += Sign<PSide>(value);
 
       // --- キャスリングを計算する --- //
       Castling rights_mask = PSide == WHITE ? WHITE_CASTLING : BLACK_CASTLING;
       if (engine.has_castled_[PSide]) {
         // キャスリングした。
-        AddOrSub<PSide>(evaluator.value_table_[Evaluator::CASTLING][0],
-        1.0);
+        evaluator.value_table_[Evaluator::CASTLING][0] += Sign<PSide>(1);
       } else {
         if (!(engine.castling_rights_ & rights_mask)) {
           // キャスリングの権利を放棄した。
-          AddOrSub<PSide>
-          (evaluator.value_table_[Evaluator::ABANDONED_CASTLING][0], 1.0);
+          evaluator.value_table_[Evaluator::ABANDONED_CASTLING][0] +=
+          Sign<PSide>(1);
         }
       }
     }
@@ -453,19 +436,19 @@ namespace Sayuri {
     // ビショップペア。
     if ((position[WHITE][BISHOP] & Util::SQCOLOR[WHITE])
     && (position[WHITE][BISHOP] & Util::SQCOLOR[BLACK])) {
-      value_table_[BISHOP_PAIR][0] += 1.0;
+      ++value_table_[BISHOP_PAIR][0];
     }
     if ((position[BLACK][BISHOP] & Util::SQCOLOR[WHITE])
     && (position[BLACK][BISHOP] & Util::SQCOLOR[BLACK])) {
-      value_table_[BISHOP_PAIR][0] -= 1.0;
+      --value_table_[BISHOP_PAIR][0];
     }
 
     // ルークペア。
     if ((position[WHITE][ROOK] & (position[WHITE][ROOK] - 1))) {
-      value_table_[ROOK_PAIR][0] += 1.0;
+      ++value_table_[ROOK_PAIR][0];
     }
     if ((position[BLACK][ROOK] & (position[BLACK][ROOK] - 1))) {
-      value_table_[ROOK_PAIR][0] -= 1.0;
+      --value_table_[ROOK_PAIR][0];
     }
 
     // 各駒毎に価値を計算する。
@@ -546,23 +529,69 @@ namespace Sayuri {
     CalValue<BLACK, KING>(engine_ptr_->king_[BLACK]);
 
     // ウェイトを付けて評価値を得る。
-    double score = 0.0;
+    int score = 0;
     unsigned int num_pieces = Util::CountBits(engine_ptr_->blocker_0_);
 
     // ウェイトを掛け合わせる。
-    for (int i = OPENING_POSITION; i <= ATTACK_AROUND_KING; ++i) {
-      for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
-        score += weight_cache_table_[i][piece_type][num_pieces]
-        * value_table_[i][piece_type];
-      }
+    for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
+      score +=
+      ((weight_cache_table_[OPENING_POSITION][piece_type][num_pieces]
+      * value_table_[OPENING_POSITION][piece_type]) >> 8)
+      + ((weight_cache_table_[ENDING_POSITION][piece_type][num_pieces]
+      * value_table_[ENDING_POSITION][piece_type]) >> 8)
+      + (weight_cache_table_[MOBILITY][piece_type][num_pieces]
+      * value_table_[MOBILITY][piece_type])
+      + (weight_cache_table_[CENTER_CONTROL][piece_type][num_pieces]
+      * value_table_[CENTER_CONTROL][piece_type])
+      + (weight_cache_table_[SWEET_CENTER_CONTROL][piece_type][num_pieces]
+      * value_table_[SWEET_CENTER_CONTROL][piece_type])
+      + (weight_cache_table_[DEVELOPMENT][piece_type][num_pieces]
+      * value_table_[DEVELOPMENT][piece_type])
+      + ((weight_cache_table_[ATTACK][piece_type][num_pieces]
+      * value_table_[ATTACK][piece_type]) >> 8)
+      + ((weight_cache_table_[DEFENSE][piece_type][num_pieces]
+      * value_table_[DEFENSE][piece_type]) >> 8)
+      + ((weight_cache_table_[PIN][piece_type][num_pieces]
+      * value_table_[PIN][piece_type]) >> 8)
+      + (weight_cache_table_[ATTACK_AROUND_KING][piece_type][num_pieces]
+      * value_table_[ATTACK_AROUND_KING][piece_type]);
     }
-    for (int i = PASS_PAWN; i <= ABANDONED_CASTLING; ++i) {
-      score += weight_cache_table_[i][0][num_pieces] * value_table_[i][0];
-    }
+    score +=
+    (weight_cache_table_[PASS_PAWN][0][num_pieces]
+    * value_table_[PASS_PAWN][0])
+    + (weight_cache_table_[PROTECTED_PASS_PAWN][0][num_pieces]
+    * value_table_[PROTECTED_PASS_PAWN][0])
+    + (weight_cache_table_[DOUBLE_PAWN][0][num_pieces]
+    * value_table_[DOUBLE_PAWN][0])
+    + (weight_cache_table_[ISO_PAWN][0][num_pieces]
+    * value_table_[ISO_PAWN][0])
+    + ((weight_cache_table_[PAWN_SHIELD][0][num_pieces]
+    * value_table_[PAWN_SHIELD][0]) >> 8)
+    + (weight_cache_table_[BISHOP_PAIR][0][num_pieces]
+    * value_table_[BISHOP_PAIR][0])
+    + (weight_cache_table_[BAD_BISHOP][0][num_pieces]
+    * value_table_[BAD_BISHOP][0])
+    + (weight_cache_table_[ROOK_PAIR][0][num_pieces]
+    * value_table_[ROOK_PAIR][0])
+    + (weight_cache_table_[ROOK_SEMIOPEN_FYLE][0][num_pieces]
+    * value_table_[ROOK_SEMIOPEN_FYLE][0])
+    + (weight_cache_table_[ROOK_OPEN_FYLE][0][num_pieces]
+    * value_table_[ROOK_OPEN_FYLE][0])
+    + (weight_cache_table_[EARLY_QUEEN_LAUNCHED][0][num_pieces]
+    * value_table_[EARLY_QUEEN_LAUNCHED][0])
+    + (weight_cache_table_[WEAK_SQUARE][0][num_pieces]
+    * value_table_[WEAK_SQUARE][0])
+    + (weight_cache_table_[CASTLING][0][num_pieces]
+    * value_table_[CASTLING][0])
+    + (weight_cache_table_[ABANDONED_CASTLING][0][num_pieces]
+    * value_table_[ABANDONED_CASTLING][0]);
+
+    // 256で割る。
+    score >>= 8;
 
     // 手番に合わせて符号を変えて返す。
-    return engine_ptr_->to_move_ == WHITE ? static_cast<int>(material + score)
-    : static_cast<int>(material - score);
+    return engine_ptr_->to_move_ == WHITE ? (material + score)
+    : (material - score);
   }
 
   // ================== //
@@ -588,22 +617,22 @@ namespace Sayuri {
     CalMobility<PSide, PType>::F(*this, attacks, pawn_moves, en_passant);
 
     // センターコントロールを計算。
-    AddOrSub<PSide>(value_table_[CENTER_CONTROL][PType],
-    Util::CountBits(attacks & center_mask_));
+    value_table_[CENTER_CONTROL][PType] +=
+    Sign<PSide>(Util::CountBits(attacks & center_mask_));
 
     // スウィートセンターのコントロールを計算。
-    AddOrSub<PSide>(value_table_[SWEET_CENTER_CONTROL][PType],
-    Util::CountBits(attacks & sweet_center_mask_));
+    value_table_[SWEET_CENTER_CONTROL][PType] +=
+    Sign<PSide>(Util::CountBits(attacks & sweet_center_mask_));
 
     // 駒の展開を計算。
     if (!(Util::SQUARE[piece_square] & start_position_[PSide][PType])) {
-      AddOrSub<PSide>(value_table_[DEVELOPMENT][PType], 1.0);
+      value_table_[DEVELOPMENT][PType] += Sign<PSide>(1);
     }
 
     // 敵への攻撃を計算。
     {
       Bitboard attacked = attacks & (engine_ptr_->side_pieces_[EnemySide]);
-      double value = 0.0;
+      int value = 0;
 
       for (; attacked; NEXT_BITBOARD(attacked)) {
         value += attack_value_table_
@@ -614,25 +643,25 @@ namespace Sayuri {
         value += attack_value_table_[PAWN][PAWN];
       }
 
-      AddOrSub<PSide>(value_table_[ATTACK][PType], value);
+      value_table_[ATTACK][PType] += Sign<PSide>(value);
     }
 
     // 味方への防御を計算。
     {
       Bitboard defensed = attacks & (engine_ptr_->side_pieces_[PSide]);
-      double value = 0.0;
+      int value = 0;
 
       for (; defensed; NEXT_BITBOARD(defensed)) {
         value += defense_value_table_
         [PType][engine_ptr_->piece_board_[Util::GetSquare(defensed)]];
       }
 
-      AddOrSub<PSide>(value_table_[DEFENSE][PType], value);
+      value_table_[DEFENSE][PType] += Sign<PSide>(value);
     }
 
     // ピンを計算。
     {
-      double value = 0.0;
+      int value = 0;
 
       // ピンのターゲットと裏駒を作成。
       Bitboard pin_target = 0;
@@ -657,12 +686,12 @@ namespace Sayuri {
         }
       }
 
-      AddOrSub<PSide>(value_table_[PIN][PType], value);
+      value_table_[PIN][PType] += Sign<PSide>(value);
     }
 
     // 相手キング周辺への攻撃を計算。
-    AddOrSub<PSide>(value_table_[ATTACK_AROUND_KING][PType],
-    Util::CountBits(attacks & Util::GetKingMove
+    value_table_[ATTACK_AROUND_KING][PType] +=
+    Sign<PSide>(Util::CountBits(attacks & Util::GetKingMove
     (engine_ptr_->king_[EnemySide])));
 
     // 各駒専用の価値を計算。
@@ -862,65 +891,83 @@ namespace Sayuri {
   void Evaluator::CacheEvalParams() {
     const EvalParams& params = engine_ptr_->eval_params();
     // キャッシュする。
-    COPY_ARRAY(opening_position_value_table_,
-    params.opening_position_value_table());
-    COPY_ARRAY(ending_position_value_table_,
-    params.ending_position_value_table());
-    COPY_ARRAY(attack_value_table_, params.attack_value_table());
-    COPY_ARRAY(defense_value_table_, params.defense_value_table());
-    COPY_ARRAY(pin_value_table_, params.pin_value_table());
-    COPY_ARRAY(pawn_shield_value_table_, params.pawn_shield_value_table());
-
     FOR_PIECE_TYPES(piece_type) {
-      COPY_ARRAY(weight_cache_table_[OPENING_POSITION][piece_type],
-      params.weight_opening_position_[piece_type].table());
-      COPY_ARRAY(weight_cache_table_[ENDING_POSITION][piece_type],
-      params.weight_ending_position_[piece_type].table());
-      COPY_ARRAY(weight_cache_table_[MOBILITY][piece_type],
-      params.weight_mobility_[piece_type].table());
-      COPY_ARRAY(weight_cache_table_[CENTER_CONTROL][piece_type],
-      params.weight_center_control_[piece_type].table());
-      COPY_ARRAY(weight_cache_table_[SWEET_CENTER_CONTROL][piece_type],
-      params.weight_sweet_center_control_[piece_type].table());
-      COPY_ARRAY(weight_cache_table_[DEVELOPMENT][piece_type],
-      params.weight_development_[piece_type].table());
-      COPY_ARRAY(weight_cache_table_[ATTACK][piece_type],
-      params.weight_attack_[piece_type].table());
-      COPY_ARRAY(weight_cache_table_[DEFENSE][piece_type],
-      params.weight_defense_[piece_type].table());
-      COPY_ARRAY(weight_cache_table_[PIN][piece_type],
-      params.weight_pin_[piece_type].table());
-      COPY_ARRAY(weight_cache_table_[ATTACK_AROUND_KING][piece_type],
-      params.weight_attack_around_king_[piece_type].table());
+      FOR_SQUARES(square) {
+        opening_position_value_table_[piece_type][square] =
+        params.opening_position_value_table()[piece_type][square] * 256.0;
+
+        ending_position_value_table_[piece_type][square] =
+        params.ending_position_value_table()[piece_type][square] * 256.0;
+
+        weight_cache_table_[OPENING_POSITION][piece_type][square] =
+        params.weight_opening_position_[piece_type](square) * 256.0;
+        weight_cache_table_[ENDING_POSITION][piece_type][square] =
+        params.weight_ending_position_[piece_type](square) * 256.0;
+        weight_cache_table_[MOBILITY][piece_type][square] =
+        params.weight_mobility_[piece_type](square) * 256.0;
+        weight_cache_table_[CENTER_CONTROL][piece_type][square] =
+        params.weight_center_control_[piece_type](square) * 256.0;
+        weight_cache_table_[SWEET_CENTER_CONTROL][piece_type][square] =
+        params.weight_sweet_center_control_[piece_type](square) * 256.0;
+        weight_cache_table_[DEVELOPMENT][piece_type][square] =
+        params.weight_development_[piece_type](square) * 256.0;
+        weight_cache_table_[ATTACK][piece_type][square] =
+        params.weight_attack_[piece_type](square) * 256.0;
+        weight_cache_table_[DEFENSE][piece_type][square] =
+        params.weight_defense_[piece_type](square) * 256.0;
+        weight_cache_table_[PIN][piece_type][square] =
+        params.weight_pin_[piece_type](square) * 256.0;
+        weight_cache_table_[ATTACK_AROUND_KING][piece_type][square] =
+        params.weight_attack_around_king_[piece_type](square) * 256.0;
+      }
+
+      FOR_PIECE_TYPES(piece_type_2) {
+        attack_value_table_[piece_type][piece_type_2] =
+        params.attack_value_table()[piece_type][piece_type_2] * 256.0;
+
+        defense_value_table_[piece_type][piece_type_2] =
+        params.defense_value_table()[piece_type][piece_type_2] * 256.0;
+
+        FOR_PIECE_TYPES(piece_type_3) {
+          pin_value_table_[piece_type][piece_type_2][piece_type_3] =
+          params.pin_value_table()[piece_type][piece_type_2][piece_type_3]
+          * 256.0;
+        }
+      }
     }
 
-    COPY_ARRAY(weight_cache_table_[PASS_PAWN][0],
-    params.weight_pass_pawn_.table());
-    COPY_ARRAY(weight_cache_table_[PROTECTED_PASS_PAWN][0],
-    params.weight_protected_pass_pawn_.table());
-    COPY_ARRAY(weight_cache_table_[DOUBLE_PAWN][0],
-    params.weight_double_pawn_.table());
-    COPY_ARRAY(weight_cache_table_[ISO_PAWN][0],
-    params.weight_iso_pawn_.table());
-    COPY_ARRAY(weight_cache_table_[PAWN_SHIELD][0],
-    params.weight_pawn_shield_.table());
-    COPY_ARRAY(weight_cache_table_[BISHOP_PAIR][0],
-    params.weight_bishop_pair_.table());
-    COPY_ARRAY(weight_cache_table_[BAD_BISHOP][0],
-    params.weight_bad_bishop_.table());
-    COPY_ARRAY(weight_cache_table_[ROOK_PAIR][0],
-    params.weight_rook_pair_.table());
-    COPY_ARRAY(weight_cache_table_[ROOK_SEMIOPEN_FYLE][0],
-    params.weight_rook_semiopen_fyle_.table());
-    COPY_ARRAY(weight_cache_table_[ROOK_OPEN_FYLE][0],
-    params.weight_rook_open_fyle_.table());
-    COPY_ARRAY(weight_cache_table_[EARLY_QUEEN_LAUNCHED][0],
-    params.weight_early_queen_launched_.table());
-    COPY_ARRAY(weight_cache_table_[WEAK_SQUARE][0],
-    params.weight_weak_square_.table());
-    COPY_ARRAY(weight_cache_table_[CASTLING][0],
-    params.weight_castling_.table());
-    COPY_ARRAY(weight_cache_table_[ABANDONED_CASTLING][0],
-    params.weight_abandoned_castling_.table());
+    FOR_SQUARES(square) {
+      pawn_shield_value_table_[square] =
+      params.pawn_shield_value_table()[square] * 256.0;
+
+      weight_cache_table_[PASS_PAWN][0][square] =
+      params.weight_pass_pawn_(square) * 256.0;
+      weight_cache_table_[PROTECTED_PASS_PAWN][0][square] =
+      params.weight_protected_pass_pawn_(square) * 256.0;
+      weight_cache_table_[DOUBLE_PAWN][0][square] =
+      params.weight_double_pawn_(square) * 256.0;
+      weight_cache_table_[ISO_PAWN][0][square] =
+      params.weight_iso_pawn_(square) * 256.0;
+      weight_cache_table_[PAWN_SHIELD][0][square] =
+      params.weight_pawn_shield_(square) * 256.0;
+      weight_cache_table_[BISHOP_PAIR][0][square] =
+      params.weight_bishop_pair_(square) * 256.0;
+      weight_cache_table_[BAD_BISHOP][0][square] =
+      params.weight_bad_bishop_(square) * 256.0;
+      weight_cache_table_[ROOK_PAIR][0][square] =
+      params.weight_rook_pair_(square) * 256.0;
+      weight_cache_table_[ROOK_SEMIOPEN_FYLE][0][square] =
+      params.weight_rook_semiopen_fyle_(square) * 256.0;
+      weight_cache_table_[ROOK_OPEN_FYLE][0][square] =
+      params.weight_rook_open_fyle_(square) * 256.0;
+      weight_cache_table_[EARLY_QUEEN_LAUNCHED][0][square] =
+      params.weight_early_queen_launched_(square) * 256.0;
+      weight_cache_table_[WEAK_SQUARE][0][square] =
+      params.weight_weak_square_(square) * 256.0;
+      weight_cache_table_[CASTLING][0][square] =
+      params.weight_castling_(square) * 256.0;
+      weight_cache_table_[ABANDONED_CASTLING][0][square] =
+      params.weight_abandoned_castling_(square) * 256.0;
+    }
   }
 }  // namespace Sayuri
