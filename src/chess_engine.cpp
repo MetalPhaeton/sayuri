@@ -1159,13 +1159,14 @@ namespace Sayuri {
     probcut_search_reduction_ = params.probcut_search_reduction_;
     enable_history_pruning_ = params.enable_history_pruning_;
     history_pruning_limit_depth_ = params.history_pruning_limit_depth_;
-    history_pruning_move_threshold_ = params.history_pruning_move_threshold_;
+    history_pruning_move_threshold_ =
+    params.history_pruning_move_threshold_ * 256.0;
     history_pruning_after_moves_ = params.history_pruning_after_moves_;
-    history_pruning_threshold_ = params.history_pruning_threshold_;
+    history_pruning_threshold_ = params.history_pruning_threshold_ * 256.0;
     history_pruning_reduction_ = params.history_pruning_reduction_;
     enable_lmr_ = params.enable_lmr_;
     lmr_limit_depth_ = params.lmr_limit_depth_;
-    lmr_threshold_ = params.lmr_threshold_;
+    lmr_threshold_ = params.lmr_threshold_ * 256.0;
     lmr_after_moves_ = params.lmr_after_moves_;
     lmr_search_reduction_ = params.lmr_search_reduction_;
     enable_futility_pruning_ = params.enable_futility_pruning_;
