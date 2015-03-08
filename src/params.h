@@ -91,13 +91,6 @@ namespace Sayuri {
       bool enable_repetition_check() const {
         return enable_repetition_check_;
       }
-      /**
-       * アクセサ - 繰り返しチェック - 2手目以降のチェックの有効無効。
-       * @return 2手目以降のチェックの有効無効。
-       */
-      bool enable_repetition_check_after_2nd() const {
-        return enable_repetition_check_after_2nd_;
-      }
 
       // --- Check Extension --- //
       /**
@@ -159,11 +152,6 @@ namespace Sayuri {
        * @return 有効無効。
        */
       bool enable_killer() const {return enable_killer_;}
-      /**
-       * アクセサ - キラームーブ - 2プライ先のキラームーブの有効無効。
-       * @return 2プライ先のキラームーブの有効無効。
-       */
-      bool enable_killer_2() const {return enable_killer_2_;}
 
       // --- トランスポジションテーブル --- //
       /**
@@ -349,13 +337,6 @@ namespace Sayuri {
       void enable_repetition_check(bool enable) {
         enable_repetition_check_= enable;
       }
-      /**
-       * ミューテータ - 繰り返しチェック - 2手目以降のチェックの有効無効。
-       * @param enable 2手目以降のチェックの有効無効。
-       */
-      void enable_repetition_check_after_2nd(bool enable) {
-        enable_repetition_check_after_2nd_ = enable;
-      }
 
       // --- Check Extension --- //
       /**
@@ -425,11 +406,6 @@ namespace Sayuri {
        * @param enable 有効無効。
        */
       void enable_killer(bool enable) {enable_killer_ = enable;}
-      /**
-       * ミューテータ - キラームーブ - 2プライ先のキラームーブの有効無効。
-       * @param enable 2プライ先のキラームーブの有効無効。
-       */
-      void enable_killer_2(bool enable) {enable_killer_2_ = enable;}
 
       // --- トランスポジションテーブル --- //
       /**
@@ -656,10 +632,8 @@ namespace Sayuri {
       bool enable_quiesce_search_;
 
       // --- 繰り返しチェック --- //
-      /** 繰り返しチェック - 初手のチェックの有効無効。 */
+      /** 繰り返しチェック - 有効無効。 */
       bool enable_repetition_check_;
-      /** 繰り返しチェック - 2手目以降のチェックの有効無効。 */
-      bool enable_repetition_check_after_2nd_;
 
       // --- Check Extension --- //
       /** Check Extension - 有効無効。 */
@@ -690,8 +664,6 @@ namespace Sayuri {
       // --- キラームーブ --- //
       /** キラームーブ - 有効無効。 */
       bool enable_killer_;
-      /** キラームーブ - 2プライ先のキラームーブの有効無効。 */
-      bool enable_killer_2_;
 
       // --- トランスポジションテーブル --- //
       /** トランスポジションテーブル - 有効無効。 */

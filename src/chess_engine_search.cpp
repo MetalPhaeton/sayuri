@@ -173,21 +173,18 @@ namespace Sayuri {
             return SCORE_DRAW;
           }
         }
-      } else if (enable_repetition_check_after_2nd_) {
-        // お互いの2手目以降。 (2手前のハッシュを比較するだけ。)
-        if (level <= 4) {
-          // お互いの2手目。
-          int index = shared_st_ptr_->position_history_.size() - (-level + 5);
-          if ((index >= 0)
-          && (shared_st_ptr_->position_history_[index].pos_hash()
-          == pos_hash)) {
-            return SCORE_DRAW;
-          }
-        } else {
-          // お互いの3手目以降。
-          if (position_memo_[level - 4] == pos_hash) {
-            return SCORE_DRAW;
-          }
+      } else if (level <= 4) {
+        // お互いの2手目。
+        int index = shared_st_ptr_->position_history_.size() - (-level + 5);
+        if ((index >= 0)
+        && (shared_st_ptr_->position_history_[index].pos_hash()
+        == pos_hash)) {
+          return SCORE_DRAW;
+        }
+      } else {
+        // お互いの3手目以降。
+        if (position_memo_[level - 4] == pos_hash) {
+          return SCORE_DRAW;
         }
       }
     }
@@ -225,9 +222,7 @@ namespace Sayuri {
               // キラームーブをセット。
               if (enable_killer_) {
                 shared_st_ptr_->killer_stack_[level][0] = best_move;
-                if (enable_killer_2_) {
-                  shared_st_ptr_->killer_stack_[level + 2][1] = best_move;
-                }
+                shared_st_ptr_->killer_stack_[level + 2][1] = best_move;
               }
             }
 
@@ -253,9 +248,7 @@ namespace Sayuri {
               // キラームーブをセット。
               if (enable_killer_) {
                 shared_st_ptr_->killer_stack_[level][0] = best_move;
-                if (enable_killer_2_) {
-                  shared_st_ptr_->killer_stack_[level + 2][1] = best_move;
-                }
+                shared_st_ptr_->killer_stack_[level + 2][1] = best_move;
               }
             }
 
@@ -404,9 +397,7 @@ namespace Sayuri {
                 // キラームーブ。
                 if (enable_killer_) {
                   shared_st_ptr_->killer_stack_[level][0] = move;
-                  if (enable_killer_2_) {
-                    shared_st_ptr_->killer_stack_[level + 2][1] = move;
-                  }
+                  shared_st_ptr_->killer_stack_[level + 2][1] = move;
                 }
 
                 // ヒストリー。
@@ -612,9 +603,7 @@ namespace Sayuri {
           // キラームーブ。
           if (enable_killer_) {
             shared_st_ptr_->killer_stack_[level][0] = move;
-            if (enable_killer_2_) {
-              shared_st_ptr_->killer_stack_[level + 2][1] = move;
-            }
+            shared_st_ptr_->killer_stack_[level + 2][1] = move;
           }
 
           // ヒストリー。
@@ -866,9 +855,7 @@ namespace Sayuri {
         // キラームーブ。
         if (enable_killer_) {
           shared_st_ptr_->killer_stack_[level][0] = prev_best;
-          if (enable_killer_2_) {
-            shared_st_ptr_->killer_stack_[level + 2][1] = prev_best;
-          }
+          shared_st_ptr_->killer_stack_[level + 2][1] = prev_best;
         }
 
         // ヒストリー。
@@ -1114,9 +1101,7 @@ namespace Sayuri {
           // キラームーブ。
           if (enable_killer_) {
             shared_st_ptr_->killer_stack_[job.level_][0] = move;
-            if (enable_killer_2_) {
-              shared_st_ptr_->killer_stack_[job.level_ + 2][1] = move;
-            }
+            shared_st_ptr_->killer_stack_[job.level_ + 2][1] = move;
           }
 
           // ヒストリー。

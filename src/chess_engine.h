@@ -1070,14 +1070,9 @@ namespace Sayuri {
       bool enable_quiesce_search_;
       /**
        * 探索関数用キャッシュ。
-       * 繰り返しチェック - 初手のチェックの有効無効。
+       * 繰り返しチェック - 有効無効。
        */
       bool enable_repetition_check_;
-      /**
-       * 探索関数用キャッシュ。
-       * 繰り返しチェック - 2手目以降のチェックの有効無効。
-       */
-      bool enable_repetition_check_after_2nd_;
       /**
        * 探索関数用キャッシュ。
        * Check Extension - 有効無効。
@@ -1123,11 +1118,6 @@ namespace Sayuri {
        * キラームーブ - 有効無効。
        */
       bool enable_killer_;
-      /**
-       * 探索関数用キャッシュ。
-       * キラームーブ - 2プライ先のキラームーブの有効無効。
-       */
-      bool enable_killer_2_;
       /**
        * 探索関数用キャッシュ。
        * トランスポジションテーブル - 有効無効。

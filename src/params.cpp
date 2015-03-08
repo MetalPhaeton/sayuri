@@ -43,7 +43,6 @@ namespace Sayuri {
   SearchParams::SearchParams() :
   enable_quiesce_search_(true),
   enable_repetition_check_(true),
-  enable_repetition_check_after_2nd_(true),
   enable_check_extension_(true),
   ybwc_limit_depth_(2),
   ybwc_after_moves_(3),
@@ -53,7 +52,6 @@ namespace Sayuri {
   enable_see_(true),
   enable_history_(true),
   enable_killer_(true),
-  enable_killer_2_(true),
   enable_ttable_(true),
   enable_iid_(true),
   iid_limit_depth_(5),
@@ -91,7 +89,6 @@ namespace Sayuri {
 
     // ヒストリーをチェック。
     if (!enable_history_) enable_history_pruning_ = false;
-    if (!enable_killer_) enable_killer_2_ = false;
   }
 
   // コピーコンストラクタ。
@@ -123,8 +120,6 @@ namespace Sayuri {
     }
     enable_quiesce_search_ = params.enable_quiesce_search_;
     enable_repetition_check_= params.enable_repetition_check_;
-    enable_repetition_check_after_2nd_ =
-    params.enable_repetition_check_after_2nd_;
     enable_check_extension_ = params.enable_check_extension_;
     ybwc_limit_depth_ = params.ybwc_limit_depth_;
     ybwc_after_moves_ = params.ybwc_after_moves_;
@@ -134,7 +129,6 @@ namespace Sayuri {
     enable_see_ = params.enable_see_;
     enable_history_ = params.enable_history_;
     enable_killer_ = params.enable_killer_;
-    enable_killer_2_ = params.enable_killer_2_;
     enable_ttable_ = params.enable_ttable_;
     enable_iid_ = params.enable_iid_;
     iid_limit_depth_ = params.iid_limit_depth_;
