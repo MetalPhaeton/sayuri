@@ -109,7 +109,7 @@ namespace Sayuri {
        * アクセサ - YBWC - 何手目以降の候補手で実行するか。
        * @return 何手目以降の候補手で実行するか。
        */
-      int ybwc_after_moves() const {return ybwc_after_moves_;}
+      int ybwc_invalid_moves() const {return ybwc_invalid_moves_;}
 
       // --- Aspiration Windows --- //
       /**
@@ -247,8 +247,8 @@ namespace Sayuri {
        * アクセサ - History Pruning - 何手目以降の候補手で実行するか。
        * @return 何手目以降の候補手で実行するか。
        */
-      int history_pruning_after_moves() const {
-        return history_pruning_after_moves_;
+      int history_pruning_invalid_moves() const {
+        return history_pruning_invalid_moves_;
       }
       /**
        * アクセサ - History Pruning - 最大ヒストリー値に対する閾値。 
@@ -287,7 +287,7 @@ namespace Sayuri {
        * アクセサ - Late Move Reduction - 何手目以降の候補手で実行するか。
        * @return 何手目以降の候補手で実行するか。
        */
-      int lmr_after_moves() const {return lmr_after_moves_;}
+      int lmr_invalid_moves() const {return lmr_invalid_moves_;}
       /**
        * アクセサ - Late Move Reduction - リダクションする深さ。
        * @return リダクションする深さ。
@@ -359,8 +359,8 @@ namespace Sayuri {
        * ミューテータ - YBWC - 何手目以降の候補手で実行するか。
        * @param num_moves 何手目以降の候補手で実行するか。
        */
-      void ybwc_after_moves(int num_moves) {
-        ybwc_after_moves_ = Util::GetMax(num_moves, 0);
+      void ybwc_invalid_moves(int num_moves) {
+        ybwc_invalid_moves_ = Util::GetMax(num_moves, 0);
       }
 
       // --- Aspiration Windows --- //
@@ -519,8 +519,8 @@ namespace Sayuri {
        * ミューテータ - History Pruning - 何手目以降の候補手で実行するか。
        * @param num_moves 何手目以降の候補手で実行するか。
        */
-      void history_pruning_after_moves(int num_moves) {
-        history_pruning_after_moves_ = Util::GetMax(num_moves, 0);
+      void history_pruning_invalid_moves(int num_moves) {
+        history_pruning_invalid_moves_ = Util::GetMax(num_moves, 0);
       }
       /**
        * ミューテータ - History Pruning - 最大ヒストリー値に対する閾値。 
@@ -564,8 +564,8 @@ namespace Sayuri {
        * ミューテータ - Late Move Reduction - 何手目以降の候補手で実行するか。
        * @param num_moves 何手目以降の候補手で実行するか。
        */
-      void lmr_after_moves(int num_moves) {
-        lmr_after_moves_ = Util::GetMax(num_moves, 0);
+      void lmr_invalid_moves(int num_moves) {
+        lmr_invalid_moves_ = Util::GetMax(num_moves, 0);
       }
       /**
        * ミューテータ - Late Move Reduction - リダクションする深さ。
@@ -642,7 +642,7 @@ namespace Sayuri {
       /** YBWC - 残り深さ制限。 */
       int ybwc_limit_depth_;
       /** YBWC - 何手目以降の候補手で実行するか。 */
-      int ybwc_after_moves_;
+      int ybwc_invalid_moves_;
 
       // --- Aspiration Windows --- //
       /** Aspiration Windows - 有効無効。 */
@@ -704,7 +704,7 @@ namespace Sayuri {
       /** History Pruning - 実行する候補手の閾値。 */
       double history_pruning_move_threshold_;
       /** History Pruning - 何手目以降の候補手で実行するか。 */
-      int history_pruning_after_moves_;
+      int history_pruning_invalid_moves_;
       /** History Pruning - 最大ヒストリー値に対する閾値。 */
       double history_pruning_threshold_;
       /** History Pruning - リダクションする深さ。 */
@@ -718,7 +718,7 @@ namespace Sayuri {
       /** Late Move Reduction - 実行する候補手の閾値。 */
       double lmr_threshold_;
       /** Late Move Reduction - 何手目以降の候補手で実行するか。 */
-      int lmr_after_moves_;
+      int lmr_invalid_moves_;
       /** Late Move Reduction - リダクションする深さ。 */
       int lmr_search_reduction_;
 

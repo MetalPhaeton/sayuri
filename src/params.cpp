@@ -45,7 +45,7 @@ namespace Sayuri {
   enable_repetition_check_(true),
   enable_check_extension_(true),
   ybwc_limit_depth_(2),
-  ybwc_after_moves_(3),
+  ybwc_invalid_moves_(3),
   enable_aspiration_windows_(true),
   aspiration_windows_limit_depth_(5),
   aspiration_windows_delta_(15),
@@ -67,13 +67,13 @@ namespace Sayuri {
   enable_history_pruning_(false),
   history_pruning_limit_depth_(4),
   history_pruning_move_threshold_(0.6),
-  history_pruning_after_moves_(10),
+  history_pruning_invalid_moves_(10),
   history_pruning_threshold_(0.5),
   history_pruning_reduction_(1),
   enable_lmr_(true),
   lmr_limit_depth_(4),
   lmr_threshold_(0.3),
-  lmr_after_moves_(4),
+  lmr_invalid_moves_(4),
   lmr_search_reduction_(1),
   enable_futility_pruning_(true),
   futility_pruning_depth_(3),
@@ -122,7 +122,7 @@ namespace Sayuri {
     enable_repetition_check_= params.enable_repetition_check_;
     enable_check_extension_ = params.enable_check_extension_;
     ybwc_limit_depth_ = params.ybwc_limit_depth_;
-    ybwc_after_moves_ = params.ybwc_after_moves_;
+    ybwc_invalid_moves_ = params.ybwc_invalid_moves_;
     enable_aspiration_windows_ = params.enable_aspiration_windows_;
     aspiration_windows_limit_depth_ = params.aspiration_windows_limit_depth_;
     aspiration_windows_delta_ = params.aspiration_windows_delta_;
@@ -144,13 +144,13 @@ namespace Sayuri {
     enable_history_pruning_ = params.enable_history_pruning_;
     history_pruning_limit_depth_ = params.history_pruning_limit_depth_;
     history_pruning_move_threshold_ = params.history_pruning_move_threshold_;
-    history_pruning_after_moves_ = params.history_pruning_after_moves_;
+    history_pruning_invalid_moves_ = params.history_pruning_invalid_moves_;
     history_pruning_threshold_ = params.history_pruning_threshold_;
     history_pruning_reduction_ = params.history_pruning_reduction_;
     enable_lmr_ = params.enable_lmr_;
     lmr_limit_depth_ = params.lmr_limit_depth_;
     lmr_threshold_ = params.lmr_threshold_;
-    lmr_after_moves_ =params.lmr_after_moves_;
+    lmr_invalid_moves_ =params.lmr_invalid_moves_;
     lmr_search_reduction_ = params.lmr_search_reduction_;
     enable_futility_pruning_ = params.enable_futility_pruning_;
     futility_pruning_depth_ = params.futility_pruning_depth_;

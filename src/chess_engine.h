@@ -1085,9 +1085,9 @@ namespace Sayuri {
       int ybwc_limit_depth_;
       /**
        * 探索関数用キャッシュ。
-       * YBWC - 何手目以降の候補手で実行するか。
+       * YBWC - 無効にする先頭の候補手の数。
        */
-      int ybwc_after_moves_;
+      int ybwc_invalid_moves_;
       /**
        * 探索関数用キャッシュ。
        * Aspiration Windows - 有効無効。
@@ -1195,9 +1195,9 @@ namespace Sayuri {
       int history_pruning_move_threshold_;
       /**
        * 探索関数用キャッシュ。
-       * History Pruning - 何手目以降の候補手で実行するか。
+       * History Pruning - 無効にする先頭の候補手の数。
        */
-      int history_pruning_after_moves_;
+      int history_pruning_invalid_moves_;
       /**
        * 探索関数用キャッシュ。
        * History Pruning - 最大ヒストリー値に対する閾値。
@@ -1225,9 +1225,9 @@ namespace Sayuri {
       int lmr_threshold_;
       /**
        * 探索関数用キャッシュ。
-       * Late Move Reduction - 何手目以降の候補手で実行するか。
+       * Late Move Reduction - 無効にする先頭の候補手の数。
        */
-      int lmr_after_moves_;
+      int lmr_invalid_moves_;
       /**
        * 探索関数用キャッシュ。
        * Late Move Reduction - リダクションする深さ。
