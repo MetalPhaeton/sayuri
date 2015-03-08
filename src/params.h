@@ -512,8 +512,8 @@ namespace Sayuri {
        * @param threshold 実行する候補手の閾値。
        */
       void history_pruning_move_threshold(double threshold) {
-        history_pruning_move_threshold_ = Util::GetMax(threshold, 0.0);
-        Util::UpdateMin(history_pruning_move_threshold_, 1.0);
+        history_pruning_move_threshold_ =
+        Util::GetMin(Util::GetMax(threshold, 0.0), 1.0);
       }
       /**
        * ミューテータ - History Pruning - 何手目以降の候補手で実行するか。
@@ -528,8 +528,8 @@ namespace Sayuri {
        * @param threshold 最大ヒストリー値に対する閾値。
        */
       void history_pruning_threshold(double threshold) {
-        history_pruning_threshold_ = Util::GetMax(threshold, 0.0);
-        Util::UpdateMin(history_pruning_threshold_, 1.0);
+        history_pruning_threshold_ =
+        Util::GetMin(Util::GetMax(threshold, 0.0), 1.0);
       }
       /**
        * ミューテータ - History Pruning - リダクションする深さ。
@@ -558,8 +558,7 @@ namespace Sayuri {
        * @param threshold 実行する候補手の閾値。
        */
       void lmr_threshold(double threshold) {
-        lmr_threshold_ = Util::GetMax(threshold, 0.0);
-        Util::UpdateMin(lmr_threshold_, 1.0);
+        lmr_threshold_ = Util::GetMin(Util::GetMax(threshold, 0.0), 1.0);
       }
       /**
        * ミューテータ - Late Move Reduction - 何手目以降の候補手で実行するか。
