@@ -67,11 +67,11 @@ namespace Sayuri {
 
     shell.InputCommand("setoption name threads value 8");
     shell.InputCommand("setoption name hash value 256");
-    for (int i = 0; i < 30; ++i) {
+    for (int i = 0; i < 200; ++i) {
       loop = true;
       shell.InputCommand("ucinewgame");
       shell.InputCommand("position startpos");
-      shell.InputCommand("go movetime 10000");
+      shell.InputCommand("go movetime 15000");
       while (loop) {
         std::this_thread::sleep_for(Chrono::milliseconds(500));
       }
