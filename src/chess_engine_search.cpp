@@ -513,53 +513,53 @@ namespace Sayuri {
       int temp_alpha = job.alpha_;
       int temp_beta = job.beta_;
 
-      // --- Late Move Reduction --- //
-      bool do_normal_search = false;
-      if (enable_lmr_) {
-        if (!is_checked && !null_reduction
-        && (depth >= lmr_limit_depth_)
-        && (move_number > lmr_threshold)
-        && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
-        && !EqualMove(move, shared_st_ptr_->killer_stack_[level][0])
-        && !EqualMove(move, shared_st_ptr_->killer_stack_[level][1])) {
-          score = -Search(NodeType::NON_PV, next_hash,
-          depth - lmr_search_reduction_ - 1, level + 1,
+      // PVノードの探索とNON_PVノードの探索に分ける。
+      if (node_type == NodeType::PV) {
+        // PV。
+        // --- PVSearch --- //
+        if (move_number <= 1) {
+          // フルウィンドウで探索。
+          score = -Search(node_type, next_hash, depth - 1, level + 1,
+          -temp_beta, -temp_alpha, -next_my_material, table);
+        } else {
+          // PV発見後のPVノード。
+          // ゼロウィンドウ探索。
+          score = -Search(NodeType::NON_PV, next_hash, depth - 1, level + 1,
           -(temp_alpha + 1), -temp_alpha, -next_my_material, table);
 
-          if (score > temp_alpha) do_normal_search = true;
+          if ((score > temp_alpha) && (score < temp_beta)) {
+            // Fail Lowならず。
+            // Fail-Softなので、Beta値以上も探索しない。
+            // フルウィンドウで再探索。
+            score = -Search(NodeType::PV, next_hash, depth - 1, level + 1,
+            -temp_beta, -temp_alpha, -next_my_material, table);
+          }
+        }
+      } else {
+        // NON_PV。
+        // --- Late Move Reduction --- //
+        bool do_normal_search = false;
+        if (enable_lmr_) {
+          if (!is_checked && !null_reduction
+          && (depth >= lmr_limit_depth_)
+          && (move_number > lmr_threshold)
+          && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
+          && !EqualMove(move, shared_st_ptr_->killer_stack_[level][0])
+          && !EqualMove(move, shared_st_ptr_->killer_stack_[level][1])) {
+            score = -Search(NodeType::NON_PV, next_hash,
+            depth - lmr_search_reduction_ - 1, level + 1,
+            -(temp_alpha + 1), -temp_alpha, -next_my_material, table);
+
+            if (score > temp_alpha) do_normal_search = true;
+          } else {
+            do_normal_search = true;
+          }
         } else {
           do_normal_search = true;
         }
-      } else {
-        do_normal_search = true;
-      }
 
-      // Late Move Reduction失敗。
-      // PVノードの探索とNON_PVノードの探索に分ける。
-      if (do_normal_search) {
-        if (node_type == NodeType::PV) {
-          // PV。
-          // --- PVSearch --- //
-          if (move_number <= 1) {
-            // フルウィンドウで探索。
-            score = -Search(node_type, next_hash, depth - 1, level + 1,
-            -temp_beta, -temp_alpha, -next_my_material, table);
-          } else {
-            // PV発見後のPVノード。
-            // ゼロウィンドウ探索。
-            score = -Search(NodeType::NON_PV, next_hash, depth - 1, level + 1,
-            -(temp_alpha + 1), -temp_alpha, -next_my_material, table);
-
-            if ((score > temp_alpha) && (score < temp_beta)) {
-              // Fail Lowならず。
-              // Fail-Softなので、Beta値以上も探索しない。
-              // フルウィンドウで再探索。
-              score = -Search(NodeType::PV, next_hash, depth - 1, level + 1,
-              -temp_beta, -temp_alpha, -next_my_material, table);
-            }
-          }
-        } else {
-          // NON_PV。
+        // Late Move Reduction失敗。
+        if (do_normal_search) {
           // --- History Pruning --- //
           int new_depth = depth;
           if (enable_history_pruning_) {
@@ -1017,57 +1017,57 @@ namespace Sayuri {
       int temp_alpha = job.alpha_;
       int temp_beta = job.beta_;
 
-      // --- Late Move Reduction --- //
-      bool do_normal_search = false;
-      if (enable_lmr_) {
-        if (!(job.is_checked_) && !(job.null_reduction_)
-        && (job.depth_ >= lmr_limit_depth_)
-        && (move_number > lmr_threshold)
-        && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
-        && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][0])
-        && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][1])) {
-          score = -Search(NodeType::NON_PV, next_hash,
-          job.depth_ - lmr_search_reduction_ - 1, job.level_ + 1,
-          -(temp_alpha + 1), -temp_alpha, -next_my_material,
+      // Late Move Reduction失敗時。
+      // PVノードの探索とNON_PVノードの探索に分ける。
+      if (node_type == NodeType::PV) {
+        // PV。
+        // --- PVSearch --- //
+        if (move_number <= 1) {
+          // フルウィンドウで探索。
+          score = -Search(node_type, next_hash, job.depth_ - 1,
+          job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
+          *(job.table_ptr_));
+        } else {
+          // PV発見後のPVノード。
+          // ゼロウィンドウ探索。
+          score = -Search(NodeType::NON_PV, next_hash, job.depth_ - 1,
+          job.level_ + 1, -(temp_alpha + 1), -temp_alpha, -next_my_material,
           *(job.table_ptr_));
 
-          if (score > temp_alpha) do_normal_search = true;
+          if ((score > temp_alpha) && (score < temp_beta)) {
+            // Fail Lowならず。
+            // Fail-Softなので、Beta値以上も探索しない。
+            // フルウィンドウで再探索。
+            score = -Search(NodeType::PV, next_hash, job.depth_ - 1,
+            job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
+            *(job.table_ptr_));
+          }
+        }
+      } else {
+        // NON_PV。
+        // --- Late Move Reduction --- //
+        bool do_normal_search = false;
+        if (enable_lmr_) {
+          if (!(job.is_checked_) && !(job.null_reduction_)
+          && (job.depth_ >= lmr_limit_depth_)
+          && (move_number > lmr_threshold)
+          && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
+          && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][0])
+          && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][1])) {
+            score = -Search(NodeType::NON_PV, next_hash,
+            job.depth_ - lmr_search_reduction_ - 1, job.level_ + 1,
+            -(temp_alpha + 1), -temp_alpha, -next_my_material,
+            *(job.table_ptr_));
+
+            if (score > temp_alpha) do_normal_search = true;
+          } else {
+            do_normal_search = true;
+          }
         } else {
           do_normal_search = true;
         }
-      } else {
-        do_normal_search = true;
-      }
 
-      // Late Move Reduction失敗時。
-      // PVノードの探索とNON_PVノードの探索に分ける。
-      if (do_normal_search) {
-        if (node_type == NodeType::PV) {
-          // PV。
-          // --- PVSearch --- //
-          if (move_number <= 1) {
-            // フルウィンドウで探索。
-            score = -Search(node_type, next_hash, job.depth_ - 1,
-            job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
-            *(job.table_ptr_));
-          } else {
-            // PV発見後のPVノード。
-            // ゼロウィンドウ探索。
-            score = -Search(NodeType::NON_PV, next_hash, job.depth_ - 1,
-            job.level_ + 1, -(temp_alpha + 1), -temp_alpha, -next_my_material,
-            *(job.table_ptr_));
-
-            if ((score > temp_alpha) && (score < temp_beta)) {
-              // Fail Lowならず。
-              // Fail-Softなので、Beta値以上も探索しない。
-              // フルウィンドウで再探索。
-              score = -Search(NodeType::PV, next_hash, job.depth_ - 1,
-              job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
-              *(job.table_ptr_));
-            }
-          }
-        } else {
-          // NON_PV。
+        if (do_normal_search) {
           // --- History Pruning --- //
           int new_depth = job.depth_;
           if (enable_history_pruning_) {
@@ -1151,11 +1151,6 @@ namespace Sayuri {
     Side side = to_move_;
     Side enemy_side = Util::GetOppositeSide(side);
     int move_number = 0;
-
-    // パラメータを準備。
-    int lmr_threshold =
-    Util::GetMax((job.num_all_moves_ * lmr_threshold_) >> 8,
-    lmr_invalid_moves_);
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       if (JudgeToStop(job.level_)) break;
@@ -1275,73 +1270,49 @@ namespace Sayuri {
           job.Unlock();  // ロック解除。
         }
       } else {
-        // --- Late Move Reduction --- //
-        bool do_normal_search = false;
-        if (enable_lmr_) {
-          if (!(job.is_checked_)
-          && (job.depth_ >= lmr_limit_depth_)
-          && (move_number > lmr_threshold)
-          && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))) {
-            // ゼロウィンドウ探索。
-            score = -Search(NodeType::NON_PV, next_hash,
-            job.depth_ - lmr_search_reduction_ - 1, job.level_ + 1,
-            -(temp_alpha + 1), -temp_alpha, -next_my_material,
-            *(job.table_ptr_));
+        // ゼロウィンドウ探索。
+        score = -Search(NodeType::NON_PV, next_hash,
+        job.depth_ - 1, job.level_ + 1, -(temp_alpha + 1), -temp_alpha,
+        -next_my_material, *(job.table_ptr_));
 
-            if (score > temp_alpha) do_normal_search = true;
-          } else {
-            do_normal_search = true;
-          }
-        } else {
-          do_normal_search = true;
-        }
+        if (score > temp_alpha) {
+          while (true) {
+            // 探索終了。
+            if (JudgeToStop(job.level_)) break;
 
-        // 普通の探索。
-        if (do_normal_search) {
-          // ゼロウィンドウ探索。
-          score = -Search(NodeType::NON_PV, next_hash,
-          job.depth_ - 1, job.level_ + 1, -(temp_alpha + 1), -temp_alpha,
-          -next_my_material, *(job.table_ptr_));
+            // フルウィンドウで再探索。
+            score = -Search(NodeType::PV, next_hash,
+            job.depth_ - 1, job.level_ + 1, -temp_beta, -temp_alpha,
+            -next_my_material, *(job.table_ptr_));
 
-          if (score > temp_alpha) {
-            while (true) {
-              // 探索終了。
-              if (JudgeToStop(job.level_)) break;
-
-              // フルウィンドウで再探索。
-              score = -Search(NodeType::PV, next_hash,
-              job.depth_ - 1, job.level_ + 1, -temp_beta, -temp_alpha,
-              -next_my_material, *(job.table_ptr_));
-
-              // ベータ値を調べる。
-              job.Lock();  // ロック。
-              if (score >= temp_beta) {
-                // 探索失敗。
-                // ベータ値を広げる。
-                job.delta_ *= 2;
-                temp_beta = score + job.delta_;
-                if (job.beta_ >= temp_beta) {
-                  temp_beta = job.beta_;
-                } else {
-                  job.beta_ = temp_beta;
-                }
-
-                if ((pv_line_table_[job.level_ + 1].mate_in() >= 0)
-                && ((pv_line_table_[job.level_ + 1].mate_in() % 2) == 1)) {
-                  // メイトっぽかった場合。
-                  job.beta_ = MAX_VALUE;
-                  temp_beta = MAX_VALUE;
-                }
-
-                job.Unlock();  // ロック解除。
-                continue;
-
+            // ベータ値を調べる。
+            job.Lock();  // ロック。
+            if (score >= temp_beta) {
+              // 探索失敗。
+              // ベータ値を広げる。
+              job.delta_ *= 2;
+              temp_beta = score + job.delta_;
+              if (job.beta_ >= temp_beta) {
+                temp_beta = job.beta_;
               } else {
-                job.Unlock();  // ロック解除。
-                break;
+                job.beta_ = temp_beta;
               }
+
+              if ((pv_line_table_[job.level_ + 1].mate_in() >= 0)
+              && ((pv_line_table_[job.level_ + 1].mate_in() % 2) == 1)) {
+                // メイトっぽかった場合。
+                job.beta_ = MAX_VALUE;
+                temp_beta = MAX_VALUE;
+              }
+
               job.Unlock();  // ロック解除。
+              continue;
+
+            } else {
+              job.Unlock();  // ロック解除。
+              break;
             }
+            job.Unlock();  // ロック解除。
           }
         }
       }
