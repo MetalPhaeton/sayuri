@@ -206,24 +206,24 @@ namespace Sayuri {
         30.0, 60.0, 90.0, 120.0, 120.0, 90.0, 60.0, 30.0
       },
       {  // ナイト。
-        -30.0, -20.0, -10.0,   0.0,   0.0, -10.0, -20.0, -30.0,
-        -20.0, -10.0,   0.0,  10.0,  10.0,   0.0, -10.0, -20.0,
-        -10.0,   0.0,  10.0,  20.0,  20.0,  10.0,   0.0, -10.0,
-          0.0,  10.0,  20.0,  30.0,  30.0,  20.0,  10.0,   0.0,
-         10.0,  20.0,  30.0,  40.0,  40.0,  30.0,  20.0,  10.0,
-         20.0,  30.0,  40.0,  50.0,  50.0,  40.0,  30.0,  20.0,
-         10.0,  20.0,  30.0,  40.0,  40.0,  30.0,  20.0,  10.0,
-          0.0,  10.0,  20.0,  30.0,  30.0,  20.0,  10.0,   0.0
+        -21.0, -14.0,  -7.0,   0.0,   0.0,  -7.0, -14.0, -21.0,
+        -14.0,  -7.0,   0.0,   7.0,   7.0,   0.0,  -7.0, -14.0,
+         -7.0,   0.0,   7.0,  14.0,  14.0,   7.0,   0.0,  -7.0,
+          0.0,   7.0,  14.0,  21.0,  21.0,  14.0,   7.0,   0.0,
+          7.0,  14.0,  21.0,  28.0,  28.0,  21.0,  14.0,   7.0,
+         14.0,  21.0,  28.0,  35.0,  35.0,  28.0,  21.0,  14.0,
+          7.0,  14.0,  21.0,  28.0,  28.0,  21.0,  14.0,   7.0,
+          0.0,   7.0,  14.0,  21.0,  21.0,  14.0,   7.0,   0.0
       },
       {  // ビショップ。
-        30.0, 20.0, 10.0,  0.0,  0.0, 10.0, 20.0, 30.0,
-        20.0, 40.0, 30.0, 20.0, 20.0, 30.0, 40.0, 20.0,
-        10.0, 30.0, 40.0, 30.0, 30.0, 40.0, 30.0, 10.0,
-        10.0, 20.0, 30.0, 50.0, 50.0, 30.0, 20.0, 10.0,
-         0.0, 15.0, 25.0, 45.0, 45.0, 25.0, 15.0,  0.0,
-         5.0, 15.0, 35.0, 25.0, 25.0, 35.0, 15.0,  5.0,
-         5.0, 25.0, 15.0,  5.0,  5.0, 15.0, 25.0,  5.0,
-        15.0,  5.0,  5.0,  0.0,  0.0,  5.0,  5.0, 15.0
+        21.0, 14.0,  7.0,  0.0,  0.0,  7.0, 14.0, 21.0,
+        14.0, 28.0, 21.0, 14.0, 14.0, 21.0, 28.0, 14.0,
+         7.0, 21.0, 28.0, 21.0, 21.0, 28.0, 21.0,  7.0,
+         7.0, 14.0, 21.0, 35.0, 35.0, 21.0, 14.0,  7.0,
+         0.0, 10.5, 17.5, 31.5, 31.5, 17.5, 10.5,  0.0,
+         3.5, 10.5, 24.5, 17.5, 17.5, 24.5, 10.5,  3.5,
+         3.5, 17.5, 10.5,  3.5,  3.5, 10.5, 17.5,  3.5,
+        10.5,  3.5,  3.5,  0.0,  0.0,  3.5,  3.5, 10.5
       },
       {  // ルーク。
          0.0,  5.0, 10.0, 15.0, 15.0, 10.0,  5.0,  0.0,
@@ -232,8 +232,8 @@ namespace Sayuri {
          0.0,  5.0, 10.0, 15.0, 15.0, 10.0,  5.0,  0.0,
          0.0,  5.0, 10.0, 15.0, 15.0, 10.0,  5.0,  0.0,
          0.0,  5.0, 10.0, 15.0, 15.0, 10.0,  5.0,  0.0,
-        30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0,
-        30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0
+        20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0,
+        20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0, 20.0
       },
       {  // クイーン。
         -5.0, -5.0, -5.0,  -5.0,  -5.0, -5.0, -5.0, -5.0,
@@ -469,55 +469,55 @@ namespace Sayuri {
     // 機動力のウェイトを初期化。
     weight_mobility_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
     weight_mobility_[PAWN] = Weight(0.0, 0.0);  // ポーン。
-    weight_mobility_[KNIGHT] = Weight(1.0, 3.0);  // ナイト。
-    weight_mobility_[BISHOP] = Weight(1.0, 3.0);  // ビショップ。
-    weight_mobility_[ROOK] = Weight(1.0, 3.0);  // ルーク。
-    weight_mobility_[QUEEN] = Weight(1.0, 3.0);  // クイーン。
+    weight_mobility_[KNIGHT] = Weight(1.0, 1.0);  // ナイト。
+    weight_mobility_[BISHOP] = Weight(1.0, 1.0);  // ビショップ。
+    weight_mobility_[ROOK] = Weight(1.0, 1.0);  // ルーク。
+    weight_mobility_[QUEEN] = Weight(1.0, 1.0);  // クイーン。
     weight_mobility_[KING] = Weight(0.0, 0.0);  // キング。
 
     // センターコントロールのウェイトを初期化。
     weight_center_control_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
     weight_center_control_[PAWN] = Weight(5.0, 0.0);  // ポーン。
-    weight_center_control_[KNIGHT] = Weight(5.0, 0.0);  //ナイト。
-    weight_center_control_[BISHOP] = Weight(5.0, 0.0);  // ビショップ。
-    weight_center_control_[ROOK] = Weight(5.0, 0.0);  // ルーク。
-    weight_center_control_[QUEEN] = Weight(5.0, 0.0);  // クイーン。
+    weight_center_control_[KNIGHT] = Weight(3.5, 1.0);  //ナイト。
+    weight_center_control_[BISHOP] = Weight(3.5, 1.0);  // ビショップ。
+    weight_center_control_[ROOK] = Weight(3.5, 1.0);  // ルーク。
+    weight_center_control_[QUEEN] = Weight(3.5, 1.0);  // クイーン。
     weight_center_control_[KING] = Weight(0.0, 0.0);  // キング。
 
     // スウィートセンターのコントロールのウェイトを初期化。
     weight_sweet_center_control_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
     weight_sweet_center_control_[PAWN] = Weight(5.0, 0.0);  // ポーン。
-    weight_sweet_center_control_[KNIGHT] = Weight(5.0, 0.0);  //ナイト。
-    weight_sweet_center_control_[BISHOP] = Weight(5.0, 0.0);  // ビショップ。
-    weight_sweet_center_control_[ROOK] = Weight(5.0, 0.0);  // ルーク。
-    weight_sweet_center_control_[QUEEN] = Weight(5.0, 0.0);  // クイーン。
+    weight_sweet_center_control_[KNIGHT] = Weight(3.5, 0.0);  //ナイト。
+    weight_sweet_center_control_[BISHOP] = Weight(3.5, 0.0);  // ビショップ。
+    weight_sweet_center_control_[ROOK] = Weight(3.5, 0.0);  // ルーク。
+    weight_sweet_center_control_[QUEEN] = Weight(3.5, 0.0);  // クイーン。
     weight_sweet_center_control_[KING] = Weight(0.0, 0.0);  // キング。
 
     // 展開のウェイトを初期化。
     weight_development_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
     weight_development_[PAWN] = Weight(0.0, 0.0);  // ポーン。
-    weight_development_[KNIGHT] = Weight(20.0, 0.0);  //ナイト。
-    weight_development_[BISHOP] = Weight(20.0, 0.0);  // ビショップ。
-    weight_development_[ROOK] = Weight(0.0, 0.0);  // ルーク。
-    weight_development_[QUEEN] = Weight(0.0, 0.0);  // クイーン。
+    weight_development_[KNIGHT] = Weight(15.0, 0.0);  //ナイト。
+    weight_development_[BISHOP] = Weight(15.0, 0.0);  // ビショップ。
+    weight_development_[ROOK] = Weight(5.0, 0.0);  // ルーク。
+    weight_development_[QUEEN] = Weight(5.0, 0.0);  // クイーン。
     weight_development_[KING] = Weight(0.0, 0.0);  // キング。
 
     // 相手への攻撃のウェイトを初期化。
     weight_attack_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_attack_[PAWN] = Weight(1.0, 0.0);  // ポーン。
-    weight_attack_[KNIGHT] = Weight(1.0, 0.0);  //ナイト。
-    weight_attack_[BISHOP] = Weight(1.0, 0.0);  // ビショップ。
-    weight_attack_[ROOK] = Weight(1.0, 0.0);  // ルーク。
-    weight_attack_[QUEEN] = Weight(1.0, 0.0);  // クイーン。
+    weight_attack_[PAWN] = Weight(1.0, 0.3);  // ポーン。
+    weight_attack_[KNIGHT] = Weight(1.0, 0.3);  //ナイト。
+    weight_attack_[BISHOP] = Weight(1.0, 0.3);  // ビショップ。
+    weight_attack_[ROOK] = Weight(1.0, 0.3);  // ルーク。
+    weight_attack_[QUEEN] = Weight(1.0, 0.3);  // クイーン。
     weight_attack_[KING] = Weight(1.0, 0.0);  // キング。
 
     // 味方への防御のウェイトを初期化。
     weight_defense_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_defense_[PAWN] = Weight(1.0, 1.0);  // ポーン。
-    weight_defense_[KNIGHT] = Weight(1.0, 0.0);  //ナイト。
-    weight_defense_[BISHOP] = Weight(1.0, 0.0);  // ビショップ。
-    weight_defense_[ROOK] = Weight(1.0, 0.0);  // ルーク。
-    weight_defense_[QUEEN] = Weight(1.0, 0.0);  // クイーン。
+    weight_defense_[PAWN] = Weight(1.0, 0.5);  // ポーン。
+    weight_defense_[KNIGHT] = Weight(1.0, 0.5);  //ナイト。
+    weight_defense_[BISHOP] = Weight(1.0, 0.5);  // ビショップ。
+    weight_defense_[ROOK] = Weight(1.0, 0.5);  // ルーク。
+    weight_defense_[QUEEN] = Weight(1.0, 0.5);  // クイーン。
     weight_defense_[KING] = Weight(1.0, 3.0);  // キング。
 
     // ピンのウェイトを初期化。
@@ -531,11 +531,11 @@ namespace Sayuri {
 
     // 相手キング周辺への攻撃のウェイトを初期化。
     weight_attack_around_king_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_attack_around_king_[PAWN] = Weight(3.0, 0.0);  // ポーン。
-    weight_attack_around_king_[KNIGHT] = Weight(3.0, 0.0);  //ナイト。
-    weight_attack_around_king_[BISHOP] = Weight(3.0, 0.0);  // ビショップ。
-    weight_attack_around_king_[ROOK] = Weight(3.0, 0.0);  // ルーク。
-    weight_attack_around_king_[QUEEN] = Weight(3.0, 0.0);  // クイーン。
+    weight_attack_around_king_[PAWN] = Weight(3.0, 1.5);  // ポーン。
+    weight_attack_around_king_[KNIGHT] = Weight(3.0, 1.5);  //ナイト。
+    weight_attack_around_king_[BISHOP] = Weight(3.0, 1.5);  // ビショップ。
+    weight_attack_around_king_[ROOK] = Weight(3.0, 1.5);  // ルーク。
+    weight_attack_around_king_[QUEEN] = Weight(3.0, 1.5);  // クイーン。
     weight_attack_around_king_[KING] = Weight(0.0, 5.0);  // キング。
   }
 
