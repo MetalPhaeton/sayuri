@@ -456,7 +456,7 @@ namespace Sayuri {
     job.Unlock();
 
     // パラメータ準備。
-    int history_pruning_move_threshold =
+    int history_pruning_move_number =
     Util::GetMax((num_all_moves * history_pruning_move_threshold_) >> 8,
     history_pruning_invalid_moves_);
 
@@ -464,7 +464,7 @@ namespace Sayuri {
     (shared_st_ptr_->history_max_ * history_pruning_threshold_) >> 8;
 
     // Late Move Reduction。
-    int lmr_threshold =
+    int lmr_move_number =
     Util::GetMax((num_all_moves * lmr_threshold_) >> 8, lmr_invalid_moves_);
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
@@ -518,7 +518,7 @@ namespace Sayuri {
       if (enable_lmr_) {
         if (!is_checked && !null_reduction
         && (depth >= lmr_limit_depth_)
-        && (move_number > lmr_threshold)
+        && (move_number > lmr_move_number)
         && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
         && !EqualMove(move, shared_st_ptr_->killer_stack_[level][0])
         && !EqualMove(move, shared_st_ptr_->killer_stack_[level][1])) {
@@ -565,7 +565,7 @@ namespace Sayuri {
           if (enable_history_pruning_) {
             if (!is_checked && !null_reduction
             && (depth >= history_pruning_limit_depth_)
-            && (move_number > history_pruning_move_threshold)
+            && (move_number > history_pruning_move_number)
             && (shared_st_ptr_->history_[side][from][to]
             < history_pruning_threshold)
             && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
@@ -965,7 +965,7 @@ namespace Sayuri {
     int margin = shared_st_ptr_->futility_pruning_margin_table_[job.depth_];
 
     // パラメータ準備。
-    int history_pruning_move_threshold =
+    int history_pruning_move_number =
     Util::GetMax((job.num_all_moves_ * history_pruning_move_threshold_) >> 8,
     history_pruning_invalid_moves_);
 
@@ -973,7 +973,7 @@ namespace Sayuri {
     (shared_st_ptr_->history_max_ * history_pruning_threshold_) >> 8;
 
     // Late Move Reduction。
-    int lmr_threshold =
+    int lmr_move_number =
     Util::GetMax((job.num_all_moves_ * lmr_threshold_) >> 8,
     lmr_invalid_moves_);
 
@@ -1022,7 +1022,7 @@ namespace Sayuri {
       if (enable_lmr_) {
         if (!(job.is_checked_) && !(job.null_reduction_)
         && (job.depth_ >= lmr_limit_depth_)
-        && (move_number > lmr_threshold)
+        && (move_number > lmr_move_number)
         && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
         && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][0])
         && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][1])) {
@@ -1073,7 +1073,7 @@ namespace Sayuri {
           if (enable_history_pruning_) {
             if (!(job.is_checked_) && !(job.null_reduction_)
             && (job.depth_ >= history_pruning_limit_depth_)
-            && (move_number > history_pruning_move_threshold)
+            && (move_number > history_pruning_move_number)
             && (shared_st_ptr_->history_[side][from][to]
             < history_pruning_threshold)
             && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
@@ -1153,7 +1153,7 @@ namespace Sayuri {
     int move_number = 0;
 
     // パラメータを準備。
-    int lmr_threshold =
+    int lmr_move_number =
     Util::GetMax((job.num_all_moves_ * lmr_threshold_) >> 8,
     lmr_invalid_moves_);
 
@@ -1280,7 +1280,7 @@ namespace Sayuri {
         if (enable_lmr_) {
           if (!(job.is_checked_)
           && (job.depth_ >= lmr_limit_depth_)
-          && (move_number > lmr_threshold)
+          && (move_number > lmr_move_number)
           && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))) {
             // ゼロウィンドウ探索。
             score = -Search(NodeType::NON_PV, next_hash,
