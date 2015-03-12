@@ -336,8 +336,6 @@ namespace Sayuri {
       }
     }
 
-    // NMRで深さが変更されている可能性があるので、その場合はクイース。
-
     // 手を作る。
     maker_table_[level].GenMoves<GenMoveType::ALL>(prev_best,
     shared_st_ptr_->iid_stack_[level],
@@ -609,7 +607,7 @@ namespace Sayuri {
         job.score_type_ = ScoreType::BETA;
 
         // ベータカット。
-        job.NotifyBetaCut(this);
+        helper_handler_.NotifyBetaCut(this, level);
         job.Unlock();  // ロック解除。
         break;
       }
@@ -618,7 +616,7 @@ namespace Sayuri {
     }
 
     // スレッドを合流。
-    job.WaitForHelpers();
+    helper_handler_.WaitForHelpers(level);
 
     // このノードでゲーム終了だった場合。
     if (!(job.has_legal_move_)) {
@@ -643,7 +641,7 @@ namespace Sayuri {
 
       // キラームーブ、ヒストリーを記録。
       if (job.score_type_ != ScoreType::ALPHA) {
-        if ((best_move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))) {
+        if (!(best_move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))) {
           // キラームーブ。
           if (enable_killer_) {
             shared_st_ptr_->killer_stack_[level][0] = best_move;
@@ -668,10 +666,19 @@ namespace Sayuri {
       // Null Move探索中の局面は登録しない。
       // Null Move Reductionされていた場合、容量節約のため登録しない。
       if (enable_ttable_) {
-        if (!is_null_searching_ && !null_reduction && !JudgeToStop(level)) {
+        if (!is_null_searching_ && !null_reduction) {
           table.Add(pos_hash, depth, job.alpha_, job.score_type_, best_move);
         }
       }
+
+      // ベータカット通知をクリア。
+      helper_handler_.mutex_.lock();
+      if (helper_handler_.betacut_engine_ptr_
+      && (helper_handler_.betacut_level_ >= level)) {
+        helper_handler_.betacut_engine_ptr_ = nullptr;
+        helper_handler_.betacut_level_ = 0;
+      }
+      helper_handler_.mutex_.unlock();
     }
 
     return job.alpha_;
@@ -858,7 +865,7 @@ namespace Sayuri {
 
       // ヘルプして待つ。
       shared_st_ptr_->helper_queue_ptr_->HelpRoot(job);
-      job.WaitForHelpers();
+      helper_handler_.WaitForHelpers(level);
 
       // 最善手を記録する。
       prev_best = pv_line_table_[level][0];
@@ -932,9 +939,8 @@ namespace Sayuri {
     while (true) {
       // 準備。
       Job* job_ptr = nullptr;
-      mailbox_.mutex_.lock();
-      mailbox_.betacut_level_tray_ = std::queue<int>();
-      mailbox_.mutex_.unlock();
+      helper_handler_.betacut_engine_ptr_ = nullptr;
+      helper_handler_.betacut_level_ = 0;
 
       // 仕事を拾う。
       job_ptr = shared_st_ptr_->helper_queue_ptr_->GetJob(this);
@@ -942,20 +948,6 @@ namespace Sayuri {
       if (!job_ptr || !(job_ptr->client_ptr_)) {
         break;
       } else {
-        job_ptr->Lock();  // ロック。
-        if (job_ptr->record_ptr_) {
-          // 駒の配置を読み込む。
-          LoadRecord(*(job_ptr->record_ptr_));
-
-          // Null Move探索中かどうかをセット。
-          is_null_searching_ = job_ptr->is_null_searching_;
-        } else {
-          job_ptr->Unlock();
-          job_ptr->RemoveHelperPtr(this);
-          continue;
-        }
-        job_ptr->Unlock();  // ロック解除。
-
         if (job_ptr->level_ <= 0) {
           // ルートノード。
           SearchRootParallel(*job_ptr, shell);
@@ -1127,7 +1119,7 @@ namespace Sayuri {
         job.score_type_ = ScoreType::BETA;
 
         // ベータカット。
-        job.NotifyBetaCut(this);
+        job.client_ptr_->helper_handler_.NotifyBetaCut(this, job.level_);
         job.Unlock();  // ロック解除。
         break;
       }
@@ -1136,7 +1128,7 @@ namespace Sayuri {
     }
 
     // 仕事終了。
-    job.RemoveHelperPtr(this);
+    job.client_ptr_->helper_handler_.Remove(this, job.level_);
   }
 
   // ルートノードで呼び出される、別スレッド用探索関数。
@@ -1367,7 +1359,7 @@ namespace Sayuri {
     }
 
     // 仕事終了。
-    job.RemoveHelperPtr(this);
+    job.client_ptr_->helper_handler_.Remove(this, job.level_);
   }
 
   // SEEで候補手を評価する。
@@ -1493,18 +1485,9 @@ namespace Sayuri {
     // 今すぐ終了すべき。
     if (shared_st_ptr_->stop_now_) return true;
 
-    // --- ベータカットメッセージから判断 --- //
-    while (!(mailbox_.betacut_level_tray_.empty())) {
-      if (level >= mailbox_.betacut_level_tray_.front()) {
-        // 現在のノードはベータカットされたノード。
-        // 他のヘルパーにベータカットされたことを伝える。
-        job_table_[level].Lock();
-        job_table_[level].NotifyBetaCut(this);
-        job_table_[level].Unlock();
-        job_table_[level].WaitForHelpers();
-        return true;
-      }
-      mailbox_.betacut_level_tray_.pop();
+    // --- ベータカット通知から判断 --- //
+    if (helper_handler_.ReceiveNotification(level)) {
+      return true;
     }
 
     // --- 思考ストップ条件から判断 --- //

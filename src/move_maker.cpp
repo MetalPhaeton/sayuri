@@ -496,13 +496,8 @@ namespace Sayuri {
         move_stack_[i].score_ = KILLER_2_MOVE_SCORE;
       } else {
         // その他の手を各候補手のタイプに分ける。
-        if ((move_stack_[i].move_ & PROMOTION_MASK)) {
-          SetScore<GenMoveType::CAPTURE>::F(*this, move_stack_[i].score_,
-          move_stack_[i].move_, side, from, to);
-        } else {
-          SetScore<Type>::F(*this, move_stack_[i].score_, move_stack_[i].move_,
-          side, from, to);
-        }
+        SetScore<Type>::F(*this, move_stack_[i].score_, move_stack_[i].move_,
+        side, from, to);
       }
     }
   }

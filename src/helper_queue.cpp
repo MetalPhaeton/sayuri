@@ -105,8 +105,22 @@ namespace Sayuri {
     is_root_client_waiting_ = false;
 
 
-    // 仕事の準備。
-    job_ptr_->AddHelperPtr(helper_ptr);
+    // --- 仕事の準備 --- //
+    job_ptr_->Lock();  // ロック。
+
+    // ヘルパー登録。
+    job_ptr_->client_ptr_->helper_handler_.Register
+    (helper_ptr, job_ptr_->level_);
+
+    // 局面のコピー。
+    helper_ptr->LoadRecord(*(job_ptr_->record_ptr_));
+
+    // 探索状態のコピー。
+    helper_ptr->is_null_searching_ = job_ptr_->is_null_searching_;
+
+    job_ptr_->Unlock();  // ロック解除。
+
+    // job_ptr_を削除。
     Job* temp = job_ptr_;
     job_ptr_ = nullptr;
 

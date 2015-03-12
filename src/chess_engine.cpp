@@ -60,7 +60,8 @@ namespace Sayuri {
   ChessEngine::ChessEngine(const SearchParams& search_params,
   const EvalParams& eval_params) :
   is_null_searching_(false),
-  evaluator_(*this) {
+  evaluator_(*this),
+  helper_handler_(this) {
     SetNewGame();
 
     // 探索関数用パラメータ。
@@ -90,7 +91,8 @@ namespace Sayuri {
   // プライベートコンストラクタ。
   ChessEngine::ChessEngine() : 
   is_null_searching_(false),
-  evaluator_(*this) {
+  evaluator_(*this),
+  helper_handler_(this) {
     SetNewGame();
 
     // ムーブメーカー。
@@ -115,7 +117,8 @@ namespace Sayuri {
   // コピーコンストラクタ。
   ChessEngine::ChessEngine(const ChessEngine& engine) :
   is_null_searching_(false),
-  evaluator_(*this) {
+  evaluator_(*this),
+  helper_handler_(this) {
     // 基本メンバをコピー。
     ScanBasicMember(engine);
 
@@ -144,7 +147,8 @@ namespace Sayuri {
   // ムーブコンストラクタ。
   ChessEngine::ChessEngine(ChessEngine&& engine) :
   is_null_searching_(false),
-  evaluator_(*this) {
+  evaluator_(*this),
+  helper_handler_(this) {
     // 基本メンバをコピー。
     ScanBasicMember(engine);
 

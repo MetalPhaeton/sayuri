@@ -87,7 +87,6 @@ namespace Sayuri {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
         record_ptr_ = nullptr;
         maker_ptr_ = &maker;
-        helper_ptr_list_.clear();
         counter_ = 0;
       }
 
@@ -97,65 +96,9 @@ namespace Sayuri {
        */
       Move PickMove();
 
-      /** ヘルパーが全員仕事を終えるまで待機する。 */
-      void WaitForHelpers() {
-        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-        while (helper_ptr_list_.size() > 0) {
-          cond_.wait(lock);
-        }
-      }
-
-      /** 
-       * ヘルパーにベータカットが発生したことを知らせる。
-       * @param caller_ptr 呼び出したエンジンのポインタ。
-       * 呼び出した人にメセージを送らないようにするためのもの。
-       */
-      void NotifyBetaCut(ChessEngine* caller_ptr);
-
       /**
-       * ジョブにヘルパー登録をする。
-       * @param helper_ptr 登録するヘルパーのポインタ。
-       */
-      void AddHelperPtr(ChessEngine* helper_ptr) {
-        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-
-        for (auto ptr : helper_ptr_list_) {
-          if (ptr == helper_ptr) return;
-        }
-        helper_ptr_list_.push_back(helper_ptr);
-      }
-
-      /**
-       * ジョブからヘルパーを削除する。
-       * @param helper_ptr 削除するヘルパーのポインタ。
-       */
-      void RemoveHelperPtr(ChessEngine* helper_ptr) {
-        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-
-        std::list<ChessEngine*>::iterator itr = helper_ptr_list_.begin();
-        for (; itr != helper_ptr_list_.end(); ++itr) {
-          if (*itr == helper_ptr) {
-            helper_ptr_list_.erase(itr);
-
-            // WaitForHelpers()で待っている人にお知らせ。
-            cond_.notify_all();
-            return;
-          }
-        }
-      }
-
-      /**
-       * 登録されているヘルパーの数を返す。
-       * @return 登録されているヘルパーの数。
-       */
-      std::size_t CountHelpers() {
-        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-        return helper_ptr_list_.size();
-      }
-
-      /**
-       *  数を数える。 探索した手の数を数えるときに使う。
-       * @return 次の数字。
+       * 数を数える。 (候補手を数えるときに使う。)
+       * @return 数字。
        */
       int Count() {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
@@ -234,7 +177,7 @@ namespace Sayuri {
       std::condition_variable cond_;
       /** 自分用ミューテックス。 */
       std::mutex my_mutex_;
-      /** 数を数えるためのカウンター。 */
+      /** 候補手を数えるためのカウンター。 */
       volatile int counter_;
   };
 }  // namespace Sayuri

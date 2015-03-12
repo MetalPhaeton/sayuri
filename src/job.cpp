@@ -81,18 +81,6 @@ namespace Sayuri {
     return maker_ptr_->PickMove();
   }
 
-  // ヘルパーにベータカットが発生したことを知らせる。
-  void Job::NotifyBetaCut(ChessEngine* caller_ptr) {
-    std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-
-    if (client_ptr_ && (client_ptr_ != caller_ptr)) {
-      client_ptr_->PostBetaCutNodeLevel(level_);
-    }
-    for (auto ptr : helper_ptr_list_) {
-      if (ptr != caller_ptr) ptr->PostBetaCutNodeLevel(level_);
-    }
-  }
-
   // ================ //
   // プライベート関数 //
   // ================ //

@@ -44,7 +44,7 @@ namespace Sayuri {
   enable_quiesce_search_(true),
   enable_repetition_check_(true),
   enable_check_extension_(true),
-  ybwc_limit_depth_(2),
+  ybwc_limit_depth_(4),
   ybwc_invalid_moves_(3),
   enable_aspiration_windows_(true),
   aspiration_windows_limit_depth_(5),
