@@ -381,6 +381,8 @@ namespace Sayuri {
 
             UnmakeMove(move);
 
+            if (JudgeToStop(level)) return alpha;
+
             // ベータカット。
             if (score >= prob_beta) {
               // PVライン。
@@ -469,7 +471,7 @@ namespace Sayuri {
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // 探索終了ならループを抜ける。
-      if (JudgeToStop(level)) return job.alpha_;
+      if (JudgeToStop(level)) break;
 
       // 別スレッドに助けを求める。(YBWC)
       if ((job.depth_ >= ybwc_limit_depth_)
@@ -583,14 +585,15 @@ namespace Sayuri {
 
       UnmakeMove(move);
 
+      // 探索終了ならループを抜ける。
+      if (JudgeToStop(level)) break;
+
       job.Lock();  // ロック。
 
       // アルファ値を更新。
       if (score > job.alpha_) {
         // 評価値のタイプをセット。
-        if (job.score_type_ == ScoreType::ALPHA) {
-          job.score_type_ = ScoreType::EXACT;
-        }
+        job.score_type_ = ScoreType::EXACT;
 
         // PVライン。
         job.pv_line_ptr_->SetMove(move);
@@ -604,24 +607,6 @@ namespace Sayuri {
       if (job.alpha_ >= job.beta_) {
         // 評価値の種類をセット。
         job.score_type_ = ScoreType::BETA;
-
-        // 取らない手。
-        if (!(move & CAPTURED_PIECE_MASK)) {
-          // キラームーブ。
-          if (enable_killer_) {
-            shared_st_ptr_->killer_stack_[level][0] = move;
-            shared_st_ptr_->killer_stack_[level + 2][1] = move;
-          }
-
-          // ヒストリー。
-          if (enable_history_) {
-            shared_st_ptr_->history_[side][from][to] += 
-            Util::DepthToHistory(job.depth_);
-
-            Util::UpdateMax(shared_st_ptr_->history_max_,
-            shared_st_ptr_->history_[side][from][to]);
-          }
-        }
 
         // ベータカット。
         job.NotifyBetaCut(this);
@@ -651,18 +636,44 @@ namespace Sayuri {
       }
     }
 
-    // トランスポジションテーブルに登録。
-    // Null Move探索中の局面は登録しない。
-    // Null Move Reductionされていた場合、容量節約のため登録しない。
-    if (enable_ttable_) {
-      if (!is_null_searching_ && !null_reduction && !JudgeToStop(level)) {
-        table.Add(pos_hash, depth, job.alpha_, job.score_type_,
-        pv_line_table_[level][0]);
+    // --- 後処理 --- //
+    {
+      Move best_move = pv_line_table_[level][0];
+      pv_line_table_[level].score(job.alpha_);
+
+      // キラームーブ、ヒストリーを記録。
+      if (job.score_type_ != ScoreType::ALPHA) {
+        if ((best_move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))) {
+          // キラームーブ。
+          if (enable_killer_) {
+            shared_st_ptr_->killer_stack_[level][0] = best_move;
+            shared_st_ptr_->killer_stack_[level + 2][1] = best_move;
+          }
+
+          // ヒストリー。
+          if (enable_history_) {
+            Square from = GetFrom(best_move);
+            Square to = GetTo(best_move);
+
+            shared_st_ptr_->history_[side][from][to] += 
+            Util::DepthToHistory(job.depth_);
+
+            Util::UpdateMax(shared_st_ptr_->history_max_,
+            shared_st_ptr_->history_[side][from][to]);
+          }
+        }
+      }
+
+      // トランスポジションテーブルに登録。
+      // Null Move探索中の局面は登録しない。
+      // Null Move Reductionされていた場合、容量節約のため登録しない。
+      if (enable_ttable_) {
+        if (!is_null_searching_ && !null_reduction && !JudgeToStop(level)) {
+          table.Add(pos_hash, depth, job.alpha_, job.score_type_, best_move);
+        }
       }
     }
 
-    // 探索結果を返す。
-    pv_line_table_[level].score(job.alpha_);
     return job.alpha_;
   }
 
@@ -1092,14 +1103,15 @@ namespace Sayuri {
 
       UnmakeMove(move);
 
+      // 探索終了ならループを抜ける。
+      if (JudgeToStop(job.level_)) break;
+
       job.Lock();  // ロック。
 
       // アルファ値を更新。
       if (score > job.alpha_) {
         // 評価値のタイプをセット。
-        if (job.score_type_ == ScoreType::ALPHA) {
-          job.score_type_ = ScoreType::EXACT;
-        }
+        job.score_type_ = ScoreType::EXACT;
 
         // PVラインをセット。
         job.pv_line_ptr_->SetMove(move);
@@ -1113,24 +1125,6 @@ namespace Sayuri {
       if (job.alpha_ >= job.beta_) {
         // 評価値の種類をセット。
         job.score_type_ = ScoreType::BETA;
-
-        // 取らない手。
-        if (!(move & CAPTURED_PIECE_MASK)) {
-          // キラームーブ。
-          if (enable_killer_) {
-            shared_st_ptr_->killer_stack_[job.level_][0] = move;
-            shared_st_ptr_->killer_stack_[job.level_ + 2][1] = move;
-          }
-
-          // ヒストリー。
-          if (enable_history_) {
-            shared_st_ptr_->history_[side][from][to] +=
-            Util::DepthToHistory(job.depth_);
-
-            Util::UpdateMax(shared_st_ptr_->history_max_,
-            shared_st_ptr_->history_[side][from][to]);
-          }
-        }
 
         // ベータカット。
         job.NotifyBetaCut(this);
