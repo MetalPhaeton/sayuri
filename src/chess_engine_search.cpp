@@ -616,7 +616,9 @@ namespace Sayuri {
     }
 
     // スレッドを合流。
-    helper_handler_.WaitForHelpers(level);
+    if (job.depth_ >= ybwc_limit_depth_) {
+      helper_handler_.WaitForHelpers(level);
+    }
 
     // このノードでゲーム終了だった場合。
     if (!(job.has_legal_move_)) {
