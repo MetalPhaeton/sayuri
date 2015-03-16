@@ -199,7 +199,9 @@ namespace Sayuri {
       // ========== //
       /** 駒の初期位置のビットボード。 [サイド][駒の種類] */
       static Bitboard start_position_[NUM_SIDES][NUM_PIECE_TYPES];
-      /** start_position_[][]を初期化。 */
+      /** 駒の初期位置のビットボードの論理否定。 [サイド][駒の種類] */
+      static Bitboard not_start_position_[NUM_SIDES][NUM_PIECE_TYPES];
+      /** start_position_[][]とnot_start_position_[][]を初期化。 */
       static void InitStartPosition();
 
       /** センターのマスク。 */

@@ -360,6 +360,7 @@ namespace Sayuri {
   // static変数 //
   // ========== //
   Bitboard Evaluator::start_position_[NUM_SIDES][NUM_PIECE_TYPES];
+  Bitboard Evaluator::not_start_position_[NUM_SIDES][NUM_PIECE_TYPES];
   Bitboard Evaluator::center_mask_;
   Bitboard Evaluator::sweet_center_mask_;
   Bitboard Evaluator::pass_pawn_mask_[NUM_SIDES][NUM_SQUARES];
@@ -414,7 +415,7 @@ namespace Sayuri {
   // ======================= //
   // static変数の初期化。
   void Evaluator::InitEvaluator() {
-    // start_position_[][]を初期化。
+    // start_position_[][]とnot_start_position_[][]を初期化。
     InitStartPosition();
     // センターマスクを初期化する。
     InitCenterMask();
@@ -440,7 +441,18 @@ namespace Sayuri {
     const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES] =
     engine_ptr_->position_;
 
-    // 全体計算。
+    // --- 全体計算 --- //
+    // 駒の展開。
+    for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
+      value_table_1_[DEVELOPMENT][piece_type] +=
+
+      (Util::CountBits(engine_ptr_->position_[WHITE][piece_type]
+      & not_start_position_[WHITE][piece_type]))
+
+      - (Util::CountBits(engine_ptr_->position_[BLACK][piece_type]
+      & not_start_position_[BLACK][piece_type]));
+    }
+
     // ビショップペア。
     if ((position[WHITE][BISHOP] & Util::SQCOLOR[WHITE])
     && (position[WHITE][BISHOP] & Util::SQCOLOR[BLACK])) {
@@ -632,11 +644,6 @@ namespace Sayuri {
     value_table_1_[SWEET_CENTER_CONTROL][PType] +=
     Sign<PSide>(Util::CountBits(attacks & sweet_center_mask_));
 
-    // 駒の展開を計算。
-    if (!(Util::SQUARE[piece_square] & start_position_[PSide][PType])) {
-      value_table_1_[DEVELOPMENT][PType] += Sign<PSide>(1);
-    }
-
     // 敵への攻撃を計算。
     {
       Bitboard attacked = attacks & (engine_ptr_->side_pieces_[EnemySide]);
@@ -725,6 +732,10 @@ namespace Sayuri {
   // ======================== //
   // start_position[][]を初期化。
   void Evaluator::InitStartPosition() {
+    // 先ずはゼロで初期化。
+    INIT_ARRAY(start_position_);
+    INIT_ARRAY(not_start_position_);
+
     // ポーン。
     start_position_[WHITE][PAWN] = Util::RANK[RANK_2];
     start_position_[BLACK][PAWN] = Util::RANK[RANK_7];
@@ -748,6 +759,14 @@ namespace Sayuri {
     // キング。
     start_position_[WHITE][KING] = Util::SQUARE[E1];
     start_position_[BLACK][KING] = Util::SQUARE[E8];
+
+    // 論理否定を初期化。
+    for (Side side = WHITE; side <= BLACK; ++side) {
+      for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
+        not_start_position_[side][piece_type] =
+        ~(start_position_[side][piece_type]);
+      }
+    }
   }
 
   // center_mask_、sweet_center_mask_を初期化する。
