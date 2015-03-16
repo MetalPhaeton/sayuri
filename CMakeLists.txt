@@ -42,12 +42,12 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 # リリース用のコンパイラのオプション設定。
-set(CMAKE_C_FLAGSE_RELEASE "-std=c++11 -Wall -Wsign-compare -O3 -march=native -pthread")
-set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -Wall -Wsign-compare -O3 -march=native -pthread")
+set(CMAKE_C_FLAGSE_RELEASE "-std=c++11 -Wall -Wsign-compare -Ofast -march=native -pthread")
+set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -Wall -Wsign-compare -Ofast -march=native -pthread")
 
 # デバッグ用のコンパイラオプションの設定
-set(CMAKE_C_FLAGS_DEBUG "-std=c++11 -Wall -Wsign-compare -O3 -g -march=native -pthread")
-set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -Wall -Wsign-compare -O3 -g -march=native -pthread")
+set(CMAKE_C_FLAGS_DEBUG "-std=c++11 -Wall -Wsign-compare -Ofast -g -march=native -pthread")
+set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -Wall -Wsign-compare -Ofast -g -march=native -pthread")
 
 # プロファイル用コンパイラオプションの設定。
 set(CMAKE_C_FLAGS_PROFILE "-std=c++11 -Wall -Wsign-compare -pg -march=native -pthread")
