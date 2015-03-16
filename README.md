@@ -81,11 +81,11 @@ in "src" directory.
 
 If you have "clang" :
 
-    clang++ -std=c++11 -O3 -march=native -pthread -o sayuri *.cpp
+    clang++ -std=c++11 -Ofast -march=native -pthread -o sayuri *.cpp
 
 If you have "gcc" :
 
-    g++ -std=c++11 -O3 -march=native -pthread -o sayuri *.cpp
+    g++ -std=c++11 -Ofast -march=native -pthread -o sayuri *.cpp
 
 
 
