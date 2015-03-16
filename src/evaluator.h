@@ -42,59 +42,65 @@ namespace Sayuri {
   class Evaluator {
     private:
       // --- クラス内で使う定数 --- //
+      /** 価値テーブル 1 のインデックス。 */
       enum {
-        /** テーブルのインデックス - オープニングの配置。 */
+        /** 価値のインデックス - オープニングの配置。 */
         OPENING_POSITION,
-        /** テーブルのインデックス - エンディングの配置。 */
+        /** 価値のインデックス - エンディングの配置。 */
         ENDING_POSITION,
-        /** テーブルのインデックス - 機動力。 */
+        /** 価値のインデックス - 機動力。 */
         MOBILITY,
-        /** テーブルのインデックス - センターコントロール。 */
+        /** 価値のインデックス - センターコントロール。 */
         CENTER_CONTROL,
-        /** テーブルのインデックス - スウィートセンターのコントロール。 */
+        /** 価値のインデックス - スウィートセンターのコントロール。 */
         SWEET_CENTER_CONTROL,
-        /** テーブルのインデックス - ピースの展開。 */
+        /** 価値のインデックス - ピースの展開。 */
         DEVELOPMENT,
-        /** テーブルのインデックス - 攻撃。 */
+        /** 価値のインデックス - 攻撃。 */
         ATTACK,
-        /** テーブルのインデックス - 防御。 */
+        /** 価値のインデックス - 防御。 */
         DEFENSE,
-        /** テーブルのインデックス - ピン。 */
+        /** 価値のインデックス - ピン。 */
         PIN,
-        /** テーブルのインデックス - キング周辺への攻撃。 */
+        /** 価値のインデックス - キング周辺への攻撃。 */
         ATTACK_AROUND_KING,
-        /** テーブルのインデックス - パスポーン。 */
+      };
+      /** 価値テーブル 1 のサイズ。 */
+      constexpr static std::size_t TABLE_SIZE_1 = ATTACK_AROUND_KING + 1;
+
+      /** 価値テーブル 2 のインデックス。 */
+      enum {
+        /** 価値のインデックス - パスポーン。 */
         PASS_PAWN,
-        /** テーブルのインデックス - 守られたパスポーン。 */
+        /** 価値のインデックス - 守られたパスポーン。 */
         PROTECTED_PASS_PAWN,
-        /** テーブルのインデックス - ダブルポーン。 */
+        /** 価値のインデックス - ダブルポーン。 */
         DOUBLE_PAWN,
-        /** テーブルのインデックス - 孤立ポーン。 */
+        /** 価値のインデックス - 孤立ポーン。 */
         ISO_PAWN,
-        /** テーブルのインデックス - ポーンの盾。 */
+        /** 価値のインデックス - ポーンの盾。 */
         PAWN_SHIELD,
-        /** テーブルのインデックス - ビショップペア。 */
+        /** 価値のインデックス - ビショップペア。 */
         BISHOP_PAIR,
-        /** テーブルのインデックス - バッドビショップ。 */
+        /** 価値のインデックス - バッドビショップ。 */
         BAD_BISHOP,
-        /** テーブルのインデックス - ルークペア。 */
+        /** 価値のインデックス - ルークペア。 */
         ROOK_PAIR,
-        /** テーブルのインデックス - セミオープンファイルのルーク。 */
+        /** 価値のインデックス - セミオープンファイルのルーク。 */
         ROOK_SEMIOPEN_FYLE,
-        /** テーブルのインデックス - オープンファイルのルーク。 */
+        /** 価値のインデックス - オープンファイルのルーク。 */
         ROOK_OPEN_FYLE,
-        /** テーブルのインデックス - 早すぎるクイーンの始動。 */
+        /** 価値のインデックス - 早すぎるクイーンの始動。 */
         EARLY_QUEEN_LAUNCHED,
-        /** テーブルのインデックス - キング周りの弱いマス。 */
+        /** 価値のインデックス - キング周りの弱いマス。 */
         WEAK_SQUARE,
-        /** テーブルのインデックス - キャスリング。 */
+        /** 価値のインデックス - キャスリング。 */
         CASTLING,
-        /** テーブルのインデックス - キャスリングの放棄。 */
+        /** 価値のインデックス - キャスリングの放棄。 */
         ABANDONED_CASTLING,
       };
-
-      /** テーブルのインデックスの種類のサイズ。 */
-      constexpr static std::size_t TABLE_SIZE = ABANDONED_CASTLING + 1;
+      /** 価値テーブル 2 のサイズ。 */
+      constexpr static std::size_t TABLE_SIZE_2 = ABANDONED_CASTLING + 1;
 
     public:
       // ==================== //
@@ -229,8 +235,11 @@ namespace Sayuri {
       /** 使用するチェスエンジン。 */
       const ChessEngine* engine_ptr_;
 
-      /** 評価関数で使う価値テーブル。 */
-      int value_table_[TABLE_SIZE][NUM_PIECE_TYPES];
+      /** 評価関数で使う価値テーブル 1。 */
+      int value_table_1_[TABLE_SIZE_1][NUM_PIECE_TYPES];
+
+      /** 評価関数で使う価値テーブル 2。 */
+      int value_table_2_[TABLE_SIZE_2];
 
       // ========================== //
       // 評価パラメータのキャッシュ //
@@ -267,10 +276,15 @@ namespace Sayuri {
        */
       int pawn_shield_value_table_[NUM_SQUARES];
       /**
-       * 評価パラメータのキャッシュ。
+       * 評価パラメータのキャッシュ 1。
        * 各種ウェイト。
        */
-      int weight_cache_table_[TABLE_SIZE][NUM_PIECE_TYPES][NUM_SQUARES];
+      int weight_cache_table_1_[TABLE_SIZE_1][NUM_PIECE_TYPES][NUM_SQUARES];
+      /**
+       * 評価パラメータのキャッシュ 2。
+       * 各種ウェイト。
+       */
+      int weight_cache_table_2_[TABLE_SIZE_2][NUM_SQUARES];
   };
 }  // namespace Sayuri
 

@@ -408,6 +408,7 @@ namespace Sayuri {
   }
 
   // Evaluatorのvalue_table_の中身を表示する。
+  /*
   void PrintValueTable(const Evaluator& evaluator) {
     const int (& table)[Evaluator::TABLE_SIZE][NUM_PIECE_TYPES] =
     evaluator.value_table_;
@@ -518,6 +519,7 @@ namespace Sayuri {
     std::cout << "ABANDONED_CASTLING:" << std::endl;
     print(Evaluator::ABANDONED_CASTLING);
   }
+  */
 
   // ================ //
   // ストップウォッチ //

@@ -100,7 +100,7 @@ namespace Sayuri {
    * Evaluatorのvalue_table_の中身を出力する。
    * @param evaluator 調べたいEvaluator。
    */
-  void PrintValueTable(const Evaluator& evaluator);
+  // void PrintValueTable(const Evaluator& evaluator);
 
   // ================ //
   // ストップウォッチ //
