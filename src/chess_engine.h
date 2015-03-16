@@ -1178,10 +1178,8 @@ namespace Sayuri {
         void WaitForHelpers(std::uint32_t level) {
           std::unique_lock<std::mutex> lock(mutex_);  // ロック。
 
-          for (unsigned int i = level; i < (MAX_PLYS + 1); ++i) {
-            while (num_helpers_[i] >= 1) {
-              cond_.wait(lock);
-            }
+          while (num_helpers_[level] >= 1) {
+            cond_.wait(lock);
           }
         }
       };
