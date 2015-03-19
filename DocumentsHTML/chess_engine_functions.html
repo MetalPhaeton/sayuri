@@ -77,6 +77,12 @@
 <li><code>@go-nodes &lt;Nodes : Number&gt; [&lt;Candidate move list : List&gt;]</code></li>
 <li><code>@set-hash-size &lt;Size : Number&gt;</code></li>
 <li><code>@set-threads &lt;Number of Threads : Number&gt;</code></li>
+<li><code>@material [&lt;New materal : List&gt;]</code></li>
+<li><code>@enable-quiesce-search [&lt;New setting : Boolean&gt;]</code></li>
+<li><code>@enable-repetition-check [&lt;New setting : Boolean&gt;]</code></li>
+<li><code>@enable-check-extension [&lt;New setting : Boolean&gt;]</code></li>
+<li><code>@ybwc-limit-depth [&lt;New depth : Number&gt;]</code></li>
+<li><code>@ybwc-invalid-moves [&lt;New number of moves : Number&gt;]</code></li>
 </ul></li>
 </ul></li>
 <li><a href="#utility-functions">Utility Functions</a></li>
@@ -461,6 +467,54 @@
 <li><code>@set-threads &lt;Number of Threads : Number&gt;</code>
 <ul>
 <li>Set number of threads and return previous number.</li>
+</ul></li>
+<li><code>@material [&lt;New material : List&gt;]</code>
+<ul>
+<li>Return score list of material.
+<ul>
+<li>1st : Empty. (It's always 0)</li>
+<li>2nd : Pawn.</li>
+<li>3rd : Knight.</li>
+<li>4th : Bishop.</li>
+<li>5th : Rook.</li>
+<li>6th : Queen.</li>
+<li>7th : King.</li>
+</ul></li>
+<li>If you give <code>&lt;New material&gt;</code>, it sets new score of material.</li>
+</ul></li>
+<li><code>@enable-quiesce-search [&lt;New setting : Boolean&gt;]</code>
+<ul>
+<li>Return setting that Quiesce Search is enabled or disabled.
+<ul>
+<li>If it returns '#t', it is enabled. Otherwise disabled.</li>
+</ul></li>
+<li>If you have specified <code>&lt;New setting&gt;</code>, it sets new setting to enable or disable Quiesce Search.</li>
+</ul></li>
+<li><code>@enable-repetition-check [&lt;New setting : Boolean&gt;]</code>
+<ul>
+<li>Return setting that Repetition Check is enabled or disabled.
+<ul>
+<li>If it returns '#t', it is enabled. Otherwise disabled.</li>
+</ul></li>
+<li>If you have specified <code>&lt;New setting&gt;</code>, it sets new setting to enable or disable Repetition Check.</li>
+</ul></li>
+<li><code>@enable-check-extension [&lt;New setting : Boolean&gt;]</code>
+<ul>
+<li>Return setting that Check Extension is enabled or disabled.
+<ul>
+<li>If it returns '#t', it is enabled. Otherwise disabled.</li>
+</ul></li>
+<li>If you have specified <code>&lt;New setting&gt;</code>, it sets new setting to enable or disable Check Extension.</li>
+</ul></li>
+<li><code>@ybwc-limit-depth [&lt;New depth : Number&gt;]</code>
+<ul>
+<li>Return depth (ply) that if the search function reaches a node on the remaining depth, it doesn't do YBWC in deeper nodes.</li>
+<li>If you have specified <code>&lt;New depth&gt;</code>, it sets new depth.</li>
+</ul></li>
+<li><code>@ybwc-invalid-moves [&lt;New number of moves : Number&gt;]</code>
+<ul>
+<li>Return number of moves that the search function invalidates YBWC while the number of candidate moves from 1st move in a node.</li>
+<li>If you have specified <code>&lt;New number of moves&gt;</code>, it sets new number of of moves.</li>
 </ul></li>
 </ul></li>
 </ul>
