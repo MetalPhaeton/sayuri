@@ -542,6 +542,78 @@ namespace Sayuri {
       }
       return SetThreads(*num_threads_ptr);
 
+    } else if (message_symbol == "@material") {
+      LispObjectPtr material_list_ptr = LispObject::NewNil();
+      if (list_itr) {
+        material_list_ptr = caller.Evaluate(*list_itr);
+        if (!(material_list_ptr->IsList())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "List", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetMaterial(*material_list_ptr);
+
+    } else if (message_symbol == "@enable-quiesce-search") {
+      LispObjectPtr enable_ptr = LispObject::NewNil();
+      if (list_itr) {
+        enable_ptr = caller.Evaluate(*list_itr);
+        if (!(enable_ptr->IsBoolean())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Boolean", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetEnableQuiesceSearch(*enable_ptr);
+
+    } else if (message_symbol == "@enable-repetition-check") {
+      LispObjectPtr enable_ptr = LispObject::NewNil();
+      if (list_itr) {
+        enable_ptr = caller.Evaluate(*list_itr);
+        if (!(enable_ptr->IsBoolean())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Boolean", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetEnableRepetitionCheck(*enable_ptr);
+
+    } else if (message_symbol == "@enable-check-extension") {
+      LispObjectPtr enable_ptr = LispObject::NewNil();
+      if (list_itr) {
+        enable_ptr = caller.Evaluate(*list_itr);
+        if (!(enable_ptr->IsBoolean())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Boolean", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetEnableCheckExtension(*enable_ptr);
+
+    } else if (message_symbol == "@ybwc-limit-depth") {
+      LispObjectPtr depth_ptr = LispObject::NewNil();
+      if (list_itr) {
+        depth_ptr = caller.Evaluate(*list_itr);
+        if (!(depth_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetYBWCLimitDepth(*depth_ptr);
+
+    } else if (message_symbol == "@ybwc-invalid-moves") {
+      LispObjectPtr num_moves_ptr = LispObject::NewNil();
+      if (list_itr) {
+        num_moves_ptr = caller.Evaluate(*list_itr);
+        if (!(num_moves_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetYBWCInvalidMoves(*num_moves_ptr);
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
@@ -1313,6 +1385,48 @@ namespace Sayuri {
 
     return GetBestMove(MAX_PLYS, nodes_2, INT_MAX,
     MoveListToVec(func_name, move_list));
+  }
+
+  // SearchParams - マテリアル。
+  LispObjectPtr EngineSuite::SetMaterial(const LispObject& material_list) {
+    // 長さをチェック。
+    unsigned int len = material_list.Length();
+    if (len > 0) {
+      if (len < 7) {
+        throw LispObject::GenError("@engine_error",
+        "Not enough length of material list. Needs 7. Given "
+        + std::to_string(len) + ".");
+      }
+    }
+
+    // 返すオブジェクトを作成しながら配列にセットする。
+    int material[NUM_PIECE_TYPES] {0, 0, 0, 0, 0, 0, 0};
+
+    LispObjectPtr ret_ptr = LispObject::NewList(7);
+    LispObject* ptr = ret_ptr.get();
+    ptr->car(LispObject::NewNumber(0));  // Emptyの分。
+    ptr = ptr->cdr().get();
+
+    LispIterator itr(&material_list);
+    ++itr;  // Emptyの分を飛ばす。
+    for (PieceType piece_type = PAWN; piece_type < NUM_PIECE_TYPES;
+    ++piece_type) {
+      ptr->car
+      (LispObject::NewNumber(search_params_ptr_->material()[piece_type]));
+
+      ptr = ptr->cdr().get();
+
+      if (len != 0) {
+        material[piece_type] = (itr++)->number_value();
+      }
+    }
+
+    // セットする。
+    if (len != 0) {
+      search_params_ptr_->material(material);
+    }
+
+    return ret_ptr;
   }
 
   // ======== //
@@ -2493,6 +2607,48 @@ __Description__
       
     + `@set-threads <Number of Threads : Number>`
         - Set number of threads and return previous number.
+
+    + `@material [<New material : List>]`
+        - Return score list of material.
+            - 1st : Empty. (It's always 0)
+            - 2nd : Pawn.
+            - 3rd : Knight.
+            - 4th : Bishop.
+            - 5th : Rook.
+            - 6th : Queen.
+            - 7th : King.
+        - If you have specified `<New material>`,
+          it sets new score of material.
+
+    + `@enable-quiesce-search [<New setting : Boolean>]`
+        - Return setting that Quiesce Search is enabled or disabled.
+            - If it returns '#t', it is enabled. Otherwise disabled.
+        - If you have specified `<New setting>`,
+          it sets new setting to enable or disable Quiesce Search.
+
+    + `@enable-repetition-check [<New setting : Boolean>]`
+        - Return setting that Repetition Check is enabled or disabled.
+            - If it returns '#t', it is enabled. Otherwise disabled.
+        - If you have specified `<New setting>`,
+          it sets new setting to enable or disable Repetition Check.
+
+    + `@enable-check-extension [<New setting : Boolean>]`
+        - Return setting that Check Extension is enabled or disabled.
+            - If it returns '#t', it is enabled. Otherwise disabled.
+        - If you have specified `<New setting>`,
+          it sets new setting to enable or disable Check Extension.
+
+    + `@ybwc-limit-depth [<New depth : Number>]`
+        - Return depth (ply) that
+          if the search function reaches a node on the remaining depth,
+          it doesn't do YBWC in deeper nodes.
+        - If you have specified `<New depth>`, it sets new depth.
+
+    + `@ybwc-invalid-moves [<New number of moves : Number>]`
+        - Return number of moves that the search function invalidates YBWC
+          while the number of candidate moves from 1st move in a node.
+        - If you have specified `<New number of moves>`,
+          it sets new number of of moves.
       
 __Example__
 

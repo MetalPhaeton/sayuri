@@ -573,6 +573,93 @@ namespace Sayuri {
         return LispObject::NewNumber(old_threads);
       }
 
+      /**
+       * SearchParams - マテリアル。
+       * @param material_list マテリアルが記されたリスト。
+       * @return セットされていたマテリアルのリスト。
+       */
+      LispObjectPtr SetMaterial(const LispObject& material_list);
+
+      /**
+       * SearchParams - クイース探索の有効無効。
+       * @param enable クイース探索の有効無効。
+       * @return セットされていたクイース探索の有効無効。
+       */
+      LispObjectPtr SetEnableQuiesceSearch(const LispObject& enable) {
+        LispObjectPtr ret_ptr =
+        LispObject::NewBoolean(search_params_ptr_->enable_quiesce_search());
+
+        if (enable.IsBoolean()) {
+          search_params_ptr_->enable_quiesce_search(enable.boolean_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - 繰り返しチェックの有効無効。
+       * @param enable 繰り返しチェックの有効無効。
+       * @return セットされていた繰り返しチェックの有効無効。
+       */
+      LispObjectPtr SetEnableRepetitionCheck(const LispObject& enable) {
+        LispObjectPtr ret_ptr =
+        LispObject::NewBoolean(search_params_ptr_->enable_repetition_check());
+
+        if (enable.IsBoolean()) {
+          search_params_ptr_->enable_repetition_check(enable.boolean_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - Check Extensionの有効無効。
+       * @param enable Check Extensionの有効無効。
+       * @return セットされていたCheck Extensionの有効無効。
+       */
+      LispObjectPtr SetEnableCheckExtension(const LispObject& enable) {
+        LispObjectPtr ret_ptr =
+        LispObject::NewBoolean(search_params_ptr_->enable_check_extension());
+
+        if (enable.IsBoolean()) {
+          search_params_ptr_->enable_check_extension(enable.boolean_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - YBWCの深さ制限。
+       * @param depth 深さ。
+       * @return セットされていたYBWCの深さ制限。
+       */
+      LispObjectPtr SetYBWCLimitDepth(const LispObject& depth) {
+        LispObjectPtr ret_ptr =
+        LispObject::NewNumber(search_params_ptr_->ybwc_limit_depth());
+
+        if (depth.IsNumber()) {
+          search_params_ptr_->ybwc_limit_depth(depth.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - YBWCを無効にする最初の候補手の数。
+       * @param num_moves 候補手の数。
+       * @return セットされていたYBWCを無効にする最初の候補手の数。
+       */
+      LispObjectPtr SetYBWCInvalidMoves(const LispObject& num_moves) {
+        LispObjectPtr ret_ptr =
+        LispObject::NewNumber(search_params_ptr_->ybwc_invalid_moves());
+
+        if (num_moves.IsNumber()) {
+          search_params_ptr_->ybwc_invalid_moves(num_moves.number_value());
+        }
+
+        return ret_ptr;
+      }
+
       // ======== //
       // アクセサ //
       // ======== //
