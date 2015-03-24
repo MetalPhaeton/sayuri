@@ -36,6 +36,7 @@
 #include <utility>
 #include <iterator>
 #include <thread>
+#include <system_error>
 #include <chrono>
 #include <sstream>
 #include <utility>
@@ -155,8 +156,10 @@ namespace Sayuri {
 
   // デストラクタ。
   UCIShell::~UCIShell() {
-    if (thinking_thread_.joinable()) {
+    try {
       thinking_thread_.join();
+    } catch (std::system_error err) {
+      // 無視。
     }
   }
 
@@ -523,8 +526,10 @@ namespace Sayuri {
 
     // 思考スレッドを終了させる。
     engine_ptr_->StopCalculation();
-    if (thinking_thread_.joinable()) {
+    try {
       thinking_thread_.join();
+    } catch (std::system_error err) {
+      // 無視。
     }
 
     // searchmovesコマンド。
@@ -633,9 +638,11 @@ namespace Sayuri {
   // 「stop」コマンドのコールバック関数。
   void UCIShell::CommandStop(UCICommand::CommandArgs& args) {
     // 思考スレッドを終了させる。
-    if (thinking_thread_.joinable()) {
-      engine_ptr_->StopCalculation();
+    engine_ptr_->StopCalculation();
+    try {
       thinking_thread_.join();
+    } catch (std::system_error err) {
+      // 無視。
     }
   }
 

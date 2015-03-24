@@ -40,6 +40,7 @@
 #include <cstdint>
 #include <functional>
 #include <queue>
+#include <system_error>
 #include "common.h"
 #include "transposition_table.h"
 #include "move_maker.h"
@@ -915,8 +916,10 @@ namespace Sayuri {
     // スレッドをジョイン。
     shared_st_ptr_->helper_queue_ptr_->ReleaseHelpers();
     for (auto& thread : thread_vec_) {
-      if (thread.joinable()) {
+      try {
         thread.join();
+      } catch (std::system_error err) {
+        // 無視。
       }
     }
 
