@@ -83,6 +83,9 @@
 <li><code>@enable-check-extension [&lt;New setting : Boolean&gt;]</code></li>
 <li><code>@ybwc-limit-depth [&lt;New depth : Number&gt;]</code></li>
 <li><code>@ybwc-invalid-moves [&lt;New number of moves : Number&gt;]</code></li>
+<li><code>@enable-aspiration-windows [&lt;New setting : Boolean&gt;]</code></li>
+<li><code>@aspiration-windows-limit-depth [&lt;New depth : Number&gt;]</code></li>
+<li><code>@aspiration-windows-delta [&lt;New delta : Number&gt;]</code></li>
 </ul></li>
 </ul></li>
 <li><a href="#utility-functions">Utility Functions</a></li>
@@ -515,6 +518,24 @@
 <ul>
 <li>Return number of moves that the search function invalidates YBWC while the number of candidate moves from 1st move in a node.</li>
 <li>If you have specified <code>&lt;New number of moves&gt;</code>, it sets new number of of moves.</li>
+</ul></li>
+<li><code>@enable-aspiration-windows [&lt;New setting : Boolean&gt;]</code>
+<ul>
+<li>Return setting that Aspiration Windows is enabled or disabled.
+<ul>
+<li>If it returns '#t', it is enabled. Otherwise disabled.</li>
+</ul></li>
+<li>If you have specified <code>&lt;New setting&gt;</code>, it sets new setting to enable or disable Aspiration Windows.</li>
+</ul></li>
+<li><code>@aspiration-windows-limit-depth [&lt;New depth : Number&gt;]</code>
+<ul>
+<li>Return depth (ply) that if depth of Iterative Deepening is less than it, the search function doesn't do Aspiration Windows on root node.</li>
+<li>If you have specified <code>&lt;New depth&gt;</code>, it sets new depth.</li>
+</ul></li>
+<li><code>@aspiration-windows-delta [&lt;New delta : Number&gt;]</code>
+<ul>
+<li>Return a value that if the search function have occurred fail-hight on root node, the function adds delta value to beta value and searches again.</li>
+<li>If you have specified <code>&lt;New delta&gt;</code>, it sets new delta value.</li>
 </ul></li>
 </ul></li>
 </ul>

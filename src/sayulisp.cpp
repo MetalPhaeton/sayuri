@@ -2677,7 +2677,7 @@ __Description__
     + `@ybwc-limit-depth [<New depth : Number>]`
         - Return depth (ply) that
           if the search function reaches a node on the remaining depth,
-          it doesn't do YBWC in deeper nodes.
+          it doesn't do YBWC in the deeper nodes.
         - If you have specified `<New depth>`, it sets new depth.
 
     + `@ybwc-invalid-moves [<New number of moves : Number>]`
@@ -2685,6 +2685,24 @@ __Description__
           while the number of candidate moves from 1st move in a node.
         - If you have specified `<New number of moves>`,
           it sets new number of of moves.
+
+    + `@enable-aspiration-windows [<New setting : Boolean>]`
+        - Return setting that Aspiration Windows is enabled or disabled.
+            - If it returns '#t', it is enabled. Otherwise disabled.
+        - If you have specified `<New setting>`,
+          it sets new setting to enable or disable Aspiration Windows.
+
+    + `@aspiration-windows-limit-depth [<New depth : Number>]`
+        - Return depth (ply) that
+          if depth of Iterative Deepening is less than it,
+          the search function doesn't do Aspiration Windows on root node.
+        - If you have specified `<New depth>`, it sets new depth.
+
+    + `@aspiration-windows-delta [<New delta : Number>]`
+        - Return a value that
+          if the search function have occurred fail-hight on root node,
+          the function adds delta value to beta value and searches again.
+        - If you have specified `<New delta>`, it sets new delta value.
       
 __Example__
 
