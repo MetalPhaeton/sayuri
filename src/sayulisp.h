@@ -660,6 +660,57 @@ namespace Sayuri {
         return ret_ptr;
       }
 
+      /**
+       * SearchParams - Aspiration Windowsの有効無効。
+       * @param enable Aspiration Windowsの有効無効。
+       * @return セットされていたAspiration Windowsの有効無効。
+       */
+      LispObjectPtr SetEnableAspirationWindows(const LispObject& enable) {
+        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        (search_params_ptr_->enable_aspiration_windows());
+
+        if (enable.IsBoolean()) {
+          search_params_ptr_->enable_aspiration_windows
+          (enable.boolean_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - Aspiration Windowsの深さ制限。
+       * @param depth 深さ。
+       * @return セットされていたAspiration Windowsの深さ制限。
+       */
+      LispObjectPtr SetAspirationWindowsLimitDepth(const LispObject& depth) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->aspiration_windows_limit_depth());
+
+        if (depth.IsNumber()) {
+          search_params_ptr_->aspiration_windows_limit_depth
+          (depth.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - Aspiration Windowsのデルタ値。
+       * @param delta デルタ値。
+       * @return セットされていたAspiration Windowsのデルタ値。
+       */
+      LispObjectPtr SetAspirationWindowsDelta(const LispObject& delta) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->aspiration_windows_delta());
+
+        if (delta.IsNumber()) {
+          search_params_ptr_->aspiration_windows_delta
+          (delta.number_value());
+        }
+
+        return ret_ptr;
+      }
+
       // ======== //
       // アクセサ //
       // ======== //

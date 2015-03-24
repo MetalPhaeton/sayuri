@@ -614,6 +614,42 @@ namespace Sayuri {
 
       return SetYBWCInvalidMoves(*num_moves_ptr);
 
+    } else if (message_symbol == "@enable-aspiration-windows") {
+      LispObjectPtr enable_ptr = LispObject::NewNil();
+      if (list_itr) {
+        enable_ptr = caller.Evaluate(*list_itr);
+        if (!(enable_ptr->IsBoolean())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Boolean", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetEnableAspirationWindows(*enable_ptr);
+
+    } else if (message_symbol == "@aspiration-windows-limit-depth") {
+      LispObjectPtr depth_ptr = LispObject::NewNil();
+      if (list_itr) {
+        depth_ptr = caller.Evaluate(*list_itr);
+        if (!(depth_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetAspirationWindowsLimitDepth(*depth_ptr);
+
+    } else if (message_symbol == "@aspiration-windows-delta") {
+      LispObjectPtr delta_ptr = LispObject::NewNil();
+      if (list_itr) {
+        delta_ptr = caller.Evaluate(*list_itr);
+        if (!(delta_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetAspirationWindowsDelta(*delta_ptr);
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
