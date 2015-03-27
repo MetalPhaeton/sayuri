@@ -86,6 +86,10 @@
 <li><code>@enable-aspiration-windows [&lt;New setting : Boolean&gt;]</code></li>
 <li><code>@aspiration-windows-limit-depth [&lt;New depth : Number&gt;]</code></li>
 <li><code>@aspiration-windows-delta [&lt;New delta : Number&gt;]</code></li>
+<li><code>@enable-see [&lt;New setting : Boolean&gt;]</code></li>
+<li><code>@enable-history [&lt;New setting : Boolean&gt;]</code></li>
+<li><code>@enable-killer [&lt;New setting : Boolean&gt;]</code></li>
+<li><code>@enable-hash-table [&lt;New setting : Boolean&gt;]</code></li>
 </ul></li>
 </ul></li>
 <li><a href="#utility-functions">Utility Functions</a></li>
@@ -536,6 +540,38 @@
 <ul>
 <li>Return a value that if the search function have occurred fail-hight on root node, the function adds delta value to beta value and searches again.</li>
 <li>If you have specified <code>&lt;New delta&gt;</code>, it sets new delta value.</li>
+</ul></li>
+<li><code>@enable-see [&lt;New setting : Boolean&gt;]</code>
+<ul>
+<li>Return setting that SEE is enabled or disabled.
+<ul>
+<li>If it returns '#t', it is enabled. Otherwise disabled.</li>
+</ul></li>
+<li>If you have specified <code>&lt;New setting&gt;</code>, it sets new setting to enable or disable SEE.</li>
+</ul></li>
+<li><code>@enable-history [&lt;New setting : Boolean&gt;]</code>
+<ul>
+<li>Return setting that History Heuristics is enabled or disabled.
+<ul>
+<li>If it returns '#t', it is enabled. Otherwise disabled.</li>
+</ul></li>
+<li>If you have specified <code>&lt;New setting&gt;</code>, it sets new setting to enable or disable History Heuristics.</li>
+</ul></li>
+<li><code>@enable-killer [&lt;New setting : Boolean&gt;]</code>
+<ul>
+<li>Return setting that Killer Move Heuristics is enabled or disabled.
+<ul>
+<li>If it returns '#t', it is enabled. Otherwise disabled.</li>
+</ul></li>
+<li>If you have specified <code>&lt;New setting&gt;</code>, it sets new setting to enable or disable Killer Move Heuristics.</li>
+</ul></li>
+<li><code>@enable-hash-table [&lt;New setting : Boolean&gt;]</code>
+<ul>
+<li>Return setting that Hash Table is enabled or disabled.
+<ul>
+<li>If it returns '#t', it is enabled. Otherwise disabled.</li>
+</ul></li>
+<li>If you have specified <code>&lt;New setting&gt;</code>, it sets new setting to enable or disable Hash Table.</li>
 </ul></li>
 </ul></li>
 </ul>
