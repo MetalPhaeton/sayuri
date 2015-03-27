@@ -196,7 +196,7 @@ namespace Sayuri {
       table.Lock();  // ロック。
 
       // 前回の繰り返しの最善手を含めたエントリーを得る。
-      const TTEntry& tt_entry = table.GetEntry(pos_hash, depth - 1);
+      const TTEntry& tt_entry = table.GetEntry(pos_hash);
       if (tt_entry) {
         ScoreType score_type = tt_entry.score_type();
 

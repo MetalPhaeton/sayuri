@@ -711,6 +711,70 @@ namespace Sayuri {
         return ret_ptr;
       }
 
+      /**
+       * SearchParams - SEEの有効無効。
+       * @param enable SEEの有効無効。
+       * @return セットされていたSEEの有効無効。
+       */
+      LispObjectPtr SetEnableSEE(const LispObject& enable) {
+        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        (search_params_ptr_->enable_see());
+
+        if (enable.IsBoolean()) {
+          search_params_ptr_->enable_see(enable.boolean_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - ヒストリーの有効無効。
+       * @param enable ヒストリーの有効無効。
+       * @return セットされていたヒストリーの有効無効。
+       */
+      LispObjectPtr SetEnableHistory(const LispObject& enable) {
+        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        (search_params_ptr_->enable_history());
+
+        if (enable.IsBoolean()) {
+          search_params_ptr_->enable_history(enable.boolean_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - キラームーブの有効無効。
+       * @param enable キラームーブの有効無効。
+       * @return セットされていたキラームーブの有効無効。
+       */
+      LispObjectPtr SetEnableKiller(const LispObject& enable) {
+        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        (search_params_ptr_->enable_killer());
+
+        if (enable.IsBoolean()) {
+          search_params_ptr_->enable_killer(enable.boolean_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - トランスポジションテーブルの有効無効。
+       * @param enable トランスポジションテーブルの有効無効。
+       * @return セットされていたトランスポジションテーブルの有効無効。
+       */
+      LispObjectPtr SetEnableHashTable(const LispObject& enable) {
+        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        (search_params_ptr_->enable_ttable());
+
+        if (enable.IsBoolean()) {
+          search_params_ptr_->enable_ttable(enable.boolean_value());
+        }
+
+        return ret_ptr;
+      }
+
       // ======== //
       // アクセサ //
       // ======== //

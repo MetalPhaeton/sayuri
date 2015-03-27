@@ -224,10 +224,9 @@ namespace Sayuri {
       /**
        * 条件を満たすエントリーを得る。
        * @param pos_hash 条件のハッシュ。
-       * @param depth 条件の残り深さ。
        * @return 条件を満たすエントリー。
        */
-      const TTEntry& GetEntry(Hash pos_hash, int depth) const;
+      const TTEntry& GetEntry(Hash pos_hash) const;
 
       /** 年を取る。 */
       void GrowOld() {age_ += 0x00010000UL;}

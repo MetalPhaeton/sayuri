@@ -176,15 +176,11 @@ namespace Sayuri {
   }
 
   // 条件を満たすエントリーを返す。
-  const TTEntry& TranspositionTable::GetEntry(Hash pos_hash, int depth) const {
-    // depthをunsigned intにしておく。
-    std::uint32_t depth_2 = depth < 0 ? 0 : depth;
-
+  const TTEntry& TranspositionTable::GetEntry(Hash pos_hash) const {
     // エントリーを得る。
     std::size_t index = pos_hash & index_mask_;
 
-    if (((entry_table_[index].age_depth_ & TTEntry::DEPTH_MASK) >= depth_2)
-    && (entry_table_[index].pos_hash_ == pos_hash)) {
+    if (entry_table_[index].pos_hash_ == pos_hash) {
       return entry_table_[index];
     }
 

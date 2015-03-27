@@ -650,6 +650,54 @@ namespace Sayuri {
 
       return SetAspirationWindowsDelta(*delta_ptr);
 
+    } else if (message_symbol == "@enable-see") {
+      LispObjectPtr enable_ptr = LispObject::NewNil();
+      if (list_itr) {
+        enable_ptr = caller.Evaluate(*list_itr);
+        if (!(enable_ptr->IsBoolean())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Boolean", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetEnableSEE(*enable_ptr);
+
+    } else if (message_symbol == "@enable-history") {
+      LispObjectPtr enable_ptr = LispObject::NewNil();
+      if (list_itr) {
+        enable_ptr = caller.Evaluate(*list_itr);
+        if (!(enable_ptr->IsBoolean())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Boolean", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetEnableHistory(*enable_ptr);
+
+    } else if (message_symbol == "@enable-killer") {
+      LispObjectPtr enable_ptr = LispObject::NewNil();
+      if (list_itr) {
+        enable_ptr = caller.Evaluate(*list_itr);
+        if (!(enable_ptr->IsBoolean())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Boolean", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetEnableKiller(*enable_ptr);
+
+    } else if (message_symbol == "@enable-hash-table") {
+      LispObjectPtr enable_ptr = LispObject::NewNil();
+      if (list_itr) {
+        enable_ptr = caller.Evaluate(*list_itr);
+        if (!(enable_ptr->IsBoolean())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Boolean", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetEnableHashTable(*enable_ptr);
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
@@ -2703,6 +2751,30 @@ __Description__
           if the search function have occurred fail-hight on root node,
           the function adds delta value to beta value and searches again.
         - If you have specified `<New delta>`, it sets new delta value.
+
+    + `@enable-see [<New setting : Boolean>]`
+        - Return setting that SEE is enabled or disabled.
+            - If it returns '#t', it is enabled. Otherwise disabled.
+        - If you have specified `<New setting>`,
+          it sets new setting to enable or disable SEE.
+
+    + `@enable-history [<New setting : Boolean>]`
+        - Return setting that History Heuristics is enabled or disabled.
+            - If it returns '#t', it is enabled. Otherwise disabled.
+        - If you have specified `<New setting>`,
+          it sets new setting to enable or disable History Heuristics.
+
+    + `@enable-killer [<New setting : Boolean>]`
+        - Return setting that Killer Move Heuristics is enabled or disabled.
+            - If it returns '#t', it is enabled. Otherwise disabled.
+        - If you have specified `<New setting>`,
+          it sets new setting to enable or disable Killer Move Heuristics.
+
+    + `@enable-hash-table [<New setting : Boolean>]`
+        - Return setting that Hash Table is enabled or disabled.
+            - If it returns '#t', it is enabled. Otherwise disabled.
+        - If you have specified `<New setting>`,
+          it sets new setting to enable or disable Hash Table.
       
 __Example__
 
