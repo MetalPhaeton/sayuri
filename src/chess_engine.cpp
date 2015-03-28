@@ -62,6 +62,7 @@ namespace Sayuri {
   is_null_searching_(false),
   evaluator_(*this),
   helper_handler_(this) {
+    InitSearchParamsCache();
     SetNewGame();
 
     // 探索関数用パラメータ。
@@ -93,6 +94,7 @@ namespace Sayuri {
   is_null_searching_(false),
   evaluator_(*this),
   helper_handler_(this) {
+    InitSearchParamsCache();
     SetNewGame();
 
     // ムーブメーカー。
@@ -119,6 +121,8 @@ namespace Sayuri {
   is_null_searching_(false),
   evaluator_(*this),
   helper_handler_(this) {
+    InitSearchParamsCache();
+
     // 基本メンバをコピー。
     ScanBasicMember(engine);
 
@@ -149,6 +153,8 @@ namespace Sayuri {
   is_null_searching_(false),
   evaluator_(*this),
   helper_handler_(this) {
+    InitSearchParamsCache();
+
     // 基本メンバをコピー。
     ScanBasicMember(engine);
 
@@ -1124,6 +1130,57 @@ namespace Sayuri {
     for (Square square = 1; square < NUM_SQUARES; ++square) {
       en_passant_hash_value_table_[square] = temp_table[temp_count++];
     }
+  }
+
+  // 探索関数用キャッシュを初期化する。
+  void ChessEngine::InitSearchParamsCache() {
+    INIT_ARRAY(material_);
+    enable_quiesce_search_ = false;
+    enable_repetition_check_ = false;
+    enable_check_extension_ = false;
+    ybwc_limit_depth_ = 0;
+    ybwc_invalid_moves_ = 0;
+    enable_aspiration_windows_ = false;
+    aspiration_windows_limit_depth_ = 0;
+    aspiration_windows_delta_ = 0;
+    enable_see_ = false;
+    enable_history_ = false;
+    enable_killer_ = false;
+    enable_ttable_ = false;
+    enable_iid_ = false;
+    iid_limit_depth_ = 0;
+    iid_search_depth_ = 0;
+    enable_nmr_ = false;
+    nmr_limit_depth_ = 0;
+    nmr_search_reduction_ = 0;
+    nmr_reduction_ = 0;
+    enable_probcut_ = false;
+    probcut_limit_depth_ = 0;
+    probcut_margin_ = 0;
+    probcut_search_reduction_ = 0;
+    enable_history_pruning_ = false;
+    history_pruning_limit_depth_ = 0;
+    history_pruning_move_threshold_ = 0;
+    history_pruning_invalid_moves_ = 0;
+    history_pruning_threshold_ = 0;
+    history_pruning_reduction_ = 0;
+    enable_lmr_ = false;
+    lmr_limit_depth_ = 0;
+    lmr_threshold_ = 0;
+    lmr_invalid_moves_ = 0;
+    lmr_search_reduction_ = 0;
+    enable_futility_pruning_ = false;
+    futility_pruning_depth_ = 0;
+    futility_pruning_margin_ = 0;
+
+    INIT_ARRAY(piece_hash_value_table_);
+    INIT_ARRAY(to_move_hash_value_table_);
+    INIT_ARRAY(castling_hash_value_table_);
+    INIT_ARRAY(en_passant_hash_value_table_);
+
+    max_depth_ = 0;
+    max_nodes_ = 0;
+    thinking_time_ = Chrono::milliseconds(0);
   }
 
   // キャッシュする。

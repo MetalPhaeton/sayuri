@@ -374,15 +374,15 @@ namespace Sayuri {
   // コンストラクタ。
   Evaluator::Evaluator(const ChessEngine& engine)
   : engine_ptr_(&engine) {
+    InitEvalParamsCache();
     INIT_ARRAY(value_table_1_);
     INIT_ARRAY(value_table_2_);
-    INIT_ARRAY(weight_cache_table_1_);
-    INIT_ARRAY(weight_cache_table_2_);
   }
 
   // コピーコンストラクタ。
   Evaluator::Evaluator(const Evaluator& eval)
   : engine_ptr_(eval.engine_ptr_) {
+    InitEvalParamsCache();
     COPY_ARRAY(value_table_1_, eval.value_table_1_);
     COPY_ARRAY(value_table_2_, eval.value_table_2_);
   }
@@ -390,6 +390,7 @@ namespace Sayuri {
   // ムーブコンストラクタ。
   Evaluator::Evaluator(Evaluator&& eval)
   : engine_ptr_(eval.engine_ptr_) {
+    InitEvalParamsCache();
     COPY_ARRAY(value_table_1_, eval.value_table_1_);
     COPY_ARRAY(value_table_2_, eval.value_table_2_);
   }
@@ -912,6 +913,18 @@ namespace Sayuri {
         }
       }
     }
+  }
+
+  // キャッシュを初期化する。
+  void Evaluator::InitEvalParamsCache() {
+    INIT_ARRAY(opening_position_value_table_);
+    INIT_ARRAY(ending_position_value_table_);
+    INIT_ARRAY(attack_value_table_);
+    INIT_ARRAY(defense_value_table_);
+    INIT_ARRAY(pin_value_table_);
+    INIT_ARRAY(pawn_shield_value_table_);
+    INIT_ARRAY(weight_cache_table_1_);
+    INIT_ARRAY(weight_cache_table_2_);
   }
 
   // EvalParamsをキャッシュする。

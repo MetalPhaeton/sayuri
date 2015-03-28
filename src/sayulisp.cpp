@@ -2521,7 +2521,7 @@ __Description__
     + `@get-empty-square-position`
         - Return List of Symbols of empty square.
 
-    + `@get-piece`
+    + `@get-piece <Square : Number>`
         - This needs one argument.
             - A constant value that indicates one square.
         - Return what kind of piece is placed at the square

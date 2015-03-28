@@ -1191,6 +1191,10 @@ namespace Sayuri {
       // 探索関数用キャッシュ //
       // ==================== //
       /**
+       * 探索関数用キャッシュを初期化する。
+       */
+      void InitSearchParamsCache();
+      /**
        * 探索関数用パラメータをキャッシュする。
        */
       void CacheSearchParams();
