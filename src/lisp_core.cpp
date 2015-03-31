@@ -505,8 +505,8 @@ __Usage__
 
 __Description__
 
-* 1: Return descriptions of all symbols.
-* 2: Return a description of `<Symbol>`.
+* 1: Returns descriptions of all symbols.
+* 2: Returns a description of `<Symbol>`.
 * All descriptions are Markdown format.
 
 __Example__
@@ -524,7 +524,7 @@ __Example__
     ;; >
     ;; > __Description__
     ;; >
-    ;; > * Return the 1st element of `<List>`.
+    ;; > * Returns the 1st element of `<List>`.
     ;; >
     ;; > __Example__
     ;; >
@@ -565,7 +565,7 @@ __Usage__
 
 __Description__
 
-* Evaluate `<Object>`.
+* Evaluates `<Object>`.
 
 __Example__
 
@@ -631,7 +631,7 @@ __Usage__
 
 __Description__
 
-* Parse `<S-Expression>` and generate a object.
+* Parses `<S-Expression>` and generates a object.
 
 __Example__
 
@@ -686,7 +686,7 @@ __Usage__
 
 __Description__
 
-* Convert `<Object>` to S-Expression as String.
+* Converts `<Object>` to S-Expression as String.
 
 __Example__
 
@@ -771,11 +771,11 @@ __Description__
 * This is Special Form.
     * `<Catch Expr>...` is evaluated if an error have been occurred
       in `<Try Expr>...`.
-* Handle exceptions.
+* Handles exceptions.
 * If an exception occurs in `<Try Expr>...`, then
   it stops `<Try Expr>...` and executes `<Catch Expr>...`.
 * In a scope of `<Catch Expr>...`, 'exception' symbol is defined.
-* Return a object evaluated at the end.
+* Returns a evaluated last object.
 
 __Example__
 
@@ -824,7 +824,7 @@ __Usage__
 
 __Description__
 
-* Throw an exception.
+* Throws an exception.
 * If you use this in (try) function,
   `<Object>` is bound to 'exception' symbol.
 
@@ -872,8 +872,7 @@ __Usage__
 
 __Description__
 
-* Return Car value of `<Pair or List>`
-* Return the 1st element of `<Pair or List>`.
+* Returns Car value of `<Pair or List>`
 
 __Example__
 
@@ -923,8 +922,7 @@ __Usage__
 
 __Description__
 
-* Return Cdr value of `<Pair or List>`
-* Return List consists of after the 1st element of `<Pair or List>`.
+* Returns Cdr value of `<Pair or List>`
 
 __Example__
 
@@ -975,7 +973,7 @@ __Usage__
 
 __Description__
 
-* Return Pair. Car is `<Object 1>`, Cdr is `<Object 2>`.
+* Returns Pair. Car is `<Object 1>`, Cdr is `<Object 2>`.
 
 __Example__
 
@@ -1029,7 +1027,7 @@ __Description__
 
 * This is Special Form.
     + `<Object>` is not Evaluated.
-* Return `<Object>` as is.
+* Returns `<Object>` as is.
 * Syntactic suger is `'<Object>`
 
 __Example__
@@ -1147,9 +1145,9 @@ __Description__
 * This is Special Form.
     + 1: `<Symbol>` isn't evaluated.
     + 2: All arguments isn't evaluated.
-* Bind something to its scope.
-* 1: Bind `<Object>` to `<Symbol>`.
-* 2: Define `<S-Expression>` as Function named `<Name>`,
+* Binds something to its scope.
+* 1: Binds `<Object>` to `<Symbol>`.
+* 2: Defines `<S-Expression>` as Function named `<Name>`,
      and `<Args>...` is names of its arguments.
 
 __Example__
@@ -1216,7 +1214,7 @@ __Description__
 
 * This is Special Form.
     + `<Symbol>` isn't evaluated.
-* Update `<Symbol>` to `<Object>` on the local scope.
+* Updates `<Symbol>` to `<Object>` on the local scope.
 
 __Example__
 
@@ -1300,7 +1298,7 @@ __Description__
 
 * This is Special Form.
     + All arguments isn't evaluated.
-* Return Function defined by `<S-Expression>...`.
+* Returns Function defined by `<S-Expression>...`.
 * (lambda) inherits parent's scope and creates its own local scope.
   So using (lambda) in (lambda), you can create closure function.
 * `<Args>...` is Symbols as name of arguments.
@@ -1400,7 +1398,7 @@ __Description__
 * This is Special Form.
     + `<Name : Symbol>` isn't evaluated.
     + But `<Object>` and `<S-Expression>` are evaluated.
-* Execute `<S-Expression>...` in new local scope.
+* Executes `<S-Expression>...` in new local scope.
 * (let) inherits parent's scope and creates its own local scope.
   So using (lambda) in (let), you can create closure function.
 * `(<Name> <Object>)...` is local values on (let)'s local scope.
@@ -1593,7 +1591,7 @@ __Usage__
 
 __Description__
 
-* Execute `<S-Expression>...` in turns and return last.
+* Executes `<S-Expression>...` in turns and returns last.
 
 __Example__
 
@@ -1672,7 +1670,7 @@ __Usage__
 
 __Description__
 
-* Print `<Object>` on Standard Output.
+* Prints `<Object>` on Standard Output.
 
 __Example__
 
@@ -1745,22 +1743,22 @@ __Usage__
 
 __Description__
 
-* Return String from Standard Input.
+* Returns String from Standard Input.
 * `<Message Symbol>` is a message to the input stream.
-    + `@get` : Read one charactor.
-    + `@read-line` : Read one line. ('LF(CR+LF)' is omitted.)
-    + `@read` : Read all.
+    + `@get` : Reads one charactor.
+    + `@read-line` : Reads one line. ('LF(CR+LF)' is omitted.)
+    + `@read` : Reads all.
 * If Standard Input is already closed, it returns Nil.
 
 __Example__
 
-    ;; Read and show one charactor from Standard Input.
+    ;; Reads and shows one charactor from Standard Input.
     (display (stdin '@get))
     
-    ;; Read and show one line from Standard Input.
+    ;; Reads and shows one line from Standard Input.
     (display (stdin '@read-line))
     
-    ;; Read and show all from Standard Input.
+    ;; Reads and shows all from Standard Input.
     (display (stdin '@read)))...";
     }
 
@@ -1800,7 +1798,7 @@ __Usage__
 
 __Description__
 
-* Print `<String>` on Standard Output.
+* Prints `<String>` on Standard Output.
 
 __Example__
 
@@ -1848,7 +1846,7 @@ __Usage__
 
 __Description__
 
-* Print `<String>` on Standard Error.
+* Prints `<String>` on Standard Error.
 
 __Example__
 
@@ -1985,13 +1983,13 @@ __Usage__
 
 __Description__
 
-* Return #t if all `<Object>...` are same structure.
-  If not, return #f.
+* Returns #t if all `<Object>...` are same structure.
+  Otherwise, returns #f.
 
 __Example__
 
     (display (equal? '(1 2 (3 4) 5) '(1 2 (3 4) 5)))
-      
+    
     ;; Output
     ;;
     ;; > #t)...";
@@ -2036,8 +2034,8 @@ __Usage__
 
 __Description__
 
-* Return #t if all `<Object>...` are Pair.
-  If not, return #f.
+* Returns #t if all `<Object>...` are Pair.
+  Otherwise, returns #f.
 
 __Example__
 
@@ -2087,8 +2085,8 @@ __Usage__
 
 __Description__
 
-* Return #t if all `<Object>...` are List.
-  If not, return #f.
+* Returns #t if all `<Object>...` are List.
+  Otherwise, returns #f.
 
 __Example__
 
@@ -2142,8 +2140,8 @@ __Usage__
 
 __Description__
 
-* Return #t if all `<Object>...` are Nil.
-  If not, return #f.
+* Returns #t if all `<Object>...` are Nil.
+  Otherwise, returns #f.
 
 __Example__
 
@@ -2196,8 +2194,8 @@ __Usage__
 
 __Description__
 
-* Return #t if all `<Object>...` are Symbol.
-  If not, return #f.
+* Returns #t if all `<Object>...` are Symbol.
+  Otherwise, returns #f.
 
 __Example__
 
@@ -2248,8 +2246,8 @@ __Usage__
 
 __Description__
 
-* Return #t if all `<Object>...` are Number.
-  If not, return #f.
+* Returns #t if all `<Object>...` are Number.
+  Otherwise, returns #f.
 
 __Example__
 
@@ -2300,8 +2298,8 @@ __Usage__
 
 __Description__
 
-* Return #t if all `<Object>...` are Boolean.
-  If not, return #f.
+* Returns #t if all `<Object>...` are Boolean.
+  Otherwise, returns #f.
 
 __Example__
 
@@ -2352,8 +2350,8 @@ __Usage__
 
 __Description__
 
-* Return #t if all `<Object>...` are String.
-  If not, return #f.
+* Returns #t if all `<Object>...` are String.
+  Otherwise, returns #f.
 
 __Example__
 
@@ -2404,8 +2402,8 @@ __Usage__
 
 __Description__
 
-* Return #t if all `<Object>...` are Function.
-  If not, return #f.
+* Returns #t if all `<Object>...` are Function.
+  Otherwise, returns #f.
 
 __Example__
 
@@ -2457,8 +2455,8 @@ __Usage__
 
 __Description__
 
-* Return #t if all `<Object>...` are Native Function.
-  If not, return #f.
+* Returns #t if all `<Object>...` are Native Function.
+  Otherwise, returns #f.
 
 __Example__
 
@@ -2509,8 +2507,8 @@ __Usage__
 
 __Description__
 
-* Return #t if all `<Object>...` are Function or Native Function.
-  If not, return #f.
+* Returns #t if all `<Object>...` are Function or Native Function.
+  Otherwise, returns #f.
 
 __Example__
 
@@ -2608,19 +2606,19 @@ __Usage__
 
 __Description__
 
-* 1: Return Native Function as an output stream of `<File name>`.
-* 2: Write `<String>` to `<File name>` and return itself.
+* 1: Returns Native Function as an output stream of `<File name>`.
+* 2: Writes `<String>` to `<File name>` and returns itself.
 * If you give Nil to the Function, the stream will be closed.
 
 __Example__
 
-    ;; Open "hello.txt".
+    ;; Opens "hello.txt".
     (define myfile (output-stream "hello.txt"))
     
-    ;; Write "Hello World" to "hello.txt".
+    ;; Writes "Hello World" to "hello.txt".
     (myfile "Hello World\n")
     
-    ;; Close "hello.txt".
+    ;; Closes "hello.txt".
     (myfile ()))...";
     }
 
@@ -2717,30 +2715,30 @@ __Usage__
 
 __Description__
 
-* 1: Return Native Function as an input stream of `<File name>`.
-* 2: Return String from `<File name>`.
+* 1: Returns Native Function as an input stream of `<File name>`.
+* 2: Returns String from `<File name>`.
 * 2: `<Message Symbol>` is a message to the input stream.
-    + `@get` : Read one charactor.
-    + `@read-line` : Read one line. ('LF(CR+LF)' is omitted.)
-    + `@read` : Read all.
+    + `@get` : Reads one charactor.
+    + `@read-line` : Reads one line. ('LF(CR+LF)' is omitted.)
+    + `@read` : Reads all.
 * If you give Nil to the stream, it will be closed.
 * If the stream already closed, it returns empty string.
 
 __Example__
 
-    ;; Open "hello.txt".
+    ;; Opens "hello.txt".
     (define myfile (input-stream "hello.txt"))
     
-    ;; Read and show one charactor from "hello.txt".
+    ;; Reads and shows one charactor from "hello.txt".
     (display (myfile '@get))
     
-    ;; Read and show one line from "hello.txt".
+    ;; Reads and shows one line from "hello.txt".
     (display (myfile '@read-line))
     
-    ;; Read and show all from "hello.txt".
+    ;; Reads and shows all from "hello.txt".
     (display (myfile '@read))
     
-    ;; Close "hello.txt".
+    ;; Closes "hello.txt".
     (myfile ()))...";
     }
   }
@@ -2790,7 +2788,7 @@ __Usage__
 
 __Description__
 
-* Append `<List 2>` after the end of `<List 1>`.
+* Appends `<List 2>` after the end of `<List 1>`.
 * In other words,
   (append) replaces last Cdr of `<List 1>` from Nil to `<List 2>`.
 
@@ -2844,7 +2842,7 @@ __Usage__
 
 __Description__
 
-* Return List consists of `<Object>...`.
+* Returns List consists of `<Object>...`.
 
 __Example__
 
@@ -2912,7 +2910,7 @@ __Usage__
 
 __Description__
 
-* Return a element of `<Index>` of `<List>`.
+* Returns a element of `<Index>` of `<List>`.
 * The 1st element of `<List>` is '0'.
 * If `<Index>` is negative number," It counts from the tail of `<List>`.
 
@@ -2998,7 +2996,7 @@ __Usage__
 
 __Description__
 
-* Return List which has replaced the `<Index>`th element of
+* Returns List which has replaced the `<Index>`th element of
   `<List>` for `<Object>`.
 * The 1st element of `<List>` is '0'.
 * If `<Index>` is negative number," It counts from the tail of `<List>`.
@@ -3073,7 +3071,7 @@ __Usage__
 
 __Description__
 
-* Return List which has removed the `<Index>`th element of `<List>`.
+* Returns List which has removed the `<Index>`th element of `<List>`.
 * The 1st element of `<List>` is '0'.
 * If `<Index>` is negative number," It counts from the tail of `<List>`.
 
@@ -3135,7 +3133,7 @@ __Usage__
 
 __Description__
 
-* Return number of `<List>`.
+* Returns number of `<List>`.
 * If you input Atom, it returns '1'. If Nil, it returns '0'.
 
 __Example__
@@ -3200,8 +3198,8 @@ __Usage__
 
 __Description__
 
-* Return #t if all `<Number>...` are same.
-  If not, return #f.
+* Returns #t if all `<Number>...` are same.
+  Otherwise, return #f.
 
 __Example__
 
@@ -3267,8 +3265,8 @@ __Usage__
 
 __Description__
 
-* Return #t if a Number is less than next Number.
-  If not, return #f.
+* Returns #t if a Number is less than next Number.
+  Otherwise, return #f.
 
 __Example__
 
@@ -3334,8 +3332,8 @@ __Usage__
 
 __Description__
 
-* Return #t if a Number is less or equal than next Number.
-  If not, return #f.
+* Returns #t if a Number is less or equal than next Number.
+  Otherwise, return #f.
 
 __Example__
 
@@ -3401,8 +3399,8 @@ __Usage__
 
 __Description__
 
-* Return #t if a Number is more than next Number.
-  If not, return #f.
+* Returns #t if a Number is more than next Number.
+  Otherwise, return #f.
 
 __Example__
 
@@ -3468,8 +3466,8 @@ __Usage__
 
 __Description__
 
-* Return #t if a Number is more or equal than next Number.
-  If not, return #f.
+* Returns #t if a Number is more or equal than next Number.
+  Otherwise, return #f.
 
 __Example__
 
@@ -3515,7 +3513,7 @@ __Usage__
 
 __Description__
 
-* Turn `<Boolean>` to opposite value. #t to #f, #f to #t.
+* Turns `<Boolean>` to opposite value. #t to #f, #f to #t.
 
 __Example__
 
@@ -3567,8 +3565,8 @@ __Usage__
 
 __Description__
 
-* Return #t if all `<Boolean>...` are #t.
-  If not, return #f.
+* Returns #t if all `<Boolean>...` are #t.
+  Otherwise, return #f.
 
 __Example__
 
@@ -3620,8 +3618,8 @@ __Usage__
 
 __Description__
 
-* Return #t if one of `<Boolean>...` is #t.
-  If not, return #f.
+* Returns #t if one of `<Boolean>...` is #t.
+  If all `<Boolean>` are #f, return #f.
 
 __Example__
 
@@ -3667,7 +3665,7 @@ __Usage__
 
 __Description__
 
-* Sum up all `<Number>...`.
+* Sums up all `<Number>...`.
 
 __Example__
 
@@ -3721,7 +3719,7 @@ __Usage__
 
 __Description__
 
-* Subtract `<Number>...` from `<1st number>`.
+* Subtracts `<Number>...` from `<1st number>`.
 
 __Example__
 
@@ -3767,7 +3765,7 @@ __Usage__
 
 __Description__
 
-* Multiply all `<Number>...`.
+* Multiplies all `<Number>...`.
 
 __Example__
 
@@ -3821,7 +3819,7 @@ __Usage__
 
 __Description__
 
-* Divide `<1st number>` with `<Number>...`.
+* Divides `<1st number>` with `<Number>...`.
 
 __Example__
 
@@ -3867,7 +3865,7 @@ __Usage__
 
 __Description__
 
-* Concatenate `<String>...`.
+* Concatenates `<String>...`.
 
 __Example__
 
@@ -3932,7 +3930,7 @@ __Usage__
 
 __Description__
 
-* Return the `<index>`th letter of `<String>`.
+* Returns the `<index>`th letter of `<String>`.
 * `<index>` of the 1st letter is '0'.
 
 __Example__
@@ -4013,7 +4011,7 @@ __Usage__
 
 __Description__
 
-* Return List consist of String splited `<String>` by `<Delim String>`.
+* Returns List consist of split `<String>` by `<Delim String>`.
 
 __Example__
 
@@ -4376,7 +4374,7 @@ __Usage__
 
 __Description__
 
-* Return square root of `<Number>`.
+* Returns square root of `<Number>`.
 
 __Example__
 
@@ -4422,7 +4420,7 @@ __Usage__
 
 __Description__
 
-* Return absolute value of `<Number>`.
+* Returns absolute value of `<Number>`.
 
 __Example__
 
@@ -4468,7 +4466,7 @@ __Usage__
 
 __Description__
 
-* Round up `<Number>` into integral value.
+* Rounds up `<Number>` into integral value.
 
 __Example__
 
@@ -4514,7 +4512,7 @@ __Usage__
 
 __Description__
 
-* Round down `<Number>` into integral value.
+* Rounds down `<Number>` into integral value.
 
 __Example__
 
@@ -4560,7 +4558,7 @@ __Usage__
 
 __Description__
 
-* Round `<Number>` into the nearest integral value.
+* Rounds `<Number>` into the nearest integral value.
 
 __Example__
 
@@ -4612,7 +4610,7 @@ __Usage__
 
 __Description__
 
-* Truncate after decimal point of `<Number>`.
+* Truncates after decimal point of `<Number>`.
 
 __Example__
 
@@ -4910,7 +4908,7 @@ __Usage__
 
 __Description__
 
-* Return random number from 0 to `<Number>`.
+* Returns random number from 0 to `<Number>`.
 
 __Example__
 
@@ -4975,7 +4973,7 @@ __Usage__
 
 __Description__
 
-* Return maximum number of `<Number>...`.
+* Returns maximum number of `<Number>...`.
 
 __Example__
 
@@ -5034,7 +5032,7 @@ __Usage__
 
 __Description__
 
-* Return minimum number of `<Number>...`.
+* Returns minimum number of `<Number>...`.
 
 __Example__
 
