@@ -3323,7 +3323,7 @@ __Example__
         return LispObject::NewBoolean(true);
       };
       root_ptr->BindSymbol("<=", func_ptr);
-      (*dict_ptr)["<"] =
+      (*dict_ptr)["<="] =
 R"...(### <= ###
 
 __Usage__
