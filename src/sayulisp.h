@@ -775,6 +775,54 @@ namespace Sayuri {
         return ret_ptr;
       }
 
+      /**
+       * SearchParams - IIDの有効無効。
+       * @param enable IIDの有効無効。
+       * @return セットされていたIIDの有効無効。
+       */
+      LispObjectPtr SetEnableIID(const LispObject& enable) {
+        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        (search_params_ptr_->enable_iid());
+
+        if (enable.IsBoolean()) {
+          search_params_ptr_->enable_iid(enable.boolean_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - IIDの深さ制限。
+       * @param depth 深さ。
+       * @return セットされていたIIDの深さ制限。
+       */
+      LispObjectPtr SetIIDLimitDepth(const LispObject& depth) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->iid_limit_depth());
+
+        if (depth.IsNumber()) {
+          search_params_ptr_->iid_limit_depth(depth.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - IIDの探索深さ。
+       * @param depth 深さ。
+       * @return セットされていたIIDの探索深さ。
+       */
+      LispObjectPtr SetIIDSearchDepth(const LispObject& depth) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->iid_search_depth());
+
+        if (depth.IsNumber()) {
+          search_params_ptr_->iid_search_depth(depth.number_value());
+        }
+
+        return ret_ptr;
+      }
+
       // ======== //
       // アクセサ //
       // ======== //

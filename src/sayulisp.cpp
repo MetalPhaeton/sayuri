@@ -698,6 +698,42 @@ namespace Sayuri {
 
       return SetEnableHashTable(*enable_ptr);
 
+    } else if (message_symbol == "@enable-iid") {
+      LispObjectPtr enable_ptr = LispObject::NewNil();
+      if (list_itr) {
+        enable_ptr = caller.Evaluate(*list_itr);
+        if (!(enable_ptr->IsBoolean())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Boolean", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetEnableIID(*enable_ptr);
+
+    } else if (message_symbol == "@iid-limit-depth") {
+      LispObjectPtr depth_ptr = LispObject::NewNil();
+      if (list_itr) {
+        depth_ptr = caller.Evaluate(*list_itr);
+        if (!(depth_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetIIDLimitDepth(*depth_ptr);
+
+    } else if (message_symbol == "@iid-search-depth") {
+      LispObjectPtr depth_ptr = LispObject::NewNil();
+      if (list_itr) {
+        depth_ptr = caller.Evaluate(*list_itr);
+        if (!(depth_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetIIDSearchDepth(*depth_ptr);
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
@@ -3168,6 +3204,48 @@ __Example__
     
     (display (my-engine '@enable-hash-table))
     ;; Output
-    ;; > #t)...";
+    ;; > #t
+* `@enable-iid [<New setting : Boolean>]`
+    + Returns whether Internal Iterative Deepening is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Internal Iterative Deepening is set to be enabled.
+      Otherwise, it is set to be disabled.
+* `@iid-limit-depth [<New depth : Number>]`
+    + If remaining depths is less than this parameter,
+      Internal Iterative Deepening is invalidated.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+* `@iid-search-depth [<New depth : Number>]`
+    + Internal Iterative Deepening searches until depth of this parameter.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-iid #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-iid))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@iid-limit-depth 10))
+    ;; Output
+    ;; > 5
+    
+    (display (my-engine '@iid-limit-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@iid-search-depth 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@iid-search-depth))
+    ;; Output
+    ;; > 10)...";
   }
 }  // namespace Sayuri
