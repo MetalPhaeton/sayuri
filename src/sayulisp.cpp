@@ -2478,314 +2478,696 @@ __Usage__
 
 __Description__
 
-* 1: Generate chess engine.
+* 1: Generates chess engine.
 * 2: The engine executes something according to `<Message Symbol>`.
 * 2: Some `<Message Symbol>` require `<Argument>...`.
-* 2: `<Message Symbol>` are...
-    + `@get-white-pawn-position`
-        - Return List of Symbols of square placed White Pawn.
 
-    + `@get-white-knight-position`
-        - Return List of Symbols of square placed White Knight.
+__Description of Message Symbols__
 
-    + `@get-white-bishop-position`
-        - Return List of Symbols of square placed White Bishop.
+* `@get-white-pawn-position`
+    + Returns List of position of White Pawns as Symbol.
+* `@get-white-knight-position`
+    + Returns List of position of White Knights as Symbol.
+* `@get-white-bishop-position`
+    + Returns List of position of White Bishops as Symbol.
+* `@get-white-rook-position`
+    + Returns List of position of White Rooks as Symbol.
+* `@get-white-queen-position`
+    + Returns List of position of White Queens as Symbol.
+* `@get-white-king-position`
+    + Returns List of position of White King as Symbol.
+* `@get-black-pawn-position`
+    + Returns List of position of White Pawns as Symbol.
+* `@get-black-knight-position`
+    + Returns List of position of White Knights as Symbol.
+* `@get-black-bishop-position`
+    + Returns List of position of White Bishops as Symbol.
+* `@get-black-rook-position`
+    + Returns List of position of White Rooks as Symbol.
+* `@get-black-queen-position`
+    + Returns List of position of White Queens as Symbol.
+* `@get-black-king-position`
+    + Returns List of position of White King as Symbol.
+* `@get-empty-square-position`
+    + Returns List of position of Empty Squares as Symbol.
 
-    + `@get-white-rook-position`
-        - Return List of Symbols of square placed White Rook.
-
-    + `@get-white-queen-position`
-        - Return List of Symbols of square placed White Queen.
-
-    + `@get-white-king-position`
-        - Return List of Symbols of square placed White King.
-
-    + `@get-black-pawn-position`
-        - Return List of Symbols of square placed Black Pawn.
-
-    + `@get-black-knight-position`
-        - Return List of Symbols of square placed Black Knight.
-
-    + `@get-black-bishop-position`
-        - Return List of Symbols of square placed Black Bishop.
-
-    + `@get-black-rook-position`
-        - Return List of Symbols of square placed Black Rook.
-
-    + `@get-black-queen-position`
-        - Return List of Symbols of square placed Black Queen.
-
-    + `@get-black-king-position`
-        - Return List of Symbols of square placed Black King.
-
-    + `@get-empty-square-position`
-        - Return List of Symbols of empty square.
-
-    + `@get-piece <Square : Number>`
-        - This needs one argument.
-            - A constant value that indicates one square.
-        - Return what kind of piece is placed at the square
-          as `(<Side : Symbol> <PieceType : Symbol>)`.
-
-    + `@get-to-move`
-        - Return Symbol of side which has its turn to move.
-
-    + `@get-castling-rights`
-        - Return what castling rights exist as List of Symbols.
-
-    + `@get-en-passant-square`
-        - Return Symbol of En Passant Square.
-
-    + `@get-ply`
-        - Return how many moves have played as plies. (1 move = 2 plies)
-
-    + `@get-clock`
-        - Return moves for 50 Moves Rule as plies. (1 move = 2 plies)
-
-    + `@get-white-has-castled`
-        - Return #t if White has castled. If not, it returns #f.
-
-    + `@get-black-has-castled`
-        - Return #t if Black has castled. If not, it returns #f.
-
-    + `@set-new-game`
-        - Set starting position and state.
-        - Return #t.
-
-    + `@set-fen <FEN : String>`
-        - Set position and state into indicated position by `<FEN>`.
-        - Return #t.
-
-    + `@get-candidate-moves`
-        - Return List that contains the candidate moves.
-
-    + `@place-piece <Square : Number> <Piece type : Number>
-      <Piece side : Number>`
-        - Place a `<Piece side>` `<Piece type>` onto `<Square>`.
-        - If `<Piece type>` is `EMPTY` and `<Piece side>` is `NO_SIDE`,
-          a piece on `<Square>` is deleted.
-        - Each side must have just one King,
-            - If you try to place a piece onto a square where King is placed,
-              Sayulisp will throw error.
-            - If you place a new King, the old King will be deleted.
-
-    + `@set-to-move <Side : Number>`
-        - Change turn to move into `<Side>`.
-        - Return the previous value.
-        - `<Side>` must be White or Black.
-
-    + `@set-castling-rights <Castling rights : List>`
-        - Change castling rights into `<List>`.
-        - Return the previous value.
-        - `<List>` is consist of constant values that are
-          'WHITE_SHORT_CASTLING' or 'WHITE_LONG_CASTLING'
-          or 'BLACK_SHORT_CASTLING' or 'BLACK_LONG_CASTLING'.
-        - After calling this function,
-          castling rights is updated by position of King or Rook.
-            - If King is not on starting square,
-              its castling rights are deleted.
-            - If Rook is not on starting square,
-              its King Side or Queen Side of castling rights is deleted.
-
-    + `@set-en-passant-square <<Square : Number> or <Nil>>`
-        - Change en passant square into `<Square>`.
-        - If argument is `<Nil>`, it changes into no en passant square.
-        - Return the previous value.
-        - But it doesn't change by following conditions.
-            - `<Square>` is not on 'RANK_3' or on 'RANK_6'.
-            - `<Square>` is not empty.
-            - `<Square>` is on 'RANK_3' and
-              White Pawn is not on directly above.
-            - `<Square>` is on 'RANK_6' and
-              Black Pawn is not on directly below.
-
-    + `@set-ply <Ply : Number>`
-        - Change ply(0.5 moves) into `<Ply>`.
-        - Return the previous value.
-        - `<Ply>` must be '1' and more.
-      
-    + `@set-clock <Ply : Number>`
-        - Change ply(0.5 moves) of 50 moves rule into `<Ply>`.
-        - Return the previous value.
-        - `<Ply>` must be '0' and more.
-
-    + `@correct-position?`
-        - Judge if the position is correct or not.
-            - If Pawn is on RANK_1 or RANK_8, then it returns `#f`.
-            - If White's turn and Black King is checked, then it returns `#f`.
-            - If Black's turn and White King is checked, then it returns `#f`.
-            - Otherwise it returns `#t`.
-
-    + `@white-checked?`
-        - Judge if White King is checked or not.
-      
-    + `@black-checked?`
-        - Judge if Black King is checked or not.
-      
-    + `@checkmated?`
-        - Judge if either King is checkmated or not.
-      
-    + `@stalemated?`
-        - Judge if either King is stalemated or not.
-
-    + `@play-move <Move : List>`
-        - Play one move.
-        - `<Move>` is `(<From : Number> <To : Number> <Promotion : Number>)`.
-            - If it doesn't promote the piece, `<Promotion>` is 'Empty'.
-        - If `<Move>` is illegal, it throws an exception.
-
-    + `@undo-move`
-        - Undo the previous move.
-        - If theres no previous move in the engine's move history table,
-          it throws an exception.
-
-    + `@input-uci-command <UCI command : String>`
-        - Execute UCI command.
-        - If the command has succeeded, it returns '#t'. Otherwise '#f'.
-        - The output from engine is put into the callback registered
-          by `@add-uci-output-listener`.
-        - If you input "go" command, the thinking process runs on other thread.
-          (It means the engine returns your control immediately.)
-      
-    + `@add-uci-output-listener <Callback : Function>`
-        - Register a callback to listen the UCI engine's output.
-        - `<Callback>` must recieve 1 argument that is UCI output as String.
-
-    + `@go-movetime <Milliseconds : Number> [<Candidate moves list : List>]`
-        - Think for `<Milliseconds>` and return the best move.
-        - Different from "go movetime ..." with `@input-uci-command`,
-          the thinking process waits until the engine to return best move.
-        - `<Candidate moves list>` is a list composed of
-          `(<From : Number> <To : Number> <Promotion : Number>)`.
-            - If it doesn't promote the piece, `<Promotion>` is 'Empty'.
-
-    + `@go-timelimit <Milliseconds : Number> [<Candidate moves list : List>]`
-        - Think by `<Milliseconds>` and return the best move.
-            - If `<Milliseconds>` is less than '600000' (10 minutes.),
-              the engine thinks for '`<Milliseconds>` / 10'.
-              Otherwise '60000' milliseconds (1 minute).
-        - Different from "go wtime (or btime) ..." with `@input-uci-command`,
-          the thinking process waits until the engine to return best move.
-        - `<Candidate moves list>` is a list composed of
-          `(<From : Number> <To : Number> <Promotion : Number>)`.
-            - If it doesn't promote the piece, `<Promotion>` is 'Empty'.
-
-    + `@go-depth <Ply : Number> [<Candidate moves list : List>]`
-        - Think until to reach `<Ply>`th depth and return the best move.
-        - Different from "go depth ..." with `@input-uci-command`,
-          the thinking process waits until the engine to return best move.
-        - `<Candidate moves list>` is a list composed of
-          `(<From : Number> <To : Number> <Promotion : Number>)`.
-            - If it doesn't promote the piece, `<Promotion>` is 'Empty'.
-
-    + `@go-nodes <Nodes : Number> [<Candidate moves list : List>]`
-        - Think for `<Nodes>` nodes and return the best move.
-        - Different from "go nodes ..." with `@input-uci-command`,
-          the thinking process waits until the engine to return best move.
-        - `<Candidate moves list>` is a list composed of
-          `(<From : Number> <To : Number> <Promotion : Number>)`.
-            - If it doesn't promote the piece, `<Promotion>` is 'Empty'.
-
-    + `@set-hash-size <Size : Number>`
-        - Set size of Transposition Table(Hash Table) and return previous size.
-      
-    + `@set-threads <Number of Threads : Number>`
-        - Set number of threads and return previous number.
-
-    + `@material [<New material : List>]`
-        - Return score list of material.
-            - 1st : Empty. (It's always 0)
-            - 2nd : Pawn.
-            - 3rd : Knight.
-            - 4th : Bishop.
-            - 5th : Rook.
-            - 6th : Queen.
-            - 7th : King.
-        - If you have specified `<New material>`,
-          it sets new score of material.
-
-    + `@enable-quiesce-search [<New setting : Boolean>]`
-        - Return setting that Quiesce Search is enabled or disabled.
-            - If it returns '#t', it is enabled. Otherwise disabled.
-        - If you have specified `<New setting>`,
-          it sets new setting to enable or disable Quiesce Search.
-
-    + `@enable-repetition-check [<New setting : Boolean>]`
-        - Return setting that Repetition Check is enabled or disabled.
-            - If it returns '#t', it is enabled. Otherwise disabled.
-        - If you have specified `<New setting>`,
-          it sets new setting to enable or disable Repetition Check.
-
-    + `@enable-check-extension [<New setting : Boolean>]`
-        - Return setting that Check Extension is enabled or disabled.
-            - If it returns '#t', it is enabled. Otherwise disabled.
-        - If you have specified `<New setting>`,
-          it sets new setting to enable or disable Check Extension.
-
-    + `@ybwc-limit-depth [<New depth : Number>]`
-        - Return depth (ply) that
-          if the search function reaches a node on the remaining depth,
-          it doesn't do YBWC in the deeper nodes.
-        - If you have specified `<New depth>`, it sets new depth.
-
-    + `@ybwc-invalid-moves [<New number of moves : Number>]`
-        - Return number of moves that the search function invalidates YBWC
-          while the number of candidate moves from 1st move in a node.
-        - If you have specified `<New number of moves>`,
-          it sets new number of of moves.
-
-    + `@enable-aspiration-windows [<New setting : Boolean>]`
-        - Return setting that Aspiration Windows is enabled or disabled.
-            - If it returns '#t', it is enabled. Otherwise disabled.
-        - If you have specified `<New setting>`,
-          it sets new setting to enable or disable Aspiration Windows.
-
-    + `@aspiration-windows-limit-depth [<New depth : Number>]`
-        - Return depth (ply) that
-          if depth of Iterative Deepening is less than it,
-          the search function doesn't do Aspiration Windows on root node.
-        - If you have specified `<New depth>`, it sets new depth.
-
-    + `@aspiration-windows-delta [<New delta : Number>]`
-        - Return a value that
-          if the search function have occurred fail-hight on root node,
-          the function adds delta value to beta value and searches again.
-        - If you have specified `<New delta>`, it sets new delta value.
-
-    + `@enable-see [<New setting : Boolean>]`
-        - Return setting that SEE is enabled or disabled.
-            - If it returns '#t', it is enabled. Otherwise disabled.
-        - If you have specified `<New setting>`,
-          it sets new setting to enable or disable SEE.
-
-    + `@enable-history [<New setting : Boolean>]`
-        - Return setting that History Heuristics is enabled or disabled.
-            - If it returns '#t', it is enabled. Otherwise disabled.
-        - If you have specified `<New setting>`,
-          it sets new setting to enable or disable History Heuristics.
-
-    + `@enable-killer [<New setting : Boolean>]`
-        - Return setting that Killer Move Heuristics is enabled or disabled.
-            - If it returns '#t', it is enabled. Otherwise disabled.
-        - If you have specified `<New setting>`,
-          it sets new setting to enable or disable Killer Move Heuristics.
-
-    + `@enable-hash-table [<New setting : Boolean>]`
-        - Return setting that Hash Table is enabled or disabled.
-            - If it returns '#t', it is enabled. Otherwise disabled.
-        - If you have specified `<New setting>`,
-          it sets new setting to enable or disable Hash Table.
-      
 __Example__
 
-    ;; Generate chess engine and bind to 'my-engine'.
     (define my-engine (gen-engine))
-    
-    ;; List squares placed White Pawn.
     (display (my-engine '@get-white-pawn-position))
     
     ;; Output
+    ;; > (A2 B2 C2 D2 E2 F2 G2 H2)
+
+* `@get-piece <Square : Number>`
+    + Returns a side and type of the piece as List that is
+      `(<Side : Symbol>, <Type : Symbol>)`.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    (display (my-engine '@get-piece D1))
+    
+    ;; Output
+    ;; > (WHITE QUEEN)
+
+* `@get-to-move`
+    + Returns turn to move as Symbol.
+* `@get-castling-rights`
+    + Returns List of Symbols indicates castling rights.
+* `@get-en-passant-square`
+    + Returns en passant square as Symbol if it exists now.
+* `@get-ply`
+    + Returns plies of moves from starting of the game.
+    + 1 move = 2 plies.
+* `@get-clock`
+    + Returns Clock(plies for 50 Moves Rule).
+        - If Pawn has moved or a piece has been captured,
+          Clock is rewound to zero.
+* `@get-white-has-castled`
+    + Returns Boolean whether White King has castled or not.
+* `@get-black-has-castled`
+    + Returns Boolean whether Black King has castled or not.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    ;; Move pieces by UCI command.
+    ;; 1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.O-O d5
+    ;; +---------------+
+    ;; |r . b q k . n r|
+    ;; |p p p . . p p p|
+    ;; |. . n . . . . .|
+    ;; |. . b p p . . .|
+    ;; |. . B . P . . .|
+    ;; |. . . . . N . .|
+    ;; |P P P P . P P P|
+    ;; |R N B Q . R K .|
+    ;; +---------------+
+    (my-engine '@input-uci-command
+        "position startpos moves e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 e1g1 d7d5")
+    
+    (display (my-engine '@get-to-move))
+    ;; Output
+    ;; > Symbol: WHITE
+    
+    (display (my-engine '@get-castling-rights))
+    ;; Output
+    ;; > (BLACK_SHORT_CASTLING BLACK_LONG_CASTLING)
+    
+    (display (my-engine '@get-en-passant-square))
+    ;; Output
+    ;; > Symbol: D6
+    
+    (display (my-engine '@get-ply))
+    ;; Output
+    ;; > 9
+    
+    (display (my-engine '@get-clock))
+    ;; Output
+    ;; > 0
+    
+    (display (my-engine '@get-white-has-castled))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@get-black-has-castled))
+    ;; Output
+    ;; > #f
+
+* `@set-to-move <Side : Number>`
+    + Sets turn to move.
+    + Returns previous setting.
+* `@set-castling_rights <Castling rights : List>`
+    + Sets castling rights.
+    + Returns previous setting.
+* `@set-en-passant-square <<Square : Number> or <Nil>>`
+    + Sets en passant square.
+    + Returns previous setting.
+* `@set-ply <Ply : Number>`
+    + Sets plies(a half of one move).
+    + Returns previous setting.
+* `@set-clock <Ply : Number>`
+    + Sets clock(plies for 50 moves rule).
+    + Returns previous setting.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    (my-engine '@place-piece E4 PAWN WHITE)
+    
+    (display (my-engine '@set-to-move BLACK))
+    ;; Output
+    ;; > Symbol: WHITE
+    
+    (display (my-engine '@set-castling-rights
+        (list WHITE_LONG_CASTLING BLACK_LONG_CASTLING)))
+    ;; Output
+    ;; > (WHITE_SHORT_CASTLING WHITE_LONG_CASTLING
+    ;; > BLACK_SHORT_CASTLING BLACK_LONG_CASTLING)
+    
+    (display (my-engine '@set-en-passant-square E3))
+    ;; Output
+    ;; > ()
+    
+    (display (my-engine '@set-ply 111))
+    ;; Output
+    ;; > 1
+    
+    (display (my-engine '@set-clock 22))
+    ;; Output
+    ;; > 0
+    
+    ;; ---------------- ;;
+    ;; Current Settings ;;
+    ;; ---------------- ;;
+    
+    (display (my-engine '@get-to-move))
+    ;; Output
+    ;; > Symbol: BLACK
+    
+    (display (my-engine '@get-castling-rights))
+    ;; Output
+    ;; > (WHITE_LONG_CASTLING BLACK_LONG_CASTLING)
+    
+    (display (my-engine '@get-en-passant-square))
+    ;; Output
+    ;; > Symbol: E3
+    
+    (display (my-engine '@get-ply))
+    ;; Output
+    ;; > 111
+    
+    (display (my-engine '@get-clock))
+    ;; Output
+    ;; > 22
+
+* `@set-new-game`
+    + Sets starting position to the chess engine object.
+    + Returns #t.
+* `@set-fen <FEN : String>`
+    + Sets FEN position to the chess engine object.
+    + Returns #t.
+* `@place-piece <Square : Number> <Piece type : Number> <Piece side : Number>`
+    + Sets a piece on `<Square>`
+      and returns the previous piece placed on `<Square>`.
+    + `<Piece type>` is piece type.
+    + `<Piece side>` is a color of the piece.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@set-new-game))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@set-fen
+        "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1"))
+    ;; Output
+    ;; > #t
+
+* `@get-candidate-moves`
+    + Generates and returns List of candidate moves.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@get-candidate-moves))
+    ;; Output
+    ;; >  ((H2 H4 EMPTY) (H2 H3 EMPTY) (G2 G4 EMPTY) (G2 G3 EMPTY)
+    ;; > (F2 F4 EMPTY) (F2 F3 EMPTY) (E2 E4 EMPTY) (E2 E3 EMPTY) (D2 D4 EMPTY)
+    ;; > (D2 D3 EMPTY) (C2 C4 EMPTY) (C2 C3 EMPTY) (B2 B4 EMPTY) (B2 B3 EMPTY)
+    ;; > (A2 A4 EMPTY) (A2 A3 EMPTY) (G1 H3 EMPTY) (G1 F3 EMPTY) (B1 C3 EMPTY)
+    ;; > (B1 A3 EMPTY))
+
+* `@correct-position?`
+    + Judges if it is position or not.
+        - If Pawn is on 1st or 8th rank, it returns #f.
+        - When turn to move is White, if Black King is checked,
+          then it returns #f.
+        - When turn to move is Black, if White King is checked,
+          then it returns #f.
+        - Otherwise, returns #t.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    ;; Put Pawn on 1st rank.
+    (my-engine '@place-piece D1 PAWN WHITE)
+    
+    (display (my-engine '@correct-position?))
+    ;; Output
+    ;; > #f
+
+* `@white-checked?`
+    + Judges if White King is checked or not.
+* `@black-checked?`
+    + Judges if Black King is checked or not.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    ;; Move pieces by UCI command.
+    ;; 1.d4 e6 2.Nf3 Bb4+
+    ;; +---------------+
+    ;; |r n b q k . n r|
+    ;; |p p p p . p p p|
+    ;; |. . . . p . . .|
+    ;; |. . . . . . . .|
+    ;; |. b . P . . . .|
+    ;; |. . . . . N . .|
+    ;; |P P P . P P P P|
+    ;; |R N B Q K B . R|
+    ;; +---------------+
+    (my-engine '@input-uci-command
+        "position startpos moves d2d4 e7e6 g1f3 f8b4")
+    
+    (display (my-engine '@white-checked?))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@black-checked?))
+    ;; Output
+    ;; > #f
+
+* `@checkmated?`
+    + Judges if either King is checkmated or not.
+* `@stalemated?`
+    + Judges if either King is stalemated or not.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    ;; Move pieces by UCI command.
+    ;; 1.f3 e5 2.g4 Qh4#
+    ;; +---------------+
+    ;; |r n b . k b n r|
+    ;; |p p p p . p p p|
+    ;; |. . . . . . . .|
+    ;; |. . . . p . . .|
+    ;; |. . . . . . P q|
+    ;; |. . . . . P . .|
+    ;; |P P P P P . . P|
+    ;; |R N B Q K B N R|
+    ;; +---------------+
+    (my-engine '@input-uci-command
+        "position startpos moves f2f3 e7e5 g2g4 d8h4")
+    
+    (display (my-engine '@checkmated?))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@stalemated?))
+    ;; Output
+    ;; > #f
+
+* `@play-move <One move : List>`
+    + Moves one piece legally.
+    + `<One move>` is `(<From : Number> <To : Number> <Promotion : Number>)`
+        - `<From>` is a square which a piece to move is placed on.
+        - `<To>` is a square where you want to move the piece to.
+        - `<Promotion>` is a piece type which you want to promote Pawn into.
+            - If it can't promote Pawn, `<Promotion>` is EMPTY.
+        - If move is illegal, it throws exception.
+        - Returns #t.
+* `@undo-move`
+    - Undoes previous move.
+    - Returns previous move.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@play-move (list E2 E4 EMPTY)))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@get-white-pawn-position))
+    ;; Output
+    ;; > (A2 B2 C2 D2 F2 G2 H2 E4)
+    
+    (display (my-engine '@undo-move))
+    ;; Output
+    ;; > (E2 E4 EMPTY)
+    
+    (display (my-engine '@get-white-pawn-position))
+    ;; Output
+    ;; > (A2 B2 C2 D2 E2 F2 G2 H2)
+
+* `@input-uci-command <UCI command : String>`
+    + Executes `<UCI command>`.
+    + If success, returns #t. Otherwise, returns #f.
+    + If you have input "go" command,
+      the engine starts to think the best move in background.
+      So control will come back soon.
+* `@add-uci-output-listener <Listener : Function>`
+    + Registers Function to receive UCI output from the engine.
+    + `<Listener>` is Function that has one argument(UCI output).
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    ;; Create a listener.
+    (define (listener message)
+        (display "I'm Listener : " message))
+    
+    ;; Register the listener.
+    (my-engine '@add-uci-output-listener listener)
+    
+    (display (my-engine '@input-uci-command "uci"))
+    ;; Output
+    ;; > I'm Listener : id name Sayuri 2015.03.27 devel
+    ;; > I'm Listener : id author Hironori Ishibashi
+    ;; > I'm Listener : option name Hash type spin default 32 min 8 max 8192
+    ;; > I'm Listener : option name Clear Hash type button
+    ;; > I'm Listener : option name Ponder type check default true
+    ;; > I'm Listener : option name Threads type spin default 1 min 1 max 64
+    ;; > I'm Listener : option name UCI_AnalyseMode type check default false
+    ;; > I'm Listener : uciok
+    ;; > #t
+
+* `@go-movetime <Milliseconds : Number> [<Candidate move list : List>]`
+    + Thinks for `<Milliseconds>` and returns the best move.
+    + Different from "go" command, until the engine have found the best move,
+      the control won't come back.
+* `@go-timelimit <Milliseconds : Number> [<Candidate move list : List>]`
+    + Thinks on the basis of `<Milliseconds>` and returns the best move.
+        - If `<Milliseconds>` is more than 600000,
+          the engine thinks for 60000 milliseconds.
+        - If `<Milliseconds>` is less than 600000,
+          the engine thinks for "`<Milliseconds>` / 10" milliseconds.
+    + Different from "go" command, until the engine have found the best move,
+      the control won't come back.
+* `@go-depth <Ply : Number> [<Candidate move list : List>]`
+    + Thinks until to reach `<Ply>`th depth and returns the best move.
+    + Different from "go" command, until the engine have found the best move,
+      the control won't come back.
+* `@go-nodes <Nodes : Number> [<Candidate move list : List>]`
+    + Thinks until to search `<Nodes>` nodes and returns the best move.
+    + Different from "go" command, until the engine have found the best move,
+      the control won't come back.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    ;; Register a listener.
+    (define (listener message) (display "Engine > " message))
+    (my-engine '@add-uci-output-listener listener)
+    
+    (display (my-engine '@go-movetime 10000))
+    ;; Output
+    ;; > Engine > info depth 1
+    ;; > Engine > info currmove h2h4 currmovenumber 1
+    ;; > Engine > info depth 1 seldepth 1 score cp 12 time 0 nodes 2 pv h2h4
+    ;; > Engine > info currmove h2h3 currmovenumber 2
+    ;; > Engine > info depth 1 seldepth 1 score cp 22 time 1 nodes 4 pv h2h3
+    ;; > Engine > info currmove g2g4 currmovenumber 3
+    ;; > Engine > info depth 1 seldepth 1 score cp 23 time 1 nodes 6 pv g2g4
+    ;; > Engine > info currmove g2g3 currmovenumber 4
+    ;; > Engine > info depth 1 seldepth 1 score cp 33 time 1 nodes 8 pv g2g3
+    ;; > Engine > info currmove f2f4 currmovenumber 5
+    ;; > Engine > info currmove f2f3 currmovenumber 6
+    ;; > Engine > info depth 1 seldepth 1 score cp 36 time 1 nodes 11 pv f2f3
+    ;; > Engine > info currmove e2e4 currmovenumber 7
+    ;; > Engine > info depth 1 seldepth 1 score cp 45 time 1 nodes 13 pv e2e4
+    ;; > Engine > info currmove e2e3 currmovenumber 8
+    ;; > Engine > info currmove d2d4 currmovenumber 9
+    ;; > Engine > info depth 1 seldepth 1 score cp 50 time 1 nodes 16 pv d2d4
+    ;; > Engine > info currmove d2d3 currmovenumber 10
+    ;; > Engine > info currmove c2c4 currmovenumber 11
+    ;; > Engine > info currmove c2c3 currmovenumber 12
+    ;; > Engine > info currmove b2b4 currmovenumber 13
+    ;; > Engine > info currmove b2b3 currmovenumber 14
+    ;; > Engine > info currmove a2a4 currmovenumber 15
+    ;; > Engine > info currmove a2a3 currmovenumber 16
+    ;; > Engine > info currmove g1h3 currmovenumber 17
+    ;; > Engine > info currmove g1f3 currmovenumber 18
+    ;; > Engine > info depth 1 seldepth 1 score cp 68 time 1 nodes 26 pv g1f3
+    ;; > Engine > info currmove b1c3 currmovenumber 19
+    ;; > Engine > info currmove b1a3 currmovenumber 20
     ;;
-    ;; > (A2 B2 C2 D2 E2 F2 G2 H2))...";
+    ;; (Omitted)
+    ;;
+    ;; > Engine > info depth 11
+    ;; > Engine > info currmove e2e4 currmovenumber 1
+    ;; > Engine > info time 10000 nodes 5599214 hashfull 390 nps 559921
+    ;; > score cp 45 pv e2e4 b8c6 g1f3 g8f6 e4e5 f6g4 d2d4 e7e6 h2h3 f8b4
+    ;; > Engine > bestmove e2e4 ponder b8c6
+    ;; > (E2 E4 EMPTY)
+
+* `@set-hash-size <Size : Number>`
+    + Sets size of Hash Table(Transposition Table)
+      and returns the previous size.
+    + The unit of size is "byte".
+* `@set-threads <Number of threads : Number>`
+    + Sets `<Number of threads>` and returns the previous number.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    ;; Set size of Hash Table to 128 MB.
+    (my-engine '@input-uci-command "setoption name hash value 128")
+    
+    (display (my-engine '@set-hash-size (* 256 1024 1024)))
+    ;; Set size of Hash Table to 256 MB and return 128 * 1024 * 1024 bytes.
+    ;; Output
+    ;; > 1.34218e+08
+    
+    ;; Set number of threads to 3.
+    (my-engine '@input-uci-command "setoption name threads value 3")
+    
+    (display (my-engine '@set-threads 4))
+    ;; Set number of threads to 4 and return 3.
+    ;; Output
+    ;; > 3
+
+* `@material [<New materal : List>]`
+    + Returns List of material.
+        - 1st : Empty (It is always 0)
+        - 2nd : Pawn
+        - 3rd : Knight
+        - 4th : Bishop
+        - 5th : Rook
+        - 6th : Queen
+        - 7th : King
+    + If you specify `<New materal>`, the material is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@material (list 111 222 333 444 555 666 777)))
+    ;; Output
+    ;; > (0 100 400 400 600 1200 1e+06)
+    
+    (display (my-engine '@material))
+    ;; Output
+    ;; > (0 222 333 444 555 666 777)
+
+* `@enable-quiesce-search [<New setting : Boolean>]`
+    + Returns whether Quiescence Search is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Quiescence Search is set to be enabled.
+      Otherwise, it is set to be disabled.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-quiesce-search #f))
+    ;; Output
+    :: > #t
+    
+    (display (my-engine '@enable-quiesce-search))
+    ;; Output
+    :: > #f
+
+* `@enable-repetition-check [<New setting : Boolean>]`
+    + Returns whether Repetition Check is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Repetition Check is set to be enabled.
+      Otherwise, it is set to be disabled.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-repetition-check #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-repetition-check))
+    ;; Output
+    ;; > #f
+
+* `@enable-check-extension [<New setting : Boolean>]`
+    + Returns whether Check Extension is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Check Extension is set to be enabled.
+      Otherwise, it is set to be disabled.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-check-extension #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-check-extension))
+    ;; Output
+    ;; > #f
+
+* `@ybwc-limit-depth [<New depth : Number>]`
+    + If remaining depths is less than this parameter, YBWC is invalidated.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+
+* `@ybwc-invalid-moves [<New number of moves : Number>]`
+    + YBWC searches with one thread during this parameter of candidate moves.
+    + Return this parameter.
+    + If you specify `<New number of moves>`, this parameter is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@ybwc-limit-depth 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@ybwc-limit-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@ybwc-invalid-moves 10))
+    ;; Output
+    ;; > 3
+    
+    (display (my-engine '@ybwc-invalid-moves))
+    ;; Output
+    ;; > 10
+
+* `@enable-aspiration-windows [<New setting : Boolean>]`
+    + Returns whether Aspiration Windows is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Aspiration Windows is set to be enabled.
+      Otherwise, it is set to be disabled.
+* `@aspiration-windows-limit-depth [<New depth : Number>]`
+    + If remaining depths is less than this parameter at the root node,
+      Aspiration Windows is invalidated.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+* `@aspiration-windows-delta [<New delta : Number>]`
+    + Return Delta.
+    + If you specify `<New delta>`, Delta is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-aspiration-windows #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-aspiration-windows))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@aspiration-windows-limit-depth 10))
+    ;; Output
+    ;; > 5
+    
+    (display (my-engine '@aspiration-windows-limit-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@aspiration-windows-delta 20))
+    ;; Output
+    ;; > 15
+    
+    (display (my-engine '@aspiration-windows-delta))
+    ;; Output
+    ;; > 20
+
+* `@enable-see [<New setting : Boolean>]`
+    + Returns whether SEE is enabled or not.
+    + If you specify #t to `<New setting>`,
+      SEE is set to be enabled. Otherwise, it is set to be disabled.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-see #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-see))
+    ;; Output
+    ;; > #f
+
+* `@enable-history [<New setting : Boolean>]`
+    + Returns whether History Heuristics is enabled or not.
+    + If you specify #t to `<New setting>`,
+      History Heuristics is set to be enabled.
+      Otherwise, it is set to be disabled.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-history #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-history))
+    ;; Output
+    ;; > #f
+
+* `@enable-killer [<New setting : Boolean>]`
+    + Returns whether Killer Move Heuristics is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Killer Move Hiuristics is set to be enabled.
+      Otherwise, it is set to be disabled.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-killer #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-killer))
+    ;; Output
+    ;; > #f
+
+* `@enable-hash-table [<New setting : Boolean>]`
+    + Returns whether Transposition Table is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Transposition Table is set to be enabled.
+      Otherwise, it is set to be disabled.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-hash-table #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-hash-table))
+    ;; Output
+    ;; > #t)...";
   }
 }  // namespace Sayuri

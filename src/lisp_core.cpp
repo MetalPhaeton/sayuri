@@ -2911,7 +2911,7 @@ __Usage__
 __Description__
 
 * Returns a element of `<Index>` of `<List>`.
-* The 1st element of `<List>` is '0'.
+* The 1st element of `<List>` is 0.
 * If `<Index>` is negative number," It counts from the tail of `<List>`.
 
 __Example__
@@ -2998,7 +2998,7 @@ __Description__
 
 * Returns List which has replaced the `<Index>`th element of
   `<List>` for `<Object>`.
-* The 1st element of `<List>` is '0'.
+* The 1st element of `<List>` is 0.
 * If `<Index>` is negative number," It counts from the tail of `<List>`.
 
 __Example__
@@ -3072,7 +3072,7 @@ __Usage__
 __Description__
 
 * Returns List which has removed the `<Index>`th element of `<List>`.
-* The 1st element of `<List>` is '0'.
+* The 1st element of `<List>` is 0.
 * If `<Index>` is negative number," It counts from the tail of `<List>`.
 
 __Example__
@@ -3134,7 +3134,7 @@ __Usage__
 __Description__
 
 * Returns number of `<List>`.
-* If you input Atom, it returns '1'. If Nil, it returns '0'.
+* If you input Atom, it returns 1. If Nil, it returns 0.
 
 __Example__
 
@@ -3931,7 +3931,7 @@ __Usage__
 __Description__
 
 * Returns the `<index>`th letter of `<String>`.
-* `<index>` of the 1st letter is '0'.
+* `<index>` of the 1st letter is 0.
 
 __Example__
 
