@@ -15,157 +15,40 @@
 </header>
 <div class="root_div">
 <section class="main_contents">
-<h1 id="chess-engine-functions">Chess Engine Functions</h1>
-<p><a href="sayulisp.html">&gt;&gt;Back to Sayulisp page</a></p>
+<h1 id="message-symbols-of-engine-object">Message Symbols of Engine Object</h1>
+<p>&quot;Message Symbol&quot; is a symbol to operate a chess engine object.</p>
+<ol style="list-style-type: decimal">
+<li>Generate a chess engine object by <code>(gen-engine)</code> function.</li>
+<li>Use the engine object as function and give &quot;Message Symbol&quot; to its 1st argument.</li>
+</ol>
 <h2 id="contents">Contents</h2>
 <ul>
-<li><a href="#constant-values">Constant Values</a>
+<li><a href="#operation-of-chess-board">Operation of Chess Board</a>
 <ul>
-<li><a href="#squares">Squares</a></li>
-<li><a href="#fyles">Fyles</a></li>
-<li><a href="#ranks">Ranks</a></li>
-<li><a href="#sides">Sides</a></li>
-<li><a href="#piece-types">Piece Types</a></li>
-<li><a href="#castling">Castling</a></li>
+<li><a href="#get-position-of-pieces">Get Position of Pieces</a></li>
+<li><a href="#get-and-set-board-status">Get and Set Board Status</a></li>
+<li><a href="#set-position">Set Position</a></li>
+<li><a href="#move-generation">Move Generation</a></li>
+<li><a href="#check-position">Check Position</a></li>
+<li><a href="#play-game">Play Game</a></li>
+<li><a href="#uci-command">UCI Command</a></li>
 </ul></li>
-<li><a href="#engine-functions">Engine Functions</a>
+<li><a href="#customization-of-search-function">Customization of Search Function</a>
 <ul>
-<li><a href="#gen-engine"><code>gen-engine</code></a> : Generate a chess engine.
-<ul>
-<li>See <a href="engine_message_symbol.html">Message Symbols of Engine Object</a></li>
+<li><a href="#material">Material</a></li>
+<li><a href="#quiescence-search">Quiescence Search</a></li>
+<li><a href="#repetition-check">Repetition Check</a></li>
+<li><a href="#check-extension">Check Extension</a></li>
+<li><a href="#ybwc">YBWC</a></li>
+<li><a href="#aspiration-windows">Aspiration Windows</a></li>
+<li><a href="#see">SEE</a></li>
+<li><a href="#history-heuristics">History Heuristics</a></li>
+<li><a href="#killer-move-heuristics">Killer Move Heuristics</a></li>
+<li><a href="#transposition-table">Transposition Table</a></li>
 </ul></li>
-</ul></li>
-<li><a href="#utility-functions">Utility Functions</a></li>
 </ul>
-<hr />
-<h2 id="constant-values">Constant Values</h2>
-<h3 id="squares">Squares</h3>
-<ul>
-<li><code>A1</code> : Number. It indicates A1 square. Value is '0'.</li>
-<li><code>B1</code> : Number. It indicates B1 square. Value is '1'.</li>
-<li><code>C1</code> : Number. It indicates C1 square. Value is '2'.</li>
-<li><code>D1</code> : Number. It indicates D1 square. Value is '3'.</li>
-<li><code>E1</code> : Number. It indicates E1 square. Value is '4'.</li>
-<li><code>F1</code> : Number. It indicates F1 square. Value is '5'.</li>
-<li><code>G1</code> : Number. It indicates G1 square. Value is '6'.</li>
-<li><code>H1</code> : Number. It indicates H1 square. Value is '7'.</li>
-<li><code>A2</code> : Number. It indicates A2 square. Value is '8'.</li>
-<li><code>B2</code> : Number. It indicates B2 square. Value is '9'.</li>
-<li><code>C2</code> : Number. It indicates C2 square. Value is '10'.</li>
-<li><code>D2</code> : Number. It indicates D2 square. Value is '11'.</li>
-<li><code>E2</code> : Number. It indicates E2 square. Value is '12'.</li>
-<li><code>F2</code> : Number. It indicates F2 square. Value is '13'.</li>
-<li><code>G2</code> : Number. It indicates G2 square. Value is '14'.</li>
-<li><code>H2</code> : Number. It indicates H2 square. Value is '15'.</li>
-<li><code>A3</code> : Number. It indicates A3 square. Value is '16'.</li>
-<li><code>B3</code> : Number. It indicates B3 square. Value is '17'.</li>
-<li><code>C3</code> : Number. It indicates C3 square. Value is '18'.</li>
-<li><code>D3</code> : Number. It indicates D3 square. Value is '19'.</li>
-<li><code>E3</code> : Number. It indicates E3 square. Value is '20'.</li>
-<li><code>F3</code> : Number. It indicates F3 square. Value is '21'.</li>
-<li><code>G3</code> : Number. It indicates G3 square. Value is '22'.</li>
-<li><code>H3</code> : Number. It indicates H3 square. Value is '23'.</li>
-<li><code>A4</code> : Number. It indicates A4 square. Value is '24'.</li>
-<li><code>B4</code> : Number. It indicates B4 square. Value is '25'.</li>
-<li><code>C4</code> : Number. It indicates C4 square. Value is '26'.</li>
-<li><code>D4</code> : Number. It indicates D4 square. Value is '27'.</li>
-<li><code>E4</code> : Number. It indicates E4 square. Value is '28'.</li>
-<li><code>F4</code> : Number. It indicates F4 square. Value is '29'.</li>
-<li><code>G4</code> : Number. It indicates G4 square. Value is '30'.</li>
-<li><code>H4</code> : Number. It indicates H4 square. Value is '31'.</li>
-<li><code>A5</code> : Number. It indicates A5 square. Value is '32'.</li>
-<li><code>B5</code> : Number. It indicates B5 square. Value is '33'.</li>
-<li><code>C5</code> : Number. It indicates C5 square. Value is '34'.</li>
-<li><code>D5</code> : Number. It indicates D5 square. Value is '35'.</li>
-<li><code>E5</code> : Number. It indicates E5 square. Value is '36'.</li>
-<li><code>F5</code> : Number. It indicates F5 square. Value is '37'.</li>
-<li><code>G5</code> : Number. It indicates G5 square. Value is '38'.</li>
-<li><code>H5</code> : Number. It indicates H5 square. Value is '39'.</li>
-<li><code>A6</code> : Number. It indicates A6 square. Value is '40'.</li>
-<li><code>B6</code> : Number. It indicates B6 square. Value is '41'.</li>
-<li><code>C6</code> : Number. It indicates C6 square. Value is '42'.</li>
-<li><code>D6</code> : Number. It indicates D6 square. Value is '43'.</li>
-<li><code>E6</code> : Number. It indicates E6 square. Value is '44'.</li>
-<li><code>F6</code> : Number. It indicates F6 square. Value is '45'.</li>
-<li><code>G6</code> : Number. It indicates G6 square. Value is '46'.</li>
-<li><code>H6</code> : Number. It indicates H6 square. Value is '47'.</li>
-<li><code>A7</code> : Number. It indicates A7 square. Value is '48'.</li>
-<li><code>B7</code> : Number. It indicates B7 square. Value is '49'.</li>
-<li><code>C7</code> : Number. It indicates C7 square. Value is '50'.</li>
-<li><code>D7</code> : Number. It indicates D7 square. Value is '51'.</li>
-<li><code>E7</code> : Number. It indicates E7 square. Value is '52'.</li>
-<li><code>F7</code> : Number. It indicates F7 square. Value is '53'.</li>
-<li><code>G7</code> : Number. It indicates G7 square. Value is '54'.</li>
-<li><code>H7</code> : Number. It indicates H7 square. Value is '55'.</li>
-<li><code>A8</code> : Number. It indicates A8 square. Value is '56'.</li>
-<li><code>B8</code> : Number. It indicates B8 square. Value is '57'.</li>
-<li><code>C8</code> : Number. It indicates C8 square. Value is '58'.</li>
-<li><code>D8</code> : Number. It indicates D8 square. Value is '59'.</li>
-<li><code>E8</code> : Number. It indicates E8 square. Value is '60'.</li>
-<li><code>F8</code> : Number. It indicates F8 square. Value is '61'.</li>
-<li><code>G8</code> : Number. It indicates G8 square. Value is '62'.</li>
-<li><code>H8</code> : Number. It indicates H8 square. Value is '63'.</li>
-</ul>
-<h3 id="fyles">Fyles</h3>
-<ul>
-<li><code>FYLE_A</code> : Number. It indicates A-Fyle. Value is '0'.</li>
-<li><code>FYLE_B</code> : Number. It indicates B-Fyle. Value is '1'.</li>
-<li><code>FYLE_C</code> : Number. It indicates C-Fyle. Value is '2'.</li>
-<li><code>FYLE_D</code> : Number. It indicates D-Fyle. Value is '3'.</li>
-<li><code>FYLE_E</code> : Number. It indicates E-Fyle. Value is '4'.</li>
-<li><code>FYLE_F</code> : Number. It indicates F-Fyle. Value is '5'.</li>
-<li><code>FYLE_G</code> : Number. It indicates G-Fyle. Value is '6'.</li>
-<li><code>FYLE_H</code> : Number. It indicates H-Fyle. Value is '7'.</li>
-</ul>
-<h3 id="ranks">Ranks</h3>
-<ul>
-<li><code>RANK_1</code> : Number. It indicates 1st rank. Value is '0'.</li>
-<li><code>RANK_2</code> : Number. It indicates 2nd rank. Value is '1'.</li>
-<li><code>RANK_3</code> : Number. It indicates 3rd rank. Value is '2'.</li>
-<li><code>RANK_4</code> : Number. It indicates 4th rank. Value is '3'.</li>
-<li><code>RANK_5</code> : Number. It indicates 5th rank. Value is '4'.</li>
-<li><code>RANK_6</code> : Number. It indicates 6th rank. Value is '5'.</li>
-<li><code>RANK_7</code> : Number. It indicates 7th rank. Value is '6'.</li>
-<li><code>RANK_8</code> : Number. It indicates 8th rank. Value is '7'.</li>
-</ul>
-<h3 id="sides">Sides</h3>
-<ul>
-<li><code>NO_SIDE</code> : Number. It indicates neither of sides. Value is '0'.</li>
-<li><code>WHITE</code> : Number. It indicates White. Value is '1'.</li>
-<li><code>BLACK</code> : Number. It indicates Black. Value is '2'.</li>
-</ul>
-<h3 id="piece-types">Piece Types</h3>
-<ul>
-<li><code>EMPTY</code> : Number. It indicates no piece. Value is '0'.</li>
-<li><code>PAWN</code> : Number. It indicates Pawn. Value is '1'.</li>
-<li><code>KNIGHT</code> : Number. It indicates Knight. Value is '2'.</li>
-<li><code>BISHOP</code> : Number. It indicates Bishop. Value is '3'.</li>
-<li><code>ROOK</code> : Number. It indicates Rook. Value is '4'.</li>
-<li><code>QUEEN</code> : Number. It indicates Queen. Value is '5'.</li>
-<li><code>KING</code> : Number. It indicates King. Value is '6'.</li>
-</ul>
-<h3 id="castling">Castling</h3>
-<ul>
-<li><code>NO_CASTLING</code> : Number. It indicates no one to castle. Value is '0'.</li>
-<li><code>WHITE_SHORT_CASTLING</code> : Number. It indicates White's Short Castling. Value is '1'.</li>
-<li><code>WHITE_LONG_CASTLING</code> : Number. It indicates White's Long Castling. Value is '2'.</li>
-<li><code>BLACK_SHORT_CASTLING</code> : Number. It indicates Black's Short Castling. Value is '3'.</li>
-<li><code>BLACK_LONG_CASTLING</code> : Number. It indicates Black's Long Castling. Value is '4'.</li>
-</ul>
-<h2 id="engine-functions">Engine Functions</h2>
-<h3 id="gen-engine">gen-engine</h3>
-<p><strong>Usage</strong></p>
-<ol style="list-style-type: decimal">
-<li><code>(gen-engine)</code></li>
-<li><code>((gen-engine) &lt;Message Symbol&gt; [&lt;Arguments&gt;...])</code></li>
-</ol>
-<p><strong>Description</strong></p>
-<ul>
-<li>1: Generates chess engine.</li>
-<li>2: The engine executes something according to <code>&lt;Message Symbol&gt;</code>.</li>
-<li>2: Some <code>&lt;Message Symbol&gt;</code> require <code>&lt;Argument&gt;...</code>.</li>
-</ul>
-<p><strong>Description of Message Symbols</strong></p>
+<h2 id="operation-of-chess-board">Operation of Chess Board</h2>
+<h3 id="get-position-of-pieces">Get Position of Pieces</h3>
 <ul>
 <li><code>@get-white-pawn-position</code>
 <ul>
@@ -238,6 +121,7 @@
 
 ;; Output
 ;; &gt; (WHITE QUEEN)</code></pre>
+<h3 id="get-and-set-board-status">Get and Set Board Status</h3>
 <ul>
 <li><code>@get-to-move</code>
 <ul>
@@ -393,6 +277,7 @@
 (display (my-engine &#39;@get-clock))
 ;; Output
 ;; &gt; 22</code></pre>
+<h3 id="set-position">Set Position</h3>
 <ul>
 <li><code>@set-new-game</code>
 <ul>
@@ -422,6 +307,7 @@
     &quot;r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1&quot;))
 ;; Output
 ;; &gt; #t</code></pre>
+<h3 id="move-generation">Move Generation</h3>
 <ul>
 <li><code>@get-candidate-moves</code>
 <ul>
@@ -438,6 +324,7 @@
 ;; &gt; (D2 D3 EMPTY) (C2 C4 EMPTY) (C2 C3 EMPTY) (B2 B4 EMPTY) (B2 B3 EMPTY)
 ;; &gt; (A2 A4 EMPTY) (A2 A3 EMPTY) (G1 H3 EMPTY) (G1 F3 EMPTY) (B1 C3 EMPTY)
 ;; &gt; (B1 A3 EMPTY))</code></pre>
+<h3 id="check-position">Check Position</h3>
 <ul>
 <li><code>@correct-position?</code>
 <ul>
@@ -529,6 +416,7 @@
 (display (my-engine &#39;@stalemated?))
 ;; Output
 ;; &gt; #f</code></pre>
+<h3 id="play-game">Play game</h3>
 <ul>
 <li><code>@play-move &lt;One move : List&gt;</code>
 <ul>
@@ -569,6 +457,7 @@
 (display (my-engine &#39;@get-white-pawn-position))
 ;; Output
 ;; &gt; (A2 B2 C2 D2 E2 F2 G2 H2)</code></pre>
+<h3 id="uci-command">UCI Command</h3>
 <ul>
 <li><code>@input-uci-command &lt;UCI command : String&gt;</code>
 <ul>
@@ -705,6 +594,9 @@
 ;; Set number of threads to 4 and return 3.
 ;; Output
 ;; &gt; 3</code></pre>
+<h2 id="customization-of-search-function">Customization of Search Function</h2>
+<h3 id="material">Material</h3>
+<p>&quot;Material&quot; is values of pieces.<br />Usually, the value of Pawn is 100 cp(centipawn).</p>
 <ul>
 <li><code>@material [&lt;New materal : List&gt;]</code>
 <ul>
@@ -731,6 +623,8 @@
 (display (my-engine &#39;@material))
 ;; Output
 ;; &gt; (0 222 333 444 555 666 777)</code></pre>
+<h3 id="quiescence-search">Quiescence Search</h3>
+<p>&quot;Quiescence Search&quot; is algorithm for soothing the position.<br />When a search function have reached the leaf node, if King is checked or there are attacked pieces, &quot;Quiescence Search&quot; continues searching until no King is checked or there are no attacked pieces.</p>
 <ul>
 <li><code>@enable-quiesce-search [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -748,6 +642,8 @@
 (display (my-engine &#39;@enable-quiesce-search))
 ;; Output
 :: &gt; #f</code></pre>
+<h3 id="repetition-check">Repetition Check</h3>
+<p>&quot;Repetition Check&quot; is a function for checking if the position has repeated or not.<br />If &quot;Repetition Check&quot; has found the position is repeated at the current node, the search function stops searching and returns 0 cp to the parent node.</p>
 <ul>
 <li><code>@enable-repetition-check [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -765,6 +661,8 @@
 (display (my-engine &#39;@enable-repetition-check))
 ;; Output
 ;; &gt; #f</code></pre>
+<h3 id="check-extension">Check Extension</h3>
+<p>&quot;Check Extension&quot; is a function to increase depth when King is checked at the current node.</p>
 <ul>
 <li><code>@enable-check-extension [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -782,6 +680,8 @@
 (display (my-engine &#39;@enable-check-extension))
 ;; Output
 ;; &gt; #f</code></pre>
+<h3 id="ybwc">YBWC</h3>
+<p>&quot;YBWC&quot; is algorithm of mulitithreading.<br />&quot;YBWC&quot; searches with one thread during first several candidate moves. After that it asks for other threads to help searching.</p>
 <ul>
 <li><code>@ybwc-limit-depth [&lt;New depth : Number&gt;]</code>
 <ul>
@@ -814,6 +714,8 @@
 (display (my-engine &#39;@ybwc-invalid-moves))
 ;; Output
 ;; &gt; 10</code></pre>
+<h3 id="aspiration-windows">Aspiration Windows</h3>
+<p>&quot;Aspiration Windows&quot; is algorithm to optimize window size at the root node.<br />At one repeat on Iterative Deepening, at the root node, first, Alpha is set to the previous score minus Delta and Beta is set to the previous score plus Delta.<br />If Fail-High has been occurred, Delta doubles and Beta is increased to Beta plus Delta and searches again.<br />At the first candidate move, if Fail-Low has been occurred, Delta doubles and Alpha is decreased to Alpha minus Delta and searches again.</p>
 <ul>
 <li><code>@enable-aspiration-windows [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -858,6 +760,8 @@
 (display (my-engine &#39;@aspiration-windows-delta))
 ;; Output
 ;; &gt; 20</code></pre>
+<h3 id="see">SEE</h3>
+<p>&quot;SEE&quot; is a function for Move Ordering.<br />If there are tactical moves(taking an opponent's piece or promoting Pawn), &quot;SEE&quot; sets the moves to temporary score by simplified searching algorithm.</p>
 <ul>
 <li><code>@enable-see [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -875,6 +779,8 @@
 (display (my-engine &#39;@enable-see))
 ;; Output
 ;; &gt; #f</code></pre>
+<h3 id="history-heuristics">History Heuristics</h3>
+<p>&quot;History Heuristics&quot; is a function for Move Ordering.<br />&quot;History Heuristics&quot; sets non tactical moves(not taking an opponent's piece and not promoting Pawn) to temporary score by history values.<br />In searching, if Beta Cut has been occurred at non tactical move, the search function adds a history value of the similar moves to &quot;<code>depth * depth</code>&quot;.<br />When ordering moves, &quot;History Heuristics&quot; sets non tactical candidate moves to score referring to the history value.</p>
 <ul>
 <li><code>@enable-history [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -892,6 +798,8 @@
 (display (my-engine &#39;@enable-history))
 ;; Output
 ;; &gt; #f</code></pre>
+<h3 id="killer-move-heuristics">Killer Move Heuristics</h3>
+<p>&quot;Killer Move Heuristics&quot; is a function for Move Ordering.<br />On non tactical moves(not taking an opponent's piece and not promoting Pawn), &quot;Killer Move Heuristics&quot; sets one of candidate moves to the highest priority referring to Killer Move.<br />In searching, if Beta Cut has been occurred at non tactical move, the search function memorizes the move as Killer Move.</p>
 <ul>
 <li><code>@enable-killer [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -909,6 +817,8 @@
 (display (my-engine &#39;@enable-killer))
 ;; Output
 ;; &gt; #f</code></pre>
+<h3 id="transposition-table">Transposition Table</h3>
+<p>&quot;Transposition Table&quot; is a function to cache a hashed position and its search result.<br />Sayuri uses the cached information for Move Ordering or optimizing to search same position.</p>
 <ul>
 <li><code>@enable-hash-table [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -926,6 +836,8 @@
 (display (my-engine &#39;@enable-hash-table))
 ;; Output
 ;; &gt; #t</code></pre>
+<h3 id="internal-iterative-deepening">Internal Iterative Deepening</h3>
+<p>&quot;Internal Iterative Deepening&quot; is algorithm for Move Ordering.<br />When ordering candidate moves at PV Node, if the best move doesn't exist in Transposition Table, &quot;Internal Iterative Deepening&quot; searches shallowly and finds good move.</p>
 <ul>
 <li><code>@enable-iid [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -971,7 +883,6 @@
 (display (my-engine &#39;@iid-search-depth))
 ;; Output
 ;; &gt; 10</code></pre>
-<h2 id="utility-functions">Utility Functions</h2>
 
 </section>
 </div>

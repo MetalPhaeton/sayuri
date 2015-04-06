@@ -87,7 +87,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Append <code>&lt;List 2&gt;</code> after the end of <code>&lt;List 1&gt;</code>.</li>
+<li>Appends <code>&lt;List 2&gt;</code> after the end of <code>&lt;List 1&gt;</code>.</li>
 <li>In other words, (append) replaces last Cdr of <code>&lt;List 1&gt;</code> from Nil to <code>&lt;List 2&gt;</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
@@ -109,7 +109,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return number of <code>&lt;List&gt;</code>.</li>
+<li>Returns number of <code>&lt;List&gt;</code>.</li>
 <li>If you input Atom, it returns '1'. If Nil, it returns '0'.</li>
 </ul>
 <p><strong>Example</strong></p>
@@ -125,7 +125,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return List consists of <code>&lt;Object&gt;...</code>.</li>
+<li>Returns List consists of <code>&lt;Object&gt;...</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (list 111 222 333))
@@ -140,7 +140,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return a element of <code>&lt;Index&gt;</code> of <code>&lt;List&gt;</code>.</li>
+<li>Returns a element of <code>&lt;Index&gt;</code> of <code>&lt;List&gt;</code>.</li>
 <li>The 1st element of <code>&lt;List&gt;</code> is '0'.</li>
 <li>If <code>&lt;Index&gt;</code> is negative number,&quot; It counts from the tail of <code>&lt;List&gt;</code>.</li>
 </ul>
@@ -163,7 +163,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return List which has replaced the <code>&lt;Index&gt;</code>th element of <code>&lt;List&gt;</code> for <code>&lt;Object&gt;</code>.</li>
+<li>Returns List which has replaced the <code>&lt;Index&gt;</code>th element of <code>&lt;List&gt;</code> for <code>&lt;Object&gt;</code>.</li>
 <li>The 1st element of <code>&lt;List&gt;</code> is '0'.</li>
 <li>If <code>&lt;Index&gt;</code> is negative number,&quot; It counts from the tail of <code>&lt;List&gt;</code>.</li>
 </ul>
@@ -181,7 +181,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return List which has removed the <code>&lt;Index&gt;</code>th element of <code>&lt;List&gt;</code>.</li>
+<li>Returns List which has removed the <code>&lt;Index&gt;</code>th element of <code>&lt;List&gt;</code>.</li>
 <li>The 1st element of <code>&lt;List&gt;</code> is '0'.</li>
 <li>If <code>&lt;Index&gt;</code> is negative number,&quot; It counts from the tail of <code>&lt;List&gt;</code>.</li>
 </ul>
@@ -199,7 +199,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Concatenate <code>&lt;String&gt;...</code>.</li>
+<li>Concatenates <code>&lt;String&gt;...</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (string-append &quot;Hello&quot; &quot; &quot; &quot;World&quot;))
@@ -214,7 +214,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return the <code>&lt;index&gt;</code>th letter of <code>&lt;String&gt;</code>.</li>
+<li>Returns the <code>&lt;index&gt;</code>th letter of <code>&lt;String&gt;</code>.</li>
 <li><code>&lt;index&gt;</code> of the 1st letter is '0'.</li>
 </ul>
 <p><strong>Example</strong></p>
@@ -230,7 +230,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return List consist of String splited <code>&lt;String&gt;</code> by <code>&lt;Delim String&gt;</code>.</li>
+<li>Returns List consist of split <code>&lt;String&gt;</code> by <code>&lt;Delim String&gt;</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (string-split &quot;aaaaSplit!bbbSplit!ccc&quot; &quot;Split!&quot;))
@@ -246,7 +246,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Turn <code>&lt;Boolean&gt;</code> to opposite value. #t to #f, #f to #t.</li>
+<li>Turns <code>&lt;Boolean&gt;</code> to opposite value. #t to #f, #f to #t.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (not (= 111 111)))
@@ -261,7 +261,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if all <code>&lt;Boolean&gt;...</code> are #t. If not, return #f.</li>
+<li>Returns #t if all <code>&lt;Boolean&gt;...</code> are #t. Otherwise, return #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (and (= 111 111) (= 222 222)))
@@ -276,7 +276,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if one of <code>&lt;Boolean&gt;...</code> is #t. If not, return #f.</li>
+<li>Returns #t if one of <code>&lt;Boolean&gt;...</code> is #t. If all <code>&lt;Boolean&gt;</code> are #f, return #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (or (= 111 111) (= 222 333)))
@@ -292,7 +292,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if all <code>&lt;Number&gt;...</code> are same. If not, return #f.</li>
+<li>Returns #t if all <code>&lt;Number&gt;...</code> are same. Otherwise, return #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (= 111 111 111))
@@ -307,7 +307,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if a Number is less than next Number. If not, return #f.</li>
+<li>Returns #t if a Number is less than next Number. Otherwise, return #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (&lt; 111 222 333))
@@ -322,7 +322,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if a Number is less or equal than next Number. If not, return #f.</li>
+<li>Returns #t if a Number is less or equal than next Number. Otherwise, return #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (&lt; 111 222 333))
@@ -337,7 +337,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if a Number is more than next Number. If not, return #f.</li>
+<li>Returns #t if a Number is more than next Number. Otherwise, return #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (&gt; 333 222 111))
@@ -352,7 +352,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if a Number is more or equal than next Number. If not, return #f.</li>
+<li>Returns #t if a Number is more or equal than next Number. Otherwise, return #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (&gt;= 333 222 111))
@@ -367,7 +367,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return maximum number of <code>&lt;Number&gt;...</code>.</li>
+<li>Returns maximum number of <code>&lt;Number&gt;...</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (max 1 2 3 4 3 2 1))
@@ -382,7 +382,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return minimum number of <code>&lt;Number&gt;...</code>.</li>
+<li>Returns minimum number of <code>&lt;Number&gt;...</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (min 4 3 2 1 2 3 4))
@@ -398,7 +398,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Sum up all <code>&lt;Number&gt;...</code>.</li>
+<li>Sums up all <code>&lt;Number&gt;...</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (+ 1 2 3))
@@ -413,7 +413,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Subtract <code>&lt;Number&gt;...</code> from <code>&lt;1st number&gt;</code>.</li>
+<li>Subtracts <code>&lt;Number&gt;...</code> from <code>&lt;1st number&gt;</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (- 5 4 3))
@@ -428,7 +428,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Multiply all <code>&lt;Number&gt;...</code>.</li>
+<li>Multiplies all <code>&lt;Number&gt;...</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (* 2 3 4))
@@ -443,7 +443,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Divide <code>&lt;1st number&gt;</code> with <code>&lt;Number&gt;...</code>.</li>
+<li>Divides <code>&lt;1st number&gt;</code> with <code>&lt;Number&gt;...</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (/ 32 2 4))
@@ -577,7 +577,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return square root of <code>&lt;Number&gt;</code>.</li>
+<li>Returns square root of <code>&lt;Number&gt;</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (sqrt 4))
@@ -592,7 +592,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return absolute value of <code>&lt;Number&gt;</code>.</li>
+<li>Returns absolute value of <code>&lt;Number&gt;</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (abs -111))
@@ -607,7 +607,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Round up <code>&lt;Number&gt;</code> into integral value.</li>
+<li>Rounds up <code>&lt;Number&gt;</code> into integral value.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (ceil 1.3))
@@ -622,7 +622,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Round down <code>&lt;Number&gt;</code> into integral value.</li>
+<li>Rounds down <code>&lt;Number&gt;</code> into integral value.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (floor 1.3))
@@ -637,7 +637,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Round <code>&lt;Number&gt;</code> into the nearest integral value.</li>
+<li>Rounds <code>&lt;Number&gt;</code> into the nearest integral value.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (round 1.5))
@@ -658,7 +658,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Truncate after decimal point of <code>&lt;Number&gt;</code>.</li>
+<li>Truncates after decimal point of <code>&lt;Number&gt;</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (trunc 1.234))
@@ -754,7 +754,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return random number from 0 to <code>&lt;Number&gt;</code>.</li>
+<li>Returns random number from 0 to <code>&lt;Number&gt;</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (random 10))
