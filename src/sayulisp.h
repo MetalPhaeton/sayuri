@@ -823,6 +823,70 @@ namespace Sayuri {
         return ret_ptr;
       }
 
+      /**
+       * SearchParams - NMRの有効無効。
+       * @param enable NMRの有効無効。
+       * @return セットされていたNMRの有効無効。
+       */
+      LispObjectPtr SetEnableNMR(const LispObject& enable) {
+        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        (search_params_ptr_->enable_nmr());
+
+        if (enable.IsBoolean()) {
+          search_params_ptr_->enable_nmr(enable.boolean_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - NMRの深さ制限。
+       * @param depth 深さ。
+       * @return セットされていたNMRの深さ制限。
+       */
+      LispObjectPtr SetNMRLimitDepth(const LispObject& depth) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->nmr_limit_depth());
+
+        if (depth.IsNumber()) {
+          search_params_ptr_->nmr_limit_depth(depth.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - NMRの探索時のリダクション。
+       * @param reduction リダクション。
+       * @return セットされていたNMRの探索時のリダクション。
+       */
+      LispObjectPtr SetNMRSearchReduction(const LispObject& reduction) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->nmr_search_reduction());
+
+        if (reduction.IsNumber()) {
+          search_params_ptr_->nmr_search_reduction(reduction.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - NMRの結果のリダクション。
+       * @param reduction リダクション。
+       * @return セットされていたNMRの結果のリダクション。
+       */
+      LispObjectPtr SetNMRReduction(const LispObject& reduction) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->nmr_reduction());
+
+        if (reduction.IsNumber()) {
+          search_params_ptr_->nmr_reduction(reduction.number_value());
+        }
+
+        return ret_ptr;
+      }
+
       // ======== //
       // アクセサ //
       // ======== //

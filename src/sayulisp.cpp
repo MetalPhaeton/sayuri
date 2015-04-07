@@ -734,6 +734,54 @@ namespace Sayuri {
 
       return SetIIDSearchDepth(*depth_ptr);
 
+    } else if (message_symbol == "@enable-nmr") {
+      LispObjectPtr enable_ptr = LispObject::NewNil();
+      if (list_itr) {
+        enable_ptr = caller.Evaluate(*list_itr);
+        if (!(enable_ptr->IsBoolean())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Boolean", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetEnableNMR(*enable_ptr);
+
+    } else if (message_symbol == "@nmr-limit-depth") {
+      LispObjectPtr depth_ptr = LispObject::NewNil();
+      if (list_itr) {
+        depth_ptr = caller.Evaluate(*list_itr);
+        if (!(depth_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetNMRLimitDepth(*depth_ptr);
+
+    } else if (message_symbol == "@nmr-search-reduction") {
+      LispObjectPtr reduction_ptr = LispObject::NewNil();
+      if (list_itr) {
+        reduction_ptr = caller.Evaluate(*list_itr);
+        if (!(reduction_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetNMRSearchReduction(*reduction_ptr);
+
+    } else if (message_symbol == "@nmr-reduction") {
+      LispObjectPtr reduction_ptr = LispObject::NewNil();
+      if (list_itr) {
+        reduction_ptr = caller.Evaluate(*list_itr);
+        if (!(reduction_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetNMRReduction(*reduction_ptr);
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
@@ -3064,7 +3112,7 @@ __Example__
     ;; > #f
 
 * `@ybwc-limit-depth [<New depth : Number>]`
-    + If remaining depths is less than this parameter, YBWC is invalidated.
+    + If remaining depth is less than this parameter, YBWC is invalidated.
     + Return this parameter.
     + If you specify `<New depth>`, this parameter is updated.
 
@@ -3099,7 +3147,7 @@ __Example__
       Aspiration Windows is set to be enabled.
       Otherwise, it is set to be disabled.
 * `@aspiration-windows-limit-depth [<New depth : Number>]`
-    + If remaining depths is less than this parameter at the root node,
+    + If remaining depth is less than this parameter at the root node,
       Aspiration Windows is invalidated.
     + Return this parameter.
     + If you specify `<New depth>`, this parameter is updated.
@@ -3211,7 +3259,7 @@ __Example__
       Internal Iterative Deepening is set to be enabled.
       Otherwise, it is set to be disabled.
 * `@iid-limit-depth [<New depth : Number>]`
-    + If remaining depths is less than this parameter,
+    + If remaining depth is less than this parameter,
       Internal Iterative Deepening is invalidated.
     + Return this parameter.
     + If you specify `<New depth>`, this parameter is updated.
@@ -3245,6 +3293,63 @@ __Example__
     ;; > 4
     
     (display (my-engine '@iid-search-depth))
+    ;; Output
+    ;; > 10
+
+* `@enable-nmr [<New setting : Boolean>]`
+    + Returns whether Null Move Reduction is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Null Move Reduction is set to be enabled.
+      Otherwise, it is set to be disabled.
+* `@nmr-limit-depth [<New depth : Number>]`
+    + If remaining depth is less than this parameter,
+      Null Move Reduction is invalidated.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+* `@nmr-search-reduction [<New reduction : Number>]`
+    + When searching shallowly, the depth is the actual depth
+      minus this parameter.
+    + Return this parameter.
+    + If you specify `<New reduction>`, this parameter is updated.
+* `@nmr-reduction [<New reduction : Number>]`
+    + If the score is greater than or equals to Beta,
+      the remaining depth is reduced by this parameter.
+    + Return this parameter.
+    + If you specify `<New reduction>`, this parameter is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-nmr #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-nmr))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@nmr-limit-depth 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@nmr-limit-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@nmr-search-reduction 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@nmr-search-reduction))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@nmr-reduction 10))
+    ;; Output
+    ;; > 3
+    
+    (display (my-engine '@nmr-reduction))
     ;; Output
     ;; > 10)...";
   }
