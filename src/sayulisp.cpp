@@ -782,6 +782,54 @@ namespace Sayuri {
 
       return SetNMRReduction(*reduction_ptr);
 
+    } else if (message_symbol == "@enable-probcut") {
+      LispObjectPtr enable_ptr = LispObject::NewNil();
+      if (list_itr) {
+        enable_ptr = caller.Evaluate(*list_itr);
+        if (!(enable_ptr->IsBoolean())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Boolean", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetEnableProbCut(*enable_ptr);
+
+    } else if (message_symbol == "@probcut-limit-depth") {
+      LispObjectPtr depth_ptr = LispObject::NewNil();
+      if (list_itr) {
+        depth_ptr = caller.Evaluate(*list_itr);
+        if (!(depth_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetProbCutLimitDepth(*depth_ptr);
+
+    } else if (message_symbol == "@probcut-margin") {
+      LispObjectPtr margin_ptr = LispObject::NewNil();
+      if (list_itr) {
+        margin_ptr = caller.Evaluate(*list_itr);
+        if (!(margin_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetProbCutMargin(*margin_ptr);
+
+    } else if (message_symbol == "@probcut-search-reduction") {
+      LispObjectPtr reduction_ptr = LispObject::NewNil();
+      if (list_itr) {
+        reduction_ptr = caller.Evaluate(*list_itr);
+        if (!(reduction_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetProbCutSearchReduction(*reduction_ptr);
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
@@ -3350,6 +3398,59 @@ __Example__
     ;; > 3
     
     (display (my-engine '@nmr-reduction))
+    ;; Output
+    ;; > 10
+
+* `@enable-probcut [<New setting : Boolean>]`
+    + Returns whether ProbCut is enabled or not.
+    + If you specify #t to `<New setting>`, ProbCut is set to be enabled.
+      Otherwise, it is set to be disabled.
+* `@probcut-limit-depth [<New depth : Number>]`
+    + If remaining depth is less than this parameter, ProbCut is invalidated.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+* `@probcut-margin [<New margin : Number>]`
+    + When Zero Window Search,
+      ProbCut uses the current Beta plus this parameter as temporary Beta.
+* `@probcut-search-reduction [<New reduction : Number>]`
+    + When Zero Window Search, the depth is the actual depth
+      minus this parameter.
+    + Return this parameter.
+    + If you specify `<New reduction>`, this parameter is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-probcut #t))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@enable-probcut))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@probcut-limit-depth 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@probcut-limit-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@probcut-margin 1200))
+    ;; Output
+    ;; > 400
+    
+    (display (my-engine '@probcut-margin))
+    ;; Output
+    ;; > 1200
+    
+    (display (my-engine '@probcut-search-reduction 10))
+    ;; Output
+    ;; > 3
+    
+    (display (my-engine '@probcut-search-reduction))
     ;; Output
     ;; > 10)...";
   }

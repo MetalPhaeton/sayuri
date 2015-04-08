@@ -887,6 +887,71 @@ namespace Sayuri {
         return ret_ptr;
       }
 
+      /**
+       * SearchParams - ProbCutの有効無効。
+       * @param enable ProbCutの有効無効。
+       * @return セットされていたProbCutの有効無効。
+       */
+      LispObjectPtr SetEnableProbCut(const LispObject& enable) {
+        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        (search_params_ptr_->enable_probcut());
+
+        if (enable.IsBoolean()) {
+          search_params_ptr_->enable_probcut(enable.boolean_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - ProbCutの深さ制限。
+       * @param depth 深さ。
+       * @return セットされていたProbCutの深さ制限。
+       */
+      LispObjectPtr SetProbCutLimitDepth(const LispObject& depth) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->probcut_limit_depth());
+
+        if (depth.IsNumber()) {
+          search_params_ptr_->probcut_limit_depth(depth.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - ProbCutのベータ値のマージン。
+       * @param margin マージン。
+       * @return セットされていたProbCutのベータ値のマージン。
+       */
+      LispObjectPtr SetProbCutMargin(const LispObject& margin) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->probcut_margin());
+
+        if (margin.IsNumber()) {
+          search_params_ptr_->probcut_margin(margin.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - ProbCutの探索時のリダクション。
+       * @param reduction リダクション。
+       * @return セットされていたProbCutの探索時のリダクション。
+       */
+      LispObjectPtr SetProbCutSearchReduction(const LispObject& reduction) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->probcut_search_reduction());
+
+        if (reduction.IsNumber()) {
+          search_params_ptr_->probcut_search_reduction
+          (reduction.number_value());
+        }
+
+        return ret_ptr;
+      }
+
       // ======== //
       // アクセサ //
       // ======== //
