@@ -37,6 +37,7 @@
 #include <queue>
 #include <map>
 #include <sstream>
+#include <iomanip>
 
 #ifndef LISP_CORE_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 #define LISP_CORE_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
@@ -77,6 +78,17 @@ namespace Sayuri {
     /** ネイティブ関数オブジェクト。 */
     NATIVE_FUNCTION
   };
+
+  /**
+   * 実数から文字列に高精度で変換。
+   * @param d 実数。
+   * @return 変換後の文字列。
+   */
+  inline std::string DoubleToString(double d) {
+    std::ostringstream stream;
+    stream << std::setprecision(15) << d;
+    return stream.str();
+  }
 
   /** 関数オブジェクト構造体。 */
   struct LispFunction {

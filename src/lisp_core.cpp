@@ -154,7 +154,7 @@ namespace Sayuri {
       stream << str_value_;
     } else if (IsNumber()) {
       // Number。
-      stream << number_value_;
+      stream << DoubleToString(number_value_);
     } else if (IsBoolean()) {
       // Boolean。
       if (boolean_value_) {
@@ -1625,7 +1625,7 @@ __Example__
           } else if (obj.IsSymbol()) {
             std::cout << "Symbol: " << obj.symbol_value();
           } else if (obj.IsNumber()) {
-            std::cout << obj.number_value();
+            std::cout << DoubleToString(obj.number_value());
           } else if (obj.IsBoolean()) {
             if (obj.boolean_value()) {
               std::cout << "#t";
@@ -4023,7 +4023,7 @@ __Example__
     }
 
     // %%% PI
-    root_ptr->BindSymbol("PI", NewNumber(3.141592653589793));
+    root_ptr->BindSymbol("PI", NewNumber(4.0 * std::atan(1.0)));
     (*dict_ptr)["PI"] =
 R"...(### PI ###
 
@@ -4033,14 +4033,14 @@ __Description__
 
 __Example__
 
-    (display (* 1 PI))
+    (display PI)
     
     ;; Output
     ;;
-    ;; > 3.14159)...";
+    ;; > 3.14159265358979)...";
 
     // %%% E
-    root_ptr->BindSymbol("E", NewNumber(2.718281828459045));
+    root_ptr->BindSymbol("E", NewNumber(std::exp(1.0)));
     (*dict_ptr)["E"] =
 R"...(### E ###
 
@@ -4050,11 +4050,11 @@ __Description__
 
 __Example__
 
-    (display (* 1 E))
+    (display E)
     
     ;; Output
     ;;
-    ;; > 2.71828)...";
+    ;; > 2.71828182845905)...";
 
     // %%% sin
     {
