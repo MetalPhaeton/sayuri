@@ -401,7 +401,7 @@ namespace Sayuri {
         if (ply < 1) {
           throw LispObject::GenError("@engine_error",
           "Minimum ply number is '1'. Given '"
-          + std::to_string(ply_ptr->number_value()) + "'.");
+          + DoubleToString(ply_ptr->number_value()) + "'.");
         }
 
         int origin = engine_ptr_->ply();
@@ -418,7 +418,7 @@ namespace Sayuri {
         if (clock < 0) {
           throw LispObject::GenError("@engine_error",
           "Minimum clock number is '0'. Given '"
-          + std::to_string(clock_ptr->number_value()) + "'.");
+          + DoubleToString(clock_ptr->number_value()) + "'.");
         }
 
         int origin = engine_ptr_->clock();
