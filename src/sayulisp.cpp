@@ -830,6 +830,78 @@ namespace Sayuri {
 
       return SetProbCutSearchReduction(*reduction_ptr);
 
+    } else if (message_symbol == "@enable-history-pruning") {
+      LispObjectPtr enable_ptr = LispObject::NewNil();
+      if (list_itr) {
+        enable_ptr = caller.Evaluate(*list_itr);
+        if (!(enable_ptr->IsBoolean())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Boolean", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetEnableHistoryPruning(*enable_ptr);
+
+    } else if (message_symbol == "@history-pruning-limit-depth") {
+      LispObjectPtr depth_ptr = LispObject::NewNil();
+      if (list_itr) {
+        depth_ptr = caller.Evaluate(*list_itr);
+        if (!(depth_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetHistoryPruningLimitDepth(*depth_ptr);
+
+    } else if (message_symbol == "@history-pruning-move-threshold") {
+      LispObjectPtr threshold_ptr = LispObject::NewNil();
+      if (list_itr) {
+        threshold_ptr = caller.Evaluate(*list_itr);
+        if (!(threshold_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetHistoryPruningMoveThreshold(*threshold_ptr);
+
+    } else if (message_symbol == "@history-pruning-invalid-moves") {
+      LispObjectPtr num_moves_ptr = LispObject::NewNil();
+      if (list_itr) {
+        num_moves_ptr = caller.Evaluate(*list_itr);
+        if (!(num_moves_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetHistoryPruningInvalidMoves(*num_moves_ptr);
+
+    } else if (message_symbol == "@history-pruning-threshold") {
+      LispObjectPtr threshold_ptr = LispObject::NewNil();
+      if (list_itr) {
+        threshold_ptr = caller.Evaluate(*list_itr);
+        if (!(threshold_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetHistoryPruningThreshold(*threshold_ptr);
+
+    } else if (message_symbol == "@history-pruning-reduction") {
+      LispObjectPtr reduction_ptr = LispObject::NewNil();
+      if (list_itr) {
+        reduction_ptr = caller.Evaluate(*list_itr);
+        if (!(reduction_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetHistoryPruningReduction(*reduction_ptr);
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
@@ -3452,6 +3524,92 @@ __Example__
     
     (display (my-engine '@probcut-search-reduction))
     ;; Output
-    ;; > 10)...";
+    ;; > 10
+* `@enable-history-pruning [<New setting : Boolean>]`
+    + Returns whether History Pruning is enabled or not.
+    + If you specify #t to `<New setting>`,
+      History Pruning is set to be enabled.
+      Otherwise, it is set to be disabled.
+* `@history-pruning-limit-depth [<New depth : Number>]`
+    + If remaining depth is less than this parameter,
+      History Pruning is invalidated.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+* `@history-pruning-move-threshold [<New threshold : Number>]`
+    + If the number of the candidate move is less
+      than the number of all moves times this parameter,
+      History Pruning is invalidated.
+    + This parameter is between 0.0 and 1.0.
+    + Return this parameter.
+    + If you specify `<New threshold>`, this parameter is updated.
+* `@history-pruning-invalid-moves [<New number of moves : Number>]`
+    + If the number of the candidate moves is less than this parameter,
+      History Pruning is invalidated.
+    + This parameter is given priority to `@history-pruning-move-threshold`.
+    + Return this parameter.
+    + If you specify `<New number of moves>`, this parameter is updated.
+* `@history-pruning-threshold [<New threshold : Number>]`
+    + If the history value of the current candidate move is lower
+      than the max history value times this parameter,
+      History Pruning temporarily reduces the remaining depth.
+    + Return this parameter.
+    + If you specify `<New threshold>`, this parameter is updated.
+* `@history-pruning-reduction [<New reduction : Number>]`
+    + When History Pruning reduces the remaining depth,
+      a new depth is the current depth minus this parameter.
+    + Return this parameter.
+    + If you specify `<New reduction>`, this parameter is updated.
+
+__Example__
+
+(define my-engine (gen-engine))
+
+(display (my-engine '@enable-history-pruning #t))
+;; Output
+;; > #f
+
+(display (my-engine '@enable-history-pruning))
+;; Output
+;; > #t
+
+(display (my-engine '@history-pruning-limit-depth 10))
+;; Output
+;; > 4
+
+(display (my-engine '@history-pruning-limit-depth))
+;; Output
+;; > 10
+
+(display (my-engine '@history-pruning-move-threshold 0.8))
+;; Output
+;; > 0.6
+
+(display (my-engine '@history-pruning-move-threshold))
+;; Output
+;; > 0.8
+
+(display (my-engine '@history-pruning-invalid-moves 20))
+;; Output
+;; > 10
+
+(display (my-engine '@history-pruning-invalid-moves))
+;; Output
+;; > 20
+
+(display (my-engine '@history-pruning-threshold 0.8))
+;; Output
+;; > 0.5
+
+(display (my-engine '@history-pruning-threshold))
+;; Output
+;; > 0.8
+
+(display (my-engine '@history-pruning-reduction 10))
+;; Output
+;; > 1
+
+(display (my-engine '@history-pruning-reduction))
+;; Output
+;; > 10)...";
   }
 }  // namespace Sayuri

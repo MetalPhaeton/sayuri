@@ -952,6 +952,109 @@ namespace Sayuri {
         return ret_ptr;
       }
 
+      /**
+       * SearchParams - History Pruningの有効無効。
+       * @param enable History Pruningの有効無効。
+       * @return セットされていたHistory Pruningの有効無効。
+       */
+      LispObjectPtr SetEnableHistoryPruning(const LispObject& enable) {
+        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        (search_params_ptr_->enable_history_pruning());
+
+        if (enable.IsBoolean()) {
+          search_params_ptr_->enable_history_pruning(enable.boolean_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - History Pruningの深さ制限。
+       * @param depth 深さ。
+       * @return セットされていたHistory Pruningの深さ制限。
+       */
+      LispObjectPtr SetHistoryPruningLimitDepth(const LispObject& depth) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->history_pruning_limit_depth());
+
+        if (depth.IsNumber()) {
+          search_params_ptr_->history_pruning_limit_depth
+          (depth.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - History Pruningの候補手の閾値。
+       * @param threshold 閾値。
+       * @return セットされていたHistory Pruningの候補手の閾値。
+       */
+      LispObjectPtr SetHistoryPruningMoveThreshold
+      (const LispObject& threshold) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->history_pruning_move_threshold());
+
+        if (threshold.IsNumber()) {
+          search_params_ptr_->history_pruning_move_threshold
+          (threshold.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - History Pruningを無効にする最初の候補手の数。
+       * @param num_moves 候補手の数。
+       * @return セットされていたHistory Pruningを無効にする最初の候補手の数。
+       */
+      LispObjectPtr SetHistoryPruningInvalidMoves
+      (const LispObject& num_moves) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->history_pruning_invalid_moves());
+
+        if (num_moves.IsNumber()) {
+          search_params_ptr_->history_pruning_invalid_moves
+          (num_moves.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - History Pruningのヒストリー値の閾値。
+       * @param threshold 閾値。
+       * @return セットされていたHistory Pruningのヒストリー値の閾値。
+       */
+      LispObjectPtr SetHistoryPruningThreshold(const LispObject& threshold) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->history_pruning_threshold());
+
+        if (threshold.IsNumber()) {
+          search_params_ptr_->history_pruning_threshold
+          (threshold.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - History Pruningのリダクション。
+       * @param reduction リダクション。
+       * @return セットされていたHistory Pruningのリダクション。
+       */
+      LispObjectPtr SetHistoryPruningReduction(const LispObject& reduction) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->history_pruning_reduction());
+
+        if (reduction.IsNumber()) {
+          search_params_ptr_->history_pruning_reduction
+          (reduction.number_value());
+        }
+
+        return ret_ptr;
+      }
+
       // ======== //
       // アクセサ //
       // ======== //
