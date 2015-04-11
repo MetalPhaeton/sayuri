@@ -1166,7 +1166,7 @@ namespace Sayuri {
     history_pruning_reduction_ = 0;
     enable_lmr_ = false;
     lmr_limit_depth_ = 0;
-    lmr_threshold_ = 0;
+    lmr_move_threshold_ = 0;
     lmr_invalid_moves_ = 0;
     lmr_search_reduction_ = 0;
     enable_futility_pruning_ = false;
@@ -1224,7 +1224,7 @@ namespace Sayuri {
     history_pruning_reduction_ = params.history_pruning_reduction_;
     enable_lmr_ = params.enable_lmr_;
     lmr_limit_depth_ = params.lmr_limit_depth_;
-    lmr_threshold_ = params.lmr_threshold_ * 256.0;
+    lmr_move_threshold_ = params.lmr_move_threshold_ * 256.0;
     lmr_invalid_moves_ = params.lmr_invalid_moves_;
     lmr_search_reduction_ = params.lmr_search_reduction_;
     enable_futility_pruning_ = params.enable_futility_pruning_;

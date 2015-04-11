@@ -1055,6 +1055,86 @@ namespace Sayuri {
         return ret_ptr;
       }
 
+      /**
+       * SearchParams - LMRの有効無効。
+       * @param enable LMRの有効無効。
+       * @return セットされていたLMRの有効無効。
+       */
+      LispObjectPtr SetEnableLMR(const LispObject& enable) {
+        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        (search_params_ptr_->enable_lmr());
+
+        if (enable.IsBoolean()) {
+          search_params_ptr_->enable_lmr(enable.boolean_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - LMRの深さ制限。
+       * @param depth 深さ。
+       * @return セットされていたLMRの深さ制限。
+       */
+      LispObjectPtr SetLMRLimitDepth(const LispObject& depth) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->lmr_limit_depth());
+
+        if (depth.IsNumber()) {
+          search_params_ptr_->lmr_limit_depth(depth.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - LMRの候補手の閾値。
+       * @param threshold 閾値。
+       * @return セットされていたLMRの候補手の閾値。
+       */
+      LispObjectPtr SetLMRMoveThreshold(const LispObject& threshold) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->lmr_move_threshold());
+
+        if (threshold.IsNumber()) {
+          search_params_ptr_->lmr_move_threshold(threshold.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - LMRを無効にする最初の候補手の数。
+       * @param num_moves 候補手の数。
+       * @return セットされていたLMRを無効にする最初の候補手の数。
+       */
+      LispObjectPtr SetLMRInvalidMoves(const LispObject& num_moves) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->lmr_invalid_moves());
+
+        if (num_moves.IsNumber()) {
+          search_params_ptr_->lmr_invalid_moves(num_moves.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - LMRの探索時のリダクション。
+       * @param reduction リダクション。
+       * @return セットされていたLMRの探索時のリダクション。
+       */
+      LispObjectPtr SetLMRSearchReduction(const LispObject& reduction) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->lmr_search_reduction());
+
+        if (reduction.IsNumber()) {
+          search_params_ptr_->lmr_search_reduction(reduction.number_value());
+        }
+
+        return ret_ptr;
+      }
+
       // ======== //
       // アクセサ //
       // ======== //

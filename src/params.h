@@ -282,7 +282,7 @@ namespace Sayuri {
        * (1.0 から 0.0)
        * @return 実行する候補手の閾値。
        */
-      double lmr_threshold() const {return lmr_threshold_;}
+      double lmr_move_threshold() const {return lmr_move_threshold_;}
       /**
        * アクセサ - Late Move Reduction - 何手目以降の候補手で実行するか。
        * @return 何手目以降の候補手で実行するか。
@@ -557,8 +557,8 @@ namespace Sayuri {
        * (1.0 から 0.0)
        * @param threshold 実行する候補手の閾値。
        */
-      void lmr_threshold(double threshold) {
-        lmr_threshold_ = Util::GetMin(Util::GetMax(threshold, 0.0), 1.0);
+      void lmr_move_threshold(double threshold) {
+        lmr_move_threshold_ = Util::GetMin(Util::GetMax(threshold, 0.0), 1.0);
       }
       /**
        * ミューテータ - Late Move Reduction - 何手目以降の候補手で実行するか。
@@ -716,7 +716,7 @@ namespace Sayuri {
       /** Late Move Reduction - 残り深さ制限。 */
       int lmr_limit_depth_;
       /** Late Move Reduction - 実行する候補手の閾値。 */
-      double lmr_threshold_;
+      double lmr_move_threshold_;
       /** Late Move Reduction - 何手目以降の候補手で実行するか。 */
       int lmr_invalid_moves_;
       /** Late Move Reduction - リダクションする深さ。 */

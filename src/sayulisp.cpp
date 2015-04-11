@@ -902,6 +902,66 @@ namespace Sayuri {
 
       return SetHistoryPruningReduction(*reduction_ptr);
 
+    } else if (message_symbol == "@enable-lmr") {
+      LispObjectPtr enable_ptr = LispObject::NewNil();
+      if (list_itr) {
+        enable_ptr = caller.Evaluate(*list_itr);
+        if (!(enable_ptr->IsBoolean())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Boolean", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetEnableLMR(*enable_ptr);
+
+    } else if (message_symbol == "@lmr-limit-depth") {
+      LispObjectPtr depth_ptr = LispObject::NewNil();
+      if (list_itr) {
+        depth_ptr = caller.Evaluate(*list_itr);
+        if (!(depth_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetLMRLimitDepth(*depth_ptr);
+
+    } else if (message_symbol == "@lmr-move-threshold") {
+      LispObjectPtr threshold_ptr = LispObject::NewNil();
+      if (list_itr) {
+        threshold_ptr = caller.Evaluate(*list_itr);
+        if (!(threshold_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetLMRMoveThreshold(*threshold_ptr);
+
+    } else if (message_symbol == "@lmr-invalid-moves") {
+      LispObjectPtr num_moves_ptr = LispObject::NewNil();
+      if (list_itr) {
+        num_moves_ptr = caller.Evaluate(*list_itr);
+        if (!(num_moves_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetLMRInvalidMoves(*num_moves_ptr);
+
+    } else if (message_symbol == "@lmr-search-reduction") {
+      LispObjectPtr reduction_ptr = LispObject::NewNil();
+      if (list_itr) {
+        reduction_ptr = caller.Evaluate(*list_itr);
+        if (!(reduction_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetLMRSearchReduction(*reduction_ptr);
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
@@ -3610,6 +3670,79 @@ __Example__
 
 (display (my-engine '@history-pruning-reduction))
 ;; Output
-;; > 10)...";
+;; > 10
+
+* `@enable-lmr [<New setting : Boolean>]`
+    + Returns whether Late Move Reduction is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Late Move Reduction is set to be enabled.
+      Otherwise, it is set to be disabled.
+* `@lmr-limit-depth [<New depth : Number>]`
+    + If remaining depth is less than this parameter,
+      Late Move Reduction is invalidated.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+* `@lmr-move-threshold [<New threshold : Number>]`
+    + If the number of the candidate move is less
+      than the number of all moves times this parameter,
+      Late Move Reduction is invalidated.
+    + This parameter is between 0.0 and 1.0.
+    + Return this parameter.
+    + If you specify `<New threshold>`, this parameter is updated.
+* `@lmr-invalid-moves [<New number of moves : Number>]`
+    + If the number of the candidate moves is less than this parameter,
+      Late Move Reduction is invalidated.
+    + This parameter is given priority to `@lmr-move-threshold`.
+    + Return this parameter.
+    + If you specify `<New number of moves>`, this parameter is updated.
+* `@lmr-search-reduction [<New reduction : Number>]`
+    + When searching shallowly, the depth is the actual depth
+      minus this parameter.
+    + Return this parameter.
+    + If you specify `<New reduction>`, this parameter is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-lmr #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-lmr))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@lmr-limit-depth 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@lmr-limit-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@lmr-move-threshold 0.8))
+    ;; Output
+    ;; > 0.3
+    
+    (display (my-engine '@lmr-move-threshold))
+    ;; Output
+    ;; > 0.8
+    
+    (display (my-engine '@lmr-invalid-moves 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@lmr-invalid-moves))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@lmr-search-reduction 5))
+    ;; Output
+    ;; > 1
+    
+    (display (my-engine '@lmr-search-reduction))
+    ;; Output
+    ;; > 5)...";
   }
 }  // namespace Sayuri

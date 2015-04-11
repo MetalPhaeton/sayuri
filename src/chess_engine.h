@@ -1362,7 +1362,7 @@ namespace Sayuri {
        * 探索関数用キャッシュ。
        * Late Move Reduction - 実行する候補手の閾値。
        */
-      int lmr_threshold_;
+      int lmr_move_threshold_;
       /**
        * 探索関数用キャッシュ。
        * Late Move Reduction - 無効にする先頭の候補手の数。
