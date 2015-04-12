@@ -45,6 +45,12 @@
 <li><a href="#history-heuristics">History Heuristics</a></li>
 <li><a href="#killer-move-heuristics">Killer Move Heuristics</a></li>
 <li><a href="#transposition-table">Transposition Table</a></li>
+<li><a href="#internal-iterative-deepening">Internal Iterative Deepening</a></li>
+<li><a href="#null-move-reduction">Null Move Reduction</a></li>
+<li><a href="#probcut">ProbCut</a></li>
+<li><a href="#history-pruning">History Pruning</a></li>
+<li><a href="#late-move-reduction">Late Move Reduction</a></li>
+<li><a href="#futility-pruning">Futility Pruning</a></li>
 </ul></li>
 </ul>
 <h2 id="operation-of-chess-board">Operation of Chess Board</h2>
@@ -328,7 +334,7 @@
 <ul>
 <li><code>@correct-position?</code>
 <ul>
-<li>Judges if it is position or not.
+<li>Judges whether it is position or not.
 <ul>
 <li>If Pawn is on 1st or 8th rank, it returns #f.</li>
 <li>When turn to move is White, if Black King is checked, then it returns #f.</li>
@@ -349,11 +355,11 @@
 <ul>
 <li><code>@white-checked?</code>
 <ul>
-<li>Judges if White King is checked or not.</li>
+<li>Judges whether White King is checked or not.</li>
 </ul></li>
 <li><code>@black-checked?</code>
 <ul>
-<li>Judges if Black King is checked or not.</li>
+<li>Judges whether Black King is checked or not.</li>
 </ul></li>
 </ul>
 <p><strong>Example</strong></p>
@@ -384,11 +390,11 @@
 <ul>
 <li><code>@checkmated?</code>
 <ul>
-<li>Judges if either King is checkmated or not.</li>
+<li>Judges whether either King is checkmated or not.</li>
 </ul></li>
 <li><code>@stalemated?</code>
 <ul>
-<li>Judges if either King is stalemated or not.</li>
+<li>Judges whether either King is stalemated or not.</li>
 </ul></li>
 </ul>
 <p><strong>Example</strong></p>
@@ -643,7 +649,7 @@
 ;; Output
 :: &gt; #f</code></pre>
 <h3 id="repetition-check">Repetition Check</h3>
-<p>&quot;Repetition Check&quot; is a function for checking if the position has repeated or not.<br />If &quot;Repetition Check&quot; has found the position is repeated at the current node, the search function stops searching and returns 0 cp to the parent node.</p>
+<p>&quot;Repetition Check&quot; is a function for checking whether the position has repeated or not.<br />If &quot;Repetition Check&quot; has found the position is repeated at the current node, the search function stops searching and returns 0 cp to the parent node.</p>
 <ul>
 <li><code>@enable-repetition-check [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -685,7 +691,7 @@
 <ul>
 <li><code>@ybwc-limit-depth [&lt;New depth : Number&gt;]</code>
 <ul>
-<li>If remaining depths is less than this parameter, YBWC is invalidated.</li>
+<li>If remaining depth is less than this parameter, YBWC is invalidated.</li>
 <li>Return this parameter.</li>
 <li>If you specify <code>&lt;New depth&gt;</code>, this parameter is updated.</li>
 </ul></li>
@@ -724,7 +730,7 @@
 </ul></li>
 <li><code>@aspiration-windows-limit-depth [&lt;New depth : Number&gt;]</code>
 <ul>
-<li>If remaining depths is less than this parameter at the root node, Aspiration Windows is invalidated.</li>
+<li>If remaining depth is less than this parameter at the root node, Aspiration Windows is invalidated.</li>
 <li>Return this parameter.</li>
 <li>If you specify <code>&lt;New depth&gt;</code>, this parameter is updated.</li>
 </ul></li>
@@ -846,7 +852,7 @@
 </ul></li>
 <li><code>@iid-limit-depth [&lt;New depth : Number&gt;]</code>
 <ul>
-<li>If remaining depths is less than this parameter, Internal Iterative Deepening is invalidated.</li>
+<li>If remaining depth is less than this parameter, Internal Iterative Deepening is invalidated.</li>
 <li>Return this parameter.</li>
 <li>If you specify <code>&lt;New depth&gt;</code>, this parameter is updated.</li>
 </ul></li>
@@ -883,6 +889,345 @@
 (display (my-engine &#39;@iid-search-depth))
 ;; Output
 ;; &gt; 10</code></pre>
+<h3 id="null-move-reduction">Null Move Reduction</h3>
+<p>&quot;Null Move Reduction&quot; is one of Forward Pruning technique.<br />&quot;Null Move&quot; means that one side gives another side turn to move without moving piece.<br />On Non PV Node...</p>
+<ol style="list-style-type: decimal">
+<li>Does Null Move and searches shallowly and gets score.</li>
+<li>If the score is greater than or equals to Beta, the remaining depth is reduced a few.</li>
+<li>Does normal search with the new remaining depth.</li>
+</ol>
+<ul>
+<li><code>@enable-nmr [&lt;New setting : Boolean&gt;]</code>
+<ul>
+<li>Returns whether Null Move Reduction is enabled or not.</li>
+<li>If you specify #t to <code>&lt;New setting&gt;</code>, Null Move Reduction is set to be enabled. Otherwise, it is set to be disabled.</li>
+</ul></li>
+<li><code>@nmr-limit-depth [&lt;New depth : Number&gt;]</code>
+<ul>
+<li>If remaining depth is less than this parameter, Null Move Reduction is invalidated.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New depth&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@nmr-search-reduction [&lt;New reduction : Number&gt;]</code>
+<ul>
+<li>When searching shallowly, the depth is the actual depth minus this parameter.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New reduction&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@nmr-reduction [&lt;New reduction : Number&gt;]</code>
+<ul>
+<li>If the score is greater than or equals to Beta, the remaining depth is reduced by this parameter.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New reduction&gt;</code>, this parameter is updated.</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define my-engine (gen-engine))
+
+(display (my-engine &#39;@enable-nmr #f))
+;; Output
+;; &gt; #t
+
+(display (my-engine &#39;@enable-nmr))
+;; Output
+;; &gt; #f
+
+(display (my-engine &#39;@nmr-limit-depth 10))
+;; Output
+;; &gt; 4
+
+(display (my-engine &#39;@nmr-limit-depth))
+;; Output
+;; &gt; 10
+
+(display (my-engine &#39;@nmr-search-reduction 10))
+;; Output
+;; &gt; 4
+
+(display (my-engine &#39;@nmr-search-reduction))
+;; Output
+;; &gt; 10
+
+(display (my-engine &#39;@nmr-reduction 10))
+;; Output
+;; &gt; 3
+
+(display (my-engine &#39;@nmr-reduction))
+;; Output
+;; &gt; 10</code></pre>
+<h3 id="probcut">ProbCut</h3>
+<p>&quot;ProbCut&quot; is one of Forward Pruning technique.<br />On Non PV Node, by Zero Window Search with temporary Beta(the current Beta plus margin), &quot;ProbCut&quot; judges whether the current node occurs Beta Cut or not.<br />If it has judged that Beta Cut is occurred, it stops searching the current node and returns Beta.</p>
+<ul>
+<li><code>@enable-probcut [&lt;New setting : Boolean&gt;]</code>
+<ul>
+<li>Returns whether ProbCut is enabled or not.</li>
+<li>If you specify #t to <code>&lt;New setting&gt;</code>, ProbCut is set to be enabled. Otherwise, it is set to be disabled.</li>
+</ul></li>
+<li><code>@probcut-limit-depth [&lt;New depth : Number&gt;]</code>
+<ul>
+<li>If remaining depth is less than this parameter, ProbCut is invalidated.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New depth&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@probcut-margin [&lt;New margin : Number&gt;]</code>
+<ul>
+<li>When Zero Window Search, ProbCut uses the current Beta plus this parameter as temporary Beta.</li>
+</ul></li>
+<li><code>@probcut-search-reduction [&lt;New reduction : Number&gt;]</code>
+<ul>
+<li>When Zero Window Search, the depth is the actual depth minus this parameter.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New reduction&gt;</code>, this parameter is updated.</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define my-engine (gen-engine))
+
+(display (my-engine &#39;@enable-probcut #t))
+;; Output
+;; &gt; #f
+
+(display (my-engine &#39;@enable-probcut))
+;; Output
+;; &gt; #t
+
+(display (my-engine &#39;@probcut-limit-depth 10))
+;; Output
+;; &gt; 4
+
+(display (my-engine &#39;@probcut-limit-depth))
+;; Output
+;; &gt; 10
+
+(display (my-engine &#39;@probcut-margin 1200))
+;; Output
+;; &gt; 400
+
+(display (my-engine &#39;@probcut-margin))
+;; Output
+;; &gt; 1200
+
+(display (my-engine &#39;@probcut-search-reduction 10))
+;; Output
+;; &gt; 3
+
+(display (my-engine &#39;@probcut-search-reduction))
+;; Output
+;; &gt; 10</code></pre>
+<h3 id="history-pruning">History Pruning</h3>
+<p>&quot;History Pruning&quot; is one of Forward Pruning technique.<br />&quot;History Pruning&quot; uses &quot;History Heuristics&quot;. So If you want to this technique, <a href="#history-heuristics"><code>@enable-history</code></a> must be enabled. On Non PV Node, when searching each candidate moves, if the history value of the move is lower than the max history times the threshold, the move is searched with reduced depth.</p>
+<ul>
+<li><code>@enable-history-pruning [&lt;New setting : Boolean&gt;]</code>
+<ul>
+<li>Returns whether History Pruning is enabled or not.</li>
+<li>If you specify #t to <code>&lt;New setting&gt;</code>, History Pruning is set to be enabled. Otherwise, it is set to be disabled.</li>
+</ul></li>
+<li><code>@history-pruning-limit-depth [&lt;New depth : Number&gt;]</code>
+<ul>
+<li>If remaining depth is less than this parameter, History Pruning is invalidated.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New depth&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@history-pruning-move-threshold [&lt;New threshold : Number&gt;]</code>
+<ul>
+<li>If the number of the candidate move is less than the number of all moves times this parameter, History Pruning is invalidated.</li>
+<li>This parameter is between 0.0 and 1.0.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New threshold&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@history-pruning-invalid-moves [&lt;New number of moves : Number&gt;]</code>
+<ul>
+<li>If the number of the candidate moves is less than this parameter, History Pruning is invalidated.</li>
+<li>This parameter is given priority to <code>@history-pruning-move-threshold</code>.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New number of moves&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@history-pruning-threshold [&lt;New threshold : Number&gt;]</code>
+<ul>
+<li>If the history value of the current candidate move is lower than the max history value times this parameter, History Pruning temporarily reduces the remaining depth.</li>
+<li>This parameter is between 0.0 and 1.0.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New threshold&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@history-pruning-reduction [&lt;New reduction : Number&gt;]</code>
+<ul>
+<li>When History Pruning reduces the remaining depth, a new depth is the current depth minus this parameter.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New reduction&gt;</code>, this parameter is updated.</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define my-engine (gen-engine))
+
+(display (my-engine &#39;@enable-history-pruning #t))
+;; Output
+;; &gt; #f
+
+(display (my-engine &#39;@enable-history-pruning))
+;; Output
+;; &gt; #t
+
+(display (my-engine &#39;@history-pruning-limit-depth 10))
+;; Output
+;; &gt; 4
+
+(display (my-engine &#39;@history-pruning-limit-depth))
+;; Output
+;; &gt; 10
+
+(display (my-engine &#39;@history-pruning-move-threshold 0.8))
+;; Output
+;; &gt; 0.6
+
+(display (my-engine &#39;@history-pruning-move-threshold))
+;; Output
+;; &gt; 0.8
+
+(display (my-engine &#39;@history-pruning-invalid-moves 20))
+;; Output
+;; &gt; 10
+
+(display (my-engine &#39;@history-pruning-invalid-moves))
+;; Output
+;; &gt; 20
+
+(display (my-engine &#39;@history-pruning-threshold 0.8))
+;; Output
+;; &gt; 0.5
+
+(display (my-engine &#39;@history-pruning-threshold))
+;; Output
+;; &gt; 0.8
+
+(display (my-engine &#39;@history-pruning-reduction 10))
+;; Output
+;; &gt; 1
+
+(display (my-engine &#39;@history-pruning-reduction))
+;; Output
+;; &gt; 10</code></pre>
+<h3 id="late-move-reduction">Late Move Reduction</h3>
+<p>&quot;Late Move Reduction&quot; is one of Forward Pruning technique.<br />When candidate moves are ordered, &quot;Late Move Reduction&quot; regards latter candidate moves as they returns lower score than Alpha and runs shallow Zero Window Search by Alpha.<br />If Fail-Low has been occurred, the move is ignored. But if Fail-Hight has been occurred, the move is searched normally again.</p>
+<ul>
+<li><code>@enable-lmr [&lt;New setting : Boolean&gt;]</code>
+<ul>
+<li>Returns whether Late Move Reduction is enabled or not.</li>
+<li>If you specify #t to <code>&lt;New setting&gt;</code>, Late Move Reduction is set to be enabled. Otherwise, it is set to be disabled.</li>
+</ul></li>
+<li><code>@lmr-limit-depth [&lt;New depth : Number&gt;]</code>
+<ul>
+<li>If remaining depth is less than this parameter, Late Move Reduction is invalidated.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New depth&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@lmr-move-threshold [&lt;New threshold : Number&gt;]</code>
+<ul>
+<li>If the number of the candidate move is less than the number of all moves times this parameter, Late Move Reduction is invalidated.</li>
+<li>This parameter is between 0.0 and 1.0.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New threshold&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@lmr-invalid-moves [&lt;New number of moves : Number&gt;]</code>
+<ul>
+<li>If the number of the candidate moves is less than this parameter, Late Move Reduction is invalidated.</li>
+<li>This parameter is given priority to <code>@lmr-move-threshold</code>.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New number of moves&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@lmr-search-reduction [&lt;New reduction : Number&gt;]</code>
+<ul>
+<li>When searching shallowly, the depth is the actual depth minus this parameter.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New reduction&gt;</code>, this parameter is updated.</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define my-engine (gen-engine))
+
+(display (my-engine &#39;@enable-lmr #f))
+;; Output
+;; &gt; #t
+
+(display (my-engine &#39;@enable-lmr))
+;; Output
+;; &gt; #f
+
+(display (my-engine &#39;@lmr-limit-depth 10))
+;; Output
+;; &gt; 4
+
+(display (my-engine &#39;@lmr-limit-depth))
+;; Output
+;; &gt; 10
+
+(display (my-engine &#39;@lmr-move-threshold 0.8))
+;; Output
+;; &gt; 0.3
+
+(display (my-engine &#39;@lmr-move-threshold))
+;; Output
+;; &gt; 0.8
+
+(display (my-engine &#39;@lmr-invalid-moves 10))
+;; Output
+;; &gt; 4
+
+(display (my-engine &#39;@lmr-invalid-moves))
+;; Output
+;; &gt; 10
+
+(display (my-engine &#39;@lmr-search-reduction 5))
+;; Output
+;; &gt; 1
+
+(display (my-engine &#39;@lmr-search-reduction))
+;; Output
+;; &gt; 5</code></pre>
+<h3 id="futility-pruning">Futility Pruning</h3>
+<p>&quot;Futility Pruning&quot; is one of Forward Pruning technique.<br />On near leaf node, &quot;Futility Pruning&quot; judges whether the candidate move should be evaluated or not.<br />If the material after the move is lower than Alpha minus margin, &quot;Futility Pruning&quot; judges that the move doesn't have to be evaluated and skips it.</p>
+<ul>
+<li><code>@enable-futility-pruning [&lt;New setting : Boolean&gt;]</code>
+<ul>
+<li>Returns whether Futility Pruning is enabled or not.</li>
+<li>If you specify #t to <code>&lt;New setting&gt;</code>, Futility Pruning is set to be enabled. Otherwise, it is set to be disabled.</li>
+</ul></li>
+<li><code>@futility-pruning-depth [&lt;New depth : Number&gt;]</code>
+<ul>
+<li>If the remaining depth is less than or equals to this parameter, Futility Pruning is executed.</li>
+<li>Return this parameter.</li>
+<li>If you specify <code>&lt;New reduction&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@futility-pruning-margin [&lt;New margin : Number&gt;]</code>
+<ul>
+<li>If the material after the move is lower than Alpha minus this parameter, the move is not evaluated.</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define my-engine (gen-engine))
+
+(display (my-engine &#39;@enable-futility-pruning #f))
+;; Output
+;; &gt; #t
+
+(display (my-engine &#39;@enable-futility-pruning))
+;; Output
+;; &gt; #f
+
+(display (my-engine &#39;@futility-pruning-depth 10))
+;; Output
+;; &gt; 3
+
+(display (my-engine &#39;@futility-pruning-depth))
+;; Output
+;; &gt; 10
+
+(display (my-engine &#39;@futility-pruning-margin 1200))
+;; Output
+;; &gt; 400
+
+(display (my-engine &#39;@futility-pruning-margin))
+;; Output
+;; &gt; 1200</code></pre>
 
 </section>
 </div>

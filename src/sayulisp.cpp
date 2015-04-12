@@ -3004,7 +3004,7 @@ __Example__
     ;; > (B1 A3 EMPTY))
 
 * `@correct-position?`
-    + Judges if it is position or not.
+    + Judges whether it is position or not.
         - If Pawn is on 1st or 8th rank, it returns #f.
         - When turn to move is White, if Black King is checked,
           then it returns #f.
@@ -3024,9 +3024,9 @@ __Example__
     ;; > #f
 
 * `@white-checked?`
-    + Judges if White King is checked or not.
+    + Judges whether White King is checked or not.
 * `@black-checked?`
-    + Judges if Black King is checked or not.
+    + Judges whether Black King is checked or not.
 
 __Example__
 
@@ -3056,9 +3056,9 @@ __Example__
     ;; > #f
 
 * `@checkmated?`
-    + Judges if either King is checkmated or not.
+    + Judges whether either King is checkmated or not.
 * `@stalemated?`
-    + Judges if either King is stalemated or not.
+    + Judges whether either King is stalemated or not.
 
 __Example__
 

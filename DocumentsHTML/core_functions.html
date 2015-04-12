@@ -57,18 +57,18 @@
 </ul></li>
 <li><a href="#predicate-functions">Predicate Functions</a>
 <ul>
-<li><a href="#equal"><code>equal?</code></a> : Judge if they are same or not.</li>
-<li><a href="#pair"><code>pair?</code></a> : Judge if they are Pair or not.</li>
-<li><a href="#list"><code>list?</code></a> : Judge if they are List or not.</li>
-<li><a href="#nil"><code>nil?</code></a> : Judge if they are Nil or not.
+<li><a href="#equal"><code>equal?</code></a> : Judge whether they are same or not.</li>
+<li><a href="#pair"><code>pair?</code></a> : Judge whether they are Pair or not.</li>
+<li><a href="#list"><code>list?</code></a> : Judge whether they are List or not.</li>
+<li><a href="#nil"><code>nil?</code></a> : Judge whether they are Nil or not.
 <ul>
 <li><code>null?</code></li>
 </ul></li>
-<li><a href="#symbol"><code>symbol?</code></a> : Judge if they are Symbol or not.</li>
-<li><a href="#number"><code>number?</code></a> : Judge if they are Number or not.</li>
-<li><a href="#boolean"><code>boolean?</code></a> Judge if they are Boolean or not.:</li>
-<li><a href="#string"><code>string?</code></a> : Judge if they are String or not.</li>
-<li><a href="#function"><code>function?</code></a> : Judge if they are Function or not.</li>
+<li><a href="#symbol"><code>symbol?</code></a> : Judge whether they are Symbol or not.</li>
+<li><a href="#number"><code>number?</code></a> : Judge whether they are Number or not.</li>
+<li><a href="#boolean"><code>boolean?</code></a> Judge whether they are Boolean or not.:</li>
+<li><a href="#string"><code>string?</code></a> : Judge whether they are String or not.</li>
+<li><a href="#function"><code>function?</code></a> : Judge whether they are Function or not.</li>
 <li><a href="#native-function"><code>native-function?</code></a> : Judge if they are Native Function or not.</li>
 <li><a href="#procedure"><code>procedure?</code></a> : Judge if they are Function or Native Function or not.</li>
 </ul></li>
@@ -91,7 +91,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Exit from Sayulisp.</li>
+<li>Exits from Sayulisp.</li>
 <li><code>&lt;Status&gt;</code> is Exit Status. Default is '0'.</li>
 </ul>
 <p><strong>Example</strong></p>
@@ -108,8 +108,8 @@
 </ol>
 <p><strong>Description</strong></p>
 <ul>
-<li>1: Return descriptions of all symbols.</li>
-<li>2: Return a description of <code>&lt;Symbol&gt;</code>.</li>
+<li>1: Returns descriptions of all symbols.</li>
+<li>2: Returns a description of <code>&lt;Symbol&gt;</code>.</li>
 <li>All descriptions are Markdown format.</li>
 </ul>
 <p><strong>Example</strong></p>
@@ -126,7 +126,7 @@
 ;; &gt;
 ;; &gt; __Description__
 ;; &gt;
-;; &gt; * Return the 1st element of `&lt;List&gt;`.
+;; &gt; * Returns the 1st element of `&lt;List&gt;`.
 ;; &gt;
 ;; &gt; __Example__
 ;; &gt;
@@ -142,7 +142,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Evaluate <code>&lt;Object&gt;</code>.</li>
+<li>Evaluates <code>&lt;Object&gt;</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(define x &#39;(+ 1 2 3))
@@ -164,7 +164,7 @@
 <ul>
 <li><code>&lt;Object&gt;</code> is not Evaluated.</li>
 </ul></li>
-<li>Return <code>&lt;Object&gt;</code> as is.</li>
+<li>Returns <code>&lt;Object&gt;</code> as is.</li>
 <li>Syntactic suger is <code>'&lt;Object&gt;</code></li>
 </ul>
 <p><strong>Example</strong></p>
@@ -201,9 +201,9 @@
 <li>1: <code>&lt;Symbol&gt;</code> isn't evaluated.</li>
 <li>2: All arguments isn't evaluated.</li>
 </ul></li>
-<li>Bind something to its scope.</li>
-<li>1: Bind <code>&lt;Object&gt;</code> to <code>&lt;Symbol&gt;</code>.</li>
-<li>2: Define <code>&lt;S-Expression&gt;</code> as Function named <code>&lt;Name&gt;</code>, and <code>&lt;Args&gt;...</code> is names of its arguments.</li>
+<li>Binds something to its scope.</li>
+<li>1: Binds <code>&lt;Object&gt;</code> to <code>&lt;Symbol&gt;</code>.</li>
+<li>2: Defines <code>&lt;S-Expression&gt;</code> as Function named <code>&lt;Name&gt;</code>, and <code>&lt;Args&gt;...</code> is names of its arguments.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(define x 123)
@@ -230,7 +230,7 @@
 <ul>
 <li><code>&lt;Symbol&gt;</code> isn't evaluated.</li>
 </ul></li>
-<li>Update <code>&lt;Symbol&gt;</code> to <code>&lt;Object&gt;</code> on the local scope.</li>
+<li>Updates <code>&lt;Symbol&gt;</code> to <code>&lt;Object&gt;</code> on the local scope.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(define x 123)
@@ -262,7 +262,7 @@
 <ul>
 <li>All arguments isn't evaluated.</li>
 </ul></li>
-<li>Return Function defined by <code>&lt;S-Expression&gt;...</code>.</li>
+<li>Returns Function defined by <code>&lt;S-Expression&gt;...</code>.</li>
 <li>(lambda) inherits parent's scope and creates its own local scope. So using (lambda) in (lambda), you can create closure function.</li>
 <li><code>&lt;Args&gt;...</code> is Symbols as name of arguments.</li>
 </ul>
@@ -293,7 +293,7 @@
 <li><code>&lt;Name : Symbol&gt;</code> isn't evaluated.</li>
 <li>But <code>&lt;Object&gt;</code> and <code>&lt;S-Expression&gt;</code> are evaluated.</li>
 </ul></li>
-<li>Execute <code>&lt;S-Expression&gt;...</code> in new local scope.</li>
+<li>Executes <code>&lt;S-Expression&gt;...</code> in new local scope.</li>
 <li>(let) inherits parent's scope and creates its own local scope. So using (lambda) in (let), you can create closure function.</li>
 <li><code>(&lt;Name&gt; &lt;Object&gt;)...</code> is local values on (let)'s local scope.</li>
 </ul>
@@ -313,7 +313,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Execute <code>&lt;S-Expression&gt;...</code> in turns and return last.</li>
+<li>Executes <code>&lt;S-Expression&gt;...</code> in turns and returns last.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (begin
@@ -336,7 +336,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Parse <code>&lt;S-Expression&gt;</code> and generate a object.</li>
+<li>Parses <code>&lt;S-Expression&gt;</code> and generates a object.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (parse &quot;(1 2 3)&quot;))
@@ -355,7 +355,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Convert <code>&lt;Object&gt;</code> to S-Expression as String.</li>
+<li>Converts <code>&lt;Object&gt;</code> to S-Expression as String.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (to-string &#39;(1 2 3)))
@@ -381,10 +381,10 @@
 <ul>
 <li><code>&lt;Catch Expr&gt;...</code> is evaluated if an error have been occurred in <code>&lt;Try Expr&gt;...</code>.</li>
 </ul></li>
-<li>Handle exceptions.</li>
+<li>Handles exceptions.</li>
 <li>If an exception occurs in <code>&lt;Try Expr&gt;...</code>, then it stops <code>&lt;Try Expr&gt;...</code> and executes <code>&lt;Catch Expr&gt;...</code>.</li>
 <li>In a scope of <code>&lt;Catch Expr&gt;...</code>, 'exception' symbol is defined.</li>
-<li>Return a object evaluated at the end.</li>
+<li>Returns a evaluated last object.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(try ((+ 1 &quot;Hello&quot;))
@@ -407,7 +407,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Throw an exception.</li>
+<li>Throws an exception.</li>
 <li>If you use this in (try) function, <code>&lt;Object&gt;</code> is bound to 'exception' symbol.</li>
 </ul>
 <p><strong>Example</strong></p>
@@ -424,8 +424,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return Car value of <code>&lt;Pair or List&gt;</code></li>
-<li>Return the 1st element of <code>&lt;Pair or List&gt;</code>.</li>
+<li>Returns Car value of <code>&lt;Pair or List&gt;</code></li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (car &#39;(111 . 222)))
@@ -445,8 +444,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return Cdr value of <code>&lt;Pair or List&gt;</code></li>
-<li>Return List consists of after the 1st element of <code>&lt;Pair or List&gt;</code>.</li>
+<li>Returns Cdr value of <code>&lt;Pair or List&gt;</code></li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (cdr &#39;(111 . 222)))
@@ -466,7 +464,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return Pair. Car is <code>&lt;Object 1&gt;</code>, Cdr is <code>&lt;Object 2&gt;</code>.</li>
+<li>Returns Pair. Car is <code>&lt;Object 1&gt;</code>, Cdr is <code>&lt;Object 2&gt;</code>.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (cons 111 222))
@@ -538,7 +536,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if all <code>&lt;Object&gt;...</code> are same structure. If not, return #f.</li>
+<li>Returns #t if all <code>&lt;Object&gt;...</code> are same structure. Otherwise, returns #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (equal? &#39;(1 2 (3 4) 5) &#39;(1 2 (3 4) 5)))
@@ -553,7 +551,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if all <code>&lt;Object&gt;...</code> are Pair. If not, return #f.</li>
+<li>Returns #t if all <code>&lt;Object&gt;...</code> are Pair. Otherwise, returns #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (pair? &#39;(1 2 3) &#39;(4 5 6)))
@@ -568,7 +566,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if all <code>&lt;Object&gt;...</code> are List. If not, return #f.</li>
+<li>Returns #t if all <code>&lt;Object&gt;...</code> are List. Otherwise, returns #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (list? &#39;(1 2 3) &#39;(4 5 6) ()))
@@ -584,7 +582,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if all <code>&lt;Object&gt;...</code> are Nil. If not, return #f.</li>
+<li>Returns #t if all <code>&lt;Object&gt;...</code> are Nil. Otherwise, returns #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (nil? ()))
@@ -599,7 +597,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if all <code>&lt;Object&gt;...</code> are Symbol. If not, return #f.</li>
+<li>Returns #t if all <code>&lt;Object&gt;...</code> are Symbol. Otherwise, returns #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (symbol? &#39;x))
@@ -614,7 +612,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if all <code>&lt;Object&gt;...</code> are Number. If not, return #f.</li>
+<li>Returns #t if all <code>&lt;Object&gt;...</code> are Number. Otherwise, returns #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (number? 123))
@@ -629,7 +627,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if all <code>&lt;Object&gt;...</code> are Boolean. If not, return #f.</li>
+<li>Returns #t if all <code>&lt;Object&gt;...</code> are Boolean. Otherwise, returns #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (boolean? #f))
@@ -644,7 +642,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if all <code>&lt;Object&gt;...</code> are String. If not, return #f.</li>
+<li>Returns #t if all <code>&lt;Object&gt;...</code> are String. Otherwise, returns #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (string? &quot;Hello&quot;))
@@ -659,7 +657,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if all <code>&lt;Object&gt;...</code> are Function. If not, return #f.</li>
+<li>Returns #t if all <code>&lt;Object&gt;...</code> are Function. Otherwise, returns #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(define myfunc (lambda (x) (+ x 1)))
@@ -675,7 +673,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if all <code>&lt;Object&gt;...</code> are Native Function. If not, return #f.</li>
+<li>Returns #t if all <code>&lt;Object&gt;...</code> are Native Function. Otherwise, returns #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(display (native-function? +))
@@ -690,7 +688,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return #t if all <code>&lt;Object&gt;...</code> are Function or Native Function. If not, return #f.</li>
+<li>Returns #t if all <code>&lt;Object&gt;...</code> are Function or Native Function. Otherwise, returns #f.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(define myfunc (lambda (x) (+ x 1)))
@@ -705,7 +703,6 @@
 ;; Output
 ;;
 ;; &gt; #t</code></pre>
-<h2 id="io-stream-functions">IO Stream Functions</h2>
 <h3 id="display">display</h3>
 <p><strong>Usage</strong></p>
 <ul>
@@ -713,7 +710,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Print <code>&lt;Object&gt;</code> on Standard Output.</li>
+<li>Prints <code>&lt;Object&gt;</code> on Standard Output.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(define x 123)
@@ -736,23 +733,23 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Return String from Standard Input.</li>
+<li>Returns String from Standard Input.</li>
 <li><code>&lt;Message Symbol&gt;</code> is a message to the input stream.
 <ul>
-<li><code>@get</code> : Read one charactor.</li>
-<li><code>@read-line</code> : Read one line. ('LF(CR+LF)' is omitted.)</li>
-<li><code>@read</code> : Read all.</li>
+<li><code>@get</code> : Reads one charactor.</li>
+<li><code>@read-line</code> : Reads one line. ('LF(CR+LF)' is omitted.)</li>
+<li><code>@read</code> : Reads all.</li>
 </ul></li>
 <li>If Standard Input is already closed, it returns Nil.</li>
 </ul>
 <p><strong>Example</strong></p>
-<pre><code>;; Read and show one charactor from Standard Input.
+<pre><code>;; Reads and shows one charactor from Standard Input.
 (display (stdin &#39;@get))
 
-;; Read and show one line from Standard Input.
+;; Reads and shows one line from Standard Input.
 (display (stdin &#39;@read-line))
 
-;; Read and show all from Standard Input.
+;; Reads and shows all from Standard Input.
 (display (stdin &#39;@read))</code></pre>
 <h3 id="stdout">stdout</h3>
 <p><strong>Usage</strong></p>
@@ -761,7 +758,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Print <code>&lt;String&gt;</code> on Standard Output.</li>
+<li>Prints <code>&lt;String&gt;</code> on Standard Output.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(stdout (to-string 123))
@@ -777,7 +774,7 @@
 </ul>
 <p><strong>Description</strong></p>
 <ul>
-<li>Print <code>&lt;String&gt;</code> on Standard Error.</li>
+<li>Prints <code>&lt;String&gt;</code> on Standard Error.</li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(stderr (to-string 123))
@@ -794,18 +791,18 @@
 </ol>
 <p><strong>Description</strong></p>
 <ul>
-<li>1: Return Native Function as an output stream of <code>&lt;File name&gt;</code>.</li>
-<li>2: Write <code>&lt;String&gt;</code> to <code>&lt;File name&gt;</code> and return itself.</li>
+<li>1: Returns Native Function as an output stream of <code>&lt;File name&gt;</code>.</li>
+<li>2: Writes <code>&lt;String&gt;</code> to <code>&lt;File name&gt;</code> and returns itself.</li>
 <li>If you give Nil to the Function, the stream will be closed.</li>
 </ul>
 <p><strong>Example</strong></p>
-<pre><code>;; Open &quot;hello.txt&quot;.
+<pre><code>;; Opens &quot;hello.txt&quot;.
 (define myfile (output-stream &quot;hello.txt&quot;))
 
-;; Write &quot;Hello World&quot; to &quot;hello.txt&quot;.
+;; Writes &quot;Hello World&quot; to &quot;hello.txt&quot;.
 (myfile &quot;Hello World\n&quot;)
 
-;; Close &quot;hello.txt&quot;.
+;; Closes &quot;hello.txt&quot;.
 (myfile ())</code></pre>
 <h3 id="input-stream">input-stream</h3>
 <p><strong>Usage</strong></p>
@@ -815,31 +812,31 @@
 </ol>
 <p><strong>Description</strong></p>
 <ul>
-<li>1: Return Native Function as an input stream of <code>&lt;File name&gt;</code>.</li>
-<li>2: Return String from <code>&lt;File name&gt;</code>.</li>
+<li>1: Returns Native Function as an input stream of <code>&lt;File name&gt;</code>.</li>
+<li>2: Returns String from <code>&lt;File name&gt;</code>.</li>
 <li>2: <code>&lt;Message Symbol&gt;</code> is a message to the input stream.
 <ul>
-<li><code>@get</code> : Read one charactor.</li>
-<li><code>@read-line</code> : Read one line. ('LF(CR+LF)' is omitted.)</li>
-<li><code>@read</code> : Read all.</li>
+<li><code>@get</code> : Reads one charactor.</li>
+<li><code>@read-line</code> : Reads one line. ('LF(CR+LF)' is omitted.)</li>
+<li><code>@read</code> : Reads all.</li>
 </ul></li>
 <li>If you give Nil to the stream, it will be closed.</li>
 <li>If the stream already closed, it returns empty string.</li>
 </ul>
 <p><strong>Example</strong></p>
-<pre><code>;; Open &quot;hello.txt&quot;.
+<pre><code>;; Opens &quot;hello.txt&quot;.
 (define myfile (input-stream &quot;hello.txt&quot;))
 
-;; Read and show one charactor from &quot;hello.txt&quot;.
+;; Reads and shows one charactor from &quot;hello.txt&quot;.
 (display (myfile &#39;@get))
 
-;; Read and show one line from &quot;hello.txt&quot;.
+;; Reads and shows one line from &quot;hello.txt&quot;.
 (display (myfile &#39;@read-line))
 
-;; Read and show all from &quot;hello.txt&quot;.
+;; Reads and shows all from &quot;hello.txt&quot;.
 (display (myfile &#39;@read))
 
-;; Close &quot;hello.txt&quot;.
+;; Closes &quot;hello.txt&quot;.
 (myfile ())</code></pre>
 
 </section>
