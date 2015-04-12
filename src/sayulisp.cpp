@@ -962,6 +962,42 @@ namespace Sayuri {
 
       return SetLMRSearchReduction(*reduction_ptr);
 
+    } else if (message_symbol == "@enable-futility-pruning") {
+      LispObjectPtr enable_ptr = LispObject::NewNil();
+      if (list_itr) {
+        enable_ptr = caller.Evaluate(*list_itr);
+        if (!(enable_ptr->IsBoolean())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Boolean", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetEnableFutilityPruning(*enable_ptr);
+
+    } else if (message_symbol == "@futility-pruning-depth") {
+      LispObjectPtr depth_ptr = LispObject::NewNil();
+      if (list_itr) {
+        depth_ptr = caller.Evaluate(*list_itr);
+        if (!(depth_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetFutilityPruningDepth(*depth_ptr);
+
+    } else if (message_symbol == "@futility-pruning-margin") {
+      LispObjectPtr margin_ptr = LispObject::NewNil();
+      if (list_itr) {
+        margin_ptr = caller.Evaluate(*list_itr);
+        if (!(margin_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetFutilityPruningMargin(*margin_ptr);
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
@@ -3743,6 +3779,48 @@ __Example__
     
     (display (my-engine '@lmr-search-reduction))
     ;; Output
-    ;; > 5)...";
+    ;; > 5
+
+* `@enable-futility-pruning [<New setting : Boolean>]`
+    + Returns whether Futility Pruning is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Futility Pruning is set to be enabled.
+      Otherwise, it is set to be disabled.
+* `@futility-pruning-depth [<New depth : Number>]`
+    + If the remaining depth is less than or equals to this parameter,
+      Futility Pruning is executed.
+    + Return this parameter.
+    + If you specify `<New reduction>`, this parameter is updated.
+* `@futility-pruning-margin [<New margin : Number>]`
+    + If the material after the move is lower than Alpha minus this parameter,
+      the move is not evaluated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-futility-pruning #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-futility-pruning))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@futility-pruning-depth 10))
+    ;; Output
+    ;; > 3
+    
+    (display (my-engine '@futility-pruning-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@futility-pruning-margin 1200))
+    ;; Output
+    ;; > 400
+    
+    (display (my-engine '@futility-pruning-margin))
+    ;; Output
+    ;; > 1200)...";
   }
 }  // namespace Sayuri

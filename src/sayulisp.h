@@ -1135,6 +1135,54 @@ namespace Sayuri {
         return ret_ptr;
       }
 
+      /**
+       * SearchParams - Futility Pruningの有効無効。
+       * @param enable Futility Pruningの有効無効。
+       * @return セットされていたFutility Pruningの有効無効。
+       */
+      LispObjectPtr SetEnableFutilityPruning(const LispObject& enable) {
+        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        (search_params_ptr_->enable_futility_pruning());
+
+        if (enable.IsBoolean()) {
+          search_params_ptr_->enable_futility_pruning(enable.boolean_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - Futility Pruningを実行する深さ。
+       * @param depth 深さ。
+       * @return セットされていたFutility Pruningを実行する深さ。
+       */
+      LispObjectPtr SetFutilityPruningDepth(const LispObject& depth) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->futility_pruning_depth());
+
+        if (depth.IsNumber()) {
+          search_params_ptr_->futility_pruning_depth(depth.number_value());
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * SearchParams - Futility Pruningのマージン。
+       * @param margin マージン。
+       * @return セットされていたFutility Pruningのマージン。
+       */
+      LispObjectPtr SetFutilityPruningMargin(const LispObject& margin) {
+        LispObjectPtr ret_ptr = LispObject::NewNumber
+        (search_params_ptr_->futility_pruning_margin());
+
+        if (margin.IsNumber()) {
+          search_params_ptr_->futility_pruning_margin(margin.number_value());
+        }
+
+        return ret_ptr;
+      }
+
       // ======== //
       // アクセサ //
       // ======== //
