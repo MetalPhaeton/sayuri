@@ -1183,6 +1183,114 @@ namespace Sayuri {
         return ret_ptr;
       }
 
+      /**
+       * EvalParams - ポーンのオープニング時のポジションの価値テーブル。
+       * @param func_name 関数名。
+       * @param square_list テーブル。
+       * @return セットされていたテーブル。
+       */
+      LispObjectPtr SetPawnSquareTableOpening(const std::string& func_name,
+      const LispObject& square_list);
+
+      /**
+       * EvalParams - ナイトのオープニング時のポジションの価値テーブル。
+       * @param func_name 関数名。
+       * @param square_list テーブル。
+       * @return セットされていたテーブル。
+       */
+      LispObjectPtr SetKnightSquareTableOpening(const std::string& func_name,
+      const LispObject& square_list);
+
+      /**
+       * EvalParams - ビショップのオープニング時のポジションの価値テーブル。
+       * @param func_name 関数名。
+       * @param square_list テーブル。
+       * @return セットされていたテーブル。
+       */
+      LispObjectPtr SetBishopSquareTableOpening(const std::string& func_name,
+      const LispObject& square_list);
+
+      /**
+       * EvalParams - ルークのオープニング時のポジションの価値テーブル。
+       * @param func_name 関数名。
+       * @param square_list テーブル。
+       * @return セットされていたテーブル。
+       */
+      LispObjectPtr SetRookSquareTableOpening(const std::string& func_name,
+      const LispObject& square_list);
+
+      /**
+       * EvalParams - クイーンのオープニング時のポジションの価値テーブル。
+       * @param func_name 関数名。
+       * @param square_list テーブル。
+       * @return セットされていたテーブル。
+       */
+      LispObjectPtr SetQueenSquareTableOpening(const std::string& func_name,
+      const LispObject& square_list);
+
+      /**
+       * EvalParams - キングのオープニング時のポジションの価値テーブル。
+       * @param func_name 関数名。
+       * @param square_list テーブル。
+       * @return セットされていたテーブル。
+       */
+      LispObjectPtr SetKingSquareTableOpening(const std::string& func_name,
+      const LispObject& square_list);
+
+      /**
+       * EvalParams - ポーンのエンディング時のポジションの価値テーブル。
+       * @param func_name 関数名。
+       * @param square_list テーブル。
+       * @return セットされていたテーブル。
+       */
+      LispObjectPtr SetPawnSquareTableEnding(const std::string& func_name,
+      const LispObject& square_list);
+
+      /**
+       * EvalParams - ナイトのエンディング時のポジションの価値テーブル。
+       * @param func_name 関数名。
+       * @param square_list テーブル。
+       * @return セットされていたテーブル。
+       */
+      LispObjectPtr SetKnightSquareTableEnding(const std::string& func_name,
+      const LispObject& square_list);
+
+      /**
+       * EvalParams - ビショップのエンディング時のポジションの価値テーブル。
+       * @param func_name 関数名。
+       * @param square_list テーブル。
+       * @return セットされていたテーブル。
+       */
+      LispObjectPtr SetBishopSquareTableEnding(const std::string& func_name,
+      const LispObject& square_list);
+
+      /**
+       * EvalParams - ルークのエンディング時のポジションの価値テーブル。
+       * @param func_name 関数名。
+       * @param square_list テーブル。
+       * @return セットされていたテーブル。
+       */
+      LispObjectPtr SetRookSquareTableEnding(const std::string& func_name,
+      const LispObject& square_list);
+
+      /**
+       * EvalParams - クイーンのエンディング時のポジションの価値テーブル。
+       * @param func_name 関数名。
+       * @param square_list テーブル。
+       * @return セットされていたテーブル。
+       */
+      LispObjectPtr SetQueenSquareTableEnding(const std::string& func_name,
+      const LispObject& square_list);
+
+      /**
+       * EvalParams - キングのエンディング時のポジションの価値テーブル。
+       * @param func_name 関数名。
+       * @param square_list テーブル。
+       * @return セットされていたテーブル。
+       */
+      LispObjectPtr SetKingSquareTableEnding(const std::string& func_name,
+      const LispObject& square_list);
+
       // ======== //
       // アクセサ //
       // ======== //
