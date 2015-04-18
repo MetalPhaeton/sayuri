@@ -237,60 +237,58 @@ namespace Sayuri {
       /** 使用するチェスエンジン。 */
       const ChessEngine* engine_ptr_;
 
-      /** 評価関数で使う価値テーブル 1。 */
-      int value_table_1_[TABLE_SIZE_1][NUM_PIECE_TYPES];
+      /** 評価関数で使う、現在の駒の数。 */
+      int num_pieces_;
 
-      /** 評価関数で使う価値テーブル 2。 */
-      int value_table_2_[TABLE_SIZE_2];
+      /** 評価関数で使う、ポジショナル評価値。 */
+      int score_;
 
-      // ========================== //
-      // 評価パラメータのキャッシュ //
-      // ========================== //
+      // ==================== //
+      // 評価関数用キャッシュ //
+      // ==================== //
+      static constexpr unsigned int MAX_ATTACKS = 7 * 4;
+      static constexpr unsigned int NUM_CENTER = 4 * 4;
+      static constexpr unsigned int NUM_SWEET_CENTER = 2 * 2;
+      static constexpr unsigned int NUM_AROUND_KING = 8;
       /**
        * キャッシュを初期化する。
        */
-      void InitEvalParamsCache();
-      /**
-       * 評価パラメータのキャッシュ。
-       * オープニング時の配置の価値テーブル。
-       */
-      int opening_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES];
-      /**
-       * 評価パラメータのキャッシュ。
-       * エンディング時の配置の価値テーブル。
-       */
-      int ending_position_value_table_[NUM_PIECE_TYPES][NUM_SQUARES];
-      /**
-       * 評価パラメータのキャッシュ。
-       * 相手への攻撃の価値テーブル。
-       */
-      int attack_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
-      /**
-       * 評価パラメータのキャッシュ。
-       * 味方への防御の価値テーブル。
-       */
-      int defense_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
-      /**
-       * 評価パラメータのキャッシュ。
-       * ピンの価値テーブル。
-       */
-      int pin_value_table_
-      [NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES];
-      /**
-       * 評価パラメータのキャッシュ。
-       * ポーンの盾の配置の価値テーブル。
-       */
-      int pawn_shield_value_table_[NUM_SQUARES];
-      /**
-       * 評価パラメータのキャッシュ 1。
-       * 各種ウェイト。
-       */
-      int weight_cache_table_1_[TABLE_SIZE_1][NUM_PIECE_TYPES][NUM_SQUARES];
-      /**
-       * 評価パラメータのキャッシュ 2。
-       * 各種ウェイト。
-       */
-      int weight_cache_table_2_[TABLE_SIZE_2][NUM_SQUARES];
+      void InitCache();
+      int opening_position_cache_[NUM_SIDES][NUM_SQUARES + 1][NUM_PIECE_TYPES]
+      [NUM_SQUARES];
+      int ending_position_cache_[NUM_SIDES][NUM_SQUARES + 1][NUM_PIECE_TYPES]
+      [NUM_SQUARES];
+      int mobility_cache_[NUM_SIDES][NUM_SQUARES + 1][NUM_PIECE_TYPES]
+      [MAX_ATTACKS + 1];
+      int center_control_cache_[NUM_SIDES][NUM_SQUARES + 1][NUM_PIECE_TYPES]
+      [NUM_CENTER + 1];
+      int sweet_center_control_cache_[NUM_SIDES][NUM_SQUARES + 1]
+      [NUM_PIECE_TYPES][NUM_SWEET_CENTER + 1];
+      int development_cache_[NUM_SIDES][NUM_SQUARES + 1][NUM_PIECE_TYPES]
+      [NUM_SQUARES + 1];
+      int attack_cache_[NUM_SIDES][NUM_SQUARES + 1][NUM_PIECE_TYPES]
+      [NUM_PIECE_TYPES];
+      int defense_cache_[NUM_SIDES][NUM_SQUARES + 1][NUM_PIECE_TYPES]
+      [NUM_PIECE_TYPES];
+      int pin_cache_[NUM_SIDES][NUM_SQUARES + 1][NUM_PIECE_TYPES]
+      [NUM_PIECE_TYPES][NUM_PIECE_TYPES];
+      int attack_around_king_cache_[NUM_SIDES][NUM_SQUARES + 1]
+      [NUM_PIECE_TYPES][NUM_AROUND_KING + 1];
+      int pass_pawn_cache_[NUM_SIDES][NUM_SQUARES + 1];
+      int protected_pass_pawn_cache_[NUM_SIDES][NUM_SQUARES + 1];
+      int double_pawn_cache_[NUM_SIDES][NUM_SQUARES + 1];
+      int iso_pawn_cache_[NUM_SIDES][NUM_SQUARES + 1];
+      int pawn_shield_cache_[NUM_SIDES][NUM_SQUARES + 1][NUM_SQUARES];
+      int bishop_pair_cache_[NUM_SIDES][NUM_SQUARES + 1];
+      int bad_bishop_cache_[NUM_SIDES][NUM_SQUARES + 1][NUM_SQUARES + 1];
+      int rook_pair_cache_[NUM_SIDES][NUM_SQUARES + 1];
+      int rook_semiopen_fyle_cache_[NUM_SIDES][NUM_SQUARES + 1];
+      int rook_open_fyle_cache_[NUM_SIDES][NUM_SQUARES + 1];
+      int early_queen_launched_cache_[NUM_SIDES][NUM_SQUARES + 1]
+      [NUM_SQUARES + 1];
+      int weak_square_cache_[NUM_SIDES][NUM_SQUARES + 1][NUM_SQUARES + 1];
+      int castling_cache_[NUM_SIDES][NUM_SQUARES + 1];
+      int abandoned_castling_cache_[NUM_SIDES][NUM_SQUARES + 1];
   };
 }  // namespace Sayuri
 
