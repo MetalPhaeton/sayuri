@@ -458,15 +458,13 @@ namespace Sayuri {
 
     // パラメータ準備。
     int history_pruning_move_number =
-    Util::GetMax((num_all_moves * history_pruning_move_threshold_) >> 8,
-    history_pruning_invalid_moves_);
+    history_pruning_invalid_moves_[num_all_moves];
 
     std::uint64_t history_pruning_threshold =
     (shared_st_ptr_->history_max_ * history_pruning_threshold_) >> 8;
 
     // Late Move Reduction。
-    int lmr_move_number = Util::GetMax
-    ((num_all_moves * lmr_move_threshold_) >> 8, lmr_invalid_moves_);
+    int lmr_move_number = lmr_invalid_moves_[num_all_moves];
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // 探索終了ならループを抜ける。
@@ -974,15 +972,13 @@ namespace Sayuri {
 
     // パラメータ準備。
     int history_pruning_move_number =
-    Util::GetMax((job.num_all_moves_ * history_pruning_move_threshold_) >> 8,
-    history_pruning_invalid_moves_);
+    history_pruning_invalid_moves_[job.num_all_moves_];
 
     std::uint64_t history_pruning_threshold =
     (shared_st_ptr_->history_max_ * history_pruning_threshold_) >> 8;
 
     // Late Move Reduction。
-    int lmr_move_number = Util::GetMax
-    ((job.num_all_moves_ * lmr_move_threshold_) >> 8, lmr_invalid_moves_);
+    int lmr_move_number = lmr_invalid_moves_[job.num_all_moves_];
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // 探索終了ならループを抜ける。
@@ -1143,8 +1139,7 @@ namespace Sayuri {
     int move_number = 0;
 
     // パラメータを準備。
-    int lmr_move_number = Util::GetMax
-    ((job.num_all_moves_ * lmr_move_threshold_) >> 8, lmr_invalid_moves_);
+    int lmr_move_number = lmr_invalid_moves_[job.num_all_moves_];
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       if (JudgeToStop(job.level_)) break;

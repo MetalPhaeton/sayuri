@@ -1160,14 +1160,12 @@ namespace Sayuri {
     probcut_search_reduction_ = 0;
     enable_history_pruning_ = false;
     history_pruning_limit_depth_ = 0;
-    history_pruning_move_threshold_ = 0;
-    history_pruning_invalid_moves_ = 0;
+    INIT_ARRAY(history_pruning_invalid_moves_);
     history_pruning_threshold_ = 0;
     history_pruning_reduction_ = 0;
     enable_lmr_ = false;
     lmr_limit_depth_ = 0;
-    lmr_move_threshold_ = 0;
-    lmr_invalid_moves_ = 0;
+    INIT_ARRAY(lmr_invalid_moves_);
     lmr_search_reduction_ = 0;
     enable_futility_pruning_ = false;
     futility_pruning_depth_ = 0;
@@ -1217,15 +1215,21 @@ namespace Sayuri {
     probcut_search_reduction_ = params.probcut_search_reduction_;
     enable_history_pruning_ = params.enable_history_pruning_;
     history_pruning_limit_depth_ = params.history_pruning_limit_depth_;
-    history_pruning_move_threshold_ =
-    params.history_pruning_move_threshold_ * 256.0;
-    history_pruning_invalid_moves_ = params.history_pruning_invalid_moves_;
+    for (unsigned int num_moves = 0; num_moves < (MAX_CANDIDATES + 1);
+    ++num_moves) {
+      history_pruning_invalid_moves_[num_moves] =
+      Util::GetMax(params.history_pruning_invalid_moves_,
+      static_cast<int>(params.history_pruning_move_threshold_ * num_moves));
+    }
     history_pruning_threshold_ = params.history_pruning_threshold_ * 256.0;
     history_pruning_reduction_ = params.history_pruning_reduction_;
     enable_lmr_ = params.enable_lmr_;
     lmr_limit_depth_ = params.lmr_limit_depth_;
-    lmr_move_threshold_ = params.lmr_move_threshold_ * 256.0;
-    lmr_invalid_moves_ = params.lmr_invalid_moves_;
+    for (unsigned int num_moves = 0; num_moves < (MAX_CANDIDATES + 1);
+    ++num_moves) {
+      lmr_invalid_moves_[num_moves] = Util::GetMax(params.lmr_invalid_moves_,
+      static_cast<int>(params.lmr_move_threshold_ * num_moves));
+    }
     lmr_search_reduction_ = params.lmr_search_reduction_;
     enable_futility_pruning_ = params.enable_futility_pruning_;
     futility_pruning_depth_ = params.futility_pruning_depth_;

@@ -1330,14 +1330,9 @@ namespace Sayuri {
       int history_pruning_limit_depth_;
       /**
        * 探索関数用キャッシュ。
-       * History Pruning - 実行する候補手の閾値。
-       */
-      int history_pruning_move_threshold_;
-      /**
-       * 探索関数用キャッシュ。
        * History Pruning - 無効にする先頭の候補手の数。
        */
-      int history_pruning_invalid_moves_;
+      int history_pruning_invalid_moves_[MAX_CANDIDATES + 1];
       /**
        * 探索関数用キャッシュ。
        * History Pruning - 最大ヒストリー値に対する閾値。
@@ -1360,14 +1355,9 @@ namespace Sayuri {
       int lmr_limit_depth_;
       /**
        * 探索関数用キャッシュ。
-       * Late Move Reduction - 実行する候補手の閾値。
-       */
-      int lmr_move_threshold_;
-      /**
-       * 探索関数用キャッシュ。
        * Late Move Reduction - 無効にする先頭の候補手の数。
        */
-      int lmr_invalid_moves_;
+      int lmr_invalid_moves_[MAX_CANDIDATES + 1];
       /**
        * 探索関数用キャッシュ。
        * Late Move Reduction - リダクションする深さ。
