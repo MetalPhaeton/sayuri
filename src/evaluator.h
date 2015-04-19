@@ -40,68 +40,6 @@ namespace Sayuri {
 
   /** 評価関数クラス。 */
   class Evaluator {
-    private:
-      // --- クラス内で使う定数 --- //
-      /** 価値テーブル 1 のインデックス。 */
-      enum {
-        /** 価値のインデックス - オープニングの配置。 */
-        OPENING_POSITION,
-        /** 価値のインデックス - エンディングの配置。 */
-        ENDING_POSITION,
-        /** 価値のインデックス - 機動力。 */
-        MOBILITY,
-        /** 価値のインデックス - センターコントロール。 */
-        CENTER_CONTROL,
-        /** 価値のインデックス - スウィートセンターのコントロール。 */
-        SWEET_CENTER_CONTROL,
-        /** 価値のインデックス - ピースの展開。 */
-        DEVELOPMENT,
-        /** 価値のインデックス - 攻撃。 */
-        ATTACK,
-        /** 価値のインデックス - 防御。 */
-        DEFENSE,
-        /** 価値のインデックス - ピン。 */
-        PIN,
-        /** 価値のインデックス - キング周辺への攻撃。 */
-        ATTACK_AROUND_KING,
-      };
-      /** 価値テーブル 1 のサイズ。 */
-      constexpr static std::size_t TABLE_SIZE_1 = ATTACK_AROUND_KING + 1;
-
-      /** 価値テーブル 2 のインデックス。 */
-      enum {
-        /** 価値のインデックス - パスポーン。 */
-        PASS_PAWN,
-        /** 価値のインデックス - 守られたパスポーン。 */
-        PROTECTED_PASS_PAWN,
-        /** 価値のインデックス - ダブルポーン。 */
-        DOUBLE_PAWN,
-        /** 価値のインデックス - 孤立ポーン。 */
-        ISO_PAWN,
-        /** 価値のインデックス - ポーンの盾。 */
-        PAWN_SHIELD,
-        /** 価値のインデックス - ビショップペア。 */
-        BISHOP_PAIR,
-        /** 価値のインデックス - バッドビショップ。 */
-        BAD_BISHOP,
-        /** 価値のインデックス - ルークペア。 */
-        ROOK_PAIR,
-        /** 価値のインデックス - セミオープンファイルのルーク。 */
-        ROOK_SEMIOPEN_FYLE,
-        /** 価値のインデックス - オープンファイルのルーク。 */
-        ROOK_OPEN_FYLE,
-        /** 価値のインデックス - 早すぎるクイーンの始動。 */
-        EARLY_QUEEN_LAUNCHED,
-        /** 価値のインデックス - キング周りの弱いマス。 */
-        WEAK_SQUARE,
-        /** 価値のインデックス - キャスリング。 */
-        CASTLING,
-        /** 価値のインデックス - キャスリングの放棄。 */
-        ABANDONED_CASTLING,
-      };
-      /** 価値テーブル 2 のサイズ。 */
-      constexpr static std::size_t TABLE_SIZE_2 = ABANDONED_CASTLING + 1;
-
     public:
       // ==================== //
       // コンストラクタと代入 //
@@ -243,7 +181,6 @@ namespace Sayuri {
       // ==================== //
       // 評価関数用キャッシュ //
       // ==================== //
-      static constexpr unsigned int NUM_SIDES_2 = NUM_SIDES - 1;
       static constexpr unsigned int MAX_ATTACKS = 7 * 4;
       static constexpr unsigned int NUM_CENTER = 4 * 4;
       static constexpr unsigned int NUM_SWEET_CENTER = 2 * 2;
@@ -257,62 +194,56 @@ namespace Sayuri {
        */
       void InitCache();
 
-      /** キャッシュ構造体。 */
+      /** キャッシュ構造体。 (9,924 Bytes) */
       struct Cache {
         /** キャッシュ - オープニングの配置。 */
-        int opening_position_cache_[NUM_SIDES_2][NUM_PIECE_TYPES]
-        [NUM_SQUARES];
+        int opening_position_cache_[NUM_PIECE_TYPES][NUM_SQUARES];
         /** キャッシュ - エンディングの配置。 */
-        int ending_position_cache_[NUM_SIDES_2][NUM_PIECE_TYPES]
-        [NUM_SQUARES];
+        int ending_position_cache_[NUM_PIECE_TYPES][NUM_SQUARES];
         /** キャッシュ - 機動力。 */
-        int mobility_cache_[NUM_SIDES_2][NUM_PIECE_TYPES][MAX_ATTACKS + 1];
+        int mobility_cache_[NUM_PIECE_TYPES][MAX_ATTACKS + 1];
         /** キャッシュ - センターコントロール。 */
-        int center_control_cache_[NUM_SIDES_2][NUM_PIECE_TYPES]
-        [NUM_CENTER + 1];
+        int center_control_cache_[NUM_PIECE_TYPES][NUM_CENTER + 1];
         /** キャッシュ - スウィートセンターコントロール。 */
-        int sweet_center_control_cache_[NUM_SIDES_2][NUM_PIECE_TYPES]
-        [NUM_SWEET_CENTER + 1];
+        int sweet_center_control_cache_[NUM_PIECE_TYPES][NUM_SWEET_CENTER + 1];
         /** キャッシュ - 駒の展開。 */
-        int development_cache_[NUM_SIDES_2][NUM_PIECE_TYPES][NUM_SQUARES + 1];
+        int development_cache_[NUM_PIECE_TYPES][NUM_SQUARES + 1];
         /** キャッシュ - 攻撃。 */
-        int attack_cache_[NUM_SIDES_2][NUM_PIECE_TYPES][NUM_PIECE_TYPES];
+        int attack_cache_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
         /** キャッシュ - 防御。 */
-        int defense_cache_[NUM_SIDES_2][NUM_PIECE_TYPES][NUM_PIECE_TYPES];
+        int defense_cache_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
         /** キャッシュ - ピン。 */
-        int pin_cache_[NUM_SIDES_2][NUM_PIECE_TYPES][NUM_PIECE_TYPES]
-        [NUM_PIECE_TYPES];
+        int pin_cache_[NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES];
         /** キャッシュ - キング周辺への攻撃。 */
-        int attack_around_king_cache_[NUM_SIDES_2][NUM_PIECE_TYPES]
-        [NUM_AROUND_KING + 1];
+        int attack_around_king_cache_[NUM_PIECE_TYPES][NUM_AROUND_KING + 1];
         /** キャッシュ - パスポーン。 */
-        int pass_pawn_cache_[NUM_SIDES_2];
+        int pass_pawn_cache_;
         /** キャッシュ - 守られたパスポーン。 */
-        int protected_pass_pawn_cache_[NUM_SIDES_2];
+        int protected_pass_pawn_cache_;
         /** キャッシュ - ダブルポーン。 */
-        int double_pawn_cache_[NUM_SIDES_2];
+        int double_pawn_cache_;
         /** キャッシュ - 孤立ポーン。 */
-        int iso_pawn_cache_[NUM_SIDES_2];
+        int iso_pawn_cache_;
         /** キャッシュ - ポーンの盾。 */
-        int pawn_shield_cache_[NUM_SIDES_2][NUM_SQUARES];
+        int pawn_shield_cache_[NUM_SQUARES];
         /** キャッシュ - ビショップペア。 */
-        int bishop_pair_cache_[NUM_SIDES_2];
+        int bishop_pair_cache_;
         /** キャッシュ - バッドビショップ。 */
-        int bad_bishop_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
+        int bad_bishop_cache_[NUM_SQUARES + 1];
         /** キャッシュ - ルークペア。 */
-        int rook_pair_cache_[NUM_SIDES_2];
+        int rook_pair_cache_;
         /** キャッシュ - セミオープンファイルのルーク。 */
-        int rook_semiopen_fyle_cache_[NUM_SIDES_2];
+        int rook_semiopen_fyle_cache_;
         /** キャッシュ - オープンファイルのルーク。 */
-        int rook_open_fyle_cache_[NUM_SIDES_2];
+        int rook_open_fyle_cache_;
         /** キャッシュ - 早すぎるクイーンの始動。 */
-        int early_queen_launched_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
+        int early_queen_launched_cache_[NUM_SQUARES + 1];
         /** キャッシュ - キング周りの弱いマス。 */
-        int weak_square_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
+        int weak_square_cache_[NUM_SQUARES + 1];
         /** キャッシュ - キャスリング。 */
-        int castling_cache_[NUM_SIDES_2];
+        int castling_cache_;
         /** キャッシュ - キャスリングの権利の放棄。 */
-        int abandoned_castling_cache_[NUM_SIDES_2];
+        int abandoned_castling_cache_;
       };
       /** キャッシュの配列。 */
       Cache cache_[NUM_SQUARES + 1];
