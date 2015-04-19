@@ -36,14 +36,6 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
-  // ========== //
-  // static定数 //
-  // ========== //
-  constexpr unsigned int Evaluator::MAX_ATTACKS;
-  constexpr unsigned int Evaluator::NUM_CENTER;
-  constexpr unsigned int Evaluator::NUM_SWEET_CENTER;
-  constexpr unsigned int Evaluator::NUM_AROUND_KING;
-
   // ================ //
   // テンプレート部品 //
   // ================ //
