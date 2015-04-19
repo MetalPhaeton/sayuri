@@ -35,6 +35,7 @@
 #include <random>
 #include <climits>
 #include <set>
+#include <cstdint>
 #include "common.h"
 
 /** Sayuri 名前空間。 */
@@ -46,8 +47,8 @@ namespace Sayuri {
      * @param bits 対象のビット。
      * @return 立っているビットの数。
      */
-    int GetNumBits(unsigned int bits) {
-      int num = 0;
+    std::uint8_t GetNumBits(unsigned int bits) {
+      std::uint8_t num = 0;
       for (; bits; bits &= bits - 1) {
         ++num;
       }
@@ -128,7 +129,7 @@ namespace Sayuri {
   // ビットを数えるときに使うもの //
   // ============================ //
   // 下位16ビットのビットの数が入った配列。 [下位16ビット]
-  int Util::num_bit16_table_[0xffff + 1];
+  std::uint8_t Util::num_bit16_table_[0xffff + 1];
   // num_bit16_table_[]を初期化する。
   void Util::InitNumBit16Table() {
     for (unsigned int index = 0; index <= 0xffff; ++index) {

@@ -35,6 +35,7 @@
 #include <vector>
 #include <random>
 #include <set>
+#include <cstdint>
 
 #include "common.h"
 
@@ -867,7 +868,7 @@ namespace Sayuri {
       /**
        * 下位16ビットのビットの数が入った配列。 [下位16ビット]
        */
-      static int num_bit16_table_[0xffff + 1];
+      static std::uint8_t num_bit16_table_[0xffff + 1];
       /** num_bit16_table_[]を初期化する。 */
       static void InitNumBit16Table();
 
