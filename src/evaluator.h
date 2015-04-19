@@ -237,9 +237,6 @@ namespace Sayuri {
       /** 使用するチェスエンジン。 */
       const ChessEngine* engine_ptr_;
 
-      /** 評価関数で使う、現在の駒の数。 */
-      int num_pieces_;
-
       /** 評価関数で使う、ポジショナル評価値。 */
       int score_;
 
@@ -254,45 +251,73 @@ namespace Sayuri {
       enum : unsigned int {
         WHITE_2, BLACK_2
       };
+
       /**
        * キャッシュを初期化する。
        */
       void InitCache();
-      int opening_position_cache_[NUM_SIDES_2][NUM_SQUARES + 1]
-      [NUM_PIECE_TYPES][NUM_SQUARES];
-      int ending_position_cache_[NUM_SIDES_2][NUM_SQUARES + 1]
-      [NUM_PIECE_TYPES][NUM_SQUARES];
-      int mobility_cache_[NUM_SIDES_2][NUM_SQUARES + 1][NUM_PIECE_TYPES]
-      [MAX_ATTACKS + 1];
-      int center_control_cache_[NUM_SIDES_2][NUM_SQUARES + 1][NUM_PIECE_TYPES]
-      [NUM_CENTER + 1];
-      int sweet_center_control_cache_[NUM_SIDES_2][NUM_SQUARES + 1]
-      [NUM_PIECE_TYPES][NUM_SWEET_CENTER + 1];
-      int development_cache_[NUM_SIDES_2][NUM_SQUARES + 1][NUM_PIECE_TYPES]
-      [NUM_SQUARES + 1];
-      int attack_cache_[NUM_SIDES_2][NUM_SQUARES + 1][NUM_PIECE_TYPES]
-      [NUM_PIECE_TYPES];
-      int defense_cache_[NUM_SIDES_2][NUM_SQUARES + 1][NUM_PIECE_TYPES]
-      [NUM_PIECE_TYPES];
-      int pin_cache_[NUM_SIDES_2][NUM_SQUARES + 1][NUM_PIECE_TYPES]
-      [NUM_PIECE_TYPES][NUM_PIECE_TYPES];
-      int attack_around_king_cache_[NUM_SIDES_2][NUM_SQUARES + 1]
-      [NUM_PIECE_TYPES][NUM_AROUND_KING + 1];
-      int pass_pawn_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
-      int protected_pass_pawn_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
-      int double_pawn_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
-      int iso_pawn_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
-      int pawn_shield_cache_[NUM_SIDES_2][NUM_SQUARES + 1][NUM_SQUARES];
-      int bishop_pair_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
-      int bad_bishop_cache_[NUM_SIDES_2][NUM_SQUARES + 1][NUM_SQUARES + 1];
-      int rook_pair_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
-      int rook_semiopen_fyle_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
-      int rook_open_fyle_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
-      int early_queen_launched_cache_[NUM_SIDES_2][NUM_SQUARES + 1]
-      [NUM_SQUARES + 1];
-      int weak_square_cache_[NUM_SIDES_2][NUM_SQUARES + 1][NUM_SQUARES + 1];
-      int castling_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
-      int abandoned_castling_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
+
+      /** キャッシュ構造体。 */
+      struct Cache {
+        /** キャッシュ - オープニングの配置。 */
+        int opening_position_cache_[NUM_SIDES_2][NUM_PIECE_TYPES]
+        [NUM_SQUARES];
+        /** キャッシュ - エンディングの配置。 */
+        int ending_position_cache_[NUM_SIDES_2][NUM_PIECE_TYPES]
+        [NUM_SQUARES];
+        /** キャッシュ - 機動力。 */
+        int mobility_cache_[NUM_SIDES_2][NUM_PIECE_TYPES][MAX_ATTACKS + 1];
+        /** キャッシュ - センターコントロール。 */
+        int center_control_cache_[NUM_SIDES_2][NUM_PIECE_TYPES]
+        [NUM_CENTER + 1];
+        /** キャッシュ - スウィートセンターコントロール。 */
+        int sweet_center_control_cache_[NUM_SIDES_2][NUM_PIECE_TYPES]
+        [NUM_SWEET_CENTER + 1];
+        /** キャッシュ - 駒の展開。 */
+        int development_cache_[NUM_SIDES_2][NUM_PIECE_TYPES][NUM_SQUARES + 1];
+        /** キャッシュ - 攻撃。 */
+        int attack_cache_[NUM_SIDES_2][NUM_PIECE_TYPES][NUM_PIECE_TYPES];
+        /** キャッシュ - 防御。 */
+        int defense_cache_[NUM_SIDES_2][NUM_PIECE_TYPES][NUM_PIECE_TYPES];
+        /** キャッシュ - ピン。 */
+        int pin_cache_[NUM_SIDES_2][NUM_PIECE_TYPES][NUM_PIECE_TYPES]
+        [NUM_PIECE_TYPES];
+        /** キャッシュ - キング周辺への攻撃。 */
+        int attack_around_king_cache_[NUM_SIDES_2][NUM_PIECE_TYPES]
+        [NUM_AROUND_KING + 1];
+        /** キャッシュ - パスポーン。 */
+        int pass_pawn_cache_[NUM_SIDES_2];
+        /** キャッシュ - 守られたパスポーン。 */
+        int protected_pass_pawn_cache_[NUM_SIDES_2];
+        /** キャッシュ - ダブルポーン。 */
+        int double_pawn_cache_[NUM_SIDES_2];
+        /** キャッシュ - 孤立ポーン。 */
+        int iso_pawn_cache_[NUM_SIDES_2];
+        /** キャッシュ - ポーンの盾。 */
+        int pawn_shield_cache_[NUM_SIDES_2][NUM_SQUARES];
+        /** キャッシュ - ビショップペア。 */
+        int bishop_pair_cache_[NUM_SIDES_2];
+        /** キャッシュ - バッドビショップ。 */
+        int bad_bishop_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
+        /** キャッシュ - ルークペア。 */
+        int rook_pair_cache_[NUM_SIDES_2];
+        /** キャッシュ - セミオープンファイルのルーク。 */
+        int rook_semiopen_fyle_cache_[NUM_SIDES_2];
+        /** キャッシュ - オープンファイルのルーク。 */
+        int rook_open_fyle_cache_[NUM_SIDES_2];
+        /** キャッシュ - 早すぎるクイーンの始動。 */
+        int early_queen_launched_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
+        /** キャッシュ - キング周りの弱いマス。 */
+        int weak_square_cache_[NUM_SIDES_2][NUM_SQUARES + 1];
+        /** キャッシュ - キャスリング。 */
+        int castling_cache_[NUM_SIDES_2];
+        /** キャッシュ - キャスリングの権利の放棄。 */
+        int abandoned_castling_cache_[NUM_SIDES_2];
+      };
+      /** キャッシュの配列。 */
+      Cache cache_[NUM_SQUARES + 1];
+      /** 現在の配列のポインタ。 */
+      Cache* cache_ptr_;
   };
 }  // namespace Sayuri
 
