@@ -700,6 +700,7 @@ namespace Sayuri {
     shared_st_ptr_->searched_nodes_ = 0;
     shared_st_ptr_->searched_level_ = 0;
     shared_st_ptr_->start_time_ = SysClock::now();
+    shared_st_ptr_->is_time_over_ = false;
     FOR_SIDES(side) {
       FOR_SQUARES(from) {
         FOR_SQUARES(to) {
@@ -761,6 +762,11 @@ namespace Sayuri {
           child_ptr->ThreadYBWC(shell);
       });
     }
+
+    // 時間計測開始。
+    std::thread time_thread([this]() {
+      this->shared_st_ptr_->NotifyTimeOver();
+    });
 
     // --- Iterative Deepening --- //
     Move prev_best = 0;
@@ -924,6 +930,13 @@ namespace Sayuri {
     // 探索終了したけど、まだ思考を止めてはいけない場合、関数を終了しない。
     while (!JudgeToStop(level)) {
       std::this_thread::sleep_for(Chrono::milliseconds(1));
+    }
+
+    // 時間スレッドを待つ。
+    try {
+      time_thread.join();
+    } catch (std::system_error err) {
+        // 無視。
     }
 
     // 最後に情報を送る。
@@ -1469,7 +1482,7 @@ namespace Sayuri {
   bool infinite_thinking) {
     shared_st_ptr_->max_depth_ = Util::GetMin(max_depth, MAX_PLYS);
     shared_st_ptr_->max_nodes_ = Util::GetMin(max_nodes, MAX_NODES);
-    shared_st_ptr_->thinking_time_ = thinking_time;
+    shared_st_ptr_->end_time_ = SysClock::now() + thinking_time;
     shared_st_ptr_->infinite_thinking_ = infinite_thinking;
   }
 
@@ -1502,9 +1515,7 @@ namespace Sayuri {
       shared_st_ptr_->stop_now_ = true;
       return true;
     }
-    TimePoint now = SysClock::now();
-    if (Chrono::duration_cast<Chrono::milliseconds>
-    (now - (shared_st_ptr_->start_time_)) >= thinking_time_) {
+    if (shared_st_ptr_->is_time_over_) {
       shared_st_ptr_->stop_now_ = true;
       return true;
     }

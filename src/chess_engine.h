@@ -939,16 +939,20 @@ namespace Sayuri {
         volatile std::uint32_t searched_level_;
         /** 探索開始時間。 */
         TimePoint start_time_;
+
         /** 探索ストップ条件: 何が何でも探索を中断。 */
         volatile bool stop_now_;
         /** 探索ストップ条件: 最大探索ノード数。 */
         std::uint64_t max_nodes_;
         /** 探索ストップ条件: 最大探索深さ。 */
         std::uint32_t max_depth_;
-        /** 探索ストップ条件: 思考時間。 */
-        Chrono::milliseconds thinking_time_;
+        /** 探索ストップ条件: 思考終了時間。 */
+        TimePoint end_time_;
+        /** 探索ストップ条件: 思考時間終了フラグ。 */
+        volatile bool is_time_over_;
         /** 探索ストップ条件: trueなら無限に考える。 */
         volatile bool infinite_thinking_;
+
         /** 指し手の履歴。 */
         std::vector<Move> move_history_;
         /** 50手ルールの手数の履歴。 */
@@ -1014,6 +1018,17 @@ namespace Sayuri {
         /** ハッシュ値のテーブルを初期化する。 */
         void InitHashValueTable();
 
+        /** 思考時間終了のお知らせ関数。 */
+        void NotifyTimeOver() {
+          while (!stop_now_) {
+            std::this_thread::sleep_for(Chrono::milliseconds(1));
+
+            if (SysClock::now() >= end_time_) {
+              is_time_over_ = true;
+              break;
+            }
+          }
+        }
       };
       /** 共有メンバの構造体。 */
       std::shared_ptr<SharedStruct> shared_st_ptr_;

@@ -977,7 +977,8 @@ namespace Sayuri {
   stop_now_(false),
   max_nodes_(ULLONG_MAX),
   max_depth_(MAX_PLYS),
-  thinking_time_(INT_MAX),
+  end_time_(Chrono::milliseconds(INT_MAX)),
+  is_time_over_(false),
   infinite_thinking_(false),
   move_history_(0),
   clock_history_(0),
@@ -1051,7 +1052,8 @@ namespace Sayuri {
     stop_now_ = shared_st.stop_now_;
     max_nodes_ = shared_st.max_nodes_;
     max_depth_ = shared_st.max_depth_;
-    thinking_time_ = shared_st.thinking_time_;
+    end_time_ = shared_st.end_time_;
+    is_time_over_ = shared_st.is_time_over_;
     infinite_thinking_ = shared_st.infinite_thinking_;
     move_history_ = shared_st.move_history_;
     clock_history_ = shared_st.clock_history_;
@@ -1178,7 +1180,6 @@ namespace Sayuri {
 
     max_depth_ = 0;
     max_nodes_ = 0;
-    thinking_time_ = Chrono::milliseconds(0);
   }
 
   // キャッシュする。
@@ -1246,6 +1247,5 @@ namespace Sayuri {
 
     max_depth_ = shared_st_ptr_->max_depth_;
     max_nodes_ = shared_st_ptr_->max_nodes_;
-    thinking_time_ = shared_st_ptr_->thinking_time_;
   }
 }  // namespace Sayuri
