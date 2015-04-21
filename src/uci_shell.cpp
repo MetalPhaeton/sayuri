@@ -186,13 +186,22 @@ namespace Sayuri {
 
   // PVライン情報を出力する。
   void UCIShell::PrintPVInfo(int depth, int seldepth, int score,
-  Chrono::milliseconds time, std::uint64_t num_nodes, PVLine& pv_line) {
+  Chrono::milliseconds time, std::uint64_t num_nodes, int hashfull,
+  PVLine& pv_line) {
     std::unique_lock<std::mutex> lock(print_mutex_);  // ロック。
+
+    int time_2 = time.count();
+    if (time_2 <= 0) time_2 = 1;
 
     std::ostringstream sout;
     sout << "info";
     sout << " depth " << depth;
     sout << " seldepth " << seldepth;
+    sout << " time " << time_2;
+    sout << " nodes " << num_nodes;
+    sout << " hashfull " << hashfull;
+    sout << " nps " << (num_nodes * 1000) / time_2;
+
     sout << " score ";
     if (pv_line.mate_in() >= 0) {
       int winner = pv_line.mate_in() % 2;
@@ -206,8 +215,7 @@ namespace Sayuri {
     } else {
       sout << "cp " << score;
     }
-    sout << " time " << time.count();
-    sout << " nodes " << num_nodes;
+
     // PVラインを送る。
     sout << " pv";
     for (std::size_t i = 0; i < pv_line.length(); ++i) {

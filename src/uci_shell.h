@@ -181,10 +181,12 @@ namespace Sayuri {
        * @param score 評価値。
        * @param time 思考時間。
        * @param num_nodes 探索したノード数。
+       * @param hashfull トランスポジションテーブルの使用率。
        * @param pv_line PVライン。
        */
       void PrintPVInfo(int depth, int seldepth, int score,
-      Chrono::milliseconds time, std::uint64_t num_nodes, PVLine& pv_line);
+      Chrono::milliseconds time, std::uint64_t num_nodes, int hashfull,
+      PVLine& pv_line);
 
       /**
        * 深さ情報を出力する。

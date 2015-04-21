@@ -699,7 +699,6 @@ namespace Sayuri {
 
     shared_st_ptr_->searched_nodes_ = 0;
     shared_st_ptr_->searched_level_ = 0;
-    shared_st_ptr_->start_time_ = SysClock::now();
     shared_st_ptr_->is_time_over_ = false;
     FOR_SIDES(side) {
       FOR_SQUARES(from) {
@@ -801,7 +800,8 @@ namespace Sayuri {
         (SysClock::now() - shared_st_ptr_->start_time_);
 
         shell.PrintPVInfo(depth, 0, pv_line_table_[level].score(), time,
-        shared_st_ptr_->searched_nodes_, pv_line_table_[level]);
+        shared_st_ptr_->searched_nodes_, table.GetUsedPermill(),
+        pv_line_table_[level]);
 
         continue;
       }
@@ -813,7 +813,8 @@ namespace Sayuri {
         (SysClock::now() - shared_st_ptr_->start_time_);
 
         shell.PrintPVInfo(depth, 0, pv_line_table_[level].score(), time,
-        shared_st_ptr_->searched_nodes_, pv_line_table_[level]);
+        shared_st_ptr_->searched_nodes_, table.GetUsedPermill(),
+        pv_line_table_[level]);
 
         continue;
       }
@@ -1348,7 +1349,8 @@ namespace Sayuri {
         (SysClock::now() - shared_st_ptr_->start_time_);
 
         shell.PrintPVInfo(job.depth_, shared_st_ptr_->searched_level_, score,
-        time, shared_st_ptr_->searched_nodes_, *(job.pv_line_ptr_));
+        time, shared_st_ptr_->searched_nodes_,
+        job.table_ptr_->GetUsedPermill(), *(job.pv_line_ptr_));
 
         job.alpha_ = score;
       }
@@ -1468,7 +1470,8 @@ namespace Sayuri {
   bool infinite_thinking) {
     shared_st_ptr_->max_depth_ = Util::GetMin(max_depth, MAX_PLYS);
     shared_st_ptr_->max_nodes_ = Util::GetMin(max_nodes, MAX_NODES);
-    shared_st_ptr_->end_time_ = SysClock::now() + thinking_time;
+    shared_st_ptr_->start_time_ = SysClock::now();
+    shared_st_ptr_->end_time_ = shared_st_ptr_->start_time_ + thinking_time;
     shared_st_ptr_->infinite_thinking_ = infinite_thinking;
   }
 
