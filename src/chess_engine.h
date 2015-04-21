@@ -1018,17 +1018,14 @@ namespace Sayuri {
         /** ハッシュ値のテーブルを初期化する。 */
         void InitHashValueTable();
 
-        /** 思考時間終了のお知らせ関数。 */
-        void NotifyTimeOver() {
-          while (!stop_now_) {
-            std::this_thread::sleep_for(Chrono::milliseconds(1));
-
-            if (SysClock::now() >= end_time_) {
-              is_time_over_ = true;
-              break;
-            }
-          }
-        }
+        /**
+         * 定期処理関数。
+         * - 思考時間終了判定。
+         * - 定期情報出力。
+         * @param shell 出力関数のあるUCIShell。
+         * @param table hashfull用のトランスポジションテーブル。
+         */
+        void ThreadPeriodicProcess(UCIShell& shell, TranspositionTable& table);
       };
       /** 共有メンバの構造体。 */
       std::shared_ptr<SharedStruct> shared_st_ptr_;

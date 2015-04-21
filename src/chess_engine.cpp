@@ -965,6 +965,121 @@ namespace Sayuri {
     return current_hash;
   }
 
+  // 探索関数用キャッシュを初期化する。
+  void ChessEngine::InitSearchParamsCache() {
+    INIT_ARRAY(material_);
+    enable_quiesce_search_ = false;
+    enable_repetition_check_ = false;
+    enable_check_extension_ = false;
+    ybwc_limit_depth_ = 0;
+    ybwc_invalid_moves_ = 0;
+    enable_aspiration_windows_ = false;
+    aspiration_windows_limit_depth_ = 0;
+    aspiration_windows_delta_ = 0;
+    enable_see_ = false;
+    enable_history_ = false;
+    enable_killer_ = false;
+    enable_ttable_ = false;
+    enable_iid_ = false;
+    iid_limit_depth_ = 0;
+    iid_search_depth_ = 0;
+    enable_nmr_ = false;
+    nmr_limit_depth_ = 0;
+    nmr_search_reduction_ = 0;
+    nmr_reduction_ = 0;
+    enable_probcut_ = false;
+    probcut_limit_depth_ = 0;
+    probcut_margin_ = 0;
+    probcut_search_reduction_ = 0;
+    enable_history_pruning_ = false;
+    history_pruning_limit_depth_ = 0;
+    INIT_ARRAY(history_pruning_invalid_moves_);
+    history_pruning_threshold_ = 0;
+    history_pruning_reduction_ = 0;
+    enable_lmr_ = false;
+    lmr_limit_depth_ = 0;
+    INIT_ARRAY(lmr_invalid_moves_);
+    lmr_search_reduction_ = 0;
+    enable_futility_pruning_ = false;
+    futility_pruning_depth_ = 0;
+    futility_pruning_margin_ = 0;
+
+    INIT_ARRAY(piece_hash_value_table_);
+    INIT_ARRAY(to_move_hash_value_table_);
+    INIT_ARRAY(castling_hash_value_table_);
+    INIT_ARRAY(en_passant_hash_value_table_);
+
+    max_depth_ = 0;
+    max_nodes_ = 0;
+  }
+
+  // キャッシュする。
+  void ChessEngine::CacheSearchParams() {
+    if (!shared_st_ptr_) return;
+    if (!(shared_st_ptr_->search_params_ptr_)) return;
+
+    const SearchParams& params = *(shared_st_ptr_->search_params_ptr_);
+
+    // キャッシュする。
+    COPY_ARRAY(material_, params.material_);
+    enable_quiesce_search_ = params.enable_quiesce_search_;
+    enable_repetition_check_ = params.enable_repetition_check_;
+    enable_check_extension_ = params.enable_check_extension_;
+    ybwc_limit_depth_ = params.ybwc_limit_depth_;
+    ybwc_invalid_moves_ = params.ybwc_invalid_moves_;
+    enable_aspiration_windows_ = params.enable_aspiration_windows_;
+    aspiration_windows_limit_depth_ = params.aspiration_windows_limit_depth_;
+    aspiration_windows_delta_ = params.aspiration_windows_delta_;
+    enable_see_ = params.enable_see_;
+    enable_history_ = params.enable_history_;
+    enable_killer_ = params.enable_killer_;
+    enable_ttable_ = params.enable_ttable_;
+    enable_iid_ = params.enable_iid_;
+    iid_limit_depth_ = params.iid_limit_depth_;
+    iid_search_depth_ = params.iid_search_depth_;
+    enable_nmr_ = params.enable_nmr_;
+    nmr_limit_depth_ = params.nmr_limit_depth_;
+    nmr_search_reduction_ = params.nmr_search_reduction_;
+    nmr_reduction_ = params.nmr_reduction_;
+    enable_probcut_ = params.enable_probcut_;
+    probcut_limit_depth_ = params.probcut_limit_depth_;
+    probcut_margin_ = params.probcut_margin_;
+    probcut_search_reduction_ = params.probcut_search_reduction_;
+    enable_history_pruning_ = params.enable_history_pruning_;
+    history_pruning_limit_depth_ = params.history_pruning_limit_depth_;
+    for (unsigned int num_moves = 0; num_moves < (MAX_CANDIDATES + 1);
+    ++num_moves) {
+      history_pruning_invalid_moves_[num_moves] =
+      Util::GetMax(params.history_pruning_invalid_moves_,
+      static_cast<int>(params.history_pruning_move_threshold_ * num_moves));
+    }
+    history_pruning_threshold_ = params.history_pruning_threshold_ * 256.0;
+    history_pruning_reduction_ = params.history_pruning_reduction_;
+    enable_lmr_ = params.enable_lmr_;
+    lmr_limit_depth_ = params.lmr_limit_depth_;
+    for (unsigned int num_moves = 0; num_moves < (MAX_CANDIDATES + 1);
+    ++num_moves) {
+      lmr_invalid_moves_[num_moves] = Util::GetMax(params.lmr_invalid_moves_,
+      static_cast<int>(params.lmr_move_threshold_ * num_moves));
+    }
+    lmr_search_reduction_ = params.lmr_search_reduction_;
+    enable_futility_pruning_ = params.enable_futility_pruning_;
+    futility_pruning_depth_ = params.futility_pruning_depth_;
+    futility_pruning_margin_ = params.futility_pruning_margin_;
+
+    COPY_ARRAY(piece_hash_value_table_,
+    shared_st_ptr_->piece_hash_value_table_);
+    COPY_ARRAY(to_move_hash_value_table_,
+    shared_st_ptr_->to_move_hash_value_table_);
+    COPY_ARRAY(castling_hash_value_table_,
+    shared_st_ptr_->castling_hash_value_table_);
+    COPY_ARRAY(en_passant_hash_value_table_,
+    shared_st_ptr_->en_passant_hash_value_table_);
+
+    max_depth_ = shared_st_ptr_->max_depth_;
+    max_nodes_ = shared_st_ptr_->max_nodes_;
+  }
+
   // ================ //
   // 共有メンバ構造体 //
   // ================ //
@@ -1134,118 +1249,32 @@ namespace Sayuri {
     }
   }
 
-  // 探索関数用キャッシュを初期化する。
-  void ChessEngine::InitSearchParamsCache() {
-    INIT_ARRAY(material_);
-    enable_quiesce_search_ = false;
-    enable_repetition_check_ = false;
-    enable_check_extension_ = false;
-    ybwc_limit_depth_ = 0;
-    ybwc_invalid_moves_ = 0;
-    enable_aspiration_windows_ = false;
-    aspiration_windows_limit_depth_ = 0;
-    aspiration_windows_delta_ = 0;
-    enable_see_ = false;
-    enable_history_ = false;
-    enable_killer_ = false;
-    enable_ttable_ = false;
-    enable_iid_ = false;
-    iid_limit_depth_ = 0;
-    iid_search_depth_ = 0;
-    enable_nmr_ = false;
-    nmr_limit_depth_ = 0;
-    nmr_search_reduction_ = 0;
-    nmr_reduction_ = 0;
-    enable_probcut_ = false;
-    probcut_limit_depth_ = 0;
-    probcut_margin_ = 0;
-    probcut_search_reduction_ = 0;
-    enable_history_pruning_ = false;
-    history_pruning_limit_depth_ = 0;
-    INIT_ARRAY(history_pruning_invalid_moves_);
-    history_pruning_threshold_ = 0;
-    history_pruning_reduction_ = 0;
-    enable_lmr_ = false;
-    lmr_limit_depth_ = 0;
-    INIT_ARRAY(lmr_invalid_moves_);
-    lmr_search_reduction_ = 0;
-    enable_futility_pruning_ = false;
-    futility_pruning_depth_ = 0;
-    futility_pruning_margin_ = 0;
+  // 定期処理する。
+  void ChessEngine::SharedStruct::ThreadPeriodicProcess
+  (UCIShell& shell, TranspositionTable& table) {
+    static const Chrono::milliseconds SLEEP_TIME(1);
+    static const Chrono::seconds INTERVAL(1);
+    TimePoint next_point = SysClock::now() + INTERVAL;
 
-    INIT_ARRAY(piece_hash_value_table_);
-    INIT_ARRAY(to_move_hash_value_table_);
-    INIT_ARRAY(castling_hash_value_table_);
-    INIT_ARRAY(en_passant_hash_value_table_);
+    while (!stop_now_) {
+      std::this_thread::sleep_for(SLEEP_TIME);
+      if (stop_now_) break;
 
-    max_depth_ = 0;
-    max_nodes_ = 0;
-  }
+      TimePoint now = SysClock::now();
 
-  // キャッシュする。
-  void ChessEngine::CacheSearchParams() {
-    if (!shared_st_ptr_) return;
-    if (!(shared_st_ptr_->search_params_ptr_)) return;
+      // 思考終了判定。
+      if (!is_time_over_ && (now >= end_time_)) {
+        is_time_over_ = true;
+      }
 
-    const SearchParams& params = *(shared_st_ptr_->search_params_ptr_);
-
-    // キャッシュする。
-    COPY_ARRAY(material_, params.material_);
-    enable_quiesce_search_ = params.enable_quiesce_search_;
-    enable_repetition_check_ = params.enable_repetition_check_;
-    enable_check_extension_ = params.enable_check_extension_;
-    ybwc_limit_depth_ = params.ybwc_limit_depth_;
-    ybwc_invalid_moves_ = params.ybwc_invalid_moves_;
-    enable_aspiration_windows_ = params.enable_aspiration_windows_;
-    aspiration_windows_limit_depth_ = params.aspiration_windows_limit_depth_;
-    aspiration_windows_delta_ = params.aspiration_windows_delta_;
-    enable_see_ = params.enable_see_;
-    enable_history_ = params.enable_history_;
-    enable_killer_ = params.enable_killer_;
-    enable_ttable_ = params.enable_ttable_;
-    enable_iid_ = params.enable_iid_;
-    iid_limit_depth_ = params.iid_limit_depth_;
-    iid_search_depth_ = params.iid_search_depth_;
-    enable_nmr_ = params.enable_nmr_;
-    nmr_limit_depth_ = params.nmr_limit_depth_;
-    nmr_search_reduction_ = params.nmr_search_reduction_;
-    nmr_reduction_ = params.nmr_reduction_;
-    enable_probcut_ = params.enable_probcut_;
-    probcut_limit_depth_ = params.probcut_limit_depth_;
-    probcut_margin_ = params.probcut_margin_;
-    probcut_search_reduction_ = params.probcut_search_reduction_;
-    enable_history_pruning_ = params.enable_history_pruning_;
-    history_pruning_limit_depth_ = params.history_pruning_limit_depth_;
-    for (unsigned int num_moves = 0; num_moves < (MAX_CANDIDATES + 1);
-    ++num_moves) {
-      history_pruning_invalid_moves_[num_moves] =
-      Util::GetMax(params.history_pruning_invalid_moves_,
-      static_cast<int>(params.history_pruning_move_threshold_ * num_moves));
+      // 定期出力。
+      if (now >= next_point) {
+        shell.PrintOtherInfo
+        (Chrono::duration_cast<Chrono::milliseconds>(now - start_time_),
+        searched_nodes_, table.GetUsedPermill());
+        next_point = now + INTERVAL;
+      }
+      if (stop_now_) break;
     }
-    history_pruning_threshold_ = params.history_pruning_threshold_ * 256.0;
-    history_pruning_reduction_ = params.history_pruning_reduction_;
-    enable_lmr_ = params.enable_lmr_;
-    lmr_limit_depth_ = params.lmr_limit_depth_;
-    for (unsigned int num_moves = 0; num_moves < (MAX_CANDIDATES + 1);
-    ++num_moves) {
-      lmr_invalid_moves_[num_moves] = Util::GetMax(params.lmr_invalid_moves_,
-      static_cast<int>(params.lmr_move_threshold_ * num_moves));
-    }
-    lmr_search_reduction_ = params.lmr_search_reduction_;
-    enable_futility_pruning_ = params.enable_futility_pruning_;
-    futility_pruning_depth_ = params.futility_pruning_depth_;
-    futility_pruning_margin_ = params.futility_pruning_margin_;
-
-    COPY_ARRAY(piece_hash_value_table_,
-    shared_st_ptr_->piece_hash_value_table_);
-    COPY_ARRAY(to_move_hash_value_table_,
-    shared_st_ptr_->to_move_hash_value_table_);
-    COPY_ARRAY(castling_hash_value_table_,
-    shared_st_ptr_->castling_hash_value_table_);
-    COPY_ARRAY(en_passant_hash_value_table_,
-    shared_st_ptr_->en_passant_hash_value_table_);
-
-    max_depth_ = shared_st_ptr_->max_depth_;
-    max_nodes_ = shared_st_ptr_->max_nodes_;
   }
 }  // namespace Sayuri

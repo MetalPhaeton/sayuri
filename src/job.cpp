@@ -107,7 +107,6 @@ namespace Sayuri {
     num_all_moves_ = job.num_all_moves_;
     has_legal_move_ = job.has_legal_move_;
     moves_to_search_ptr_ = job.moves_to_search_ptr_;
-    next_print_info_time_ = job.next_print_info_time_;
 
     maker_ptr_ = job.maker_ptr_;
     counter_ = job.counter_;

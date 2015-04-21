@@ -36,6 +36,7 @@
 #include <utility>
 #include <iterator>
 #include <thread>
+#include <mutex>
 #include <system_error>
 #include <chrono>
 #include <sstream>
@@ -54,6 +55,11 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
+  // ====== //
+  // static //
+  // ====== //
+  std::mutex UCIShell::print_mutex_;
+
   // ==================== //
   // コンストラクタと代入 //
   // ==================== //
@@ -181,6 +187,8 @@ namespace Sayuri {
   // PVライン情報を出力する。
   void UCIShell::PrintPVInfo(int depth, int seldepth, int score,
   Chrono::milliseconds time, std::uint64_t num_nodes, PVLine& pv_line) {
+    std::unique_lock<std::mutex> lock(print_mutex_);  // ロック。
+
     std::ostringstream sout;
     sout << "info";
     sout << " depth " << depth;
@@ -216,6 +224,8 @@ namespace Sayuri {
 
   // 深さ情報を出力する。
   void UCIShell::PrintDepthInfo(int depth) {
+    std::unique_lock<std::mutex> lock(print_mutex_);  // ロック。
+
     std::ostringstream sout;
     sout << "info depth " << depth;
     // 出力関数に送る。
@@ -226,6 +236,8 @@ namespace Sayuri {
 
   // 現在探索している候補手の情報を出力する。
   void UCIShell::PrintCurrentMoveInfo(Move move, int move_num) {
+    std::unique_lock<std::mutex> lock(print_mutex_);  // ロック。
+
     std::ostringstream sout;
     // 手の情報を送る。
     sout << "info currmove " << Util::MoveToString(move);
@@ -242,6 +254,8 @@ namespace Sayuri {
   // その他の情報を出力する。
   void UCIShell::PrintOtherInfo(Chrono::milliseconds time,
   std::uint64_t num_nodes, int hashfull) {
+    std::unique_lock<std::mutex> lock(print_mutex_);  // ロック。
+
     std::ostringstream sout;
 
     int time_2 = time.count();
@@ -260,6 +274,8 @@ namespace Sayuri {
   // 探索後の最終出力を出力する。
   void UCIShell::PrintFinalInfo(Chrono::milliseconds time,
   std::uint64_t num_nodes, int hashfull, int score, PVLine& pv_line) {
+    std::unique_lock<std::mutex> lock(print_mutex_);  // ロック。
+
     std::ostringstream sout;
 
     int time_2 = time.count();

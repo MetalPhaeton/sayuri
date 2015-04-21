@@ -763,9 +763,9 @@ namespace Sayuri {
       });
     }
 
-    // 時間計測開始。
-    std::thread time_thread([this]() {
-      this->shared_st_ptr_->NotifyTimeOver();
+    // 定期処理開始。
+    std::thread time_thread([this, &shell, &table]() {
+      this->shared_st_ptr_->ThreadPeriodicProcess(shell, table);
     });
 
     // --- Iterative Deepening --- //
@@ -866,8 +866,6 @@ namespace Sayuri {
       job.num_all_moves_ = num_all_moves;
       job.has_legal_move_ = false;
       job.moves_to_search_ptr_ = &moves_to_search;
-      job.next_print_info_time_ =
-      SysClock::now() + Chrono::milliseconds(1000);
       job.Unlock();
 
       // ヘルプして待つ。
@@ -932,7 +930,7 @@ namespace Sayuri {
       std::this_thread::sleep_for(Chrono::milliseconds(1));
     }
 
-    // 時間スレッドを待つ。
+    // 定期処理スレッドを待つ。
     try {
       time_thread.join();
     } catch (std::system_error err) {
@@ -1156,18 +1154,6 @@ namespace Sayuri {
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       if (JudgeToStop(job.level_)) break;
-
-      // 定時(1秒)報告の情報を送る。
-      job.Lock();  // ロック。
-      TimePoint now = SysClock::now();
-      if (now > job.next_print_info_time_) {
-        shell.PrintOtherInfo(Chrono::duration_cast<Chrono::milliseconds>
-        (now - shared_st_ptr_->start_time_),
-        shared_st_ptr_->searched_nodes_, job.table_ptr_->GetUsedPermill());
-
-        job.next_print_info_time_ = now + Chrono::milliseconds(1000);
-      }
-      job.Unlock();  // ロック解除。
 
       // 探索すべき手が指定されていれば、今の手がその手かどうか調べる。
       if (!(job.moves_to_search_ptr_->empty())) {

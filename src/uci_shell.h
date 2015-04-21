@@ -36,6 +36,7 @@
 #include <map>
 #include <cstddef>
 #include <thread>
+#include <mutex>
 #include <memory>
 #include <functional>
 #include <utility>
@@ -338,6 +339,8 @@ namespace Sayuri {
       /** UCIオプション。 アナライズモード。 */
       bool analyse_mode_;
 
+      /** 出力用ミューテックス。 */
+      static std::mutex print_mutex_;
       /** 出力を受け取るコールバック関数のベクトル。 */
       std::vector<std::function<void(const std::string&)>> output_listeners_;
   };

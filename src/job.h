@@ -151,8 +151,6 @@ namespace Sayuri {
       volatile bool has_legal_move_;
       /** 探索する候補手のベクトルのポインタ。 */
       const std::vector<Move>* moves_to_search_ptr_;
-      /** 次にinfoコマンドを送る時間のポインタ。 */
-      TimePoint next_print_info_time_;
 
     private:
       // ================ //
