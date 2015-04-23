@@ -4545,147 +4545,147 @@ __Example__
 
 * `@pawn-square-table-opening [<New table : List>]`
     + Returns Piece Square Table for Pawn at Opening as List composed
-      of 64 numbers.
-        - From 1st to 8th : From A1 to H1
-        - From 9th to 16th : From A2 to H2
-        - From 17th to 24th : From A3 to H3
-        - From 25th to 32nd : From A4 to H4
-        - From 33rd to 40th : From A5 to H5
-        - From 41st to 48th : From A6 to H6
-        - From 49th to 56th : From A7 to H7
-        - From 57th to 64th : From A8 to H8
+      of 64 numbers. "()" is a square when evaluating Black.
+        - From 1st to 8th : From A1(A8) to H1(H8)
+        - From 9th to 16th : From A2(A7) to H2(H7)
+        - From 17th to 24th : From A3(A6) to H3(H6)
+        - From 25th to 32nd : From A4(A5) to H4(H5)
+        - From 33rd to 40th : From A5(A4) to H5(H4)
+        - From 41st to 48th : From A6(A3) to H6(H3)
+        - From 49th to 56th : From A7(A2) to H7(H2)
+        - From 57th to 64th : From A8(A1) to H8(H1)
     + If you specify `<New table>`, this parameter is updated.
 * `@knight-square-table-opening [<New table : List>]`
     + Returns Piece Square Table for Knight at Opening as List composed
-      of 64 numbers.
-        - From 1st to 8th : From A1 to H1
-        - From 9th to 16th : From A2 to H2
-        - From 17th to 24th : From A3 to H3
-        - From 25th to 32nd : From A4 to H4
-        - From 33rd to 40th : From A5 to H5
-        - From 41st to 48th : From A6 to H6
-        - From 49th to 56th : From A7 to H7
-        - From 57th to 64th : From A8 to H8
+      of 64 numbers. "()" is a square when evaluating Black.
+        - From 1st to 8th : From A1(A8) to H1(H8)
+        - From 9th to 16th : From A2(A7) to H2(H7)
+        - From 17th to 24th : From A3(A6) to H3(H6)
+        - From 25th to 32nd : From A4(A5) to H4(H5)
+        - From 33rd to 40th : From A5(A4) to H5(H4)
+        - From 41st to 48th : From A6(A3) to H6(H3)
+        - From 49th to 56th : From A7(A2) to H7(H2)
+        - From 57th to 64th : From A8(A1) to H8(H1)
     + If you specify `<New table>`, this parameter is updated.
 * `@bishop-square-table-opening [<New table : List>]`
     + Returns Piece Square Table for Bishop at Opening as List composed
-      of 64 numbers.
-        - From 1st to 8th : From A1 to H1
-        - From 9th to 16th : From A2 to H2
-        - From 17th to 24th : From A3 to H3
-        - From 25th to 32nd : From A4 to H4
-        - From 33rd to 40th : From A5 to H5
-        - From 41st to 48th : From A6 to H6
-        - From 49th to 56th : From A7 to H7
-        - From 57th to 64th : From A8 to H8
+      of 64 numbers. "()" is a square when evaluating Black.
+        - From 1st to 8th : From A1(A8) to H1(H8)
+        - From 9th to 16th : From A2(A7) to H2(H7)
+        - From 17th to 24th : From A3(A6) to H3(H6)
+        - From 25th to 32nd : From A4(A5) to H4(H5)
+        - From 33rd to 40th : From A5(A4) to H5(H4)
+        - From 41st to 48th : From A6(A3) to H6(H3)
+        - From 49th to 56th : From A7(A2) to H7(H2)
+        - From 57th to 64th : From A8(A1) to H8(H1)
     + If you specify `<New table>`, this parameter is updated.
 * `@rook-square-table-opening [<New table : List>]`
     + Returns Piece Square Table for Rook at Opening as List composed
-      of 64 numbers.
-        - From 1st to 8th : From A1 to H1
-        - From 9th to 16th : From A2 to H2
-        - From 17th to 24th : From A3 to H3
-        - From 25th to 32nd : From A4 to H4
-        - From 33rd to 40th : From A5 to H5
-        - From 41st to 48th : From A6 to H6
-        - From 49th to 56th : From A7 to H7
-        - From 57th to 64th : From A8 to H8
+      of 64 numbers. "()" is a square when evaluating Black.
+        - From 1st to 8th : From A1(A8) to H1(H8)
+        - From 9th to 16th : From A2(A7) to H2(H7)
+        - From 17th to 24th : From A3(A6) to H3(H6)
+        - From 25th to 32nd : From A4(A5) to H4(H5)
+        - From 33rd to 40th : From A5(A4) to H5(H4)
+        - From 41st to 48th : From A6(A3) to H6(H3)
+        - From 49th to 56th : From A7(A2) to H7(H2)
+        - From 57th to 64th : From A8(A1) to H8(H1)
     + If you specify `<New table>`, this parameter is updated.
 * `@queen-square-table-opening [<New table : List>]`
     + Returns Piece Square Table for Queen at Opening as List composed
-      of 64 numbers.
-        - From 1st to 8th : From A1 to H1
-        - From 9th to 16th : From A2 to H2
-        - From 17th to 24th : From A3 to H3
-        - From 25th to 32nd : From A4 to H4
-        - From 33rd to 40th : From A5 to H5
-        - From 41st to 48th : From A6 to H6
-        - From 49th to 56th : From A7 to H7
-        - From 57th to 64th : From A8 to H8
+      of 64 numbers. "()" is a square when evaluating Black.
+        - From 1st to 8th : From A1(A8) to H1(H8)
+        - From 9th to 16th : From A2(A7) to H2(H7)
+        - From 17th to 24th : From A3(A6) to H3(H6)
+        - From 25th to 32nd : From A4(A5) to H4(H5)
+        - From 33rd to 40th : From A5(A4) to H5(H4)
+        - From 41st to 48th : From A6(A3) to H6(H3)
+        - From 49th to 56th : From A7(A2) to H7(H2)
+        - From 57th to 64th : From A8(A1) to H8(H1)
     + If you specify `<New table>`, this parameter is updated.
 * `@king-square-table-opening [<New table : List>]`
     + Returns Piece Square Table for King at Opening as List composed
-      of 64 numbers.
-        - From 1st to 8th : From A1 to H1
-        - From 9th to 16th : From A2 to H2
-        - From 17th to 24th : From A3 to H3
-        - From 25th to 32nd : From A4 to H4
-        - From 33rd to 40th : From A5 to H5
-        - From 41st to 48th : From A6 to H6
-        - From 49th to 56th : From A7 to H7
-        - From 57th to 64th : From A8 to H8
+      of 64 numbers. "()" is a square when evaluating Black.
+        - From 1st to 8th : From A1(A8) to H1(H8)
+        - From 9th to 16th : From A2(A7) to H2(H7)
+        - From 17th to 24th : From A3(A6) to H3(H6)
+        - From 25th to 32nd : From A4(A5) to H4(H5)
+        - From 33rd to 40th : From A5(A4) to H5(H4)
+        - From 41st to 48th : From A6(A3) to H6(H3)
+        - From 49th to 56th : From A7(A2) to H7(H2)
+        - From 57th to 64th : From A8(A1) to H8(H1)
     + If you specify `<New table>`, this parameter is updated.
 * `@pawn-square-table-ending [<New table : List>]`
     + Returns Piece Square Table for Pawn at Ending as List composed
-      of 64 numbers.
-        - From 1st to 8th : From A1 to H1
-        - From 9th to 16th : From A2 to H2
-        - From 17th to 24th : From A3 to H3
-        - From 25th to 32nd : From A4 to H4
-        - From 33rd to 40th : From A5 to H5
-        - From 41st to 48th : From A6 to H6
-        - From 49th to 56th : From A7 to H7
-        - From 57th to 64th : From A8 to H8
+      of 64 numbers. "()" is a square when evaluating Black.
+        - From 1st to 8th : From A1(A8) to H1(H8)
+        - From 9th to 16th : From A2(A7) to H2(H7)
+        - From 17th to 24th : From A3(A6) to H3(H6)
+        - From 25th to 32nd : From A4(A5) to H4(H5)
+        - From 33rd to 40th : From A5(A4) to H5(H4)
+        - From 41st to 48th : From A6(A3) to H6(H3)
+        - From 49th to 56th : From A7(A2) to H7(H2)
+        - From 57th to 64th : From A8(A1) to H8(H1)
     + If you specify `<New table>`, this parameter is updated.
 * `@knight-square-table-ending [<New table : List>]`
     + Returns Piece Square Table for Knight at Ending as List composed
-      of 64 numbers.
-        - From 1st to 8th : From A1 to H1
-        - From 9th to 16th : From A2 to H2
-        - From 17th to 24th : From A3 to H3
-        - From 25th to 32nd : From A4 to H4
-        - From 33rd to 40th : From A5 to H5
-        - From 41st to 48th : From A6 to H6
-        - From 49th to 56th : From A7 to H7
-        - From 57th to 64th : From A8 to H8
+      of 64 numbers. "()" is a square when evaluating Black.
+        - From 1st to 8th : From A1(A8) to H1(H8)
+        - From 9th to 16th : From A2(A7) to H2(H7)
+        - From 17th to 24th : From A3(A6) to H3(H6)
+        - From 25th to 32nd : From A4(A5) to H4(H5)
+        - From 33rd to 40th : From A5(A4) to H5(H4)
+        - From 41st to 48th : From A6(A3) to H6(H3)
+        - From 49th to 56th : From A7(A2) to H7(H2)
+        - From 57th to 64th : From A8(A1) to H8(H1)
     + If you specify `<New table>`, this parameter is updated.
 * `@bishop-square-table-ending [<New table : List>]`
     + Returns Piece Square Table for Bishop at Ending as List composed
-      of 64 numbers.
-        - From 1st to 8th : From A1 to H1
-        - From 9th to 16th : From A2 to H2
-        - From 17th to 24th : From A3 to H3
-        - From 25th to 32nd : From A4 to H4
-        - From 33rd to 40th : From A5 to H5
-        - From 41st to 48th : From A6 to H6
-        - From 49th to 56th : From A7 to H7
-        - From 57th to 64th : From A8 to H8
+      of 64 numbers. "()" is a square when evaluating Black.
+        - From 1st to 8th : From A1(A8) to H1(H8)
+        - From 9th to 16th : From A2(A7) to H2(H7)
+        - From 17th to 24th : From A3(A6) to H3(H6)
+        - From 25th to 32nd : From A4(A5) to H4(H5)
+        - From 33rd to 40th : From A5(A4) to H5(H4)
+        - From 41st to 48th : From A6(A3) to H6(H3)
+        - From 49th to 56th : From A7(A2) to H7(H2)
+        - From 57th to 64th : From A8(A1) to H8(H1)
     + If you specify `<New table>`, this parameter is updated.
 * `@rook-square-table-ending [<New table : List>]`
     + Returns Piece Square Table for Rook at Ending as List composed
-      of 64 numbers.
-        - From 1st to 8th : From A1 to H1
-        - From 9th to 16th : From A2 to H2
-        - From 17th to 24th : From A3 to H3
-        - From 25th to 32nd : From A4 to H4
-        - From 33rd to 40th : From A5 to H5
-        - From 41st to 48th : From A6 to H6
-        - From 49th to 56th : From A7 to H7
-        - From 57th to 64th : From A8 to H8
+      of 64 numbers. "()" is a square when evaluating Black.
+        - From 1st to 8th : From A1(A8) to H1(H8)
+        - From 9th to 16th : From A2(A7) to H2(H7)
+        - From 17th to 24th : From A3(A6) to H3(H6)
+        - From 25th to 32nd : From A4(A5) to H4(H5)
+        - From 33rd to 40th : From A5(A4) to H5(H4)
+        - From 41st to 48th : From A6(A3) to H6(H3)
+        - From 49th to 56th : From A7(A2) to H7(H2)
+        - From 57th to 64th : From A8(A1) to H8(H1)
     + If you specify `<New table>`, this parameter is updated.
 * `@queen-square-table-ending [<New table : List>]`
     + Returns Piece Square Table for Queen at Ending as List composed
-      of 64 numbers.
-        - From 1st to 8th : From A1 to H1
-        - From 9th to 16th : From A2 to H2
-        - From 17th to 24th : From A3 to H3
-        - From 25th to 32nd : From A4 to H4
-        - From 33rd to 40th : From A5 to H5
-        - From 41st to 48th : From A6 to H6
-        - From 49th to 56th : From A7 to H7
-        - From 57th to 64th : From A8 to H8
+      of 64 numbers. "()" is a square when evaluating Black.
+        - From 1st to 8th : From A1(A8) to H1(H8)
+        - From 9th to 16th : From A2(A7) to H2(H7)
+        - From 17th to 24th : From A3(A6) to H3(H6)
+        - From 25th to 32nd : From A4(A5) to H4(H5)
+        - From 33rd to 40th : From A5(A4) to H5(H4)
+        - From 41st to 48th : From A6(A3) to H6(H3)
+        - From 49th to 56th : From A7(A2) to H7(H2)
+        - From 57th to 64th : From A8(A1) to H8(H1)
     + If you specify `<New table>`, this parameter is updated.
 * `@king-square-table-ending [<New table : List>]`
     + Returns Piece Square Table for King at Ending as List composed
-      of 64 numbers.
-        - From 1st to 8th : From A1 to H1
-        - From 9th to 16th : From A2 to H2
-        - From 17th to 24th : From A3 to H3
-        - From 25th to 32nd : From A4 to H4
-        - From 33rd to 40th : From A5 to H5
-        - From 41st to 48th : From A6 to H6
-        - From 49th to 56th : From A7 to H7
-        - From 57th to 64th : From A8 to H8
+      of 64 numbers. "()" is a square when evaluating Black.
+        - From 1st to 8th : From A1(A8) to H1(H8)
+        - From 9th to 16th : From A2(A7) to H2(H7)
+        - From 17th to 24th : From A3(A6) to H3(H6)
+        - From 25th to 32nd : From A4(A5) to H4(H5)
+        - From 33rd to 40th : From A5(A4) to H5(H4)
+        - From 41st to 48th : From A6(A3) to H6(H3)
+        - From 49th to 56th : From A7(A2) to H7(H2)
+        - From 57th to 64th : From A8(A1) to H8(H1)
     + If you specify `<New table>`, this parameter is updated.
 
 __Example__
