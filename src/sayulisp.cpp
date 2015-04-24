@@ -3960,6 +3960,128 @@ __Example__
     ;; > 111111 222222 333333 444444 555555 666666 777777 888888
     ;; > 1111111 2222222 3333333 4444444 5555555 6666666 7777777 8888888
     ;; > 11111111 22222222 33333333 44444444 55555555 66666666 77777777
-    ;; > 88888888))...";
+    ;; > 88888888)
+
+* `@pawn-attack-table [<New table : List>]`
+    + Returns a value table of Attacking Score for Pawn
+      as List composed of 7 values.
+        - 1st : Not used. This is always '0'. (For EMPTY)
+        - 2nd : Value of attacking Pawn.
+        - 3rd : Value of attacking Knight.
+        - 4th : Value of attacking Bishop.
+        - 5th : Value of attacking Rook.
+        - 6th : Value of attacking Queen.
+        - 7th : Value of attacking King.
+    + If you specify `<New table>`, this parameter is updated.
+* `@knight-attack-table [<New table : List>]`
+    + Returns a value table of Attacking Score for Knight
+      as List composed of 7 values.
+        - 1st : Not used. This is always '0'. (For EMPTY)
+        - 2nd : Value of attacking Pawn.
+        - 3rd : Value of attacking Knight.
+        - 4th : Value of attacking Bishop.
+        - 5th : Value of attacking Rook.
+        - 6th : Value of attacking Queen.
+        - 7th : Value of attacking King.
+    + If you specify `<New table>`, this parameter is updated.
+* `@bishop-attack-table [<New table : List>]`
+    + Returns a value table of Attacking Score for Bishop
+      as List composed of 7 values.
+        - 1st : Not used. This is always '0'. (For EMPTY)
+        - 2nd : Value of attacking Pawn.
+        - 3rd : Value of attacking Knight.
+        - 4th : Value of attacking Bishop.
+        - 5th : Value of attacking Rook.
+        - 6th : Value of attacking Queen.
+        - 7th : Value of attacking King.
+    + If you specify `<New table>`, this parameter is updated.
+* `@rook-attack-table [<New table : List>]`
+    + Returns a value table of Attacking Score for Rook
+      as List composed of 7 values.
+        - 1st : Not used. This is always '0'. (For EMPTY)
+        - 2nd : Value of attacking Pawn.
+        - 3rd : Value of attacking Knight.
+        - 4th : Value of attacking Bishop.
+        - 5th : Value of attacking Rook.
+        - 6th : Value of attacking Queen.
+        - 7th : Value of attacking King.
+    + If you specify `<New table>`, this parameter is updated.
+* `@queen-attack-table [<New table : List>]`
+    + Returns a value table of Attacking Score for Queen
+      as List composed of 7 values.
+        - 1st : Not used. This is always '0'. (For EMPTY)
+        - 2nd : Value of attacking Pawn.
+        - 3rd : Value of attacking Knight.
+        - 4th : Value of attacking Bishop.
+        - 5th : Value of attacking Rook.
+        - 6th : Value of attacking Queen.
+        - 7th : Value of attacking King.
+    + If you specify `<New table>`, this parameter is updated.
+* `@king-attack-table [<New table : List>]`
+    + Returns a value table of Attacking Score for King
+      as List composed of 7 values.
+        - 1st : Not used. This is always '0'. (For EMPTY)
+        - 2nd : Value of attacking Pawn.
+        - 3rd : Value of attacking Knight.
+        - 4th : Value of attacking Bishop.
+        - 5th : Value of attacking Rook.
+        - 6th : Value of attacking Queen.
+        - 7th : Value of attacking King.
+    + If you specify `<New table>`, this parameter is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@pawn-attack-table (list 1 2 3 4 5 6 7)))
+    ;; Output
+    ;; > (0 10 12 14 16 18 20)
+    
+    (display (my-engine '@pawn-attack-table))
+    ;; Output
+    ;; > (0 2 3 4 5 6 7)
+
+* `@weight-pawn-attack [<New weight : List>]`
+    + Return Weight for Attacking Score for Pawn as List of 2 elements.
+        + 1st : Weight on Opening.
+        + 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-knight-attack [<New weight : List>]`
+    + Return Weight for Attacking Score for Knight as List of 2 elements.
+        + 1st : Weight on Opening.
+        + 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-bishop-attack [<New weight : List>]`
+    + Return Weight for Attacking Score for Bishop as List of 2 elements.
+        + 1st : Weight on Opening.
+        + 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-rook-attack [<New weight : List>]`
+    + Return Weight for Attacking Score for Rook as List of 2 elements.
+        + 1st : Weight on Opening.
+        + 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-queen-attack [<New weight : List>]`
+    + Return Weight for Attacking Score for Queen as List of 2 elements.
+        + 1st : Weight on Opening.
+        + 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-king-attack [<New weight : List>]`
+    + Return Weight for Attacking Score for King as List of 2 elements.
+        + 1st : Weight on Opening.
+        + 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@weight-pawn-attack (list 111 222)))
+    ;; Output
+    ;; > (1 0.3)
+    
+    (display (my-engine '@weight-pawn-attack))
+    ;; Output
+    ;; > (111 222))...";
   }
 }  // namespace Sayuri

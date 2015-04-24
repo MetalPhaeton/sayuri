@@ -1475,6 +1475,168 @@
 ;; &gt; 1111111 2222222 3333333 4444444 5555555 6666666 7777777 8888888
 ;; &gt; 11111111 22222222 33333333 44444444 55555555 66666666 77777777
 ;; &gt; 88888888)</code></pre>
+<ul>
+<li><code>@pawn-attack-table [&lt;New table : List&gt;]</code>
+<ul>
+<li>Returns a value table of Attacking Score for Pawn as List composed of 7 values.
+<ul>
+<li>1st : Not used. This is always '0'. (For EMPTY)</li>
+<li>2nd : Value of attacking Pawn.</li>
+<li>3rd : Value of attacking Knight.</li>
+<li>4th : Value of attacking Bishop.</li>
+<li>5th : Value of attacking Rook.</li>
+<li>6th : Value of attacking Queen.</li>
+<li>7th : Value of attacking King.</li>
+</ul></li>
+<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@knight-attack-table [&lt;New table : List&gt;]</code>
+<ul>
+<li>Returns a value table of Attacking Score for Knight as List composed of 7 values.
+<ul>
+<li>1st : Not used. This is always '0'. (For EMPTY)</li>
+<li>2nd : Value of attacking Pawn.</li>
+<li>3rd : Value of attacking Knight.</li>
+<li>4th : Value of attacking Bishop.</li>
+<li>5th : Value of attacking Rook.</li>
+<li>6th : Value of attacking Queen.</li>
+<li>7th : Value of attacking King.</li>
+</ul></li>
+<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@bishop-attack-table [&lt;New table : List&gt;]</code>
+<ul>
+<li>Returns a value table of Attacking Score for Bishop as List composed of 7 values.
+<ul>
+<li>1st : Not used. This is always '0'. (For EMPTY)</li>
+<li>2nd : Value of attacking Pawn.</li>
+<li>3rd : Value of attacking Knight.</li>
+<li>4th : Value of attacking Bishop.</li>
+<li>5th : Value of attacking Rook.</li>
+<li>6th : Value of attacking Queen.</li>
+<li>7th : Value of attacking King.</li>
+</ul></li>
+<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@rook-attack-table [&lt;New table : List&gt;]</code>
+<ul>
+<li>Returns a value table of Attacking Score for Rook as List composed of 7 values.
+<ul>
+<li>1st : Not used. This is always '0'. (For EMPTY)</li>
+<li>2nd : Value of attacking Pawn.</li>
+<li>3rd : Value of attacking Knight.</li>
+<li>4th : Value of attacking Bishop.</li>
+<li>5th : Value of attacking Rook.</li>
+<li>6th : Value of attacking Queen.</li>
+<li>7th : Value of attacking King.</li>
+</ul></li>
+<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@queen-attack-table [&lt;New table : List&gt;]</code>
+<ul>
+<li>Returns a value table of Attacking Score for Queen as List composed of 7 values.
+<ul>
+<li>1st : Not used. This is always '0'. (For EMPTY)</li>
+<li>2nd : Value of attacking Pawn.</li>
+<li>3rd : Value of attacking Knight.</li>
+<li>4th : Value of attacking Bishop.</li>
+<li>5th : Value of attacking Rook.</li>
+<li>6th : Value of attacking Queen.</li>
+<li>7th : Value of attacking King.</li>
+</ul></li>
+<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@king-attack-table [&lt;New table : List&gt;]</code>
+<ul>
+<li>Returns a value table of Attacking Score for King as List composed of 7 values.
+<ul>
+<li>1st : Not used. This is always '0'. (For EMPTY)</li>
+<li>2nd : Value of attacking Pawn.</li>
+<li>3rd : Value of attacking Knight.</li>
+<li>4th : Value of attacking Bishop.</li>
+<li>5th : Value of attacking Rook.</li>
+<li>6th : Value of attacking Queen.</li>
+<li>7th : Value of attacking King.</li>
+</ul></li>
+<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define my-engine (gen-engine))
+
+(display (my-engine &#39;@pawn-attack-table (list 1 2 3 4 5 6 7)))
+;; Output
+;; &gt; (0 10 12 14 16 18 20)
+
+(display (my-engine &#39;@pawn-attack-table))
+;; Output
+;; &gt; (0 2 3 4 5 6 7)</code></pre>
+<ul>
+<li><code>@weight-pawn-attack [&lt;New weight : List&gt;]</code>
+<ul>
+<li>Return Weight for Attacking Score for Pawn as List of 2 elements.
+<ul>
+<li>1st : Weight on Opening.</li>
+<li>2nd : Weight on Ending.</li>
+</ul></li>
+<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@weight-knight-attack [&lt;New weight : List&gt;]</code>
+<ul>
+<li>Return Weight for Attacking Score for Knight as List of 2 elements.
+<ul>
+<li>1st : Weight on Opening.</li>
+<li>2nd : Weight on Ending.</li>
+</ul></li>
+<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@weight-bishop-attack [&lt;New weight : List&gt;]</code>
+<ul>
+<li>Return Weight for Attacking Score for Bishop as List of 2 elements.
+<ul>
+<li>1st : Weight on Opening.</li>
+<li>2nd : Weight on Ending.</li>
+</ul></li>
+<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@weight-rook-attack [&lt;New weight : List&gt;]</code>
+<ul>
+<li>Return Weight for Attacking Score for Rook as List of 2 elements.
+<ul>
+<li>1st : Weight on Opening.</li>
+<li>2nd : Weight on Ending.</li>
+</ul></li>
+<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@weight-queen-attack [&lt;New weight : List&gt;]</code>
+<ul>
+<li>Return Weight for Attacking Score for Queen as List of 2 elements.
+<ul>
+<li>1st : Weight on Opening.</li>
+<li>2nd : Weight on Ending.</li>
+</ul></li>
+<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
+</ul></li>
+<li><code>@weight-king-attack [&lt;New weight : List&gt;]</code>
+<ul>
+<li>Return Weight for Attacking Score for King as List of 2 elements.
+<ul>
+<li>1st : Weight on Opening.</li>
+<li>2nd : Weight on Ending.</li>
+</ul></li>
+<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
+</ul></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define my-engine (gen-engine))
+
+(display (my-engine &#39;@weight-pawn-attack (list 111 222)))
+;; Output
+;; &gt; (1 0.3)
+
+(display (my-engine &#39;@weight-pawn-attack))
+;; Output
+;; &gt; (111 222)</code></pre>
 <h2 id="utility-functions">Utility Functions</h2>
 
 </section>
