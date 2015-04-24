@@ -1304,23 +1304,25 @@ namespace Sayuri {
       /**
        * EvalParams - 攻撃のウェイト。
        * @param func_name 関数名。
+       * @param symbol_name シンボル名。
        * @param weight_params ウェイトのパラメータリスト。
        * @return セットされていたウェイト。
        */
       template<PieceType TYPE>
       LispObjectPtr SetWeightAttack(const std::string& func_name,
-      const LispObject& weight_params) {
+      const std::string& symbol_name, const LispObject& weight_params) {
         const Weight& weight = eval_params_ptr_->weight_attack()[TYPE];
 
         LispObjectPtr ret_ptr = LispObject::NewList(2);
         ret_ptr->car(LispObject::NewNumber(weight.opening_weight()));
-        ret_ptr->cdr()->car(LispObject::NewNumber(weight.opening_weight()));
+        ret_ptr->cdr()->car(LispObject::NewNumber(weight.ending_weight()));
 
         if (weight_params.IsList() && !(weight_params.IsNil())) {
           int len = weight_params.Length();
           if (len < 2) {
             throw LispObject::GenError("@engine_error",
-            "Weight needs 2 parameters. Given " + std::to_string(len) + ".");
+            symbol_name + " needs 2 parameters. Given " + std::to_string(len)
+            + ".");
           }
 
           if (!(weight_params.car()->IsNumber())) {
@@ -1338,6 +1340,7 @@ namespace Sayuri {
           }
           temp[TYPE].opening_weight(weight_params.car()->number_value());
           temp[TYPE].ending_weight(weight_params.cdr()->car()->number_value());
+          eval_params_ptr_->weight_attack(temp);
         }
 
         return ret_ptr;

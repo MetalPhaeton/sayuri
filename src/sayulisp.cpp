@@ -1103,6 +1103,41 @@ namespace Sayuri {
         (func_name, message_symbol, *value_list_ptr);
       }
 
+    } else if ((message_symbol == "@weight-pawn-attack")
+    || (message_symbol == "@weight-knight-attack")
+    || (message_symbol == "@weight-bishop-attack")
+    || (message_symbol == "@weight-rook-attack")
+    || (message_symbol == "@weight-queen-attack")
+    || (message_symbol == "@weight-king-attack")) {
+      LispObjectPtr weight_params_ptr = LispObject::NewNil();
+      if (list_itr) {
+        weight_params_ptr = caller.Evaluate(*list_itr);
+        if (!(weight_params_ptr->IsList())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "List", std::vector<int> {2}, true);
+        }
+      }
+
+      if (message_symbol == "@weight-pawn-attack") {
+        return SetWeightAttack<PAWN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-knight-attack") {
+        return SetWeightAttack<KNIGHT>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-bishop-attack") {
+        return SetWeightAttack<BISHOP>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-rook-attack") {
+        return SetWeightAttack<ROOK>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-queen-attack") {
+        return SetWeightAttack<QUEEN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else {
+        return SetWeightAttack<KING>
+        (func_name, message_symbol, *weight_params_ptr);
+      }
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
