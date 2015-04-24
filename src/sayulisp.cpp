@@ -998,7 +998,12 @@ namespace Sayuri {
 
       return SetFutilityPruningMargin(*margin_ptr);
 
-    } else if (message_symbol == "@pawn-square-table-opening") {
+    } else if ((message_symbol == "@pawn-square-table-opening")
+    || (message_symbol == "@knight-square-table-opening")
+    || (message_symbol == "@bishop-square-table-opening")
+    || (message_symbol == "@rook-square-table-opening")
+    || (message_symbol == "@queen-square-table-opening")
+    || (message_symbol == "@king-square-table-opening")) {
       LispObjectPtr table_ptr = LispObject::NewNil();
       if (list_itr) {
         table_ptr = caller.Evaluate(*list_itr);
@@ -1008,9 +1013,32 @@ namespace Sayuri {
         }
       }
 
-      return SetPawnSquareTableOpening(func_name, *table_ptr);
+      if (message_symbol == "@pawn-square-table-opening") {
+        return SetPieceSquareTableOpening<PAWN>
+        (func_name, message_symbol, *table_ptr);
+      } else if (message_symbol == "@knight-square-table-opening") {
+        return SetPieceSquareTableOpening<KNIGHT>
+        (func_name, message_symbol, *table_ptr);
+      } else if (message_symbol == "@bishop-square-table-opening") {
+        return SetPieceSquareTableOpening<BISHOP>
+        (func_name, message_symbol, *table_ptr);
+      } else if (message_symbol == "@rook-square-table-opening") {
+        return SetPieceSquareTableOpening<ROOK>
+        (func_name, message_symbol, *table_ptr);
+      } else if (message_symbol == "@queen-square-table-opening") {
+        return SetPieceSquareTableOpening<QUEEN>
+        (func_name, message_symbol, *table_ptr);
+      } else {
+        return SetPieceSquareTableOpening<KING>
+        (func_name, message_symbol, *table_ptr);
+      }
 
-    } else if (message_symbol == "@knight-square-table-opening") {
+    } else if ((message_symbol == "@pawn-square-table-ending")
+    || (message_symbol == "@knight-square-table-ending")
+    || (message_symbol == "@bishop-square-table-ending")
+    || (message_symbol == "@rook-square-table-ending")
+    || (message_symbol == "@queen-square-table-ending")
+    || (message_symbol == "@king-square-table-ending")) {
       LispObjectPtr table_ptr = LispObject::NewNil();
       if (list_itr) {
         table_ptr = caller.Evaluate(*list_itr);
@@ -1020,127 +1048,25 @@ namespace Sayuri {
         }
       }
 
-      return SetKnightSquareTableOpening(func_name, *table_ptr);
-
-    } else if (message_symbol == "@bishop-square-table-opening") {
-      LispObjectPtr table_ptr = LispObject::NewNil();
-      if (list_itr) {
-        table_ptr = caller.Evaluate(*list_itr);
-        if (!(table_ptr->IsList())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "List", std::vector<int> {2}, true);
-        }
+      if (message_symbol == "@pawn-square-table-ending") {
+        return SetPieceSquareTableEnding<PAWN>
+        (func_name, message_symbol, *table_ptr);
+      } else if (message_symbol == "@knight-square-table-ending") {
+        return SetPieceSquareTableEnding<KNIGHT>
+        (func_name, message_symbol, *table_ptr);
+      } else if (message_symbol == "@bishop-square-table-ending") {
+        return SetPieceSquareTableEnding<BISHOP>
+        (func_name, message_symbol, *table_ptr);
+      } else if (message_symbol == "@rook-square-table-ending") {
+        return SetPieceSquareTableEnding<ROOK>
+        (func_name, message_symbol, *table_ptr);
+      } else if (message_symbol == "@queen-square-table-ending") {
+        return SetPieceSquareTableEnding<QUEEN>
+        (func_name, message_symbol, *table_ptr);
+      } else {
+        return SetPieceSquareTableEnding<KING>
+        (func_name, message_symbol, *table_ptr);
       }
-
-      return SetBishopSquareTableOpening(func_name, *table_ptr);
-
-    } else if (message_symbol == "@rook-square-table-opening") {
-      LispObjectPtr table_ptr = LispObject::NewNil();
-      if (list_itr) {
-        table_ptr = caller.Evaluate(*list_itr);
-        if (!(table_ptr->IsList())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "List", std::vector<int> {2}, true);
-        }
-      }
-
-      return SetRookSquareTableOpening(func_name, *table_ptr);
-
-    } else if (message_symbol == "@queen-square-table-opening") {
-      LispObjectPtr table_ptr = LispObject::NewNil();
-      if (list_itr) {
-        table_ptr = caller.Evaluate(*list_itr);
-        if (!(table_ptr->IsList())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "List", std::vector<int> {2}, true);
-        }
-      }
-
-      return SetQueenSquareTableOpening(func_name, *table_ptr);
-
-    } else if (message_symbol == "@king-square-table-opening") {
-      LispObjectPtr table_ptr = LispObject::NewNil();
-      if (list_itr) {
-        table_ptr = caller.Evaluate(*list_itr);
-        if (!(table_ptr->IsList())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "List", std::vector<int> {2}, true);
-        }
-      }
-
-      return SetKingSquareTableOpening(func_name, *table_ptr);
-
-    } else if (message_symbol == "@pawn-square-table-ending") {
-      LispObjectPtr table_ptr = LispObject::NewNil();
-      if (list_itr) {
-        table_ptr = caller.Evaluate(*list_itr);
-        if (!(table_ptr->IsList())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "List", std::vector<int> {2}, true);
-        }
-      }
-
-      return SetPawnSquareTableEnding(func_name, *table_ptr);
-
-    } else if (message_symbol == "@knight-square-table-ending") {
-      LispObjectPtr table_ptr = LispObject::NewNil();
-      if (list_itr) {
-        table_ptr = caller.Evaluate(*list_itr);
-        if (!(table_ptr->IsList())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "List", std::vector<int> {2}, true);
-        }
-      }
-
-      return SetKnightSquareTableEnding(func_name, *table_ptr);
-
-    } else if (message_symbol == "@bishop-square-table-ending") {
-      LispObjectPtr table_ptr = LispObject::NewNil();
-      if (list_itr) {
-        table_ptr = caller.Evaluate(*list_itr);
-        if (!(table_ptr->IsList())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "List", std::vector<int> {2}, true);
-        }
-      }
-
-      return SetBishopSquareTableEnding(func_name, *table_ptr);
-
-    } else if (message_symbol == "@rook-square-table-ending") {
-      LispObjectPtr table_ptr = LispObject::NewNil();
-      if (list_itr) {
-        table_ptr = caller.Evaluate(*list_itr);
-        if (!(table_ptr->IsList())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "List", std::vector<int> {2}, true);
-        }
-      }
-
-      return SetRookSquareTableEnding(func_name, *table_ptr);
-
-    } else if (message_symbol == "@queen-square-table-ending") {
-      LispObjectPtr table_ptr = LispObject::NewNil();
-      if (list_itr) {
-        table_ptr = caller.Evaluate(*list_itr);
-        if (!(table_ptr->IsList())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "List", std::vector<int> {2}, true);
-        }
-      }
-
-      return SetQueenSquareTableEnding(func_name, *table_ptr);
-
-    } else if (message_symbol == "@king-square-table-ending") {
-      LispObjectPtr table_ptr = LispObject::NewNil();
-      if (list_itr) {
-        table_ptr = caller.Evaluate(*list_itr);
-        if (!(table_ptr->IsList())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "List", std::vector<int> {2}, true);
-        }
-      }
-
-      return SetKingSquareTableEnding(func_name, *table_ptr);
 
     } else if ((message_symbol == "@pawn-attack-table")
     || (message_symbol == "@knight-attack-table")
@@ -1176,6 +1102,7 @@ namespace Sayuri {
         return SetAttackValueTable<KING>
         (func_name, message_symbol, *value_list_ptr);
       }
+
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
@@ -1986,582 +1913,6 @@ namespace Sayuri {
     // セットする。
     if (len != 0) {
       search_params_ptr_->material(material);
-    }
-
-    return ret_ptr;
-  }
-
-  // EvalParams - ポーンのオープニング時のポジションの価値テーブル。
-  LispObjectPtr EngineSuite::SetPawnSquareTableOpening
-  (const std::string& func_name, const LispObject& square_list) {
-    // テーブルを抽出。
-    const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
-    eval_params_ptr_->opening_position_value_table();
-
-    // 先ず返すリストを作る。
-    LispObjectPtr ret_ptr = LispObject::NewList(64);
-    LispIterator itr(ret_ptr.get());
-    FOR_SQUARES(square) {
-      itr->type(LispObjectType::NUMBER);
-      itr->number_value (table[PAWN][square]);
-
-      ++itr;
-    }
-
-    // セットする。
-    if (!(square_list.IsNil())) {
-      if (square_list.Length() != 64) {
-        throw LispObject::GenError("@engine_error",
-        "The length of square table is not '64'. It is '"
-        + std::to_string(square_list.Length()) + "'.");
-      }
-
-      // 全体をコピー。
-      double temp[NUM_PIECE_TYPES][NUM_SQUARES];
-      COPY_ARRAY(temp, table);
-
-      // 値を変更。
-      LispIterator list_itr(&square_list);
-      FOR_SQUARES(square) {
-        if (!(list_itr->IsNumber())) {
-          throw LispObject::GenWrongTypeError(func_name, "Number",
-          std::vector<int> {2, static_cast<int>(square + 1)}, false);
-        }
-
-        temp[PAWN][square] = list_itr->number_value();
-        ++list_itr;
-      }
-
-      // セット。
-      eval_params_ptr_->opening_position_value_table(temp);
-    }
-
-    return ret_ptr;
-  }
-
-  // EvalParams - ナイトのオープニング時のポジションの価値テーブル。
-  LispObjectPtr EngineSuite::SetKnightSquareTableOpening
-  (const std::string& func_name, const LispObject& square_list) {
-    // テーブルを抽出。
-    const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
-    eval_params_ptr_->opening_position_value_table();
-
-    // 先ず返すリストを作る。
-    LispObjectPtr ret_ptr = LispObject::NewList(64);
-    LispIterator itr(ret_ptr.get());
-    FOR_SQUARES(square) {
-      itr->type(LispObjectType::NUMBER);
-      itr->number_value (table[KNIGHT][square]);
-
-      ++itr;
-    }
-
-    // セットする。
-    if (!(square_list.IsNil())) {
-      if (square_list.Length() != 64) {
-        throw LispObject::GenError("@engine_error",
-        "The length of square table is not '64'. It is '"
-        + std::to_string(square_list.Length()) + "'.");
-      }
-
-      // 全体をコピー。
-      double temp[NUM_PIECE_TYPES][NUM_SQUARES];
-      COPY_ARRAY(temp, table);
-
-      // 値を変更。
-      LispIterator list_itr(&square_list);
-      FOR_SQUARES(square) {
-        if (!(list_itr->IsNumber())) {
-          throw LispObject::GenWrongTypeError(func_name, "Number",
-          std::vector<int> {2, static_cast<int>(square + 1)}, false);
-        }
-
-        temp[KNIGHT][square] = list_itr->number_value();
-        ++list_itr;
-      }
-
-      // セット。
-      eval_params_ptr_->opening_position_value_table(temp);
-    }
-
-    return ret_ptr;
-  }
-
-  // EvalParams - ビショップのオープニング時のポジションの価値テーブル。
-  LispObjectPtr EngineSuite::SetBishopSquareTableOpening
-  (const std::string& func_name, const LispObject& square_list) {
-    // テーブルを抽出。
-    const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
-    eval_params_ptr_->opening_position_value_table();
-
-    // 先ず返すリストを作る。
-    LispObjectPtr ret_ptr = LispObject::NewList(64);
-    LispIterator itr(ret_ptr.get());
-    FOR_SQUARES(square) {
-      itr->type(LispObjectType::NUMBER);
-      itr->number_value (table[BISHOP][square]);
-
-      ++itr;
-    }
-
-    // セットする。
-    if (!(square_list.IsNil())) {
-      if (square_list.Length() != 64) {
-        throw LispObject::GenError("@engine_error",
-        "The length of square table is not '64'. It is '"
-        + std::to_string(square_list.Length()) + "'.");
-      }
-
-      // 全体をコピー。
-      double temp[NUM_PIECE_TYPES][NUM_SQUARES];
-      COPY_ARRAY(temp, table);
-
-      // 値を変更。
-      LispIterator list_itr(&square_list);
-      FOR_SQUARES(square) {
-        if (!(list_itr->IsNumber())) {
-          throw LispObject::GenWrongTypeError(func_name, "Number",
-          std::vector<int> {2, static_cast<int>(square + 1)}, false);
-        }
-
-        temp[BISHOP][square] = list_itr->number_value();
-        ++list_itr;
-      }
-
-      // セット。
-      eval_params_ptr_->opening_position_value_table(temp);
-    }
-
-    return ret_ptr;
-  }
-
-  // EvalParams - ルークのオープニング時のポジションの価値テーブル。
-  LispObjectPtr EngineSuite::SetRookSquareTableOpening
-  (const std::string& func_name, const LispObject& square_list) {
-    // テーブルを抽出。
-    const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
-    eval_params_ptr_->opening_position_value_table();
-
-    // 先ず返すリストを作る。
-    LispObjectPtr ret_ptr = LispObject::NewList(64);
-    LispIterator itr(ret_ptr.get());
-    FOR_SQUARES(square) {
-      itr->type(LispObjectType::NUMBER);
-      itr->number_value (table[ROOK][square]);
-
-      ++itr;
-    }
-
-    // セットする。
-    if (!(square_list.IsNil())) {
-      if (square_list.Length() != 64) {
-        throw LispObject::GenError("@engine_error",
-        "The length of square table is not '64'. It is '"
-        + std::to_string(square_list.Length()) + "'.");
-      }
-
-      // 全体をコピー。
-      double temp[NUM_PIECE_TYPES][NUM_SQUARES];
-      COPY_ARRAY(temp, table);
-
-      // 値を変更。
-      LispIterator list_itr(&square_list);
-      FOR_SQUARES(square) {
-        if (!(list_itr->IsNumber())) {
-          throw LispObject::GenWrongTypeError(func_name, "Number",
-          std::vector<int> {2, static_cast<int>(square + 1)}, false);
-        }
-
-        temp[ROOK][square] = list_itr->number_value();
-        ++list_itr;
-      }
-
-      // セット。
-      eval_params_ptr_->opening_position_value_table(temp);
-    }
-
-    return ret_ptr;
-  }
-
-  // EvalParams - クイーンのオープニング時のポジションの価値テーブル。
-  LispObjectPtr EngineSuite::SetQueenSquareTableOpening
-  (const std::string& func_name, const LispObject& square_list) {
-    // テーブルを抽出。
-    const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
-    eval_params_ptr_->opening_position_value_table();
-
-    // 先ず返すリストを作る。
-    LispObjectPtr ret_ptr = LispObject::NewList(64);
-    LispIterator itr(ret_ptr.get());
-    FOR_SQUARES(square) {
-      itr->type(LispObjectType::NUMBER);
-      itr->number_value (table[QUEEN][square]);
-
-      ++itr;
-    }
-
-    // セットする。
-    if (!(square_list.IsNil())) {
-      if (square_list.Length() != 64) {
-        throw LispObject::GenError("@engine_error",
-        "The length of square table is not '64'. It is '"
-        + std::to_string(square_list.Length()) + "'.");
-      }
-
-      // 全体をコピー。
-      double temp[NUM_PIECE_TYPES][NUM_SQUARES];
-      COPY_ARRAY(temp, table);
-
-      // 値を変更。
-      LispIterator list_itr(&square_list);
-      FOR_SQUARES(square) {
-        if (!(list_itr->IsNumber())) {
-          throw LispObject::GenWrongTypeError(func_name, "Number",
-          std::vector<int> {2, static_cast<int>(square + 1)}, false);
-        }
-
-        temp[QUEEN][square] = list_itr->number_value();
-        ++list_itr;
-      }
-
-      // セット。
-      eval_params_ptr_->opening_position_value_table(temp);
-    }
-
-    return ret_ptr;
-  }
-
-  // EvalParams - キングのオープニング時のポジションの価値テーブル。
-  LispObjectPtr EngineSuite::SetKingSquareTableOpening
-  (const std::string& func_name, const LispObject& square_list) {
-    // テーブルを抽出。
-    const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
-    eval_params_ptr_->opening_position_value_table();
-
-    // 先ず返すリストを作る。
-    LispObjectPtr ret_ptr = LispObject::NewList(64);
-    LispIterator itr(ret_ptr.get());
-    FOR_SQUARES(square) {
-      itr->type(LispObjectType::NUMBER);
-      itr->number_value (table[KING][square]);
-
-      ++itr;
-    }
-
-    // セットする。
-    if (!(square_list.IsNil())) {
-      if (square_list.Length() != 64) {
-        throw LispObject::GenError("@engine_error",
-        "The length of square table is not '64'. It is '"
-        + std::to_string(square_list.Length()) + "'.");
-      }
-
-      // 全体をコピー。
-      double temp[NUM_PIECE_TYPES][NUM_SQUARES];
-      COPY_ARRAY(temp, table);
-
-      // 値を変更。
-      LispIterator list_itr(&square_list);
-      FOR_SQUARES(square) {
-        if (!(list_itr->IsNumber())) {
-          throw LispObject::GenWrongTypeError(func_name, "Number",
-          std::vector<int> {2, static_cast<int>(square + 1)}, false);
-        }
-
-        temp[KING][square] = list_itr->number_value();
-        ++list_itr;
-      }
-
-      // セット。
-      eval_params_ptr_->opening_position_value_table(temp);
-    }
-
-    return ret_ptr;
-  }
-
-  // EvalParams - ポーンのオープニング時のポジションの価値テーブル。
-  LispObjectPtr EngineSuite::SetPawnSquareTableEnding
-  (const std::string& func_name, const LispObject& square_list) {
-    // テーブルを抽出。
-    const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
-    eval_params_ptr_->ending_position_value_table();
-
-    // 先ず返すリストを作る。
-    LispObjectPtr ret_ptr = LispObject::NewList(64);
-    LispIterator itr(ret_ptr.get());
-    FOR_SQUARES(square) {
-      itr->type(LispObjectType::NUMBER);
-      itr->number_value (table[PAWN][square]);
-
-      ++itr;
-    }
-
-    // セットする。
-    if (!(square_list.IsNil())) {
-      if (square_list.Length() != 64) {
-        throw LispObject::GenError("@engine_error",
-        "The length of square table is not '64'. It is '"
-        + std::to_string(square_list.Length()) + "'.");
-      }
-
-      // 全体をコピー。
-      double temp[NUM_PIECE_TYPES][NUM_SQUARES];
-      COPY_ARRAY(temp, table);
-
-      // 値を変更。
-      LispIterator list_itr(&square_list);
-      FOR_SQUARES(square) {
-        if (!(list_itr->IsNumber())) {
-          throw LispObject::GenWrongTypeError(func_name, "Number",
-          std::vector<int> {2, static_cast<int>(square + 1)}, false);
-        }
-
-        temp[PAWN][square] = list_itr->number_value();
-        ++list_itr;
-      }
-
-      // セット。
-      eval_params_ptr_->ending_position_value_table(temp);
-    }
-
-    return ret_ptr;
-  }
-
-  // EvalParams - ナイトのオープニング時のポジションの価値テーブル。
-  LispObjectPtr EngineSuite::SetKnightSquareTableEnding
-  (const std::string& func_name, const LispObject& square_list) {
-    // テーブルを抽出。
-    const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
-    eval_params_ptr_->ending_position_value_table();
-
-    // 先ず返すリストを作る。
-    LispObjectPtr ret_ptr = LispObject::NewList(64);
-    LispIterator itr(ret_ptr.get());
-    FOR_SQUARES(square) {
-      itr->type(LispObjectType::NUMBER);
-      itr->number_value (table[KNIGHT][square]);
-
-      ++itr;
-    }
-
-    // セットする。
-    if (!(square_list.IsNil())) {
-      if (square_list.Length() != 64) {
-        throw LispObject::GenError("@engine_error",
-        "The length of square table is not '64'. It is '"
-        + std::to_string(square_list.Length()) + "'.");
-      }
-
-      // 全体をコピー。
-      double temp[NUM_PIECE_TYPES][NUM_SQUARES];
-      COPY_ARRAY(temp, table);
-
-      // 値を変更。
-      LispIterator list_itr(&square_list);
-      FOR_SQUARES(square) {
-        if (!(list_itr->IsNumber())) {
-          throw LispObject::GenWrongTypeError(func_name, "Number",
-          std::vector<int> {2, static_cast<int>(square + 1)}, false);
-        }
-
-        temp[KNIGHT][square] = list_itr->number_value();
-        ++list_itr;
-      }
-
-      // セット。
-      eval_params_ptr_->ending_position_value_table(temp);
-    }
-
-    return ret_ptr;
-  }
-
-  // EvalParams - ビショップのオープニング時のポジションの価値テーブル。
-  LispObjectPtr EngineSuite::SetBishopSquareTableEnding
-  (const std::string& func_name, const LispObject& square_list) {
-    // テーブルを抽出。
-    const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
-    eval_params_ptr_->ending_position_value_table();
-
-    // 先ず返すリストを作る。
-    LispObjectPtr ret_ptr = LispObject::NewList(64);
-    LispIterator itr(ret_ptr.get());
-    FOR_SQUARES(square) {
-      itr->type(LispObjectType::NUMBER);
-      itr->number_value (table[BISHOP][square]);
-
-      ++itr;
-    }
-
-    // セットする。
-    if (!(square_list.IsNil())) {
-      if (square_list.Length() != 64) {
-        throw LispObject::GenError("@engine_error",
-        "The length of square table is not '64'. It is '"
-        + std::to_string(square_list.Length()) + "'.");
-      }
-
-      // 全体をコピー。
-      double temp[NUM_PIECE_TYPES][NUM_SQUARES];
-      COPY_ARRAY(temp, table);
-
-      // 値を変更。
-      LispIterator list_itr(&square_list);
-      FOR_SQUARES(square) {
-        if (!(list_itr->IsNumber())) {
-          throw LispObject::GenWrongTypeError(func_name, "Number",
-          std::vector<int> {2, static_cast<int>(square + 1)}, false);
-        }
-
-        temp[BISHOP][square] = list_itr->number_value();
-        ++list_itr;
-      }
-
-      // セット。
-      eval_params_ptr_->ending_position_value_table(temp);
-    }
-
-    return ret_ptr;
-  }
-
-  // EvalParams - ルークのオープニング時のポジションの価値テーブル。
-  LispObjectPtr EngineSuite::SetRookSquareTableEnding
-  (const std::string& func_name, const LispObject& square_list) {
-    // テーブルを抽出。
-    const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
-    eval_params_ptr_->ending_position_value_table();
-
-    // 先ず返すリストを作る。
-    LispObjectPtr ret_ptr = LispObject::NewList(64);
-    LispIterator itr(ret_ptr.get());
-    FOR_SQUARES(square) {
-      itr->type(LispObjectType::NUMBER);
-      itr->number_value (table[ROOK][square]);
-
-      ++itr;
-    }
-
-    // セットする。
-    if (!(square_list.IsNil())) {
-      if (square_list.Length() != 64) {
-        throw LispObject::GenError("@engine_error",
-        "The length of square table is not '64'. It is '"
-        + std::to_string(square_list.Length()) + "'.");
-      }
-
-      // 全体をコピー。
-      double temp[NUM_PIECE_TYPES][NUM_SQUARES];
-      COPY_ARRAY(temp, table);
-
-      // 値を変更。
-      LispIterator list_itr(&square_list);
-      FOR_SQUARES(square) {
-        if (!(list_itr->IsNumber())) {
-          throw LispObject::GenWrongTypeError(func_name, "Number",
-          std::vector<int> {2, static_cast<int>(square + 1)}, false);
-        }
-
-        temp[ROOK][square] = list_itr->number_value();
-        ++list_itr;
-      }
-
-      // セット。
-      eval_params_ptr_->ending_position_value_table(temp);
-    }
-
-    return ret_ptr;
-  }
-
-  // EvalParams - クイーンのオープニング時のポジションの価値テーブル。
-  LispObjectPtr EngineSuite::SetQueenSquareTableEnding
-  (const std::string& func_name, const LispObject& square_list) {
-    // テーブルを抽出。
-    const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
-    eval_params_ptr_->ending_position_value_table();
-
-    // 先ず返すリストを作る。
-    LispObjectPtr ret_ptr = LispObject::NewList(64);
-    LispIterator itr(ret_ptr.get());
-    FOR_SQUARES(square) {
-      itr->type(LispObjectType::NUMBER);
-      itr->number_value (table[QUEEN][square]);
-
-      ++itr;
-    }
-
-    // セットする。
-    if (!(square_list.IsNil())) {
-      if (square_list.Length() != 64) {
-        throw LispObject::GenError("@engine_error",
-        "The length of square table is not '64'. It is '"
-        + std::to_string(square_list.Length()) + "'.");
-      }
-
-      // 全体をコピー。
-      double temp[NUM_PIECE_TYPES][NUM_SQUARES];
-      COPY_ARRAY(temp, table);
-
-      // 値を変更。
-      LispIterator list_itr(&square_list);
-      FOR_SQUARES(square) {
-        if (!(list_itr->IsNumber())) {
-          throw LispObject::GenWrongTypeError(func_name, "Number",
-          std::vector<int> {2, static_cast<int>(square + 1)}, false);
-        }
-
-        temp[QUEEN][square] = list_itr->number_value();
-        ++list_itr;
-      }
-
-      // セット。
-      eval_params_ptr_->ending_position_value_table(temp);
-    }
-
-    return ret_ptr;
-  }
-
-  // EvalParams - キングのオープニング時のポジションの価値テーブル。
-  LispObjectPtr EngineSuite::SetKingSquareTableEnding
-  (const std::string& func_name, const LispObject& square_list) {
-    // テーブルを抽出。
-    const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
-    eval_params_ptr_->ending_position_value_table();
-
-    // 先ず返すリストを作る。
-    LispObjectPtr ret_ptr = LispObject::NewList(64);
-    LispIterator itr(ret_ptr.get());
-    FOR_SQUARES(square) {
-      itr->type(LispObjectType::NUMBER);
-      itr->number_value (table[KING][square]);
-
-      ++itr;
-    }
-
-    // セットする。
-    if (!(square_list.IsNil())) {
-      if (square_list.Length() != 64) {
-        throw LispObject::GenError("@engine_error",
-        "The length of square table is not '64'. It is '"
-        + std::to_string(square_list.Length()) + "'.");
-      }
-
-      // 全体をコピー。
-      double temp[NUM_PIECE_TYPES][NUM_SQUARES];
-      COPY_ARRAY(temp, table);
-
-      // 値を変更。
-      LispIterator list_itr(&square_list);
-      FOR_SQUARES(square) {
-        if (!(list_itr->IsNumber())) {
-          throw LispObject::GenWrongTypeError(func_name, "Number",
-          std::vector<int> {2, static_cast<int>(square + 1)}, false);
-        }
-
-        temp[KING][square] = list_itr->number_value();
-        ++list_itr;
-      }
-
-      // セット。
-      eval_params_ptr_->ending_position_value_table(temp);
     }
 
     return ret_ptr;
