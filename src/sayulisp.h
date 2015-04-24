@@ -230,70 +230,27 @@ namespace Sayuri {
       // ========================== //
       // --- エンジンの状態にアクセス --- //
       /**
-       * 白ポーンの配置を得る。
+       * 駒の配置を得る。
        * @return 戻り値のオブジェクト。
        */
-      LispObjectPtr GetWhitePawnPosition() const;
-      /**
-       * 白ナイトの配置を得る。
-       * @return 戻り値のオブジェクト。
-       */
-      LispObjectPtr GetWhiteKnightPosition() const;
-      /**
-       * 白ビショップの配置を得る。
-       * @return 戻り値のオブジェクト。
-       */
-      LispObjectPtr GetWhiteBishopPosition() const;
-      /**
-       * 白ルークの配置を得る。
-       * @return 戻り値のオブジェクト。
-       */
-      LispObjectPtr GetWhiteRookPosition() const;
-      /**
-       * 白クイーンの配置を得る。
-       * @return 戻り値のオブジェクト。
-       */
-      LispObjectPtr GetWhiteQueenPosition() const;
-      /**
-       * 白キングの配置を得る。
-       * @return 戻り値のオブジェクト。
-       */
-      LispObjectPtr GetWhiteKingPosition() const;
-      /**
-       * 黒ポーンの配置を得る。
-       * @return 戻り値のオブジェクト。
-       */
-      LispObjectPtr GetBlackPawnPosition() const;
-      /**
-       * 黒ナイトの配置を得る。
-       * @return 戻り値のオブジェクト。
-       */
-      LispObjectPtr GetBlackKnightPosition() const;
-      /**
-       * 黒ビショップの配置を得る。
-       * @return 戻り値のオブジェクト。
-       */
-      LispObjectPtr GetBlackBishopPosition() const;
-      /**
-       * 黒ルークの配置を得る。
-       * @return 戻り値のオブジェクト。
-       */
-      LispObjectPtr GetBlackRookPosition() const;
-      /**
-       * 黒クイーンの配置を得る。
-       * @return 戻り値のオブジェクト。
-       */
-      LispObjectPtr GetBlackQueenPosition() const;
-      /**
-       * 黒キングの配置を得る。
-       * @return 戻り値のオブジェクト。
-       */
-      LispObjectPtr GetBlackKingPosition() const;
-      /**
-       * 空のマスの配置を得る。
-       * @return 戻り値のオブジェクト。
-       */
-      LispObjectPtr GetEmptySquarePosition() const;
+      template<Side SIDE, PieceType TYPE>
+      LispObjectPtr GetPosition() const {
+        Bitboard bb = 0;
+        if (TYPE == EMPTY) {
+          bb = ~(engine_ptr_->blocker_0());
+        } else {
+          bb = engine_ptr_->position()[SIDE][TYPE];
+        }
+
+        LispObjectPtr ret_ptr = LispObject::NewList(Util::CountBits(bb));
+        LispObject* ptr = ret_ptr.get();
+        for (; bb; NEXT_BITBOARD(bb)) {
+          ptr->car(LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]));
+          ptr = ptr->cdr().get();
+        }
+
+        return ret_ptr;
+      }
 
       /**
        * その位置の駒を得る。

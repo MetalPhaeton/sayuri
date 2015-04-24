@@ -176,43 +176,43 @@ namespace Sayuri {
 
     // メッセージシンボルに合わせて分岐する。
     if (message_symbol == "@get-white-pawn-position") {
-      return GetWhitePawnPosition();
+      return GetPosition<WHITE, PAWN>();
 
     } else if (message_symbol == "@get-white-knight-position") {
-      return GetWhiteKnightPosition();
+      return GetPosition<WHITE, KNIGHT>();
 
     } else if (message_symbol == "@get-white-bishop-position") {
-      return GetWhiteBishopPosition();
+      return GetPosition<WHITE, BISHOP>();
 
     } else if (message_symbol == "@get-white-rook-position") {
-      return GetWhiteRookPosition();
+      return GetPosition<WHITE, ROOK>();
 
     } else if (message_symbol == "@get-white-queen-position") {
-      return GetWhiteQueenPosition();
+      return GetPosition<WHITE, QUEEN>();
 
     } else if (message_symbol == "@get-white-king-position") {
-      return GetWhiteKingPosition();
+      return GetPosition<WHITE, KING>();
 
     } else if (message_symbol == "@get-black-pawn-position") {
-      return GetBlackPawnPosition();
+      return GetPosition<BLACK, PAWN>();
 
     } else if (message_symbol == "@get-black-knight-position") {
-      return GetBlackKnightPosition();
+      return GetPosition<BLACK, KNIGHT>();
 
     } else if (message_symbol == "@get-black-bishop-position") {
-      return GetBlackBishopPosition();
+      return GetPosition<BLACK, BISHOP>();
 
     } else if (message_symbol == "@get-black-rook-position") {
-      return GetBlackRookPosition();
+      return GetPosition<BLACK, ROOK>();
 
     } else if (message_symbol == "@get-black-queen-position") {
-      return GetBlackQueenPosition();
+      return GetPosition<BLACK, QUEEN>();
 
     } else if (message_symbol == "@get-black-king-position") {
-      return GetBlackKingPosition();
+      return GetPosition<BLACK, KING>();
 
     } else if (message_symbol == "@get-empty-square-position") {
-      return GetEmptySquarePosition();
+      return GetPosition<NO_SIDE, EMPTY>();
 
     } else if (message_symbol == "@get-piece") {
       // 駒を得る。
@@ -1221,189 +1221,6 @@ namespace Sayuri {
     }
 
     return ret;
-  }
-
-  // 白ポーンの配置にアクセス。
-  LispObjectPtr EngineSuite::GetWhitePawnPosition() const {
-    LispObjectPtr ret_ptr = LispObject::NewNil();
-    for (Bitboard bb = engine_ptr_->position()[WHITE][PAWN];
-    bb; NEXT_BITBOARD(bb)) {
-      LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
-      LispObject::NewNil());
-
-      ret_ptr->Append(temp);
-    }
-
-    return ret_ptr;
-  }
-  // 白ナイトの配置にアクセス。
-  LispObjectPtr EngineSuite::GetWhiteKnightPosition() const {
-    LispObjectPtr ret_ptr = LispObject::NewNil();
-    for (Bitboard bb = engine_ptr_->position()[WHITE][KNIGHT];
-    bb; NEXT_BITBOARD(bb)) {
-      LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
-      LispObject::NewNil());
-
-      ret_ptr->Append(temp);
-    }
-
-    return ret_ptr;
-  }
-  // 白ビショップの配置にアクセス。
-  LispObjectPtr EngineSuite::GetWhiteBishopPosition() const {
-    LispObjectPtr ret_ptr = LispObject::NewNil();
-    for (Bitboard bb = engine_ptr_->position()[WHITE][BISHOP];
-    bb; NEXT_BITBOARD(bb)) {
-      LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
-      LispObject::NewNil());
-
-      ret_ptr->Append(temp);
-    }
-
-    return ret_ptr;
-  }
-  // 白ルークの配置にアクセス。
-  LispObjectPtr EngineSuite::GetWhiteRookPosition() const {
-    LispObjectPtr ret_ptr = LispObject::NewNil();
-    for (Bitboard bb = engine_ptr_->position()[WHITE][ROOK];
-    bb; NEXT_BITBOARD(bb)) {
-      LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
-      LispObject::NewNil());
-
-      ret_ptr->Append(temp);
-    }
-
-    return ret_ptr;
-  }
-  // 白クイーンの配置にアクセス。
-  LispObjectPtr EngineSuite::GetWhiteQueenPosition() const {
-    LispObjectPtr ret_ptr = LispObject::NewNil();
-    for (Bitboard bb = engine_ptr_->position()[WHITE][QUEEN];
-    bb; NEXT_BITBOARD(bb)) {
-      LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
-      LispObject::NewNil());
-
-      ret_ptr->Append(temp);
-    }
-
-    return ret_ptr;
-  }
-  // 白キングの配置にアクセス。
-  LispObjectPtr EngineSuite::GetWhiteKingPosition() const {
-    LispObjectPtr ret_ptr = LispObject::NewNil();
-    for (Bitboard bb = engine_ptr_->position()[WHITE][KING];
-    bb; NEXT_BITBOARD(bb)) {
-      LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
-      LispObject::NewNil());
-
-      ret_ptr->Append(temp);
-    }
-
-    return ret_ptr;
-  }
-  // 黒ポーンの配置にアクセス。
-  LispObjectPtr EngineSuite::GetBlackPawnPosition() const {
-    LispObjectPtr ret_ptr = LispObject::NewNil();
-    for (Bitboard bb = engine_ptr_->position()[BLACK][PAWN];
-    bb; NEXT_BITBOARD(bb)) {
-      LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
-      LispObject::NewNil());
-
-      ret_ptr->Append(temp);
-    }
-
-    return ret_ptr;
-  }
-  // 黒ナイトの配置にアクセス。
-  LispObjectPtr EngineSuite::GetBlackKnightPosition() const {
-    LispObjectPtr ret_ptr = LispObject::NewNil();
-    for (Bitboard bb = engine_ptr_->position()[BLACK][KNIGHT];
-    bb; NEXT_BITBOARD(bb)) {
-      LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
-      LispObject::NewNil());
-
-      ret_ptr->Append(temp);
-    }
-
-    return ret_ptr;
-  }
-  // 黒ビショップの配置にアクセス。
-  LispObjectPtr EngineSuite::GetBlackBishopPosition() const {
-    LispObjectPtr ret_ptr = LispObject::NewNil();
-    for (Bitboard bb = engine_ptr_->position()[BLACK][BISHOP];
-    bb; NEXT_BITBOARD(bb)) {
-      LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
-      LispObject::NewNil());
-
-      ret_ptr->Append(temp);
-    }
-
-    return ret_ptr;
-  }
-  // 黒ルークの配置にアクセス。
-  LispObjectPtr EngineSuite::GetBlackRookPosition() const {
-    LispObjectPtr ret_ptr = LispObject::NewNil();
-    for (Bitboard bb = engine_ptr_->position()[BLACK][ROOK];
-    bb; NEXT_BITBOARD(bb)) {
-      LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
-      LispObject::NewNil());
-
-      ret_ptr->Append(temp);
-    }
-
-    return ret_ptr;
-  }
-  // 黒クイーンの配置にアクセス。
-  LispObjectPtr EngineSuite::GetBlackQueenPosition() const {
-    LispObjectPtr ret_ptr = LispObject::NewNil();
-    for (Bitboard bb = engine_ptr_->position()[BLACK][QUEEN];
-    bb; NEXT_BITBOARD(bb)) {
-      LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
-      LispObject::NewNil());
-
-      ret_ptr->Append(temp);
-    }
-
-    return ret_ptr;
-  }
-  // 黒キングの配置にアクセス。
-  LispObjectPtr EngineSuite::GetBlackKingPosition() const {
-    LispObjectPtr ret_ptr = LispObject::NewNil();
-    for (Bitboard bb = engine_ptr_->position()[BLACK][KING];
-    bb; NEXT_BITBOARD(bb)) {
-      LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
-      LispObject::NewNil());
-
-      ret_ptr->Append(temp);
-    }
-
-    return ret_ptr;
-  }
-  // 空のマスの配置にアクセス。
-  LispObjectPtr EngineSuite::GetEmptySquarePosition() const {
-    LispObjectPtr ret_ptr = LispObject::NewNil();
-    for (Bitboard bb = ~(engine_ptr_->blocker_0());
-    bb; NEXT_BITBOARD(bb)) {
-      LispObjectPtr temp = LispObject::NewPair
-      (LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]),
-      LispObject::NewNil());
-
-      ret_ptr->Append(temp);
-    }
-
-    return ret_ptr;
   }
 
   // 駒を得る。
