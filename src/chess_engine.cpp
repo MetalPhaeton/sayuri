@@ -159,7 +159,7 @@ namespace Sayuri {
     ScanBasicMember(engine);
 
     // 共有メンバのムーブ。
-    shared_st_ptr_ = std::move(shared_st_ptr_);
+    shared_st_ptr_ = std::move(engine.shared_st_ptr_);
 
     // ムーブメーカー。
     maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
@@ -197,7 +197,7 @@ namespace Sayuri {
     ScanBasicMember(engine);
 
     // 共有メンバをムーブ。
-    shared_st_ptr_ = std::move(shared_st_ptr_);
+    shared_st_ptr_ = std::move(engine.shared_st_ptr_);
 
     return *this;
   }
