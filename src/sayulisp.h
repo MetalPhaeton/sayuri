@@ -1291,6 +1291,99 @@ namespace Sayuri {
       LispObjectPtr SetKingSquareTableEnding(const std::string& func_name,
       const LispObject& square_list);
 
+      /**
+       * EvalParams - 攻撃の価値テーブル。
+       * @param func_name 関数名。
+       * @param symbol_name シンボル名。
+       * @param value_list テーブル。
+       * @return セットされていたテーブル。
+       */
+      template<PieceType TYPE>
+      LispObjectPtr SetAttackValueTable(const std::string& func_name,
+      const std::string& symbol_name, const LispObject& value_list) {
+        const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES] =
+        eval_params_ptr_->attack_value_table();
+        LispObjectPtr ret_ptr = LispObject::NewList(NUM_PIECE_TYPES);
+        LispObject* ptr = ret_ptr.get();
+        FOR_PIECE_TYPES(piece_type) {
+          ptr->car(LispObject::NewNumber(table[TYPE][piece_type]));
+
+          ptr = ptr->cdr().get();
+        }
+
+        if (value_list.IsList() && !(value_list.IsNil())) {
+          unsigned int len = value_list.Length();
+          if (len < NUM_PIECE_TYPES) {
+            throw LispObject::GenError("@engine_error",
+            symbol_name + " needs List of "
+            + std::to_string(NUM_PIECE_TYPES) + " parameters. Given "
+            + std::to_string(len) + ".");
+          }
+
+          double temp[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
+          COPY_ARRAY(temp, table);
+          LispIterator itr(&value_list);
+          FOR_PIECE_TYPES(piece_type) {
+            if (!(itr->IsNumber())) {
+              throw LispObject::GenWrongTypeError(func_name, "Number",
+              std::vector<int> {2, static_cast<int>(piece_type + 1)}, false);
+            }
+            if (piece_type == EMPTY) {
+              temp[TYPE][piece_type] = 0.0;
+            } else {
+              temp[TYPE][piece_type] = itr->number_value();
+            }
+            ++itr;
+          }
+
+          eval_params_ptr_->attack_value_table(temp);
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * EvalParams - 攻撃のウェイト。
+       * @param func_name 関数名。
+       * @param weight_params ウェイトのパラメータリスト。
+       * @return セットされていたウェイト。
+       */
+      template<PieceType TYPE>
+      LispObjectPtr SetWeightAttack(const std::string& func_name,
+      const LispObject& weight_params) {
+        const Weight& weight = eval_params_ptr_->weight_attack()[TYPE];
+
+        LispObjectPtr ret_ptr = LispObject::NewList(2);
+        ret_ptr->car(LispObject::NewNumber(weight.opening_weight()));
+        ret_ptr->cdr()->car(LispObject::NewNumber(weight.opening_weight()));
+
+        if (weight_params.IsList() && !(weight_params.IsNil())) {
+          int len = weight_params.Length();
+          if (len < 2) {
+            throw LispObject::GenError("@engine_error",
+            "Weight needs 2 parameters. Given " + std::to_string(len) + ".");
+          }
+
+          if (!(weight_params.car()->IsNumber())) {
+            throw LispObject::GenWrongTypeError
+            (func_name, "Number", std::vector<int> {2, 1}, false);
+          }
+          if (!(weight_params.cdr()->car()->IsNumber())) {
+            throw LispObject::GenWrongTypeError
+            (func_name, "Number", std::vector<int> {2, 2}, false);
+          }
+
+          Weight temp[NUM_PIECE_TYPES];
+          FOR_PIECE_TYPES(piece_type) {
+            temp[piece_type] = eval_params_ptr_->weight_attack()[piece_type];
+          }
+          temp[TYPE].opening_weight(weight_params.car()->number_value());
+          temp[TYPE].ending_weight(weight_params.cdr()->car()->number_value());
+        }
+
+        return ret_ptr;
+      }
+
       // ======== //
       // アクセサ //
       // ======== //

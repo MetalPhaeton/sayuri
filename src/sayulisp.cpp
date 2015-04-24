@@ -1142,6 +1142,40 @@ namespace Sayuri {
 
       return SetKingSquareTableEnding(func_name, *table_ptr);
 
+    } else if ((message_symbol == "@pawn-attack-table")
+    || (message_symbol == "@knight-attack-table")
+    || (message_symbol == "@bishop-attack-table")
+    || (message_symbol == "@rook-attack-table")
+    || (message_symbol == "@queen-attack-table")
+    || (message_symbol == "@king-attack-table")) {
+      LispObjectPtr value_list_ptr = LispObject::NewNil();
+      if (list_itr) {
+        value_list_ptr = caller.Evaluate(*list_itr);
+        if (!(value_list_ptr->IsList())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "List", std::vector<int> {2}, true);
+        }
+      }
+
+      if (message_symbol == "@pawn-attack-table") {
+        return SetAttackValueTable<PAWN>
+        (func_name, message_symbol, *value_list_ptr);
+      } else if (message_symbol == "@knight-attack-table") {
+        return SetAttackValueTable<KNIGHT>
+        (func_name, message_symbol, *value_list_ptr);
+      } else if (message_symbol == "@bishop-attack-table") {
+        return SetAttackValueTable<BISHOP>
+        (func_name, message_symbol, *value_list_ptr);
+      } else if (message_symbol == "@rook-attack-table") {
+        return SetAttackValueTable<ROOK>
+        (func_name, message_symbol, *value_list_ptr);
+      } else if (message_symbol == "@queen-attack-table") {
+        return SetAttackValueTable<QUEEN>
+        (func_name, message_symbol, *value_list_ptr);
+      } else {
+        return SetAttackValueTable<KING>
+        (func_name, message_symbol, *value_list_ptr);
+      }
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
