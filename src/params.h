@@ -602,13 +602,13 @@ namespace Sayuri {
       /** 探索関数のあるChessEngineはフレンド。 */
       friend class ChessEngine;
       /** 探索関数で使うテンプレート部品。 */
-      template<NodeType Type>
+      template<NodeType TYPE>
       friend struct DoIID;
       /** 探索関数で使うテンプレート部品。 */
-      template<NodeType Type>
+      template<NodeType TYPE>
       friend struct DoNMR;
       /** 探索関数で使うテンプレート部品。 */
-      template<NodeType Type>
+      template<NodeType TYPE>
       friend struct DoProbCut;
 
       // ================ //
@@ -1270,19 +1270,19 @@ namespace Sayuri {
       /** 評価関数はフレンド。 */
       friend class Evaluator;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, PieceType PType>
+      template<Side SIDE, PieceType TYPE>
       friend struct GenBitboards;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, PieceType PType>
+      template<Side SIDE, PieceType TYPE>
       friend struct CalPosition;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, PieceType PType>
+      template<Side SIDE, PieceType TYPE>
       friend struct CalMobility;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, PieceType PType>
+      template<Side SIDE, PieceType TYPE>
       friend struct GenPinTargets;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, PieceType PType>
+      template<Side SIDE, PieceType TYPE>
       friend struct CalSpecial;
 
       /**

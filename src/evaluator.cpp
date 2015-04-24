@@ -41,63 +41,63 @@ namespace Sayuri {
   // ================ //
 
   // 評価用ビットボードを作成するテンプレート部品。
-  template<Side PSide, PieceType PType>
+  template<Side SIDE, PieceType TYPE>
   struct GenBitboards {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square, Bitboard& attacks, Bitboard& pawn_moves,
     Bitboard& en_passant) {}
   };
-  template<Side PSide>
-  struct GenBitboards<PSide, PAWN> {
+  template<Side SIDE>
+  struct GenBitboards<SIDE, PAWN> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square, Bitboard& attacks, Bitboard& pawn_moves,
     Bitboard& en_passant) {
       // 通常の動き。
-      pawn_moves = engine.GetPawnStep(PSide, square);
+      pawn_moves = engine.GetPawnStep(SIDE, square);
 
       // 攻撃。
-      attacks = Util::GetPawnAttack(PSide, square);
+      attacks = Util::GetPawnAttack(SIDE, square);
 
       // アンパッサン。
-      if (engine.en_passant_square_ && (PSide == engine.to_move_)) {
+      if (engine.en_passant_square_ && (SIDE == engine.to_move_)) {
         en_passant = Util::SQUARE[engine.en_passant_square_] & attacks;
       }
     }
   };
-  template<Side PSide>
-  struct GenBitboards<PSide, KNIGHT> {
+  template<Side SIDE>
+  struct GenBitboards<SIDE, KNIGHT> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square, Bitboard& attacks, Bitboard& pawn_moves,
     Bitboard& en_passant) {
       attacks = Util::GetKnightMove(square);
     }
   };
-  template<Side PSide>
-  struct GenBitboards<PSide, BISHOP> {
+  template<Side SIDE>
+  struct GenBitboards<SIDE, BISHOP> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square, Bitboard& attacks, Bitboard& pawn_moves,
     Bitboard& en_passant) {
       attacks = evaluator.engine_ptr_->GetBishopAttack(square);
     }
   };
-  template<Side PSide>
-  struct GenBitboards<PSide, ROOK> {
+  template<Side SIDE>
+  struct GenBitboards<SIDE, ROOK> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square, Bitboard& attacks, Bitboard& pawn_moves,
     Bitboard& en_passant) {
       attacks = evaluator.engine_ptr_->GetRookAttack(square);
     }
   };
-  template<Side PSide>
-  struct GenBitboards<PSide, QUEEN> {
+  template<Side SIDE>
+  struct GenBitboards<SIDE, QUEEN> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square, Bitboard& attacks, Bitboard& pawn_moves,
     Bitboard& en_passant) {
       attacks = evaluator.engine_ptr_->GetQueenAttack(square);
     }
   };
-  template<Side PSide>
-  struct GenBitboards<PSide, KING> {
+  template<Side SIDE>
+  struct GenBitboards<SIDE, KING> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square, Bitboard& attacks, Bitboard& pawn_moves,
     Bitboard& en_passant) {
@@ -106,146 +106,146 @@ namespace Sayuri {
   };
 
   // 駒の配置価値を計算するテンプレート部品。
-  template<Side PSide, PieceType PType>
+  template<Side SIDE, PieceType TYPE>
   struct CalPosition {
     static void F(Evaluator& evaluator, Square square) {}
   };
-  template<PieceType PType>
-  struct CalPosition<WHITE, PType> {
+  template<PieceType TYPE>
+  struct CalPosition<WHITE, TYPE> {
     static void F(Evaluator& evaluator, Square square) {
       // オープニング。
       evaluator.score_ +=
-      evaluator.cache_ptr_->opening_position_cache_[PType][square];
+      evaluator.cache_ptr_->opening_position_cache_[TYPE][square];
 
       // エンディング。
       evaluator.score_ +=
-      evaluator.cache_ptr_->ending_position_cache_[PType][square];
+      evaluator.cache_ptr_->ending_position_cache_[TYPE][square];
     }
   };
-  template<PieceType PType>
-  struct CalPosition<BLACK, PType> {
+  template<PieceType TYPE>
+  struct CalPosition<BLACK, TYPE> {
     static void F(Evaluator& evaluator, Square square) {
       // オープニング。
       evaluator.score_ -=
-      evaluator.cache_ptr_->opening_position_cache_[PType][Util::FLIP[square]];
+      evaluator.cache_ptr_->opening_position_cache_[TYPE][Util::FLIP[square]];
 
       // エンディング。
       evaluator.score_ -=
-      evaluator.cache_ptr_->ending_position_cache_[PType][Util::FLIP[square]];
+      evaluator.cache_ptr_->ending_position_cache_[TYPE][Util::FLIP[square]];
     }
   };
 
   // 駒の機動力を計算するテンプレート部品。
-  template<Side PSide, PieceType PType>
+  template<Side SIDE, PieceType TYPE>
   struct CalMobility {
     static void F(Evaluator& evaluator, Bitboard attacks, Bitboard pawn_moves,
     Bitboard en_passant) {
-      constexpr int SIGN = PSide == WHITE ? 1 : -1;
+      constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
-      evaluator.score_ += SIGN * evaluator.cache_ptr_->mobility_cache_[PType]
+      evaluator.score_ += SIGN * evaluator.cache_ptr_->mobility_cache_[TYPE]
       [Util::CountBits
-      (attacks & ~(evaluator.engine_ptr_->side_pieces_[PSide]))];
+      (attacks & ~(evaluator.engine_ptr_->side_pieces_[SIDE]))];
     }
   };
-  template<Side PSide>
-  struct CalMobility<PSide, PAWN> {
+  template<Side SIDE>
+  struct CalMobility<SIDE, PAWN> {
     static void F(Evaluator& evaluator, Bitboard attacks, Bitboard pawn_moves,
     Bitboard en_passant) {
-      constexpr Side EnemySide = Util::GetOppositeSide(PSide);
-      constexpr int SIGN = PSide == WHITE ? 1 : -1;
+      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
+      constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       evaluator.score_ += SIGN * evaluator.cache_ptr_->mobility_cache_[PAWN]
       [Util::CountBits
-      ((attacks & evaluator.engine_ptr_->side_pieces_[EnemySide]) | pawn_moves
+      ((attacks & evaluator.engine_ptr_->side_pieces_[ENEMY_SIDE]) | pawn_moves
       | en_passant)];
     }
   };
 
   // ピンのターゲットや裏駒を抽出するテンプレート部品。
-  template<Side PSide, PieceType PType>
+  template<Side SIDE, PieceType TYPE>
   struct GenPinTargets {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square, Bitboard attacks, Bitboard& target, Bitboard& back) {}
   };
-  template<Side PSide>
-  struct GenPinTargets<PSide, BISHOP> {
+  template<Side SIDE>
+  struct GenPinTargets<SIDE, BISHOP> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square, Bitboard attacks, Bitboard& target, Bitboard& back) {
-      constexpr Side EnemySide = Util::GetOppositeSide(PSide);
+      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
 
-      target = attacks & engine.side_board_[EnemySide];
+      target = attacks & engine.side_board_[ENEMY_SIDE];
 
-      back = (engine.side_board_[EnemySide]
+      back = (engine.side_board_[ENEMY_SIDE]
       & Util::GetBishopMove(square)) & ~target;
     }
   };
-  template<Side PSide>
-  struct GenPinTargets<PSide, ROOK> {
+  template<Side SIDE>
+  struct GenPinTargets<SIDE, ROOK> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square, Bitboard attacks, Bitboard& target, Bitboard& back) {
-      constexpr Side EnemySide = Util::GetOppositeSide(PSide);
+      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
 
-      target = attacks & engine.side_board_[EnemySide];
+      target = attacks & engine.side_board_[ENEMY_SIDE];
 
-      back = (engine.side_board_[EnemySide]
+      back = (engine.side_board_[ENEMY_SIDE]
       & Util::GetRookMove(square)) & ~target;
     }
   };
-  template<Side PSide>
-  struct GenPinTargets<PSide, QUEEN> {
+  template<Side SIDE>
+  struct GenPinTargets<SIDE, QUEEN> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square, Bitboard attacks, Bitboard& target, Bitboard& back) {
-      constexpr Side EnemySide = Util::GetOppositeSide(PSide);
+      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
 
-      target = attacks & engine.side_board_[EnemySide];
+      target = attacks & engine.side_board_[ENEMY_SIDE];
 
-      back = (engine.side_board_[EnemySide]
+      back = (engine.side_board_[ENEMY_SIDE]
       & Util::GetQueenMove(square)) & ~target;
     }
   };
 
   // 各駒専用の価値を計算するテンプレート部品。
-  template<Side PSide, PieceType PType>
+  template<Side SIDE, PieceType TYPE>
   struct CalSpecial {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square) {}
   };
-  template<Side PSide>
-  struct CalSpecial<PSide, PAWN> {
+  template<Side SIDE>
+  struct CalSpecial<SIDE, PAWN> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square) {
-      constexpr Side EnemySide = Util::GetOppositeSide(PSide);
-      constexpr int SIGN = PSide == WHITE ? 1 : -1;
+      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
+      constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // パスポーンを計算。
-      if (!(engine.position_[EnemySide][PAWN]
-      & evaluator.pass_pawn_mask_[PSide][square])) {
+      if (!(engine.position_[ENEMY_SIDE][PAWN]
+      & evaluator.pass_pawn_mask_[SIDE][square])) {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->pass_pawn_cache_;
 
         // 守られたパスポーン。
-        if (engine.position_[PSide][PAWN]
-        & Util::GetPawnAttack(EnemySide, square)) {
+        if (engine.position_[SIDE][PAWN]
+        & Util::GetPawnAttack(ENEMY_SIDE, square)) {
           evaluator.score_ +=
           SIGN * evaluator.cache_ptr_->protected_pass_pawn_cache_;
         }
       }
 
       // ダブルポーンを計算。
-      if (Util::CountBits(engine.position_[PSide][PAWN]
+      if (Util::CountBits(engine.position_[SIDE][PAWN]
       & Util::FYLE[Util::SQUARE_TO_FYLE[square]]) >= 2) {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->double_pawn_cache_;
       }
 
       // 孤立ポーンを計算。
-      if (!(engine.position_[PSide][PAWN]
+      if (!(engine.position_[SIDE][PAWN]
       & evaluator.iso_pawn_mask_[square])) {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->iso_pawn_cache_;
       }
 
       // ポーンの盾を計算。
       if ((Util::SQUARE[square]
-      & evaluator.pawn_shield_mask_[PSide][engine.king_[PSide]])) {
-        if (PSide == WHITE) {
+      & evaluator.pawn_shield_mask_[SIDE][engine.king_[SIDE]])) {
+        if (SIDE == WHITE) {
           evaluator.score_ +=
           SIGN * evaluator.cache_ptr_->pawn_shield_cache_[square];
         } else {
@@ -256,38 +256,38 @@ namespace Sayuri {
       }
     }
   };
-  template<Side PSide>
-  struct CalSpecial<PSide, BISHOP> {
+  template<Side SIDE>
+  struct CalSpecial<SIDE, BISHOP> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square) {
-      constexpr int SIGN = PSide == WHITE ? 1 : -1;
+      constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // バッドビショップを計算。
       if ((Util::SQUARE[square] & Util::SQCOLOR[WHITE])) {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->bad_bishop_cache_
         [Util::CountBits
-        (engine.position_[PSide][PAWN] & Util::SQCOLOR[WHITE])];
+        (engine.position_[SIDE][PAWN] & Util::SQCOLOR[WHITE])];
       } else {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->bad_bishop_cache_
         [Util::CountBits
-        (engine.position_[PSide][PAWN] & Util::SQCOLOR[BLACK])];
+        (engine.position_[SIDE][PAWN] & Util::SQCOLOR[BLACK])];
       }
     }
   };
-  template<Side PSide>
-  struct CalSpecial<PSide, ROOK> {
+  template<Side SIDE>
+  struct CalSpecial<SIDE, ROOK> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square) {
-      constexpr Side EnemySide = Util::GetOppositeSide(PSide);
-      constexpr int SIGN = PSide == WHITE ? 1 : -1;
+      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
+      constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // オープンファイルとセミオープンファイルを計算。
       Bitboard rook_fyle = Util::FYLE[Util::SQUARE_TO_FYLE[square]];
-      if (!(engine.position_[PSide][PAWN] & rook_fyle)) {
+      if (!(engine.position_[SIDE][PAWN] & rook_fyle)) {
         // セミオープン。
         evaluator.score_ +=
         SIGN * evaluator.cache_ptr_->rook_semiopen_fyle_cache_;
-        if (!(engine.position_[EnemySide][PAWN] & rook_fyle)) {
+        if (!(engine.position_[ENEMY_SIDE][PAWN] & rook_fyle)) {
           // オープン。
           evaluator.score_ +=
           SIGN * evaluator.cache_ptr_->rook_open_fyle_cache_;
@@ -295,47 +295,47 @@ namespace Sayuri {
       }
     }
   };
-  template<Side PSide>
-  struct CalSpecial<PSide, QUEEN> {
+  template<Side SIDE>
+  struct CalSpecial<SIDE, QUEEN> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square) {
-      constexpr int SIGN = PSide == WHITE ? 1 : -1;
+      constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // クイーンの早過ぎる始動を計算。
       int value = 0;
-      if (!(Util::SQUARE[square] & evaluator.start_position_[PSide][QUEEN])) {
-        value += Util::CountBits(engine.position_[PSide][KNIGHT]
-        & evaluator.start_position_[PSide][KNIGHT]);
+      if (!(Util::SQUARE[square] & evaluator.start_position_[SIDE][QUEEN])) {
+        value += Util::CountBits(engine.position_[SIDE][KNIGHT]
+        & evaluator.start_position_[SIDE][KNIGHT]);
 
-        value += Util::CountBits(engine.position_[PSide][BISHOP]
-        & evaluator.start_position_[PSide][BISHOP]);
+        value += Util::CountBits(engine.position_[SIDE][BISHOP]
+        & evaluator.start_position_[SIDE][BISHOP]);
       }
 
       evaluator.score_ +=
       SIGN * evaluator.cache_ptr_->early_queen_launched_cache_[value];
     }
   };
-  template<Side PSide>
-  struct CalSpecial<PSide, KING> {
+  template<Side SIDE>
+  struct CalSpecial<SIDE, KING> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square) {
-      constexpr Side EnemySide = Util::GetOppositeSide(PSide);
-      constexpr int SIGN = PSide == WHITE ? 1 : -1;
+      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
+      constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // --- キング周りの弱いマスを計算 --- //
       int value = 0;
 
       // 弱いマス。
-      Bitboard weak = (~(engine.position_[PSide][PAWN]))
-      & evaluator.weak_square_mask_[PSide][square];
+      Bitboard weak = (~(engine.position_[SIDE][PAWN]))
+      & evaluator.weak_square_mask_[SIDE][square];
 
       // 相手の白マスビショップに対する弱いマス。
-      if ((engine.position_[EnemySide][BISHOP] & Util::SQCOLOR[WHITE])) {
+      if ((engine.position_[ENEMY_SIDE][BISHOP] & Util::SQCOLOR[WHITE])) {
         value += Util::CountBits(weak & Util::SQCOLOR[WHITE]);
       }
 
       // 相手の黒マスビショップに対する弱いマス。
-      if ((engine.position_[EnemySide][BISHOP] & Util::SQCOLOR[BLACK])) {
+      if ((engine.position_[ENEMY_SIDE][BISHOP] & Util::SQCOLOR[BLACK])) {
         value += Util::CountBits(weak & Util::SQCOLOR[BLACK]);
       }
 
@@ -344,8 +344,8 @@ namespace Sayuri {
       SIGN * evaluator.cache_ptr_->weak_square_cache_[value];
 
       // --- キャスリングを計算する --- //
-      Castling rights_mask = PSide == WHITE ? WHITE_CASTLING : BLACK_CASTLING;
-      if (engine.has_castled_[PSide]) {
+      Castling rights_mask = SIDE == WHITE ? WHITE_CASTLING : BLACK_CASTLING;
+      if (engine.has_castled_[SIDE]) {
         // キャスリングした。
         evaluator.score_ += SIGN * evaluator.cache_ptr_->castling_cache_;
       } else {
@@ -555,39 +555,39 @@ namespace Sayuri {
   // 価値を計算する関数 //
   // ================== //
   // 各駒の価値を計算する。
-  template<Side PSide, PieceType PType>
+  template<Side SIDE, PieceType TYPE>
   void Evaluator::CalValue(Square piece_square) {
-    constexpr Side EnemySide = Util::GetOppositeSide(PSide);
-    constexpr int SIGN = PSide == WHITE ? 1 : -1;
+    constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
+    constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
     // 利き筋を作る。
     Bitboard attacks = 0;
     Bitboard pawn_moves = 0;
     Bitboard en_passant = 0;
-    GenBitboards<PSide, PType>::F(*this, *engine_ptr_, piece_square, attacks,
+    GenBitboards<SIDE, TYPE>::F(*this, *engine_ptr_, piece_square, attacks,
     pawn_moves, en_passant);
 
     // --- 全駒共通 --- //
     // オープニング、エンディング時の駒の配置を計算。
-    CalPosition<PSide, PType>::F(*this, piece_square);
+    CalPosition<SIDE, TYPE>::F(*this, piece_square);
 
     // 機動力を計算。
-    CalMobility<PSide, PType>::F(*this, attacks, pawn_moves, en_passant);
+    CalMobility<SIDE, TYPE>::F(*this, attacks, pawn_moves, en_passant);
 
     // センターコントロールを計算。
-    score_ += SIGN * cache_ptr_->center_control_cache_[PType]
+    score_ += SIGN * cache_ptr_->center_control_cache_[TYPE]
     [Util::CountBits(attacks & center_mask_)];
 
     // スウィートセンターのコントロールを計算。
-    score_ += SIGN * cache_ptr_->sweet_center_control_cache_[PType]
+    score_ += SIGN * cache_ptr_->sweet_center_control_cache_[TYPE]
     [Util::CountBits(attacks & sweet_center_mask_)];
 
     // 敵への攻撃を計算。
     {
-      Bitboard attacked = attacks & (engine_ptr_->side_pieces_[EnemySide]);
+      Bitboard attacked = attacks & (engine_ptr_->side_pieces_[ENEMY_SIDE]);
 
       for (; attacked; NEXT_BITBOARD(attacked)) {
-        score_ += SIGN * cache_ptr_->attack_cache_[PType]
+        score_ += SIGN * cache_ptr_->attack_cache_[TYPE]
         [engine_ptr_->piece_board_[Util::GetSquare(attacked)]];
       }
 
@@ -598,10 +598,10 @@ namespace Sayuri {
 
     // 味方への防御を計算。
     {
-      Bitboard defensed = attacks & (engine_ptr_->side_pieces_[PSide]);
+      Bitboard defensed = attacks & (engine_ptr_->side_pieces_[SIDE]);
 
       for (; defensed; NEXT_BITBOARD(defensed)) {
-        score_ += SIGN * cache_ptr_->defense_cache_[PType]
+        score_ += SIGN * cache_ptr_->defense_cache_[TYPE]
         [engine_ptr_->piece_board_[Util::GetSquare(defensed)]];
       }
     }
@@ -611,7 +611,7 @@ namespace Sayuri {
       // ピンのターゲットと裏駒を作成。
       Bitboard pin_target = 0;
       Bitboard pin_back = 0;
-      GenPinTargets<PSide, PType>::F(*this, *engine_ptr_, piece_square,
+      GenPinTargets<SIDE, TYPE>::F(*this, *engine_ptr_, piece_square,
       attacks, pin_target, pin_back);
 
       // ピンを判定。
@@ -625,7 +625,7 @@ namespace Sayuri {
         // 下のif文によるピンの判定条件は、
         // 「裏駒と自分との間」に「ピンの対象」が一つのみだった場合。
         if ((between & pin_target) && !(between & pin_back)) {
-          score_ += SIGN * cache_ptr_->pin_cache_[PType]
+          score_ += SIGN * cache_ptr_->pin_cache_[TYPE]
           [engine_ptr_->piece_board_[Util::GetSquare(between & pin_target)]]
           [engine_ptr_->piece_board_[pin_back_sq]];
         }
@@ -633,12 +633,12 @@ namespace Sayuri {
     }
 
     // 相手キング周辺への攻撃を計算。
-    score_ += SIGN * cache_ptr_->attack_around_king_cache_[PType]
+    score_ += SIGN * cache_ptr_->attack_around_king_cache_[TYPE]
     [Util::CountBits(attacks & Util::GetKingMove
-    (engine_ptr_->king_[EnemySide]))];
+    (engine_ptr_->king_[ENEMY_SIDE]))];
 
     // 各駒専用の価値を計算。
-    CalSpecial<PSide, PType>::F(*this, *engine_ptr_, piece_square);
+    CalSpecial<SIDE, TYPE>::F(*this, *engine_ptr_, piece_square);
   }
 
   // 実体化。

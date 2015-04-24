@@ -274,14 +274,14 @@ namespace Sayuri {
 
       /**
        * キャスリング出来るかどうかを判定する。
-       * @param <Flag> キャスリングの指定。
+       * @param <FLAG> キャスリングの指定。
        * - WHITE_SHORT_CASTLING: 白のショートキャスリング。
        * - WHITE_LONG_CASTLING: 白のロングキャスリング。
        * - BLACK_SHORT_CASTLING: 黒のショートキャスリング。
        * - BLACK_LONG_CASTLING: 黒のロングキャスリング。
        * @return キャスリング可能ならtrue。
        */
-      template<Castling Flag>
+      template<Castling FLAG>
       bool CanCastling() const {return false;}
 
       /**
@@ -657,19 +657,19 @@ namespace Sayuri {
       /** 評価関数はフレンド。 */
       friend class Evaluator;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, PieceType PType>
+      template<Side SIDE, PieceType TYPE>
       friend struct GenBitboards;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, PieceType PType>
+      template<Side SIDE, PieceType TYPE>
       friend struct CalPosition;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, PieceType PType>
+      template<Side SIDE, PieceType TYPE>
       friend struct CalMobility;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, PieceType PType>
+      template<Side SIDE, PieceType TYPE>
       friend struct GenPinTargets;
       /** 評価関数で使うテンプレート部品。 */
-      template<Side PSide, PieceType PType>
+      template<Side SIDE, PieceType TYPE>
       friend struct CalSpecial;
 
       /** PositionRecordはフレンド。 */

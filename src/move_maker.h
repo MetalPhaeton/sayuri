@@ -91,7 +91,7 @@ namespace Sayuri {
       /**
        * スタックに候補手を生成する。
        * 自らチェックされる手も作る。
-       * @param <Type> 生成する手の種類。
+       * @param <TYPE> 生成する手の種類。
        * - NON_CAPTURE: 駒を取らない手。
        * - CAPTURE: 駒を取る手。
        * - ALL: 上記の両方。
@@ -101,7 +101,7 @@ namespace Sayuri {
        * @param killer_2 2プライ前のレベルのキラームーブ。
        * @return 生成した候補手の数。
        */
-      template<GenMoveType Type>
+      template<GenMoveType TYPE>
       int GenMoves(Move prev_best, Move iid_move, Move killer_1,
       Move killer_2);
 
@@ -140,21 +140,21 @@ namespace Sayuri {
       // プライベート関数 //
       // ================ //
       // --- テンプレート部品 --- //
-      template<GenMoveType Type>
+      template<GenMoveType TYPE>
       friend struct UpdateMaxHistory;
-      template<GenMoveType Type>
+      template<GenMoveType TYPE>
       friend struct GenPieceBitboard;
-      template<GenMoveType Type>
+      template<GenMoveType TYPE>
       friend struct GenPawnBitboard;
-      template<GenMoveType Type>
+      template<GenMoveType TYPE>
       friend struct GenKingBitboard;
-      template<GenMoveType Type>
+      template<GenMoveType TYPE>
       friend struct SetScore;
 
       /**
        * スタックに候補手を生成する。 (内部用)
        * 自らチェックされる手も作る。
-       * @param <Type> 生成する手の種類。
+       * @param <TYPE> 生成する手の種類。
        * - NON_CAPTURE: 駒を取らない手。
        * - CAPTURE: 駒を取る手。
        * - ALL: 上記の両方。
@@ -164,13 +164,13 @@ namespace Sayuri {
        * @param killer_2 2プライ前のレベルのキラームーブ。
        * @return 生成した候補手の数。
        */
-      template<GenMoveType Type>
+      template<GenMoveType TYPE>
       void GenMovesCore(Move prev_best, Move iid_move, Move killer_1,
       Move killer_2);
 
       /**
        * 候補手に点数をつける。
-       * @param <Type> 生成する手の種類。
+       * @param <TYPE> 生成する手の種類。
        * - NON_CAPTURE: 駒を取らない手。
        * - CAPTURE: 駒を取る手。
        * - ALL: 上記の両方。
@@ -181,7 +181,7 @@ namespace Sayuri {
        * @param killer_2 2プライ前のレベルのキラームーブ。
        * @param side 候補手のサイド。
        */
-      template<GenMoveType Type>
+      template<GenMoveType TYPE>
       void ScoreMoves(std::size_t start, Move prev_best, Move iid_move,
       Move killer_1, Move killer_2, Side side);
 
