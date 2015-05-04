@@ -4580,33 +4580,33 @@ __Example__
 
 * `@weight-pawn-attack [<New weight : List>]`
     + Return Weight for Attacking Score for Pawn as List of 2 elements.
-        + 1st : Weight on Opening.
-        + 2nd : Weight on Ending.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-knight-attack [<New weight : List>]`
     + Return Weight for Attacking Score for Knight as List of 2 elements.
-        + 1st : Weight on Opening.
-        + 2nd : Weight on Ending.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-bishop-attack [<New weight : List>]`
     + Return Weight for Attacking Score for Bishop as List of 2 elements.
-        + 1st : Weight on Opening.
-        + 2nd : Weight on Ending.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-rook-attack [<New weight : List>]`
     + Return Weight for Attacking Score for Rook as List of 2 elements.
-        + 1st : Weight on Opening.
-        + 2nd : Weight on Ending.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-queen-attack [<New weight : List>]`
     + Return Weight for Attacking Score for Queen as List of 2 elements.
-        + 1st : Weight on Opening.
-        + 2nd : Weight on Ending.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-king-attack [<New weight : List>]`
     + Return Weight for Attacking Score for King as List of 2 elements.
-        + 1st : Weight on Opening.
-        + 2nd : Weight on Ending.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 
 __Example__
@@ -4618,6 +4618,655 @@ __Example__
     ;; > (1 0.3)
     
     (display (my-engine '@weight-pawn-attack))
+    ;; Output
+    ;; > (111 222)
+
+* `@pawn-defense-table [<New table : List>]`
+    + Returns a value table of Defense Score for Pawn
+      as List composed of 7 values.
+        - 1st : Not used. This is always '0'. (For EMPTY)
+        - 2nd : Value of defense Pawn.
+        - 3rd : Value of defense Knight.
+        - 4th : Value of defense Bishop.
+        - 5th : Value of defense Rook.
+        - 6th : Value of defense Queen.
+        - 7th : Value of defense King.
+    + If you specify `<New table>`, this parameter is updated.
+* `@knight-defense-table [<New table : List>]`
+    + Returns a value table of Defense Score for Knight
+      as List composed of 7 values.
+        - 1st : Not used. This is always '0'. (For EMPTY)
+        - 2nd : Value of defense Pawn.
+        - 3rd : Value of defense Knight.
+        - 4th : Value of defense Bishop.
+        - 5th : Value of defense Rook.
+        - 6th : Value of defense Queen.
+        - 7th : Value of defense King.
+    + If you specify `<New table>`, this parameter is updated.
+* `@bishop-defense-table [<New table : List>]`
+    + Returns a value table of Defense Score for Bishop
+      as List composed of 7 values.
+        - 1st : Not used. This is always '0'. (For EMPTY)
+        - 2nd : Value of defense Pawn.
+        - 3rd : Value of defense Knight.
+        - 4th : Value of defense Bishop.
+        - 5th : Value of defense Rook.
+        - 6th : Value of defense Queen.
+        - 7th : Value of defense King.
+    + If you specify `<New table>`, this parameter is updated.
+* `@rook-defense-table [<New table : List>]`
+    + Returns a value table of Defense Score for Rook
+      as List composed of 7 values.
+        - 1st : Not used. This is always '0'. (For EMPTY)
+        - 2nd : Value of defense Pawn.
+        - 3rd : Value of defense Knight.
+        - 4th : Value of defense Bishop.
+        - 5th : Value of defense Rook.
+        - 6th : Value of defense Queen.
+        - 7th : Value of defense King.
+    + If you specify `<New table>`, this parameter is updated.
+* `@queen-defense-table [<New table : List>]`
+    + Returns a value table of Defense Score for Queen
+      as List composed of 7 values.
+        - 1st : Not used. This is always '0'. (For EMPTY)
+        - 2nd : Value of defense Pawn.
+        - 3rd : Value of defense Knight.
+        - 4th : Value of defense Bishop.
+        - 5th : Value of defense Rook.
+        - 6th : Value of defense Queen.
+        - 7th : Value of defense King.
+    + If you specify `<New table>`, this parameter is updated.
+* `@king-defense-table [<New table : List>]`
+    + Returns a value table of Defense Score for King
+      as List composed of 7 values.
+        - 1st : Not used. This is always '0'. (For EMPTY)
+        - 2nd : Value of defense Pawn.
+        - 3rd : Value of defense Knight.
+        - 4th : Value of defense Bishop.
+        - 5th : Value of defense Rook.
+        - 6th : Value of defense Queen.
+        - 7th : Value of defense King.
+    + If you specify `<New table>`, this parameter is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@pawn-defense-table (list 1 2 3 4 5 6 7)))
+    ;; Output
+    ;; > (0 10 0 0 0 0 0)
+    
+    (display (my-engine '@pawn-defense-table))
+    ;; Output
+    ;; > (0 2 3 4 5 6 7)
+
+* `@weight-pawn-defense [<New weight : List>]`
+    + Return Weight for Defense Score for Pawn as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-knight-defense [<New weight : List>]`
+    + Return Weight for Defense Score for Knight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-bishop-defense [<New weight : List>]`
+    + Return Weight for Defense Score for Bishop as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-rook-defense [<New weight : List>]`
+    + Return Weight for Defense Score for Rook as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-queen-defense [<New weight : List>]`
+    + Return Weight for Defense Score for Queen as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-king-defense [<New weight : List>]`
+    + Return Weight for Defense Score for King as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@weight-pawn-defense (list 111 222)))
+    ;; Output
+    ;; > (1 0.5)
+    
+    (display (my-engine '@weight-pawn-defense))
+    ;; Output
+    ;; > (111 222)
+
+* `@bishop-pin-table [<New value table : List>]`
+    + Return a value table composed of 7 lists.
+      Each list is composed of 7 values.
+        - 1st : Futile list. (For EMPTY)
+        - 2nd : a value list When a target piece is Pawn.
+            - 1st : Futile value. (For EMPTY)
+            - 2nd : a value when pin-board piece is Pawn.
+            - 3rd : a value when pin-board piece is Knight.
+            - 4rd : a value when pin-board piece is Bishop.
+            - 5rd : a value when pin-board piece is Rook.
+            - 6rd : a value when pin-board piece is Queen.
+            - 7rd : a value when pin-board piece is King.
+        - 3rd : a value list When a target piece is Knight.
+            - 1st : Futile value. (For EMPTY)
+            - 2nd : a value when pin-board piece is Pawn.
+            - 3rd : a value when pin-board piece is Knight.
+            - 4rd : a value when pin-board piece is Bishop.
+            - 5rd : a value when pin-board piece is Rook.
+            - 6rd : a value when pin-board piece is Queen.
+            - 7rd : a value when pin-board piece is King.
+        - 4th : a value list When a target piece is Bishop.
+            - 1st : Futile value. (For EMPTY)
+            - 2nd : a value when pin-board piece is Pawn.
+            - 3rd : a value when pin-board piece is Knight.
+            - 4rd : a value when pin-board piece is Bishop.
+            - 5rd : a value when pin-board piece is Rook.
+            - 6rd : a value when pin-board piece is Queen.
+            - 7rd : a value when pin-board piece is King.
+        - 5th : a value list When a target piece is Rook.
+            - 1st : Futile value. (For EMPTY)
+            - 2nd : a value when pin-board piece is Pawn.
+            - 3rd : a value when pin-board piece is Knight.
+            - 4rd : a value when pin-board piece is Bishop.
+            - 5rd : a value when pin-board piece is Rook.
+            - 6rd : a value when pin-board piece is Queen.
+            - 7rd : a value when pin-board piece is King.
+        - 6th : a value list When a target piece is Queen.
+            - 1st : Futile value. (For EMPTY)
+            - 2nd : a value when pin-board piece is Pawn.
+            - 3rd : a value when pin-board piece is Knight.
+            - 4rd : a value when pin-board piece is Bishop.
+            - 5rd : a value when pin-board piece is Rook.
+            - 6rd : a value when pin-board piece is Queen.
+            - 7rd : a value when pin-board piece is King.
+        - 7th : a value list When a target piece is King.
+            - 1st : Futile value. (For EMPTY)
+            - 2nd : a value when pin-board piece is Pawn.
+            - 3rd : a value when pin-board piece is Knight.
+            - 4rd : a value when pin-board piece is Bishop.
+            - 5rd : a value when pin-board piece is Rook.
+            - 6rd : a value when pin-board piece is Queen.
+            - 7rd : a value when pin-board piece is King.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@bishop-pin-table
+      (list (list 1 2 3 4 5 6 7)
+            (list 8 9 10 11 12 13 14)
+            (list 15 16 17 18 19 20 21)
+            (list 22 23 24 25 26 27 28)
+            (list 29 30 31 32 33 34 35)
+            (list 36 37 38 39 40 41 42)
+            (list 43 44 45 46 47 48 49))))
+    ;; Output
+    ;; > ((0 0 0 0 0 0 0)
+    ;; > (0 0 0 0 5 5 5)
+    ;; > (0 0 0 0 10 10 10)
+    ;; > (0 0 0 0 0 0 0)
+    ;; > (0 0 0 0 20 30 40)
+    ;; > (0 0 0 0 30 40 50)
+    ;; > (0 0 0 0 40 50 0))
+    
+    (display (my-engine '@bishop-pin-table))
+    ;; Output
+    ;; >  ((0 0 0 0 0 0 0)
+    ;; > (0 9 10 11 12 13 14)
+    ;; > (0 16 17 18 19 20 21)
+    ;; > (0 23 24 25 26 27 28)
+    ;; > (0 30 31 32 33 34 35)
+    ;; > (0 37 38 39 40 41 42)
+    ;; > (0 44 45 46 47 48 49))
+
+* `@weight-bishop-pin [<New weight : List>]`
+    + Return Weight for Pin Score for King as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-rook-pin [<New weight : List>]`
+    + Return Weight for Pin Score for Rook as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-queen-pin [<New weight : List>]`
+    + Return Weight for Pin Score for Queen as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@weight-bishop-pin (list 111 222)))
+    ;; Output
+    ;; > (1 1)
+    
+    (display (my-engine '@weight-bishop-pin))
+    ;; Output
+    ;; > (111 222)
+
+* `@pawn-shield-table [<New table : List>]`
+    + Returns Piece Square Table for Pawn Shield
+      as List composed of 64 numbers. "()" is a square when evaluating Black.
+        - From 1st to 8th : From A1(A8) to H1(H8)
+        - From 9th to 16th : From A2(A7) to H2(H7)
+        - From 17th to 24th : From A3(A6) to H3(H6)
+        - From 25th to 32nd : From A4(A5) to H4(H5)
+        - From 33rd to 40th : From A5(A4) to H5(H4)
+        - From 41st to 48th : From A6(A3) to H6(H3)
+        - From 49th to 56th : From A7(A2) to H7(H2)
+        - From 57th to 64th : From A8(A1) to H8(H1)
+    + If you specify `<New table>`, this parameter is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (define table
+      (list 1 2 3 4 5 6 7 8
+            9 10 11 12 13 14 15 16
+            17 18 19 20 21 22 23 24
+            25 26 27 28 29 30 31 32
+            33 34 35 36 37 38 39 40
+            41 42 43 44 45 46 47 48
+            49 50 51 52 53 54 55 56
+            57 58 59 60 61 62 63 64))
+    
+    (display (my-engine '@pawn-shield-table table))
+    ;; Output
+    ;; > (0 0 0 0 0 0 0 0
+    ;; > 30 30 30 30 30 30 30 30
+    ;; > 0 0 0 0 0 0 0 0
+    ;; > -30 -30 -30 -30 -30 -30 -30 -30
+    ;; > -60 -60 -60 -60 -60 -60 -60 -60
+    ;; > -90 -90 -90 -90 -90 -90 -90 -90
+    ;; > -60 -60 -60 -60 -60 -60 -60 -60
+    ;; > -30 -30 -30 -30 -30 -30 -30 -30)
+    
+    (display (my-engine '@pawn-shield-table))
+    ;; Output
+    ;; > (1 2 3 4 5 6 7 8
+    ;; > 9 10 11 12 13 14 15 16
+    ;; > 17 18 19 20 21 22 23 24
+    ;; > 25 26 27 28 29 30 31 32
+    ;; > 33 34 35 36 37 38 39 40
+    ;; > 41 42 43 44 45 46 47 48
+    ;; > 49 50 51 52 53 54 55 56
+    ;; > 57 58 59 60 61 62 63 64)
+
+* `@weight-pawn-shield [<New weight : List>]`
+    + Return Weight for Pawn Shield as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@weight-pawn-shield (list 111 222)))
+    ;; Output
+    ;; > (1 0)
+    
+    (display (my-engine '@weight-pawn-shield))
+    ;; Output
+    ;; > (111 222)
+
+* `@weight-pawn-mobility [<New weight : List>]`
+    + Weight for Mobility of Pawn.
+        - Score is Weight times number of squares where it can go to.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-knight-mobility [<New weight : List>]`
+        - Score is Weight times number of squares where it can go to.
+    + Weight for Mobility of Knight.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-bishop-mobility [<New weight : List>]`
+    + Weight for Mobility of Bishop.
+        - Score is Weight times number of squares where it can go to.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-rook-mobility [<New weight : List>]`
+    + Weight for Mobility of Rook.
+        - Score is Weight times number of squares where it can go to.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-queen-mobility [<New weight : List>]`
+    + Weight for Mobility of Queen.
+        - Score is Weight times number of squares where it can go to.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-king-mobility [<New weight : List>]`
+    + Weight for Mobility of King.
+        - Score is Weight times number of squares where it can go to.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-pawn-center-control [<New weight : List>]`
+    + Weight for Controlling Center by Pawn.
+        - Score is Weight times number of Center where it attacks.
+        - "Center" is squares of
+          C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-knight-center-control [<New weight : List>]`
+    + Weight for Controlling Center by Knight.
+        - Score is Weight times number of Center where it attacks.
+        - "Center" is squares of
+          C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-bishop-center-control [<New weight : List>]`
+    + Weight for Controlling Center by Bishop.
+        - Score is Weight times number of Center where it attacks.
+        - "Center" is squares of
+          C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-rook-center-control [<New weight : List>]`
+    + Weight for Controlling Center by Rook.
+        - Score is Weight times number of Center where it attacks.
+        - "Center" is squares of
+          C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-queen-center-control [<New weight : List>]`
+    + Weight for Controlling Center by Queen.
+        - Score is Weight times number of Center where it attacks.
+        - "Center" is squares of
+          C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-king-center-control [<New weight : List>]`
+    + Weight for Controlling Center by King.
+        - Score is Weight times number of Center where it attacks.
+        - "Center" is squares of
+          C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-pawn-sweet-center-control [<New weight : List>]`
+    + Weight for Controlling Sweet Center by Pawn.
+        - Score is Weight times number of Sweet Center where it attacks.
+        - "Sweet Center" is squares of D4 D5 E4 E5.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-knight-sweet-center-control [<New weight : List>]`
+    + Weight for Controlling Sweet Center by Knight.
+        - Score is Weight times number of Sweet Center where it attacks.
+        - "Sweet Center" is squares of D4 D5 E4 E5.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-bishop-sweet-center-control [<New weight : List>]`
+    + Weight for Controlling Sweet Center by Bishop.
+        - Score is Weight times number of Sweet Center where it attacks.
+        - "Sweet Center" is squares of D4 D5 E4 E5.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-rook-sweet-center-control [<New weight : List>]`
+    + Weight for Controlling Sweet Center by Rook.
+        - Score is Weight times number of Sweet Center where it attacks.
+        - "Sweet Center" is squares of D4 D5 E4 E5.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-queen-sweet-center-control [<New weight : List>]`
+    + Weight for Controlling Sweet Center by Queen.
+        - Score is Weight times number of Sweet Center where it attacks.
+        - "Sweet Center" is squares of D4 D5 E4 E5.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-king-sweet-center-control [<New weight : List>]`
+    + Weight for Controlling Sweet Center by King.
+        - Score is Weight times number of Sweet Center where it attacks.
+        - "Sweet Center" is squares of D4 D5 E4 E5.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-pawn-development [<New weight : List>]`
+    + Weight for Development of Pawn.
+        - Score is Weight times number of Pawns not on starting position.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-knight-development [<New weight : List>]`
+    + Weight for Development of Knight.
+        - Score is Weight times number of Knights not on starting position.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-bishop-development [<New weight : List>]`
+    + Weight for Development of Bishop.
+        - Score is Weight times number of Bishops not on starting position.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-rook-development [<New weight : List>]`
+    + Weight for Development of Rook.
+        - Score is Weight times number of Rooks not on starting position.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-queen-development [<New weight : List>]`
+    + Weight for Development of Queen.
+        - Score is Weight times number of Queens not on starting position.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-king-development [<New weight : List>]`
+    + Weight for Development of King.
+        - Score is Weight times number of King not on starting position.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-pawn-attack-around-king [<New weight : List>]`
+    + Weight for Pawn attacking squares around opponent's King.
+        - Score is Weight times number of attacked squares
+          around opponent's King.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-knight-attack-around-king [<New weight : List>]`
+    + Weight for Knight attacking squares around opponent's King.
+        - Score is Weight times number of attacked squares
+          around opponent's King.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-bishop-attack-around-king [<New weight : List>]`
+    + Weight for Bishop attacking squares around opponent's King.
+        - Score is Weight times number of attacked squares
+          around opponent's King.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-rook-attack-around-king [<New weight : List>]`
+    + Weight for Rook attacking squares around opponent's King.
+        - Score is Weight times number of attacked squares
+          around opponent's King.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-queen-attack-around-king [<New weight : List>]`
+    + Weight for Queen attacking squares around opponent's King.
+        - Score is Weight times number of attacked squares
+          around opponent's King.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-king-attack-around-king [<New weight : List>]`
+    + Weight for King attacking squares around opponent's King.
+        - Score is Weight times number of attacked squares
+          around opponent's King.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-pass-pawn [<New weight : List>]`
+    + Weight for Pass Pawn.
+        - Score is Weight times number of Pass Pawns.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-protected-pass-pawn [<New weight : List>]`
+    + Weight for Pass Pawn protected by friend Pawns.
+        - Score is Weight times number of Pass Pawns protected by friend Pawns.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-double-pawn [<New weight : List>]`
+    + Weight for Double Pawn.
+        - Score is Weight times number of Double Pawn.
+            - If 2 pawns are on same fyle, the number of Double Pawn is '2'.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-iso-pawn [<New weight : List>]`
+    + Weight for Isolated Pawn.
+        - Score is Weight times number of Isolated Pawn.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-bishop-pair [<New weight : List>]`
+    + Weight for Bishop Pair.
+        - Score is Weight if 2 or more Bishops exists
+          on different colored square.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-bad-bishop [<New weight : List>]`
+    + Weight for Bad Bishop.
+        - Score is Weight times number of Pawns on the same colored square
+          where Bishop is placed on.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-rook-pair [<New weight : List>]`
+    + Weight for Rook Pair.
+        - Score is Weight if 2 or more Rooks exists on the chess board.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-rook-semiopen-fyle [<New weight : List>]`
+    + Weight for Rook on semi-open fyle.
+        - Score is Weight times number of Rooks on semi-open fyle.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-rook-open-fyle [<New weight : List>]`
+    + Weight for Rook on open fyle.
+        - Score is Weight times number of Rooks on open fyle.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-early-queen-starting [<New weight : List>]`
+    + Weight for Queen that has moved too early in the game.
+        - Score is Weight times number of Minor Pieces
+          on its starting position.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-weak-square [<New weight : List>]`
+    + Weight for Weak Square.
+        - When King is on A1(A8) or A2(A7) or B1(B8) or B2(B7) or C1(C8)
+          or C2(C7), "Weak Square" is A2(A7) or A3(A6) or B2(B7) or B3(B6)
+          or C2(C7) or C3(C6) squares where Pawn is NOT placed on.  
+          When King is on F1(F8) or F2(F7) or G1(G8) or G2(G7) or H1(H8)
+          or H2(H7), "Weak Square" is F2(F7) or F3(F6) or G2(G7) or G3(G6)
+          or H2(H7) or H3(H6) squares where Pawn is NOT placed on.
+        - Score is Weight times number of Weak Square.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-castling [<New weight : List>]`
+    + Weight for Castling.
+        - Score is Weight if King has castled.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-abandoned-castling [<New weight : List>]`
+    + Weight for King abandoned all Castling rights.
+        - Score is Weight if King has abandoned all castling rights.
+    + Return Weight as List of 2 elements.
+        - 1st : Weight on Opening.
+        - 2nd : Weight on Ending.
+    + If you specify `<New weight>`, this parameter is updated.
+
+__Example__
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@weight-pawn-mobility (list 111 222)))
+    ;; Output
+    ;; > (0 0)
+    
+    (display (my-engine '@weight-pawn-mobility))
     ;; Output
     ;; > (111 222))...";
   }

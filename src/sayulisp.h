@@ -1374,8 +1374,12 @@ namespace Sayuri {
 
           LispObject* ptr_2 = ptr->car().get();
           FOR_PIECE_TYPES(piece_type_2) {
-            ptr_2->car(LispObject::NewNumber(table
-            [TYPE][piece_type_1][piece_type_2]));
+            if ((piece_type_1 == EMPTY) || (piece_type_2 == EMPTY)) {
+              ptr_2->car(LispObject::NewNumber(0));
+            } else {
+              ptr_2->car(LispObject::NewNumber(table
+              [TYPE][piece_type_1][piece_type_2]));
+            }
 
             ptr_2 = ptr_2->cdr().get();
           }
@@ -1422,7 +1426,11 @@ namespace Sayuri {
                 static_cast<int>(piece_type_2 + 1)}, false);
               }
 
-              temp[TYPE][piece_type_1][piece_type_2] = itr_2->number_value();
+              if ((piece_type_1 == EMPTY) || (piece_type_2 == EMPTY)) {
+                temp[TYPE][piece_type_1][piece_type_2] = 0.0;
+              } else {
+                temp[TYPE][piece_type_1][piece_type_2] = itr_2->number_value();
+              }
 
               ++itr_2;
             }
