@@ -179,7 +179,7 @@ namespace Sayuri {
   weight_rook_pair_(10.0, 20.0),
   weight_rook_semiopen_fyle_(7.5, 7.5),
   weight_rook_open_fyle_(7.5, 7.5),
-  weight_early_queen_launched_(-20.0, 0.0),
+  weight_early_queen_starting_(-20.0, 0.0),
   weight_weak_square_(-5.0, 0.0),
   weight_castling_(20.0, 0.0),
   weight_abandoned_castling_(-110.0, 0.0) {
@@ -728,7 +728,7 @@ namespace Sayuri {
     weight_rook_pair_ = params.weight_rook_pair_;
     weight_rook_semiopen_fyle_ = params.weight_rook_semiopen_fyle_;
     weight_rook_open_fyle_ = params.weight_rook_open_fyle_;
-    weight_early_queen_launched_ = params.weight_early_queen_launched_;
+    weight_early_queen_starting_ = params.weight_early_queen_starting_;
     weight_weak_square_ = params.weight_weak_square_;
     weight_castling_ = params.weight_castling_;
     weight_abandoned_castling_ = params.weight_abandoned_castling_;

@@ -237,7 +237,7 @@ namespace Sayuri {
         /** キャッシュ - オープンファイルのルーク。 */
         int rook_open_fyle_cache_;
         /** キャッシュ - 早すぎるクイーンの始動。 */
-        int early_queen_launched_cache_[NUM_SQUARES + 1];
+        int early_queen_starting_cache_[NUM_SQUARES + 1];
         /** キャッシュ - キング周りの弱いマス。 */
         int weak_square_cache_[NUM_SQUARES + 1];
         /** キャッシュ - キャスリング。 */

@@ -1060,8 +1060,8 @@ namespace Sayuri {
        * アクセサ - 早すぎるクイーンの始動のウェイト。
        * @return 早すぎるクイーンの始動のウェイト。
        */
-      const Weight& weight_early_queen_launched() const {
-        return weight_early_queen_launched_;
+      const Weight& weight_early_queen_starting() const {
+        return weight_early_queen_starting_;
       }
       /**
        * アクセサ - キング周りの弱いマスのウェイト。
@@ -1243,8 +1243,8 @@ namespace Sayuri {
        * ミューテータ - 早すぎるクイーンの始動のウェイト。
        * @param weight 早すぎるクイーンの始動のウェイト。
        */
-      void weight_early_queen_launched(const Weight& weight) {
-        weight_early_queen_launched_ = weight;
+      void weight_early_queen_starting(const Weight& weight) {
+        weight_early_queen_starting_ = weight;
       }
       /**
        * ミューテータ - キング周りの弱いマスのウェイト。
@@ -1352,7 +1352,7 @@ namespace Sayuri {
       /** オープンファイルのルークのウェイト。 */
       Weight weight_rook_open_fyle_;
       /** 早すぎるクイーンの始動のウェイト。 */
-      Weight weight_early_queen_launched_;
+      Weight weight_early_queen_starting_;
       /** キング周りの弱いマスのウェイト。 */
       Weight weight_weak_square_;
       /** キャスリングのウェイト。 */

@@ -312,7 +312,7 @@ namespace Sayuri {
       }
 
       evaluator.score_ +=
-      SIGN * evaluator.cache_ptr_->early_queen_launched_cache_[value];
+      SIGN * evaluator.cache_ptr_->early_queen_starting_cache_[value];
     }
   };
   template<Side SIDE>
@@ -866,7 +866,7 @@ namespace Sayuri {
       cache_[num_pieces].rook_pair_cache_ = 0;
       cache_[num_pieces].rook_semiopen_fyle_cache_ = 0;
       cache_[num_pieces].rook_open_fyle_cache_ = 0;
-      INIT_ARRAY(cache_[num_pieces].early_queen_launched_cache_);
+      INIT_ARRAY(cache_[num_pieces].early_queen_starting_cache_);
       INIT_ARRAY(cache_[num_pieces].weak_square_cache_);
       cache_[num_pieces].castling_cache_ = 0;
       cache_[num_pieces].abandoned_castling_cache_ = 0;
@@ -982,8 +982,8 @@ namespace Sayuri {
 
       for (unsigned int num_minor = 0; num_minor < (NUM_SQUARES + 1);
       ++num_minor) {
-        ptr->early_queen_launched_cache_[num_minor] =
-        256.0 * num_minor * params.weight_early_queen_launched()(num_pieces);
+        ptr->early_queen_starting_cache_[num_minor] =
+        256.0 * num_minor * params.weight_early_queen_starting()(num_pieces);
       }
 
       for (unsigned int num_square = 0; num_square < (NUM_SQUARES + 1);

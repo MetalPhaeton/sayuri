@@ -96,6 +96,8 @@ namespace Sayuri {
     // 出力リスナー。
     shell_ptr_->AddOutputListener
     ([this](const std::string& message) {this->ListenUCIOutput(message);});
+
+    SetWeightFunctions();
   }
 
   // コピーコンストラクタ。
@@ -111,6 +113,8 @@ namespace Sayuri {
     // 出力リスナー。
     shell_ptr_->AddOutputListener
     ([this](const std::string& message) {this->ListenUCIOutput(message);});
+
+    SetWeightFunctions();
   }
 
   // ムーブコンストラクタ。
@@ -119,7 +123,9 @@ namespace Sayuri {
   eval_params_ptr_(std::move(suite.eval_params_ptr_)),
   engine_ptr_(std::move(suite.engine_ptr_)),
   table_ptr_(std::move(suite.table_ptr_)),
-  shell_ptr_(std::move(suite.shell_ptr_)) {}
+  shell_ptr_(std::move(suite.shell_ptr_)) {
+    SetWeightFunctions();
+  }
 
   // コピー代入演算子。
   EngineSuite& EngineSuite::operator=(const EngineSuite& suite) {
@@ -136,6 +142,8 @@ namespace Sayuri {
     shell_ptr_->AddOutputListener
     ([this](const std::string& message) {this->ListenUCIOutput(message);});
 
+    SetWeightFunctions();
+
     return *this;
   }
 
@@ -146,7 +154,253 @@ namespace Sayuri {
     engine_ptr_ = std::move(suite.engine_ptr_);
     table_ptr_ = std::move(suite.table_ptr_);
     shell_ptr_ = std::move(suite.shell_ptr_);
+
+    SetWeightFunctions();
+
     return *this;
+  }
+
+  // ウェイト関数オブジェクトをセット。
+  void EngineSuite::SetWeightFunctions() {
+    weight_1_accessor_[WEIGHT_OPENING_POSITION] =
+    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
+      return this->eval_params_ptr_->weight_opening_position();
+    };
+
+    weight_1_accessor_[WEIGHT_ENDING_POSITION] =
+    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
+      return this->eval_params_ptr_->weight_ending_position();
+    };
+
+    weight_1_accessor_[WEIGHT_MOBILITY] =
+    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
+      return this->eval_params_ptr_->weight_mobility();
+    };
+
+    weight_1_accessor_[WEIGHT_CENTER_CONTROL] =
+    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
+      return this->eval_params_ptr_->weight_center_control();
+    };
+
+    weight_1_accessor_[WEIGHT_SWEET_CENTER_CONTROL] =
+    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
+      return this->eval_params_ptr_->weight_sweet_center_control();
+    };
+
+    weight_1_accessor_[WEIGHT_DEVELOPMENT] =
+    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
+      return this->eval_params_ptr_->weight_development();
+    };
+
+    weight_1_accessor_[WEIGHT_ATTACK] =
+    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
+      return this->eval_params_ptr_->weight_attack();
+    };
+
+    weight_1_accessor_[WEIGHT_DEFENSE] =
+    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
+      return this->eval_params_ptr_->weight_defense();
+    };
+
+    weight_1_accessor_[WEIGHT_PIN] =
+    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
+      return this->eval_params_ptr_->weight_pin();
+    };
+
+    weight_1_accessor_[WEIGHT_ATTACK_AROUND_KING] =
+    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
+      return this->eval_params_ptr_->weight_attack_around_king();
+    };
+
+    weight_2_accessor_[WEIGHT_PASS_PAWN] =
+    [this]() -> const Weight& {
+      return this->eval_params_ptr_->weight_pass_pawn();
+    };
+
+    weight_2_accessor_[WEIGHT_PROTECTED_PASS_PAWN] =
+    [this]() -> const Weight& {
+      return this->eval_params_ptr_->weight_protected_pass_pawn();
+    };
+
+    weight_2_accessor_[WEIGHT_DOUBLE_PAWN] =
+    [this]() -> const Weight& {
+      return this->eval_params_ptr_->weight_double_pawn();
+    };
+
+    weight_2_accessor_[WEIGHT_ISO_PAWN] =
+    [this]() -> const Weight& {
+      return this->eval_params_ptr_->weight_iso_pawn();
+    };
+
+    weight_2_accessor_[WEIGHT_PAWN_SHIELD] =
+    [this]() -> const Weight& {
+      return this->eval_params_ptr_->weight_pawn_shield();
+    };
+
+    weight_2_accessor_[WEIGHT_BISHOP_PAIR] =
+    [this]() -> const Weight& {
+      return this->eval_params_ptr_->weight_bishop_pair();
+    };
+
+    weight_2_accessor_[WEIGHT_BAD_BISHOP] =
+    [this]() -> const Weight& {
+      return this->eval_params_ptr_->weight_bad_bishop();
+    };
+
+    weight_2_accessor_[WEIGHT_ROOK_PAIR] =
+    [this]() -> const Weight& {
+      return this->eval_params_ptr_->weight_rook_pair();
+    };
+
+    weight_2_accessor_[WEIGHT_ROOK_SEMIOPEN_FYLE] =
+    [this]() -> const Weight& {
+      return this->eval_params_ptr_->weight_rook_semiopen_fyle();
+    };
+
+    weight_2_accessor_[WEIGHT_ROOK_OPEN_FYLE] =
+    [this]() -> const Weight& {
+      return this->eval_params_ptr_->weight_rook_open_fyle();
+    };
+
+    weight_2_accessor_[WEIGHT_EARLY_QUEEN_STARTING] =
+    [this]() -> const Weight& {
+      return this->eval_params_ptr_->weight_early_queen_starting();
+    };
+
+    weight_2_accessor_[WEIGHT_WEAK_SQUARE] =
+    [this]() -> const Weight& {
+      return this->eval_params_ptr_->weight_weak_square();
+    };
+
+    weight_2_accessor_[WEIGHT_CASTLING] =
+    [this]() -> const Weight& {
+      return this->eval_params_ptr_->weight_castling();
+    };
+
+    weight_2_accessor_[WEIGHT_ABANDONED_CASTLING] =
+    [this]() -> const Weight& {
+      return this->eval_params_ptr_->weight_abandoned_castling();
+    };
+
+    weight_1_mutator_[WEIGHT_OPENING_POSITION] =
+    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
+      this->eval_params_ptr_->weight_opening_position(weights);
+    };
+
+    weight_1_mutator_[WEIGHT_ENDING_POSITION] =
+    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
+      this->eval_params_ptr_->weight_ending_position(weights);
+    };
+
+    weight_1_mutator_[WEIGHT_MOBILITY] =
+    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
+      this->eval_params_ptr_->weight_mobility(weights);
+    };
+
+    weight_1_mutator_[WEIGHT_CENTER_CONTROL] =
+    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
+      this->eval_params_ptr_->weight_center_control(weights);
+    };
+
+    weight_1_mutator_[WEIGHT_SWEET_CENTER_CONTROL] =
+    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
+      this->eval_params_ptr_->weight_sweet_center_control(weights);
+    };
+
+    weight_1_mutator_[WEIGHT_DEVELOPMENT] =
+    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
+      this->eval_params_ptr_->weight_development(weights);
+    };
+
+    weight_1_mutator_[WEIGHT_ATTACK] =
+    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
+      this->eval_params_ptr_->weight_attack(weights);
+    };
+
+    weight_1_mutator_[WEIGHT_DEFENSE] =
+    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
+      this->eval_params_ptr_->weight_defense(weights);
+    };
+
+    weight_1_mutator_[WEIGHT_PIN] =
+    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
+      this->eval_params_ptr_->weight_pin(weights);
+    };
+
+    weight_1_mutator_[WEIGHT_ATTACK_AROUND_KING] =
+    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
+      this->eval_params_ptr_->weight_attack_around_king(weights);
+    };
+
+    weight_2_mutator_[WEIGHT_PASS_PAWN] =
+    [this](const Weight& weight) {
+      this->eval_params_ptr_->weight_pass_pawn(weight);
+    };
+
+    weight_2_mutator_[WEIGHT_PROTECTED_PASS_PAWN] =
+    [this](const Weight& weight) {
+      this->eval_params_ptr_->weight_protected_pass_pawn(weight);
+    };
+
+    weight_2_mutator_[WEIGHT_DOUBLE_PAWN] =
+    [this](const Weight& weight) {
+      this->eval_params_ptr_->weight_double_pawn(weight);
+    };
+
+    weight_2_mutator_[WEIGHT_ISO_PAWN] =
+    [this](const Weight& weight) {
+      this->eval_params_ptr_->weight_iso_pawn(weight);
+    };
+
+    weight_2_mutator_[WEIGHT_PAWN_SHIELD] =
+    [this](const Weight& weight) {
+      this->eval_params_ptr_->weight_pawn_shield(weight);
+    };
+
+    weight_2_mutator_[WEIGHT_BISHOP_PAIR] =
+    [this](const Weight& weight) {
+      this->eval_params_ptr_->weight_bishop_pair(weight);
+    };
+
+    weight_2_mutator_[WEIGHT_BAD_BISHOP] =
+    [this](const Weight& weight) {
+      this->eval_params_ptr_->weight_bad_bishop(weight);
+    };
+
+    weight_2_mutator_[WEIGHT_ROOK_PAIR] =
+    [this](const Weight& weight) {
+      this->eval_params_ptr_->weight_rook_pair(weight);
+    };
+
+    weight_2_mutator_[WEIGHT_ROOK_SEMIOPEN_FYLE] =
+    [this](const Weight& weight) {
+      this->eval_params_ptr_->weight_rook_semiopen_fyle(weight);
+    };
+
+    weight_2_mutator_[WEIGHT_ROOK_OPEN_FYLE] =
+    [this](const Weight& weight) {
+      this->eval_params_ptr_->weight_rook_open_fyle(weight);
+    };
+
+    weight_2_mutator_[WEIGHT_EARLY_QUEEN_STARTING] =
+    [this](const Weight& weight) {
+      this->eval_params_ptr_->weight_early_queen_starting(weight);
+    };
+
+    weight_2_mutator_[WEIGHT_WEAK_SQUARE] =
+    [this](const Weight& weight) {
+      this->eval_params_ptr_->weight_weak_square(weight);
+    };
+
+    weight_2_mutator_[WEIGHT_CASTLING] =
+    [this](const Weight& weight) {
+      this->eval_params_ptr_->weight_castling(weight);
+    };
+
+    weight_2_mutator_[WEIGHT_ABANDONED_CASTLING] =
+    [this](const Weight& weight) {
+      this->eval_params_ptr_->weight_abandoned_castling(weight);
+    };
   }
 
   // ========================== //
@@ -436,7 +690,7 @@ namespace Sayuri {
       }
       int num_args = func_ptr->function().arg_name_vec_.size();
       if (num_args != 1) {
-        throw LispObject::GenError("@engine_error",
+        throw LispObject::GenError("@engine-error",
         "The number of argument of callback must be 1. ("
         + list_itr->ToString() + ") requires "
         + std::to_string(num_args) + " arguments.");
@@ -1103,12 +1357,137 @@ namespace Sayuri {
         (func_name, message_symbol, *value_list_ptr);
       }
 
-    } else if ((message_symbol == "@weight-pawn-attack")
+    } else if ((message_symbol == "@pawn-defense-table")
+    || (message_symbol == "@knight-defense-table")
+    || (message_symbol == "@bishop-defense-table")
+    || (message_symbol == "@rook-defense-table")
+    || (message_symbol == "@queen-defense-table")
+    || (message_symbol == "@king-defense-table")) {
+      LispObjectPtr value_list_ptr = LispObject::NewNil();
+      if (list_itr) {
+        value_list_ptr = caller.Evaluate(*list_itr);
+        if (!(value_list_ptr->IsList())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "List", std::vector<int> {2}, true);
+        }
+      }
+
+      if (message_symbol == "@pawn-defense-table") {
+        return SetDefenseValueTable<PAWN>
+        (func_name, message_symbol, *value_list_ptr);
+      } else if (message_symbol == "@knight-defense-table") {
+        return SetDefenseValueTable<KNIGHT>
+        (func_name, message_symbol, *value_list_ptr);
+      } else if (message_symbol == "@bishop-defense-table") {
+        return SetDefenseValueTable<BISHOP>
+        (func_name, message_symbol, *value_list_ptr);
+      } else if (message_symbol == "@rook-defense-table") {
+        return SetDefenseValueTable<ROOK>
+        (func_name, message_symbol, *value_list_ptr);
+      } else if (message_symbol == "@queen-defense-table") {
+        return SetDefenseValueTable<QUEEN>
+        (func_name, message_symbol, *value_list_ptr);
+      } else {
+        return SetDefenseValueTable<KING>
+        (func_name, message_symbol, *value_list_ptr);
+      }
+
+    } else if ((message_symbol == "@bishop-pin-table")
+    || (message_symbol == "@rook-pin-table")
+    || (message_symbol == "@queen-pin-table")) {
+      LispObjectPtr value_list_ptr = LispObject::NewNil();
+      if (list_itr) {
+        value_list_ptr = caller.Evaluate(*list_itr);
+        if (!(value_list_ptr->IsList())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "List", std::vector<int> {2}, true);
+        }
+      }
+
+      if (message_symbol == "@bishop-pin-table") {
+        return SetPinValueTable<BISHOP>
+        (func_name, message_symbol, *value_list_ptr);
+      } else if (message_symbol == "@rook-pin-table") {
+        return SetPinValueTable<ROOK>
+        (func_name, message_symbol, *value_list_ptr);
+      } else {
+        return SetPinValueTable<QUEEN>
+        (func_name, message_symbol, *value_list_ptr);
+      }
+
+    } else if (message_symbol == "@pawn-shield-table") {
+      LispObjectPtr table_ptr = LispObject::NewNil();
+      if (list_itr) {
+        table_ptr = caller.Evaluate(*list_itr);
+        if (!(table_ptr->IsList())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "List", std::vector<int> {2}, true);
+        }
+      }
+
+      return SetPawnShieldValueTable
+      (func_name, message_symbol, *table_ptr);
+
+    } else if ((message_symbol == "@weight-pawn-mobility")
+    || (message_symbol == "@weight-knight-mobility")
+    || (message_symbol == "@weight-bishop-mobility")
+    || (message_symbol == "@weight-rook-mobility")
+    || (message_symbol == "@weight-queen-mobility")
+    || (message_symbol == "@weight-king-mobility")
+    || (message_symbol == "@weight-pawn-center-control")
+    || (message_symbol == "@weight-knight-center-control")
+    || (message_symbol == "@weight-bishop-center-control")
+    || (message_symbol == "@weight-rook-center-control")
+    || (message_symbol == "@weight-queen-center-control")
+    || (message_symbol == "@weight-king-center-control")
+    || (message_symbol == "@weight-pawn-sweet-center-control")
+    || (message_symbol == "@weight-knight-sweet-center-control")
+    || (message_symbol == "@weight-bishop-sweet-center-control")
+    || (message_symbol == "@weight-rook-sweet-center-control")
+    || (message_symbol == "@weight-queen-sweet-center-control")
+    || (message_symbol == "@weight-king-sweet-center-control")
+    || (message_symbol == "@weight-pawn-development")
+    || (message_symbol == "@weight-knight-development")
+    || (message_symbol == "@weight-bishop-development")
+    || (message_symbol == "@weight-rook-development")
+    || (message_symbol == "@weight-queen-development")
+    || (message_symbol == "@weight-king-development")
+    || (message_symbol == "@weight-pawn-attack")
     || (message_symbol == "@weight-knight-attack")
     || (message_symbol == "@weight-bishop-attack")
     || (message_symbol == "@weight-rook-attack")
     || (message_symbol == "@weight-queen-attack")
-    || (message_symbol == "@weight-king-attack")) {
+    || (message_symbol == "@weight-king-attack")
+    || (message_symbol == "@weight-pawn-defense")
+    || (message_symbol == "@weight-knight-defense")
+    || (message_symbol == "@weight-bishop-defense")
+    || (message_symbol == "@weight-rook-defense")
+    || (message_symbol == "@weight-queen-defense")
+    || (message_symbol == "@weight-king-defense")
+    || (message_symbol == "@weight-bishop-pin")
+    || (message_symbol == "@weight-rook-pin")
+    || (message_symbol == "@weight-queen-pin")
+    || (message_symbol == "@weight-pawn-attack-around-king")
+    || (message_symbol == "@weight-knight-attack-around-king")
+    || (message_symbol == "@weight-bishop-attack-around-king")
+    || (message_symbol == "@weight-rook-attack-around-king")
+    || (message_symbol == "@weight-queen-attack-around-king")
+    || (message_symbol == "@weight-king-attack-around-king")
+    || (message_symbol == "@weight-pass-pawn")
+    || (message_symbol == "@weight-protected-pass-pawn")
+    || (message_symbol == "@weight-double-pawn")
+    || (message_symbol == "@weight-iso-pawn")
+    || (message_symbol == "@weight-pawn-shield")
+    || (message_symbol == "@weight-bishop-pair")
+    || (message_symbol == "@weight-bad-bishop")
+    || (message_symbol == "@weight-rook-pair")
+    || (message_symbol == "@weight-rook-semiopen-fyle")
+    || (message_symbol == "@weight-rook-open-fyle")
+    || (message_symbol == "@weight-early-queen-starting")
+    || (message_symbol == "@weight-weak-square")
+    || (message_symbol == "@weight-castling")
+    || (message_symbol == "@weight-abandoned-castling")
+    ) {
       LispObjectPtr weight_params_ptr = LispObject::NewNil();
       if (list_itr) {
         weight_params_ptr = caller.Evaluate(*list_itr);
@@ -1118,26 +1497,184 @@ namespace Sayuri {
         }
       }
 
-      if (message_symbol == "@weight-pawn-attack") {
-        return SetWeightAttack<PAWN>
+      if (message_symbol == "@weight-pawn-mobility") {
+        return SetWeight1<WEIGHT_MOBILITY, PAWN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-knight-mobility") {
+        return SetWeight1<WEIGHT_MOBILITY, KNIGHT>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-bishop-mobility") {
+        return SetWeight1<WEIGHT_MOBILITY, BISHOP>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-rook-mobility") {
+        return SetWeight1<WEIGHT_MOBILITY, ROOK>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-queen-mobility") {
+        return SetWeight1<WEIGHT_MOBILITY, QUEEN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-king-mobility") {
+        return SetWeight1<WEIGHT_MOBILITY, KING>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-pawn-center-control") {
+        return SetWeight1<WEIGHT_CENTER_CONTROL, PAWN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-knight-center-control") {
+        return SetWeight1<WEIGHT_CENTER_CONTROL, KNIGHT>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-bishop-center-control") {
+        return SetWeight1<WEIGHT_CENTER_CONTROL, BISHOP>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-rook-center-control") {
+        return SetWeight1<WEIGHT_CENTER_CONTROL, ROOK>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-queen-center-control") {
+        return SetWeight1<WEIGHT_CENTER_CONTROL, QUEEN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-king-center-control") {
+        return SetWeight1<WEIGHT_CENTER_CONTROL, KING>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-pawn-sweet-center-control") {
+        return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, PAWN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-knight-sweet-center-control") {
+        return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, KNIGHT>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-bishop-sweet-center-control") {
+        return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, BISHOP>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-rook-sweet-center-control") {
+        return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, ROOK>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-queen-sweet-center-control") {
+        return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, QUEEN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-king-sweet-center-control") {
+        return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, KING>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-pawn-development") {
+        return SetWeight1<WEIGHT_DEVELOPMENT, PAWN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-knight-development") {
+        return SetWeight1<WEIGHT_DEVELOPMENT, KNIGHT>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-bishop-development") {
+        return SetWeight1<WEIGHT_DEVELOPMENT, BISHOP>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-rook-development") {
+        return SetWeight1<WEIGHT_DEVELOPMENT, ROOK>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-queen-development") {
+        return SetWeight1<WEIGHT_DEVELOPMENT, QUEEN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-king-development") {
+        return SetWeight1<WEIGHT_DEVELOPMENT, KING>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-pawn-attack") {
+        return SetWeight1<WEIGHT_ATTACK, PAWN>
         (func_name, message_symbol, *weight_params_ptr);
       } else if (message_symbol == "@weight-knight-attack") {
-        return SetWeightAttack<KNIGHT>
+        return SetWeight1<WEIGHT_ATTACK, KNIGHT>
         (func_name, message_symbol, *weight_params_ptr);
       } else if (message_symbol == "@weight-bishop-attack") {
-        return SetWeightAttack<BISHOP>
+        return SetWeight1<WEIGHT_ATTACK, BISHOP>
         (func_name, message_symbol, *weight_params_ptr);
       } else if (message_symbol == "@weight-rook-attack") {
-        return SetWeightAttack<ROOK>
+        return SetWeight1<WEIGHT_ATTACK, ROOK>
         (func_name, message_symbol, *weight_params_ptr);
       } else if (message_symbol == "@weight-queen-attack") {
-        return SetWeightAttack<QUEEN>
+        return SetWeight1<WEIGHT_ATTACK, QUEEN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else {
-        return SetWeightAttack<KING>
+      } else if (message_symbol == "@weight-king-attack") {
+        return SetWeight1<WEIGHT_ATTACK, KING>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-pawn-defense") {
+        return SetWeight1<WEIGHT_DEFENSE, PAWN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-knight-defense") {
+        return SetWeight1<WEIGHT_DEFENSE, KNIGHT>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-bishop-defense") {
+        return SetWeight1<WEIGHT_DEFENSE, BISHOP>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-rook-defense") {
+        return SetWeight1<WEIGHT_DEFENSE, ROOK>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-queen-defense") {
+        return SetWeight1<WEIGHT_DEFENSE, QUEEN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-king-defense"){
+        return SetWeight1<WEIGHT_DEFENSE, KING>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-bishop-pin") {
+        return SetWeight1<WEIGHT_PIN, BISHOP>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-rook-pin") {
+        return SetWeight1<WEIGHT_PIN, ROOK>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-queen-pin") {
+        return SetWeight1<WEIGHT_PIN, QUEEN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-pawn-attack-around-king") {
+        return SetWeight1<WEIGHT_ATTACK_AROUND_KING, PAWN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-knight-attack-around-king") {
+        return SetWeight1<WEIGHT_ATTACK_AROUND_KING, KNIGHT>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-bishop-attack-around-king") {
+        return SetWeight1<WEIGHT_ATTACK_AROUND_KING, BISHOP>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-rook-attack-around-king") {
+        return SetWeight1<WEIGHT_ATTACK_AROUND_KING, ROOK>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-queen-attack-around-king") {
+        return SetWeight1<WEIGHT_ATTACK_AROUND_KING, QUEEN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-king-attack-around-king"){
+        return SetWeight1<WEIGHT_ATTACK_AROUND_KING, KING>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-pass-pawn"){
+        return SetWeight2<WEIGHT_PASS_PAWN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-protected-pass-pawn"){
+        return SetWeight2<WEIGHT_PROTECTED_PASS_PAWN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-double-pawn"){
+        return SetWeight2<WEIGHT_DOUBLE_PAWN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-iso-pawn"){
+        return SetWeight2<WEIGHT_ISO_PAWN>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-pawn-shield"){
+        return SetWeight2<WEIGHT_PAWN_SHIELD>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-bishop-pair"){
+        return SetWeight2<WEIGHT_BISHOP_PAIR>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-bad-bishop"){
+        return SetWeight2<WEIGHT_BAD_BISHOP>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-rook-pair"){
+        return SetWeight2<WEIGHT_ROOK_PAIR>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-rook-semiopen-fyle"){
+        return SetWeight2<WEIGHT_ROOK_SEMIOPEN_FYLE>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-rook-open-fyle"){
+        return SetWeight2<WEIGHT_ROOK_OPEN_FYLE>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-early-queen-starting"){
+        return SetWeight2<WEIGHT_EARLY_QUEEN_STARTING>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-weak-square"){
+        return SetWeight2<WEIGHT_WEAK_SQUARE>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-castling"){
+        return SetWeight2<WEIGHT_CASTLING>
+        (func_name, message_symbol, *weight_params_ptr);
+      } else if (message_symbol == "@weight-abandoned-castling"){
+        return SetWeight2<WEIGHT_ABANDONED_CASTLING>
         (func_name, message_symbol, *weight_params_ptr);
       }
-
     }
 
     throw LispObject::GenError("@engine-error", "(" + func_name
@@ -1210,7 +1747,7 @@ namespace Sayuri {
 
       // 長さは3?。
       if (list_itr->Length() != 3) {
-        throw LispObject::GenError("@engine_error",
+        throw LispObject::GenError("@engine-error",
         "The " + std::to_string(index) + "th move of move list of ("
         + func_name + ") must be 3 elements. Given "
         + std::to_string(list_itr->Length()) + ".");
@@ -1393,22 +1930,22 @@ namespace Sayuri {
 
     // 引数チェック。
     if (square >= NUM_SQUARES) {
-      throw LispObject::GenError("@engine_error",
+      throw LispObject::GenError("@engine-error",
       "The square value '" + std::to_string(square)
       + "' doesn't indicate any square.");
     }
     if (piece_type >= NUM_PIECE_TYPES) {
-      throw LispObject::GenError("@engine_error",
+      throw LispObject::GenError("@engine-error",
       "The piece type value '" + std::to_string(piece_type)
       +  "' doesn't indicate any piece type.");
     }
     if (side >= NUM_SIDES) {
-      throw LispObject::GenError("@engine_error",
+      throw LispObject::GenError("@engine-error",
       "The side value '" + std::to_string(side)
       + "' doesn't indicate any side.");
     }
     if ((piece_type && !side) || (!piece_type && side)) {
-      throw LispObject::GenError("@engine_error",
+      throw LispObject::GenError("@engine-error",
       "'" + SIDE_SYMBOL[side] + " " + PIECE_TYPE_SYMBOL[piece_type]
       + "' doesn't exist in the world.");
     }
@@ -1419,7 +1956,7 @@ namespace Sayuri {
 
     // もし置き換える前の駒がキングなら置き換えられない。
     if (origin_type == KING) {
-      throw LispObject::GenError("@engine_error",
+      throw LispObject::GenError("@engine-error",
       "Couldn't place the piece, because " + SIDE_SYMBOL[origin_side]
       + " " + PIECE_TYPE_SYMBOL[origin_type] + " is placed there."
       " Each side must have just one King.");
@@ -1441,12 +1978,12 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::SetToMove(LispObjectPtr to_move_ptr) {
     Side to_move = to_move_ptr->number_value();
     if (to_move >= NUM_SIDES) {
-      throw LispObject::GenError("@engine_error",
+      throw LispObject::GenError("@engine-error",
       "The side value '" + std::to_string(to_move)
       + "' doesn't indicate any side.");
     }
     if (!to_move) {
-      throw LispObject::GenError("@engine_error", "'NO_SIDE' is not allowed.");
+      throw LispObject::GenError("@engine-error", "'NO_SIDE' is not allowed.");
     }
 
     Side origin = engine_ptr_->to_move();
@@ -1514,32 +2051,32 @@ namespace Sayuri {
 
     // 引数をチェック。
     if (square >= NUM_SQUARES) {
-      throw LispObject::GenError("@engine_error", "The square value '"
+      throw LispObject::GenError("@engine-error", "The square value '"
       + std::to_string(square)
       + "' doesn't indicate any square.");
     }
 
     // 位置が0でなければフィルタリング。
     if ((engine_ptr_->blocker_0() & Util::SQUARE[square])) {
-      throw LispObject::GenError("@engine_error",
+      throw LispObject::GenError("@engine-error",
       "'" + SQUARE_SYMBOL[square] + "' is not empty.");
     }
     Rank rank = Util::SQUARE_TO_RANK[square];
     if (!((rank == RANK_3) || (rank == RANK_6))) {
-      throw LispObject::GenError("@engine_error",
+      throw LispObject::GenError("@engine-error",
       "The rank of square must be 'RANK_3' or 'RANK_6'. you indicated '"
       + RANK_SYMBOL[rank] + "'.");
     }
     if (rank == RANK_3) {
       Square target = square + 8;
       if (!(engine_ptr_->position()[WHITE][PAWN] & Util::SQUARE[target])) {
-        throw LispObject::GenError("@engine_error",
+        throw LispObject::GenError("@engine-error",
         "White Pawn doesn't exist on '" + SQUARE_SYMBOL[target] + "' .");
       }
     } else if (rank == RANK_6) {
       Square target = square - 8;
       if (!(engine_ptr_->position()[BLACK][PAWN] & Util::SQUARE[target])) {
-        throw LispObject::GenError("@engine_error",
+        throw LispObject::GenError("@engine-error",
         "Black Pawn doesn't exist on '" + SQUARE_SYMBOL[target] + "' .");
       }
     }
@@ -1563,7 +2100,7 @@ namespace Sayuri {
     // fromをチェック。
     if (!itr) {
       throw LispObject::GenError
-      ("@engine_error", "Couldn't find 'From' value.");
+      ("@engine-error", "Couldn't find 'From' value.");
     }
     LispObjectPtr from_ptr = caller.Evaluate(*(itr++));
     if (!(from_ptr->IsNumber())) {
@@ -1572,14 +2109,14 @@ namespace Sayuri {
     }
     Square from = from_ptr->number_value();
     if (from >= NUM_SQUARES) {
-      throw LispObject::GenError("@engine_error", "The 'From' value '"
+      throw LispObject::GenError("@engine-error", "The 'From' value '"
       + std::to_string(from) + "' doesn't indicate any square.");
     }
 
     // toをチェック。
     if (!itr) {
       throw LispObject::GenError
-      ("@engine_error", "Couldn't find 'To' value.");
+      ("@engine-error", "Couldn't find 'To' value.");
     }
     LispObjectPtr to_ptr = caller.Evaluate(*(itr++));
     if (!(to_ptr->IsNumber())) {
@@ -1588,14 +2125,14 @@ namespace Sayuri {
     }
     Square to = to_ptr->number_value();
     if (to >= NUM_SQUARES) {
-      throw LispObject::GenError("@engine_error", "The 'To' value '"
+      throw LispObject::GenError("@engine-error", "The 'To' value '"
       + std::to_string(to) + "' doesn't indicate any square.");
     }
 
     // promotionをチェック。
     if (!itr) {
       throw LispObject::GenError
-      ("@engine_error", "Couldn't find 'Promotion' value.");
+      ("@engine-error", "Couldn't find 'Promotion' value.");
     }
     LispObjectPtr promotion_ptr = caller.Evaluate(*itr);
     if (!(promotion_ptr->IsNumber())) {
@@ -1604,7 +2141,7 @@ namespace Sayuri {
     }
     PieceType promotion = promotion_ptr->number_value();
     if (promotion >= NUM_PIECE_TYPES) {
-      throw LispObject::GenError("@engine_error", "The 'Promotion' value '"
+      throw LispObject::GenError("@engine-error", "The 'Promotion' value '"
       + std::to_string(promotion) + "' doesn't indicate any piece type.");
     }
 
@@ -1616,7 +2153,7 @@ namespace Sayuri {
     try {
       engine_ptr_->PlayMove(move);
     } catch (SayuriError error) {
-      throw LispObject::GenError("@engine_error",
+      throw LispObject::GenError("@engine-error",
       "'(" + SQUARE_SYMBOL[from] + " " + SQUARE_SYMBOL[to] + " "
       + PIECE_TYPE_SYMBOL[promotion] + ")' is not legal move.");
     }
@@ -1630,7 +2167,7 @@ namespace Sayuri {
     try {
       move = engine_ptr_->UndoMove();
     } catch (SayuriError error) {
-      throw LispObject::GenError("@engine_error", "Couldn't undo,"
+      throw LispObject::GenError("@engine-error", "Couldn't undo,"
       " because there are no moves in the engine's move history table.");
     }
 
@@ -1677,7 +2214,7 @@ namespace Sayuri {
   const LispObject& move_time, const LispObject& move_list) {
     int move_time_2 = move_time.number_value();
     if (move_time_2 < 0) {
-      throw LispObject::GenError("@engine_error",
+      throw LispObject::GenError("@engine-error",
       "Move time must be 0 milliseconds and more. Given "
       + std::to_string(move_time_2) + " milliseconds.");
     }
@@ -1691,7 +2228,7 @@ namespace Sayuri {
   const LispObject& time, const LispObject& move_list) {
     int time_2 = time.number_value();
     if (time_2 < 0) {
-      throw LispObject::GenError("@engine_error",
+      throw LispObject::GenError("@engine-error",
       "Time limit must be 0 milliseconds and more. Given "
       + std::to_string(time_2) + " milliseconds.");
     }
@@ -1705,7 +2242,7 @@ namespace Sayuri {
   const LispObject& depth, const LispObject& move_list) {
     int depth_2 = depth.number_value();
     if (depth_2 < 0) {
-      throw LispObject::GenError("@engine_error",
+      throw LispObject::GenError("@engine-error",
       "Depth must be 0 and more. Given "
       + std::to_string(depth_2) + ".");
     }
@@ -1719,7 +2256,7 @@ namespace Sayuri {
   const LispObject& nodes, const LispObject& move_list) {
     long long nodes_2 = nodes.number_value();
     if (nodes_2 < 0) {
-      throw LispObject::GenError("@engine_error",
+      throw LispObject::GenError("@engine-error",
       "Nodes must be 0 and more. Given "
       + std::to_string(nodes_2) + ".");
     }
@@ -1734,7 +2271,7 @@ namespace Sayuri {
     unsigned int len = material_list.Length();
     if (len > 0) {
       if (len < 7) {
-        throw LispObject::GenError("@engine_error",
+        throw LispObject::GenError("@engine-error",
         "Not enough length of material list. Needs 7. Given "
         + std::to_string(len) + ".");
       }
