@@ -50,6 +50,7 @@
 #include "job.h"
 #include "helper_queue.h"
 #include "params.h"
+#include "cache.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -62,7 +63,6 @@ namespace Sayuri {
   is_null_searching_(false),
   evaluator_(*this),
   helper_handler_(this) {
-    InitSearchParamsCache();
     SetNewGame();
 
     // 探索関数用パラメータ。
@@ -94,7 +94,6 @@ namespace Sayuri {
   is_null_searching_(false),
   evaluator_(*this),
   helper_handler_(this) {
-    InitSearchParamsCache();
     SetNewGame();
 
     // ムーブメーカー。
@@ -121,8 +120,6 @@ namespace Sayuri {
   is_null_searching_(false),
   evaluator_(*this),
   helper_handler_(this) {
-    InitSearchParamsCache();
-
     // 基本メンバをコピー。
     ScanBasicMember(engine);
 
@@ -153,8 +150,6 @@ namespace Sayuri {
   is_null_searching_(false),
   evaluator_(*this),
   helper_handler_(this) {
-    InitSearchParamsCache();
-
     // 基本メンバをコピー。
     ScanBasicMember(engine);
 
@@ -880,6 +875,9 @@ namespace Sayuri {
 
   // 次の局面のハッシュを得る。
   Hash ChessEngine::GetNextHash(Hash current_hash, Move move) const {
+    // キャッシュ。
+    Cache& cache = shared_st_ptr_->cache_;
+
     // 駒の情報を得る。
     Square from = GetFrom(move);
     Square to = GetTo(move);
@@ -900,24 +898,28 @@ namespace Sayuri {
     }
 
     // 移動する駒のハッシュを削除する。
-    current_hash ^= piece_hash_value_table_[piece_side][piece_type][from];
+    current_hash ^=
+    cache.piece_hash_value_table_[piece_side][piece_type][from];
 
     // 取る駒のハッシュを削除する。
     current_hash ^=
-    piece_hash_value_table_[target_side][target_type][target_square];
+    cache.piece_hash_value_table_[target_side][target_type][target_square];
 
     // 移動する駒の移動先のハッシュを追加する。
     if (promotion) {
-      current_hash ^= piece_hash_value_table_[piece_side][promotion][to];
+      current_hash ^=
+      cache.piece_hash_value_table_[piece_side][promotion][to];
     } else {
-      current_hash ^= piece_hash_value_table_[piece_side][piece_type][to];
+      current_hash ^=
+      cache.piece_hash_value_table_[piece_side][piece_type][to];
     }
 
     // 現在の手番のハッシュを削除。
-    current_hash ^= to_move_hash_value_table_[to_move_];
+    current_hash ^= cache.to_move_hash_value_table_[to_move_];
 
     // 次の手番のハッシュを追加。
-    current_hash ^= to_move_hash_value_table_[Util::GetOppositeSide(to_move_)];
+    current_hash ^=
+    cache.to_move_hash_value_table_[Util::GetOppositeSide(to_move_)];
 
     // キャスリングのハッシュをセット。
     // 失われるキャスリングの権利。
@@ -946,138 +948,24 @@ namespace Sayuri {
     Castling next_rights = castling_rights_ & ~loss_rights;
     // 現在のキャスリングのハッシュを消す。
     current_hash ^=
-    castling_hash_value_table_[castling_rights_ & ALL_CASTLING];
+    cache.castling_hash_value_table_[castling_rights_ & ALL_CASTLING];
     // 次のキャスリングのハッシュをセット。
-    current_hash ^= castling_hash_value_table_[next_rights & ALL_CASTLING];
+    current_hash ^=
+    cache.castling_hash_value_table_[next_rights & ALL_CASTLING];
 
     // とりあえずアンパッサンのハッシュを削除。
-    current_hash ^= en_passant_hash_value_table_[en_passant_square_];
+    current_hash ^= cache.en_passant_hash_value_table_[en_passant_square_];
 
     // ポーンの2歩の動きの場合はアンパッサンハッシュを追加。
     if (piece_type == PAWN) {
       if (Util::GetDistance(from, to) == 2) {
-        current_hash ^= en_passant_hash_value_table_
+        current_hash ^= cache.en_passant_hash_value_table_
         [Util::TO_EN_PASSANT_SQUARE[piece_side][to]];
       }
     }
 
     // 次の局面のハッシュを返す。
     return current_hash;
-  }
-
-  // 探索関数用キャッシュを初期化する。
-  void ChessEngine::InitSearchParamsCache() {
-    INIT_ARRAY(material_);
-    enable_quiesce_search_ = false;
-    enable_repetition_check_ = false;
-    enable_check_extension_ = false;
-    ybwc_limit_depth_ = 0;
-    ybwc_invalid_moves_ = 0;
-    enable_aspiration_windows_ = false;
-    aspiration_windows_limit_depth_ = 0;
-    aspiration_windows_delta_ = 0;
-    enable_see_ = false;
-    enable_history_ = false;
-    enable_killer_ = false;
-    enable_ttable_ = false;
-    enable_iid_ = false;
-    iid_limit_depth_ = 0;
-    iid_search_depth_ = 0;
-    enable_nmr_ = false;
-    nmr_limit_depth_ = 0;
-    nmr_search_reduction_ = 0;
-    nmr_reduction_ = 0;
-    enable_probcut_ = false;
-    probcut_limit_depth_ = 0;
-    probcut_margin_ = 0;
-    probcut_search_reduction_ = 0;
-    enable_history_pruning_ = false;
-    history_pruning_limit_depth_ = 0;
-    INIT_ARRAY(history_pruning_invalid_moves_);
-    history_pruning_threshold_ = 0;
-    history_pruning_reduction_ = 0;
-    enable_lmr_ = false;
-    lmr_limit_depth_ = 0;
-    INIT_ARRAY(lmr_invalid_moves_);
-    lmr_search_reduction_ = 0;
-    enable_futility_pruning_ = false;
-    futility_pruning_depth_ = 0;
-    futility_pruning_margin_ = 0;
-
-    INIT_ARRAY(piece_hash_value_table_);
-    INIT_ARRAY(to_move_hash_value_table_);
-    INIT_ARRAY(castling_hash_value_table_);
-    INIT_ARRAY(en_passant_hash_value_table_);
-
-    max_depth_ = 0;
-    max_nodes_ = 0;
-  }
-
-  // キャッシュする。
-  void ChessEngine::CacheSearchParams() {
-    if (!shared_st_ptr_) return;
-    if (!(shared_st_ptr_->search_params_ptr_)) return;
-
-    const SearchParams& params = *(shared_st_ptr_->search_params_ptr_);
-
-    // キャッシュする。
-    COPY_ARRAY(material_, params.material_);
-    enable_quiesce_search_ = params.enable_quiesce_search_;
-    enable_repetition_check_ = params.enable_repetition_check_;
-    enable_check_extension_ = params.enable_check_extension_;
-    ybwc_limit_depth_ = params.ybwc_limit_depth_;
-    ybwc_invalid_moves_ = params.ybwc_invalid_moves_;
-    enable_aspiration_windows_ = params.enable_aspiration_windows_;
-    aspiration_windows_limit_depth_ = params.aspiration_windows_limit_depth_;
-    aspiration_windows_delta_ = params.aspiration_windows_delta_;
-    enable_see_ = params.enable_see_;
-    enable_history_ = params.enable_history_;
-    enable_killer_ = params.enable_killer_;
-    enable_ttable_ = params.enable_ttable_;
-    enable_iid_ = params.enable_iid_;
-    iid_limit_depth_ = params.iid_limit_depth_;
-    iid_search_depth_ = params.iid_search_depth_;
-    enable_nmr_ = params.enable_nmr_;
-    nmr_limit_depth_ = params.nmr_limit_depth_;
-    nmr_search_reduction_ = params.nmr_search_reduction_;
-    nmr_reduction_ = params.nmr_reduction_;
-    enable_probcut_ = params.enable_probcut_;
-    probcut_limit_depth_ = params.probcut_limit_depth_;
-    probcut_margin_ = params.probcut_margin_;
-    probcut_search_reduction_ = params.probcut_search_reduction_;
-    enable_history_pruning_ = params.enable_history_pruning_;
-    history_pruning_limit_depth_ = params.history_pruning_limit_depth_;
-    for (unsigned int num_moves = 0; num_moves < (MAX_CANDIDATES + 1);
-    ++num_moves) {
-      history_pruning_invalid_moves_[num_moves] =
-      Util::GetMax(params.history_pruning_invalid_moves_,
-      static_cast<int>(params.history_pruning_move_threshold_ * num_moves));
-    }
-    history_pruning_threshold_ = params.history_pruning_threshold_ * 256.0;
-    history_pruning_reduction_ = params.history_pruning_reduction_;
-    enable_lmr_ = params.enable_lmr_;
-    lmr_limit_depth_ = params.lmr_limit_depth_;
-    for (unsigned int num_moves = 0; num_moves < (MAX_CANDIDATES + 1);
-    ++num_moves) {
-      lmr_invalid_moves_[num_moves] = Util::GetMax(params.lmr_invalid_moves_,
-      static_cast<int>(params.lmr_move_threshold_ * num_moves));
-    }
-    lmr_search_reduction_ = params.lmr_search_reduction_;
-    enable_futility_pruning_ = params.enable_futility_pruning_;
-    futility_pruning_depth_ = params.futility_pruning_depth_;
-    futility_pruning_margin_ = params.futility_pruning_margin_;
-
-    COPY_ARRAY(piece_hash_value_table_,
-    shared_st_ptr_->piece_hash_value_table_);
-    COPY_ARRAY(to_move_hash_value_table_,
-    shared_st_ptr_->to_move_hash_value_table_);
-    COPY_ARRAY(castling_hash_value_table_,
-    shared_st_ptr_->castling_hash_value_table_);
-    COPY_ARRAY(en_passant_hash_value_table_,
-    shared_st_ptr_->en_passant_hash_value_table_);
-
-    max_depth_ = shared_st_ptr_->max_depth_;
-    max_nodes_ = shared_st_ptr_->max_nodes_;
   }
 
   // ================ //
@@ -1187,6 +1075,9 @@ namespace Sayuri {
 
     COPY_ARRAY(en_passant_hash_value_table_,
     shared_st.en_passant_hash_value_table_);
+
+    // キャッシュ。
+    cache_ = shared_st.cache_;
   }
 
   // ハッシュ値のテーブルを初期化する。

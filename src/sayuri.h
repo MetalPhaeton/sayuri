@@ -46,6 +46,7 @@
 #include "transposition_table.h"
 #include "uci_shell.h"
 #include "params.h"
+#include "cache.h"
 #include "lisp_core.h"
 #include "sayulisp.h"
 

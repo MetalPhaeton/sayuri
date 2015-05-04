@@ -33,6 +33,7 @@
 #include "common.h"
 #include "chess_engine.h"
 #include "params.h"
+#include "cache.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -375,23 +376,17 @@ namespace Sayuri {
   // ==================== //
   // コンストラクタ。
   Evaluator::Evaluator(const ChessEngine& engine)
-  : engine_ptr_(&engine), score_(0), cache_ptr_(nullptr) {
-    InitCache();
-  }
+  : engine_ptr_(&engine), score_(0), cache_ptr_(nullptr) {}
 
   // コピーコンストラクタ。
   Evaluator::Evaluator(const Evaluator& eval)
   : engine_ptr_(eval.engine_ptr_), score_(0),
-  cache_ptr_(nullptr) {
-    InitCache();
-  }
+  cache_ptr_(nullptr) {}
 
   // ムーブコンストラクタ。
   Evaluator::Evaluator(Evaluator&& eval)
   : engine_ptr_(eval.engine_ptr_), score_(0),
-  cache_ptr_(nullptr) {
-    InitCache();
-  }
+  cache_ptr_(nullptr) {}
 
   // コピー代入演算子。
   Evaluator& Evaluator::operator=(const Evaluator& eval) {
@@ -430,7 +425,8 @@ namespace Sayuri {
   // 現在の局面の評価値を計算する。
   int Evaluator::Evaluate(int material) {
     // 初期化。
-    cache_ptr_ = &(cache_[Util::CountBits(engine_ptr_->blocker_0_)]);
+    cache_ptr_ = &(engine_ptr_->shared_st_ptr_->cache_.eval_cache_
+    [Util::CountBits(engine_ptr_->blocker_0_)]);
     score_ = 0;
 
     const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES] =
@@ -839,164 +835,6 @@ namespace Sayuri {
           }
         }
       }
-    }
-  }
-
-  // キャッシュを初期化する。
-  void Evaluator::InitCache() {
-    for (unsigned int num_pieces = 0; num_pieces < (NUM_SQUARES + 1);
-    ++num_pieces) {
-      INIT_ARRAY(cache_[num_pieces].opening_position_cache_);
-      INIT_ARRAY(cache_[num_pieces].ending_position_cache_);
-      INIT_ARRAY(cache_[num_pieces].mobility_cache_);
-      INIT_ARRAY(cache_[num_pieces].center_control_cache_);
-      INIT_ARRAY(cache_[num_pieces].sweet_center_control_cache_);
-      INIT_ARRAY(cache_[num_pieces].development_cache_);
-      INIT_ARRAY(cache_[num_pieces].attack_cache_);
-      INIT_ARRAY(cache_[num_pieces].defense_cache_);
-      INIT_ARRAY(cache_[num_pieces].pin_cache_);
-      INIT_ARRAY(cache_[num_pieces].attack_around_king_cache_);
-      cache_[num_pieces].pass_pawn_cache_ = 0;
-      cache_[num_pieces].protected_pass_pawn_cache_ = 0;
-      cache_[num_pieces].double_pawn_cache_ = 0;
-      cache_[num_pieces].iso_pawn_cache_ = 0;
-      INIT_ARRAY(cache_[num_pieces].pawn_shield_cache_);
-      cache_[num_pieces].bishop_pair_cache_ = 0;
-      INIT_ARRAY(cache_[num_pieces].bad_bishop_cache_);
-      cache_[num_pieces].rook_pair_cache_ = 0;
-      cache_[num_pieces].rook_semiopen_fyle_cache_ = 0;
-      cache_[num_pieces].rook_open_fyle_cache_ = 0;
-      INIT_ARRAY(cache_[num_pieces].early_queen_starting_cache_);
-      INIT_ARRAY(cache_[num_pieces].weak_square_cache_);
-      cache_[num_pieces].castling_cache_ = 0;
-      cache_[num_pieces].abandoned_castling_cache_ = 0;
-    }
-  }
-
-  // EvalParamsをキャッシュする。
-  void Evaluator::CacheEvalParams() {
-    const EvalParams& params = engine_ptr_->eval_params();
-    for (unsigned int num_pieces = 0; num_pieces < (NUM_SQUARES + 1);
-    ++num_pieces) {
-      Cache* ptr = &(cache_[num_pieces]);
-
-      FOR_PIECE_TYPES(piece_type) {
-        FOR_SQUARES(square) {
-          ptr->opening_position_cache_[piece_type][square] =
-          256.0 * params.opening_position_value_table()[piece_type][square]
-          * params.weight_opening_position()[piece_type](num_pieces);
-
-          ptr->ending_position_cache_[piece_type][square] =
-          256.0 * params.ending_position_value_table()[piece_type][square]
-          * params.weight_ending_position()[piece_type](num_pieces);
-        }
-
-        for (unsigned int num_attacks = 0; num_attacks < (MAX_ATTACKS + 1);
-        ++num_attacks) {
-          ptr->mobility_cache_[piece_type][num_attacks] =
-          256.0 * params.weight_mobility()[piece_type](num_pieces);
-        }
-
-        for (unsigned int num_center = 0; num_center < (NUM_CENTER + 1);
-        ++num_center) {
-          ptr->center_control_cache_[piece_type][num_center] =
-          256.0 * num_center
-          * params.weight_center_control()[piece_type](num_pieces);
-        }
-
-        for (unsigned int num_sweet_center = 0;
-        num_sweet_center < (NUM_SWEET_CENTER + 1); ++num_sweet_center) {
-          ptr->sweet_center_control_cache_[piece_type]
-          [num_sweet_center] =
-          256.0 * num_sweet_center
-          * params.weight_sweet_center_control()[piece_type](num_pieces);
-        }
-
-        for (unsigned int num_pieces_2 = 0; num_pieces_2 < (NUM_SQUARES + 1);
-        ++num_pieces_2) {
-          ptr->development_cache_[piece_type][num_pieces_2] =
-          256.0 * num_pieces_2
-          * params.weight_development()[piece_type](num_pieces);
-        }
-
-        FOR_PIECE_TYPES(piece_type_2) {
-          ptr->attack_cache_[piece_type][piece_type_2] =
-          256.0 * params.attack_value_table()[piece_type][piece_type_2]
-          * params.weight_attack()[piece_type](num_pieces);
-
-          ptr->defense_cache_[piece_type][piece_type_2] =
-          256.0 * params.defense_value_table()[piece_type][piece_type_2]
-          * params.weight_defense()[piece_type](num_pieces);
-
-          FOR_PIECE_TYPES(piece_type_3) {
-            ptr->pin_cache_[piece_type][piece_type_2]
-            [piece_type_3] =
-            256.0 * params.pin_value_table()[piece_type][piece_type_2]
-            [piece_type_3]
-            * params.weight_pin()[piece_type](num_pieces);
-          }
-        }
-
-        for (unsigned int num_around_king = 0;
-        num_around_king < (NUM_AROUND_KING + 1); ++num_around_king) {
-          ptr->attack_around_king_cache_[piece_type]
-          [num_around_king] = 256.0 * num_around_king
-          * params.weight_attack_around_king()[piece_type](num_pieces);
-        }
-      }
-
-      ptr->pass_pawn_cache_ = 256.0 * params.weight_pass_pawn()(num_pieces);
-
-      ptr->protected_pass_pawn_cache_ =
-      256.0 * params.weight_protected_pass_pawn()(num_pieces);
-
-      ptr->double_pawn_cache_ =
-      256.0 * params.weight_double_pawn()(num_pieces);
-
-      ptr->iso_pawn_cache_ =
-      256.0 * params.weight_iso_pawn()(num_pieces);
-
-      FOR_SQUARES(square) {
-        ptr->pawn_shield_cache_[square] =
-        256.0 * params.pawn_shield_value_table()[square]
-        * params.weight_pawn_shield()(num_pieces);
-      }
-
-      ptr->bishop_pair_cache_ =
-      256.0 * params.weight_bishop_pair()(num_pieces);
-
-      for (unsigned int num_pawn = 0; num_pawn < (NUM_SQUARES + 1);
-      ++num_pawn) {
-        ptr->bad_bishop_cache_[num_pawn] =
-        256.0 * num_pawn * params.weight_bad_bishop()(num_pieces);
-      }
-
-      ptr->rook_pair_cache_ =
-      256.0 * params.weight_rook_pair()(num_pieces);
-
-      ptr->rook_open_fyle_cache_ =
-      256.0 * params.weight_rook_open_fyle()(num_pieces);
-
-      ptr->rook_semiopen_fyle_cache_ =
-      256.0 * params.weight_rook_semiopen_fyle()(num_pieces);
-
-      for (unsigned int num_minor = 0; num_minor < (NUM_SQUARES + 1);
-      ++num_minor) {
-        ptr->early_queen_starting_cache_[num_minor] =
-        256.0 * num_minor * params.weight_early_queen_starting()(num_pieces);
-      }
-
-      for (unsigned int num_square = 0; num_square < (NUM_SQUARES + 1);
-      ++num_square) {
-        ptr->weak_square_cache_[num_square] =
-        256.0 * num_square * params.weight_weak_square()(num_pieces);
-      }
-
-      ptr->castling_cache_ =
-      256.0 * params.weight_castling()(num_pieces);
-
-      ptr->abandoned_castling_cache_ =
-      256.0 * params.weight_abandoned_castling()(num_pieces);
     }
   }
 }  // namespace Sayuri

@@ -37,6 +37,7 @@
 /** Sayuri 名前空間。 */
 namespace Sayuri {
   class ChessEngine;
+  struct EvalCache;
 
   /** 評価関数クラス。 */
   class Evaluator {
@@ -89,11 +90,6 @@ namespace Sayuri {
        * @return 評価値。
        */
       int Evaluate(int material);
-
-      /**
-       * EvalParamsをキャッシュする。
-       */
-      void CacheEvalParams();
 
     private:
       /** フレンドのデバッグ用関数。 */
@@ -178,77 +174,8 @@ namespace Sayuri {
       /** 評価関数で使う、ポジショナル評価値。 */
       int score_;
 
-      // ==================== //
-      // 評価関数用キャッシュ //
-      // ==================== //
-      static constexpr unsigned int MAX_ATTACKS = 7 * 4;
-      static constexpr unsigned int NUM_CENTER = 4 * 4;
-      static constexpr unsigned int NUM_SWEET_CENTER = 2 * 2;
-      static constexpr unsigned int NUM_AROUND_KING = 8;
-      enum : unsigned int {
-        WHITE_2, BLACK_2
-      };
-
-      /**
-       * キャッシュを初期化する。
-       */
-      void InitCache();
-
-      /** キャッシュ構造体。 (9,924 Bytes) */
-      struct Cache {
-        /** キャッシュ - オープニングの配置。 */
-        int opening_position_cache_[NUM_PIECE_TYPES][NUM_SQUARES];
-        /** キャッシュ - エンディングの配置。 */
-        int ending_position_cache_[NUM_PIECE_TYPES][NUM_SQUARES];
-        /** キャッシュ - 機動力。 */
-        int mobility_cache_[NUM_PIECE_TYPES][MAX_ATTACKS + 1];
-        /** キャッシュ - センターコントロール。 */
-        int center_control_cache_[NUM_PIECE_TYPES][NUM_CENTER + 1];
-        /** キャッシュ - スウィートセンターコントロール。 */
-        int sweet_center_control_cache_[NUM_PIECE_TYPES][NUM_SWEET_CENTER + 1];
-        /** キャッシュ - 駒の展開。 */
-        int development_cache_[NUM_PIECE_TYPES][NUM_SQUARES + 1];
-        /** キャッシュ - 攻撃。 */
-        int attack_cache_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
-        /** キャッシュ - 防御。 */
-        int defense_cache_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
-        /** キャッシュ - ピン。 */
-        int pin_cache_[NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES];
-        /** キャッシュ - キング周辺への攻撃。 */
-        int attack_around_king_cache_[NUM_PIECE_TYPES][NUM_AROUND_KING + 1];
-        /** キャッシュ - パスポーン。 */
-        int pass_pawn_cache_;
-        /** キャッシュ - 守られたパスポーン。 */
-        int protected_pass_pawn_cache_;
-        /** キャッシュ - ダブルポーン。 */
-        int double_pawn_cache_;
-        /** キャッシュ - 孤立ポーン。 */
-        int iso_pawn_cache_;
-        /** キャッシュ - ポーンの盾。 */
-        int pawn_shield_cache_[NUM_SQUARES];
-        /** キャッシュ - ビショップペア。 */
-        int bishop_pair_cache_;
-        /** キャッシュ - バッドビショップ。 */
-        int bad_bishop_cache_[NUM_SQUARES + 1];
-        /** キャッシュ - ルークペア。 */
-        int rook_pair_cache_;
-        /** キャッシュ - セミオープンファイルのルーク。 */
-        int rook_semiopen_fyle_cache_;
-        /** キャッシュ - オープンファイルのルーク。 */
-        int rook_open_fyle_cache_;
-        /** キャッシュ - 早すぎるクイーンの始動。 */
-        int early_queen_starting_cache_[NUM_SQUARES + 1];
-        /** キャッシュ - キング周りの弱いマス。 */
-        int weak_square_cache_[NUM_SQUARES + 1];
-        /** キャッシュ - キャスリング。 */
-        int castling_cache_;
-        /** キャッシュ - キャスリングの権利の放棄。 */
-        int abandoned_castling_cache_;
-      };
-      /** キャッシュの配列。 */
-      Cache cache_[NUM_SQUARES + 1];
-      /** 現在の配列のポインタ。 */
-      Cache* cache_ptr_;
+      /** 現在のキャッシュポインタ。 */
+      EvalCache* cache_ptr_;
   };
 }  // namespace Sayuri
 

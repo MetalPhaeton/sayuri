@@ -212,14 +212,15 @@ namespace Sayuri {
 
       /**
        * 探索終了時の最終出力を出力する。
+       * @param depth 繰り返しの深さ。
        * @param time 探索時間。
        * @param num_nodes 探索したノード数。
        * @param hashfull トランスポジションテーブルの使用率。
        * @param score 評価値。
        * @param pv_line PVライン。
        */
-      void PrintFinalInfo(Chrono::milliseconds time, std::uint64_t num_nodes,
-      int hashfull, int score,  PVLine& pv_line);
+      void PrintFinalInfo(int depth, Chrono::milliseconds time,
+      std::uint64_t num_nodes, int hashfull, int score,  PVLine& pv_line);
 
       // ======== //
       // アクセサ //

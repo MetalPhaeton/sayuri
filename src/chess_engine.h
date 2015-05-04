@@ -46,6 +46,7 @@
 #include "position_record.h"
 #include "helper_queue.h"
 #include "params.h"
+#include "cache.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -336,18 +337,21 @@ namespace Sayuri {
        * @return 次の局面の「自分」のマテリアル。
        */
       int GetNextMyMaterial(int current_material, Move move) const {
+        Cache& cache = shared_st_ptr_->cache_;
         if (GetMoveType(move) == NORMAL) {
           if ((move & PROMOTION_MASK)) {
             // プロモーション。
-            return current_material + material_[piece_board_[GetTo(move)]]
-            + material_[GetPromotion(move)] - material_[PAWN];
+            return current_material
+            + cache.material_[piece_board_[GetTo(move)]]
+            + cache.material_[GetPromotion(move)] - cache.material_[PAWN];
           }
 
-          return current_material + material_[piece_board_[GetTo(move)]];
+          return current_material
+          + cache.material_[piece_board_[GetTo(move)]];
 
         } else if (GetMoveType(move) == EN_PASSANT) {
           // アンパッサン。
-          return current_material + material_[PAWN];
+          return current_material + cache.material_[PAWN];
         }
 
         return current_material;
@@ -926,11 +930,6 @@ namespace Sayuri {
         volatile Move iid_stack_[MAX_PLYS + 1];
         /** キラームーブスタック。[探索レベル][index * 2 プライ前] */
         volatile Move killer_stack_[MAX_PLYS + 2 + 1][2];
-        /**
-         * Futility Pruningのマージンテーブル。 [残り探索深さ]
-         * マージンが0の時はFutility Pruningしない。
-         */
-        int futility_pruning_margin_table_[MAX_PLYS + 1];
         /** 現在のIterative Deepeningの深さ。 */
         volatile std::uint32_t i_depth_;
         /** 探索したノード数。 */
@@ -978,6 +977,12 @@ namespace Sayuri {
         /** アンパッサンのハッシュ値のテーブル。 */
         Hash en_passant_hash_value_table_[NUM_SQUARES];
 
+        // ========== //
+        // キャッシュ //
+        // ========== //
+        /** 探索関数、評価関数用キャッシュ。 */
+        Cache cache_;
+
         // ==================== //
         // コンストラクタと代入 //
         // ==================== //
@@ -1017,6 +1022,28 @@ namespace Sayuri {
 
         /** ハッシュ値のテーブルを初期化する。 */
         void InitHashValueTable();
+
+        /** パラメータをキャッシュする。 */
+        void Cache() {
+          if (search_params_ptr_) {
+            cache_.CacheSearchParams(*search_params_ptr_);
+          }
+          if (eval_params_ptr_) {
+            cache_.CacheEvalParams(*eval_params_ptr_);
+          }
+
+          COPY_ARRAY(cache_.piece_hash_value_table_,
+          piece_hash_value_table_);
+          COPY_ARRAY(cache_.to_move_hash_value_table_,
+          to_move_hash_value_table_);
+          COPY_ARRAY(cache_.castling_hash_value_table_,
+          castling_hash_value_table_);
+          COPY_ARRAY(cache_.en_passant_hash_value_table_,
+          en_passant_hash_value_table_);
+
+          cache_.max_depth_ = max_depth_;
+          cache_.max_nodes_ = max_nodes_;
+        }
 
         /**
          * 定期処理関数。
@@ -1198,233 +1225,6 @@ namespace Sayuri {
       friend struct HelperHandler;
       /** ヘルパーハンドラ。 */
       HelperHandler helper_handler_;
-
-      // ==================== //
-      // 探索関数用キャッシュ //
-      // ==================== //
-      /**
-       * 探索関数用キャッシュを初期化する。
-       */
-      void InitSearchParamsCache();
-      /**
-       * 探索関数用パラメータをキャッシュする。
-       */
-      void CacheSearchParams();
-      /** 
-       * 探索関数用キャッシュ。
-       * マテリアル。
-       */
-      int material_[NUM_PIECE_TYPES];
-      /**
-       * 探索関数用キャッシュ。
-       * Quiescence Search - 有効無効。
-       */
-      bool enable_quiesce_search_;
-      /**
-       * 探索関数用キャッシュ。
-       * 繰り返しチェック - 有効無効。
-       */
-      bool enable_repetition_check_;
-      /**
-       * 探索関数用キャッシュ。
-       * Check Extension - 有効無効。
-       */
-      bool enable_check_extension_;
-      /**
-       * 探索関数用キャッシュ。
-       * YBWC - 残り深さ制限。
-       */
-      int ybwc_limit_depth_;
-      /**
-       * 探索関数用キャッシュ。
-       * YBWC - 無効にする先頭の候補手の数。
-       */
-      int ybwc_invalid_moves_;
-      /**
-       * 探索関数用キャッシュ。
-       * Aspiration Windows - 有効無効。
-       */
-      bool enable_aspiration_windows_;
-      /**
-       * 探索関数用キャッシュ。
-       * Aspiration Windows - 残り深さ制限。
-       */
-      int aspiration_windows_limit_depth_;
-      /**
-       * 探索関数用キャッシュ。
-       * Aspiration Windows - デルタ値。
-       */
-      int aspiration_windows_delta_;
-      /**
-       * 探索関数用キャッシュ。
-       * SEE - 有効無効。
-       */
-      bool enable_see_;
-      /**
-       * 探索関数用キャッシュ。
-       * ヒストリー - 有効無効。
-       */
-      bool enable_history_;
-      /**
-       * 探索関数用キャッシュ。
-       * キラームーブ - 有効無効。
-       */
-      bool enable_killer_;
-      /**
-       * 探索関数用キャッシュ。
-       * トランスポジションテーブル - 有効無効。
-       */
-      bool enable_ttable_;
-      /**
-       * 探索関数用キャッシュ。
-       * Internal Iterative Deepening - 有効無効。
-       */
-      bool enable_iid_;
-      /**
-       * 探索関数用キャッシュ。
-       * Internal Iterative Deepening - 残り深さ制限。
-       */
-      int iid_limit_depth_;
-      /**
-       * 探索関数用キャッシュ。
-       * Internal Iterative Deepening - 探索の深さ。
-       */
-      int iid_search_depth_;
-      /**
-       * 探索関数用キャッシュ。
-       * Null Move Reduction - 有効無効。
-       */
-      bool enable_nmr_;
-      /**
-       * 探索関数用キャッシュ。
-       * Null Move Reduction - 残り深さ制限。
-       */
-      int nmr_limit_depth_;
-      /**
-       * 探索関数用キャッシュ。
-       * Null Move Reduction - 何プライ浅く探索するか。
-       */
-      int nmr_search_reduction_;
-      /**
-       * 探索関数用キャッシュ。
-       * Null Move Reduction - リダクションする深さ。
-       */
-      int nmr_reduction_;
-      /**
-       * 探索関数用キャッシュ。
-       * ProbCut - 有効無効。
-       */
-      bool enable_probcut_;
-      /**
-       * 探索関数用キャッシュ。
-       * ProbCut - 残り深さ制限。
-       */
-      int probcut_limit_depth_;
-      /**
-       * 探索関数用キャッシュ。
-       * ProbCut - ベータ値の増分。
-       */
-      int probcut_margin_;
-      /**
-       * 探索関数用キャッシュ。
-       * ProbCut - 何プライ浅く探索するか。
-       */
-      int probcut_search_reduction_;
-      /**
-       * 探索関数用キャッシュ。
-       * History Pruning - 有効無効。
-       */
-      bool enable_history_pruning_;
-      /**
-       * 探索関数用キャッシュ。
-       * History Pruning - 残り深さ制限。
-       */
-      int history_pruning_limit_depth_;
-      /**
-       * 探索関数用キャッシュ。
-       * History Pruning - 無効にする先頭の候補手の数。
-       */
-      int history_pruning_invalid_moves_[MAX_CANDIDATES + 1];
-      /**
-       * 探索関数用キャッシュ。
-       * History Pruning - 最大ヒストリー値に対する閾値。
-       */
-      std::uint64_t history_pruning_threshold_;
-      /**
-       * 探索関数用キャッシュ。
-       * History Pruning - リダクションする深さ。
-       */
-      int history_pruning_reduction_;
-      /**
-       * 探索関数用キャッシュ。
-       * Late Move Reduction - 有効無効。
-       */
-      bool enable_lmr_;
-      /**
-       * 探索関数用キャッシュ。
-       * Late Move Reduction - 残り深さ制限。
-       */
-      int lmr_limit_depth_;
-      /**
-       * 探索関数用キャッシュ。
-       * Late Move Reduction - 無効にする先頭の候補手の数。
-       */
-      int lmr_invalid_moves_[MAX_CANDIDATES + 1];
-      /**
-       * 探索関数用キャッシュ。
-       * Late Move Reduction - リダクションする深さ。
-       */
-      int lmr_search_reduction_;
-      /**
-       * 探索関数用キャッシュ。
-       * Futility Pruning - 有効無効。
-       */
-      bool enable_futility_pruning_;
-      /**
-       * 探索関数用キャッシュ。
-       * Futility Pruning - 有効にする残り深さ。
-       */
-      int futility_pruning_depth_;
-      /**
-       * 探索関数用キャッシュ。
-       * Futility Pruning - 残り深さ1プライあたりのマージン。
-       */
-      int futility_pruning_margin_;
-      /**
-       * 探索関数用キャッシュ。
-       * 駒の情報のハッシュ値のテーブル。
-       */
-      Hash piece_hash_value_table_[NUM_SIDES][NUM_PIECE_TYPES][NUM_SQUARES];
-      /**
-       * 探索関数用キャッシュ。
-       * 手番のハッシュ値のテーブル。
-       */
-      Hash to_move_hash_value_table_[NUM_SIDES];
-      /**
-       * 探索関数用キャッシュ。
-       * キャスリングの権利のハッシュ値のテーブル。
-       */
-      Hash castling_hash_value_table_[16];
-      /**
-       * 探索関数用キャッシュ。
-       * アンパッサンのハッシュ値のテーブル。
-       */
-      Hash en_passant_hash_value_table_[NUM_SQUARES];
-      /**
-       * 探索関数用キャッシュ。
-       * 探索ストップ条件 - 最大探索ノード数。
-       */
-      std::uint64_t max_nodes_;
-      /**
-       * 探索関数用キャッシュ。
-       * 探索ストップ条件 - 最大探索深さ。
-       */
-      std::uint32_t max_depth_;
-      /**
-       * 探索関数用キャッシュ。
-       * 探索ストップ条件 - 思考時間。
-       */
-      Chrono::milliseconds thinking_time_;
   };
 
   // ==================== //

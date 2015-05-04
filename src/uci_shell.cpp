@@ -280,15 +280,17 @@ namespace Sayuri {
   }
 
   // 探索後の最終出力を出力する。
-  void UCIShell::PrintFinalInfo(Chrono::milliseconds time,
+  void UCIShell::PrintFinalInfo(int depth, Chrono::milliseconds time,
   std::uint64_t num_nodes, int hashfull, int score, PVLine& pv_line) {
     std::unique_lock<std::mutex> lock(print_mutex_);  // ロック。
 
     std::ostringstream sout;
 
+    sout << "info depth " << depth;
+
     int time_2 = time.count();
     if (time_2 <= 0) time_2 = 1;
-    sout << "info time " << time_2;
+    sout << " time " << time_2;
     sout << " nodes " << num_nodes;
     sout << " hashfull " << hashfull;
     sout << " nps " << (num_nodes * 1000) / time_2;
