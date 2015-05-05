@@ -1024,7 +1024,7 @@ namespace Sayuri {
         void InitHashValueTable();
 
         /** パラメータをキャッシュする。 */
-        void Cache() {
+        void CacheParams() {
           if (search_params_ptr_) {
             cache_.CacheSearchParams(*search_params_ptr_);
           }

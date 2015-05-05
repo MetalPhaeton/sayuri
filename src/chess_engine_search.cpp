@@ -700,7 +700,7 @@ namespace Sayuri {
 
     // --- 初期化 --- //
     // キャッシュ。
-    shared_st_ptr_->Cache();
+    shared_st_ptr_->CacheParams();
     Cache& cache = shared_st_ptr_->cache_;
 
     shared_st_ptr_->searched_nodes_ = 0;
