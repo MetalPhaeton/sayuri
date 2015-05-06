@@ -328,7 +328,8 @@ namespace Sayuri {
 
     // パース。
     while (token_queue.size() > 0) {
-      LispObjectPtr temp_ptr = LispObject::NewNil();
+      LispObjectPtr temp_ptr = LispObjectPtr(new LispObject());
+      temp_ptr->type_ = LispObjectType::NIL;
 
       ParseCore(*temp_ptr, token_queue);
 
@@ -346,58 +347,39 @@ namespace Sayuri {
     // 最初の文字。
     std::string front = token_queue.front();
     token_queue.pop();
-
     if (front == "(") {
-      // リストの場合。
-      // 空のリストならNil。
-      if (token_queue.front() == ")") {
-        target.type_ = LispObjectType::NIL;
+      // リストの時。
+      // とりあえずNil。
+      target.type_ = LispObjectType::NIL;
 
-        token_queue.pop();
-        return;
-      }
-
-      // 空のリストでない。
-      LispObject* current = &target;
+      LispObject* ptr = &target;
       while (!(token_queue.empty())) {
-        current->type_ = LispObjectType::PAIR;
-        current->car_ = LispObject::NewNil();
-        current->cdr_ = LispObject::NewNil();
+        // 次の文字を調べる。
+        front = token_queue.front();
 
-        // Carの処理。
-        // なぜか次の文字がドットだったら、CarはNilのまま。
-        if (token_queue.front() != ".") {
-          ParseCore(*(current->car_), token_queue);
-        }
-
-        // Cdrの処理。
-        if (token_queue.empty()) return;
-        if (token_queue.front() == ".") {
-          // ドット対の記号。
+        if (front == ")") {
+          // リスト終了。
           token_queue.pop();
-          if (token_queue.empty()) return;
-
-          // Cdrにパース。 なぜか次の文字が閉じ括弧だったら、CdrはNilのまま。
-          if (token_queue.front() != ")") {
-            ParseCore(*(current->cdr_), token_queue);
-          }
-
-          // リストの終端まで読み飛ばして終了。
-          if (token_queue.empty()) return;
-          while (token_queue.front() != ")") {
-            token_queue.pop();
-            if (token_queue.empty()) return;
-          }
+          break;
+        } else if (front == ".") {
+          // ドット対。
+          // ドットを抜いて、自分をパース。
           token_queue.pop();
-
-          return;
-        } else if (token_queue.front() == ")") {
-          // リストの終端。
-          token_queue.pop();
-          return;
+          ParseCore(*ptr, token_queue);
         } else {
-          // まだ続きがある。
-          current = current->cdr_.get();
+          // それ意外。
+          // 現在のポインタをPairにする。
+          ptr->type_ = LispObjectType::PAIR;
+          ptr->car_ = LispObjectPtr(new LispObject());
+          ptr->car_->type_ = LispObjectType::NIL;
+          ptr->cdr_ = LispObjectPtr(new LispObject());
+          ptr->cdr_->type_ = LispObjectType::NIL;
+
+          // carをパース。
+          ParseCore(*(ptr->car_), token_queue);
+
+          // 次へ。
+          ptr = ptr->cdr_.get();
         }
       }
     } else {
@@ -410,11 +392,9 @@ namespace Sayuri {
 
         // 次の'"'までポップ。
         while (!(token_queue.empty())) {
-          if (token_queue.front() == "\"") {
-            token_queue.pop();
-            return;
-          }
+          front = token_queue.front();
           token_queue.pop();
+          if (front == "\"") break;
         }
       } else if ((front == "#t") || (front == "#T")){
         // Boolean::true。
@@ -427,13 +407,20 @@ namespace Sayuri {
       } else if (front == "'") {
         // quoteの糖衣構文。
         target.type_ = LispObjectType::PAIR;
-        target.car_ = NewSymbol("quote");
-        target.cdr_ = NewPair();
+
+        target.car_ = LispObjectPtr(new LispObject());
+        target.car_->type_ = LispObjectType::SYMBOL;
+        target.car_->str_value_ = "quote";
+
+        target.cdr_ = LispObjectPtr(new LispObject());
+        target.cdr_->type_ = LispObjectType::PAIR;
+        target.cdr_->car_ = LispObjectPtr(new LispObject());
+        target.cdr_->cdr_ = LispObjectPtr(new LispObject());
 
         // 第1引数(Cdr->Car)をパース。
         ParseCore(*(target.cdr_->car_), token_queue);
-      } else if (front == ".") {
-        // 妙な所にドット対発見。 CarはNilとする。
+      } else if ((front == ".") || (front == ")")) {
+        // おかしなトークン。
         target.type_ = LispObjectType::NIL;
       } else {
         try {
