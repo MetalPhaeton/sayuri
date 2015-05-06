@@ -1794,6 +1794,228 @@ namespace Sayuri {
        */
       LispObjectPtr GenEngine();
 
+      /**
+       * マスのシンボルを数値に変換する。
+       * @param obj 変換したいオブジェクト。
+       * @return 変換後のオブジェクト。
+       */
+      LispObjectPtr SquareToNumber(const LispObject& obj) {
+        // コピーする。
+        LispObjectPtr copy_ptr = obj.Clone();
+
+        std::function<void(LispObject&)> to_number;
+        to_number = [&to_number](LispObject& obj_2) {
+          if (obj_2.IsSymbol()) {
+            FOR_SQUARES(square) {
+              if (obj_2.symbol_value()
+              == EngineSuite::SQUARE_SYMBOL[square]) {
+                obj_2.type(LispObjectType::NUMBER);
+                obj_2.number_value(square);
+                break;
+              }
+            }
+          }
+
+          if (obj_2.IsPair()) {
+            if (obj_2.car()) {
+              to_number(*(obj_2.car()));
+            }
+            if (obj_2.cdr()) {
+              to_number(*(obj_2.cdr()));
+            }
+          }
+        };
+
+        to_number(*copy_ptr);
+
+        return copy_ptr;
+      }
+
+      /**
+       * ファイルのシンボルを数値に変換する。
+       * @param obj 変換したいオブジェクト。
+       * @return 変換後のオブジェクト。
+       */
+      LispObjectPtr FyleToNumber(const LispObject& obj) {
+        // コピーする。
+        LispObjectPtr copy_ptr = obj.Clone();
+
+        std::function<void(LispObject&)> to_number;
+        to_number = [&to_number](LispObject& obj_2) {
+          if (obj_2.IsSymbol()) {
+            FOR_FYLES(fyle) {
+              if (obj_2.symbol_value()
+              == EngineSuite::FYLE_SYMBOL[fyle]) {
+                obj_2.type(LispObjectType::NUMBER);
+                obj_2.number_value(fyle);
+                break;
+              }
+            }
+          }
+
+          if (obj_2.IsPair()) {
+            if (obj_2.car()) {
+              to_number(*(obj_2.car()));
+            }
+            if (obj_2.cdr()) {
+              to_number(*(obj_2.cdr()));
+            }
+          }
+        };
+
+        to_number(*copy_ptr);
+
+        return copy_ptr;
+      }
+
+      /**
+       * ランクのシンボルを数値に変換する。
+       * @param obj 変換したいオブジェクト。
+       * @return 変換後のオブジェクト。
+       */
+      LispObjectPtr RankToNumber(const LispObject& obj) {
+        // コピーする。
+        LispObjectPtr copy_ptr = obj.Clone();
+
+        std::function<void(LispObject&)> to_number;
+        to_number = [&to_number](LispObject& obj_2) {
+          if (obj_2.IsSymbol()) {
+            FOR_RANKS(rank) {
+              if (obj_2.symbol_value()
+              == EngineSuite::RANK_SYMBOL[rank]) {
+                obj_2.type(LispObjectType::NUMBER);
+                obj_2.number_value(rank);
+                break;
+              }
+            }
+          }
+
+          if (obj_2.IsPair()) {
+            if (obj_2.car()) {
+              to_number(*(obj_2.car()));
+            }
+            if (obj_2.cdr()) {
+              to_number(*(obj_2.cdr()));
+            }
+          }
+        };
+
+        to_number(*copy_ptr);
+
+        return copy_ptr;
+      }
+
+      /**
+       * サイドのシンボルを数値に変換する。
+       * @param obj 変換したいオブジェクト。
+       * @return 変換後のオブジェクト。
+       */
+      LispObjectPtr SideToNumber(const LispObject& obj) {
+        // コピーする。
+        LispObjectPtr copy_ptr = obj.Clone();
+
+        std::function<void(LispObject&)> to_number;
+        to_number = [&to_number](LispObject& obj_2) {
+          if (obj_2.IsSymbol()) {
+            FOR_SIDES(side) {
+              if (obj_2.symbol_value()
+              == EngineSuite::SIDE_SYMBOL[side]) {
+                obj_2.type(LispObjectType::NUMBER);
+                obj_2.number_value(side);
+                break;
+              }
+            }
+          }
+
+          if (obj_2.IsPair()) {
+            if (obj_2.car()) {
+              to_number(*(obj_2.car()));
+            }
+            if (obj_2.cdr()) {
+              to_number(*(obj_2.cdr()));
+            }
+          }
+        };
+
+        to_number(*copy_ptr);
+
+        return copy_ptr;
+      }
+
+      /**
+       * 駒の種類のシンボルを数値に変換する。
+       * @param obj 変換したいオブジェクト。
+       * @return 変換後のオブジェクト。
+       */
+      LispObjectPtr PieceTypeToNumber(const LispObject& obj) {
+        // コピーする。
+        LispObjectPtr copy_ptr = obj.Clone();
+
+        std::function<void(LispObject&)> to_number;
+        to_number = [&to_number](LispObject& obj_2) {
+          if (obj_2.IsSymbol()) {
+            FOR_PIECE_TYPES(piece_type) {
+              if (obj_2.symbol_value()
+              == EngineSuite::PIECE_TYPE_SYMBOL[piece_type]) {
+                obj_2.type(LispObjectType::NUMBER);
+                obj_2.number_value(piece_type);
+                break;
+              }
+            }
+          }
+
+          if (obj_2.IsPair()) {
+            if (obj_2.car()) {
+              to_number(*(obj_2.car()));
+            }
+            if (obj_2.cdr()) {
+              to_number(*(obj_2.cdr()));
+            }
+          }
+        };
+
+        to_number(*copy_ptr);
+
+        return copy_ptr;
+      }
+
+      /**
+       * キャスリングのシンボルを数値に変換する。
+       * @param obj 変換したいオブジェクト。
+       * @return 変換後のオブジェクト。
+       */
+      LispObjectPtr CastlingToNumber(const LispObject& obj) {
+        // コピーする。
+        LispObjectPtr copy_ptr = obj.Clone();
+
+        std::function<void(LispObject&)> to_number;
+        to_number = [&to_number](LispObject& obj_2) {
+          if (obj_2.IsSymbol()) {
+            for (int right = 0; right < 5; ++right) {
+              if (obj_2.symbol_value()
+              == EngineSuite::CASTLING_SYMBOL[right]) {
+                obj_2.type(LispObjectType::NUMBER);
+                obj_2.number_value(right);
+                break;
+              }
+            }
+          }
+
+          if (obj_2.IsPair()) {
+            if (obj_2.car()) {
+              to_number(*(obj_2.car()));
+            }
+            if (obj_2.cdr()) {
+              to_number(*(obj_2.cdr()));
+            }
+          }
+        };
+
+        to_number(*copy_ptr);
+
+        return copy_ptr;
+      }
+
       // ========== //
       // メンバ変数 //
       // ========== //

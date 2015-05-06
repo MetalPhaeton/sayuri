@@ -2829,7 +2829,7 @@ __Usage__
 
 __Description__
 
-* Returns List consists of `<Object>...`.
+* Returns List composed of `<Object>...`.
 
 __Example__
 
@@ -3998,7 +3998,7 @@ __Usage__
 
 __Description__
 
-* Returns List consist of split `<String>` by `<Delim String>`.
+* Returns List composed of split `<String>` by `<Delim String>`.
 
 __Example__
 
