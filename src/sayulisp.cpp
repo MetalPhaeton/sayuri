@@ -2471,7 +2471,7 @@ namespace Sayuri {
 
         return this->PieceTypeToNumber(*(caller.Evaluate(*list_itr)));
       });
-      global_ptr_->BindSymbol("piece-type->number", func_ptr);
+      global_ptr_->BindSymbol("piece->number", func_ptr);
     }
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
@@ -3384,6 +3384,135 @@ __Example__
     
     ;; Exit with EXIT_FAILURE.
     (exit 1))...";
+
+    (*dict_ptr_)["square->number"] =
+R"...(### square->number ###
+
+__Usage__
+
+* `(square->number <Object>)`
+
+__Description__
+
+* If `<Object>` is Square Symbol, it returns Number indicating to Square.
+* If `<Object>` is List, it returns List changed Square Symbol into Number. 
+
+__Example__
+
+    (define symbol-list
+      '(A1 B1 C1 (WHITE D3 E4 (F5 PAWN G6) H7 BLACK_LONG_CASTLING)))
+    
+    (display (square->number symbol-list))
+    ;; Output
+    ;; > (0 1 2 (WHITE 19 28 (37 PAWN 46) 55 BLACK_LONG_CASTLING)))...";
+
+    (*dict_ptr_)["fyle->number"] =
+R"...(### fyle->number ###
+
+__Usage__
+
+* `(fyle->number <Object>)`
+
+__Description__
+
+* If `<Object>` is Fyle Symbol, it returns Number indicating to Fyle.
+* If `<Object>` is List, it returns List changed Fyle Symbol into Number. 
+
+__Example__
+
+    (define symbol-list
+      '(FYLE_A FYLE_B (WHITE FYLE_D E4 (PAWN G6) FYLE_H BLACK_LONG_CASTLING)))
+    
+    (display (fyle->number symbol-list))
+    ;; Output
+    ;; > (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING)))...";
+
+    (*dict_ptr_)["rank->number"] =
+R"...(### rank->number ###
+
+__Usage__
+
+* `(rank->number <Object>)`
+
+__Description__
+
+* If `<Object>` is Rank Symbol, it returns Number indicating to Rank.
+* If `<Object>` is List, it returns List changed Rank Symbol into Number. 
+
+__Example__
+
+    (define symbol-list
+      '(RANK_1 RANK_2 (WHITE RANK_4 E4 (PAWN G6) RANK_8 BLACK_LONG_CASTLING)))
+    
+    (display (rank->number symbol-list))
+    ;; Output
+    ;; > (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING)))...";
+
+    (*dict_ptr_)["side->number"] =
+R"...(### side->number ### {#side-to-number}
+
+__Usage__
+
+* `(side->number <Object>)`
+
+__Description__
+
+* If `<Object>` is Side Symbol, it returns Number indicating to Side.
+* If `<Object>` is List, it returns List changed Side Symbol into Number. 
+
+__Example__
+
+    (define symbol-list
+      '(NO_SIDE WHITE (FYLE_A BLACK E4 (PAWN G6) BLACK_LONG_CASTLING)))
+    
+    (display (side->number symbol-list))
+    ;; Output
+    ;; > (0 1 (FYLE_A 2 E4 (PAWN G6) BLACK_LONG_CASTLING)))...";
+
+    (*dict_ptr_)["piece->number"] =
+R"...(### piece->number ###
+
+__Usage__
+
+* `(piece->number <Object>)`
+
+__Description__
+
+* If `<Object>` is Piece Type Symbol, it returns Number indicating
+  to Piece Type.
+* If `<Object>` is List, it returns List changed Piece Type Symbol into Number. 
+
+__Example__
+
+    (define symbol-list
+      '(EMPTY PAWN (FYLE_A QUEEN E4 (RANK_4 G6) KING BLACK_LONG_CASTLING)))
+    
+    (display (piece->number symbol-list))
+    ;; Output
+    ;; > (0 1 (FYLE_A 5 E4 (RANK_4 G6) 6 BLACK_LONG_CASTLING)))...";
+
+    (*dict_ptr_)["castling->number"] =
+R"...(### castling->number ###
+
+__Usage__
+
+* `(castling->number <Object>)`
+
+__Description__
+
+* If `<Object>` is Castling Right Symbol, it returns Number indicating
+  to Piece Type.
+* If `<Object>` is List, it returns List changed Castling Right Symbol
+  into Number. 
+
+__Example__
+
+    (define symbol-list
+      '(NO_CASTLING WHITE_SHORT_CASTLING (FYLE_A E4 (RANK_4 G6) KING)))
+    
+    (display (castling->number symbol-list))
+    ;; Output
+    ;; > (0 1 (FYLE_A E4 (RANK_4 G6) KING)))...";
 
     // %%% gen-engine
     (*dict_ptr_)["gen-engine"] =

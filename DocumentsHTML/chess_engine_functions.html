@@ -35,7 +35,15 @@
 <li>See <a href="engine_message_symbol.html">Message Symbols of Engine Object</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#utility-functions">Utility Functions</a></li>
+<li><a href="#utility-functions">Utility Functions</a>
+<ul>
+<li><a href="#square-to-number">square-&gt;number</a></li>
+<li><a href="#fyle-to-number">fyle-&gt;number</a></li>
+<li><a href="#rank-to-number">rank-&gt;number</a></li>
+<li><a href="#side-to-number">side-&gt;number</a></li>
+<li><a href="#piece-to-number">piece-&gt;number</a></li>
+<li><a href="#castling-to-number">castling-&gt;number</a></li>
+</ul></li>
 </ul>
 <hr />
 <h2 id="constant-values">Constant Values</h2>
@@ -2593,6 +2601,108 @@
 ;; Output
 ;; &gt; (111 222)</code></pre>
 <h2 id="utility-functions">Utility Functions</h2>
+<h3 id="square-to-number">square-&gt;number</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(square-&gt;number &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>If <code>&lt;Object&gt;</code> is Square Symbol, it returns Number indicating to Square.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Square Symbol into Number.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define symbol-list
+  &#39;(A1 B1 C1 (WHITE D3 E4 (F5 PAWN G6) H7 BLACK_LONG_CASTLING)))
+
+(display (square-&gt;number symbol-list))
+;; Output
+;; &gt; (0 1 2 (WHITE 19 28 (37 PAWN 46) 55 BLACK_LONG_CASTLING))</code></pre>
+<h3 id="fyle-to-number">fyle-&gt;number</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(fyle-&gt;number &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>If <code>&lt;Object&gt;</code> is Fyle Symbol, it returns Number indicating to Fyle.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Fyle Symbol into Number.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define symbol-list
+  &#39;(FYLE_A FYLE_B (WHITE FYLE_D E4 (PAWN G6) FYLE_H BLACK_LONG_CASTLING)))
+
+(display (fyle-&gt;number symbol-list))
+;; Output
+;; &gt; (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING))</code></pre>
+<h3 id="rank-to-number">rank-&gt;number</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(rank-&gt;number &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>If <code>&lt;Object&gt;</code> is Rank Symbol, it returns Number indicating to Rank.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Rank Symbol into Number.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define symbol-list
+  &#39;(RANK_1 RANK_2 (WHITE RANK_4 E4 (PAWN G6) RANK_8 BLACK_LONG_CASTLING)))
+
+(display (rank-&gt;number symbol-list))
+;; Output
+;; &gt; (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING))</code></pre>
+<h3 id="side-to-number">side-&gt;number</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(side-&gt;number &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>If <code>&lt;Object&gt;</code> is Side Symbol, it returns Number indicating to Side.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Side Symbol into Number.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define symbol-list
+  &#39;(NO_SIDE WHITE (FYLE_A BLACK E4 (PAWN G6) BLACK_LONG_CASTLING)))
+
+(display (side-&gt;number symbol-list))
+;; Output
+;; &gt; (0 1 (FYLE_A 2 E4 (PAWN G6) BLACK_LONG_CASTLING))</code></pre>
+<h3 id="piece-to-number">piece-&gt;number</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(piece-&gt;number &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>If <code>&lt;Object&gt;</code> is Piece Type Symbol, it returns Number indicating to Piece Type.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Piece Type Symbol into Number.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define symbol-list
+  &#39;(EMPTY PAWN (FYLE_A QUEEN E4 (RANK_4 G6) KING BLACK_LONG_CASTLING)))
+
+(display (piece-&gt;number symbol-list))
+;; Output
+;; &gt; (0 1 (FYLE_A 5 E4 (RANK_4 G6) 6 BLACK_LONG_CASTLING))</code></pre>
+<h3 id="castling-to-number">castling-&gt;number</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(castling-&gt;number &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>If <code>&lt;Object&gt;</code> is Castling Right Symbol, it returns Number indicating to Piece Type.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Castling Right Symbol into Number.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define symbol-list
+  &#39;(NO_CASTLING WHITE_SHORT_CASTLING (FYLE_A E4 (RANK_4 G6) KING)))
+
+(display (castling-&gt;number symbol-list))
+;; Output
+;; &gt; (0 1 (FYLE_A E4 (RANK_4 G6) KING))</code></pre>
 
 </section>
 </div>
