@@ -3817,6 +3817,102 @@ __Example__
     ;; > 4)...";
     }
 
+    // %%% ++
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
+      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      ->LispObjectPtr {
+        // 準備。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+
+        LispObjectPtr result = caller.Evaluate(*(list_itr++));
+        if (!(result->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {1}, true);
+        }
+
+        // インクリメントして返す。
+        return LispObject::NewNumber(result->number_value() + 1.0);
+      };
+      root_ptr->BindSymbol("++", func_ptr);
+      (*dict_ptr)["++"] =
+R"...(### ++ ###
+
+__Usage__
+
+* `(++ <Number>)`
+
+__Description__
+
+* Adds `<Number>` to '1'.
+
+__Example__
+
+    (display (++ 111))
+    
+    ;; Output
+    ;;
+    ;; > 112)...";
+    }
+
+    // %%% --
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
+      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      ->LispObjectPtr {
+        // 準備。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+
+        LispObjectPtr result = caller.Evaluate(*(list_itr++));
+        if (!(result->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {1}, true);
+        }
+
+        // インクリメントして返す。
+        return LispObject::NewNumber(result->number_value() - 1.0);
+      };
+      root_ptr->BindSymbol("--", func_ptr);
+      (*dict_ptr)["--"] =
+R"...(### -- ###
+
+__Usage__
+
+* `(-- <Number>)`
+
+__Description__
+
+* Subtracts '1' from `<Number>`.
+
+__Example__
+
+    (display (-- 111))
+    
+    ;; Output
+    ;;
+    ;; > 110)...";
+    }
+
     // %%% string-append
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
