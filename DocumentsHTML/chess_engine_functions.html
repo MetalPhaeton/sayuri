@@ -43,6 +43,12 @@
 <li><a href="#side-to-number">side-&gt;number</a></li>
 <li><a href="#piece-to-number">piece-&gt;number</a></li>
 <li><a href="#castling-to-number">castling-&gt;number</a></li>
+<li><a href="#number-to-square">number-&gt;square</a></li>
+<li><a href="#number-to-fyle">number-&gt;fyle</a></li>
+<li><a href="#number-to-rank">number-&gt;rank</a></li>
+<li><a href="#number-to-side">number-&gt;side</a></li>
+<li><a href="#number-to-piece">number-&gt;piece</a></li>
+<li><a href="#number-to-castling">number-&gt;castling</a></li>
 </ul></li>
 </ul>
 <hr />
@@ -2703,6 +2709,103 @@
 (display (castling-&gt;number symbol-list))
 ;; Output
 ;; &gt; (0 1 (FYLE_A E4 (RANK_4 G6) KING))</code></pre>
+<h3 id="number-to-square">number-&gt;square</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(number-&gt;square &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>If <code>&lt;Object&gt;</code> is Number, it returns Square Symbol.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Number into Square Symbol.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define number-list &#39;(0 1 (2 (3 4 &quot;Hello&quot;) 5) 100))
+
+(display (number-&gt;square number-list))
+;; Output
+;; &gt; (A1 B1 (C1 (D1 E1 &quot;Hello&quot;) F1) 100)</code></pre>
+<h3 id="number-to-fyle">number-&gt;fyle</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(number-&gt;fyle &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>If <code>&lt;Object&gt;</code> is Number, it returns Fyle Symbol.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Number into Fyle Symbol.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define number-list &#39;(0 1 (2 (3 4 &quot;Hello&quot;) 5) 100))
+
+(display (number-&gt;fyle number-list))
+;; Output
+;; &gt; (FYLE_A FYLE_B (FYLE_C (FYLE_D FYLE_E &quot;Hello&quot;) FYLE_F) 100)</code></pre>
+<h3 id="number-to-rank">number-&gt;rank</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(number-&gt;rank &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>If <code>&lt;Object&gt;</code> is Number, it returns Rank Symbol.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Number into Rank Symbol.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define number-list &#39;(0 1 (2 (3 4 &quot;Hello&quot;) 5) 100))
+
+(display (number-&gt;rank number-list))
+;; Output
+;; &gt; (RANK_1 RANK_2 (RANK_3 (RANK_4 RANK_5 &quot;Hello&quot;) RANK_6) 100)</code></pre>
+<h3 id="number-to-side">number-&gt;side</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(number-&gt;side &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>If <code>&lt;Object&gt;</code> is Number, it returns Side Symbol.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Number into Side Symbol.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define number-list &#39;(0 1 (2 (3 4 &quot;Hello&quot;) 5) 100))
+
+(display (number-&gt;side number-list))
+;; Output
+;; &gt; (NO_SIDE WHITE (BLACK (3 4 &quot;Hello&quot;) 5) 100)</code></pre>
+<h3 id="number-to-piece">number-&gt;piece</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(number-&gt;piece &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>If <code>&lt;Object&gt;</code> is Number, it returns Piece Type Symbol.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Number into Piece Type Symbol.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define number-list &#39;(0 1 (2 (3 4 &quot;Hello&quot;) 5) 100))
+
+(display (number-&gt;piece number-list))
+;; Output
+;; &gt; (EMPTY PAWN (KNIGHT (BISHOP ROOK &quot;Hello&quot;) QUEEN) 100)</code></pre>
+<h3 id="number-to-castling">number-&gt;castling</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(number-&gt;castling &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>If <code>&lt;Object&gt;</code> is Number, it returns Castling Rights Symbol.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Number into CAstling Rights Symbol.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(define number-list &#39;(0 1 (2 (3 4 &quot;Hello&quot;) 5) 100))
+
+(display (number-&gt;castling number-list))
+;; Output
+;; &gt; (NO_CASTLING WHITE_SHORT_CASTLING (WHITE_LONG_CASTLING
+;; &gt; (BLACK_SHORT_CASTLING BLACK_LONG_CASTLING &quot;Hello&quot;) 5) 100)</code></pre>
 
 </section>
 </div>
