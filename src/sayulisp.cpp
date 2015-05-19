@@ -3634,6 +3634,128 @@ __Example__
     ;; Output
     ;; > (0 1 (FYLE_A E4 (RANK_4 G6) KING)))...";
 
+    (*dict_ptr_)["number->square"] =
+R"...(### number->square ### {#number-to-square}
+
+__Usage__
+
+* `(number->square <Object>)`
+
+__Description__
+
+* If `<Object>` is Number, it returns Square Symbol.
+* If `<Object>` is List, it returns List changed Number into Square Symbol.
+
+__Example__
+
+    (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+    
+    (display (number->square number-list))
+    ;; Output
+    ;; > (A1 B1 (C1 (D1 E1 "Hello") F1) 100))...";
+
+    (*dict_ptr_)["number->fyle"] =
+R"...(### number->fyle ### {#number-to-fyle}
+
+__Usage__
+
+* `(number->fyle <Object>)`
+
+__Description__
+
+* If `<Object>` is Number, it returns Fyle Symbol.
+* If `<Object>` is List, it returns List changed Number into Fyle Symbol.
+
+__Example__
+
+    (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+    
+    (display (number->fyle number-list))
+    ;; Output
+    ;; > (FYLE_A FYLE_B (FYLE_C (FYLE_D FYLE_E "Hello") FYLE_F) 100))...";
+
+    (*dict_ptr_)["number->rank"] =
+R"...(### number->rank ### {#number-to-rank}
+
+__Usage__
+
+* `(number->rank <Object>)`
+
+__Description__
+
+* If `<Object>` is Number, it returns Rank Symbol.
+* If `<Object>` is List, it returns List changed Number into Rank Symbol.
+
+__Example__
+
+    (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+    
+    (display (number->rank number-list))
+    ;; Output
+    ;; > (RANK_1 RANK_2 (RANK_3 (RANK_4 RANK_5 "Hello") RANK_6) 100))...";
+
+    (*dict_ptr_)["number->side"] =
+R"...(### number->side ### {#number-to-side}
+
+__Usage__
+
+* `(number->side <Object>)`
+
+__Description__
+
+* If `<Object>` is Number, it returns Side Symbol.
+* If `<Object>` is List, it returns List changed Number into Side Symbol.
+
+__Example__
+
+    (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+    
+    (display (number->side number-list))
+    ;; Output
+    ;; > (NO_SIDE WHITE (BLACK (3 4 "Hello") 5) 100))...";
+
+    (*dict_ptr_)["number->piece"] =
+R"...(### number->piece ### {#number-to-piece}
+
+__Usage__
+
+* `(number->piece <Object>)`
+
+__Description__
+
+* If `<Object>` is Number, it returns Piece Type Symbol.
+* If `<Object>` is List, it returns List changed Number into Piece Type Symbol.
+
+__Example__
+
+    (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+    
+    (display (number->piece number-list))
+    ;; Output
+    ;; > (EMPTY PAWN (KNIGHT (BISHOP ROOK "Hello") QUEEN) 100))...";
+
+    (*dict_ptr_)["number->castling"] =
+R"...(### number->castling ### {#number-to-castling}
+
+__Usage__
+
+* `(number->castling <Object>)`
+
+__Description__
+
+* If `<Object>` is Number, it returns Castling Rights Symbol.
+* If `<Object>` is List, it returns List changed Number
+  into CAstling Rights Symbol.
+
+__Example__
+
+    (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+    
+    (display (number->castling number-list))
+    ;; Output
+    ;; > (NO_CASTLING WHITE_SHORT_CASTLING (WHITE_LONG_CASTLING
+    ;; > (BLACK_SHORT_CASTLING BLACK_LONG_CASTLING "Hello") 5) 100))...";
+
     // %%% gen-engine
     (*dict_ptr_)["gen-engine"] =
 R"...(### gen-engine ###
