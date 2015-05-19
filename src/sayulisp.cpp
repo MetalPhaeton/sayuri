@@ -2493,6 +2493,126 @@ namespace Sayuri {
       });
       global_ptr_->BindSymbol("castling->number", func_ptr);
     }
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain(global_ptr_->scope_chain());
+      func_ptr->native_function([this]
+      (LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      -> LispObjectPtr {
+        // 引数チェック。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+
+        return this->NumberToSquare(*(caller.Evaluate(*list_itr)));
+      });
+      global_ptr_->BindSymbol("number->square", func_ptr);
+    }
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain(global_ptr_->scope_chain());
+      func_ptr->native_function([this]
+      (LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      -> LispObjectPtr {
+        // 引数チェック。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+
+        return this->NumberToFyle(*(caller.Evaluate(*list_itr)));
+      });
+      global_ptr_->BindSymbol("number->fyle", func_ptr);
+    }
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain(global_ptr_->scope_chain());
+      func_ptr->native_function([this]
+      (LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      -> LispObjectPtr {
+        // 引数チェック。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+
+        return this->NumberToRank(*(caller.Evaluate(*list_itr)));
+      });
+      global_ptr_->BindSymbol("number->rank", func_ptr);
+    }
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain(global_ptr_->scope_chain());
+      func_ptr->native_function([this]
+      (LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      -> LispObjectPtr {
+        // 引数チェック。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+
+        return this->NumberToSide(*(caller.Evaluate(*list_itr)));
+      });
+      global_ptr_->BindSymbol("number->side", func_ptr);
+    }
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain(global_ptr_->scope_chain());
+      func_ptr->native_function([this]
+      (LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      -> LispObjectPtr {
+        // 引数チェック。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+
+        return this->NumberToPiece(*(caller.Evaluate(*list_itr)));
+      });
+      global_ptr_->BindSymbol("number->piece", func_ptr);
+    }
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain(global_ptr_->scope_chain());
+      func_ptr->native_function([this]
+      (LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      -> LispObjectPtr {
+        // 引数チェック。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+
+        return this->NumberToCastling(*(caller.Evaluate(*list_itr)));
+      });
+      global_ptr_->BindSymbol("number->castling", func_ptr);
+    }
   }
   // コピーコンストラクタ。
   Sayulisp::Sayulisp(const Sayulisp& sayulisp) :
