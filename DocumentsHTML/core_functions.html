@@ -21,65 +21,65 @@
 <ul>
 <li><a href="#most-important-functions">Most Important Functions</a>
 <ul>
-<li><a href="#exit"><code>exit</code></a> : Exit from Sayulisp.</li>
-<li><a href="#help"><code>help</code></a> : Show descriptions.</li>
-<li><a href="#eval"><code>eval</code></a> : Evaluate an expression.</li>
-<li><a href="#quote"><code>quote</code></a> : Don't evaluate an expression.</li>
-<li><a href="#define"><code>define</code></a> : Bind an object or define a function.</li>
-<li><a href="#set"><code>set!</code></a> : Rewrite a bound object.</li>
-<li><a href="#lambda"><code>lambda</code></a> : Generate Function.</li>
-<li><a href="#let"><code>let</code></a> : Make local scope and execute expressions.</li>
-<li><a href="#begin"><code>begin</code></a> : Execute expressions.</li>
-<li><a href="#parse"><code>parse</code></a> : Parse String to an expression.
+<li><a href="#exit"><code>exit</code></a> : Exits from Sayulisp.</li>
+<li><a href="#help"><code>help</code></a> : Shows descriptions.</li>
+<li><a href="#eval"><code>eval</code></a> : Evaluates an expression.</li>
+<li><a href="#quote"><code>quote</code></a> : Doesn't evaluate an expression.</li>
+<li><a href="#define"><code>define</code></a> : Binds an object or define a function.</li>
+<li><a href="#set"><code>set!</code></a> : Rewrites a bound object.</li>
+<li><a href="#lambda"><code>lambda</code></a> : Generates Function.</li>
+<li><a href="#let"><code>let</code></a> : Makes local scope and execute expressions.</li>
+<li><a href="#begin"><code>begin</code></a> : Executes expressions.</li>
+<li><a href="#parse"><code>parse</code></a> : Parses String to an expression.
 <ul>
 <li><code>string-&gt;number</code></li>
 <li><code>string-&gt;boolean</code></li>
 <li><code>string-&gt;symbol</code></li>
 <li><code>string-&gt;list</code></li>
 </ul></li>
-<li><a href="#to-string"><code>to-string</code></a> : Convert an expression to String.
+<li><a href="#to-string"><code>to-string</code></a> : Converts an expression to String.
 <ul>
 <li><code>number-&gt;string</code></li>
 <li><code>boolean-&gt;string</code></li>
 <li><code>symbol-&gt;string</code></li>
 <li><code>list-&gt;string</code></li>
 </ul></li>
-<li><a href="#try"><code>try</code></a> : Catch exceptions.</li>
-<li><a href="#throw"><code>throw</code></a> : Throw an exception.</li>
-<li><a href="#car"><code>car</code></a> : Pull out Car value from Pair.</li>
-<li><a href="#cdr"><code>cdr</code></a> : Pull out Cdr value from Pair.</li>
-<li><a href="#cons"><code>cons</code></a> : Construct Pair.</li>
+<li><a href="#try"><code>try</code></a> : Catches exceptions.</li>
+<li><a href="#throw"><code>throw</code></a> : Throws an exception.</li>
+<li><a href="#car"><code>car</code></a> : Pulls out Car value from Pair.</li>
+<li><a href="#cdr"><code>cdr</code></a> : Pull outs Cdr value from Pair.</li>
+<li><a href="#cons"><code>cons</code></a> : Constructs Pair.</li>
 </ul></li>
 <li><a href="#conditional-branch-functions">Conditional Branch Functions</a>
 <ul>
-<li><a href="#if"><code>if</code></a> : Branch two ways.</li>
-<li><a href="#cond"><code>cond</code></a> : Branch a lot of ways.</li>
+<li><a href="#if"><code>if</code></a> : Branches two ways.</li>
+<li><a href="#cond"><code>cond</code></a> : Branches a lot of ways.</li>
 </ul></li>
 <li><a href="#predicate-functions">Predicate Functions</a>
 <ul>
-<li><a href="#equal"><code>equal?</code></a> : Judge whether they are same or not.</li>
-<li><a href="#pair"><code>pair?</code></a> : Judge whether they are Pair or not.</li>
-<li><a href="#list"><code>list?</code></a> : Judge whether they are List or not.</li>
-<li><a href="#nil"><code>nil?</code></a> : Judge whether they are Nil or not.
+<li><a href="#equal"><code>equal?</code></a> : Judges whether they are same or not.</li>
+<li><a href="#pair"><code>pair?</code></a> : Judges whether they are Pair or not.</li>
+<li><a href="#list"><code>list?</code></a> : Judges whether they are List or not.</li>
+<li><a href="#nil"><code>nil?</code></a> : Judges whether they are Nil or not.
 <ul>
 <li><code>null?</code></li>
 </ul></li>
-<li><a href="#symbol"><code>symbol?</code></a> : Judge whether they are Symbol or not.</li>
-<li><a href="#number"><code>number?</code></a> : Judge whether they are Number or not.</li>
-<li><a href="#boolean"><code>boolean?</code></a> Judge whether they are Boolean or not.:</li>
-<li><a href="#string"><code>string?</code></a> : Judge whether they are String or not.</li>
-<li><a href="#function"><code>function?</code></a> : Judge whether they are Function or not.</li>
-<li><a href="#native-function"><code>native-function?</code></a> : Judge if they are Native Function or not.</li>
-<li><a href="#procedure"><code>procedure?</code></a> : Judge if they are Function or Native Function or not.</li>
+<li><a href="#symbol"><code>symbol?</code></a> : Judges whether they are Symbol or not.</li>
+<li><a href="#number"><code>number?</code></a> : Judges whether they are Number or not.</li>
+<li><a href="#boolean"><code>boolean?</code></a> Judges whether they are Boolean or not.:</li>
+<li><a href="#string"><code>string?</code></a> : Judges whether they are String or not.</li>
+<li><a href="#function"><code>function?</code></a> : Judges whether they are Function or not.</li>
+<li><a href="#native-function"><code>native-function?</code></a> : Judges if they are Native Function or not.</li>
+<li><a href="#procedure"><code>procedure?</code></a> : Judges if they are Function or Native Function or not.</li>
 </ul></li>
 <li><a href="#io-stream-functions">IO Stream Functions</a>
 <ul>
-<li><a href="#display"><code>display</code></a> : Print objects to Standard Output.</li>
-<li><a href="#stdin"><code>stdin</code></a> : Read String from Standard Input.</li>
-<li><a href="#stdout"><code>stdout</code></a> : Write String to Standard Output.</li>
-<li><a href="#stderr"><code>stderr</code></a> : Write String to Standard Error.</li>
-<li><a href="#output-stream"><code>output-stream</code></a> : Generate an output file stream.</li>
-<li><a href="#input-stream"><code>input-stream</code></a> : Generate an input file stream.</li>
+<li><a href="#display"><code>display</code></a> : Prints objects to Standard Output.</li>
+<li><a href="#stdin"><code>stdin</code></a> : Reads String from Standard Input.</li>
+<li><a href="#stdout"><code>stdout</code></a> : Writes String to Standard Output.</li>
+<li><a href="#stderr"><code>stderr</code></a> : Writes String to Standard Error.</li>
+<li><a href="#output-stream"><code>output-stream</code></a> : Generates an output file stream.</li>
+<li><a href="#input-stream"><code>input-stream</code></a> : Generates an input file stream.</li>
 </ul></li>
 </ul>
 <hr />
