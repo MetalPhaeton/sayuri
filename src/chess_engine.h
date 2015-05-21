@@ -279,11 +279,11 @@ namespace Sayuri {
        */
       bool CanWhiteShortCastling() const {
         if (!(castling_rights_ & WHITE_SHORT_CASTLING)) return false;
+        if (piece_board_[F1]) return false;
+        if (piece_board_[G1]) return false;
         if (IsAttacked(E1, BLACK)) return false;
         if (IsAttacked(F1, BLACK)) return false;
         if (IsAttacked(G1, BLACK)) return false;
-        if (piece_board_[F1]) return false;
-        if (piece_board_[G1]) return false;
 
         return true;
       }
@@ -294,12 +294,12 @@ namespace Sayuri {
        */
       bool CanWhiteLongCastling() const {
         if (!(castling_rights_ & WHITE_LONG_CASTLING)) return false;
-        if (IsAttacked(E1, BLACK)) return false;
-        if (IsAttacked(D1, BLACK)) return false;
-        if (IsAttacked(C1, BLACK)) return false;
         if (piece_board_[D1]) return false;
         if (piece_board_[C1]) return false;
         if (piece_board_[B1]) return false;
+        if (IsAttacked(E1, BLACK)) return false;
+        if (IsAttacked(D1, BLACK)) return false;
+        if (IsAttacked(C1, BLACK)) return false;
 
         return true;
       }
@@ -310,11 +310,11 @@ namespace Sayuri {
        */
       bool CanBlackShortCastling() const {
         if (!(castling_rights_ & BLACK_SHORT_CASTLING)) return false;
+        if (piece_board_[F8]) return false;
+        if (piece_board_[G8]) return false;
         if (IsAttacked(E8, WHITE)) return false;
         if (IsAttacked(F8, WHITE)) return false;
         if (IsAttacked(G8, WHITE)) return false;
-        if (piece_board_[F8]) return false;
-        if (piece_board_[G8]) return false;
 
         return true;
       }
@@ -325,12 +325,12 @@ namespace Sayuri {
        */
       bool CanBlackLongCastling() const {
         if (!(castling_rights_ & BLACK_LONG_CASTLING)) return false;
-        if (IsAttacked(E8, WHITE)) return false;
-        if (IsAttacked(D8, WHITE)) return false;
-        if (IsAttacked(C8, WHITE)) return false;
         if (piece_board_[D8]) return false;
         if (piece_board_[C8]) return false;
         if (piece_board_[B8]) return false;
+        if (IsAttacked(E8, WHITE)) return false;
+        if (IsAttacked(D8, WHITE)) return false;
+        if (IsAttacked(C8, WHITE)) return false;
 
         return true;
       }
