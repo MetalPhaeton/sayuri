@@ -345,17 +345,17 @@ namespace Sayuri {
     constexpr Move BL_CASTLING_MOVE = E8 | (C8 << TO_SHIFT)
     | (CASTLE_BL << MOVE_TYPE_SHIFT);
     if (side == WHITE) {
-      if (engine_ptr_->CanCastling<WHITE_SHORT_CASTLING>()) {
+      if (engine_ptr_->CanWhiteShortCastling()) {
         move_stack_[last_++].move_ = WS_CASTLING_MOVE;
       }
-      if (engine_ptr_->CanCastling<WHITE_LONG_CASTLING>()) {
+      if (engine_ptr_->CanWhiteLongCastling()) {
         move_stack_[last_++].move_ = WL_CASTLING_MOVE;
       }
     } else {
-      if (engine_ptr_->CanCastling<BLACK_SHORT_CASTLING>()) {
+      if (engine_ptr_->CanBlackShortCastling()) {
         move_stack_[last_++].move_ = BS_CASTLING_MOVE;
       }
-      if (engine_ptr_->CanCastling<BLACK_LONG_CASTLING>()) {
+      if (engine_ptr_->CanBlackLongCastling()) {
         move_stack_[last_++].move_ = BL_CASTLING_MOVE;
       }
     }

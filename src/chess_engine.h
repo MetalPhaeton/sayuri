@@ -274,16 +274,66 @@ namespace Sayuri {
       }
 
       /**
-       * キャスリング出来るかどうかを判定する。
-       * @param <FLAG> キャスリングの指定。
-       * - WHITE_SHORT_CASTLING: 白のショートキャスリング。
-       * - WHITE_LONG_CASTLING: 白のロングキャスリング。
-       * - BLACK_SHORT_CASTLING: 黒のショートキャスリング。
-       * - BLACK_LONG_CASTLING: 黒のロングキャスリング。
+       * 白のショートキャスリングが出来るかどうか判定する。
        * @return キャスリング可能ならtrue。
        */
-      template<Castling FLAG>
-      bool CanCastling() const {return false;}
+      bool CanWhiteShortCastling() const {
+        if (!(castling_rights_ & WHITE_SHORT_CASTLING)) return false;
+        if (IsAttacked(E1, BLACK)) return false;
+        if (IsAttacked(F1, BLACK)) return false;
+        if (IsAttacked(G1, BLACK)) return false;
+        if (piece_board_[F1]) return false;
+        if (piece_board_[G1]) return false;
+
+        return true;
+      }
+
+      /**
+       * 白のロングキャスリングが出来るかどうか判定する。
+       * @return キャスリング可能ならtrue。
+       */
+      bool CanWhiteLongCastling() const {
+        if (!(castling_rights_ & WHITE_LONG_CASTLING)) return false;
+        if (IsAttacked(E1, BLACK)) return false;
+        if (IsAttacked(D1, BLACK)) return false;
+        if (IsAttacked(C1, BLACK)) return false;
+        if (piece_board_[D1]) return false;
+        if (piece_board_[C1]) return false;
+        if (piece_board_[B1]) return false;
+
+        return true;
+      }
+
+      /**
+       * 黒のショートキャスリングが出来るかどうか判定する。
+       * @return キャスリング可能ならtrue。
+       */
+      bool CanBlackShortCastling() const {
+        if (!(castling_rights_ & BLACK_SHORT_CASTLING)) return false;
+        if (IsAttacked(E8, WHITE)) return false;
+        if (IsAttacked(F8, WHITE)) return false;
+        if (IsAttacked(G8, WHITE)) return false;
+        if (piece_board_[F8]) return false;
+        if (piece_board_[G8]) return false;
+
+        return true;
+      }
+
+      /**
+       * 黒のロングキャスリングが出来るかどうか判定する。
+       * @return キャスリング可能ならtrue。
+       */
+      bool CanBlackLongCastling() const {
+        if (!(castling_rights_ & BLACK_LONG_CASTLING)) return false;
+        if (IsAttacked(E8, WHITE)) return false;
+        if (IsAttacked(D8, WHITE)) return false;
+        if (IsAttacked(C8, WHITE)) return false;
+        if (piece_board_[D8]) return false;
+        if (piece_board_[C8]) return false;
+        if (piece_board_[B8]) return false;
+
+        return true;
+      }
 
       /**
        * キャスリングの権利を更新。
@@ -1226,57 +1276,6 @@ namespace Sayuri {
       /** ヘルパーハンドラ。 */
       HelperHandler helper_handler_;
   };
-
-  // ==================== //
-  // テンプレートの特殊化 //
-  // ==================== //
-  // --- キャスリング出来るかどうかの関数 --- //
-  template<>
-  inline bool ChessEngine::CanCastling<WHITE_SHORT_CASTLING>() const {
-    if (!(castling_rights_ & WHITE_SHORT_CASTLING)) return false;
-    if (IsAttacked(E1, BLACK)) return false;
-    if (IsAttacked(F1, BLACK)) return false;
-    if (IsAttacked(G1, BLACK)) return false;
-    if (piece_board_[F1]) return false;
-    if (piece_board_[G1]) return false;
-
-    return true;
-  }
-  template<>
-  inline bool ChessEngine::CanCastling<WHITE_LONG_CASTLING>() const {
-    if (!(castling_rights_ & WHITE_LONG_CASTLING)) return false;
-    if (IsAttacked(E1, BLACK)) return false;
-    if (IsAttacked(D1, BLACK)) return false;
-    if (IsAttacked(C1, BLACK)) return false;
-    if (piece_board_[D1]) return false;
-    if (piece_board_[C1]) return false;
-    if (piece_board_[B1]) return false;
-
-    return true;
-  }
-  template<>
-  inline bool ChessEngine::CanCastling<BLACK_SHORT_CASTLING>() const {
-    if (!(castling_rights_ & BLACK_SHORT_CASTLING)) return false;
-    if (IsAttacked(E8, WHITE)) return false;
-    if (IsAttacked(F8, WHITE)) return false;
-    if (IsAttacked(G8, WHITE)) return false;
-    if (piece_board_[F8]) return false;
-    if (piece_board_[G8]) return false;
-
-    return true;
-  }
-  template<>
-  inline bool ChessEngine::CanCastling<BLACK_LONG_CASTLING>() const {
-    if (!(castling_rights_ & BLACK_LONG_CASTLING)) return false;
-    if (IsAttacked(E8, WHITE)) return false;
-    if (IsAttacked(D8, WHITE)) return false;
-    if (IsAttacked(C8, WHITE)) return false;
-    if (piece_board_[D8]) return false;
-    if (piece_board_[C8]) return false;
-    if (piece_board_[B8]) return false;
-
-    return true;
-  }
 }  // namespace Sayuri
 
 #endif
