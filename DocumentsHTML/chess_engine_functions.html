@@ -595,6 +595,11 @@
 <li>Registers Function to receive UCI output from the engine.</li>
 <li><code>&lt;Listener&gt;</code> is Function that has one argument(UCI output).</li>
 </ul></li>
+<li><code>@run</code>
+<ul>
+<li>Runs as UCI Chess Engine until the engine gets &quot;quit&quot; command.</li>
+<li>The control doesn't come back while the engine is running.</li>
+</ul></li>
 </ul>
 <p><strong>Example</strong></p>
 <pre><code>(define my-engine (gen-engine))
