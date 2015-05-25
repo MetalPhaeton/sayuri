@@ -698,6 +698,9 @@ namespace Sayuri {
 
       return AddUCIOutputListener(caller, *list_itr);
 
+    } else if (message_symbol == "@run") {
+      return RunEngine();
+
     } else if (message_symbol == "@go-movetime") {
       required_args = 2;
       if (!list_itr) {
@@ -2205,6 +2208,29 @@ namespace Sayuri {
     };
 
     callback_vec_.push_back(callback);
+
+    return LispObject::NewBoolean(true);
+  }
+
+  // UCIエンジンとして実行する。
+  LispObjectPtr EngineSuite::RunEngine() {
+    volatile bool loop = true;
+
+    // 自分用アウトプットリスナーを登録する。
+    std::function<void(const std::string&)> callback =
+    [this](const std::string& message) {
+      std::cout << message << std::endl;
+    };
+    callback_vec_.push_back(callback);
+
+    // quitが来るまでループ。
+    std::string input;
+    while (loop) {
+      std::getline(std::cin, input);
+      if (input == "quit") loop = false;
+
+      shell_ptr_->InputCommand(input);
+    }
 
     return LispObject::NewBoolean(true);
   }
@@ -4118,6 +4144,9 @@ __Example__
 * `@add-uci-output-listener <Listener : Function>`
     + Registers Function to receive UCI output from the engine.
     + `<Listener>` is Function that has one argument(UCI output).
+* `@run`
+    + Runs as UCI Chess Engine until the engine gets "quit" command.
+    + The control doesn't come back while the engine is running.
 
 __Example__
 

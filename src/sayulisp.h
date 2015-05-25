@@ -464,6 +464,12 @@ namespace Sayuri {
       const LispObject& symbol);
 
       /**
+       * UCIエンジンとして実行する。
+       * @return #t。
+       */
+      LispObjectPtr RunEngine();
+
+      /**
        * move_timeミリ秒間思考する。 最善手が見つかるまで戻らない。
        * 思考中の出力はAddUCIOutputListener()で登録した関数で得られる。
        * @param func_name 関数名。
