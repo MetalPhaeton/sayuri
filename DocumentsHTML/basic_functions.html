@@ -31,13 +31,22 @@
 <li><a href="#string-ref"><code>string-ref</code></a> : Pulls out a letter from String.</li>
 <li><a href="#string-split"><code>string-split</code></a> : Splits String.</li>
 </ul></li>
+<li><a href="#container-functions">Container Functions</a>
+<ul>
+<li><a href="#front"><code>front</code></a> : Returns the first element of List.</li>
+<li><a href="#back"><code>back</code></a> : Returns the last element of List.</li>
+<li><a href="#push-front"><code>push-front</code></a> : Adds Object at the fist element.</li>
+<li><a href="#pop-front"><code>pop-front</code></a> : Removes the first element from List.</li>
+<li><a href="#push-back"><code>push-back</code></a> : Adds Object at the end element.</li>
+<li><a href="#pop-back"><code>pop-back</code></a> : Removes the last element from List.</li>
+</ul></li>
 <li><a href="#boolean-equation-function">Boolean Equation Function</a>
 <ul>
 <li><a href="#not"><code>not</code></a> : Converts &quot;True&quot; to &quot;False&quot;, &quot;False&quot; to &quot;True&quot;.</li>
 <li><a href="#and"><code>and</code></a> : Judges whether all Booleans are &quot;True&quot; or not.</li>
 <li><a href="#or"><code>or</code></a> : Judges whether one of all Booleans is &quot;True&quot; or not.</li>
 </ul></li>
-<li><a href="#comparision-function">Comparision Function</a>
+<li><a href="#comparision-function">Comparison Function</a>
 <ul>
 <li><a href="#same"><code>=</code></a> : Judges whether all Numbers are same or not.</li>
 <li><a href="#less-than"><code>&lt;</code></a> : Judges whether a Number is less than the next Number or not.</li>
@@ -240,6 +249,97 @@
 ;; Outpu
 ;;
 ;; &gt; (&quot;aaa&quot; &quot;bbb&quot; &quot;ccc&quot;)</code></pre>
+<h2 id="container-functions">Container Functions</h2>
+<h3 id="front">front</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(front &lt;List&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Returns the first element of <code>&lt;List&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (front &#39;(111 222 333)))
+
+;; Outpu
+;;
+;; &gt; 111</code></pre>
+<h3 id="back">back</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(back &lt;List&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Returns the last element of <code>&lt;List&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (back &#39;(111 222 333)))
+
+;; Outpu
+;;
+;; &gt; 333</code></pre>
+<h3 id="push-front">push-front</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(push-front &lt;List&gt; &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Returns List added <code>&lt;Object&gt;</code> at the first element of <code>&lt;List&gt;</code></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (push-front &#39;(111 222 333) &quot;Hello&quot;))
+
+;; Outpu
+;;
+;; &gt; (&quot;Hello&quot; 111 222 333)</code></pre>
+<h3 id="pop-front">pop-front</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(pop-front &lt;List&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Returns List removed the first element from <code>&lt;List&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (pop-front &#39;(111 222 333)))
+
+;; Outpu
+;;
+;; &gt; (222 333)</code></pre>
+<h3 id="push-back">push-back</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(push-back &lt;List&gt; &lt;Object&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Returns List added <code>&lt;Object&gt;</code> at the last element of <code>&lt;List&gt;</code></li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (push-back &#39;(111 222 333) &quot;Hello&quot;))
+
+;; Outpu
+;;
+;; &gt; (111 222 333 &quot;Hello&quot;)</code></pre>
+<h3 id="pop-back">pop-back</h3>
+<p><strong>Usage</strong></p>
+<ul>
+<li><code>(pop-back &lt;List&gt;)</code></li>
+</ul>
+<p><strong>Description</strong></p>
+<ul>
+<li>Returns List removed the last element from <code>&lt;List&gt;</code>.</li>
+</ul>
+<p><strong>Example</strong></p>
+<pre><code>(display (pop-back &#39;(111 222 333)))
+
+;; Outpu
+;;
+;; &gt; (111 222)</code></pre>
 <h2 id="boolean-equation-function">Boolean Equation Function</h2>
 <h3 id="not">not</h3>
 <p><strong>Usage</strong></p>
