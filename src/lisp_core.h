@@ -1164,13 +1164,13 @@ namespace Sayuri {
                 token_queue_.push(stream_.str());
                 stream_.str("");
               }
-            } else if (c == '(') {
+            } else if ((c == '(') || (c == '[')) {
               // 開き括弧。
-              pause(c);
+              pause('(');
               ++parentheses_;
-            } else if (c == ')') {
+            } else if ((c == ')') || (c == ']')) {
               // 閉じ括弧。
-              pause(c);
+              pause(')');
               --parentheses_;
             } else if (c == ';') {
               // コメント開始文字。
