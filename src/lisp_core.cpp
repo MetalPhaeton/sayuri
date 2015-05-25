@@ -4105,6 +4105,335 @@ __Example__
     ;; > ("aaa" "bbb" "ccc"))...";
     }
 
+    // %%% front
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
+      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      ->LispObjectPtr {
+        // 準備。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr result = caller.Evaluate(*list_itr);
+        if (!(result->IsList())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "List", std::vector<int> {1}, true);
+        }
+
+        LispObjectPtr ret_ptr = LispObject::NewNil();
+        if (result->IsPair()) {
+          ret_ptr = result->car();
+        }
+
+        return ret_ptr;
+      };
+      root_ptr->BindSymbol("front", func_ptr);
+      (*dict_ptr)["front"] =
+R"...(### front ###
+
+__Usage__
+
+* `(front <List>)`
+
+__Description__
+
+* Returns the first element of `<List>`.
+
+__Example__
+
+    (display (front '(111 222 333)))
+    
+    ;; Outpu
+    ;;
+    ;; > 111)...";
+    }
+
+    // %%% back
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
+      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      ->LispObjectPtr {
+        // 準備。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr result = caller.Evaluate(*list_itr);
+        if (!(result->IsList())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "List", std::vector<int> {1}, true);
+        }
+
+        LispObjectPtr ret_ptr = LispObject::NewNil();
+        if (result->IsPair()) {
+          LispObject* current_ptr = result.get();
+          LispObject* ptr = result->cdr().get();
+          for (; ptr->IsPair(); ptr = ptr->cdr().get()) {
+            current_ptr = current_ptr->cdr().get();
+          }
+
+          ret_ptr = current_ptr->car();
+        }
+
+        return ret_ptr;
+      };
+      root_ptr->BindSymbol("back", func_ptr);
+      (*dict_ptr)["back"] =
+R"...(### back ###
+
+__Usage__
+
+* `(back <List>)`
+
+__Description__
+
+* Returns the last element of `<List>`.
+
+__Example__
+
+    (display (back '(111 222 333)))
+    
+    ;; Outpu
+    ;;
+    ;; > 333)...";
+    }
+
+    // %%% push-front
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
+      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      ->LispObjectPtr {
+        // 準備。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 2;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr first_ptr = caller.Evaluate(*(list_itr++));
+        if (!(first_ptr->IsList())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "List", std::vector<int> {1}, true);
+        }
+
+        // 第2引数をチェック。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr second_ptr = caller.Evaluate(*list_itr);
+
+        // くっつける。
+        LispObjectPtr ret_ptr = LispObject::NewPair();
+        ret_ptr->car(second_ptr);
+        ret_ptr->cdr(first_ptr);
+
+        return ret_ptr;
+      };
+      root_ptr->BindSymbol("push-front", func_ptr);
+      (*dict_ptr)["push-front"] =
+R"...(### push-front ###
+
+__Usage__
+
+* `(push-front <List> <Object>)`
+
+__Description__
+
+* Returns List added `<Object>` at the first element of `<List>`
+
+__Example__
+
+    (display (push-front '(111 222 333) "Hello"))
+    
+    ;; Outpu
+    ;;
+    ;; > ("Hello" 111 222 333))...";
+    }
+
+    // %%% pop-front
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
+      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      ->LispObjectPtr {
+        // 準備。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr result = caller.Evaluate(*list_itr);
+        if (!(result->IsList())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "List", std::vector<int> {1}, true);
+        }
+
+        LispObjectPtr ret_ptr = LispObject::NewNil();
+        if (result->IsPair()) {
+          ret_ptr = result->cdr();
+        }
+
+        return ret_ptr;
+      };
+      root_ptr->BindSymbol("pop-front", func_ptr);
+      (*dict_ptr)["pop-front"] =
+R"...(### pop-front ###
+
+__Usage__
+
+* `(pop-front <List>)`
+
+__Description__
+
+* Returns List removed the first element from `<List>`.
+
+__Example__
+
+    (display (pop-front '(111 222 333)))
+    
+    ;; Outpu
+    ;;
+    ;; > (222 333))...";
+    }
+
+    // %%% push-back
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
+      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      ->LispObjectPtr {
+        // 準備。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 2;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr first_ptr = caller.Evaluate(*(list_itr++));
+        if (!(first_ptr->IsList())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "List", std::vector<int> {1}, true);
+        }
+
+        // 第2引数をチェック。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr second_ptr = caller.Evaluate(*list_itr);
+
+        // くっつける。
+        first_ptr->Append
+        (LispObject::NewPair(second_ptr, LispObject::NewNil()));
+
+        return first_ptr;
+      };
+      root_ptr->BindSymbol("push-back", func_ptr);
+      (*dict_ptr)["push-back"] =
+R"...(### push-back ###
+
+__Usage__
+
+* `(push-back <List> <Object>)`
+
+__Description__
+
+* Returns List added `<Object>` at the last element of `<List>`
+
+__Example__
+
+    (display (push-back '(111 222 333) "Hello"))
+    
+    ;; Outpu
+    ;;
+    ;; > (111 222 333 "Hello"))...";
+    }
+
+    // %%% pop-back
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
+      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      ->LispObjectPtr {
+        // 準備。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr result = caller.Evaluate(*list_itr);
+        if (!(result->IsList())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "List", std::vector<int> {1}, true);
+        }
+
+        if (result->IsPair()) {
+          LispObject* current_ptr = result.get();
+          LispObject* ptr = result->cdr().get();
+          for (; ptr->IsPair(); ptr = ptr->cdr().get()) {
+            current_ptr = current_ptr->cdr().get();
+          }
+          *current_ptr = *(LispObject::NewNil());
+        }
+
+        return result;
+      };
+      root_ptr->BindSymbol("pop-back", func_ptr);
+      (*dict_ptr)["pop-back"] =
+R"...(### pop-back ###
+
+__Usage__
+
+* `(pop-back <List>)`
+
+__Description__
+
+* Returns List removed the last element from `<List>`.
+
+__Example__
+
+    (display (pop-back '(111 222 333)))
+    
+    ;; Outpu
+    ;;
+    ;; > (111 222))...";
+    }
+
     // %%% PI
     root_ptr->BindSymbol("PI", NewNumber(4.0 * std::atan(1.0)));
     (*dict_ptr)["PI"] =
