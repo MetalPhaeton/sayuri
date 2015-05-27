@@ -160,18 +160,27 @@ Example
 <h3 id="warning">Warning!!!!</h3>
 <p>Sayuri always works on the major premises that are <strong>&quot;King is never taken&quot;</strong> and <strong>&quot;Each side must have just one King&quot;</strong>.</p>
 <p>If you set an engine's board to be able to take King by a piece, the engine will work unexpectedly.<br />If you are unlucky, segment fault error will be occurred.</p>
-<h3 id="skeleton-of-customizing-engine">Skeleton of Customizing Engine</h3>
-<p>The following code is how to customize an engine and run it.</p>
+<h3 id="customization-of-engine">Customization of Engine</h3>
+<p>If you want to customize an engine, then write code to execute the following 3 steps.</p>
+<ol style="list-style-type: decimal">
+<li>Generate an engine.</li>
+<li>Customize Search Function or Evaluation Function.</li>
+<li>Run the engine.</li>
+</ol>
 <h6> 
-Skeleton
+Example
 </h6>
 
-<pre><code>(define my-engine (gen-engine))
+<pre><code>;; 1st.
+;; Generate an engine.
+(define my-engine (gen-engine))
 
-;; Write code here to customize Search Function or Evaluation Function.
+;; 2nd.
+;; Customize Search Function or Evaluation Function.
 ;; For example, if you want to change Material Score, then...
 (my-engine &#39;@material (list 0 100 300 300 500 900 1e+6))
 
+;; 3rd.
 ;; Run the engine.
 (my-engine &#39;@run)</code></pre>
 <h3 id="techniques">Techniques</h3>
