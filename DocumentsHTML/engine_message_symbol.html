@@ -118,7 +118,10 @@
 <li>Returns List of position of Empty Squares as Symbol.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 (display (my-engine &#39;@get-white-pawn-position))
 
@@ -130,7 +133,10 @@
 <li>Returns a side and type of the piece as List that is <code>(&lt;Side : Symbol&gt;, &lt;Type : Symbol&gt;)</code>.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 (display (my-engine &#39;@get-piece D1))
 
@@ -171,7 +177,10 @@
 <li>Returns Boolean whether Black King has castled or not.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 ;; Move pieces by UCI command.
@@ -243,7 +252,10 @@
 <li>Returns previous setting.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 (my-engine &#39;@place-piece E4 PAWN WHITE)
 
@@ -311,7 +323,10 @@
 <li><code>&lt;Piece side&gt;</code> is a color of the piece.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@set-new-game))
@@ -329,7 +344,10 @@
 <li>Generates and returns List of candidate moves.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@get-candidate-moves))
@@ -352,7 +370,10 @@
 </ul></li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 ;; Put Pawn on 1st rank.
@@ -371,7 +392,10 @@
 <li>Judges whether Black King is checked or not.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 ;; Move pieces by UCI command.
@@ -406,7 +430,10 @@
 <li>Judges whether either King is stalemated or not.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 ;; Move pieces by UCI command.
@@ -454,7 +481,10 @@
 <li>Returns previous move.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@play-move (list E2 E4 EMPTY)))
@@ -491,7 +521,10 @@
 <li>The control doesn't come back while the engine is running.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 ;; Create a listener.
@@ -538,7 +571,10 @@
 <li>Different from &quot;go&quot; command, until the engine have found the best move, the control won't come back.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 ;; Register a listener.
@@ -596,7 +632,10 @@
 <li>Sets <code>&lt;Number of threads&gt;</code> and returns the previous number.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 ;; Set size of Hash Table to 128 MB.
@@ -633,7 +672,10 @@
 <li>If you specify <code>&lt;New materal&gt;</code>, the material is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@material (list 111 222 333 444 555 666 777)))
@@ -652,7 +694,10 @@
 <li>If you specify #t to <code>&lt;New setting&gt;</code>, Quiescence Search is set to be enabled. Otherwise, it is set to be disabled.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@enable-quiesce-search #f))
@@ -671,7 +716,10 @@
 <li>If you specify #t to <code>&lt;New setting&gt;</code>, Repetition Check is set to be enabled. Otherwise, it is set to be disabled.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@enable-repetition-check #f))
@@ -690,7 +738,10 @@
 <li>If you specify #t to <code>&lt;New setting&gt;</code>, Check Extension is set to be enabled. Otherwise, it is set to be disabled.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@enable-check-extension #f))
@@ -716,7 +767,10 @@
 <li>If you specify <code>&lt;New number of moves&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@ybwc-limit-depth 10))
@@ -754,7 +808,10 @@
 <li>If you specify <code>&lt;New delta&gt;</code>, Delta is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@enable-aspiration-windows #f))
@@ -789,7 +846,10 @@
 <li>If you specify #t to <code>&lt;New setting&gt;</code>, SEE is set to be enabled. Otherwise, it is set to be disabled.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@enable-see #f))
@@ -808,7 +868,10 @@
 <li>If you specify #t to <code>&lt;New setting&gt;</code>, History Heuristics is set to be enabled. Otherwise, it is set to be disabled.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@enable-history #f))
@@ -827,7 +890,10 @@
 <li>If you specify #t to <code>&lt;New setting&gt;</code>, Killer Move Hiuristics is set to be enabled. Otherwise, it is set to be disabled.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@enable-killer #f))
@@ -846,7 +912,10 @@
 <li>If you specify #t to <code>&lt;New setting&gt;</code>, Transposition Table is set to be enabled. Otherwise, it is set to be disabled.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@enable-hash-table #f))
@@ -877,7 +946,10 @@
 <li>If you specify <code>&lt;New depth&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@enable-iid #f))
@@ -935,7 +1007,10 @@
 <li>If you specify <code>&lt;New reduction&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@enable-nmr #f))
@@ -994,7 +1069,10 @@
 <li>If you specify <code>&lt;New reduction&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@enable-probcut #t))
@@ -1070,7 +1148,10 @@
 <li>If you specify <code>&lt;New reduction&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@enable-history-pruning #t))
@@ -1155,7 +1236,10 @@
 <li>If you specify <code>&lt;New reduction&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@enable-lmr #f))
@@ -1216,7 +1300,10 @@
 <li>If the material after the move is lower than Alpha minus this parameter, the move is not evaluated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@enable-futility-pruning #f))
@@ -1429,7 +1516,10 @@
 <li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@pawn-square-table-opening
@@ -1552,7 +1642,10 @@
 <li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@pawn-attack-table (list 1 2 3 4 5 6 7)))
@@ -1618,7 +1711,10 @@
 <li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@weight-pawn-attack (list 111 222)))
@@ -1716,7 +1812,10 @@
 <li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@pawn-defense-table (list 1 2 3 4 5 6 7)))
@@ -1782,7 +1881,10 @@
 <li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@weight-pawn-defense (list 111 222)))
@@ -1863,7 +1965,10 @@
 </ul></li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@bishop-pin-table
@@ -1921,7 +2026,10 @@
 <li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@weight-bishop-pin (list 111 222)))
@@ -1950,7 +2058,10 @@
 <li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (define table
@@ -1995,7 +2106,10 @@
 <li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@weight-pawn-shield (list 111 222)))
@@ -2580,7 +2694,10 @@
 <li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
-<p><strong>Example</strong></p>
+<h6>
+Example
+</h6>
+
 <pre><code>(define my-engine (gen-engine))
 
 (display (my-engine &#39;@weight-pawn-mobility (list 111 222)))
