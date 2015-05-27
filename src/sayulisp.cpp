@@ -2754,7 +2754,7 @@ namespace Sayuri {
     (*dict_ptr_)["A1"] =
 R"...(### A1 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates A1 square.
 * Value is '0'.)...";
@@ -2762,7 +2762,7 @@ __Description__
     (*dict_ptr_)["B1"] =
 R"...(### B1 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates B1 square.
 * Value is '1'.)...";
@@ -2770,7 +2770,7 @@ __Description__
     (*dict_ptr_)["C1"] =
 R"...(### C1 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates C1 square.
 * Value is '2'.)...";
@@ -2778,7 +2778,7 @@ __Description__
     (*dict_ptr_)["D1"] =
 R"...(### D1 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates D1 square.
 * Value is '3'.)...";
@@ -2786,7 +2786,7 @@ __Description__
     (*dict_ptr_)["E1"] =
 R"...(### E1 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates E1 square.
 * Value is '4'.)...";
@@ -2794,7 +2794,7 @@ __Description__
     (*dict_ptr_)["F1"] =
 R"...(### F1 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates F1 square.
 * Value is '5'.)...";
@@ -2802,7 +2802,7 @@ __Description__
     (*dict_ptr_)["G1"] =
 R"...(### G1 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates G1 square.
 * Value is '6'.)...";
@@ -2810,14 +2810,14 @@ __Description__
     (*dict_ptr_)["H1"] =
 R"...(### H1 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates H1 square.
 * Value is '7'.)...";
     (*dict_ptr_)["A2"] =
 R"...(### A2 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates A2 square.
 * Value is '8'.)...";
@@ -2825,7 +2825,7 @@ __Description__
     (*dict_ptr_)["B2"] =
 R"...(### B2 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates B2 square.
 * Value is '9'.)...";
@@ -2833,7 +2833,7 @@ __Description__
     (*dict_ptr_)["C2"] =
 R"...(### C2 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates C2 square.
 * Value is '10'.)...";
@@ -2841,7 +2841,7 @@ __Description__
     (*dict_ptr_)["D2"] =
 R"...(### D2 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates D2 square.
 * Value is '11'.)...";
@@ -2849,7 +2849,7 @@ __Description__
     (*dict_ptr_)["E2"] =
 R"...(### E2 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates E2 square.
 * Value is '12'.)...";
@@ -2857,7 +2857,7 @@ __Description__
     (*dict_ptr_)["F2"] =
 R"...(### F2 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates F2 square.
 * Value is '13'.)...";
@@ -2865,7 +2865,7 @@ __Description__
     (*dict_ptr_)["G2"] =
 R"...(### G2 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates G2 square.
 * Value is '14'.)...";
@@ -2873,7 +2873,7 @@ __Description__
     (*dict_ptr_)["H2"] =
 R"...(### H2 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates H2 square.
 * Value is '15'.)...";
@@ -2881,7 +2881,7 @@ __Description__
     (*dict_ptr_)["A3"] =
 R"...(### A3 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates A3 square.
 * Value is '16'.)...";
@@ -2889,7 +2889,7 @@ __Description__
     (*dict_ptr_)["B3"] =
 R"...(### B3 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates B3 square.
 * Value is '17'.)...";
@@ -2897,7 +2897,7 @@ __Description__
     (*dict_ptr_)["C3"] =
 R"...(### C3 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates C3 square.
 * Value is '18'.)...";
@@ -2905,7 +2905,7 @@ __Description__
     (*dict_ptr_)["D3"] =
 R"...(### D3 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates D3 square.
 * Value is '19'.)...";
@@ -2913,7 +2913,7 @@ __Description__
     (*dict_ptr_)["E3"] =
 R"...(### E3 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates E3 square.
 * Value is '20'.)...";
@@ -2921,7 +2921,7 @@ __Description__
     (*dict_ptr_)["F3"] =
 R"...(### F3 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates F3 square.
 * Value is '21'.)...";
@@ -2929,7 +2929,7 @@ __Description__
     (*dict_ptr_)["G3"] =
 R"...(### G3 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates G3 square.
 * Value is '22'.)...";
@@ -2937,7 +2937,7 @@ __Description__
     (*dict_ptr_)["H3"] =
 R"...(### H3 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates H3 square.
 * Value is '23'.)...";
@@ -2945,7 +2945,7 @@ __Description__
     (*dict_ptr_)["A4"] =
 R"...(### A4 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates A4 square.
 * Value is '24'.)...";
@@ -2953,7 +2953,7 @@ __Description__
     (*dict_ptr_)["B4"] =
 R"...(### B4 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates B4 square.
 * Value is '25'.)...";
@@ -2961,7 +2961,7 @@ __Description__
     (*dict_ptr_)["C4"] =
 R"...(### C4 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates C4 square.
 * Value is '26'.)...";
@@ -2969,7 +2969,7 @@ __Description__
     (*dict_ptr_)["D4"] =
 R"...(### D4 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates D4 square.
 * Value is '27'.)...";
@@ -2977,7 +2977,7 @@ __Description__
     (*dict_ptr_)["E4"] =
 R"...(### E4 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates E4 square.
 * Value is '28'.)...";
@@ -2985,7 +2985,7 @@ __Description__
     (*dict_ptr_)["F4"] =
 R"...(### F4 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates F4 square.
 * Value is '29'.)...";
@@ -2993,7 +2993,7 @@ __Description__
     (*dict_ptr_)["G4"] =
 R"...(### G4 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates G4 square.
 * Value is '30'.)...";
@@ -3001,7 +3001,7 @@ __Description__
     (*dict_ptr_)["H4"] =
 R"...(### H4 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates H4 square.
 * Value is '31'.)...";
@@ -3009,7 +3009,7 @@ __Description__
     (*dict_ptr_)["A5"] =
 R"...(### A5 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates A5 square.
 * Value is '32'.)...";
@@ -3017,7 +3017,7 @@ __Description__
     (*dict_ptr_)["B5"] =
 R"...(### B5 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates B5 square.
 * Value is '33'.)...";
@@ -3025,7 +3025,7 @@ __Description__
     (*dict_ptr_)["C5"] =
 R"...(### C5 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates C5 square.
 * Value is '34'.)...";
@@ -3033,7 +3033,7 @@ __Description__
     (*dict_ptr_)["D5"] =
 R"...(### D5 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates D5 square.
 * Value is '35'.)...";
@@ -3041,7 +3041,7 @@ __Description__
     (*dict_ptr_)["E5"] =
 R"...(### E5 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates E5 square.
 * Value is '36'.)...";
@@ -3049,7 +3049,7 @@ __Description__
     (*dict_ptr_)["F5"] =
 R"...(### F5 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates F5 square.
 * Value is '37'.)...";
@@ -3057,7 +3057,7 @@ __Description__
     (*dict_ptr_)["G5"] =
 R"...(### G5 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates G5 square.
 * Value is '38'.)...";
@@ -3065,7 +3065,7 @@ __Description__
     (*dict_ptr_)["H5"] =
 R"...(### H5 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates H5 square.
 * Value is '39'.)...";
@@ -3073,7 +3073,7 @@ __Description__
     (*dict_ptr_)["A6"] =
 R"...(### A6 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates A6 square.
 * Value is '40'.)...";
@@ -3081,7 +3081,7 @@ __Description__
     (*dict_ptr_)["B6"] =
 R"...(### B6 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates B6 square.
 * Value is '41'.)...";
@@ -3089,7 +3089,7 @@ __Description__
     (*dict_ptr_)["C6"] =
 R"...(### C6 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates C6 square.
 * Value is '42'.)...";
@@ -3097,7 +3097,7 @@ __Description__
     (*dict_ptr_)["D6"] =
 R"...(### D6 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates D6 square.
 * Value is '43'.)...";
@@ -3105,7 +3105,7 @@ __Description__
     (*dict_ptr_)["E6"] =
 R"...(### E6 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates E6 square.
 * Value is '44'.)...";
@@ -3113,7 +3113,7 @@ __Description__
     (*dict_ptr_)["F6"] =
 R"...(### F6 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates F6 square.
 * Value is '45'.)...";
@@ -3121,7 +3121,7 @@ __Description__
     (*dict_ptr_)["G6"] =
 R"...(### G6 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates G6 square.
 * Value is '46'.)...";
@@ -3129,7 +3129,7 @@ __Description__
     (*dict_ptr_)["H6"] =
 R"...(### H6 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates H6 square.
 * Value is '47'.)...";
@@ -3137,7 +3137,7 @@ __Description__
     (*dict_ptr_)["A7"] =
 R"...(### A7 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates A7 square.
 * Value is '48'.)...";
@@ -3145,7 +3145,7 @@ __Description__
     (*dict_ptr_)["B7"] =
 R"...(### B7 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates B7 square.
 * Value is '49'.)...";
@@ -3153,7 +3153,7 @@ __Description__
     (*dict_ptr_)["C7"] =
 R"...(### C7 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates C7 square.
 * Value is '50'.)...";
@@ -3161,7 +3161,7 @@ __Description__
     (*dict_ptr_)["D7"] =
 R"...(### D7 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates D7 square.
 * Value is '51'.)...";
@@ -3169,7 +3169,7 @@ __Description__
     (*dict_ptr_)["E7"] =
 R"...(### E7 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates E7 square.
 * Value is '52'.)...";
@@ -3177,7 +3177,7 @@ __Description__
     (*dict_ptr_)["F7"] =
 R"...(### F7 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates F7 square.
 * Value is '53'.)...";
@@ -3185,7 +3185,7 @@ __Description__
     (*dict_ptr_)["G7"] =
 R"...(### G7 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates G7 square.
 * Value is '54'.)...";
@@ -3193,7 +3193,7 @@ __Description__
     (*dict_ptr_)["H7"] =
 R"...(### H7 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates H7 square.
 * Value is '55'.)...";
@@ -3201,7 +3201,7 @@ __Description__
     (*dict_ptr_)["A8"] =
 R"...(### A8 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates A8 square.
 * Value is '56'.)...";
@@ -3209,7 +3209,7 @@ __Description__
     (*dict_ptr_)["B8"] =
 R"...(### B8 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates B8 square.
 * Value is '57'.)...";
@@ -3217,7 +3217,7 @@ __Description__
     (*dict_ptr_)["C8"] =
 R"...(### C8 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates C8 square.
 * Value is '58'.)...";
@@ -3225,7 +3225,7 @@ __Description__
     (*dict_ptr_)["D8"] =
 R"...(### D8 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates D8 square.
 * Value is '59'.)...";
@@ -3233,7 +3233,7 @@ __Description__
     (*dict_ptr_)["E8"] =
 R"...(### E8 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates E8 square.
 * Value is '60'.)...";
@@ -3241,7 +3241,7 @@ __Description__
     (*dict_ptr_)["F8"] =
 R"...(### F8 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates F8 square.
 * Value is '61'.)...";
@@ -3249,7 +3249,7 @@ __Description__
     (*dict_ptr_)["G8"] =
 R"...(### G8 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates G8 square.
 * Value is '62'.)...";
@@ -3257,7 +3257,7 @@ __Description__
     (*dict_ptr_)["H8"] =
 R"...(### H8 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates H8 square.
 * Value is '63'.)...";
@@ -3265,7 +3265,7 @@ __Description__
     (*dict_ptr_)["FYLE_A"] =
 R"...(### FYLE_A ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates A-fyle.
 * Value is '0'.)...";
@@ -3273,7 +3273,7 @@ __Description__
     (*dict_ptr_)["FYLE_B"] =
 R"...(### FYLE_B ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates B-fyle.
 * Value is '1'.)...";
@@ -3281,7 +3281,7 @@ __Description__
     (*dict_ptr_)["FYLE_C"] =
 R"...(### FYLE_C ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates C-fyle.
 * Value is '2'.)...";
@@ -3289,7 +3289,7 @@ __Description__
     (*dict_ptr_)["FYLE_D"] =
 R"...(### FYLE_D ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates D-fyle.
 * Value is '3'.)...";
@@ -3297,7 +3297,7 @@ __Description__
     (*dict_ptr_)["FYLE_E"] =
 R"...(### FYLE_E ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates E-fyle.
 * Value is '4'.)...";
@@ -3305,7 +3305,7 @@ __Description__
     (*dict_ptr_)["FYLE_F"] =
 R"...(### FYLE_F ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates F-fyle.
 * Value is '5'.)...";
@@ -3313,7 +3313,7 @@ __Description__
     (*dict_ptr_)["FYLE_G"] =
 R"...(### FYLE_G ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates G-fyle.
 * Value is '6'.)...";
@@ -3321,7 +3321,7 @@ __Description__
     (*dict_ptr_)["FYLE_H"] =
 R"...(### FYLE_H ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates H-fyle.
 * Value is '7'.)...";
@@ -3329,7 +3329,7 @@ __Description__
     (*dict_ptr_)["RANK_1"] =
 R"...(### RANK_1 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates the 1st rank.
 * Value is '0'.)...";
@@ -3337,7 +3337,7 @@ __Description__
     (*dict_ptr_)["RANK_2"] =
 R"...(### RANK_2 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates the 2nd rank.
 * Value is '1'.)...";
@@ -3345,7 +3345,7 @@ __Description__
     (*dict_ptr_)["RANK_3"] =
 R"...(### RANK_3 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates the 3rd rank.
 * Value is '2'.)...";
@@ -3353,7 +3353,7 @@ __Description__
     (*dict_ptr_)["RANK_4"] =
 R"...(### RANK_4 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates the 4th rank.
 * Value is '3'.)...";
@@ -3361,7 +3361,7 @@ __Description__
     (*dict_ptr_)["RANK_5"] =
 R"...(### RANK_5 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates the 5th rank.
 * Value is '4'.)...";
@@ -3369,7 +3369,7 @@ __Description__
     (*dict_ptr_)["RANK_6"] =
 R"...(### RANK_6 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates the 6th rank.
 * Value is '5'.)...";
@@ -3377,7 +3377,7 @@ __Description__
     (*dict_ptr_)["RANK_7"] =
 R"...(### RANK_7 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates the 7th rank.
 * Value is '6'.)...";
@@ -3385,7 +3385,7 @@ __Description__
     (*dict_ptr_)["RANK_8"] =
 R"...(### RANK_8 ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates the 8th rank.
 * Value is '7'.)...";
@@ -3393,7 +3393,7 @@ __Description__
     (*dict_ptr_)["NO_SIDE"] =
 R"...(### NO_SIDE ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates neither of sides.
 * Value is '0'.)...";
@@ -3401,7 +3401,7 @@ __Description__
     (*dict_ptr_)["WHITE"] =
 R"...(### WHITE ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates White.
 * Value is '1'.)...";
@@ -3409,7 +3409,7 @@ __Description__
     (*dict_ptr_)["BLACK"] =
 R"...(### BLACK ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates Black.
 * Value is '2'.)...";
@@ -3417,7 +3417,7 @@ __Description__
     (*dict_ptr_)["EMPTY"] =
 R"...(### EMPTY ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates no piece.
 * Value is '0'.)...";
@@ -3425,7 +3425,7 @@ __Description__
     (*dict_ptr_)["PAWN"] =
 R"...(### PAWN ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates Pawn.
 * Value is '1'.)...";
@@ -3433,7 +3433,7 @@ __Description__
     (*dict_ptr_)["KNIGHT"] =
 R"...(### KNIGHT ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates Knight.
 * Value is '2'.)...";
@@ -3441,7 +3441,7 @@ __Description__
     (*dict_ptr_)["BISHOP"] =
 R"...(### BISHOP ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates Bishop.
 * Value is '3'.)...";
@@ -3449,7 +3449,7 @@ __Description__
     (*dict_ptr_)["ROOK"] =
 R"...(### ROOK ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates Rook.
 * Value is '4'.)...";
@@ -3457,7 +3457,7 @@ __Description__
     (*dict_ptr_)["QUEEN"] =
 R"...(### QUEEN ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates Queen.
 * Value is '5'.)...";
@@ -3465,7 +3465,7 @@ __Description__
     (*dict_ptr_)["KING"] =
 R"...(### KING ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates King.
 * Value is '6'.)...";
@@ -3473,7 +3473,7 @@ __Description__
     (*dict_ptr_)["NO_CASTLING"] =
 R"...(### NO_CASTLING ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates no one to castle.
 * Value is '0'.)...";
@@ -3481,7 +3481,7 @@ __Description__
     (*dict_ptr_)["WHITE_SHORT_CASTLING"] =
 R"...(### WHITE_SHORT_CASTLING ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates White's Short Castling.
 * Value is '1'.)...";
@@ -3489,7 +3489,7 @@ __Description__
     (*dict_ptr_)["WHITE_LONG_CASTLING"] =
 R"...(### WHITE_LONG_CASTLING ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates White's Long Castling.
 * Value is '2'.)...";
@@ -3497,7 +3497,7 @@ __Description__
     (*dict_ptr_)["BLACK_SHORT_CASTLING"] =
 R"...(### BLACK_SHORT_CASTLING ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates Black's Short Castling.
 * Value is '3'.)...";
@@ -3505,7 +3505,7 @@ __Description__
     (*dict_ptr_)["BLACK_LONG_CASTLING"] =
 R"...(### BLACK_LONG_CASTLING ###
 
-__Description__
+<h6> Description </h6>
 
 * Constant value of Number that indicates Black's Long Castling.
 * Value is '4'.)...";
@@ -3514,16 +3514,16 @@ __Description__
     (*dict_ptr_)["exit"] =
 R"...(### exit ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(exit [<Status : Number>])`
 
-__Description__
+<h6> Description </h6>
 
 * Exit from Sayulisp.
 * `<Status>` is Exit Status. Default is '0'.
 
-__Example__
+<h6> Example </h6>
 
     ;; Exit from Sayulisp.
     (exit)
@@ -3534,16 +3534,16 @@ __Example__
     (*dict_ptr_)["square->number"] =
 R"...(### square->number ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(square->number <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * If `<Object>` is Square Symbol, it returns Number indicating to Square.
 * If `<Object>` is List, it returns List changed Square Symbol into Number. 
 
-__Example__
+<h6> Example </h6>
 
     (define symbol-list
       '(A1 B1 C1 (WHITE D3 E4 (F5 PAWN G6) H7 BLACK_LONG_CASTLING)))
@@ -3555,16 +3555,16 @@ __Example__
     (*dict_ptr_)["fyle->number"] =
 R"...(### fyle->number ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(fyle->number <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * If `<Object>` is Fyle Symbol, it returns Number indicating to Fyle.
 * If `<Object>` is List, it returns List changed Fyle Symbol into Number. 
 
-__Example__
+<h6> Example </h6>
 
     (define symbol-list
       '(FYLE_A FYLE_B (WHITE FYLE_D E4 (PAWN G6) FYLE_H BLACK_LONG_CASTLING)))
@@ -3576,16 +3576,16 @@ __Example__
     (*dict_ptr_)["rank->number"] =
 R"...(### rank->number ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(rank->number <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * If `<Object>` is Rank Symbol, it returns Number indicating to Rank.
 * If `<Object>` is List, it returns List changed Rank Symbol into Number. 
 
-__Example__
+<h6> Example </h6>
 
     (define symbol-list
       '(RANK_1 RANK_2 (WHITE RANK_4 E4 (PAWN G6) RANK_8 BLACK_LONG_CASTLING)))
@@ -3597,16 +3597,16 @@ __Example__
     (*dict_ptr_)["side->number"] =
 R"...(### side->number ### {#side-to-number}
 
-__Usage__
+<h6> Usage </h6>
 
 * `(side->number <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * If `<Object>` is Side Symbol, it returns Number indicating to Side.
 * If `<Object>` is List, it returns List changed Side Symbol into Number. 
 
-__Example__
+<h6> Example </h6>
 
     (define symbol-list
       '(NO_SIDE WHITE (FYLE_A BLACK E4 (PAWN G6) BLACK_LONG_CASTLING)))
@@ -3618,17 +3618,17 @@ __Example__
     (*dict_ptr_)["piece->number"] =
 R"...(### piece->number ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(piece->number <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * If `<Object>` is Piece Type Symbol, it returns Number indicating
   to Piece Type.
 * If `<Object>` is List, it returns List changed Piece Type Symbol into Number. 
 
-__Example__
+<h6> Example </h6>
 
     (define symbol-list
       '(EMPTY PAWN (FYLE_A QUEEN E4 (RANK_4 G6) KING BLACK_LONG_CASTLING)))
@@ -3640,18 +3640,18 @@ __Example__
     (*dict_ptr_)["castling->number"] =
 R"...(### castling->number ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(castling->number <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * If `<Object>` is Castling Right Symbol, it returns Number indicating
   to Piece Type.
 * If `<Object>` is List, it returns List changed Castling Right Symbol
   into Number. 
 
-__Example__
+<h6> Example </h6>
 
     (define symbol-list
       '(NO_CASTLING WHITE_SHORT_CASTLING (FYLE_A E4 (RANK_4 G6) KING)))
@@ -3663,16 +3663,16 @@ __Example__
     (*dict_ptr_)["number->square"] =
 R"...(### number->square ### {#number-to-square}
 
-__Usage__
+<h6> Usage </h6>
 
 * `(number->square <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * If `<Object>` is Number, it returns Square Symbol.
 * If `<Object>` is List, it returns List changed Number into Square Symbol.
 
-__Example__
+<h6> Example </h6>
 
     (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
     
@@ -3683,16 +3683,16 @@ __Example__
     (*dict_ptr_)["number->fyle"] =
 R"...(### number->fyle ### {#number-to-fyle}
 
-__Usage__
+<h6> Usage </h6>
 
 * `(number->fyle <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * If `<Object>` is Number, it returns Fyle Symbol.
 * If `<Object>` is List, it returns List changed Number into Fyle Symbol.
 
-__Example__
+<h6> Example </h6>
 
     (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
     
@@ -3703,16 +3703,16 @@ __Example__
     (*dict_ptr_)["number->rank"] =
 R"...(### number->rank ### {#number-to-rank}
 
-__Usage__
+<h6> Usage </h6>
 
 * `(number->rank <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * If `<Object>` is Number, it returns Rank Symbol.
 * If `<Object>` is List, it returns List changed Number into Rank Symbol.
 
-__Example__
+<h6> Example </h6>
 
     (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
     
@@ -3723,16 +3723,16 @@ __Example__
     (*dict_ptr_)["number->side"] =
 R"...(### number->side ### {#number-to-side}
 
-__Usage__
+<h6> Usage </h6>
 
 * `(number->side <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * If `<Object>` is Number, it returns Side Symbol.
 * If `<Object>` is List, it returns List changed Number into Side Symbol.
 
-__Example__
+<h6> Example </h6>
 
     (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
     
@@ -3743,16 +3743,16 @@ __Example__
     (*dict_ptr_)["number->piece"] =
 R"...(### number->piece ### {#number-to-piece}
 
-__Usage__
+<h6> Usage </h6>
 
 * `(number->piece <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * If `<Object>` is Number, it returns Piece Type Symbol.
 * If `<Object>` is List, it returns List changed Number into Piece Type Symbol.
 
-__Example__
+<h6> Example </h6>
 
     (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
     
@@ -3763,17 +3763,17 @@ __Example__
     (*dict_ptr_)["number->castling"] =
 R"...(### number->castling ### {#number-to-castling}
 
-__Usage__
+<h6> Usage </h6>
 
 * `(number->castling <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * If `<Object>` is Number, it returns Castling Rights Symbol.
 * If `<Object>` is List, it returns List changed Number
   into CAstling Rights Symbol.
 
-__Example__
+<h6> Example </h6>
 
     (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
     
@@ -3786,18 +3786,18 @@ __Example__
     (*dict_ptr_)["gen-engine"] =
 R"...(### gen-engine ###
 
-__Usage__
+<h6> Usage </h6>
 
 1. `(gen-engine)`
 2. `((gen-engine) <Message Symbol> [<Arguments>...])`
 
-__Description__
+<h6> Description </h6>
 
 * 1: Generates chess engine.
 * 2: The engine executes something according to `<Message Symbol>`.
 * 2: Some `<Message Symbol>` require `<Argument>...`.
 
-__Description of Message Symbols__
+<h6> Description of Message Symbols </h6>
 
 * `@get-white-pawn-position`
     + Returns List of position of White Pawns as Symbol.
@@ -3826,7 +3826,7 @@ __Description of Message Symbols__
 * `@get-empty-square-position`
     + Returns List of position of Empty Squares as Symbol.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     (display (my-engine '@get-white-pawn-position))
@@ -3838,7 +3838,7 @@ __Example__
     + Returns a side and type of the piece as List that is
       `(<Side : Symbol>, <Type : Symbol>)`.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     (display (my-engine '@get-piece D1))
@@ -3864,7 +3864,7 @@ __Example__
 * `@get-black-has-castled`
     + Returns Boolean whether Black King has castled or not.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -3927,7 +3927,7 @@ __Example__
     + Sets clock(plies for 50 moves rule).
     + Returns previous setting.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     (my-engine '@place-piece E4 PAWN WHITE)
@@ -3990,7 +3990,7 @@ __Example__
     + `<Piece type>` is piece type.
     + `<Piece side>` is a color of the piece.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4006,7 +4006,7 @@ __Example__
 * `@get-candidate-moves`
     + Generates and returns List of candidate moves.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4027,7 +4027,7 @@ __Example__
           then it returns #f.
         - Otherwise, returns #t.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4043,7 +4043,7 @@ __Example__
 * `@black-checked?`
     + Judges whether Black King is checked or not.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4075,7 +4075,7 @@ __Example__
 * `@stalemated?`
     + Judges whether either King is stalemated or not.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4115,7 +4115,7 @@ __Example__
     - Undoes previous move.
     - Returns previous move.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4148,7 +4148,7 @@ __Example__
     + Runs as UCI Chess Engine until the engine gets "quit" command.
     + The control doesn't come back while the engine is running.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4192,7 +4192,7 @@ __Example__
     + Different from "go" command, until the engine have found the best move,
       the control won't come back.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4248,7 +4248,7 @@ __Example__
 * `@set-threads <Number of threads : Number>`
     + Sets `<Number of threads>` and returns the previous number.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4279,7 +4279,7 @@ __Example__
         - 7th : King
     + If you specify `<New materal>`, the material is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4297,7 +4297,7 @@ __Example__
       Quiescence Search is set to be enabled.
       Otherwise, it is set to be disabled.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4315,7 +4315,7 @@ __Example__
       Repetition Check is set to be enabled.
       Otherwise, it is set to be disabled.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4333,7 +4333,7 @@ __Example__
       Check Extension is set to be enabled.
       Otherwise, it is set to be disabled.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4355,7 +4355,7 @@ __Example__
     + Return this parameter.
     + If you specify `<New number of moves>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4389,7 +4389,7 @@ __Example__
     + Return Delta.
     + If you specify `<New delta>`, Delta is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4422,7 +4422,7 @@ __Example__
     + If you specify #t to `<New setting>`,
       SEE is set to be enabled. Otherwise, it is set to be disabled.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4440,7 +4440,7 @@ __Example__
       History Heuristics is set to be enabled.
       Otherwise, it is set to be disabled.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4458,7 +4458,7 @@ __Example__
       Killer Move Hiuristics is set to be enabled.
       Otherwise, it is set to be disabled.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4476,7 +4476,7 @@ __Example__
       Transposition Table is set to be enabled.
       Otherwise, it is set to be disabled.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4502,7 +4502,7 @@ __Example__
     + Return this parameter.
     + If you specify `<New depth>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4551,7 +4551,7 @@ __Example__
     + Return this parameter.
     + If you specify `<New reduction>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4604,7 +4604,7 @@ __Example__
     + Return this parameter.
     + If you specify `<New reduction>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4674,7 +4674,7 @@ __Example__
     + Return this parameter.
     + If you specify `<New reduction>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
 (define my-engine (gen-engine))
 
@@ -4755,7 +4755,7 @@ __Example__
     + Return this parameter.
     + If you specify `<New reduction>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4813,7 +4813,7 @@ __Example__
     + If the material after the move is lower than Alpha minus this parameter,
       the move is not evaluated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -4986,7 +4986,7 @@ __Example__
         - From 57th to 64th : From A8(A1) to H8(H1)
     + If you specify `<New table>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -5090,7 +5090,7 @@ __Example__
         - 7th : Value of attacking King.
     + If you specify `<New table>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -5133,7 +5133,7 @@ __Example__
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -5212,7 +5212,7 @@ __Example__
         - 7th : Value of defense King.
     + If you specify `<New table>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -5255,7 +5255,7 @@ __Example__
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -5320,7 +5320,7 @@ __Example__
             - 6rd : a value when pin-board piece is Queen.
             - 7rd : a value when pin-board piece is King.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -5367,7 +5367,7 @@ __Example__
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -5392,7 +5392,7 @@ __Example__
         - From 57th to 64th : From A8(A1) to H8(H1)
     + If you specify `<New table>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -5434,7 +5434,7 @@ __Example__
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     
@@ -5782,7 +5782,7 @@ __Example__
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 
-__Example__
+<h6> Example </h6>
 
     (define my-engine (gen-engine))
     

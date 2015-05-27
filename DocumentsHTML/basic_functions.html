@@ -92,14 +92,14 @@
 <hr />
 <h2 id="vector-value-functions">Vector Value Functions</h2>
 <h3 id="append">append</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(append &lt;List 1&gt; &lt;List 2&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
@@ -107,7 +107,7 @@ Description
 <li>Appends <code>&lt;List 2&gt;</code> after the end of <code>&lt;List 1&gt;</code>.</li>
 <li>In other words, (append) replaces last Cdr of <code>&lt;List 1&gt;</code> from Nil to <code>&lt;List 2&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -123,14 +123,14 @@ Example
 ;;
 ;; &gt; (111 222 333 . &quot;Not List&quot;)</code></pre>
 <h3 id="length">length</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(length &lt;List&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
@@ -138,7 +138,7 @@ Description
 <li>Returns number of <code>&lt;List&gt;</code>.</li>
 <li>If you input Atom, it returns '1'. If Nil, it returns '0'.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -148,21 +148,21 @@ Example
 ;;
 ;; &gt; 6</code></pre>
 <h3 id="list">list</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(list &lt;Object&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns List composed of <code>&lt;Object&gt;...</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -172,14 +172,14 @@ Example
 ;;
 ;; &gt; (111 222 333)</code></pre>
 <h3 id="list-ref">list-ref</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(list-ref &lt;List&gt; &lt;Index : Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
@@ -188,7 +188,7 @@ Description
 <li>The 1st element of <code>&lt;List&gt;</code> is '0'.</li>
 <li>If <code>&lt;Index&gt;</code> is negative number,&quot; It counts from the tail of <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -204,14 +204,14 @@ Example
 ;;
 ;; &gt; 333</code></pre>
 <h3 id="list-replace">list-replace</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(list-replace &lt;List&gt; &lt;Index : Number&gt; &lt;Object&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
@@ -220,7 +220,7 @@ Description
 <li>The 1st element of <code>&lt;List&gt;</code> is '0'.</li>
 <li>If <code>&lt;Index&gt;</code> is negative number,&quot; It counts from the tail of <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -231,14 +231,14 @@ Example
 ;;
 ;; &gt; (111 &quot;Hello&quot; 333)</code></pre>
 <h3 id="list-remove">list-remove</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(list-remove &lt;List&gt; &lt;Index : Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
@@ -247,7 +247,7 @@ Description
 <li>The 1st element of <code>&lt;List&gt;</code> is '0'.</li>
 <li>If <code>&lt;Index&gt;</code> is negative number,&quot; It counts from the tail of <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -258,21 +258,21 @@ Example
 ;;
 ;; &gt; (111 333)</code></pre>
 <h3 id="string-append">string-append</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(string-append &lt;String&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Concatenates <code>&lt;String&gt;...</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -282,14 +282,14 @@ Example
 ;;
 ;; &gt; Hello World</code></pre>
 <h3 id="string-ref">string-ref</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(string-ref &lt;String&gt; &lt;index&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
@@ -297,7 +297,7 @@ Description
 <li>Returns the <code>&lt;index&gt;</code>th letter of <code>&lt;String&gt;</code>.</li>
 <li><code>&lt;index&gt;</code> of the 1st letter is '0'.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -307,21 +307,21 @@ Example
 ;;
 ;; &gt; W</code></pre>
 <h3 id="string-split">string-split</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(string-split &lt;String&gt; &lt;Delim String&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns List composed of split <code>&lt;String&gt;</code> by <code>&lt;Delim String&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -332,21 +332,21 @@ Example
 ;; &gt; (&quot;aaa&quot; &quot;bbb&quot; &quot;ccc&quot;)</code></pre>
 <h2 id="container-functions">Container Functions</h2>
 <h3 id="front">front</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(front &lt;List&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns the first element of <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -356,21 +356,21 @@ Example
 ;;
 ;; &gt; 111</code></pre>
 <h3 id="back">back</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(back &lt;List&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns the last element of <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -380,21 +380,21 @@ Example
 ;;
 ;; &gt; 333</code></pre>
 <h3 id="push-front">push-front</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(push-front &lt;List&gt; &lt;Object&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns List added <code>&lt;Object&gt;</code> at the first element of <code>&lt;List&gt;</code></li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -404,21 +404,21 @@ Example
 ;;
 ;; &gt; (&quot;Hello&quot; 111 222 333)</code></pre>
 <h3 id="pop-front">pop-front</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(pop-front &lt;List&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns List removed the first element from <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -428,21 +428,21 @@ Example
 ;;
 ;; &gt; (222 333)</code></pre>
 <h3 id="push-back">push-back</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(push-back &lt;List&gt; &lt;Object&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns List added <code>&lt;Object&gt;</code> at the last element of <code>&lt;List&gt;</code></li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -452,21 +452,21 @@ Example
 ;;
 ;; &gt; (111 222 333 &quot;Hello&quot;)</code></pre>
 <h3 id="pop-back">pop-back</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(pop-back &lt;List&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns List removed the last element from <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -477,21 +477,21 @@ Example
 ;; &gt; (111 222)</code></pre>
 <h2 id="boolean-equation-function">Boolean Equation Function</h2>
 <h3 id="not">not</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(not &lt;Boolean&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Turns <code>&lt;Boolean&gt;</code> to opposite value. #t to #f, #f to #t.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -501,21 +501,21 @@ Example
 ;;
 ;; &gt; #f</code></pre>
 <h3 id="and">and</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(and &lt;Boolean&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns #t if all <code>&lt;Boolean&gt;...</code> are #t. Otherwise, return #f.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -525,21 +525,21 @@ Example
 ;;
 ;; &gt; #t</code></pre>
 <h3 id="or">or</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(or &lt;Boolean&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns #t if one of <code>&lt;Boolean&gt;...</code> is #t. If all <code>&lt;Boolean&gt;</code> are #f, return #f.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -550,21 +550,21 @@ Example
 ;; &gt; #t</code></pre>
 <h2 id="comparison-function">Comparison Function</h2>
 <h3 id="same">=</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(= &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns #t if all <code>&lt;Number&gt;...</code> are same. Otherwise, return #f.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -574,21 +574,21 @@ Example
 ;;
 ;; &gt; #t</code></pre>
 <h3 id="less-than">&lt;</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(&lt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns #t if a Number is less than next Number. Otherwise, return #f.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -598,21 +598,21 @@ Example
 ;;
 ;; &gt; #t</code></pre>
 <h3 id="less-equal">&lt;=</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(&lt;= &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns #t if a Number is less or equal than next Number. Otherwise, return #f.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -622,21 +622,21 @@ Example
 ;;
 ;; &gt; #t</code></pre>
 <h3 id="greater-than">&gt;</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns #t if a Number is more than next Number. Otherwise, return #f.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -646,21 +646,21 @@ Example
 ;;
 ;; &gt; #t</code></pre>
 <h3 id="greater-equal">&gt;=</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(&gt;= &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns #t if a Number is more or equal than next Number. Otherwise, return #f.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -670,21 +670,21 @@ Example
 ;;
 ;; &gt; #t</code></pre>
 <h3 id="max">max</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(max &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns maximum number of <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -694,21 +694,21 @@ Example
 ;;
 ;; &gt; 4</code></pre>
 <h3 id="min">min</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(min &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns minimum number of <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -719,21 +719,21 @@ Example
 ;; &gt; 1</code></pre>
 <h2 id="arithmetic-operation-function">Arithmetic Operation Function</h2>
 <h3 id="add">+</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(+ &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Sums up all <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -743,21 +743,21 @@ Example
 ;;
 ;; &gt; 6</code></pre>
 <h3 id="sub">-</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(- &lt;1st number&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Subtracts <code>&lt;Number&gt;...</code> from <code>&lt;1st number&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -767,21 +767,21 @@ Example
 ;;
 ;; &gt; -2</code></pre>
 <h3 id="mul">*</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(* &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Multiplies all <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -791,21 +791,21 @@ Example
 ;;
 ;; &gt; 24</code></pre>
 <h3 id="div">/</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(/ &lt;1st number&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Divides <code>&lt;1st number&gt;</code> with <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -815,21 +815,21 @@ Example
 ;;
 ;; &gt; 4</code></pre>
 <h3 id="inc">++</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(++ &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Adds <code>&lt;Number&gt;</code> to '1'.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -839,21 +839,21 @@ Example
 ;;
 ;; &gt; 112</code></pre>
 <h3 id="dec">--</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(-- &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Subtracts '1' from <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -864,14 +864,14 @@ Example
 ;; &gt; 110</code></pre>
 <h2 id="mathematics-function">Mathematics Function</h2>
 <h3 id="pi">PI</h3>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Circular constant.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -881,14 +881,14 @@ Example
 ;;
 ;; &gt; 3.14159265358979</code></pre>
 <h3 id="e">E</h3>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Napier's constant.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -898,14 +898,14 @@ Example
 ;;
 ;; &gt; 2.71828182845905</code></pre>
 <h3 id="sin">sin</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(sin &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
@@ -913,7 +913,7 @@ Description
 <li>Sine. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is radian.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -923,14 +923,14 @@ Example
 ;;
 ;; &gt; 1</code></pre>
 <h3 id="cos">cos</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(cos &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
@@ -938,7 +938,7 @@ Description
 <li>Cosine. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is radian.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -948,14 +948,14 @@ Example
 ;;
 ;; &gt; -1</code></pre>
 <h3 id="tan">tan</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(tan &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
@@ -963,7 +963,7 @@ Description
 <li>Tangent. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is radian.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -973,14 +973,14 @@ Example
 ;;
 ;; &gt; 1</code></pre>
 <h3 id="asin">asin</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(asin &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
@@ -988,7 +988,7 @@ Description
 <li>Arc sine. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is sine.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -998,14 +998,14 @@ Example
 ;;
 ;; &gt; 0</code></pre>
 <h3 id="acos">acos</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(acos &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
@@ -1013,7 +1013,7 @@ Description
 <li>Arc cosine. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is cosine.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -1023,14 +1023,14 @@ Example
 ;;
 ;; &gt; 0</code></pre>
 <h3 id="atan">atan</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(atan &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
@@ -1038,7 +1038,7 @@ Description
 <li>Arc tangent. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is tangent.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -1048,21 +1048,21 @@ Example
 ;;
 ;; &gt; 0</code></pre>
 <h3 id="sqrt">sqrt</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(sqrt &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns square root of <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -1072,21 +1072,21 @@ Example
 ;;
 ;; &gt; 2</code></pre>
 <h3 id="abs">abs</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(abs &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns absolute value of <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -1096,21 +1096,21 @@ Example
 ;;
 ;; &gt; 111</code></pre>
 <h3 id="ceil">ceil</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(ceil &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Rounds up <code>&lt;Number&gt;</code> into integral value.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -1120,21 +1120,21 @@ Example
 ;;
 ;; &gt; 2</code></pre>
 <h3 id="floor">floor</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(floor &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Rounds down <code>&lt;Number&gt;</code> into integral value.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -1144,21 +1144,21 @@ Example
 ;;
 ;; &gt; 1</code></pre>
 <h3 id="round">round</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(round &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Rounds <code>&lt;Number&gt;</code> into the nearest integral value.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -1174,21 +1174,21 @@ Example
 ;;
 ;; &gt; 1</code></pre>
 <h3 id="trunc">trunc</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(trunc &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Truncates after decimal point of <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -1204,21 +1204,21 @@ Example
 ;;
 ;; &gt; -1</code></pre>
 <h3 id="exp">exp</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(exp &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Exponent function of <code>&lt;Number&gt;</code>. The base is Napier's constant.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -1228,21 +1228,21 @@ Example
 ;;
 ;; &gt; 2.71828</code></pre>
 <h3 id="expt">expt</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(expt &lt;Base&gt; &lt;Exponent&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Exponent function of <code>&lt;Exponent&gt;</code>. The base is <code>&lt;Base&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -1252,21 +1252,21 @@ Example
 ;;
 ;; &gt; 8</code></pre>
 <h3 id="log">log</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(log &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Logarithmic function of <code>&lt;Number&gt;</code>. The base is Napier's constant.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -1276,21 +1276,21 @@ Example
 ;;
 ;; &gt; 1</code></pre>
 <h3 id="log2">log2</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(log2 &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Logarithmic function of <code>&lt;Number&gt;</code>. The base is 2.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -1300,21 +1300,21 @@ Example
 ;;
 ;; &gt; 3</code></pre>
 <h3 id="log10">log10</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(log10 &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Logarithmic function of <code>&lt;Number&gt;</code>. The base is 10.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 
@@ -1324,21 +1324,21 @@ Example
 ;;
 ;; &gt; 2</code></pre>
 <h3 id="random">random</h3>
-<h6>
+<h6> 
 Usage
 </h6>
 
 <ul>
 <li><code>(random &lt;Number&gt;)</code></li>
 </ul>
-<h6>
+<h6> 
 Description
 </h6>
 
 <ul>
 <li>Returns random number from 0 to <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6>
+<h6> 
 Example
 </h6>
 

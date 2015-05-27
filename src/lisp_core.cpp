@@ -485,18 +485,18 @@ namespace Sayuri {
       (*dict_ptr)["help"] =
 R"...(### help ###
 
-__Usage__
+<h6> Usage </h6>
 
 1. `(help)`
 2. `(help <Symbol>)`
 
-__Description__
+<h6> Description </h6>
 
 * 1: Returns descriptions of all symbols.
 * 2: Returns a description of `<Symbol>`.
 * All descriptions are Markdown format.
 
-__Example__
+<h6> Example </h6>
 
     (display (help 'car))
     
@@ -504,16 +504,16 @@ __Example__
     ;;
     ;; > ### car ###
     ;; >
-    ;; > __Usage__
+    ;; > <h6> Usage </h6>
     ;; >
     ;; >
     ;; > * `(car <List>)`
     ;; >
-    ;; > __Description__
+    ;; > <h6> Description </h6>
     ;; >
     ;; > * Returns the 1st element of `<List>`.
     ;; >
-    ;; > __Example__
+    ;; > <h6> Example </h6>
     ;; >
     ;; >     (display (car (list 111 222 333)))
     ;; >     
@@ -546,15 +546,15 @@ __Example__
       (*dict_ptr)["eval"] =
 R"...(### eval ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(eval <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * Evaluates `<Object>`.
 
-__Example__
+<h6> Example </h6>
 
     (define x '(+ 1 2 3))
     (display x)
@@ -608,7 +608,7 @@ __Example__
       std::string temp =
 R"...(### parse ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(parse <S-Expression : String>)`
 * `(string->symbol <S-Expression : String>)`
@@ -616,11 +616,11 @@ __Usage__
 * `(string->boolean <S-Expression : String>)`
 * `(string->list <S-Expression : String>)`
 
-__Description__
+<h6> Description </h6>
 
 * Parses `<S-Expression>` and generates a object.
 
-__Example__
+<h6> Example </h6>
 
     (display (parse "(1 2 3)"))
     
@@ -663,7 +663,7 @@ __Example__
       std::string temp =
 R"...(### to-string ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(to-string <Object>)`
 * `(symbol->string <Object>)`
@@ -671,11 +671,11 @@ __Usage__
 * `(boolean->string <Object>)`
 * `(list->string <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * Converts `<Object>` to S-Expression as String.
 
-__Example__
+<h6> Example </h6>
 
     (display (to-string '(1 2 3)))
     
@@ -749,11 +749,11 @@ __Example__
       (*dict_ptr)["try"] =
 R"...(### try ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(try (<Try Expr>...) <Catch Expr>...)`
 
-__Description__
+<h6> Description </h6>
 
 * This is Special Form.
     * `<Catch Expr>...` is evaluated if an error have been occurred
@@ -764,7 +764,7 @@ __Description__
 * In a scope of `<Catch Expr>...`, 'exception' symbol is defined.
 * Returns a evaluated last object.
 
-__Example__
+<h6> Example </h6>
 
     (try ((+ 1 "Hello"))
          (display "Error Occured!!"))
@@ -805,17 +805,17 @@ __Example__
       (*dict_ptr)["throw"] =
 R"...(### throw ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(throw <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * Throws an exception.
 * If you use this in (try) function,
   `<Object>` is bound to 'exception' symbol.
 
-__Example__
+<h6> Example </h6>
 
     (try ((throw 123))
          (display exception))
@@ -853,15 +853,15 @@ __Example__
       (*dict_ptr)["car"] =
 R"...(### car ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(car <Pair or List>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns Car value of `<Pair or List>`
 
-__Example__
+<h6> Example </h6>
 
     (display (car '(111 . 222)))
     ;; Output
@@ -903,15 +903,15 @@ __Example__
       (*dict_ptr)["cdr"] =
 R"...(### cdr ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(cdr <Pair or List>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns Cdr value of `<Pair or List>`
 
-__Example__
+<h6> Example </h6>
 
     (display (cdr '(111 . 222)))
     ;; Output
@@ -954,15 +954,15 @@ __Example__
       (*dict_ptr)["cons"] =
 R"...(### cons ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(cons <Object 1> <Object 2>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns Pair. Car is `<Object 1>`, Cdr is `<Object 2>`.
 
-__Example__
+<h6> Example </h6>
 
 
     (display (cons 111 222))
@@ -1006,18 +1006,18 @@ __Example__
       (*dict_ptr)["quote"] =
 R"...(### quote ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(quote <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * This is Special Form.
     + `<Object>` is not Evaluated.
 * Returns `<Object>` as is.
 * Syntactic suger is `'<Object>`
 
-__Example__
+<h6> Example </h6>
 
     (display (quote (111 222 333)))
     
@@ -1122,12 +1122,12 @@ __Example__
       (*dict_ptr)["define"] =
 R"...(### define ###
 
-__Usage__
+<h6> Usage </h6>
 
 1. `(define <Symbol> <Object>)`
 2. `(define (<Name : Symbol> <Args : Symbol>...) <S-Expression>...)`
 
-__Description__
+<h6> Description </h6>
 
 * This is Special Form.
     + 1: `<Symbol>` isn't evaluated.
@@ -1137,7 +1137,7 @@ __Description__
 * 2: Defines `<S-Expression>` as Function named `<Name>`,
      and `<Args>...` is names of its arguments.
 
-__Example__
+<h6> Example </h6>
 
     (define x 123)
     (display x)
@@ -1193,17 +1193,17 @@ __Example__
       (*dict_ptr)["set!"] =
 R"...(### set! ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(set! <Symbol> <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * This is Special Form.
     + `<Symbol>` isn't evaluated.
 * Updates `<Symbol>` to `<Object>` on the local scope.
 
-__Example__
+<h6> Example </h6>
 
     (define x 123)
     (set! x 456)
@@ -1277,11 +1277,11 @@ __Example__
       (*dict_ptr)["lambda"] =
 R"...(### lambda ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(lambda (<Args : Symbol>...) <S-Expression>...)`
 
-__Description__
+<h6> Description </h6>
 
 * This is Special Form.
     + All arguments isn't evaluated.
@@ -1290,7 +1290,7 @@ __Description__
   So using (lambda) in (lambda), you can create closure function.
 * `<Args>...` is Symbols as name of arguments.
 
-__Example__
+<h6> Example </h6>
 
     (define myfunc (lambda (x) (+ x 100)))
     (display (myfunc 5))
@@ -1376,11 +1376,11 @@ __Example__
       (*dict_ptr)["let"] =
 R"...(### let ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(let ((<Name : Symbol> <Object>)...) <S-Expression>...)`
 
-__Description__
+<h6> Description </h6>
 
 * This is Special Form.
     + `<Name : Symbol>` isn't evaluated.
@@ -1390,7 +1390,7 @@ __Description__
   So using (lambda) in (let), you can create closure function.
 * `(<Name> <Object>)...` is local values on (let)'s local scope.
 
-__Example__
+<h6> Example </h6>
 
     (define (gen-func x y) (let ((a x) (b y))
               (lambda () (+ a b))))
@@ -1448,18 +1448,18 @@ __Example__
       (*dict_ptr)["if"] =
 R"...(### if ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(if <Condition : Boolean> <Then> <Else>)`
 
-__Description__
+<h6> Description </h6>
 
 * This is Special Form.
     + Either of `<Then>` and `<Else>` are evaluated.
 * If `<Condition>` is true, then (if) evaluates `<Then>`.
   If false, then it evaluates `<Else>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (if (< 1 2) (+ 3 4) (+ 5 6)))
     
@@ -1524,11 +1524,11 @@ __Example__
       (*dict_ptr)["cond"] =
 R"...(### cond ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(cond (<Condition : Boolean> <Then>)... (else <Else>))`
 
-__Description__
+<h6> Description </h6>
 
 * This is Special Form.
     + Only one of `<Then>` or `<Else>` are evaluated.
@@ -1537,7 +1537,7 @@ __Description__
   If false, then it evaluates next `<Condition>`.
 * If all `<Condition>` are false, then (cond) returns `<Else>`.
 
-__Example__
+<h6> Example </h6>
 
     (cond
         ((> 1 2) (display "Hello"))
@@ -1572,15 +1572,15 @@ __Example__
       (*dict_ptr)["begin"] =
 R"...(### begin ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(begin <S-Expression>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Executes `<S-Expression>...` in turns and returns last.
 
-__Example__
+<h6> Example </h6>
 
     (display (begin
                  (display "Hello")
@@ -1651,15 +1651,15 @@ __Example__
       (*dict_ptr)["display"] =
 R"...(### display ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(display <Object>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Prints `<Object>` on Standard Output.
 
-__Example__
+<h6> Example </h6>
 
     (define x 123)
     (display x)
@@ -1724,11 +1724,11 @@ __Example__
       (*dict_ptr)["stdin"] =
 R"...(### stdin ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(stdin <Message Symbol>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns String from Standard Input.
 * `<Message Symbol>` is a message to the input stream.
@@ -1737,7 +1737,7 @@ __Description__
     + `@read` : Reads all.
 * If Standard Input is already closed, it returns Nil.
 
-__Example__
+<h6> Example </h6>
 
     ;; Reads and shows one charactor from Standard Input.
     (display (stdin '@get))
@@ -1779,15 +1779,15 @@ __Example__
       (*dict_ptr)["stdout"] =
 R"...(### stdout ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(stdout <String>)`
 
-__Description__
+<h6> Description </h6>
 
 * Prints `<String>` on Standard Output.
 
-__Example__
+<h6> Example </h6>
 
     (stdout (to-string 123))
     (stdout "\n")
@@ -1827,15 +1827,15 @@ __Example__
       (*dict_ptr)["stderr"] =
 R"...(### stderr ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(stderr <String>)`
 
-__Description__
+<h6> Description </h6>
 
 * Prints `<String>` on Standard Error.
 
-__Example__
+<h6> Example </h6>
 
     (stderr (to-string 123))
     (stderr "\n")
@@ -1964,16 +1964,16 @@ __Example__
       (*dict_ptr)["equal?"] =
 R"...(### equal? ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(equal? <Object>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if all `<Object>...` are same structure.
   Otherwise, returns #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (equal? '(1 2 (3 4) 5) '(1 2 (3 4) 5)))
     
@@ -2015,16 +2015,16 @@ __Example__
       (*dict_ptr)["pair?"] =
 R"...(### pair? ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(pair? <Object>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if all `<Object>...` are Pair.
   Otherwise, returns #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (pair? '(1 2 3) '(4 5 6)))
     
@@ -2066,16 +2066,16 @@ __Example__
       (*dict_ptr)["list?"] =
 R"...(### list? ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(list? <Object>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if all `<Object>...` are List.
   Otherwise, returns #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (list? '(1 2 3) '(4 5 6) ()))
     
@@ -2120,17 +2120,17 @@ __Example__
       std::string temp =
 R"...(### nil? ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(nil? <Object>...)`
 * `(null? <Object>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if all `<Object>...` are Nil.
   Otherwise, returns #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (nil? ()))
     
@@ -2175,16 +2175,16 @@ __Example__
       (*dict_ptr)["symbol?"] =
 R"...(### symbol? ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(symbol? <Object>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if all `<Object>...` are Symbol.
   Otherwise, returns #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (symbol? 'x))
     
@@ -2227,16 +2227,16 @@ __Example__
       (*dict_ptr)["number?"] =
 R"...(### number? ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(number? <Object>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if all `<Object>...` are Number.
   Otherwise, returns #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (number? 123))
     
@@ -2279,16 +2279,16 @@ __Example__
       (*dict_ptr)["boolean?"] =
 R"...(### boolean? ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(boolean? <Object>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if all `<Object>...` are Boolean.
   Otherwise, returns #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (boolean? #f))
     
@@ -2331,16 +2331,16 @@ __Example__
       (*dict_ptr)["string?"] =
 R"...(### string? ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(string? <Object>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if all `<Object>...` are String.
   Otherwise, returns #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (string? "Hello"))
     
@@ -2383,16 +2383,16 @@ __Example__
       (*dict_ptr)["function?"] =
 R"...(### function? ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(function? <Object>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if all `<Object>...` are Function.
   Otherwise, returns #f.
 
-__Example__
+<h6> Example </h6>
 
     (define myfunc (lambda (x) (+ x 1)))
     (display (function? myfunc))
@@ -2436,16 +2436,16 @@ __Example__
       (*dict_ptr)["native-function?"] =
 R"...(### native-function? ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(native-function? <Object>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if all `<Object>...` are Native Function.
   Otherwise, returns #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (native-function? +))
     
@@ -2488,16 +2488,16 @@ __Example__
       (*dict_ptr)["procedure?"] =
 R"...(### procedure? ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(procedure? <Object>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if all `<Object>...` are Function or Native Function.
   Otherwise, returns #f.
 
-__Example__
+<h6> Example </h6>
 
     (define myfunc (lambda (x) (+ x 1)))
     (display (procedure? myfunc))
@@ -2586,18 +2586,18 @@ __Example__
       (*dict_ptr)["output-stream"] =
 R"...(### output-stream ###
 
-__Usage__
+<h6> Usage </h6>
 
 1. `(output-stream <File name : String>)`
 2. `((output-stream <File name : String>) <String>)`
 
-__Description__
+<h6> Description </h6>
 
 * 1: Returns Native Function as an output stream of `<File name>`.
 * 2: Writes `<String>` to `<File name>` and returns itself.
 * If you give Nil to the Function, the stream will be closed.
 
-__Example__
+<h6> Example </h6>
 
     ;; Opens "hello.txt".
     (define myfile (output-stream "hello.txt"))
@@ -2695,12 +2695,12 @@ __Example__
       (*dict_ptr)["input-stream"] =
 R"...(### input-stream ###
 
-__Usage__
+<h6> Usage </h6>
 
 1. `(input-stream <File name : String>)`
 2. `((input-stream <File name : String>) <Message Symbol : Symbol>)`
 
-__Description__
+<h6> Description </h6>
 
 * 1: Returns Native Function as an input stream of `<File name>`.
 * 2: Returns String from `<File name>`.
@@ -2711,7 +2711,7 @@ __Description__
 * If you give Nil to the stream, it will be closed.
 * If the stream already closed, it returns empty string.
 
-__Example__
+<h6> Example </h6>
 
     ;; Opens "hello.txt".
     (define myfile (input-stream "hello.txt"))
@@ -2769,17 +2769,17 @@ __Example__
       (*dict_ptr)["append"] =
 R"...(### append ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(append <List 1> <List 2>)`
 
-__Description__
+<h6> Description </h6>
 
 * Appends `<List 2>` after the end of `<List 1>`.
 * In other words,
   (append) replaces last Cdr of `<List 1>` from Nil to `<List 2>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (append '(111 222 333) '(444 555 666)))
     
@@ -2823,15 +2823,15 @@ __Example__
 R"...(### list ###
 
 
-__Usage__
+<h6> Usage </h6>
 
 * `(list <Object>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns List composed of `<Object>...`.
 
-__Example__
+<h6> Example </h6>
 
     (display (list 111 222 333))
     
@@ -2891,17 +2891,17 @@ __Example__
       (*dict_ptr)["list-ref"] =
 R"...(### list-ref ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(list-ref <List> <Index : Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns a element of `<Index>` of `<List>`.
 * The 1st element of `<List>` is 0.
 * If `<Index>` is negative number," It counts from the tail of `<List>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (list-ref (111 222 333) 1))
     
@@ -2977,18 +2977,18 @@ __Example__
       (*dict_ptr)["list-replace"] =
 R"...(### list-replace ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(list-replace <List> <Index : Number> <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns List which has replaced the `<Index>`th element of
   `<List>` for `<Object>`.
 * The 1st element of `<List>` is 0.
 * If `<Index>` is negative number," It counts from the tail of `<List>`.
 
-__Example__
+<h6> Example </h6>
 
     (define lst (list 111 222 333))
     (display (list-replace lst 1 "Hello"))
@@ -3052,17 +3052,17 @@ __Example__
       (*dict_ptr)["list-remove"] =
 R"...(### list-remove ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(list-remove <List> <Index : Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns List which has removed the `<Index>`th element of `<List>`.
 * The 1st element of `<List>` is 0.
 * If `<Index>` is negative number," It counts from the tail of `<List>`.
 
-__Example__
+<h6> Example </h6>
 
     (define lst (list 111 222 333))
     (display (list-remove lst 1))
@@ -3114,16 +3114,16 @@ __Example__
       (*dict_ptr)["length"] =
 R"...(### length ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(length <List>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns number of `<List>`.
 * If you input Atom, it returns 1. If Nil, it returns 0.
 
-__Example__
+<h6> Example </h6>
 
     (display (length '(111 222 333 444 555 666)))
     
@@ -3179,16 +3179,16 @@ __Example__
       (*dict_ptr)["="] =
 R"...(### = ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(= <Number>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if all `<Number>...` are same.
   Otherwise, return #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (= 111 111 111))
     
@@ -3246,16 +3246,16 @@ __Example__
       (*dict_ptr)["<"] =
 R"...(### < ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(< <Number>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if a Number is less than next Number.
   Otherwise, return #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (< 111 222 333))
     
@@ -3313,16 +3313,16 @@ __Example__
       (*dict_ptr)["<="] =
 R"...(### <= ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(<= <Number>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if a Number is less or equal than next Number.
   Otherwise, return #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (< 111 222 333))
     
@@ -3380,16 +3380,16 @@ __Example__
       (*dict_ptr)[">"] =
 R"...(### > ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(> <Number>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if a Number is more than next Number.
   Otherwise, return #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (> 333 222 111))
     
@@ -3447,16 +3447,16 @@ __Example__
       (*dict_ptr)[">="] =
 R"...(### >= ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(>= <Number>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if a Number is more or equal than next Number.
   Otherwise, return #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (>= 333 222 111))
     
@@ -3494,15 +3494,15 @@ __Example__
       (*dict_ptr)["not"] =
 R"...(### not ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(not <Boolean>)`
 
-__Description__
+<h6> Description </h6>
 
 * Turns `<Boolean>` to opposite value. #t to #f, #f to #t.
 
-__Example__
+<h6> Example </h6>
 
     (display (not (= 111 111)))
     
@@ -3546,16 +3546,16 @@ __Example__
       (*dict_ptr)["and"] =
 R"...(### and ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(and <Boolean>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if all `<Boolean>...` are #t.
   Otherwise, return #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (and (= 111 111) (= 222 222)))
     
@@ -3599,16 +3599,16 @@ __Example__
       (*dict_ptr)["or"] =
 R"...(### or ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(or <Boolean>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns #t if one of `<Boolean>...` is #t.
   If all `<Boolean>` are #f, return #f.
 
-__Example__
+<h6> Example </h6>
 
     (display (or (= 111 111) (= 222 333)))
     
@@ -3646,15 +3646,15 @@ __Example__
       (*dict_ptr)["+"] =
 R"...(### + ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(+ <Number>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Sums up all `<Number>...`.
 
-__Example__
+<h6> Example </h6>
 
     (display (+ 1 2 3))
     
@@ -3700,15 +3700,15 @@ __Example__
       (*dict_ptr)["-"] =
 R"...(### - ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(- <1st number> <Number>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Subtracts `<Number>...` from `<1st number>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (- 5 4 3))
     
@@ -3746,15 +3746,15 @@ __Example__
       (*dict_ptr)["*"] =
 R"...(### * ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(* <Number>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Multiplies all `<Number>...`.
 
-__Example__
+<h6> Example </h6>
 
     (display (* 2 3 4))
     
@@ -3800,15 +3800,15 @@ __Example__
       (*dict_ptr)["/"] =
 R"...(### / ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(/ <1st number> <Number>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Divides `<1st number>` with `<Number>...`.
 
-__Example__
+<h6> Example </h6>
 
     (display (/ 32 2 4))
     
@@ -3848,15 +3848,15 @@ __Example__
       (*dict_ptr)["++"] =
 R"...(### ++ ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(++ <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Adds `<Number>` to '1'.
 
-__Example__
+<h6> Example </h6>
 
     (display (++ 111))
     
@@ -3896,15 +3896,15 @@ __Example__
       (*dict_ptr)["--"] =
 R"...(### -- ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(-- <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Subtracts '1' from `<Number>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (-- 111))
     
@@ -3942,15 +3942,15 @@ __Example__
       (*dict_ptr)["string-append"] =
 R"...(### string-append ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(string-append <String>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Concatenates `<String>...`.
 
-__Example__
+<h6> Example </h6>
 
     (display (string-append "Hello" " " "World"))
     
@@ -4007,16 +4007,16 @@ __Example__
       (*dict_ptr)["string-ref"] =
 R"...(### string-ref ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(string-ref <String> <index>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns the `<index>`th letter of `<String>`.
 * `<index>` of the 1st letter is 0.
 
-__Example__
+<h6> Example </h6>
 
     (display (string-ref "Hello World" 6))
     
@@ -4088,15 +4088,15 @@ __Example__
       (*dict_ptr)["string-split"] =
 R"...(### string-split ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(string-split <String> <Delim String>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns List composed of split `<String>` by `<Delim String>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (string-split "aaaaSplit!bbbSplit!ccc" "Split!"))
     
@@ -4139,15 +4139,15 @@ __Example__
       (*dict_ptr)["front"] =
 R"...(### front ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(front <List>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns the first element of `<List>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (front '(111 222 333)))
     
@@ -4196,15 +4196,15 @@ __Example__
       (*dict_ptr)["back"] =
 R"...(### back ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(back <List>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns the last element of `<List>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (back '(111 222 333)))
     
@@ -4254,15 +4254,15 @@ __Example__
       (*dict_ptr)["push-front"] =
 R"...(### push-front ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(push-front <List> <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns List added `<Object>` at the first element of `<List>`
 
-__Example__
+<h6> Example </h6>
 
     (display (push-front '(111 222 333) "Hello"))
     
@@ -4305,15 +4305,15 @@ __Example__
       (*dict_ptr)["pop-front"] =
 R"...(### pop-front ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(pop-front <List>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns List removed the first element from `<List>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (pop-front '(111 222 333)))
     
@@ -4362,15 +4362,15 @@ __Example__
       (*dict_ptr)["push-back"] =
 R"...(### push-back ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(push-back <List> <Object>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns List added `<Object>` at the last element of `<List>`
 
-__Example__
+<h6> Example </h6>
 
     (display (push-back '(111 222 333) "Hello"))
     
@@ -4417,15 +4417,15 @@ __Example__
       (*dict_ptr)["pop-back"] =
 R"...(### pop-back ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(pop-back <List>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns List removed the last element from `<List>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (pop-back '(111 222 333)))
     
@@ -4439,11 +4439,11 @@ __Example__
     (*dict_ptr)["PI"] =
 R"...(### PI ###
 
-__Description__
+<h6> Description </h6>
 
 * Circular constant.
 
-__Example__
+<h6> Example </h6>
 
     (display PI)
     
@@ -4456,11 +4456,11 @@ __Example__
     (*dict_ptr)["E"] =
 R"...(### E ###
 
-__Description__
+<h6> Description </h6>
 
 * Napier's constant.
 
-__Example__
+<h6> Example </h6>
 
     (display E)
     
@@ -4497,16 +4497,16 @@ __Example__
       (*dict_ptr)["sin"] =
 R"...(### sin ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(sin <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Sine. A trigonometric function.
 * `<Number>` is radian.
 
-__Example__
+<h6> Example </h6>
 
     (display (sin (/ PI 2)))
     
@@ -4544,16 +4544,16 @@ __Example__
       (*dict_ptr)["cos"] =
 R"...(### cos ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(cos <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Cosine. A trigonometric function.
 * `<Number>` is radian.
 
-__Example__
+<h6> Example </h6>
 
     (display (cos PI))
     
@@ -4591,16 +4591,16 @@ __Example__
       (*dict_ptr)["tan"] =
 R"...(### tan ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(tan <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Tangent. A trigonometric function.
 * `<Number>` is radian.
 
-__Example__
+<h6> Example </h6>
 
     (display (tan (/ PI 4)))
     
@@ -4638,16 +4638,16 @@ __Example__
       (*dict_ptr)["asin"] =
 R"...(### asin ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(asin <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Arc sine. A trigonometric function.
 * `<Number>` is sine.
 
-__Example__
+<h6> Example </h6>
 
     (display (asin 0))
     
@@ -4685,16 +4685,16 @@ __Example__
       (*dict_ptr)["acos"] =
 R"...(### acos ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(acos <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Arc cosine. A trigonometric function.
 * `<Number>` is cosine.
 
-__Example__
+<h6> Example </h6>
 
     (display (acos 1))
     
@@ -4732,16 +4732,16 @@ __Example__
       (*dict_ptr)["atan"] =
 R"...(### atan ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(atan <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Arc tangent. A trigonometric function.
 * `<Number>` is tangent.
 
-__Example__
+<h6> Example </h6>
 
     (display (atan 0))
     
@@ -4780,15 +4780,15 @@ __Example__
       (*dict_ptr)["sqrt"] =
 R"...(### sqrt ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(sqrt <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns square root of `<Number>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (sqrt 4))
     
@@ -4826,15 +4826,15 @@ __Example__
       (*dict_ptr)["abs"] =
 R"...(### abs ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(abs <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns absolute value of `<Number>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (abs -111))
     
@@ -4872,15 +4872,15 @@ __Example__
       (*dict_ptr)["ceil"] =
 R"...(### ceil ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(ceil <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Rounds up `<Number>` into integral value.
 
-__Example__
+<h6> Example </h6>
 
     (display (ceil 1.3))
     
@@ -4918,15 +4918,15 @@ __Example__
       (*dict_ptr)["floor"] =
 R"...(### floor ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(floor <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Rounds down `<Number>` into integral value.
 
-__Example__
+<h6> Example </h6>
 
     (display (floor 1.3))
     
@@ -4964,15 +4964,15 @@ __Example__
       (*dict_ptr)["round"] =
 R"...(### round ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(round <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Rounds `<Number>` into the nearest integral value.
 
-__Example__
+<h6> Example </h6>
 
     (display (round 1.5))
     
@@ -5016,15 +5016,15 @@ __Example__
       (*dict_ptr)["trunc"] =
 R"...(### trunc ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(trunc <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Truncates after decimal point of `<Number>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (trunc 1.234))
     
@@ -5068,15 +5068,15 @@ __Example__
       (*dict_ptr)["exp"] =
 R"...(### exp ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(exp <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Exponent function of `<Number>`. The base is Napier's constant.
 
-__Example__
+<h6> Example </h6>
 
     (display (exp 1))
     
@@ -5126,15 +5126,15 @@ __Example__
       (*dict_ptr)["expt"] =
 R"...(### expt ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(expt <Base> <Exponent>)`
 
-__Description__
+<h6> Description </h6>
 
 * Exponent function of `<Exponent>`. The base is `<Base>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (expt 2 3))
     
@@ -5172,15 +5172,15 @@ __Example__
       (*dict_ptr)["log"] =
 R"...(### log ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(log <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Logarithmic function of `<Number>`. The base is Napier's constant.
 
-__Example__
+<h6> Example </h6>
 
     (display (log E))
     
@@ -5218,15 +5218,15 @@ __Example__
       (*dict_ptr)["log2"] =
 R"...(### log2 ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(log2 <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Logarithmic function of `<Number>`. The base is 2.
 
-__Example__
+<h6> Example </h6>
 
     (display (log2 8))
     
@@ -5264,15 +5264,15 @@ __Example__
       (*dict_ptr)["log10"] =
 R"...(### log10 ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(log10 <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Logarithmic function of `<Number>`. The base is 10.
 
-__Example__
+<h6> Example </h6>
 
     (display (log10 100))
     
@@ -5314,15 +5314,15 @@ __Example__
       (*dict_ptr)["random"] =
 R"...(### random ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(random <Number>)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns random number from 0 to `<Number>`.
 
-__Example__
+<h6> Example </h6>
 
     (display (random 10))
     
@@ -5379,15 +5379,15 @@ __Example__
       (*dict_ptr)["max"] =
 R"...(### max ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(max <Number>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns maximum number of `<Number>...`.
 
-__Example__
+<h6> Example </h6>
 
     (display (max 1 2 3 4 3 2 1))
     
@@ -5438,15 +5438,15 @@ __Example__
       (*dict_ptr)["min"] =
 R"...(### min ###
 
-__Usage__
+<h6> Usage </h6>
 
 * `(min <Number>...)`
 
-__Description__
+<h6> Description </h6>
 
 * Returns minimum number of `<Number>...`.
 
-__Example__
+<h6> Example </h6>
 
     (display (min 4 3 2 1 2 3 4))
     
