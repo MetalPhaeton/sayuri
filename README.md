@@ -90,7 +90,7 @@ If you have "gcc" :
 
 
 How To Make Distributable Packages
-------------------------------
+----------------------------------
 
 After building Sayuri with CMake, run "`$ make dist`" command.
 
