@@ -158,8 +158,14 @@ Example
 ;;
 ;; &gt; 123</code></pre>
 <h3 id="warning">Warning!!!!</h3>
-<p>Sayuri always works on the major premises that are <strong>&quot;King is never taken&quot;</strong> and <strong>&quot;Each side must have just one King&quot;</strong>.</p>
-<p>If you set an engine's board to be able to take King by a piece, the engine will work unexpectedly.<br />If you are unlucky, segment fault error will be occurred.</p>
+<p>Sayuri works correctly on a correct position.<br />It means that if the following conditions exist, Sayuri works unexpectedly.</p>
+<ul>
+<li>King can be captured by next move.</li>
+<li>One side has 2 Kings and more.</li>
+<li>One side has no King.</li>
+<li>Pawn is on 1st rank or 8th rank.</li>
+</ul>
+<p>Using Sayulisp, you can set a wrong position to the engine. But then the engine doesn't work correctly.</p>
 <h3 id="customization-of-engine">Customization of Engine</h3>
 <p>If you want to customize an engine, then write code to execute the following 3 steps.</p>
 <ol style="list-style-type: decimal">
@@ -184,24 +190,7 @@ Example
 ;; Run the engine.
 (my-engine &#39;@run)</code></pre>
 <h3 id="techniques">Techniques</h3>
-<p>If you want to receive the answer from Sayulisp as S-Expression, you can use &quot;<code>(display)</code>&quot; function and &quot;<code>(to-string)</code>&quot; function.</p>
-<h6> 
-Example
-</h6>
-
-<pre><code>(display (to-string (list 111 222 333)))
-
-;; Output
-;;
-;; &gt; (111 222 333)
-
-;; Print &quot;Hello World&quot; with quotation marks.
-(display (to-string &quot;Hello World&quot;))
-
-;; Output
-;;
-;; &gt; &quot;Hello World&quot;</code></pre>
-<p>The following example is how to define class as Object Oriented Programming using Message Symbol Semantics.</p>
+<p>The following example is how to define Class as Object Oriented Programming using Message Symbol Semantics.</p>
 <h6> 
 Example
 </h6>
