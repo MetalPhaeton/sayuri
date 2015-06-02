@@ -435,9 +435,10 @@ namespace Sayuri {
       /**
        * SEEで候補手を評価する。
        * @param move 評価したい手。
-       * @return 候補手の評価。
+       * @param score 前の評価。
+       * @return 計算後の候補手の評価。
        */
-      int SEE(Move move) const;
+      int SEE(Move move, int score) const;
 
       /**
        * 現在の局面のハッシュを計算する。

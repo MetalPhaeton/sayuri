@@ -414,7 +414,7 @@ namespace Sayuri {
 
       // SEEで点数をつけていく。
       score =
-      Util::GetMax(static_cast<std::int64_t>(maker.engine_ptr_->SEE(move))
+      Util::GetMax(static_cast<std::int64_t>(maker.engine_ptr_->SEE(move, 0))
       << CAPTURE_SCORE_SHIFT, BAD_CAPTURE_SCORE);
     }
   };

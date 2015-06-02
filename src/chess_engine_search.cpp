@@ -1359,62 +1359,58 @@ namespace Sayuri {
   }
 
   // SEEで候補手を評価する。
-  int ChessEngine::SEE(Move move) const {
+  int ChessEngine::SEE(Move move, int score) const {
     // キャッシュ。
     Cache& cache = shared_st_ptr_->cache_;
+    int temp_score = score;  // 保存。
 
-    int score = 0;
-    if (!(cache.enable_see_)) return score;
+    // すでに駒得していれば、動かさずに帰る。
+    if (score >= cache.material_[PAWN]) return score;
 
-    if (move) {
-      // 手の情報を得る。
-      Square to = GetTo(move);
-      MoveType move_type = GetMoveType(move);
+    // moveが無効ならそのまま帰る。
+    if (!move) return score;
 
-      // キングを取る手なら無視。
-      if (piece_board_[to] == KING) {
-        return score;
-      }
+    // 準備。
+    PieceType target = piece_board_[GetTo(move)];
 
-      // 取る駒の価値を得る。
-      int capture_value = 0;
-      if (move_type == EN_PASSANT) {
-        // アンパッサン。
-        capture_value = cache.material_[PAWN];
-      } else {
-        capture_value = cache.material_[piece_board_[to]];
-      }
-
-      // ポーンの昇格。
-      if ((move & PROMOTION_MASK)) {
-        capture_value +=
-        cache.material_[GetPromotion(move)] - cache.material_[PAWN];
-      }
-
-      Side side = to_move_;
-
-      ChessEngine* self = const_cast<ChessEngine*>(this);
-      self->MakeMove(move);
-
-      // 違法な手なら計算しない。
-      if (!(IsAttacked(king_[side], Util::GetOppositeSide(side)))) {
-        // 再帰して次の局面の評価値を得る。
-        score = capture_value - self->SEE(GetNextSEEMove(to));
-      }
-
-      self->UnmakeMove(move);
+    // 取った時の評価を計算。
+    score += cache.material_[target];
+    if (GetMoveType(move) == EN_PASSANT) score += cache.material_[PAWN];
+    if ((move & PROMOTION_MASK)) {
+      score += cache.material_[GetPromotion(move)] - cache.material_[PAWN];
     }
+
+    // 取る相手がキングなら帰る。
+    if (target == KING) return score;
+
+    // SEEが無効の場合、簡単計算で帰る。
+    if (!(cache.enable_see_)) {
+      if ((move & PROMOTION_MASK)) {
+        return cache.material_[GetPromotion(move)] - cache.material_[PAWN];
+      } else {
+        return score - cache.material_[piece_board_[GetFrom(move)]];
+      }
+    }
+
+    // 次の局面へ。
+    Side side = to_move_;
+    ChessEngine* self = const_cast<ChessEngine*>(this);
+    self->MakeMove(move);
+
+    if (IsAttacked(king_[side], to_move_)) {
+      self->UnmakeMove(move);
+      return temp_score;
+    }
+
+    score -= SEE(GetNextSEEMove(GetTo(move)), -score);
+
+    self->UnmakeMove(move);
 
     return score;
   }
 
   // SEE()で使う、次の手を得る。
   Move ChessEngine::GetNextSEEMove(Square target) const {
-    // キングがターゲットの時はなし。
-    if (target == king_[Util::GetOppositeSide(to_move_)]) {
-      return 0;
-    }
-
     // 価値の低いものから調べる。
     for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
       Bitboard attackers = 0;
