@@ -264,8 +264,7 @@ namespace Sayuri {
             move_bitboard = engine_ptr_->GetQueenAttack(from);
             break;
           default:
-            throw SayuriError
-            ("駒の種類が不正です。 in MoveMaker::GenMoveCore()");
+            throw SayuriError("MoveMaker::GenMoveCore()_1");
             break;
         }
 

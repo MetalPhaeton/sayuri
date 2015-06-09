@@ -40,9 +40,11 @@ namespace Sayuri {
   class SayuriError : public std::logic_error {
     public:
       /** コンストラクタ。 */
-      SayuriError(const char* message) : std::logic_error(message) {}
+      SayuriError(const char* message) :
+      std::logic_error(std::string("SayuriError: ") + std::string(message)) {}
       /** コンストラクタ。 */
-      SayuriError(const std::string message) : std::logic_error(message) {}
+      SayuriError(const std::string message) :
+      std::logic_error(std::string("SayuriError: ") + message) {}
   };
 }  // namespace Sayuri
 

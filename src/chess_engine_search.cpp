@@ -1444,8 +1444,7 @@ namespace Sayuri {
           attackers = Util::GetKingMove(target) & position_[to_move_][KING];
           break;
         default:
-          throw SayuriError
-          ("駒の種類が不正です。in ChessEngine::GetNextSEEMove()");
+          throw SayuriError("ChessEngine::GetNextSEEMove()_1");
           break;
       }
       if (attackers) {

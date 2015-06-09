@@ -620,15 +620,14 @@ namespace Sayuri {
     }
 
     // 違法手。
-    throw SayuriError("合法手ではありません。 at ChessEngine::PlayMove()");
+    throw SayuriError("ChessEngine::PlayMove()_1");
   }
 
   // 1手戻す。
   Move ChessEngine::UndoMove() throw (SayuriError) {
     // エラー。
     if (shared_st_ptr_->move_history_.size() <= 0) {
-      throw SayuriError
-      ("手を戻すことができません。 at ChessEngine::UndoMove()");
+      throw SayuriError("ChessEngine::UndoMove()_1");
     }
 
     --ply_;

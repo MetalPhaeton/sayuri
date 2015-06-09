@@ -1890,7 +1890,7 @@ namespace Sayuri {
     FEN fen;
     try {
       fen = FEN(fen_str_ptr->string_value());
-    } catch (SayuriError error) {
+    } catch (...) {
       throw LispObject::GenError("@engine-error", "Couldn't parse FEN.");
     }
 

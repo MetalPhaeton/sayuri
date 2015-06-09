@@ -194,7 +194,7 @@ namespace Sayuri {
         std::cout << "King";
         break;
       default:
-        throw SayuriError("駒の種類が不正です。 in debug.cpp::PrintMove()");
+        throw SayuriError("debug.cpp::PrintMove()_1");
         break;
     }
     std::cout << std::endl;
@@ -224,7 +224,7 @@ namespace Sayuri {
         std::cout << "King";
         break;
       default:
-        throw SayuriError("駒の種類が不正です。 in debug.cpp::PrintMove()");
+        throw SayuriError("debug.cpp::PrintMove()_2");
         break;
     }
     std::cout << std::endl;
@@ -277,7 +277,7 @@ namespace Sayuri {
         std::cout << "Null Move";
         break;
       default:
-        throw SayuriError("手の種類が不正です。 in debug.cpp::PrintMove()");
+        throw SayuriError("debug.cpp::PrintMove()_3");
         break;
     }
     std::cout << std::endl;
