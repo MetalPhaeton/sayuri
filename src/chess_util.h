@@ -548,12 +548,28 @@ namespace Sayuri {
       // ========== //
       // 位置の変換 //
       // ========== //
+      /**
+       * マスをファイルに変換。
+       * @param マス。
+       * @return ファイル。
+       */
       static constexpr Fyle SquareToFyle(Square square) {
         return square & 7;
       }
+      /**
+       * マスをランクに変換。
+       * @param マス。
+       * @return ランク。
+       */
       static constexpr Rank SquareToRank(Square square) {
         return (square >> 3) & 7;
       }
+      /**
+       * ファイルとランクをマスに変換。
+       * @param fyle ファイル。
+       * @param rank ランク。
+       * @return マス。
+       */
       static constexpr Square CoordToSquare(Fyle fyle, Rank rank) {
         return ((rank << 3) | (fyle & 7)) & 63;
       }
