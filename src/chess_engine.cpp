@@ -294,29 +294,6 @@ namespace Sayuri {
     COPY_ARRAY(position_memo_, record.position_memo_);
   }
 
-  constexpr int MyCountBits(Bitboard bitboard) {
-    return bitboard ? (((bitboard & 0x1ULL) ? 1 : 0)
-    + MyCountBits(bitboard >> 1)) : 0;
-  }
-
-  constexpr Bitboard MyRotate45(Bitboard bitboard) {
-    return bitboard
-    ? (Util::SQUARE[Util::ROT45[MyCountBits((bitboard & (-bitboard)) - 1)]]
-    | MyRotate45(bitboard & (bitboard - 1))) : 0;
-  }
-
-  constexpr Bitboard MyRotate90(Bitboard bitboard) {
-    return bitboard
-    ? (Util::SQUARE[Util::ROT90[MyCountBits((bitboard & (-bitboard)) - 1)]]
-    | MyRotate90(bitboard & (bitboard - 1))) : 0;
-  }
-
-  constexpr Bitboard MyRotate135(Bitboard bitboard) {
-    return bitboard
-    ? (Util::SQUARE[Util::ROT135[MyCountBits((bitboard & (-bitboard)) - 1)]]
-    | MyRotate135(bitboard & (bitboard - 1))) : 0;
-  }
-
   // 駒を初期配置にセットする。
   void ChessEngine::SetStartPosition() {
     constexpr static const Bitboard
@@ -349,17 +326,18 @@ namespace Sayuri {
     side_pieces_[BLACK] = Util::RANK[RANK_8] | Util::RANK[RANK_7];
 
     // ブロッカーのビットボードを作る。
-    constexpr Bitboard STARTING_BLOCKER_0 =
-    Util::RANK[RANK_1] | Util::RANK[RANK_2]
+    blocker_0_ = Util::RANK[RANK_1] | Util::RANK[RANK_2]
     | Util::RANK[RANK_8] | Util::RANK[RANK_7];
-    constexpr Bitboard STARTING_BLOCKER_45 = MyRotate45(STARTING_BLOCKER_0);
-    constexpr Bitboard STARTING_BLOCKER_90 = MyRotate90(STARTING_BLOCKER_0);
-    constexpr Bitboard STARTING_BLOCKER_135 = MyRotate135(STARTING_BLOCKER_0);
+    blocker_45_ = 0;
+    blocker_90_ = 0;
+    blocker_135_ = 0;
+    for (Bitboard bb = blocker_0_; bb; NEXT_BITBOARD(bb)) {
+      Square square = Util::GetSquare(bb);
 
-    blocker_0_ = STARTING_BLOCKER_0;
-    blocker_45_ = STARTING_BLOCKER_45;
-    blocker_90_ = STARTING_BLOCKER_90;
-    blocker_135_ = STARTING_BLOCKER_135;
+      blocker_45_ |= Util::SQUARE[Util::ROT45[square]];
+      blocker_90_ |= Util::SQUARE[Util::ROT90[square]];
+      blocker_135_ |= Util::SQUARE[Util::ROT135[square]];
+    }
 
     // 駒の種類とサイドの配置を作る。
     constexpr static const PieceType STARTING_PIECE_BOARD[NUM_SQUARES] {
