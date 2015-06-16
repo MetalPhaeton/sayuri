@@ -233,7 +233,7 @@ namespace Sayuri {
 
       // ダブルポーンを計算。
       if (Util::CountBits(engine.position_[SIDE][PAWN]
-      & Util::FYLE[Util::SQUARE_TO_FYLE[square]]) >= 2) {
+      & Util::FYLE[Util::SquareToFyle(square)]) >= 2) {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->double_pawn_cache_;
       }
 
@@ -283,7 +283,7 @@ namespace Sayuri {
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // オープンファイルとセミオープンファイルを計算。
-      Bitboard rook_fyle = Util::FYLE[Util::SQUARE_TO_FYLE[square]];
+      Bitboard rook_fyle = Util::FYLE[Util::SquareToFyle(square)];
       if (!(engine.position_[SIDE][PAWN] & rook_fyle)) {
         // セミオープン。
         evaluator.score_ +=
@@ -720,7 +720,7 @@ namespace Sayuri {
           pass_pawn_mask_[side][square] = 0;
         } else {
           // 自分のファイルと隣のファイルのマスクを作る。
-          Fyle fyle = Util::SQUARE_TO_FYLE[square];
+          Fyle fyle = Util::SquareToFyle(square);
           mask |= Util::FYLE[fyle];
           if (fyle == FYLE_A) {  // aファイルのときはbファイルが隣り。
             mask |= Util::FYLE[fyle + 1];
@@ -734,11 +734,11 @@ namespace Sayuri {
           // 自分の位置より手前のランクは消す。
           if (side == WHITE) {
             Bitboard temp = (Util::SQUARE[square] - 1)
-            | Util::RANK[Util::SQUARE_TO_RANK[square]];
+            | Util::RANK[Util::SquareToRank(square)];
             mask &= ~temp;
           } else {
             Bitboard temp = ~(Util::SQUARE[square] - 1)
-            | Util::RANK[Util::SQUARE_TO_RANK[square]];
+            | Util::RANK[Util::SquareToRank(square)];
             mask &= ~temp;
           }
 
@@ -752,7 +752,7 @@ namespace Sayuri {
   // iso_pawn_mask_[]を初期化する。
   void Evaluator::InitIsoPawnMask() {
     FOR_SQUARES(square) {
-      Fyle fyle = Util::SQUARE_TO_FYLE[square];
+      Fyle fyle = Util::SquareToFyle(square);
       if (fyle == FYLE_A) {
         iso_pawn_mask_[square] = Util::FYLE[fyle + 1];
       } else if (fyle == FYLE_H) {

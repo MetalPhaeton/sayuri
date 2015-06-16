@@ -2064,7 +2064,7 @@ namespace Sayuri {
       throw LispObject::GenError("@engine-error",
       "'" + SQUARE_SYMBOL[square] + "' is not empty.");
     }
-    Rank rank = Util::SQUARE_TO_RANK[square];
+    Rank rank = Util::SquareToRank(square);
     if (!((rank == RANK_3) || (rank == RANK_6))) {
       throw LispObject::GenError("@engine-error",
       "The rank of square must be 'RANK_3' or 'RANK_6'. you indicated '"

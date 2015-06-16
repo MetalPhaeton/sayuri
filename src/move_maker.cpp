@@ -315,8 +315,8 @@ namespace Sayuri {
           SetMoveType(move, NORMAL);
         }
 
-        if (((side == WHITE) && (Util::SQUARE_TO_RANK[to] == RANK_8))
-        || ((side == BLACK) && (Util::SQUARE_TO_RANK[to] == RANK_1))) {
+        if (((side == WHITE) && (Util::SquareToRank(to) == RANK_8))
+        || ((side == BLACK) && (Util::SquareToRank(to) == RANK_1))) {
           // 昇格を設定。
           for (PieceType piece_type = KNIGHT;
           piece_type <= QUEEN; ++piece_type) {

@@ -202,40 +202,6 @@ namespace Sayuri {
         A1, B1, C1, D1, E1, F1, G1, H1
       };
 
-      /** マスからファイルに変換。 [マス] */
-      static constexpr Fyle SQUARE_TO_FYLE[NUM_SQUARES] {
-        FYLE_A, FYLE_B, FYLE_C, FYLE_D, FYLE_E, FYLE_F, FYLE_G, FYLE_H,
-        FYLE_A, FYLE_B, FYLE_C, FYLE_D, FYLE_E, FYLE_F, FYLE_G, FYLE_H,
-        FYLE_A, FYLE_B, FYLE_C, FYLE_D, FYLE_E, FYLE_F, FYLE_G, FYLE_H,
-        FYLE_A, FYLE_B, FYLE_C, FYLE_D, FYLE_E, FYLE_F, FYLE_G, FYLE_H,
-        FYLE_A, FYLE_B, FYLE_C, FYLE_D, FYLE_E, FYLE_F, FYLE_G, FYLE_H,
-        FYLE_A, FYLE_B, FYLE_C, FYLE_D, FYLE_E, FYLE_F, FYLE_G, FYLE_H,
-        FYLE_A, FYLE_B, FYLE_C, FYLE_D, FYLE_E, FYLE_F, FYLE_G, FYLE_H,
-        FYLE_A, FYLE_B, FYLE_C, FYLE_D, FYLE_E, FYLE_F, FYLE_G, FYLE_H
-      };
-      /** マスからランクに変換。 [マス] */
-      static constexpr Rank SQUARE_TO_RANK[NUM_SQUARES] {
-        RANK_1, RANK_1, RANK_1, RANK_1, RANK_1, RANK_1, RANK_1, RANK_1,
-        RANK_2, RANK_2, RANK_2, RANK_2, RANK_2, RANK_2, RANK_2, RANK_2,
-        RANK_3, RANK_3, RANK_3, RANK_3, RANK_3, RANK_3, RANK_3, RANK_3,
-        RANK_4, RANK_4, RANK_4, RANK_4, RANK_4, RANK_4, RANK_4, RANK_4,
-        RANK_5, RANK_5, RANK_5, RANK_5, RANK_5, RANK_5, RANK_5, RANK_5,
-        RANK_6, RANK_6, RANK_6, RANK_6, RANK_6, RANK_6, RANK_6, RANK_6,
-        RANK_7, RANK_7, RANK_7, RANK_7, RANK_7, RANK_7, RANK_7, RANK_7,
-        RANK_8, RANK_8, RANK_8, RANK_8, RANK_8, RANK_8, RANK_8, RANK_8
-      };
-      /** ファイルトランクからマスに変換。 [ファイル][ランク] */
-      static constexpr Square COORD_TO_SQUARE[NUM_FYLES][NUM_RANKS] {
-        {A1, A2, A3, A4, A5, A6, A7, A8},
-        {B1, B2, B3, B4, B5, B6, B7, B8},
-        {C1, C2, C3, C4, C5, C6, C7, C8},
-        {D1, D2, D3, D4, D5, D6, D7, D8},
-        {E1, E2, E3, E4, E5, E6, E7, E8},
-        {F1, F2, F3, F4, F5, F6, F7, F8},
-        {G1, G2, G3, G4, G5, G6, G7, G8},
-        {H1, H2, H3, H4, H5, H6, H7, H8}
-      };
-
       /**
        * アンパッサン用マス-ターゲット変換テーブル。 [マス]
        */
@@ -579,6 +545,19 @@ namespace Sayuri {
         return king_move_[square];
       }
 
+      // ========== //
+      // 位置の変換 //
+      // ========== //
+      static constexpr Fyle SquareToFyle(Square square) {
+        return square & 7;
+      }
+      static constexpr Rank SquareToRank(Square square) {
+        return (square >> 3) & 7;
+      }
+      static constexpr Square CoordToSquare(Fyle fyle, Rank rank) {
+        return ((rank << 3) | (fyle & 7)) & 63;
+      }
+
       // ================ //
       // その他の便利関数 //
       // ================ //
@@ -710,10 +689,10 @@ namespace Sayuri {
         PieceType promotion = GetPromotion(move);
 
         // 文字列を作成。
-        ret.push_back(Util::SQUARE_TO_FYLE[from] + 'a');
-        ret.push_back(Util::SQUARE_TO_RANK[from] + '1');
-        ret.push_back(Util::SQUARE_TO_FYLE[to] + 'a');
-        ret.push_back(Util::SQUARE_TO_RANK[to] + '1');
+        ret.push_back(Util::SquareToFyle(from) + 'a');
+        ret.push_back(Util::SquareToRank(from) + '1');
+        ret.push_back(Util::SquareToFyle(to) + 'a');
+        ret.push_back(Util::SquareToRank(to) + '1');
         switch (promotion) {
           case KNIGHT:
             ret.push_back('n');
@@ -749,14 +728,14 @@ namespace Sayuri {
         if (fyle >= NUM_FYLES) return 0;
         Rank rank = str[1] - '1';
         if (rank >= NUM_RANKS) return 0;
-        SetFrom(ret, COORD_TO_SQUARE[fyle][rank]);
+        SetFrom(ret, CoordToSquare(fyle, rank));
 
         // toをパース。
         fyle = str[2] - 'a';
         if (fyle >= NUM_FYLES) return 0;
         rank = str[3] - '1';
         if (rank >= NUM_RANKS) return 0;
-        SetTo(ret, COORD_TO_SQUARE[fyle][rank]);
+        SetTo(ret, CoordToSquare(fyle, rank));
 
         // 昇格をパース。
         if (str.size() >= 5) {

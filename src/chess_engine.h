@@ -672,7 +672,7 @@ namespace Sayuri {
           return;
         }
 
-        Rank rank = Util::SQUARE_TO_RANK[en_passant_square];
+        Rank rank = Util::SquareToRank(en_passant_square);
         if (rank == RANK_3) {
           // すぐ上に白ポーンがいなければならない。
           Square en_passant_target = en_passant_square + 8;

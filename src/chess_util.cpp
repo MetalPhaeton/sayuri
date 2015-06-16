@@ -70,10 +70,7 @@ namespace Sayuri {
   constexpr Square Util::R_ROT90[NUM_SQUARES];
   constexpr Square Util::R_ROT135[NUM_SQUARES];
   constexpr Square Util::FLIP[NUM_SQUARES];
-  constexpr Fyle Util::SQUARE_TO_FYLE[NUM_SQUARES];
-  constexpr Rank Util::SQUARE_TO_RANK[NUM_SQUARES];
   constexpr Rank Util::EN_PASSANT_TRANS_TABLE[NUM_SQUARES];
-  constexpr Square Util::COORD_TO_SQUARE[NUM_FYLES][NUM_RANKS];
   constexpr int Util::MAGIC_SHIFT_V[NUM_SQUARES];
   constexpr int Util::MAGIC_SHIFT_D[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK_V[NUM_SQUARES];
@@ -270,7 +267,7 @@ namespace Sayuri {
       FOR_SQUARES(square) {
         for (unsigned int map = 0; map <= BLOCKER_MAP; ++map) {
           if (side == WHITE) {
-            if (SQUARE_TO_RANK[square] == RANK_2) {
+            if (SquareToRank(square) == RANK_2) {
               // 初期配置のポーンの位置。
               Bitboard front_bit =
               SQUARE[ROT90[square + 8]] >> MAGIC_SHIFT_V[ROT90[square + 8]];
@@ -288,7 +285,7 @@ namespace Sayuri {
               } else {
                 pawn_movable_table_[side][square][map] = 0;
               }
-            } else if (SQUARE_TO_RANK[square] == RANK_8) {
+            } else if (SquareToRank(square) == RANK_8) {
               // 最上ランク。
               pawn_movable_table_[side][square][map] = 0;
             } else {
@@ -302,7 +299,7 @@ namespace Sayuri {
               }
             }
           } else if (side == BLACK) {
-            if (SQUARE_TO_RANK[square] == RANK_7) {
+            if (SquareToRank(square) == RANK_7) {
               // 初期配置のポーンの位置。
               Bitboard front_bit =
               SQUARE[ROT90[square - 8]] >> MAGIC_SHIFT_V[ROT90[square - 8]];
@@ -320,7 +317,7 @@ namespace Sayuri {
               } else {
                 pawn_movable_table_[side][square][map] = 0;
               }
-            } else if (SQUARE_TO_RANK[square] == RANK_1) {
+            } else if (SquareToRank(square) == RANK_1) {
               // 最上ランク。
               pawn_movable_table_[side][square][map] = 0;
             } else {
@@ -696,10 +693,10 @@ namespace Sayuri {
   void Util::InitDistanceTable() {
     FOR_SQUARES(square_1) {
       FOR_SQUARES(square_2) {
-        Fyle fyle_1 = SQUARE_TO_FYLE[square_1];
-        Rank rank_1 = SQUARE_TO_RANK[square_1];
-        Fyle fyle_2 = SQUARE_TO_FYLE[square_2];
-        Rank rank_2 = SQUARE_TO_RANK[square_2];
+        Fyle fyle_1 = SquareToFyle(square_1);
+        Rank rank_1 = SquareToRank(square_1);
+        Fyle fyle_2 = SquareToFyle(square_2);
+        Rank rank_2 = SquareToRank(square_2);
 
         int fyle_diff = fyle_1 >= fyle_2
         ? (fyle_1 - fyle_2) : (fyle_2 - fyle_1);

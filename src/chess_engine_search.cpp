@@ -1421,9 +1421,9 @@ namespace Sayuri {
           Util::GetPawnAttack(Util::GetOppositeSide(to_move_), target)
           & position_[to_move_][PAWN];
           if (((to_move_ == WHITE)
-          && (Util::SQUARE_TO_RANK[target] == RANK_8))
+          && (Util::SquareToRank(target) == RANK_8))
           || ((to_move_ == BLACK)
-          && (Util::SQUARE_TO_RANK[target] == RANK_1))) {
+          && (Util::SquareToRank(target) == RANK_1))) {
             promotion = QUEEN;
           }
           break;

@@ -132,7 +132,7 @@ namespace Sayuri {
       std::string temp = tree["en_passant_square"];
       if (temp != "-") {
         en_passant_square_ =
-        Util::COORD_TO_SQUARE[temp[0] - 'a'][temp[1] - '1'];
+        Util::CoordToSquare(temp[0] - 'a', temp[1] - '1');
       }
 
       // 50手ルールの手数を解析。 あれば。
