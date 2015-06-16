@@ -72,9 +72,8 @@ namespace Sayuri {
   constexpr Square Util::FLIP[NUM_SQUARES];
   constexpr Fyle Util::SQUARE_TO_FYLE[NUM_SQUARES];
   constexpr Rank Util::SQUARE_TO_RANK[NUM_SQUARES];
+  constexpr Rank Util::EN_PASSANT_TRANS_TABLE[NUM_SQUARES];
   constexpr Square Util::COORD_TO_SQUARE[NUM_FYLES][NUM_RANKS];
-  constexpr Square Util::TO_EN_PASSANT_TARGET[NUM_SIDES][NUM_SQUARES];
-  constexpr Square Util::TO_EN_PASSANT_SQUARE[NUM_SIDES][NUM_SQUARES];
   constexpr int Util::MAGIC_SHIFT_V[NUM_SQUARES];
   constexpr int Util::MAGIC_SHIFT_D[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK_V[NUM_SQUARES];
