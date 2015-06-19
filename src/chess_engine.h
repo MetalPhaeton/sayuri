@@ -278,14 +278,12 @@ namespace Sayuri {
        * @return キャスリング可能ならtrue。
        */
       bool CanWhiteShortCastling() const {
-        if (!(castling_rights_ & WHITE_SHORT_CASTLING)) return false;
-        if (piece_board_[F1]) return false;
-        if (piece_board_[G1]) return false;
-        if (IsAttacked(E1, BLACK)) return false;
-        if (IsAttacked(F1, BLACK)) return false;
-        if (IsAttacked(G1, BLACK)) return false;
-
-        return true;
+        return (castling_rights_ & WHITE_SHORT_CASTLING)
+        && !(piece_board_[F1])
+        && !(piece_board_[G1])
+        && !IsAttacked(E1, BLACK)
+        && !IsAttacked(F1, BLACK)
+        && !IsAttacked(G1, BLACK);
       }
 
       /**
@@ -293,15 +291,13 @@ namespace Sayuri {
        * @return キャスリング可能ならtrue。
        */
       bool CanWhiteLongCastling() const {
-        if (!(castling_rights_ & WHITE_LONG_CASTLING)) return false;
-        if (piece_board_[D1]) return false;
-        if (piece_board_[C1]) return false;
-        if (piece_board_[B1]) return false;
-        if (IsAttacked(E1, BLACK)) return false;
-        if (IsAttacked(D1, BLACK)) return false;
-        if (IsAttacked(C1, BLACK)) return false;
-
-        return true;
+        return (castling_rights_ & WHITE_LONG_CASTLING)
+        && !(piece_board_[D1])
+        && !(piece_board_[C1])
+        && !(piece_board_[B1])
+        && !IsAttacked(E1, BLACK)
+        && !IsAttacked(D1, BLACK)
+        && !IsAttacked(C1, BLACK);
       }
 
       /**
@@ -309,14 +305,12 @@ namespace Sayuri {
        * @return キャスリング可能ならtrue。
        */
       bool CanBlackShortCastling() const {
-        if (!(castling_rights_ & BLACK_SHORT_CASTLING)) return false;
-        if (piece_board_[F8]) return false;
-        if (piece_board_[G8]) return false;
-        if (IsAttacked(E8, WHITE)) return false;
-        if (IsAttacked(F8, WHITE)) return false;
-        if (IsAttacked(G8, WHITE)) return false;
-
-        return true;
+        return (castling_rights_ & BLACK_SHORT_CASTLING)
+        && !(piece_board_[F8])
+        && !(piece_board_[G8])
+        && !IsAttacked(E8, WHITE)
+        && !IsAttacked(F8, WHITE)
+        && !IsAttacked(G8, WHITE);
       }
 
       /**
@@ -324,15 +318,13 @@ namespace Sayuri {
        * @return キャスリング可能ならtrue。
        */
       bool CanBlackLongCastling() const {
-        if (!(castling_rights_ & BLACK_LONG_CASTLING)) return false;
-        if (piece_board_[D8]) return false;
-        if (piece_board_[C8]) return false;
-        if (piece_board_[B8]) return false;
-        if (IsAttacked(E8, WHITE)) return false;
-        if (IsAttacked(D8, WHITE)) return false;
-        if (IsAttacked(C8, WHITE)) return false;
-
-        return true;
+        return (castling_rights_ & BLACK_LONG_CASTLING)
+        && !(piece_board_[D8])
+        && !(piece_board_[C8])
+        && !(piece_board_[B8])
+        && !IsAttacked(E8, WHITE)
+        && !IsAttacked(D8, WHITE)
+        && !IsAttacked(C8, WHITE);
       }
 
       /**
