@@ -619,6 +619,53 @@ namespace Sayuri {
     return move;
   }
 
+  // 駒を置く。
+  void ChessEngine::PutPiece(Square square, PieceType piece_type, Side side) {
+    // 置く位置の現在の駒の種類を入手する。
+    PieceType placed_piece = piece_board_[square];
+
+    // 置く位置の現在の駒のサイドを得る。
+    Side placed_side = side_board_[square];
+
+    // 置く位置のメンバを消す。
+    if (placed_piece) {
+      position_[placed_side][placed_piece] &= ~Util::SQUARE[square];
+      side_pieces_[placed_side] &= ~Util::SQUARE[square];
+    }
+
+    // 置く駒がEMPTYか置くサイドがNO_SIDEなら
+    // その位置のメンバを消して返る。
+    if ((!piece_type) || (!side)) {
+      piece_board_[square] = EMPTY;
+      side_board_[square] = NO_SIDE;
+      if (placed_piece) {
+        blocker_0_ &= ~Util::SQUARE[square];
+        blocker_45_ &= ~Util::SQUARE[Util::ROT45[square]];
+        blocker_90_ &= ~Util::SQUARE[Util::ROT90[square]];
+        blocker_135_ &= ~Util::SQUARE[Util::ROT135[square]];
+      }
+      return;
+    }
+
+    // 置く位置の駒の種類を書き変える。
+    piece_board_[square] = piece_type;
+    // 置く位置のサイドを書き変える。
+    side_board_[square] = side;
+
+    // 置く位置のビットボードをセットする。
+    position_[side][piece_type] |= Util::SQUARE[square];
+    side_pieces_[side] |= Util::SQUARE[square];
+    blocker_0_ |= Util::SQUARE[square];
+    blocker_45_ |= Util::SQUARE[Util::ROT45[square]];
+    blocker_90_ |= Util::SQUARE[Util::ROT90[square]];
+    blocker_135_ |= Util::SQUARE[Util::ROT135[square]];
+
+    // キングの位置を更新する。
+    if (piece_type == KING) {
+      king_[side] = square;
+    }
+  }
+
   // 次の手を指す。
   void ChessEngine::MakeMove(Move& move) {
     // 動かす側のサイドを得る。

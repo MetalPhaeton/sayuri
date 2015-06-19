@@ -804,6 +804,28 @@ namespace Sayuri {
       void ScanBasicMember(const ChessEngine& engine);
 
       /**
+       * 駒を置く。
+       * @param square 駒を置きたいマス。
+       * @param piece_type 置きたい駒の種類。
+       * @param side 置きたい駒のサイド。
+       */
+      void PutPiece(Square square, PieceType piece_type, Side side=NO_SIDE);
+
+      /**
+       * 駒の位置を変える。 (移動先の駒は上書きされる。)
+       * @param from 位置を変えたい駒のマス。
+       * @param to 移動先。
+       */
+      void ReplacePiece(Square from, Square to) {
+        // 移動する位置と移動先の位置が同じなら何もしない。
+        if (from == to) return;
+
+        // 移動。
+        PutPiece(to, piece_board_[from], side_board_[from]);
+        PutPiece(from, EMPTY, NO_SIDE);
+      }
+
+      /**
        * 次の一手を指す。
        * 取った駒、動かす前のキャスリングの権利、アンパッサンは
        * 「move」に記録される。
@@ -846,72 +868,6 @@ namespace Sayuri {
         // 情報を戻す。
         castling_rights_ = GetCastlingRights(move);
         en_passant_square_ = GetEnPassantSquare(move);
-      }
-
-      /**
-       * 駒を置く。
-       * @param square 駒を置きたいマス。
-       * @param piece_type 置きたい駒の種類。
-       * @param side 置きたい駒のサイド。
-       */
-      void PutPiece(Square square, PieceType piece_type, Side side=NO_SIDE) {
-        // 置く位置の現在の駒の種類を入手する。
-        PieceType placed_piece = piece_board_[square];
-
-        // 置く位置の現在の駒のサイドを得る。
-        Side placed_side = side_board_[square];
-
-        // 置く位置のメンバを消す。
-        if (placed_piece) {
-          position_[placed_side][placed_piece] &= ~Util::SQUARE[square];
-          side_pieces_[placed_side] &= ~Util::SQUARE[square];
-        }
-
-        // 置く駒がEMPTYか置くサイドがNO_SIDEなら
-        // その位置のメンバを消して返る。
-        if ((!piece_type) || (!side)) {
-          piece_board_[square] = EMPTY;
-          side_board_[square] = NO_SIDE;
-          if (placed_piece) {
-            blocker_0_ &= ~Util::SQUARE[square];
-            blocker_45_ &= ~Util::SQUARE[Util::ROT45[square]];
-            blocker_90_ &= ~Util::SQUARE[Util::ROT90[square]];
-            blocker_135_ &= ~Util::SQUARE[Util::ROT135[square]];
-          }
-          return;
-        }
-
-        // 置く位置の駒の種類を書き変える。
-        piece_board_[square] = piece_type;
-        // 置く位置のサイドを書き変える。
-        side_board_[square] = side;
-
-        // 置く位置のビットボードをセットする。
-        position_[side][piece_type] |= Util::SQUARE[square];
-        side_pieces_[side] |= Util::SQUARE[square];
-        blocker_0_ |= Util::SQUARE[square];
-        blocker_45_ |= Util::SQUARE[Util::ROT45[square]];
-        blocker_90_ |= Util::SQUARE[Util::ROT90[square]];
-        blocker_135_ |= Util::SQUARE[Util::ROT135[square]];
-
-        // キングの位置を更新する。
-        if (piece_type == KING) {
-          king_[side] = square;
-        }
-      }
-
-      /**
-       * 駒の位置を変える。 (移動先の駒は上書きされる。)
-       * @param from 位置を変えたい駒のマス。
-       * @param to 移動先。
-       */
-      void ReplacePiece(Square from, Square to) {
-        // 移動する位置と移動先の位置が同じなら何もしない。
-        if (from == to) return;
-
-        // 移動。
-        PutPiece(to, piece_board_[from], side_board_[from]);
-        PutPiece(from, EMPTY, NO_SIDE);
       }
 
       /**
