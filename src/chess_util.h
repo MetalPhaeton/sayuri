@@ -224,176 +224,136 @@ namespace Sayuri {
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を右に移動したビットボード。
        */
-      static Bitboard GetRightBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~FYLE[FYLE_H];
-
-        return bitboard << 1;
+      static constexpr Bitboard GetRightBitboard(Bitboard bitboard) {
+        return (bitboard & ~FYLE[FYLE_H]) << 1;
       }
       /**
        * 左に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を左に移動したビットボード。
        */
-      static Bitboard GetLeftBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~FYLE[FYLE_A];
-
-        return bitboard >> 1;
+      static constexpr Bitboard GetLeftBitboard(Bitboard bitboard) {
+        return (bitboard & ~FYLE[FYLE_A]) >> 1;
       }
       /**
        * 上に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を上に移動したビットボード。
        */
-      static Bitboard GetUpBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~RANK[RANK_8];
-
-        return bitboard << 8;
+      static constexpr Bitboard GetUpBitboard(Bitboard bitboard) {
+        return (bitboard & ~RANK[RANK_8]) << 8;
       }
       /**
        * 下に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を下に移動したビットボード。
        */
-      static Bitboard GetDownBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~RANK[RANK_1];
-
-        return bitboard >> 8;
+      static constexpr Bitboard GetDownBitboard(Bitboard bitboard) {
+        return (bitboard & ~RANK[RANK_1]) >> 8;
       }
       /**
        * 右上に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を右上に移動したビットボード。
        */
-      static Bitboard GetRightUpBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~(RANK[RANK_8] | FYLE[FYLE_H]);
-
-        return bitboard << 9;
+      static constexpr Bitboard GetRightUpBitboard(Bitboard bitboard) {
+        return (bitboard & ~(RANK[RANK_8] | FYLE[FYLE_H])) << 9;
       }
       /**
        * 右下に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を右下に移動したビットボード。
        */
-      static Bitboard GetRightDownBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~(RANK[RANK_1] | FYLE[FYLE_H]);
-
-        return bitboard >> 7;
+      static constexpr Bitboard GetRightDownBitboard(Bitboard bitboard) {
+        return (bitboard & ~(RANK[RANK_1] | FYLE[FYLE_H])) >> 7;
       }
       /**
        * 左上に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を左上に移動したビットボード。
        */
-      static Bitboard GetLeftUpBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~(RANK[RANK_8] | FYLE[FYLE_A]);
-
-        return bitboard << 7;
+      static constexpr Bitboard GetLeftUpBitboard(Bitboard bitboard) {
+        return (bitboard & ~(RANK[RANK_8] | FYLE[FYLE_A])) << 7;
       }
       /**
        * 左下に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を左下に移動したビットボード。
        */
-      static Bitboard GetLeftDownBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~(RANK[RANK_1] | FYLE[FYLE_A]);
-
-        return bitboard >> 9;
+      static constexpr Bitboard GetLeftDownBitboard(Bitboard bitboard) {
+        return (bitboard & ~(RANK[RANK_1] | FYLE[FYLE_A])) >> 9;
       }
       /**
        * 右右上に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を右右上に移動したビットボード。
        */
-      static Bitboard GetRightRightUpBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~(RANK[RANK_8] | FYLE[FYLE_H] | FYLE[FYLE_G]);
-
-        return bitboard << 10;
+      static constexpr Bitboard GetRightRightUpBitboard(Bitboard bitboard) {
+        return (bitboard & ~(RANK[RANK_8] | FYLE[FYLE_H] | FYLE[FYLE_G]))
+        << 10;
       }
       /**
        * 右上上に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を右上上に移動したビットボード。
        */
-      static Bitboard GetRightUpUpBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~(RANK[RANK_8] | RANK[RANK_7] | FYLE[FYLE_H]);
-
-        return bitboard << 17;
+      static constexpr Bitboard GetRightUpUpBitboard(Bitboard bitboard) {
+        return (bitboard & ~(RANK[RANK_8] | RANK[RANK_7] | FYLE[FYLE_H]))
+        << 17;
       }
       /**
        * 右右下に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を右右下に移動したビットボード。
        */
-      static Bitboard GetRightRightDownBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~(RANK[RANK_1] | FYLE[FYLE_H] | FYLE[FYLE_G]);
-
-        return bitboard >> 6;
+      static constexpr Bitboard GetRightRightDownBitboard(Bitboard bitboard) {
+        return (bitboard & ~(RANK[RANK_1] | FYLE[FYLE_H] | FYLE[FYLE_G]))
+        >> 6;
       }
       /**
        * 右下下に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を右下下に移動したビットボード。
        */
-      static Bitboard GetRightDownDownBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~(RANK[RANK_1] | RANK[RANK_2] | FYLE[FYLE_H]);
-
-        return bitboard >> 15;
+      static constexpr Bitboard GetRightDownDownBitboard(Bitboard bitboard) {
+        return (bitboard & ~(RANK[RANK_1] | RANK[RANK_2] | FYLE[FYLE_H]))
+        >> 15;
       }
       /**
        * 左左上に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を左左上に移動したビットボード。
        */
-      static Bitboard GetLeftLeftUpBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~(RANK[RANK_8] | FYLE[FYLE_A] | FYLE[FYLE_B]);
-
-        return bitboard << 6;
+      static constexpr Bitboard GetLeftLeftUpBitboard(Bitboard bitboard) {
+        return (bitboard & ~(RANK[RANK_8] | FYLE[FYLE_A] | FYLE[FYLE_B]))
+        << 6;
       }
       /**
        * 左上上に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を左上上に移動したビットボード。
        */
-      static Bitboard GetLeftUpUpBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~(RANK[RANK_8] | RANK[RANK_7] | FYLE[FYLE_A]);
-
-        return bitboard << 15;
+      static constexpr Bitboard GetLeftUpUpBitboard(Bitboard bitboard) {
+        return (bitboard & ~(RANK[RANK_8] | RANK[RANK_7] | FYLE[FYLE_A]))
+        << 15;
       }
       /**
        * 左左下に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を左左下に移動したビットボード。
        */
-      static Bitboard GetLeftLeftDownBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~(RANK[RANK_1] | FYLE[FYLE_A] | FYLE[FYLE_B]);
-
-        return bitboard >> 10;
+      static constexpr Bitboard GetLeftLeftDownBitboard(Bitboard bitboard) {
+        return (bitboard & ~(RANK[RANK_1] | FYLE[FYLE_A] | FYLE[FYLE_B]))
+        >> 10;
       }
       /**
        * 左下下に移動したビットボードを得る。
        * @param bitboard 対象のビットボード。
        * @return 「bitboard」を左下下に移動したビットボード。
        */
-      static Bitboard GetLeftDownDownBitboard(Bitboard bitboard) {
-        // 移動すると盤外になるマスは削除。
-        bitboard &= ~(RANK[RANK_1] | RANK[RANK_2] | FYLE[FYLE_A]);
-
-        return bitboard >> 17;
+      static constexpr Bitboard GetLeftDownDownBitboard(Bitboard bitboard) {
+        return (bitboard & ~(RANK[RANK_1] | RANK[RANK_2] | FYLE[FYLE_A]))
+        >> 17;
       }
 
       // ====================== //
