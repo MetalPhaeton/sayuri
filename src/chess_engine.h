@@ -331,27 +331,30 @@ namespace Sayuri {
        * キャスリングの権利を更新。
        */
       void UpdateCastlingRights() {
-        // 白のキャスリングの権利。
-        if (king_[WHITE] != E1) {
-          castling_rights_ &= ~WHITE_CASTLING;
-        } else {
-          if (!(position_[WHITE][ROOK] & Util::SQUARE[H1])) {
-            castling_rights_ &= ~WHITE_SHORT_CASTLING;
-          }
-          if (!(position_[WHITE][ROOK] & Util::SQUARE[A1])) {
-            castling_rights_ &= ~WHITE_LONG_CASTLING;
+        if ((castling_rights_ & WHITE_CASTLING)) {
+          // 白のキャスリングの権利。
+          if (king_[WHITE] != E1) {
+            castling_rights_ &= ~WHITE_CASTLING;
+          } else {
+            if (!(position_[WHITE][ROOK] & Util::SQUARE[H1])) {
+              castling_rights_ &= ~WHITE_SHORT_CASTLING;
+            }
+            if (!(position_[WHITE][ROOK] & Util::SQUARE[A1])) {
+              castling_rights_ &= ~WHITE_LONG_CASTLING;
+            }
           }
         }
-
-        // 黒のキャスリングの権利。
-        if (king_[BLACK] != E8) {
-          castling_rights_ &= ~BLACK_CASTLING;
-        } else {
-          if (!(position_[BLACK][ROOK] & Util::SQUARE[H8])) {
-            castling_rights_ &= ~BLACK_SHORT_CASTLING;
-          }
-          if (!(position_[BLACK][ROOK] & Util::SQUARE[A8])) {
-            castling_rights_ &= ~BLACK_LONG_CASTLING;
+        if ((castling_rights_ & BLACK_CASTLING)) {
+          // 黒のキャスリングの権利。
+          if (king_[BLACK] != E8) {
+            castling_rights_ &= ~BLACK_CASTLING;
+          } else {
+            if (!(position_[BLACK][ROOK] & Util::SQUARE[H8])) {
+              castling_rights_ &= ~BLACK_SHORT_CASTLING;
+            }
+            if (!(position_[BLACK][ROOK] & Util::SQUARE[A8])) {
+              castling_rights_ &= ~BLACK_LONG_CASTLING;
+            }
           }
         }
       }
