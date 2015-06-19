@@ -1481,29 +1481,24 @@ namespace Sayuri {
     // キャッシュ。
     Cache& cache = shared_st_ptr_->cache_;
 
-    // 今すぐ終了すべき。
-    if (shared_st_ptr_->stop_now_) return true;
-
-    // --- ベータカット通知から判断 --- //
-    if (helper_handler_.ReceiveNotification(level)) {
+    // 今すぐ終了すべきかどうか。
+    // stop_now_とベータカット通知で診断。
+    if (shared_st_ptr_->stop_now_
+    || helper_handler_.ReceiveNotification(level)) {
       return true;
     }
 
     // --- 思考ストップ条件から判断 --- //
     // ストップするべきではない。
-    if (shared_st_ptr_->infinite_thinking_) return false;
-    if (shared_st_ptr_->i_depth_ <= 1) return false;
+    if ((shared_st_ptr_->i_depth_ <= 1)
+    || shared_st_ptr_->infinite_thinking_) {
+      return false;
+    }
 
     // ストップするべき。
-    if (shared_st_ptr_->i_depth_ > cache.max_depth_) {
-      shared_st_ptr_->stop_now_ = true;
-      return true;
-    }
-    if (shared_st_ptr_->searched_nodes_ >= cache.max_nodes_) {
-      shared_st_ptr_->stop_now_ = true;
-      return true;
-    }
-    if (shared_st_ptr_->is_time_over_) {
+    if ((shared_st_ptr_->is_time_over_)
+    || (shared_st_ptr_->searched_nodes_ >= cache.max_nodes_)
+    || (shared_st_ptr_->i_depth_ > cache.max_depth_)) {
       shared_st_ptr_->stop_now_ = true;
       return true;
     }
