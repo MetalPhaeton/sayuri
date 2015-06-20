@@ -239,9 +239,9 @@ namespace Sayuri {
           piece_board_[square] = piece_type;
           side_pieces_[side] |= Util::SQUARE[square];
           blocker_0_ |= Util::SQUARE[square];
-          blocker_45_ |= Util::SQUARE[Util::ROT45[square]];
-          blocker_90_ |= Util::SQUARE[Util::ROT90[square]];
-          blocker_135_ |= Util::SQUARE[Util::ROT135[square]];
+          blocker_45_ |= Util::SQUARE45[square];
+          blocker_90_ |= Util::SQUARE90[square];
+          blocker_135_ |= Util::SQUARE135[square];
           if (piece_type == KING) {
             king_[side] = square;
           }
@@ -334,9 +334,9 @@ namespace Sayuri {
     for (Bitboard bb = blocker_0_; bb; NEXT_BITBOARD(bb)) {
       Square square = Util::GetSquare(bb);
 
-      blocker_45_ |= Util::SQUARE[Util::ROT45[square]];
-      blocker_90_ |= Util::SQUARE[Util::ROT90[square]];
-      blocker_135_ |= Util::SQUARE[Util::ROT135[square]];
+      blocker_45_ |= Util::SQUARE45[square];
+      blocker_90_ |= Util::SQUARE90[square];
+      blocker_135_ |= Util::SQUARE135[square];
     }
 
     // 駒の種類とサイドの配置を作る。
