@@ -60,6 +60,9 @@ namespace Sayuri {
   // static定数 //
   // ========== //
   constexpr Bitboard Util::SQUARE[NUM_SQUARES];
+  constexpr Bitboard Util::SQUARE45[NUM_SQUARES];
+  constexpr Bitboard Util::SQUARE90[NUM_SQUARES];
+  constexpr Bitboard Util::SQUARE135[NUM_SQUARES];
   constexpr Bitboard Util::FYLE[NUM_FYLES];
   constexpr Bitboard Util::RANK[NUM_RANKS];
   constexpr Bitboard Util::SQCOLOR[NUM_SIDES];

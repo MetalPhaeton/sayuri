@@ -640,9 +640,9 @@ namespace Sayuri {
       side_board_[square] = NO_SIDE;
       if (placed_piece) {
         blocker_0_ &= ~Util::SQUARE[square];
-        blocker_45_ &= ~Util::SQUARE[Util::ROT45[square]];
-        blocker_90_ &= ~Util::SQUARE[Util::ROT90[square]];
-        blocker_135_ &= ~Util::SQUARE[Util::ROT135[square]];
+        blocker_45_ &= ~Util::SQUARE45[square];
+        blocker_90_ &= ~Util::SQUARE90[square];
+        blocker_135_ &= ~Util::SQUARE135[square];
       }
       return;
     }
@@ -656,9 +656,9 @@ namespace Sayuri {
     position_[side][piece_type] |= Util::SQUARE[square];
     side_pieces_[side] |= Util::SQUARE[square];
     blocker_0_ |= Util::SQUARE[square];
-    blocker_45_ |= Util::SQUARE[Util::ROT45[square]];
-    blocker_90_ |= Util::SQUARE[Util::ROT90[square]];
-    blocker_135_ |= Util::SQUARE[Util::ROT135[square]];
+    blocker_45_ |= Util::SQUARE45[square];
+    blocker_90_ |= Util::SQUARE90[square];
+    blocker_135_ |= Util::SQUARE135[square];
 
     // キングの位置を更新する。
     if (piece_type == KING) {
