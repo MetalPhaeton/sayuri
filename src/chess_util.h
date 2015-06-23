@@ -1385,7 +1385,7 @@ namespace Sayuri {
        * @return ランク。
        */
       static constexpr Rank SquareToRank(Square square) {
-        return (square >> 3) & 7;
+        return square >> 3;
       }
       /**
        * ファイルとランクをマスに変換。
@@ -1394,7 +1394,7 @@ namespace Sayuri {
        * @return マス。
        */
       static constexpr Square CoordToSquare(Fyle fyle, Rank rank) {
-        return ((rank << 3) | (fyle & 7)) & 63;
+        return (rank << 3) | (fyle & 7);
       }
 
       // ================ //
