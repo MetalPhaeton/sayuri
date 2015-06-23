@@ -402,6 +402,600 @@ namespace Sayuri {
         0x55aa55aa55aa55aaULL
       };
 
+      // ======== //
+      // マジック //
+      // ======== //
+      /** マジックのシフトの数。0度と90度用。 [マス] */
+      static constexpr int MAGIC_SHIFT_V[NUM_SQUARES] {
+        0, 0, 0, 0, 0, 0, 0, 0,
+        8, 8, 8, 8, 8, 8, 8, 8,
+        16, 16, 16, 16, 16, 16, 16, 16,
+        24, 24, 24, 24, 24, 24, 24, 24,
+        32, 32, 32, 32, 32, 32, 32, 32,
+        40, 40, 40, 40, 40, 40, 40, 40,
+        48, 48, 48, 48, 48, 48, 48, 48,
+        56, 56, 56, 56, 56, 56, 56, 56
+      };
+      /** マジックのシフトの数。45度と135度用。 [マス] */
+      static constexpr int MAGIC_SHIFT_D[NUM_SQUARES] {
+        0,
+        1, 1,
+        3, 3, 3,
+        6, 6, 6, 6,
+        10, 10, 10, 10, 10,
+        15, 15, 15, 15, 15, 15,
+        21, 21, 21, 21, 21, 21, 21,
+        28, 28, 28, 28, 28, 28, 28, 28,
+        36, 36, 36, 36, 36, 36, 36,
+        43, 43, 43, 43, 43, 43,
+        49, 49, 49, 49, 49,
+        54, 54, 54, 54,
+        58, 58, 58,
+        61, 61,
+        63
+      };
+      /** マジックのシフトの数。 [マス][角度] */
+      static constexpr Bitboard MAGIC_SHIFT[NUM_SQUARES][NUM_ROTS] {
+        {
+          MAGIC_SHIFT_V[A1], MAGIC_SHIFT_D[ROT45[A1]],
+          MAGIC_SHIFT_V[ROT90[A1]], MAGIC_SHIFT_D[ROT135[A1]]
+        },
+        {
+          MAGIC_SHIFT_V[B1], MAGIC_SHIFT_D[ROT45[B1]],
+          MAGIC_SHIFT_V[ROT90[B1]], MAGIC_SHIFT_D[ROT135[B1]]
+        },
+        {
+          MAGIC_SHIFT_V[C1], MAGIC_SHIFT_D[ROT45[C1]],
+          MAGIC_SHIFT_V[ROT90[C1]], MAGIC_SHIFT_D[ROT135[C1]]
+        },
+        {
+          MAGIC_SHIFT_V[D1], MAGIC_SHIFT_D[ROT45[D1]],
+          MAGIC_SHIFT_V[ROT90[D1]], MAGIC_SHIFT_D[ROT135[D1]]
+        },
+        {
+          MAGIC_SHIFT_V[E1], MAGIC_SHIFT_D[ROT45[E1]],
+          MAGIC_SHIFT_V[ROT90[E1]], MAGIC_SHIFT_D[ROT135[E1]]
+        },
+        {
+          MAGIC_SHIFT_V[F1], MAGIC_SHIFT_D[ROT45[F1]],
+          MAGIC_SHIFT_V[ROT90[F1]], MAGIC_SHIFT_D[ROT135[F1]]
+        },
+        {
+          MAGIC_SHIFT_V[G1], MAGIC_SHIFT_D[ROT45[G1]],
+          MAGIC_SHIFT_V[ROT90[G1]], MAGIC_SHIFT_D[ROT135[G1]]
+        },
+        {
+          MAGIC_SHIFT_V[H1], MAGIC_SHIFT_D[ROT45[H1]],
+          MAGIC_SHIFT_V[ROT90[H1]], MAGIC_SHIFT_D[ROT135[H1]]
+        },
+
+        {
+          MAGIC_SHIFT_V[A2], MAGIC_SHIFT_D[ROT45[A2]],
+          MAGIC_SHIFT_V[ROT90[A2]], MAGIC_SHIFT_D[ROT135[A2]]
+        },
+        {
+          MAGIC_SHIFT_V[B2], MAGIC_SHIFT_D[ROT45[B2]],
+          MAGIC_SHIFT_V[ROT90[B2]], MAGIC_SHIFT_D[ROT135[B2]]
+        },
+        {
+          MAGIC_SHIFT_V[C2], MAGIC_SHIFT_D[ROT45[C2]],
+          MAGIC_SHIFT_V[ROT90[C2]], MAGIC_SHIFT_D[ROT135[C2]]
+        },
+        {
+          MAGIC_SHIFT_V[D2], MAGIC_SHIFT_D[ROT45[D2]],
+          MAGIC_SHIFT_V[ROT90[D2]], MAGIC_SHIFT_D[ROT135[D2]]
+        },
+        {
+          MAGIC_SHIFT_V[E2], MAGIC_SHIFT_D[ROT45[E2]],
+          MAGIC_SHIFT_V[ROT90[E2]], MAGIC_SHIFT_D[ROT135[E2]]
+        },
+        {
+          MAGIC_SHIFT_V[F2], MAGIC_SHIFT_D[ROT45[F2]],
+          MAGIC_SHIFT_V[ROT90[F2]], MAGIC_SHIFT_D[ROT135[F2]]
+        },
+        {
+          MAGIC_SHIFT_V[G2], MAGIC_SHIFT_D[ROT45[G2]],
+          MAGIC_SHIFT_V[ROT90[G2]], MAGIC_SHIFT_D[ROT135[G2]]
+        },
+        {
+          MAGIC_SHIFT_V[H2], MAGIC_SHIFT_D[ROT45[H2]],
+          MAGIC_SHIFT_V[ROT90[H2]], MAGIC_SHIFT_D[ROT135[H2]]
+        },
+
+        {
+          MAGIC_SHIFT_V[A3], MAGIC_SHIFT_D[ROT45[A3]],
+          MAGIC_SHIFT_V[ROT90[A3]], MAGIC_SHIFT_D[ROT135[A3]]
+        },
+        {
+          MAGIC_SHIFT_V[B3], MAGIC_SHIFT_D[ROT45[B3]],
+          MAGIC_SHIFT_V[ROT90[B3]], MAGIC_SHIFT_D[ROT135[B3]]
+        },
+        {
+          MAGIC_SHIFT_V[C3], MAGIC_SHIFT_D[ROT45[C3]],
+          MAGIC_SHIFT_V[ROT90[C3]], MAGIC_SHIFT_D[ROT135[C3]]
+        },
+        {
+          MAGIC_SHIFT_V[D3], MAGIC_SHIFT_D[ROT45[D3]],
+          MAGIC_SHIFT_V[ROT90[D3]], MAGIC_SHIFT_D[ROT135[D3]]
+        },
+        {
+          MAGIC_SHIFT_V[E3], MAGIC_SHIFT_D[ROT45[E3]],
+          MAGIC_SHIFT_V[ROT90[E3]], MAGIC_SHIFT_D[ROT135[E3]]
+        },
+        {
+          MAGIC_SHIFT_V[F3], MAGIC_SHIFT_D[ROT45[F3]],
+          MAGIC_SHIFT_V[ROT90[F3]], MAGIC_SHIFT_D[ROT135[F3]]
+        },
+        {
+          MAGIC_SHIFT_V[G3], MAGIC_SHIFT_D[ROT45[G3]],
+          MAGIC_SHIFT_V[ROT90[G3]], MAGIC_SHIFT_D[ROT135[G3]]
+        },
+        {
+          MAGIC_SHIFT_V[H3], MAGIC_SHIFT_D[ROT45[H3]],
+          MAGIC_SHIFT_V[ROT90[H3]], MAGIC_SHIFT_D[ROT135[H3]]
+        },
+
+        {
+          MAGIC_SHIFT_V[A4], MAGIC_SHIFT_D[ROT45[A4]],
+          MAGIC_SHIFT_V[ROT90[A4]], MAGIC_SHIFT_D[ROT135[A4]]
+        },
+        {
+          MAGIC_SHIFT_V[B4], MAGIC_SHIFT_D[ROT45[B4]],
+          MAGIC_SHIFT_V[ROT90[B4]], MAGIC_SHIFT_D[ROT135[B4]]
+        },
+        {
+          MAGIC_SHIFT_V[C4], MAGIC_SHIFT_D[ROT45[C4]],
+          MAGIC_SHIFT_V[ROT90[C4]], MAGIC_SHIFT_D[ROT135[C4]]
+        },
+        {
+          MAGIC_SHIFT_V[D4], MAGIC_SHIFT_D[ROT45[D4]],
+          MAGIC_SHIFT_V[ROT90[D4]], MAGIC_SHIFT_D[ROT135[D4]]
+        },
+        {
+          MAGIC_SHIFT_V[E4], MAGIC_SHIFT_D[ROT45[E4]],
+          MAGIC_SHIFT_V[ROT90[E4]], MAGIC_SHIFT_D[ROT135[E4]]
+        },
+        {
+          MAGIC_SHIFT_V[F4], MAGIC_SHIFT_D[ROT45[F4]],
+          MAGIC_SHIFT_V[ROT90[F4]], MAGIC_SHIFT_D[ROT135[F4]]
+        },
+        {
+          MAGIC_SHIFT_V[G4], MAGIC_SHIFT_D[ROT45[G4]],
+          MAGIC_SHIFT_V[ROT90[G4]], MAGIC_SHIFT_D[ROT135[G4]]
+        },
+        {
+          MAGIC_SHIFT_V[H4], MAGIC_SHIFT_D[ROT45[H4]],
+          MAGIC_SHIFT_V[ROT90[H4]], MAGIC_SHIFT_D[ROT135[H4]]
+        },
+
+        {
+          MAGIC_SHIFT_V[A5], MAGIC_SHIFT_D[ROT45[A5]],
+          MAGIC_SHIFT_V[ROT90[A5]], MAGIC_SHIFT_D[ROT135[A5]]
+        },
+        {
+          MAGIC_SHIFT_V[B5], MAGIC_SHIFT_D[ROT45[B5]],
+          MAGIC_SHIFT_V[ROT90[B5]], MAGIC_SHIFT_D[ROT135[B5]]
+        },
+        {
+          MAGIC_SHIFT_V[C5], MAGIC_SHIFT_D[ROT45[C5]],
+          MAGIC_SHIFT_V[ROT90[C5]], MAGIC_SHIFT_D[ROT135[C5]]
+        },
+        {
+          MAGIC_SHIFT_V[D5], MAGIC_SHIFT_D[ROT45[D5]],
+          MAGIC_SHIFT_V[ROT90[D5]], MAGIC_SHIFT_D[ROT135[D5]]
+        },
+        {
+          MAGIC_SHIFT_V[E5], MAGIC_SHIFT_D[ROT45[E5]],
+          MAGIC_SHIFT_V[ROT90[E5]], MAGIC_SHIFT_D[ROT135[E5]]
+        },
+        {
+          MAGIC_SHIFT_V[F5], MAGIC_SHIFT_D[ROT45[F5]],
+          MAGIC_SHIFT_V[ROT90[F5]], MAGIC_SHIFT_D[ROT135[F5]]
+        },
+        {
+          MAGIC_SHIFT_V[G5], MAGIC_SHIFT_D[ROT45[G5]],
+          MAGIC_SHIFT_V[ROT90[G5]], MAGIC_SHIFT_D[ROT135[G5]]
+        },
+        {
+          MAGIC_SHIFT_V[H5], MAGIC_SHIFT_D[ROT45[H5]],
+          MAGIC_SHIFT_V[ROT90[H5]], MAGIC_SHIFT_D[ROT135[H5]]
+        },
+
+        {
+          MAGIC_SHIFT_V[A6], MAGIC_SHIFT_D[ROT45[A6]],
+          MAGIC_SHIFT_V[ROT90[A6]], MAGIC_SHIFT_D[ROT135[A6]]
+        },
+        {
+          MAGIC_SHIFT_V[B6], MAGIC_SHIFT_D[ROT45[B6]],
+          MAGIC_SHIFT_V[ROT90[B6]], MAGIC_SHIFT_D[ROT135[B6]]
+        },
+        {
+          MAGIC_SHIFT_V[C6], MAGIC_SHIFT_D[ROT45[C6]],
+          MAGIC_SHIFT_V[ROT90[C6]], MAGIC_SHIFT_D[ROT135[C6]]
+        },
+        {
+          MAGIC_SHIFT_V[D6], MAGIC_SHIFT_D[ROT45[D6]],
+          MAGIC_SHIFT_V[ROT90[D6]], MAGIC_SHIFT_D[ROT135[D6]]
+        },
+        {
+          MAGIC_SHIFT_V[E6], MAGIC_SHIFT_D[ROT45[E6]],
+          MAGIC_SHIFT_V[ROT90[E6]], MAGIC_SHIFT_D[ROT135[E6]]
+        },
+        {
+          MAGIC_SHIFT_V[F6], MAGIC_SHIFT_D[ROT45[F6]],
+          MAGIC_SHIFT_V[ROT90[F6]], MAGIC_SHIFT_D[ROT135[F6]]
+        },
+        {
+          MAGIC_SHIFT_V[G6], MAGIC_SHIFT_D[ROT45[G6]],
+          MAGIC_SHIFT_V[ROT90[G6]], MAGIC_SHIFT_D[ROT135[G6]]
+        },
+        {
+          MAGIC_SHIFT_V[H6], MAGIC_SHIFT_D[ROT45[H6]],
+          MAGIC_SHIFT_V[ROT90[H6]], MAGIC_SHIFT_D[ROT135[H6]]
+        },
+
+        {
+          MAGIC_SHIFT_V[A7], MAGIC_SHIFT_D[ROT45[A7]],
+          MAGIC_SHIFT_V[ROT90[A7]], MAGIC_SHIFT_D[ROT135[A7]]
+        },
+        {
+          MAGIC_SHIFT_V[B7], MAGIC_SHIFT_D[ROT45[B7]],
+          MAGIC_SHIFT_V[ROT90[B7]], MAGIC_SHIFT_D[ROT135[B7]]
+        },
+        {
+          MAGIC_SHIFT_V[C7], MAGIC_SHIFT_D[ROT45[C7]],
+          MAGIC_SHIFT_V[ROT90[C7]], MAGIC_SHIFT_D[ROT135[C7]]
+        },
+        {
+          MAGIC_SHIFT_V[D7], MAGIC_SHIFT_D[ROT45[D7]],
+          MAGIC_SHIFT_V[ROT90[D7]], MAGIC_SHIFT_D[ROT135[D7]]
+        },
+        {
+          MAGIC_SHIFT_V[E7], MAGIC_SHIFT_D[ROT45[E7]],
+          MAGIC_SHIFT_V[ROT90[E7]], MAGIC_SHIFT_D[ROT135[E7]]
+        },
+        {
+          MAGIC_SHIFT_V[F7], MAGIC_SHIFT_D[ROT45[F7]],
+          MAGIC_SHIFT_V[ROT90[F7]], MAGIC_SHIFT_D[ROT135[F7]]
+        },
+        {
+          MAGIC_SHIFT_V[G7], MAGIC_SHIFT_D[ROT45[G7]],
+          MAGIC_SHIFT_V[ROT90[G7]], MAGIC_SHIFT_D[ROT135[G7]]
+        },
+        {
+          MAGIC_SHIFT_V[H7], MAGIC_SHIFT_D[ROT45[H7]],
+          MAGIC_SHIFT_V[ROT90[H7]], MAGIC_SHIFT_D[ROT135[H7]]
+        },
+
+        {
+          MAGIC_SHIFT_V[A8], MAGIC_SHIFT_D[ROT45[A8]],
+          MAGIC_SHIFT_V[ROT90[A8]], MAGIC_SHIFT_D[ROT135[A8]]
+        },
+        {
+          MAGIC_SHIFT_V[B8], MAGIC_SHIFT_D[ROT45[B8]],
+          MAGIC_SHIFT_V[ROT90[B8]], MAGIC_SHIFT_D[ROT135[B8]]
+        },
+        {
+          MAGIC_SHIFT_V[C8], MAGIC_SHIFT_D[ROT45[C8]],
+          MAGIC_SHIFT_V[ROT90[C8]], MAGIC_SHIFT_D[ROT135[C8]]
+        },
+        {
+          MAGIC_SHIFT_V[D8], MAGIC_SHIFT_D[ROT45[D8]],
+          MAGIC_SHIFT_V[ROT90[D8]], MAGIC_SHIFT_D[ROT135[D8]]
+        },
+        {
+          MAGIC_SHIFT_V[E8], MAGIC_SHIFT_D[ROT45[E8]],
+          MAGIC_SHIFT_V[ROT90[E8]], MAGIC_SHIFT_D[ROT135[E8]]
+        },
+        {
+          MAGIC_SHIFT_V[F8], MAGIC_SHIFT_D[ROT45[F8]],
+          MAGIC_SHIFT_V[ROT90[F8]], MAGIC_SHIFT_D[ROT135[F8]]
+        },
+        {
+          MAGIC_SHIFT_V[G8], MAGIC_SHIFT_D[ROT45[G8]],
+          MAGIC_SHIFT_V[ROT90[G8]], MAGIC_SHIFT_D[ROT135[G8]]
+        },
+        {
+          MAGIC_SHIFT_V[H8], MAGIC_SHIFT_D[ROT45[H8]],
+          MAGIC_SHIFT_V[ROT90[H8]], MAGIC_SHIFT_D[ROT135[H8]]
+        }
+      }
+      /** マジックのマスク。0度と90度用。 [マス] */
+      static constexpr Bitboard MAGIC_MASK_V[NUM_SQUARES] {
+        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
+        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
+        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
+        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
+        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
+        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
+        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
+        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL
+      };
+      /** マジックのマスク。45度と135度用。 [マス] */
+      static constexpr Bitboard MAGIC_MASK_D[NUM_SQUARES] {
+        0x1ULL,
+        0x3ULL, 0x3ULL,
+        0x7ULL, 0x7ULL, 0x7ULL,
+        0xfULL, 0xfULL, 0xfULL, 0xfULL,
+        0x1fULL, 0x1fULL, 0x1fULL, 0x1fULL, 0x1fULL,
+        0x3fULL, 0x3fULL, 0x3fULL, 0x3fULL, 0x3fULL, 0x3fULL,
+        0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL,
+        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
+        0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL,
+        0x3fULL, 0x3fULL, 0x3fULL, 0x3fULL, 0x3fULL, 0x3fULL,
+        0x1fULL, 0x1fULL, 0x1fULL, 0x1fULL, 0x1fULL,
+        0xfULL, 0xfULL, 0xfULL, 0xfULL,
+        0x7ULL, 0x7ULL, 0x7ULL,
+        0x3ULL, 0x3ULL,
+        0x1ULL
+      };
+      /** マジックのマスク。 [マス][角度] */
+      static constexpr Bitboard MAGIC_MASK[NUM_SQUARES][NUM_ROTS] {
+        {
+          MAGIC_MASK_V[A1], MAGIC_MASK_D[ROT45[A1]],
+          MAGIC_MASK_V[ROT90[A1]], MAGIC_MASK_D[ROT135[A1]]
+        },
+        {
+          MAGIC_MASK_V[B1], MAGIC_MASK_D[ROT45[B1]],
+          MAGIC_MASK_V[ROT90[B1]], MAGIC_MASK_D[ROT135[B1]]
+        },
+        {
+          MAGIC_MASK_V[C1], MAGIC_MASK_D[ROT45[C1]],
+          MAGIC_MASK_V[ROT90[C1]], MAGIC_MASK_D[ROT135[C1]]
+        },
+        {
+          MAGIC_MASK_V[D1], MAGIC_MASK_D[ROT45[D1]],
+          MAGIC_MASK_V[ROT90[D1]], MAGIC_MASK_D[ROT135[D1]]
+        },
+        {
+          MAGIC_MASK_V[E1], MAGIC_MASK_D[ROT45[E1]],
+          MAGIC_MASK_V[ROT90[E1]], MAGIC_MASK_D[ROT135[E1]]
+        },
+        {
+          MAGIC_MASK_V[F1], MAGIC_MASK_D[ROT45[F1]],
+          MAGIC_MASK_V[ROT90[F1]], MAGIC_MASK_D[ROT135[F1]]
+        },
+        {
+          MAGIC_MASK_V[G1], MAGIC_MASK_D[ROT45[G1]],
+          MAGIC_MASK_V[ROT90[G1]], MAGIC_MASK_D[ROT135[G1]]
+        },
+        {
+          MAGIC_MASK_V[H1], MAGIC_MASK_D[ROT45[H1]],
+          MAGIC_MASK_V[ROT90[H1]], MAGIC_MASK_D[ROT135[H1]]
+        },
+
+        {
+          MAGIC_MASK_V[A2], MAGIC_MASK_D[ROT45[A2]],
+          MAGIC_MASK_V[ROT90[A2]], MAGIC_MASK_D[ROT135[A2]]
+        },
+        {
+          MAGIC_MASK_V[B2], MAGIC_MASK_D[ROT45[B2]],
+          MAGIC_MASK_V[ROT90[B2]], MAGIC_MASK_D[ROT135[B2]]
+        },
+        {
+          MAGIC_MASK_V[C2], MAGIC_MASK_D[ROT45[C2]],
+          MAGIC_MASK_V[ROT90[C2]], MAGIC_MASK_D[ROT135[C2]]
+        },
+        {
+          MAGIC_MASK_V[D2], MAGIC_MASK_D[ROT45[D2]],
+          MAGIC_MASK_V[ROT90[D2]], MAGIC_MASK_D[ROT135[D2]]
+        },
+        {
+          MAGIC_MASK_V[E2], MAGIC_MASK_D[ROT45[E2]],
+          MAGIC_MASK_V[ROT90[E2]], MAGIC_MASK_D[ROT135[E2]]
+        },
+        {
+          MAGIC_MASK_V[F2], MAGIC_MASK_D[ROT45[F2]],
+          MAGIC_MASK_V[ROT90[F2]], MAGIC_MASK_D[ROT135[F2]]
+        },
+        {
+          MAGIC_MASK_V[G2], MAGIC_MASK_D[ROT45[G2]],
+          MAGIC_MASK_V[ROT90[G2]], MAGIC_MASK_D[ROT135[G2]]
+        },
+        {
+          MAGIC_MASK_V[H2], MAGIC_MASK_D[ROT45[H2]],
+          MAGIC_MASK_V[ROT90[H2]], MAGIC_MASK_D[ROT135[H2]]
+        },
+
+        {
+          MAGIC_MASK_V[A3], MAGIC_MASK_D[ROT45[A3]],
+          MAGIC_MASK_V[ROT90[A3]], MAGIC_MASK_D[ROT135[A3]]
+        },
+        {
+          MAGIC_MASK_V[B3], MAGIC_MASK_D[ROT45[B3]],
+          MAGIC_MASK_V[ROT90[B3]], MAGIC_MASK_D[ROT135[B3]]
+        },
+        {
+          MAGIC_MASK_V[C3], MAGIC_MASK_D[ROT45[C3]],
+          MAGIC_MASK_V[ROT90[C3]], MAGIC_MASK_D[ROT135[C3]]
+        },
+        {
+          MAGIC_MASK_V[D3], MAGIC_MASK_D[ROT45[D3]],
+          MAGIC_MASK_V[ROT90[D3]], MAGIC_MASK_D[ROT135[D3]]
+        },
+        {
+          MAGIC_MASK_V[E3], MAGIC_MASK_D[ROT45[E3]],
+          MAGIC_MASK_V[ROT90[E3]], MAGIC_MASK_D[ROT135[E3]]
+        },
+        {
+          MAGIC_MASK_V[F3], MAGIC_MASK_D[ROT45[F3]],
+          MAGIC_MASK_V[ROT90[F3]], MAGIC_MASK_D[ROT135[F3]]
+        },
+        {
+          MAGIC_MASK_V[G3], MAGIC_MASK_D[ROT45[G3]],
+          MAGIC_MASK_V[ROT90[G3]], MAGIC_MASK_D[ROT135[G3]]
+        },
+        {
+          MAGIC_MASK_V[H3], MAGIC_MASK_D[ROT45[H3]],
+          MAGIC_MASK_V[ROT90[H3]], MAGIC_MASK_D[ROT135[H3]]
+        },
+
+        {
+          MAGIC_MASK_V[A4], MAGIC_MASK_D[ROT45[A4]],
+          MAGIC_MASK_V[ROT90[A4]], MAGIC_MASK_D[ROT135[A4]]
+        },
+        {
+          MAGIC_MASK_V[B4], MAGIC_MASK_D[ROT45[B4]],
+          MAGIC_MASK_V[ROT90[B4]], MAGIC_MASK_D[ROT135[B4]]
+        },
+        {
+          MAGIC_MASK_V[C4], MAGIC_MASK_D[ROT45[C4]],
+          MAGIC_MASK_V[ROT90[C4]], MAGIC_MASK_D[ROT135[C4]]
+        },
+        {
+          MAGIC_MASK_V[D4], MAGIC_MASK_D[ROT45[D4]],
+          MAGIC_MASK_V[ROT90[D4]], MAGIC_MASK_D[ROT135[D4]]
+        },
+        {
+          MAGIC_MASK_V[E4], MAGIC_MASK_D[ROT45[E4]],
+          MAGIC_MASK_V[ROT90[E4]], MAGIC_MASK_D[ROT135[E4]]
+        },
+        {
+          MAGIC_MASK_V[F4], MAGIC_MASK_D[ROT45[F4]],
+          MAGIC_MASK_V[ROT90[F4]], MAGIC_MASK_D[ROT135[F4]]
+        },
+        {
+          MAGIC_MASK_V[G4], MAGIC_MASK_D[ROT45[G4]],
+          MAGIC_MASK_V[ROT90[G4]], MAGIC_MASK_D[ROT135[G4]]
+        },
+        {
+          MAGIC_MASK_V[H4], MAGIC_MASK_D[ROT45[H4]],
+          MAGIC_MASK_V[ROT90[H4]], MAGIC_MASK_D[ROT135[H4]]
+        },
+
+        {
+          MAGIC_MASK_V[A5], MAGIC_MASK_D[ROT45[A5]],
+          MAGIC_MASK_V[ROT90[A5]], MAGIC_MASK_D[ROT135[A5]]
+        },
+        {
+          MAGIC_MASK_V[B5], MAGIC_MASK_D[ROT45[B5]],
+          MAGIC_MASK_V[ROT90[B5]], MAGIC_MASK_D[ROT135[B5]]
+        },
+        {
+          MAGIC_MASK_V[C5], MAGIC_MASK_D[ROT45[C5]],
+          MAGIC_MASK_V[ROT90[C5]], MAGIC_MASK_D[ROT135[C5]]
+        },
+        {
+          MAGIC_MASK_V[D5], MAGIC_MASK_D[ROT45[D5]],
+          MAGIC_MASK_V[ROT90[D5]], MAGIC_MASK_D[ROT135[D5]]
+        },
+        {
+          MAGIC_MASK_V[E5], MAGIC_MASK_D[ROT45[E5]],
+          MAGIC_SHIFT_V[ROT90[E5]], MAGIC_MASK_D[ROT135[E5]]
+        },
+        {
+          MAGIC_MASK_V[F5], MAGIC_MASK_D[ROT45[F5]],
+          MAGIC_MASK_V[ROT90[F5]], MAGIC_MASK_D[ROT135[F5]]
+        },
+        {
+          MAGIC_MASK_V[G5], MAGIC_MASK_D[ROT45[G5]],
+          MAGIC_MASK_V[ROT90[G5]], MAGIC_MASK_D[ROT135[G5]]
+        },
+        {
+          MAGIC_MASK_V[H5], MAGIC_MASK_D[ROT45[H5]],
+          MAGIC_MASK_V[ROT90[H5]], MAGIC_MASK_D[ROT135[H5]]
+        },
+
+        {
+          MAGIC_MASK_V[A6], MAGIC_MASK_D[ROT45[A6]],
+          MAGIC_MASK_V[ROT90[A6]], MAGIC_MASK_D[ROT135[A6]]
+        },
+        {
+          MAGIC_MASK_V[B6], MAGIC_MASK_D[ROT45[B6]],
+          MAGIC_MASK_V[ROT90[B6]], MAGIC_MASK_D[ROT135[B6]]
+        },
+        {
+          MAGIC_MASK_V[C6], MAGIC_MASK_D[ROT45[C6]],
+          MAGIC_MASK_V[ROT90[C6]], MAGIC_MASK_D[ROT135[C6]]
+        },
+        {
+          MAGIC_MASK_V[D6], MAGIC_MASK_D[ROT45[D6]],
+          MAGIC_MASK_V[ROT90[D6]], MAGIC_MASK_D[ROT135[D6]]
+        },
+        {
+          MAGIC_MASK_V[E6], MAGIC_MASK_D[ROT45[E6]],
+          MAGIC_MASK_V[ROT90[E6]], MAGIC_MASK_D[ROT135[E6]]
+        },
+        {
+          MAGIC_MASK_V[F6], MAGIC_MASK_D[ROT45[F6]],
+          MAGIC_MASK_V[ROT90[F6]], MAGIC_MASK_D[ROT135[F6]]
+        },
+        {
+          MAGIC_MASK_V[G6], MAGIC_MASK_D[ROT45[G6]],
+          MAGIC_MASK_V[ROT90[G6]], MAGIC_MASK_D[ROT135[G6]]
+        },
+        {
+          MAGIC_MASK_V[H6], MAGIC_MASK_D[ROT45[H6]],
+          MAGIC_MASK_V[ROT90[H6]], MAGIC_MASK_D[ROT135[H6]]
+        },
+
+        {
+          MAGIC_MASK_V[A7], MAGIC_MASK_D[ROT45[A7]],
+          MAGIC_MASK_V[ROT90[A7]], MAGIC_MASK_D[ROT135[A7]]
+        },
+        {
+          MAGIC_MASK_V[B7], MAGIC_MASK_D[ROT45[B7]],
+          MAGIC_MASK_V[ROT90[B7]], MAGIC_MASK_D[ROT135[B7]]
+        },
+        {
+          MAGIC_MASK_V[C7], MAGIC_MASK_D[ROT45[C7]],
+          MAGIC_MASK_V[ROT90[C7]], MAGIC_MASK_D[ROT135[C7]]
+        },
+        {
+          MAGIC_MASK_V[D7], MAGIC_MASK_D[ROT45[D7]],
+          MAGIC_MASK_V[ROT90[D7]], MAGIC_MASK_D[ROT135[D7]]
+        },
+        {
+          MAGIC_MASK_V[E7], MAGIC_MASK_D[ROT45[E7]],
+          MAGIC_MASK_V[ROT90[E7]], MAGIC_MASK_D[ROT135[E7]]
+        },
+        {
+          MAGIC_MASK_V[F7], MAGIC_MASK_D[ROT45[F7]],
+          MAGIC_MASK_V[ROT90[F7]], MAGIC_MASK_D[ROT135[F7]]
+        },
+        {
+          MAGIC_MASK_V[G7], MAGIC_MASK_D[ROT45[G7]],
+          MAGIC_MASK_V[ROT90[G7]], MAGIC_MASK_D[ROT135[G7]]
+        },
+        {
+          MAGIC_MASK_V[H7], MAGIC_MASK_D[ROT45[H7]],
+          MAGIC_MASK_V[ROT90[H7]], MAGIC_MASK_D[ROT135[H7]]
+        },
+
+        {
+          MAGIC_MASK_V[A8], MAGIC_MASK_D[ROT45[A8]],
+          MAGIC_MASK_V[ROT90[A8]], MAGIC_MASK_D[ROT135[A8]]
+        },
+        {
+          MAGIC_MASK_V[B8], MAGIC_MASK_D[ROT45[B8]],
+          MAGIC_MASK_V[ROT90[B8]], MAGIC_MASK_D[ROT135[B8]]
+        },
+        {
+          MAGIC_MASK_V[C8], MAGIC_MASK_D[ROT45[C8]],
+          MAGIC_MASK_V[ROT90[C8]], MAGIC_MASK_D[ROT135[C8]]
+        },
+        {
+          MAGIC_MASK_V[D8], MAGIC_MASK_D[ROT45[D8]],
+          MAGIC_MASK_V[ROT90[D8]], MAGIC_MASK_D[ROT135[D8]]
+        },
+        {
+          MAGIC_MASK_V[E8], MAGIC_MASK_D[ROT45[E8]],
+          MAGIC_MASK_V[ROT90[E8]], MAGIC_MASK_D[ROT135[E8]]
+        },
+        {
+          MAGIC_MASK_V[F8], MAGIC_MASK_D[ROT45[F8]],
+          MAGIC_MASK_V[ROT90[F8]], MAGIC_MASK_D[ROT135[F8]]
+        },
+        {
+          MAGIC_MASK_V[G8], MAGIC_MASK_D[ROT45[G8]],
+          MAGIC_MASK_V[ROT90[G8]], MAGIC_MASK_D[ROT135[G8]]
+        },
+        {
+          MAGIC_MASK_V[H8], MAGIC_MASK_D[ROT45[H8]],
+          MAGIC_MASK_V[ROT90[H8]], MAGIC_MASK_D[ROT135[H8]]
+        }
+      }
+
       // ================================ //
       // 各種方向のビットボードを得る関数 //
       // ================================ //
@@ -953,67 +1547,9 @@ namespace Sayuri {
       /** num_bit16_table_[]を初期化する。 */
       static void InitNumBit16Table();
 
-      // ======== //
-      // マジック //
-      // ======== //
-      /** マジックのシフトの数。0度と90度用。 [マス] */
-      static constexpr int MAGIC_SHIFT_V[NUM_SQUARES] {
-        0, 0, 0, 0, 0, 0, 0, 0,
-        8, 8, 8, 8, 8, 8, 8, 8,
-        16, 16, 16, 16, 16, 16, 16, 16,
-        24, 24, 24, 24, 24, 24, 24, 24,
-        32, 32, 32, 32, 32, 32, 32, 32,
-        40, 40, 40, 40, 40, 40, 40, 40,
-        48, 48, 48, 48, 48, 48, 48, 48,
-        56, 56, 56, 56, 56, 56, 56, 56
-      };
-      /** マジックのシフトの数。45度と135度用。 [マス] */
-      static constexpr int MAGIC_SHIFT_D[NUM_SQUARES] {
-        0,
-        1, 1,
-        3, 3, 3,
-        6, 6, 6, 6,
-        10, 10, 10, 10, 10,
-        15, 15, 15, 15, 15, 15,
-        21, 21, 21, 21, 21, 21, 21,
-        28, 28, 28, 28, 28, 28, 28, 28,
-        36, 36, 36, 36, 36, 36, 36,
-        43, 43, 43, 43, 43, 43,
-        49, 49, 49, 49, 49,
-        54, 54, 54, 54,
-        58, 58, 58,
-        61, 61,
-        63
-      };
-      /** マジックのマスク。0度と90度用。 [マス] */
-      static constexpr Bitboard MAGIC_MASK_V[NUM_SQUARES] {
-        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
-        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
-        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
-        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
-        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
-        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
-        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
-        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL
-      };
-      /** マジックのマスク。45度と135度用。 [マス] */
-      static constexpr Bitboard MAGIC_MASK_D[NUM_SQUARES] {
-        0x1ULL,
-        0x3ULL, 0x3ULL,
-        0x7ULL, 0x7ULL, 0x7ULL,
-        0xfULL, 0xfULL, 0xfULL, 0xfULL,
-        0x1fULL, 0x1fULL, 0x1fULL, 0x1fULL, 0x1fULL,
-        0x3fULL, 0x3fULL, 0x3fULL, 0x3fULL, 0x3fULL, 0x3fULL,
-        0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL,
-        0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
-        0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL, 0x7fULL,
-        0x3fULL, 0x3fULL, 0x3fULL, 0x3fULL, 0x3fULL, 0x3fULL,
-        0x1fULL, 0x1fULL, 0x1fULL, 0x1fULL, 0x1fULL,
-        0xfULL, 0xfULL, 0xfULL, 0xfULL,
-        0x7ULL, 0x7ULL, 0x7ULL,
-        0x3ULL, 0x3ULL,
-        0x1ULL
-      };
+      // ========== //
+      // マジック用 //
+      // ========== //
       /** ブロッカー用8ビットマスク。 */
       static constexpr unsigned int BLOCKER_MAP = 0xff;
       /** 0度方向への攻撃の配列。 [マス][ブロッカーのパターン8ビット] */
