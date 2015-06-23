@@ -74,8 +74,10 @@ namespace Sayuri {
   constexpr Bitboard Util::SQCOLOR[NUM_SIDES];
   constexpr int Util::MAGIC_SHIFT_V[NUM_SQUARES];
   constexpr int Util::MAGIC_SHIFT_D[NUM_SQUARES];
+  constexpr int Util::MAGIC_SHIFT[NUM_SQUARES][NUM_ROTS];
   constexpr Bitboard Util::MAGIC_MASK_V[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK_D[NUM_SQUARES];
+  constexpr Bitboard Util::MAGIC_MASK[NUM_SQUARES][NUM_ROTS];
   constexpr unsigned int Util::BLOCKER_MAP;
 
   // ================== //

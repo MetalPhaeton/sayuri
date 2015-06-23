@@ -100,7 +100,27 @@ namespace Sayuri {
 
     // ========================================================================
 
-    DoRepeatTest(*shell_ptr);
+    FOR_SQUARES(square) {
+      if (Util::MAGIC_SHIFT[square][R0] != Util::MAGIC_SHIFT_V[square]) {
+        std::cout << "Error: " << square << " - R0" << std::endl;
+        break;
+      }
+      if (Util::MAGIC_SHIFT[square][R45]
+      != Util::MAGIC_SHIFT_D[Util::ROT45[square]]) {
+        std::cout << "Error: " << square << " - R45" << std::endl;
+        break;
+      }
+      if (Util::MAGIC_SHIFT[square][R90]
+      != Util::MAGIC_SHIFT_V[Util::ROT90[square]]) {
+        std::cout << "Error: " << square << " - R90" << std::endl;
+        break;
+      }
+      if (Util::MAGIC_SHIFT[square][R135]
+      != Util::MAGIC_SHIFT_D[Util::ROT135[square]]) {
+        std::cout << "Error: " << square << " - R135" << std::endl;
+        break;
+      }
+    }
 
     return 0;
   }

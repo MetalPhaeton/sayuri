@@ -964,7 +964,7 @@ namespace Sayuri {
         },
         {
           MAGIC_MASK_V[E5], MAGIC_MASK_D[ROT45[E5]],
-          MAGIC_SHIFT_V[ROT90[E5]], MAGIC_MASK_D[ROT135[E5]]
+          MAGIC_MASK_V[ROT90[E5]], MAGIC_MASK_D[ROT135[E5]]
         },
         {
           MAGIC_MASK_V[F5], MAGIC_MASK_D[ROT45[F5]],
@@ -1230,7 +1230,7 @@ namespace Sayuri {
        */
       static Bitboard GetAttack0(Square square, Bitboard blocker_0) {
         return attack_table_0_[square]
-        [(blocker_0 >> MAGIC_SHIFT_V[square]) & MAGIC_MASK_V[square]];
+        [(blocker_0 >> MAGIC_SHIFT[square][R0]) & MAGIC_MASK[square][R0]];
       }
       /**
        * 45度の利き筋ラインを得る。
@@ -1240,8 +1240,8 @@ namespace Sayuri {
        */
       static Bitboard GetAttack45(Square square, Bitboard blocker_45) {
         return attack_table_45_[square]
-        [(blocker_45 >> MAGIC_SHIFT_D[ROT45[square]])
-        & MAGIC_MASK_D[ROT45[square]]];
+        [(blocker_45 >> MAGIC_SHIFT[square][R45])
+        & MAGIC_MASK[square][R45]];
       }
       /**
        * 90度の利き筋ラインを得る。
@@ -1251,8 +1251,8 @@ namespace Sayuri {
        */
       static Bitboard GetAttack90(Square square, Bitboard blocker_90) {
         return attack_table_90_[square]
-        [(blocker_90 >> MAGIC_SHIFT_V[ROT90[square]])
-        & MAGIC_MASK_V[ROT90[square]]];
+        [(blocker_90 >> MAGIC_SHIFT[square][R90])
+        & MAGIC_MASK[square][R90]];
       }
       /**
        * 135度の利き筋ラインを得る。
@@ -1262,8 +1262,8 @@ namespace Sayuri {
        */
       static Bitboard GetAttack135(Square square, Bitboard blocker_135) {
         return attack_table_135_[square]
-        [(blocker_135 >> MAGIC_SHIFT_D[ROT135[square]])
-        & MAGIC_MASK_D[ROT135[square]]];
+        [(blocker_135 >> MAGIC_SHIFT[square][R135])
+        & MAGIC_MASK[square][R135]];
       }
       /**
        * ポーンの動ける位置を得る。
@@ -1275,8 +1275,8 @@ namespace Sayuri {
       static Bitboard GetPawnMovable(Side side, Square square,
       Bitboard blocker_90) {
         return pawn_movable_table_[side][square]
-        [(blocker_90 >> MAGIC_SHIFT_V[ROT90[square]])
-        & MAGIC_MASK_V[ROT90[square]]];
+        [(blocker_90 >> MAGIC_SHIFT[square][R90])
+        & MAGIC_MASK[square][R90]];
       }
 
       // ==================== //
