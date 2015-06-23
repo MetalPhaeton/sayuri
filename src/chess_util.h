@@ -1394,7 +1394,7 @@ namespace Sayuri {
        * @return マス。
        */
       static constexpr Square CoordToSquare(Fyle fyle, Rank rank) {
-        return (rank << 3) | (fyle & 7);
+        return (rank << 3) | fyle;
       }
 
       // ================ //
