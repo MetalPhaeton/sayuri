@@ -334,9 +334,9 @@ namespace Sayuri {
     for (Bitboard bb = blocker_0_; bb; NEXT_BITBOARD(bb)) {
       Square square = Util::GetSquare(bb);
 
-      blocker_45_ |= Util::SQUARE45[square];
-      blocker_90_ |= Util::SQUARE90[square];
-      blocker_135_ |= Util::SQUARE135[square];
+      blocker_45_ |= Util::SQUARE[square][R45];
+      blocker_90_ |= Util::SQUARE[square][R90];
+      blocker_135_ |= Util::SQUARE[square][R135];
     }
 
     // 駒の種類とサイドの配置を作る。

@@ -68,9 +68,6 @@ namespace Sayuri {
   constexpr Square Util::FLIP[NUM_SQUARES];
   constexpr Square Util::EN_PASSANT_TRANS_TABLE[NUM_SQUARES];
   constexpr Bitboard Util::SQUARE0[NUM_SQUARES];
-  constexpr Bitboard Util::SQUARE45[NUM_SQUARES];
-  constexpr Bitboard Util::SQUARE90[NUM_SQUARES];
-  constexpr Bitboard Util::SQUARE135[NUM_SQUARES];
   constexpr Bitboard Util::SQUARE[NUM_SQUARES][NUM_ROTS];
   constexpr Bitboard Util::FYLE[NUM_FYLES];
   constexpr Bitboard Util::RANK[NUM_RANKS];

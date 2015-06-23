@@ -782,7 +782,7 @@ namespace Sayuri {
           MAGIC_SHIFT_V[H8], MAGIC_SHIFT_D[ROT45[H8]],
           MAGIC_SHIFT_V[ROT90[H8]], MAGIC_SHIFT_D[ROT135[H8]]
         }
-      }
+      };
       /** マジックのマスク。0度と90度用。 [マス] */
       static constexpr Bitboard MAGIC_MASK_V[NUM_SQUARES] {
         0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL, 0xffULL,
@@ -1077,7 +1077,7 @@ namespace Sayuri {
           MAGIC_MASK_V[H8], MAGIC_MASK_D[ROT45[H8]],
           MAGIC_MASK_V[ROT90[H8]], MAGIC_MASK_D[ROT135[H8]]
         }
-      }
+      };
 
       // ================================ //
       // 各種方向のビットボードを得る関数 //
