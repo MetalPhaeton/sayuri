@@ -106,7 +106,7 @@ namespace Sayuri {
    * @param mask 更新したい場所。
    */
 #define UPDATE_FIELD(origin_data, new_data, mask) \
-((origin_data) ^= ((mask) & ((origin_data) ^ (new_data))))
+((origin_data) = ((origin_data) & ~(mask)) | (new_data))
 
   /**
    * 次のマスのビットボードに更新する。
