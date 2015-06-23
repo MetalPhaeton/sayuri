@@ -62,7 +62,7 @@ namespace Sayuri {
       // 配置を解析。
       std::string::iterator itr = tree["position"].begin();
       FOR_SQUARES(square) {
-        Bitboard bb = Util::SQUARE[square];
+        Bitboard bb = Util::SQUARE[square][R0];
 
         switch (*itr) {
           case 'P':
@@ -218,20 +218,20 @@ namespace Sayuri {
     position_[WHITE][PAWN] = Util::RANK[RANK_2];
     position_[BLACK][PAWN] = Util::RANK[RANK_7];
     // ナイト。
-    position_[WHITE][KNIGHT] = Util::SQUARE[B1] | Util::SQUARE[G1];
-    position_[BLACK][KNIGHT] = Util::SQUARE[B8] | Util::SQUARE[G8];
+    position_[WHITE][KNIGHT] = Util::SQUARE[B1][R0] | Util::SQUARE[G1][R0];
+    position_[BLACK][KNIGHT] = Util::SQUARE[B8][R0] | Util::SQUARE[G8][R0];
     // ビショップ。
-    position_[WHITE][BISHOP] = Util::SQUARE[C1] | Util::SQUARE[F1];
-    position_[BLACK][BISHOP] = Util::SQUARE[C8] | Util::SQUARE[F8];
+    position_[WHITE][BISHOP] = Util::SQUARE[C1][R0] | Util::SQUARE[F1][R0];
+    position_[BLACK][BISHOP] = Util::SQUARE[C8][R0] | Util::SQUARE[F8][R0];
     // ルーク。
-    position_[WHITE][ROOK] = Util::SQUARE[A1] | Util::SQUARE[H1];
-    position_[BLACK][ROOK] = Util::SQUARE[A8] | Util::SQUARE[H8];
+    position_[WHITE][ROOK] = Util::SQUARE[A1][R0] | Util::SQUARE[H1][R0];
+    position_[BLACK][ROOK] = Util::SQUARE[A8][R0] | Util::SQUARE[H8][R0];
     // クイーン。
-    position_[WHITE][QUEEN] = Util::SQUARE[D1];
-    position_[BLACK][QUEEN] = Util::SQUARE[D8];
+    position_[WHITE][QUEEN] = Util::SQUARE[D1][R0];
+    position_[BLACK][QUEEN] = Util::SQUARE[D8][R0];
     // キング。
-    position_[WHITE][KING] = Util::SQUARE[E1];
-    position_[BLACK][KING] = Util::SQUARE[E8];
+    position_[WHITE][KING] = Util::SQUARE[E1][R0];
+    position_[BLACK][KING] = Util::SQUARE[E8][R0];
   }
 
   // 構文木を作る。

@@ -206,7 +206,7 @@ namespace Sayuri {
 
       // アンパッサンがある場合。
       if (maker.engine_ptr_->en_passant_square()) {
-        bitboard |= Util::SQUARE[maker.engine_ptr_->en_passant_square()]
+        bitboard |= Util::SQUARE[maker.engine_ptr_->en_passant_square()][R0]
         & Util::GetPawnAttack(side, from);
       }
     }
@@ -438,7 +438,7 @@ namespace Sayuri {
     // constexpr std::int64_t BAD_CAPTURE_SCORE = -1LL;
 
     Bitboard enemy_king_bb =
-    Util::SQUARE[engine_ptr_->king()[Util::GetOppositeSide(side)]];
+    Util::SQUARE[engine_ptr_->king()[Util::GetOppositeSide(side)]][R0];
     for (std::size_t i = start; i < last_; ++i) {
       // 手の情報を得る。
       Square from = GetFrom(move_stack_[i].move_);

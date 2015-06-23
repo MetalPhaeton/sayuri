@@ -336,10 +336,10 @@ namespace Sayuri {
           if (king_[WHITE] != E1) {
             castling_rights_ &= ~WHITE_CASTLING;
           } else {
-            if (!(position_[WHITE][ROOK] & Util::SQUARE[H1])) {
+            if (!(position_[WHITE][ROOK] & Util::SQUARE[H1][R0])) {
               castling_rights_ &= ~WHITE_SHORT_CASTLING;
             }
-            if (!(position_[WHITE][ROOK] & Util::SQUARE[A1])) {
+            if (!(position_[WHITE][ROOK] & Util::SQUARE[A1][R0])) {
               castling_rights_ &= ~WHITE_LONG_CASTLING;
             }
           }
@@ -349,10 +349,10 @@ namespace Sayuri {
           if (king_[BLACK] != E8) {
             castling_rights_ &= ~BLACK_CASTLING;
           } else {
-            if (!(position_[BLACK][ROOK] & Util::SQUARE[H8])) {
+            if (!(position_[BLACK][ROOK] & Util::SQUARE[H8][R0])) {
               castling_rights_ &= ~BLACK_SHORT_CASTLING;
             }
-            if (!(position_[BLACK][ROOK] & Util::SQUARE[A8])) {
+            if (!(position_[BLACK][ROOK] & Util::SQUARE[A8][R0])) {
               castling_rights_ &= ~BLACK_LONG_CASTLING;
             }
           }
@@ -662,7 +662,7 @@ namespace Sayuri {
           return;
         }
 
-        if ((blocker_0_ & Util::SQUARE[en_passant_square])) {
+        if ((blocker_0_ & Util::SQUARE[en_passant_square][R0])) {
           // 駒があるのでアンパッサンの位置に指定できない。
           return;
         }
@@ -671,14 +671,14 @@ namespace Sayuri {
         if (rank == RANK_3) {
           // すぐ上に白ポーンがいなければならない。
           Square en_passant_target = en_passant_square + 8;
-          if ((position_[WHITE][PAWN] & Util::SQUARE[en_passant_target])) {
+          if ((position_[WHITE][PAWN] & Util::SQUARE[en_passant_target][R0])) {
             en_passant_square_ = en_passant_square;
             return;
           }
         } else if (rank == RANK_6) {
           // すぐ下に黒ポーンがいなければならない。
           Square en_passant_target = en_passant_square - 8;
-          if ((position_[BLACK][PAWN] & Util::SQUARE[en_passant_target])) {
+          if ((position_[BLACK][PAWN] & Util::SQUARE[en_passant_target][R0])) {
             en_passant_square_ = en_passant_square;
             return;
           }

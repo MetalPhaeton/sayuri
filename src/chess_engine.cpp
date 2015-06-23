@@ -237,11 +237,11 @@ namespace Sayuri {
           Square square = Util::GetSquare(bb);
           side_board_[square] = side;
           piece_board_[square] = piece_type;
-          side_pieces_[side] |= Util::SQUARE[square];
-          blocker_0_ |= Util::SQUARE[square];
-          blocker_45_ |= Util::SQUARE45[square];
-          blocker_90_ |= Util::SQUARE90[square];
-          blocker_135_ |= Util::SQUARE135[square];
+          side_pieces_[side] |= Util::SQUARE[square][R0];
+          blocker_0_ |= Util::SQUARE[square][R0];
+          blocker_45_ |= Util::SQUARE[square][R45];
+          blocker_90_ |= Util::SQUARE[square][R90];
+          blocker_135_ |= Util::SQUARE[square][R135];
           if (piece_type == KING) {
             king_[side] = square;
           }
@@ -302,20 +302,20 @@ namespace Sayuri {
       {
         0,
         Util::RANK[RANK_2],
-        Util::SQUARE[B1] | Util::SQUARE[G1],
-        Util::SQUARE[C1] | Util::SQUARE[F1],
-        Util::SQUARE[A1] | Util::SQUARE[H1],
-        Util::SQUARE[D1],
-        Util::SQUARE[E1]
+        Util::SQUARE[B1][R0] | Util::SQUARE[G1][R0],
+        Util::SQUARE[C1][R0] | Util::SQUARE[F1][R0],
+        Util::SQUARE[A1][R0] | Util::SQUARE[H1][R0],
+        Util::SQUARE[D1][R0],
+        Util::SQUARE[E1][R0]
       },
       {
         0,
         Util::RANK[RANK_7],
-        Util::SQUARE[B8] | Util::SQUARE[G8],
-        Util::SQUARE[C8] | Util::SQUARE[F8],
-        Util::SQUARE[A8] | Util::SQUARE[H8],
-        Util::SQUARE[D8],
-        Util::SQUARE[E8]
+        Util::SQUARE[B8][R0] | Util::SQUARE[G8][R0],
+        Util::SQUARE[C8][R0] | Util::SQUARE[F8][R0],
+        Util::SQUARE[A8][R0] | Util::SQUARE[H8][R0],
+        Util::SQUARE[D8][R0],
+        Util::SQUARE[E8][R0]
       }
     };
     COPY_ARRAY(position_, STARTING_POSITION);
@@ -629,8 +629,8 @@ namespace Sayuri {
 
     // 置く位置のメンバを消す。
     if (placed_piece) {
-      position_[placed_side][placed_piece] &= ~Util::SQUARE[square];
-      side_pieces_[placed_side] &= ~Util::SQUARE[square];
+      position_[placed_side][placed_piece] &= ~Util::SQUARE[square][R0];
+      side_pieces_[placed_side] &= ~Util::SQUARE[square][R0];
     }
 
     // 置く駒がEMPTYか置くサイドがNO_SIDEなら
@@ -639,10 +639,10 @@ namespace Sayuri {
       piece_board_[square] = EMPTY;
       side_board_[square] = NO_SIDE;
       if (placed_piece) {
-        blocker_0_ &= ~Util::SQUARE[square];
-        blocker_45_ &= ~Util::SQUARE45[square];
-        blocker_90_ &= ~Util::SQUARE90[square];
-        blocker_135_ &= ~Util::SQUARE135[square];
+        blocker_0_ &= ~Util::SQUARE[square][R0];
+        blocker_45_ &= ~Util::SQUARE[square][R45];
+        blocker_90_ &= ~Util::SQUARE[square][R90];
+        blocker_135_ &= ~Util::SQUARE[square][R135];
       }
       return;
     }
@@ -653,12 +653,12 @@ namespace Sayuri {
     side_board_[square] = side;
 
     // 置く位置のビットボードをセットする。
-    position_[side][piece_type] |= Util::SQUARE[square];
-    side_pieces_[side] |= Util::SQUARE[square];
-    blocker_0_ |= Util::SQUARE[square];
-    blocker_45_ |= Util::SQUARE45[square];
-    blocker_90_ |= Util::SQUARE90[square];
-    blocker_135_ |= Util::SQUARE135[square];
+    position_[side][piece_type] |= Util::SQUARE[square][R0];
+    side_pieces_[side] |= Util::SQUARE[square][R0];
+    blocker_0_ |= Util::SQUARE[square][R0];
+    blocker_45_ |= Util::SQUARE[square][R45];
+    blocker_90_ |= Util::SQUARE[square][R90];
+    blocker_135_ |= Util::SQUARE[square][R135];
 
     // キングの位置を更新する。
     if (piece_type == KING) {

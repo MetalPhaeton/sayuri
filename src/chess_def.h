@@ -439,6 +439,19 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
   /** 引き分けの評価値。 */
   constexpr int SCORE_DRAW = 0;
 
+  // 回転の角度を表す。
+  enum {
+    /** 0度。 */
+    R0,
+    /** 45度。 */
+    R45,
+    /** 90度。 */
+    R90,
+    /** 135度。 */
+    R135
+  };
+  constexpr int NUM_ROTS = 4;
+
   // ======================= //
   // Transposition Table関連 //
   // ======================= //

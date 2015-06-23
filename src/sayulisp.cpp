@@ -2060,7 +2060,7 @@ namespace Sayuri {
     }
 
     // 位置が0でなければフィルタリング。
-    if ((engine_ptr_->blocker_0() & Util::SQUARE[square])) {
+    if ((engine_ptr_->blocker_0() & Util::SQUARE[square][R0])) {
       throw LispObject::GenError("@engine-error",
       "'" + SQUARE_SYMBOL[square] + "' is not empty.");
     }
@@ -2072,13 +2072,13 @@ namespace Sayuri {
     }
     if (rank == RANK_3) {
       Square target = square + 8;
-      if (!(engine_ptr_->position()[WHITE][PAWN] & Util::SQUARE[target])) {
+      if (!(engine_ptr_->position()[WHITE][PAWN] & Util::SQUARE[target][R0])) {
         throw LispObject::GenError("@engine-error",
         "White Pawn doesn't exist on '" + SQUARE_SYMBOL[target] + "' .");
       }
     } else if (rank == RANK_6) {
       Square target = square - 8;
-      if (!(engine_ptr_->position()[BLACK][PAWN] & Util::SQUARE[target])) {
+      if (!(engine_ptr_->position()[BLACK][PAWN] & Util::SQUARE[target][R0])) {
         throw LispObject::GenError("@engine-error",
         "Black Pawn doesn't exist on '" + SQUARE_SYMBOL[target] + "' .");
       }

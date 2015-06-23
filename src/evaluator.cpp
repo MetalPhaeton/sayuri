@@ -61,7 +61,7 @@ namespace Sayuri {
 
       // アンパッサン。
       if (engine.en_passant_square_ && (SIDE == engine.to_move_)) {
-        en_passant = Util::SQUARE[engine.en_passant_square_] & attacks;
+        en_passant = Util::SQUARE[engine.en_passant_square_][R0] & attacks;
       }
     }
   };
@@ -244,7 +244,7 @@ namespace Sayuri {
       }
 
       // ポーンの盾を計算。
-      if ((Util::SQUARE[square]
+      if ((Util::SQUARE[square][R0]
       & evaluator.pawn_shield_mask_[SIDE][engine.king_[SIDE]])) {
         if (SIDE == WHITE) {
           evaluator.score_ +=
@@ -264,7 +264,7 @@ namespace Sayuri {
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // バッドビショップを計算。
-      if ((Util::SQUARE[square] & Util::SQCOLOR[WHITE])) {
+      if ((Util::SQUARE[square][R0] & Util::SQCOLOR[WHITE])) {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->bad_bishop_cache_
         [Util::CountBits
         (engine.position_[SIDE][PAWN] & Util::SQCOLOR[WHITE])];
@@ -304,7 +304,8 @@ namespace Sayuri {
 
       // クイーンの早過ぎる始動を計算。
       int value = 0;
-      if (!(Util::SQUARE[square] & evaluator.start_position_[SIDE][QUEEN])) {
+      if (!(Util::SQUARE[square][R0]
+      & evaluator.start_position_[SIDE][QUEEN])) {
         value += Util::CountBits(engine.position_[SIDE][KNIGHT]
         & evaluator.start_position_[SIDE][KNIGHT]);
 
@@ -665,24 +666,30 @@ namespace Sayuri {
     start_position_[BLACK][PAWN] = Util::RANK[RANK_7];
 
     // ナイト。
-    start_position_[WHITE][KNIGHT] = Util::SQUARE[B1] | Util::SQUARE[G1];
-    start_position_[BLACK][KNIGHT] = Util::SQUARE[B8] | Util::SQUARE[G8];
+    start_position_[WHITE][KNIGHT] =
+    Util::SQUARE[B1][R0] | Util::SQUARE[G1][R0];
+    start_position_[BLACK][KNIGHT] =
+    Util::SQUARE[B8][R0] | Util::SQUARE[G8][R0];
 
     // ビショップ。
-    start_position_[WHITE][BISHOP] = Util::SQUARE[C1] | Util::SQUARE[F1];
-    start_position_[BLACK][BISHOP] = Util::SQUARE[C8] | Util::SQUARE[F8];
+    start_position_[WHITE][BISHOP] =
+    Util::SQUARE[C1][R0] | Util::SQUARE[F1][R0];
+    start_position_[BLACK][BISHOP] =
+    Util::SQUARE[C8][R0] | Util::SQUARE[F8][R0];
 
     // ルーク。
-    start_position_[WHITE][ROOK] = Util::SQUARE[A1] | Util::SQUARE[H1];
-    start_position_[BLACK][ROOK] = Util::SQUARE[A8] | Util::SQUARE[H8];
+    start_position_[WHITE][ROOK] =
+    Util::SQUARE[A1][R0] | Util::SQUARE[H1][R0];
+    start_position_[BLACK][ROOK] =
+    Util::SQUARE[A8][R0] | Util::SQUARE[H8][R0];
 
     // クイーン。
-    start_position_[WHITE][QUEEN] = Util::SQUARE[D1];
-    start_position_[BLACK][QUEEN] = Util::SQUARE[D8];
+    start_position_[WHITE][QUEEN] = Util::SQUARE[D1][R0];
+    start_position_[BLACK][QUEEN] = Util::SQUARE[D8][R0];
 
     // キング。
-    start_position_[WHITE][KING] = Util::SQUARE[E1];
-    start_position_[BLACK][KING] = Util::SQUARE[E8];
+    start_position_[WHITE][KING] = Util::SQUARE[E1][R0];
+    start_position_[BLACK][KING] = Util::SQUARE[E8][R0];
 
     // 論理否定を初期化。
     for (Side side = WHITE; side <= BLACK; ++side) {
@@ -696,18 +703,18 @@ namespace Sayuri {
   // center_mask_、sweet_center_mask_を初期化する。
   void Evaluator::InitCenterMask() {
     // センター。
-    center_mask_ = Util::SQUARE[C3] | Util::SQUARE[C4]
-    | Util::SQUARE[C5] | Util::SQUARE[C6]
-    | Util::SQUARE[D3] | Util::SQUARE[D4]
-    | Util::SQUARE[D5] | Util::SQUARE[D6]
-    | Util::SQUARE[E3] | Util::SQUARE[E4]
-    | Util::SQUARE[E5] | Util::SQUARE[E6]
-    | Util::SQUARE[F3] | Util::SQUARE[F4]
-    | Util::SQUARE[F5] | Util::SQUARE[F6];
+    center_mask_ = Util::SQUARE[C3][R0] | Util::SQUARE[C4][R0]
+    | Util::SQUARE[C5][R0] | Util::SQUARE[C6][R0]
+    | Util::SQUARE[D3][R0] | Util::SQUARE[D4][R0]
+    | Util::SQUARE[D5][R0] | Util::SQUARE[D6][R0]
+    | Util::SQUARE[E3][R0] | Util::SQUARE[E4][R0]
+    | Util::SQUARE[E5][R0] | Util::SQUARE[E6][R0]
+    | Util::SQUARE[F3][R0] | Util::SQUARE[F4][R0]
+    | Util::SQUARE[F5][R0] | Util::SQUARE[F6][R0];
 
     // スウィートセンター。
-    sweet_center_mask_ = Util::SQUARE[D4] | Util::SQUARE[D5]
-    | Util::SQUARE[E4] | Util::SQUARE[E5];
+    sweet_center_mask_ = Util::SQUARE[D4][R0] | Util::SQUARE[D5][R0]
+    | Util::SQUARE[E4][R0] | Util::SQUARE[E5][R0];
   }
 
   // pass_pawn_mask_[][]を初期化する。
@@ -733,11 +740,11 @@ namespace Sayuri {
 
           // 自分の位置より手前のランクは消す。
           if (side == WHITE) {
-            Bitboard temp = (Util::SQUARE[square] - 1)
+            Bitboard temp = (Util::SQUARE[square][R0] - 1)
             | Util::RANK[Util::SquareToRank(square)];
             mask &= ~temp;
           } else {
-            Bitboard temp = ~(Util::SQUARE[square] - 1)
+            Bitboard temp = ~(Util::SQUARE[square][R0] - 1)
             | Util::RANK[Util::SquareToRank(square)];
             mask &= ~temp;
           }
