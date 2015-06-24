@@ -176,8 +176,19 @@ namespace Sayuri {
 
       target = attacks & engine.side_board_[ENEMY_SIDE];
 
+      back =
+      (Evaluator::pin_back_table_[square]
+      [(engine.blocker_45_ >> Util::MAGIC_SHIFT[square][R45])
+      & Util::MAGIC_MASK[square][R45]][R45]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_135_ >> Util::MAGIC_SHIFT[square][R135])
+      & Util::MAGIC_MASK[square][R135]][R135])
+      & engine.side_board_[ENEMY_SIDE];
+
+      /*
       back = (engine.side_board_[ENEMY_SIDE]
       & Util::GetBishopMove(square)) & ~target;
+      */
     }
   };
   template<Side SIDE>
@@ -188,8 +199,19 @@ namespace Sayuri {
 
       target = attacks & engine.side_board_[ENEMY_SIDE];
 
+      back =
+      (Evaluator::pin_back_table_[square]
+      [(engine.blocker_0_ >> Util::MAGIC_SHIFT[square][R0])
+      & Util::MAGIC_MASK[square][R0]][R0]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_90_ >> Util::MAGIC_SHIFT[square][R90])
+      & Util::MAGIC_MASK[square][R90]][R90])
+      & engine.side_board_[ENEMY_SIDE];
+
+      /*
       back = (engine.side_board_[ENEMY_SIDE]
       & Util::GetRookMove(square)) & ~target;
+      */
     }
   };
   template<Side SIDE>
@@ -200,8 +222,25 @@ namespace Sayuri {
 
       target = attacks & engine.side_board_[ENEMY_SIDE];
 
+      back =
+      (Evaluator::pin_back_table_[square]
+      [(engine.blocker_0_ >> Util::MAGIC_SHIFT[square][R0])
+      & Util::MAGIC_MASK[square][R0]][R0]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_45_ >> Util::MAGIC_SHIFT[square][R45])
+      & Util::MAGIC_MASK[square][R45]][R45]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_90_ >> Util::MAGIC_SHIFT[square][R90])
+      & Util::MAGIC_MASK[square][R90]][R90]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_135_ >> Util::MAGIC_SHIFT[square][R135])
+      & Util::MAGIC_MASK[square][R135]][R135])
+      & engine.side_board_[ENEMY_SIDE];
+
+      /*
       back = (engine.side_board_[ENEMY_SIDE]
       & Util::GetQueenMove(square)) & ~target;
+      */
     }
   };
 
@@ -261,7 +300,6 @@ namespace Sayuri {
   struct CalSpecial<SIDE, BISHOP> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square) {
-      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // バッドビショップを計算。
@@ -273,63 +311,6 @@ namespace Sayuri {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->bad_bishop_cache_
         [Util::CountBits
         (engine.position_[SIDE][PAWN] & Util::SQCOLOR[BLACK])];
-      }
-
-      // --- ピンを計算 --- //
-      // 準備。
-      Bitboard pattern_45 =
-      (engine.blocker_45_ >> Util::MAGIC_SHIFT[square][R45])
-      & Util::MAGIC_MASK[square][R45];
-      Bitboard pattern_135 =
-      (engine.blocker_135_ >> Util::MAGIC_SHIFT[square][R135])
-      & Util::MAGIC_MASK[square][R135];
-
-      // 45度、左。
-      Square target = Evaluator::pin_table_
-      [square][pattern_45][R45][Evaluator::LEFT][Evaluator::TARGET];
-      Square pin_back = Evaluator::pin_table_
-      [square][pattern_45][R45][Evaluator::LEFT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [BISHOP][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
-
-      // 45度、右。
-      target = Evaluator::pin_table_
-      [square][pattern_45][R45][Evaluator::RIGHT][Evaluator::TARGET];
-      pin_back = Evaluator::pin_table_
-      [square][pattern_45][R45][Evaluator::RIGHT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [BISHOP][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
-
-      // 135度、左。
-      target = Evaluator::pin_table_
-      [square][pattern_135][R135][Evaluator::LEFT][Evaluator::TARGET];
-      pin_back = Evaluator::pin_table_
-      [square][pattern_135][R135][Evaluator::LEFT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [BISHOP][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
-
-      // 135度、右。
-      target = Evaluator::pin_table_
-      [square][pattern_135][R135][Evaluator::RIGHT][Evaluator::TARGET];
-      pin_back = Evaluator::pin_table_
-      [square][pattern_135][R135][Evaluator::RIGHT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [BISHOP][engine.piece_board_[target]][engine.piece_board_[pin_back]];
       }
     }
   };
@@ -352,70 +333,12 @@ namespace Sayuri {
           SIGN * evaluator.cache_ptr_->rook_open_fyle_cache_;
         }
       }
-
-      // --- ピンを計算 --- //
-      // 準備。
-      Bitboard pattern_0 =
-      (engine.blocker_0_ >> Util::MAGIC_SHIFT[square][R0])
-      & Util::MAGIC_MASK[square][R0];
-      Bitboard pattern_90 =
-      (engine.blocker_90_ >> Util::MAGIC_SHIFT[square][R90])
-      & Util::MAGIC_MASK[square][R90];
-
-      // 0度、左。
-      Square target = Evaluator::pin_table_
-      [square][pattern_0][R0][Evaluator::LEFT][Evaluator::TARGET];
-      Square pin_back = Evaluator::pin_table_
-      [square][pattern_0][R0][Evaluator::LEFT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [ROOK][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
-
-      // 0度、右。
-      target = Evaluator::pin_table_
-      [square][pattern_0][R0][Evaluator::RIGHT][Evaluator::TARGET];
-      pin_back = Evaluator::pin_table_
-      [square][pattern_0][R0][Evaluator::RIGHT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [ROOK][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
-
-      // 90度、左。
-      target = Evaluator::pin_table_
-      [square][pattern_90][R90][Evaluator::LEFT][Evaluator::TARGET];
-      pin_back = Evaluator::pin_table_
-      [square][pattern_90][R90][Evaluator::LEFT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [ROOK][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
-
-      // 90度、右。
-      target = Evaluator::pin_table_
-      [square][pattern_90][R90][Evaluator::RIGHT][Evaluator::TARGET];
-      pin_back = Evaluator::pin_table_
-      [square][pattern_90][R90][Evaluator::RIGHT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [ROOK][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
     }
   };
   template<Side SIDE>
   struct CalSpecial<SIDE, QUEEN> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square) {
-      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // クイーンの早過ぎる始動を計算。
@@ -431,117 +354,6 @@ namespace Sayuri {
 
       evaluator.score_ +=
       SIGN * evaluator.cache_ptr_->early_queen_starting_cache_[value];
-
-      // --- ピンを計算 --- //
-      // 準備。
-      Bitboard pattern_0 =
-      (engine.blocker_0_ >> Util::MAGIC_SHIFT[square][R0])
-      & Util::MAGIC_MASK[square][R0];
-      Bitboard pattern_45 =
-      (engine.blocker_45_ >> Util::MAGIC_SHIFT[square][R45])
-      & Util::MAGIC_MASK[square][R45];
-      Bitboard pattern_90 =
-      (engine.blocker_90_ >> Util::MAGIC_SHIFT[square][R90])
-      & Util::MAGIC_MASK[square][R90];
-      Bitboard pattern_135 =
-      (engine.blocker_135_ >> Util::MAGIC_SHIFT[square][R135])
-      & Util::MAGIC_MASK[square][R135];
-
-      // 45度、左。
-      Square target = Evaluator::pin_table_
-      [square][pattern_45][R45][Evaluator::LEFT][Evaluator::TARGET];
-      Square pin_back = Evaluator::pin_table_
-      [square][pattern_45][R45][Evaluator::LEFT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
-
-      // 45度、右。
-      target = Evaluator::pin_table_
-      [square][pattern_45][R45][Evaluator::RIGHT][Evaluator::TARGET];
-      pin_back = Evaluator::pin_table_
-      [square][pattern_45][R45][Evaluator::RIGHT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
-
-      // 135度、左。
-      target = Evaluator::pin_table_
-      [square][pattern_135][R135][Evaluator::LEFT][Evaluator::TARGET];
-      pin_back = Evaluator::pin_table_
-      [square][pattern_135][R135][Evaluator::LEFT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
-
-      // 135度、右。
-      target = Evaluator::pin_table_
-      [square][pattern_135][R135][Evaluator::RIGHT][Evaluator::TARGET];
-      pin_back = Evaluator::pin_table_
-      [square][pattern_135][R135][Evaluator::RIGHT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
-
-      // 0度、左。
-      target = Evaluator::pin_table_
-      [square][pattern_0][R0][Evaluator::LEFT][Evaluator::TARGET];
-      pin_back = Evaluator::pin_table_
-      [square][pattern_0][R0][Evaluator::LEFT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
-
-      // 0度、右。
-      target = Evaluator::pin_table_
-      [square][pattern_0][R0][Evaluator::RIGHT][Evaluator::TARGET];
-      pin_back = Evaluator::pin_table_
-      [square][pattern_0][R0][Evaluator::RIGHT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
-
-      // 90度、左。
-      target = Evaluator::pin_table_
-      [square][pattern_90][R90][Evaluator::LEFT][Evaluator::TARGET];
-      pin_back = Evaluator::pin_table_
-      [square][pattern_90][R90][Evaluator::LEFT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
-
-      // 90度、右。
-      target = Evaluator::pin_table_
-      [square][pattern_90][R90][Evaluator::RIGHT][Evaluator::TARGET];
-      pin_back = Evaluator::pin_table_
-      [square][pattern_90][R90][Evaluator::RIGHT][Evaluator::PIN_BACK];
-      if ((target != Evaluator::NO_PIN)
-      && (engine.side_board_[target] == ENEMY_SIDE)
-      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
-        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
-        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
-      }
     }
   };
   template<Side SIDE>
@@ -598,7 +410,7 @@ namespace Sayuri {
   Bitboard Evaluator::iso_pawn_mask_[NUM_SQUARES];
   Bitboard Evaluator::pawn_shield_mask_[NUM_SIDES][NUM_SQUARES];
   Bitboard Evaluator::weak_square_mask_[NUM_SIDES][NUM_SQUARES];
-  Square Evaluator::pin_table_[NUM_SQUARES][0xff + 1][NUM_ROTS][2][2];
+  Bitboard Evaluator::pin_back_table_[NUM_SQUARES][0xff + 1][NUM_ROTS];
 
   // ==================== //
   // コンストラクタと代入 //
@@ -646,8 +458,8 @@ namespace Sayuri {
     InitPawnShieldMask();
     // weak_square_mask_[][]を初期化する。
     InitWeakSquareMask();
-    // pin_table_[][][][][]を初期化する。
-    InitPinTable();
+    // pin_back_table_[][][][][]を初期化する。
+    InitPinBackTable();
   }
 
   // ============== //
@@ -834,7 +646,6 @@ namespace Sayuri {
     }
 
     // ピンを計算。
-    /*
     {
       // ピンのターゲットと裏駒を作成。
       Bitboard pin_target = 0;
@@ -852,14 +663,13 @@ namespace Sayuri {
 
         // 下のif文によるピンの判定条件は、
         // 「裏駒と自分との間」に「ピンの対象」が一つのみだった場合。
-        if ((between & pin_target) && !(between & pin_back)) {
+        if ((between & pin_target)) {
           score_ += SIGN * cache_ptr_->pin_cache_[TYPE]
           [engine_ptr_->piece_board_[Util::GetSquare(between & pin_target)]]
           [engine_ptr_->piece_board_[pin_back_sq]];
         }
       }
     }
-    */
 
     // 相手キング周辺への攻撃を計算。
     score_ += SIGN * cache_ptr_->attack_around_king_cache_[TYPE]
@@ -1077,20 +887,10 @@ namespace Sayuri {
     }
   }
 
-  // pin_table_[][][][][]を初期化する。
-  void Evaluator::InitPinTable() {
-    // 先ず、全てをNO_PINで初期化。
-    FOR_SQUARES(square) {
-      for (Bitboard pattern = 0; pattern <= 0xff; ++pattern) {
-        for (int rot = 0; rot < NUM_ROTS; ++rot) {
-          for (int dir = 0; dir <= RIGHT; ++dir) {
-            for (int roll = 0; roll <= PIN_BACK; ++roll) {
-              pin_table_[square][pattern][rot][dir][roll] = NO_PIN;
-            }
-          }
-        }
-      }
-    }
+  // pin_back_table_[][][][][]を初期化する。
+  void Evaluator::InitPinBackTable() {
+    // 初期化。
+    INIT_ARRAY(pin_back_table_);
 
     FOR_SQUARES(square) {
       for (Bitboard pattern = 0; pattern <= 0xff; ++pattern) {
@@ -1122,16 +922,14 @@ namespace Sayuri {
             if (!find_target[R0]) {
               // ターゲットを見つける。
               if ((temp[R0] & pattern)) {
-                pin_table_[square][pattern][R0][LEFT][TARGET] =
-                Util::GetSquare(temp[R0] << Util::MAGIC_SHIFT[square][R0]);
-
                 find_target[R0] = true;
               }
             } else {
               // バックを見つける。
               if ((temp[R0] & pattern)) {
-                pin_table_[square][pattern][R0][LEFT][PIN_BACK] =
-                Util::GetSquare(temp[R0] << Util::MAGIC_SHIFT[square][R0]);
+                pin_back_table_[square][pattern][R0] |=
+                Util::SQUARE[Util::GetSquare(temp[R0]
+                << Util::MAGIC_SHIFT[square][R0])][R0];
 
                 // もう必要ない。
                 temp[R0] = 0;
@@ -1143,18 +941,14 @@ namespace Sayuri {
             if (!find_target[R45]) {
               // ターゲットを見つける。
               if ((temp[R45] & pattern)) {
-                pin_table_[square][pattern][R45][LEFT][TARGET] =
-                Util::R_ROT45[Util::GetSquare(temp[R45]
-                << Util::MAGIC_SHIFT[square][R45])];
-
                 find_target[R45] = true;
               }
             } else {
               // バックを見つける。
               if ((temp[R45] & pattern)) {
-                pin_table_[square][pattern][R45][LEFT][PIN_BACK] =
-                Util::R_ROT45[Util::GetSquare(temp[R45]
-                << Util::MAGIC_SHIFT[square][R45])];
+                pin_back_table_[square][pattern][R45] |=
+                Util::SQUARE[Util::R_ROT45[Util::GetSquare(temp[R45]
+                << Util::MAGIC_SHIFT[square][R45])]][R0];
 
                 // もう必要ない。
                 temp[R45] = 0;
@@ -1166,18 +960,14 @@ namespace Sayuri {
             if (!find_target[R90]) {
               // ターゲットを見つける。
               if ((temp[R90] & pattern)) {
-                pin_table_[square][pattern][R90][LEFT][TARGET] =
-                Util::R_ROT90[Util::GetSquare(temp[R90]
-                << Util::MAGIC_SHIFT[square][R90])];
-
                 find_target[R90] = true;
               }
             } else {
               // バックを見つける。
               if ((temp[R90] & pattern)) {
-                pin_table_[square][pattern][R90][LEFT][PIN_BACK] =
-                Util::R_ROT90[Util::GetSquare(temp[R90]
-                << Util::MAGIC_SHIFT[square][R90])];
+                pin_back_table_[square][pattern][R90] |=
+                Util::SQUARE[Util::R_ROT90[Util::GetSquare(temp[R90]
+                << Util::MAGIC_SHIFT[square][R90])]][R0];
 
                 // もう必要ない。
                 temp[R90] = 0;
@@ -1189,18 +979,14 @@ namespace Sayuri {
             if (!find_target[R135]) {
               // ターゲットを見つける。
               if ((temp[R135] & pattern)) {
-                pin_table_[square][pattern][R135][LEFT][TARGET] =
-                Util::R_ROT135[Util::GetSquare(temp[R135]
-                << Util::MAGIC_SHIFT[square][R135])];
-
                 find_target[R135] = true;
               }
             } else {
               // バックを見つける。
               if ((temp[R135] & pattern)) {
-                pin_table_[square][pattern][R135][LEFT][PIN_BACK] =
-                Util::R_ROT135[Util::GetSquare(temp[R135]
-                << Util::MAGIC_SHIFT[square][R135])];
+                pin_back_table_[square][pattern][R135] |=
+                Util::SQUARE[Util::R_ROT135[Util::GetSquare(temp[R135]
+                << Util::MAGIC_SHIFT[square][R135])]][R0];
 
                 // もう必要ない。
                 temp[R135] = 0;
@@ -1227,16 +1013,14 @@ namespace Sayuri {
             if (!find_target[R0]) {
               // ターゲットを見つける。
               if ((temp[R0] & pattern)) {
-                pin_table_[square][pattern][R0][RIGHT][TARGET] =
-                Util::GetSquare(temp[R0] << Util::MAGIC_SHIFT[square][R0]);
-
                 find_target[R0] = true;
               }
             } else {
               // バックを見つける。
               if ((temp[R0] & pattern)) {
-                pin_table_[square][pattern][R0][RIGHT][PIN_BACK] =
-                Util::GetSquare(temp[R0] << Util::MAGIC_SHIFT[square][R0]);
+                pin_back_table_[square][pattern][R0] |=
+                Util::SQUARE[Util::GetSquare(temp[R0]
+                << Util::MAGIC_SHIFT[square][R0])][R0];
 
                 // もう必要ない。
                 temp[R0] = 0;
@@ -1248,18 +1032,14 @@ namespace Sayuri {
             if (!find_target[R45]) {
               // ターゲットを見つける。
               if ((temp[R45] & pattern)) {
-                pin_table_[square][pattern][R45][RIGHT][TARGET] =
-                Util::R_ROT45[Util::GetSquare(temp[R45]
-                << Util::MAGIC_SHIFT[square][R45])];
-
                 find_target[R45] = true;
               }
             } else {
               // バックを見つける。
               if ((temp[R45] & pattern)) {
-                pin_table_[square][pattern][R45][RIGHT][PIN_BACK] =
-                Util::R_ROT45[Util::GetSquare(temp[R45]
-                << Util::MAGIC_SHIFT[square][R45])];
+                pin_back_table_[square][pattern][R45] |=
+                Util::SQUARE[Util::R_ROT45[Util::GetSquare(temp[R45]
+                << Util::MAGIC_SHIFT[square][R45])]][R0];
 
                 // もう必要ない。
                 temp[R45] = 0;
@@ -1271,18 +1051,14 @@ namespace Sayuri {
             if (!find_target[R90]) {
               // ターゲットを見つける。
               if ((temp[R90] & pattern)) {
-                pin_table_[square][pattern][R90][RIGHT][TARGET] =
-                Util::R_ROT90[Util::GetSquare(temp[R90]
-                << Util::MAGIC_SHIFT[square][R90])];
-
                 find_target[R90] = true;
               }
             } else {
               // バックを見つける。
               if ((temp[R90] & pattern)) {
-                pin_table_[square][pattern][R90][RIGHT][PIN_BACK] =
-                Util::R_ROT90[Util::GetSquare(temp[R90]
-                << Util::MAGIC_SHIFT[square][R90])];
+                pin_back_table_[square][pattern][R90] |=
+                Util::SQUARE[Util::R_ROT90[Util::GetSquare(temp[R90]
+                << Util::MAGIC_SHIFT[square][R90])]][R0];
 
                 // もう必要ない。
                 temp[R90] = 0;
@@ -1294,35 +1070,18 @@ namespace Sayuri {
             if (!find_target[R135]) {
               // ターゲットを見つける。
               if ((temp[R135] & pattern)) {
-                pin_table_[square][pattern][R135][RIGHT][TARGET] =
-                Util::R_ROT135[Util::GetSquare(temp[R135]
-                << Util::MAGIC_SHIFT[square][R135])];
-
                 find_target[R135] = true;
               }
             } else {
               // バックを見つける。
               if ((temp[R135] & pattern)) {
-                pin_table_[square][pattern][R135][RIGHT][PIN_BACK] =
-                Util::R_ROT135[Util::GetSquare(temp[R135]
-                << Util::MAGIC_SHIFT[square][R135])];
+                pin_back_table_[square][pattern][R135] |=
+                Util::SQUARE[Util::R_ROT135[Util::GetSquare(temp[R135]
+                << Util::MAGIC_SHIFT[square][R135])]][R0];
 
                 // もう必要ない。
                 temp[R135] = 0;
               }
-            }
-          }
-        }
-      }
-    }
-
-    // 最後、PIN_BACKがNO_PINならTARGETもNO_PINになるようにする。
-    FOR_SQUARES(square) {
-      for (Bitboard pattern = 0; pattern <= 0xff; ++pattern) {
-        for (int rot = 0; rot < NUM_ROTS; ++rot) {
-          for (int dir = 0; dir <= RIGHT; ++dir) {
-            if (pin_table_[square][pattern][rot][dir][PIN_BACK] == NO_PIN) {
-              pin_table_[square][pattern][rot][dir][TARGET] = NO_PIN;
             }
           }
         }

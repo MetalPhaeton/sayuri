@@ -116,7 +116,7 @@ namespace Sayuri {
       & Util::MAGIC_MASK[square][R135]
     };
 
-    static const std::string square_str[NUM_SQUARES + 1] {
+    static const std::string square_str[NUM_SQUARES] {
       "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1",
       "A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2",
       "A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3",
@@ -125,26 +125,17 @@ namespace Sayuri {
       "A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6",
       "A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7",
       "A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8",
-      "NO_PIN"
     };
     static const std::string rot_str[NUM_ROTS] {
       "[R0]", "[R45]", "[R90]", "[R135]"
     };
-    static const std::string dir_str[2] {
-      "[LEFT]", "[RIGHT]"
-    };
-    static const std::string roll_str[2] {
-      "[TARGET]", "[PIN_BACK]"
-    };
 
     for (int rot = 0; rot < NUM_ROTS; ++rot) {
-      for (int dir = 0; dir <= Evaluator::RIGHT; ++dir) {
-        for (int roll = 0; roll <= Evaluator::PIN_BACK; ++roll) {
-          std::cout << "[" << square_str[square] << "][***]" << rot_str[rot]
-          << dir_str[dir] << roll_str[roll] << ": "
-          << square_str[Evaluator::pin_table_
-          [square][pattern[rot]][rot][dir][roll]] << std::endl;
-        }
+      for (Bitboard bb = Evaluator::pin_back_table_[square][pattern[rot]][rot];
+      bb; NEXT_BITBOARD(bb)) {
+        std::cout << "[" << square_str[square] << "][***]"
+        << rot_str[rot] << ": " << square_str[Util::GetSquare(bb)]
+        << std::endl;
       }
     }
 
