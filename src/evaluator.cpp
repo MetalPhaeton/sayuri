@@ -166,39 +166,64 @@ namespace Sayuri {
   template<Side SIDE, PieceType TYPE>
   struct GenPinTargets {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
-    Square square, Bitboard attacks, Bitboard& target, Bitboard& back) {}
+    Square square, Bitboard& back) {}
   };
   template<Side SIDE>
   struct GenPinTargets<SIDE, BISHOP> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
-    Square square, Bitboard attacks, Bitboard& target, Bitboard& back) {
+    Square square, Bitboard& back) {
       constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
 
-      target = attacks & engine.side_board_[ENEMY_SIDE];
-
-      back = (engine.blocker_0_ & Util::GetBishopMove(square)) & ~target;
+      // back = (engine.blocker_0_ & Util::GetBishopMove(square)) & ~target;
+      // back = evaluator.GetBishopPinBack<SIDE>(square);
+      back = (Evaluator::pin_back_table_[square]
+      [(engine.blocker_45_ >> Util::MAGIC_SHIFT[square][R45])
+      & Util::MAGIC_MASK[square][R45]][R45]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_135_ >> Util::MAGIC_SHIFT[square][R135])
+      & Util::MAGIC_MASK[square][R135]][R135])
+      & engine.side_pieces_[ENEMY_SIDE];
     }
   };
   template<Side SIDE>
   struct GenPinTargets<SIDE, ROOK> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
-    Square square, Bitboard attacks, Bitboard& target, Bitboard& back) {
+    Square square, Bitboard& back) {
       constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
 
-      target = attacks & engine.side_board_[ENEMY_SIDE];
-
-      back = (engine.blocker_0_ & Util::GetRookMove(square)) & ~target;
+      // back = (engine.blocker_0_ & Util::GetRookMove(square)) & ~target;
+      // back = evaluator.GetRookPinBack<SIDE>(square);
+      back = (Evaluator::pin_back_table_[square]
+      [(engine.blocker_0_ >> Util::MAGIC_SHIFT[square][R0])
+      & Util::MAGIC_MASK[square][R0]][R0]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_90_ >> Util::MAGIC_SHIFT[square][R90])
+      & Util::MAGIC_MASK[square][R90]][R90])
+      & engine.side_pieces_[ENEMY_SIDE];
     }
   };
   template<Side SIDE>
   struct GenPinTargets<SIDE, QUEEN> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
-    Square square, Bitboard attacks, Bitboard& target, Bitboard& back) {
+    Square square, Bitboard& back) {
       constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
 
-      target = attacks & engine.side_board_[ENEMY_SIDE];
-
-      back = (engine.blocker_0_ & Util::GetQueenMove(square)) & ~target;
+      // back = (engine.blocker_0_ & Util::GetQueenMove(square)) & ~target;
+      // back = evaluator.GetBishopPinBack<SIDE>(square)
+      // | evaluator.GetRookPinBack<SIDE>(square);
+      back = (Evaluator::pin_back_table_[square]
+      [(engine.blocker_0_ >> Util::MAGIC_SHIFT[square][R0])
+      & Util::MAGIC_MASK[square][R0]][R0]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_45_ >> Util::MAGIC_SHIFT[square][R45])
+      & Util::MAGIC_MASK[square][R45]][R45]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_90_ >> Util::MAGIC_SHIFT[square][R90])
+      & Util::MAGIC_MASK[square][R90]][R90]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_135_ >> Util::MAGIC_SHIFT[square][R135])
+      & Util::MAGIC_MASK[square][R135]][R135])
+      & engine.side_pieces_[ENEMY_SIDE];
     }
   };
 
@@ -206,12 +231,12 @@ namespace Sayuri {
   template<Side SIDE, PieceType TYPE>
   struct CalSpecial {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
-    Square square) {}
+    Square square, Bitboard attacks) {}
   };
   template<Side SIDE>
   struct CalSpecial<SIDE, PAWN> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
-    Square square) {
+    Square square, Bitboard attacks) {
       constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
@@ -257,7 +282,8 @@ namespace Sayuri {
   template<Side SIDE>
   struct CalSpecial<SIDE, BISHOP> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
-    Square square) {
+    Square square, Bitboard attacks) {
+      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // バッドビショップを計算。
@@ -270,12 +296,42 @@ namespace Sayuri {
         [Util::CountBits
         (engine.position_[SIDE][PAWN] & Util::SQCOLOR[BLACK])];
       }
+
+      // ピンを計算。
+      // ピンのターゲットと裏駒を作成。
+      Bitboard pin_target = attacks & engine.side_pieces_[ENEMY_SIDE];
+      Bitboard pin_back = (Evaluator::pin_back_table_[square]
+      [(engine.blocker_45_ >> Util::MAGIC_SHIFT[square][R45])
+      & Util::MAGIC_MASK[square][R45]][R45]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_135_ >> Util::MAGIC_SHIFT[square][R135])
+      & Util::MAGIC_MASK[square][R135]][R135])
+      & engine.side_pieces_[ENEMY_SIDE];
+
+      // ピンを判定。
+      for (; pin_back; NEXT_BITBOARD(pin_back)) {
+        // 裏駒のマス。
+        Square pin_back_sq = Util::GetSquare(pin_back);
+
+        // 裏駒と自分の間のビットボード。
+        Bitboard between = Util::GetBetween(square, pin_back_sq);
+
+        // 下のif文によるピンの判定条件は、
+        // 「裏駒と自分との間」にターゲット(相手の駒)があった場合。
+        // pin_backに対応するターゲットが味方の駒の場合もあるので
+        // 相手の駒に限定しなくてはならない。
+        if ((between & pin_target)) {
+          evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_[BISHOP]
+          [engine.piece_board_[Util::GetSquare(between & pin_target)]]
+          [engine.piece_board_[pin_back_sq]];
+        }
+      }
     }
   };
   template<Side SIDE>
   struct CalSpecial<SIDE, ROOK> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
-    Square square) {
+    Square square, Bitboard attacks) {
       constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
@@ -291,12 +347,43 @@ namespace Sayuri {
           SIGN * evaluator.cache_ptr_->rook_open_fyle_cache_;
         }
       }
+
+      // ピンを計算。
+      // ピンのターゲットと裏駒を作成。
+      Bitboard pin_target = attacks & engine.side_pieces_[ENEMY_SIDE];
+      Bitboard pin_back = (Evaluator::pin_back_table_[square]
+      [(engine.blocker_0_ >> Util::MAGIC_SHIFT[square][R0])
+      & Util::MAGIC_MASK[square][R0]][R0]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_90_ >> Util::MAGIC_SHIFT[square][R90])
+      & Util::MAGIC_MASK[square][R90]][R90])
+      & engine.side_pieces_[ENEMY_SIDE];
+
+      // ピンを判定。
+      for (; pin_back; NEXT_BITBOARD(pin_back)) {
+        // 裏駒のマス。
+        Square pin_back_sq = Util::GetSquare(pin_back);
+
+        // 裏駒と自分の間のビットボード。
+        Bitboard between = Util::GetBetween(square, pin_back_sq);
+
+        // 下のif文によるピンの判定条件は、
+        // 「裏駒と自分との間」にターゲット(相手の駒)があった場合。
+        // pin_backに対応するターゲットが味方の駒の場合もあるので
+        // 相手の駒に限定しなくてはならない。
+        if ((between & pin_target)) {
+          evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_[ROOK]
+          [engine.piece_board_[Util::GetSquare(between & pin_target)]]
+          [engine.piece_board_[pin_back_sq]];
+        }
+      }
     }
   };
   template<Side SIDE>
   struct CalSpecial<SIDE, QUEEN> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
-    Square square) {
+    Square square, Bitboard attacks) {
+      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // クイーンの早過ぎる始動を計算。
@@ -312,12 +399,48 @@ namespace Sayuri {
 
       evaluator.score_ +=
       SIGN * evaluator.cache_ptr_->early_queen_starting_cache_[value];
+
+      // ピンを計算。
+      // ピンのターゲットと裏駒を作成。
+      Bitboard pin_target = attacks & engine.side_pieces_[ENEMY_SIDE];
+      Bitboard pin_back = (Evaluator::pin_back_table_[square]
+      [(engine.blocker_0_ >> Util::MAGIC_SHIFT[square][R0])
+      & Util::MAGIC_MASK[square][R0]][R0]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_45_ >> Util::MAGIC_SHIFT[square][R45])
+      & Util::MAGIC_MASK[square][R45]][R45]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_90_ >> Util::MAGIC_SHIFT[square][R90])
+      & Util::MAGIC_MASK[square][R90]][R90]
+      | Evaluator::pin_back_table_[square]
+      [(engine.blocker_135_ >> Util::MAGIC_SHIFT[square][R135])
+      & Util::MAGIC_MASK[square][R135]][R135])
+      & engine.side_pieces_[ENEMY_SIDE];
+
+      // ピンを判定。
+      for (; pin_back; NEXT_BITBOARD(pin_back)) {
+        // 裏駒のマス。
+        Square pin_back_sq = Util::GetSquare(pin_back);
+
+        // 裏駒と自分の間のビットボード。
+        Bitboard between = Util::GetBetween(square, pin_back_sq);
+
+        // 下のif文によるピンの判定条件は、
+        // 「裏駒と自分との間」にターゲット(相手の駒)があった場合。
+        // pin_backに対応するターゲットが味方の駒の場合もあるので
+        // 相手の駒に限定しなくてはならない。
+        if ((between & pin_target)) {
+          evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_[QUEEN]
+          [engine.piece_board_[Util::GetSquare(between & pin_target)]]
+          [engine.piece_board_[pin_back_sq]];
+        }
+      }
     }
   };
   template<Side SIDE>
   struct CalSpecial<SIDE, KING> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
-    Square square) {
+    Square square, Bitboard attacks) {
       constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
@@ -603,40 +726,13 @@ namespace Sayuri {
       }
     }
 
-    // ピンを計算。
-    {
-      // ピンのターゲットと裏駒を作成。
-      Bitboard pin_target = 0;
-      Bitboard pin_back = 0;
-      GenPinTargets<SIDE, TYPE>::F(*this, *engine_ptr_, piece_square,
-      attacks, pin_target, pin_back);
-
-      // ピンを判定。
-      for (Bitboard bb = pin_back & engine_ptr_->side_pieces_[ENEMY_SIDE];
-      bb; NEXT_BITBOARD(bb)) {
-        // 裏駒のマス。
-        Square pin_back_sq = Util::GetSquare(bb);
-
-        // 裏駒と自分の間のビットボード。
-        Bitboard between = Util::GetBetween(piece_square, pin_back_sq);
-
-        // 下のif文によるピンの判定条件は、
-        // 「裏駒と自分との間」に「ピンの対象」が一つのみだった場合。
-        if ((between & pin_target) && !(between & pin_back)) {
-          score_ += SIGN * cache_ptr_->pin_cache_[TYPE]
-          [engine_ptr_->piece_board_[Util::GetSquare(between & pin_target)]]
-          [engine_ptr_->piece_board_[pin_back_sq]];
-        }
-      }
-    }
-
     // 相手キング周辺への攻撃を計算。
     score_ += SIGN * cache_ptr_->attack_around_king_cache_[TYPE]
     [Util::CountBits(attacks & Util::GetKingMove
     (engine_ptr_->king_[ENEMY_SIDE]))];
 
     // 各駒専用の価値を計算。
-    CalSpecial<SIDE, TYPE>::F(*this, *engine_ptr_, piece_square);
+    CalSpecial<SIDE, TYPE>::F(*this, *engine_ptr_, piece_square, attacks);
   }
 
   // 実体化。
