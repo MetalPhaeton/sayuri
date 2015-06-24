@@ -261,6 +261,7 @@ namespace Sayuri {
   struct CalSpecial<SIDE, BISHOP> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square) {
+      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // バッドビショップを計算。
@@ -272,6 +273,63 @@ namespace Sayuri {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->bad_bishop_cache_
         [Util::CountBits
         (engine.position_[SIDE][PAWN] & Util::SQCOLOR[BLACK])];
+      }
+
+      // --- ピンを計算 --- //
+      // 準備。
+      Bitboard pattern_45 =
+      (engine.blocker_45_ >> Util::MAGIC_SHIFT[square][R45])
+      & Util::MAGIC_MASK[square][R45];
+      Bitboard pattern_135 =
+      (engine.blocker_135_ >> Util::MAGIC_SHIFT[square][R135])
+      & Util::MAGIC_MASK[square][R135];
+
+      // 45度、左。
+      Square target = Evaluator::pin_table_
+      [square][pattern_45][R45][Evaluator::LEFT][Evaluator::TARGET];
+      Square pin_back = Evaluator::pin_table_
+      [square][pattern_45][R45][Evaluator::LEFT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [BISHOP][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
+
+      // 45度、右。
+      target = Evaluator::pin_table_
+      [square][pattern_45][R45][Evaluator::RIGHT][Evaluator::TARGET];
+      pin_back = Evaluator::pin_table_
+      [square][pattern_45][R45][Evaluator::RIGHT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [BISHOP][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
+
+      // 135度、左。
+      target = Evaluator::pin_table_
+      [square][pattern_135][R135][Evaluator::LEFT][Evaluator::TARGET];
+      pin_back = Evaluator::pin_table_
+      [square][pattern_135][R135][Evaluator::LEFT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [BISHOP][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
+
+      // 135度、右。
+      target = Evaluator::pin_table_
+      [square][pattern_135][R135][Evaluator::RIGHT][Evaluator::TARGET];
+      pin_back = Evaluator::pin_table_
+      [square][pattern_135][R135][Evaluator::RIGHT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [BISHOP][engine.piece_board_[target]][engine.piece_board_[pin_back]];
       }
     }
   };
@@ -294,12 +352,70 @@ namespace Sayuri {
           SIGN * evaluator.cache_ptr_->rook_open_fyle_cache_;
         }
       }
+
+      // --- ピンを計算 --- //
+      // 準備。
+      Bitboard pattern_0 =
+      (engine.blocker_0_ >> Util::MAGIC_SHIFT[square][R0])
+      & Util::MAGIC_MASK[square][R0];
+      Bitboard pattern_90 =
+      (engine.blocker_90_ >> Util::MAGIC_SHIFT[square][R90])
+      & Util::MAGIC_MASK[square][R90];
+
+      // 0度、左。
+      Square target = Evaluator::pin_table_
+      [square][pattern_0][R0][Evaluator::LEFT][Evaluator::TARGET];
+      Square pin_back = Evaluator::pin_table_
+      [square][pattern_0][R0][Evaluator::LEFT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [ROOK][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
+
+      // 0度、右。
+      target = Evaluator::pin_table_
+      [square][pattern_0][R0][Evaluator::RIGHT][Evaluator::TARGET];
+      pin_back = Evaluator::pin_table_
+      [square][pattern_0][R0][Evaluator::RIGHT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [ROOK][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
+
+      // 90度、左。
+      target = Evaluator::pin_table_
+      [square][pattern_90][R90][Evaluator::LEFT][Evaluator::TARGET];
+      pin_back = Evaluator::pin_table_
+      [square][pattern_90][R90][Evaluator::LEFT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [ROOK][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
+
+      // 90度、右。
+      target = Evaluator::pin_table_
+      [square][pattern_90][R90][Evaluator::RIGHT][Evaluator::TARGET];
+      pin_back = Evaluator::pin_table_
+      [square][pattern_90][R90][Evaluator::RIGHT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [ROOK][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
     }
   };
   template<Side SIDE>
   struct CalSpecial<SIDE, QUEEN> {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square) {
+      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // クイーンの早過ぎる始動を計算。
@@ -315,6 +431,117 @@ namespace Sayuri {
 
       evaluator.score_ +=
       SIGN * evaluator.cache_ptr_->early_queen_starting_cache_[value];
+
+      // --- ピンを計算 --- //
+      // 準備。
+      Bitboard pattern_0 =
+      (engine.blocker_0_ >> Util::MAGIC_SHIFT[square][R0])
+      & Util::MAGIC_MASK[square][R0];
+      Bitboard pattern_45 =
+      (engine.blocker_45_ >> Util::MAGIC_SHIFT[square][R45])
+      & Util::MAGIC_MASK[square][R45];
+      Bitboard pattern_90 =
+      (engine.blocker_90_ >> Util::MAGIC_SHIFT[square][R90])
+      & Util::MAGIC_MASK[square][R90];
+      Bitboard pattern_135 =
+      (engine.blocker_135_ >> Util::MAGIC_SHIFT[square][R135])
+      & Util::MAGIC_MASK[square][R135];
+
+      // 45度、左。
+      Square target = Evaluator::pin_table_
+      [square][pattern_45][R45][Evaluator::LEFT][Evaluator::TARGET];
+      Square pin_back = Evaluator::pin_table_
+      [square][pattern_45][R45][Evaluator::LEFT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
+
+      // 45度、右。
+      target = Evaluator::pin_table_
+      [square][pattern_45][R45][Evaluator::RIGHT][Evaluator::TARGET];
+      pin_back = Evaluator::pin_table_
+      [square][pattern_45][R45][Evaluator::RIGHT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
+
+      // 135度、左。
+      target = Evaluator::pin_table_
+      [square][pattern_135][R135][Evaluator::LEFT][Evaluator::TARGET];
+      pin_back = Evaluator::pin_table_
+      [square][pattern_135][R135][Evaluator::LEFT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
+
+      // 135度、右。
+      target = Evaluator::pin_table_
+      [square][pattern_135][R135][Evaluator::RIGHT][Evaluator::TARGET];
+      pin_back = Evaluator::pin_table_
+      [square][pattern_135][R135][Evaluator::RIGHT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
+
+      // 0度、左。
+      target = Evaluator::pin_table_
+      [square][pattern_0][R0][Evaluator::LEFT][Evaluator::TARGET];
+      pin_back = Evaluator::pin_table_
+      [square][pattern_0][R0][Evaluator::LEFT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
+
+      // 0度、右。
+      target = Evaluator::pin_table_
+      [square][pattern_0][R0][Evaluator::RIGHT][Evaluator::TARGET];
+      pin_back = Evaluator::pin_table_
+      [square][pattern_0][R0][Evaluator::RIGHT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
+
+      // 90度、左。
+      target = Evaluator::pin_table_
+      [square][pattern_90][R90][Evaluator::LEFT][Evaluator::TARGET];
+      pin_back = Evaluator::pin_table_
+      [square][pattern_90][R90][Evaluator::LEFT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
+
+      // 90度、右。
+      target = Evaluator::pin_table_
+      [square][pattern_90][R90][Evaluator::RIGHT][Evaluator::TARGET];
+      pin_back = Evaluator::pin_table_
+      [square][pattern_90][R90][Evaluator::RIGHT][Evaluator::PIN_BACK];
+      if ((target != Evaluator::NO_PIN)
+      && (engine.side_board_[target] == ENEMY_SIDE)
+      && (engine.side_board_[pin_back] == ENEMY_SIDE)) {
+        evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_
+        [QUEEN][engine.piece_board_[target]][engine.piece_board_[pin_back]];
+      }
     }
   };
   template<Side SIDE>
@@ -607,6 +834,7 @@ namespace Sayuri {
     }
 
     // ピンを計算。
+    /*
     {
       // ピンのターゲットと裏駒を作成。
       Bitboard pin_target = 0;
@@ -631,6 +859,7 @@ namespace Sayuri {
         }
       }
     }
+    */
 
     // 相手キング周辺への攻撃を計算。
     score_ += SIGN * cache_ptr_->attack_around_king_cache_[TYPE]
