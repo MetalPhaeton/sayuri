@@ -100,25 +100,51 @@ namespace Sayuri {
 
     // ========================================================================
 
-    FOR_SQUARES(square) {
-      if (Util::MAGIC_SHIFT[square][R0] != Util::MAGIC_SHIFT_V[square]) {
-        std::cout << "Error: " << square << " - R0" << std::endl;
-        break;
-      }
-      if (Util::MAGIC_SHIFT[square][R45]
-      != Util::MAGIC_SHIFT_D[Util::ROT45[square]]) {
-        std::cout << "Error: " << square << " - R45" << std::endl;
-        break;
-      }
-      if (Util::MAGIC_SHIFT[square][R90]
-      != Util::MAGIC_SHIFT_V[Util::ROT90[square]]) {
-        std::cout << "Error: " << square << " - R90" << std::endl;
-        break;
-      }
-      if (Util::MAGIC_SHIFT[square][R135]
-      != Util::MAGIC_SHIFT_D[Util::ROT135[square]]) {
-        std::cout << "Error: " << square << " - R135" << std::endl;
-        break;
+    std::string fen = "4k2R/2n5/5b2/rp2Q3/4p3/2P3P1/7B/R3K3 w KQkq - 0 1";
+
+    engine_ptr->LoadFEN(FEN(fen));
+
+    Square square = E5;
+    Bitboard pattern[NUM_ROTS] {
+      (engine_ptr->blocker_0_ >> Util::MAGIC_SHIFT[square][R0])
+      & Util::MAGIC_MASK[square][R0],
+      (engine_ptr->blocker_45_ >> Util::MAGIC_SHIFT[square][R45])
+      & Util::MAGIC_MASK[square][R45],
+      (engine_ptr->blocker_90_ >> Util::MAGIC_SHIFT[square][R90])
+      & Util::MAGIC_MASK[square][R90],
+      (engine_ptr->blocker_135_ >> Util::MAGIC_SHIFT[square][R135])
+      & Util::MAGIC_MASK[square][R135]
+    };
+
+    static const std::string square_str[NUM_SQUARES + 1] {
+      "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1",
+      "A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2",
+      "A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3",
+      "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4",
+      "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5",
+      "A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6",
+      "A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7",
+      "A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8",
+      "NO_PIN"
+    };
+    static const std::string rot_str[NUM_ROTS] {
+      "[R0]", "[R45]", "[R90]", "[R135]"
+    };
+    static const std::string dir_str[2] {
+      "[LEFT]", "[RIGHT]"
+    };
+    static const std::string roll_str[2] {
+      "[TARGET]", "[PIN_BACK]"
+    };
+
+    for (int rot = 0; rot < NUM_ROTS; ++rot) {
+      for (int dir = 0; dir <= Evaluator::RIGHT; ++dir) {
+        for (int roll = 0; roll <= Evaluator::PIN_BACK; ++roll) {
+          std::cout << "[" << square_str[square] << "][***]" << rot_str[rot]
+          << dir_str[dir] << roll_str[roll] << ": "
+          << square_str[Evaluator::pin_table_
+          [square][pattern[rot]][rot][dir][roll]] << std::endl;
+        }
       }
     }
 

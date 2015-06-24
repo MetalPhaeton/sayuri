@@ -165,6 +165,27 @@ namespace Sayuri {
       /** weak_square_mask_[][]を初期化する。 */
       static void InitWeakSquareMask();
 
+      // --- ピン用便利ツール --- //
+      /** ピン用定数 - 方向。 */
+      enum {
+        LEFT, RIGHT
+      };
+      /** ピン用定数 - 相手の駒の役割。 */
+      enum {
+        TARGET, PIN_BACK
+      };
+      /** ピンがない定数。 */
+      static constexpr Square NO_PIN = H8 + 1;
+      /**
+       * ピン用のテーブル。
+       * マス、パターン、方向、駒の役割を指定すると、
+       * その役割の駒の位置を得られる。
+       * [マス][マジックパターン][角度][方向][相手の駒の役割]
+       */
+      static Square pin_table_[NUM_SQUARES][0xff + 1][NUM_ROTS][2][2];
+      /** pin_table[][][][]を初期化する。 */
+      static void InitPinTable();
+
       // ========== //
       // メンバ変数 //
       // ========== //
