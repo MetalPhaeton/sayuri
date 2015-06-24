@@ -176,19 +176,8 @@ namespace Sayuri {
 
       target = attacks & engine.side_board_[ENEMY_SIDE];
 
-      back =
-      (Evaluator::pin_back_table_[square]
-      [(engine.blocker_45_ >> Util::MAGIC_SHIFT[square][R45])
-      & Util::MAGIC_MASK[square][R45]][R45]
-      | Evaluator::pin_back_table_[square]
-      [(engine.blocker_135_ >> Util::MAGIC_SHIFT[square][R135])
-      & Util::MAGIC_MASK[square][R135]][R135])
-      & engine.side_board_[ENEMY_SIDE];
-
-      /*
       back = (engine.side_board_[ENEMY_SIDE]
       & Util::GetBishopMove(square)) & ~target;
-      */
     }
   };
   template<Side SIDE>
@@ -199,19 +188,8 @@ namespace Sayuri {
 
       target = attacks & engine.side_board_[ENEMY_SIDE];
 
-      back =
-      (Evaluator::pin_back_table_[square]
-      [(engine.blocker_0_ >> Util::MAGIC_SHIFT[square][R0])
-      & Util::MAGIC_MASK[square][R0]][R0]
-      | Evaluator::pin_back_table_[square]
-      [(engine.blocker_90_ >> Util::MAGIC_SHIFT[square][R90])
-      & Util::MAGIC_MASK[square][R90]][R90])
-      & engine.side_board_[ENEMY_SIDE];
-
-      /*
       back = (engine.side_board_[ENEMY_SIDE]
       & Util::GetRookMove(square)) & ~target;
-      */
     }
   };
   template<Side SIDE>
@@ -222,25 +200,8 @@ namespace Sayuri {
 
       target = attacks & engine.side_board_[ENEMY_SIDE];
 
-      back =
-      (Evaluator::pin_back_table_[square]
-      [(engine.blocker_0_ >> Util::MAGIC_SHIFT[square][R0])
-      & Util::MAGIC_MASK[square][R0]][R0]
-      | Evaluator::pin_back_table_[square]
-      [(engine.blocker_45_ >> Util::MAGIC_SHIFT[square][R45])
-      & Util::MAGIC_MASK[square][R45]][R45]
-      | Evaluator::pin_back_table_[square]
-      [(engine.blocker_90_ >> Util::MAGIC_SHIFT[square][R90])
-      & Util::MAGIC_MASK[square][R90]][R90]
-      | Evaluator::pin_back_table_[square]
-      [(engine.blocker_135_ >> Util::MAGIC_SHIFT[square][R135])
-      & Util::MAGIC_MASK[square][R135]][R135])
-      & engine.side_board_[ENEMY_SIDE];
-
-      /*
       back = (engine.side_board_[ENEMY_SIDE]
       & Util::GetQueenMove(square)) & ~target;
-      */
     }
   };
 
