@@ -176,8 +176,7 @@ namespace Sayuri {
 
       target = attacks & engine.side_board_[ENEMY_SIDE];
 
-      back = (engine.side_board_[ENEMY_SIDE]
-      & Util::GetBishopMove(square)) & ~target;
+      back = (engine.blocker_0_ & Util::GetBishopMove(square)) & ~target;
     }
   };
   template<Side SIDE>
@@ -188,8 +187,7 @@ namespace Sayuri {
 
       target = attacks & engine.side_board_[ENEMY_SIDE];
 
-      back = (engine.side_board_[ENEMY_SIDE]
-      & Util::GetRookMove(square)) & ~target;
+      back = (engine.blocker_0_ & Util::GetRookMove(square)) & ~target;
     }
   };
   template<Side SIDE>
@@ -200,8 +198,7 @@ namespace Sayuri {
 
       target = attacks & engine.side_board_[ENEMY_SIDE];
 
-      back = (engine.side_board_[ENEMY_SIDE]
-      & Util::GetQueenMove(square)) & ~target;
+      back = (engine.blocker_0_ & Util::GetQueenMove(square)) & ~target;
     }
   };
 
@@ -615,7 +612,8 @@ namespace Sayuri {
       attacks, pin_target, pin_back);
 
       // ピンを判定。
-      for (Bitboard bb = pin_back; bb; NEXT_BITBOARD(bb)) {
+      for (Bitboard bb = pin_back & engine_ptr_->side_pieces_[ENEMY_SIDE];
+      bb; NEXT_BITBOARD(bb)) {
         // 裏駒のマス。
         Square pin_back_sq = Util::GetSquare(bb);
 
@@ -624,7 +622,7 @@ namespace Sayuri {
 
         // 下のif文によるピンの判定条件は、
         // 「裏駒と自分との間」に「ピンの対象」が一つのみだった場合。
-        if ((between & pin_target)) {
+        if ((between & pin_target) && !(between & pin_back)) {
           score_ += SIGN * cache_ptr_->pin_cache_[TYPE]
           [engine_ptr_->piece_board_[Util::GetSquare(between & pin_target)]]
           [engine_ptr_->piece_board_[pin_back_sq]];
