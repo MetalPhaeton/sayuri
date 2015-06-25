@@ -78,7 +78,6 @@ namespace Sayuri {
   constexpr Bitboard Util::MAGIC_MASK_V[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK_D[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK[NUM_SQUARES][NUM_ROTS];
-  constexpr unsigned int Util::BLOCKER_MAP;
 
   // ================== //
   // Utilクラスの初期化 //
@@ -89,8 +88,10 @@ namespace Sayuri {
   void Util::InitUtil() {
     // num_bit16_table_[]を初期化する。
     InitNumBit16Table();
-    // attack_table_***_[][]を初期化する。
-    InitMagicTable();
+    // attack_table_[][][]を初期化する。
+    InitAttackTable();
+    // pawn_movable_table_[][][]を初期化する。
+    InitPawnMovableTable();
     // line_[][]を初期化する。
     InitLine();
     // between_[][]を初期化する。
@@ -139,206 +140,202 @@ namespace Sayuri {
   // ======== //
   // マジック //
   // ======== //
-  // 0度方向への攻撃の配列。 [マス][ブロッカーのパターン8ビット]
-  Bitboard Util::attack_table_0_[NUM_SQUARES][BLOCKER_MAP + 1];
-  // 45度方向への攻撃の配列。 [マス][ブロッカーのパターン8ビット]
-  Bitboard Util::attack_table_45_[NUM_SQUARES][BLOCKER_MAP + 1];
-  // 90度方向への攻撃の配列。 [マス][ブロッカーのパターン8ビット]
-  Bitboard Util::attack_table_90_[NUM_SQUARES][BLOCKER_MAP + 1];
-  // 135度方向への攻撃の配列。 [マス][ブロッカーのパターン8ビット]
-  Bitboard Util::attack_table_135_[NUM_SQUARES][BLOCKER_MAP + 1];
+  // マジックビットボードの配列。
+  Bitboard Util::attack_table_[NUM_SQUARES][0xff + 1][NUM_ROTS];
+  // attack_table_[][]を初期化する。
+  void Util::InitAttackTable() {
+    // 初期化。
+    INIT_ARRAY(attack_table_);
+
+    FOR_SQUARES(square) {
+      for (Bitboard pattern = 0; pattern <= 0xff; ++pattern) {
+        // 各角度のポイント。
+        Bitboard point[NUM_ROTS] {
+          (Util::SQUARE[square][R0] >> Util::MAGIC_SHIFT[square][R0])
+          & Util::MAGIC_MASK[square][R0],
+          (Util::SQUARE[square][R45] >> Util::MAGIC_SHIFT[square][R45])
+          & Util::MAGIC_MASK[square][R45],
+          (Util::SQUARE[square][R90] >> Util::MAGIC_SHIFT[square][R90])
+          & Util::MAGIC_MASK[square][R90],
+          (Util::SQUARE[square][R135] >> Util::MAGIC_SHIFT[square][R135])
+          & Util::MAGIC_MASK[square][R135]
+        };
+        Bitboard temp[NUM_ROTS] {0, 0, 0, 0};
+
+        // 先ず左。
+        COPY_ARRAY(temp, point);
+        for (int i = 0; i < 8; ++i) {
+          // シフト。
+          temp[R0] = (temp[R0] << 1) & Util::MAGIC_MASK[square][R0];
+          temp[R45] = (temp[R45] << 1) & Util::MAGIC_MASK[square][R45];
+          temp[R90] = (temp[R90] << 1) & Util::MAGIC_MASK[square][R90];
+          temp[R135] = (temp[R135] << 1) & Util::MAGIC_MASK[square][R135];
+
+          // 0度。
+          if (temp[R0]) {
+            attack_table_[square][pattern][R0] |=
+            temp[R0] << Util::MAGIC_SHIFT[square][R0];
+
+            // もし他の駒にぶつかったら終了。
+            if (temp[R0] & pattern) temp[R0] = 0;
+          }
+          // 45度。
+          if (temp[R45]) {
+            attack_table_[square][pattern][R45] |=
+            Util::SQUARE[Util::R_ROT45[Util::GetSquare(temp[R45]
+            << Util::MAGIC_SHIFT[square][R45])]][R0];
+
+            // もし他の駒にぶつかったら終了。
+            if (temp[R45] & pattern) temp[R45] = 0;
+          }
+          // 90度。
+          if (temp[R90]) {
+            attack_table_[square][pattern][R90] |=
+            Util::SQUARE[Util::R_ROT90[Util::GetSquare(temp[R90]
+            << Util::MAGIC_SHIFT[square][R90])]][R0];
+
+            // もし他の駒にぶつかったら終了。
+            if (temp[R90] & pattern) temp[R90] = 0;
+          }
+          // 135度。
+          if (temp[R135]) {
+            attack_table_[square][pattern][R135] |=
+            Util::SQUARE[Util::R_ROT135[Util::GetSquare(temp[R135]
+            << Util::MAGIC_SHIFT[square][R135])]][R0];
+
+            // もし他の駒にぶつかったら終了。
+            if (temp[R135] & pattern) temp[R135] = 0;
+          }
+        }
+        // 次は右。
+        COPY_ARRAY(temp, point);
+        for (int i = 0; i < 8; ++i) {
+          // シフト。
+          temp[R0] = (temp[R0] >> 1) & Util::MAGIC_MASK[square][R0];
+          temp[R45] = (temp[R45] >> 1) & Util::MAGIC_MASK[square][R45];
+          temp[R90] = (temp[R90] >> 1) & Util::MAGIC_MASK[square][R90];
+          temp[R135] = (temp[R135] >> 1) & Util::MAGIC_MASK[square][R135];
+
+          // 0度。
+          if (temp[R0]) {
+            attack_table_[square][pattern][R0] |=
+            temp[R0] << Util::MAGIC_SHIFT[square][R0];
+
+            // もし他の駒にぶつかったら終了。
+            if (temp[R0] & pattern) temp[R0] = 0;
+          }
+          // 45度。
+          if (temp[R45]) {
+            attack_table_[square][pattern][R45] |=
+            Util::SQUARE[Util::R_ROT45[Util::GetSquare(temp[R45]
+            << Util::MAGIC_SHIFT[square][R45])]][R0];
+
+            // もし他の駒にぶつかったら終了。
+            if (temp[R45] & pattern) temp[R45] = 0;
+          }
+          // 90度。
+          if (temp[R90]) {
+            attack_table_[square][pattern][R90] |=
+            Util::SQUARE[Util::R_ROT90[Util::GetSquare(temp[R90]
+            << Util::MAGIC_SHIFT[square][R90])]][R0];
+
+            // もし他の駒にぶつかったら終了。
+            if (temp[R90] & pattern) temp[R90] = 0;
+          }
+          // 135度。
+          if (temp[R135]) {
+            attack_table_[square][pattern][R135] |=
+            Util::SQUARE[Util::R_ROT135[Util::GetSquare(temp[R135]
+            << Util::MAGIC_SHIFT[square][R135])]][R0];
+
+            // もし他の駒にぶつかったら終了。
+            if (temp[R135] & pattern) temp[R135] = 0;
+          }
+        }
+      }
+    }
+  }
+
   // ポーンの動ける位置の配列。
-  Bitboard Util::pawn_movable_table_[NUM_SIDES][NUM_SQUARES][BLOCKER_MAP + 1];
-  // attack_table_***_[][]を初期化する。
-  void Util::InitMagicTable() {
-    // 0度のマップを作成。
-    FOR_SQUARES(square) {
-      Bitboard point = SQUARE[square][R0];
-      point >>= MAGIC_SHIFT_V[square];
-      for (unsigned int map = 0; map <= BLOCKER_MAP; ++map) {
-        Bitboard attack = 0;
-        // 右側を作る。
-        Bitboard temp = point;
-        while ((temp = GetRightBitboard(temp))) {
-          attack |= temp;
-          if (temp & map) break;
-        }
-        // 左側を作る。
-        temp = point;
-        while ((temp = GetLeftBitboard(temp))) {
-          attack |= temp;
-          if (temp & map) break;
-        }
-        // 利き筋をマスクする。
-        attack &= MAGIC_MASK_V[square];
-        // 利き筋をシフトする。
-        attack <<= MAGIC_SHIFT_V[square];
-        // 利き筋をマップに入れる。
-        attack_table_0_[square][map] = attack;
-      }
-    }
-
-    // 45度のマップを作成。
-    FOR_SQUARES(square) {
-      Bitboard point = SQUARE[square][R45];
-      point >>= MAGIC_SHIFT_D[ROT45[square]];
-      for (unsigned int map = 0; map <= BLOCKER_MAP; ++map) {
-        Bitboard attack = 0;
-        // 右側を作る。
-        Bitboard temp = point;
-        while ((temp = GetRightBitboard(temp))) {
-          attack |= temp;
-          if (temp & map) break;
-        }
-        // 左側を作る。
-        temp = point;
-        while ((temp = GetLeftBitboard(temp))) {
-          attack |= temp;
-          if (temp & map) break;
-        }
-        // 利き筋をマスクする。
-        attack &= MAGIC_MASK_D[ROT45[square]];
-        // 利き筋をシフトする。
-        attack <<= MAGIC_SHIFT_D[ROT45[square]];
-        // 利き筋を通常の座標にする。
-        attack = Reverse45(attack);
-        // 利き筋をマップに入れる。
-        attack_table_45_[square][map] = attack;
-      }
-    }
-
-    // 90度のマップを作成。
-    FOR_SQUARES(square) {
-      Bitboard point = SQUARE[square][R90];
-      point >>= MAGIC_SHIFT_V[ROT90[square]];
-      for (unsigned int map = 0; map <= BLOCKER_MAP; ++map) {
-        Bitboard attack = 0;
-        // 右側を作る。
-        Bitboard temp = point;
-        while ((temp = GetRightBitboard(temp))) {
-          attack |= temp;
-          if (temp & map) break;
-        }
-        // 左側を作る。
-        temp = point;
-        while ((temp = GetLeftBitboard(temp))) {
-          attack |= temp;
-          if (temp & map) break;
-        }
-        // 利き筋をマスクする。
-        attack &= MAGIC_MASK_V[ROT90[square]];
-        // 利き筋をシフトする。
-        attack <<= MAGIC_SHIFT_V[ROT90[square]];
-        // 利き筋を通常の座標にする。
-        attack = Reverse90(attack);
-        // 利き筋をマップに入れる。
-        attack_table_90_[square][map] = attack;
-      }
-    }
-
-    // 135度のマップを作成。
-    FOR_SQUARES(square) {
-      Bitboard point = SQUARE[square][R135];
-      point >>= MAGIC_SHIFT_D[ROT135[square]];
-      for (unsigned int map = 0; map <= BLOCKER_MAP; ++map) {
-        Bitboard attack = 0;
-        // 右側を作る。
-        Bitboard temp = point;
-        while ((temp = GetRightBitboard(temp))) {
-          attack |= temp;
-          if (temp & map) break;
-        }
-        // 左側を作る。
-        temp = point;
-        while ((temp = GetLeftBitboard(temp))) {
-          attack |= temp;
-          if (temp & map) break;
-        }
-        // 利き筋をマスクする。
-        attack &= MAGIC_MASK_D[ROT135[square]];
-        // 利き筋をシフトする。
-        attack <<= MAGIC_SHIFT_D[ROT135[square]];
-        // 利き筋を通常の座標にする。
-        attack = Reverse135(attack);
-        // 利き筋をマップに入れる。
-        attack_table_135_[square][map] = attack;
-      }
-    }
+  Bitboard Util::pawn_movable_table_[NUM_SIDES][NUM_SQUARES][0xff + 1];
+  void Util::InitPawnMovableTable() {
+    // 初期化。
+    INIT_ARRAY(pawn_movable_table_);
 
     // ポーンの動ける位置の配列を作成。
     FOR_SIDES(side) {
       FOR_SQUARES(square) {
-        for (unsigned int map = 0; map <= BLOCKER_MAP; ++map) {
+        for (Bitboard pattern = 0; pattern <= 0xff; ++pattern) {
           if (side == WHITE) {
             if (SquareToRank(square) == RANK_2) {
               // 初期配置のポーンの位置。
               Bitboard front_bit =
-              SQUARE[square + 8][R90] >> MAGIC_SHIFT_V[ROT90[square + 8]];
-              if (!(front_bit & map)) {
+              SQUARE[square + 8][R90] >> MAGIC_SHIFT[square + 8][R90];
+              if (!(front_bit & pattern)) {
                 // 1歩目。
-                pawn_movable_table_[side][square][map] =
+                pawn_movable_table_[side][square][pattern] =
                 SQUARE[square + 8][R0];
 
                 // 2歩目。
                 front_bit = SQUARE[square + 16][R90] >>
-                MAGIC_SHIFT_V[ROT90[square + 16]];
-                if (!(front_bit & map)) {
-                  pawn_movable_table_[side][square][map] |=
+                MAGIC_SHIFT[square + 16][R90];
+                if (!(front_bit & pattern)) {
+                  pawn_movable_table_[side][square][pattern] |=
                   SQUARE[square + 16][R0];
                 }
               } else {
-                pawn_movable_table_[side][square][map] = 0;
+                pawn_movable_table_[side][square][pattern] = 0;
               }
             } else if (SquareToRank(square) == RANK_8) {
               // 最上ランク。
-              pawn_movable_table_[side][square][map] = 0;
+              pawn_movable_table_[side][square][pattern] = 0;
             } else {
               // その他のランク。
               Bitboard front_bit =
-              SQUARE[square + 8][R90] >> MAGIC_SHIFT_V[ROT90[square + 8]];
-              if (!(front_bit & map)) {
-                pawn_movable_table_[side][square][map] =
+              SQUARE[square + 8][R90] >> MAGIC_SHIFT[square + 8][R90];
+              if (!(front_bit & pattern)) {
+                pawn_movable_table_[side][square][pattern] =
                 SQUARE[square + 8][R0];
               } else {
-                pawn_movable_table_[side][square][map] = 0;
+                pawn_movable_table_[side][square][pattern] = 0;
               }
             }
           } else if (side == BLACK) {
             if (SquareToRank(square) == RANK_7) {
               // 初期配置のポーンの位置。
               Bitboard front_bit =
-              SQUARE[square - 8][R90] >> MAGIC_SHIFT_V[ROT90[square - 8]];
-              if (!(front_bit & map)) {
+              SQUARE[square - 8][R90] >> MAGIC_SHIFT[square - 8][R90];
+              if (!(front_bit & pattern)) {
                 // 1歩目。
-                pawn_movable_table_[side][square][map] =
+                pawn_movable_table_[side][square][pattern] =
                 SQUARE[square - 8][R0];
 
                 // 2歩目。
-                front_bit = SQUARE[square - 16][R90] >>
-                MAGIC_SHIFT_V[ROT90[square - 16]];
-                if (!(front_bit & map)) {
-                  pawn_movable_table_[side][square][map] |=
+                front_bit =
+                SQUARE[square - 16][R90] >> MAGIC_SHIFT[square - 16][R90];
+                if (!(front_bit & pattern)) {
+                  pawn_movable_table_[side][square][pattern] |=
                   SQUARE[square - 16][R0];
                 }
               } else {
-                pawn_movable_table_[side][square][map] = 0;
+                pawn_movable_table_[side][square][pattern] = 0;
               }
             } else if (SquareToRank(square) == RANK_1) {
               // 最上ランク。
-              pawn_movable_table_[side][square][map] = 0;
+              pawn_movable_table_[side][square][pattern] = 0;
             } else {
               // その他のランク。
               Bitboard front_bit =
-              SQUARE[square - 8][R90] >> MAGIC_SHIFT_V[ROT90[square - 8]];
-              if (!(front_bit & map)) {
-                pawn_movable_table_[side][square][map] =
+              SQUARE[square - 8][R90] >> MAGIC_SHIFT[square - 8][R90];
+              if (!(front_bit & pattern)) {
+                pawn_movable_table_[side][square][pattern] =
                 SQUARE[square - 8][R0];
               } else {
-                pawn_movable_table_[side][square][map] = 0;
+                pawn_movable_table_[side][square][pattern] = 0;
               }
             }
           } else {
-            pawn_movable_table_[side][square][map] = 0;
+            pawn_movable_table_[side][square][pattern] = 0;
           }
         }
       }

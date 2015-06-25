@@ -1223,47 +1223,61 @@ namespace Sayuri {
       // 利き筋ラインを得る関数 //
       // ====================== //
       /**
-       * 0度の利き筋ラインを得る。
-       * @param square 基点。
-       * @param blocker_0 全駒の配置のビットボード。 角度0度。
-       * @return 利き筋ライン。
+       * ビショップ用マジックビットボードを得る。
+       * @param square ビショップの位置。
+       * @param blocker_45 45度のブロッカー。
+       * @param blocker_135 135度のブロッカー。
+       * @return ビットボード。
        */
-      static Bitboard GetAttack0(Square square, Bitboard blocker_0) {
-        return attack_table_0_[square]
-        [(blocker_0 >> MAGIC_SHIFT[square][R0]) & MAGIC_MASK[square][R0]];
-      }
-      /**
-       * 45度の利き筋ラインを得る。
-       * @param square 基点。
-       * @param blocker_45 全駒の配置のビットボード。 角度45度。
-       * @return 利き筋ライン。
-       */
-      static Bitboard GetAttack45(Square square, Bitboard blocker_45) {
-        return attack_table_45_[square]
+      static Bitboard GetBishopMagic(Square square,
+      Bitboard blocker_45, Bitboard blocker_135) {
+        return attack_table_[square]
         [(blocker_45 >> MAGIC_SHIFT[square][R45])
-        & MAGIC_MASK[square][R45]];
-      }
-      /**
-       * 90度の利き筋ラインを得る。
-       * @param square 基点。
-       * @param blocker_90 全駒の配置のビットボード。 角度90度。
-       * @return 利き筋ライン。
-       */
-      static Bitboard GetAttack90(Square square, Bitboard blocker_90) {
-        return attack_table_90_[square]
-        [(blocker_90 >> MAGIC_SHIFT[square][R90])
-        & MAGIC_MASK[square][R90]];
-      }
-      /**
-       * 135度の利き筋ラインを得る。
-       * @param square 基点。
-       * @param blocker_135 全駒の配置のビットボード。 角度135度。
-       * @return 利き筋ライン。
-       */
-      static Bitboard GetAttack135(Square square, Bitboard blocker_135) {
-        return attack_table_135_[square]
+        & MAGIC_MASK[square][R45]][R45]
+        | attack_table_[square]
         [(blocker_135 >> MAGIC_SHIFT[square][R135])
-        & MAGIC_MASK[square][R135]];
+        & MAGIC_MASK[square][R135]][R135];
+      }
+      /**
+       * ルーク用マジックビットボードを得る。
+       * @param square ルークの位置。
+       * @param blocker_0 0度のブロッカー。
+       * @param blocker_90 90度のブロッカー。
+       * @return ビットボード。
+       */
+      static Bitboard GetRookMagic(Square square,
+      Bitboard blocker_0, Bitboard blocker_90) {
+        return attack_table_[square]
+        [(blocker_0 >> MAGIC_SHIFT[square][R0])
+        & MAGIC_MASK[square][R0]][R0]
+        | attack_table_[square]
+        [(blocker_90 >> MAGIC_SHIFT[square][R90])
+        & MAGIC_MASK[square][R90]][R90];
+      }
+      /**
+       * クイーン用マジックビットボードを得る。
+       * @param square クイーンの位置。
+       * @param blocker_0 0度のブロッカー。
+       * @param blocker_45 45度のブロッカー。
+       * @param blocker_90 90度のブロッカー。
+       * @param blocker_135 135度のブロッカー。
+       * @return ビットボード。
+       */
+      static Bitboard GetQueenMagic(Square square,
+      Bitboard blocker_0, Bitboard blocker_45,
+      Bitboard blocker_90, Bitboard blocker_135) {
+        return attack_table_[square]
+        [(blocker_0 >> MAGIC_SHIFT[square][R0])
+        & MAGIC_MASK[square][R0]][R0]
+        | attack_table_[square]
+        [(blocker_45 >> MAGIC_SHIFT[square][R45])
+        & MAGIC_MASK[square][R45]][R45]
+        | attack_table_[square]
+        [(blocker_90 >> MAGIC_SHIFT[square][R90])
+        & MAGIC_MASK[square][R90]][R90]
+        | attack_table_[square]
+        [(blocker_135 >> MAGIC_SHIFT[square][R135])
+        & MAGIC_MASK[square][R135]][R135];
       }
       /**
        * ポーンの動ける位置を得る。
@@ -1633,25 +1647,14 @@ namespace Sayuri {
       // ========== //
       // マジック用 //
       // ========== //
-      /** ブロッカー用8ビットマスク。 */
-      static constexpr unsigned int BLOCKER_MAP = 0xff;
-      /** 0度方向への攻撃の配列。 [マス][ブロッカーのパターン8ビット] */
-      static Bitboard attack_table_0_[NUM_SQUARES][BLOCKER_MAP + 1];
-      // 45度。
-      /** 45度方向への攻撃の配列。 [マス][ブロッカーのパターン8ビット] */
-      static Bitboard attack_table_45_[NUM_SQUARES][BLOCKER_MAP + 1];
-      // 90度。
-      /** 90度方向への攻撃の配列。 [マス][ブロッカーのパターン8ビット] */
-      static Bitboard attack_table_90_[NUM_SQUARES][BLOCKER_MAP + 1];
-      /** 135度方向への攻撃の配列。 [マス][ブロッカーのパターン8ビット] */
-      static Bitboard attack_table_135_[NUM_SQUARES][BLOCKER_MAP + 1];
-      /** ポーンの動ける位置の配列。
-       *  [サイド][マス][ブロッカーのパターン8ビット]
-       */
-      static Bitboard pawn_movable_table_
-      [NUM_SIDES][NUM_SQUARES][BLOCKER_MAP + 1];
-      /** attack_table_???_[][]を初期化する。 */
-      static void InitMagicTable();
+      /** マジックビットボードの配列。 [サイド][マス][パターン][角度] */
+      static Bitboard attack_table_[NUM_SQUARES][0xff + 1][NUM_ROTS];
+      /** attack_table_[][][]を初期化する。 */
+      static void InitAttackTable();
+      /** ポーンの動ける位置の配列。 [サイド][マス][パターン] */
+      static Bitboard pawn_movable_table_[NUM_SIDES][NUM_SQUARES][0xff + 1];
+      /** pawn_movable_table_[][][]を初期化する。 */
+      static void InitPawnMovableTable();
 
       /**
        * 45度の座標を0度に逆変換する。

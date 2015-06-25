@@ -243,8 +243,7 @@ namespace Sayuri {
        * @return ビショップの利き筋。
        */
       Bitboard GetBishopAttack(Square square) const {
-        return Util::GetAttack45(square, blocker_45_)
-        | Util::GetAttack135(square, blocker_135_);
+        return Util::GetBishopMagic(square, blocker_45_, blocker_135_);
       }
       /**
        * ボードの状態からルークの利き筋を作る。
@@ -252,8 +251,7 @@ namespace Sayuri {
        * @return ルークの利き筋。
        */
       Bitboard GetRookAttack(Square square) const {
-        return Util::GetAttack0(square, blocker_0_)
-        | Util::GetAttack90(square, blocker_90_);
+        return Util::GetRookMagic(square, blocker_0_, blocker_90_);
       }
       /**
        * ボードの状態からクイーンの利き筋を作る。
@@ -261,7 +259,8 @@ namespace Sayuri {
        * @return クイーンの利き筋。
        */
       Bitboard GetQueenAttack(Square square) const {
-        return GetBishopAttack(square) | GetRookAttack(square);
+        return Util::GetQueenMagic
+        (square, blocker_0_, blocker_45_, blocker_90_, blocker_135_);
       }
       /**
        * ボードの状態からポーンの動ける位置を作る。

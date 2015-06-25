@@ -886,10 +886,14 @@ namespace Sayuri {
       for (Bitboard pattern = 0; pattern <= 0xff; ++pattern) {
         // 各角度のポイント。
         Bitboard point[NUM_ROTS] {
-          Util::SQUARE[square][R0] >> Util::MAGIC_SHIFT[square][R0],
-          Util::SQUARE[square][R45] >> Util::MAGIC_SHIFT[square][R45],
-          Util::SQUARE[square][R90] >> Util::MAGIC_SHIFT[square][R90],
-          Util::SQUARE[square][R135] >> Util::MAGIC_SHIFT[square][R135]
+          (Util::SQUARE[square][R0] >> Util::MAGIC_SHIFT[square][R0])
+          & Util::MAGIC_MASK[square][R0],
+          (Util::SQUARE[square][R45] >> Util::MAGIC_SHIFT[square][R45])
+          & Util::MAGIC_MASK[square][R45],
+          (Util::SQUARE[square][R90] >> Util::MAGIC_SHIFT[square][R90])
+          & Util::MAGIC_MASK[square][R90],
+          (Util::SQUARE[square][R135] >> Util::MAGIC_SHIFT[square][R135])
+          & Util::MAGIC_MASK[square][R135]
         };
         Bitboard temp[NUM_ROTS] {0, 0, 0, 0};
         bool find_target[NUM_ROTS] {false, false, false, false};
@@ -902,10 +906,10 @@ namespace Sayuri {
         find_target[R135] = false;
         for (int i = 0; i < 8; ++i) {
           // シフト。
-          temp[R0] <<= 1;
-          temp[R45] <<= 1;
-          temp[R90] <<= 1;
-          temp[R135] <<= 1;
+          temp[R0] = (temp[R0] << 1) & Util::MAGIC_MASK[square][R0];
+          temp[R45] = (temp[R45] << 1) & Util::MAGIC_MASK[square][R45];
+          temp[R90] = (temp[R90] << 1) & Util::MAGIC_MASK[square][R90];
+          temp[R135] = (temp[R135] << 1) & Util::MAGIC_MASK[square][R135];
 
           // 0度。
           if (temp[R0]) {
@@ -918,8 +922,7 @@ namespace Sayuri {
               // バックを見つける。
               if ((temp[R0] & pattern)) {
                 pin_back_table_[square][pattern][R0] |=
-                Util::SQUARE[Util::GetSquare(temp[R0]
-                << Util::MAGIC_SHIFT[square][R0])][R0];
+                temp[R0] << Util::MAGIC_SHIFT[square][R0];
 
                 // もう必要ない。
                 temp[R0] = 0;
@@ -993,10 +996,10 @@ namespace Sayuri {
         find_target[R135] = false;
         for (int i = 0; i < 8; ++i) {
           // シフト。
-          temp[R0] >>= 1;
-          temp[R45] >>= 1;
-          temp[R90] >>= 1;
-          temp[R135] >>= 1;
+          temp[R0] = (temp[R0] >> 1) & Util::MAGIC_MASK[square][R0];
+          temp[R45] = (temp[R45] >> 1) & Util::MAGIC_MASK[square][R45];
+          temp[R90] = (temp[R90] >> 1) & Util::MAGIC_MASK[square][R90];
+          temp[R135] = (temp[R135] >> 1) & Util::MAGIC_MASK[square][R135];
 
           // 0度。
           if (temp[R0]) {
