@@ -207,6 +207,7 @@ namespace Sayuri {
             if (temp[R135] & pattern) temp[R135] = 0;
           }
         }
+
         // 次は右。
         COPY_ARRAY(temp, point);
         for (int i = 0; i < 8; ++i) {
@@ -340,49 +341,6 @@ namespace Sayuri {
         }
       }
     }
-  }
-
-  // 45度の座標を0度に逆変換する。
-  Bitboard Util::Reverse45(Bitboard bitboard45) {
-    // 通常座標に変換する。
-    Bitboard bitboard = 0;
-    for (;bitboard45; NEXT_BITBOARD(bitboard45)) {
-      // 45度座標の位置を得る。
-      Square square45 = CountZero(bitboard45);
-      // 変換して追加。
-      bitboard |= SQUARE[R_ROT45[square45]][R0];
-    }
-
-    // 返す。
-    return bitboard;
-  }
-  // 90度の座標を0度に逆変換する。
-  Bitboard Util::Reverse90(Bitboard bitboard90) {
-    // 通常座標に変換する。
-    Bitboard bitboard = 0;
-    for (;bitboard90; NEXT_BITBOARD(bitboard90)) {
-      // 90度座標の位置を得る。
-      Square square90 = CountZero(bitboard90);
-      // 変換して追加。
-      bitboard |= SQUARE[R_ROT90[square90]][R0];
-    }
-
-    // 返す。
-    return bitboard;
-  }
-  // 135度の座標を0度に逆変換する。
-  Bitboard Util::Reverse135(Bitboard bitboard135) {
-    // 通常座標に変換する。
-    Bitboard bitboard = 0;
-    for (;bitboard135; NEXT_BITBOARD(bitboard135)) {
-      // 135度座標の位置を得る。
-      Square square135 = CountZero(bitboard135);
-      // 変換して追加。
-      bitboard |= SQUARE[R_ROT135[square135]][R0];
-    }
-
-    // 返す。
-    return bitboard;
   }
 
   // ================== //

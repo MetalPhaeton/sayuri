@@ -1656,25 +1656,6 @@ namespace Sayuri {
       /** pawn_movable_table_[][][]を初期化する。 */
       static void InitPawnMovableTable();
 
-      /**
-       * 45度の座標を0度に逆変換する。
-       * @param bitboard45 45度座標のビットボード。
-       * @return 0度座標のビットボード。
-       */
-      static Bitboard Reverse45(Bitboard bitboard45);
-      /**
-       * 90度の座標を0度に逆変換する。
-       * @param bitboard90 90度座標のビットボード。
-       * @return 0度座標のビットボード。
-       */
-      static Bitboard Reverse90(Bitboard bitboard90);
-      /**
-       * 135度の座標を0度に逆変換する。
-       * @param bitboard135 135度座標のビットボード。
-       * @return 0度座標のビットボード。
-       */
-      static Bitboard Reverse135(Bitboard bitboard135);
-
       // ================== //
       // ビットボードの配列 //
       // ================== //
