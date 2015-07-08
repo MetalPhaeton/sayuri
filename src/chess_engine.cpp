@@ -61,8 +61,7 @@ namespace Sayuri {
   ChessEngine::ChessEngine(const SearchParams& search_params,
   const EvalParams& eval_params) :
   is_null_searching_(false),
-  evaluator_(*this),
-  helper_handler_(this) {
+  evaluator_(*this) {
     SetNewGame();
 
     // 探索関数用パラメータ。
@@ -83,6 +82,7 @@ namespace Sayuri {
     job_table_.reset(new Job[MAX_PLYS + 1]);
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       job_table_[i].client_ptr_ = this;
+      job_table_[i].level_ = i;
     }
 
     // PositionRecord。
@@ -92,8 +92,7 @@ namespace Sayuri {
   // プライベートコンストラクタ。
   ChessEngine::ChessEngine() : 
   is_null_searching_(false),
-  evaluator_(*this),
-  helper_handler_(this) {
+  evaluator_(*this) {
     SetNewGame();
 
     // ムーブメーカー。
@@ -109,6 +108,7 @@ namespace Sayuri {
     job_table_.reset(new Job[MAX_PLYS + 1]);
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       job_table_[i].client_ptr_ = this;
+      job_table_[i].level_ = i;
     }
 
     // PositionRecord。
@@ -117,9 +117,7 @@ namespace Sayuri {
 
   // コピーコンストラクタ。
   ChessEngine::ChessEngine(const ChessEngine& engine) :
-  is_null_searching_(false),
-  evaluator_(*this),
-  helper_handler_(this) {
+  is_null_searching_(false), evaluator_(*this) {
     // 基本メンバをコピー。
     ScanBasicMember(engine);
 
@@ -139,6 +137,7 @@ namespace Sayuri {
     job_table_.reset(new Job[MAX_PLYS + 1]);
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       job_table_[i].client_ptr_ = this;
+      job_table_[i].level_ = i;
     }
 
     // PositionRecord。
@@ -148,8 +147,7 @@ namespace Sayuri {
   // ムーブコンストラクタ。
   ChessEngine::ChessEngine(ChessEngine&& engine) :
   is_null_searching_(false),
-  evaluator_(*this),
-  helper_handler_(this) {
+  evaluator_(*this) {
     // 基本メンバをコピー。
     ScanBasicMember(engine);
 
@@ -169,6 +167,7 @@ namespace Sayuri {
     job_table_.reset(new Job[MAX_PLYS + 1]);
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
       job_table_[i].client_ptr_ = this;
+      job_table_[i].level_ = i;
     }
 
     // PositionRecord。

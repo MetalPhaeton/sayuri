@@ -85,11 +85,11 @@ namespace Sayuri {
        */
       void Init(MoveMaker& maker) {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+        num_helpers_ = 0;
+        has_cut_ = false;
         record_ptr_ = nullptr;
         maker_ptr_ = &maker;
         counter_ = 0;
-        helper_handle_.end_ = helper_handle_.helper_ptr_table_;
-        helper_handle_.num_helpers_ = 0;
       }
 
       /**
@@ -111,41 +111,46 @@ namespace Sayuri {
        * ヘルパー登録する。
        * @param helper_ptr 登録するヘルパーのポインタ。
        */
-      void RegisterHelper(ChessEngine* helper_ptr) {
+      void RegisterHelper() {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-        *(helper_handle_.end_) = helper_ptr;
-        ++(helper_handle_.end_);
-        ++(helper_handle_.num_helpers_);
+        // すでにカット済みなら登録しない。
+        if (has_cut_) return;
+
+        ++num_helpers_;
       }
 
       /**
        * ヘルパー登録解除する。
-       * @param helper_ptr 登録解除するヘルパーのポインタ。
        */
-      void ReleaseHelper(ChessEngine* helper_ptr) {
+      void ReleaseHelper() {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-        for (volatile ChessEngine** ptr = helper_handle_.helper_ptr_table_;
-        ptr < helper_handle_.end_; ++ptr) {
-          if (*ptr == helper_ptr) {
-            *ptr = nullptr;
-            --helper_handle_.num_helpers_;
-          }
-        }
+        --num_helpers_;
       }
 
       /**
-       * ヘルパーに通知する。
-       * @param notifier_ptr 通知したヘルパーのポインタ。
+       * ベータカットを通知する。
        */
-      void NotifyBetaCut(ChessEngine* notifier_ptr);
+      void NotifyBetaCut() {
+        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+        has_cut_ = true;
+      }
+
+      /**
+       * カット済みかどうかチェックする。
+       * @return カット済みならtrue。
+       */
+      bool HasCut() {
+        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+        return has_cut_;
+      }
 
       /**
        * ヘルパーが全て抜けるのを待つ。
        */
       void WaitForHelpers() {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-        while (helper_handle_.num_helpers_ >= 1) {
-          helper_handle_.cond_.wait(lock);
+        while (num_helpers_ >= 1) {
+          cond_.wait(lock);
         }
       }
 
@@ -209,17 +214,12 @@ namespace Sayuri {
       // ========== //
       // メンバ変数 //
       // ========== //
-      /** ヘルパーの登録構造体。 */
-      struct {
-        /** ヘルパーのテーブル。 */
-        volatile ChessEngine* helper_ptr_table_[UCI_MAX_THREADS + 1];
-        /** ヘルパーのテーブルの終端。 */
-        volatile ChessEngine** end_;
-        /** ヘルパーの数。 */
-        volatile int num_helpers_;
-        /** コンディション。 */
-        std::condition_variable cond_;
-      } helper_handle_;
+      /** 登録されているヘルパーの数。 */
+      volatile int num_helpers_;
+      /** すでにベータカット済みかどうか。 */
+      volatile bool has_cut_;
+      /** ヘルパーを待つためのコンディション。 */
+      std::condition_variable cond_;
 
       /** 仕事用MoveMakerのポインタ。 */
       MoveMaker* maker_ptr_;

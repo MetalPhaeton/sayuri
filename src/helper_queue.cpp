@@ -106,11 +106,10 @@ namespace Sayuri {
 
 
     // --- 仕事の準備 --- //
-    job_ptr_->Lock();  // ロック。
-
     // ヘルパー登録。
-    job_ptr_->client_ptr_->helper_handler_.Register
-    (helper_ptr, job_ptr_->level_);
+    job_ptr_->RegisterHelper();
+
+    job_ptr_->Lock();  // ロック。
 
     // 局面のコピー。
     helper_ptr->LoadRecord(*(job_ptr_->record_ptr_));

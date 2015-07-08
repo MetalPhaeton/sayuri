@@ -794,10 +794,10 @@ namespace Sayuri {
 
       /**
        * 現在のノードの探索を中止すべきかどうか判断する。
-       * @param level 現在のノードのレベル。
+       * @param job 現在のノードのジョブ。
        * @return 中止すべきならtrue。
        */
-      bool JudgeToStop(int level);
+      bool JudgeToStop(Job& job);
 
       // ======================== //
       // その他のプライベート関数 //
@@ -1080,160 +1080,8 @@ namespace Sayuri {
       std::mutex mutex_;
       /** 並列探索用スレッドのベクトル。 */
       std::vector<std::thread> thread_vec_;
-
-      struct {
-        /** ベータカットしたレベル。 */
-        volatile std::uint32_t cut_level_;
-      } mail_box_;
-
-      /** ヘルパーハンドラ構造体。 */
-      struct HelperHandler {
-        /** この構造体の持ち主。 */
-        ChessEngine* owner_ptr_;
-
-        /** クライアントのポインタ。 */
-        ChessEngine* client_ptr_;
-        /** クライアントから依頼された時のレベル。 */
-        std::uint32_t client_level_;
-        /** クライアントのヘルパーテーブルでの自分のインデックス。 */
-        int my_index_;
-
-        /** ヘルパーのポインタ。 */
-        ChessEngine* helper_ptr_table_[UCI_MAX_THREADS];
-        /** ヘルパーに依頼した時のレベル。 */
-        std::uint32_t helper_level_table_[UCI_MAX_THREADS];
-        /** 各レベルで依頼したヘルパーの数。 */
-        int num_helpers_[MAX_PLYS + 1];
-
-        /** ベータカットしたエンジンのポインタ。 */
-        ChessEngine* betacut_engine_ptr_;
-        /** ベータカットしたレベル。 */
-        std::uint32_t betacut_level_;
-
-        /** ミューテックス。 */
-        std::mutex mutex_;
-        /** コンディション変数。 */
-        std::condition_variable cond_;
-
-        /**
-         * コンストラクタ。
-         * @param owner_ptr この構造体の持ち主。
-         */
-        HelperHandler(ChessEngine* owner_ptr) : owner_ptr_(owner_ptr),
-        client_ptr_(nullptr), client_level_(0), my_index_(0),
-        betacut_engine_ptr_(nullptr), betacut_level_(0) {
-          for (int i = 0; i < UCI_MAX_THREADS; ++i) {
-            helper_ptr_table_[i] = nullptr;
-            helper_level_table_[i] = 0;
-          }
-
-          INIT_ARRAY(num_helpers_);
-        }
-        HelperHandler() = delete;
-        HelperHandler(const HelperHandler&) = delete;
-        HelperHandler(HelperHandler&&) = delete;
-        HelperHandler& operator=(const HelperHandler&) = delete;
-        HelperHandler& operator=(HelperHandler&&) = delete;
-
-        /**
-         * ヘルパー登録する。
-         * @param helper_ptr 自分のポインタ。
-         * @param level 登録時のレベル。
-         */
-        void Register(ChessEngine* helper_ptr, std::uint32_t level) {
-          std::unique_lock<std::mutex> lock(mutex_);  // ロック。
-
-          for (int i = 0; i < UCI_MAX_THREADS; ++i) {
-            if (!(helper_ptr_table_[i])) {
-              helper_ptr_table_[i] = helper_ptr;
-              helper_level_table_[i] = level;
-              ++(num_helpers_[level]);
-
-              helper_ptr->helper_handler_.client_ptr_ = owner_ptr_;
-              helper_ptr->helper_handler_.client_level_ = level;
-              helper_ptr->helper_handler_.my_index_ = i;
-              break;
-            }
-          }
-        }
-
-        /**
-         * ヘルパー登録を解除する。
-         * @param helper_ptr 自分のポインタ。
-         */
-        void Remove(ChessEngine* helper_ptr, std::uint32_t level) {
-          std::unique_lock<std::mutex> lock(mutex_);  // ロック。
-
-          int index = helper_ptr->helper_handler_.my_index_;
-          if (helper_ptr == helper_ptr_table_[index]) {
-            helper_ptr_table_[index] = nullptr;
-            helper_level_table_[index] = 0;
-            --(num_helpers_[level]);
-
-            cond_.notify_one();
-          }
-        }
-
-        /** 
-         * エンジンにベータカットを通知する。
-         * @param notifier_ptr 通知人。
-         * @param level 通知してきたレベル。
-         */
-        void NotifyBetaCut(ChessEngine* notifier_ptr, std::uint32_t level) {
-          std::unique_lock<std::mutex> lock(mutex_);  // ロック。
-
-          // すでに通知があって、上階層の通知だった場合は無視する。
-          if (betacut_engine_ptr_ && (betacut_level_ < level)) return;
-
-          betacut_engine_ptr_ = notifier_ptr;
-          betacut_level_ = level;
-
-          // 他のヘルパーにもベータカット通知する。
-          for (int i = 0; i < UCI_MAX_THREADS; ++i) {
-            if (helper_ptr_table_[i] && (helper_level_table_[i] >= level)
-            && (helper_ptr_table_[i] != notifier_ptr)
-            && (helper_ptr_table_[i] != owner_ptr_)) {
-              helper_ptr_table_[i]->helper_handler_.NotifyBetaCut(owner_ptr_,
-              helper_level_table_[i]);
-            }
-          }
-        }
-
-        /**
-         * ベータカット通知を受け取る。
-         * @param level 現在のレベル。
-         * @return 通知があればtrue。
-         */
-        bool ReceiveNotification(std::uint32_t level) {
-          std::unique_lock<std::mutex> lock(mutex_);  // ロック。
-
-          if (betacut_engine_ptr_) {
-            if (betacut_level_ <= level) {
-              return true;
-            } else {
-              betacut_engine_ptr_ = nullptr;
-              betacut_level_ = 0;
-              return false;
-            }
-          }
-          return false;
-        }
-
-        /**
-         * ヘルパーが全ていなくなるまで待機する。
-         * @param level 待機中のレベル。
-         */
-        void WaitForHelpers(std::uint32_t level) {
-          std::unique_lock<std::mutex> lock(mutex_);  // ロック。
-
-          while (num_helpers_[level] >= 1) {
-            cond_.wait(lock);
-          }
-        }
-      };
-      friend struct HelperHandler;
-      /** ヘルパーハンドラ。 */
-      HelperHandler helper_handler_;
+      /** ベータカット通知。 中身はベータカットしたレベル。 */
+      volatile std::uint32_t notice_cut_level_;
   };
 }  // namespace Sayuri
 

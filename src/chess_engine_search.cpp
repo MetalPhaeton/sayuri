@@ -62,7 +62,7 @@ namespace Sayuri {
     Cache& cache = shared_st_ptr_->cache_;
 
     // 探索中止。
-    if (JudgeToStop(level)) return alpha;
+    if (JudgeToStop(job_table_[level])) return alpha;
 
     // ノード数を加算。
     ++(shared_st_ptr_->searched_nodes_);
@@ -150,7 +150,7 @@ namespace Sayuri {
     Cache& cache = shared_st_ptr_->cache_;
 
     // 探索中止。
-    if (JudgeToStop(level)) return alpha;
+    if (JudgeToStop(job_table_[level])) return alpha;
 
     // ノード数を加算。
     ++(shared_st_ptr_->searched_nodes_);
@@ -367,7 +367,7 @@ namespace Sayuri {
 
           // 探索。
           for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
-            if (JudgeToStop(level)) return alpha;
+            if (JudgeToStop(job_table_[level])) return alpha;
 
             // 次のノードへの準備。
             Hash next_hash = GetNextHash(pos_hash, move);
@@ -387,7 +387,7 @@ namespace Sayuri {
 
             UnmakeMove(move);
 
-            if (JudgeToStop(level)) return alpha;
+            if (JudgeToStop(job_table_[level])) return alpha;
 
             // ベータカット。
             if (score >= prob_beta) {
@@ -444,12 +444,10 @@ namespace Sayuri {
     Job& job = job_table_[level];
     job.Lock();
     job.Init(maker_table_[level]);
-    job.client_ptr_ = this;
     job.record_ptr_ = nullptr;
     job.node_type_ = node_type;
     job.pos_hash_ = pos_hash;
     job.depth_ = depth;
-    job.level_ = level;
     job.alpha_ = alpha;
     job.beta_ = beta;
     job.table_ptr_ = &table;
@@ -475,7 +473,7 @@ namespace Sayuri {
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // 探索終了ならループを抜ける。
-      if (JudgeToStop(level)) break;
+      if (JudgeToStop(job)) break;
 
       // 別スレッドに助けを求める。(YBWC)
       if ((job.depth_ >= cache.ybwc_limit_depth_)
@@ -590,7 +588,7 @@ namespace Sayuri {
       UnmakeMove(move);
 
       // 探索終了ならループを抜ける。
-      if (JudgeToStop(level)) break;
+      if (JudgeToStop(job)) break;
 
       job.Lock();  // ロック。
 
@@ -613,7 +611,7 @@ namespace Sayuri {
         job.score_type_ = ScoreType::BETA;
 
         // ベータカット。
-        helper_handler_.NotifyBetaCut(this, level);
+        job.NotifyBetaCut();
         job.Unlock();  // ロック解除。
         break;
       }
@@ -623,7 +621,7 @@ namespace Sayuri {
 
     // スレッドを合流。
     if (job.depth_ >= cache.ybwc_limit_depth_) {
-      helper_handler_.WaitForHelpers(level);
+      job.WaitForHelpers();
     }
 
     // このノードでゲーム終了だった場合。
@@ -678,15 +676,6 @@ namespace Sayuri {
           table.Add(pos_hash, depth, job.alpha_, job.score_type_, best_move);
         }
       }
-
-      // ベータカット通知をクリア。
-      helper_handler_.mutex_.lock();
-      if (helper_handler_.betacut_engine_ptr_
-      && (helper_handler_.betacut_level_ >= level)) {
-        helper_handler_.betacut_engine_ptr_ = nullptr;
-        helper_handler_.betacut_level_ = 0;
-      }
-      helper_handler_.mutex_.unlock();
     }
 
     return job.alpha_;
@@ -769,7 +758,7 @@ namespace Sayuri {
     for (shared_st_ptr_->i_depth_ = 1; shared_st_ptr_->i_depth_ <= MAX_PLYS;
     ++(shared_st_ptr_->i_depth_)) {
       // 探索終了。
-      if (JudgeToStop(level)) {
+      if (JudgeToStop(job_table_[level])) {
         --(shared_st_ptr_->i_depth_);
         break;
       }
@@ -839,12 +828,10 @@ namespace Sayuri {
       Job& job = job_table_[level];
       job.Lock();
       job.Init(maker_table_[level]);
-      job.client_ptr_ = this;
       job.record_ptr_ = nullptr;
       job.node_type_ = NodeType::PV;
       job.pos_hash_ = pos_hash;
       job.depth_ = depth;
-      job.level_ = level;
       job.alpha_ = alpha;
       job.beta_ = beta;
       job.delta_ = delta;
@@ -862,7 +849,7 @@ namespace Sayuri {
 
       // ヘルプして待つ。
       shared_st_ptr_->helper_queue_ptr_->HelpRoot(job);
-      helper_handler_.WaitForHelpers(level);
+      job.WaitForHelpers();
 
       // 最善手を記録する。
       prev_best = pv_line_table_[level][0];
@@ -918,7 +905,7 @@ namespace Sayuri {
     }
 
     // 探索終了したけど、まだ思考を止めてはいけない場合、関数を終了しない。
-    while (!JudgeToStop(level)) {
+    while (!JudgeToStop(job_table_[level])) {
       std::this_thread::sleep_for(Chrono::milliseconds(1));
     }
 
@@ -945,15 +932,11 @@ namespace Sayuri {
     while (true) {
       // 準備。
       Job* job_ptr = nullptr;
-      helper_handler_.betacut_engine_ptr_ = nullptr;
-      helper_handler_.betacut_level_ = 0;
 
       // 仕事を拾う。
       job_ptr = shared_st_ptr_->helper_queue_ptr_->GetJob(this);
 
-      if (!job_ptr || !(job_ptr->client_ptr_)) {
-        break;
-      } else {
+      if (job_ptr) {
         if (job_ptr->level_ <= 0) {
           // ルートノード。
           SearchRootParallel(*job_ptr, shell);
@@ -961,6 +944,10 @@ namespace Sayuri {
           // ルートではないノード。
           SearchParallel(job_ptr->node_type_, *job_ptr);
         }
+
+        job_ptr->ReleaseHelper();
+      } else {
+        break;
       }
     }
   }
@@ -988,7 +975,7 @@ namespace Sayuri {
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
       // 探索終了ならループを抜ける。
-      if (JudgeToStop(job.level_)) break;
+      if (JudgeToStop(job)) break;
 
       // 次のハッシュ。
       Hash next_hash = GetNextHash(job.pos_hash_, move);
@@ -1102,7 +1089,7 @@ namespace Sayuri {
       UnmakeMove(move);
 
       // 探索終了ならループを抜ける。
-      if (JudgeToStop(job.level_)) break;
+      if (JudgeToStop(job)) break;
 
       job.Lock();  // ロック。
 
@@ -1125,16 +1112,13 @@ namespace Sayuri {
         job.score_type_ = ScoreType::BETA;
 
         // ベータカット。
-        job.client_ptr_->helper_handler_.NotifyBetaCut(this, job.level_);
+        job.NotifyBetaCut();
         job.Unlock();  // ロック解除。
         break;
       }
 
       job.Unlock();  // ロック解除。
     }
-
-    // 仕事終了。
-    job.client_ptr_->helper_handler_.Remove(this, job.level_);
   }
 
   // ルートノードで呼び出される、別スレッド用探索関数。
@@ -1151,7 +1135,7 @@ namespace Sayuri {
     int lmr_move_number = cache.lmr_invalid_moves_[job.num_all_moves_];
 
     for (Move move = job.PickMove(); move; move = job.PickMove()) {
-      if (JudgeToStop(job.level_)) break;
+      if (JudgeToStop(job)) break;
 
       // 探索すべき手が指定されていれば、今の手がその手かどうか調べる。
       if (!(job.moves_to_search_ptr_->empty())) {
@@ -1198,7 +1182,7 @@ namespace Sayuri {
       if (move_number <= 1) {
         while (true) {
           // 探索終了。
-          if (JudgeToStop(job.level_)) break;
+          if (JudgeToStop(job)) break;
 
           // フルでPVを探索。
           score = -Search(NodeType::PV, next_hash,
@@ -1287,7 +1271,7 @@ namespace Sayuri {
           if (score > temp_alpha) {
             while (true) {
               // 探索終了。
-              if (JudgeToStop(job.level_)) break;
+              if (JudgeToStop(job)) break;
 
               // フルウィンドウで再探索。
               score = -Search(NodeType::PV, next_hash,
@@ -1330,7 +1314,7 @@ namespace Sayuri {
       UnmakeMove(move);
 
       // ストップがかかっていたらループを抜ける。
-      if (JudgeToStop(job.level_)) break;
+      if (JudgeToStop(job)) break;
 
       // 最善手を見つけた。
       job.Lock();  // ロック。
@@ -1353,9 +1337,6 @@ namespace Sayuri {
       }
       job.Unlock();  // ロック解除。
     }
-
-    // 仕事終了。
-    job.client_ptr_->helper_handler_.Remove(this, job.level_);
   }
 
   // SEEで候補手を評価する。
@@ -1477,14 +1458,13 @@ namespace Sayuri {
   }
 
   // 現在のノードの探索を中止すべきかどうか判断する。
-  bool ChessEngine::JudgeToStop(int level) {
+  bool ChessEngine::JudgeToStop(Job& job) {
     // キャッシュ。
     Cache& cache = shared_st_ptr_->cache_;
 
     // 今すぐ終了すべきかどうか。
     // stop_now_とベータカット通知で診断。
-    if (shared_st_ptr_->stop_now_
-    || helper_handler_.ReceiveNotification(level)) {
+    if (shared_st_ptr_->stop_now_ || job.HasCut()) {
       return true;
     }
 
