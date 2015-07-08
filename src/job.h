@@ -88,6 +88,8 @@ namespace Sayuri {
         record_ptr_ = nullptr;
         maker_ptr_ = &maker;
         counter_ = 0;
+        helper_handle_.end_ = helper_handle_.helper_ptr_table_;
+        helper_handle_.num_helpers_ = 0;
       }
 
       /**
@@ -103,6 +105,48 @@ namespace Sayuri {
       int Count() {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
         return ++counter_;
+      }
+
+      /**
+       * ヘルパー登録する。
+       * @param helper_ptr 登録するヘルパーのポインタ。
+       */
+      void RegisterHelper(ChessEngine* helper_ptr) {
+        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+        *(helper_handle_.end_) = helper_ptr;
+        ++(helper_handle_.end_);
+        ++(helper_handle_.num_helpers_);
+      }
+
+      /**
+       * ヘルパー登録解除する。
+       * @param helper_ptr 登録解除するヘルパーのポインタ。
+       */
+      void ReleaseHelper(ChessEngine* helper_ptr) {
+        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+        for (volatile ChessEngine** ptr = helper_handle_.helper_ptr_table_;
+        ptr < helper_handle_.end_; ++ptr) {
+          if (*ptr == helper_ptr) {
+            *ptr = nullptr;
+            --helper_handle_.num_helpers_;
+          }
+        }
+      }
+
+      /**
+       * ヘルパーに通知する。
+       * @param notifier_ptr 通知したヘルパーのポインタ。
+       */
+      void NotifyBetaCut(ChessEngine* notifier_ptr);
+
+      /**
+       * ヘルパーが全て抜けるのを待つ。
+       */
+      void WaitForHelpers() {
+        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+        while (helper_handle_.num_helpers_ >= 1) {
+          helper_handle_.cond_.wait(lock);
+        }
       }
 
       /** ロックする。 */
@@ -165,14 +209,22 @@ namespace Sayuri {
       // ========== //
       // メンバ変数 //
       // ========== //
+      /** ヘルパーの登録構造体。 */
+      struct {
+        /** ヘルパーのテーブル。 */
+        volatile ChessEngine* helper_ptr_table_[UCI_MAX_THREADS + 1];
+        /** ヘルパーのテーブルの終端。 */
+        volatile ChessEngine** end_;
+        /** ヘルパーの数。 */
+        volatile int num_helpers_;
+        /** コンディション。 */
+        std::condition_variable cond_;
+      } helper_handle_;
+
       /** 仕事用MoveMakerのポインタ。 */
       MoveMaker* maker_ptr_;
-      /** ヘルパーのポインタのリスト。 */
-      std::list<ChessEngine*> helper_ptr_list_;
       /** ミューテックス。 */
       std::mutex mutex_;
-      /** 自分用コンディション。 */
-      std::condition_variable cond_;
       /** 自分用ミューテックス。 */
       std::mutex my_mutex_;
       /** 候補手を数えるためのカウンター。 */

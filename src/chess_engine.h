@@ -727,6 +727,9 @@ namespace Sayuri {
       /** HelperQueueはフレンド。 */
       friend class HelperQueue;
 
+      /** Jobはフレンド。 */
+      friend class Job;
+
       /** プライベート用コンストラクタ。 */
       ChessEngine();
 
@@ -1077,6 +1080,11 @@ namespace Sayuri {
       std::mutex mutex_;
       /** 並列探索用スレッドのベクトル。 */
       std::vector<std::thread> thread_vec_;
+
+      struct {
+        /** ベータカットしたレベル。 */
+        volatile std::uint32_t cut_level_;
+      } mail_box_;
 
       /** ヘルパーハンドラ構造体。 */
       struct HelperHandler {
