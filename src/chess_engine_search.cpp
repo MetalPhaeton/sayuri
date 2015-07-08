@@ -58,11 +58,15 @@ namespace Sayuri {
   // クイース探索。
   int ChessEngine::Quiesce(std::uint32_t level, int alpha, int beta,
   int material) {
+    // ジョブの準備。
+    Job& job = job_table_[level];
+    job.Init(maker_table_[level]);
+
     // キャッシュ。
     Cache& cache = shared_st_ptr_->cache_;
 
     // 探索中止。
-    if (JudgeToStop(job_table_[level])) return alpha;
+    if (JudgeToStop(job)) return alpha;
 
     // ノード数を加算。
     ++(shared_st_ptr_->searched_nodes_);
@@ -146,11 +150,15 @@ namespace Sayuri {
   int ChessEngine::Search(NodeType node_type, Hash pos_hash, int depth,
   std::uint32_t level, int alpha, int beta, int material,
   TranspositionTable& table) {
+    // ジョブの準備。
+    Job& job = job_table_[level];
+    job.Init(maker_table_[level]);
+
     // キャッシュ。
     Cache& cache = shared_st_ptr_->cache_;
 
     // 探索中止。
-    if (JudgeToStop(job_table_[level])) return alpha;
+    if (JudgeToStop(job)) return alpha;
 
     // ノード数を加算。
     ++(shared_st_ptr_->searched_nodes_);
@@ -367,7 +375,7 @@ namespace Sayuri {
 
           // 探索。
           for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
-            if (JudgeToStop(job_table_[level])) return alpha;
+            if (JudgeToStop(job)) return alpha;
 
             // 次のノードへの準備。
             Hash next_hash = GetNextHash(pos_hash, move);
@@ -387,7 +395,7 @@ namespace Sayuri {
 
             UnmakeMove(move);
 
-            if (JudgeToStop(job_table_[level])) return alpha;
+            if (JudgeToStop(job)) return alpha;
 
             // ベータカット。
             if (score >= prob_beta) {
@@ -441,7 +449,6 @@ namespace Sayuri {
     int margin = cache.futility_pruning_margin_[depth];
 
     // 仕事の生成。
-    Job& job = job_table_[level];
     job.Lock();
     job.Init(maker_table_[level]);
     job.record_ptr_ = nullptr;
@@ -688,6 +695,9 @@ namespace Sayuri {
 
 
     // --- 初期化 --- //
+    // ジョブ。
+    Job& job = job_table_[level];
+    job.Init(maker_table_[level]);
     // キャッシュ。
     shared_st_ptr_->CacheParams();
     Cache& cache = shared_st_ptr_->cache_;
@@ -711,7 +721,6 @@ namespace Sayuri {
       shared_st_ptr_->killer_stack_[i + 2][1] = 0;
       maker_table_[i].ResetStack();
       pv_line_table_[i].ResetLine();
-      job_table_[i] = Job();
       record_table_[i] = PositionRecord();
     }
     shared_st_ptr_->history_max_ = 1;
@@ -758,7 +767,7 @@ namespace Sayuri {
     for (shared_st_ptr_->i_depth_ = 1; shared_st_ptr_->i_depth_ <= MAX_PLYS;
     ++(shared_st_ptr_->i_depth_)) {
       // 探索終了。
-      if (JudgeToStop(job_table_[level])) {
+      if (JudgeToStop(job)) {
         --(shared_st_ptr_->i_depth_);
         break;
       }
@@ -825,7 +834,6 @@ namespace Sayuri {
       shared_st_ptr_->iid_stack_[level],
       shared_st_ptr_->killer_stack_[level][0],
       shared_st_ptr_->killer_stack_[level][1]);
-      Job& job = job_table_[level];
       job.Lock();
       job.Init(maker_table_[level]);
       job.record_ptr_ = nullptr;
@@ -905,7 +913,7 @@ namespace Sayuri {
     }
 
     // 探索終了したけど、まだ思考を止めてはいけない場合、関数を終了しない。
-    while (!JudgeToStop(job_table_[level])) {
+    while (!JudgeToStop(job)) {
       std::this_thread::sleep_for(Chrono::milliseconds(1));
     }
 

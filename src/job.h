@@ -113,9 +113,6 @@ namespace Sayuri {
        */
       void RegisterHelper() {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-        // すでにカット済みなら登録しない。
-        if (has_cut_) return;
-
         ++num_helpers_;
       }
 
@@ -125,6 +122,7 @@ namespace Sayuri {
       void ReleaseHelper() {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
         --num_helpers_;
+        cond_.notify_all();
       }
 
       /**
