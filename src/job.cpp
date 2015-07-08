@@ -46,9 +46,7 @@ namespace Sayuri {
   // コンストラクタと代入 //
   // ==================== //
   // コンストラクタ。
-  Job::Job() : num_helpers_(0), has_cut_(false),
-  maker_ptr_(nullptr), counter_(0) {
-  }
+  Job::Job() : num_helpers_(0), maker_ptr_(nullptr), counter_(0) {}
 
   // コピーコンストラクタ。
   Job::Job(const Job& job) {
@@ -83,6 +81,24 @@ namespace Sayuri {
     return maker_ptr_->PickMove();
   }
 
+  // ベータカットを通知する。
+  void Job::NotifyBetaCut(ChessEngine& notifier) {
+    std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+    // クライアントに通知。
+    if ((client_ptr_ != &notifier)
+    && (client_ptr_->notice_cut_level_ > level_)) {
+      client_ptr_->notice_cut_level_ = level_;
+    }
+
+    // ヘルパーに通知。
+    for (ChessEngine** ptrptr = helpers_table_; ptrptr < end_;
+    ++ptrptr) {
+      if (*ptrptr && (*ptrptr != &notifier)
+      && ((*ptrptr)->notice_cut_level_ > level_)) {
+        (*ptrptr)->notice_cut_level_ = level_;
+      }
+    }
+  }
   // ================ //
   // プライベート関数 //
   // ================ //
@@ -110,8 +126,9 @@ namespace Sayuri {
     has_legal_move_ = job.has_legal_move_;
     moves_to_search_ptr_ = job.moves_to_search_ptr_;
 
+    COPY_ARRAY(helpers_table_, job.helpers_table_);
+    end_ = (job.end_ - job.helpers_table_) + helpers_table_;
     num_helpers_ = job.num_helpers_;
-    has_cut_ = job.has_cut_;
     maker_ptr_ = job.maker_ptr_;
     counter_ = job.counter_;
   }

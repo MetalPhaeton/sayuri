@@ -85,8 +85,8 @@ namespace Sayuri {
        */
       void Init(MoveMaker& maker) {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+        end_ = helpers_table_;
         num_helpers_ = 0;
-        has_cut_ = false;
         record_ptr_ = nullptr;
         maker_ptr_ = &maker;
         counter_ = 0;
@@ -109,38 +109,36 @@ namespace Sayuri {
 
       /**
        * ヘルパー登録する。
-       * @param helper_ptr 登録するヘルパーのポインタ。
+       * @param helper 登録するヘルパー。
        */
-      void RegisterHelper() {
+      void RegisterHelper(ChessEngine& helper) {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
+        *end_ = &helper;
+        ++end_;
         ++num_helpers_;
       }
 
       /**
        * ヘルパー登録解除する。
+       * @param helper 登録解除するヘルパー。
        */
-      void ReleaseHelper() {
+      void ReleaseHelper(ChessEngine& helper) {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-        --num_helpers_;
-        cond_.notify_all();
+        for (ChessEngine** ptrptr = helpers_table_; ptrptr < end_;
+        ++ptrptr) {
+          if (*ptrptr == &helper) {
+            *ptrptr = nullptr;
+            --num_helpers_;
+          }
+        }
+        cond_.notify_one();
       }
 
       /**
        * ベータカットを通知する。
+       * @param notifier 通知するヘルパー。
        */
-      void NotifyBetaCut() {
-        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-        has_cut_ = true;
-      }
-
-      /**
-       * カット済みかどうかチェックする。
-       * @return カット済みならtrue。
-       */
-      bool HasCut() {
-        std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
-        return has_cut_;
-      }
+      void NotifyBetaCut(ChessEngine& notifier);
 
       /**
        * ヘルパーが全て抜けるのを待つ。
@@ -171,7 +169,7 @@ namespace Sayuri {
       /** 共有ノードの深さ。 */
       int depth_;
       /** 共有ノードのレベル。 */
-      int level_;
+      std::uint32_t level_;
       /** 共有ノードのアルファ値。 */
       volatile int alpha_;
       /** 共有ノードのベータ値。 */
@@ -212,10 +210,12 @@ namespace Sayuri {
       // ========== //
       // メンバ変数 //
       // ========== //
+      /** 登録されているヘルパーの配列。 */
+      ChessEngine* helpers_table_[UCI_MAX_THREADS + 1];
+      /** ヘルパーのテーブルの終端。 */
+      ChessEngine** end_;
       /** 登録されているヘルパーの数。 */
       volatile int num_helpers_;
-      /** すでにベータカット済みかどうか。 */
-      volatile bool has_cut_;
       /** ヘルパーを待つためのコンディション。 */
       std::condition_variable cond_;
 

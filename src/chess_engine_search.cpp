@@ -112,6 +112,8 @@ namespace Sayuri {
     int margin = cache.futility_pruning_margin_[0];
 
     for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
+      if (JudgeToStop(job)) break;
+
       // 次の自分のマテリアル。
       int next_my_material = GetNextMyMaterial(material, move);
 
@@ -618,7 +620,7 @@ namespace Sayuri {
         job.score_type_ = ScoreType::BETA;
 
         // ベータカット。
-        job.NotifyBetaCut();
+        job.NotifyBetaCut(*this);
         job.Unlock();  // ロック解除。
         break;
       }
@@ -698,6 +700,10 @@ namespace Sayuri {
     // ジョブ。
     Job& job = job_table_[level];
     job.Init(maker_table_[level]);
+
+    // カット通知。
+    notice_cut_level_ = MAX_PLYS + 1;
+
     // キャッシュ。
     shared_st_ptr_->CacheParams();
     Cache& cache = shared_st_ptr_->cache_;
@@ -940,6 +946,7 @@ namespace Sayuri {
     while (true) {
       // 準備。
       Job* job_ptr = nullptr;
+      notice_cut_level_ = MAX_PLYS + 1;
 
       // 仕事を拾う。
       job_ptr = shared_st_ptr_->helper_queue_ptr_->GetJob(this);
@@ -953,7 +960,7 @@ namespace Sayuri {
           SearchParallel(job_ptr->node_type_, *job_ptr);
         }
 
-        job_ptr->ReleaseHelper();
+        job_ptr->ReleaseHelper(*this);
       } else {
         break;
       }
@@ -1120,7 +1127,7 @@ namespace Sayuri {
         job.score_type_ = ScoreType::BETA;
 
         // ベータカット。
-        job.NotifyBetaCut();
+        job.NotifyBetaCut(*this);
         job.Unlock();  // ロック解除。
         break;
       }
@@ -1288,7 +1295,8 @@ namespace Sayuri {
 
               // ベータ値を調べる。
               job.Lock();  // ロック。
-              if (score >= temp_beta) {
+              // if (score >= temp_beta) {
+              if (score >= job.beta_) {
                 // 探索失敗。
                 // ベータ値を広げる。
                 job.delta_ *= 2;
@@ -1471,8 +1479,19 @@ namespace Sayuri {
     Cache& cache = shared_st_ptr_->cache_;
 
     // 今すぐ終了すべきかどうか。
-    // stop_now_とベータカット通知で診断。
-    if (shared_st_ptr_->stop_now_ || job.HasCut()) {
+    if (shared_st_ptr_->stop_now_) {
+      return true;
+    }
+
+    // ベータカット通知で終了すべきかどうか。
+    if (notice_cut_level_ > job.level_) {
+      // notice_cut_level_がjob.level_より大きければ、古い通知なので消す。
+      notice_cut_level_ = MAX_PLYS + 1;
+    } else {
+      if ((job.client_ptr_ == this) && (job.level_ != notice_cut_level_)) {
+        // 自分のヘルパーに「もう意味ないよ」と通知する。
+        job.NotifyBetaCut(*this);
+      }
       return true;
     }
 

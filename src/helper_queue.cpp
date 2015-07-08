@@ -107,7 +107,7 @@ namespace Sayuri {
 
     // --- 仕事の準備 --- //
     // ヘルパー登録。
-    job_ptr_->RegisterHelper();
+    job_ptr_->RegisterHelper(*helper_ptr);
 
     job_ptr_->Lock();  // ロック。
 

@@ -61,7 +61,8 @@ namespace Sayuri {
   ChessEngine::ChessEngine(const SearchParams& search_params,
   const EvalParams& eval_params) :
   is_null_searching_(false),
-  evaluator_(*this) {
+  evaluator_(*this),
+  notice_cut_level_(MAX_PLYS + 1) {
     SetNewGame();
 
     // 探索関数用パラメータ。
@@ -117,7 +118,9 @@ namespace Sayuri {
 
   // コピーコンストラクタ。
   ChessEngine::ChessEngine(const ChessEngine& engine) :
-  is_null_searching_(false), evaluator_(*this) {
+  is_null_searching_(false),
+  evaluator_(*this),
+  notice_cut_level_(MAX_PLYS + 1) {
     // 基本メンバをコピー。
     ScanBasicMember(engine);
 
@@ -147,7 +150,8 @@ namespace Sayuri {
   // ムーブコンストラクタ。
   ChessEngine::ChessEngine(ChessEngine&& engine) :
   is_null_searching_(false),
-  evaluator_(*this) {
+  evaluator_(*this),
+  notice_cut_level_(MAX_PLYS + 1)  {
     // 基本メンバをコピー。
     ScanBasicMember(engine);
 

@@ -1080,6 +1080,8 @@ namespace Sayuri {
       std::mutex mutex_;
       /** 並列探索用スレッドのベクトル。 */
       std::vector<std::thread> thread_vec_;
+      /** ベータカット通知。 カットされたレベルが記録される。 */
+      volatile std::uint32_t notice_cut_level_;
   };
 }  // namespace Sayuri
 
