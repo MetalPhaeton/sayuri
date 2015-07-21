@@ -1402,6 +1402,82 @@ R"...(### let ###
     ;; > 30)...";
     }
 
+    // %%% while
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
+      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      -> LispObjectPtr {
+        // 準備。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 2;
+
+        // 引数が2つ異常あるかどうかを予め調べる。
+        int len = list.Length();
+        if (len < 3) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, true, len - 1);
+        }
+
+        // ループ開始。
+        LispObjectPtr ret_ptr = LispObject::NewNil();
+        while (true) {
+          // 条件式へのポインタ。
+          const LispObject* ptr = &(list_itr.current());
+          LispObjectPtr cond_ptr = caller.Evaluate(*(ptr->car()));
+          if (!(cond_ptr->IsBoolean())) {
+            throw LispObject::GenWrongTypeError
+            (func_name, "Boolean", std::vector<int> {1}, true);
+          }
+
+          // 条件が#fならループを抜ける。
+          if (!(cond_ptr->boolean_value())) break;
+
+          // S式を次々と実行していく。
+          for (; ptr->IsPair(); ptr = ptr->cdr().get()) {
+            ret_ptr = caller.Evaluate(*(ptr->car()));
+          }
+        }
+
+        return ret_ptr;
+      };
+      root_ptr->BindSymbol("while", func_ptr);
+      (*dict_ptr)["while"] =
+R"...(### while ###
+
+<h6> Usage </h6>
+
+* `(while <Condition : Boolean> <S-Expression>...)`
+
+<h6> Description </h6>
+
+* This is Special Form.
+* While `<Condition>` is #t, it iterates `<S-Expression>...`.
+* Returns Object returned by the last S-Expression.
+
+<h6> Example </h6>
+
+    (define i 0)
+    (while (< i 5)
+        (display "Hello " i)
+        (display "World" i)
+        (set! i (++ i)))
+    
+    ;; Output
+    ;; > Hello 0
+    ;; > World 0
+    ;; > Hello 1
+    ;; > World 1
+    ;; > Hello 2
+    ;; > World 2
+    ;; > Hello 3
+    ;; > World 3
+    ;; > Hello 4
+    ;; > World 4)...";
+    }
+
     // %%% if
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
@@ -3913,6 +3989,132 @@ R"...(### -- ###
     ;; > 110)...";
     }
 
+    // %%% inc! 
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
+      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      ->LispObjectPtr {
+        // 準備。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+
+        // 第一引数はシンボルでなくてはならない。
+        if (!(list_itr->IsSymbol())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Symbol", std::vector<int> {1}, false);
+        }
+
+        // 第一シンボルにはNumberがバインドされていなくてはならない。
+        LispObjectPtr bound_ptr = caller.ReferSymbol(list_itr->symbol_value());
+        if (!(bound_ptr->IsNumber())) {
+          throw LispObject::GenError("@not-number",
+          "\"" +  list_itr->symbol_value() + "\" is not bound with Number.");
+        }
+
+        // バインドされているNumberをインクリメントする。
+        bound_ptr->number_value(bound_ptr->number_value() + 1);
+
+        // シンボルを改めて評価して返す。
+        return caller.Evaluate(*list_itr);
+      };
+      root_ptr->BindSymbol("inc!", func_ptr);
+      (*dict_ptr)["inc!"] =
+R"...(### inc! ###
+
+<h6> Usage </h6>
+
+* `(inc! <Symbol bound with Number : Symbol>)`
+
+<h6> Description </h6>
+
+* This is Special Form.
+    + Rewrites `<Symbol bound with Number>`.
+* Increments `<Symbol bound with Number>` and returns it.
+
+<h6> Example </h6>
+
+    (define i 111)
+    (display (inc! i))
+    (display i)
+    
+    ;; Output
+    ;;
+    ;; > 112
+    ;; > 112)...";
+    }
+
+    // %%% dec! 
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
+      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      ->LispObjectPtr {
+        // 準備。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+
+        // 第一引数はシンボルでなくてはならない。
+        if (!(list_itr->IsSymbol())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Symbol", std::vector<int> {1}, false);
+        }
+
+        // 第一シンボルにはNumberがバインドされていなくてはならない。
+        LispObjectPtr bound_ptr = caller.ReferSymbol(list_itr->symbol_value());
+        if (!(bound_ptr->IsNumber())) {
+          throw LispObject::GenError("@not-number",
+          "\"" +  list_itr->symbol_value() + "\" is not bound with Number.");
+        }
+
+        // バインドされているNumberをインクリメントする。
+        bound_ptr->number_value(bound_ptr->number_value() - 1);
+
+        // シンボルを改めて評価して返す。
+        return caller.Evaluate(*list_itr);
+      };
+      root_ptr->BindSymbol("dec!", func_ptr);
+      (*dict_ptr)["dec!"] =
+R"...(### dec! ###
+
+<h6> Usage </h6>
+
+* `(dec! <Symbol bound with Number : Symbol>)`
+
+<h6> Description </h6>
+
+* This is Special Form.
+    + Rewrites `<Symbol bound with Number>`.
+* Decrements `<Symbol bound with Number>` and returns it.
+
+<h6> Example </h6>
+
+    (define i 111)
+    (display (dec! i))
+    (display i)
+    
+    ;; Output
+    ;;
+    ;; > 110
+    ;; > 110)...";
+    }
+
     // %%% string-append
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
@@ -4353,8 +4555,8 @@ R"...(### pop-front ###
         LispObjectPtr second_ptr = caller.Evaluate(*list_itr);
 
         // くっつける。
-        first_ptr->Append
-        (LispObject::NewPair(second_ptr, LispObject::NewNil()));
+        first_ptr->Append(LispObject::NewPair(second_ptr,
+        LispObject::NewNil()));
 
         return first_ptr;
       };
