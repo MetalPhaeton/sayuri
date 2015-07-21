@@ -64,6 +64,8 @@
 <li><a href="#div"><code>/</code></a> : Calculates division.</li>
 <li><a href="#inc"><code>++</code></a> : Increment.</li>
 <li><a href="#dec"><code>--</code></a> : Decrement.</li>
+<li><a href="#inc2"><code>inc!</code></a> : Increments and rewrites.</li>
+<li><a href="#dec2"><code>dec!</code></a> : Decrements and rewrites.</li>
 </ul></li>
 <li><a href="#mathematics-function">Mathematics Function</a>
 <ul>
@@ -861,6 +863,68 @@ Example
 
 ;; Output
 ;;
+;; &gt; 110</code></pre>
+<h3 id="inc2">inc!</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(inc! &lt;Symbol bound with Number : Symbol&gt;)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>This is Special Form.
+<ul>
+<li>Rewrites <code>&lt;Symbol bound with Number&gt;</code>.</li>
+</ul></li>
+<li>Increments <code>&lt;Symbol bound with Number&gt;</code> and returns it.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(define i 111)
+(display (inc! i))
+(display i)
+
+;; Output
+;;
+;; &gt; 112
+;; &gt; 112</code></pre>
+<h3 id="dec2">dec!</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(dec! &lt;Symbol bound with Number : Symbol&gt;)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>This is Special Form.
+<ul>
+<li>Rewrites <code>&lt;Symbol bound with Number&gt;</code>.</li>
+</ul></li>
+<li>Decrements <code>&lt;Symbol bound with Number&gt;</code> and returns it.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(define i 111)
+(display (dec! i))
+(display i)
+
+;; Output
+;;
+;; &gt; 110
 ;; &gt; 110</code></pre>
 <h2 id="mathematics-function">Mathematics Function</h2>
 <h3 id="pi">PI</h3>
