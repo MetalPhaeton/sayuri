@@ -45,7 +45,6 @@
 /** Sayuri 名前空間。 */
 namespace Sayuri {
   class ChessEngine;
-  class TranspositionTable;
   class PVLine;
 
   /** UCIコマンドラインのパーサのクラス。 */
@@ -130,9 +129,8 @@ namespace Sayuri {
       /**
        * コンストラクタ。
        * @param engine 関連付けるChessEngine。
-       * @param table 関連付けるTranspositionTable。
        */
-      UCIShell(ChessEngine& engine, TranspositionTable& table);
+      UCIShell(ChessEngine& engine);
       /**
        * コピーコンストラクタ。
        * @param shell コピー元。
@@ -231,11 +229,6 @@ namespace Sayuri {
        */
       const ChessEngine& engine() const {return *engine_ptr_;}
       /**
-       * アクセサ - トランスポジションテーブル。
-       * @return トランスポジションテーブル。
-       */
-      const TranspositionTable& table() const {return *table_ptr_;}
-      /**
        * アクセサ - スレッドの数。
        * @return スレッドの数。
        */
@@ -327,8 +320,6 @@ namespace Sayuri {
 
       /** 関連付けられたチェスエンジン。 */
       ChessEngine* engine_ptr_;
-      /** 関連付けられたトランスポジションテーブル。 */
-      TranspositionTable* table_ptr_;
 
       /** 探索スレッド。 */
       std::thread thinking_thread_;

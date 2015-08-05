@@ -76,11 +76,12 @@ namespace Sayuri {
       // ==================== //
       /**
        * 基本コンストラクタ。
-       * @param search_params 探索関数用パラメータ。
-       * @param eval_params 評価関数用パラメータ。
+       * @param search_params 登録する探索関数用パラメータ。
+       * @param eval_params 登録する評価関数用パラメータ。
+       * @param table 登録するトランスポジションテーブル。
        */
       ChessEngine(const SearchParams& search_params,
-      const EvalParams& eval_params);
+      const EvalParams& eval_params, TranspositionTable& table);
       /**
        * コピーコンストラクタ。
        * @param engine コピー元。
@@ -159,12 +160,11 @@ namespace Sayuri {
       /**
        * 探索を開始する。
        * @param num_threads 探索用のスレッド数。
-       * @param table 探索用トランスポジションテーブル。
        * @param moves_to_search 探索する候補手。 空ならすべての候補手を探索。
        * @param shell Infoコマンドを出力するUCIShell。
        * @return 探索結果のPVライン。
        */
-      PVLine Calculate(int num_threads, TranspositionTable& table,
+      PVLine Calculate(int num_threads,
       const std::vector<Move>& moves_to_search, UCIShell& shell);
 
       /** 探索を終了させる。 */
@@ -599,6 +599,13 @@ namespace Sayuri {
         return *(shared_st_ptr_->eval_params_ptr_);
       }
       /**
+       * アクセサ - トランスポジションテーブル。
+       * @return トランスポジションテーブル。
+       */
+      TranspositionTable& table() {
+        return *(shared_st_ptr_->table_ptr_);
+      }
+      /**
        * アクセサ - 駒の情報のハッシュ値のテーブル。
        * [サイド][駒の種類][駒の位置]
        * @return 駒の情報ハッシュ値のテーブル。
@@ -755,22 +762,19 @@ namespace Sayuri {
        * @param alpha アルファ値。
        * @param beta ベータ値。
        * @param material 現在のマテリアル。
-       * @param table トランスポジションテーブル。
        * @return 評価値。
        */
       int Search(NodeType node_type, Hash pos_hash, int depth,
-      std::uint32_t level, int alpha, int beta, int material,
-      TranspositionTable& table);
+      std::uint32_t level, int alpha, int beta, int material);
 
       /**
        * 探索のルート。
-       * @param table トランスポジションテーブル。
        * @param moves_to_search 探索する候補手。 空なら全ての候補手を探索。
        * @param shell Infoコマンドの出力用UCIShell。
        * @return 探索結果のPVライン。
        */
-      PVLine SearchRoot(TranspositionTable& table,
-      const std::vector<Move>& moves_to_search, UCIShell& shell);
+      PVLine SearchRoot(const std::vector<Move>& moves_to_search,
+      UCIShell& shell);
 
       /**
        * YBWC探索用スレッド。
@@ -968,6 +972,8 @@ namespace Sayuri {
         const SearchParams* search_params_ptr_;
         /** 評価関数用パラメータ。 */
         const EvalParams* eval_params_ptr_;
+        /** トランスポジションテーブル。 */
+        TranspositionTable* table_ptr_;
 
         // ============ //
         // ハッシュ関連 //
@@ -1054,9 +1060,8 @@ namespace Sayuri {
          * - 思考時間終了判定。
          * - 定期情報出力。
          * @param shell 出力関数のあるUCIShell。
-         * @param table hashfull用のトランスポジションテーブル。
          */
-        void ThreadPeriodicProcess(UCIShell& shell, TranspositionTable& table);
+        void ThreadPeriodicProcess(UCIShell& shell);
       };
       /** 共有メンバの構造体。 */
       std::shared_ptr<SharedStruct> shared_st_ptr_;

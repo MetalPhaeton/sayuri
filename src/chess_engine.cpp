@@ -59,7 +59,7 @@ namespace Sayuri {
   // ==================== //
   // コンストラクタ。
   ChessEngine::ChessEngine(const SearchParams& search_params,
-  const EvalParams& eval_params) :
+  const EvalParams& eval_params, TranspositionTable& table) :
   is_null_searching_(false),
   evaluator_(*this),
   notice_cut_level_(MAX_PLYS + 1) {
@@ -69,6 +69,8 @@ namespace Sayuri {
     shared_st_ptr_->search_params_ptr_ = &search_params;
     // 評価関数用パラメータ。
     shared_st_ptr_->eval_params_ptr_ = &eval_params;
+    // トランスポジションテーブル。
+    shared_st_ptr_->table_ptr_ = &table;
 
     // ムーブメーカー。
     maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
@@ -414,13 +416,16 @@ namespace Sayuri {
     // 共有メンバ構造体を初期化。
     const SearchParams* temp_sp_ptr = nullptr;
     const EvalParams* temp_ep_ptr = nullptr;
+    TranspositionTable* temp_table_ptr = nullptr;
     if (shared_st_ptr_) {
       temp_sp_ptr = shared_st_ptr_->search_params_ptr_;  // 一時待避。
       temp_ep_ptr = shared_st_ptr_->eval_params_ptr_;  // 一時待避。
+      temp_table_ptr = shared_st_ptr_->table_ptr_;  // 一時待避。
     }
     shared_st_ptr_.reset(new SharedStruct());
     shared_st_ptr_->search_params_ptr_ = temp_sp_ptr;  // 復帰。
     shared_st_ptr_->eval_params_ptr_ = temp_ep_ptr;  // 復帰。
+    shared_st_ptr_->table_ptr_ = temp_table_ptr; // 復帰。
 
     // 50手ルールの履歴を初期化。
     shared_st_ptr_->clock_history_.push_back(0);
@@ -477,12 +482,11 @@ namespace Sayuri {
 
   // 探索を開始する。
   PVLine ChessEngine::Calculate(int num_threads,
-  TranspositionTable& table, const std::vector<Move>& moves_to_search,
-  UCIShell& shell) {
+  const std::vector<Move>& moves_to_search, UCIShell& shell) {
     Util::UpdateMax(num_threads, 1);
     Util::UpdateMin(num_threads, UCI_MAX_THREADS);
     thread_vec_.resize(num_threads);
-    return std::move(SearchRoot(table, moves_to_search, shell));
+    return std::move(SearchRoot(moves_to_search, shell));
   }
 
   // 探索を終了させる。
@@ -1013,7 +1017,9 @@ namespace Sayuri {
   move_history_(0),
   clock_history_(0),
   position_history_(0),
-  eval_params_ptr_(nullptr) {
+  search_params_ptr_(nullptr),
+  eval_params_ptr_(nullptr),
+  table_ptr_(nullptr) {
     // volatileは 'void*' にできない。
     FOR_SIDES(side) {
       FOR_SQUARES(from) {
@@ -1091,6 +1097,7 @@ namespace Sayuri {
     helper_queue_ptr_.reset(new HelperQueue(*(shared_st.helper_queue_ptr_)));
     search_params_ptr_ = shared_st.search_params_ptr_;
     eval_params_ptr_ = shared_st.eval_params_ptr_;
+    table_ptr_ = shared_st.table_ptr_;
 
     // ハッシュ関連。
     COPY_ARRAY(piece_hash_value_table_, shared_st.piece_hash_value_table_);
@@ -1168,8 +1175,7 @@ namespace Sayuri {
   }
 
   // 定期処理する。
-  void ChessEngine::SharedStruct::ThreadPeriodicProcess
-  (UCIShell& shell, TranspositionTable& table) {
+  void ChessEngine::SharedStruct::ThreadPeriodicProcess(UCIShell& shell) {
     static const Chrono::milliseconds SLEEP_TIME(1);
     static const Chrono::seconds INTERVAL(1);
     TimePoint next_point = SysClock::now() + INTERVAL;
@@ -1189,7 +1195,7 @@ namespace Sayuri {
       if (now >= next_point) {
         shell.PrintOtherInfo
         (Chrono::duration_cast<Chrono::milliseconds>(now - start_time_),
-        searched_nodes_, table.GetUsedPermill());
+        searched_nodes_, table_ptr_->GetUsedPermill());
         next_point = now + INTERVAL;
       }
       if (stop_now_) break;

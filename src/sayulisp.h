@@ -1607,15 +1607,15 @@ namespace Sayuri {
        */
       const EvalParams& eval_params() const {return *eval_params_ptr_;}
       /**
-       * アクセサ - チェスエンジン。
-       * @return チェスエンジン。
-       */
-      const ChessEngine& engine() const {return *engine_ptr_;}
-      /**
        * アクセサ - トランスポジションテーブル。
        * @return トランスポジションテーブル。
        */
       const TranspositionTable& table() const {return *table_ptr_;}
+      /**
+       * アクセサ - チェスエンジン。
+       * @return チェスエンジン。
+       */
+      const ChessEngine& engine() const {return *engine_ptr_;}
       /**
        * アクセサ - UCIShell。
        * @return UCIShell。
@@ -1663,10 +1663,10 @@ namespace Sayuri {
       std::unique_ptr<SearchParams> search_params_ptr_;
       /** 評価関数用パラメータのポインタ。 */
       std::unique_ptr<EvalParams> eval_params_ptr_;
-      /** チェスエンジンのポインタ。 */
-      std::unique_ptr<ChessEngine> engine_ptr_;
       /** トランスポジションテーブルのポインタ。 */
       std::unique_ptr<TranspositionTable> table_ptr_;
+      /** チェスエンジンのポインタ。 */
+      std::unique_ptr<ChessEngine> engine_ptr_;
       /** UCIShellのポインタ。 */
       std::unique_ptr<UCIShell> shell_ptr_;
       /** UCIのアウトプットリスナー。 */

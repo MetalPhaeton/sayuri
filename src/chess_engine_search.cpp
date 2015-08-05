@@ -150,8 +150,7 @@ namespace Sayuri {
 
   // 通常の探索。
   int ChessEngine::Search(NodeType node_type, Hash pos_hash, int depth,
-  std::uint32_t level, int alpha, int beta, int material,
-  TranspositionTable& table) {
+  std::uint32_t level, int alpha, int beta, int material) {
     // ジョブの準備。
     Job& job = job_table_[level];
     job.Init(maker_table_[level]);
@@ -210,10 +209,10 @@ namespace Sayuri {
     // --- トランスポジションテーブル --- //
     Move prev_best = 0;
     if (cache.enable_ttable_) {
-      table.Lock();  // ロック。
+      shared_st_ptr_->table_ptr_->Lock();  // ロック。
 
       // 前回の繰り返しの最善手を含めたエントリーを得る。
-      const TTEntry& tt_entry = table.GetEntry(pos_hash);
+      const TTEntry& tt_entry = shared_st_ptr_->table_ptr_->GetEntry(pos_hash);
       if (tt_entry) {
         ScoreType score_type = tt_entry.score_type();
 
@@ -245,14 +244,14 @@ namespace Sayuri {
             }
 
             pv_line_table_[level].score(score);
-            table.Unlock();  // ロック解除。
+            shared_st_ptr_->table_ptr_->Unlock();  // ロック解除。
             return score;
           } else if (tt_entry.score_type() == ScoreType::ALPHA) {
             // エントリーがアルファ値。
             if (score <= alpha) {
               // アルファ値以下が確定。
               pv_line_table_[level].score(score);
-              table.Unlock();  // ロック解除。
+              shared_st_ptr_->table_ptr_->Unlock();  // ロック解除。
               return score;
             }
 
@@ -273,7 +272,7 @@ namespace Sayuri {
             if (score >= beta) {
               // ベータ値以上が確定。
               pv_line_table_[level].score(score);
-              table.Unlock();  // ロック解除。
+              shared_st_ptr_->table_ptr_->Unlock();  // ロック解除。
               return score;
             }
 
@@ -282,7 +281,7 @@ namespace Sayuri {
           }
         }
       }
-      table.Unlock();  // ロック解除。
+      shared_st_ptr_->table_ptr_->Unlock();  // ロック解除。
     }
 
     // 深さが0ならクイース。 (無効なら評価値を返す。)
@@ -308,7 +307,7 @@ namespace Sayuri {
           && (depth >= cache.iid_limit_depth_)) {
             // Internal Iterative Deepening。
             Search(NodeType::PV, pos_hash, cache.iid_search_depth_,
-            level, alpha, beta, material, table);
+            level, alpha, beta, material);
 
             shared_st_ptr_->iid_stack_[level] =
             pv_line_table_[level][0];
@@ -332,7 +331,7 @@ namespace Sayuri {
           // Null Move Search。
           int score = -(Search(NodeType::NON_PV, pos_hash,
           depth - cache.nmr_search_reduction_ - 1, level + 1, -(beta),
-          -(beta - 1), -material, table));
+          -(beta - 1), -material));
 
           UnmakeNullMove(null_move);
           is_null_searching_ = false;
@@ -393,7 +392,7 @@ namespace Sayuri {
 
             int score = -Search(NodeType::NON_PV, next_hash,
             prob_depth - 1, level + 1, -prob_beta, -(prob_beta - 1),
-            -next_my_material, table);
+            -next_my_material);
 
             UnmakeMove(move);
 
@@ -430,7 +429,8 @@ namespace Sayuri {
 
               // トランスポジションテーブルに登録。
               if (!null_reduction) {
-                table.Add(pos_hash, depth, beta, ScoreType::BETA, move);
+                shared_st_ptr_->table_ptr_->Add(pos_hash, depth, beta,
+                ScoreType::BETA, move);
               }
 
               return beta;
@@ -459,7 +459,6 @@ namespace Sayuri {
     job.depth_ = depth;
     job.alpha_ = alpha;
     job.beta_ = beta;
-    job.table_ptr_ = &table;
     job.pv_line_ptr_ = &pv_line_table_[level];
     job.is_null_searching_ = is_null_searching_;
     job.null_reduction_ = null_reduction;
@@ -537,7 +536,7 @@ namespace Sayuri {
         && !EqualMove(move, shared_st_ptr_->killer_stack_[level][1])) {
           score = -Search(NodeType::NON_PV, next_hash,
           depth - cache.lmr_search_reduction_ - 1, level + 1,
-          -(temp_alpha + 1), -temp_alpha, -next_my_material, table);
+          -(temp_alpha + 1), -temp_alpha, -next_my_material);
 
           if (score > temp_alpha) do_normal_search = true;
         } else {
@@ -556,19 +555,19 @@ namespace Sayuri {
           if (move_number <= 1) {
             // フルウィンドウで探索。
             score = -Search(node_type, next_hash, depth - 1, level + 1,
-            -temp_beta, -temp_alpha, -next_my_material, table);
+            -temp_beta, -temp_alpha, -next_my_material);
           } else {
             // PV発見後のPVノード。
             // ゼロウィンドウ探索。
             score = -Search(NodeType::NON_PV, next_hash, depth - 1, level + 1,
-            -(temp_alpha + 1), -temp_alpha, -next_my_material, table);
+            -(temp_alpha + 1), -temp_alpha, -next_my_material);
 
             if ((score > temp_alpha) && (score < temp_beta)) {
               // Fail Lowならず。
               // Fail-Softなので、Beta値以上も探索しない。
               // フルウィンドウで再探索。
               score = -Search(NodeType::PV, next_hash, depth - 1, level + 1,
-              -temp_beta, -temp_alpha, -next_my_material, table);
+              -temp_beta, -temp_alpha, -next_my_material);
             }
           }
         } else {
@@ -590,7 +589,7 @@ namespace Sayuri {
 
           // 探索。 NON_PVノードなので、ゼロウィンドウになる。
           score = -Search(node_type, next_hash, new_depth - 1, level + 1,
-          -temp_beta, -temp_alpha, -next_my_material, table);
+          -temp_beta, -temp_alpha, -next_my_material);
         }
       }
 
@@ -682,7 +681,8 @@ namespace Sayuri {
       // Null Move Reductionされていた場合、容量節約のため登録しない。
       if (cache.enable_ttable_) {
         if (!is_null_searching_ && !null_reduction) {
-          table.Add(pos_hash, depth, job.alpha_, job.score_type_, best_move);
+          shared_st_ptr_->table_ptr_->Add(pos_hash, depth, job.alpha_,
+          job.score_type_, best_move);
         }
       }
     }
@@ -691,8 +691,8 @@ namespace Sayuri {
   }
 
   // 探索のルート。
-  PVLine ChessEngine::SearchRoot(TranspositionTable& table,
-  const std::vector<Move>& moves_to_search, UCIShell& shell) {
+  PVLine ChessEngine::SearchRoot(const std::vector<Move>& moves_to_search,
+  UCIShell& shell) {
     constexpr int level = 0;
 
 
@@ -755,8 +755,8 @@ namespace Sayuri {
     }
 
     // 定期処理開始。
-    std::thread time_thread([this, &shell, &table]() {
-      this->shared_st_ptr_->ThreadPeriodicProcess(shell, table);
+    std::thread time_thread([this, &shell]() {
+      this->shared_st_ptr_->ThreadPeriodicProcess(shell);
     });
 
     // --- Iterative Deepening --- //
@@ -795,7 +795,8 @@ namespace Sayuri {
         (SysClock::now() - shared_st_ptr_->start_time_);
 
         shell.PrintPVInfo(depth, 0, pv_line_table_[level].score(), time,
-        shared_st_ptr_->searched_nodes_, table.GetUsedPermill(),
+        shared_st_ptr_->searched_nodes_,
+        shared_st_ptr_->table_ptr_->GetUsedPermill(),
         pv_line_table_[level]);
 
         continue;
@@ -808,8 +809,8 @@ namespace Sayuri {
         (SysClock::now() - shared_st_ptr_->start_time_);
 
         shell.PrintPVInfo(depth, 0, pv_line_table_[level].score(), time,
-        shared_st_ptr_->searched_nodes_, table.GetUsedPermill(),
-        pv_line_table_[level]);
+        shared_st_ptr_->searched_nodes_,
+        shared_st_ptr_->table_ptr_->GetUsedPermill(), pv_line_table_[level]);
 
         continue;
       }
@@ -849,7 +850,6 @@ namespace Sayuri {
       job.alpha_ = alpha;
       job.beta_ = beta;
       job.delta_ = delta;
-      job.table_ptr_ = &table;
       job.pv_line_ptr_ = &pv_line_table_[level];
       job.is_null_searching_ = is_null_searching_;
       job.null_reduction_ = 0;
@@ -897,8 +897,8 @@ namespace Sayuri {
 
       // 最善手をトランスポジションテーブルに登録。
       if (cache.enable_ttable_) {
-        table.Add(job.pos_hash_, job.depth_, job.alpha_, ScoreType::EXACT,
-        prev_best);
+        shared_st_ptr_->table_ptr_->Add(job.pos_hash_, job.depth_, job.alpha_,
+        ScoreType::EXACT, prev_best);
       }
 
       // メイトを見つけたらフラグを立てる。
@@ -934,7 +934,8 @@ namespace Sayuri {
     shell.PrintFinalInfo(shared_st_ptr_->i_depth_,
     Chrono::duration_cast<Chrono::milliseconds>
     (SysClock::now() - (shared_st_ptr_->start_time_)),
-    shared_st_ptr_->searched_nodes_, table.GetUsedPermill(),
+    shared_st_ptr_->searched_nodes_,
+    shared_st_ptr_->table_ptr_->GetUsedPermill(),
     pv_line_table_[level].score(), pv_line_table_[level]);
 
     return pv_line_table_[level];
@@ -1039,8 +1040,7 @@ namespace Sayuri {
         && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][1])) {
           score = -Search(NodeType::NON_PV, next_hash,
           job.depth_ - cache.lmr_search_reduction_ - 1, job.level_ + 1,
-          -(temp_alpha + 1), -temp_alpha, -next_my_material,
-          *(job.table_ptr_));
+          -(temp_alpha + 1), -temp_alpha, -next_my_material);
 
           if (score > temp_alpha) do_normal_search = true;
         } else {
@@ -1059,22 +1059,19 @@ namespace Sayuri {
           if (move_number <= 1) {
             // フルウィンドウで探索。
             score = -Search(node_type, next_hash, job.depth_ - 1,
-            job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
-            *(job.table_ptr_));
+            job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material);
           } else {
             // PV発見後のPVノード。
             // ゼロウィンドウ探索。
             score = -Search(NodeType::NON_PV, next_hash, job.depth_ - 1,
-            job.level_ + 1, -(temp_alpha + 1), -temp_alpha, -next_my_material,
-            *(job.table_ptr_));
+            job.level_ + 1, -(temp_alpha + 1), -temp_alpha, -next_my_material);
 
             if ((score > temp_alpha) && (score < temp_beta)) {
               // Fail Lowならず。
               // Fail-Softなので、Beta値以上も探索しない。
               // フルウィンドウで再探索。
               score = -Search(NodeType::PV, next_hash, job.depth_ - 1,
-              job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material,
-              *(job.table_ptr_));
+              job.level_ + 1, -temp_beta, -temp_alpha, -next_my_material);
             }
           }
         } else {
@@ -1097,7 +1094,7 @@ namespace Sayuri {
 
           // 探索。 NON_PVノードなので、ゼロウィンドウになる。
           score = -Search(node_type, next_hash, new_depth - 1, job.level_ + 1,
-          -temp_beta, -temp_alpha, -next_my_material, *(job.table_ptr_));
+          -temp_beta, -temp_alpha, -next_my_material);
         }
       }
 
@@ -1202,7 +1199,7 @@ namespace Sayuri {
           // フルでPVを探索。
           score = -Search(NodeType::PV, next_hash,
           job.depth_ - 1, job.level_ + 1, -temp_beta, -temp_alpha,
-          -next_my_material, *(job.table_ptr_));
+          -next_my_material);
           
           // アルファ値、ベータ値を調べる。
           job.Lock();  // ロック。
@@ -1265,8 +1262,7 @@ namespace Sayuri {
             // ゼロウィンドウ探索。
             score = -Search(NodeType::NON_PV, next_hash,
             job.depth_ - cache.lmr_search_reduction_ - 1, job.level_ + 1,
-            -(temp_alpha + 1), -temp_alpha, -next_my_material,
-            *(job.table_ptr_));
+            -(temp_alpha + 1), -temp_alpha, -next_my_material);
 
             if (score > temp_alpha) do_normal_search = true;
           } else {
@@ -1281,7 +1277,7 @@ namespace Sayuri {
           // ゼロウィンドウ探索。
           score = -Search(NodeType::NON_PV, next_hash,
           job.depth_ - 1, job.level_ + 1, -(temp_alpha + 1), -temp_alpha,
-          -next_my_material, *(job.table_ptr_));
+          -next_my_material);
 
           if (score > temp_alpha) {
             while (true) {
@@ -1291,7 +1287,7 @@ namespace Sayuri {
               // フルウィンドウで再探索。
               score = -Search(NodeType::PV, next_hash,
               job.depth_ - 1, job.level_ + 1, -temp_beta, -temp_alpha,
-              -next_my_material, *(job.table_ptr_));
+              -next_my_material);
 
               // ベータ値を調べる。
               job.Lock();  // ロック。
@@ -1347,7 +1343,7 @@ namespace Sayuri {
 
         shell.PrintPVInfo(job.depth_, shared_st_ptr_->searched_level_, score,
         time, shared_st_ptr_->searched_nodes_,
-        job.table_ptr_->GetUsedPermill(), *(job.pv_line_ptr_));
+        shared_st_ptr_->table_ptr_->GetUsedPermill(), *(job.pv_line_ptr_));
 
         job.alpha_ = score;
       }

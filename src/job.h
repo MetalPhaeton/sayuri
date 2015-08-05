@@ -40,7 +40,6 @@
 /** Sayuri 名前空間。 */
 namespace Sayuri {
   class ChessEngine;
-  class TranspositionTable;
   class MoveMaker;
   class PositionRecord;
   class PVLine;
@@ -176,8 +175,6 @@ namespace Sayuri {
       volatile int beta_;
       /** 共有ノードのデルタ値。 */
       volatile int delta_;
-      /** トランスポジションテーブルのポインタ。 */
-      TranspositionTable* table_ptr_;
       /** 共有ノードのPVラインのポインタ。 */
       PVLine* pv_line_ptr_;
       /** クライアントがNull Search中かどうかのフラグ。 */

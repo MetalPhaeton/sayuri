@@ -35,7 +35,6 @@
 #include <functional>
 #include "common.h"
 #include "chess_engine.h"
-#include "transposition_table.h"
 #include "pv_line.h"
 #include "move_maker.h"
 #include "position_record.h"
@@ -115,7 +114,6 @@ namespace Sayuri {
     alpha_ = job.alpha_;
     beta_ = job.beta_;
     delta_ = job.delta_;
-    table_ptr_ = job.table_ptr_;
     pv_line_ptr_ = job.pv_line_ptr_;
     is_null_searching_ = job.is_null_searching_;
     null_reduction_ = job.null_reduction_;

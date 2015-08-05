@@ -64,10 +64,9 @@ namespace Sayuri {
   // コンストラクタと代入 //
   // ==================== //
   // コンストラクタ。
-  UCIShell::UCIShell(ChessEngine& engine, TranspositionTable& table) :
+  UCIShell::UCIShell(ChessEngine& engine) :
   uci_command_(),
   engine_ptr_(&engine),
-  table_ptr_(&table),
   moves_to_search_(0),
   enable_pondering_(UCI_DEFAULT_PONDER),
   num_threads_(UCI_DEFAULT_THREADS),
@@ -114,7 +113,6 @@ namespace Sayuri {
   UCIShell::UCIShell(const UCIShell& shell) :
   uci_command_(shell.uci_command_),
   engine_ptr_(shell.engine_ptr_),
-  table_ptr_(shell.table_ptr_),
   moves_to_search_(shell.moves_to_search_),
   enable_pondering_(shell.enable_pondering_),
   num_threads_(shell.num_threads_),
@@ -126,7 +124,6 @@ namespace Sayuri {
   UCIShell::UCIShell(UCIShell&& shell) :
   uci_command_(std::move(shell.uci_command_)),
   engine_ptr_(shell.engine_ptr_),
-  table_ptr_(shell.table_ptr_),
   moves_to_search_(std::move(shell.moves_to_search_)),
   enable_pondering_(shell.enable_pondering_),
   num_threads_(shell.num_threads_),
@@ -138,7 +135,6 @@ namespace Sayuri {
   UCIShell& UCIShell::operator=(const UCIShell& shell) {
     uci_command_ = shell.uci_command_;
     engine_ptr_ = shell.engine_ptr_;
-    table_ptr_ = shell.table_ptr_;
     moves_to_search_ = shell.moves_to_search_;
     enable_pondering_ = shell.enable_pondering_;
     num_threads_ = shell.num_threads_;
@@ -151,7 +147,6 @@ namespace Sayuri {
   UCIShell& UCIShell::operator=(UCIShell&& shell) {
     uci_command_ = std::move(shell.uci_command_);
     engine_ptr_ = shell.engine_ptr_;
-    table_ptr_ = shell.table_ptr_;
     moves_to_search_ = std::move(shell.moves_to_search_);
     enable_pondering_ = shell.enable_pondering_;
     num_threads_ = shell.num_threads_;
@@ -326,15 +321,15 @@ namespace Sayuri {
   void UCIShell::ThreadThinking() {
     // アナライズモードならトランスポジションテーブルを初期化。
     if (analyse_mode_) {
-      table_ptr_->Clear();
+      engine_ptr_->table().Clear();
     }
 
     // テーブルの年齢の増加。
-    table_ptr_->GrowOld();
+    engine_ptr_->table().GrowOld();
 
     // 思考開始。
-    PVLine pv_line = engine_ptr_->Calculate(num_threads_,
-    *table_ptr_, moves_to_search_, *this);
+    PVLine pv_line =
+    engine_ptr_->Calculate(num_threads_, moves_to_search_, *this);
 
     // 最善手を表示。
     std::ostringstream sout;
@@ -436,7 +431,7 @@ namespace Sayuri {
     }
 
     // オプションの初期設定。
-    table_ptr_->SetSize(UCI_DEFAULT_TABLE_SIZE);
+    engine_ptr_->table().SetSize(UCI_DEFAULT_TABLE_SIZE);
     enable_pondering_ = UCI_DEFAULT_PONDER;
     num_threads_ = UCI_DEFAULT_THREADS;
   }
@@ -477,13 +472,13 @@ namespace Sayuri {
 
         Util::UpdateMin(table_size, UCI_MAX_TABLE_SIZE);
 
-        table_ptr_->SetSize(table_size);
+        engine_ptr_->table().SetSize(table_size);
       } catch (...) {
         // 無視。
       }
     } else if (name_str == "clear hash") {
       // トランスポジションテーブルの初期化。
-      table_ptr_->Clear();
+      engine_ptr_->table().Clear();
     } else if (name_str == "ponder") {
       // ponderの有効化、無効化。
       if (args["value"][1] == "true") enable_pondering_ = true;
@@ -506,7 +501,7 @@ namespace Sayuri {
   // 「ucinewgame」コマンドのコールバック関数。
   void UCIShell::CommandUCINewGame(UCICommand::CommandArgs& args) {
     engine_ptr_->SetNewGame();
-    table_ptr_->Clear();
+    engine_ptr_->table().Clear();
   }
 
   // 「position」コマンドのコールバック関数。

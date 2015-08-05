@@ -153,14 +153,15 @@ R"...(Usage:
     std::unique_ptr<Sayuri::EvalParams>
     eval_params_ptr(new Sayuri::EvalParams());
 
-    std::unique_ptr<Sayuri::ChessEngine>
-    engine_ptr(new Sayuri::ChessEngine(*search_params_ptr, *eval_params_ptr));
-
     std::unique_ptr<Sayuri::TranspositionTable>
     table_ptr(new Sayuri::TranspositionTable(Sayuri::UCI_DEFAULT_TABLE_SIZE));
 
+    std::unique_ptr<Sayuri::ChessEngine>
+    engine_ptr(new Sayuri::ChessEngine(*search_params_ptr, *eval_params_ptr,
+    *table_ptr));
+
     std::unique_ptr<Sayuri::UCIShell>
-    shell_ptr(new Sayuri::UCIShell(*engine_ptr, *table_ptr));
+    shell_ptr(new Sayuri::UCIShell(*engine_ptr));
 
     shell_ptr->AddOutputListener(Print);
 

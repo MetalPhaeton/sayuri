@@ -90,9 +90,10 @@ namespace Sayuri {
   EngineSuite::EngineSuite() :
   search_params_ptr_(new SearchParams()),
   eval_params_ptr_(new EvalParams()),
-  engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_)),
   table_ptr_(new TranspositionTable(UCI_DEFAULT_TABLE_SIZE)),
-  shell_ptr_(new UCIShell(*engine_ptr_, *table_ptr_)) {
+  engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
+  *table_ptr_)),
+  shell_ptr_(new UCIShell(*engine_ptr_)) {
     // 出力リスナー。
     shell_ptr_->AddOutputListener
     ([this](const std::string& message) {this->ListenUCIOutput(message);});
@@ -104,9 +105,10 @@ namespace Sayuri {
   EngineSuite::EngineSuite(const EngineSuite& suite) :
   search_params_ptr_(new SearchParams(*(suite.search_params_ptr_))),
   eval_params_ptr_(new EvalParams(*(suite.eval_params_ptr_))),
-  engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_)),
   table_ptr_(new TranspositionTable(suite.table_ptr_->GetSizeBytes())),
-  shell_ptr_(new UCIShell(*engine_ptr_, *table_ptr_)) {
+  engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
+  *table_ptr_)),
+  shell_ptr_(new UCIShell(*engine_ptr_)) {
     PositionRecord record(*(suite.engine_ptr_), 0);
     engine_ptr_->LoadRecord(record);
 
@@ -121,8 +123,8 @@ namespace Sayuri {
   EngineSuite::EngineSuite(EngineSuite&& suite) :
   search_params_ptr_(std::move(suite.search_params_ptr_)),
   eval_params_ptr_(std::move(suite.eval_params_ptr_)),
-  engine_ptr_(std::move(suite.engine_ptr_)),
   table_ptr_(std::move(suite.table_ptr_)),
+  engine_ptr_(std::move(suite.engine_ptr_)),
   shell_ptr_(std::move(suite.shell_ptr_)) {
     SetWeightFunctions();
   }
@@ -131,9 +133,10 @@ namespace Sayuri {
   EngineSuite& EngineSuite::operator=(const EngineSuite& suite) {
     search_params_ptr_.reset(new SearchParams(*(suite.search_params_ptr_)));
     eval_params_ptr_.reset(new EvalParams(*(suite.eval_params_ptr_)));
-    engine_ptr_.reset(new ChessEngine(*search_params_ptr_, *eval_params_ptr_));
     table_ptr_.reset(new TranspositionTable(suite.table_ptr_->GetSizeBytes()));
-    shell_ptr_.reset(new UCIShell(*engine_ptr_, *table_ptr_));
+    engine_ptr_.reset(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
+    *table_ptr_));
+    shell_ptr_.reset(new UCIShell(*engine_ptr_));
 
     PositionRecord record(*(suite.engine_ptr_), 0);
     engine_ptr_->LoadRecord(record);
@@ -151,8 +154,8 @@ namespace Sayuri {
   EngineSuite& EngineSuite::operator=(EngineSuite&& suite) {
     search_params_ptr_ = std::move(suite.search_params_ptr_);
     eval_params_ptr_ = std::move(suite.eval_params_ptr_);
-    engine_ptr_ = std::move(suite.engine_ptr_);
     table_ptr_ = std::move(suite.table_ptr_);
+    engine_ptr_ = std::move(suite.engine_ptr_);
     shell_ptr_ = std::move(suite.shell_ptr_);
 
     SetWeightFunctions();
@@ -1696,7 +1699,7 @@ namespace Sayuri {
 
     // 思考開始。
     PVLine pv_line = engine_ptr_->Calculate(shell_ptr_->num_threads(),
-    *table_ptr_, move_vec, *shell_ptr_);
+    move_vec, *shell_ptr_);
     Move best_move = pv_line.length() >= 1 ? pv_line[0] : 0;
 
     std::ostringstream stream;
