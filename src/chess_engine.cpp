@@ -61,6 +61,7 @@ namespace Sayuri {
   ChessEngine::ChessEngine(const SearchParams& search_params,
   const EvalParams& eval_params, TranspositionTable& table) :
   is_null_searching_(false),
+  table_ptr_(nullptr),
   evaluator_(*this),
   notice_cut_level_(MAX_PLYS + 1) {
     SetNewGame();

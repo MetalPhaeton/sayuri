@@ -1071,6 +1071,8 @@ namespace Sayuri {
       // ===================================================== //
       /** 今ヌルムーブのサーチ中かどうかのフラグ。 */
       bool is_null_searching_;
+      /** 探索中のテーブルへのポインタ。 */
+      TranspositionTable* table_ptr_;
       /** 探索用MoveMakerのテーブル。 [探索レベル] */
       std::unique_ptr<MoveMaker[]> maker_table_;
       /** 探索用PVLineのテーブル。 [探索レベル] */

@@ -209,10 +209,10 @@ namespace Sayuri {
     // --- トランスポジションテーブル --- //
     Move prev_best = 0;
     if (cache.enable_ttable_) {
-      shared_st_ptr_->table_ptr_->Lock();  // ロック。
+      table_ptr_->Lock();  // ロック。
 
       // 前回の繰り返しの最善手を含めたエントリーを得る。
-      const TTEntry& tt_entry = shared_st_ptr_->table_ptr_->GetEntry(pos_hash);
+      const TTEntry& tt_entry = table_ptr_->GetEntry(pos_hash);
       if (tt_entry) {
         ScoreType score_type = tt_entry.score_type();
 
@@ -244,14 +244,14 @@ namespace Sayuri {
             }
 
             pv_line_table_[level].score(score);
-            shared_st_ptr_->table_ptr_->Unlock();  // ロック解除。
+            table_ptr_->Unlock();  // ロック解除。
             return score;
           } else if (tt_entry.score_type() == ScoreType::ALPHA) {
             // エントリーがアルファ値。
             if (score <= alpha) {
               // アルファ値以下が確定。
               pv_line_table_[level].score(score);
-              shared_st_ptr_->table_ptr_->Unlock();  // ロック解除。
+              table_ptr_->Unlock();  // ロック解除。
               return score;
             }
 
@@ -272,7 +272,7 @@ namespace Sayuri {
             if (score >= beta) {
               // ベータ値以上が確定。
               pv_line_table_[level].score(score);
-              shared_st_ptr_->table_ptr_->Unlock();  // ロック解除。
+              table_ptr_->Unlock();  // ロック解除。
               return score;
             }
 
@@ -281,7 +281,7 @@ namespace Sayuri {
           }
         }
       }
-      shared_st_ptr_->table_ptr_->Unlock();  // ロック解除。
+      table_ptr_->Unlock();  // ロック解除。
     }
 
     // 深さが0ならクイース。 (無効なら評価値を返す。)
@@ -429,8 +429,7 @@ namespace Sayuri {
 
               // トランスポジションテーブルに登録。
               if (!null_reduction) {
-                shared_st_ptr_->table_ptr_->Add(pos_hash, depth, beta,
-                ScoreType::BETA, move);
+                table_ptr_->Add(pos_hash, depth, beta, ScoreType::BETA, move);
               }
 
               return beta;
@@ -681,8 +680,8 @@ namespace Sayuri {
       // Null Move Reductionされていた場合、容量節約のため登録しない。
       if (cache.enable_ttable_) {
         if (!is_null_searching_ && !null_reduction) {
-          shared_st_ptr_->table_ptr_->Add(pos_hash, depth, job.alpha_,
-          job.score_type_, best_move);
+          table_ptr_->Add(pos_hash, depth, job.alpha_, job.score_type_,
+          best_move);
         }
       }
     }
@@ -695,7 +694,6 @@ namespace Sayuri {
   UCIShell& shell) {
     constexpr int level = 0;
 
-
     // --- 初期化 --- //
     // ジョブ。
     Job& job = job_table_[level];
@@ -705,6 +703,7 @@ namespace Sayuri {
     notice_cut_level_ = MAX_PLYS + 1;
 
     // キャッシュ。
+    table_ptr_ = shared_st_ptr_->table_ptr_;
     shared_st_ptr_->CacheParams();
     Cache& cache = shared_st_ptr_->cache_;
 
@@ -795,8 +794,7 @@ namespace Sayuri {
         (SysClock::now() - shared_st_ptr_->start_time_);
 
         shell.PrintPVInfo(depth, 0, pv_line_table_[level].score(), time,
-        shared_st_ptr_->searched_nodes_,
-        shared_st_ptr_->table_ptr_->GetUsedPermill(),
+        shared_st_ptr_->searched_nodes_, table_ptr_->GetUsedPermill(),
         pv_line_table_[level]);
 
         continue;
@@ -809,8 +807,8 @@ namespace Sayuri {
         (SysClock::now() - shared_st_ptr_->start_time_);
 
         shell.PrintPVInfo(depth, 0, pv_line_table_[level].score(), time,
-        shared_st_ptr_->searched_nodes_,
-        shared_st_ptr_->table_ptr_->GetUsedPermill(), pv_line_table_[level]);
+        shared_st_ptr_->searched_nodes_, table_ptr_->GetUsedPermill(),
+        pv_line_table_[level]);
 
         continue;
       }
@@ -897,7 +895,7 @@ namespace Sayuri {
 
       // 最善手をトランスポジションテーブルに登録。
       if (cache.enable_ttable_) {
-        shared_st_ptr_->table_ptr_->Add(job.pos_hash_, job.depth_, job.alpha_,
+        table_ptr_->Add(job.pos_hash_, job.depth_, job.alpha_,
         ScoreType::EXACT, prev_best);
       }
 
@@ -934,8 +932,7 @@ namespace Sayuri {
     shell.PrintFinalInfo(shared_st_ptr_->i_depth_,
     Chrono::duration_cast<Chrono::milliseconds>
     (SysClock::now() - (shared_st_ptr_->start_time_)),
-    shared_st_ptr_->searched_nodes_,
-    shared_st_ptr_->table_ptr_->GetUsedPermill(),
+    shared_st_ptr_->searched_nodes_, table_ptr_->GetUsedPermill(),
     pv_line_table_[level].score(), pv_line_table_[level]);
 
     return pv_line_table_[level];
@@ -943,6 +940,11 @@ namespace Sayuri {
 
   // YBWC探索用スレッド。
   void ChessEngine::ThreadYBWC(UCIShell& shell) {
+    // 準備。
+    notice_cut_level_ = MAX_PLYS + 1;
+    table_ptr_ = shared_st_ptr_->table_ptr_;
+    is_null_searching_ = false;
+
     // 仕事ループ。
     while (true) {
       // 準備。
@@ -1342,8 +1344,8 @@ namespace Sayuri {
         (SysClock::now() - shared_st_ptr_->start_time_);
 
         shell.PrintPVInfo(job.depth_, shared_st_ptr_->searched_level_, score,
-        time, shared_st_ptr_->searched_nodes_,
-        shared_st_ptr_->table_ptr_->GetUsedPermill(), *(job.pv_line_ptr_));
+        time, shared_st_ptr_->searched_nodes_, table_ptr_->GetUsedPermill(),
+        *(job.pv_line_ptr_));
 
         job.alpha_ = score;
       }
