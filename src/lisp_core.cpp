@@ -280,11 +280,11 @@ namespace Sayuri {
         func_obj->function_.arg_name_vec_;
         for (auto& arg_name : arg_name_vec) {
           if (!target_itr) {
-            throw GenInsufficientArgumentsError
-            (func_name, arg_name_vec.size(), false, target.Length() - 1);
+            // 引数が足りないならNilで補完。
+            func_obj->BindSymbol(arg_name, LispObjectPtr(new LispObject()));
+          } else {
+            func_obj->BindSymbol(arg_name, Evaluate(*(target_itr++)));
           }
-
-          func_obj->BindSymbol(arg_name, Evaluate(*(target_itr++)));
         }
 
         // 関数を評価。
