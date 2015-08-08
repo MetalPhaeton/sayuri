@@ -2950,6 +2950,117 @@ R"...(### append ###
       (*dict_ptr)["string-append"] = temp;
     }
 
+    // %%% ref
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
+      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      -> LispObjectPtr {
+        // 準備。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 2;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr result = caller.Evaluate(*(list_itr++));
+        if (!(result->IsList() || result->IsString())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "List or String", std::vector<int> {1}, true);
+        }
+
+        // 第2引数をチェック。 インデックス。 0が最初。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr index_ptr = caller.Evaluate(*list_itr);
+        if (!(index_ptr->IsNumber())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+
+        // 目的の要素を得る。
+        if (result->IsList()) {
+          // リストの場合。
+          int index = index_ptr->number_value();
+          index = index < 0 ? result->Length() + index : index;
+          int i = 0;
+          for (LispIterator result_itr(result.get());
+          result_itr; ++result_itr, ++i) {
+            if (i == index) return result_itr->Clone();
+          }
+        } else {
+          // 文字列の場合。
+          std::string result_str = result->string_value();
+          int index = index_ptr->number_value();
+          index = index < 0 ? result_str.size() + index : index;
+          if (static_cast<unsigned int>(index) < result_str.size()) {
+            std::string ret_str = "";
+            ret_str.push_back(result->string_value()[index]);
+            return LispObject::NewString(ret_str);
+          }
+        }
+
+        // 範囲外。
+        throw LispObject::GenError("@out-of-range",
+        "The index number of (" + func_name + ") is out of range.");
+      };
+      root_ptr->BindSymbol("ref", func_ptr);
+      root_ptr->BindSymbol("list-ref", func_ptr);
+      root_ptr->BindSymbol("string-ref", func_ptr);
+      std::string temp =
+R"...(### ref ###
+
+<h6> Usage </h6>
+
+1. `(ref <List> <Index : Number>)`
+  + or `(list-ref <List> <Index : Number>)`
+2. `(ref <String> <Index : Number>)`
+  + or `(string-ref <String> <Index : Number>)`
+
+<h6> Description </h6>
+
+1. If the 1st argument is List, returns a element of `<Index>`th `<List>`.
+1. If the 1st argument is String, returns a letter of `<Index>`th `<String>`.
+* The index of 1st element is 0.
+* If `<Index>` is negative number,
+  It counts from the tail of `<List | String>`.
+
+<h6> Example </h6>
+
+    (display (ref '(111 222 333) 1))
+    
+    ;; Output
+    ;;
+    ;; > 222
+    
+    (display (ref '(111 222 333) -1))
+    
+    ;; Output
+    ;;
+    ;; > 333
+    
+    (display (ref "Hello World" 4))
+    
+    ;; Output
+    ;;
+    ;; > "o"
+    
+    (display (ref "Hello World" -3))
+    
+    ;; Output
+    ;;
+    ;; > "r")...";
+      (*dict_ptr)["ref"] = temp;
+      (*dict_ptr)["list-ref"] = temp;
+      (*dict_ptr)["string-ref"] = temp;
+    }
+
     // %%% list
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
@@ -2994,82 +3105,6 @@ R"...(### list ###
     ;; Output
     ;;
     ;; > (111 222 333))...";
-    }
-
-    // %%% list-ref
-    {
-      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->scope_chain_ = root_ptr->scope_chain_;
-      func_ptr->native_function_ =
-      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
-      -> LispObjectPtr {
-        // 準備。
-        LispIterator list_itr(&list);
-        std::string func_name = (list_itr++)->ToString();
-        int required_args = 2;
-
-        // 第1引数をチェック。
-        if (!list_itr) {
-          throw LispObject::GenInsufficientArgumentsError
-          (func_name, required_args, false, list.Length() - 1);
-        }
-        LispObjectPtr result = caller.Evaluate(*(list_itr++));
-        if (!(result->IsList())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "List", std::vector<int> {1}, true);
-        }
-
-        // 第2引数をチェック。 インデックス。 0が最初。
-        if (!list_itr) {
-          throw LispObject::GenInsufficientArgumentsError
-          (func_name, required_args, false, list.Length() - 1);
-        }
-        LispObjectPtr index_ptr = caller.Evaluate(*list_itr);
-        if (!(index_ptr->IsNumber())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "Number", std::vector<int> {2}, true);
-        }
-
-        // 目的の要素を得る。
-        int index = index_ptr->number_value();
-        index = index < 0 ? result->Length() + index : index;
-        int i = 0;
-        for (LispIterator result_itr(result.get());
-        result_itr; ++result_itr, ++i) {
-          if (i == index) return result_itr->Clone();
-        }
-
-        // 範囲外。
-        throw LispObject::GenError("@out-of-range",
-        "The index number of (" + func_name + ") is out of range.");
-      };
-      root_ptr->BindSymbol("list-ref", func_ptr);
-      (*dict_ptr)["list-ref"] =
-R"...(### list-ref ###
-
-<h6> Usage </h6>
-
-* `(list-ref <List> <Index : Number>)`
-
-<h6> Description </h6>
-
-* Returns a element of `<Index>` of `<List>`.
-* The 1st element of `<List>` is 0.
-* If `<Index>` is negative number," It counts from the tail of `<List>`.
-
-<h6> Example </h6>
-
-    (display (list-ref (111 222 333) 1))
-    
-    ;; Output
-    ;;
-    ;; > 222
-    
-    (display (list-ref (111 222 333) -1))
-    
-    ;; Output
-    ;;
-    ;; > 333)...";
     }
 
     // %%% list-replace
@@ -4128,72 +4163,6 @@ R"...(### dec! ###
     ;;
     ;; > 110
     ;; > 110)...";
-    }
-
-    // %%% string-ref
-    {
-      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->scope_chain_ = root_ptr->scope_chain_;
-      func_ptr->native_function_ =
-      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
-      ->LispObjectPtr {
-        // 準備。
-        LispIterator list_itr(&list);
-        std::string func_name = (list_itr++)->ToString();
-        int required_args = 2;
-
-        // 第1引数をチェック。
-        if (!list_itr) {
-          throw LispObject::GenInsufficientArgumentsError
-          (func_name, required_args, false, list.Length() - 1);
-        }
-        LispObjectPtr result = caller.Evaluate(*(list_itr++));
-        if (!(result->IsString())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "String", std::vector<int> {1}, true);
-        }
-
-        // 第2引数をチェック。 インデックス。 0が最初。
-        if (!list_itr) {
-          throw LispObject::GenInsufficientArgumentsError
-          (func_name, required_args, false, list.Length() - 1);
-        }
-        LispObjectPtr index_ptr = caller.Evaluate(*list_itr);
-        if (!(index_ptr->IsNumber())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "Number", std::vector<int> {2}, true);
-        }
-
-        // 指定の文字を得る。
-        std::string result_str = result->string_value();
-        int index = index_ptr->number_value();
-        index = index < 0 ? result_str.size() + index : index;
-        if ((index >= 0) && (index < static_cast<int>(result_str.size()))) {
-          return LispObject::NewString(std::string {result_str[index]});
-        }
-
-        return LispObject::NewString("");
-      };
-      root_ptr->BindSymbol("string-ref", func_ptr);
-      (*dict_ptr)["string-ref"] =
-R"...(### string-ref ###
-
-<h6> Usage </h6>
-
-* `(string-ref <String> <index>)`
-
-<h6> Description </h6>
-
-* Returns the `<index>`th letter of `<String>`.
-* `<index>` of the 1st letter is 0.
-
-<h6> Example </h6>
-
-    (display (string-ref "Hello World" 6))
-    
-    ;; Output
-    ;;
-    ;; > W)...";
     }
 
     // %%% string-split
