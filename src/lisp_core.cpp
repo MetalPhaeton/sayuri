@@ -2062,6 +2062,56 @@ R"...(### equal? ###
       (*dict_ptr)["="] = temp;
     }
 
+    // %%% !=
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
+      [root_ptr](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) -> LispObjectPtr {
+        // 準備。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 引数をチェック。
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+
+        // equal?を実行。
+        LispObjectPtr equal_func = root_ptr->ReferSymbol("equal?");
+        LispObjectPtr result =
+        equal_func->native_function()(equal_func, caller, list);
+
+        // 結果を反転して返す。
+        if (result->boolean_value()) return LispObject::NewBoolean(false);
+        return LispObject::NewBoolean(true);
+      };
+
+      root_ptr->BindSymbol("!=", func_ptr);
+      (*dict_ptr)["!="] =
+R"...(### != ###
+
+<h6> Usage </h6>
+
+* `(!= <Object>...)`
+
+<h6> Description </h6>
+
+* Returns #t if all `<Object>...` are different structure.
+  Otherwise, returns #f.
+
+<h6> Example </h6>
+
+    (display (!= '(1 2 (3 4) 5) '(1 2 (3 4) 5)))
+    
+    ;; Output
+    ;;
+    ;; > #f)...";
+    }
+
     // %%% pair?
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
