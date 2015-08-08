@@ -385,17 +385,18 @@ namespace Sayuri {
     } else {
       if (front == "\"") {
         // String。
-        if (token_queue.empty()) return;
         target.type_ = LispObjectType::STRING;
-        target.str_value_ = token_queue.front();
-        token_queue.pop();
 
-        // 次の'"'までポップ。
+        std::ostringstream stream;
         while (!(token_queue.empty())) {
           front = token_queue.front();
           token_queue.pop();
-          if (front == "\"") break;
+          if (front == "\"") break;  // 文字列終了なら抜ける。
+
+          stream << front;
         }
+
+        target.str_value_ = stream.str();
       } else if ((front == "#t") || (front == "#T")){
         // Boolean::true。
         target.type_ = LispObjectType::BOOLEAN;
