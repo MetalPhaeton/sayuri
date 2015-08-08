@@ -2873,55 +2873,80 @@ R"...(### input-stream ###
         // 準備。
         LispIterator list_itr(&list);
         std::string func_name = (list_itr++)->ToString();
-        int required_args = 2;
 
-        // 第1引数をチェック。
-        if (!list_itr) {
-          throw LispObject::GenInsufficientArgumentsError
-          (func_name, required_args, false, list.Length() - 1);
-        }
-        LispObjectPtr ret_ptr = caller.Evaluate(*(list_itr++));
-        if (!(ret_ptr->IsList())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "List", std::vector<int> {1}, true);
+        // ペアと文字列で分岐。
+        if (list_itr) {
+          LispObjectPtr result = caller.Evaluate(*(list_itr++));
+
+          if (result->IsList()) {
+            // リストの場合。
+            LispObject* ptr = result.get();
+            for (; list_itr; ++list_itr) {
+              for (; ptr->IsPair(); ptr = ptr->cdr().get()) continue;
+              if (!(ptr->IsNil())) break;
+              *ptr = *(caller.Evaluate(*list_itr));
+            }
+
+            return result;
+          } else if (result->IsString()) {
+            // 文字列の場合。
+            std::ostringstream stream;
+            stream << result->string_value();
+            for (; list_itr; ++list_itr) {
+              LispObjectPtr result_2 = caller.Evaluate(*list_itr);
+              switch (result_2->type()) {
+                case LispObjectType::STRING:
+                  stream << result_2->string_value();
+                  break;
+                case LispObjectType::SYMBOL:
+                case LispObjectType::NUMBER:
+                case LispObjectType::BOOLEAN:
+                case LispObjectType::PAIR:
+                  stream << result_2->ToString();
+                  break;
+                default:
+                  // 無視。
+                  break;
+              }
+            }
+            return LispObject::NewString(stream.str());
+          }
         }
 
-        // 第2引数を追加。
-        if (!list_itr) {
-          throw LispObject::GenInsufficientArgumentsError
-          (func_name, required_args, false, list.Length() - 1);
-        }
-        ret_ptr->Append(caller.Evaluate(*list_itr));
-
-        return ret_ptr;
+        return LispObject::NewNil();
       };
       root_ptr->BindSymbol("append", func_ptr);
-      (*dict_ptr)["append"] =
+      root_ptr->BindSymbol("string-append", func_ptr);
+      std::string temp =
 R"...(### append ###
 
 <h6> Usage </h6>
 
-* `(append <List 1> <List 2>)`
+1. `(append <List> <Object>...)`
+2. `(append <String> <Object>...)`
+  + or `(string-append <String> <Object>...)`
 
 <h6> Description </h6>
 
-* Appends `<List 2>` after the end of `<List 1>`.
-* In other words,
-  (append) replaces last Cdr of `<List 1>` from Nil to `<List 2>`.
+1. If the 1st argument is List, appends `<Object>...` to its Cdr.
+2. If the 1st argument is String,
+   converts `<Object>...` into String and concatenates them.
 
 <h6> Example </h6>
 
-    (display (append '(111 222 333) '(444 555 666)))
+    (display (append '(111 222) '(333 444) '(555 666) 777))
     
     ;; Output
     ;;
-    ;; > (111 222 333 444 555 666)
+    ;; > (111 222 333 444 555 666 . 777)
     
-    (display (append '(111 222 333) "Not List"))
+    (display (append "Hello " 111 " World"))
     
     ;; Output
     ;;
-    ;; > (111 222 333 . "Not List"))...";
+    ;; > "Hello 111 World")...";
+      (*dict_ptr)["append"] = temp;
+      (*dict_ptr)["string-append"] = temp;
     }
 
     // %%% list
@@ -4102,52 +4127,6 @@ R"...(### dec! ###
     ;;
     ;; > 110
     ;; > 110)...";
-    }
-
-    // %%% string-append
-    {
-      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->scope_chain_ = root_ptr->scope_chain_;
-      func_ptr->native_function_ =
-      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
-      ->LispObjectPtr {
-        // 準備。
-        LispIterator list_itr(&list);
-        std::string func_name = (list_itr++)->ToString();
-
-        std::ostringstream stream;
-        int index = 1;
-        for (; list_itr; ++list_itr, ++index) {
-          LispObjectPtr result = caller.Evaluate(*list_itr);
-          if (!(result->IsString())) {
-            throw LispObject::GenWrongTypeError
-            (func_name, "String", std::vector<int> {1}, true);
-          }
-
-          stream << result->string_value();
-        }
-
-        return LispObject::NewString(stream.str());
-      };
-      root_ptr->BindSymbol("string-append", func_ptr);
-      (*dict_ptr)["string-append"] =
-R"...(### string-append ###
-
-<h6> Usage </h6>
-
-* `(string-append <String>...)`
-
-<h6> Description </h6>
-
-* Concatenates `<String>...`.
-
-<h6> Example </h6>
-
-    (display (string-append "Hello" " " "World"))
-    
-    ;; Output
-    ;;
-    ;; > Hello World)...";
     }
 
     // %%% string-ref
