@@ -114,6 +114,43 @@
 </tr>
 </tbody>
 </table>
+<h3 id="flexible-arguments">Flexible Arguments</h3>
+<p>If you define functions with <code>(lambda)</code> or <code>(define)</code>, their arguments are flexible.</p>
+<p>For example, if you define a function that requires 2 arguments, the function can receive the less arguments or the more arguments than 2.<br />If the function has received 1 argument, then the 2nd argument in the function is Nil.<br />If the function has received 3 arguments, then the 3rd argument is ignored.</p>
+<h6> 
+Example
+</h6>
+
+<pre><code>;; Define a function that requires 2 arguments.
+(define (my-func x y) (display x) (display y))
+
+;; Give 3 arguments.
+(my-func 111 222 333)
+
+;; Output
+;; &gt; 111
+;; &gt; 222
+
+;; Give 2 arguments.
+(my-func 111 222)
+
+;; Output
+;; &gt; 111
+;; &gt; 222
+
+;; Give 1 argument.
+(my-func 111)
+
+;; Output
+;; &gt; 111
+;; &gt; ()
+
+;; Give 0 argument.
+(my-func)
+
+;; Output
+;; &gt; ()
+;; &gt; ()</code></pre>
 <h3 id="message-symbol-semantics">Message Symbol Semantics</h3>
 <p>Some functions use <em>Message Symbol</em>.</p>
 <ul>
@@ -215,9 +252,9 @@ Example
 (define my-obj (my-class))
 
 ;; Execute the member function.
-(my-obj &#39;@say-hello ())  ;; Output &gt; Hello
+(my-obj &#39;@say-hello)  ;; Output &gt; Hello
 (my-obj &#39;@set-val 30)
-(display (my-obj &#39;@get-val ()))  ;; Output &gt; 30</code></pre>
+(display (my-obj &#39;@get-val))  ;; Output &gt; 30</code></pre>
 <h2 id="index-of-reference-of-sayulisp-functions">Index of Reference of Sayulisp Functions</h2>
 <ul>
 <li><a href="core_functions.html">Core Functions</a></li>

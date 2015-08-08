@@ -57,7 +57,11 @@
 </ul></li>
 <li><a href="#predicate-functions">Predicate Functions</a>
 <ul>
-<li><a href="#equal"><code>equal?</code></a> : Judges whether they are same or not.</li>
+<li><a href="#equal"><code>equal?</code></a> : Judges whether they are same or not.
+<ul>
+<li><code>=</code></li>
+</ul></li>
+<li><a href="#not-equal"><code>!=</code></a> : Judges whether they are different.</li>
 <li><a href="#pair"><code>pair?</code></a> : Judges whether they are Pair or not.</li>
 <li><a href="#list"><code>list?</code></a> : Judges whether they are List or not.</li>
 <li><a href="#nil"><code>nil?</code></a> : Judges whether they are Nil or not.
@@ -703,6 +707,7 @@ Usage
 
 <ul>
 <li><code>(equal? &lt;Object&gt;...)</code></li>
+<li><code>(= &lt;Object&gt;...)</code></li>
 </ul>
 <h6> 
 Description
@@ -720,6 +725,30 @@ Example
 ;; Output
 ;;
 ;; &gt; #t</code></pre>
+<h3 id="not-equal">!=</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(!= &lt;Object&gt;...)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>Returns #t if all <code>&lt;Object&gt;...</code> are different structure. Otherwise, returns #f.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(display (!= &#39;(1 2 (3 4) 5) &#39;(1 2 (3 4) 5)))
+
+;; Output
+;;
+;; &gt; #f</code></pre>
 <h3 id="pair">pair?</h3>
 <h6> 
 Usage
