@@ -2037,12 +2037,14 @@ R"...(### stderr ###
         return ret_ptr;
       };
       root_ptr->BindSymbol("equal?", func_ptr);
-      (*dict_ptr)["equal?"] =
+      root_ptr->BindSymbol("=", func_ptr);
+      std::string temp =
 R"...(### equal? ###
 
 <h6> Usage </h6>
 
 * `(equal? <Object>...)`
+* `(= <Object>...)`
 
 <h6> Description </h6>
 
@@ -2056,6 +2058,8 @@ R"...(### equal? ###
     ;; Output
     ;;
     ;; > #t)...";
+      (*dict_ptr)["equal?"] = temp;
+      (*dict_ptr)["="] = temp;
     }
 
     // %%% pair?
@@ -3206,71 +3210,6 @@ R"...(### length ###
     ;; Output
     ;;
     ;; > 6)...";
-    }
-
-    // %%% =
-    {
-      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
-      func_ptr->scope_chain_ = root_ptr->scope_chain_;
-      func_ptr->native_function_ =
-      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
-      -> LispObjectPtr {
-        // 準備。
-        LispIterator list_itr(&list);
-        std::string func_name = (list_itr++)->ToString();
-        int required_args = 1;
-
-        // 最初の数字を得る。
-        if (!list_itr) {
-          throw LispObject::GenInsufficientArgumentsError
-          (func_name, required_args, true, list.Length() - 1);
-        }
-        LispObjectPtr first_ptr = caller.Evaluate(*(list_itr++));
-        if (!(first_ptr->IsNumber())) {
-          throw LispObject::GenWrongTypeError
-          (func_name, "Number", std::vector<int> {1}, true);
-        }
-        double first = first_ptr->number_value();
-
-        // 2つ目以降の引数と比較する。
-        int index = 2;
-        for (; list_itr; ++list_itr, ++index) {
-          // 調べたい数字を得る。
-          LispObjectPtr current_ptr = caller.Evaluate(*list_itr);
-          if (!(current_ptr->IsNumber())) {
-            throw LispObject::GenWrongTypeError
-            (func_name, "List", std::vector<int> {index}, true);
-          }
-
-          // 比較。
-          double current = current_ptr->number_value();
-          if (current != first) {
-            return LispObject::NewBoolean(false);
-          }
-        }
-
-        return LispObject::NewBoolean(true);
-      };
-      root_ptr->BindSymbol("=", func_ptr);
-      (*dict_ptr)["="] =
-R"...(### = ###
-
-<h6> Usage </h6>
-
-* `(= <Number>...)`
-
-<h6> Description </h6>
-
-* Returns #t if all `<Number>...` are same.
-  Otherwise, return #f.
-
-<h6> Example </h6>
-
-    (display (= 111 111 111))
-    
-    ;; Output
-    ;;
-    ;; > #t)...";
     }
 
     // %%% <
