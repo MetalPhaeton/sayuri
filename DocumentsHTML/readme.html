@@ -22,11 +22,11 @@
 <li>MIT License software.</li>
 <li>Written in C++11 and only use the standard libraries.</li>
 <li>Easy to build with CMake.</li>
-<li>Equipped Lisp interpreter that is named <em>Sayulisp</em>. (unfinished)
+<li>Equipped Lisp interpreter that is named <em>Sayulisp</em>.
 <ul>
-<li>Sayulisp can generate and operate Chess Engine. (unfinished)</li>
-<li>Sayulisp can customize algorithm of Search Function. (unfinished)</li>
-<li>Sayulisp can customize values of Evaluation Function. (unfinished)</li>
+<li>Sayulisp can generate and operate Chess Engine.</li>
+<li>Sayulisp can customize algorithm of Search Function.</li>
+<li>Sayulisp can customize values of Evaluation Function.</li>
 </ul></li>
 </ul>
 <h2 id="files-and-directories">Files and Directories</h2>
@@ -58,7 +58,6 @@
 <h2 id="how-to-build-with-cmake">How To Build with CMake</h2>
 <p>Using CMake, you can build Sayuri easily.</p>
 <p>It's default compiler is <em>&quot;clang++&quot;</em>.</p>
-<p>(If you want to change a compiler, please change 26th line and 27th line in &quot;CMakeLists.txt&quot;.)</p>
 <h3 id="build-for-release">Build for Release</h3>
 <ol style="list-style-type: decimal">
 <li>Change directory to where &quot;CMakeLists.txt&quot; is placed in.</li>
@@ -66,7 +65,10 @@
 <ol style="list-style-type: decimal">
 <li><code>$ mkdir build</code></li>
 <li><code>$ cd build</code></li>
-<li><code>$ cmake ..</code></li>
+<li><code>$ cmake ..</code>
+<ul>
+<li>If you want to change a compiler into <code>&lt;cc&gt;</code>, you should call...<br /> <code>$ cmake -DCMAKE_CXX_COMPILER=&lt;cc&gt; ..</code></li>
+</ul></li>
 <li><code>$ make</code></li>
 </ol></li>
 <li><em>&quot;sayuri&quot;</em> is built.</li>
@@ -79,7 +81,10 @@
 <ol style="list-style-type: decimal">
 <li><code>$ mkdir build</code></li>
 <li><code>$ cd build</code></li>
-<li><code>$ cmake -DCMAKE\_BUILD\_TYPE=Debug ..</code></li>
+<li><code>$ cmake -DCMAKE_BUILD_TYPE=Debug ..</code>
+<ul>
+<li>If you want to change a compiler into <code>&lt;cc&gt;</code>, you should call...<br /> <code>$ cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=&lt;cc&gt; ..</code></li>
+</ul></li>
 <li><code>$ make</code></li>
 </ol></li>
 <li><em>&quot;sayuri&quot;</em> is built.</li>

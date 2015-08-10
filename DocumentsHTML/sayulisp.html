@@ -47,9 +47,9 @@
 </ul></li>
 </ul></li>
 <li><p>Sayulisp doesn't print output automatically. If you want output, you can use <code>(display)</code> function.</p></li>
-<li>You can use '<code>[</code>' and '<code>]</code>' instead of '<code>(</code>' and '<code>)</code>'.
+<li>You can use '<code>[</code>' and '<code>]</code>', '<code>{</code>' and '<code>}</code>' instead of '<code>(</code>' and '<code>)</code>'.
 <ul>
-<li>Sayulisp considers '<code>[</code>' and '<code>]</code>' as '<code>(</code>' and '<code>)</code>'.<br /> So &quot;<code>(...)</code>&quot; and &quot;<code>[...]</code>&quot; and &quot;<code>(...]</code>&quot; and &quot;<code>[...)</code>&quot; are the same meaning.</li>
+<li>Inside, Sayulisp converts '<code>[</code>' or '<code>{</code>' into '<code>(</code>', and '<code>]</code>' or '<code>}</code>' into '<code>)</code>'.</li>
 </ul></li>
 </ul>
 <h3 id="object-type-of-sayulisp">Object Type of Sayulisp</h3>
