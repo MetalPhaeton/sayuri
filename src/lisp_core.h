@@ -1164,11 +1164,11 @@ namespace Sayuri {
                 token_queue_.push(stream_.str());
                 stream_.str("");
               }
-            } else if ((c == '(') || (c == '[')) {
+            } else if ((c == '(') || (c == '[') || (c == '{')) {
               // 開き括弧。
               pause('(');
               ++parentheses_;
-            } else if ((c == ')') || (c == ']')) {
+            } else if ((c == ')') || (c == ']') || (c == '}')) {
               // 閉じ括弧。
               pause(')');
               --parentheses_;
