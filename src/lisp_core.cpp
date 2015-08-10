@@ -5263,12 +5263,14 @@ R"...(### exp ###
         (std::pow(first_ptr->number_value(), second_ptr->number_value()));
       };
       root_ptr->BindSymbol("expt", func_ptr);
-      (*dict_ptr)["expt"] =
+      root_ptr->BindSymbol("^", func_ptr);
+      std::string temp =
 R"...(### expt ###
 
 <h6> Usage </h6>
 
 * `(expt <Base> <Exponent>)`
+* `(^ <Base> <Exponent>)`
 
 <h6> Description </h6>
 
@@ -5281,6 +5283,8 @@ R"...(### expt ###
     ;; Output
     ;;
     ;; > 8)...";
+      (*dict_ptr)["expt"] = temp;
+      (*dict_ptr)["^"] = temp;
     }
 
     // %%% log
@@ -5309,12 +5313,14 @@ R"...(### expt ###
         return LispObject::NewNumber(std::log(result->number_value()));
       };
       root_ptr->BindSymbol("log", func_ptr);
-      (*dict_ptr)["log"] =
+      root_ptr->BindSymbol("ln", func_ptr);
+      std::string temp =
 R"...(### log ###
 
 <h6> Usage </h6>
 
 * `(log <Number>)`
+* `(ln <Number>)`
 
 <h6> Description </h6>
 
@@ -5327,6 +5333,8 @@ R"...(### log ###
     ;; Output
     ;;
     ;; > 1)...";
+      (*dict_ptr)["log"] = temp;
+      (*dict_ptr)["ln"] = temp;
     }
 
     // %%% log2
