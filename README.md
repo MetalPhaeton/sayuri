@@ -8,10 +8,10 @@ Sayuri is ...
 * MIT License software.
 * Written in C++11 and only use the standard libraries.
 * Easy to build with CMake.
-* Equipped Lisp interpreter that is named *Sayulisp*. (unfinished)
-    + Sayulisp can generate and operate Chess Engine. (unfinished)
-    + Sayulisp can customize algorithm of Search Function. (unfinished)
-    + Sayulisp can customize values of Evaluation Function. (unfinished)
+* Equipped Lisp interpreter that is named *Sayulisp*.
+    + Sayulisp can generate and operate Chess Engine.
+    + Sayulisp can customize algorithm of Search Function.
+    + Sayulisp can customize values of Evaluation Function.
 
 
 
@@ -44,10 +44,7 @@ How To Build with CMake
 
 Using CMake, you can build Sayuri easily.
 
-It's default compiler is *"clang++"*.
-
-(If you want to change a compiler, please change 26th line and 27th line
-in "CMakeLists.txt".)
+It's default compiler is *"clang++"*.  
 
 ### Build for Release ###
 
@@ -56,6 +53,8 @@ in "CMakeLists.txt".)
     1. `$ mkdir build`
     2. `$ cd build`
     3. `$ cmake ..`
+        - If you want to change a compiler into `<cc>`, you should call...  
+          `$ cmake -DCMAKE_CXX_COMPILER=<cc> ..`
     4. `$ make`
 3. *"sayuri"* is built.
 
@@ -67,7 +66,9 @@ in "CMakeLists.txt".)
 2. Run the following commands.
     1. `$ mkdir build`
     2. `$ cd build`
-    3. `$ cmake -DCMAKE\_BUILD\_TYPE=Debug ..`
+    3. `$ cmake -DCMAKE_BUILD_TYPE=Debug ..`
+        - If you want to change a compiler into `<cc>`, you should call...  
+          `$ cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=<cc> ..`
     4. `$ make`
 3. *"sayuri"* is built.
 
