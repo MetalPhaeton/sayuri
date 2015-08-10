@@ -22,9 +22,15 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 #  IN THE SOFTWARE.
 
+cmake_minimum_required(VERSION 2.8)
+
 # コンパイラの設定。
-set(CMAKE_C_COMPILER clang)
-set(CMAKE_CXX_COMPILER clang++)
+if(NOT CMAKE_C_COMPILER)
+    set(CMAKE_C_COMPILER clang)
+endif(NOT CMAKE_C_COMPILER)
+if(NOT CMAKE_CXX_COMPILER)
+    set(CMAKE_CXX_COMPILER clang++)
+endif(NOT CMAKE_CXX_COMPILER)
 
 cmake_minimum_required(VERSION 2.8)
 
@@ -41,17 +47,20 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif(NOT CMAKE_BUILD_TYPE)
 
+# 基本オプション。
+set(BASIC_FLAGS "-std=c++11 -Wall -Wsign-compare -fexceptions -pthread -march=native")
+
 # リリース用のコンパイラのオプション設定。
-set(CMAKE_C_FLAGSE_RELEASE "-std=c++11 -Wall -Wsign-compare -Ofast -march=native -pthread")
-set(CMAKE_CXX_FLAGS_RELEASE "-std=c++11 -Wall -Wsign-compare -Ofast -march=native -pthread")
+set(CMAKE_C_FLAGS_RELEASE "${BASIC_FLAGS} -Ofast")
+set(CMAKE_CXX_FLAGS_RELEASE "${BASIC_FLAGS} -Ofast")
 
 # デバッグ用のコンパイラオプションの設定
-set(CMAKE_C_FLAGS_DEBUG "-std=c++11 -Wall -Wsign-compare -Ofast -g -march=native -pthread")
-set(CMAKE_CXX_FLAGS_DEBUG "-std=c++11 -Wall -Wsign-compare -Ofast -g -march=native -pthread")
+set(CMAKE_C_FLAGS_DEBUG "${BASIC_FLAGS} -Ofast -g")
+set(CMAKE_CXX_FLAGS_DEBUG "${BASIC_FLAGS} -Ofast -g")
 
 # プロファイル用コンパイラオプションの設定。
-set(CMAKE_C_FLAGS_PROFILE "-std=c++11 -Wall -Wsign-compare -pg -march=native -pthread")
-set(CMAKE_CXX_FLAGS_PROFILE "-std=c++11 -Wall -Wsign-compare -pg -march=native -pthread")
+set(CMAKE_C_FLAGS_PROFILE "${BASIC_FLAGS} -pg")
+set(CMAKE_CXX_FLAGS_PROFILE "${BASIC_FLAGS} -pg")
 
 # ビルド設定。
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
