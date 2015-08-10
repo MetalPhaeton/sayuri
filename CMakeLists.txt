@@ -32,8 +32,6 @@ if(NOT CMAKE_CXX_COMPILER)
     set(CMAKE_CXX_COMPILER clang++)
 endif(NOT CMAKE_CXX_COMPILER)
 
-cmake_minimum_required(VERSION 2.8)
-
 # プロジェクト名。
 project(SAYURI)
 set(VERSION "2015.08.05")
