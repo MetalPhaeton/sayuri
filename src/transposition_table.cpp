@@ -53,7 +53,8 @@ namespace Sayuri {
   index_mask_(0),
   age_(0x00010000UL) {
     // エントリーをいくつ作るか決める。
-    std::uint64_t temp = table_size / sizeof(TTEntry);
+    // TTEntryのサイズは32バイトと決め打ちする。
+    std::uint64_t temp = table_size / TTEntry::TTENTRY_HARD_CODED_SIZE;
     temp = temp < 1 ? 1 : temp;
 
     // 以下は最上位ビットだけを残し、他のビットをゼロにするアルゴリズム。

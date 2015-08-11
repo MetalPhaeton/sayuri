@@ -101,7 +101,7 @@ namespace Sayuri {
 
     // ========================================================================
 
-    DoRepeatTest(*shell_ptr);
+    std::cout << "TTEntry Size: " << sizeof(TTEntry) << std::endl;
 
     return 0;
   }

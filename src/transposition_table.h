@@ -55,6 +55,9 @@ namespace Sayuri {
       constexpr static int AGE_SHIFT = 16;
 
     public:
+      /** TTEntryの決め打ちサイズ。 */
+      constexpr static std::size_t TTENTRY_HARD_CODED_SIZE = 32;
+
       // ==================== //
       // コンストラクタと代入 //
       // ==================== //
@@ -250,7 +253,7 @@ namespace Sayuri {
         num_used_entries_ = 0;
 
         // エントリーをいくつ作るか決める。
-        std::uint64_t temp = table_size / sizeof(TTEntry);
+        std::uint64_t temp = table_size / TTEntry::TTENTRY_HARD_CODED_SIZE;
         temp = temp < 1 ? 1 : temp;
 
         // 以下は最上位ビットだけを残し、他のビットをゼロにするアルゴリズム。
