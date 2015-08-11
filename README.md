@@ -82,11 +82,11 @@ in "src" directory.
 
 If you have "clang" :
 
-    clang++ -std=c++11 -Ofast -march=native -pthread -o sayuri *.cpp
+    clang++ -std=c++11 -fno-rtti -Ofast -march=native -pthread -o sayuri *.cpp
 
 If you have "gcc" :
 
-    g++ -std=c++11 -Ofast -march=native -pthread -o sayuri *.cpp
+    g++ -std=c++11 -fno-rtti -Ofast -march=native -pthread -o sayuri *.cpp
 
 
 
@@ -109,7 +109,8 @@ UCI Options
 -----------
 
 * To change size of the hash table. (Default: 32 MB, Max: 8192 MB, Min: 8 MB)
-    + `setoption name Hash value <Size(MB)>`
+    + `setoption name Hash value <Size(MB)>`  
+      (Note!!) `<Size(MB)>` must be 2^n. (e.g. 128, 256, 512, 1024,...)
 
 * To initialize the hash table.
     + `setoption name Clear Hash`
@@ -121,4 +122,4 @@ UCI Options
     + `setoption name Threads value <Number of threads>`
 
 * To enable analyse mode. (Default: false)
-    + `setoption name UCI\_AnalyseMode value <true or false>`
+    + `setoption name UCI_AnalyseMode value <true or false>`
