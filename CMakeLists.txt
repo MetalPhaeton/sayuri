@@ -46,7 +46,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 # 基本オプション。
-set(BASIC_FLAGS "-std=c++11 -Wall -Wsign-compare -fexceptions -pthread -march=native")
+set(BASIC_FLAGS "-std=c++11 -Wall -Wsign-compare -fexceptions -fno-rtti -pthread -march=native")
 
 # リリース用のコンパイラのオプション設定。
 set(CMAKE_C_FLAGS_RELEASE "${BASIC_FLAGS} -Ofast")
