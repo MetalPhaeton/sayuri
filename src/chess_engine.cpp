@@ -913,7 +913,6 @@ namespace Sayuri {
     // 駒の情報を得る。
     Square from = GetFrom(move);
     Square to = GetTo(move);
-    PieceType promotion = GetPromotion(move);
 
     // 駒の位置の種類とサイドを得る。
     PieceType piece_type = piece_board_[from];
@@ -923,10 +922,10 @@ namespace Sayuri {
     PieceType target_type = piece_board_[to];
     Side target_side = side_board_[to];
     Square target_square = to;
-    if ((piece_type == PAWN) && en_passant_square_
-    && (to == en_passant_square_)) {
+    if (GetMoveType(move) == EN_PASSANT) {
       // アンパッサンの時。
       target_type = PAWN;
+      target_square = Util::EN_PASSANT_TRANS_TABLE[to];
     }
 
     // 移動する駒のハッシュを削除する。
@@ -938,9 +937,9 @@ namespace Sayuri {
     cache.piece_hash_value_table_[target_side][target_type][target_square];
 
     // 移動する駒の移動先のハッシュを追加する。
-    if (promotion) {
+    if (move & PROMOTION_MASK) {
       current_hash ^=
-      cache.piece_hash_value_table_[piece_side][promotion][to];
+      cache.piece_hash_value_table_[piece_side][GetPromotion(move)][to];
     } else {
       current_hash ^=
       cache.piece_hash_value_table_[piece_side][piece_type][to];
@@ -954,46 +953,37 @@ namespace Sayuri {
     cache.to_move_hash_value_table_[Util::GetOppositeSide(to_move_)];
 
     // キャスリングのハッシュをセット。
-    // 失われるキャスリングの権利。
-    Castling loss_rights = 0;
-    if (piece_type == KING) {
-      if (piece_side == WHITE) {
-        loss_rights |= WHITE_CASTLING;
-      } else {
-        loss_rights |= BLACK_CASTLING;
-      }
-    } else if (piece_type == ROOK) {
-      if (piece_side == WHITE) {
-        if (from == H1) {
-          loss_rights |= WHITE_SHORT_CASTLING;
-        } else if (from == A1) {
-          loss_rights |= WHITE_LONG_CASTLING;
-        }
-      } else {
-        if (from == H8) {
-          loss_rights |= BLACK_SHORT_CASTLING;
-        } else if (from == A8) {
-          loss_rights |= BLACK_LONG_CASTLING;
+    Hash next_rights = castling_rights_;
+    if (castling_rights_) {
+      Castling loss_rights = 0;
+      if (piece_type == KING) {
+        loss_rights |=
+        piece_side == WHITE ? WHITE_CASTLING : BLACK_LONG_CASTLING;
+      } else if (piece_type == ROOK) {
+        if (piece_side == WHITE) {
+          if (from == H1) loss_rights |= WHITE_SHORT_CASTLING;
+          else if (from == A1) loss_rights |= WHITE_LONG_CASTLING;
+        } else {
+          if (from == H8) loss_rights |= BLACK_SHORT_CASTLING;
+          else if (from == A8) loss_rights |= BLACK_LONG_CASTLING;
         }
       }
+      next_rights &= ~loss_rights;
+
+      // 現在のキャスリングのハッシュを消す。
+      current_hash ^= cache.castling_hash_value_table_[castling_rights_];
+
+      // 次のキャスリングのハッシュをセット。
+      current_hash ^= cache.castling_hash_value_table_[next_rights];
     }
-    Castling next_rights = castling_rights_ & ~loss_rights;
-    // 現在のキャスリングのハッシュを消す。
-    current_hash ^=
-    cache.castling_hash_value_table_[castling_rights_ & ALL_CASTLING];
-    // 次のキャスリングのハッシュをセット。
-    current_hash ^=
-    cache.castling_hash_value_table_[next_rights & ALL_CASTLING];
 
     // とりあえずアンパッサンのハッシュを削除。
     current_hash ^= cache.en_passant_hash_value_table_[en_passant_square_];
 
     // ポーンの2歩の動きの場合はアンパッサンハッシュを追加。
-    if (piece_type == PAWN) {
-      if (Util::GetDistance(from, to) == 2) {
-        current_hash ^= cache.en_passant_hash_value_table_
-        [Util::EN_PASSANT_TRANS_TABLE[to]];
-      }
+    if ((piece_type == PAWN) && (Util::GetDistance(from, to) == 2)) {
+      current_hash ^= cache.en_passant_hash_value_table_
+      [Util::EN_PASSANT_TRANS_TABLE[to]];
     }
 
     // 次の局面のハッシュを返す。
