@@ -692,91 +692,80 @@ namespace Sayuri {
     // 手の要素を得る。
     Square from = GetFrom(move);
     Square to = GetTo(move);
-    PieceType promotion = GetPromotion(move);
-    MoveType move_type = GetMoveType(move);
 
     // キャスリングの権利を更新。
-    PieceType piece = piece_board_[from];
-    if ((castling_rights_ & WHITE_CASTLING) && (side == WHITE)) {
-      if (piece == KING) {
-        castling_rights_ &= ~WHITE_CASTLING;
-      } else if (piece == ROOK) {
-        if ((castling_rights_ & WHITE_SHORT_CASTLING) && (from == H1)) {
-          castling_rights_ &= ~WHITE_SHORT_CASTLING;
-        } else if ((castling_rights_ & WHITE_LONG_CASTLING) && (from == A1)) {
-          castling_rights_ &= ~WHITE_LONG_CASTLING;
-        }
-      }
-    } else if ((castling_rights_ & BLACK_CASTLING) && (side == BLACK)) {
-      if (piece == KING) {
-        castling_rights_ &= ~BLACK_CASTLING;
-      } else if (piece == ROOK) {
-        if ((castling_rights_ & BLACK_SHORT_CASTLING) && (from == H8)) {
-          castling_rights_ &= ~BLACK_SHORT_CASTLING;
-        } else if ((castling_rights_ & BLACK_LONG_CASTLING) && (from == A8)) {
-          castling_rights_ &= ~BLACK_LONG_CASTLING;
-        }
+    if (castling_rights_) {
+      switch (piece_board_[from]) {
+        case KING:
+          castling_rights_ &=
+          ~(side == WHITE ? WHITE_CASTLING : BLACK_CASTLING);
+          break;
+        case ROOK:
+          if (side == WHITE) {
+            if (from == H1) castling_rights_ &= ~(WHITE_SHORT_CASTLING);
+            else if (from == A1) castling_rights_ &= ~(WHITE_LONG_CASTLING);
+          } else {
+            if (from == H8) castling_rights_ &= ~(BLACK_SHORT_CASTLING);
+            else if (from == A8) castling_rights_ &= ~(BLACK_LONG_CASTLING);
+          }
+          break;
       }
     }
 
     // 手の種類によって分岐する。
-    if (move_type == NORMAL) {
-      // 取る駒を登録する。
-      SetCapturedPiece(move, piece_board_[to]);
-      // 駒を動かす。
-      ReplacePiece(from, to);
-      // 駒を昇格させるなら、駒を昇格させる。
-      if (promotion) {
-        PutPiece(to, promotion, side);
-      }
+    switch (GetMoveType(move)) {
+      case NORMAL:  // 通常の手。
+        // 取る駒を登録する。
+        SetCapturedPiece(move, piece_board_[to]);
+        // 駒を動かす。
+        ReplacePiece(from, to);
+        // 駒を昇格させるなら、駒を昇格させる。
+        if (move & PROMOTION_MASK) {
+          PutPiece(to, GetPromotion(move), side);
+        }
 
-      // ポーンの2歩の動きの場合はアンパッサンできるようにする。
-      if (piece_board_[to] == PAWN) {
-        if (Util::GetDistance(from, to) == 2) {
+        // ポーンの2歩の動きの場合はアンパッサンできるようにする。
+        if ((piece_board_[to] == PAWN)
+        && (Util::GetDistance(from, to) == 2)) {
           en_passant_square_ = Util::EN_PASSANT_TRANS_TABLE[to];
         }
-      }
-    } else if (move_type == EN_PASSANT) {  // アンパッサンの場合。
-      // 取った駒をボーンにする。
-      SetCapturedPiece(move, PAWN);
-      // 動かす。
-      ReplacePiece(from, to);
-      // アンパッサンのターゲットを消す。
-      PutPiece(Util::EN_PASSANT_TRANS_TABLE[to], EMPTY);
-    } else if (move_type == CASTLE_WS) {  // 白のショートキャスリング。
-      // キングを動かす。
-      ReplacePiece(from, to);
-
-      // ルークを動かす。
-      ReplacePiece(H1, F1);
-
-      has_castled_[WHITE] = true;
-    } else if (move_type == CASTLE_WL) {  // 白のロングキャスリング。
-      // キングを動かす。
-      ReplacePiece(from, to);
-
-      // ルークを動かす。
-      ReplacePiece(A1, D1);
-
-      has_castled_[WHITE] = true;
-    } else if (move_type == CASTLE_BS) {  // 黒のショートキャスリング。
-      // キングを動かす。
-      ReplacePiece(from, to);
-
-      // ルークを動かす。
-      ReplacePiece(H8, F8);
-
-      has_castled_[BLACK] = true;
-    } else if (move_type == CASTLE_BL) {  // 黒のロングキャスリング。
-      // キングを動かす。
-      ReplacePiece(from, to);
-
-      // ルークを動かす。
-      ReplacePiece(A8, D8);
-
-      has_castled_[BLACK] = true;
-    } else {  // それ以外の場合。 (Null Moveなど。)
-      return;
+        break;
+      case EN_PASSANT:  // アンパッサン。
+        // 取った駒をボーンにする。
+        SetCapturedPiece(move, PAWN);
+        // 動かす。
+        ReplacePiece(from, to);
+        // アンパッサンのターゲットを消す。
+        PutPiece(Util::EN_PASSANT_TRANS_TABLE[to], EMPTY);
+        break;
+      case CASTLE_WS:  // 白ショートキャスリング。
+        // キングを動かす。
+        ReplacePiece(from, to);
+        // ルークを動かす。
+        ReplacePiece(H1, F1);
+        has_castled_[WHITE] = true;
+        break;
+      case CASTLE_WL:  // 白ロングキャスリング。
+        // キングを動かす。
+        ReplacePiece(from, to);
+        // ルークを動かす。
+        ReplacePiece(A1, D1);
+        has_castled_[WHITE] = true;
+        break;
+      case CASTLE_BS:  // 黒ショートキャスリング。
+        // キングを動かす。
+        ReplacePiece(from, to);
+        // ルークを動かす。
+        ReplacePiece(H8, F8);
+        has_castled_[BLACK] = true;
+        break;
+      case CASTLE_BL:  // 黒ロングキャスリング。
+        // キングを動かす。
+        ReplacePiece(from, to);
+        // ルークを動かす。
+        ReplacePiece(A8, D8);
+        has_castled_[BLACK] = true;
+        break;
     }
   }
 
@@ -786,7 +775,7 @@ namespace Sayuri {
     Side enemy_side = to_move_;
 
     // 手番を反転させる。
-    to_move_ ^=  0x3;
+    to_move_ = Util::GetOppositeSide(to_move_);
 
     // 動かす前のキャスリングの権利とアンパッサンを復元する。
     castling_rights_ = GetCastlingRights(move);
@@ -795,47 +784,45 @@ namespace Sayuri {
     // 手の情報を得る。
     Square from = GetFrom(move);
     Square to = GetTo(move);
-    PieceType promotion = GetPromotion(move);
-    MoveType move_type = GetMoveType(move);
 
     // 駒の位置を戻す。
     ReplacePiece(to, from);
 
     // 手の種類で分岐する。
-    if (move_type == NORMAL) {  // 普通の手の場合。
-      // 取った駒を戻す。
-      PutPiece(to, GetCapturedPiece(move), enemy_side);
-
-      // 昇格ならポーンに戻す。
-      if (promotion) {
-        PutPiece(from, PAWN, to_move_);
-      }
-    } else if (move_type == CASTLE_WS) {  // 白のショートキャスリング。
-      // ルークを戻す。
-      ReplacePiece(F1, H1);
-
-      has_castled_[WHITE] = false;
-    } else if (move_type == CASTLE_WL) {  // 白のロングキャスリング。
-      // ルークを戻す。
-      ReplacePiece(D1, A1);
-
-      has_castled_[WHITE] = false;
-    } else if (move_type == CASTLE_BS) {  // 黒のショートキャスリング。
-      // ルークを戻す。
-      ReplacePiece(F8, H8);
-
-      has_castled_[BLACK] = false;
-    } else if (move_type == CASTLE_BL) {  // 黒のロングキャスリング。
-      // ルークを戻す。
-      ReplacePiece(D8, A8);
-
-      has_castled_[BLACK] = false;
-    } else if (move_type == EN_PASSANT) {  // アンパッサンの場合。
-      // アンパッサンのターゲットを戻す。
-      PutPiece(Util::EN_PASSANT_TRANS_TABLE[en_passant_square_],
-      PAWN, enemy_side);
-    } else {  // それ以外の場合。 (Null Moveなど。)
-      return;
+    switch (GetMoveType(move)) {
+      case NORMAL:
+        // 取った駒を戻す。
+        PutPiece(to, GetCapturedPiece(move), enemy_side);
+        // 昇格ならポーンに戻す。
+        if (GetPromotion(move)) {
+          PutPiece(from, PAWN, to_move_);
+        }
+        break;
+      case EN_PASSANT:
+        // アンパッサンのターゲットを戻す。
+        PutPiece(Util::EN_PASSANT_TRANS_TABLE[en_passant_square_],
+        PAWN, enemy_side);
+        break;
+      case CASTLE_WS:
+        // ルークを戻す。
+        ReplacePiece(F1, H1);
+        has_castled_[WHITE] = false;
+        break;
+      case CASTLE_WL:
+        // ルークを戻す。
+        ReplacePiece(D1, A1);
+        has_castled_[WHITE] = false;
+        break;
+      case CASTLE_BS:
+        // ルークを戻す。
+        ReplacePiece(F8, H8);
+        has_castled_[BLACK] = false;
+        break;
+      case CASTLE_BL:
+        // ルークを戻す。
+        ReplacePiece(D8, A8);
+        has_castled_[BLACK] = false;
+        break;
     }
   }
 
@@ -983,17 +970,18 @@ namespace Sayuri {
     Hash next_rights = castling_rights_;
     if (castling_rights_) {
       Castling loss_rights = 0;
-      if (piece_type == KING) {
-        loss_rights |=
-        piece_side == WHITE ? WHITE_CASTLING : BLACK_LONG_CASTLING;
-      } else if (piece_type == ROOK) {
-        if (piece_side == WHITE) {
-          if (from == H1) loss_rights |= WHITE_SHORT_CASTLING;
-          else if (from == A1) loss_rights |= WHITE_LONG_CASTLING;
-        } else {
-          if (from == H8) loss_rights |= BLACK_SHORT_CASTLING;
-          else if (from == A8) loss_rights |= BLACK_LONG_CASTLING;
-        }
+      switch (piece_type) {
+        case KING:
+          loss_rights |=
+          piece_side == WHITE ? WHITE_CASTLING : BLACK_CASTLING;
+        case ROOK:
+          if (piece_side == WHITE) {
+            if (from == H1) loss_rights |= WHITE_SHORT_CASTLING;
+            else if (from == A1) loss_rights |= WHITE_LONG_CASTLING;
+          } else {
+            if (from == H8) loss_rights |= BLACK_SHORT_CASTLING;
+            else if (from == A8) loss_rights |= BLACK_LONG_CASTLING;
+          }
       }
       next_rights &= ~loss_rights;
 
