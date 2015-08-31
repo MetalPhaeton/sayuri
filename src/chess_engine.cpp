@@ -922,10 +922,37 @@ namespace Sayuri {
     PieceType target_type = piece_board_[to];
     Side target_side = side_board_[to];
     Square target_square = to;
-    if (GetMoveType(move) == EN_PASSANT) {
-      // アンパッサンの時。
-      target_type = PAWN;
-      target_square = Util::EN_PASSANT_TRANS_TABLE[to];
+    switch (GetMoveType(move)) {
+      case EN_PASSANT:  // アンパッサン。
+        {
+          target_type = PAWN;
+          target_square = Util::EN_PASSANT_TRANS_TABLE[to];
+        }
+        break;
+      case CASTLE_WS:  // 白ショートキャスリング。
+        {
+          current_hash ^= cache.piece_hash_value_table_[WHITE][ROOK][H1];
+          current_hash ^= cache.piece_hash_value_table_[WHITE][ROOK][F1];
+        }
+        break;
+      case CASTLE_WL:  // 白ロングキャスリング。
+        {
+          current_hash ^= cache.piece_hash_value_table_[WHITE][ROOK][A1];
+          current_hash ^= cache.piece_hash_value_table_[WHITE][ROOK][D1];
+        }
+        break;
+      case CASTLE_BS:  // 黒ショートキャスリング。
+        {
+          current_hash ^= cache.piece_hash_value_table_[BLACK][ROOK][H8];
+          current_hash ^= cache.piece_hash_value_table_[BLACK][ROOK][F8];
+        }
+        break;
+      case CASTLE_BL:  // 黒ロングキャスリング。
+        {
+          current_hash ^= cache.piece_hash_value_table_[BLACK][ROOK][A8];
+          current_hash ^= cache.piece_hash_value_table_[BLACK][ROOK][D8];
+        }
+        break;
     }
 
     // 移動する駒のハッシュを削除する。
@@ -952,7 +979,7 @@ namespace Sayuri {
     current_hash ^=
     cache.to_move_hash_value_table_[Util::GetOppositeSide(to_move_)];
 
-    // キャスリングのハッシュをセット。
+    // キャスリングの権利のハッシュをセット。
     Hash next_rights = castling_rights_;
     if (castling_rights_) {
       Castling loss_rights = 0;
