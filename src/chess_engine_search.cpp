@@ -1464,7 +1464,9 @@ namespace Sayuri {
     shared_st_ptr_->max_depth_ = Util::GetMin(max_depth, MAX_PLYS);
     shared_st_ptr_->max_nodes_ = Util::GetMin(max_nodes, MAX_NODES);
     shared_st_ptr_->start_time_ = SysClock::now();
-    shared_st_ptr_->end_time_ = shared_st_ptr_->start_time_ + thinking_time;
+    // 時間を10ミリ秒(100分の1秒)余裕を見る。
+    shared_st_ptr_->end_time_ =
+    shared_st_ptr_->start_time_ + thinking_time - Chrono::milliseconds(10);
     shared_st_ptr_->infinite_thinking_ = infinite_thinking;
   }
 

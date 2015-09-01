@@ -1140,7 +1140,7 @@ namespace Sayuri {
 
   // 定期処理する。
   void ChessEngine::SharedStruct::ThreadPeriodicProcess(UCIShell& shell) {
-    static const Chrono::milliseconds SLEEP_TIME(1);
+    static const Chrono::milliseconds SLEEP_TIME(3);
     static const Chrono::seconds INTERVAL(1);
     TimePoint next_point = SysClock::now() + INTERVAL;
 
