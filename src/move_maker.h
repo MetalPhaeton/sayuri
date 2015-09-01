@@ -185,6 +185,46 @@ namespace Sayuri {
       void ScoreMoves(std::size_t start, Move prev_best, Move iid_move,
       Move killer_1, Move killer_2, Side side);
 
+      // ================ //
+      // テンプレート部品 //
+      // ================ //
+      /**
+       * ヒストリーの最大値を更新する。
+       * @param <TYPE> 生成する手の種類。
+       * @param side ヒストリーのインデックス。 サイド。
+       * @param from ヒストリーのインデックス。 基点。
+       * @param to ヒストリーのインデックス。 目的地。
+       */
+      template<GenMoveType TYPE>
+      void UpdateMaxHistory(Side side, Square from, Square to);
+
+      /**
+       * 生成した指し手のビットボードをマスクするマスクを生成する。
+       * @param side 指し手のサイド。
+       * @return マスク。
+       */
+      template<GenMoveType TYPE> Bitboard GenBitboardMask(Side side) const;
+
+      /**
+       * ポーン用の候補手のビットボードを生成する。
+       * @param side 指し手のサイド。
+       * @param from 駒の位置。
+       * @return ポーンの候補手のビットボード。
+       */
+      template<GenMoveType TYPE>
+      Bitboard GenPawnBitboard(Side side, Square from) const;
+
+      /**
+       * 指し手のスコアを計算する。
+       * @param move 指し手。
+       * @param side 指し手のサイド。
+       * @param from 駒の位置。
+       * @param to 駒の目的地。
+       * @return スコア。
+       */
+      template<GenMoveType TYPE> std::int64_t CalScore
+      (Move move, Side side, Square from, Square to) const;
+
       // ========== //
       // メンバ変数 //
       // ========== //

@@ -719,12 +719,6 @@ namespace Sayuri {
 
       /** 指し手作成クラスはフレンド。 */
       friend class MoveMaker;
-      template<GenMoveType TYPE>
-      friend struct GenPieceBitboard;
-      template<GenMoveType TYPE>
-      friend struct GenPawnBitboard;
-      template<GenMoveType TYPE>
-      friend struct GenKingBitboard;
 
       /** PositionRecordはフレンド。 */
       friend class PositionRecord;
