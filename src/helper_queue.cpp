@@ -112,7 +112,7 @@ namespace Sayuri {
     job_ptr_->Lock();  // ロック。
 
     // 局面のコピー。
-    helper_ptr->LoadRecord(*(job_ptr_->record_ptr_));
+    helper_ptr->basic_st_ = job_ptr_->client_ptr_->basic_st_;
 
     // 探索状態のコピー。
     helper_ptr->is_null_searching_ = job_ptr_->is_null_searching_;
@@ -135,14 +135,7 @@ namespace Sayuri {
     
     // ヘルパーがいれば仕事を依頼。
     if (num_helpers_ > 0) {
-      job.Lock();
-      if (!(job.record_ptr_)) {
-        job.record_ptr_ =
-        &(job.client_ptr_->GetRecord(job.level_, job.pos_hash_));
-      }
-
       job_ptr_ = &job;
-      job.Unlock();
       helper_cond_.notify_one();
 
       // ヘルパーの準備が完了するまで待つ。
@@ -154,14 +147,7 @@ namespace Sayuri {
   void HelperQueue::HelpRoot(Job& job) {
     std::unique_lock<std::mutex> lock(mutex_);  // ロック。
 
-    job.Lock();
-    if (!(job.record_ptr_)) {
-      job.record_ptr_ =
-      &(job.client_ptr_->GetRecord(job.level_, job.pos_hash_));
-    }
-
     job_ptr_ = &job;
-    job.Unlock();
     helper_cond_.notify_one();
 
     // ヘルパーがやってきて、準備が完了するまで待つ。

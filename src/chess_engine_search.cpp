@@ -80,7 +80,7 @@ namespace Sayuri {
     }
 
     // サイド。
-    Side side = to_move_;
+    Side side = basic_st_.to_move_;
     Side enemy_side = Util::GetOppositeSide(side);
 
     // stand_pad。
@@ -101,7 +101,7 @@ namespace Sayuri {
     // 候補手を作る。
     // 駒を取る手だけ。
     MoveMaker& maker = maker_table_[level];
-    if (IsAttacked(king_[side], enemy_side)) {
+    if (IsAttacked(basic_st_.king_[side], enemy_side)) {
       maker.GenMoves<GenMoveType::ALL>(0, 0, 0, 0);
     } else {
       maker.GenMoves<GenMoveType::CAPTURE>(0, 0, 0, 0);
@@ -120,7 +120,7 @@ namespace Sayuri {
       MakeMove(move);
 
       // 合法手かどうか調べる。
-      if (IsAttacked(king_[side], enemy_side)) {
+      if (IsAttacked(basic_st_.king_[side], enemy_side)) {
         UnmakeMove(move);
         continue;
       }
@@ -168,9 +168,9 @@ namespace Sayuri {
     Util::UpdateMax(shared_st_ptr_->searched_level_, level);
 
     // サイドとチェックされているか。
-    Side side = to_move_;
+    Side side = basic_st_.to_move_;
     Side enemy_side = Util::GetOppositeSide(side);
-    bool is_checked = IsAttacked(king_[side], enemy_side);
+    bool is_checked = IsAttacked(basic_st_.king_[side], enemy_side);
 
     // PVLineをリセット。
     pv_line_table_[level].ResetLine();
@@ -181,7 +181,7 @@ namespace Sayuri {
     }
 
     // --- 繰り返しチェック (繰り返しなら0点。) --- //
-    position_memo_[level] = pos_hash;
+    basic_st_.position_memo_[level] = pos_hash;
     if (cache.enable_repetition_check_) {
       if (level <= 2) {
         // お互いの初手。 (今までの配置を調べる。)
@@ -200,7 +200,7 @@ namespace Sayuri {
         }
       } else {
         // お互いの3手目以降。
-        if (position_memo_[level - 4] == pos_hash) {
+        if (basic_st_.position_memo_[level - 4] == pos_hash) {
           return SCORE_DRAW;
         }
       }
@@ -385,7 +385,7 @@ namespace Sayuri {
             MakeMove(move);
 
             // 合法手じゃなければ次の手へ。
-            if (IsAttacked(king_[side], enemy_side)) {
+            if (IsAttacked(basic_st_.king_[side], enemy_side)) {
               UnmakeMove(move);
               continue;
             }
@@ -452,7 +452,6 @@ namespace Sayuri {
     // 仕事の生成。
     job.Lock();
     job.Init(maker_table_[level]);
-    job.record_ptr_ = nullptr;
     job.node_type_ = node_type;
     job.pos_hash_ = pos_hash;
     job.depth_ = depth;
@@ -497,7 +496,7 @@ namespace Sayuri {
       MakeMove(move);
 
       // 合法手じゃなければ次の手へ。
-      if (IsAttacked(king_[side], enemy_side)) {
+      if (IsAttacked(basic_st_.king_[side], enemy_side)) {
         UnmakeMove(move);
         continue;
       }
@@ -718,7 +717,7 @@ namespace Sayuri {
       }
     }
     for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
-      position_memo_[i] = 0;
+      basic_st_.position_memo_[i] = 0;
       shared_st_ptr_->iid_stack_[i] = 0;
       shared_st_ptr_->killer_stack_[i][0] = 0;
       shared_st_ptr_->killer_stack_[i][1] = 0;
@@ -760,13 +759,13 @@ namespace Sayuri {
 
     // --- Iterative Deepening --- //
     Move prev_best = 0;
-    Hash pos_hash = position_memo_[level] = GetCurrentHash();
-    int material = GetMaterial(to_move_);
+    Hash pos_hash = basic_st_.position_memo_[level] = GetCurrentHash();
+    int material = GetMaterial(basic_st_.to_move_);
     int alpha = -MAX_VALUE;
     int beta = MAX_VALUE;
-    Side side = to_move_;
+    Side side = basic_st_.to_move_;
     Side enemy_side = Util::GetOppositeSide(side);
-    bool is_checked = IsAttacked(king_[side], enemy_side);
+    bool is_checked = IsAttacked(basic_st_.king_[side], enemy_side);
     bool found_mate = false;
 
     for (shared_st_ptr_->i_depth_ = 1; shared_st_ptr_->i_depth_ <= MAX_PLYS;
@@ -841,7 +840,6 @@ namespace Sayuri {
       shared_st_ptr_->killer_stack_[level][1]);
       job.Lock();
       job.Init(maker_table_[level]);
-      job.record_ptr_ = nullptr;
       job.node_type_ = NodeType::PV;
       job.pos_hash_ = pos_hash;
       job.depth_ = depth;
@@ -976,7 +974,7 @@ namespace Sayuri {
     Cache& cache = shared_st_ptr_->cache_;
 
     // 仕事ループ。
-    Side side = to_move_;
+    Side side = basic_st_.to_move_;
     Side enemy_side = Util::GetOppositeSide(side);
     int move_number = 0;
     int margin = cache.futility_pruning_margin_[job.depth_];
@@ -1004,7 +1002,7 @@ namespace Sayuri {
       MakeMove(move);
 
       // 合法手じゃなければ次の手へ。
-      if (IsAttacked(king_[side], enemy_side)) {
+      if (IsAttacked(basic_st_.king_[side], enemy_side)) {
         UnmakeMove(move);
         continue;
       }
@@ -1141,7 +1139,7 @@ namespace Sayuri {
     Cache& cache = shared_st_ptr_->cache_;
 
     // 仕事ループ。
-    Side side = to_move_;
+    Side side = basic_st_.to_move_;
     Side enemy_side = Util::GetOppositeSide(side);
     int move_number = 0;
 
@@ -1177,7 +1175,7 @@ namespace Sayuri {
       MakeMove(move);
 
       // 合法手じゃなければ次の手へ。
-      if (IsAttacked(king_[side], enemy_side)) {
+      if (IsAttacked(basic_st_.king_[side], enemy_side)) {
         UnmakeMove(move);
         continue;
       }
@@ -1366,7 +1364,7 @@ namespace Sayuri {
     if (!move) return score;
 
     // 準備。
-    PieceType target = piece_board_[GetTo(move)];
+    PieceType target = basic_st_.piece_board_[GetTo(move)];
 
     // 取った時の評価を計算。
     score += cache.material_[target];
@@ -1383,16 +1381,16 @@ namespace Sayuri {
       if ((move & PROMOTION_MASK)) {
         return cache.material_[GetPromotion(move)] - cache.material_[PAWN];
       } else {
-        return score - cache.material_[piece_board_[GetFrom(move)]];
+        return score - cache.material_[basic_st_.piece_board_[GetFrom(move)]];
       }
     }
 
     // 次の局面へ。
-    Side side = to_move_;
+    Side side = basic_st_.to_move_;
     ChessEngine* self = const_cast<ChessEngine*>(this);
     self->MakeMove(move);
 
-    if (IsAttacked(king_[side], to_move_)) {
+    if (IsAttacked(basic_st_.king_[side], basic_st_.to_move_)) {
       self->UnmakeMove(move);
       return temp_score;
     }
@@ -1412,31 +1410,35 @@ namespace Sayuri {
       PieceType promotion = EMPTY;
       switch (piece_type) {
         case PAWN:
-          attackers =
-          Util::GetPawnAttack(Util::GetOppositeSide(to_move_), target)
-          & position_[to_move_][PAWN];
-          if (((to_move_ == WHITE)
+          attackers = Util::GetPawnAttack
+          (Util::GetOppositeSide(basic_st_.to_move_), target)
+          & basic_st_.position_[basic_st_.to_move_][PAWN];
+          if (((basic_st_.to_move_ == WHITE)
           && (Util::SquareToRank(target) == RANK_8))
-          || ((to_move_ == BLACK)
+          || ((basic_st_.to_move_ == BLACK)
           && (Util::SquareToRank(target) == RANK_1))) {
             promotion = QUEEN;
           }
           break;
         case KNIGHT:
-          attackers =
-          Util::GetKnightMove(target) & position_[to_move_][KNIGHT];
+          attackers = Util::GetKnightMove(target)
+          & basic_st_.position_[basic_st_.to_move_][KNIGHT];
           break;
         case BISHOP:
-          attackers = GetBishopAttack(target) & position_[to_move_][BISHOP];
+          attackers = GetBishopAttack(target)
+          & basic_st_.position_[basic_st_.to_move_][BISHOP];
           break;
         case ROOK:
-          attackers = GetRookAttack(target) & position_[to_move_][ROOK];
+          attackers = GetRookAttack(target)
+          & basic_st_.position_[basic_st_.to_move_][ROOK];
           break;
         case QUEEN:
-          attackers = GetQueenAttack(target) & position_[to_move_][QUEEN];
+          attackers = GetQueenAttack(target)
+          & basic_st_.position_[basic_st_.to_move_][QUEEN];
           break;
         case KING:
-          attackers = Util::GetKingMove(target) & position_[to_move_][KING];
+          attackers = Util::GetKingMove(target)
+          & basic_st_.position_[basic_st_.to_move_][KING];
           break;
         default:
           throw SayuriError("ChessEngine::GetNextSEEMove()_1");

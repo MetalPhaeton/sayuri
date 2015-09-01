@@ -106,7 +106,6 @@ namespace Sayuri {
     std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
 
     client_ptr_ = job.client_ptr_;
-    record_ptr_ = job.record_ptr_;
     node_type_ = job.node_type_;
     pos_hash_ = job.pos_hash_;
     depth_ = job.depth_;

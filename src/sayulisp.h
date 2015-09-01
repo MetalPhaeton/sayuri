@@ -237,7 +237,7 @@ namespace Sayuri {
       LispObjectPtr GetPosition() const {
         Bitboard bb = 0;
         if (TYPE == EMPTY) {
-          bb = ~(engine_ptr_->blocker_0());
+          bb = ~(engine_ptr_->blocker()[R0]);
         } else {
           bb = engine_ptr_->position()[SIDE][TYPE];
         }

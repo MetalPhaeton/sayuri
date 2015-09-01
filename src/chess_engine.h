@@ -216,20 +216,25 @@ namespace Sayuri {
        */
       bool IsCorrectPosition() const {
         // ポーンの配置を調べる。 第1ランクと第8ランクのポーンは間違い。
-        if (((position_[WHITE][PAWN] | position_[BLACK][PAWN])
+        if (((basic_st_.position_[WHITE][PAWN]
+        | basic_st_.position_[BLACK][PAWN])
         & (Util::RANK[RANK_1] | Util::RANK[RANK_8]))) {
           return false;
         }
 
         // キングの個数を調べる。
-        if (Util::CountBits(position_[WHITE][KING]) != 1) return false;
-        if (Util::CountBits(position_[BLACK][KING]) != 1) return false;
+        if (Util::CountBits(basic_st_.position_[WHITE][KING]) != 1) {
+          return false;
+        };
+        if (Util::CountBits(basic_st_.position_[BLACK][KING]) != 1) {
+          return false;
+        }
 
         // キングのチェックを調べる。
-        if (to_move_ == WHITE) {
-          if (IsAttacked(king_[BLACK], WHITE)) return false;
+        if (basic_st_.to_move_ == WHITE) {
+          if (IsAttacked(basic_st_.king_[BLACK], WHITE)) return false;
         } else {
-          if (IsAttacked(king_[WHITE], BLACK)) return false;
+          if (IsAttacked(basic_st_.king_[WHITE], BLACK)) return false;
         }
 
         // 全てクリア。
@@ -243,7 +248,8 @@ namespace Sayuri {
        * @return ビショップの利き筋。
        */
       Bitboard GetBishopAttack(Square square) const {
-        return Util::GetBishopMagic(square, blocker_45_, blocker_135_);
+        return Util::GetBishopMagic(square, basic_st_.blocker_[R45],
+        basic_st_.blocker_[R135]);
       }
       /**
        * ボードの状態からルークの利き筋を作る。
@@ -251,7 +257,8 @@ namespace Sayuri {
        * @return ルークの利き筋。
        */
       Bitboard GetRookAttack(Square square) const {
-        return Util::GetRookMagic(square, blocker_0_, blocker_90_);
+        return Util::GetRookMagic(square, basic_st_.blocker_[R0],
+        basic_st_.blocker_[R90]);
       }
       /**
        * ボードの状態からクイーンの利き筋を作る。
@@ -260,7 +267,8 @@ namespace Sayuri {
        */
       Bitboard GetQueenAttack(Square square) const {
         return Util::GetQueenMagic
-        (square, blocker_0_, blocker_45_, blocker_90_, blocker_135_);
+        (square, basic_st_.blocker_[R0], basic_st_.blocker_[R45],
+        basic_st_.blocker_[R90], basic_st_.blocker_[R135]);
       }
       /**
        * ボードの状態からポーンの動ける位置を作る。
@@ -269,7 +277,7 @@ namespace Sayuri {
        * @return ポーンの動ける位置。
        */
       Bitboard GetPawnStep(Side side, Square square) const {
-        return Util::GetPawnMovable(side, square, blocker_90_);
+        return Util::GetPawnMovable(side, square, basic_st_.blocker_[R90]);
       }
 
       /**
@@ -277,9 +285,9 @@ namespace Sayuri {
        * @return キャスリング可能ならtrue。
        */
       bool CanWhiteShortCastling() const {
-        return (castling_rights_ & WHITE_SHORT_CASTLING)
-        && !(piece_board_[F1])
-        && !(piece_board_[G1])
+        return (basic_st_.castling_rights_ & WHITE_SHORT_CASTLING)
+        && !(basic_st_.piece_board_[F1])
+        && !(basic_st_.piece_board_[G1])
         && !IsAttacked(E1, BLACK)
         && !IsAttacked(F1, BLACK)
         && !IsAttacked(G1, BLACK);
@@ -290,10 +298,10 @@ namespace Sayuri {
        * @return キャスリング可能ならtrue。
        */
       bool CanWhiteLongCastling() const {
-        return (castling_rights_ & WHITE_LONG_CASTLING)
-        && !(piece_board_[D1])
-        && !(piece_board_[C1])
-        && !(piece_board_[B1])
+        return (basic_st_.castling_rights_ & WHITE_LONG_CASTLING)
+        && !(basic_st_.piece_board_[D1])
+        && !(basic_st_.piece_board_[C1])
+        && !(basic_st_.piece_board_[B1])
         && !IsAttacked(E1, BLACK)
         && !IsAttacked(D1, BLACK)
         && !IsAttacked(C1, BLACK);
@@ -304,9 +312,9 @@ namespace Sayuri {
        * @return キャスリング可能ならtrue。
        */
       bool CanBlackShortCastling() const {
-        return (castling_rights_ & BLACK_SHORT_CASTLING)
-        && !(piece_board_[F8])
-        && !(piece_board_[G8])
+        return (basic_st_.castling_rights_ & BLACK_SHORT_CASTLING)
+        && !(basic_st_.piece_board_[F8])
+        && !(basic_st_.piece_board_[G8])
         && !IsAttacked(E8, WHITE)
         && !IsAttacked(F8, WHITE)
         && !IsAttacked(G8, WHITE);
@@ -317,10 +325,10 @@ namespace Sayuri {
        * @return キャスリング可能ならtrue。
        */
       bool CanBlackLongCastling() const {
-        return (castling_rights_ & BLACK_LONG_CASTLING)
-        && !(piece_board_[D8])
-        && !(piece_board_[C8])
-        && !(piece_board_[B8])
+        return (basic_st_.castling_rights_ & BLACK_LONG_CASTLING)
+        && !(basic_st_.piece_board_[D8])
+        && !(basic_st_.piece_board_[C8])
+        && !(basic_st_.piece_board_[B8])
         && !IsAttacked(E8, WHITE)
         && !IsAttacked(D8, WHITE)
         && !IsAttacked(C8, WHITE);
@@ -330,29 +338,29 @@ namespace Sayuri {
        * キャスリングの権利を更新。
        */
       void UpdateCastlingRights() {
-        if ((castling_rights_ & WHITE_CASTLING)) {
+        if ((basic_st_.castling_rights_ & WHITE_CASTLING)) {
           // 白のキャスリングの権利。
-          if (king_[WHITE] != E1) {
-            castling_rights_ &= ~WHITE_CASTLING;
+          if (basic_st_.king_[WHITE] != E1) {
+            basic_st_.castling_rights_ &= ~WHITE_CASTLING;
           } else {
-            if (!(position_[WHITE][ROOK] & Util::SQUARE[H1][R0])) {
-              castling_rights_ &= ~WHITE_SHORT_CASTLING;
+            if (!(basic_st_.position_[WHITE][ROOK] & Util::SQUARE[H1][R0])) {
+              basic_st_.castling_rights_ &= ~WHITE_SHORT_CASTLING;
             }
-            if (!(position_[WHITE][ROOK] & Util::SQUARE[A1][R0])) {
-              castling_rights_ &= ~WHITE_LONG_CASTLING;
+            if (!(basic_st_.position_[WHITE][ROOK] & Util::SQUARE[A1][R0])) {
+              basic_st_.castling_rights_ &= ~WHITE_LONG_CASTLING;
             }
           }
         }
-        if ((castling_rights_ & BLACK_CASTLING)) {
+        if ((basic_st_.castling_rights_ & BLACK_CASTLING)) {
           // 黒のキャスリングの権利。
-          if (king_[BLACK] != E8) {
-            castling_rights_ &= ~BLACK_CASTLING;
+          if (basic_st_.king_[BLACK] != E8) {
+            basic_st_.castling_rights_ &= ~BLACK_CASTLING;
           } else {
-            if (!(position_[BLACK][ROOK] & Util::SQUARE[H8][R0])) {
-              castling_rights_ &= ~BLACK_SHORT_CASTLING;
+            if (!(basic_st_.position_[BLACK][ROOK] & Util::SQUARE[H8][R0])) {
+              basic_st_.castling_rights_ &= ~BLACK_SHORT_CASTLING;
             }
-            if (!(position_[BLACK][ROOK] & Util::SQUARE[A8][R0])) {
-              castling_rights_ &= ~BLACK_LONG_CASTLING;
+            if (!(basic_st_.position_[BLACK][ROOK] & Util::SQUARE[A8][R0])) {
+              basic_st_.castling_rights_ &= ~BLACK_LONG_CASTLING;
             }
           }
         }
@@ -386,12 +394,12 @@ namespace Sayuri {
           if ((move & PROMOTION_MASK)) {
             // プロモーション。
             return current_material
-            + cache.material_[piece_board_[GetTo(move)]]
+            + cache.material_[basic_st_.piece_board_[GetTo(move)]]
             + cache.material_[GetPromotion(move)] - cache.material_[PAWN];
           }
 
           return current_material
-          + cache.material_[piece_board_[GetTo(move)]];
+          + cache.material_[basic_st_.piece_board_[GetTo(move)]];
 
         } else if (GetMoveType(move) == EN_PASSANT) {
           // アンパッサン。
@@ -407,8 +415,9 @@ namespace Sayuri {
        */
       bool HasSufficientMaterial() const {
         // キング以外の駒のビットボード。
-        Bitboard bb =
-        blocker_0_ & ~(position_[WHITE][KING] | position_[BLACK][KING]);
+        Bitboard bb = basic_st_.blocker_[R0]
+        & ~(basic_st_.position_[WHITE][KING]
+        | basic_st_.position_[BLACK][KING]);
 
         if (!bb) {
           // キングのみだった場合。
@@ -416,7 +425,7 @@ namespace Sayuri {
         } else if (!(bb & (bb - 1))) {
           // キング以外の、残りの駒が1つのとき。
           // 残った駒がビショップやナイトだった時は十分な駒がない。
-          PieceType piece_type = piece_board_[Util::GetSquare(bb)];
+          PieceType piece_type = basic_st_.piece_board_[Util::GetSquare(bb)];
           if ((piece_type == KNIGHT) || (piece_type == BISHOP)) {
             return false;
           }
@@ -448,17 +457,6 @@ namespace Sayuri {
        */
       Hash GetNextHash(Hash current_hash, Move move) const;
 
-      /**
-       * 現在の局面のPositionRecordの参照を配列から得る。
-       * @param level 配列のインデックス。 (探索深さのレベル)
-       * @param pos_hash 現在の局面のハッシュ。
-       * @return PositionRecordの参照。
-       */
-      const PositionRecord& GetRecord(std::uint32_t level, Hash pos_hash) {
-        record_table_[level] = PositionRecord(*this, pos_hash);
-        return record_table_[level];
-      }
-
       // ======== //
       // アクセサ //
       // ======== //
@@ -467,90 +465,79 @@ namespace Sayuri {
        * @return 駒の配置のビットボード。 [サイド][駒の種類]
        */
       const Bitboard (& position() const)[NUM_SIDES][NUM_PIECE_TYPES] {
-        return position_;
+        return basic_st_.position_;
       }
       /**
        * アクセサ - 駒の種類の配置。
        * @return 駒の種類の配置。 [マス]
        */
       const PieceType (& piece_board() const)[NUM_SQUARES] {
-        return piece_board_;
+        return basic_st_.piece_board_;
       }
       /**
        * アクセサ - サイドの配置。
        * @return サイドの配置。 [マス]
        */
       const Side (& side_board() const)[NUM_SQUARES] {
-        return side_board_;
+        return basic_st_.side_board_;
       }
       /**
        * アクセサ - 各サイドの駒の配置のビットボード。
        * @return 各サイドの駒の配置のビットボード。 [サイド]
        */
       const Bitboard (& side_pieces() const)[NUM_SIDES] {
-        return side_pieces_;
+        return basic_st_.side_pieces_;
       }
       /**
-       * アクセサ - 全駒の配置のビットボード。 角度0度。
-       * @return 全駒の配置のビットボード。 角度0度。
+       * アクセサ - 全駒の配置のビットボード。 [角度]
+       * @return 全駒の配置のビットボード。
        */
-      Bitboard blocker_0() const {return blocker_0_;}
-      /**
-       * アクセサ - 全駒の配置のビットボード。 角度45度。
-       * @return 全駒の配置のビットボード。 角度45度。
-       */
-      Bitboard blocker_45() const {return blocker_45_;}
-      /**
-       * アクセサ - 全駒の配置のビットボード。 角度90度。
-       * @return 全駒の配置のビットボード。 角度90度。
-       */
-      Bitboard blocker_90() const {return blocker_90_;}
-      /**
-       * アクセサ - 全駒の配置のビットボード。 角度135度。
-       * @return 全駒の配置のビットボード。 角度135度。
-       */
-      Bitboard blocker_135() const {return blocker_135_;}
+      const Bitboard (& blocker() const)[NUM_ROTS] {
+        return basic_st_.blocker_;
+      }
       /**
        * アクセサ - 各サイドのキングの位置。
        * @return 各サイドのキングの位置。 [サイド]
        */
-      const Square (& king() const)[NUM_SIDES] {return king_;}
+      const Square (& king() const)[NUM_SIDES] {return basic_st_.king_;}
       /**
        * アクセサ - 手番。
        * @return 手番。
        */
-      Side to_move() const {return to_move_;}
+      Side to_move() const {return basic_st_.to_move_;}
       /**
        * アクセサ - キャスリングの権利。
        * @return キャスリングの権利。
        */
-      Castling castling_rights() const {return castling_rights_;}
+      Castling castling_rights() const {return basic_st_.castling_rights_;}
       /**
        * アクセサ - アンパッサンの位置。
        * @return アンパッサンの位置。 なければ 0。
        */
-      Square en_passant_square() const {return en_passant_square_;}
+      Square en_passant_square() const {return basic_st_.en_passant_square_;}
       /**
        * アクセサ - 50手ルールの手数。
        * @return 50手ルールの手数。
        */
-      int clock() const {return clock_;}
+      int clock() const {return basic_st_.clock_;}
       /**
        * アクセサ - 現在の手数。
        * @return 現在の手数。
        */
-      int ply() const {return ply_;}
+      int ply() const {return basic_st_.ply_;}
       /**
        * アクセサ - 各サイドの、キャスリングしたかどうかのフラグ。
        * @return 各サイドの、キャスリングしたかどうかのフラグ。 [サイド]
        */
-      const bool (& has_castled() const)[NUM_SIDES] {return has_castled_;}
+      const bool (& has_castled() const)[NUM_SIDES] {
+        return basic_st_.has_castled_;
+      }
       /**
        * アクセサ - 探索中の配置のメモ。
        * @return 探索中の配置のメモ。
        */
       const Hash (& position_memo() const)[MAX_PLYS + 1] {
-        return position_memo_;
+        return basic_st_.position_memo_;
       }
       /**
        * アクセサ - ヒストリー。
@@ -646,14 +633,14 @@ namespace Sayuri {
       void to_move(Side to_move) {
         if (!to_move) return;
         if (to_move >= NUM_SIDES) return;
-        to_move_ = to_move;
+        basic_st_.to_move_ = to_move;
       }
       /**
        * ミューテータ - キャスリングの権利。
        * @param castling_rights キャスリングの権利。
        */
       void castling_rights(Castling castling_rights) {
-        castling_rights_ = castling_rights;
+        basic_st_.castling_rights_ = castling_rights;
 
         UpdateCastlingRights();
       }
@@ -664,11 +651,11 @@ namespace Sayuri {
       void en_passant_square(Square en_passant_square) {
         // 0の場合は0。
         if (!en_passant_square) {
-          en_passant_square_ = en_passant_square;
+          basic_st_.en_passant_square_ = en_passant_square;
           return;
         }
 
-        if ((blocker_0_ & Util::SQUARE[en_passant_square][R0])) {
+        if ((basic_st_.blocker_[R0] & Util::SQUARE[en_passant_square][R0])) {
           // 駒があるのでアンパッサンの位置に指定できない。
           return;
         }
@@ -677,15 +664,17 @@ namespace Sayuri {
         if (rank == RANK_3) {
           // すぐ上に白ポーンがいなければならない。
           Square en_passant_target = en_passant_square + 8;
-          if ((position_[WHITE][PAWN] & Util::SQUARE[en_passant_target][R0])) {
-            en_passant_square_ = en_passant_square;
+          if ((basic_st_.position_[WHITE][PAWN]
+          & Util::SQUARE[en_passant_target][R0])) {
+            basic_st_.en_passant_square_ = en_passant_square;
             return;
           }
         } else if (rank == RANK_6) {
           // すぐ下に黒ポーンがいなければならない。
           Square en_passant_target = en_passant_square - 8;
-          if ((position_[BLACK][PAWN] & Util::SQUARE[en_passant_target][R0])) {
-            en_passant_square_ = en_passant_square;
+          if ((basic_st_.position_[BLACK][PAWN]
+          & Util::SQUARE[en_passant_target][R0])) {
+            basic_st_.en_passant_square_ = en_passant_square;
             return;
           }
         }
@@ -695,15 +684,15 @@ namespace Sayuri {
        * @param clock 50手ルールの手数。
        */
       void clock(int clock) {
-        clock_ = clock < 0 ? 0 : clock;
-        shared_st_ptr_->clock_history_.back() = clock_;
+        basic_st_.clock_ = clock < 0 ? 0 : clock;
+        shared_st_ptr_->clock_history_.back() = basic_st_.clock_;
       }
       /**
        * ミューテータ - 現在の手数。
        * @param ply 現在の手数。
        */
       void ply(int ply) {
-        ply_ = ply < 1 ? 1 : ply;
+        basic_st_.ply_ = ply < 1 ? 1 : ply;
       }
 
     private:
@@ -727,6 +716,15 @@ namespace Sayuri {
       /** 評価関数で使うテンプレート部品。 */
       template<Side SIDE, PieceType TYPE>
       friend struct CalSpecial;
+
+      /** 指し手作成クラスはフレンド。 */
+      friend class MoveMaker;
+      template<GenMoveType TYPE>
+      friend struct GenPieceBitboard;
+      template<GenMoveType TYPE>
+      friend struct GenPawnBitboard;
+      template<GenMoveType TYPE>
+      friend struct GenKingBitboard;
 
       /** PositionRecordはフレンド。 */
       friend class PositionRecord;
@@ -807,12 +805,6 @@ namespace Sayuri {
       // その他のプライベート関数 //
       // ======================== //
       /**
-       * 他のエンジンの基本メンバをコピーする。
-       * @param engine 他のエンジン。
-       */
-      void ScanBasicMember(const ChessEngine& engine);
-
-      /**
        * 駒を置く。
        * @param square 駒を置きたいマス。
        * @param piece_type 置きたい駒の種類。
@@ -830,7 +822,8 @@ namespace Sayuri {
         if (from == to) return;
 
         // 移動。
-        PutPiece(to, piece_board_[from], side_board_[from]);
+        PutPiece(to, basic_st_.piece_board_[from],
+        basic_st_.side_board_[from]);
         PutPiece(from, EMPTY, NO_SIDE);
       }
 
@@ -856,14 +849,14 @@ namespace Sayuri {
        */
       void MakeNullMove(Move& move) {
         // 手番を変える。
-        to_move_ = Util::GetOppositeSide(to_move_);
+        basic_st_.to_move_ = Util::GetOppositeSide(basic_st_.to_move_);
 
         // 情報をメモ。
-        SetCastlingRights(move, castling_rights_);
-        SetEnPassantSquare(move, en_passant_square_);
+        SetCastlingRights(move, basic_st_.castling_rights_);
+        SetEnPassantSquare(move, basic_st_.en_passant_square_);
 
         // アンパッサンの位置を削除。
-        en_passant_square_ = 0;
+        basic_st_.en_passant_square_ = 0;
       }
 
       /**
@@ -872,11 +865,11 @@ namespace Sayuri {
        */
       void UnmakeNullMove(Move move) {
         // 手番を変える。
-        to_move_ = Util::GetOppositeSide(to_move_);
+        basic_st_.to_move_ = Util::GetOppositeSide(basic_st_.to_move_);
 
         // 情報を戻す。
-        castling_rights_ = GetCastlingRights(move);
-        en_passant_square_ = GetEnPassantSquare(move);
+        basic_st_.castling_rights_ = GetCastlingRights(move);
+        basic_st_.en_passant_square_ = GetEnPassantSquare(move);
       }
 
       /**
@@ -892,38 +885,35 @@ namespace Sayuri {
       // ========== //
       // 基本メンバ //
       // ========== //
-      /** 駒の配置のビットボード。 [サイド][駒の種類] */
-      Bitboard position_[NUM_SIDES][NUM_PIECE_TYPES];
-      /** 駒の種類の配置。 [マス] */
-      PieceType piece_board_[NUM_SQUARES];
-      /** サイドの配置。 [マス] */
-      Side side_board_[NUM_SQUARES];
-      /** 各サイドの駒の配置のビットボード。 [サイド] */
-      Bitboard side_pieces_[NUM_SIDES];
-      /** 全駒の配置のビットボード。 角度0度。 */
-      Bitboard blocker_0_;
-      /** 全駒の配置のビットボード。 角度45度。 */
-      Bitboard blocker_45_;
-      /** 全駒の配置のビットボード。 角度90度。 */
-      Bitboard blocker_90_;
-      /** 全駒の配置のビットボード。 角度135度。 */
-      Bitboard blocker_135_;
-      /** 各サイドのキングの位置。 [サイド] */
-      Square king_[NUM_SIDES];
-      /** 手番。 */
-      Side to_move_;
-      /** キャスリングの権利。 */
-      Castling castling_rights_;
-      /** アンパッサンの位置。アンパッサンできなければ0。 */
-      Square en_passant_square_;
-      /** 50手ルールの手数。 */
-      int clock_;
-      /** 現在の手数。 */
-      int ply_;
-      /** 各サイドのキャスリングしたかどうかのフラグ。 [サイド] */
-      bool has_castled_[NUM_SIDES];
-      /** 探索中の配置のメモ。 */
-      Hash position_memo_[MAX_PLYS + 1];
+      /** 基本メンバ構造体。 (ボードのコピーを用意にするための構造体) */
+      struct BasicStruct {
+        /** 駒の配置のビットボード。 [サイド][駒の種類] */
+        Bitboard position_[NUM_SIDES][NUM_PIECE_TYPES];
+        /** 駒の種類の配置。 [マス] */
+        PieceType piece_board_[NUM_SQUARES];
+        /** サイドの配置。 [マス] */
+        Side side_board_[NUM_SQUARES];
+        /** 各サイドの駒の配置のビットボード。 [サイド] */
+        Bitboard side_pieces_[NUM_SIDES];
+        /** 全駒の配置のビットボード。 [角度]。 */
+        Bitboard blocker_[NUM_ROTS];
+        /** 各サイドのキングの位置。 [サイド] */
+        Square king_[NUM_SIDES];
+        /** 手番。 */
+        Side to_move_;
+        /** キャスリングの権利。 */
+        Castling castling_rights_;
+        /** アンパッサンの位置。アンパッサンできなければ0。 */
+        Square en_passant_square_;
+        /** 50手ルールの手数。 */
+        int clock_;
+        /** 現在の手数。 */
+        int ply_;
+        /** 各サイドのキャスリングしたかどうかのフラグ。 [サイド] */
+        bool has_castled_[NUM_SIDES];
+        /** 探索中の配置のメモ。 */
+        Hash position_memo_[MAX_PLYS + 1];
+      } basic_st_;
 
       // ================================================= //
       // 共有メンバ (指定した他のエンジンと共有するメンバ) //

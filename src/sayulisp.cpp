@@ -109,7 +109,7 @@ namespace Sayuri {
   engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
   *table_ptr_)),
   shell_ptr_(new UCIShell(*engine_ptr_)) {
-    PositionRecord record(*(suite.engine_ptr_), 0);
+    PositionRecord record(*(suite.engine_ptr_));
     engine_ptr_->LoadRecord(record);
 
     // 出力リスナー。
@@ -138,7 +138,7 @@ namespace Sayuri {
     *table_ptr_));
     shell_ptr_.reset(new UCIShell(*engine_ptr_));
 
-    PositionRecord record(*(suite.engine_ptr_), 0);
+    PositionRecord record(*(suite.engine_ptr_));
     engine_ptr_->LoadRecord(record);
 
     // 出力リスナー。
@@ -2063,7 +2063,7 @@ namespace Sayuri {
     }
 
     // 位置が0でなければフィルタリング。
-    if ((engine_ptr_->blocker_0() & Util::SQUARE[square][R0])) {
+    if ((engine_ptr_->blocker()[R0] & Util::SQUARE[square][R0])) {
       throw LispObject::GenError("@engine-error",
       "'" + SQUARE_SYMBOL[square] + "' is not empty.");
     }

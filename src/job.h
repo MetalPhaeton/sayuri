@@ -86,7 +86,6 @@ namespace Sayuri {
         std::unique_lock<std::mutex> lock(my_mutex_);  // ロック。
         end_ = helpers_table_;
         num_helpers_ = 0;
-        record_ptr_ = nullptr;
         maker_ptr_ = &maker;
         counter_ = 0;
       }
@@ -159,8 +158,6 @@ namespace Sayuri {
       // ==================== //
       /** クライアントのポインタ。 */
       ChessEngine* client_ptr_;
-      /** ポジションの記録のポインタ。 */
-      const PositionRecord* record_ptr_;
       /** 共有ノードのノードタイプ。 */
       NodeType node_type_;
       /** 共有ノードのハッシュ。 */

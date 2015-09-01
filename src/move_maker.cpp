@@ -173,7 +173,7 @@ namespace Sayuri {
   template<>
   struct GenPieceBitboard<GenMoveType::NON_CAPTURE> {
     static void F(MoveMaker& maker, Bitboard& bitboard, Side side) {
-      bitboard &= ~(maker.engine_ptr_->blocker_0());
+      bitboard &= ~(maker.engine_ptr_->basic_st_.blocker_[R0]);
     }
   };
   template<>
@@ -220,7 +220,7 @@ namespace Sayuri {
   template<>
   struct GenKingBitboard<GenMoveType::NON_CAPTURE> {
     static void F(MoveMaker& maker, Bitboard& bitboard, Side side) {
-      bitboard &= ~(maker.engine_ptr_->blocker_0());
+      bitboard &= ~(maker.engine_ptr_->basic_st_.blocker_[R0]);
     }
   };
   template<>
