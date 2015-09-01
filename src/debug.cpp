@@ -71,7 +71,7 @@ namespace Sayuri {
       loop = true;
       shell.InputCommand("ucinewgame");
       shell.InputCommand("position startpos");
-      shell.InputCommand("go movetime 15000");
+      shell.InputCommand("go movetime 10000");
       while (loop) {
         std::this_thread::sleep_for(Chrono::milliseconds(500));
       }
@@ -101,7 +101,7 @@ namespace Sayuri {
 
     // ========================================================================
 
-    std::cout << "TTEntry Size: " << sizeof(TTEntry) << std::endl;
+    DoRepeatTest(*shell_ptr);
 
     return 0;
   }

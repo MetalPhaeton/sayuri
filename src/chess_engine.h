@@ -873,6 +873,17 @@ namespace Sayuri {
        */
       Move GetNextSEEMove(Square target) const;
 
+      /**
+       * 探索関数でノードを抜けるときに呼び出す関数。
+       * @param score そのノードの計算結果。
+       * @param level そのノードのレベル。
+       * @return 引数score。
+       */
+      int ReturnProcess(int score, std::uint32_t level) {
+        if (level >= notice_cut_level_) notice_cut_level_ = MAX_PLYS + 1;
+        return score;
+      }
+
       // ========== //
       // メンバ変数 //
       // ========== //

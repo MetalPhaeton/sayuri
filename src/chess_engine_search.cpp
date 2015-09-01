@@ -66,7 +66,7 @@ namespace Sayuri {
     Cache& cache = shared_st_ptr_->cache_;
 
     // 探索中止。
-    if (JudgeToStop(job)) return alpha;
+    if (JudgeToStop(job)) return ReturnProcess(alpha, level);
 
     // ノード数を加算。
     ++(shared_st_ptr_->searched_nodes_);
@@ -76,7 +76,7 @@ namespace Sayuri {
 
     // 勝負に十分な駒がなければ0点。
     if (!HasSufficientMaterial()) {
-      return SCORE_DRAW;
+      return ReturnProcess(SCORE_DRAW, level);
     }
 
     // サイド。
@@ -88,14 +88,14 @@ namespace Sayuri {
 
     // アルファ値、ベータ値を調べる。
     if (stand_pad >= beta) {
-      return stand_pad;
+      return ReturnProcess(stand_pad, level);
     }
     Util::UpdateMax(alpha, stand_pad);
 
     // 探索できる限界を超えているか。
     // 超えていればこれ以上探索しない。
     if (level >= MAX_PLYS) {
-      return alpha;
+      return ReturnProcess(alpha, level);
     }
 
     // 候補手を作る。
@@ -145,7 +145,7 @@ namespace Sayuri {
       }
     }
 
-    return alpha;
+    return ReturnProcess(alpha, level);
   }
 
   // 通常の探索。
@@ -159,7 +159,7 @@ namespace Sayuri {
     Cache& cache = shared_st_ptr_->cache_;
 
     // 探索中止。
-    if (JudgeToStop(job)) return alpha;
+    if (JudgeToStop(job)) return ReturnProcess(alpha, level);
 
     // ノード数を加算。
     ++(shared_st_ptr_->searched_nodes_);
@@ -177,7 +177,7 @@ namespace Sayuri {
 
     // 勝負に十分な駒がなければ0点。
     if (!HasSufficientMaterial()) {
-      return SCORE_DRAW;
+      return ReturnProcess(SCORE_DRAW, level);
     }
 
     // --- 繰り返しチェック (繰り返しなら0点。) --- //
@@ -187,7 +187,7 @@ namespace Sayuri {
         // お互いの初手。 (今までの配置を調べる。)
         for (auto& position : shared_st_ptr_->position_history_) {
           if (position == *this) {
-            return SCORE_DRAW;
+            return ReturnProcess(SCORE_DRAW, level);
           }
         }
       } else if (level <= 4) {
@@ -196,12 +196,12 @@ namespace Sayuri {
         if ((index >= 0)
         && (shared_st_ptr_->position_history_[index].pos_hash()
         == pos_hash)) {
-          return SCORE_DRAW;
+          return ReturnProcess(SCORE_DRAW, level);
         }
       } else {
         // お互いの3手目以降。
         if (basic_st_.position_memo_[level - 4] == pos_hash) {
-          return SCORE_DRAW;
+          return ReturnProcess(SCORE_DRAW, level);
         }
       }
     }
@@ -245,14 +245,14 @@ namespace Sayuri {
 
             pv_line_table_[level].score(score);
             table_ptr_->Unlock();  // ロック解除。
-            return score;
+            return ReturnProcess(score, level);
           } else if (tt_entry.score_type() == ScoreType::ALPHA) {
             // エントリーがアルファ値。
             if (score <= alpha) {
               // アルファ値以下が確定。
               pv_line_table_[level].score(score);
               table_ptr_->Unlock();  // ロック解除。
-              return score;
+              return ReturnProcess(score, level);
             }
 
             // ベータ値を下げられる。
@@ -273,7 +273,7 @@ namespace Sayuri {
               // ベータ値以上が確定。
               pv_line_table_[level].score(score);
               table_ptr_->Unlock();  // ロック解除。
-              return score;
+              return ReturnProcess(score, level);
             }
 
             // アルファ値を上げられる。
@@ -290,9 +290,9 @@ namespace Sayuri {
       if (cache.enable_quiesce_search_) {
         // クイース探索ノードに移行するため、ノード数を減らしておく。
         --(shared_st_ptr_->searched_nodes_);
-        return Quiesce(level, alpha, beta, material);
+        return ReturnProcess(Quiesce(level, alpha, beta, material), level);
       } else {
-        return evaluator_.Evaluate(material);
+        return ReturnProcess(evaluator_.Evaluate(material), level);
       }
     }
 
@@ -343,9 +343,10 @@ namespace Sayuri {
               if (cache.enable_quiesce_search_) {
                 // クイース探索ノードに移行するため、ノード数を減らしておく。
                 --(shared_st_ptr_->searched_nodes_);
-                return Quiesce(level, alpha, beta, material);
+                return ReturnProcess
+                (Quiesce(level, alpha, beta, material), level);
               } else {
-                return evaluator_.Evaluate(material);
+                return ReturnProcess(evaluator_.Evaluate(material), level);
               }
     }
           }
@@ -376,7 +377,7 @@ namespace Sayuri {
 
           // 探索。
           for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
-            if (JudgeToStop(job)) return alpha;
+            if (JudgeToStop(job)) return ReturnProcess(alpha, level);
 
             // 次のノードへの準備。
             Hash next_hash = GetNextHash(pos_hash, move);
@@ -396,7 +397,7 @@ namespace Sayuri {
 
             UnmakeMove(move);
 
-            if (JudgeToStop(job)) return alpha;
+            if (JudgeToStop(job)) return ReturnProcess(alpha, level);
 
             // ベータカット。
             if (score >= prob_beta) {
@@ -432,7 +433,7 @@ namespace Sayuri {
                 table_ptr_->Add(pos_hash, depth, beta, ScoreType::BETA, move);
               }
 
-              return beta;
+              return ReturnProcess(beta, level);
             }
           }
         }
@@ -634,15 +635,13 @@ namespace Sayuri {
     if (!(job.has_legal_move_)) {
       if (is_checked) {
         // チェックメイト。
-        int score = SCORE_LOSE;
-        pv_line_table_[level].score(score);
+        pv_line_table_[level].score(SCORE_LOSE);
         pv_line_table_[level].mate_in(level);
-        return score;
+        return ReturnProcess(SCORE_LOSE, level);
       } else {
         // ステールメイト。
-        int score = SCORE_DRAW;
-        pv_line_table_[level].score(score);
-        return score;
+        pv_line_table_[level].score(SCORE_DRAW);
+        return ReturnProcess(SCORE_DRAW, level);
       }
     }
 
@@ -685,7 +684,7 @@ namespace Sayuri {
       }
     }
 
-    return job.alpha_;
+    return ReturnProcess(job.alpha_, level);
   }
 
   // 探索のルート。
@@ -1486,10 +1485,7 @@ namespace Sayuri {
     }
 
     // ベータカット通知で終了すべきかどうか。
-    if (notice_cut_level_ > job.level_) {
-      // notice_cut_level_がjob.level_より大きければ、古い通知なので消す。
-      notice_cut_level_ = MAX_PLYS + 1;
-    } else {
+    if (notice_cut_level_ <= job.level_) {
       if ((job.client_ptr_ == this) && (job.level_ != notice_cut_level_)) {
         // 自分のヘルパーに「もう意味ないよ」と通知する。
         job.NotifyBetaCut(*this);
