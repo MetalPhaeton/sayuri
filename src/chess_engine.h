@@ -1072,8 +1072,6 @@ namespace Sayuri {
       std::unique_ptr<MoveMaker[]> maker_table_;
       /** 探索用PVLineのテーブル。 [探索レベル] */
       std::unique_ptr<PVLine[]> pv_line_table_;
-      /** 探索用PositionRecordのテーブル。 [探索レベル] */
-      std::unique_ptr<PositionRecord[]> record_table_;
       /** 探索用Evaluator。 */
       Evaluator evaluator_;
       /** 並列探索用仕事のテーブル。 [探索レベル] */

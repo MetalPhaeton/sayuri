@@ -724,7 +724,6 @@ namespace Sayuri {
       shared_st_ptr_->killer_stack_[i + 2][1] = 0;
       maker_table_[i].ResetStack();
       pv_line_table_[i].ResetLine();
-      record_table_[i] = PositionRecord();
     }
     shared_st_ptr_->history_max_ = 1;
     shared_st_ptr_->stop_now_ = false;
