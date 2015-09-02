@@ -201,6 +201,7 @@ namespace Sayuri {
       /** キングサイドのポーンシールドのマスク。 */
       static constexpr Bitboard KING_SIDE_SHIELD_MASK =
       Util::FYLE[FYLE_F] | Util::FYLE[FYLE_G] | Util::FYLE[FYLE_H];
+      /** ポーンシールドのマスク。 */
       static constexpr Bitboard PAWN_SHIELD_MASK[NUM_SIDES][NUM_SQUARES] {
         {
           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
