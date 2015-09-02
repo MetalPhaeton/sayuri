@@ -579,7 +579,7 @@ namespace Sayuri {
 
     // 置く駒がEMPTYか置くサイドがNO_SIDEなら
     // その位置のメンバを消して返る。
-    if ((!piece_type) || (!side)) {
+    if (!piece_type) {
       basic_st_.piece_board_[square] = EMPTY;
       basic_st_.side_board_[square] = NO_SIDE;
       if (placed_piece) {
@@ -911,23 +911,21 @@ namespace Sayuri {
     cache.to_move_hash_value_table_[Util::GetOppositeSide(basic_st_.to_move_)];
 
     // キャスリングの権利のハッシュをセット。
-    Hash next_rights = basic_st_.castling_rights_;
     if (basic_st_.castling_rights_) {
-      Castling loss_rights = 0;
+      Hash next_rights = basic_st_.castling_rights_;
       switch (piece_type) {
         case KING:
-          loss_rights |=
-          piece_side == WHITE ? WHITE_CASTLING : BLACK_CASTLING;
+          next_rights &=
+          ~(piece_side == WHITE ? WHITE_CASTLING : BLACK_CASTLING);
         case ROOK:
           if (piece_side == WHITE) {
-            if (from == H1) loss_rights |= WHITE_SHORT_CASTLING;
-            else if (from == A1) loss_rights |= WHITE_LONG_CASTLING;
+            if (from == H1) next_rights &= ~WHITE_SHORT_CASTLING;
+            else if (from == A1) next_rights &= ~WHITE_LONG_CASTLING;
           } else {
-            if (from == H8) loss_rights |= BLACK_SHORT_CASTLING;
-            else if (from == A8) loss_rights |= BLACK_LONG_CASTLING;
+            if (from == H8) next_rights &= ~BLACK_SHORT_CASTLING;
+            else if (from == A8) next_rights &= ~BLACK_LONG_CASTLING;
           }
       }
-      next_rights &= ~loss_rights;
 
       // 現在のキャスリングのハッシュを消す。
       current_hash ^= cache.castling_hash_value_table_
