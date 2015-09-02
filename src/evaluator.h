@@ -132,18 +132,58 @@ namespace Sayuri {
       // 局面分析用 //
       // ========== //
       /** 駒の初期位置のビットボード。 [サイド][駒の種類] */
-      static Bitboard start_position_[NUM_SIDES][NUM_PIECE_TYPES];
-      /** 駒の初期位置のビットボードの論理否定。 [サイド][駒の種類] */
-      static Bitboard not_start_position_[NUM_SIDES][NUM_PIECE_TYPES];
-      /** start_position_[][]とnot_start_position_[][]を初期化。 */
-      static void InitStartPosition();
+      static constexpr Bitboard START_POSITION[NUM_SIDES][NUM_PIECE_TYPES] {
+        {0, 0, 0, 0, 0, 0, 0},
+        {
+          0, Util::RANK[RANK_2],
+          Util::SQUARE[B1][R0] | Util::SQUARE[G1][R0],
+          Util::SQUARE[C1][R0] | Util::SQUARE[F1][R0],
+          Util::SQUARE[A1][R0] | Util::SQUARE[H1][R0],
+          Util::SQUARE[D1][R0], Util::SQUARE[E1][R0]
+        },
+        {
+          0, Util::RANK[RANK_7],
+          Util::SQUARE[B8][R0] | Util::SQUARE[G8][R0],
+          Util::SQUARE[C8][R0] | Util::SQUARE[F8][R0],
+          Util::SQUARE[A8][R0] | Util::SQUARE[H8][R0],
+          Util::SQUARE[D8][R0], Util::SQUARE[E8][R0]
+        }
+      };
+      static constexpr Bitboard NOT_START_POSITION
+      [NUM_SIDES][NUM_PIECE_TYPES] {
+        {0, 0, 0, 0, 0, 0, 0},
+        {
+          0, ~START_POSITION[WHITE][PAWN],
+          ~START_POSITION[WHITE][KNIGHT],
+          ~START_POSITION[WHITE][BISHOP],
+          ~START_POSITION[WHITE][ROOK],
+          ~START_POSITION[WHITE][QUEEN],
+          ~START_POSITION[WHITE][KING]
+        },
+        {
+          0, ~START_POSITION[BLACK][PAWN],
+          ~START_POSITION[BLACK][KNIGHT],
+          ~START_POSITION[BLACK][BISHOP],
+          ~START_POSITION[BLACK][ROOK],
+          ~START_POSITION[BLACK][QUEEN],
+          ~START_POSITION[BLACK][KING]
+        }
+      };
 
       /** センターのマスク。 */
-      static Bitboard center_mask_;
+      static constexpr Bitboard CENTER_MASK = 
+      Util::SQUARE[C3][R0] | Util::SQUARE[C4][R0]
+      | Util::SQUARE[C5][R0] | Util::SQUARE[C6][R0]
+      | Util::SQUARE[D3][R0] | Util::SQUARE[D4][R0]
+      | Util::SQUARE[D5][R0] | Util::SQUARE[D6][R0]
+      | Util::SQUARE[E3][R0] | Util::SQUARE[E4][R0]
+      | Util::SQUARE[E5][R0] | Util::SQUARE[E6][R0]
+      | Util::SQUARE[F3][R0] | Util::SQUARE[F4][R0]
+      | Util::SQUARE[F5][R0] | Util::SQUARE[F6][R0];
       /** スウィートセンターのマスク。 */
-      static Bitboard sweet_center_mask_;
-      /** center_mask_、sweet_center_mask_を初期化する。 */
-      static void InitCenterMask();
+      static constexpr Bitboard SWEET_CENTER_MASK =
+      Util::SQUARE[D4][R0] | Util::SQUARE[D5][R0]
+      | Util::SQUARE[E4][R0] | Util::SQUARE[E5][R0];
 
       /** パスポーンの前方3列のマスク。 [サイド][マス] */
       static Bitboard pass_pawn_mask_[NUM_SIDES][NUM_SQUARES];
@@ -155,15 +195,122 @@ namespace Sayuri {
       /** iso_pawn_mask_[]を初期化する。 */
       static void InitIsoPawnMask();
 
-      /** ポーン盾の位置のマスク。 [サイド][キングの位置] */
-      static Bitboard pawn_shield_mask_[NUM_SIDES][NUM_SQUARES];
-      /** pawn_shield_mask_[][]を初期化する。 */
-      static void InitPawnShieldMask();
+      /** クイーンサイドのポーンシールドのマスク。 */
+      static constexpr Bitboard QUEEN_SIDE_SHIELD_MASK =
+      Util::FYLE[FYLE_A] | Util::FYLE[FYLE_B] | Util::FYLE[FYLE_C];
+      /** キングサイドのポーンシールドのマスク。 */
+      static constexpr Bitboard KING_SIDE_SHIELD_MASK =
+      Util::FYLE[FYLE_F] | Util::FYLE[FYLE_G] | Util::FYLE[FYLE_H];
+      static constexpr Bitboard PAWN_SHIELD_MASK[NUM_SIDES][NUM_SQUARES] {
+        {
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        },
+        {
+          QUEEN_SIDE_SHIELD_MASK,
+          QUEEN_SIDE_SHIELD_MASK,
+          QUEEN_SIDE_SHIELD_MASK,
+          0, 0,
+          KING_SIDE_SHIELD_MASK,
+          KING_SIDE_SHIELD_MASK,
+          KING_SIDE_SHIELD_MASK,
+          QUEEN_SIDE_SHIELD_MASK,
+          QUEEN_SIDE_SHIELD_MASK,
+          QUEEN_SIDE_SHIELD_MASK,
+          0, 0,
+          KING_SIDE_SHIELD_MASK,
+          KING_SIDE_SHIELD_MASK,
+          KING_SIDE_SHIELD_MASK,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        },
+        {
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          QUEEN_SIDE_SHIELD_MASK,
+          QUEEN_SIDE_SHIELD_MASK,
+          QUEEN_SIDE_SHIELD_MASK,
+          0, 0,
+          KING_SIDE_SHIELD_MASK,
+          KING_SIDE_SHIELD_MASK,
+          KING_SIDE_SHIELD_MASK,
+          QUEEN_SIDE_SHIELD_MASK,
+          QUEEN_SIDE_SHIELD_MASK,
+          QUEEN_SIDE_SHIELD_MASK,
+          0, 0,
+          KING_SIDE_SHIELD_MASK,
+          KING_SIDE_SHIELD_MASK,
+          KING_SIDE_SHIELD_MASK
+        }
+      };
 
+      /** 白のクイーンサイドの弱いマスのマスク。 */
+      static constexpr Bitboard WHITE_QUEEN_SIDE_WEAK_MASK =
+      (Util::FYLE[FYLE_A] | Util::FYLE[FYLE_B] | Util::FYLE[FYLE_C])
+      & (Util::RANK[RANK_2] | Util::RANK[RANK_3]);
+      /** 白のキングサイドの弱いマスのマスク。 */
+      static constexpr Bitboard WHITE_KING_SIDE_WEAK_MASK =
+      (Util::FYLE[FYLE_F] | Util::FYLE[FYLE_G] | Util::FYLE[FYLE_H])
+      & (Util::RANK[RANK_2] | Util::RANK[RANK_3]);
+      /** 黒のクイーンサイドの弱いマスのマスク。 */
+      static constexpr Bitboard BLACK_QUEEN_SIDE_WEAK_MASK =
+      (Util::FYLE[FYLE_A] | Util::FYLE[FYLE_B] | Util::FYLE[FYLE_C])
+      & (Util::RANK[RANK_7] | Util::RANK[RANK_6]);
+      /** 黒のキングサイドの弱いマスのマスク。 */
+      static constexpr Bitboard BLACK_KING_SIDE_WEAK_MASK =
+      (Util::FYLE[FYLE_F] | Util::FYLE[FYLE_G] | Util::FYLE[FYLE_H])
+      & (Util::RANK[RANK_7] | Util::RANK[RANK_6]);
       /** 弱いマスのマスク。 [サイド][キングの位置] */
-      static Bitboard weak_square_mask_[NUM_SIDES][NUM_SQUARES];
-      /** weak_square_mask_[][]を初期化する。 */
-      static void InitWeakSquareMask();
+      static constexpr Bitboard WEAK_SQUARE_MASK[NUM_SIDES][NUM_SQUARES] {
+        {
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        },
+        {
+          WHITE_QUEEN_SIDE_WEAK_MASK,
+          WHITE_QUEEN_SIDE_WEAK_MASK,
+          WHITE_QUEEN_SIDE_WEAK_MASK,
+          0, 0,
+          WHITE_KING_SIDE_WEAK_MASK,
+          WHITE_KING_SIDE_WEAK_MASK,
+          WHITE_KING_SIDE_WEAK_MASK,
+          WHITE_QUEEN_SIDE_WEAK_MASK,
+          WHITE_QUEEN_SIDE_WEAK_MASK,
+          WHITE_QUEEN_SIDE_WEAK_MASK,
+          0, 0,
+          WHITE_KING_SIDE_WEAK_MASK,
+          WHITE_KING_SIDE_WEAK_MASK,
+          WHITE_KING_SIDE_WEAK_MASK,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        },
+        {
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          BLACK_QUEEN_SIDE_WEAK_MASK,
+          BLACK_QUEEN_SIDE_WEAK_MASK,
+          BLACK_QUEEN_SIDE_WEAK_MASK,
+          0, 0,
+          BLACK_KING_SIDE_WEAK_MASK,
+          BLACK_KING_SIDE_WEAK_MASK,
+          BLACK_KING_SIDE_WEAK_MASK,
+          BLACK_QUEEN_SIDE_WEAK_MASK,
+          BLACK_QUEEN_SIDE_WEAK_MASK,
+          BLACK_QUEEN_SIDE_WEAK_MASK,
+          0, 0,
+          BLACK_KING_SIDE_WEAK_MASK,
+          BLACK_KING_SIDE_WEAK_MASK,
+          BLACK_KING_SIDE_WEAK_MASK
+        }
+      };
 
       // --- ピン用便利ツール --- //
       /**
