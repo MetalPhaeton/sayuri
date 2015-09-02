@@ -382,31 +382,28 @@ namespace Sayuri {
       int GetMaterial(Side side) const;
 
       /**
-       * 指定の候補手から次の局面の「自分」のマテリアルを得る。
-       * (「相手」のマテリアルではない。)
+       * 指定の候補手から次の局面のマテリアルを得る。
        * @param current_material 現在のマテリアル。
        * @param move 次の局面への候補手。
-       * @return 次の局面の「自分」のマテリアル。
+       * @return 次の局面のマテリアル。
        */
-      int GetNextMyMaterial(int current_material, Move move) const {
+      int GetNextMaterial(int current_material, Move move) const {
         Cache& cache = shared_st_ptr_->cache_;
-        if (GetMoveType(move) == NORMAL) {
-          if ((move & PROMOTION_MASK)) {
-            // プロモーション。
-            return current_material
-            + cache.material_[basic_st_.piece_board_[GetTo(move)]]
-            + cache.material_[GetPromotion(move)] - cache.material_[PAWN];
-          }
-
-          return current_material
-          + cache.material_[basic_st_.piece_board_[GetTo(move)]];
-
-        } else if (GetMoveType(move) == EN_PASSANT) {
-          // アンパッサン。
-          return current_material + cache.material_[PAWN];
+        switch (GetMoveType(move)) {
+          case NORMAL:
+            if ((move & PROMOTION_MASK)) {
+              // プロモーション。
+              return -(current_material
+              + cache.material_[basic_st_.piece_board_[GetTo(move)]]
+              + cache.material_[GetPromotion(move)] - cache.material_[PAWN]);
+            }
+            return -(current_material
+            + cache.material_[basic_st_.piece_board_[GetTo(move)]]);
+          case EN_PASSANT:  // アンパッサン。
+            return -(current_material + cache.material_[PAWN]);
         }
 
-        return current_material;
+        return -current_material;
       }
 
       /**
