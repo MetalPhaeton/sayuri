@@ -183,7 +183,7 @@ namespace Sayuri {
 
       // パスポーンを計算。
       if (!(basic_st.position_[ENEMY_SIDE][PAWN]
-      & evaluator.pass_pawn_mask_[SIDE][square])) {
+      & Evaluator::pass_pawn_mask_[SIDE][square])) {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->pass_pawn_cache_;
 
         // 守られたパスポーン。
@@ -202,7 +202,7 @@ namespace Sayuri {
 
       // 孤立ポーンを計算。
       if (!(basic_st.position_[SIDE][PAWN]
-      & evaluator.iso_pawn_mask_[square])) {
+      & Evaluator::iso_pawn_mask_[square])) {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->iso_pawn_cache_;
       }
 
