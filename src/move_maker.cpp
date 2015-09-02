@@ -106,11 +106,11 @@ namespace Sayuri {
     return last_;
   }
   // インスタンス化。
-  template int MoveMaker::GenMoves<GenMoveType::NON_CAPTURE>(Move prev_best,
-  Move iid_move, Move killer_1, Move killer_2);
-  template int MoveMaker::GenMoves<GenMoveType::CAPTURE>(Move prev_best,
-  Move iid_move, Move killer_1, Move killer_2);
-  template <>
+  template
+  int MoveMaker::GenMoves<GenMoveType::NON_CAPTURE>(Move, Move, Move, Move);
+  template
+  int MoveMaker::GenMoves<GenMoveType::CAPTURE>(Move, Move, Move, Move);
+  template<>
   int MoveMaker::GenMoves<GenMoveType::ALL>(Move prev_best,
   Move iid_move, Move killer_1, Move killer_2) {
     // 初期化。
@@ -341,9 +341,9 @@ namespace Sayuri {
 
   // 実体化。
   template void MoveMaker::GenMovesCore<GenMoveType::NON_CAPTURE>
-  (Move prev_best, Move iid_move, Move killer_1, Move killer_2);
+  (Move, Move, Move, Move);
   template void MoveMaker::GenMovesCore<GenMoveType::CAPTURE>
-  (Move prev_best, Move iid_move, Move killer_1, Move killer_2);
+  (Move, Move, Move, Move);
 
   // 指し手のスコアを計算する。
   template<GenMoveType>
@@ -458,9 +458,7 @@ namespace Sayuri {
 
   // 実体化。
   template void MoveMaker::ScoreMoves<GenMoveType::NON_CAPTURE>
-  (std::size_t start, Move best_move, Move iid_move, Move killer_1,
-  Move killer_2, Side side);
+  (std::size_t, Move, Move, Move, Move, Side);
   template void MoveMaker::ScoreMoves<GenMoveType::CAPTURE>
-  (std::size_t start, Move best_move, Move iid_move, Move killer_1,
-  Move killer_2, Side side);
+  (std::size_t, Move, Move, Move, Move, Side);
 }  // namespace Sayuri
