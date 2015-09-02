@@ -85,13 +85,16 @@ R"...(Usage:
 
 [option]:
     --version
-        Show version.
+        Shows version.
+
+    --license
+        Shows license terms.
 
     --help
-        Show help.
+        Shows help.
 
     --sayulisp <file name>
-        Run Sayuri as Sayulisp Interpreter.
+        Runs Sayuri as Sayulisp Interpreter.
         <file name> is Sayulisp script.
         If <file name> is '-', Sayuri reads script from standard input.)...";
     std::cout << usage_str << std::endl;
@@ -99,6 +102,10 @@ R"...(Usage:
   && (std::strcmp(argv[1], "--version") == 0)) {
     // バージョン番号の表示。
     std::cout << Sayuri::ID_NAME << std::endl;
+  } else if ((argc >= 2)
+  && (std::strcmp(argv[1], "--license") == 0)) {
+    // ライセンス分の表示。
+    std::cout << Sayuri::LICENSE << std::endl;
   } else if ((argc >= 2)
   && (std::strcmp(argv[1], "--sayulisp") == 0)) {
     // Sayulispモード。
