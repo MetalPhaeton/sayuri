@@ -200,15 +200,17 @@ namespace Sayuri {
   template<GenMoveType TYPE>
   void MoveMaker::GenMovesCore(Move prev_best, Move iid_move,
   Move killer_1, Move killer_2) {
+    // 準備。
+    const ChessEngine::BasicStruct& basic_st =  engine_ptr_->basic_st_;
     // サイド。
-    Side side = engine_ptr_->basic_st_.to_move_;
+    Side side = basic_st.to_move_;
 
     // 生成開始時のポインタ。
     std::size_t start = last_;
 
     // ナイト、ビショップ、ルーク、クイーンの候補手を作る。
     for (PieceType piece_type = KNIGHT; piece_type <= QUEEN; ++piece_type) {
-      Bitboard pieces = engine_ptr_->basic_st_.position_[side][piece_type];
+      Bitboard pieces = basic_st.position_[side][piece_type];
 
       for (; pieces; NEXT_BITBOARD(pieces)) {
         Square from = Util::GetSquare(pieces);
@@ -255,7 +257,7 @@ namespace Sayuri {
     }
 
     // ポーンの動きを作る。
-    Bitboard pieces = engine_ptr_->basic_st_.position_[side][PAWN];
+    Bitboard pieces = basic_st.position_[side][PAWN];
     for (; pieces; NEXT_BITBOARD(pieces)) {
       Square from = Util::GetSquare(pieces);
 
@@ -271,8 +273,7 @@ namespace Sayuri {
         // ヒストリーの最大値を更新。 (テンプレート部品)
         UpdateMaxHistory<TYPE>(side, from, to);
 
-        if (engine_ptr_->basic_st_.en_passant_square_
-        && (to == engine_ptr_->basic_st_.en_passant_square_)) {
+        if (Util::IsEnPassant(basic_st.en_passant_square_, to)) {
           SetMoveType(move, EN_PASSANT);
         } else {
           SetMoveType(move, NORMAL);
@@ -294,7 +295,7 @@ namespace Sayuri {
     }
 
     // キングの動きを作る。
-    Square from = engine_ptr_->basic_st_.king_[side];
+    Square from = basic_st.king_[side];
     Bitboard move_bitboard =
     Util::GetKingMove(from) & GenBitboardMask<TYPE>(side);
 

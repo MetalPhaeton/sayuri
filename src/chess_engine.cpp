@@ -668,7 +668,7 @@ namespace Sayuri {
 
         // ポーンの2歩の動きの場合はアンパッサンできるようにする。
         if ((basic_st_.piece_board_[to] == PAWN)
-        && (Util::GetDistance(from, to) == 2)) {
+        && (Util::Is2StepMove(from, to))) {
           basic_st_.en_passant_square_ = Util::EN_PASSANT_TRANS_TABLE[to];
         }
         break;
@@ -940,7 +940,7 @@ namespace Sayuri {
     [basic_st_.en_passant_square_];
 
     // ポーンの2歩の動きの場合はアンパッサンハッシュを追加。
-    if ((piece_type == PAWN) && (Util::GetDistance(from, to) == 2)) {
+    if ((piece_type == PAWN) && (Util::Is2StepMove(from, to))) {
       current_hash ^= cache.en_passant_hash_value_table_
       [Util::EN_PASSANT_TRANS_TABLE[to]];
     }
