@@ -182,7 +182,7 @@ namespace Sayuri {
        * @param side 候補手のサイド。
        */
       template<GenMoveType TYPE>
-      void ScoreMoves(std::size_t start, Move prev_best, Move iid_move,
+      void ScoreMoves(std::uint32_t start, Move prev_best, Move iid_move,
       Move killer_1, Move killer_2, Side side);
 
       // ================ //
@@ -235,8 +235,8 @@ namespace Sayuri {
       MoveSlot move_stack_[MAX_CANDIDATES + 1];
 
       /** スタックのインデックス。 */
-      std::size_t last_;
-      std::size_t max_;
+      std::uint32_t last_;
+      std::uint32_t max_;
 
       /** ヒストリーの最大値。 */
       std::uint64_t history_max_;

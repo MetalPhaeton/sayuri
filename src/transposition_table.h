@@ -56,7 +56,7 @@ namespace Sayuri {
 
     public:
       /** TTEntryの決め打ちサイズ。 */
-      constexpr static std::size_t TTENTRY_HARD_CODED_SIZE = 32;
+      constexpr static std::uint32_t TTENTRY_HARD_CODED_SIZE = 32;
 
       // ==================== //
       // コンストラクタと代入 //

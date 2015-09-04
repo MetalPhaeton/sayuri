@@ -213,7 +213,7 @@ namespace Sayuri {
 
     // PVラインを送る。
     sout << " pv";
-    for (std::size_t i = 0; i < pv_line.length(); ++i) {
+    for (std::uint32_t i = 0; i < pv_line.length(); ++i) {
       if (!(pv_line[i])) break;
 
       sout << " " << Util::MoveToString(pv_line[i]);
@@ -305,7 +305,7 @@ namespace Sayuri {
 
     // pvラインを送る。
     sout << " pv";
-    for (std::size_t i = 0; i < pv_line.length(); ++i) {
+    for (std::uint32_t i = 0; i < pv_line.length(); ++i) {
       if (!(pv_line[i])) break;
 
       sout << " " << Util::MoveToString(pv_line[i]);

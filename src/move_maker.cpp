@@ -206,7 +206,7 @@ namespace Sayuri {
     Side side = basic_st.to_move_;
 
     // 生成開始時のポインタ。
-    std::size_t start = last_;
+    std::uint32_t start = last_;
 
     // ナイト、ビショップ、ルーク、クイーンの候補手を作る。
     for (PieceType piece_type = KNIGHT; piece_type <= QUEEN; ++piece_type) {
@@ -375,8 +375,8 @@ namespace Sayuri {
 
   // 候補手に点数をつける。
   template<GenMoveType TYPE>
-  void MoveMaker::ScoreMoves(std::size_t start, Move prev_best, Move iid_move,
-  Move killer_1, Move killer_2, Side side) {
+  void MoveMaker::ScoreMoves(std::uint32_t start, Move prev_best,
+  Move iid_move, Move killer_1, Move killer_2, Side side) {
     // --- 評価値の定義 --- //
     // キラームーブの点数。
     constexpr std::int64_t KILLER_2_MOVE_SCORE = 0x400LL;
@@ -395,7 +395,7 @@ namespace Sayuri {
     Bitboard enemy_king_bb =
     Util::SQUARE[engine_ptr_->basic_st_.king_
     [Util::GetOppositeSide(side)]][R0];
-    for (std::size_t i = start; i < last_; ++i) {
+    for (std::uint32_t i = start; i < last_; ++i) {
       // 手の情報を得る。
       Square from = GetFrom(move_stack_[i].move_);
       Square to = GetTo(move_stack_[i].move_);
@@ -459,7 +459,7 @@ namespace Sayuri {
 
   // 実体化。
   template void MoveMaker::ScoreMoves<GenMoveType::NON_CAPTURE>
-  (std::size_t, Move, Move, Move, Move, Side);
+  (std::uint32_t, Move, Move, Move, Move, Side);
   template void MoveMaker::ScoreMoves<GenMoveType::CAPTURE>
-  (std::size_t, Move, Move, Move, Move, Side);
+  (std::uint32_t, Move, Move, Move, Move, Side);
 }  // namespace Sayuri
