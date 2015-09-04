@@ -119,6 +119,10 @@ namespace Sayuri {
     }
     // distance_table_[][]を初期化する。
     InitDistanceTable();
+    // is_en_passant_table_[][]を初期化する。
+    InitIsEnPassantTable();
+    // is_2step_move_table_[][]を初期化する。
+    InitIs2StepMoveTable();
     // king_move_[]を初期化する。
     InitKingMove();
     // ランダム関連を初期化する。
@@ -666,6 +670,37 @@ namespace Sayuri {
         ? (rank_1 - rank_2) : (rank_2 - rank_1);
 
         distance_table_[square_1][square_2] = GetMax(fyle_diff, rank_diff);
+      }
+    }
+  }
+
+  // アンパッサン判定配列。
+  bool Util::is_en_passant_table_[NUM_SQUARES][NUM_SQUARES];
+  void Util::InitIsEnPassantTable() {
+    FOR_SQUARES(en_passant_square) {
+      FOR_SQUARES(to) {
+        is_en_passant_table_[en_passant_square][to] = false;
+        if (en_passant_square == to) {
+          if ((SquareToRank(en_passant_square) == RANK_3)
+          || (SquareToRank(en_passant_square) == RANK_6)) {
+            is_en_passant_table_[en_passant_square][to] = true;
+          }
+        }
+      }
+    }
+  }
+
+  // ポーンの2歩の動き判定テーブル。
+  bool Util::is_2step_move_table_[NUM_SQUARES][NUM_SQUARES];
+  void Util::InitIs2StepMoveTable() {
+    FOR_SQUARES(from) {
+      FOR_SQUARES(to) {
+        is_2step_move_table_[from][to] = false;
+        if (SquareToRank(from) == RANK_2) {
+          if (to == (from + 16)) is_2step_move_table_[from][to] = true;
+        } else if (SquareToRank(from) == RANK_7) {
+          if (to == (from - 16)) is_2step_move_table_[from][to] = true;
+        }
       }
     }
   }

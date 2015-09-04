@@ -1499,6 +1499,26 @@ namespace Sayuri {
       }
 
       /**
+       * 指し手がアンパッサンかどうか判断する。
+       * @param en_passant_square 現在のアンパッサンのマス。
+       * @param to 指し手の移動先のマス。
+       * @return アンパッサンならtrue。
+       */
+      static bool IsEnPassant(Square en_passant_square, Square to) {
+        return is_en_passant_table_[en_passant_square][to];
+      }
+
+      /**
+       * 指し手がポーンの2歩の動きかどうかを判断する。
+       * @param from 駒の位置。
+       * @param to 移動先。
+       * @return 2歩の動きならtrue。
+       */
+      static bool Is2StepMove(Square from, Square to) {
+        return is_2step_move_table_[from][to];
+      }
+
+      /**
        * 探索深さをヒストリー値にする。
        * @param depth 探索深さ。
        * @return ヒストリー値。
@@ -1703,6 +1723,19 @@ namespace Sayuri {
       static int distance_table_[NUM_SQUARES][NUM_SQUARES];
       /** distance_table_[][]を初期化する。 */
       static void InitDistanceTable();
+
+      /**
+       * 指し手がアンパッサンかどうかを判定する配列。
+       * [en_passant_square][to]
+       */
+      static bool is_en_passant_table_[NUM_SQUARES][NUM_SQUARES];
+      /** is_en_passant_table_[][]を初期化する。 */
+      static void InitIsEnPassantTable();
+
+      /** ポーンの2歩の動きかどうかを判定する。 [from][to] */
+      static bool is_2step_move_table_[NUM_SQUARES][NUM_SQUARES];
+      /** is_2step_move_table_[][]を初期化する。 */
+      static void InitIs2StepMoveTable();
 
       // ================== //
       // その他のstatic変数 //
