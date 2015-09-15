@@ -276,16 +276,32 @@ namespace Sayuri {
         func_obj->NewLocalScope();
 
         // 引数リストをシンボルマップにバインド。
-        std::vector<std::string>& arg_name_vec =
-        func_obj->function_.arg_name_vec_;
-        for (auto& arg_name : arg_name_vec) {
-          if (!target_itr) {
-            // 引数が足りないならNilで補完。
-            func_obj->BindSymbol(arg_name, LispObjectPtr(new LispObject()));
-          } else {
-            func_obj->BindSymbol(arg_name, Evaluate(*(target_itr++)));
+        std::vector<std::string>::iterator arg_name_itr =
+        func_obj->function_.arg_name_vec_.begin();
+        LispObjectPtr arg_list =
+        LispObject::NewList(target_itr.current().Length());
+        LispObject* arg_ptr = arg_list.get();
+        for (; target_itr; ++target_itr) {
+          // 引数を評価。
+          LispObjectPtr result = Evaluate(*target_itr);
+
+          // 引数リストに入れる。
+          arg_ptr->car(result);
+          arg_ptr = arg_ptr->cdr().get();
+
+          // 引数リストにバインド。
+          if (arg_name_itr != func_obj->function_.arg_name_vec_.end()) {
+            func_obj->BindSymbol(*arg_name_itr, result->Clone());
+            ++arg_name_itr;
           }
         }
+        // もし引数の名前が余っていれば、NILをバインドする。
+        for (; arg_name_itr != func_obj->function_.arg_name_vec_.end();
+        ++arg_name_itr) {
+            func_obj->BindSymbol(*arg_name_itr, LispObject::NewNil());
+        }
+        // 引数リストを"#args"にバインドする。
+        func_obj->BindSymbol("$@", arg_list);
 
         // 関数を評価。
         LispObjectPtr ret_ptr;
