@@ -151,6 +151,30 @@ Example
 ;; Output
 ;; &gt; ()
 ;; &gt; ()</code></pre>
+<h3 id="variable-length-arguments">Variable Length Arguments</h3>
+<p>Sayulisp supports Variable Length Arguments.<br />Arguments of a function is automatically bound to '<code>$@</code>' as List in its local scope.</p>
+<h6> 
+Example
+</h6>
+
+<pre><code>;; Define variables.
+(define first 111)
+(define second 222)
+(define third &quot;Hello&quot;)
+
+;; Define a function
+(define (my-func a b)
+    (display &quot;a: &quot; a)
+    (display &quot;b: &quot; b)
+    (display &quot;$@: &quot; $@))
+
+;; Execute the function.
+(my-func first second third)
+
+;; Output
+;; &gt; a: 111
+;; &gt; b: 222
+;; &gt; $@: (111 222 &quot;Hello&quot;)</code></pre>
 <h3 id="message-symbol-semantics">Message Symbol Semantics</h3>
 <p>Some functions use <em>Message Symbol</em>.</p>
 <ul>
