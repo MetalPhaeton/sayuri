@@ -1938,6 +1938,93 @@ R"...(### stderr ###
     ;; > 123)...";
     }
 
+    // %%% import
+    {
+      LispObjectPtr func_ptr = LispObject::NewNativeFunction();
+      func_ptr->scope_chain_ = root_ptr->scope_chain_;
+      func_ptr->native_function_ =
+      [](LispObjectPtr self, const LispObject& caller, const LispObject& list)
+      -> LispObjectPtr {
+        // 準備。
+        LispIterator list_itr(&list);
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        if (!list_itr) {
+          throw LispObject::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr result = caller.Evaluate(*list_itr); 
+        if (!(result->IsString())) {
+          throw LispObject::GenWrongTypeError
+          (func_name, "String", std::vector<int> {1}, true);
+        }
+
+        LispObjectPtr ret_ptr = LispObject::NewNil();
+
+        // 全部読み込む。
+        std::string input = "";
+        std::ifstream stream(result->string_value());
+        if (!stream) {
+          throw LispObject::GenError("@runtime-error",
+          "Couldn't open '" + result->string_value() + "'.");
+        }
+        std::ostringstream osstream;
+        while (std::getline(stream, input)) osstream << (input + "\n");
+
+        // 字句解析する。
+        LispTokenizer tokenizer;
+        int count = tokenizer.Analyse(osstream.str());
+        if (count != 0) {
+          throw LispObject::GenError("@runtime-error",
+          "Couldn't Parse '" + result->string_value() + "'.");
+        }
+
+        // パースする。
+        std::queue<std::string> token_queue = tokenizer.token_queue();
+        std::vector<LispObjectPtr> obj_ptr_vec =
+        LispObject::Parse(token_queue);
+
+        // 評価する。
+        for (auto& obj_ptr : obj_ptr_vec) {
+          ret_ptr = caller.Evaluate(*obj_ptr);
+        }
+
+        // 最後の評価結果を返す。
+        return ret_ptr;
+      };
+      root_ptr->BindSymbol("import", func_ptr);
+      (*dict_ptr)["import"] =
+R"...(### import ###
+
+<h6> Usage </h6>
+
+* `(import <File name : String>)`
+
+<h6> Description </h6>
+
+* Reads `<File name>` and executes it.
+* Returns the last evaluated Object of `<File name>`.
+
+<h6> Example </h6>
+
+    ;; When the following code is written in 'hello.scm'
+    ;;
+    ;; (define a 111)
+    ;; (define b 222)
+    ;; (string-append "Hello " "World")  ;; <- The last S-Expression.
+    
+    (display (import "hello.scm"))
+    (display "a: " a)
+    (display "b: " b)
+    
+    ;; Output
+    ;;
+    ;; > Hello World
+    :: > a: 111
+    :: > b: 222)...";
+    }
+
     // %%% equal?
     {
       LispObjectPtr func_ptr = LispObject::NewNativeFunction();
