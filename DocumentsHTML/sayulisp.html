@@ -218,6 +218,27 @@ Example
 ;; Output
 ;;
 ;; &gt; 123</code></pre>
+<h3 id="importing-script-file">Importing Script File</h3>
+<p>Using <a href="core_functions.html#import"><code>(import)</code></a> function, Sayulisp reads and executes it.</p>
+<h6> 
+Example
+</h6>
+
+<pre><code>;; When the following code is written in &#39;hello.scm&#39;
+;;
+;; (define a 111)
+;; (define b 222)
+;; (string-append &quot;Hello &quot; &quot;World&quot;)  ;; &lt;- The last S-Expression.
+
+(display (import &quot;hello.scm&quot;))
+(display &quot;a: &quot; a)
+(display &quot;b: &quot; b)
+
+;; Output
+;;
+;; &gt; Hello World
+:: &gt; a: 111
+:: &gt; b: 222</code></pre>
 <h3 id="warning">Warning!!!!</h3>
 <p>Sayuri works correctly on a correct position.<br />It means that if the following conditions exist, Sayuri works unexpectedly.</p>
 <ul>

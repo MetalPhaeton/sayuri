@@ -83,6 +83,7 @@
 <li><a href="#io-stream-functions">IO Stream Functions</a>
 <ul>
 <li><a href="#display"><code>display</code></a> : Prints objects to Standard Output.</li>
+<li><a href="#import"><code>import</code></a> : Reads and executes Sayulisp file.</li>
 <li><a href="#stdin"><code>stdin</code></a> : Reads String from Standard Input.</li>
 <li><a href="#stdout"><code>stdout</code></a> : Writes String to Standard Output.</li>
 <li><a href="#stderr"><code>stderr</code></a> : Writes String to Standard Error.</li>
@@ -1154,6 +1155,41 @@ Example
 ;; Output
 ;;
 ;; &gt; 123</code></pre>
+<h3 id="import">import</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(import &lt;File name : String&gt;)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>Reads <code>&lt;File name&gt;</code> and executes it.</li>
+<li>Returns the last evaluated Object of <code>&lt;File name&gt;</code>.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>;; When the following code is written in &#39;hello.scm&#39;
+;;
+;; (define a 111)
+;; (define b 222)
+;; (string-append &quot;Hello &quot; &quot;World&quot;)  ;; &lt;- The last S-Expression.
+
+(display (import &quot;hello.scm&quot;))
+(display &quot;a: &quot; a)
+(display &quot;b: &quot; b)
+
+;; Output
+;;
+;; &gt; Hello World
+:: &gt; a: 111
+:: &gt; b: 222</code></pre>
 <h3 id="output-stream">output-stream</h3>
 <h6> 
 Usage
