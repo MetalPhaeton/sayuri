@@ -1156,16 +1156,13 @@ namespace Sayuri {
       template<PieceType TYPE>
       LispObjectPtr SetPieceSquareTableOpening(const std::string& func_name,
       const std::string& symbol_name, const LispObject& square_list) {
-        // テーブルを抽出。
-        const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
-        eval_params_ptr_->opening_position_value_table();
-
         // 先ず返すリストを作る。
         LispObjectPtr ret_ptr = LispObject::NewList(64);
         LispIterator itr(ret_ptr.get());
         FOR_SQUARES(square) {
           itr->type(LispObjectType::NUMBER);
-          itr->number_value (table[TYPE][square]);
+          itr->number_value
+          (eval_params_ptr_->opening_position_value_table()[TYPE][square]);
 
           ++itr;
         }
@@ -1177,25 +1174,15 @@ namespace Sayuri {
             symbol_name + " needs List of 64 parameters. Given "
             + std::to_string(square_list.Length()) + ".");
           }
-
-          // 全体をコピー。
-          double temp[NUM_PIECE_TYPES][NUM_SQUARES];
-          COPY_ARRAY(temp, table);
-
-          // 値を変更。
           LispIterator list_itr(&square_list);
           FOR_SQUARES(square) {
             if (!(list_itr->IsNumber())) {
               throw LispObject::GenWrongTypeError(func_name, "Number",
               std::vector<int> {2, static_cast<int>(square + 1)}, false);
             }
-
-            temp[TYPE][square] = list_itr->number_value();
-            ++list_itr;
+            eval_params_ptr_->opening_position_value_table
+            (TYPE, square, list_itr->number_value());
           }
-
-          // セット。
-          eval_params_ptr_->opening_position_value_table(temp);
         }
 
         return ret_ptr;
@@ -1211,16 +1198,13 @@ namespace Sayuri {
       template<PieceType TYPE>
       LispObjectPtr SetPieceSquareTableEnding(const std::string& func_name,
       const std::string& symbol_name, const LispObject& square_list) {
-        // テーブルを抽出。
-        const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
-        eval_params_ptr_->ending_position_value_table();
-
         // 先ず返すリストを作る。
         LispObjectPtr ret_ptr = LispObject::NewList(64);
         LispIterator itr(ret_ptr.get());
         FOR_SQUARES(square) {
           itr->type(LispObjectType::NUMBER);
-          itr->number_value (table[TYPE][square]);
+          itr->number_value
+          (eval_params_ptr_->ending_position_value_table()[TYPE][square]);
 
           ++itr;
         }
@@ -1233,10 +1217,6 @@ namespace Sayuri {
             + std::to_string(square_list.Length()) + ".");
           }
 
-          // 全体をコピー。
-          double temp[NUM_PIECE_TYPES][NUM_SQUARES];
-          COPY_ARRAY(temp, table);
-
           // 値を変更。
           LispIterator list_itr(&square_list);
           FOR_SQUARES(square) {
@@ -1244,13 +1224,9 @@ namespace Sayuri {
               throw LispObject::GenWrongTypeError(func_name, "Number",
               std::vector<int> {2, static_cast<int>(square + 1)}, false);
             }
-
-            temp[TYPE][square] = list_itr->number_value();
-            ++list_itr;
+            eval_params_ptr_->ending_position_value_table
+            (TYPE, square, list_itr->number_value());
           }
-
-          // セット。
-          eval_params_ptr_->ending_position_value_table(temp);
         }
 
         return ret_ptr;
@@ -1266,12 +1242,11 @@ namespace Sayuri {
       template<PieceType TYPE>
       LispObjectPtr SetAttackValueTable(const std::string& func_name,
       const std::string& symbol_name, const LispObject& value_list) {
-        const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES] =
-        eval_params_ptr_->attack_value_table();
         LispObjectPtr ret_ptr = LispObject::NewList(NUM_PIECE_TYPES);
         LispObject* ptr = ret_ptr.get();
         FOR_PIECE_TYPES(piece_type) {
-          ptr->car(LispObject::NewNumber(table[TYPE][piece_type]));
+          ptr->car(LispObject::NewNumber
+          (eval_params_ptr_->attack_value_table()[TYPE][piece_type]));
 
           ptr = ptr->cdr().get();
         }
@@ -1285,8 +1260,6 @@ namespace Sayuri {
             + std::to_string(len) + ".");
           }
 
-          double temp[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
-          COPY_ARRAY(temp, table);
           LispIterator itr(&value_list);
           FOR_PIECE_TYPES(piece_type) {
             if (!(itr->IsNumber())) {
@@ -1294,14 +1267,13 @@ namespace Sayuri {
               std::vector<int> {2, static_cast<int>(piece_type + 1)}, false);
             }
             if (piece_type == EMPTY) {
-              temp[TYPE][piece_type] = 0.0;
+              eval_params_ptr_->attack_value_table(TYPE, piece_type, 0.0);
             } else {
-              temp[TYPE][piece_type] = itr->number_value();
+              eval_params_ptr_->attack_value_table
+              (TYPE, piece_type, itr->number_value());
             }
             ++itr;
           }
-
-          eval_params_ptr_->attack_value_table(temp);
         }
 
         return ret_ptr;
@@ -1317,13 +1289,11 @@ namespace Sayuri {
       template<PieceType TYPE>
       LispObjectPtr SetDefenseValueTable(const std::string& func_name,
       const std::string& symbol_name, const LispObject& value_list) {
-        const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES] =
-        eval_params_ptr_->defense_value_table();
-
         LispObjectPtr ret_ptr = LispObject::NewList(NUM_PIECE_TYPES);
         LispObject* ptr = ret_ptr.get();
         FOR_PIECE_TYPES(piece_type) {
-          ptr->car(LispObject::NewNumber(table[TYPE][piece_type]));
+          ptr->car(LispObject::NewNumber
+          (eval_params_ptr_->defense_value_table()[TYPE][piece_type]));
 
           ptr = ptr->cdr().get();
         }
@@ -1337,8 +1307,6 @@ namespace Sayuri {
             + std::to_string(len) + ".");
           }
 
-          double temp[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
-          COPY_ARRAY(temp, table);
           LispIterator itr(&value_list);
           FOR_PIECE_TYPES(piece_type) {
             if (!(itr->IsNumber())) {
@@ -1346,21 +1314,20 @@ namespace Sayuri {
               std::vector<int> {2, static_cast<int>(piece_type + 1)}, false);
             }
             if (piece_type == EMPTY) {
-              temp[TYPE][piece_type] = 0.0;
+              eval_params_ptr_->defense_value_table(TYPE, piece_type, 0.0);
             } else {
-              temp[TYPE][piece_type] = itr->number_value();
+              eval_params_ptr_->defense_value_table
+              (TYPE, piece_type, itr->number_value());
             }
             ++itr;
           }
-
-          eval_params_ptr_->defense_value_table(temp);
         }
 
         return ret_ptr;
       }
 
       /**
-       * EvalParams - ピンの勝ちテーブル。
+       * EvalParams - ピンの価値テーブル。
        * @param func_name 関数名。
        * @param symbol_name シンボル名。
        * @param value_list テーブル。
@@ -1369,10 +1336,6 @@ namespace Sayuri {
       template<PieceType TYPE>
       LispObjectPtr SetPinValueTable(const std::string& func_name,
       const std::string& symbol_name, const LispObject& value_list) {
-        const double (& table)
-        [NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES] =
-        eval_params_ptr_->pin_value_table();
-
         LispObjectPtr ret_ptr = LispObject::NewList(NUM_PIECE_TYPES);
         LispObject* ptr = ret_ptr.get();
         FOR_PIECE_TYPES(piece_type_1) {
@@ -1383,7 +1346,8 @@ namespace Sayuri {
             if ((piece_type_1 == EMPTY) || (piece_type_2 == EMPTY)) {
               ptr_2->car(LispObject::NewNumber(0));
             } else {
-              ptr_2->car(LispObject::NewNumber(table
+              ptr_2->car(LispObject::NewNumber
+              (eval_params_ptr_->pin_value_table()
               [TYPE][piece_type_1][piece_type_2]));
             }
 
@@ -1402,9 +1366,6 @@ namespace Sayuri {
             + std::to_string(NUM_PIECE_TYPES) + " parameters. Given "
             + std::to_string(len) + ".");
           }
-
-          double temp[NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES];
-          COPY_ARRAY(temp, table);
 
           // ループ 1。
           LispIterator itr_1(&value_list);
@@ -1433,9 +1394,11 @@ namespace Sayuri {
               }
 
               if ((piece_type_1 == EMPTY) || (piece_type_2 == EMPTY)) {
-                temp[TYPE][piece_type_1][piece_type_2] = 0.0;
+                eval_params_ptr_->pin_value_table
+                (TYPE, piece_type_1, piece_type_2, 0.0);
               } else {
-                temp[TYPE][piece_type_1][piece_type_2] = itr_2->number_value();
+                eval_params_ptr_->pin_value_table
+                (TYPE, piece_type_1, piece_type_2, itr_2->number_value());
               }
 
               ++itr_2;
@@ -1443,8 +1406,6 @@ namespace Sayuri {
 
             ++itr_1;
           }
-
-          eval_params_ptr_->pin_value_table(temp);
         }
 
         return ret_ptr;
@@ -1459,16 +1420,13 @@ namespace Sayuri {
        */
       LispObjectPtr SetPawnShieldValueTable(const std::string& func_name,
       const std::string& symbol_name, const LispObject& square_list) {
-        // テーブルを抽出。
-        const double (& table)[NUM_SQUARES] =
-        eval_params_ptr_->pawn_shield_value_table();
-
         // 先ず返すリストを作る。
         LispObjectPtr ret_ptr = LispObject::NewList(64);
         LispIterator itr(ret_ptr.get());
         FOR_SQUARES(square) {
           itr->type(LispObjectType::NUMBER);
-          itr->number_value (table[square]);
+          itr->number_value
+          (eval_params_ptr_->pawn_shield_value_table()[square]);
 
           ++itr;
         }
@@ -1481,10 +1439,6 @@ namespace Sayuri {
             + std::to_string(square_list.Length()) + ".");
           }
 
-          // 全体をコピー。
-          double temp[NUM_SQUARES];
-          COPY_ARRAY(temp, table);
-
           // 値を変更。
           LispIterator list_itr(&square_list);
           FOR_SQUARES(square) {
@@ -1493,12 +1447,11 @@ namespace Sayuri {
               std::vector<int> {2, static_cast<int>(square + 1)}, false);
             }
 
-            temp[square] = list_itr->number_value();
+            eval_params_ptr_->pawn_shield_value_table
+            (square, list_itr->number_value());
+
             ++list_itr;
           }
-
-          // セット。
-          eval_params_ptr_->pawn_shield_value_table(temp);
         }
 
         return ret_ptr;
@@ -1537,16 +1490,9 @@ namespace Sayuri {
             (func_name, "Number", std::vector<int> {2, 2}, false);
           }
 
-          Weight temp[NUM_PIECE_TYPES];
-          FOR_PIECE_TYPES(piece_type) {
-            temp[piece_type] = weight_1_accessor_[WEIGHT_TYPE]()[piece_type];
-          }
-          temp[PIECE_TYPE].
-          opening_weight(weight_params.car()->number_value());
-          temp[PIECE_TYPE].
-          ending_weight(weight_params.cdr()->car()->number_value());
-
-          weight_1_mutator_[WEIGHT_TYPE](temp);
+          weight_1_mutator_[WEIGHT_TYPE](PIECE_TYPE,
+          weight_params.car()->number_value(),
+          weight_params.cdr()->car()->number_value());
         }
 
         return ret_ptr;
@@ -1585,9 +1531,8 @@ namespace Sayuri {
             (func_name, "Number", std::vector<int> {2, 2}, false);
           }
 
-          weight_2_mutator_[WEIGHT_TYPE](Weight
-          (weight_params.car()->number_value(),
-          weight_params.cdr()->car()->number_value()));
+          weight_2_mutator_[WEIGHT_TYPE](weight_params.car()->number_value(),
+          weight_params.cdr()->car()->number_value());
         }
 
         return ret_ptr;
@@ -1732,10 +1677,10 @@ namespace Sayuri {
       std::function<const Weight&()>
       weight_2_accessor_[WEIGHT_ABANDONED_CASTLING + 1];
       /** ウェイトミューテータオブジェクト。 その1。 */
-      std::function<void(const Weight (&)[NUM_PIECE_TYPES])>
+      std::function<void(PieceType, double, double)>
       weight_1_mutator_[WEIGHT_ATTACK_AROUND_KING + 1];
       /** ウェイトミューテータオブジェクト。 その2。 */
-      std::function<void(const Weight&)>
+      std::function<void(double, double)>
       weight_2_mutator_[WEIGHT_ABANDONED_CASTLING + 1];
       /** ウェイト関数オブジェクトをセットする。 */
       void SetWeightFunctions();

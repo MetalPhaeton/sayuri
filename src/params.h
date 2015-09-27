@@ -1453,6 +1453,15 @@ namespace Sayuri {
         weight_pass_pawn_.weights(opening_weight, ending_weight);
       }
       /**
+       * ミューテータ 2 - 守られたパスポーンのウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_protected_pass_pawn(double opening_weight,
+      double ending_weight) {
+        weight_protected_pass_pawn_.weights(opening_weight, ending_weight);
+      }
+      /**
        * ミューテータ 2 - ダブルポーンのウェイト。
        * @param opening_weight オープニング時のウェイト。
        * @param ending_weight エンディング時のウェイト。

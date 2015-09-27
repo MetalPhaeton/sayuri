@@ -286,123 +286,157 @@ namespace Sayuri {
     };
 
     weight_1_mutator_[WEIGHT_OPENING_POSITION] =
-    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
-      this->eval_params_ptr_->weight_opening_position(weights);
+    [this](PieceType piece_type, double opening_weight,
+    double ending_weight) {
+      this->eval_params_ptr_->weight_opening_position
+      (piece_type, opening_weight, ending_weight);
     };
 
     weight_1_mutator_[WEIGHT_ENDING_POSITION] =
-    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
-      this->eval_params_ptr_->weight_ending_position(weights);
+    [this](PieceType piece_type, double opening_weight,
+    double ending_weight) {
+      this->eval_params_ptr_->weight_ending_position
+      (piece_type, opening_weight, ending_weight);
     };
 
     weight_1_mutator_[WEIGHT_MOBILITY] =
-    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
-      this->eval_params_ptr_->weight_mobility(weights);
+    [this](PieceType piece_type, double opening_weight,
+    double ending_weight) {
+      this->eval_params_ptr_->weight_mobility
+      (piece_type, opening_weight, ending_weight);
     };
 
     weight_1_mutator_[WEIGHT_CENTER_CONTROL] =
-    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
-      this->eval_params_ptr_->weight_center_control(weights);
+    [this](PieceType piece_type, double opening_weight,
+    double ending_weight) {
+      this->eval_params_ptr_->weight_center_control
+      (piece_type, opening_weight, ending_weight);
     };
 
     weight_1_mutator_[WEIGHT_SWEET_CENTER_CONTROL] =
-    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
-      this->eval_params_ptr_->weight_sweet_center_control(weights);
+    [this](PieceType piece_type, double opening_weight,
+    double ending_weight) {
+      this->eval_params_ptr_->weight_sweet_center_control
+      (piece_type, opening_weight, ending_weight);
     };
 
     weight_1_mutator_[WEIGHT_DEVELOPMENT] =
-    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
-      this->eval_params_ptr_->weight_development(weights);
+    [this](PieceType piece_type, double opening_weight,
+    double ending_weight) {
+      this->eval_params_ptr_->weight_development
+      (piece_type, opening_weight, ending_weight);
     };
 
     weight_1_mutator_[WEIGHT_ATTACK] =
-    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
-      this->eval_params_ptr_->weight_attack(weights);
+    [this](PieceType piece_type, double opening_weight,
+    double ending_weight) {
+      this->eval_params_ptr_->weight_attack
+      (piece_type, opening_weight, ending_weight);
     };
 
     weight_1_mutator_[WEIGHT_DEFENSE] =
-    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
-      this->eval_params_ptr_->weight_defense(weights);
+    [this](PieceType piece_type, double opening_weight,
+    double ending_weight) {
+      this->eval_params_ptr_->weight_defense
+      (piece_type, opening_weight, ending_weight);
     };
 
     weight_1_mutator_[WEIGHT_PIN] =
-    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
-      this->eval_params_ptr_->weight_pin(weights);
+    [this](PieceType piece_type, double opening_weight,
+    double ending_weight) {
+      this->eval_params_ptr_->weight_pin
+      (piece_type, opening_weight, ending_weight);
     };
 
     weight_1_mutator_[WEIGHT_ATTACK_AROUND_KING] =
-    [this](const Weight (& weights)[NUM_PIECE_TYPES]) {
-      this->eval_params_ptr_->weight_attack_around_king(weights);
+    [this](PieceType piece_type, double opening_weight,
+    double ending_weight) {
+      this->eval_params_ptr_->weight_attack_around_king
+      (piece_type, opening_weight, ending_weight);
     };
 
     weight_2_mutator_[WEIGHT_PASS_PAWN] =
-    [this](const Weight& weight) {
-      this->eval_params_ptr_->weight_pass_pawn(weight);
+    [this](double opening_weight, double ending_weight) {
+      this->eval_params_ptr_->weight_pass_pawn
+      (opening_weight, ending_weight);
     };
 
     weight_2_mutator_[WEIGHT_PROTECTED_PASS_PAWN] =
-    [this](const Weight& weight) {
-      this->eval_params_ptr_->weight_protected_pass_pawn(weight);
+    [this](double opening_weight, double ending_weight) {
+      this->eval_params_ptr_->weight_protected_pass_pawn
+      (opening_weight, ending_weight);
     };
 
     weight_2_mutator_[WEIGHT_DOUBLE_PAWN] =
-    [this](const Weight& weight) {
-      this->eval_params_ptr_->weight_double_pawn(weight);
+    [this](double opening_weight, double ending_weight) {
+      this->eval_params_ptr_->weight_double_pawn
+      (opening_weight, ending_weight);
     };
 
     weight_2_mutator_[WEIGHT_ISO_PAWN] =
-    [this](const Weight& weight) {
-      this->eval_params_ptr_->weight_iso_pawn(weight);
+    [this](double opening_weight, double ending_weight) {
+      this->eval_params_ptr_->weight_iso_pawn
+      (opening_weight, ending_weight);
     };
 
     weight_2_mutator_[WEIGHT_PAWN_SHIELD] =
-    [this](const Weight& weight) {
-      this->eval_params_ptr_->weight_pawn_shield(weight);
+    [this](double opening_weight, double ending_weight) {
+      this->eval_params_ptr_->weight_pawn_shield
+      (opening_weight, ending_weight);
     };
 
     weight_2_mutator_[WEIGHT_BISHOP_PAIR] =
-    [this](const Weight& weight) {
-      this->eval_params_ptr_->weight_bishop_pair(weight);
+    [this](double opening_weight, double ending_weight) {
+      this->eval_params_ptr_->weight_bishop_pair
+      (opening_weight, ending_weight);
     };
 
     weight_2_mutator_[WEIGHT_BAD_BISHOP] =
-    [this](const Weight& weight) {
-      this->eval_params_ptr_->weight_bad_bishop(weight);
+    [this](double opening_weight, double ending_weight) {
+      this->eval_params_ptr_->weight_bad_bishop
+      (opening_weight, ending_weight);
     };
 
     weight_2_mutator_[WEIGHT_ROOK_PAIR] =
-    [this](const Weight& weight) {
-      this->eval_params_ptr_->weight_rook_pair(weight);
+    [this](double opening_weight, double ending_weight) {
+      this->eval_params_ptr_->weight_rook_pair
+      (opening_weight, ending_weight);
     };
 
     weight_2_mutator_[WEIGHT_ROOK_SEMIOPEN_FYLE] =
-    [this](const Weight& weight) {
-      this->eval_params_ptr_->weight_rook_semiopen_fyle(weight);
+    [this](double opening_weight, double ending_weight) {
+      this->eval_params_ptr_->weight_rook_semiopen_fyle
+      (opening_weight, ending_weight);
     };
 
     weight_2_mutator_[WEIGHT_ROOK_OPEN_FYLE] =
-    [this](const Weight& weight) {
-      this->eval_params_ptr_->weight_rook_open_fyle(weight);
+    [this](double opening_weight, double ending_weight) {
+      this->eval_params_ptr_->weight_rook_open_fyle
+      (opening_weight, ending_weight);
     };
 
     weight_2_mutator_[WEIGHT_EARLY_QUEEN_STARTING] =
-    [this](const Weight& weight) {
-      this->eval_params_ptr_->weight_early_queen_starting(weight);
+    [this](double opening_weight, double ending_weight) {
+      this->eval_params_ptr_->weight_early_queen_starting
+      (opening_weight, ending_weight);
     };
 
     weight_2_mutator_[WEIGHT_WEAK_SQUARE] =
-    [this](const Weight& weight) {
-      this->eval_params_ptr_->weight_weak_square(weight);
+    [this](double opening_weight, double ending_weight) {
+      this->eval_params_ptr_->weight_weak_square
+      (opening_weight, ending_weight);
     };
 
     weight_2_mutator_[WEIGHT_CASTLING] =
-    [this](const Weight& weight) {
-      this->eval_params_ptr_->weight_castling(weight);
+    [this](double opening_weight, double ending_weight) {
+      this->eval_params_ptr_->weight_castling
+      (opening_weight, ending_weight);
     };
 
     weight_2_mutator_[WEIGHT_ABANDONED_CASTLING] =
-    [this](const Weight& weight) {
-      this->eval_params_ptr_->weight_abandoned_castling(weight);
+    [this](double opening_weight, double ending_weight) {
+      this->eval_params_ptr_->weight_abandoned_castling
+      (opening_weight, ending_weight);
     };
   }
 
