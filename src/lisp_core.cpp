@@ -239,12 +239,6 @@ namespace Sayuri {
 
   // 自分のシンボルマップで評価する。
   LispObjectPtr LispObject::Evaluate(const LispObject& target) const {
-    // 自分がFUNCTION又は、NATIVE_FUNCTIONではない場合は不正。
-    if (!((IsFunction() || IsNativeFunction()))) {
-      throw GenError("@not-procedure",
-      "Caller of Evaluate() is not Function or Native Function.");
-    }
-
     if (!(target.IsList())) {
       // Listではない場合。
       if (target.IsSymbol()) {
