@@ -838,6 +838,16 @@ namespace Sayuri {
         ending_weight_ = ending_weight;
         SetSlope();
       }
+      /**
+       * ミューテータ - オープニング時とエンディング時のウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weights(double opening_weight, double ending_weight) {
+        opening_weight_ = opening_weight;
+        ending_weight_ = ending_weight;
+        SetSlope();
+      }
 
     private:
       /** 傾きをセットする。 */
@@ -1264,6 +1274,283 @@ namespace Sayuri {
        */
       void weight_abandoned_castling(const Weight& weight) {
         weight_abandoned_castling_ = weight;
+      }
+
+      // ============== //
+      // ミューテータ 2 //
+      // ============== //
+      /**
+       * ミューテータ 2 - オープニング時の配置の価値テーブル。
+       * @param piece_type 駒の種類。
+       * @param square 位置。
+       * @param value 価値。
+       */
+      void opening_position_value_table(PieceType piece_type, Square square,
+      double value) {
+        opening_position_value_table_[piece_type][square] = value;
+      }
+      /**
+       * ミューテータ 2 - エンディング時の配置の価値テーブル。
+       * @param piece_type 駒の種類。
+       * @param square 位置。
+       * @param value 価値。
+       */
+      void ending_position_value_table(PieceType piece_type, Square square,
+      double value) {
+        ending_position_value_table_[piece_type][square] = value;
+      }
+      /**
+       * ミューテータ 2 - 相手への攻撃の価値テーブル。
+       * @param piece_type 自分の駒の種類。
+       * @param enemy_piece_type 相手の駒の種類。
+       * @param value 価値。
+       */
+      void attack_value_table(PieceType piece_type,
+      PieceType enemy_piece_type, double value) {
+        attack_value_table_[piece_type][enemy_piece_type] = value;
+      }
+      /**
+       * ミューテータ 2 - 味方への防御の価値テーブル。
+       * @param piece_type 自分の駒の種類。
+       * @param friend_piece_type 味方の駒の種類。
+       * @param value 価値。
+       */
+      void defense_value_table(PieceType piece_type,
+      PieceType friend_piece_type, double value) {
+        defense_value_table_[piece_type][friend_piece_type] = value;
+      }
+      /**
+       * ミューテータ 2 - ピンの価値テーブル。
+       * @param piece_type ピンをする駒の種類。
+       * @param target_piece_type ターゲットの駒の種類。
+       * @param pin_board_piece_type ターゲットの裏の駒の種類。
+       * @param value 価値。
+       */
+      void pin_value_table(PieceType piece_type, PieceType target_piece_type,
+      PieceType pin_board_piece_type, double value) {
+        pin_value_table_[piece_type][target_piece_type]
+        [pin_board_piece_type] = value;
+      }
+      /**
+       * ミューテータ 2 - ポーンの盾の価値テーブル。
+       * @param square ポーンの位置。
+       * @param value 価値。
+       */
+      void pawn_shield_value_table(Square square, double value) {
+        pawn_shield_value_table_[square] = value;
+      }
+      /**
+       * ミューテータ 2 - オープニング時の駒の配置のウェイト。
+       * @param piece_type 駒の種類。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_opening_position(PieceType piece_type,
+      double opening_weight, double ending_weight) {
+        weight_opening_position_[piece_type].weights
+        (opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - エンディング時の駒の配置のウェイト。
+       * @param piece_type 駒の種類。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_ending_position(PieceType piece_type,
+      double opening_weight, double ending_weight) {
+        weight_ending_position_[piece_type].weights
+        (opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - 機動力のウェイト。
+       * @param piece_type 駒の種類。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_mobility(PieceType piece_type,
+      double opening_weight, double ending_weight) {
+        weight_mobility_[piece_type].weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - センターコントロールのウェイト。
+       * @param piece_type 駒の種類。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_center_control(PieceType piece_type,
+      double opening_weight, double ending_weight) {
+        weight_center_control_[piece_type].weights
+        (opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - スウィートセンターコントロールのウェイト。
+       * @param piece_type 駒の種類。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_sweet_center_control(PieceType piece_type,
+      double opening_weight, double ending_weight) {
+        weight_sweet_center_control_[piece_type].weights
+        (opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - 駒の展開のウェイト。
+       * @param piece_type 駒の種類。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_development(PieceType piece_type,
+      double opening_weight, double ending_weight) {
+        weight_development_[piece_type].weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - 相手への攻撃のウェイト。
+       * @param piece_type 駒の種類。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_attack(PieceType piece_type,
+      double opening_weight, double ending_weight) {
+        weight_attack_[piece_type].weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - 味方への防御のウェイト。
+       * @param piece_type 駒の種類。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_defense(PieceType piece_type,
+      double opening_weight, double ending_weight) {
+        weight_defense_[piece_type].weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - ピンのウェイト。
+       * @param piece_type 駒の種類。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_pin(PieceType piece_type,
+      double opening_weight, double ending_weight) {
+        weight_pin_[piece_type].weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - 相手キング周辺への攻撃のウェイト。
+       * @param piece_type 駒の種類。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_attack_around_king(PieceType piece_type,
+      double opening_weight, double ending_weight) {
+        weight_attack_around_king_[piece_type].weights
+        (opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - パスポーンのウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_pass_pawn(double opening_weight, double ending_weight) {
+        weight_pass_pawn_.weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - ダブルポーンのウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_double_pawn(double opening_weight, double ending_weight) {
+        weight_double_pawn_.weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - 孤立ポーンのウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_iso_pawn(double opening_weight, double ending_weight) {
+        weight_iso_pawn_.weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - ポーンの盾のウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_pawn_shield(double opening_weight, double ending_weight) {
+        weight_pawn_shield_.weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - ビショップペアのウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_bishop_pair(double opening_weight, double ending_weight) {
+        weight_bishop_pair_.weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - バッドビショップのウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_bad_bishop(double opening_weight, double ending_weight) {
+        weight_bad_bishop_.weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - ルークペアのウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_rook_pair(double opening_weight, double ending_weight) {
+        weight_rook_pair_.weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - セミオープンファイルのルークのウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_rook_semiopen_fyle(double opening_weight,
+      double ending_weight) {
+        weight_rook_semiopen_fyle_.weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - オープンファイルのルークのウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_rook_open_fyle(double opening_weight,
+      double ending_weight) {
+        weight_rook_open_fyle_.weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - 早すぎるクイーンの始動のウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_early_queen_starting(double opening_weight,
+      double ending_weight) {
+        weight_early_queen_starting_.weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - キング周りの弱いマスのウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_weak_square(double opening_weight, double ending_weight) {
+        weight_weak_square_.weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - キャスリングのウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_castling(double opening_weight, double ending_weight) {
+        weight_castling_.weights(opening_weight, ending_weight);
+      }
+      /**
+       * ミューテータ 2 - キャスリングの放棄のウェイト。
+       * @param opening_weight オープニング時のウェイト。
+       * @param ending_weight エンディング時のウェイト。
+       */
+      void weight_abandoned_castling(double opening_weight,
+      double ending_weight) {
+        weight_abandoned_castling_.weights(opening_weight, ending_weight);
       }
 
     private:
