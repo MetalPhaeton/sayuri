@@ -219,10 +219,8 @@ namespace Sayuri {
        * シンボルを参照する。
        * @param symbol シンボル。
        * @return シンボルにバインドされているLispObjectPtr。
-       * @throw LispObjectPtr エラーメッセージ。 (シンボルが見つからなかった。)
        */
-      LispObjectPtr ReferSymbol(const std::string& symbol) const
-      throw (LispObjectPtr) {
+      LispObjectPtr ReferSymbol(const std::string& symbol) const {
         // スコープチェーンを検索する。
         ScopeChain::const_reverse_iterator citr = scope_chain_.crbegin();
 
