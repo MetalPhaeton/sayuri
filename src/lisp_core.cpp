@@ -2902,10 +2902,9 @@ R"...(### output-stream ###
           std::string message = message_ptr->symbol_value();
           std::string input_str = "";
           if (message == "@read") {
-            char c;
-            while (stream_ptr->get(c)) {
-              input_str.push_back(c);
-            }
+            std::ostringstream oss;
+            oss << stream_ptr->rdbuf();
+            input_str = oss.str();
           } else if (message == "@read-line") {
             std::getline(*stream_ptr, input_str);
           } else if (message == "@get") {
