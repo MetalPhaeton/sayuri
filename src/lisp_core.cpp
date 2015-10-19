@@ -193,6 +193,9 @@ namespace Sayuri {
       LispObjectPtr func_obj = Evaluate(*(target_itr++));
 
       if (func_obj->IsFunction()) {  // Function。
+        // ローカルスコープを作成。
+        func_obj->scope_chain_.push_back(SymbolMapPtr(new SymbolMap()));
+
         // 引数リストをシンボルマップにバインド。
         std::vector<std::string>::iterator arg_name_itr =
         func_obj->function_.arg_name_vec_.begin();
@@ -230,6 +233,8 @@ namespace Sayuri {
 
         return ret_ptr;
       } else if (func_obj->IsNativeFunction()) { // NativeFunction。
+        // ローカルスコープを作成。
+        func_obj->scope_chain_.push_back(SymbolMapPtr(new SymbolMap()));
         return func_obj->native_function_(func_obj, *this, target);
       } else {
         // 関数オブジェクトじゃないので、エラー。
@@ -1272,12 +1277,6 @@ R"...(### lambda ###
         LispIterator list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
-
-        // 自身にスコープチェーンを継承。
-        // その後、ローカルスコープを作成。
-        ScopeChain chain = caller.scope_chain();
-        chain.push_back(SymbolMapPtr(new SymbolMap()));
-        self->scope_chain(chain);
 
         // 第1引数(ローカル変数定義リスト)を得る。
         if (!list_itr) {

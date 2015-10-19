@@ -880,7 +880,6 @@ namespace Sayuri {
 
         // スコープを継承。
         ret_ptr->scope_chain_ = parent_scope;
-        ret_ptr->scope_chain_.push_back(SymbolMapPtr(new SymbolMap()));
 
         ret_ptr->function_.arg_name_vec_ = arg_name_vec;
         ret_ptr->function_.def_vec_ = def_vec;
@@ -901,7 +900,6 @@ namespace Sayuri {
 
         // スコープを継承。
         ret_ptr->scope_chain_ = parent_scope;
-        ret_ptr->scope_chain_.push_back(SymbolMapPtr(new SymbolMap()));
 
         ret_ptr->native_function_ = native_function;
 
