@@ -134,7 +134,7 @@ namespace Sayuri {
         std::string message = "The value '" + std::to_string(square)
         + "' given to (" + func_name + ") does not exist on chess board.";
 
-        return LispObject::GenError("@not-square", message);
+        return Lisp::GenError("@not-square", message);
       }
 
       /**
@@ -148,7 +148,7 @@ namespace Sayuri {
         std::string message = "The value '" + std::to_string(piece_type)
         + "' given to (" + func_name + ") is not a piece type.";
 
-        return LispObject::GenError("@not-piece-type", message);
+        return Lisp::GenError("@not-piece-type", message);
       }
 
       /**
@@ -162,7 +162,7 @@ namespace Sayuri {
         std::string message = "The value '" + std::to_string(fyle)
         + "' given to (" + func_name + ") does not exist on chess board.";
 
-        return LispObject::GenError("@not-fyle", message);
+        return Lisp::GenError("@not-fyle", message);
       }
 
       /**
@@ -176,7 +176,7 @@ namespace Sayuri {
         std::string message = "The value '" + std::to_string(rank)
         + "' given to (" + func_name + ") does not exist on chess board.";
 
-        return LispObject::GenError("@not-rank", message);
+        return Lisp::GenError("@not-rank", message);
       }
 
       /**
@@ -190,7 +190,7 @@ namespace Sayuri {
         std::string message = "The value '" + std::to_string(side)
         + "' given to (" + func_name + ") is not side.";
 
-        return LispObject::GenError("@not-side", message);
+        return Lisp::GenError("@not-side", message);
       }
 
       /**
@@ -203,7 +203,7 @@ namespace Sayuri {
       (const std::string& func_name, int castling) {
         std::string message = "The value '" + std::to_string(castling)
         + "' given to (" + func_name + ") does not indicate any castlings.";
-        return LispObject::GenError("@not-castling", message);
+        return Lisp::GenError("@not-castling", message);
       }
 
       /**
@@ -212,15 +212,15 @@ namespace Sayuri {
        * @return 変換結果のリスト。
        */
       static LispObjectPtr MoveToList(Move move) {
-        LispObjectPtr ret_ptr = LispObject::NewList(3);
+        LispObjectPtr ret_ptr = Lisp::NewList(3);
 
-        ret_ptr->car(LispObject::NewSymbol(SQUARE_SYMBOL[GetFrom(move)]));
+        ret_ptr->car(Lisp::NewSymbol(SQUARE_SYMBOL[GetFrom(move)]));
 
         ret_ptr->cdr()->car
-        (LispObject::NewSymbol(SQUARE_SYMBOL[GetTo(move)]));
+        (Lisp::NewSymbol(SQUARE_SYMBOL[GetTo(move)]));
 
         ret_ptr->cdr()->cdr()->car
-        (LispObject::NewSymbol(PIECE_TYPE_SYMBOL[GetPromotion(move)]));
+        (Lisp::NewSymbol(PIECE_TYPE_SYMBOL[GetPromotion(move)]));
 
         return ret_ptr;
       }
@@ -242,10 +242,10 @@ namespace Sayuri {
           bb = engine_ptr_->position()[SIDE][TYPE];
         }
 
-        LispObjectPtr ret_ptr = LispObject::NewList(Util::CountBits(bb));
+        LispObjectPtr ret_ptr = Lisp::NewList(Util::CountBits(bb));
         LispObject* ptr = ret_ptr.get();
         for (; bb; NEXT_BITBOARD(bb)) {
-          ptr->car(LispObject::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]));
+          ptr->car(Lisp::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]));
           ptr = ptr->cdr().get();
         }
 
@@ -356,14 +356,14 @@ namespace Sayuri {
       LispObjectPtr SetPly(LispObjectPtr ply_ptr) {
         int ply = ply_ptr->number_value();
         if (ply < 1) {
-          throw LispObject::GenError("@engine-error",
+          throw Lisp::GenError("@engine-error",
           "Minimum ply number is '1'. Given '"
           + DoubleToString(ply_ptr->number_value()) + "'.");
         }
 
         int origin = engine_ptr_->ply();
         engine_ptr_->ply(ply);
-        return LispObject::NewNumber(origin);
+        return Lisp::NewNumber(origin);
       }
       /**
        * 50手ルールの手数をセットする。
@@ -373,28 +373,28 @@ namespace Sayuri {
       LispObjectPtr SetClock(LispObjectPtr clock_ptr) {
         int clock = clock_ptr->number_value();
         if (clock < 0) {
-          throw LispObject::GenError("@engine-error",
+          throw Lisp::GenError("@engine-error",
           "Minimum clock number is '0'. Given '"
           + DoubleToString(clock_ptr->number_value()) + "'.");
         }
 
         int origin = engine_ptr_->clock();
         engine_ptr_->clock(clock);
-        return LispObject::NewNumber(origin);
+        return Lisp::NewNumber(origin);
       }
       /**
        * 正しい駒の配置かどうか。
        * @return 正しければ#t。
        */
       LispObjectPtr IsCorrectPosition() const {
-        return LispObject::NewBoolean(engine_ptr_->IsCorrectPosition());
+        return Lisp::NewBoolean(engine_ptr_->IsCorrectPosition());
       }
       /**
        * 白キングがチェックされているかどうか。
        * @return チェックされていれば#t。
        */
       LispObjectPtr IsWhiteChecked() const {
-        return LispObject::NewBoolean
+        return Lisp::NewBoolean
         (engine_ptr_->IsAttacked(engine_ptr_->king()[WHITE], BLACK));
       }
       /**
@@ -402,7 +402,7 @@ namespace Sayuri {
        * @return チェックされていれば#t。
        */
       LispObjectPtr IsBlackChecked() const {
-        return LispObject::NewBoolean
+        return Lisp::NewBoolean
         (engine_ptr_->IsAttacked(engine_ptr_->king()[BLACK], WHITE));
       }
       /**
@@ -414,9 +414,9 @@ namespace Sayuri {
         if (engine_ptr_->IsAttacked
         (engine_ptr_->king()[side], Util::GetOppositeSide(side))) {
           std::vector<Move> move = engine_ptr_->GetLegalMoves();
-          if (move.size() == 0) return LispObject::NewBoolean(true);
+          if (move.size() == 0) return Lisp::NewBoolean(true);
         }
-        return LispObject::NewBoolean(false);
+        return Lisp::NewBoolean(false);
       }
       /**
        * ステールメイトかどうか。
@@ -427,9 +427,9 @@ namespace Sayuri {
         if (!(engine_ptr_->IsAttacked
         (engine_ptr_->king()[side], Util::GetOppositeSide(side)))) {
           std::vector<Move> move = engine_ptr_->GetLegalMoves();
-          if (move.size() == 0) return LispObject::NewBoolean(true);
+          if (move.size() == 0) return Lisp::NewBoolean(true);
         }
-        return LispObject::NewBoolean(false);
+        return Lisp::NewBoolean(false);
       }
 
       /**
@@ -520,7 +520,7 @@ namespace Sayuri {
 
         table_ptr_->SetSize(hash_size.number_value());
 
-        return LispObject::NewNumber(old_size);
+        return Lisp::NewNumber(old_size);
       }
 
       /**
@@ -533,7 +533,7 @@ namespace Sayuri {
 
         shell_ptr_->num_threads(num_threads.number_value());
 
-        return LispObject::NewNumber(old_threads);
+        return Lisp::NewNumber(old_threads);
       }
 
       /**
@@ -550,7 +550,7 @@ namespace Sayuri {
        */
       LispObjectPtr SetEnableQuiesceSearch(const LispObject& enable) {
         LispObjectPtr ret_ptr =
-        LispObject::NewBoolean(search_params_ptr_->enable_quiesce_search());
+        Lisp::NewBoolean(search_params_ptr_->enable_quiesce_search());
 
         if (enable.IsBoolean()) {
           search_params_ptr_->enable_quiesce_search(enable.boolean_value());
@@ -566,7 +566,7 @@ namespace Sayuri {
        */
       LispObjectPtr SetEnableRepetitionCheck(const LispObject& enable) {
         LispObjectPtr ret_ptr =
-        LispObject::NewBoolean(search_params_ptr_->enable_repetition_check());
+        Lisp::NewBoolean(search_params_ptr_->enable_repetition_check());
 
         if (enable.IsBoolean()) {
           search_params_ptr_->enable_repetition_check(enable.boolean_value());
@@ -582,7 +582,7 @@ namespace Sayuri {
        */
       LispObjectPtr SetEnableCheckExtension(const LispObject& enable) {
         LispObjectPtr ret_ptr =
-        LispObject::NewBoolean(search_params_ptr_->enable_check_extension());
+        Lisp::NewBoolean(search_params_ptr_->enable_check_extension());
 
         if (enable.IsBoolean()) {
           search_params_ptr_->enable_check_extension(enable.boolean_value());
@@ -598,7 +598,7 @@ namespace Sayuri {
        */
       LispObjectPtr SetYBWCLimitDepth(const LispObject& depth) {
         LispObjectPtr ret_ptr =
-        LispObject::NewNumber(search_params_ptr_->ybwc_limit_depth());
+        Lisp::NewNumber(search_params_ptr_->ybwc_limit_depth());
 
         if (depth.IsNumber()) {
           search_params_ptr_->ybwc_limit_depth(depth.number_value());
@@ -614,7 +614,7 @@ namespace Sayuri {
        */
       LispObjectPtr SetYBWCInvalidMoves(const LispObject& num_moves) {
         LispObjectPtr ret_ptr =
-        LispObject::NewNumber(search_params_ptr_->ybwc_invalid_moves());
+        Lisp::NewNumber(search_params_ptr_->ybwc_invalid_moves());
 
         if (num_moves.IsNumber()) {
           search_params_ptr_->ybwc_invalid_moves(num_moves.number_value());
@@ -629,7 +629,7 @@ namespace Sayuri {
        * @return セットされていたAspiration Windowsの有効無効。
        */
       LispObjectPtr SetEnableAspirationWindows(const LispObject& enable) {
-        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        LispObjectPtr ret_ptr = Lisp::NewBoolean
         (search_params_ptr_->enable_aspiration_windows());
 
         if (enable.IsBoolean()) {
@@ -646,7 +646,7 @@ namespace Sayuri {
        * @return セットされていたAspiration Windowsの深さ制限。
        */
       LispObjectPtr SetAspirationWindowsLimitDepth(const LispObject& depth) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->aspiration_windows_limit_depth());
 
         if (depth.IsNumber()) {
@@ -663,7 +663,7 @@ namespace Sayuri {
        * @return セットされていたAspiration Windowsのデルタ値。
        */
       LispObjectPtr SetAspirationWindowsDelta(const LispObject& delta) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->aspiration_windows_delta());
 
         if (delta.IsNumber()) {
@@ -680,7 +680,7 @@ namespace Sayuri {
        * @return セットされていたSEEの有効無効。
        */
       LispObjectPtr SetEnableSEE(const LispObject& enable) {
-        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        LispObjectPtr ret_ptr = Lisp::NewBoolean
         (search_params_ptr_->enable_see());
 
         if (enable.IsBoolean()) {
@@ -696,7 +696,7 @@ namespace Sayuri {
        * @return セットされていたヒストリーの有効無効。
        */
       LispObjectPtr SetEnableHistory(const LispObject& enable) {
-        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        LispObjectPtr ret_ptr = Lisp::NewBoolean
         (search_params_ptr_->enable_history());
 
         if (enable.IsBoolean()) {
@@ -712,7 +712,7 @@ namespace Sayuri {
        * @return セットされていたキラームーブの有効無効。
        */
       LispObjectPtr SetEnableKiller(const LispObject& enable) {
-        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        LispObjectPtr ret_ptr = Lisp::NewBoolean
         (search_params_ptr_->enable_killer());
 
         if (enable.IsBoolean()) {
@@ -728,7 +728,7 @@ namespace Sayuri {
        * @return セットされていたトランスポジションテーブルの有効無効。
        */
       LispObjectPtr SetEnableHashTable(const LispObject& enable) {
-        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        LispObjectPtr ret_ptr = Lisp::NewBoolean
         (search_params_ptr_->enable_ttable());
 
         if (enable.IsBoolean()) {
@@ -744,7 +744,7 @@ namespace Sayuri {
        * @return セットされていたIIDの有効無効。
        */
       LispObjectPtr SetEnableIID(const LispObject& enable) {
-        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        LispObjectPtr ret_ptr = Lisp::NewBoolean
         (search_params_ptr_->enable_iid());
 
         if (enable.IsBoolean()) {
@@ -760,7 +760,7 @@ namespace Sayuri {
        * @return セットされていたIIDの深さ制限。
        */
       LispObjectPtr SetIIDLimitDepth(const LispObject& depth) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->iid_limit_depth());
 
         if (depth.IsNumber()) {
@@ -776,7 +776,7 @@ namespace Sayuri {
        * @return セットされていたIIDの探索深さ。
        */
       LispObjectPtr SetIIDSearchDepth(const LispObject& depth) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->iid_search_depth());
 
         if (depth.IsNumber()) {
@@ -792,7 +792,7 @@ namespace Sayuri {
        * @return セットされていたNMRの有効無効。
        */
       LispObjectPtr SetEnableNMR(const LispObject& enable) {
-        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        LispObjectPtr ret_ptr = Lisp::NewBoolean
         (search_params_ptr_->enable_nmr());
 
         if (enable.IsBoolean()) {
@@ -808,7 +808,7 @@ namespace Sayuri {
        * @return セットされていたNMRの深さ制限。
        */
       LispObjectPtr SetNMRLimitDepth(const LispObject& depth) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->nmr_limit_depth());
 
         if (depth.IsNumber()) {
@@ -824,7 +824,7 @@ namespace Sayuri {
        * @return セットされていたNMRの探索時のリダクション。
        */
       LispObjectPtr SetNMRSearchReduction(const LispObject& reduction) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->nmr_search_reduction());
 
         if (reduction.IsNumber()) {
@@ -840,7 +840,7 @@ namespace Sayuri {
        * @return セットされていたNMRの結果のリダクション。
        */
       LispObjectPtr SetNMRReduction(const LispObject& reduction) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->nmr_reduction());
 
         if (reduction.IsNumber()) {
@@ -856,7 +856,7 @@ namespace Sayuri {
        * @return セットされていたProbCutの有効無効。
        */
       LispObjectPtr SetEnableProbCut(const LispObject& enable) {
-        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        LispObjectPtr ret_ptr = Lisp::NewBoolean
         (search_params_ptr_->enable_probcut());
 
         if (enable.IsBoolean()) {
@@ -872,7 +872,7 @@ namespace Sayuri {
        * @return セットされていたProbCutの深さ制限。
        */
       LispObjectPtr SetProbCutLimitDepth(const LispObject& depth) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->probcut_limit_depth());
 
         if (depth.IsNumber()) {
@@ -888,7 +888,7 @@ namespace Sayuri {
        * @return セットされていたProbCutのベータ値のマージン。
        */
       LispObjectPtr SetProbCutMargin(const LispObject& margin) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->probcut_margin());
 
         if (margin.IsNumber()) {
@@ -904,7 +904,7 @@ namespace Sayuri {
        * @return セットされていたProbCutの探索時のリダクション。
        */
       LispObjectPtr SetProbCutSearchReduction(const LispObject& reduction) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->probcut_search_reduction());
 
         if (reduction.IsNumber()) {
@@ -921,7 +921,7 @@ namespace Sayuri {
        * @return セットされていたHistory Pruningの有効無効。
        */
       LispObjectPtr SetEnableHistoryPruning(const LispObject& enable) {
-        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        LispObjectPtr ret_ptr = Lisp::NewBoolean
         (search_params_ptr_->enable_history_pruning());
 
         if (enable.IsBoolean()) {
@@ -937,7 +937,7 @@ namespace Sayuri {
        * @return セットされていたHistory Pruningの深さ制限。
        */
       LispObjectPtr SetHistoryPruningLimitDepth(const LispObject& depth) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->history_pruning_limit_depth());
 
         if (depth.IsNumber()) {
@@ -955,7 +955,7 @@ namespace Sayuri {
        */
       LispObjectPtr SetHistoryPruningMoveThreshold
       (const LispObject& threshold) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->history_pruning_move_threshold());
 
         if (threshold.IsNumber()) {
@@ -973,7 +973,7 @@ namespace Sayuri {
        */
       LispObjectPtr SetHistoryPruningInvalidMoves
       (const LispObject& num_moves) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->history_pruning_invalid_moves());
 
         if (num_moves.IsNumber()) {
@@ -990,7 +990,7 @@ namespace Sayuri {
        * @return セットされていたHistory Pruningのヒストリー値の閾値。
        */
       LispObjectPtr SetHistoryPruningThreshold(const LispObject& threshold) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->history_pruning_threshold());
 
         if (threshold.IsNumber()) {
@@ -1007,7 +1007,7 @@ namespace Sayuri {
        * @return セットされていたHistory Pruningのリダクション。
        */
       LispObjectPtr SetHistoryPruningReduction(const LispObject& reduction) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->history_pruning_reduction());
 
         if (reduction.IsNumber()) {
@@ -1024,7 +1024,7 @@ namespace Sayuri {
        * @return セットされていたLMRの有効無効。
        */
       LispObjectPtr SetEnableLMR(const LispObject& enable) {
-        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        LispObjectPtr ret_ptr = Lisp::NewBoolean
         (search_params_ptr_->enable_lmr());
 
         if (enable.IsBoolean()) {
@@ -1040,7 +1040,7 @@ namespace Sayuri {
        * @return セットされていたLMRの深さ制限。
        */
       LispObjectPtr SetLMRLimitDepth(const LispObject& depth) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->lmr_limit_depth());
 
         if (depth.IsNumber()) {
@@ -1056,7 +1056,7 @@ namespace Sayuri {
        * @return セットされていたLMRの候補手の閾値。
        */
       LispObjectPtr SetLMRMoveThreshold(const LispObject& threshold) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->lmr_move_threshold());
 
         if (threshold.IsNumber()) {
@@ -1072,7 +1072,7 @@ namespace Sayuri {
        * @return セットされていたLMRを無効にする最初の候補手の数。
        */
       LispObjectPtr SetLMRInvalidMoves(const LispObject& num_moves) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->lmr_invalid_moves());
 
         if (num_moves.IsNumber()) {
@@ -1088,7 +1088,7 @@ namespace Sayuri {
        * @return セットされていたLMRの探索時のリダクション。
        */
       LispObjectPtr SetLMRSearchReduction(const LispObject& reduction) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->lmr_search_reduction());
 
         if (reduction.IsNumber()) {
@@ -1104,7 +1104,7 @@ namespace Sayuri {
        * @return セットされていたFutility Pruningの有効無効。
        */
       LispObjectPtr SetEnableFutilityPruning(const LispObject& enable) {
-        LispObjectPtr ret_ptr = LispObject::NewBoolean
+        LispObjectPtr ret_ptr = Lisp::NewBoolean
         (search_params_ptr_->enable_futility_pruning());
 
         if (enable.IsBoolean()) {
@@ -1120,7 +1120,7 @@ namespace Sayuri {
        * @return セットされていたFutility Pruningを実行する深さ。
        */
       LispObjectPtr SetFutilityPruningDepth(const LispObject& depth) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->futility_pruning_depth());
 
         if (depth.IsNumber()) {
@@ -1136,7 +1136,7 @@ namespace Sayuri {
        * @return セットされていたFutility Pruningのマージン。
        */
       LispObjectPtr SetFutilityPruningMargin(const LispObject& margin) {
-        LispObjectPtr ret_ptr = LispObject::NewNumber
+        LispObjectPtr ret_ptr = Lisp::NewNumber
         (search_params_ptr_->futility_pruning_margin());
 
         if (margin.IsNumber()) {
@@ -1157,8 +1157,8 @@ namespace Sayuri {
       LispObjectPtr SetPieceSquareTableOpening(const std::string& func_name,
       const std::string& symbol_name, const LispObject& square_list) {
         // 先ず返すリストを作る。
-        LispObjectPtr ret_ptr = LispObject::NewList(64);
-        LispIterator itr(ret_ptr.get());
+        LispObjectPtr ret_ptr = Lisp::NewList(64);
+        LispIterator itr {ret_ptr.get()};
         FOR_SQUARES(square) {
           itr->type(LispObjectType::NUMBER);
           itr->number_value
@@ -1170,14 +1170,14 @@ namespace Sayuri {
         // セットする。
         if (!(square_list.IsNil())) {
           if (square_list.Length() != 64) {
-            throw LispObject::GenError("@engine-error",
+            throw Lisp::GenError("@engine-error",
             symbol_name + " needs List of 64 parameters. Given "
             + std::to_string(square_list.Length()) + ".");
           }
-          LispIterator list_itr(&square_list);
+          LispIterator list_itr {&square_list};
           FOR_SQUARES(square) {
             if (!(list_itr->IsNumber())) {
-              throw LispObject::GenWrongTypeError(func_name, "Number",
+              throw Lisp::GenWrongTypeError(func_name, "Number",
               std::vector<int> {2, static_cast<int>(square + 1)}, false);
             }
             eval_params_ptr_->opening_position_value_table
@@ -1199,8 +1199,8 @@ namespace Sayuri {
       LispObjectPtr SetPieceSquareTableEnding(const std::string& func_name,
       const std::string& symbol_name, const LispObject& square_list) {
         // 先ず返すリストを作る。
-        LispObjectPtr ret_ptr = LispObject::NewList(64);
-        LispIterator itr(ret_ptr.get());
+        LispObjectPtr ret_ptr = Lisp::NewList(64);
+        LispIterator itr {ret_ptr.get()};
         FOR_SQUARES(square) {
           itr->type(LispObjectType::NUMBER);
           itr->number_value
@@ -1212,16 +1212,16 @@ namespace Sayuri {
         // セットする。
         if (!(square_list.IsNil())) {
           if (square_list.Length() != 64) {
-            throw LispObject::GenError("@engine-error",
+            throw Lisp::GenError("@engine-error",
             symbol_name + " needs List of 64 parameters. Given "
             + std::to_string(square_list.Length()) + ".");
           }
 
           // 値を変更。
-          LispIterator list_itr(&square_list);
+          LispIterator list_itr {&square_list};
           FOR_SQUARES(square) {
             if (!(list_itr->IsNumber())) {
-              throw LispObject::GenWrongTypeError(func_name, "Number",
+              throw Lisp::GenWrongTypeError(func_name, "Number",
               std::vector<int> {2, static_cast<int>(square + 1)}, false);
             }
             eval_params_ptr_->ending_position_value_table
@@ -1242,10 +1242,10 @@ namespace Sayuri {
       template<PieceType TYPE>
       LispObjectPtr SetAttackValueTable(const std::string& func_name,
       const std::string& symbol_name, const LispObject& value_list) {
-        LispObjectPtr ret_ptr = LispObject::NewList(NUM_PIECE_TYPES);
+        LispObjectPtr ret_ptr = Lisp::NewList(NUM_PIECE_TYPES);
         LispObject* ptr = ret_ptr.get();
         FOR_PIECE_TYPES(piece_type) {
-          ptr->car(LispObject::NewNumber
+          ptr->car(Lisp::NewNumber
           (eval_params_ptr_->attack_value_table()[TYPE][piece_type]));
 
           ptr = ptr->cdr().get();
@@ -1254,16 +1254,16 @@ namespace Sayuri {
         if (value_list.IsList() && !(value_list.IsNil())) {
           unsigned int len = value_list.Length();
           if (len < NUM_PIECE_TYPES) {
-            throw LispObject::GenError("@engine-error",
+            throw Lisp::GenError("@engine-error",
             symbol_name + " needs List of "
             + std::to_string(NUM_PIECE_TYPES) + " parameters. Given "
             + std::to_string(len) + ".");
           }
 
-          LispIterator itr(&value_list);
+          LispIterator itr {&value_list};
           FOR_PIECE_TYPES(piece_type) {
             if (!(itr->IsNumber())) {
-              throw LispObject::GenWrongTypeError(func_name, "Number",
+              throw Lisp::GenWrongTypeError(func_name, "Number",
               std::vector<int> {2, static_cast<int>(piece_type + 1)}, false);
             }
             if (piece_type == EMPTY) {
@@ -1289,10 +1289,10 @@ namespace Sayuri {
       template<PieceType TYPE>
       LispObjectPtr SetDefenseValueTable(const std::string& func_name,
       const std::string& symbol_name, const LispObject& value_list) {
-        LispObjectPtr ret_ptr = LispObject::NewList(NUM_PIECE_TYPES);
+        LispObjectPtr ret_ptr = Lisp::NewList(NUM_PIECE_TYPES);
         LispObject* ptr = ret_ptr.get();
         FOR_PIECE_TYPES(piece_type) {
-          ptr->car(LispObject::NewNumber
+          ptr->car(Lisp::NewNumber
           (eval_params_ptr_->defense_value_table()[TYPE][piece_type]));
 
           ptr = ptr->cdr().get();
@@ -1301,16 +1301,16 @@ namespace Sayuri {
         if (value_list.IsList() && !(value_list.IsNil())) {
           unsigned int len = value_list.Length();
           if (len < NUM_PIECE_TYPES) {
-            throw LispObject::GenError("@engine-error",
+            throw Lisp::GenError("@engine-error",
             symbol_name + " needs List of "
             + std::to_string(NUM_PIECE_TYPES) + " parameters. Given "
             + std::to_string(len) + ".");
           }
 
-          LispIterator itr(&value_list);
+          LispIterator itr {&value_list};
           FOR_PIECE_TYPES(piece_type) {
             if (!(itr->IsNumber())) {
-              throw LispObject::GenWrongTypeError(func_name, "Number",
+              throw Lisp::GenWrongTypeError(func_name, "Number",
               std::vector<int> {2, static_cast<int>(piece_type + 1)}, false);
             }
             if (piece_type == EMPTY) {
@@ -1336,17 +1336,17 @@ namespace Sayuri {
       template<PieceType TYPE>
       LispObjectPtr SetPinValueTable(const std::string& func_name,
       const std::string& symbol_name, const LispObject& value_list) {
-        LispObjectPtr ret_ptr = LispObject::NewList(NUM_PIECE_TYPES);
+        LispObjectPtr ret_ptr = Lisp::NewList(NUM_PIECE_TYPES);
         LispObject* ptr = ret_ptr.get();
         FOR_PIECE_TYPES(piece_type_1) {
-          ptr->car(LispObject::NewList(NUM_PIECE_TYPES));
+          ptr->car(Lisp::NewList(NUM_PIECE_TYPES));
 
           LispObject* ptr_2 = ptr->car().get();
           FOR_PIECE_TYPES(piece_type_2) {
             if ((piece_type_1 == EMPTY) || (piece_type_2 == EMPTY)) {
-              ptr_2->car(LispObject::NewNumber(0));
+              ptr_2->car(Lisp::NewNumber(0));
             } else {
-              ptr_2->car(LispObject::NewNumber
+              ptr_2->car(Lisp::NewNumber
               (eval_params_ptr_->pin_value_table()
               [TYPE][piece_type_1][piece_type_2]));
             }
@@ -1361,23 +1361,23 @@ namespace Sayuri {
         if (value_list.IsList() && !(value_list.IsNil())) {
           unsigned int len = value_list.Length();
           if (len < NUM_PIECE_TYPES) {
-            throw LispObject::GenError("@engine-error",
+            throw Lisp::GenError("@engine-error",
             symbol_name + " needs List of "
             + std::to_string(NUM_PIECE_TYPES) + " parameters. Given "
             + std::to_string(len) + ".");
           }
 
           // ループ 1。
-          LispIterator itr_1(&value_list);
+          LispIterator itr_1 {&value_list};
           FOR_PIECE_TYPES(piece_type_1) {
             if (!(itr_1->IsList())) {
-              throw LispObject::GenWrongTypeError(func_name, "List",
+              throw Lisp::GenWrongTypeError(func_name, "List",
               std::vector<int> {2, static_cast<int>(piece_type_1 + 1)}, false);
             }
 
             unsigned int len = itr_1->Length();
             if (len < NUM_PIECE_TYPES) {
-              throw LispObject::GenError("@engine-error",
+              throw Lisp::GenError("@engine-error",
               "The " + std::to_string(piece_type_1 + 1) + "th parameter of "
               + symbol_name + " needs List of "
               + std::to_string(NUM_PIECE_TYPES) + " parameters. Given "
@@ -1385,10 +1385,10 @@ namespace Sayuri {
             }
 
             // ループ 2。
-            LispIterator itr_2(&(*itr_1));
+            LispIterator itr_2 {&(*itr_1)};
             FOR_PIECE_TYPES(piece_type_2) {
               if (!(itr_2->IsNumber())) {
-                throw LispObject::GenWrongTypeError(func_name, "Number",
+                throw Lisp::GenWrongTypeError(func_name, "Number",
                 std::vector<int> {2, static_cast<int>(piece_type_1 + 1),
                 static_cast<int>(piece_type_2 + 1)}, false);
               }
@@ -1421,8 +1421,8 @@ namespace Sayuri {
       LispObjectPtr SetPawnShieldValueTable(const std::string& func_name,
       const std::string& symbol_name, const LispObject& square_list) {
         // 先ず返すリストを作る。
-        LispObjectPtr ret_ptr = LispObject::NewList(64);
-        LispIterator itr(ret_ptr.get());
+        LispObjectPtr ret_ptr = Lisp::NewList(64);
+        LispIterator itr {ret_ptr.get()};
         FOR_SQUARES(square) {
           itr->type(LispObjectType::NUMBER);
           itr->number_value
@@ -1434,16 +1434,16 @@ namespace Sayuri {
         // セットする。
         if (!(square_list.IsNil())) {
           if (square_list.Length() != 64) {
-            throw LispObject::GenError("@engine-error",
+            throw Lisp::GenError("@engine-error",
             symbol_name + " needs List of 64 parameters. Given "
             + std::to_string(square_list.Length()) + ".");
           }
 
           // 値を変更。
-          LispIterator list_itr(&square_list);
+          LispIterator list_itr {&square_list};
           FOR_SQUARES(square) {
             if (!(list_itr->IsNumber())) {
-              throw LispObject::GenWrongTypeError(func_name, "Number",
+              throw Lisp::GenWrongTypeError(func_name, "Number",
               std::vector<int> {2, static_cast<int>(square + 1)}, false);
             }
 
@@ -1469,24 +1469,24 @@ namespace Sayuri {
       const std::string& symbol_name, const LispObject& weight_params) {
         const Weight& weight = weight_1_accessor_[WEIGHT_TYPE]()[PIECE_TYPE];
 
-        LispObjectPtr ret_ptr = LispObject::NewList(2);
-        ret_ptr->car(LispObject::NewNumber(weight.opening_weight()));
-        ret_ptr->cdr()->car(LispObject::NewNumber(weight.ending_weight()));
+        LispObjectPtr ret_ptr = Lisp::NewList(2);
+        ret_ptr->car(Lisp::NewNumber(weight.opening_weight()));
+        ret_ptr->cdr()->car(Lisp::NewNumber(weight.ending_weight()));
 
         if (weight_params.IsList() && !(weight_params.IsNil())) {
           int len = weight_params.Length();
           if (len < 2) {
-            throw LispObject::GenError("@engine-error",
+            throw Lisp::GenError("@engine-error",
             symbol_name + " needs 2 parameters. Given " + std::to_string(len)
             + ".");
           }
 
           if (!(weight_params.car()->IsNumber())) {
-            throw LispObject::GenWrongTypeError
+            throw Lisp::GenWrongTypeError
             (func_name, "Number", std::vector<int> {2, 1}, false);
           }
           if (!(weight_params.cdr()->car()->IsNumber())) {
-            throw LispObject::GenWrongTypeError
+            throw Lisp::GenWrongTypeError
             (func_name, "Number", std::vector<int> {2, 2}, false);
           }
 
@@ -1510,24 +1510,24 @@ namespace Sayuri {
       const std::string& symbol_name, const LispObject& weight_params) {
         const Weight& weight = weight_2_accessor_[WEIGHT_TYPE]();
 
-        LispObjectPtr ret_ptr = LispObject::NewList(2);
-        ret_ptr->car(LispObject::NewNumber(weight.opening_weight()));
-        ret_ptr->cdr()->car(LispObject::NewNumber(weight.ending_weight()));
+        LispObjectPtr ret_ptr = Lisp::NewList(2);
+        ret_ptr->car(Lisp::NewNumber(weight.opening_weight()));
+        ret_ptr->cdr()->car(Lisp::NewNumber(weight.ending_weight()));
 
         if (weight_params.IsList() && !(weight_params.IsNil())) {
           int len = weight_params.Length();
           if (len < 2) {
-            throw LispObject::GenError("@engine-error",
+            throw Lisp::GenError("@engine-error",
             symbol_name + " needs 2 parameters. Given " + std::to_string(len)
             + ".");
           }
 
           if (!(weight_params.car()->IsNumber())) {
-            throw LispObject::GenWrongTypeError
+            throw Lisp::GenWrongTypeError
             (func_name, "Number", std::vector<int> {2, 1}, false);
           }
           if (!(weight_params.cdr()->car()->IsNumber())) {
-            throw LispObject::GenWrongTypeError
+            throw Lisp::GenWrongTypeError
             (func_name, "Number", std::vector<int> {2, 2}, false);
           }
 
@@ -1750,410 +1750,89 @@ namespace Sayuri {
        * @param obj 変換したいオブジェクト。
        * @return 変換後のオブジェクト。
        */
-      LispObjectPtr SquareToNumber(const LispObject& obj) {
-        // コピーする。
-        LispObjectPtr copy_ptr = obj.Clone();
-
-        std::function<void(LispObject&)> to_number;
-        to_number = [&to_number](LispObject& obj_2) {
-          if (obj_2.IsSymbol()) {
-            FOR_SQUARES(square) {
-              if (obj_2.symbol_value()
-              == EngineSuite::SQUARE_SYMBOL[square]) {
-                obj_2.type(LispObjectType::NUMBER);
-                obj_2.number_value(square);
-                break;
-              }
-            }
-          } else if (obj_2.IsPair()) {
-            if (obj_2.car()) {
-              to_number(*(obj_2.car()));
-            }
-            if (obj_2.cdr()) {
-              to_number(*(obj_2.cdr()));
-            }
-          }
-        };
-
-        to_number(*copy_ptr);
-
-        return copy_ptr;
-      }
+      LispObjectPtr SquareToNumber(const LispObject& obj);
 
       /**
        * ファイルのシンボルを数値に変換する。
        * @param obj 変換したいオブジェクト。
        * @return 変換後のオブジェクト。
        */
-      LispObjectPtr FyleToNumber(const LispObject& obj) {
-        // コピーする。
-        LispObjectPtr copy_ptr = obj.Clone();
-
-        std::function<void(LispObject&)> to_number;
-        to_number = [&to_number](LispObject& obj_2) {
-          if (obj_2.IsSymbol()) {
-            FOR_FYLES(fyle) {
-              if (obj_2.symbol_value()
-              == EngineSuite::FYLE_SYMBOL[fyle]) {
-                obj_2.type(LispObjectType::NUMBER);
-                obj_2.number_value(fyle);
-                break;
-              }
-            }
-          } else if (obj_2.IsPair()) {
-            if (obj_2.car()) {
-              to_number(*(obj_2.car()));
-            }
-            if (obj_2.cdr()) {
-              to_number(*(obj_2.cdr()));
-            }
-          }
-        };
-
-        to_number(*copy_ptr);
-
-        return copy_ptr;
-      }
+      LispObjectPtr FyleToNumber(const LispObject& obj);
 
       /**
        * ランクのシンボルを数値に変換する。
        * @param obj 変換したいオブジェクト。
        * @return 変換後のオブジェクト。
        */
-      LispObjectPtr RankToNumber(const LispObject& obj) {
-        // コピーする。
-        LispObjectPtr copy_ptr = obj.Clone();
-
-        std::function<void(LispObject&)> to_number;
-        to_number = [&to_number](LispObject& obj_2) {
-          if (obj_2.IsSymbol()) {
-            FOR_RANKS(rank) {
-              if (obj_2.symbol_value()
-              == EngineSuite::RANK_SYMBOL[rank]) {
-                obj_2.type(LispObjectType::NUMBER);
-                obj_2.number_value(rank);
-                break;
-              }
-            }
-          } else if (obj_2.IsPair()) {
-            if (obj_2.car()) {
-              to_number(*(obj_2.car()));
-            }
-            if (obj_2.cdr()) {
-              to_number(*(obj_2.cdr()));
-            }
-          }
-        };
-
-        to_number(*copy_ptr);
-
-        return copy_ptr;
-      }
+      LispObjectPtr RankToNumber(const LispObject& obj);
 
       /**
        * サイドのシンボルを数値に変換する。
        * @param obj 変換したいオブジェクト。
        * @return 変換後のオブジェクト。
        */
-      LispObjectPtr SideToNumber(const LispObject& obj) {
-        // コピーする。
-        LispObjectPtr copy_ptr = obj.Clone();
-
-        std::function<void(LispObject&)> to_number;
-        to_number = [&to_number](LispObject& obj_2) {
-          if (obj_2.IsSymbol()) {
-            FOR_SIDES(side) {
-              if (obj_2.symbol_value()
-              == EngineSuite::SIDE_SYMBOL[side]) {
-                obj_2.type(LispObjectType::NUMBER);
-                obj_2.number_value(side);
-                break;
-              }
-            }
-          } else if (obj_2.IsPair()) {
-            if (obj_2.car()) {
-              to_number(*(obj_2.car()));
-            }
-            if (obj_2.cdr()) {
-              to_number(*(obj_2.cdr()));
-            }
-          }
-        };
-
-        to_number(*copy_ptr);
-
-        return copy_ptr;
-      }
+      LispObjectPtr SideToNumber(const LispObject& obj);
 
       /**
        * 駒の種類のシンボルを数値に変換する。
        * @param obj 変換したいオブジェクト。
        * @return 変換後のオブジェクト。
        */
-      LispObjectPtr PieceTypeToNumber(const LispObject& obj) {
-        // コピーする。
-        LispObjectPtr copy_ptr = obj.Clone();
-
-        std::function<void(LispObject&)> to_number;
-        to_number = [&to_number](LispObject& obj_2) {
-          if (obj_2.IsSymbol()) {
-            FOR_PIECE_TYPES(piece_type) {
-              if (obj_2.symbol_value()
-              == EngineSuite::PIECE_TYPE_SYMBOL[piece_type]) {
-                obj_2.type(LispObjectType::NUMBER);
-                obj_2.number_value(piece_type);
-                break;
-              }
-            }
-          } else if (obj_2.IsPair()) {
-            if (obj_2.car()) {
-              to_number(*(obj_2.car()));
-            }
-            if (obj_2.cdr()) {
-              to_number(*(obj_2.cdr()));
-            }
-          }
-        };
-
-        to_number(*copy_ptr);
-
-        return copy_ptr;
-      }
+      LispObjectPtr PieceTypeToNumber(const LispObject& obj);
 
       /**
        * キャスリングのシンボルを数値に変換する。
        * @param obj 変換したいオブジェクト。
        * @return 変換後のオブジェクト。
        */
-      LispObjectPtr CastlingToNumber(const LispObject& obj) {
-        // コピーする。
-        LispObjectPtr copy_ptr = obj.Clone();
-
-        std::function<void(LispObject&)> to_number;
-        to_number = [&to_number](LispObject& obj_2) {
-          if (obj_2.IsSymbol()) {
-            for (int right = 0; right < 5; ++right) {
-              if (obj_2.symbol_value()
-              == EngineSuite::CASTLING_SYMBOL[right]) {
-                obj_2.type(LispObjectType::NUMBER);
-                obj_2.number_value(right);
-                break;
-              }
-            }
-          } else if (obj_2.IsPair()) {
-            if (obj_2.car()) {
-              to_number(*(obj_2.car()));
-            }
-            if (obj_2.cdr()) {
-              to_number(*(obj_2.cdr()));
-            }
-          }
-        };
-
-        to_number(*copy_ptr);
-
-        return copy_ptr;
-      }
+      LispObjectPtr CastlingToNumber(const LispObject& obj);
 
       /**
        * 数値をマスのシンボルに変換する。
        * @param obj 変換したいオブジェクト。
        * @return 変換後のオブジェクト。
        */
-      LispObjectPtr NumberToSquare(const LispObject& obj) {
-        // コピーする。
-        LispObjectPtr copy_ptr = obj.Clone();
-
-        std::function<void(LispObject&)> to_symbol;
-        to_symbol = [&to_symbol](LispObject& obj_2) {
-          if (obj_2.IsNumber()) {
-            unsigned int number = obj_2.number_value();
-            if (number < NUM_SQUARES) {
-              obj_2.type(LispObjectType::SYMBOL);
-              obj_2.symbol_value(EngineSuite::SQUARE_SYMBOL[number]);
-            }
-          } else if (obj_2.IsPair()) {
-            if (obj_2.car()) {
-              to_symbol(*(obj_2.car()));
-            }
-            if (obj_2.cdr()) {
-              to_symbol(*(obj_2.cdr()));
-            }
-          }
-        };
-
-        to_symbol(*copy_ptr);
-
-        return copy_ptr;
-      }
+      LispObjectPtr NumberToSquare(const LispObject& obj);
 
       /**
        * 数値をファイルのシンボルに変換する。
        * @param obj 変換したいオブジェクト。
        * @return 変換後のオブジェクト。
        */
-      LispObjectPtr NumberToFyle(const LispObject& obj) {
-        // コピーする。
-        LispObjectPtr copy_ptr = obj.Clone();
-
-        std::function<void(LispObject&)> to_symbol;
-        to_symbol = [&to_symbol](LispObject& obj_2) {
-          if (obj_2.IsNumber()) {
-            unsigned int number = obj_2.number_value();
-            if (number < NUM_FYLES) {
-              obj_2.type(LispObjectType::SYMBOL);
-              obj_2.symbol_value(EngineSuite::FYLE_SYMBOL[number]);
-            }
-          } else if (obj_2.IsPair()) {
-            if (obj_2.car()) {
-              to_symbol(*(obj_2.car()));
-            }
-            if (obj_2.cdr()) {
-              to_symbol(*(obj_2.cdr()));
-            }
-          }
-        };
-
-        to_symbol(*copy_ptr);
-
-        return copy_ptr;
-      }
+      LispObjectPtr NumberToFyle(const LispObject& obj);
 
       /**
        * 数値をランクのシンボルに変換する。
        * @param obj 変換したいオブジェクト。
        * @return 変換後のオブジェクト。
        */
-      LispObjectPtr NumberToRank(const LispObject& obj) {
-        // コピーする。
-        LispObjectPtr copy_ptr = obj.Clone();
-
-        std::function<void(LispObject&)> to_symbol;
-        to_symbol = [&to_symbol](LispObject& obj_2) {
-          if (obj_2.IsNumber()) {
-            unsigned int number = obj_2.number_value();
-            if (number < NUM_RANKS) {
-              obj_2.type(LispObjectType::SYMBOL);
-              obj_2.symbol_value(EngineSuite::RANK_SYMBOL[number]);
-            }
-          } else if (obj_2.IsPair()) {
-            if (obj_2.car()) {
-              to_symbol(*(obj_2.car()));
-            }
-            if (obj_2.cdr()) {
-              to_symbol(*(obj_2.cdr()));
-            }
-          }
-        };
-
-        to_symbol(*copy_ptr);
-
-        return copy_ptr;
-      }
+      LispObjectPtr NumberToRank(const LispObject& obj);
 
       /**
        * 数値をサイドのシンボルに変換する。
        * @param obj 変換したいオブジェクト。
        * @return 変換後のオブジェクト。
        */
-      LispObjectPtr NumberToSide(const LispObject& obj) {
-        // コピーする。
-        LispObjectPtr copy_ptr = obj.Clone();
-
-        std::function<void(LispObject&)> to_symbol;
-        to_symbol = [&to_symbol](LispObject& obj_2) {
-          if (obj_2.IsNumber()) {
-            unsigned int number = obj_2.number_value();
-            if (number < NUM_SIDES) {
-              obj_2.type(LispObjectType::SYMBOL);
-              obj_2.symbol_value(EngineSuite::SIDE_SYMBOL[number]);
-            }
-          } else if (obj_2.IsPair()) {
-            if (obj_2.car()) {
-              to_symbol(*(obj_2.car()));
-            }
-            if (obj_2.cdr()) {
-              to_symbol(*(obj_2.cdr()));
-            }
-          }
-        };
-
-        to_symbol(*copy_ptr);
-
-        return copy_ptr;
-      }
+      LispObjectPtr NumberToSide(const LispObject& obj);
 
       /**
        * 数値を駒の種類のシンボルに変換する。
        * @param obj 変換したいオブジェクト。
        * @return 変換後のオブジェクト。
        */
-      LispObjectPtr NumberToPiece(const LispObject& obj) {
-        // コピーする。
-        LispObjectPtr copy_ptr = obj.Clone();
-
-        std::function<void(LispObject&)> to_symbol;
-        to_symbol = [&to_symbol](LispObject& obj_2) {
-          if (obj_2.IsNumber()) {
-            unsigned int number = obj_2.number_value();
-            if (number < NUM_PIECE_TYPES) {
-              obj_2.type(LispObjectType::SYMBOL);
-              obj_2.symbol_value(EngineSuite::PIECE_TYPE_SYMBOL[number]);
-            }
-          } else if (obj_2.IsPair()) {
-            if (obj_2.car()) {
-              to_symbol(*(obj_2.car()));
-            }
-            if (obj_2.cdr()) {
-              to_symbol(*(obj_2.cdr()));
-            }
-          }
-        };
-
-        to_symbol(*copy_ptr);
-
-        return copy_ptr;
-      }
+      LispObjectPtr NumberToPiece(const LispObject& obj);
 
       /**
        * 数値をキャスリングのシンボルに変換する。
        * @param obj 変換したいオブジェクト。
        * @return 変換後のオブジェクト。
        */
-      LispObjectPtr NumberToCastling(const LispObject& obj) {
-        // コピーする。
-        LispObjectPtr copy_ptr = obj.Clone();
-
-        std::function<void(LispObject&)> to_symbol;
-        to_symbol = [&to_symbol](LispObject& obj_2) {
-          if (obj_2.IsNumber()) {
-            unsigned int number = obj_2.number_value();
-            if (number < 5) {
-              obj_2.type(LispObjectType::SYMBOL);
-              obj_2.symbol_value(EngineSuite::CASTLING_SYMBOL[number]);
-            }
-          } else if (obj_2.IsPair()) {
-            if (obj_2.car()) {
-              to_symbol(*(obj_2.car()));
-            }
-            if (obj_2.cdr()) {
-              to_symbol(*(obj_2.cdr()));
-            }
-          }
-        };
-
-        to_symbol(*copy_ptr);
-
-        return copy_ptr;
-      }
+      LispObjectPtr NumberToCastling(const LispObject& obj);
 
       // ========== //
       // メンバ変数 //
       // ========== //
-      /** ヘルプ辞書。 */
-      std::shared_ptr<HelpDict> dict_ptr_;
-      /** グローバル関数オブジェクト。 */
-      LispObjectPtr global_ptr_;
+      std::unique_ptr<Lisp> lisp_ptr_;
   };
 }  // namespace Sayuri
 

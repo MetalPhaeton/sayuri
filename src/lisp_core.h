@@ -739,13 +739,23 @@ namespace Sayuri {
       }
 
       /**
+       * グローバルにシンボルをバインドする。
+       * @param func 登録する関数。
+       * @param symbol 関数のシンボル。
+       */
+      void BindSymbol(const std::string& symbol,
+      const LispObjectPtr& obj_ptr) {
+        global_ptr_->BindSymbol(symbol, obj_ptr);
+      }
+
+      /**
        * 関数を登録する。
        * @param func 登録する関数。
        * @param symbol 関数のシンボル。
        */
       void AddNativeFunction(const NativeFunction& func,
       const std::string& symbol) {
-        global_ptr_->BindSymbol(symbol,
+        BindSymbol(symbol,
         NewNativeFunction(global_ptr_->scope_chain_, func));
       }
 
@@ -987,6 +997,20 @@ namespace Sayuri {
       static LispObjectPtr GenWrongTypeError(const std::string& func_name,
       const std::string& required_type_str, std::vector<int> index_vec,
       bool has_evaluated);
+
+      // ======== //
+      // アクセサ //
+      // ======== //
+      /**
+       * アクセサ - グローバルオブジェクト。
+       * @return グローバルオブジェクト。
+       */
+      const LispObject& global() const {return *global_ptr_;}
+      /**
+       * アクセサ - ヘルプ辞書。
+       * @return ヘルプ辞書。
+       */
+      const HelpDict& helpdict() const {return *help_ptr_;}
 
     private:
       // ================ //
