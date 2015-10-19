@@ -55,10 +55,6 @@
   (if (equal? (list-ref (string-split str " ") 0) "info")
     (set! output str) ()))
 
-;; If str is "bestmove..", then return #t. Otherwise return #f
-(define (bestmove? str)
-  (if (equal? (list-ref (string-split str " ") 0) "bestmove") #t #f))
-
 ;; Append time data.
 (define (append-time li)
   (set! data-time
