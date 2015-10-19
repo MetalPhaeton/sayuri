@@ -27,6 +27,9 @@
  * @brief Lispインタープリタ。 
  */
 
+#ifndef LISP_CORE_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
+#define LISP_CORE_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
+
 #include <iostream>
 #include <memory>
 #include <utility>
@@ -38,9 +41,6 @@
 #include <map>
 #include <sstream>
 #include <iomanip>
-
-#ifndef LISP_CORE_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
-#define LISP_CORE_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -85,45 +85,17 @@ namespace Sayuri {
    * @return 変換後の文字列。
    */
   inline std::string DoubleToString(double d) {
-    std::ostringstream stream;
-    stream << std::setprecision(15) << d;
-    return stream.str();
+    std::ostringstream oss;
+    oss << std::setprecision(15) << d;
+    return oss.str();
   }
 
   /** 関数オブジェクト構造体。 */
   struct LispFunction {
-    /** 引数の名前空間。 */
+    /** 引数の名前。 */
     std::vector<std::string> arg_name_vec_;
     /** 関数定義。 */
     std::vector<LispObjectPtr> def_vec_;
-
-    // ==================== //
-    // コンストラクタと代入 //
-    // ==================== //
-    /** コンストラクタ。 */
-    LispFunction();
-    /**
-     * コピーコンストラクタ。
-     * @param func コピー元。
-     */
-    LispFunction(const LispFunction& func);
-    /**
-     * ムーブコンストラクタ。
-     * @param func ムーブ元。
-     */
-    LispFunction(LispFunction&& func);
-    /**
-     * コピー代入演算子。
-     * @param func コピー元。
-     */
-    LispFunction& operator=(const LispFunction& func);
-    /**
-     * ムーブ代入演算子。
-     * @param func ムーブ元。
-     */
-    LispFunction& operator=(LispFunction&& func);
-    /** デストラクタ。 */
-    virtual ~LispFunction();
   };
 
   /** Lispオブジェクト構造体。 */
@@ -133,29 +105,86 @@ namespace Sayuri {
       // コンストラクタと代入 //
       // ==================== //
       /** コンストラクタ。 */
-      LispObject();
+      LispObject() :
+      type_(LispObjectType::NIL),
+      car_(nullptr), cdr_(nullptr),
+      number_value_(0.0), boolean_value_(false), str_value_("") {}
       /**
        * コピーコンストラクタ。
        * @param obj コピー元。
        */
-      LispObject(const LispObject& obj);
+      LispObject(const LispObject& obj) :
+      type_(obj.type_),
+      car_(obj.car_), cdr_(obj.cdr_),
+      number_value_(obj.number_value_),
+      boolean_value_(obj.boolean_value_),
+      str_value_(obj.str_value_),
+      function_(obj.function_),
+      native_function_(obj.native_function_),
+      scope_chain_(obj.scope_chain_) {}
       /**
        * ムーブコンストラクタ。
        * @param obj ムーブ元。
        */
-      LispObject(LispObject&& obj);
+      LispObject(LispObject&& obj) :
+      type_(obj.type_),
+      car_(std::move(obj.car_)), cdr_(std::move(obj.cdr_)),
+      number_value_(obj.number_value_),
+      boolean_value_(obj.boolean_value_),
+      str_value_(std::move(obj.str_value_)),
+      function_(std::move(obj.function_)),
+      native_function_(std::move(obj.native_function_)),
+      scope_chain_(std::move(obj.scope_chain_)) {}
       /**
        * コピー代入演算子。
        * @param obj コピー元。
        */
-      LispObject& operator=(const LispObject& obj);
+      LispObject& operator=(const LispObject& obj) {
+        type_ = obj.type_;
+        car_ = obj.car_;
+        cdr_ = obj.cdr_;
+        number_value_ = obj.number_value_;
+        boolean_value_ = obj.boolean_value_;
+        str_value_ = obj.str_value_;
+        function_ = obj.function_;
+        native_function_ = obj.native_function_;
+        scope_chain_ = obj.scope_chain_;
+        return *this;
+      }
       /**
        * ムーブ代入演算子。
        * @param obj ムーブ元。
        */
-      LispObject& operator=(LispObject&& obj);
+      LispObject& operator=(LispObject&& obj) {
+        type_ = obj.type_;
+        car_ = std::move(obj.car_);
+        cdr_ = std::move(obj.cdr_);
+        number_value_ = obj.number_value_;
+        boolean_value_ = obj.boolean_value_;
+        str_value_ = std::move(obj.str_value_);
+        function_ = std::move(obj.function_);
+        native_function_ = std::move(obj.native_function_);
+        scope_chain_ = std::move(obj.scope_chain_);
+        return *this;
+      }
       /** デストラクタ。 */
-      virtual ~LispObject();
+      virtual ~LispObject() {}
+
+      // ====== //
+      // 演算子 //
+      // ====== //
+      /*
+       * 比較演算子。
+       * @param obj 比較対象。
+       * @return 同じならtrue。
+       */
+      bool operator==(const LispObject& obj) const;
+      /*
+       * 比較演算子。
+       * @param obj 比較対象。
+       * @return 違うならtrue。
+       */
+      bool operator!=(const LispObject& obj) const {return !operator==(obj);}
 
       // ============== //
       // パブリック関数 //
@@ -169,12 +198,8 @@ namespace Sayuri {
         LispObjectPtr ret_ptr(new LispObject(*this));
 
         // 子ノードをクローンする。
-        if (car_) {
-          ret_ptr->car_ = car_->Clone();
-        }
-        if (cdr_) {
-          ret_ptr->cdr_ = cdr_->Clone();
-        }
+        if (car_) ret_ptr->car_ = car_->Clone();
+        if (cdr_) ret_ptr->cdr_ = cdr_->Clone();
 
         return ret_ptr;
       }
@@ -184,12 +209,9 @@ namespace Sayuri {
        * @param symbol シンボル。
        * @param obj_ptr バインドするLispObjectPtr。
        */
-      void BindSymbol(const std::string& symbol, LispObjectPtr obj_ptr) const {
-        // scope_chain_.back() : SymbolMapPtr
-        // *(scope_chain_.back()) : SymbolMap
-        // (*(scope_chain_.back()))[symbol] : LispObjectPtr
-        // *((*(scope_chain_.back()))[symbol]) : LispObject
-        (*(scope_chain_.back()))[symbol] = obj_ptr;
+      void BindSymbol(const std::string& symbol, LispObjectPtr obj_ptr)
+      const {
+        scope_chain_.back()->emplace(symbol, obj_ptr);
       }
 
       /**
@@ -202,17 +224,14 @@ namespace Sayuri {
         // スコープチェーンを検索する。
         ScopeChain::const_reverse_iterator citr = scope_chain_.crbegin();
 
-        // *citr : SymbolMapPtr
-        // **citr : SymbolMap
-        // (**citr)[symbol] : LispObjectPtr
-        // *((**citr)[symbol]) : LispObject
         for (; citr != scope_chain_.rend(); ++citr) {
-          if ((**citr).find(symbol) != (**citr).end()) {
-            (**citr)[symbol] = obj_ptr;
+          if ((*citr)->find(symbol) != (*citr)->end()) {
+            (*citr)->at(symbol) = obj_ptr;
+            return;
           }
         }
 
-        (*(scope_chain_.back()))[symbol] = obj_ptr;
+        BindSymbol(symbol, obj_ptr);
       }
 
       /**
@@ -224,18 +243,25 @@ namespace Sayuri {
         // スコープチェーンを検索する。
         ScopeChain::const_reverse_iterator citr = scope_chain_.crbegin();
 
-        // *citr : SymbolMapPtr
-        // **citr : SymbolMap
-        // (**citr)[symbol] : LispObjectPtr
-        // *((**citr)[symbol]) : LispObject
         for (; citr != scope_chain_.rend(); ++citr) {
-          if ((**citr).find(symbol) != (**citr).end()) {
-            return (**citr)[symbol];
+          if ((*citr)->find(symbol) != (*citr)->end()) {
+            return (*citr)->at(symbol);
           }
         }
 
-        throw GenError
-        ("@unbound", "'" + symbol + "' is not bound with any object.");
+        LispObjectPtr error(new LispObject());
+        error->type_ = LispObjectType::PAIR;
+        error->car_.reset(new LispObject());
+        error->cdr_.reset(new LispObject());
+        error->cdr_->type_ = LispObjectType::PAIR;
+        error->cdr_->car_.reset(new LispObject());
+        error->cdr_->cdr_.reset(new LispObject());
+        error->car_->type_ = LispObjectType::SYMBOL;
+        error->car_->str_value_ = "@unbound";
+        error->cdr_->car_->type_ = LispObjectType::STRING;
+        error->cdr_->car_->str_value_ =
+        "'" + symbol + "' is not bound with any object.";
+        throw error;
       }
 
       /**
@@ -265,57 +291,43 @@ namespace Sayuri {
        * 自分がLispPairかどうか判定する。
        * @return LispPairならtrue。
        */
-      bool IsPair() const {
-        return type_ == LispObjectType::PAIR;
-      }
+      bool IsPair() const {return type_ == LispObjectType::PAIR;}
 
       /**
        * 自分がNilかどうか判定する。
        * @return Nilならtrue。
        */
-      bool IsNil() const {
-        return type_ == LispObjectType::NIL;
-      }
+      bool IsNil() const {return type_ == LispObjectType::NIL;}
 
       /**
        * 自分がSymbolかどうか判定する。
        * @return Symbolならtrue。
        */
-      bool IsSymbol() const {
-        return type_ == LispObjectType::SYMBOL;
-      }
+      bool IsSymbol() const {return type_ == LispObjectType::SYMBOL;}
 
       /**
        * 自分がNumberかどうか判定する。
        * @return Numberならtrue。
        */
-      bool IsNumber() const {
-        return type_ == LispObjectType::NUMBER;
-      }
+      bool IsNumber() const {return type_ == LispObjectType::NUMBER;}
 
       /**
        * 自分がBooleanかどうか判定する。
        * @return Booleanならtrue。
        */
-      bool IsBoolean() const {
-        return type_ == LispObjectType::BOOLEAN;
-      }
+      bool IsBoolean() const {return type_ == LispObjectType::BOOLEAN;}
 
       /**
        * 自分がStringかどうか判定する。
        * @return Stringならtrue。
        */
-      bool IsString() const {
-        return type_ == LispObjectType::STRING;
-      }
+      bool IsString() const {return type_ == LispObjectType::STRING;}
 
       /**
        * 自分がFunctionかどうか判定する。
        * @return Functionならtrue。
        */
-      bool IsFunction() const {
-        return type_ == LispObjectType::FUNCTION;
-      }
+      bool IsFunction() const {return type_ == LispObjectType::FUNCTION;}
 
       /**
        * 自分がNative Functionかどうか判定する。
@@ -332,9 +344,7 @@ namespace Sayuri {
       bool IsList() const {
         const LispObject* ptr = this;
         for (; ptr && ptr->IsPair(); ptr = ptr->cdr_.get()) continue;
-
-        if (ptr->IsNil()) return true;
-        return false;
+        return ptr->IsNil();
       }
 
       /**
@@ -351,8 +361,18 @@ namespace Sayuri {
           if (i == index) return *(ptr->car_);
         }
 
-        throw LispObject::GenError
-        ("@out-of-range", "The index is out-of-range.");
+        LispObjectPtr error(new LispObject());
+        error->type_ = LispObjectType::PAIR;
+        error->car_.reset(new LispObject());
+        error->cdr_.reset(new LispObject());
+        error->cdr_->type_ = LispObjectType::PAIR;
+        error->cdr_->car_.reset(new LispObject());
+        error->cdr_->cdr_.reset(new LispObject());
+        error->car_->type_ = LispObjectType::SYMBOL;
+        error->car_->str_value_ = "@out-of-range";
+        error->cdr_->car_->type_ = LispObjectType::STRING;
+        error->cdr_->car_->str_value_ = "The index is out-of-range.";
+        throw error;
       }
 
       /**
@@ -364,13 +384,6 @@ namespace Sayuri {
       LispObjectPtr Evaluate(const LispObject& target) const;
 
       /**
-       * 新しいローカルスコープを生成する。
-       */
-      void NewLocalScope() {
-        scope_chain_.push_back(SymbolMapPtr(new SymbolMap()));
-      }
-
-      /**
        * リストの末尾のCdrにオブジェクトを追加する。
        * @param obj 追加するオブジェクト。
        */
@@ -380,307 +393,6 @@ namespace Sayuri {
 
         if (ptr->IsNil()) *ptr = *obj;
       }
-
-      /**
-       * 基本関数を登録する。
-       * @param obj セットしたいルートのLispObjectPtr。
-       * @param dict_ptr ヘルプ用辞書の共有ポインタ。
-       */
-      static void SetBasicFunctions(LispObjectPtr root_ptr,
-      std::shared_ptr<HelpDict> dict_ptr);
-
-      /**
-       * グローバルオブジェクトを生成する。
-       * @param obj セットしたいルートのLispObjectPtr。
-       * @return グローバルオブジェクト。
-       */
-      static LispObjectPtr GenGlobal(std::shared_ptr<HelpDict> dict_ptr) {
-        LispObjectPtr ret_ptr = NewFunction();
-        ret_ptr->NewLocalScope();
-        SetCoreFunctions(ret_ptr, dict_ptr);
-        return ret_ptr;
-      }
-
-      /**
-       * LispPairオブジェクトを作る。 (引数あり)
-       * @param car Car。
-       * @param cdr Cdr。
-       * @return LispPairオブジェクト。
-       */
-      static LispObjectPtr NewPair(LispObjectPtr car, LispObjectPtr cdr) {
-        LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::PAIR;
-        ret_ptr->car_ = car;
-        ret_ptr->cdr_ = cdr;
-
-        return ret_ptr;
-      }
-
-      /**
-       * LispPairオブジェクトを作る。 (引数無し)
-       * @return LispPairオブジェクト。
-       */
-      static LispObjectPtr NewPair() {
-        LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::PAIR;
-
-        ret_ptr->car_.reset(new LispObject());
-        ret_ptr->car_->type_ = LispObjectType::NIL;
-
-        ret_ptr->cdr_.reset(new LispObject());
-        ret_ptr->cdr_->type_ = LispObjectType::NIL;
-
-        return ret_ptr;
-      }
-
-      /**
-       * Nilオブジェクトを作る。
-       * @return Nilオブジェクト。
-       */
-      static LispObjectPtr NewNil() {
-        LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::NIL;
-        return ret_ptr;
-      }
-
-      /**
-       * Symbolオブジェクトを作る。
-       * @param value 初期値。
-       * @return Symboオブジェクト。
-       */
-      static LispObjectPtr NewSymbol(const std::string& value) {
-        LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::SYMBOL;
-        ret_ptr->str_value_ = value;
-        return ret_ptr;
-      }
-
-      /**
-       * Numberオブジェクトを作る。
-       * @param value 初期値。
-       * @return Numberオブジェクト。
-       */
-      static LispObjectPtr NewNumber(double value) {
-        LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::NUMBER;
-        ret_ptr->number_value_ = value;
-        return ret_ptr;
-      }
-
-      /**
-       * Booleanオブジェクトを作る。
-       * @param value 初期値。
-       * @return Booleanオブジェクト。
-       */
-      static LispObjectPtr NewBoolean(bool value) {
-        LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::BOOLEAN;
-        ret_ptr->boolean_value_ = value;
-        return ret_ptr;
-      }
-
-      /**
-       * Stringオブジェクトを作る。
-       * @param value 初期値。
-       * @return Stringオブジェクト。
-       */
-      static LispObjectPtr NewString(const std::string& value) {
-        LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::STRING;
-        ret_ptr->str_value_ = value;
-        return ret_ptr;
-      }
-
-      /**
-       * Functionオブジェクトを作る。
-       * @return Functionオブジェクト。
-       */
-      static LispObjectPtr NewFunction() {
-        LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::FUNCTION;
-        return ret_ptr;
-      }
-
-      /**
-       * Native Functionオブジェクトを作る。
-       * @return Native Functionオブジェクト。
-       */
-      static LispObjectPtr NewNativeFunction() {
-        LispObjectPtr ret_ptr(new LispObject());
-        ret_ptr->type_ = LispObjectType::NATIVE_FUNCTION;
-        return ret_ptr;
-      }
-
-      /**
-       * 特定の長さのリストを作る。
-       * @param length リストの長さ。
-       * @return リスト。
-       */
-      static LispObjectPtr NewList(unsigned int length) {
-        LispObjectPtr ret_ptr = NewNil();
-        LispObject* ptr = ret_ptr.get();
-        for (unsigned int i = 0; i < length; ++i) {
-          ptr->type_ = LispObjectType::PAIR;
-          ptr->car_ = NewNil();
-          ptr->cdr_ = NewNil();
-
-          ptr = ptr->cdr_.get();
-        }
-
-        return ret_ptr;
-      }
-
-      /**
-       * エラー用リストを作成する。
-       * @param error_symbol エラー識別シンボル。
-       * @param message エラーメッセージ。
-       * @return エラー用リスト。
-       */
-      static LispObjectPtr GenError(const std::string& error_symbol,
-      const std::string& message) {
-        LispObjectPtr ret_ptr = NewList(2);
-
-        ret_ptr->car_ = NewSymbol(error_symbol);
-        ret_ptr->cdr_->car_ = NewString(message);
-
-        return ret_ptr;
-      }
-   
-      /**
-       * 「不十分な引数エラー」を作成する。
-       * @param func_name 関数名。
-       * @param require 本来必要な引数の数。
-       * @param is_and_more 本来必要な引数の数のは必要最小限の数かどうか。
-       * @param given 実際与えられた引数の数。
-       * @return エラー用リスト。
-       */
-      static LispObjectPtr GenInsufficientArgumentsError
-      (const std::string& func_name, int require, bool is_and_more,
-      int given) {
-        // 必要な引数の数。
-        std::string message = "(" + func_name + ") needs "
-        + std::to_string(require);
-        if (require <= 1) message += " argument";
-        else message += " arguments";
-
-        // 以上かどうか。
-        if (is_and_more) message += " and more. ";
-        else message += ". ";
-
-        // 実際与えられた引数の数。
-        message += "Given " + std::to_string(given);
-        if (given <= 1) message += " argument.";
-        else message += " arguments.";
-
-        return GenError("@insufficient-arguments", message);
-      }
-
-
-      /**
-       * タイプ違いのエラーリストを作成する。
-       * @param func_name 関数名。
-       * @param required_type_str 求められている型の文字列。 以下の内どれか。
-       *   - Pair
-       *   - Nil
-       *   - Symbol
-       *   - Number
-       *   - Boolean
-       *   - String
-       *   - List
-       * @param index_stack 要素のインデックスが積まれたスタック。
-       *                    深い入れ子要素ほど高い位置に積まれる。
-       * @param has_evaluated 評価済みの要素かどうか。
-       */
-      static LispObjectPtr GenWrongTypeError(const std::string& func_name,
-      const std::string& required_type_str, std::vector<int> index_vec,
-      bool has_evaluated) {
-        // エラー識別シンボルを作成。
-        std::string error_symbol = "";
-        if (required_type_str == "Pair") {
-          error_symbol = "@not-pair";
-        } else if (required_type_str == "Nil") {
-          error_symbol = "@not-nil";
-        } else if (required_type_str == "Symbol") {
-          error_symbol = "@not-symbol";
-        } else if (required_type_str == "Number") {
-          error_symbol = "@not-number";
-        } else if (required_type_str == "Boolean") {
-          error_symbol = "@not-boolean";
-        } else if (required_type_str == "String") {
-          error_symbol = "@not-string";
-        } else if (required_type_str == "List") {
-          error_symbol = "@not-list";
-        } else if (required_type_str == "Procedure") {
-          error_symbol = "@not-procedure";
-        } else if (required_type_str == "Function") {
-          error_symbol = "@not-function";
-        } else if (required_type_str == "Native Function") {
-          error_symbol = "@not-native-function";
-        } else {
-          error_symbol = "@type-error";
-        }
-
-        // エラーメッセージを作成。
-        // どの要素かを作成。
-        std::string message = "";
-        bool first = true;
-        for (; index_vec.size() > 0; index_vec.pop_back()) {
-          // 冠詞。
-          if (first) {
-            message += "The ";
-            first = false;
-          } else {
-            message += "the ";
-          }
-
-          // 何番目か。
-          message += std::to_string(index_vec.back());
-          int column_1 = index_vec.back() % 10;
-          if (column_1 == 1) message += "st ";
-          else if (column_1 == 2) message += "nd ";
-          else if (column_1 == 3) message += "rd ";
-          else message += "th ";
-
-          // 要素。
-          if (index_vec.size() == 1) {
-            message += "argument of ";
-          } else {
-            message += "element of ";
-          }
-        }
-
-        // どの関数かを作成。
-        message += "(" + func_name + ") ";
-        if (has_evaluated) message += "didn't return ";
-        else message += "is not ";
-
-        // 要求されたタイプを作成。
-        message += required_type_str + ".";
-
-        return GenError(error_symbol, message);
-      }
-
-      /**
-       * S式をパースする。
-       * @param トークンのキュー。
-       * @return パース結果のベクトル。
-       */
-      static std::vector<LispObjectPtr>
-      Parse(std::queue<std::string>& token_queue);
-
-      /**
-       * LispObjectを標準出力に表示する。
-       * @param obj_ptr 表示するLispObjectのポインタ。
-       */
-      static void Print(const LispObject* obj_ptr);
-
-      /**
-       * LispObjectのツリー構造を標準出力に表示する。
-       * @param obj_ptr 表示するLispObjectのポインタ。
-       * @param pre_str インデント。 再帰コールで使う。
-       */
-      static void PrintTree(const LispObject* obj_ptr,
-      const std::string& pre_str);
 
       // ======== //
       // アクセサ //
@@ -827,21 +539,21 @@ namespace Sayuri {
       }
 
     private:
-      /**
-       * Parse()の本体。
-       * @param target パース結果を格納するオブジェクト。
-       * @param token_queue パースする残りの文字列。
-       */
-      static void ParseCore(LispObject& target,
-      std::queue<std::string>& token_queue);
+      // フレンド。
+      friend class Lisp;
 
       /**
-       * 絶対必要なコア関数を登録する。
-       * @param obj セットしたいルートのLispObjectPtr。
-       * @param dict_ptr ヘルプ用辞書の共有ポインタ。
+       * プライベートコンストラクタ
+       * @param type オブジェクトのタイプ。
+       * @param number_value 実数。
+       * @param boolean_value 真偽値。
+       * @param str_value 文字列・シンボル。
        */
-      static void SetCoreFunctions(LispObjectPtr root_ptr,
-      std::shared_ptr<HelpDict> dict_ptr);
+      LispObject(LispObjectType type, double number_value,
+      bool boolean_value, const std::string& str_value) :
+      type_(type), car_(nullptr), cdr_(nullptr),
+      number_value_(number_value), boolean_value_(boolean_value),
+      str_value_(str_value) {}
 
       // ========== //
       // メンバ変数 //
@@ -854,14 +566,10 @@ namespace Sayuri {
       /** Cdr。 */
       LispObjectPtr cdr_;
 
-      /** プリミティブデータ。 */
-      union {
-        /** 実数データ。 */
-        double number_value_;
-        /** 真偽値データ。 */
-        bool boolean_value_;
-      };
-
+      /** 実数データ。 */
+      double number_value_;
+      /** 真偽値データ。 */
+      bool boolean_value_;
       /** シンボル・文字列データ。 */
       std::string str_value_;
 
@@ -876,366 +584,457 @@ namespace Sayuri {
   };
 
   /** List用イテレータ。 */
-  class LispIterator {
-    public:
-      // ==================== //
-      // コンストラクタと代入 //
-      // ==================== //
-      /**
-       * コンストラクタ。
-       * @param list_ptr リストのポインタ。
-       */
-      LispIterator(const LispObject* list_ptr);
-      /** コンストラクタ。 */
-      LispIterator();
-      /**
-       * コピーコンストラクタ。
-       * @param itr コピー元。
-       */
-      LispIterator(const LispIterator& itr);
-      /**
-       * ムーブコンストラクタ。
-       * @param itr ムーブ元。
-       */
-      LispIterator(LispIterator&& itr);
-      /**
-       * コピー代入演算子。
-       * @param itr コピー元。
-       */
-      LispIterator& operator=(const LispIterator& itr);
-      /**
-       * ムーブ代入演算子。
-       * @param itr ムーブ元。
-       */
-      LispIterator& operator=(LispIterator&& itr);
-      /** デストラクタ。 */
-      virtual ~LispIterator();
+  struct LispIterator {
+    /** 現在の位置。 */
+    const LispObject* current_;
 
-      // ====== //
-      // 演算子 //
-      // ====== //
-      /**
-       * 前置インクリメント演算子。
-       * @return 自分自身。
-       */
-      LispIterator& operator++() {
-        if (!current_ptr_) return *this;
-        if (current_ptr_->IsPair()) {
-          current_ptr_ = current_ptr_->cdr().get();
-        }
+    // ====== //
+    // 演算子 //
+    // ====== //
+    /**
+     * 前置インクリメント演算子。
+     * @return 自分自身。
+     */
+    LispIterator& operator++() {
+      if (current_ && current_->IsPair()) current_ = current_->cdr().get();
+      return *this;
+    }
 
-        return *this;
+    /**
+     * 後置インクリメント演算子。
+     * @return インクリメント前のコピー。
+     */
+    LispIterator operator++(int dummy) {
+      LispIterator ret(*this);
+      if (current_ && current_->IsPair()) current_ = current_->cdr().get();
+      return ret;
+    }
+
+    /**
+     * 末尾に到達していなければtrue。
+     */
+    explicit operator bool() {
+      return current_ ? current_->IsPair() : false;
+    }
+
+    /**
+     * ポインタアクセス演算子。
+     */
+    LispObject& operator*() {
+      return *(current_->car());
+    }
+
+    /**
+     * LispObjectのポインタとしての演算子。
+     */
+    operator LispObject*() {
+      return current_->car().get();
+    }
+
+    /**
+     * アロー演算子。
+     */
+    LispObject* operator->() {
+      return current_->car().get();
+    }
+
+    /**
+     * 足し算挿入演算子。
+     */
+    LispIterator& operator+=(int inc) {
+      for (int i = 0; i < inc; ++i) {
+        if (current_ && current_->IsPair()) current_ = current_->cdr().get();
+        else break;
       }
-
-      /**
-       * 後置インクリメント演算子。
-       * @return インクリメント前のコピー。
-       */
-      LispIterator operator++(int dummy) {
-        // インクリメント前のコピーを取っておく。
-        LispIterator ret(*this);
-
-        if (!current_ptr_) return ret;
-        if (current_ptr_->IsPair()) {
-          current_ptr_ = current_ptr_->cdr().get();
-        }
-
-        // インクリメント前のコピーを返す。
-        return ret;
-      }
-
-      /**
-       * 末尾に到達していなければtrue。
-       */
-      explicit operator bool() {
-        if (!current_ptr_) return false;
-        return current_ptr_->IsPair();
-      }
-
-      /**
-       * ポインタアクセス演算子。
-       */
-      LispObject& operator*() {
-        return *(current_ptr_->car());
-      }
-
-      /**
-       * LispObjectのポインタとしての演算子。
-       */
-      operator LispObject*() {
-        return current_ptr_->car().get();
-      }
-
-      /**
-       * アロー演算子。
-       */
-      LispObject* operator->() {
-        return current_ptr_->car().get();
-      }
-
-      /**
-       * 足し算挿入演算子。
-       */
-      LispIterator& operator+=(int inc) {
-        for (int i = 0; i < inc; ++i) {
-          if (current_ptr_->IsPair()) {
-            current_ptr_ = current_ptr_->cdr().get();
-          } else {
-            break;
-          }
-        }
-        return *this;
-      }
-
-      // ======== //
-      // アクセサ //
-      // ======== //
-      /**
-       * アクセサ - 現在参照している。
-       * @return 現在参照しているCdr。
-       */
-      const LispObject& current() const {return *current_ptr_;}
-
-    private:
-      /** 現在参照しているポインタ。 */
-      const LispObject* current_ptr_;
+      return *this;
+    }
   };
 
-  /** 字句解析するクラス。 */
-  class LispTokenizer {
+  /** Lispインタープリタのクラス。 */
+  class Lisp {
     public:
       // ==================== //
       // コンストラクタと代入 //
       // ==================== //
       /** コンストラクタ。 */
-      LispTokenizer() :
-      parentheses_(0),
-      in_comment_(false),
-      in_string_(false) {}
+      Lisp() : global_ptr_(new LispObject()), help_ptr_(new HelpDict()),
+      parentheses_(0), in_comment_(false), in_string_(false),
+      in_escape_(false) {
+        global_ptr_->type_ = LispObjectType::NATIVE_FUNCTION;
+        global_ptr_->scope_chain_.push_back(SymbolMapPtr(new SymbolMap()));
+        SetCoreFunctions();
+        SetBasicFunctions();
+      }
       /**
        * コピーコンストラクタ。
-       * @param tokenizer コピー元。
+       * @param lisp コピー元。
        */
-      LispTokenizer(const LispTokenizer& tokenizer) :
-      token_queue_(tokenizer.token_queue_),
-      stream_(tokenizer.stream_.str()),
-      parentheses_(tokenizer.parentheses_),
-      in_comment_(tokenizer.in_comment_),
-      in_string_(tokenizer.in_string_) {}
+      Lisp(const Lisp& lisp) :
+      global_ptr_(lisp.global_ptr_->Clone()),
+      help_ptr_(new HelpDict(*(lisp.help_ptr_))),
+      token_queue_(lisp.token_queue_),
+      token_stream_(lisp.token_stream_.str()),
+      parentheses_(lisp.parentheses_),
+      in_comment_(lisp.in_comment_),
+      in_string_(lisp.in_string_),
+      in_escape_(lisp.in_escape_) {}
       /**
        * ムーブコンストラクタ。
-       * @param tokenizer ムーブ元。
+       * @param lisp ムーブ元。
        */
-      LispTokenizer(LispTokenizer&& tokenizer) :
-      token_queue_(std::move(tokenizer.token_queue_)),
-      stream_(tokenizer.stream_.str()),
-      parentheses_(tokenizer.parentheses_),
-      in_comment_(tokenizer.in_comment_),
-      in_string_(tokenizer.in_string_) {}
+      Lisp(Lisp&& lisp) :
+      global_ptr_(std::move(lisp.global_ptr_)),
+      help_ptr_(std::move(lisp.help_ptr_)),
+      token_queue_(std::move(lisp.token_queue_)),
+      token_stream_(lisp.token_stream_.str()),
+      parentheses_(lisp.parentheses_),
+      in_comment_(lisp.in_comment_),
+      in_string_(lisp.in_string_),
+      in_escape_(lisp.in_escape_) {
+      }
+
       /**
        * コピー代入演算子。
-       * @param tokenizer コピー元。
+       * @param lisp コピー元。
        */
-      LispTokenizer& operator=(const LispTokenizer& tokenizer) {
-        token_queue_ = tokenizer.token_queue_;
-        stream_.str(tokenizer.stream_.str());
-        parentheses_ = tokenizer.parentheses_;
-        in_comment_ = tokenizer.in_comment_;
-        in_string_ = tokenizer.in_string_;
+      Lisp& operator=(const Lisp& lisp) {
+        global_ptr_ = lisp.global_ptr_->Clone();
+        help_ptr_.reset(new HelpDict(*(lisp.help_ptr_)));
+        token_queue_ = lisp.token_queue_;
+        token_stream_ << lisp.token_stream_.rdbuf();
+        parentheses_ = lisp.parentheses_;
+        in_comment_ = lisp.in_comment_;
+        in_string_ = lisp.in_string_;
+        in_escape_ = lisp.in_escape_;
         return *this;
       }
       /**
        * ムーブ代入演算子。
-       * @param tokenizer ムーブ元。
+       * @param lisp ムーブ元。
        */
-      LispTokenizer& operator=(LispTokenizer&& tokenizer) {
-        token_queue_ = std::move(tokenizer.token_queue_);
-        stream_.str(tokenizer.stream_.str());
-        parentheses_ = tokenizer.parentheses_;
-        in_comment_ = tokenizer.in_comment_;
-        in_string_ = tokenizer.in_string_;
+      Lisp& operator=(Lisp&& lisp) {
+        global_ptr_ = std::move(lisp.global_ptr_);
+        help_ptr_ = std::move(lisp.help_ptr_);
+        token_queue_ = std::move(lisp.token_queue_);
+        token_stream_ << lisp.token_stream_.rdbuf();
+        parentheses_ = lisp.parentheses_;
+        in_comment_ = lisp.in_comment_;
+        in_string_ = lisp.in_string_;
+        in_escape_ = lisp.in_escape_;
         return *this;
       }
       /** デストラクタ。 */
-      virtual ~LispTokenizer() {}
+      virtual ~Lisp() {}
 
       // ============== //
       // パブリック関数 //
       // ============== //
       /**
-       * 文字列を字句解析する。
-       * @param input_str 解析したい文字列。
-       * @return
-       * - return == 0 : 括弧の対応関係が正しい。
-       * - return < 0 : 閉じ括弧が多すぎる。
-       * - return > 0 : 閉じ括弧が足りない。
+       * S式を実行する。
+       * @param obj 実行するLispObject。
+       * @return 実行結果のオブジェクト。
        */
-      int Analyse(const std::string& input_str) {
-        // 区切り時の処理。
-        auto pause = [this](char c) {
-          if (!(stream_.str().empty())) {
-            // トークンキューに今までの文字をプッシュ。
-            this->token_queue_.push(stream_.str());
-            // ストリームをクリア。
-            stream_.str("");
-          }
-
-          // トークンキューに文字をプッシュ。
-          char one_letter[] {c, '\0'};
-          this->token_queue_.push(one_letter);
-        };
-
-        // 空白文字。
-        static const std::set<char> empty_c_set {
-          ' ', '\n', '\r', '\t', '\b', '\a', '\f', '\0'
-        };
-
-        // 一文字ずつ調べる。
-        bool escape_c = false;  // エスケープ文字フラグ。
-        for (auto c : input_str) {
-          if (in_comment_) {
-            // コメント中。
-            if (c == '\n') {
-              in_comment_ = false;
-            }
-          } else if (in_string_) {
-            // 文字列中。
-            // 空白文字なら無視。 ただし、スペースは無視しない。
-            if ((empty_c_set.find(c) != empty_c_set.end()) && (c != ' ')) {
-              continue;
-            }
-
-            if (escape_c) {
-              // エスケープ文字。
-              escape_c = false;
-              switch (c) {
-                case 'n':
-                  // 改行指定。
-                  stream_ << '\n';
-                  break;
-                case 'r':
-                  // キャリッジリターン指定。
-                  stream_ << '\r';
-                  break;
-                case 't':
-                  // タブ指定。
-                  stream_ << '\t';
-                  break;
-                case 'b':
-                  // バックスペース指定。
-                  stream_ << '\b';
-                  break;
-                case 'a':
-                  // ビープ音指定。
-                  stream_ << '\a';
-                  break;
-                case 'f':
-                  // 改ページ指定。
-                  stream_ << '\f';
-                  break;
-                case '0':
-                  // ヌル文字指定。
-                  stream_ << '\0';
-                  break;
-                default:
-                  // それ以外。 クォート、バックスラッシュも含む。
-                  stream_ << c;
-                  break;
-              }
-            } else {
-              if (c == '"') {
-                // 文字列終了。
-                in_string_ = false;
-                pause(c);  // 区切り。
-              } else if (c == '\\') {
-                // バックスラッシュ。 次の文字はエスケープ文字。
-                escape_c = true;
-              } else {
-                stream_ << c;
-              }
-            }
-          } else {
-            // コメント中でも文字列中でもない。
-            if (empty_c_set.find(c) != empty_c_set.end()) {
-              // 空白文字。
-              if (!(stream_.str().empty())) {
-                token_queue_.push(stream_.str());
-                stream_.str("");
-              }
-            } else if ((c == '(') || (c == '[') || (c == '{')) {
-              // 開き括弧。
-              pause('(');
-              ++parentheses_;
-            } else if ((c == ')') || (c == ']') || (c == '}')) {
-              // 閉じ括弧。
-              pause(')');
-              --parentheses_;
-            } else if (c == ';') {
-              // コメント開始文字。
-              if (!(stream_.str().empty())) {
-                token_queue_.push(stream_.str());
-                stream_.str("");
-              }
-              in_comment_ = true;
-            } else if (c == '"') {
-              // 文字列開始文字。
-              pause(c);
-              in_string_ = true;
-            } else if (c == '\'') {
-              // (quote)の糖衣構文。
-              pause(c);
-            } else {
-              // それ以外。
-              stream_ << c;
-            }
-          }
-        }
-
-        // 最後にストリームの残りをキューにプッシュ。
-        // ただし、文字列中やコメント中の時は、
-        // トークンが完成していないのでプッシュしない。
-        if (!in_string_ && !in_comment_ && !(stream_.str().empty())) {
-          token_queue_.push(stream_.str());
-          stream_.str("");
-        }
-
-        return parentheses_;
+      LispObjectPtr Execute(const LispObject& obj) {
+        return global_ptr_->Evaluate(obj);
       }
 
       /**
-       * 状態を初期状態にリセットする。
+       * 関数を登録する。
+       * @param func 登録する関数。
+       * @param symbol 関数のシンボル。
+       */
+      void AddNativeFunction(const NativeFunction& func,
+      const std::string& symbol) {
+        global_ptr_->BindSymbol(symbol,
+        NewNativeFunction(global_ptr_->scope_chain_, func));
+      }
+
+      /**
+       * 関数を削除する。
+       * @param symbol 削除する関数のシンボル。
+       */
+      void RemoveNativeFunction(const std::string& symbol) {
+        global_ptr_->scope_chain_[0]->erase(symbol);
+      }
+
+      /**
+       * ヘルプ辞書を登録する。
+       * @param func 登録する関数。
+       * @param symbol 関数のシンボル。
+       */
+      void AddHelpDict(const std::string& symbol,
+      const std::string& contents) {
+        (*help_ptr_)[symbol] = contents;
+      }
+
+      /**
+       * 内部状態をリセットする。
        */
       void Reset() {
         token_queue_ = std::queue<std::string>();
-        stream_.str("");
+        token_stream_.str("");
         parentheses_ = 0;
         in_comment_ = false;
         in_string_ = false;
+        in_escape_ = false;
       }
 
-      // ======== //
-      // アクセサ //
-      // ======== //
       /**
-       * アクセサ - 蓄積されたトークンキュー。
-       * @return 蓄積されたトークンキュー。
+       * Nilオブジェクトを作る。
+       * @return Nilオブジェクト。
        */
-      std::queue<std::string> token_queue() const {return token_queue_;}
+      static LispObjectPtr NewNil() {return LispObjectPtr(new LispObject());}
 
-      // 括弧の対応関係の数。
-      int parentheses() const {return parentheses_;}
+      /**
+       * LispPairオブジェクトを作る。 (引数あり)
+       * @param car Car。
+       * @param cdr Cdr。
+       * @return LispPairオブジェクト。
+       */
+      static LispObjectPtr NewPair(LispObjectPtr car, LispObjectPtr cdr) {
+        LispObjectPtr ret_ptr(new LispObject(LispObjectType::PAIR,
+        0.0, false, ""));
+
+        ret_ptr->car_ = car;
+        ret_ptr->cdr_ = cdr;
+
+        return ret_ptr;
+      }
+
+      /**
+       * LispPairオブジェクトを作る。 (引数無し)
+       * @return LispPairオブジェクト。
+       */
+      static LispObjectPtr NewPair() {
+        LispObjectPtr ret_ptr(new LispObject(LispObjectType::PAIR,
+        0.0, false, ""));
+
+        ret_ptr->car_.reset(new LispObject());
+        ret_ptr->cdr_.reset(new LispObject());
+
+        return ret_ptr;
+      }
+
+      /**
+       * Symbolオブジェクトを作る。
+       * @param value 初期値。
+       * @return Symboオブジェクト。
+       */
+      static LispObjectPtr NewSymbol(const std::string& value) {
+        return LispObjectPtr(new LispObject(LispObjectType::SYMBOL,
+        0.0, false, value));
+      }
+
+      /**
+       * Numberオブジェクトを作る。
+       * @param value 初期値。
+       * @return Numberオブジェクト。
+       */
+      static LispObjectPtr NewNumber(double value) {
+        return LispObjectPtr(new LispObject(LispObjectType::NUMBER,
+        value, false, ""));
+      }
+
+      /**
+       * Booleanオブジェクトを作る。
+       * @param value 初期値。
+       * @return Booleanオブジェクト。
+       */
+      static LispObjectPtr NewBoolean(bool value) {
+        return LispObjectPtr(new LispObject(LispObjectType::BOOLEAN,
+        0.0, value, ""));
+      }
+
+      /**
+       * Stringオブジェクトを作る。
+       * @param value 初期値。
+       * @return Stringオブジェクト。
+       */
+      static LispObjectPtr NewString(const std::string& value) {
+        return LispObjectPtr(new LispObject(LispObjectType::STRING,
+        0.0, false, value));
+      }
+
+      /**
+       * Functionオブジェクトを作る。
+       * @param parent_scope 継承する親のスコープ。
+       * @param arg_name_vec 引数名のベクトル。
+       * @param def_vec 定義式のベクトル。
+       * @return Functionオブジェクト。
+       */
+      static LispObjectPtr NewFunction(const ScopeChain& parent_scope,
+      const std::vector<std::string>& arg_name_vec,
+      const std::vector<LispObjectPtr>& def_vec) {
+        LispObjectPtr ret_ptr(new LispObject(LispObjectType::FUNCTION,
+        0.0, false, ""));
+
+        // スコープを継承。
+        ret_ptr->scope_chain_ = parent_scope;
+        ret_ptr->scope_chain_.push_back(SymbolMapPtr(new SymbolMap()));
+
+        ret_ptr->function_.arg_name_vec_ = arg_name_vec;
+        ret_ptr->function_.def_vec_ = def_vec;
+
+        return ret_ptr;
+      }
+
+      /**
+       * NativeFunctionオブジェクトを作る。
+       * @param parent_scope 継承する親のスコープ。
+       * @param native_function ネイティブ関数。
+       * @return NativeFunctionオブジェクト。
+       */
+      static LispObjectPtr NewNativeFunction(const ScopeChain& parent_scope,
+      const NativeFunction& native_function) {
+        LispObjectPtr ret_ptr(new LispObject(LispObjectType::NATIVE_FUNCTION,
+        0.0, false, ""));
+
+        // スコープを継承。
+        ret_ptr->scope_chain_ = parent_scope;
+        ret_ptr->scope_chain_.push_back(SymbolMapPtr(new SymbolMap()));
+
+        ret_ptr->native_function_ = native_function;
+
+        return ret_ptr;
+      }
+
+      /**
+       * 特定の長さのリストを作る。
+       * @param length リストの長さ。
+       * @return リスト。
+       */
+      static LispObjectPtr NewList(unsigned int length) {
+        LispObjectPtr ret_ptr = NewNil();
+        LispObject* ptr = ret_ptr.get();
+        for (unsigned int i = 0; i < length; ++i) {
+          ptr->type_ = LispObjectType::PAIR;
+          ptr->car_ = NewNil();
+          ptr->cdr_ = NewNil();
+
+          ptr = ptr->cdr_.get();
+        }
+
+        return ret_ptr;
+      }
+
+      /**
+       * S式をパースする。
+       * @param code Lispコード。
+       * @return パース結果のベクトル。 パース不可能なら空のベクトル。
+       */
+      std::vector<LispObjectPtr> Parse(const std::string& code) {
+        std::vector<LispObjectPtr> ret;
+
+        // コードを字句解析。
+        Tokenize(code);
+        if (parentheses_ == 0) {
+          while (!(token_queue_.empty())) {
+            LispObjectPtr result(new LispObject());
+            ParseCore(*result);
+            ret.push_back(result);
+          }
+
+          // 終了処理。 初期化する。
+          Reset();
+        }
+
+        return ret;
+      }
+
+      /**
+       * エラー用リストを作成する。
+       * @param error_symbol エラー識別シンボル。
+       * @param message エラーメッセージ。
+       * @return エラー用リスト。
+       */
+      static LispObjectPtr GenError(const std::string& error_symbol,
+      const std::string& message) {
+        LispObjectPtr ret_ptr = NewList(2);
+
+        ret_ptr->car_ = NewSymbol(error_symbol);
+        ret_ptr->cdr_->car_ = NewString(message);
+
+        return ret_ptr;
+      }
+   
+      /**
+       * 「不十分な引数エラー」を作成する。
+       * @param func_name 関数名。
+       * @param require 本来必要な引数の数。
+       * @param is_and_more 本来必要な引数の数のは必要最小限の数かどうか。
+       * @param given 実際与えられた引数の数。
+       * @return エラー用リスト。
+       */
+      static LispObjectPtr GenInsufficientArgumentsError
+      (const std::string& func_name, int require, bool is_and_more,
+      int given);
+
+      /**
+       * タイプ違いのエラーリストを作成する。
+       * @param func_name 関数名。
+       * @param required_type_str 求められている型の文字列。 以下の内どれか。
+       *   - Pair
+       *   - Nil
+       *   - Symbol
+       *   - Number
+       *   - Boolean
+       *   - String
+       *   - List
+       * @param index_stack 要素のインデックスが積まれたスタック。
+       *                    深い入れ子要素ほど高い位置に積まれる。
+       * @param has_evaluated 評価済みの要素かどうか。
+       */
+      static LispObjectPtr GenWrongTypeError(const std::string& func_name,
+      const std::string& required_type_str, std::vector<int> index_vec,
+      bool has_evaluated);
 
     private:
+      // ================ //
+      // プライベート関数 //
+      // ================ //
+      /**
+       * 文字列を字句解析する。
+       * @param code 解析したいコード。
+       * @return
+       */
+      void Tokenize(const std::string& code);
+
+      /**
+       * Parse()の本体。
+       * @param target パース結果を格納するオブジェクト。
+       */
+      void ParseCore(LispObject& target);
+
+      /**
+       * コア関数を登録する。
+       */
+      void SetCoreFunctions();
+
+      /**
+       * 基本関数を登録する。
+       */
+      void SetBasicFunctions();
+
+      // ========== //
+      // メンバ変数 //
+      // ========== //
+      /** グローバルオブジェクト。 */
+      LispObjectPtr global_ptr_;
+      /** ヘルプ辞書。 */
+      std::unique_ptr<HelpDict> help_ptr_;
+
       /** トークンを入れるキュー。 */
       std::queue<std::string> token_queue_;
       /** 解析用ストリーム。 */
-      std::ostringstream stream_;
+      std::ostringstream token_stream_;
       /** 括弧の対応関係の数。 */
       int parentheses_;
       /** 現在コメント中かどうか。 */
       bool in_comment_;
       /** 現在文字列中かどうか。 */
       bool in_string_;
+      /** 現在エスケープ文字中かどうか。 */
+      bool in_escape_;
   };
 }  // namespace Sayuri
 
