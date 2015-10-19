@@ -34,6 +34,7 @@
 <li><a href="#list"><code>list</code></a> : Generates List.</li>
 <li><a href="#list-replace"><code>list-replace</code></a> : Replaces an element of List for an object.</li>
 <li><a href="#list-remove"><code>list-remove</code></a> : Removes an element of List.</li>
+<li><a href="#search"><code>search</code></a> : Searches an object from List.</li>
 <li><a href="#string-split"><code>string-split</code></a> : Splits String.</li>
 </ul></li>
 <li><a href="#container-functions">Container Functions</a>
@@ -297,6 +298,33 @@ Example
 ;; Output
 ;;
 ;; &gt; (111 333)</code></pre>
+<h3 id="search">search</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(search &lt;Object&gt; &lt;List&gt;)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>If <code>&lt;List&gt;</code> has an object same as <code>&lt;Object&gt;</code>, it returns index number of the object.<br /> Otherwise it returns Nil.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(define lst &#39;(111 222 &quot;Hello&quot; #t))
+
+(display (search &quot;Hello&quot; lst))
+(display (search &quot;World&quot; lst))
+
+;; Output
+;; &gt;  2
+;; &gt; ()</code></pre>
 <h3 id="string-split">string-split</h3>
 <h6> 
 Usage
