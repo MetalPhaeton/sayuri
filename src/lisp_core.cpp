@@ -719,15 +719,15 @@ R"...(### to-string ###
             (func_name, required_args, true, list.Length() - 1);
           }
 
-          // 自分のスコープに例外メッセージをバインド。
-          ScopeChain chain = caller.scope_chain();
-          chain.push_back(SymbolMapPtr(new SymbolMap()));
-          self->scope_chain(chain);
-          self->BindSymbol("exception", exception);
+          // 一時スコープに例外メッセージをバインド。
+          LispObjectPtr scope_ptr =
+          Lisp::NewScopeObject(caller.scope_chain());
+
+          scope_ptr->BindSymbol("exception", exception);
 
           // 例外処理。
           for (; list_itr; ++list_itr) {
-            ret_ptr = self->Evaluate(*list_itr);
+            ret_ptr = scope_ptr->Evaluate(*list_itr);
           }
         }
 
@@ -1340,8 +1340,9 @@ R"...(### lambda ###
         }
         LispIterator first_itr {&(*(list_itr++))};
 
-        // ローカル変数定義をローカルスコープにバインドする。
+        // 一時スコープを作成してバインド。
         int index = 1;
+        LispObjectPtr scope_ptr = Lisp::NewScopeObject(caller.scope_chain());
         for (; first_itr; ++first_itr, ++index) {
           if (!(first_itr->IsList())) {
             throw Lisp::GenWrongTypeError
@@ -1364,14 +1365,14 @@ R"...(### lambda ###
             }
 
             // バインド。
-            self->BindSymbol(var_name, value);
+            scope_ptr->BindSymbol(var_name, value);
           }
         }
 
         // 第3引数以降を自分のスコープで評価する。
         LispObjectPtr ret_ptr;
         for (; list_itr; ++list_itr) {
-          ret_ptr = self->Evaluate(*list_itr);
+          ret_ptr = scope_ptr->Evaluate(*list_itr);
         }
 
         return ret_ptr;
@@ -1423,8 +1424,9 @@ R"...(### let ###
           (func_name, required_args, true, len - 1);
         }
 
-        // ループ開始。
+        // 一時スコープを作り、ループ開始。
         LispObjectPtr ret_ptr = Lisp::NewNil();
+        LispObjectPtr scope_ptr = Lisp::NewScopeObject(caller.scope_chain());
         while (true) {
           // 条件式へのポインタ。
           const LispObject* ptr = list_itr.current_;
@@ -1439,7 +1441,7 @@ R"...(### let ###
 
           // 自分のスコープで実行していく。
           for (; ptr->IsPair(); ptr = ptr->cdr().get()) {
-            ret_ptr = self->Evaluate(*(ptr->car()));
+            ret_ptr = scope_ptr->Evaluate(*(ptr->car()));
           }
         }
 
@@ -1509,9 +1511,10 @@ R"...(### while ###
           throw Lisp::GenWrongTypeError
           (func_name, "Symbol", std::vector<int> {1, 1}, false);
         }
-        // バインド。
+        // 一時スコープにバインド。
+        LispObjectPtr scope_ptr = Lisp::NewScopeObject(caller.scope_chain());
         std::string symbol = first_itr->symbol_value();
-        self->BindSymbol(symbol, Lisp::NewNil());
+        scope_ptr->BindSymbol(symbol, Lisp::NewNil());
 
         // ループ用リストをチェックする。
         ++first_itr;
@@ -1528,11 +1531,11 @@ R"...(### while ###
         LispObjectPtr ret_ptr = Lisp::NewNil();
         for (LispIterator itr {loop_list_ptr.get()}; itr; ++itr) {
           // ローカルスコープに要素をバインド。
-          self->RewriteSymbol(symbol, itr->Clone());
+          scope_ptr->RewriteSymbol(symbol, itr->Clone());
 
           // 自分のスコープで次々と実行する。
           for (LispIterator itr_2 {list_itr.current_}; itr_2; ++itr_2) {
-            ret_ptr = self->Evaluate(*itr_2);
+            ret_ptr = scope_ptr->Evaluate(*itr_2);
           }
         }
         return ret_ptr;

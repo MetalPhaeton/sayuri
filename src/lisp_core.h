@@ -937,6 +937,18 @@ namespace Sayuri {
       }
 
       /**
+       * 一時スコープ用オブジェクトを作る。
+       * @param parent_scope 継承する親のスコープ。
+       * @return スコープ用オブジェクト。
+       */
+      static LispObjectPtr NewScopeObject(const ScopeChain& parent_scope) {
+        LispObjectPtr ret_ptr = NewNil();
+        ret_ptr->scope_chain_ = parent_scope;
+        ret_ptr->scope_chain_.push_back(SymbolMapPtr(new SymbolMap));
+        return ret_ptr;
+      }
+
+      /**
        * S式をパースする。
        * @param code Lispコード。
        * @return パース結果のベクトル。 パース不可能なら空のベクトル。
