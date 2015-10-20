@@ -20,9 +20,9 @@
 ;; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 ;; IN THE SOFTWARE.
 
-;;;;;;;;;;;;;;;
-;; Configure ;;
-;;;;;;;;;;;;;;; You can edit this section.
+;;;;;;;;;;;;;;
+;; Settings ;;
+;;;;;;;;;;;;;; You can edit this section.
 ;;-----------------------------------------------------------------------------
 ;; Number of threads.
 (define threads 2)
@@ -52,46 +52,42 @@
 
 ;; If str is "info..", then update info-str.
 (define (output-info?-update str)
-  (if (equal? (list-ref (string-split str " ") 0) "info")
+  (if (equal? (ref (string-split str " ") 0) "info")
     (set! output str) ()))
+
+;; If str is "bestmove..", then return #t. Otherwise return #f
+(define (bestmove? str)
+  (if (equal? (ref (string-split str " ") 0) "bestmove") #t #f))
 
 ;; Append time data.
 (define (append-time li)
   (set! data-time
-    (cons (string->number (list-ref li (++ (search "time" li))))
-          data-time)))
+    (cons (parse (ref li (++ (search "time" li)))) data-time)))
 
 ;; Append nodes data.
 (define (append-nodes li)
   (set! data-nodes
-    (cons (string->number (list-ref li (++ (search "nodes" li))))
-          data-nodes)))
+    (cons (parse (ref li (++ (search "nodes" li)))) data-nodes)))
 
 ;; Append nps data.
 (define (append-nps li)
   (set! data-nps
-    (cons (string->number (list-ref li (++ (search "nps" li))))
-          data-nps)))
+    (cons (parse (ref li (++ (search "nps" li)))) data-nps)))
 
 ;; Append hashfull data.
 (define (append-hashfull li)
   (set! data-hashfull
-    (cons (string->number (list-ref li (++ (search "hashfull" li))))
-          data-hashfull)))
+    (cons (parse (ref li (++ (search "hashfull" li)))) data-hashfull)))
 
 ;; Mean.
 (define (mean li)
-  (/ (eval (cons '+ li)) (length li)))
+  (/ (conval '+ li) (length li)))
 
 ;; Dispersion.
 (define (var li)
   (define m (mean li))
-  (define i 0)
   (define sum 0)
-  (while (< i (length li))
-         (set! sum
-           (+ sum (* (- (list-ref li i) m) (- (list-ref li i) m))))
-         (inc! i))
+  (for (x li) (set! sum (+ sum (* (- x m) (- x m)))))
   (/ sum (length li)))
 
 ;; Standard Deviation.
@@ -104,14 +100,12 @@
 (define (mode li)
   (define i 0)
   (define li-log ())
-  (while (< i (length li))
-         (set! li-log (cons (log-2 (list-ref li i)) li-log ))
-         (inc! i))
+  (for (x li) (set! li-log (cons (log-2 x) li-log )))
   (exp (- (mean li-log) (var li-log))))
 
 ;; Listener.
 (define (output-listener message)
-  (stderr (string-append message "\n"))
+  (stderr (append message "\n"))
   (output-info?-update message))
 
 ;; Print result.
@@ -123,7 +117,7 @@
   (display "")
 
   ;; Configure.
-  (display "Configure:")
+  (display "Settings:")
   (display "    Threads: " threads)
   (display "    Hash Size:  " hash-size)
   (display "    Repeat:  " repeat)
@@ -135,8 +129,8 @@
   ;; Time.
   (display "Time:")
   (display "    Mean: " (mean data-time))
-  (display "    Max: " (eval (cons 'max data-time)))
-  (display "    Min: " (eval (cons 'min data-time)))
+  (display "    Max: " (conval 'max data-time))
+  (display "    Min: " (conval 'min data-time))
   (display "    SDev: " (dev data-time))
   (display "    Mode: " (mode data-time))
 
@@ -145,8 +139,8 @@
   ;; Nodes.
   (display "Nodes:")
   (display "    Mean: " (mean data-nodes))
-  (display "    Max: " (eval (cons 'max data-nodes)))
-  (display "    Min: " (eval (cons 'min data-nodes)))
+  (display "    Max: " (conval 'max data-nodes))
+  (display "    Min: " (conval 'min data-nodes))
   (display "    SDev: " (dev data-nodes))
   (display "    Mode: " (mode data-nodes))
 
@@ -155,8 +149,8 @@
   ;; NPS
   (display "NPS:")
   (display "    Mean: " (mean data-nps))
-  (display "    Max: " (eval (cons 'max data-nps)))
-  (display "    Min: " (eval (cons 'min data-nps)))
+  (display "    Max: " (conval 'max data-nps))
+  (display "    Min: " (conval 'min data-nps))
   (display "    SDev: " (dev data-nps))
   (display "    Mode: " (mode data-nps))
 
@@ -165,8 +159,8 @@
   ;; Hash Full
   (display "Hash Full:")
   (display "    Mean: " (mean data-hashfull))
-  (display "    Max: " (eval (cons 'max data-hashfull)))
-  (display "    Min: " (eval (cons 'min data-hashfull)))
+  (display "    Max: " (conval 'max data-hashfull))
+  (display "    Min: " (conval 'min data-hashfull))
   (display "    SDev: " (dev data-hashfull))
   (display "    Mode: " (mode data-hashfull)))
 
@@ -174,15 +168,14 @@
 ;; Get ready.
 (engine '@add-uci-output-listener output-listener)
 (engine '@input-uci-command
-        (string-append "setoption name threads value " (to-string threads)))
+        (append "setoption name threads value " (to-string threads)))
 (engine '@input-uci-command
-        (string-append "setoption name hash value " (to-string hash-size)))
+        (append "setoption name hash value " (to-string hash-size)))
 ;; Go.
 (define count 0)
 (while (< count repeat)
        (engine '@input-uci-command "ucinewgame")
-       (engine '@input-uci-command
-               (string-append "position fen " fen))
+       (engine '@input-uci-command (append "position fen " fen))
        (engine '@go-depth depth)
        (append-time (string-split output " "))
        (append-nodes (string-split output " "))
