@@ -187,6 +187,52 @@ Example
 <li><code>(stdin '@read)</code> : This means to get all strings until EOF from Standard Input.</li>
 </ul></li>
 </ul>
+<h3 id="looping">Looping</h3>
+<p>Sayulisp has special form for looping.</p>
+<ul>
+<li><code>(while)</code>: &quot;While Loop&quot;</li>
+<li><code>(for)</code>: &quot;Foreach Loop&quot;</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>;; --- While Loop --- ;;
+(define i 0)
+(while (&lt; i 5)
+    (display &quot;Hello &quot; i)
+    (display &quot;World&quot; i)
+    (inc! i))
+
+;; Output
+;; &gt; Hello 0
+;; &gt; World 0
+;; &gt; Hello 1
+;; &gt; World 1
+;; &gt; Hello 2
+;; &gt; World 2
+;; &gt; Hello 3
+;; &gt; World 3
+;; &gt; Hello 4
+;; &gt; World 4
+
+;; --- Foreach Loop --- ;;
+(define aaa &#39;(1 2 3 4 5))
+
+(for (x aaa)
+    (display &quot;Hello &quot; x)
+    (display &quot;World &quot; (+ x 5)))
+;; Output
+;; &gt; Hello 1
+;; &gt; World 6
+;; &gt; Hello 2
+;; &gt; World 7
+;; &gt; Hello 3
+;; &gt; World 8
+;; &gt; Hello 4
+;; &gt; World 9
+;; &gt; Hello 5
+;; &gt; World 10</code></pre>
 <h3 id="exception-handling">Exception Handling</h3>
 <p>Some functions throws an exception.<br />If you don't do anything, Sayulisp shows the error message and interpreter is stopped.</p>
 <p>But you can catch exception using <a href="core_functions.html#try"><code>(try)</code></a> function.</p>
@@ -300,6 +346,18 @@ Example
 (my-obj &#39;@say-hello)  ;; Output &gt; Hello
 (my-obj &#39;@set-val 30)
 (display (my-obj &#39;@get-val))  ;; Output &gt; 30</code></pre>
+<p>If you want to sum of List, you can use <code>(cons-eval)</code> function.</p>
+<h6> 
+Example
+</h6>
+
+<pre><code>(define a &#39;(1 2 3))
+
+(display (cons-eval + a))
+;; This is same as &quot;(eval (cons + a))&quot;.
+
+;; Output
+;; &gt; 6</code></pre>
 <h2 id="index-of-reference-of-sayulisp-functions">Index of Reference of Sayulisp Functions</h2>
 <ul>
 <li><a href="core_functions.html">Core Functions</a></li>

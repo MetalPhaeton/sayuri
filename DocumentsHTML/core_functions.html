@@ -49,6 +49,7 @@
 <li><a href="#car"><code>car</code></a> : Pulls out Car value from Pair.</li>
 <li><a href="#cdr"><code>cdr</code></a> : Pull outs Cdr value from Pair.</li>
 <li><a href="#cons"><code>cons</code></a> : Constructs Pair.</li>
+<li><a href="#conval"><code>conval</code></a>: Constructs Pair and evaluates.</li>
 </ul></li>
 <li><a href="#conditional-branch-functions">Conditional Branch Functions</a>
 <ul>
@@ -79,6 +80,7 @@
 <li><a href="#looping">Looping</a>
 <ul>
 <li><a href="#while"><code>while</code></a> : Iterates codes.</li>
+<li><a href="#for"><code>for</code></a> : Iterates codes.</li>
 </ul></li>
 <li><a href="#io-stream-functions">IO Stream Functions</a>
 <ul>
@@ -125,22 +127,21 @@ Usage
 
 <ol style="list-style-type: decimal">
 <li><code>(help)</code></li>
-<li><code>(help &lt;Symbol&gt;)</code></li>
+<li><code>(help &lt;String&gt;)</code></li>
 </ol>
 <h6> 
 Description
 </h6>
 
 <ul>
-<li>1: Returns descriptions of all symbols.</li>
-<li>2: Returns a description of <code>&lt;Symbol&gt;</code>.</li>
-<li>All descriptions are Markdown format.</li>
+<li>1: Returns descriptions of all help.</li>
+<li>2: Returns a description of <code>&lt;String&gt;</code>.</li>
 </ul>
 <h6> 
 Example
 </h6>
 
-<pre><code>(display (help &#39;car))
+<pre><code>(display (help &quot;car&quot;))
 
 ;; Output
 ;;
@@ -638,6 +639,33 @@ Example
 ;; Output
 ;;
 ;; &gt; (444 555 666)</code></pre>
+<h3 id="conval">conval</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(conval &lt;Object 1&gt; &lt;Object 2&gt;)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>Constructs Pair and evaluates it. (cons and eval -&gt; conval)</li>
+<li><code>&lt;Object 1&gt;</code> is Car, <code>&lt;Object 2&gt;</code> is Cdr.</li>
+<li>It is same as <code>(eval (cons &lt;Object 1&gt; &lt;Object 2&gt;))</code>.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(define a &#39;(1 2 3))
+
+(display (conval + a))
+
+;; Output
+;; &gt; 6</code></pre>
 <h2 id="conditional-branch-functions">Conditional Branch Functions</h2>
 <h3 id="if">if</h3>
 <h6> 
@@ -1025,7 +1053,7 @@ Example
 (while (&lt; i 5)
     (display &quot;Hello &quot; i)
     (display &quot;World&quot; i)
-    (set! i (++ i)))
+    (inc! i))
 
 ;; Output
 ;; &gt; Hello 0
@@ -1038,6 +1066,49 @@ Example
 ;; &gt; World 3
 ;; &gt; Hello 4
 ;; &gt; World 4</code></pre>
+<h3 id="for">for</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(for (&lt;Variable : Symbol&gt; &lt;List&gt;) &lt;S-Expression&gt;...)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>This is Special Form.
+<ul>
+<li><code>&lt;Variable&gt;</code> is not evaluated.</li>
+</ul></li>
+<li>Repeats <code>&lt;S-Expression&gt;...</code> until a number of elements of <code>&lt;List&gt;</code>.
+<ul>
+<li>The element of <code>&lt;List&gt;</code> is bound to <code>&lt;Variable&gt;</code>.</li>
+</ul></li>
+<li>Returns Object returned by the last S-Expression.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(define aaa &#39;(1 2 3 4 5))
+
+(for (x aaa)
+    (display &quot;Hello &quot; x)
+    (display &quot;World &quot; (+ x 5)))
+;; Output
+;; &gt; Hello 1
+;; &gt; World 6
+;; &gt; Hello 2
+;; &gt; World 7
+;; &gt; Hello 3
+;; &gt; World 8
+;; &gt; Hello 4
+;; &gt; World 9
+;; &gt; Hello 5
+;; &gt; World 10</code></pre>
 <h2 id="io-stream-functions">IO Stream Functions</h2>
 <h3 id="display">display</h3>
 <h6> 
