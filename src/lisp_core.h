@@ -657,7 +657,7 @@ namespace Sayuri {
       // コンストラクタと代入 //
       // ==================== //
       /** コンストラクタ。 */
-      Lisp() : global_ptr_(new LispObject()), help_ptr_(new HelpDict()),
+      Lisp() : global_ptr_(new LispObject()),
       parentheses_(0), in_comment_(false), in_string_(false),
       in_escape_(false) {
         global_ptr_->type_ = LispObjectType::NATIVE_FUNCTION;
@@ -671,7 +671,7 @@ namespace Sayuri {
        */
       Lisp(const Lisp& lisp) :
       global_ptr_(lisp.global_ptr_->Clone()),
-      help_ptr_(new HelpDict(*(lisp.help_ptr_))),
+      help_(lisp.help_),
       token_queue_(lisp.token_queue_),
       token_stream_(lisp.token_stream_.str()),
       parentheses_(lisp.parentheses_),
@@ -684,14 +684,13 @@ namespace Sayuri {
        */
       Lisp(Lisp&& lisp) :
       global_ptr_(std::move(lisp.global_ptr_)),
-      help_ptr_(std::move(lisp.help_ptr_)),
+      help_(std::move(lisp.help_)),
       token_queue_(std::move(lisp.token_queue_)),
       token_stream_(lisp.token_stream_.str()),
       parentheses_(lisp.parentheses_),
       in_comment_(lisp.in_comment_),
       in_string_(lisp.in_string_),
-      in_escape_(lisp.in_escape_) {
-      }
+      in_escape_(lisp.in_escape_) {}
 
       /**
        * コピー代入演算子。
@@ -699,7 +698,7 @@ namespace Sayuri {
        */
       Lisp& operator=(const Lisp& lisp) {
         global_ptr_ = lisp.global_ptr_->Clone();
-        help_ptr_.reset(new HelpDict(*(lisp.help_ptr_)));
+        help_ = lisp.help_;
         token_queue_ = lisp.token_queue_;
         token_stream_ << lisp.token_stream_.rdbuf();
         parentheses_ = lisp.parentheses_;
@@ -714,7 +713,7 @@ namespace Sayuri {
        */
       Lisp& operator=(Lisp&& lisp) {
         global_ptr_ = std::move(lisp.global_ptr_);
-        help_ptr_ = std::move(lisp.help_ptr_);
+        help_ = std::move(lisp.help_);
         token_queue_ = std::move(lisp.token_queue_);
         token_stream_ << lisp.token_stream_.rdbuf();
         parentheses_ = lisp.parentheses_;
@@ -758,13 +757,15 @@ namespace Sayuri {
         BindSymbol(symbol,
         NewNativeFunction(global_ptr_->scope_chain_, func));
       }
-
       /**
        * 関数を削除する。
        * @param symbol 削除する関数のシンボル。
        */
       void RemoveNativeFunction(const std::string& symbol) {
-        global_ptr_->scope_chain_[0]->erase(symbol);
+        if (global_ptr_->scope_chain_[0]->find(symbol)
+        != global_ptr_->scope_chain_[0]->end()) {
+          global_ptr_->scope_chain_[0]->erase(symbol);
+        }
       }
 
       /**
@@ -774,7 +775,17 @@ namespace Sayuri {
        */
       void AddHelpDict(const std::string& symbol,
       const std::string& contents) {
-        (*help_ptr_)[symbol] = contents;
+        help_.emplace(symbol, contents);
+      }
+      /**
+       * ヘルプ辞書を削除する。
+       * @param func 登録する関数。
+       * @param symbol 関数のシンボル。
+       */
+      void RemoveHelpDict(const std::string& symbol) {
+        if (help_.find(symbol) != help_.end()) {
+          help_.erase(symbol);
+        }
       }
 
       /**
@@ -1008,7 +1019,7 @@ namespace Sayuri {
        * アクセサ - ヘルプ辞書。
        * @return ヘルプ辞書。
        */
-      const HelpDict& helpdict() const {return *help_ptr_;}
+      const HelpDict& help() const {return help_;}
 
     private:
       // ================ //
@@ -1043,7 +1054,7 @@ namespace Sayuri {
       /** グローバルオブジェクト。 */
       LispObjectPtr global_ptr_;
       /** ヘルプ辞書。 */
-      std::unique_ptr<HelpDict> help_ptr_;
+      HelpDict help_;
 
       /** トークンを入れるキュー。 */
       std::queue<std::string> token_queue_;

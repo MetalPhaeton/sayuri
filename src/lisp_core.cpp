@@ -400,16 +400,13 @@ namespace Sayuri {
         }
 
         target.str_value_ = oss.str();
-      } else if ((front == "#t") || (front == "#T")){
-        // Boolean::true。
+      } else if ((front == "#t") || (front == "#T")){ // Boolean::true。
         target.type_ = LispObjectType::BOOLEAN;
         target.boolean_value_ = true;
-      } else if ((front == "#f") || (front == "#F")){
-        // Boolean::false。
+      } else if ((front == "#f") || (front == "#F")){ // Boolean::false。
         target.type_ = LispObjectType::BOOLEAN;
         target.boolean_value_ = false;
-      } else if (front == "'") {
-        // quoteの糖衣構文。
+      } else if (front == "'") { // quoteの糖衣構文。
         target.type_ = LispObjectType::PAIR;
 
         target.car_ = NewSymbol("quote");
@@ -417,16 +414,22 @@ namespace Sayuri {
 
         // 第1引数(Cdr->Car)をパース。
         ParseCore(*(target.cdr_->car_));
-      } else if ((front == ".") || (front == ")")) {
-        // おかしなトークン。
+      } else if ((front == ".") || (front == ")")) { // おかしなトークン。
         target.type_ = LispObjectType::NIL;
       } else {
-        try {
-          // Number。
-          target.type_ = LispObjectType::NUMBER;
-          target.number_value_ = std::stod(front);
-        } catch (...) {
-          // Symbol。
+        // 数字かどうかの判定。 最初が数字なら数字としてパースしてみる。
+        char c = front[0];
+        if ((front.size() >= 2) && ((c == '+') || (c == '-'))) c = front[1];
+
+        if ((c >= '0') && (c <= '9')) {  // Number。
+          try {
+            target.type_ = LispObjectType::NUMBER;
+            target.number_value_ = std::stod(front);
+          } catch (...) { // エラーならSymbol。
+            target.type_ = LispObjectType::SYMBOL;
+            target.str_value_ = front;
+          }
+        } else {  // Symbol
           target.type_ = LispObjectType::SYMBOL;
           target.str_value_ = front;
         }
@@ -446,7 +449,7 @@ namespace Sayuri {
         if (!list_itr) {
           // 引数がなければ一覧を文字列にする。
           std::ostringstream oss;
-          for (auto& pair : *(this->help_ptr_)) {
+          for (auto& pair : this->help_) {
             oss << pair.second;
             oss << std::endl << std::endl;
             oss << "- - - - - - - - - - - - - - - - - - - - "
@@ -457,14 +460,14 @@ namespace Sayuri {
         } else {
           // 引数があればその項目を文字列にする。
           LispObjectPtr first_ptr = caller.Evaluate(*list_itr);
-          if (!(first_ptr->IsSymbol())) {
+          if (!(first_ptr->IsString())) {
             throw Lisp::GenWrongTypeError
-            (func_name, "Symbol", std::vector<int> {1}, true);
+            (func_name, "String", std::vector<int> {1}, true);
           }
 
           HelpDict::iterator itr =
-          this->help_ptr_->find(first_ptr->symbol_value());
-          if (itr != this->help_ptr_->end()) {
+          this->help_.find(first_ptr->string_value());
+          if (itr != this->help_.end()) {
             return Lisp::NewString(itr->second);
           }
 
@@ -476,23 +479,22 @@ namespace Sayuri {
       };
       global_ptr_->BindSymbol
       ("help", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["help"] =
+      help_["help"] =
 R"...(### help ###
 
 <h6> Usage </h6>
 
 1. `(help)`
-2. `(help <Symbol>)`
+2. `(help <String>)`
 
 <h6> Description </h6>
 
-* 1: Returns descriptions of all symbols.
-* 2: Returns a description of `<Symbol>`.
-* All descriptions are Markdown format.
+* 1: Returns descriptions of all help.
+* 2: Returns a description of `<String>`.
 
 <h6> Example </h6>
 
-    (display (help 'car))
+    (display (help "car"))
     
     ;; Output
     ;;
@@ -535,7 +537,7 @@ R"...(### help ###
       };
       global_ptr_->BindSymbol
       ("eval", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["eval"] =
+      help_["eval"] =
 R"...(### eval ###
 
 <h6> Usage </h6>
@@ -616,11 +618,11 @@ R"...(### parse ###
     ;; Output
     ;;
     ;; > (1 2 3))...";
-      (*help_ptr_)["parse"] = temp;
-      (*help_ptr_)["string->symbol"] = temp;
-      (*help_ptr_)["string->number"] = temp;
-      (*help_ptr_)["string->boolean"] = temp;
-      (*help_ptr_)["string->list"] = temp;
+      help_["parse"] = temp;
+      help_["string->symbol"] = temp;
+      help_["string->number"] = temp;
+      help_["string->boolean"] = temp;
+      help_["string->list"] = temp;
     }
 
     // %%% to-string
@@ -677,11 +679,11 @@ R"...(### to-string ###
     ;; Output
     ;;
     ;; > #t)...";
-      (*help_ptr_)["to-string"] = temp;
-      (*help_ptr_)["symbol->string"] = temp;
-      (*help_ptr_)["number->string"] = temp;
-      (*help_ptr_)["boolean->string"] = temp;
-      (*help_ptr_)["list->string"] = temp;
+      help_["to-string"] = temp;
+      help_["symbol->string"] = temp;
+      help_["number->string"] = temp;
+      help_["boolean->string"] = temp;
+      help_["list->string"] = temp;
     }
 
     // %%% try
@@ -733,7 +735,7 @@ R"...(### to-string ###
       };
       global_ptr_->BindSymbol
       ("try", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["try"] =
+      help_["try"] =
 R"...(### try ###
 
 <h6> Usage </h6>
@@ -787,7 +789,7 @@ R"...(### try ###
       };
       global_ptr_->BindSymbol
       ("throw", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["throw"] =
+      help_["throw"] =
 R"...(### throw ###
 
 <h6> Usage </h6>
@@ -833,7 +835,7 @@ R"...(### throw ###
       };
       global_ptr_->BindSymbol
       ("car", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["car"] =
+      help_["car"] =
 R"...(### car ###
 
 <h6> Usage </h6>
@@ -881,7 +883,7 @@ R"...(### car ###
       };
       global_ptr_->BindSymbol
       ("cdr", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["cdr"] =
+      help_["cdr"] =
 R"...(### cdr ###
 
 <h6> Usage </h6>
@@ -930,7 +932,7 @@ R"...(### cdr ###
       };
       global_ptr_->BindSymbol
       ("cons", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["cons"] =
+      help_["cons"] =
 R"...(### cons ###
 
 <h6> Usage </h6>
@@ -963,6 +965,55 @@ R"...(### cons ###
     ;; > (444 555 666))...";
     }
 
+    // %%% conval
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) -> LispObjectPtr {
+        // 準備。
+        LispIterator list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 2;
+
+        // 先ず、cons。
+        if (!list_itr) {
+          throw Lisp::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr result_car = caller.Evaluate(*(list_itr++));
+        if (!list_itr) {
+          throw Lisp::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr result_cdr = caller.Evaluate(*list_itr);
+
+        // evalして返す。
+        return caller.Evaluate(*(Lisp::NewPair(result_car, result_cdr)));
+      };
+      global_ptr_->BindSymbol
+      ("conval", NewNativeFunction(global_ptr_->scope_chain_, func));
+      help_["conval"] =
+R"...(### conval ###
+
+<h6> Usage </h6>
+
+* `(conval <Object 1> <Object 2>)`
+
+<h6> Description </h6>
+
+* Constructs Pair and evaluates it. (cons and eval -> conval)
+  + `<Object 1>` is Car, `<Object 2>` is Cdr.
+  + It is same as `(eval (cons <Object 1> <Object 2>))`.
+
+<h6> Example </h6>
+
+    (define a '(1 2 3))
+    
+    (display (conval + a))
+    
+    ;; Output
+    ;; > 6)...";
+    }
+
     // %%% quote
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
@@ -980,7 +1031,7 @@ R"...(### cons ###
       };
       global_ptr_->BindSymbol
       ("quote", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["quote"] =
+      help_["quote"] =
 R"...(### quote ###
 
 <h6> Usage </h6>
@@ -1090,7 +1141,7 @@ R"...(### quote ###
       };
       global_ptr_->BindSymbol
       ("define", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["define"] =
+      help_["define"] =
 R"...(### define ###
 
 <h6> Usage </h6>
@@ -1159,7 +1210,7 @@ R"...(### define ###
       };
       global_ptr_->BindSymbol
       ("set!", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["set!"] =
+      help_["set!"] =
 R"...(### set! ###
 
 <h6> Usage </h6>
@@ -1235,7 +1286,7 @@ R"...(### set! ###
       };
       global_ptr_->BindSymbol
       ("lambda", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["lambda"] =
+      help_["lambda"] =
 R"...(### lambda ###
 
 <h6> Usage </h6>
@@ -1327,7 +1378,7 @@ R"...(### lambda ###
       };
       global_ptr_->BindSymbol
       ("let", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["let"] =
+      help_["let"] =
 R"...(### let ###
 
 <h6> Usage </h6>
@@ -1365,7 +1416,7 @@ R"...(### let ###
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
-        // 引数が2つ異常あるかどうかを予め調べる。
+        // 引数が2つ以上あるかどうかを予め調べる。
         int len = list.Length();
         if (len < 3) {
           throw Lisp::GenInsufficientArgumentsError
@@ -1386,9 +1437,9 @@ R"...(### let ###
           // 条件が#fならループを抜ける。
           if (!(cond_ptr->boolean_value())) break;
 
-          // S式を次々と実行していく。
+          // 自分のスコープで実行していく。
           for (; ptr->IsPair(); ptr = ptr->cdr().get()) {
-            ret_ptr = caller.Evaluate(*(ptr->car()));
+            ret_ptr = self->Evaluate(*(ptr->car()));
           }
         }
 
@@ -1396,7 +1447,7 @@ R"...(### let ###
       };
       global_ptr_->BindSymbol
       ("while", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["while"] =
+      help_["while"] =
 R"...(### while ###
 
 <h6> Usage </h6>
@@ -1428,6 +1479,99 @@ R"...(### while ###
     ;; > World 3
     ;; > Hello 4
     ;; > World 4)...";
+    }
+
+    // %%% for
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) -> LispObjectPtr {
+        // 準備。
+        LispIterator list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 2;
+
+        // 要素用シンボルをローカルスコープにバインドする。
+        // チェック。
+        if (!list_itr) {
+          throw Lisp::GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        if (!(list_itr->IsList())) {
+          throw Lisp::GenWrongTypeError
+          (func_name, "List", std::vector<int> {1}, false);
+        }
+        LispIterator first_itr {&(*(list_itr++))};
+        if (!first_itr) {
+          throw Lisp::GenError("@insufficient-arguments",
+          "No Symbol to bind element for loop.");
+        }
+        if (!(first_itr->IsSymbol())) {
+          throw Lisp::GenWrongTypeError
+          (func_name, "Symbol", std::vector<int> {1, 1}, false);
+        }
+        // バインド。
+        std::string symbol = first_itr->symbol_value();
+        self->BindSymbol(symbol, Lisp::NewNil());
+
+        // ループ用リストをチェックする。
+        ++first_itr;
+        if (!first_itr) {
+          throw Lisp::GenError("@insufficient-arguments", "No List for loop.");
+        }
+        LispObjectPtr loop_list_ptr = caller.Evaluate(*first_itr);
+        if (!(loop_list_ptr->IsList())) {
+          throw Lisp::GenWrongTypeError
+          (func_name, "List", std::vector<int> {1, 2}, true);
+        }
+
+        // ループ開始。
+        LispObjectPtr ret_ptr = Lisp::NewNil();
+        for (LispIterator itr {loop_list_ptr.get()}; itr; ++itr) {
+          // ローカルスコープに要素をバインド。
+          self->RewriteSymbol(symbol, itr->Clone());
+
+          // 自分のスコープで次々と実行する。
+          for (LispIterator itr_2 {list_itr.current_}; itr_2; ++itr_2) {
+            ret_ptr = self->Evaluate(*itr_2);
+          }
+        }
+        return ret_ptr;
+      };
+      global_ptr_->BindSymbol
+      ("for", NewNativeFunction(global_ptr_->scope_chain_, func));
+      help_["for"] =
+R"...(### for ###
+
+<h6> Usage </h6>
+
+* `(for (<Variable : Symbol> <List>) <S-Expression>...)`
+
+<h6> Description </h6>
+
+* This is Special Form.
+    + `<Variable>` is not evaluated.
+* Repeats `<S-Expression>...` until a number of elements of `<List>`.
+    + The element of `<List>` is bound to `<Variable>`.
+* Returns Object returned by the last S-Expression.
+
+<h6> Example </h6>
+
+    (define aaa '(1 2 3 4 5))
+    
+    (for (x aaa)
+        (display "Hello " x)
+        (display "World " (+ x 5)))
+    ;; Output
+    ;; > Hello 1
+    ;; > World 6
+    ;; > Hello 2
+    ;; > World 7
+    ;; > Hello 3
+    ;; > World 8
+    ;; > Hello 4
+    ;; > World 9
+    ;; > Hello 5
+    ;; > World 10)...";
     }
 
     // %%% if
@@ -1471,7 +1615,7 @@ R"...(### while ###
       };
       global_ptr_->BindSymbol
       ("if", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["if"] =
+      help_["if"] =
 R"...(### if ###
 
 <h6> Usage </h6>
@@ -1545,7 +1689,7 @@ R"...(### if ###
       };
       global_ptr_->BindSymbol
       ("cond", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["cond"] =
+      help_["cond"] =
 R"...(### cond ###
 
 <h6> Usage </h6>
@@ -1588,7 +1732,7 @@ R"...(### cond ###
       };
       global_ptr_->BindSymbol
       ("begin", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["begin"] =
+      help_["begin"] =
 R"...(### begin ###
 
 <h6> Usage </h6>
@@ -1650,7 +1794,7 @@ R"...(### begin ###
       };
       global_ptr_->BindSymbol
       ("display", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["display"] =
+      help_["display"] =
 R"...(### display ###
 
 <h6> Usage </h6>
@@ -1721,7 +1865,7 @@ R"...(### display ###
       };
       global_ptr_->BindSymbol
       ("stdin", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["stdin"] =
+      help_["stdin"] =
 R"...(### stdin ###
 
 <h6> Usage </h6>
@@ -1774,7 +1918,7 @@ R"...(### stdin ###
       };
       global_ptr_->BindSymbol
       ("stdout", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["stdout"] =
+      help_["stdout"] =
 R"...(### stdout ###
 
 <h6> Usage </h6>
@@ -1820,7 +1964,7 @@ R"...(### stdout ###
       };
       global_ptr_->BindSymbol
       ("stderr", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["stderr"] =
+      help_["stderr"] =
 R"...(### stderr ###
 
 <h6> Usage </h6>
@@ -1886,7 +2030,7 @@ R"...(### stderr ###
       };
       global_ptr_->BindSymbol
       ("import", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["import"] =
+      help_["import"] =
 R"...(### import ###
 
 <h6> Usage </h6>
@@ -1964,8 +2108,8 @@ R"...(### equal? ###
     ;; Output
     ;;
     ;; > #t)...";
-      (*help_ptr_)["equal?"] = temp;
-      (*help_ptr_)["="] = temp;
+      help_["equal?"] = temp;
+      help_["="] = temp;
     }
 
     // %%% !=
@@ -1993,7 +2137,7 @@ R"...(### equal? ###
       };
       global_ptr_->BindSymbol
       ("!=", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["!="] =
+      help_["!="] =
 R"...(### != ###
 
 <h6> Usage </h6>
@@ -2042,7 +2186,7 @@ R"...(### != ###
       };
       global_ptr_->BindSymbol
       ("pair?", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["pair?"] =
+      help_["pair?"] =
 R"...(### pair? ###
 
 <h6> Usage </h6>
@@ -2091,7 +2235,7 @@ R"...(### pair? ###
       };
       global_ptr_->BindSymbol
       ("list?", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["list?"] =
+      help_["list?"] =
 R"...(### list? ###
 
 <h6> Usage </h6>
@@ -2164,8 +2308,8 @@ R"...(### nil? ###
     ;; Output
     ;;
     ;; > #t)...";
-      (*help_ptr_)["nil?"] = temp;
-      (*help_ptr_)["null?"] = temp;
+      help_["nil?"] = temp;
+      help_["null?"] = temp;
     }
 
     // %%% symbol?
@@ -2197,7 +2341,7 @@ R"...(### nil? ###
       };
       global_ptr_->BindSymbol
       ("symbol?", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["symbol?"] =
+      help_["symbol?"] =
 R"...(### symbol? ###
 
 <h6> Usage </h6>
@@ -2247,7 +2391,7 @@ R"...(### symbol? ###
       };
       global_ptr_->BindSymbol
       ("number?", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["number?"] =
+      help_["number?"] =
 R"...(### number? ###
 
 <h6> Usage </h6>
@@ -2297,7 +2441,7 @@ R"...(### number? ###
       };
       global_ptr_->BindSymbol
       ("boolean?", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["boolean?"] =
+      help_["boolean?"] =
 R"...(### boolean? ###
 
 <h6> Usage </h6>
@@ -2347,7 +2491,7 @@ R"...(### boolean? ###
       };
       global_ptr_->BindSymbol
       ("string?", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["string?"] =
+      help_["string?"] =
 R"...(### string? ###
 
 <h6> Usage </h6>
@@ -2397,7 +2541,7 @@ R"...(### string? ###
       };
       global_ptr_->BindSymbol
       ("function?", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["function?"] =
+      help_["function?"] =
 R"...(### function? ###
 
 <h6> Usage </h6>
@@ -2448,7 +2592,7 @@ R"...(### function? ###
       };
       global_ptr_->BindSymbol("native-function?",
        NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["native-function?"] =
+      help_["native-function?"] =
 R"...(### native-function? ###
 
 <h6> Usage </h6>
@@ -2498,7 +2642,7 @@ R"...(### native-function? ###
       };
       global_ptr_->BindSymbol
       ("procedure?", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["procedure?"] =
+      help_["procedure?"] =
 R"...(### procedure? ###
 
 <h6> Usage </h6>
@@ -2591,7 +2735,7 @@ R"...(### procedure? ###
       };
       global_ptr_->BindSymbol
       ("output-stream", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["output-stream"] =
+      help_["output-stream"] =
 R"...(### output-stream ###
 
 <h6> Usage </h6>
@@ -2694,7 +2838,7 @@ R"...(### output-stream ###
       };
       global_ptr_->BindSymbol
       ("input-stream", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["input-stream"] =
+      help_["input-stream"] =
 R"...(### input-stream ###
 
 <h6> Usage </h6>
@@ -2812,8 +2956,8 @@ R"...(### append ###
     ;; Output
     ;;
     ;; > "Hello 111 World")...";
-      (*help_ptr_)["append"] = temp;
-      (*help_ptr_)["string-append"] = temp;
+      help_["append"] = temp;
+      help_["string-append"] = temp;
     }
 
     // %%% ref
@@ -2921,9 +3065,9 @@ R"...(### ref ###
     ;; Output
     ;;
     ;; > "r")...";
-      (*help_ptr_)["ref"] = temp;
-      (*help_ptr_)["list-ref"] = temp;
-      (*help_ptr_)["string-ref"] = temp;
+      help_["ref"] = temp;
+      help_["list-ref"] = temp;
+      help_["string-ref"] = temp;
     }
 
     // %%% list
@@ -2949,7 +3093,7 @@ R"...(### ref ###
       };
       global_ptr_->BindSymbol
       ("list", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["list"] =
+      help_["list"] =
 R"...(### list ###
 
 
@@ -3026,7 +3170,7 @@ R"...(### list ###
       };
       global_ptr_->BindSymbol
       ("list-replace", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["list-replace"] =
+      help_["list-replace"] =
 R"...(### list-replace ###
 
 <h6> Usage </h6>
@@ -3099,7 +3243,7 @@ R"...(### list-replace ###
       };
       global_ptr_->BindSymbol
       ("list-remove", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["list-remove"] =
+      help_["list-remove"] =
 R"...(### list-remove ###
 
 <h6> Usage </h6>
@@ -3160,7 +3304,7 @@ R"...(### list-remove ###
       };
       global_ptr_->BindSymbol
       ("search", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["search"] =
+      help_["search"] =
 R"...(### search ###
 
 <h6> Usage </h6>
@@ -3222,7 +3366,7 @@ R"...(### search ###
       };
       global_ptr_->BindSymbol
       ("length", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["length"] =
+      help_["length"] =
 R"...(### length ###
 
 <h6> Usage </h6>
@@ -3287,7 +3431,7 @@ R"...(### length ###
       };
       global_ptr_->BindSymbol
       ("<", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["<"] =
+      help_["<"] =
 R"...(### < ###
 
 <h6> Usage </h6>
@@ -3352,7 +3496,7 @@ R"...(### < ###
       };
       global_ptr_->BindSymbol
       ("<=", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["<="] =
+      help_["<="] =
 R"...(### <= ###
 
 <h6> Usage </h6>
@@ -3417,7 +3561,7 @@ R"...(### <= ###
       };
       global_ptr_->BindSymbol
       (">", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)[">"] =
+      help_[">"] =
 R"...(### > ###
 
 <h6> Usage </h6>
@@ -3482,7 +3626,7 @@ R"...(### > ###
       };
       global_ptr_->BindSymbol
       (">=", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)[">="] =
+      help_[">="] =
 R"...(### >= ###
 
 <h6> Usage </h6>
@@ -3527,7 +3671,7 @@ R"...(### >= ###
       };
       global_ptr_->BindSymbol
       ("not", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["not"] =
+      help_["not"] =
 R"...(### not ###
 
 <h6> Usage </h6>
@@ -3577,7 +3721,7 @@ R"...(### not ###
       };
       global_ptr_->BindSymbol
       ("and", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["and"] =
+      help_["and"] =
 R"...(### and ###
 
 <h6> Usage </h6>
@@ -3628,7 +3772,7 @@ R"...(### and ###
       };
       global_ptr_->BindSymbol
       ("or", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["or"] =
+      help_["or"] =
 R"...(### or ###
 
 <h6> Usage </h6>
@@ -3673,7 +3817,7 @@ R"...(### or ###
       };
       global_ptr_->BindSymbol
       ("+", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["+"] =
+      help_["+"] =
 R"...(### + ###
 
 <h6> Usage </h6>
@@ -3725,7 +3869,7 @@ R"...(### + ###
       };
       global_ptr_->BindSymbol
       ("-", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["-"] =
+      help_["-"] =
 R"...(### - ###
 
 <h6> Usage </h6>
@@ -3769,7 +3913,7 @@ R"...(### - ###
       };
       global_ptr_->BindSymbol
       ("*", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["*"] =
+      help_["*"] =
 R"...(### * ###
 
 <h6> Usage </h6>
@@ -3821,7 +3965,7 @@ R"...(### * ###
       };
       global_ptr_->BindSymbol
       ("/", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["/"] =
+      help_["/"] =
 R"...(### / ###
 
 <h6> Usage </h6>
@@ -3867,7 +4011,7 @@ R"...(### / ###
       };
       global_ptr_->BindSymbol
       ("++", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["++"] =
+      help_["++"] =
 R"...(### ++ ###
 
 <h6> Usage </h6>
@@ -3913,7 +4057,7 @@ R"...(### ++ ###
       };
       global_ptr_->BindSymbol
       ("--", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["--"] =
+      help_["--"] =
 R"...(### -- ###
 
 <h6> Usage </h6>
@@ -3970,7 +4114,7 @@ R"...(### -- ###
       };
       global_ptr_->BindSymbol
       ("inc!", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["inc!"] =
+      help_["inc!"] =
 R"...(### inc! ###
 
 <h6> Usage </h6>
@@ -4032,7 +4176,7 @@ R"...(### inc! ###
       };
       global_ptr_->BindSymbol
       ("dec!", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["dec!"] =
+      help_["dec!"] =
 R"...(### dec! ###
 
 <h6> Usage </h6>
@@ -4115,7 +4259,7 @@ R"...(### dec! ###
       };
       global_ptr_->BindSymbol
       ("string-split", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["string-split"] =
+      help_["string-split"] =
 R"...(### string-split ###
 
 <h6> Usage </h6>
@@ -4164,7 +4308,7 @@ R"...(### string-split ###
       };
       global_ptr_->BindSymbol
       ("front", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["front"] =
+      help_["front"] =
 R"...(### front ###
 
 <h6> Usage </h6>
@@ -4219,7 +4363,7 @@ R"...(### front ###
       };
       global_ptr_->BindSymbol
       ("back", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["back"] =
+      help_["back"] =
 R"...(### back ###
 
 <h6> Usage </h6>
@@ -4275,7 +4419,7 @@ R"...(### back ###
       };
       global_ptr_->BindSymbol
       ("push-front", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["push-front"] =
+      help_["push-front"] =
 R"...(### push-front ###
 
 <h6> Usage </h6>
@@ -4324,7 +4468,7 @@ R"...(### push-front ###
       };
       global_ptr_->BindSymbol
       ("pop-front", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["pop-front"] =
+      help_["pop-front"] =
 R"...(### pop-front ###
 
 <h6> Usage </h6>
@@ -4378,7 +4522,7 @@ R"...(### pop-front ###
       };
       global_ptr_->BindSymbol
       ("push-back", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["push-back"] =
+      help_["push-back"] =
 R"...(### push-back ###
 
 <h6> Usage </h6>
@@ -4431,7 +4575,7 @@ R"...(### push-back ###
       };
       global_ptr_->BindSymbol
       ("pop-back", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["pop-back"] =
+      help_["pop-back"] =
 R"...(### pop-back ###
 
 <h6> Usage </h6>
@@ -4453,7 +4597,7 @@ R"...(### pop-back ###
 
     // %%% PI
     global_ptr_->BindSymbol("PI", NewNumber(4.0 * std::atan(1.0)));
-    (*help_ptr_)["PI"] =
+    help_["PI"] =
 R"...(### PI ###
 
 <h6> Description </h6>
@@ -4470,7 +4614,7 @@ R"...(### PI ###
 
     // %%% E
     global_ptr_->BindSymbol("E", NewNumber(std::exp(1.0)));
-    (*help_ptr_)["E"] =
+    help_["E"] =
 R"...(### E ###
 
 <h6> Description </h6>
@@ -4509,7 +4653,7 @@ R"...(### E ###
       };
       global_ptr_->BindSymbol
       ("sin", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["sin"] =
+      help_["sin"] =
 R"...(### sin ###
 
 <h6> Usage </h6>
@@ -4554,7 +4698,7 @@ R"...(### sin ###
       };
       global_ptr_->BindSymbol
       ("cos", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["cos"] =
+      help_["cos"] =
 R"...(### cos ###
 
 <h6> Usage </h6>
@@ -4599,7 +4743,7 @@ R"...(### cos ###
       };
       global_ptr_->BindSymbol
       ("tan", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["tan"] =
+      help_["tan"] =
 R"...(### tan ###
 
 <h6> Usage </h6>
@@ -4644,7 +4788,7 @@ R"...(### tan ###
       };
       global_ptr_->BindSymbol
       ("asin", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["asin"] =
+      help_["asin"] =
 R"...(### asin ###
 
 <h6> Usage </h6>
@@ -4689,7 +4833,7 @@ R"...(### asin ###
       };
       global_ptr_->BindSymbol
       ("acos", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["acos"] =
+      help_["acos"] =
 R"...(### acos ###
 
 <h6> Usage </h6>
@@ -4734,7 +4878,7 @@ R"...(### acos ###
       };
       global_ptr_->BindSymbol
       ("atan", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["atan"] =
+      help_["atan"] =
 R"...(### atan ###
 
 <h6> Usage </h6>
@@ -4780,7 +4924,7 @@ R"...(### atan ###
       };
       global_ptr_->BindSymbol
       ("sqrt", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["sqrt"] =
+      help_["sqrt"] =
 R"...(### sqrt ###
 
 <h6> Usage </h6>
@@ -4824,7 +4968,7 @@ R"...(### sqrt ###
       };
       global_ptr_->BindSymbol
       ("abs", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["abs"] =
+      help_["abs"] =
 R"...(### abs ###
 
 <h6> Usage </h6>
@@ -4868,7 +5012,7 @@ R"...(### abs ###
       };
       global_ptr_->BindSymbol
       ("ceil", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["ceil"] =
+      help_["ceil"] =
 R"...(### ceil ###
 
 <h6> Usage </h6>
@@ -4912,7 +5056,7 @@ R"...(### ceil ###
       };
       global_ptr_->BindSymbol
       ("floor", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["floor"] =
+      help_["floor"] =
 R"...(### floor ###
 
 <h6> Usage </h6>
@@ -4956,7 +5100,7 @@ R"...(### floor ###
       };
       global_ptr_->BindSymbol
       ("round", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["round"] =
+      help_["round"] =
 R"...(### round ###
 
 <h6> Usage </h6>
@@ -5006,7 +5150,7 @@ R"...(### round ###
       };
       global_ptr_->BindSymbol
       ("trunc", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["trunc"] =
+      help_["trunc"] =
 R"...(### trunc ###
 
 <h6> Usage </h6>
@@ -5056,7 +5200,7 @@ R"...(### trunc ###
       };
       global_ptr_->BindSymbol
       ("exp", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["exp"] =
+      help_["exp"] =
 R"...(### exp ###
 
 <h6> Usage </h6>
@@ -5133,8 +5277,8 @@ R"...(### expt ###
     ;; Output
     ;;
     ;; > 8)...";
-      (*help_ptr_)["expt"] = temp;
-      (*help_ptr_)["^"] = temp;
+      help_["expt"] = temp;
+      help_["^"] = temp;
     }
 
     // %%% log
@@ -5182,8 +5326,8 @@ R"...(### log ###
     ;; Output
     ;;
     ;; > 1)...";
-      (*help_ptr_)["log"] = temp;
-      (*help_ptr_)["ln"] = temp;
+      help_["log"] = temp;
+      help_["ln"] = temp;
     }
 
     // %%% log2
@@ -5210,7 +5354,7 @@ R"...(### log ###
       };
       global_ptr_->BindSymbol
       ("log2", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["log2"] =
+      help_["log2"] =
 R"...(### log2 ###
 
 <h6> Usage </h6>
@@ -5254,7 +5398,7 @@ R"...(### log2 ###
       };
       global_ptr_->BindSymbol
       ("log10", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["log10"] =
+      help_["log10"] =
 R"...(### log10 ###
 
 <h6> Usage </h6>
@@ -5302,7 +5446,7 @@ R"...(### log10 ###
       };
       global_ptr_->BindSymbol
       ("random", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["random"] =
+      help_["random"] =
 R"...(### random ###
 
 <h6> Usage </h6>
@@ -5365,7 +5509,7 @@ R"...(### random ###
       };
       global_ptr_->BindSymbol
       ("max", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["max"] =
+      help_["max"] =
 R"...(### max ###
 
 <h6> Usage </h6>
@@ -5422,7 +5566,7 @@ R"...(### max ###
       };
       global_ptr_->BindSymbol
       ("min", NewNativeFunction(global_ptr_->scope_chain_, func));
-      (*help_ptr_)["min"] =
+      help_["min"] =
 R"...(### min ###
 
 <h6> Usage </h6>
