@@ -1,6 +1,6 @@
 /* The MIT License (MIT)
  *
- * Copyright (c) 2015 Hironori Ishibashi
+ * Copyright (c) 2013-2015 Hironori Ishibashi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -3980,7 +3980,7 @@ R"...(### sayuri-license ###
     (display (sayuri-license))
     
     ;; Output
-    ;; > Copyright (c) 2015 Hironori Ishibashi
+    ;; > Copyright (c) 2013-2015 Hironori Ishibashi
     ;; > 
     ;; > Permission is hereby granted, free of charge, to any person obtaining
     :: > a copy
