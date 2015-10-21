@@ -1519,12 +1519,25 @@ R"...(### while ###
         // ループ用リストをチェックする。
         ++first_itr;
         if (!first_itr) {
-          throw Lisp::GenError("@insufficient-arguments", "No List for loop.");
+          throw Lisp::GenError("@insufficient-arguments",
+          "No List or String for loop.");
         }
         LispObjectPtr loop_list_ptr = caller.Evaluate(*first_itr);
-        if (!(loop_list_ptr->IsList())) {
+        if (!(loop_list_ptr->IsList() || loop_list_ptr->IsString())) {
           throw Lisp::GenWrongTypeError
-          (func_name, "List", std::vector<int> {1, 2}, true);
+          (func_name, "List or String", std::vector<int> {1, 2}, true);
+        }
+
+        // loop_list_ptrが文字列の場合、Listに変更する。
+        if (loop_list_ptr->IsString()) {
+          LispObjectPtr temp = Lisp::NewNil();
+          LispObject* ptr = temp.get();
+          for (auto c : loop_list_ptr->string_value()) {
+            *ptr = *(Lisp::NewPair(Lisp::NewString(std::string(1, c)),
+            Lisp::NewNil()));
+            ptr = ptr->cdr().get();
+          }
+          loop_list_ptr = temp;
         }
 
         // ループ開始。
