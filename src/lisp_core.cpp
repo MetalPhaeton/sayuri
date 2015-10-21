@@ -625,6 +625,64 @@ R"...(### parse ###
       help_["string->list"] = temp;
     }
 
+    // %%% parval
+    {
+      auto func = [this](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) -> LispObjectPtr {
+        // 準備。
+        LispIterator list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 引数をチェック。
+        if (!list_itr) {
+          throw Lisp::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+
+        LispObjectPtr result = caller.Evaluate(*list_itr);
+        if (!(result->IsString())) {
+          throw Lisp::GenWrongTypeError
+          (func_name, "String", std::vector<int> {1}, true);
+        }
+
+        // パース。
+        std::vector<LispObjectPtr> ret_vec =
+        this->Parse(result->string_value());
+
+        // 評価して結果を返す。
+        LispObjectPtr ret_ptr = Lisp::NewNil();
+        for (auto& ptr : ret_vec) {
+          ret_ptr = caller.Evaluate(*ptr);
+        }
+        return ret_ptr;
+      };
+      global_ptr_->BindSymbol
+      ("parval", NewNativeFunction(global_ptr_->scope_chain_, func));
+      help_["parval"] =
+R"...(### parse ###
+
+<h6> Usage </h6>
+
+* `(parse <S-Expression : String>)`
+* `(string->symbol <S-Expression : String>)`
+* `(string->number <S-Expression : String>)`
+* `(string->boolean <S-Expression : String>)`
+* `(string->list <S-Expression : String>)`
+
+<h6> Description </h6>
+
+* Parses `<S-Expression>` and generates a object.
+
+<h6> Example </h6>
+
+    (display (parse "(1 2 3)"))
+    
+    ;; Output
+    ;;
+    ;; > (1 2 3))...";
+    }
+
     // %%% to-string
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
