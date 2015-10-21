@@ -444,6 +444,34 @@ Example
 ;; Output
 ;;
 ;; &gt; (1 2 3)</code></pre>
+<h3 id="parval">parval</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(parse &lt;S-Expression : String&gt;)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>Parses and evaluates <code>&lt;S-Expression&gt;</code> and returns result.
+<ul>
+<li>It is similar to <code>(eval (parse &lt;S-Expression&gt;))</code>.</li>
+</ul></li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(parval &quot;(display \&quot;Hello\&quot;)(display \&quot;World\&quot;)&quot;)
+
+;; Output
+;;
+;; &gt; Hello
+;; &gt; World</code></pre>
 <h3 id="to-string">to-string</h3>
 <h6> 
 Usage
@@ -1072,7 +1100,7 @@ Usage
 </h6>
 
 <ul>
-<li><code>(for (&lt;Variable : Symbol&gt; &lt;List&gt;) &lt;S-Expression&gt;...)</code></li>
+<li><code>(for (&lt;Variable : Symbol&gt; &lt;List | String&gt;) &lt;S-Expression&gt;...)</code></li>
 </ul>
 <h6> 
 Description
@@ -1083,9 +1111,9 @@ Description
 <ul>
 <li><code>&lt;Variable&gt;</code> is not evaluated.</li>
 </ul></li>
-<li>Repeats <code>&lt;S-Expression&gt;...</code> until a number of elements of <code>&lt;List&gt;</code>.
+<li>Repeats <code>&lt;S-Expression&gt;...</code> until a number of elements of <code>&lt;List | String&gt;</code>.
 <ul>
-<li>The element of <code>&lt;List&gt;</code> is bound to <code>&lt;Variable&gt;</code>.</li>
+<li>The element of <code>&lt;List | String&gt;</code> is bound to <code>&lt;Variable&gt;</code>.</li>
 </ul></li>
 <li>Returns Object returned by the last S-Expression.</li>
 </ul>
@@ -1108,7 +1136,16 @@ Example
 ;; &gt; Hello 4
 ;; &gt; World 9
 ;; &gt; Hello 5
-;; &gt; World 10</code></pre>
+;; &gt; World 10
+
+(for (x &quot;Hello&quot;)
+    (display x))
+;; Output
+;; &gt; H
+;; &gt; e
+;; &gt; l
+;; &gt; l
+;; &gt; o</code></pre>
 <h2 id="io-stream-functions">IO Stream Functions</h2>
 <h3 id="display">display</h3>
 <h6> 
