@@ -562,7 +562,7 @@ R"...(### eval ###
 
     // %%% parse
     {
-      auto func = [this](LispObjectPtr self, const LispObject& caller,
+      auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
         LispIterator list_itr {&list};
@@ -582,8 +582,9 @@ R"...(### eval ###
         }
 
         // パース。
+        Lisp::Lisp lisp;
         std::vector<LispObjectPtr> ret_vec =
-        this->Parse(result->string_value());
+        lisp.Parse(result->string_value());
 
         // 結果を返す。
         if (ret_vec.empty()) return Lisp::NewNil();
@@ -627,7 +628,7 @@ R"...(### parse ###
 
     // %%% parval
     {
-      auto func = [this](LispObjectPtr self, const LispObject& caller,
+      auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
         LispIterator list_itr {&list};
@@ -647,8 +648,9 @@ R"...(### parse ###
         }
 
         // パース。
+        Lisp::Lisp lisp;
         std::vector<LispObjectPtr> ret_vec =
-        this->Parse(result->string_value());
+        lisp.Parse(result->string_value());
 
         // 評価して結果を返す。
         LispObjectPtr ret_ptr = Lisp::NewNil();
