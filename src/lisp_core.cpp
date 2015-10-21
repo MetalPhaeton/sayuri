@@ -1560,14 +1560,14 @@ R"...(### for ###
 
 <h6> Usage </h6>
 
-* `(for (<Variable : Symbol> <List>) <S-Expression>...)`
+* `(for (<Variable : Symbol> <List | String>) <S-Expression>...)`
 
 <h6> Description </h6>
 
 * This is Special Form.
     + `<Variable>` is not evaluated.
-* Repeats `<S-Expression>...` until a number of elements of `<List>`.
-    + The element of `<List>` is bound to `<Variable>`.
+* Repeats `<S-Expression>...` until a number of elements of `<List | String>`.
+    + The element of `<List | String>` is bound to `<Variable>`.
 * Returns Object returned by the last S-Expression.
 
 <h6> Example </h6>
@@ -1587,7 +1587,16 @@ R"...(### for ###
     ;; > Hello 4
     ;; > World 9
     ;; > Hello 5
-    ;; > World 10)...";
+    ;; > World 10
+
+    (for (x "Hello")
+        (display x))
+    ;; Output
+    ;; > H
+    ;; > e
+    ;; > l
+    ;; > l
+    ;; > o)...";
     }
 
     // %%% if
