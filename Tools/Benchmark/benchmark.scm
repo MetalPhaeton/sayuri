@@ -51,7 +51,7 @@
 (define data-hashfull ())
 
 ;; If str is "info..", then update info-str.
-(define (output-info?-update str)
+(define (info?-update str)
   (if (equal? (ref (string-split str " ") 0) "info")
     (set! output str) ()))
 
@@ -106,7 +106,7 @@
 ;; Listener.
 (define (output-listener message)
   (stderr (append message "\n"))
-  (output-info?-update message))
+  (info?-update message))
 
 ;; Print result.
 (define (print-result)
@@ -172,16 +172,14 @@
 (engine '@input-uci-command
         (append "setoption name hash value " (to-string hash-size)))
 ;; Go.
-(define count 0)
-(while (< count repeat)
+(for (x (range repeat))
        (engine '@input-uci-command "ucinewgame")
        (engine '@input-uci-command (append "position fen " fen))
        (engine '@go-depth depth)
        (append-time (string-split output " "))
        (append-nodes (string-split output " "))
        (append-nps (string-split output " "))
-       (append-hashfull (string-split output " "))
-       (inc! count))
+       (append-hashfull (string-split output " ")))
 ;; Result.
 (stderr "\n")
 (print-result)
