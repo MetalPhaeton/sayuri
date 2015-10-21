@@ -582,7 +582,7 @@ R"...(### eval ###
         }
 
         // パース。
-        Lisp::Lisp lisp;
+        Lisp lisp;
         std::vector<LispObjectPtr> ret_vec =
         lisp.Parse(result->string_value());
 
@@ -648,7 +648,7 @@ R"...(### parse ###
         }
 
         // パース。
-        Lisp::Lisp lisp;
+        Lisp lisp;
         std::vector<LispObjectPtr> ret_vec =
         lisp.Parse(result->string_value());
 
@@ -3410,6 +3410,57 @@ R"...(### search ###
     ;; Output
     ;; >  2
     ;; > ())...";
+    }
+
+    // %%% range
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) -> LispObjectPtr {
+        // 準備。
+        LispIterator list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 2;
+
+        // 数を得る。
+        if (!list_itr) {
+          throw Lisp::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr size_ptr = caller.Evaluate(*list_itr);
+        if (!(size_ptr->IsNumber())) {
+          throw Lisp::GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+
+        LispObjectPtr ret_ptr = Lisp::NewNil();
+        LispObject* ptr = ret_ptr.get();
+        int size = size_ptr->number_value();
+        size = size < 0 ? 0 : size;
+        for (int i = 0; i < size; ++i, ptr = ptr->cdr().get()) {
+          *ptr = *(Lisp::NewPair(Lisp::NewNumber(i), Lisp::NewNil()));
+        }
+
+        return ret_ptr;
+      };
+      global_ptr_->BindSymbol
+      ("range", NewNativeFunction(global_ptr_->scope_chain_, func));
+      help_["range"] =
+R"...(### range ###
+
+<h6> Usage </h6>
+
+* `(range <Size : Number>)`
+
+<h6> Description </h6>
+
+* Returns List composed with 0...(`<Size>` - 1).
+
+<h6> Example </h6>
+
+    (display (range 10))
+    
+    ;; Output
+    ;; > (0 1 2 3 4 5 6 7 8 9))...";
     }
 
     // %%% length
