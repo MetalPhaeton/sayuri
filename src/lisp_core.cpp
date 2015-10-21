@@ -207,8 +207,8 @@ namespace Sayuri {
           LispObjectPtr result = Evaluate(*target_itr);
 
           // 引数リストに入れる。
-          arg_ptr->car(result);
-          arg_ptr = arg_ptr->cdr().get();
+          arg_ptr->car_ = result;
+          arg_ptr = arg_ptr->cdr_.get();
 
           // 引数リストにバインド。
           if (arg_name_itr != func_obj->function_.arg_name_vec_.end()) {
@@ -361,8 +361,8 @@ namespace Sayuri {
           // それ意外。
           // 現在のポインタをPairにする。
           ptr->type_ = LispObjectType::PAIR;
-          ptr->car_ = Lisp::NewNil();
-          ptr->cdr_ = Lisp::NewNil();
+          ptr->car_ = NewNil();
+          ptr->cdr_ = NewNil();
 
           // carへパース。
           ParseCore(*(ptr->car_));
@@ -456,29 +456,27 @@ namespace Sayuri {
             "- - - - - - - - - - - - - - - - - - - -" << std::endl;
             oss << std::endl;
           }
-          return Lisp::NewString(oss.str());
+          return NewString(oss.str());
         } else {
           // 引数があればその項目を文字列にする。
           LispObjectPtr first_ptr = caller.Evaluate(*list_itr);
           if (!(first_ptr->IsString())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "String", std::vector<int> {1}, true);
           }
 
           HelpDict::iterator itr =
-          this->help_.find(first_ptr->string_value());
+          this->help_.find(first_ptr->str_value_);
           if (itr != this->help_.end()) {
-            return Lisp::NewString(itr->second);
+            return NewString(itr->second);
           }
 
-          return Lisp::NewString
-          ("Not found help of " + list_itr->ToString() + ".");
+          return NewString("Not found help of " + list_itr->ToString() + ".");
         }
 
-        return Lisp::NewNil();
+        return NewNil();
       };
-      global_ptr_->BindSymbol
-      ("help", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "help");
       help_["help"] =
 R"...(### help ###
 
@@ -529,14 +527,13 @@ R"...(### help ###
 
         // 引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
 
         return caller.Evaluate(*(caller.Evaluate(*list_itr)));
       };
-      global_ptr_->BindSymbol
-      ("eval", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "eval");
       help_["eval"] =
 R"...(### eval ###
 
@@ -571,23 +568,22 @@ R"...(### eval ###
 
         // 引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
 
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsString())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "String", std::vector<int> {1}, true);
         }
 
         // パース。
         Lisp lisp;
-        std::vector<LispObjectPtr> ret_vec =
-        lisp.Parse(result->string_value());
+        std::vector<LispObjectPtr> ret_vec = lisp.Parse(result->str_value_);
 
         // 結果を返す。
-        if (ret_vec.empty()) return Lisp::NewNil();
+        if (ret_vec.empty()) return NewNil();
         return ret_vec[0];
       };
       LispObjectPtr func_ptr =
@@ -637,30 +633,28 @@ R"...(### parse ###
 
         // 引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
 
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsString())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "String", std::vector<int> {1}, true);
         }
 
         // パース。
         Lisp lisp;
-        std::vector<LispObjectPtr> ret_vec =
-        lisp.Parse(result->string_value());
+        std::vector<LispObjectPtr> ret_vec = lisp.Parse(result->str_value_);
 
         // 評価して結果を返す。
-        LispObjectPtr ret_ptr = Lisp::NewNil();
+        LispObjectPtr ret_ptr = NewNil();
         for (auto& ptr : ret_vec) {
           ret_ptr = caller.Evaluate(*ptr);
         }
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("parval", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "parval");
       help_["parval"] =
 R"...(### parval ###
 
@@ -694,12 +688,12 @@ R"...(### parval ###
 
         // 引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         
         LispObjectPtr result = caller.Evaluate(*list_itr);
-        return Lisp::NewString(result->ToString());
+        return NewString(result->ToString());
       };
       LispObjectPtr func_ptr =
       NewNativeFunction(global_ptr_->scope_chain_, func);
@@ -755,16 +749,16 @@ R"...(### to-string ###
 
         // 第一引数を得る。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         LispObject& first = *(list_itr++);
         if (!(first.IsList())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, false);
         }
 
-        LispObjectPtr ret_ptr = Lisp::NewNil();
+        LispObjectPtr ret_ptr = NewNil();
         try {
           // 第1引数をトライ。
           for (LispIterator first_itr {&first}; first_itr; ++first_itr) {
@@ -773,13 +767,12 @@ R"...(### to-string ###
         } catch (LispObjectPtr exception) {
           // 第2引数以降でキャッチ。
           if (!list_itr) {
-            throw Lisp::GenInsufficientArgumentsError
+            throw GenInsufficientArgumentsError
             (func_name, required_args, true, list.Length() - 1);
           }
 
           // 一時スコープに例外メッセージをバインド。
-          LispObjectPtr scope_ptr =
-          Lisp::NewScopeObject(caller.scope_chain());
+          LispObjectPtr scope_ptr = NewScopeObject(caller.scope_chain_);
 
           scope_ptr->BindSymbol("exception", exception);
 
@@ -791,8 +784,7 @@ R"...(### to-string ###
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("try", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "try");
       help_["try"] =
 R"...(### try ###
 
@@ -839,14 +831,13 @@ R"...(### try ###
 
         // 引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
 
         throw caller.Evaluate(*list_itr);
       };
-      global_ptr_->BindSymbol
-      ("throw", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "throw");
       help_["throw"] =
 R"...(### throw ###
 
@@ -880,19 +871,18 @@ R"...(### throw ###
         int required_args = 1;
 
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsPair())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Pair", std::vector<int> {1}, true);
         }
 
-        return result->car()->Clone();
+        return result->car_->Clone();
       };
-      global_ptr_->BindSymbol
-      ("car", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "car");
       help_["car"] =
 R"...(### car ###
 
@@ -928,19 +918,18 @@ R"...(### car ###
         int required_args = 1;
 
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsPair())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Pair", std::vector<int> {1}, true);
         }
 
-        return result->cdr()->Clone();
+        return result->cdr_->Clone();
       };
-      global_ptr_->BindSymbol
-      ("cdr", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "cdr");
       help_["cdr"] =
 R"...(### cdr ###
 
@@ -976,20 +965,19 @@ R"...(### cdr ###
         int required_args = 2;
 
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result_car = caller.Evaluate(*(list_itr++));
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result_cdr = caller.Evaluate(*list_itr);
 
-        return Lisp::NewPair(result_car, result_cdr);
+        return NewPair(result_car, result_cdr);
       };
-      global_ptr_->BindSymbol
-      ("cons", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "cons");
       help_["cons"] =
 R"...(### cons ###
 
@@ -1034,21 +1022,20 @@ R"...(### cons ###
 
         // 先ず、cons。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result_car = caller.Evaluate(*(list_itr++));
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result_cdr = caller.Evaluate(*list_itr);
 
         // evalして返す。
-        return caller.Evaluate(*(Lisp::NewPair(result_car, result_cdr)));
+        return caller.Evaluate(*(NewPair(result_car, result_cdr)));
       };
-      global_ptr_->BindSymbol
-      ("conval", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "conval");
       help_["conval"] =
 R"...(### conval ###
 
@@ -1082,13 +1069,12 @@ R"...(### conval ###
         int required_args = 1;
 
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         return list_itr->Clone();
       };
-      global_ptr_->BindSymbol
-      ("quote", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "quote");
       help_["quote"] =
 R"...(### quote ###
 
@@ -1138,16 +1124,16 @@ R"...(### quote ###
 
         // マクロ定義と関数定義に分ける。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         if (list_itr->IsSymbol()) {  // マクロ定義。
           // バインドされるシンボル。
-          std::string symbol = (list_itr++)->symbol_value();
+          std::string symbol = (list_itr++)->str_value_;
 
           // バインドする値。
           if (!list_itr) {
-            throw Lisp::GenInsufficientArgumentsError
+            throw GenInsufficientArgumentsError
             (func_name, required_args, true, list.Length() - 1);
           }
           LispObjectPtr value_ptr = caller.Evaluate(*list_itr);
@@ -1156,26 +1142,26 @@ R"...(### quote ###
           caller.BindSymbol(symbol, value_ptr);
 
           // シンボルを返す。
-          return Lisp::NewSymbol(symbol);
+          return NewSymbol(symbol);
         } else if (list_itr->IsList()) {  // 関数定義。
           LispIterator inner_itr {&(*(list_itr++))};
 
           // 第1引数内の第1要素は関数名。
           if (!(inner_itr->IsSymbol())) {
-            throw Lisp::GenWrongTypeError(func_name, "Symbol",
+            throw GenWrongTypeError(func_name, "Symbol",
             std::vector<int> {1, 1}, false);
           }
-          std::string def_func_name = (inner_itr++)->symbol_value();
+          std::string def_func_name = (inner_itr++)->str_value_;
 
           // 第1引数内の第2要素以降は引数定義。
           std::vector<std::string> arg_name_vec;
           int index = 2;
           for (; inner_itr; ++inner_itr, ++index) {
             if (!(inner_itr->IsSymbol())) {
-              throw Lisp::GenWrongTypeError(func_name, "Symbol",
+              throw GenWrongTypeError(func_name, "Symbol",
               std::vector<int> {1, index}, false);
             }
-            arg_name_vec.push_back(inner_itr->symbol_value());
+            arg_name_vec.push_back(inner_itr->str_value_);
           }
 
           // 関数定義をベクトルにする。
@@ -1186,19 +1172,18 @@ R"...(### quote ###
 
           // 関数オブジェクトを作成。
           LispObjectPtr func_obj =
-          Lisp::NewFunction(caller.scope_chain(), arg_name_vec, def_vec);
+          NewFunction(caller.scope_chain_, arg_name_vec, def_vec);
 
           // 呼び出し元のスコープにバインド。
           caller.BindSymbol(def_func_name, func_obj);
 
-          return Lisp::NewSymbol(def_func_name);
+          return NewSymbol(def_func_name);
         }
 
-        throw Lisp::GenWrongTypeError(func_name, "List or Symbol",
+        throw GenWrongTypeError(func_name, "List or Symbol",
         std::vector<int> {1}, false);
       };
-      global_ptr_->BindSymbol
-      ("define", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "define");
       help_["define"] =
 R"...(### define ###
 
@@ -1245,14 +1230,14 @@ R"...(### define ###
 
         // 第1引数。 シンボルでなくてはならない。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         if (!(list_itr->IsSymbol())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Symbol", std::vector<int> {1}, false);
         }
-        std::string symbol = (list_itr++)->symbol_value();
+        std::string symbol = (list_itr++)->str_value_;
 
         // 書きかえる前の値を待避。 (シンボルが見つからなければエラー。)
         LispObjectPtr ret_ptr = caller.ReferSymbol(symbol)->Clone();
@@ -1266,8 +1251,7 @@ R"...(### define ###
         // 書きかえる前を返す。
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("set!", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "set!");
       help_["set!"] =
 R"...(### set! ###
 
@@ -1314,11 +1298,11 @@ R"...(### set! ###
 
         // 第1引数はリスト。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         if (!(list_itr->IsList())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, false);
         }
         LispIterator first_itr {&(*(list_itr++))};
@@ -1328,10 +1312,10 @@ R"...(### set! ###
         std::vector<std::string> arg_name_vec;
         for (; first_itr; ++first_itr, ++index) {
           if (!(first_itr->IsSymbol())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Symbol", std::vector<int> {1, index}, false);
           }
-          arg_name_vec.push_back(first_itr->symbol_value());
+          arg_name_vec.push_back(first_itr->str_value_);
         }
 
         // 関数定義をセット。
@@ -1340,10 +1324,9 @@ R"...(### set! ###
           def_vec.push_back(list_itr->Clone());
         }
 
-        return NewFunction(caller.scope_chain(), arg_name_vec, def_vec);
+        return NewFunction(caller.scope_chain_, arg_name_vec, def_vec);
       };
-      global_ptr_->BindSymbol
-      ("lambda", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "lambda");
       help_["lambda"] =
 R"...(### lambda ###
 
@@ -1389,37 +1372,37 @@ R"...(### lambda ###
 
         // 第1引数(ローカル変数定義リスト)を得る。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         if (!(list_itr->IsList())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, false);
         }
         LispIterator first_itr {&(*(list_itr++))};
 
         // 一時スコープを作成してバインド。
         int index = 1;
-        LispObjectPtr scope_ptr = Lisp::NewScopeObject(caller.scope_chain());
+        LispObjectPtr scope_ptr = NewScopeObject(caller.scope_chain_);
         for (; first_itr; ++first_itr, ++index) {
           if (!(first_itr->IsList())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "List", std::vector<int> {1, index}, false);
           }
 
           // 定義のペア。
           if (first_itr->IsPair()) {
             // 変数名。
-            if (!(first_itr->car()->IsSymbol())) {
-              throw Lisp::GenWrongTypeError
+            if (!(first_itr->car_->IsSymbol())) {
+              throw GenWrongTypeError
               (func_name, "Symbol", std::vector<int> {1, index, 1}, false);
             }
-            std::string var_name = first_itr->car()->symbol_value();
+            std::string var_name = first_itr->car_->str_value_;
 
             // 変数の初期値。
-            LispObjectPtr value = Lisp::NewNil();
-            if (first_itr->cdr()->IsPair()) {
-              value = caller.Evaluate(*(first_itr->cdr()->car()));
+            LispObjectPtr value = NewNil();
+            if (first_itr->cdr_->IsPair()) {
+              value = caller.Evaluate(*(first_itr->cdr_->car_));
             }
 
             // バインド。
@@ -1435,8 +1418,7 @@ R"...(### lambda ###
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("let", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "let");
       help_["let"] =
 R"...(### let ###
 
@@ -1478,35 +1460,34 @@ R"...(### let ###
         // 引数が2つ以上あるかどうかを予め調べる。
         int len = list.Length();
         if (len < 3) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, len - 1);
         }
 
         // 一時スコープを作り、ループ開始。
-        LispObjectPtr ret_ptr = Lisp::NewNil();
-        LispObjectPtr scope_ptr = Lisp::NewScopeObject(caller.scope_chain());
+        LispObjectPtr ret_ptr = NewNil();
+        LispObjectPtr scope_ptr = NewScopeObject(caller.scope_chain_);
         while (true) {
           // 条件式へのポインタ。
           const LispObject* ptr = list_itr.current_;
-          LispObjectPtr cond_ptr = caller.Evaluate(*(ptr->car()));
+          LispObjectPtr cond_ptr = caller.Evaluate(*(ptr->car_));
           if (!(cond_ptr->IsBoolean())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Boolean", std::vector<int> {1}, true);
           }
 
           // 条件が#fならループを抜ける。
-          if (!(cond_ptr->boolean_value())) break;
+          if (!(cond_ptr->boolean_value_)) break;
 
           // 自分のスコープで実行していく。
-          for (; ptr->IsPair(); ptr = ptr->cdr().get()) {
-            ret_ptr = scope_ptr->Evaluate(*(ptr->car()));
+          for (; ptr->IsPair(); ptr = ptr->cdr_.get()) {
+            ret_ptr = scope_ptr->Evaluate(*(ptr->car_));
           }
         }
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("while", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "while");
       help_["while"] =
 R"...(### while ###
 
@@ -1553,53 +1534,52 @@ R"...(### while ###
         // 要素用シンボルをローカルスコープにバインドする。
         // チェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         if (!(list_itr->IsList())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, false);
         }
         LispIterator first_itr {&(*(list_itr++))};
         if (!first_itr) {
-          throw Lisp::GenError("@insufficient-arguments",
+          throw GenError("@insufficient-arguments",
           "No Symbol to bind element for loop.");
         }
         if (!(first_itr->IsSymbol())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Symbol", std::vector<int> {1, 1}, false);
         }
         // 一時スコープにバインド。
-        LispObjectPtr scope_ptr = Lisp::NewScopeObject(caller.scope_chain());
-        std::string symbol = first_itr->symbol_value();
-        scope_ptr->BindSymbol(symbol, Lisp::NewNil());
+        LispObjectPtr scope_ptr = NewScopeObject(caller.scope_chain_);
+        std::string symbol = first_itr->str_value_;
+        scope_ptr->BindSymbol(symbol, NewNil());
 
         // ループ用リストをチェックする。
         ++first_itr;
         if (!first_itr) {
-          throw Lisp::GenError("@insufficient-arguments",
+          throw GenError("@insufficient-arguments",
           "No List or String for loop.");
         }
         LispObjectPtr loop_list_ptr = caller.Evaluate(*first_itr);
         if (!(loop_list_ptr->IsList() || loop_list_ptr->IsString())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List or String", std::vector<int> {1, 2}, true);
         }
 
         // loop_list_ptrが文字列の場合、Listに変更する。
         if (loop_list_ptr->IsString()) {
-          LispObjectPtr temp = Lisp::NewNil();
+          LispObjectPtr temp = NewNil();
           LispObject* ptr = temp.get();
-          for (auto c : loop_list_ptr->string_value()) {
-            *ptr = *(Lisp::NewPair(Lisp::NewString(std::string(1, c)),
-            Lisp::NewNil()));
-            ptr = ptr->cdr().get();
+          for (auto c : loop_list_ptr->str_value_) {
+            *ptr = *(NewPair(NewString(std::string(1, c)), NewNil()));
+            ptr = ptr->cdr_.get();
           }
           loop_list_ptr = temp;
         }
 
         // ループ開始。
-        LispObjectPtr ret_ptr = Lisp::NewNil();
+        LispObjectPtr ret_ptr = NewNil();
         for (LispIterator itr {loop_list_ptr.get()}; itr; ++itr) {
           // ローカルスコープに要素をバインド。
           scope_ptr->RewriteSymbol(symbol, itr->Clone());
@@ -1611,8 +1591,7 @@ R"...(### while ###
         }
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("for", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "for");
       help_["for"] =
 R"...(### for ###
 
@@ -1668,21 +1647,21 @@ R"...(### for ###
 
         // 第1引数を評価。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*(list_itr++));
         if (!(result->IsBoolean())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Boolean", std::vector<int> {1}, true);
         }
 
         // resultが#tの場合。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
-        if (result->boolean_value()) {
+        if (result->boolean_value_) {
           // 第2引数を評価。
           return caller.Evaluate(*list_itr);
         }
@@ -1691,13 +1670,12 @@ R"...(### for ###
         // 第3引数を評価。
         ++list_itr;
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         return caller.Evaluate(*list_itr);
       };
-      global_ptr_->BindSymbol
-      ("if", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "if");
       help_["if"] =
 R"...(### if ###
 
@@ -1734,7 +1712,7 @@ R"...(### if ###
         for (; list_itr; ++list_itr, ++index) {
           // 各条件リストはリストでなくてはいけない。
           if (!(list_itr->IsList())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "List", std::vector<int> {index}, false);
           }
 
@@ -1744,34 +1722,33 @@ R"...(### if ###
             // 空リストではない。
             // elseリストなら無条件で実行式を評価して終了。
             if (cond_list_itr->IsSymbol()
-            && (cond_list_itr->symbol_value() == "else")) {
+            && (cond_list_itr->str_value_ == "else")) {
               ++cond_list_itr;
               if (cond_list_itr) {
                 return caller.Evaluate(*cond_list_itr);
               }
-              return Lisp::NewNil();
+              return NewNil();
             }
 
             // 条件を評価する。
             LispObjectPtr result = caller.Evaluate(*(cond_list_itr++));
             if (!(result->IsBoolean())) {
-              throw Lisp::GenWrongTypeError
+              throw GenWrongTypeError
               (func_name, "Boolean", std::vector<int> {index, 1}, true);
             }
 
             // #tなら実行式を評価して終了。
-            if (result->boolean_value()) {
+            if (result->boolean_value_) {
               if (cond_list_itr) {
                 return caller.Evaluate(*cond_list_itr);
               }
-              return Lisp::NewNil();
+              return NewNil();
             }
           }
         }
-        return Lisp::NewNil();
+        return NewNil();
       };
-      global_ptr_->BindSymbol
-      ("cond", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "cond");
       help_["cond"] =
 R"...(### cond ###
 
@@ -1805,7 +1782,7 @@ R"...(### cond ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 各引数を評価。
-        LispObjectPtr ret_ptr = Lisp::NewNil();
+        LispObjectPtr ret_ptr = NewNil();
         LispIterator list_itr {&list};
         for (++list_itr; list_itr; ++list_itr) {
           ret_ptr = caller.Evaluate(*list_itr);
@@ -1813,8 +1790,7 @@ R"...(### cond ###
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("begin", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "begin");
       help_["begin"] =
 R"...(### begin ###
 
@@ -1847,7 +1823,7 @@ R"...(### begin ###
         std::ostringstream oss;
         for (++list_itr; list_itr; ++list_itr) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
-          switch (result->type()) {
+          switch (result->type_) {
             case LispObjectType::PAIR:
             case LispObjectType::NIL:
             case LispObjectType::NUMBER:
@@ -1855,10 +1831,10 @@ R"...(### begin ###
               oss << result->ToString();
               break;
             case LispObjectType::SYMBOL:
-              oss << "Symbol:" << result->symbol_value();
+              oss << "Symbol:" << result->str_value_;
               break;
             case LispObjectType::STRING:
-              oss << result->string_value();
+              oss << result->str_value_;
               break;
             case LispObjectType::FUNCTION:
               oss << "Function: " << result->ToString();
@@ -1873,10 +1849,9 @@ R"...(### begin ###
         // 表示。
         std::cout << oss.str() << std::endl;
 
-        return Lisp::NewString(oss.str());
+        return NewString(oss.str());
       };
-      global_ptr_->BindSymbol
-      ("display", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "display");
       help_["display"] =
 R"...(### display ###
 
@@ -1910,7 +1885,7 @@ R"...(### display ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // ストリームが閉じていたらNilを返す。
-        if (!(std::cin)) return Lisp::NewNil();
+        if (!(std::cin)) return NewNil();
 
         // 準備。
         LispIterator list_itr {&list};
@@ -1919,23 +1894,21 @@ R"...(### display ###
 
         // 引数を調べる。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr message_ptr = caller.Evaluate(*(list_itr++));
-        if (message_ptr->IsNil())       if (!(message_ptr->IsSymbol())) {
-          throw Lisp::GenWrongTypeError
+        if (!(message_ptr->IsSymbol())) {
+          throw GenWrongTypeError
           (func_name, "Symbol", std::vector<int> {1}, true);
         }
 
         // メッセージシンボルに合わせて読み方を変える。
-        std::string message = message_ptr->symbol_value();
+        std::string message = message_ptr->str_value_;
         std::string input_str = "";
         if (message == "@read") {
           char c;
-          while (std::cin.get(c)) {
-            input_str.push_back(c);
-          }
+          while (std::cin.get(c)) input_str.push_back(c);
         } else if (message == "@read-line") {
           std::getline(std::cin, input_str);
         } else if (message == "@get") {
@@ -1944,10 +1917,9 @@ R"...(### display ###
           input_str.push_back(c);
         }
 
-        return Lisp::NewString(input_str);
+        return NewString(input_str);
       };
-      global_ptr_->BindSymbol
-      ("stdin", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "stdin");
       help_["stdin"] =
 R"...(### stdin ###
 
@@ -1986,21 +1958,20 @@ R"...(### stdin ###
         int required_args = 1;
 
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr); 
         if (!(result->IsString())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "String", std::vector<int> {1}, true);
         }
 
-        std::cout << result->string_value() << std::flush;
+        std::cout << result->str_value_ << std::flush;
 
         return self;
       };
-      global_ptr_->BindSymbol
-      ("stdout", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "stdout");
       help_["stdout"] =
 R"...(### stdout ###
 
@@ -2032,21 +2003,20 @@ R"...(### stdout ###
         int required_args = 1;
 
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr); 
         if (!(result->IsString())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "String", std::vector<int> {1}, true);
         }
 
-        std::cerr << result->string_value() << std::flush;
+        std::cerr << result->str_value_ << std::flush;
 
         return self;
       };
-      global_ptr_->BindSymbol
-      ("stderr", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "stderr");
       help_["stderr"] =
 R"...(### stderr ###
 
@@ -2070,7 +2040,7 @@ R"...(### stderr ###
 
     // %%% import
     {
-      auto func = [this](LispObjectPtr self, const LispObject& caller,
+      auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
         LispIterator list_itr {&list};
@@ -2078,30 +2048,30 @@ R"...(### stderr ###
         int required_args = 1;
 
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr); 
         if (!(result->IsString())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "String", std::vector<int> {1}, true);
         }
 
-        LispObjectPtr ret_ptr = Lisp::NewNil();
+        LispObjectPtr ret_ptr = NewNil();
 
         // 全部読み込む。
         std::string input = "";
-        std::ifstream ifs(result->string_value());
+        std::ifstream ifs(result->str_value_);
         if (!ifs) {
-          throw Lisp::GenError
-          ("@runtime-error",
-          "Couldn't open '" + result->string_value() + "'.");
+          throw GenError
+          ("@runtime-error", "Couldn't open '" + result->str_value_ + "'.");
         }
         std::ostringstream osstream;
         osstream << ifs.rdbuf();
 
         // 字句解析する。
-        std::vector<LispObjectPtr> obj_ptr_vec = this->Parse(osstream.str());
+        Lisp lisp;
+        std::vector<LispObjectPtr> obj_ptr_vec = lisp.Parse(osstream.str());
 
         // 評価する。
         for (auto& obj_ptr : obj_ptr_vec) {
@@ -2111,8 +2081,7 @@ R"...(### stderr ###
         // 最後の評価結果を返す。
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("import", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "import");
       help_["import"] =
 R"...(### import ###
 
@@ -2154,7 +2123,7 @@ R"...(### import ###
         int required_args = 1;
 
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         LispObjectPtr first_ptr = caller.Evaluate(*(list_itr++));
@@ -2162,10 +2131,10 @@ R"...(### import ###
         // 比較。
         for (; list_itr; ++list_itr) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
-          if (*first_ptr != *result) return Lisp::NewBoolean(false);
+          if (*first_ptr != *result) return NewBoolean(false);
         }
 
-        return Lisp::NewBoolean(true);
+        return NewBoolean(true);
       };
       LispObjectPtr func_ptr =
       NewNativeFunction(global_ptr_->scope_chain_, func);
@@ -2205,7 +2174,7 @@ R"...(### equal? ###
         int required_args = 1;
 
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         LispObjectPtr first_ptr = caller.Evaluate(*(list_itr++));
@@ -2213,13 +2182,12 @@ R"...(### equal? ###
         // 比較。
         for (; list_itr; ++list_itr) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
-          if (*first_ptr != *result) return Lisp::NewBoolean(true);
+          if (*first_ptr != *result) return NewBoolean(true);
         }
 
-        return Lisp::NewBoolean(false);
+        return NewBoolean(false);
       };
-      global_ptr_->BindSymbol
-      ("!=", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "!=");
       help_["!="] =
 R"...(### != ###
 
@@ -2250,25 +2218,24 @@ R"...(### != ###
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
-        LispObjectPtr ret_ptr = Lisp::NewBoolean(true);
+        LispObjectPtr ret_ptr = NewBoolean(true);
 
         // 全ての引数がLispPairならtrue。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         for (; list_itr; ++list_itr) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
           if (!(result->IsPair())) {
-            ret_ptr->boolean_value(false);
+            ret_ptr->boolean_value_ = false;
             break;
           }
         }
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("pair?", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "pair?");
       help_["pair?"] =
 R"...(### pair? ###
 
@@ -2299,25 +2266,24 @@ R"...(### pair? ###
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
-        LispObjectPtr ret_ptr = Lisp::NewBoolean(true);
+        LispObjectPtr ret_ptr = NewBoolean(true);
 
         // 全ての引数がListならtrue。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         for (; list_itr; ++list_itr) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
           if (!(result->IsList())) {
-            ret_ptr->boolean_value(false);
+            ret_ptr->boolean_value_ = false;
             break;
           }
         }
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("list?", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "list?");
       help_["list?"] =
 R"...(### list? ###
 
@@ -2349,18 +2315,18 @@ R"...(### list? ###
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
-        LispObjectPtr ret_ptr = Lisp::NewBoolean(true);
+        LispObjectPtr ret_ptr = NewBoolean(true);
 
         // 全ての引数がNilならtrue。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         for (; list_itr; ++list_itr) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
 
           if (!(result->IsNil())) {
-            ret_ptr->boolean_value(false);
+            ret_ptr->boolean_value_ = false;
             break;
           }
         }
@@ -2404,26 +2370,25 @@ R"...(### nil? ###
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
-        LispObjectPtr ret_ptr = Lisp::NewBoolean(true);
+        LispObjectPtr ret_ptr = NewBoolean(true);
 
         // 全ての引数がシンボルならtrue。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         for (; list_itr; ++list_itr) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
 
           if (!(result->IsSymbol())){
-            ret_ptr->boolean_value(false);
+            ret_ptr->boolean_value_ = false;
             break;
           }
         }
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("symbol?", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "symbol?");
       help_["symbol?"] =
 R"...(### symbol? ###
 
@@ -2454,26 +2419,25 @@ R"...(### symbol? ###
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
-        LispObjectPtr ret_ptr = Lisp::NewBoolean(true);
+        LispObjectPtr ret_ptr = NewBoolean(true);
 
         // 全ての引数が数字ならtrue。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         for (; list_itr; ++list_itr) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
 
           if (!(result->IsNumber())) {
-            ret_ptr->boolean_value(false);
+            ret_ptr->boolean_value_ = false;
             break;
           }
         }
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("number?", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "number?");
       help_["number?"] =
 R"...(### number? ###
 
@@ -2504,26 +2468,25 @@ R"...(### number? ###
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
-        LispObjectPtr ret_ptr = Lisp::NewBoolean(true);
+        LispObjectPtr ret_ptr = NewBoolean(true);
 
         // 全ての引数がBooleanならtrue。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         for (; list_itr; ++list_itr) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
 
           if (!(result->IsBoolean())) {
-            ret_ptr->boolean_value(false);
+            ret_ptr->boolean_value_ = false;
             break;
           }
         }
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("boolean?", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "boolean?");
       help_["boolean?"] =
 R"...(### boolean? ###
 
@@ -2554,26 +2517,25 @@ R"...(### boolean? ###
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
-        LispObjectPtr ret_ptr = Lisp::NewBoolean(true);
+        LispObjectPtr ret_ptr = NewBoolean(true);
 
         // 全ての引数が文字列ならtrue。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         for (; list_itr; ++list_itr) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
 
           if (!(result->IsString())) {
-            ret_ptr->boolean_value(false);
+            ret_ptr->boolean_value_ = false;
             break;
           }
         }
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("string?", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "string?");
       help_["string?"] =
 R"...(### string? ###
 
@@ -2604,26 +2566,25 @@ R"...(### string? ###
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
-        LispObjectPtr ret_ptr = Lisp::NewBoolean(true);
+        LispObjectPtr ret_ptr = NewBoolean(true);
 
         // 全ての引数が関数オブジェクトならtrue。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         for (; list_itr; ++list_itr) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
 
           if (!(result->IsFunction())) {
-            ret_ptr->boolean_value(false);
+            ret_ptr->boolean_value_ = false;
             break;
           }
         }
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("function?", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "function?");
       help_["function?"] =
 R"...(### function? ###
 
@@ -2655,26 +2616,25 @@ R"...(### function? ###
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
-        LispObjectPtr ret_ptr = Lisp::NewBoolean(true);
+        LispObjectPtr ret_ptr = NewBoolean(true);
 
         // 全ての引数がネイティブ関数オブジェクトならtrue。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         for (; list_itr; ++list_itr) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
 
           if (!(result->IsNativeFunction())) {
-            ret_ptr->boolean_value(false);
+            ret_ptr->boolean_value_ = false;
             break;
           }
         }
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol("native-function?",
-       NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "native-function?");
       help_["native-function?"] =
 R"...(### native-function? ###
 
@@ -2705,26 +2665,25 @@ R"...(### native-function? ###
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
-        LispObjectPtr ret_ptr = Lisp::NewBoolean(true);
+        LispObjectPtr ret_ptr = NewBoolean(true);
 
         // 全ての引数が関数、又はネイティブ関数オブジェクトならtrue。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         for (; list_itr; ++list_itr) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
 
           if (!((result->IsFunction()) || (result->IsNativeFunction()))) {
-            ret_ptr->boolean_value(false);
+            ret_ptr->boolean_value_ = false;
             break;
           }
         }
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("procedure?", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "procedure?");
       help_["procedure?"] =
 R"...(### procedure? ###
 
@@ -2764,21 +2723,20 @@ R"...(### procedure? ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsString())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "String", std::vector<int> {1}, true);
         }
 
         // ヒープにファイルを開く。
         std::shared_ptr<std::ofstream>
-        ofs_ptr(new std::ofstream(result->string_value()));
+        ofs_ptr(new std::ofstream(result->str_value_));
         if (!(*ofs_ptr)) {
-          throw Lisp::GenError
-          ("@not-open-stream", "Couldn't open output stream.");
+          throw GenError("@not-open-stream", "Couldn't open output stream.");
         }
 
         // ネイティブ関数オブジェクトを作成。
@@ -2790,7 +2748,7 @@ R"...(### procedure? ###
           int required_args = 1;
 
           if (!list_itr) {
-            throw Lisp::GenInsufficientArgumentsError
+            throw GenInsufficientArgumentsError
             (func_name, required_args, false, list.Length() - 1);
           }
           LispObjectPtr result = caller.Evaluate(*list_itr);
@@ -2803,21 +2761,20 @@ R"...(### procedure? ###
 
           // ファイルを書き込む。
           if (!(result->IsString())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "String or Nil", std::vector<int> {1}, true);
           }
 
           if (*ofs_ptr) {
-            *ofs_ptr << result->string_value() << std::flush;
+            *ofs_ptr << result->str_value_ << std::flush;
           }
 
           return self;
         };
 
-        return Lisp::NewNativeFunction(caller.scope_chain(), func);
+        return NewNativeFunction(caller.scope_chain_, func);
       };
-      global_ptr_->BindSymbol
-      ("output-stream", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "output-stream");
       help_["output-stream"] =
 R"...(### output-stream ###
 
@@ -2855,28 +2812,27 @@ R"...(### output-stream ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsString())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "String", std::vector<int> {1}, true);
         }
 
         // ヒープにファイルを開く。
         std::shared_ptr<std::ifstream>
-        ifs_ptr(new std::ifstream(result->string_value()));
+        ifs_ptr(new std::ifstream(result->str_value_));
         if (!(*ifs_ptr)) {
-          throw Lisp::GenError
-          ("@not-open-stream", "Couldn't open input stream.");
+          throw GenError("@not-open-stream", "Couldn't open input stream.");
         }
 
         // ネイティブ関数オブジェクトを作成。
         auto func = [ifs_ptr](LispObjectPtr self, const LispObject& caller,
         const LispObject& list) -> LispObjectPtr {
           // ストリームが閉じていたらNilを返す。
-          if (!(*ifs_ptr)) return Lisp::NewNil();
+          if (!(*ifs_ptr)) return NewNil();
 
           // 準備。
           LispIterator list_itr {&list};
@@ -2885,22 +2841,22 @@ R"...(### output-stream ###
 
           // 引数を調べる。
           if (!list_itr) {
-            throw Lisp::GenInsufficientArgumentsError
+            throw GenInsufficientArgumentsError
             (func_name, required_args, false, list.Length() - 1);
           }
           LispObjectPtr message_ptr = caller.Evaluate(*(list_itr++));
           if (message_ptr->IsNil()) {
             // Nilの場合は閉じる。
             ifs_ptr->close();
-            return Lisp::NewNil();
+            return NewNil();
           }
           if (!(message_ptr->IsSymbol())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Symbol or Nil", std::vector<int> {1}, true);
           }
 
           // メッセージシンボルに合わせて読み方を変える。
-          std::string message = message_ptr->symbol_value();
+          std::string message = message_ptr->str_value_;
           std::string input_str = "";
           if (message == "@read") {
             std::ostringstream oss;
@@ -2914,13 +2870,12 @@ R"...(### output-stream ###
             input_str.push_back(c);
           }
 
-          return Lisp::NewString(input_str);
+          return NewString(input_str);
         };
 
-        return Lisp::NewNativeFunction(caller.scope_chain(), func);
+        return NewNativeFunction(caller.scope_chain_, func);
       };
-      global_ptr_->BindSymbol
-      ("input-stream", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "input-stream");
       help_["input-stream"] =
 R"...(### input-stream ###
 
@@ -2976,7 +2931,7 @@ R"...(### input-stream ###
             // リストの場合。
             LispObject* ptr = result.get();
             for (; list_itr; ++list_itr) {
-              for (; ptr->IsPair(); ptr = ptr->cdr().get()) continue;
+              for (; ptr->IsPair(); ptr = ptr->cdr_.get()) continue;
               if (!(ptr->IsNil())) break;
               *ptr = *(caller.Evaluate(*list_itr));
             }
@@ -2985,12 +2940,12 @@ R"...(### input-stream ###
           } else if (result->IsString()) {
             // 文字列の場合。
             std::ostringstream oss;
-            oss << result->string_value();
+            oss << result->str_value_;
             for (; list_itr; ++list_itr) {
               LispObjectPtr result_2 = caller.Evaluate(*list_itr);
-              switch (result_2->type()) {
+              switch (result_2->type_) {
                 case LispObjectType::STRING:
-                  oss << result_2->string_value();
+                  oss << result_2->str_value_;
                   break;
                 case LispObjectType::SYMBOL:
                 case LispObjectType::NUMBER:
@@ -3001,11 +2956,11 @@ R"...(### input-stream ###
                 default: break;
               }
             }
-            return Lisp::NewString(oss.str());
+            return NewString(oss.str());
           }
         }
 
-        return Lisp::NewNil();
+        return NewNil();
       };
       LispObjectPtr func_ptr =
       NewNativeFunction(global_ptr_->scope_chain_, func);
@@ -3054,30 +3009,30 @@ R"...(### append ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*(list_itr++));
         if (!(result->IsList() || result->IsString())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List or String", std::vector<int> {1}, true);
         }
 
         // 第2引数をチェック。 インデックス。 0が最初。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr index_ptr = caller.Evaluate(*list_itr);
         if (!(index_ptr->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {2}, true);
         }
 
         // 目的の要素を得る。
         if (result->IsList()) {
           // リストの場合。
-          int index = index_ptr->number_value();
+          int index = index_ptr->number_value_;
           index = index < 0 ? result->Length() + index : index;
           int i = 0;
           for (LispIterator result_itr {result.get()};
@@ -3086,18 +3041,18 @@ R"...(### append ###
           }
         } else {
           // 文字列の場合。
-          std::string result_str = result->string_value();
-          int index = index_ptr->number_value();
+          std::string result_str = result->str_value_;
+          int index = index_ptr->number_value_;
           index = index < 0 ? result_str.size() + index : index;
           if (static_cast<unsigned int>(index) < result_str.size()) {
             std::string ret_str = "";
-            ret_str.push_back(result->string_value()[index]);
-            return Lisp::NewString(ret_str);
+            ret_str.push_back(result->str_value_[index]);
+            return NewString(ret_str);
           }
         }
 
         // 範囲外。
-        throw Lisp::GenError("@out-of-range",
+        throw GenError("@out-of-range",
         "The index number of (" + func_name + ") is out of range.");
       };
       LispObjectPtr func_ptr =
@@ -3162,20 +3117,19 @@ R"...(### ref ###
         std::string func_name = (list_itr++)->ToString();
 
         // 作成する大きさのリストを作りながらセットしていく。
-        LispObjectPtr ret_ptr = Lisp::NewNil();
+        LispObjectPtr ret_ptr = NewNil();
         LispObject* ptr = ret_ptr.get();
         for (; list_itr; ++list_itr) {
           ptr->type(LispObjectType::PAIR);
-          ptr->car(caller.Evaluate(*list_itr));
-          ptr->cdr(Lisp::NewNil());
+          ptr->car_ = caller.Evaluate(*list_itr);
+          ptr->cdr_ = NewNil();
 
-          ptr = ptr->cdr().get();
+          ptr = ptr->cdr_.get();
         }
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("list", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "list");
       help_["list"] =
 R"...(### list ###
 
@@ -3208,35 +3162,35 @@ R"...(### list ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*(list_itr++));
         if (!(result->IsList())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, true);
         }
 
         // 第2引数をチェック。 インデックス。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr index_ptr = caller.Evaluate(*(list_itr++));
         if (!(index_ptr->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {2}, true);
         }
 
         // 第3引数を得る。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr replace_obj_ptr = caller.Evaluate(*list_itr);
 
         // インデックスの要素を入れ替える。
-        int index = index_ptr->number_value();
+        int index = index_ptr->number_value_;
         index = index < 0 ? result->Length() + index : index;
         int i = 0;
         for (LispIterator result_itr {result.get()};
@@ -3248,11 +3202,10 @@ R"...(### list ###
         }
 
         // 範囲外。
-        throw Lisp::GenError("@out-of-range",
+        throw GenError("@out-of-range",
         "The index number of (" + func_name + ") is out of range.");
       };
-      global_ptr_->BindSymbol
-      ("list-replace", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "list-replace");
       help_["list-replace"] =
 R"...(### list-replace ###
 
@@ -3288,44 +3241,43 @@ R"...(### list-replace ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*(list_itr++));
         if (!(result->IsList())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, true);
         }
 
         // 第2引数をチェック。 インデックス。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr index_ptr = caller.Evaluate(*list_itr);
         if (!(index_ptr->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {2}, true);
         }
 
         // インデックスの要素を削除する。 後ろの要素を1つ前に持ってくる。
-        int index = index_ptr->number_value();
+        int index = index_ptr->number_value_;
         index = index < 0 ? result->Length() + index : index;
         int i = 0;
         for (LispObject* ptr = result.get();
-        ptr->IsPair(); ptr = ptr->cdr().get(), ++i) {
+        ptr->IsPair(); ptr = ptr->cdr_.get(), ++i) {
           if (i == index) {
-            *ptr = *(ptr->cdr());
+            *ptr = *(ptr->cdr_);
             return result;
           }
         }
 
         // 範囲外。
-        throw Lisp::GenError("@out-of-range",
+        throw GenError("@out-of-range",
         "The index number of (" + func_name + ") is out of range.");
       };
-      global_ptr_->BindSymbol
-      ("list-remove", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "list-remove");
       help_["list-remove"] =
 R"...(### list-remove ###
 
@@ -3360,19 +3312,19 @@ R"...(### list-remove ###
 
         // 検索するアトムを得る。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr key_ptr = caller.Evaluate(*(list_itr++));
 
         // リストを得る。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr target_ptr = caller.Evaluate(*list_itr);
         if (!(target_ptr->IsList())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List", std::vector<int> {2}, true);
         }
 
@@ -3380,13 +3332,12 @@ R"...(### list-remove ###
         long long index = 0;
         for (LispIterator target_itr {target_ptr.get()}; target_itr;
         ++target_itr, ++index) {
-          if (*target_itr == *key_ptr) return Lisp::NewNumber(index);
+          if (*target_itr == *key_ptr) return NewNumber(index);
         }
 
-        return Lisp::NewNil();
+        return NewNil();
       };
-      global_ptr_->BindSymbol
-      ("search", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "search");
       help_["search"] =
 R"...(### search ###
 
@@ -3423,27 +3374,26 @@ R"...(### search ###
 
         // 数を得る。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr size_ptr = caller.Evaluate(*list_itr);
         if (!(size_ptr->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {2}, true);
         }
 
-        LispObjectPtr ret_ptr = Lisp::NewNil();
+        LispObjectPtr ret_ptr = NewNil();
         LispObject* ptr = ret_ptr.get();
-        int size = size_ptr->number_value();
+        int size = size_ptr->number_value_;
         size = size < 0 ? 0 : size;
-        for (int i = 0; i < size; ++i, ptr = ptr->cdr().get()) {
-          *ptr = *(Lisp::NewPair(Lisp::NewNumber(i), Lisp::NewNil()));
+        for (int i = 0; i < size; ++i, ptr = ptr->cdr_.get()) {
+          *ptr = *(NewPair(NewNumber(i), NewNil()));
         }
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("range", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "range");
       help_["range"] =
 R"...(### range ###
 
@@ -3473,33 +3423,26 @@ R"...(### range ###
         int required_args = 1;
 
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
 
         // Atomの場合。
         if (!(result->IsPair())) {
-          if (result->IsNil()) {
-            return Lisp::NewNumber(0);
-          }
-          return Lisp::NewNumber(1);
+          if (result->IsNil()) return NewNumber(0);
+          return NewNumber(1);
         }
 
         // Pairの場合。
         LispIterator result_itr {&(*result)};
         int count = 0;
-        for (; result_itr; ++result_itr) {
-          ++count;
-        }
-        if (!(result_itr.current_->IsNil())) {
-          ++count;
-        }
+        for (; result_itr; ++result_itr) ++count;
+        if (!(result_itr.current_->IsNil())) ++count;
 
-        return Lisp::NewNumber(count);
+        return NewNumber(count);
       };
-      global_ptr_->BindSymbol
-      ("length", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "length");
       help_["length"] =
 R"...(### length ###
 
@@ -3532,15 +3475,15 @@ R"...(### length ###
 
         // 最初の数字を得る。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*(list_itr++));
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
-        double prev = result->number_value();
+        double prev = result->number_value_;
 
         // 2つ目以降の引数と比較する。
         int index = 2;
@@ -3548,23 +3491,20 @@ R"...(### length ###
           // 調べたい数字を得る。
           LispObjectPtr current_ptr = caller.Evaluate(*list_itr);
           if (!(current_ptr->IsNumber())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Number", std::vector<int> {index}, true);
           }
 
           // 比較。
-          double current = current_ptr->number_value();
-          if (!(prev < current)) {
-            return Lisp::NewBoolean(false);
-          }
+          double current = current_ptr->number_value_;
+          if (!(prev < current)) return NewBoolean(false);
 
           prev = current;
         }
 
-        return Lisp::NewBoolean(true);
+        return NewBoolean(true);
       };
-      global_ptr_->BindSymbol
-      ("<", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "<");
       help_["<"] =
 R"...(### < ###
 
@@ -3597,15 +3537,15 @@ R"...(### < ###
 
         // 最初の数字を得る。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*(list_itr++));
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
-        double prev = result->number_value();
+        double prev = result->number_value_;
 
         // 2つ目以降の引数と比較する。
         int index = 2;
@@ -3613,23 +3553,20 @@ R"...(### < ###
           // 調べたい数字を得る。
           LispObjectPtr current_ptr = caller.Evaluate(*list_itr);
           if (!(current_ptr->IsNumber())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Number", std::vector<int> {index}, true);
           }
 
           // 比較。
-          double current = current_ptr->number_value();
-          if (!(prev <= current)) {
-            return Lisp::NewBoolean(false);
-          }
+          double current = current_ptr->number_value_;
+          if (!(prev <= current)) return NewBoolean(false);
 
           prev = current;
         }
 
-        return Lisp::NewBoolean(true);
+        return NewBoolean(true);
       };
-      global_ptr_->BindSymbol
-      ("<=", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "<=");
       help_["<="] =
 R"...(### <= ###
 
@@ -3662,15 +3599,15 @@ R"...(### <= ###
 
         // 最初の数字を得る。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*(list_itr++));
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
-        double prev = result->number_value();
+        double prev = result->number_value_;
 
         // 2つ目以降の引数と比較する。
         int index = 2;
@@ -3678,23 +3615,20 @@ R"...(### <= ###
           // 調べたい数字を得る。
           LispObjectPtr current_ptr = caller.Evaluate(*list_itr);
           if (!(current_ptr->IsNumber())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Number", std::vector<int> {index}, true);
           }
 
           // 比較。
-          double current = current_ptr->number_value();
-          if (!(prev > current)) {
-            return Lisp::NewBoolean(false);
-          }
+          double current = current_ptr->number_value_;
+          if (!(prev > current)) return NewBoolean(false);
 
           prev = current;
         }
 
-        return Lisp::NewBoolean(true);
+        return NewBoolean(true);
       };
-      global_ptr_->BindSymbol
-      (">", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, ">");
       help_[">"] =
 R"...(### > ###
 
@@ -3727,15 +3661,15 @@ R"...(### > ###
 
         // 最初の数字を得る。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*(list_itr++));
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
-        double prev = result->number_value();
+        double prev = result->number_value_;
 
         // 2つ目以降の引数と比較する。
         int index = 2;
@@ -3743,23 +3677,20 @@ R"...(### > ###
           // 調べたい数字を得る。
           LispObjectPtr current_ptr = caller.Evaluate(*list_itr);
           if (!(current_ptr->IsNumber())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Number", std::vector<int> {index}, true);
           }
 
           // 比較。
-          double current = current_ptr->number_value();
-          if (!(prev >= current)) {
-            return Lisp::NewBoolean(false);
-          }
+          double current = current_ptr->number_value_;
+          if (!(prev >= current)) return NewBoolean(false);
 
           prev = current;
         }
 
-        return Lisp::NewBoolean(true);
+        return NewBoolean(true);
       };
-      global_ptr_->BindSymbol
-      (">=", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, ">=");
       help_[">="] =
 R"...(### >= ###
 
@@ -3792,19 +3723,18 @@ R"...(### >= ###
 
         // 引数を評価してみる。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsBoolean())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Boolean", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewBoolean(!(result->boolean_value()));
+        return NewBoolean(!(result->boolean_value_));
       };
-      global_ptr_->BindSymbol
-      ("not", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "not");
       help_["not"] =
 R"...(### not ###
 
@@ -3836,25 +3766,22 @@ R"...(### not ###
 
         // 各引数を調べる。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         int index = 1;
         for (; list_itr; ++list_itr, ++index) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
           if (!(result->IsBoolean())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Boolean", std::vector<int> {index}, true);
           }
 
-          if (!(result->boolean_value())) {
-            return Lisp::NewBoolean(false);
-          }
+          if (!(result->boolean_value_)) return NewBoolean(false);
         }
-        return Lisp::NewBoolean(true);
+        return NewBoolean(true);
       };
-      global_ptr_->BindSymbol
-      ("and", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "and");
       help_["and"] =
 R"...(### and ###
 
@@ -3887,25 +3814,22 @@ R"...(### and ###
 
         // 各引数を調べる。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         int index = 1;
         for (; list_itr; ++list_itr, ++index) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
           if (!(result->IsBoolean())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Boolean", std::vector<int> {index}, true);
           }
 
-          if (result->boolean_value()) {
-            return Lisp::NewBoolean(true);
-          }
+          if (result->boolean_value_) return NewBoolean(true);
         }
-        return Lisp::NewBoolean(false);
+        return NewBoolean(false);
       };
-      global_ptr_->BindSymbol
-      ("or", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "or");
       help_["or"] =
 R"...(### or ###
 
@@ -3941,16 +3865,15 @@ R"...(### or ###
         for (; list_itr; ++list_itr, ++index) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
           if (!(result->IsNumber())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Number", std::vector<int> {index}, true);
           }
 
-          value += result->number_value();
+          value += result->number_value_;
         }
-        return Lisp::NewNumber(value);
+        return NewNumber(value);
       };
-      global_ptr_->BindSymbol
-      ("+", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "+");
       help_["+"] =
 R"...(### + ###
 
@@ -3984,25 +3907,24 @@ R"...(### + ###
         if (list_itr) {
           LispObjectPtr result = caller.Evaluate(*(list_itr++));
           if (!(result->IsNumber())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Number", std::vector<int> {1}, true);
           }
-          value = result->number_value();
+          value = result->number_value_;
         }
         int index = 2;
         for (; list_itr; ++list_itr, ++index) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
           if (!(result->IsNumber())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Number", std::vector<int> {index}, true);
           }
 
-          value -= result->number_value();
+          value -= result->number_value_;
         }
-        return Lisp::NewNumber(value);
+        return NewNumber(value);
       };
-      global_ptr_->BindSymbol
-      ("-", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "-");
       help_["-"] =
 R"...(### - ###
 
@@ -4037,16 +3959,15 @@ R"...(### - ###
         for (; list_itr; ++list_itr, ++index) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
           if (!(result->IsNumber())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Number", std::vector<int> {index}, true);
           }
 
-          value *= result->number_value();
+          value *= result->number_value_;
         }
-        return Lisp::NewNumber(value);
+        return NewNumber(value);
       };
-      global_ptr_->BindSymbol
-      ("*", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "*");
       help_["*"] =
 R"...(### * ###
 
@@ -4080,25 +4001,24 @@ R"...(### * ###
         if (list_itr) {
           LispObjectPtr result = caller.Evaluate(*(list_itr++));
           if (!(result->IsNumber())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Number", std::vector<int> {1}, true);
           }
-          value = result->number_value();
+          value = result->number_value_;
         }
         int index = 2;
         for (; list_itr; ++list_itr, ++index) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
           if (!(result->IsNumber())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Number", std::vector<int> {index}, true);
           }
 
-          value /= result->number_value();
+          value /= result->number_value_;
         }
-        return Lisp::NewNumber(value);
+        return NewNumber(value);
       };
-      global_ptr_->BindSymbol
-      ("/", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "/");
       help_["/"] =
 R"...(### / ###
 
@@ -4130,21 +4050,20 @@ R"...(### / ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
 
         LispObjectPtr result = caller.Evaluate(*(list_itr++));
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
         // インクリメントして返す。
-        return Lisp::NewNumber(result->number_value() + 1.0);
+        return NewNumber(result->number_value_ + 1.0);
       };
-      global_ptr_->BindSymbol
-      ("++", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "++");
       help_["++"] =
 R"...(### ++ ###
 
@@ -4176,21 +4095,20 @@ R"...(### ++ ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
 
         LispObjectPtr result = caller.Evaluate(*(list_itr++));
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
         // インクリメントして返す。
-        return Lisp::NewNumber(result->number_value() - 1.0);
+        return NewNumber(result->number_value_ - 1.0);
       };
-      global_ptr_->BindSymbol
-      ("--", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "--");
       help_["--"] =
 R"...(### -- ###
 
@@ -4222,32 +4140,31 @@ R"...(### -- ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
 
         // 第一引数はシンボルでなくてはならない。
         if (!(list_itr->IsSymbol())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Symbol", std::vector<int> {1}, false);
         }
 
         // 第一シンボルにはNumberがバインドされていなくてはならない。
         LispObjectPtr bound_ptr =
-        caller.ReferSymbol(list_itr->symbol_value());
+        caller.ReferSymbol(list_itr->str_value_);
         if (!(bound_ptr->IsNumber())) {
-          throw Lisp::GenError("@not-number",
-          "\"" +  list_itr->symbol_value() + "\" is not bound with Number.");
+          throw GenError("@not-number",
+          "\"" +  list_itr->str_value_ + "\" is not bound with Number.");
         }
 
         // バインドされているNumberをインクリメントする。
-        bound_ptr->number_value(bound_ptr->number_value() + 1);
+        bound_ptr->number_value_ = bound_ptr->number_value_ + 1;
 
         // シンボルを改めて評価して返す。
         return caller.Evaluate(*list_itr);
       };
-      global_ptr_->BindSymbol
-      ("inc!", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "inc!");
       help_["inc!"] =
 R"...(### inc! ###
 
@@ -4284,32 +4201,30 @@ R"...(### inc! ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
 
         // 第一引数はシンボルでなくてはならない。
         if (!(list_itr->IsSymbol())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Symbol", std::vector<int> {1}, false);
         }
 
         // 第一シンボルにはNumberがバインドされていなくてはならない。
-        LispObjectPtr bound_ptr =
-        caller.ReferSymbol(list_itr->symbol_value());
+        LispObjectPtr bound_ptr = caller.ReferSymbol(list_itr->str_value_);
         if (!(bound_ptr->IsNumber())) {
-          throw Lisp::GenError("@not-number",
-          "\"" +  list_itr->symbol_value() + "\" is not bound with Number.");
+          throw GenError("@not-number",
+          "\"" +  list_itr->str_value_ + "\" is not bound with Number.");
         }
 
         // バインドされているNumberをインクリメントする。
-        bound_ptr->number_value(bound_ptr->number_value() - 1);
+        bound_ptr->number_value_ = bound_ptr->number_value_ - 1;
 
         // シンボルを改めて評価して返す。
         return caller.Evaluate(*list_itr);
       };
-      global_ptr_->BindSymbol
-      ("dec!", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "dec!");
       help_["dec!"] =
 R"...(### dec! ###
 
@@ -4346,29 +4261,29 @@ R"...(### dec! ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*(list_itr++));
         if (!(result->IsString())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "String", std::vector<int> {1}, true);
         }
 
         // 第2引数をチェック。 区切り文字列。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr delim_ptr = caller.Evaluate(*list_itr);
         if (!(delim_ptr->IsString())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "String", std::vector<int> {2}, true);
         }
 
         // 区切る。
-        std::string origin = result->string_value();
-        std::string delim = delim_ptr->string_value();
+        std::string origin = result->str_value_;
+        std::string delim = delim_ptr->str_value_;
         std::vector<std::string> str_vec;
         for (std::string::size_type pos = origin.find(delim);
         pos != std::string::npos;
@@ -4380,19 +4295,17 @@ R"...(### dec! ###
         str_vec.push_back(origin);
 
         // Listに区切った文字列を格納。
-        LispObjectPtr ret_ptr = Lisp::NewNil();
+        LispObjectPtr ret_ptr = NewNil();
         LispObject* ptr = ret_ptr.get();
         for (auto& str : str_vec) {
-          *ptr = *(Lisp::NewPair
-          (Lisp::NewString(str), Lisp::NewNil()));
+          *ptr = *(NewPair(NewString(str), NewNil()));
 
-          ptr = ptr->cdr().get();
+          ptr = ptr->cdr_.get();
         }
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("string-split", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "string-split");
       help_["string-split"] =
 R"...(### string-split ###
 
@@ -4424,24 +4337,21 @@ R"...(### string-split ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsList())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, true);
         }
 
-        LispObjectPtr ret_ptr = Lisp::NewNil();
-        if (result->IsPair()) {
-          ret_ptr = result->car();
-        }
+        LispObjectPtr ret_ptr = NewNil();
+        if (result->IsPair()) ret_ptr = result->car_;
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("front", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "front");
       help_["front"] =
 R"...(### front ###
 
@@ -4473,30 +4383,29 @@ R"...(### front ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsList())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, true);
         }
 
-        LispObjectPtr ret_ptr = Lisp::NewNil();
+        LispObjectPtr ret_ptr = NewNil();
         if (result->IsPair()) {
           LispObject* current_ptr = result.get();
-          LispObject* ptr = result->cdr().get();
-          for (; ptr->IsPair(); ptr = ptr->cdr().get()) {
-            current_ptr = current_ptr->cdr().get();
+          LispObject* ptr = result->cdr_.get();
+          for (; ptr->IsPair(); ptr = ptr->cdr_.get()) {
+            current_ptr = current_ptr->cdr_.get();
           }
 
-          ret_ptr = current_ptr->car();
+          ret_ptr = current_ptr->car_;
         }
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("back", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "back");
       help_["back"] =
 R"...(### back ###
 
@@ -4528,31 +4437,30 @@ R"...(### back ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr first_ptr = caller.Evaluate(*(list_itr++));
         if (!(first_ptr->IsList())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, true);
         }
 
         // 第2引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr second_ptr = caller.Evaluate(*list_itr);
 
         // くっつける。
-        LispObjectPtr ret_ptr = Lisp::NewPair();
-        ret_ptr->car(second_ptr);
-        ret_ptr->cdr(first_ptr);
+        LispObjectPtr ret_ptr = NewPair();
+        ret_ptr->car_ = second_ptr;
+        ret_ptr->cdr_ = first_ptr;
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("push-front", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "push-front");
       help_["push-front"] =
 R"...(### push-front ###
 
@@ -4584,24 +4492,21 @@ R"...(### push-front ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsList())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, true);
         }
 
-        LispObjectPtr ret_ptr = Lisp::NewNil();
-        if (result->IsPair()) {
-          ret_ptr = result->cdr();
-        }
+        LispObjectPtr ret_ptr = NewNil();
+        if (result->IsPair()) ret_ptr = result->cdr_;
 
         return ret_ptr;
       };
-      global_ptr_->BindSymbol
-      ("pop-front", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "pop-front");
       help_["pop-front"] =
 R"...(### pop-front ###
 
@@ -4633,29 +4538,28 @@ R"...(### pop-front ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr first_ptr = caller.Evaluate(*(list_itr++));
         if (!(first_ptr->IsList())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, true);
         }
 
         // 第2引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr second_ptr = caller.Evaluate(*list_itr);
 
         // くっつける。
-        first_ptr->Append(Lisp::NewPair(second_ptr, Lisp::NewNil()));
+        first_ptr->Append(NewPair(second_ptr, NewNil()));
 
         return first_ptr;
       };
-      global_ptr_->BindSymbol
-      ("push-back", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "push-back");
       help_["push-back"] =
 R"...(### push-back ###
 
@@ -4687,28 +4591,27 @@ R"...(### push-back ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsList())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, true);
         }
 
         if (result->IsPair()) {
           LispObject* current_ptr = result.get();
-          LispObject* ptr = result->cdr().get();
-          for (; ptr->IsPair(); ptr = ptr->cdr().get()) {
-            current_ptr = current_ptr->cdr().get();
+          LispObject* ptr = result->cdr_.get();
+          for (; ptr->IsPair(); ptr = ptr->cdr_.get()) {
+            current_ptr = current_ptr->cdr_.get();
           }
-          *current_ptr = *(Lisp::NewNil());
+          *current_ptr = *(NewNil());
         }
 
         return result;
       };
-      global_ptr_->BindSymbol
-      ("pop-back", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "pop-back");
       help_["pop-back"] =
 R"...(### pop-back ###
 
@@ -4774,19 +4677,18 @@ R"...(### E ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::sin(result->number_value()));
+        return NewNumber(std::sin(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("sin", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "sin");
       help_["sin"] =
 R"...(### sin ###
 
@@ -4819,19 +4721,18 @@ R"...(### sin ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::cos(result->number_value()));
+        return NewNumber(std::cos(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("cos", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "cos");
       help_["cos"] =
 R"...(### cos ###
 
@@ -4864,19 +4765,18 @@ R"...(### cos ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::tan(result->number_value()));
+        return NewNumber(std::tan(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("tan", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "tan");
       help_["tan"] =
 R"...(### tan ###
 
@@ -4909,19 +4809,18 @@ R"...(### tan ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::asin(result->number_value()));
+        return NewNumber(std::asin(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("asin", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "asin");
       help_["asin"] =
 R"...(### asin ###
 
@@ -4954,19 +4853,18 @@ R"...(### asin ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::acos(result->number_value()));
+        return NewNumber(std::acos(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("acos", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "acos");
       help_["acos"] =
 R"...(### acos ###
 
@@ -4999,19 +4897,18 @@ R"...(### acos ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::atan(result->number_value()));
+        return NewNumber(std::atan(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("atan", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "atan");
       help_["atan"] =
 R"...(### atan ###
 
@@ -5044,20 +4941,19 @@ R"...(### atan ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::sqrt(result->number_value()));
-        // 引数をチェック(result->number_value()));
+        return NewNumber(std::sqrt(result->number_value_));
+        // 引数をチェック(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("sqrt", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "sqrt");
       help_["sqrt"] =
 R"...(### sqrt ###
 
@@ -5089,19 +4985,18 @@ R"...(### sqrt ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::abs(result->number_value()));
+        return NewNumber(std::abs(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("abs", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "abs");
       help_["abs"] =
 R"...(### abs ###
 
@@ -5133,19 +5028,18 @@ R"...(### abs ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::ceil(result->number_value()));
+        return NewNumber(std::ceil(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("ceil", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "ceil");
       help_["ceil"] =
 R"...(### ceil ###
 
@@ -5177,19 +5071,18 @@ R"...(### ceil ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::floor(result->number_value()));
+        return NewNumber(std::floor(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("floor", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "floor");
       help_["floor"] =
 R"...(### floor ###
 
@@ -5221,19 +5114,18 @@ R"...(### floor ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::round(result->number_value()));
+        return NewNumber(std::round(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("round", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "round");
       help_["round"] =
 R"...(### round ###
 
@@ -5271,19 +5163,18 @@ R"...(### round ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::trunc(result->number_value()));
+        return NewNumber(std::trunc(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("trunc", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "trunc");
       help_["trunc"] =
 R"...(### trunc ###
 
@@ -5321,19 +5212,18 @@ R"...(### trunc ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::exp(result->number_value()));
+        return NewNumber(std::exp(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("exp", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "exp");
       help_["exp"] =
 R"...(### exp ###
 
@@ -5365,28 +5255,28 @@ R"...(### exp ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr first_ptr = caller.Evaluate(*(list_itr++));
         if (!(first_ptr->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
         // 第2引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr second_ptr = caller.Evaluate(*list_itr);
         if (!(second_ptr->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {2}, true);
         }
 
-        return Lisp::NewNumber
-        (std::pow(first_ptr->number_value(), second_ptr->number_value()));
+        return NewNumber
+        (std::pow(first_ptr->number_value_, second_ptr->number_value_));
       };
       LispObjectPtr func_ptr =
       NewNativeFunction(global_ptr_->scope_chain_, func);
@@ -5426,16 +5316,16 @@ R"...(### expt ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::log(result->number_value()));
+        return NewNumber(std::log(result->number_value_));
       };
       LispObjectPtr func_ptr =
       NewNativeFunction(global_ptr_->scope_chain_, func);
@@ -5475,19 +5365,18 @@ R"...(### log ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::log2(result->number_value()));
+        return NewNumber(std::log2(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("log2", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "log2");
       help_["log2"] =
 R"...(### log2 ###
 
@@ -5519,19 +5408,18 @@ R"...(### log2 ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        return Lisp::NewNumber(std::log10(result->number_value()));
+        return NewNumber(std::log10(result->number_value_));
       };
-      global_ptr_->BindSymbol
-      ("log10", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "log10");
       help_["log10"] =
 R"...(### log10 ###
 
@@ -5566,20 +5454,19 @@ R"...(### log10 ###
 
         // 第1引数をチェック。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
         }
         LispObjectPtr result = caller.Evaluate(*list_itr);
         if (!(result->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
-        std::uniform_real_distribution<> dist(0, result->number_value());
-        return Lisp::NewNumber(dist(*engine_ptr));
+        std::uniform_real_distribution<> dist(0, result->number_value_);
+        return NewNumber(dist(*engine_ptr));
       };
-      global_ptr_->BindSymbol
-      ("random", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "random");
       help_["random"] =
 R"...(### random ###
 
@@ -5617,12 +5504,12 @@ R"...(### random ###
 
         // 第1引数。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         LispObjectPtr max_ptr = caller.Evaluate(*(list_itr++));
         if (!(max_ptr->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
@@ -5630,19 +5517,18 @@ R"...(### random ###
         for (; list_itr; ++list_itr, ++index) {
           LispObjectPtr current = caller.Evaluate(*list_itr);
           if (!(current->IsNumber())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Number", std::vector<int> {index}, true);
           }
 
-          if (current->number_value() > max_ptr->number_value()) {
+          if (current->number_value_ > max_ptr->number_value_) {
             max_ptr = current;
           }
         }
 
         return max_ptr;
       };
-      global_ptr_->BindSymbol
-      ("max", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "max");
       help_["max"] =
 R"...(### max ###
 
@@ -5674,12 +5560,12 @@ R"...(### max ###
 
         // 第1引数。
         if (!list_itr) {
-          throw Lisp::GenInsufficientArgumentsError
+          throw GenInsufficientArgumentsError
           (func_name, required_args, true, list.Length() - 1);
         }
         LispObjectPtr min_ptr = caller.Evaluate(*(list_itr++));
         if (!(min_ptr->IsNumber())) {
-          throw Lisp::GenWrongTypeError
+          throw GenWrongTypeError
           (func_name, "Number", std::vector<int> {1}, true);
         }
 
@@ -5687,19 +5573,18 @@ R"...(### max ###
         for (; list_itr; ++list_itr, ++index) {
           LispObjectPtr current = caller.Evaluate(*list_itr);
           if (!(current->IsNumber())) {
-            throw Lisp::GenWrongTypeError
+            throw GenWrongTypeError
             (func_name, "Number", std::vector<int> {index}, true);
           }
 
-          if (current->number_value() < min_ptr->number_value()) {
+          if (current->number_value_ < min_ptr->number_value_) {
             min_ptr = current;
           }
         }
 
         return min_ptr;
       };
-      global_ptr_->BindSymbol
-      ("min", NewNativeFunction(global_ptr_->scope_chain_, func));
+      AddNativeFunction(func, "min");
       help_["min"] =
 R"...(### min ###
 
