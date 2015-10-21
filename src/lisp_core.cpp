@@ -660,27 +660,25 @@ R"...(### parse ###
       global_ptr_->BindSymbol
       ("parval", NewNativeFunction(global_ptr_->scope_chain_, func));
       help_["parval"] =
-R"...(### parse ###
+R"...(### parval ###
 
 <h6> Usage </h6>
 
 * `(parse <S-Expression : String>)`
-* `(string->symbol <S-Expression : String>)`
-* `(string->number <S-Expression : String>)`
-* `(string->boolean <S-Expression : String>)`
-* `(string->list <S-Expression : String>)`
 
 <h6> Description </h6>
 
-* Parses `<S-Expression>` and generates a object.
+* Parses and evaluates `<S-Expression>` and returns result.
+    + It is similar to `(eval (parse <S-Expression>))`.
 
 <h6> Example </h6>
 
-    (display (parse "(1 2 3)"))
+    (parval "(display \"Hello\")(display \"World\")")
     
     ;; Output
     ;;
-    ;; > (1 2 3))...";
+    ;; > Hello
+    ;; > World)...";
     }
 
     // %%% to-string
