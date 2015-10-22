@@ -447,7 +447,7 @@ namespace Sayuri {
   LispObjectPtr EngineSuite::operator()
   (LispObjectPtr self, const LispObject& caller, const LispObject& list) {
     // 準備。
-    LispIterator list_itr {&list};
+    LispIterator<false> list_itr {&list};
     std::string func_name = (list_itr++)->ToString();
     int required_args = 1;
 
@@ -1777,7 +1777,7 @@ namespace Sayuri {
 
     std::vector<Move> ret;
 
-    LispIterator list_itr {&move_list};
+    LispIterator<false> list_itr {&move_list};
     for (int index = 1; list_itr; ++list_itr, ++index) {
       // リストかどうか。
       if (!(list_itr->IsList())) {
@@ -2037,7 +2037,8 @@ namespace Sayuri {
   (LispObjectPtr castling_rights_ptr, const std::string& func_name) {
     Castling rights = 0;
     int index = 1;
-    for (LispIterator itr {castling_rights_ptr.get()}; itr; ++itr, ++index) {
+    for (LispIterator<false> itr {castling_rights_ptr.get()};
+    itr; ++itr, ++index) {
       if (!(itr->IsNumber())) {
         throw Lisp::GenWrongTypeError
         (func_name, "Number", std::vector<int> {2, index}, true);
@@ -2134,7 +2135,7 @@ namespace Sayuri {
   // 1手指す。
   LispObjectPtr EngineSuite::PlayMove(const LispObject& caller,
   const std::string& func_name, LispObjectPtr move_ptr) {
-    LispIterator itr {move_ptr.get()};
+    LispIterator<false> itr {move_ptr.get()};
 
     // 引数をチェック。
     // fromをチェック。
@@ -2344,18 +2345,18 @@ namespace Sayuri {
     int material[NUM_PIECE_TYPES] {0, 0, 0, 0, 0, 0, 0};
 
     LispObjectPtr ret_ptr = Lisp::NewList(7);
-    LispObject* ptr = ret_ptr.get();
-    ptr->car(Lisp::NewNumber(0));  // Emptyの分。
-    ptr = ptr->cdr().get();
+    LispIterator<true> ret_itr {ret_ptr.get()};
+    ret_itr.current_->car(Lisp::NewNumber(0));  // Emptyの分。
+    ++ret_itr;
 
-    LispIterator itr {&material_list};
+    LispIterator<false> itr {&material_list};
     ++itr;  // Emptyの分を飛ばす。
     for (PieceType piece_type = PAWN; piece_type < NUM_PIECE_TYPES;
     ++piece_type) {
-      ptr->car
+      ret_itr.current_->car
       (Lisp::NewNumber(search_params_ptr_->material()[piece_type]));
 
-      ptr = ptr->cdr().get();
+      ++ret_itr;
 
       if (len != 0) {
         material[piece_type] = (itr++)->number_value();
@@ -2441,7 +2442,7 @@ namespace Sayuri {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 引数チェック。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2458,7 +2459,7 @@ namespace Sayuri {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 引数チェック。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2475,7 +2476,7 @@ namespace Sayuri {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 引数チェック。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2492,7 +2493,7 @@ namespace Sayuri {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 引数チェック。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2509,7 +2510,7 @@ namespace Sayuri {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 引数チェック。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2526,7 +2527,7 @@ namespace Sayuri {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 引数チェック。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2543,7 +2544,7 @@ namespace Sayuri {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 引数チェック。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2560,7 +2561,7 @@ namespace Sayuri {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 引数チェック。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2577,7 +2578,7 @@ namespace Sayuri {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 引数チェック。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2594,7 +2595,7 @@ namespace Sayuri {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 引数チェック。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2611,7 +2612,7 @@ namespace Sayuri {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 引数チェック。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2628,7 +2629,7 @@ namespace Sayuri {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 引数チェック。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2668,7 +2669,7 @@ namespace Sayuri {
     auto func = [&status, &loop](LispObjectPtr self, const LispObject& caller,
     const LispObject& list) -> LispObjectPtr {
       // 準備。
-      LispIterator list_itr{&list};
+      LispIterator<false> list_itr{&list};
       std::string func_name = (list_itr++)->ToString();
 
       // ループをセット。

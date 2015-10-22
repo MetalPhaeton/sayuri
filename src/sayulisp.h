@@ -1158,7 +1158,7 @@ namespace Sayuri {
       const std::string& symbol_name, const LispObject& square_list) {
         // 先ず返すリストを作る。
         LispObjectPtr ret_ptr = Lisp::NewList(64);
-        LispIterator itr {ret_ptr.get()};
+        LispIterator<false> itr {ret_ptr.get()};
         FOR_SQUARES(square) {
           itr->type(LispObjectType::NUMBER);
           itr->number_value
@@ -1174,7 +1174,7 @@ namespace Sayuri {
             symbol_name + " needs List of 64 parameters. Given "
             + std::to_string(square_list.Length()) + ".");
           }
-          LispIterator list_itr {&square_list};
+          LispIterator<false> list_itr {&square_list};
           FOR_SQUARES(square) {
             if (!(list_itr->IsNumber())) {
               throw Lisp::GenWrongTypeError(func_name, "Number",
@@ -1200,7 +1200,7 @@ namespace Sayuri {
       const std::string& symbol_name, const LispObject& square_list) {
         // 先ず返すリストを作る。
         LispObjectPtr ret_ptr = Lisp::NewList(64);
-        LispIterator itr {ret_ptr.get()};
+        LispIterator<false> itr {ret_ptr.get()};
         FOR_SQUARES(square) {
           itr->type(LispObjectType::NUMBER);
           itr->number_value
@@ -1218,7 +1218,7 @@ namespace Sayuri {
           }
 
           // 値を変更。
-          LispIterator list_itr {&square_list};
+          LispIterator<false> list_itr {&square_list};
           FOR_SQUARES(square) {
             if (!(list_itr->IsNumber())) {
               throw Lisp::GenWrongTypeError(func_name, "Number",
@@ -1260,7 +1260,7 @@ namespace Sayuri {
             + std::to_string(len) + ".");
           }
 
-          LispIterator itr {&value_list};
+          LispIterator<false> itr {&value_list};
           FOR_PIECE_TYPES(piece_type) {
             if (!(itr->IsNumber())) {
               throw Lisp::GenWrongTypeError(func_name, "Number",
@@ -1307,7 +1307,7 @@ namespace Sayuri {
             + std::to_string(len) + ".");
           }
 
-          LispIterator itr {&value_list};
+          LispIterator<false> itr {&value_list};
           FOR_PIECE_TYPES(piece_type) {
             if (!(itr->IsNumber())) {
               throw Lisp::GenWrongTypeError(func_name, "Number",
@@ -1368,7 +1368,7 @@ namespace Sayuri {
           }
 
           // ループ 1。
-          LispIterator itr_1 {&value_list};
+          LispIterator<false> itr_1 {&value_list};
           FOR_PIECE_TYPES(piece_type_1) {
             if (!(itr_1->IsList())) {
               throw Lisp::GenWrongTypeError(func_name, "List",
@@ -1385,7 +1385,7 @@ namespace Sayuri {
             }
 
             // ループ 2。
-            LispIterator itr_2 {&(*itr_1)};
+            LispIterator<false> itr_2 {&(*itr_1)};
             FOR_PIECE_TYPES(piece_type_2) {
               if (!(itr_2->IsNumber())) {
                 throw Lisp::GenWrongTypeError(func_name, "Number",
@@ -1422,7 +1422,7 @@ namespace Sayuri {
       const std::string& symbol_name, const LispObject& square_list) {
         // 先ず返すリストを作る。
         LispObjectPtr ret_ptr = Lisp::NewList(64);
-        LispIterator itr {ret_ptr.get()};
+        LispIterator<false> itr {ret_ptr.get()};
         FOR_SQUARES(square) {
           itr->type(LispObjectType::NUMBER);
           itr->number_value
@@ -1440,7 +1440,7 @@ namespace Sayuri {
           }
 
           // 値を変更。
-          LispIterator list_itr {&square_list};
+          LispIterator<false> list_itr {&square_list};
           FOR_SQUARES(square) {
             if (!(list_itr->IsNumber())) {
               throw Lisp::GenWrongTypeError(func_name, "Number",

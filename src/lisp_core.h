@@ -104,11 +104,54 @@ namespace Sayuri {
       // ==================== //
       // コンストラクタと代入 //
       // ==================== //
-      /** コンストラクタ。 */
+      /** コンストラクタ。 (NIL) */
       LispObject() :
       type_(LispObjectType::NIL),
       car_(nullptr), cdr_(nullptr),
       number_value_(0.0), boolean_value_(false), str_value_("") {}
+      /**
+       * コンストラクタ。 (PAIR)
+       * @param car Car。
+       * @param cdr Cdr。
+       */
+      LispObject(LispObjectPtr car, LispObjectPtr cdr) :
+      type_(LispObjectType::PAIR), car_(car), cdr_(cdr),
+      number_value_(0.0), boolean_value_(false), str_value_("") {}
+      /**
+       * コンストラクタ。 (SYMBOL、NUMBER、BOOLEAN、STRING)
+       * @param type タイプ。 (SYMBOL、NUMBER、BOOLEAN、STRING)
+       * @param number_value NUMBERの値。
+       * @param boolean_value BOOLEANの値。
+       * @param str_value SYMBOL、STRINGの値。
+       */
+      LispObject(LispObjectType type, double number_value, bool boolean_value,
+      const std::string& str_value) :
+      type_(type), car_(nullptr), cdr_(nullptr),
+      number_value_(number_value), boolean_value_(boolean_value),
+      str_value_(str_value) {}
+      /**
+       * コンストラクタ。 (FUNCTION)
+       * @param parent_chain 継承するスコープチェーン。
+       * @param arg_name_vec 引数の名前ベクトル。
+       * @param def_vec 関数定義のベクトル。
+       */
+      LispObject(const ScopeChain& parent_chain,
+      const std::vector<std::string>& arg_name_vec,
+      const std::vector<LispObjectPtr>& def_vec) :
+      type_(LispObjectType::FUNCTION), car_(nullptr), cdr_(nullptr),
+      number_value_(0.0), boolean_value_(false), str_value_(""),
+      function_({arg_name_vec, def_vec}),
+      scope_chain_(parent_chain) {}
+      /**
+       * コンストラクタ。 (NATIVE_FUNCTION)
+       * @param parent_chain 継承するスコープチェーン。
+       * @param arg_name_vec 引数の名前ベクトル。
+       * @param def_vec 関数定義のベクトル。
+       */
+      LispObject(const ScopeChain& parent_chain, const NativeFunction& func) :
+      type_(LispObjectType::NATIVE_FUNCTION), car_(nullptr), cdr_(nullptr),
+      number_value_(0.0), boolean_value_(false), str_value_(""),
+      native_function_(func), scope_chain_(parent_chain) {}
       /**
        * コピーコンストラクタ。
        * @param obj コピー元。
@@ -542,19 +585,6 @@ namespace Sayuri {
       // フレンド。
       friend class Lisp;
 
-      /**
-       * プライベートコンストラクタ
-       * @param type オブジェクトのタイプ。
-       * @param number_value 実数。
-       * @param boolean_value 真偽値。
-       * @param str_value 文字列・シンボル。
-       */
-      LispObject(LispObjectType type, double number_value,
-      bool boolean_value, const std::string& str_value) :
-      type_(type), car_(nullptr), cdr_(nullptr),
-      number_value_(number_value), boolean_value_(boolean_value),
-      str_value_(str_value) {}
-
       // ========== //
       // メンバ変数 //
       // ========== //
@@ -584,9 +614,11 @@ namespace Sayuri {
   };
 
   /** List用イテレータ。 */
-  struct LispIterator {
+  template<bool COND> struct TypeIf {using T = LispObject*;};
+  template<> struct TypeIf<false> {using T = const LispObject*;};
+  template<bool MUTABLE> struct LispIterator {
     /** 現在の位置。 */
-    const LispObject* current_;
+    typename TypeIf<MUTABLE>::T current_;
 
     // ====== //
     // 演算子 //
@@ -813,13 +845,7 @@ namespace Sayuri {
        * @return LispPairオブジェクト。
        */
       static LispObjectPtr NewPair(LispObjectPtr car, LispObjectPtr cdr) {
-        LispObjectPtr ret_ptr(new LispObject(LispObjectType::PAIR,
-        0.0, false, ""));
-
-        ret_ptr->car_ = car;
-        ret_ptr->cdr_ = cdr;
-
-        return ret_ptr;
+        return LispObjectPtr(new LispObject(car, cdr));
       }
 
       /**
@@ -827,13 +853,7 @@ namespace Sayuri {
        * @return LispPairオブジェクト。
        */
       static LispObjectPtr NewPair() {
-        LispObjectPtr ret_ptr(new LispObject(LispObjectType::PAIR,
-        0.0, false, ""));
-
-        ret_ptr->car_.reset(new LispObject());
-        ret_ptr->cdr_.reset(new LispObject());
-
-        return ret_ptr;
+        return LispObjectPtr(new LispObject(NewNil(), NewNil()));
       }
 
       /**
@@ -886,16 +906,8 @@ namespace Sayuri {
       static LispObjectPtr NewFunction(const ScopeChain& parent_scope,
       const std::vector<std::string>& arg_name_vec,
       const std::vector<LispObjectPtr>& def_vec) {
-        LispObjectPtr ret_ptr(new LispObject(LispObjectType::FUNCTION,
-        0.0, false, ""));
-
-        // スコープを継承。
-        ret_ptr->scope_chain_ = parent_scope;
-
-        ret_ptr->function_.arg_name_vec_ = arg_name_vec;
-        ret_ptr->function_.def_vec_ = def_vec;
-
-        return ret_ptr;
+        return LispObjectPtr
+        (new LispObject(parent_scope, arg_name_vec, def_vec));
       }
 
       /**
@@ -906,15 +918,7 @@ namespace Sayuri {
        */
       static LispObjectPtr NewNativeFunction(const ScopeChain& parent_scope,
       const NativeFunction& native_function) {
-        LispObjectPtr ret_ptr(new LispObject(LispObjectType::NATIVE_FUNCTION,
-        0.0, false, ""));
-
-        // スコープを継承。
-        ret_ptr->scope_chain_ = parent_scope;
-
-        ret_ptr->native_function_ = native_function;
-
-        return ret_ptr;
+        return LispObjectPtr(new LispObject(parent_scope, native_function));
       }
 
       /**
@@ -926,10 +930,7 @@ namespace Sayuri {
         LispObjectPtr ret_ptr = NewNil();
         LispObject* ptr = ret_ptr.get();
         for (unsigned int i = 0; i < length; ++i) {
-          ptr->type_ = LispObjectType::PAIR;
-          ptr->car_ = NewNil();
-          ptr->cdr_ = NewNil();
-
+          *ptr = LispObject(NewNil(), NewNil());
           ptr = ptr->cdr_.get();
         }
 

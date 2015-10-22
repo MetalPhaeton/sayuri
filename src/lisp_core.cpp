@@ -103,10 +103,8 @@ namespace Sayuri {
           oss << "(";
 
           // carを文字列へ。
-          LispIterator itr {this};
-          for (; itr; ++itr) {
-            oss << itr->ToString() << " ";
-          }
+          LispIterator<false> itr {this};
+          for (; itr; ++itr) oss << itr->ToString() << " ";
 
           // 最後のcdr。
           if (itr.current_->IsNil()) {
@@ -186,7 +184,7 @@ namespace Sayuri {
       }
     } else {  // ペア。関数として処理。
       // 準備。
-      LispIterator target_itr {&target};
+      LispIterator<false> target_itr {&target};
 
       // 第1要素を評価して関数オブジェクトを得る。
       std::string func_name = target_itr->ToString();
@@ -199,16 +197,14 @@ namespace Sayuri {
         // 引数リストをシンボルマップにバインド。
         std::vector<std::string>::iterator arg_name_itr =
         func_obj->function_.arg_name_vec_.begin();
-        LispObjectPtr arg_list =
-        Lisp::NewList(target_itr.current_->Length());
-        LispObject* arg_ptr = arg_list.get();
-        for (; target_itr; ++target_itr) {
+        LispObjectPtr arg_list = Lisp::NewList(target_itr.current_->Length());
+        LispIterator<true> arg_itr {arg_list.get()};
+        for (; target_itr; ++target_itr, ++arg_itr) {
           // 引数を評価。
           LispObjectPtr result = Evaluate(*target_itr);
 
           // 引数リストに入れる。
-          arg_ptr->car_ = result;
-          arg_ptr = arg_ptr->cdr_.get();
+          arg_itr.current_->car_ = result;
 
           // 引数リストにバインド。
           if (arg_name_itr != func_obj->function_.arg_name_vec_.end()) {
@@ -343,7 +339,7 @@ namespace Sayuri {
     token_queue_.pop();
 
     if (front == "(") {  // リスト。
-      LispObject* ptr = &target;
+      LispIterator<true> itr {&target};
       while (!(token_queue_.empty())) {
         // 次の文字を調べる。
         front = token_queue_.front();
@@ -356,19 +352,17 @@ namespace Sayuri {
           // ドット対。
           // ドットを抜いてポインタへパース。
           token_queue_.pop();
-          ParseCore(*ptr);
+          ParseCore(*(itr.current_));
         } else {
           // それ意外。
           // 現在のポインタをPairにする。
-          ptr->type_ = LispObjectType::PAIR;
-          ptr->car_ = NewNil();
-          ptr->cdr_ = NewNil();
+          *(itr.current_) = LispObject(NewNil(), NewNil());
 
           // carへパース。
-          ParseCore(*(ptr->car_));
+          ParseCore(*itr);
 
           // 次へ。
-          ptr = ptr->cdr_.get();
+          ++itr;
         }
       }
     } else {  // アトム。
@@ -443,7 +437,7 @@ namespace Sayuri {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
 
         if (!list_itr) {
@@ -521,7 +515,7 @@ R"...(### help ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -562,7 +556,7 @@ R"...(### eval ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -627,7 +621,7 @@ R"...(### parse ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -682,7 +676,7 @@ R"...(### parval ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -743,7 +737,7 @@ R"...(### to-string ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -761,7 +755,8 @@ R"...(### to-string ###
         LispObjectPtr ret_ptr = NewNil();
         try {
           // 第1引数をトライ。
-          for (LispIterator first_itr {&first}; first_itr; ++first_itr) {
+          for (LispIterator<false> first_itr {&first}; first_itr;
+          ++first_itr) {
             ret_ptr = caller.Evaluate(*first_itr);
           }
         } catch (LispObjectPtr exception) {
@@ -825,7 +820,7 @@ R"...(### try ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -866,7 +861,7 @@ R"...(### throw ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -913,7 +908,7 @@ R"...(### car ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -960,7 +955,7 @@ R"...(### cdr ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -1016,11 +1011,10 @@ R"...(### cons ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
-        // 先ず、cons。
         if (!list_itr) {
           throw GenInsufficientArgumentsError
           (func_name, required_args, false, list.Length() - 1);
@@ -1032,8 +1026,8 @@ R"...(### cons ###
         }
         LispObjectPtr result_cdr = caller.Evaluate(*list_itr);
 
-        // evalして返す。
-        return caller.Evaluate(*(NewPair(result_car, result_cdr)));
+        // consしてevalして返す。
+        return caller.Evaluate(LispObject(result_car, result_cdr));
       };
       AddNativeFunction(func, "apply");
       help_["apply"] =
@@ -1064,7 +1058,7 @@ R"...(### apply ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -1118,7 +1112,7 @@ R"...(### quote ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -1144,7 +1138,7 @@ R"...(### quote ###
           // シンボルを返す。
           return NewSymbol(symbol);
         } else if (list_itr->IsList()) {  // 関数定義。
-          LispIterator inner_itr {&(*(list_itr++))};
+          LispIterator<false> inner_itr {&(*(list_itr++))};
 
           // 第1引数内の第1要素は関数名。
           if (!(inner_itr->IsSymbol())) {
@@ -1224,7 +1218,7 @@ R"...(### define ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -1292,7 +1286,7 @@ R"...(### set! ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -1305,7 +1299,7 @@ R"...(### set! ###
           throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, false);
         }
-        LispIterator first_itr {&(*(list_itr++))};
+        LispIterator<false> first_itr {&(*(list_itr++))};
 
         // 引数リストを作成。
         int index = 1;
@@ -1366,7 +1360,7 @@ R"...(### lambda ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -1379,7 +1373,7 @@ R"...(### lambda ###
           throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, false);
         }
-        LispIterator first_itr {&(*(list_itr++))};
+        LispIterator<false> first_itr {&(*(list_itr++))};
 
         // 一時スコープを作成してバインド。
         int index = 1;
@@ -1453,7 +1447,7 @@ R"...(### let ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -1469,8 +1463,8 @@ R"...(### let ###
         LispObjectPtr scope_ptr = NewScopeObject(caller.scope_chain_);
         while (true) {
           // 条件式へのポインタ。
-          const LispObject* ptr = list_itr.current_;
-          LispObjectPtr cond_ptr = caller.Evaluate(*(ptr->car_));
+          LispIterator<false> itr {list_itr.current_};
+          LispObjectPtr cond_ptr = caller.Evaluate(*(itr++));
           if (!(cond_ptr->IsBoolean())) {
             throw GenWrongTypeError
             (func_name, "Boolean", std::vector<int> {1}, true);
@@ -1480,8 +1474,8 @@ R"...(### let ###
           if (!(cond_ptr->boolean_value_)) break;
 
           // 自分のスコープで実行していく。
-          for (; ptr->IsPair(); ptr = ptr->cdr_.get()) {
-            ret_ptr = scope_ptr->Evaluate(*(ptr->car_));
+          for (; itr; ++itr) {
+            ret_ptr = scope_ptr->Evaluate(*itr);
           }
         }
 
@@ -1527,7 +1521,7 @@ R"...(### while ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -1541,7 +1535,7 @@ R"...(### while ###
           throw GenWrongTypeError
           (func_name, "List", std::vector<int> {1}, false);
         }
-        LispIterator first_itr {&(*(list_itr++))};
+        LispIterator<false> first_itr {&(*(list_itr++))};
         if (!first_itr) {
           throw GenError("@insufficient-arguments",
           "No Symbol to bind element for loop.");
@@ -1574,12 +1568,12 @@ R"...(### while ###
 
         // ループ開始。
         LispObjectPtr ret_ptr = NewNil();
-        for (LispIterator itr {loop_list_ptr.get()}; itr; ++itr) {
+        for (LispIterator<false> itr {loop_list_ptr.get()}; itr; ++itr) {
           // ローカルスコープに要素をバインド。
           scope_ptr->RewriteSymbol(symbol, itr->Clone());
 
           // 自分のスコープで次々と実行する。
-          for (LispIterator itr_2 {list_itr.current_}; itr_2; ++itr_2) {
+          for (LispIterator<false> itr_2 {list_itr.current_}; itr_2; ++itr_2) {
             ret_ptr = scope_ptr->Evaluate(*itr_2);
           }
         }
@@ -1635,7 +1629,7 @@ R"...(### for ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 3;
 
@@ -1698,7 +1692,7 @@ R"...(### if ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
 
         // 各条件リストを評価。
@@ -1711,7 +1705,7 @@ R"...(### if ###
           }
 
           // 各条件リストの中身を評価。
-          LispIterator cond_list_itr {&(*list_itr)};
+          LispIterator<false> cond_list_itr {&(*list_itr)};
           if (cond_list_itr) {
             // 空リストではない。
             // elseリストなら無条件で実行式を評価して終了。
@@ -1777,7 +1771,7 @@ R"...(### cond ###
       const LispObject& list) -> LispObjectPtr {
         // 各引数を評価。
         LispObjectPtr ret_ptr = NewNil();
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         for (++list_itr; list_itr; ++list_itr) {
           ret_ptr = caller.Evaluate(*list_itr);
         }
@@ -1813,7 +1807,7 @@ R"...(### begin ###
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::ostringstream oss;
         for (++list_itr; list_itr; ++list_itr) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
@@ -1882,7 +1876,7 @@ R"...(### display ###
         if (!(std::cin)) return NewNil();
 
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -1947,7 +1941,7 @@ R"...(### stdin ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -1992,7 +1986,7 @@ R"...(### stdout ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2037,7 +2031,7 @@ R"...(### stderr ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2112,7 +2106,7 @@ R"...(### import ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2163,7 +2157,7 @@ R"...(### equal? ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2208,7 +2202,7 @@ R"...(### != ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2256,7 +2250,7 @@ R"...(### pair? ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2305,7 +2299,7 @@ R"...(### list? ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2360,7 +2354,7 @@ R"...(### nil? ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2409,7 +2403,7 @@ R"...(### symbol? ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2458,7 +2452,7 @@ R"...(### number? ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2507,7 +2501,7 @@ R"...(### boolean? ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2556,7 +2550,7 @@ R"...(### string? ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2606,7 +2600,7 @@ R"...(### function? ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2655,7 +2649,7 @@ R"...(### native-function? ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2711,7 +2705,7 @@ R"...(### procedure? ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2737,7 +2731,7 @@ R"...(### procedure? ###
         auto func = [ofs_ptr](LispObjectPtr self, const LispObject& caller,
         const LispObject& list) -> LispObjectPtr {
           // 準備。
-          LispIterator list_itr {&list};
+          LispIterator<false> list_itr {&list};
           std::string func_name = (list_itr++)->ToString();
           int required_args = 1;
 
@@ -2800,7 +2794,7 @@ R"...(### output-stream ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -2829,7 +2823,7 @@ R"...(### output-stream ###
           if (!(*ifs_ptr)) return NewNil();
 
           // 準備。
-          LispIterator list_itr {&list};
+          LispIterator<false> list_itr {&list};
           std::string func_name = (list_itr++)->ToString();
           int required_args = 1;
 
@@ -2914,7 +2908,7 @@ R"...(### input-stream ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
 
         // ペアと文字列で分岐。
@@ -2923,11 +2917,10 @@ R"...(### input-stream ###
 
           if (result->IsList()) {
             // リストの場合。
-            LispObject* ptr = result.get();
+            LispIterator<true> itr {result.get()};
             for (; list_itr; ++list_itr) {
-              for (; ptr->IsPair(); ptr = ptr->cdr_.get()) continue;
-              if (!(ptr->IsNil())) break;
-              *ptr = *(caller.Evaluate(*list_itr));
+              for (; itr; ++itr) continue;
+              *(itr.current_) = *(caller.Evaluate(*list_itr));
             }
 
             return result;
@@ -2997,7 +2990,7 @@ R"...(### append ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -3029,7 +3022,7 @@ R"...(### append ###
           int index = index_ptr->number_value_;
           index = index < 0 ? result->Length() + index : index;
           int i = 0;
-          for (LispIterator result_itr {result.get()};
+          for (LispIterator<false> result_itr {result.get()};
           result_itr; ++result_itr, ++i) {
             if (i == index) return result_itr->Clone();
           }
@@ -3107,18 +3100,14 @@ R"...(### ref ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
 
         // 作成する大きさのリストを作りながらセットしていく。
         LispObjectPtr ret_ptr = NewNil();
-        LispObject* ptr = ret_ptr.get();
-        for (; list_itr; ++list_itr) {
-          ptr->type(LispObjectType::PAIR);
-          ptr->car_ = caller.Evaluate(*list_itr);
-          ptr->cdr_ = NewNil();
-
-          ptr = ptr->cdr_.get();
+        LispIterator<true> itr {ret_ptr.get()};
+        for (; list_itr; ++list_itr, ++itr) {
+          *(itr.current_) = LispObject(caller.Evaluate(*list_itr), NewNil());
         }
 
         return ret_ptr;
@@ -3150,7 +3139,7 @@ R"...(### list ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 3;
 
@@ -3187,7 +3176,7 @@ R"...(### list ###
         int index = index_ptr->number_value_;
         index = index < 0 ? result->Length() + index : index;
         int i = 0;
-        for (LispIterator result_itr {result.get()};
+        for (LispIterator<false> result_itr {result.get()};
         result_itr; ++result_itr, ++i) {
           if (i == index) {
             *result_itr = *replace_obj_ptr;
@@ -3229,7 +3218,7 @@ R"...(### list-replace ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -3259,10 +3248,9 @@ R"...(### list-replace ###
         int index = index_ptr->number_value_;
         index = index < 0 ? result->Length() + index : index;
         int i = 0;
-        for (LispObject* ptr = result.get();
-        ptr->IsPair(); ptr = ptr->cdr_.get(), ++i) {
+        for (LispIterator<true> itr {result.get()}; itr; ++itr, ++i) {
           if (i == index) {
-            *ptr = *(ptr->cdr_);
+            *(itr.current_) = *(itr.current_->cdr_);
             return result;
           }
         }
@@ -3300,7 +3288,7 @@ R"...(### list-remove ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -3324,7 +3312,7 @@ R"...(### list-remove ###
 
         // 検索する。
         long long index = 0;
-        for (LispIterator target_itr {target_ptr.get()}; target_itr;
+        for (LispIterator<false> target_itr {target_ptr.get()}; target_itr;
         ++target_itr, ++index) {
           if (*target_itr == *key_ptr) return NewNumber(index);
         }
@@ -3362,7 +3350,7 @@ R"...(### search ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -3375,7 +3363,7 @@ R"...(### search ###
 
         // 各リストのポインタとイテレータを得る。
         std::vector<LispObjectPtr> temp_vec;
-        std::vector<LispIterator> temp_itr_vec;
+        std::vector<LispIterator<false>> temp_itr_vec;
         int index = 3;
         for (; list_itr; ++list_itr, ++index) {
           LispObjectPtr result = caller.Evaluate(*list_itr);
@@ -3384,7 +3372,7 @@ R"...(### search ###
             (func_name, "List", std::vector<int> {index}, true);
           }
           temp_vec.push_back(result);
-          temp_itr_vec.push_back(LispIterator {result.get()});
+          temp_itr_vec.push_back(LispIterator<false> {result.get()});
         }
 
         // 要素があるかどうかの判定関数。
@@ -3399,23 +3387,23 @@ R"...(### search ###
 
         // 適用していく。
         LispObjectPtr ret_ptr = NewNil();
-        LispObject* ret_ptr_ptr = ret_ptr.get();
+        LispIterator<true> ret_itr {ret_ptr.get()};
         for (; is_ok(); inc_itr()) {
           // 引数ベクトルを作る。
           LispObjectPtr arg_ptr = NewNil();
-          LispObject* ptr = arg_ptr.get();
+          LispIterator<true> arg_itr {arg_ptr.get()};
           for (auto& itr : temp_itr_vec) {
-            *ptr = *(NewPair(itr->Clone(), NewNil()));
-            ptr = ptr->cdr_.get();
+            *(arg_itr.current_) = LispObject(itr->Clone(), NewNil());
+            ++arg_itr;
           }
 
           // Lisp関数を作って評価する。
           LispObjectPtr result =
-          caller.Evaluate(*(NewPair(first_ptr, arg_ptr)));
+          caller.Evaluate(LispObject(first_ptr, arg_ptr));
 
           // 結果をリストに入れる。
-          *ret_ptr_ptr = *(NewPair(result, NewNil()));
-          ret_ptr_ptr = ret_ptr_ptr->cdr_.get();
+          *(ret_itr.current_) = LispObject(result, NewNil());
+          ++ret_itr;
         }
 
         return ret_ptr;
@@ -3455,7 +3443,7 @@ R"...(### map ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -3471,11 +3459,11 @@ R"...(### map ###
         }
 
         LispObjectPtr ret_ptr = NewNil();
-        LispObject* ptr = ret_ptr.get();
+        LispIterator<true> itr {ret_ptr.get()};
         int size = size_ptr->number_value_;
         size = size < 0 ? 0 : size;
-        for (int i = 0; i < size; ++i, ptr = ptr->cdr_.get()) {
-          *ptr = *(NewPair(NewNumber(i), NewNil()));
+        for (int i = 0; i < size; ++i, ++itr) {
+          *(itr.current_) = LispObject(NewNumber(i), NewNil());
         }
 
         return ret_ptr;
@@ -3505,7 +3493,7 @@ R"...(### range ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -3522,7 +3510,7 @@ R"...(### range ###
         }
 
         // Pairの場合。
-        LispIterator result_itr {&(*result)};
+        LispIterator<false> result_itr {&(*result)};
         int count = 0;
         for (; result_itr; ++result_itr) ++count;
         if (!(result_itr.current_->IsNil())) ++count;
@@ -3556,7 +3544,7 @@ R"...(### length ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -3618,7 +3606,7 @@ R"...(### < ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -3680,7 +3668,7 @@ R"...(### <= ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -3742,7 +3730,7 @@ R"...(### > ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -3804,7 +3792,7 @@ R"...(### >= ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -3847,7 +3835,7 @@ R"...(### not ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -3895,7 +3883,7 @@ R"...(### and ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -3943,7 +3931,7 @@ R"...(### or ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
 
         double value = 0.0;
@@ -3986,7 +3974,7 @@ R"...(### + ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
 
         double value = 0.0;
@@ -4037,7 +4025,7 @@ R"...(### - ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
 
         double value = 1.0;
@@ -4080,7 +4068,7 @@ R"...(### * ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
 
         double value = 0.0;
@@ -4131,7 +4119,7 @@ R"...(### / ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -4176,7 +4164,7 @@ R"...(### ++ ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -4221,7 +4209,7 @@ R"...(### -- ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -4282,7 +4270,7 @@ R"...(### inc! ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -4342,7 +4330,7 @@ R"...(### dec! ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -4383,11 +4371,10 @@ R"...(### dec! ###
 
         // Listに区切った文字列を格納。
         LispObjectPtr ret_ptr = NewNil();
-        LispObject* ptr = ret_ptr.get();
+        LispIterator<true> itr {ret_ptr.get()};
         for (auto& str : str_vec) {
-          *ptr = *(NewPair(NewString(str), NewNil()));
-
-          ptr = ptr->cdr_.get();
+          *(itr.current_) = LispObject(NewString(str), NewNil());
+          ++itr;
         }
 
         return ret_ptr;
@@ -4418,7 +4405,7 @@ R"...(### string-split ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -4464,7 +4451,7 @@ R"...(### front ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -4481,13 +4468,11 @@ R"...(### front ###
 
         LispObjectPtr ret_ptr = NewNil();
         if (result->IsPair()) {
-          LispObject* current_ptr = result.get();
-          LispObject* ptr = result->cdr_.get();
-          for (; ptr->IsPair(); ptr = ptr->cdr_.get()) {
-            current_ptr = current_ptr->cdr_.get();
-          }
+          LispIterator<true> current_itr {result.get()};
+          LispIterator<true> itr {result->cdr_.get()};
+          for (; itr; ++current_itr, ++itr) continue;
 
-          ret_ptr = current_ptr->car_;
+          ret_ptr = itr.current_->car_;
         }
 
         return ret_ptr;
@@ -4518,7 +4503,7 @@ R"...(### back ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -4541,11 +4526,7 @@ R"...(### back ###
         LispObjectPtr second_ptr = caller.Evaluate(*list_itr);
 
         // くっつける。
-        LispObjectPtr ret_ptr = NewPair();
-        ret_ptr->car_ = second_ptr;
-        ret_ptr->cdr_ = first_ptr;
-
-        return ret_ptr;
+        return NewPair(second_ptr, first_ptr);
       };
       AddNativeFunction(func, "push-front");
       help_["push-front"] =
@@ -4573,7 +4554,7 @@ R"...(### push-front ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -4619,7 +4600,7 @@ R"...(### pop-front ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -4672,7 +4653,7 @@ R"...(### push-back ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -4688,12 +4669,10 @@ R"...(### push-back ###
         }
 
         if (result->IsPair()) {
-          LispObject* current_ptr = result.get();
-          LispObject* ptr = result->cdr_.get();
-          for (; ptr->IsPair(); ptr = ptr->cdr_.get()) {
-            current_ptr = current_ptr->cdr_.get();
-          }
-          *current_ptr = *(NewNil());
+          LispIterator<true> current_itr {result.get()};
+          LispIterator<true> itr {result->cdr_.get()};
+          for (; itr; ++current_itr, ++itr) continue;
+          *(current_itr.current_) = LispObject();
         }
 
         return result;
@@ -4758,7 +4737,7 @@ R"...(### E ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -4802,7 +4781,7 @@ R"...(### sin ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -4846,7 +4825,7 @@ R"...(### cos ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -4890,7 +4869,7 @@ R"...(### tan ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -4934,7 +4913,7 @@ R"...(### asin ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -4978,7 +4957,7 @@ R"...(### acos ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -5022,7 +5001,7 @@ R"...(### atan ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -5066,7 +5045,7 @@ R"...(### sqrt ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -5109,7 +5088,7 @@ R"...(### abs ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -5152,7 +5131,7 @@ R"...(### ceil ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -5195,7 +5174,7 @@ R"...(### floor ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -5244,7 +5223,7 @@ R"...(### round ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -5293,7 +5272,7 @@ R"...(### trunc ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -5336,7 +5315,7 @@ R"...(### exp ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 2;
 
@@ -5397,7 +5376,7 @@ R"...(### expt ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -5446,7 +5425,7 @@ R"...(### log ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -5489,7 +5468,7 @@ R"...(### log2 ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -5535,7 +5514,7 @@ R"...(### log10 ###
       auto func = [engine_ptr](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -5585,7 +5564,7 @@ R"...(### random ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
@@ -5641,7 +5620,7 @@ R"...(### max ###
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
         // 準備。
-        LispIterator list_itr {&list};
+        LispIterator<false> list_itr {&list};
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
