@@ -1569,13 +1569,7 @@ R"...(### while ###
 
         // loop_list_ptrが文字列の場合、Listに変更する。
         if (loop_list_ptr->IsString()) {
-          LispObjectPtr temp = NewNil();
-          LispObject* ptr = temp.get();
-          for (auto c : loop_list_ptr->str_value_) {
-            *ptr = *(NewPair(NewString(std::string(1, c)), NewNil()));
-            ptr = ptr->cdr_.get();
-          }
-          loop_list_ptr = temp;
+          loop_list_ptr = StringToList(loop_list_ptr->str_value_);
         }
 
         // ループ開始。

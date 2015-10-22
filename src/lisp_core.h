@@ -1019,6 +1019,20 @@ namespace Sayuri {
       const std::string& required_type_str, std::vector<int> index_vec,
       bool has_evaluated);
 
+      /**
+       * 文字列を一文字毎のLispのリストにする。
+       * @param str リストにしたい文字列。
+       */
+      static LispObjectPtr StringToList(const std::string& str) {
+        LispObjectPtr ret_ptr = NewNil();
+        LispObject* ptr = ret_ptr.get();
+        for (auto c : str) {
+          *ptr = *(NewPair(NewString(std::string(1, c)), NewNil()));
+          ptr = ptr->cdr_.get();
+        }
+        return ret_ptr;
+      }
+
       // ======== //
       // アクセサ //
       // ======== //
