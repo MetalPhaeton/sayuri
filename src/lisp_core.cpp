@@ -1011,7 +1011,7 @@ R"...(### cons ###
     ;; > (444 555 666))...";
     }
 
-    // %%% conval
+    // %%% apply
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
@@ -1035,17 +1035,17 @@ R"...(### cons ###
         // evalして返す。
         return caller.Evaluate(*(NewPair(result_car, result_cdr)));
       };
-      AddNativeFunction(func, "conval");
-      help_["conval"] =
-R"...(### conval ###
+      AddNativeFunction(func, "apply");
+      help_["apply"] =
+R"...(### apply ###
 
 <h6> Usage </h6>
 
-* `(conval <Object 1> <Object 2>)`
+* `(apply <Object 1> <Object 2>)`
 
 <h6> Description </h6>
 
-* Constructs Pair and evaluates it. (cons and eval -> conval)
+* Constructs Pair and evaluates it.
   + `<Object 1>` is Car, `<Object 2>` is Cdr.
   + It is same as `(eval (cons <Object 1> <Object 2>))`.
 
@@ -1053,7 +1053,7 @@ R"...(### conval ###
 
     (define a '(1 2 3))
     
-    (display (conval + a))
+    (display (apply '+ a))
     
     ;; Output
     ;; > 6)...";
