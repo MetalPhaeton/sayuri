@@ -3357,6 +3357,99 @@ R"...(### search ###
     ;; > ())...";
     }
 
+    // %%% map
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) -> LispObjectPtr {
+        // 準備。
+        LispIterator list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 2;
+
+        // 関数名を得る。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        LispObjectPtr first_ptr = caller.Evaluate(*(list_itr++));
+
+        // 各リストのポインタとイテレータを得る。
+        std::vector<LispObjectPtr> temp_vec;
+        std::vector<LispIterator> temp_itr_vec;
+        int index = 3;
+        for (; list_itr; ++list_itr, ++index) {
+          LispObjectPtr result = caller.Evaluate(*list_itr);
+          if (!(result->IsList())) {
+            throw GenWrongTypeError
+            (func_name, "List", std::vector<int> {index}, true);
+          }
+          temp_vec.push_back(result);
+          temp_itr_vec.push_back(LispIterator {result.get()});
+        }
+
+        // 要素があるかどうかの判定関数。
+        auto is_ok = [&temp_itr_vec]() -> bool {
+          for (auto& itr : temp_itr_vec) if (!itr) return false;
+          return true;
+        };
+        // 各イテレータをインクリメントする関数。
+        auto inc_itr = [&temp_itr_vec]() {
+          for (auto& itr : temp_itr_vec) ++itr;
+        };
+
+        // 適用していく。
+        LispObjectPtr ret_ptr = NewNil();
+        LispObject* ret_ptr_ptr = ret_ptr.get();
+        for (; is_ok(); inc_itr()) {
+          // 引数ベクトルを作る。
+          LispObjectPtr arg_ptr = NewNil();
+          LispObject* ptr = arg_ptr.get();
+          for (auto& itr : temp_itr_vec) {
+            *ptr = *(NewPair(itr->Clone(), NewNil()));
+            ptr = ptr->cdr_.get();
+          }
+
+          // Lisp関数を作って評価する。
+          LispObjectPtr result =
+          caller.Evaluate(*(NewPair(first_ptr, arg_ptr)));
+
+          // 結果をリストに入れる。
+          *ret_ptr_ptr = *(NewPair(result, NewNil()));
+          ret_ptr_ptr = ret_ptr_ptr->cdr_.get();
+        }
+
+        return ret_ptr;
+      };
+      AddNativeFunction(func, "map");
+      help_["map"] =
+R"...(### map ###
+
+<h6> Usage </h6>
+
+* `(map <Function : Symbol or Function> <Argument list : List>...)`
+
+<h6> Description </h6>
+
+* Applies `<Function>` to `<Argument List>...` iteratively
+  and returns List composed with returned object by `<Function>`.
+      + It looks like addition of Linear Algebra. See Example.
+
+<h6> Example </h6>
+
+    (display (map '+ '(1 2 3 4 5)
+                     '(10 20 30 40 50)
+                     '(100 200 300 400 500)))
+    ;; The above means...
+    ;; (display (list (+ 1 10 100)
+    ;;                (+ 2 20 200)
+    ;;                (+ 3 30 300)
+    ;;                (+ 4 40 400)
+    ;;                (+ 5 50 500)))
+    
+    ;; Output
+    ;; > (111 222 333 444 555))...";
+    }
+
     // %%% range
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
