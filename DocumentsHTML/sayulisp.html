@@ -244,14 +244,12 @@ Example
      (display &quot;Error Occured!!&quot;))
 
 ;; Output
-;;
 ;; &gt; Error Occured!!
 
 (try ((+ 1 &quot;Hello&quot;))
      (display exception))
 
 ;; Output
-;;
 ;; &gt; (@not-number &quot;The 2nd argument of (+) didn&#39;t return Number.&quot;)</code></pre>
 <p>You can also throw an exception using <a href="core_functions.html#throw"><code>(throw)</code></a> function.</p>
 <h6> 
@@ -262,7 +260,6 @@ Example
      (display exception))
 
 ;; Output
-;;
 ;; &gt; 123</code></pre>
 <h3 id="importing-script-file">Importing Script File</h3>
 <p>Using <a href="core_functions.html#import"><code>(import)</code></a> function, Sayulisp reads and executes it.</p>
@@ -281,7 +278,6 @@ Example
 (display &quot;b: &quot; b)
 
 ;; Output
-;;
 ;; &gt; Hello World
 :: &gt; a: 111
 :: &gt; b: 222</code></pre>
@@ -346,18 +342,6 @@ Example
 (my-obj &#39;@say-hello)  ;; Output &gt; Hello
 (my-obj &#39;@set-val 30)
 (display (my-obj &#39;@get-val))  ;; Output &gt; 30</code></pre>
-<p>If you want to sum of List, you can use <code>(cons-eval)</code> function.</p>
-<h6> 
-Example
-</h6>
-
-<pre><code>(define a &#39;(1 2 3))
-
-(display (cons-eval + a))
-;; This is same as &quot;(eval (cons + a))&quot;.
-
-;; Output
-;; &gt; 6</code></pre>
 <h2 id="index-of-reference-of-sayulisp-functions">Index of Reference of Sayulisp Functions</h2>
 <ul>
 <li><a href="core_functions.html">Core Functions</a></li>

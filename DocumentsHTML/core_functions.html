@@ -37,6 +37,7 @@
 <li><code>string-&gt;symbol</code></li>
 <li><code>string-&gt;list</code></li>
 </ul></li>
+<li><a href="#parval"><code>parval</code></a> : Parses and evaluates String.</li>
 <li><a href="#to-string"><code>to-string</code></a> : Converts an expression to String.
 <ul>
 <li><code>number-&gt;string</code></li>
@@ -49,7 +50,7 @@
 <li><a href="#car"><code>car</code></a> : Pulls out Car value from Pair.</li>
 <li><a href="#cdr"><code>cdr</code></a> : Pull outs Cdr value from Pair.</li>
 <li><a href="#cons"><code>cons</code></a> : Constructs Pair.</li>
-<li><a href="#conval"><code>conval</code></a>: Constructs Pair and evaluates.</li>
+<li><a href="#apply"><code>apply</code></a>: Constructs Pair and evaluates.</li>
 </ul></li>
 <li><a href="#conditional-branch-functions">Conditional Branch Functions</a>
 <ul>
@@ -144,7 +145,6 @@ Example
 <pre><code>(display (help &quot;car&quot;))
 
 ;; Output
-;;
 ;; &gt; ### car ###
 ;; &gt;
 ;; &gt; &lt;h6&gt; Usage &lt;/h6&gt;
@@ -187,7 +187,6 @@ Example
 (display (eval x))
 
 ;; Output
-;;
 ;; &gt; (+ 1 2 3)
 ;; &gt; 6</code></pre>
 <h3 id="quote">quote</h3>
@@ -217,13 +216,11 @@ Example
 <pre><code>(display (quote (111 222 333)))
 
 ;; Output
-;;
 ;; &gt; (111 222 333)
 
 (display &#39;(444 555 666))
 
 ;; Output
-;;
 ;; &gt; (444 555 666)
 
 (define x 123)
@@ -231,7 +228,6 @@ Example
 (display &#39;x)
 
 ;; Output
-;;
 ;; &gt; 123
 ;; &gt; Symbol: x</code></pre>
 <h3 id="define">define</h3>
@@ -265,14 +261,12 @@ Example
 (display x)
 
 ;; Output
-;;
 ;; &gt; 123
 
 (define (myfunc x) (+ x 10))
 (display (myfunc 5))
 
 ;; Output
-;;
 ;; &gt; 15</code></pre>
 <h3 id="set">set!</h3>
 <h6> 
@@ -302,7 +296,6 @@ Example
 (display x)
 
 ;; Output
-;;
 ;; &gt; 456
 
 (define myfunc (let ((x 1)) (lambda () (set! x (+ x 1)) x)))
@@ -311,7 +304,6 @@ Example
 (display (myfunc))
 
 ;; Output
-;;
 ;; &gt; 2
 ;; &gt; 3
 ;; &gt; 4</code></pre>
@@ -344,7 +336,6 @@ Example
 (display (myfunc 5))
 
 ;; Output
-;;
 ;; &gt; 105
 
 (define gen-func (lambda (x) (lambda () (+ x 100))))
@@ -352,7 +343,6 @@ Example
 (display (myfunc2))
 
 ;; Output
-;;
 ;; &gt; 150</code></pre>
 <h3 id="let">let</h3>
 <h6> 
@@ -386,7 +376,6 @@ Example
 (display (myfunc))
 
 ;; Output
-;;
 ;; &gt; 30</code></pre>
 <h3 id="begin">begin</h3>
 <h6> 
@@ -412,7 +401,6 @@ Example
              (display &quot;World&quot;)))
 
 ;; Output
-;;
 ;; &gt; Hello
 ;; &gt; World
 ;; &gt; World</code></pre>
@@ -442,7 +430,6 @@ Example
 <pre><code>(display (parse &quot;(1 2 3)&quot;))
 
 ;; Output
-;;
 ;; &gt; (1 2 3)</code></pre>
 <h3 id="parval">parval</h3>
 <h6> 
@@ -469,7 +456,6 @@ Example
 <pre><code>(parval &quot;(display \&quot;Hello\&quot;)(display \&quot;World\&quot;)&quot;)
 
 ;; Output
-;;
 ;; &gt; Hello
 ;; &gt; World</code></pre>
 <h3 id="to-string">to-string</h3>
@@ -498,14 +484,12 @@ Example
 <pre><code>(display (to-string &#39;(1 2 3)))
 
 ;; Output
-;;
 ;; &gt; (1 2 3)
 ;;
 
 (display (string? (to-string &#39;(1 2 3))))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="try">try</h3>
 <h6> 
@@ -537,14 +521,12 @@ Example
      (display &quot;Error Occured!!&quot;))
 
 ;; Output
-;;
 ;; &gt; Error Occured!!
 
 (try ((+ 1 &quot;Hello&quot;))
      (display exception))
 
 ;; Output
-;;
 ;; &gt; (@not-number &quot;The 2nd argument of (+) didn&#39;t return Number.&quot;)</code></pre>
 <h3 id="throw">throw</h3>
 <h6> 
@@ -570,7 +552,6 @@ Example
      (display exception))
 
 ;; Output
-;;
 ;; &gt; 123</code></pre>
 <h3 id="car">car</h3>
 <h6> 
@@ -593,13 +574,11 @@ Example
 
 <pre><code>(display (car &#39;(111 . 222)))
 ;; Output
-;;
 ;; &gt; 111
 
 (display (car (list 111 222 333)))
 
 ;; Output
-;;
 ;; &gt; 111</code></pre>
 <h3 id="cdr">cdr</h3>
 <h6> 
@@ -622,13 +601,11 @@ Example
 
 <pre><code>(display (cdr &#39;(111 . 222)))
 ;; Output
-;;
 ;; &gt; 222
 
 (display (cdr (list 111 222 333)))
 
 ;; Output
-;;
 ;; &gt; (222 333)</code></pre>
 <h3 id="cons">cons</h3>
 <h6> 
@@ -653,34 +630,31 @@ Example
 <pre><code>(display (cons 111 222))
 
 ;; Output
-;;
 ;; &gt; (111 . 222)
 
 (display (cons 111 &#39;(222 333)))
 
 ;; Output
-;;
 ;; &gt; (111 222 333)
 
 (display (cons 444 (cons 555 (cons 666 ()))))
 
 ;; Output
-;;
 ;; &gt; (444 555 666)</code></pre>
-<h3 id="conval">conval</h3>
+<h3 id="apply">apply</h3>
 <h6> 
 Usage
 </h6>
 
 <ul>
-<li><code>(conval &lt;Object 1&gt; &lt;Object 2&gt;)</code></li>
+<li><code>(apply &lt;Object 1&gt; &lt;Object 2&gt;)</code></li>
 </ul>
 <h6> 
 Description
 </h6>
 
 <ul>
-<li>Constructs Pair and evaluates it. (cons and eval -&gt; conval)</li>
+<li>Constructs Pair and evaluates it.</li>
 <li><code>&lt;Object 1&gt;</code> is Car, <code>&lt;Object 2&gt;</code> is Cdr.</li>
 <li>It is same as <code>(eval (cons &lt;Object 1&gt; &lt;Object 2&gt;))</code>.</li>
 </ul>
@@ -690,7 +664,7 @@ Example
 
 <pre><code>(define a &#39;(1 2 3))
 
-(display (conval + a))
+(display (apply &#39;+ a))
 
 ;; Output
 ;; &gt; 6</code></pre>
@@ -721,7 +695,6 @@ Example
 <pre><code>(display (if (&lt; 1 2) (+ 3 4) (+ 5 6)))
 
 ;; Output
-;;
 ;; &gt; 7</code></pre>
 <h3 id="cond">cond</h3>
 <h6> 
@@ -754,7 +727,6 @@ Example
     (else &quot;Else!!&quot;))
 
 ;; Output
-;;
 ;; &gt; World</code></pre>
 <h2 id="predicate-functions">Predicate Functions</h2>
 <h3 id="equal">equal?</h3>
@@ -780,7 +752,6 @@ Example
 <pre><code>(display (equal? &#39;(1 2 (3 4) 5) &#39;(1 2 (3 4) 5)))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="not-equal">!=</h3>
 <h6> 
@@ -804,7 +775,6 @@ Example
 <pre><code>(display (!= &#39;(1 2 (3 4) 5) &#39;(1 2 (3 4) 5)))
 
 ;; Output
-;;
 ;; &gt; #f</code></pre>
 <h3 id="pair">pair?</h3>
 <h6> 
@@ -828,7 +798,6 @@ Example
 <pre><code>(display (pair? &#39;(1 2 3) &#39;(4 5 6)))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="list">list?</h3>
 <h6> 
@@ -852,7 +821,6 @@ Example
 <pre><code>(display (list? &#39;(1 2 3) &#39;(4 5 6) ()))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="nil">nil?</h3>
 <h6> 
@@ -877,7 +845,6 @@ Example
 <pre><code>(display (nil? ()))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="symbol">symbol?</h3>
 <h6> 
@@ -901,7 +868,6 @@ Example
 <pre><code>(display (symbol? &#39;x))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="number">number?</h3>
 <h6> 
@@ -925,7 +891,6 @@ Example
 <pre><code>(display (number? 123))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="boolean">boolean?</h3>
 <h6> 
@@ -949,7 +914,6 @@ Example
 <pre><code>(display (boolean? #f))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="string">string?</h3>
 <h6> 
@@ -973,7 +937,6 @@ Example
 <pre><code>(display (string? &quot;Hello&quot;))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="function">function?</h3>
 <h6> 
@@ -998,7 +961,6 @@ Example
 (display (function? myfunc))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="native-function">native-function?</h3>
 <h6> 
@@ -1022,7 +984,6 @@ Example
 <pre><code>(display (native-function? +))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="procedure">procedure?</h3>
 <h6> 
@@ -1047,13 +1008,11 @@ Example
 (display (procedure? myfunc))
 
 ;; Output
-;;
 ;; &gt; #t
 
 (display (procedure? +))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h2 id="looping">Looping</h2>
 <h3 id="while">while</h3>
@@ -1170,14 +1129,12 @@ Example
 (display x)
 
 ;; Output
-;;
 ;; &gt; 123
 
 (define x 123)
 (display &quot;x is &quot; x)
 
 ;; Output
-;;
 ;; &gt; x is 123</code></pre>
 <h3 id="stdin">stdin</h3>
 <h6> 
@@ -1236,7 +1193,6 @@ Example
 (stdout &quot;\n&quot;)
 
 ;; Output
-;;
 ;; &gt; 123</code></pre>
 <h3 id="stderr">stderr</h3>
 <h6> 
@@ -1261,7 +1217,6 @@ Example
 (stderr &quot;\n&quot;)
 
 ;; Output
-;;
 ;; &gt; 123</code></pre>
 <h3 id="import">import</h3>
 <h6> 
@@ -1294,7 +1249,6 @@ Example
 (display &quot;b: &quot; b)
 
 ;; Output
-;;
 ;; &gt; Hello World
 :: &gt; a: 111
 :: &gt; b: 222</code></pre>

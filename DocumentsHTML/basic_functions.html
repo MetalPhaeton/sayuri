@@ -34,7 +34,7 @@
 <li><a href="#list"><code>list</code></a> : Generates List.</li>
 <li><a href="#list-replace"><code>list-replace</code></a> : Replaces an element of List for an object.</li>
 <li><a href="#list-remove"><code>list-remove</code></a> : Removes an element of List.</li>
-<li><a href="#search"><code>search</code></a> : Searches an object from List.</li>
+<li><a href="#list-search"><code>list-search</code></a> : Searches an object from List.</li>
 <li><a href="#string-split"><code>string-split</code></a> : Splits String.</li>
 </ul></li>
 <li><a href="#container-functions">Container Functions</a>
@@ -45,6 +45,10 @@
 <li><a href="#pop-front"><code>pop-front</code></a> : Removes the first element from List.</li>
 <li><a href="#push-back"><code>push-back</code></a> : Adds Object at the end element.</li>
 <li><a href="#pop-back"><code>pop-back</code></a> : Removes the last element from List.</li>
+<li><a href="#push-front2"><code>push-front!</code></a> : Adds Object at the fist element.</li>
+<li><a href="#pop-front2"><code>pop-front!</code></a> : Removes the first element from List.</li>
+<li><a href="#push-back2"><code>push-back!</code></a> : Adds Object at the end element.</li>
+<li><a href="#pop-back2"><code>pop-back!</code></a> : Removes the last element from List.</li>
 </ul></li>
 <li><a href="#boolean-equation-function">Boolean Equation Function</a>
 <ul>
@@ -69,8 +73,12 @@
 <li><a href="#div"><code>/</code></a> : Calculates division.</li>
 <li><a href="#inc"><code>++</code></a> : Increment.</li>
 <li><a href="#dec"><code>--</code></a> : Decrement.</li>
-<li><a href="#inc2"><code>inc!</code></a> : Increments and rewrites.</li>
-<li><a href="#dec2"><code>dec!</code></a> : Decrements and rewrites.</li>
+<li><a href="#add2"><code>+!</code></a> : Calculates addition and rewrites.</li>
+<li><a href="#sub2"><code>-!</code></a> : Calculates subtraction and rewrites.</li>
+<li><a href="#mul2"><code>*!</code></a> : Calculates multiplication and rewrites.</li>
+<li><a href="#div2"><code>/!</code></a> : Calculates division and rewrites.</li>
+<li><a href="#inc2"><code>++!</code></a> : Increment and rewrites.</li>
+<li><a href="#dec2"><code>--!</code></a> : Decrement and rewrites.</li>
 </ul></li>
 <li><a href="#mathematics-function">Mathematics Function</a>
 <ul>
@@ -131,13 +139,11 @@ Example
 <pre><code>(display (append &#39;(111 222) &#39;(333 444) &#39;(555 666) 777))
 
 ;; Output
-;;
 ;; &gt; (111 222 333 444 555 666 . 777)
 
 (display (append &quot;Hello &quot; 111 &quot; World&quot;))
 
 ;; Output
-;;
 ;; &gt; &quot;Hello 111 World&quot;;</code></pre>
 <h3 id="ref">ref</h3>
 <h6> 
@@ -175,25 +181,21 @@ Example
 <pre><code>(display (ref &#39;(111 222 333) 1))
 
 ;; Output
-;;
 ;; &gt; 222
 
 (display (ref &#39;(111 222 333) -1))
 
 ;; Output
-;;
 ;; &gt; 333
 
 (display (ref &quot;Hello World&quot; 4))
 
 ;; Output
-;;
 ;; &gt; &quot;o&quot;
 
 (display (ref &quot;Hello World&quot; -3))
 
 ;; Output
-;;
 ;; &gt; &quot;r&quot;</code></pre>
 <h3 id="range">range</h3>
 <h6> 
@@ -241,7 +243,6 @@ Example
 <pre><code>(display (length &#39;(111 222 333 444 555 666)))
 
 ;; Output
-;;
 ;; &gt; 6</code></pre>
 <h3 id="list">list</h3>
 <h6> 
@@ -265,7 +266,6 @@ Example
 <pre><code>(display (list 111 222 333))
 
 ;; Output
-;;
 ;; &gt; (111 222 333)</code></pre>
 <h3 id="list-replace">list-replace</h3>
 <h6> 
@@ -292,7 +292,6 @@ Example
 (display (list-replace lst 1 &quot;Hello&quot;))
 
 ;; Output
-;;
 ;; &gt; (111 &quot;Hello&quot; 333)</code></pre>
 <h3 id="list-remove">list-remove</h3>
 <h6> 
@@ -319,15 +318,14 @@ Example
 (display (list-remove lst 1))
 
 ;; Output
-;;
 ;; &gt; (111 333)</code></pre>
-<h3 id="search">search</h3>
+<h3 id="list-search">list-search</h3>
 <h6> 
 Usage
 </h6>
 
 <ul>
-<li><code>(search &lt;Object&gt; &lt;List&gt;)</code></li>
+<li><code>(list-search &lt;Object&gt; &lt;List&gt;)</code></li>
 </ul>
 <h6> 
 Description
@@ -342,12 +340,46 @@ Example
 
 <pre><code>(define lst &#39;(111 222 &quot;Hello&quot; #t))
 
-(display (search &quot;Hello&quot; lst))
-(display (search &quot;World&quot; lst))
+(display (list-search &quot;Hello&quot; lst))
+(display (list-search &quot;World&quot; lst))
 
 ;; Output
 ;; &gt;  2
 ;; &gt; ()</code></pre>
+<h3 id="map">map</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(map &lt;Function : Symbol or Function&gt; &lt;Argument list : List&gt;...)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>Applies <code>&lt;Function&gt;</code> to <code>&lt;Argument List&gt;...</code> iteratively and returns List composed with returned object by <code>&lt;Function&gt;</code>.
+<ul>
+<li>It looks like addition of Linear Algebra. See Example.</li>
+</ul></li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(display (map &#39;+ &#39;(1 2 3 4 5)
+                 &#39;(10 20 30 40 50)
+                 &#39;(100 200 300 400 500)))
+;; The above means...
+;; (display (list (+ 1 10 100)
+;;                (+ 2 20 200)
+;;                (+ 3 30 300)
+;;                (+ 4 40 400)
+;;                (+ 5 50 500)))
+
+;; Output
+;; &gt; (111 222 333 444 555)</code></pre>
 <h3 id="string-split">string-split</h3>
 <h6> 
 Usage
@@ -369,8 +401,7 @@ Example
 
 <pre><code>(display (string-split &quot;aaaaSplit!bbbSplit!ccc&quot; &quot;Split!&quot;))
 
-;; Outpu
-;;
+;; Output
 ;; &gt; (&quot;aaa&quot; &quot;bbb&quot; &quot;ccc&quot;)</code></pre>
 <h2 id="container-functions">Container Functions</h2>
 <h3 id="front">front</h3>
@@ -394,8 +425,7 @@ Example
 
 <pre><code>(display (front &#39;(111 222 333)))
 
-;; Outpu
-;;
+;; Output
 ;; &gt; 111</code></pre>
 <h3 id="back">back</h3>
 <h6> 
@@ -418,8 +448,7 @@ Example
 
 <pre><code>(display (back &#39;(111 222 333)))
 
-;; Outpu
-;;
+;; Output
 ;; &gt; 333</code></pre>
 <h3 id="push-front">push-front</h3>
 <h6> 
@@ -442,8 +471,7 @@ Example
 
 <pre><code>(display (push-front &#39;(111 222 333) &quot;Hello&quot;))
 
-;; Outpu
-;;
+;; Output
 ;; &gt; (&quot;Hello&quot; 111 222 333)</code></pre>
 <h3 id="pop-front">pop-front</h3>
 <h6> 
@@ -466,8 +494,7 @@ Example
 
 <pre><code>(display (pop-front &#39;(111 222 333)))
 
-;; Outpu
-;;
+;; Output
 ;; &gt; (222 333)</code></pre>
 <h3 id="push-back">push-back</h3>
 <h6> 
@@ -490,8 +517,7 @@ Example
 
 <pre><code>(display (push-back &#39;(111 222 333) &quot;Hello&quot;))
 
-;; Outpu
-;;
+;; Output
 ;; &gt; (111 222 333 &quot;Hello&quot;)</code></pre>
 <h3 id="pop-back">pop-back</h3>
 <h6> 
@@ -514,8 +540,133 @@ Example
 
 <pre><code>(display (pop-back &#39;(111 222 333)))
 
-;; Outpu
-;;
+;; Output
+;; &gt; (111 222)</code></pre>
+<h3 id="push-front-push-front2">push-front! ### {push-front2}</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(push-front! &lt;Symbol&gt; &lt;Object&gt;)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>This is Special Form.
+<ul>
+<li>The 1st argument must be Symbol bound with List.</li>
+<li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
+</ul></li>
+<li>Appends to the top of List of <code>&lt;Symbol&gt;</code>.</li>
+<li>Returns previous List bound to <code>&lt;Symbol&gt;</code>.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(define l &#39;(111 222 333))
+(display (push-front! l 444))  ;; Returns previous List.
+(display l)
+
+;; Output
+;; &gt; (111 222 333)
+;; &gt; (444 111 222 333)</code></pre>
+<h3 id="pop-front2">pop-front!</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(pop-front! &lt;Symbol&gt;)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>This is Special Form.
+<ul>
+<li>The 1st argument must be Symbol bound with List.</li>
+</ul></li>
+<li>Pops out the 1st element of List of <code>&lt;Symbol&gt;</code>.</li>
+<li>Returns previous List bound to <code>&lt;Symbol&gt;</code>.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(define l &#39;(111 222 333))
+(display (pop-front! l))
+(display l)
+
+;; Output
+;; &gt; (111 222 333)
+;; &gt; (222 333)</code></pre>
+<h3 id="push-back2">push-back!</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(push-back! &lt;Symbol&gt; &lt;Object&gt;)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>This is Special Form.
+<ul>
+<li>The 1st argument must be Symbol bound with List.</li>
+<li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
+</ul></li>
+<li>Appends to the tail of List of <code>&lt;Symbol&gt;</code>.</li>
+<li>Returns previous List bound to <code>&lt;Symbol&gt;</code>.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(define l &#39;(111 222 333))
+(display (push-back! l 444))
+(display l)
+
+;; Output
+;; &gt; (111 222 333)
+;; &gt; (111 222 333 444))...&quot;;</code></pre>
+<h3 id="pop-back2">pop-back!</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(pop-back! &lt;Symbol&gt;)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>This is Special Form.
+<ul>
+<li>The 1st argument must be Symbol bound with List.</li>
+</ul></li>
+<li>Pops out the last element of List of <code>&lt;Symbol&gt;</code>.</li>
+<li>Returns previous List bound to <code>&lt;Symbol&gt;</code>.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(define l &#39;(111 222 333))
+(display (pop-back! l))
+(display l)
+
+;; Output
+;; &gt; (111 222 333)
 ;; &gt; (111 222)</code></pre>
 <h2 id="boolean-equation-function">Boolean Equation Function</h2>
 <h3 id="not">not</h3>
@@ -540,7 +691,6 @@ Example
 <pre><code>(display (not (= 111 111)))
 
 ;; Output
-;;
 ;; &gt; #f</code></pre>
 <h3 id="and">and</h3>
 <h6> 
@@ -564,7 +714,6 @@ Example
 <pre><code>(display (and (= 111 111) (= 222 222)))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="or">or</h3>
 <h6> 
@@ -588,7 +737,6 @@ Example
 <pre><code>(display (or (= 111 111) (= 222 333)))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h2 id="comparison-function">Comparison Function</h2>
 <h3 id="less-than">&lt;</h3>
@@ -613,7 +761,6 @@ Example
 <pre><code>(display (&lt; 111 222 333))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="less-equal">&lt;=</h3>
 <h6> 
@@ -637,7 +784,6 @@ Example
 <pre><code>(display (&lt; 111 222 333))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="greater-than">&gt;</h3>
 <h6> 
@@ -661,7 +807,6 @@ Example
 <pre><code>(display (&gt; 333 222 111))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="greater-equal">&gt;=</h3>
 <h6> 
@@ -685,7 +830,6 @@ Example
 <pre><code>(display (&gt;= 333 222 111))
 
 ;; Output
-;;
 ;; &gt; #t</code></pre>
 <h3 id="max">max</h3>
 <h6> 
@@ -709,7 +853,6 @@ Example
 <pre><code>(display (max 1 2 3 4 3 2 1))
 
 ;; Output
-;;
 ;; &gt; 4</code></pre>
 <h3 id="min">min</h3>
 <h6> 
@@ -733,7 +876,6 @@ Example
 <pre><code>(display (min 4 3 2 1 2 3 4))
 
 ;; Output
-;;
 ;; &gt; 1</code></pre>
 <h2 id="arithmetic-operation-function">Arithmetic Operation Function</h2>
 <h3 id="add">+</h3>
@@ -758,7 +900,6 @@ Example
 <pre><code>(display (+ 1 2 3))
 
 ;; Output
-;;
 ;; &gt; 6</code></pre>
 <h3 id="sub">-</h3>
 <h6> 
@@ -782,7 +923,6 @@ Example
 <pre><code>(display (- 5 4 3))
 
 ;; Output
-;;
 ;; &gt; -2</code></pre>
 <h3 id="mul">*</h3>
 <h6> 
@@ -806,7 +946,6 @@ Example
 <pre><code>(display (* 2 3 4))
 
 ;; Output
-;;
 ;; &gt; 24</code></pre>
 <h3 id="div">/</h3>
 <h6> 
@@ -830,7 +969,6 @@ Example
 <pre><code>(display (/ 32 2 4))
 
 ;; Output
-;;
 ;; &gt; 4</code></pre>
 <h3 id="inc">++</h3>
 <h6> 
@@ -854,7 +992,6 @@ Example
 <pre><code>(display (++ 111))
 
 ;; Output
-;;
 ;; &gt; 112</code></pre>
 <h3 id="dec">--</h3>
 <h6> 
@@ -878,15 +1015,14 @@ Example
 <pre><code>(display (-- 111))
 
 ;; Output
-;;
 ;; &gt; 110</code></pre>
-<h3 id="inc2">inc!</h3>
+<h3 id="add2">+!</h3>
 <h6> 
 Usage
 </h6>
 
 <ul>
-<li><code>(inc! &lt;Symbol bound with Number : Symbol&gt;)</code></li>
+<li><code>(+! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
 </ul>
 <h6> 
 Description
@@ -895,29 +1031,160 @@ Description
 <ul>
 <li>This is Special Form.
 <ul>
-<li>Rewrites <code>&lt;Symbol bound with Number&gt;</code>.</li>
+<li>The 1st argument must be Symbol bound with Number.</li>
+<li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
 </ul></li>
-<li>Increments <code>&lt;Symbol bound with Number&gt;</code> and returns it.</li>
+<li>Sums up <code>&lt;Number&gt;...</code> and adds it to <code>&lt;Symbol&gt;</code>.</li>
+<li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(define n 5)
+(display (+! n 3 4 5))  ;; Returns previous Number.
+(display n)
+
+;; Output
+;; &gt; 5
+:: &gt; 17</code></pre>
+<h3 id="sub2">-!</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(-! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>This is Special Form.
+<ul>
+<li>The 1st argument must be Symbol bound with Number.</li>
+<li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
+</ul></li>
+<li>Subtracts <code>&lt;Number&gt;...</code> from <code>&lt;Symbol&gt;</code> and rewrite it to <code>&lt;Symbol&gt;</code>.</li>
+<li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(define n 5)
+(display (-! n 1 2))  ;; Returns previous Number.
+(display n)
+
+;; Output
+;; &gt; 5
+;; &gt; 2</code></pre>
+<h3 id="mul2">*!</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(*! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>This is Special Form.
+<ul>
+<li>The 1st argument must be Symbol bound with Number.</li>
+<li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
+</ul></li>
+<li>Multiplies <code>&lt;Symbol&gt;</code> and <code>&lt;Number&gt;...</code> and rewrite it to <Symbol>.</li>
+<li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(define n 5)
+(display (*! n 1 2))  ;; Returns previous Number.
+(display n)
+
+;; Output
+;; &gt; 5
+;; &gt; 10</code></pre>
+<h3 id="div2">/!</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(/! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>This is Special Form.
+<ul>
+<li>The 1st argument must be Symbol bound with Number.</li>
+<li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
+</ul></li>
+<li>Divides <code>&lt;Symbol&gt;</code> with <code>&lt;Number&gt;...</code> and rewrites it to <code>&lt;Symbol&gt;</code>.</li>
+<li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
+</ul>
+<h6> 
+Example
+</h6>
+
+<pre><code>(define n 6)
+(display (/! n 2 3))  ;; Returns previous Number.
+(display n)
+
+;; Output
+;; &gt; 6
+;; &gt; 1</code></pre>
+<h3 id="inc2">++!</h3>
+<h6> 
+Usage
+</h6>
+
+<ul>
+<li><code>(++! &lt;Symbol)</code></li>
+<li><code>(inc! &lt;Symbol&gt;)</code></li>
+</ul>
+<h6> 
+Description
+</h6>
+
+<ul>
+<li>This is Special Form.
+<ul>
+<li>The 1st argument must be Symbol bound with Number.</li>
+<li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
+</ul></li>
+<li>Increments <code>&lt;Symbol&gt;</code>.</li>
+<li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
 <h6> 
 Example
 </h6>
 
 <pre><code>(define i 111)
-(display (inc! i))
+(display (++! i))
 (display i)
 
 ;; Output
-;;
-;; &gt; 112
+;; &gt; 111
 ;; &gt; 112</code></pre>
-<h3 id="dec2">dec!</h3>
+<h3 id="dec2">--!</h3>
 <h6> 
 Usage
 </h6>
 
 <ul>
-<li><code>(dec! &lt;Symbol bound with Number : Symbol&gt;)</code></li>
+<li><code>(--! &lt;Symbol)</code></li>
+<li><code>(dec! &lt;Symbol&gt;)</code></li>
 </ul>
 <h6> 
 Description
@@ -926,21 +1193,22 @@ Description
 <ul>
 <li>This is Special Form.
 <ul>
-<li>Rewrites <code>&lt;Symbol bound with Number&gt;</code>.</li>
+<li>The 1st argument must be Symbol bound with Number.</li>
+<li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
 </ul></li>
-<li>Decrements <code>&lt;Symbol bound with Number&gt;</code> and returns it.</li>
+<li>Decrements <code>&lt;Symbol&gt;</code>.</li>
+<li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
 <h6> 
 Example
 </h6>
 
 <pre><code>(define i 111)
-(display (dec! i))
+(display (--! i))
 (display i)
 
 ;; Output
-;;
-;; &gt; 110
+;; &gt; 111
 ;; &gt; 110</code></pre>
 <h2 id="mathematics-function">Mathematics Function</h2>
 <h3 id="pi">PI</h3>
@@ -958,7 +1226,6 @@ Example
 <pre><code>(display PI)
 
 ;; Output
-;;
 ;; &gt; 3.14159265358979</code></pre>
 <h3 id="e">E</h3>
 <h6> 
@@ -975,7 +1242,6 @@ Example
 <pre><code>(display E)
 
 ;; Output
-;;
 ;; &gt; 2.71828182845905</code></pre>
 <h3 id="sin">sin</h3>
 <h6> 
@@ -1000,7 +1266,6 @@ Example
 <pre><code>(display (sin (/ PI 2)))
 
 ;; Output
-;;
 ;; &gt; 1</code></pre>
 <h3 id="cos">cos</h3>
 <h6> 
@@ -1025,7 +1290,6 @@ Example
 <pre><code>(display (cos PI))
 
 ;; Output
-;;
 ;; &gt; -1</code></pre>
 <h3 id="tan">tan</h3>
 <h6> 
@@ -1050,7 +1314,6 @@ Example
 <pre><code>(display (tan (/ PI 4)))
 
 ;; Output
-;;
 ;; &gt; 1</code></pre>
 <h3 id="asin">asin</h3>
 <h6> 
@@ -1075,7 +1338,6 @@ Example
 <pre><code>(display (asin 0))
 
 ;; Output
-;;
 ;; &gt; 0</code></pre>
 <h3 id="acos">acos</h3>
 <h6> 
@@ -1100,7 +1362,6 @@ Example
 <pre><code>(display (acos 1))
 
 ;; Output
-;;
 ;; &gt; 0</code></pre>
 <h3 id="atan">atan</h3>
 <h6> 
@@ -1125,7 +1386,6 @@ Example
 <pre><code>(display (atan 0))
 
 ;; Output
-;;
 ;; &gt; 0</code></pre>
 <h3 id="sqrt">sqrt</h3>
 <h6> 
@@ -1149,7 +1409,6 @@ Example
 <pre><code>(display (sqrt 4))
 
 ;; Output
-;;
 ;; &gt; 2</code></pre>
 <h3 id="abs">abs</h3>
 <h6> 
@@ -1173,7 +1432,6 @@ Example
 <pre><code>(display (abs -111))
 
 ;; Output
-;;
 ;; &gt; 111</code></pre>
 <h3 id="ceil">ceil</h3>
 <h6> 
@@ -1197,7 +1455,6 @@ Example
 <pre><code>(display (ceil 1.3))
 
 ;; Output
-;;
 ;; &gt; 2</code></pre>
 <h3 id="floor">floor</h3>
 <h6> 
@@ -1221,7 +1478,6 @@ Example
 <pre><code>(display (floor 1.3))
 
 ;; Output
-;;
 ;; &gt; 1</code></pre>
 <h3 id="round">round</h3>
 <h6> 
@@ -1245,13 +1501,11 @@ Example
 <pre><code>(display (round 1.5))
 
 ;; Output
-;;
 ;; &gt; 2
 
 (display (round 1.49))
 
 ;; Output
-;;
 ;; &gt; 1</code></pre>
 <h3 id="trunc">trunc</h3>
 <h6> 
@@ -1275,13 +1529,11 @@ Example
 <pre><code>(display (trunc 1.234))
 
 ;; Output
-;;
 ;; &gt; 1
 
 (display (trunc -1.234))
 
 ;; Output
-;;
 ;; &gt; -1</code></pre>
 <h3 id="exp">exp</h3>
 <h6> 
@@ -1305,7 +1557,6 @@ Example
 <pre><code>(display (exp 1))
 
 ;; Output
-;;
 ;; &gt; 2.71828</code></pre>
 <h3 id="expt">expt</h3>
 <h6> 
@@ -1330,7 +1581,6 @@ Example
 <pre><code>(display (expt 2 3))
 
 ;; Output
-;;
 ;; &gt; 8</code></pre>
 <h3 id="log">log</h3>
 <h6> 
@@ -1355,7 +1605,6 @@ Example
 <pre><code>(display (log E))
 
 ;; Output
-;;
 ;; &gt; 1</code></pre>
 <h3 id="log2">log2</h3>
 <h6> 
@@ -1379,7 +1628,6 @@ Example
 <pre><code>(display (log2 8))
 
 ;; Output
-;;
 ;; &gt; 3</code></pre>
 <h3 id="log10">log10</h3>
 <h6> 
@@ -1403,7 +1651,6 @@ Example
 <pre><code>(display (log10 100))
 
 ;; Output
-;;
 ;; &gt; 2</code></pre>
 <h3 id="random">random</h3>
 <h6> 
@@ -1427,13 +1674,11 @@ Example
 <pre><code>(display (random 10))
 
 ;; Output
-;;
 ;; &gt; 2.42356
 
 (display (random -10))
 
 ;; Output
-;;
 ;; &gt; -7.13453</code></pre>
 
 </section>
