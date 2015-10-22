@@ -31,7 +31,7 @@
 (define hash-size 512)
 
 ;; Number of repeat.
-(define repeat 30)
+(define repeat 3)
 
 ;; Position. (FEN)
 (define fen "r1bq1r1k/p1pnbpp1/1p2p3/6p1/3PB3/5N2/PPPQ1PPP/2KR3R w - - 0 1")
@@ -169,14 +169,16 @@
 (engine '@input-uci-command
         (append "setoption name hash value " (to-string hash-size)))
 ;; Go.
+(define str-list ())
 (for (x (range repeat))
        (engine '@input-uci-command "ucinewgame")
        (engine '@input-uci-command (append "position fen " fen))
        (engine '@go-depth depth)
-       (append-time (string-split output " "))
-       (append-nodes (string-split output " "))
-       (append-nps (string-split output " "))
-       (append-hashfull (string-split output " ")))
+       (set! str-list (string-split output " "))
+       (append-time str-list)
+       (append-nodes str-list)
+       (append-nps str-list)
+       (append-hashfull str-list))
 ;; Result.
 (stderr "\n")
 (print-result)
