@@ -489,7 +489,6 @@ R"...(### help ###
     (display (help "car"))
     
     ;; Output
-    ;;
     ;; > ### car ###
     ;; >
     ;; > <h6> Usage </h6>
@@ -546,7 +545,6 @@ R"...(### eval ###
     (display (eval x))
     
     ;; Output
-    ;;
     ;; > (+ 1 2 3)
     ;; > 6)...";
     }
@@ -607,7 +605,6 @@ R"...(### parse ###
     (display (parse "(1 2 3)"))
     
     ;; Output
-    ;;
     ;; > (1 2 3))...";
       help_["parse"] = temp;
       help_["string->symbol"] = temp;
@@ -666,7 +663,6 @@ R"...(### parval ###
     (parval "(display \"Hello\")(display \"World\")")
     
     ;; Output
-    ;;
     ;; > Hello
     ;; > World)...";
     }
@@ -716,14 +712,12 @@ R"...(### to-string ###
     (display (to-string '(1 2 3)))
     
     ;; Output
-    ;;
     ;; > (1 2 3)
     ;;
     
     (display (string? (to-string '(1 2 3))))
     
     ;; Output
-    ;;
     ;; > #t)...";
       help_["to-string"] = temp;
       help_["symbol->string"] = temp;
@@ -804,14 +798,12 @@ R"...(### try ###
          (display "Error Occured!!"))
     
     ;; Output
-    ;;
     ;; > Error Occured!!
     
     (try ((+ 1 "Hello"))
          (display exception))
     
     ;; Output
-    ;;
     ;; > (@not-number "The 2nd argument of (+) didn't return Number."))...";
     }
 
@@ -852,7 +844,6 @@ R"...(### throw ###
          (display exception))
     
     ;; Output
-    ;;
     ;; > 123)...";
     }
 
@@ -893,13 +884,11 @@ R"...(### car ###
 
     (display (car '(111 . 222)))
     ;; Output
-    ;;
     ;; > 111
     
     (display (car (list 111 222 333)))
     
     ;; Output
-    ;;
     ;; > 111)...";
     }
 
@@ -940,13 +929,11 @@ R"...(### cdr ###
 
     (display (cdr '(111 . 222)))
     ;; Output
-    ;;
     ;; > 222
     
     (display (cdr (list 111 222 333)))
     
     ;; Output
-    ;;
     ;; > (222 333))...";
     }
 
@@ -990,19 +977,16 @@ R"...(### cons ###
     (display (cons 111 222))
     
     ;; Output
-    ;;
     ;; > (111 . 222)
     
     (display (cons 111 '(222 333)))
     
     ;; Output
-    ;;
     ;; > (111 222 333)
     
     (display (cons 444 (cons 555 (cons 666 ()))))
     
     ;; Output
-    ;;
     ;; > (444 555 666))...";
     }
 
@@ -1088,13 +1072,11 @@ R"...(### quote ###
     (display (quote (111 222 333)))
     
     ;; Output
-    ;;
     ;; > (111 222 333)
     
     (display '(444 555 666))
     
     ;; Output
-    ;;
     ;; > (444 555 666)
     
     (define x 123)
@@ -1102,7 +1084,6 @@ R"...(### quote ###
     (display 'x)
     
     ;; Output
-    ;;
     ;; > 123
     ;; > Symbol: x)...";
     }
@@ -1202,14 +1183,12 @@ R"...(### define ###
     (display x)
     
     ;; Output
-    ;;
     ;; > 123
     
     (define (myfunc x) (+ x 10))
     (display (myfunc 5))
     
     ;; Output
-    ;;
     ;; > 15)...";
     }
 
@@ -1266,7 +1245,6 @@ R"...(### set! ###
     (display x)
     
     ;; Output
-    ;;
     ;; > 456
     
     (define myfunc (let ((x 1)) (lambda () (set! x (+ x 1)) x)))
@@ -1275,7 +1253,6 @@ R"...(### set! ###
     (display (myfunc))
     
     ;; Output
-    ;;
     ;; > 2
     ;; > 3
     ;; > 4)...";
@@ -1343,7 +1320,6 @@ R"...(### lambda ###
     (display (myfunc 5))
     
     ;; Output
-    ;;
     ;; > 105
     
     (define gen-func (lambda (x) (lambda () (+ x 100))))
@@ -1351,7 +1327,6 @@ R"...(### lambda ###
     (display (myfunc2))
     
     ;; Output
-    ;;
     ;; > 150)...";
     }
 
@@ -1438,7 +1413,6 @@ R"...(### let ###
     (display (myfunc))
     
     ;; Output
-    ;;
     ;; > 30)...";
     }
 
@@ -1683,7 +1657,6 @@ R"...(### if ###
     (display (if (< 1 2) (+ 3 4) (+ 5 6)))
     
     ;; Output
-    ;;
     ;; > 7)...";
     }
 
@@ -1761,7 +1734,6 @@ R"...(### cond ###
         (else "Else!!"))
     
     ;; Output
-    ;;
     ;; > World)...";
     }
 
@@ -1797,7 +1769,6 @@ R"...(### begin ###
                  (display "World")))
     
     ;; Output
-    ;;
     ;; > Hello
     ;; > World
     ;; > World)...";
@@ -1857,14 +1828,12 @@ R"...(### display ###
     (display x)
     
     ;; Output
-    ;;
     ;; > 123
     
     (define x 123)
     (display "x is " x)
     
     ;; Output
-    ;;
     ;; > x is 123)...";
     }
 
@@ -1977,7 +1946,6 @@ R"...(### stdout ###
     (stdout "\n")
     
     ;; Output
-    ;;
     ;; > 123)...";
     }
 
@@ -2022,7 +1990,6 @@ R"...(### stderr ###
     (stderr "\n")
     
     ;; Output
-    ;;
     ;; > 123)...";
     }
 
@@ -2095,7 +2062,6 @@ R"...(### import ###
     (display "b: " b)
     
     ;; Output
-    ;;
     ;; > Hello World
     :: > a: 111
     :: > b: 222)...";
@@ -2146,7 +2112,6 @@ R"...(### equal? ###
     (display (equal? '(1 2 (3 4) 5) '(1 2 (3 4) 5)))
     
     ;; Output
-    ;;
     ;; > #t)...";
       help_["equal?"] = temp;
       help_["="] = temp;
@@ -2193,7 +2158,6 @@ R"...(### != ###
     (display (!= '(1 2 (3 4) 5) '(1 2 (3 4) 5)))
     
     ;; Output
-    ;;
     ;; > #f)...";
     }
 
@@ -2241,7 +2205,6 @@ R"...(### pair? ###
     (display (pair? '(1 2 3) '(4 5 6)))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -2289,7 +2252,6 @@ R"...(### list? ###
     (display (list? '(1 2 3) '(4 5 6) ()))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -2343,7 +2305,6 @@ R"...(### nil? ###
     (display (nil? ()))
     
     ;; Output
-    ;;
     ;; > #t)...";
       help_["nil?"] = temp;
       help_["null?"] = temp;
@@ -2394,7 +2355,6 @@ R"...(### symbol? ###
     (display (symbol? 'x))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -2443,7 +2403,6 @@ R"...(### number? ###
     (display (number? 123))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -2492,7 +2451,6 @@ R"...(### boolean? ###
     (display (boolean? #f))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -2541,7 +2499,6 @@ R"...(### string? ###
     (display (string? "Hello"))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -2591,7 +2548,6 @@ R"...(### function? ###
     (display (function? myfunc))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -2640,7 +2596,6 @@ R"...(### native-function? ###
     (display (native-function? +))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -2690,13 +2645,11 @@ R"...(### procedure? ###
     (display (procedure? myfunc))
     
     ;; Output
-    ;;
     ;; > #t
     
     (display (procedure? +))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -2973,13 +2926,11 @@ R"...(### append ###
     (display (append '(111 222) '(333 444) '(555 666) 777))
     
     ;; Output
-    ;;
     ;; > (111 222 333 444 555 666 . 777)
     
     (display (append "Hello " 111 " World"))
     
     ;; Output
-    ;;
     ;; > "Hello 111 World")...";
       help_["append"] = temp;
       help_["string-append"] = temp;
@@ -3070,25 +3021,21 @@ R"...(### ref ###
     (display (ref '(111 222 333) 1))
     
     ;; Output
-    ;;
     ;; > 222
     
     (display (ref '(111 222 333) -1))
     
     ;; Output
-    ;;
     ;; > 333
     
     (display (ref "Hello World" 4))
     
     ;; Output
-    ;;
     ;; > "o"
     
     (display (ref "Hello World" -3))
     
     ;; Output
-    ;;
     ;; > "r")...";
       help_["ref"] = temp;
       help_["list-ref"] = temp;
@@ -3130,7 +3077,6 @@ R"...(### list ###
     (display (list 111 222 333))
     
     ;; Output
-    ;;
     ;; > (111 222 333))...";
     }
 
@@ -3209,7 +3155,6 @@ R"...(### list-replace ###
     (display (list-replace lst 1 "Hello"))
     
     ;; Output
-    ;;
     ;; > (111 "Hello" 333))...";
     }
 
@@ -3279,7 +3224,6 @@ R"...(### list-remove ###
     (display (list-remove lst 1))
     
     ;; Output
-    ;;
     ;; > (111 333))...";
     }
 
@@ -3535,7 +3479,6 @@ R"...(### length ###
     (display (length '(111 222 333 444 555 666)))
     
     ;; Output
-    ;;
     ;; > 6)...";
     }
 
@@ -3597,7 +3540,6 @@ R"...(### < ###
     (display (< 111 222 333))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -3659,7 +3601,6 @@ R"...(### <= ###
     (display (< 111 222 333))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -3721,7 +3662,6 @@ R"...(### > ###
     (display (> 333 222 111))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -3783,7 +3723,6 @@ R"...(### >= ###
     (display (>= 333 222 111))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -3826,7 +3765,6 @@ R"...(### not ###
     (display (not (= 111 111)))
     
     ;; Output
-    ;;
     ;; > #f)...";
     }
 
@@ -3874,7 +3812,6 @@ R"...(### and ###
     (display (and (= 111 111) (= 222 222)))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -3922,7 +3859,6 @@ R"...(### or ###
     (display (or (= 111 111) (= 222 333)))
     
     ;; Output
-    ;;
     ;; > #t)...";
     }
 
@@ -3965,7 +3901,6 @@ R"...(### + ###
     (display (+ 1 2 3))
     
     ;; Output
-    ;;
     ;; > 6)...";
     }
 
@@ -4081,7 +4016,6 @@ R"...(### - ###
     (display (- 5 4 3))
     
     ;; Output
-    ;;
     ;; > -2)...";
     }
 
@@ -4197,7 +4131,6 @@ R"...(### * ###
     (display (* 2 3 4))
     
     ;; Output
-    ;;
     ;; > 24)...";
     }
 
@@ -4313,7 +4246,6 @@ R"...(### / ###
     (display (/ 32 2 4))
     
     ;; Output
-    ;;
     ;; > 4)...";
     }
 
@@ -4431,7 +4363,6 @@ R"...(### ++ ###
     (display (++ 111))
     
     ;; Output
-    ;;
     ;; > 112)...";
     }
 
@@ -4490,7 +4421,6 @@ R"...(### ++! ###
     (display i)
     
     ;; Output
-    ;;
     ;; > 111
     ;; > 112)...";
     help_["++!"] = temp;
@@ -4538,7 +4468,6 @@ R"...(### -- ###
     (display (-- 111))
     
     ;; Output
-    ;;
     ;; > 110)...";
     }
 
@@ -4597,7 +4526,6 @@ R"...(### --! ###
     (display i)
     
     ;; Output
-    ;;
     ;; > 111
     ;; > 110)...";
     help_["--!"] = temp;
@@ -4674,8 +4602,7 @@ R"...(### string-split ###
 
     (display (string-split "aaaaSplit!bbbSplit!ccc" "Split!"))
     
-    ;; Outpu
-    ;;
+    ;; Output
     ;; > ("aaa" "bbb" "ccc"))...";
     }
 
@@ -4720,8 +4647,7 @@ R"...(### front ###
 
     (display (front '(111 222 333)))
     
-    ;; Outpu
-    ;;
+    ;; Output
     ;; > 111)...";
     }
 
@@ -4772,8 +4698,7 @@ R"...(### back ###
 
     (display (back '(111 222 333)))
     
-    ;; Outpu
-    ;;
+    ;; Output
     ;; > 333)...";
     }
 
@@ -4823,8 +4748,7 @@ R"...(### push-front ###
 
     (display (push-front '(111 222 333) "Hello"))
     
-    ;; Outpu
-    ;;
+    ;; Output
     ;; > ("Hello" 111 222 333))...";
     }
 
@@ -4893,8 +4817,7 @@ R"...(### push-front! ###
     (display (push-front! l 444))  ;; Returns previous List.
     (display l)
     
-    ;; Outpu
-    ;;
+    ;; Output
     ;; > (111 222 333)
     ;; > (444 111 222 333))...";
     }
@@ -4940,8 +4863,7 @@ R"...(### pop-front ###
 
     (display (pop-front '(111 222 333)))
     
-    ;; Outpu
-    ;;
+    ;; Output
     ;; > (222 333))...";
     }
 
@@ -5001,7 +4923,7 @@ R"...(### pop-front! ###
     (display (pop-front! l))
     (display l)
     
-    ;; Outpu
+    ;; Output
     ;; > (111 222 333)
     ;; > (222 333))...";
     }
@@ -5054,8 +4976,7 @@ R"...(### push-back ###
 
     (display (push-back '(111 222 333) "Hello"))
     
-    ;; Outpu
-    ;;
+    ;; Output
     ;; > (111 222 333 "Hello"))...";
     }
 
@@ -5106,11 +5027,11 @@ R"...(### push-back ###
       };
       AddNativeFunction(func, "push-back!");
       help_["push-back!"] =
-R"...(### push-back ###
+R"...(### push-back! ###
 
 <h6> Usage </h6>
 
-* `(push-back <List> <Object>)`
+* `(push-back! <Symbol> <Object>)`
 
 <h6> Description </h6>
 
@@ -5126,7 +5047,7 @@ R"...(### push-back ###
     (display (push-back! l 444))
     (display l)
     
-    ;; Outpu
+    ;; Output
     ;; > (111 222 333)
     ;; > (111 222 333 444))...";
     }
@@ -5176,8 +5097,7 @@ R"...(### pop-back ###
 
     (display (pop-back '(111 222 333)))
     
-    ;; Outpu
-    ;;
+    ;; Output
     ;; > (111 222))...";
     }
 
@@ -5246,7 +5166,7 @@ R"...(### pop-back! ###
     (display (pop-back! l))
     (display l)
     
-    ;; Outpu
+    ;; Output
     ;; > (111 222 333)
     ;; > (111 222))...";
     }
@@ -5265,7 +5185,6 @@ R"...(### PI ###
     (display PI)
     
     ;; Output
-    ;;
     ;; > 3.14159265358979)...";
 
     // %%% E
@@ -5282,7 +5201,6 @@ R"...(### E ###
     (display E)
     
     ;; Output
-    ;;
     ;; > 2.71828182845905)...";
 
     // %%% sin
@@ -5325,7 +5243,6 @@ R"...(### sin ###
     (display (sin (/ PI 2)))
     
     ;; Output
-    ;;
     ;; > 1)...";
     }
 
@@ -5369,7 +5286,6 @@ R"...(### cos ###
     (display (cos PI))
     
     ;; Output
-    ;;
     ;; > -1)...";
     }
 
@@ -5413,7 +5329,6 @@ R"...(### tan ###
     (display (tan (/ PI 4)))
     
     ;; Output
-    ;;
     ;; > 1)...";
     }
 
@@ -5457,7 +5372,6 @@ R"...(### asin ###
     (display (asin 0))
     
     ;; Output
-    ;;
     ;; > 0)...";
     }
 
@@ -5501,7 +5415,6 @@ R"...(### acos ###
     (display (acos 1))
     
     ;; Output
-    ;;
     ;; > 0)...";
     }
 
@@ -5545,7 +5458,6 @@ R"...(### atan ###
     (display (atan 0))
     
     ;; Output
-    ;;
     ;; > 0)...";
     }
 
@@ -5589,7 +5501,6 @@ R"...(### sqrt ###
     (display (sqrt 4))
     
     ;; Output
-    ;;
     ;; > 2)...";
     }
 
@@ -5632,7 +5543,6 @@ R"...(### abs ###
     (display (abs -111))
     
     ;; Output
-    ;;
     ;; > 111)...";
     }
 
@@ -5675,7 +5585,6 @@ R"...(### ceil ###
     (display (ceil 1.3))
     
     ;; Output
-    ;;
     ;; > 2)...";
     }
 
@@ -5718,7 +5627,6 @@ R"...(### floor ###
     (display (floor 1.3))
     
     ;; Output
-    ;;
     ;; > 1)...";
     }
 
@@ -5761,13 +5669,11 @@ R"...(### round ###
     (display (round 1.5))
     
     ;; Output
-    ;;
     ;; > 2
     
     (display (round 1.49))
     
     ;; Output
-    ;;
     ;; > 1)...";
     }
 
@@ -5810,13 +5716,11 @@ R"...(### trunc ###
     (display (trunc 1.234))
     
     ;; Output
-    ;;
     ;; > 1
     
     (display (trunc -1.234))
     
     ;; Output
-    ;;
     ;; > -1)...";
     }
 
@@ -5859,7 +5763,6 @@ R"...(### exp ###
     (display (exp 1))
     
     ;; Output
-    ;;
     ;; > 2.71828)...";
     }
 
@@ -5918,7 +5821,6 @@ R"...(### expt ###
     (display (expt 2 3))
     
     ;; Output
-    ;;
     ;; > 8)...";
       help_["expt"] = temp;
       help_["^"] = temp;
@@ -5967,7 +5869,6 @@ R"...(### log ###
     (display (log E))
     
     ;; Output
-    ;;
     ;; > 1)...";
       help_["log"] = temp;
       help_["ln"] = temp;
@@ -6012,7 +5913,6 @@ R"...(### log2 ###
     (display (log2 8))
     
     ;; Output
-    ;;
     ;; > 3)...";
     }
 
@@ -6055,7 +5955,6 @@ R"...(### log10 ###
     (display (log10 100))
     
     ;; Output
-    ;;
     ;; > 2)...";
     }
 
@@ -6102,13 +6001,11 @@ R"...(### random ###
     (display (random 10))
     
     ;; Output
-    ;;
     ;; > 2.42356
     
     (display (random -10))
     
     ;; Output
-    ;;
     ;; > -7.13453)...";
     }
 
@@ -6164,7 +6061,6 @@ R"...(### max ###
     (display (max 1 2 3 4 3 2 1))
     
     ;; Output
-    ;;
     ;; > 4)...";
     }
 
@@ -6220,7 +6116,6 @@ R"...(### min ###
     (display (min 4 3 2 1 2 3 4))
     
     ;; Output
-    ;;
     ;; > 1)...";
     }
   }
