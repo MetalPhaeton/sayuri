@@ -3283,7 +3283,7 @@ R"...(### list-remove ###
     ;; > (111 333))...";
     }
 
-    // %%% search
+    // %%% list-search
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
@@ -3319,13 +3319,13 @@ R"...(### list-remove ###
 
         return NewNil();
       };
-      AddNativeFunction(func, "search");
-      help_["search"] =
-R"...(### search ###
+      AddNativeFunction(func, "list-search");
+      help_["list-search"] =
+R"...(### list-search ###
 
 <h6> Usage </h6>
 
-* `(search <Object> <List>)`
+* `(list-search <Object> <List>)`
 
 <h6> Description </h6>
 
@@ -3337,8 +3337,8 @@ R"...(### search ###
 
     (define lst '(111 222 "Hello" #t))
     
-    (display (search "Hello" lst))
-    (display (search "World" lst))
+    (display (list-search "Hello" lst))
+    (display (list-search "World" lst))
     
     ;; Output
     ;; >  2
@@ -3969,6 +3969,71 @@ R"...(### + ###
     ;; > 6)...";
     }
 
+    // %%% +!
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) -> LispObjectPtr {
+        // 準備。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // シンボル名を得る。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        if (!(list_itr->IsSymbol())) {
+          throw GenWrongTypeError
+          (func_name, "Symbol", std::vector<int> {1}, false);
+        }
+        std::string symbol = list_itr->str_value_;
+
+        // 現在の値を得る。
+        LispObjectPtr ret_ptr = caller.Evaluate(*list_itr);
+
+        double value = 0.0;
+
+        int index = 1;
+        for (; list_itr; ++list_itr, ++index) {
+          LispObjectPtr result = caller.Evaluate(*list_itr);
+          if (!(result->IsNumber())) {
+            throw GenWrongTypeError
+            (func_name, "Number", std::vector<int> {index}, true);
+          }
+
+          value += result->number_value_;
+        }
+        caller.RewriteSymbol(symbol, NewNumber(value));
+        return ret_ptr;
+      };
+      AddNativeFunction(func, "+!");
+      help_["+!"] =
+R"...(### +! ###
+
+<h6> Usage </h6>
+
+* `(+! <Symbol> <Number>...)`
+
+<h6> Description </h6>
+
+* This is Special Form.
+    + The 1st argument must be Symbol bound with Number.
+    + `<Symbol>` is not evaluated.
+* Sums up `<Number>...` and adds it to `<Symbol>`.
+* Returns previous Number bound to `<Symbol>`.
+
+<h6> Example </h6>
+
+    (define n 5)
+    (display (+! n 3 4 5))  ;; Returns previous Number.
+    (display n)
+    
+    ;; Output
+    ;; > 5
+    :: > 17)...";
+    }
+
     // %%% -
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
@@ -4020,6 +4085,79 @@ R"...(### - ###
     ;; > -2)...";
     }
 
+    // %%% -!
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) ->LispObjectPtr {
+        // 準備。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // シンボル名を得る。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        if (!(list_itr->IsSymbol())) {
+          throw GenWrongTypeError
+          (func_name, "Symbol", std::vector<int> {1}, false);
+        }
+        std::string symbol = list_itr->str_value_;
+
+        // 現在の値を得る。
+        LispObjectPtr ret_ptr = caller.Evaluate(*list_itr);
+
+        double value = 0.0;
+
+        if (list_itr) {
+          LispObjectPtr result = caller.Evaluate(*(list_itr++));
+          if (!(result->IsNumber())) {
+            throw GenWrongTypeError
+            (func_name, "Number", std::vector<int> {1}, true);
+          }
+          value = result->number_value_;
+        }
+        int index = 2;
+        for (; list_itr; ++list_itr, ++index) {
+          LispObjectPtr result = caller.Evaluate(*list_itr);
+          if (!(result->IsNumber())) {
+            throw GenWrongTypeError
+            (func_name, "Number", std::vector<int> {index}, true);
+          }
+
+          value -= result->number_value_;
+        }
+        caller.RewriteSymbol(symbol, NewNumber(value));
+        return ret_ptr;
+      };
+      AddNativeFunction(func, "-!");
+      help_["-!"] =
+R"...(### -! ###
+
+<h6> Usage </h6>
+
+* `(-! <Symbol> <Number>...)`
+
+<h6> Description </h6>
+
+* This is Special Form.
+    + The 1st argument must be Symbol bound with Number.
+    + `<Symbol>` is not evaluated.
+* Subtracts `<Number>...` from `<Symbol>` and rewrite it to `<Symbol>`.
+* Returns previous Number bound to `<Symbol>`.
+
+<h6> Example </h6>
+
+    (define n 5)
+    (display (-! n 1 2))  ;; Returns previous Number.
+    (display n)
+    
+    ;; Output
+    ;; > 5
+    ;; > 2)...";
+    }
+
     // %%% *
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
@@ -4061,6 +4199,71 @@ R"...(### * ###
     ;; Output
     ;;
     ;; > 24)...";
+    }
+
+    // %%% *!
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) ->LispObjectPtr {
+        // 準備。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // シンボル名を得る。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        if (!(list_itr->IsSymbol())) {
+          throw GenWrongTypeError
+          (func_name, "Symbol", std::vector<int> {1}, false);
+        }
+        std::string symbol = list_itr->str_value_;
+
+        // 現在の値を得る。
+        LispObjectPtr ret_ptr = caller.Evaluate(*list_itr);
+
+        double value = 1.0;
+
+        int index = 1;
+        for (; list_itr; ++list_itr, ++index) {
+          LispObjectPtr result = caller.Evaluate(*list_itr);
+          if (!(result->IsNumber())) {
+            throw GenWrongTypeError
+            (func_name, "Number", std::vector<int> {index}, true);
+          }
+
+          value *= result->number_value_;
+        }
+        caller.RewriteSymbol(symbol, NewNumber(value));
+        return ret_ptr;
+      };
+      AddNativeFunction(func, "*!");
+      help_["*!"] =
+R"...(### *! ###
+
+<h6> Usage </h6>
+
+* `(*! <Symbol> <Number>...)`
+
+<h6> Description </h6>
+
+* This is Special Form.
+    + The 1st argument must be Symbol bound with Number.
+    + `<Symbol>` is not evaluated.
+* Multiplies `<Symbol>` and `<Number>...` and rewrite it to <Symbol>.
+* Returns previous Number bound to `<Symbol>`.
+
+<h6> Example </h6>
+
+    (define n 5)
+    (display (*! n 1 2))  ;; Returns previous Number.
+    (display n)
+    
+    ;; Output
+    ;; > 5
+    ;; > 10)...";
     }
 
     // %%% /
@@ -4114,6 +4317,79 @@ R"...(### / ###
     ;; > 4)...";
     }
 
+    // %%% /!
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) ->LispObjectPtr {
+        // 準備。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // シンボル名を得る。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        if (!(list_itr->IsSymbol())) {
+          throw GenWrongTypeError
+          (func_name, "Symbol", std::vector<int> {1}, false);
+        }
+        std::string symbol = list_itr->str_value_;
+
+        // 現在の値を得る。
+        LispObjectPtr ret_ptr = caller.Evaluate(*list_itr);
+
+        double value = 0.0;
+
+        if (list_itr) {
+          LispObjectPtr result = caller.Evaluate(*(list_itr++));
+          if (!(result->IsNumber())) {
+            throw GenWrongTypeError
+            (func_name, "Number", std::vector<int> {1}, true);
+          }
+          value = result->number_value_;
+        }
+        int index = 2;
+        for (; list_itr; ++list_itr, ++index) {
+          LispObjectPtr result = caller.Evaluate(*list_itr);
+          if (!(result->IsNumber())) {
+            throw GenWrongTypeError
+            (func_name, "Number", std::vector<int> {index}, true);
+          }
+
+          value /= result->number_value_;
+        }
+        caller.RewriteSymbol(symbol, NewNumber(value));
+        return ret_ptr;
+      };
+      AddNativeFunction(func, "/!");
+      help_["/!"] =
+R"...(### /! ###
+
+<h6> Usage </h6>
+
+* `(/! <Symbol> <Number>...)`
+
+<h6> Description </h6>
+
+* This is Special Form.
+    + The 1st argument must be Symbol bound with Number.
+    + `<Symbol>` is not evaluated.
+* Divides `<Symbol>` with `<Number>...` and rewrites it to `<Symbol>`.
+* Returns previous Number bound to `<Symbol>`.
+
+<h6> Example </h6>
+
+    (define n 6)
+    (display (/! n 2 3))  ;; Returns previous Number.
+    (display n)
+    
+    ;; Output
+    ;; > 6
+    ;; > 1)...";
+    }
+
     // %%% ++
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
@@ -4157,6 +4433,68 @@ R"...(### ++ ###
     ;; Output
     ;;
     ;; > 112)...";
+    }
+
+    // %%% ++!
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) ->LispObjectPtr {
+        // 準備。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // シンボル名を得る。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        if (!(list_itr->IsSymbol())) {
+          throw GenWrongTypeError
+          (func_name, "Symbol", std::vector<int> {1}, false);
+        }
+        std::string symbol = list_itr->str_value_;
+
+        // 現在の値を得る。
+        LispObjectPtr ret_ptr = caller.Evaluate(*list_itr);
+
+        // インクリメントして上書き。
+        caller.RewriteSymbol(symbol, NewNumber(ret_ptr->number_value_ + 1.0));
+
+        return ret_ptr;
+      };
+      LispObjectPtr func_ptr =
+      NewNativeFunction(global_ptr_->scope_chain_, func);
+      global_ptr_->BindSymbol("++!", func_ptr);
+      global_ptr_->BindSymbol("inc!", func_ptr);
+      std::string temp =
+R"...(### ++! ###
+
+<h6> Usage </h6>
+
+* `(++! <Symbol)`
+* `(inc! <Symbol>)`
+
+<h6> Description </h6>
+
+* This is Special Form.
+    + The 1st argument must be Symbol bound with Number.
+    + `<Symbol>` is not evaluated.
+* Increments `<Symbol>`.
+* Returns previous Number bound to `<Symbol>`.
+
+<h6> Example </h6>
+
+    (define i 111)
+    (display (++! i))
+    (display i)
+    
+    ;; Output
+    ;;
+    ;; > 111
+    ;; > 112)...";
+    help_["++!"] = temp;
+    help_["inc!"] = temp;
     }
 
     // %%% --
@@ -4204,7 +4542,7 @@ R"...(### -- ###
     ;; > 110)...";
     }
 
-    // %%% inc! 
+    // %%% --!
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
@@ -4213,116 +4551,57 @@ R"...(### -- ###
         std::string func_name = (list_itr++)->ToString();
         int required_args = 1;
 
-        // 第1引数をチェック。
+        // シンボル名を得る。
         if (!list_itr) {
           throw GenInsufficientArgumentsError
-          (func_name, required_args, false, list.Length() - 1);
+          (func_name, required_args, true, list.Length() - 1);
         }
-
-        // 第一引数はシンボルでなくてはならない。
         if (!(list_itr->IsSymbol())) {
           throw GenWrongTypeError
           (func_name, "Symbol", std::vector<int> {1}, false);
         }
+        std::string symbol = list_itr->str_value_;
 
-        // 第一シンボルにはNumberがバインドされていなくてはならない。
-        LispObjectPtr bound_ptr =
-        caller.ReferSymbol(list_itr->str_value_);
-        if (!(bound_ptr->IsNumber())) {
-          throw GenError("@not-number",
-          "\"" +  list_itr->str_value_ + "\" is not bound with Number.");
-        }
+        // 現在の値を得る。
+        LispObjectPtr ret_ptr = caller.Evaluate(*list_itr);
 
-        // バインドされているNumberをインクリメントする。
-        bound_ptr->number_value_ = bound_ptr->number_value_ + 1;
+        // デクリメントして上書き。
+        caller.RewriteSymbol(symbol, NewNumber(ret_ptr->number_value_ - 1.0));
 
-        // シンボルを改めて評価して返す。
-        return caller.Evaluate(*list_itr);
+        return ret_ptr;
       };
-      AddNativeFunction(func, "inc!");
-      help_["inc!"] =
-R"...(### inc! ###
+      LispObjectPtr func_ptr =
+      NewNativeFunction(global_ptr_->scope_chain_, func);
+      global_ptr_->BindSymbol("--!", func_ptr);
+      global_ptr_->BindSymbol("dec!", func_ptr);
+      std::string temp =
+R"...(### --! ###
 
 <h6> Usage </h6>
 
-* `(inc! <Symbol bound with Number : Symbol>)`
+* `(--! <Symbol)`
+* `(dec! <Symbol>)`
 
 <h6> Description </h6>
 
 * This is Special Form.
-    + Rewrites `<Symbol bound with Number>`.
-* Increments `<Symbol bound with Number>` and returns it.
+    + The 1st argument must be Symbol bound with Number.
+    + `<Symbol>` is not evaluated.
+* Decrements `<Symbol>`.
+* Returns previous Number bound to `<Symbol>`.
 
 <h6> Example </h6>
 
     (define i 111)
-    (display (inc! i))
+    (display (--! i))
     (display i)
     
     ;; Output
     ;;
-    ;; > 112
-    ;; > 112)...";
-    }
-
-    // %%% dec! 
-    {
-      auto func = [](LispObjectPtr self, const LispObject& caller,
-      const LispObject& list) ->LispObjectPtr {
-        // 準備。
-        LispIterator<false> list_itr {&list};
-        std::string func_name = (list_itr++)->ToString();
-        int required_args = 1;
-
-        // 第1引数をチェック。
-        if (!list_itr) {
-          throw GenInsufficientArgumentsError
-          (func_name, required_args, false, list.Length() - 1);
-        }
-
-        // 第一引数はシンボルでなくてはならない。
-        if (!(list_itr->IsSymbol())) {
-          throw GenWrongTypeError
-          (func_name, "Symbol", std::vector<int> {1}, false);
-        }
-
-        // 第一シンボルにはNumberがバインドされていなくてはならない。
-        LispObjectPtr bound_ptr = caller.ReferSymbol(list_itr->str_value_);
-        if (!(bound_ptr->IsNumber())) {
-          throw GenError("@not-number",
-          "\"" +  list_itr->str_value_ + "\" is not bound with Number.");
-        }
-
-        // バインドされているNumberをインクリメントする。
-        bound_ptr->number_value_ = bound_ptr->number_value_ - 1;
-
-        // シンボルを改めて評価して返す。
-        return caller.Evaluate(*list_itr);
-      };
-      AddNativeFunction(func, "dec!");
-      help_["dec!"] =
-R"...(### dec! ###
-
-<h6> Usage </h6>
-
-* `(dec! <Symbol bound with Number : Symbol>)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + Rewrites `<Symbol bound with Number>`.
-* Decrements `<Symbol bound with Number>` and returns it.
-
-<h6> Example </h6>
-
-    (define i 111)
-    (display (dec! i))
-    (display i)
-    
-    ;; Output
-    ;;
-    ;; > 110
+    ;; > 111
     ;; > 110)...";
+    help_["--!"] = temp;
+    help_["dec!"] = temp;
     }
 
     // %%% string-split
@@ -4549,6 +4828,77 @@ R"...(### push-front ###
     ;; > ("Hello" 111 222 333))...";
     }
 
+    // %%% push-front!
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) ->LispObjectPtr {
+        // 準備。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 2;
+
+        // シンボル名を得る。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        if (!(list_itr->IsSymbol())) {
+          throw GenWrongTypeError
+          (func_name, "Symbol", std::vector<int> {1}, false);
+        }
+        std::string symbol = list_itr->str_value_;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr first_ptr = caller.Evaluate(*(list_itr++));
+        if (!(first_ptr->IsList())) {
+          throw GenWrongTypeError
+          (func_name, "List", std::vector<int> {1}, true);
+        }
+
+        // 第2引数をチェック。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr second_ptr = caller.Evaluate(*list_itr);
+
+        // くっつけて上書き。
+        caller.RewriteSymbol(symbol, NewPair(second_ptr, first_ptr));
+
+        return first_ptr;
+      };
+      AddNativeFunction(func, "push-front!");
+      help_["push-front!"] =
+R"...(### push-front! ###
+
+<h6> Usage </h6>
+
+* `(push-front! <Symbol> <Object>)`
+
+<h6> Description </h6>
+
+* This is Special Form.
+    + The 1st argument must be Symbol bound with List.
+    + `<Symbol>` is not evaluated.
+* Appends to the top of List of `<Symbol>`.
+* Returns previous List bound to `<Symbol>`.
+
+<h6> Example </h6>
+
+    (define l '(111 222 333))
+    (display (push-front! l 444))  ;; Returns previous List.
+    (display l)
+    
+    ;; Outpu
+    ;;
+    ;; > (111 222 333)
+    ;; > (444 111 222 333))...";
+    }
+
     // %%% pop-front
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
@@ -4592,6 +4942,67 @@ R"...(### pop-front ###
     
     ;; Outpu
     ;;
+    ;; > (222 333))...";
+    }
+
+    // %%% pop-front!
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) ->LispObjectPtr {
+        // 準備。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // シンボル名を得る。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        if (!(list_itr->IsSymbol())) {
+          throw GenWrongTypeError
+          (func_name, "Symbol", std::vector<int> {1}, false);
+        }
+        std::string symbol = list_itr->str_value_;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr result = caller.Evaluate(*list_itr);
+        if (!(result->IsList())) {
+          throw GenWrongTypeError
+          (func_name, "List", std::vector<int> {1}, true);
+        }
+
+        caller.RewriteSymbol(symbol, result->cdr_->Clone());
+
+        return result;
+      };
+      AddNativeFunction(func, "pop-front!");
+      help_["pop-front!"] =
+R"...(### pop-front! ###
+
+<h6> Usage </h6>
+
+* `(pop-front! <Symbol>)`
+
+<h6> Description </h6>
+
+* This is Special Form.
+    + The 1st argument must be Symbol bound with List.
+* Pops out the 1st element of List of `<Symbol>`.
+* Returns previous List bound to `<Symbol>`.
+
+<h6> Example </h6>
+
+    (define l '(111 222 333))
+    (display (pop-front! l))
+    (display l)
+    
+    ;; Outpu
+    ;; > (111 222 333)
     ;; > (222 333))...";
     }
 
@@ -4648,6 +5059,78 @@ R"...(### push-back ###
     ;; > (111 222 333 "Hello"))...";
     }
 
+    // %%% push-back!
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) ->LispObjectPtr {
+        // 準備。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 2;
+
+        // シンボル名を得る。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        if (!(list_itr->IsSymbol())) {
+          throw GenWrongTypeError
+          (func_name, "Symbol", std::vector<int> {1}, false);
+        }
+        std::string symbol = list_itr->str_value_;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr first_ptr = caller.Evaluate(*(list_itr++));
+        if (!(first_ptr->IsList())) {
+          throw GenWrongTypeError
+          (func_name, "List", std::vector<int> {1}, true);
+        }
+
+        // 第2引数をチェック。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr second_ptr = caller.Evaluate(*list_itr);
+
+        // くっつけて上書き。
+        LispObjectPtr ret_ptr = first_ptr->Clone();
+        first_ptr->Append(NewPair(second_ptr, NewNil()));
+        caller.RewriteSymbol(symbol, first_ptr);
+
+        return ret_ptr;
+      };
+      AddNativeFunction(func, "push-back!");
+      help_["push-back!"] =
+R"...(### push-back ###
+
+<h6> Usage </h6>
+
+* `(push-back <List> <Object>)`
+
+<h6> Description </h6>
+
+* This is Special Form.
+    + The 1st argument must be Symbol bound with List.
+    + `<Symbol>` is not evaluated.
+* Appends to the tail of List of `<Symbol>`.
+* Returns previous List bound to `<Symbol>`.
+
+<h6> Example </h6>
+
+    (define l '(111 222 333))
+    (display (push-back! l 444))
+    (display l)
+    
+    ;; Outpu
+    ;; > (111 222 333)
+    ;; > (111 222 333 444))...";
+    }
+
     // %%% pop-back
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
@@ -4695,6 +5178,76 @@ R"...(### pop-back ###
     
     ;; Outpu
     ;;
+    ;; > (111 222))...";
+    }
+
+    // %%% pop-back!
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) ->LispObjectPtr {
+        // 準備。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // シンボル名を得る。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        if (!(list_itr->IsSymbol())) {
+          throw GenWrongTypeError
+          (func_name, "Symbol", std::vector<int> {1}, false);
+        }
+        std::string symbol = list_itr->str_value_;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr result = caller.Evaluate(*list_itr);
+        if (!(result->IsList())) {
+          throw GenWrongTypeError
+          (func_name, "List", std::vector<int> {1}, true);
+        }
+
+        // コピー。
+        LispObjectPtr ret_ptr = result->Clone();
+
+        if (result->IsPair()) {
+          LispIterator<true> current_itr {result.get()};
+          LispIterator<true> itr {result->cdr_.get()};
+          for (; itr; ++current_itr, ++itr) continue;
+          *(current_itr.current_) = LispObject();
+        }
+        caller.RewriteSymbol(symbol, result);
+
+        return ret_ptr;
+      };
+      AddNativeFunction(func, "pop-back!");
+      help_["pop-back!"] =
+R"...(### pop-back! ###
+
+<h6> Usage </h6>
+
+* `(pop-back! <Symbol>)`
+
+<h6> Description </h6>
+
+* This is Special Form.
+    + The 1st argument must be Symbol bound with List.
+* Pops out the last element of List of `<Symbol>`.
+* Returns previous List bound to `<Symbol>`.
+
+<h6> Example </h6>
+
+    (define l '(111 222 333))
+    (display (pop-back! l))
+    (display l)
+    
+    ;; Outpu
+    ;; > (111 222 333)
     ;; > (111 222))...";
     }
 
