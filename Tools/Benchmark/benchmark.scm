@@ -81,27 +81,24 @@
 
 ;; Mean.
 (define (mean li)
-  (/ (conval '+ li) (length li)))
+  (/ (apply '+ li) (length li)))
 
 ;; Dispersion.
 (define (var li)
   (define m (mean li))
-  (define sum 0)
-  (for (x li) (set! sum (+ sum (* (- x m) (- x m)))))
-  (/ sum (length li)))
+  (define (func x) (* (- x m) (- x m)))
+  (mean (map 'func li)))
 
 ;; Standard Deviation.
 (define (dev li) (sqrt (var li)))
 
 ;; Log.
-(define (log-2 x) (if (<= x 0.01) (log 0.01) (log x)))
 
 ;; Mode.
 (define (mode li)
-  (define i 0)
-  (define li-log ())
-  (for (x li) (set! li-log (cons (log-2 x) li-log )))
-  (exp (- (mean li-log) (var li-log))))
+  (define (func x) (if (<= x 0.01) (log 0.01) (log x)))
+  (define log-nums (map 'func li))
+  (exp (- (mean log-nums) (var log-nums))))
 
 ;; Listener.
 (define (output-listener message)
@@ -129,8 +126,8 @@
   ;; Time.
   (display "Time:")
   (display "    Mean: " (mean data-time))
-  (display "    Max: " (conval 'max data-time))
-  (display "    Min: " (conval 'min data-time))
+  (display "    Max: " (apply 'max data-time))
+  (display "    Min: " (apply 'min data-time))
   (display "    SDev: " (dev data-time))
   (display "    Mode: " (mode data-time))
 
@@ -139,8 +136,8 @@
   ;; Nodes.
   (display "Nodes:")
   (display "    Mean: " (mean data-nodes))
-  (display "    Max: " (conval 'max data-nodes))
-  (display "    Min: " (conval 'min data-nodes))
+  (display "    Max: " (apply 'max data-nodes))
+  (display "    Min: " (apply 'min data-nodes))
   (display "    SDev: " (dev data-nodes))
   (display "    Mode: " (mode data-nodes))
 
@@ -149,8 +146,8 @@
   ;; NPS
   (display "NPS:")
   (display "    Mean: " (mean data-nps))
-  (display "    Max: " (conval 'max data-nps))
-  (display "    Min: " (conval 'min data-nps))
+  (display "    Max: " (apply 'max data-nps))
+  (display "    Min: " (apply 'min data-nps))
   (display "    SDev: " (dev data-nps))
   (display "    Mode: " (mode data-nps))
 
@@ -159,8 +156,8 @@
   ;; Hash Full
   (display "Hash Full:")
   (display "    Mean: " (mean data-hashfull))
-  (display "    Max: " (conval 'max data-hashfull))
-  (display "    Min: " (conval 'min data-hashfull))
+  (display "    Max: " (apply 'max data-hashfull))
+  (display "    Min: " (apply 'min data-hashfull))
   (display "    SDev: " (dev data-hashfull))
   (display "    Mode: " (mode data-hashfull)))
 
