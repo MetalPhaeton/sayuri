@@ -31,7 +31,7 @@
 (define hash-size 512)
 
 ;; Number of repeat.
-(define repeat 3)
+(define repeat 30)
 
 ;; Position. (FEN)
 (define fen "r1bq1r1k/p1pnbpp1/1p2p3/6p1/3PB3/5N2/PPPQ1PPP/2KR3R w - - 0 1")
@@ -115,19 +115,19 @@
 
   ;; Configure.
   (display "Settings:")
-  (display "    Threads: " threads)
-  (display "    Hash Size:  " hash-size)
-  (display "    Repeat:  " repeat)
-  (display "    Position: " fen)
-  (display "    Depth: " depth)
+  (display "      Threads: " threads)
+  (display "    Hash Size: " hash-size)
+  (display "       Repeat: " repeat)
+  (display "     Position: " fen)
+  (display "        Depth: " depth)
 
   (display "")
 
   ;; Time.
   (display "Time:")
   (display "    Mean: " (mean data-time))
-  (display "    Max: " (apply 'max data-time))
-  (display "    Min: " (apply 'min data-time))
+  (display "     Max: " (apply 'max data-time))
+  (display "     Min: " (apply 'min data-time))
   (display "    SDev: " (dev data-time))
   (display "    Mode: " (mode data-time))
 
@@ -136,8 +136,8 @@
   ;; Nodes.
   (display "Nodes:")
   (display "    Mean: " (mean data-nodes))
-  (display "    Max: " (apply 'max data-nodes))
-  (display "    Min: " (apply 'min data-nodes))
+  (display "     Max: " (apply 'max data-nodes))
+  (display "     Min: " (apply 'min data-nodes))
   (display "    SDev: " (dev data-nodes))
   (display "    Mode: " (mode data-nodes))
 
@@ -146,8 +146,8 @@
   ;; NPS
   (display "NPS:")
   (display "    Mean: " (mean data-nps))
-  (display "    Max: " (apply 'max data-nps))
-  (display "    Min: " (apply 'min data-nps))
+  (display "     Max: " (apply 'max data-nps))
+  (display "     Min: " (apply 'min data-nps))
   (display "    SDev: " (dev data-nps))
   (display "    Mode: " (mode data-nps))
 
@@ -156,8 +156,8 @@
   ;; Hash Full
   (display "Hash Full:")
   (display "    Mean: " (mean data-hashfull))
-  (display "    Max: " (apply 'max data-hashfull))
-  (display "    Min: " (apply 'min data-hashfull))
+  (display "     Max: " (apply 'max data-hashfull))
+  (display "     Min: " (apply 'min data-hashfull))
   (display "    SDev: " (dev data-hashfull))
   (display "    Mode: " (mode data-hashfull)))
 
