@@ -61,23 +61,23 @@
 
 ;; Append time data.
 (define (append-time li)
-  (set! data-time
-    (cons (parse (ref li (++ (search "time" li)))) data-time)))
+  (push-back! data-time
+              (parse (ref li (++ (list-search "time" li))))))
 
 ;; Append nodes data.
 (define (append-nodes li)
-  (set! data-nodes
-    (cons (parse (ref li (++ (search "nodes" li)))) data-nodes)))
+  (push-back! data-nodes
+              (parse (ref li (++ (list-search "nodes" li))))))
 
 ;; Append nps data.
 (define (append-nps li)
-  (set! data-nps
-    (cons (parse (ref li (++ (search "nps" li)))) data-nps)))
+  (push-back! data-nps
+              (parse (ref li (++ (list-search "nps" li))))))
 
 ;; Append hashfull data.
 (define (append-hashfull li)
-  (set! data-hashfull
-    (cons (parse (ref li (++ (search "hashfull" li)))) data-hashfull)))
+  (push-back! data-hashfull
+              (parse (ref li (++ (list-search "hashfull" li))))))
 
 ;; Mean.
 (define (mean li)
