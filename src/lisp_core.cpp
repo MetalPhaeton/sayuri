@@ -3904,7 +3904,7 @@ R"...(### + ###
     ;; > 6)...";
     }
 
-    // %%% +!
+    // %%% add!
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
@@ -3942,13 +3942,13 @@ R"...(### + ###
         caller.RewriteSymbol(symbol, NewNumber(value));
         return ret_ptr;
       };
-      AddNativeFunction(func, "+!");
-      help_["+!"] =
-R"...(### +! ###
+      AddNativeFunction(func, "add!");
+      help_["add!"] =
+R"...(### add! ###
 
 <h6> Usage </h6>
 
-* `(+! <Symbol> <Number>...)`
+* `(add! <Symbol> <Number>...)`
 
 <h6> Description </h6>
 
@@ -3961,7 +3961,7 @@ R"...(### +! ###
 <h6> Example </h6>
 
     (define n 5)
-    (display (+! n 3 4 5))  ;; Returns previous Number.
+    (display (add! n 3 4 5))  ;; Returns previous Number.
     (display n)
     
     ;; Output
@@ -4019,7 +4019,7 @@ R"...(### - ###
     ;; > -2)...";
     }
 
-    // %%% -!
+    // %%% sub!
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
@@ -4065,13 +4065,13 @@ R"...(### - ###
         caller.RewriteSymbol(symbol, NewNumber(value));
         return ret_ptr;
       };
-      AddNativeFunction(func, "-!");
-      help_["-!"] =
-R"...(### -! ###
+      AddNativeFunction(func, "sub!");
+      help_["sub!"] =
+R"...(### sub! ###
 
 <h6> Usage </h6>
 
-* `(-! <Symbol> <Number>...)`
+* `(sub! <Symbol> <Number>...)`
 
 <h6> Description </h6>
 
@@ -4084,7 +4084,7 @@ R"...(### -! ###
 <h6> Example </h6>
 
     (define n 5)
-    (display (-! n 1 2))  ;; Returns previous Number.
+    (display (sub! n 1 2))  ;; Returns previous Number.
     (display n)
     
     ;; Output
@@ -4134,7 +4134,7 @@ R"...(### * ###
     ;; > 24)...";
     }
 
-    // %%% *!
+    // %%% mul!
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
@@ -4172,13 +4172,13 @@ R"...(### * ###
         caller.RewriteSymbol(symbol, NewNumber(value));
         return ret_ptr;
       };
-      AddNativeFunction(func, "*!");
-      help_["*!"] =
-R"...(### *! ###
+      AddNativeFunction(func, "mul!");
+      help_["mul!"] =
+R"...(### mul! ###
 
 <h6> Usage </h6>
 
-* `(*! <Symbol> <Number>...)`
+* `(mul! <Symbol> <Number>...)`
 
 <h6> Description </h6>
 
@@ -4191,7 +4191,7 @@ R"...(### *! ###
 <h6> Example </h6>
 
     (define n 5)
-    (display (*! n 1 2))  ;; Returns previous Number.
+    (display (mul! n 1 2))  ;; Returns previous Number.
     (display n)
     
     ;; Output
@@ -4249,7 +4249,7 @@ R"...(### / ###
     ;; > 4)...";
     }
 
-    // %%% /!
+    // %%% div!
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
@@ -4295,13 +4295,13 @@ R"...(### / ###
         caller.RewriteSymbol(symbol, NewNumber(value));
         return ret_ptr;
       };
-      AddNativeFunction(func, "/!");
-      help_["/!"] =
-R"...(### /! ###
+      AddNativeFunction(func, "div!");
+      help_["div!"] =
+R"...(### div! ###
 
 <h6> Usage </h6>
 
-* `(/! <Symbol> <Number>...)`
+* `(div! <Symbol> <Number>...)`
 
 <h6> Description </h6>
 
@@ -4314,7 +4314,7 @@ R"...(### /! ###
 <h6> Example </h6>
 
     (define n 6)
-    (display (/! n 2 3))  ;; Returns previous Number.
+    (display (div! n 2 3))  ;; Returns previous Number.
     (display n)
     
     ;; Output
@@ -4366,7 +4366,7 @@ R"...(### ++ ###
     ;; > 112)...";
     }
 
-    // %%% ++!
+    // %%% inc!
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
@@ -4394,17 +4394,13 @@ R"...(### ++ ###
 
         return ret_ptr;
       };
-      LispObjectPtr func_ptr =
-      NewNativeFunction(global_ptr_->scope_chain_, func);
-      global_ptr_->BindSymbol("++!", func_ptr);
-      global_ptr_->BindSymbol("inc!", func_ptr);
-      std::string temp =
-R"...(### ++! ###
+      AddNativeFunction(func, "inc!");
+      help_["inc!"] =
+R"...(### inc! ###
 
 <h6> Usage </h6>
 
-* `(++! <Symbol)`
-* `(inc! <Symbol>)`
+* `(inc! <Symbol)`
 
 <h6> Description </h6>
 
@@ -4417,14 +4413,12 @@ R"...(### ++! ###
 <h6> Example </h6>
 
     (define i 111)
-    (display (++! i))
+    (display (inc! i))
     (display i)
     
     ;; Output
     ;; > 111
     ;; > 112)...";
-    help_["++!"] = temp;
-    help_["inc!"] = temp;
     }
 
     // %%% --
@@ -4471,7 +4465,7 @@ R"...(### -- ###
     ;; > 110)...";
     }
 
-    // %%% --!
+    // %%% dec!
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
@@ -4499,17 +4493,13 @@ R"...(### -- ###
 
         return ret_ptr;
       };
-      LispObjectPtr func_ptr =
-      NewNativeFunction(global_ptr_->scope_chain_, func);
-      global_ptr_->BindSymbol("--!", func_ptr);
-      global_ptr_->BindSymbol("dec!", func_ptr);
-      std::string temp =
-R"...(### --! ###
+      AddNativeFunction(func, "dec!");
+      help_["dec!"] =
+R"...(### dec! ###
 
 <h6> Usage </h6>
 
-* `(--! <Symbol)`
-* `(dec! <Symbol>)`
+* `(dec! <Symbol)`
 
 <h6> Description </h6>
 
@@ -4522,14 +4512,12 @@ R"...(### --! ###
 <h6> Example </h6>
 
     (define i 111)
-    (display (--! i))
+    (display (dec! i))
     (display i)
     
     ;; Output
     ;; > 111
     ;; > 110)...";
-    help_["--!"] = temp;
-    help_["dec!"] = temp;
     }
 
     // %%% string-split
