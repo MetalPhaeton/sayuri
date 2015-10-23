@@ -31,7 +31,8 @@
 </ul></li>
 </ul>
 <div class="figure">
-<img src="res/diagram01.svg" alt="Using Pipe Image" /><p class="caption">Using Pipe Image</p>
+<img src="res/diagram01.svg" alt="Using Pipe Image" />
+<p class="caption">Using Pipe Image</p>
 </div>
 <h2 id="run-sayuri-with-sayulisp-mode">Run Sayuri with Sayulisp Mode</h2>
 <p>Run the following command.</p>
@@ -117,10 +118,9 @@
 <h3 id="flexible-arguments">Flexible Arguments</h3>
 <p>If you define functions with <code>(lambda)</code> or <code>(define)</code>, their arguments are flexible.</p>
 <p>For example, if you define a function that requires 2 arguments, the function can receive the less arguments or the more arguments than 2.<br />If the function has received 1 argument, then the 2nd argument in the function is Nil.<br />If the function has received 3 arguments, then the 3rd argument is ignored.</p>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>;; Define a function that requires 2 arguments.
 (define (my-func x y) (display x) (display y))
 
@@ -153,10 +153,9 @@ Example
 ;; &gt; ()</code></pre>
 <h3 id="variable-length-arguments">Variable Length Arguments</h3>
 <p>Sayulisp supports Variable Length Arguments.<br />Arguments of a function is automatically bound to '<code>$@</code>' as List in its local scope.</p>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>;; Define variables.
 (define first 111)
 (define second 222)
@@ -193,10 +192,9 @@ Example
 <li><code>(while)</code>: &quot;While Loop&quot;</li>
 <li><code>(for)</code>: &quot;Foreach Loop&quot;</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>;; --- While Loop --- ;;
 (define i 0)
 (while (&lt; i 5)
@@ -236,10 +234,9 @@ Example
 <h3 id="exception-handling">Exception Handling</h3>
 <p>Some functions throws an exception.<br />If you don't do anything, Sayulisp shows the error message and interpreter is stopped.</p>
 <p>But you can catch exception using <a href="core_functions.html#try"><code>(try)</code></a> function.</p>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(try ((+ 1 &quot;Hello&quot;))
      (display &quot;Error Occured!!&quot;))
 
@@ -252,10 +249,9 @@ Example
 ;; Output
 ;; &gt; (@not-number &quot;The 2nd argument of (+) didn&#39;t return Number.&quot;)</code></pre>
 <p>You can also throw an exception using <a href="core_functions.html#throw"><code>(throw)</code></a> function.</p>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(try ((throw 123))
      (display exception))
 
@@ -263,10 +259,9 @@ Example
 ;; &gt; 123</code></pre>
 <h3 id="importing-script-file">Importing Script File</h3>
 <p>Using <a href="core_functions.html#import"><code>(import)</code></a> function, Sayulisp reads and executes it.</p>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>;; When the following code is written in &#39;hello.scm&#39;
 ;;
 ;; (define a 111)
@@ -297,10 +292,9 @@ Example
 <li>Customize Search Function or Evaluation Function.</li>
 <li>Run the engine.</li>
 </ol>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>;; 1st.
 ;; Generate an engine.
 (define my-engine (gen-engine))
@@ -315,10 +309,9 @@ Example
 (my-engine &#39;@run)</code></pre>
 <h3 id="techniques">Techniques</h3>
 <p>The following example is how to define Class as Object Oriented Programming using Message Symbol Semantics.</p>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>;; Definition of &quot;my-class&quot;.
 (define my-class
   (lambda ()

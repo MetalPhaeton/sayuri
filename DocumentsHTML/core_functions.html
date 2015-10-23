@@ -59,11 +59,7 @@
 </ul></li>
 <li><a href="#predicate-functions">Predicate Functions</a>
 <ul>
-<li><a href="#equal"><code>equal?</code></a> : Judges whether they are same or not.
-<ul>
-<li><code>=</code></li>
-</ul></li>
-<li><a href="#not-equal"><code>!=</code></a> : Judges whether they are different.</li>
+<li><a href="#equal"><code>equal?</code></a> : Judges whether they are same or not.</li>
 <li><a href="#pair"><code>pair?</code></a> : Judges whether they are Pair or not.</li>
 <li><a href="#list"><code>list?</code></a> : Judges whether they are List or not.</li>
 <li><a href="#nil"><code>nil?</code></a> : Judges whether they are Nil or not.
@@ -97,51 +93,45 @@
 <hr />
 <h2 id="most-important-functions">Most Important Functions</h2>
 <h3 id="exit">exit</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(exit [&lt;Status : Number&gt;])</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Exits from Sayulisp.</li>
 <li><code>&lt;Status&gt;</code> is Exit Status. Default is '0'.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>;; Exit from Sayulisp.
 (exit)
 
 ;; Exit with EXIT_FAILURE.
 (exit 1)</code></pre>
 <h3 id="help">help</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ol style="list-style-type: decimal">
 <li><code>(help)</code></li>
 <li><code>(help &lt;String&gt;)</code></li>
 </ol>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>1: Returns descriptions of all help.</li>
 <li>2: Returns a description of <code>&lt;String&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (help &quot;car&quot;))
 
 ;; Output
@@ -164,24 +154,21 @@ Example
 ;; &gt;     ;;
 ;; &gt;     ;; &gt; 111</code></pre>
 <h3 id="eval">eval</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(eval &lt;Object&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Evaluates <code>&lt;Object&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define x &#39;(+ 1 2 3))
 (display x)
 (display (eval x))
@@ -190,17 +177,15 @@ Example
 ;; &gt; (+ 1 2 3)
 ;; &gt; 6</code></pre>
 <h3 id="quote">quote</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(quote &lt;Object&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -209,10 +194,9 @@ Description
 <li>Returns <code>&lt;Object&gt;</code> as is.</li>
 <li>Syntactic suger is <code>'&lt;Object&gt;</code></li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (quote (111 222 333)))
 
 ;; Output
@@ -231,18 +215,16 @@ Example
 ;; &gt; 123
 ;; &gt; Symbol: x</code></pre>
 <h3 id="define">define</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ol style="list-style-type: decimal">
 <li><code>(define &lt;Symbol&gt; &lt;Object&gt;)</code></li>
 <li><code>(define (&lt;Name : Symbol&gt; &lt;Args : Symbol&gt;...) &lt;S-Expression&gt;...)</code></li>
 </ol>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -253,10 +235,9 @@ Description
 <li>1: Binds <code>&lt;Object&gt;</code> to <code>&lt;Symbol&gt;</code>.</li>
 <li>2: Defines <code>&lt;S-Expression&gt;</code> as Function named <code>&lt;Name&gt;</code>, and <code>&lt;Args&gt;...</code> is names of its arguments.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define x 123)
 (display x)
 
@@ -269,17 +250,15 @@ Example
 ;; Output
 ;; &gt; 15</code></pre>
 <h3 id="set">set!</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(set! &lt;Symbol&gt; &lt;Object&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -287,10 +266,9 @@ Description
 </ul></li>
 <li>Updates <code>&lt;Symbol&gt;</code> to <code>&lt;Object&gt;</code> on the local scope.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define x 123)
 (set! x 456)
 (display x)
@@ -308,17 +286,15 @@ Example
 ;; &gt; 3
 ;; &gt; 4</code></pre>
 <h3 id="lambda">lambda</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(lambda (&lt;Args : Symbol&gt;...) &lt;S-Expression&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -328,10 +304,9 @@ Description
 <li>(lambda) inherits parent's scope and creates its own local scope. So using (lambda) in (lambda), you can create closure function.</li>
 <li><code>&lt;Args&gt;...</code> is Symbols as name of arguments.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define myfunc (lambda (x) (+ x 100)))
 (display (myfunc 5))
 
@@ -345,17 +320,15 @@ Example
 ;; Output
 ;; &gt; 150</code></pre>
 <h3 id="let">let</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(let ((&lt;Name : Symbol&gt; &lt;Object&gt;)...) &lt;S-Expression&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -366,10 +339,9 @@ Description
 <li>(let) inherits parent's scope and creates its own local scope. So using (lambda) in (let), you can create closure function.</li>
 <li><code>(&lt;Name&gt; &lt;Object&gt;)...</code> is local values on (let)'s local scope.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define (gen-func x y) (let ((a x) (b y))
           (lambda () (+ a b))))
 (define myfunc (gen-func 10 20))
@@ -378,24 +350,21 @@ Example
 ;; Output
 ;; &gt; 30</code></pre>
 <h3 id="begin">begin</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(begin &lt;S-Expression&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Executes <code>&lt;S-Expression&gt;...</code> in turns and returns last.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (begin
              (display &quot;Hello&quot;)
              (display &quot;World&quot;)))
@@ -405,10 +374,9 @@ Example
 ;; &gt; World
 ;; &gt; World</code></pre>
 <h3 id="parse">parse</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(parse &lt;S-Expression : String&gt;)</code></li>
 <li><code>(string-&gt;symbol &lt;S-Expression : String&gt;)</code></li>
@@ -416,53 +384,47 @@ Usage
 <li><code>(string-&gt;boolean &lt;S-Expression : String&gt;)</code></li>
 <li><code>(string-&gt;list &lt;S-Expression : String&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Parses <code>&lt;S-Expression&gt;</code> and generates a object.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (parse &quot;(1 2 3)&quot;))
 
 ;; Output
 ;; &gt; (1 2 3)</code></pre>
 <h3 id="parval">parval</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(parse &lt;S-Expression : String&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Parses and evaluates <code>&lt;S-Expression&gt;</code> and returns result.
 <ul>
 <li>It is similar to <code>(eval (parse &lt;S-Expression&gt;))</code>.</li>
 </ul></li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(parval &quot;(display \&quot;Hello\&quot;)(display \&quot;World\&quot;)&quot;)
 
 ;; Output
 ;; &gt; Hello
 ;; &gt; World</code></pre>
 <h3 id="to-string">to-string</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(to-string &lt;Object&gt;)</code></li>
 <li><code>(symbol-&gt;string &lt;Object&gt;)</code></li>
@@ -470,17 +432,15 @@ Usage
 <li><code>(boolean-&gt;string &lt;Object&gt;)</code></li>
 <li><code>(list-&gt;string &lt;Object&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Converts <code>&lt;Object&gt;</code> to S-Expression as String.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (to-string &#39;(1 2 3)))
 
 ;; Output
@@ -492,17 +452,15 @@ Example
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="try">try</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(try (&lt;Try Expr&gt;...) &lt;Catch Expr&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -513,10 +471,9 @@ Description
 <li>In a scope of <code>&lt;Catch Expr&gt;...</code>, 'exception' symbol is defined.</li>
 <li>Returns a evaluated last object.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(try ((+ 1 &quot;Hello&quot;))
      (display &quot;Error Occured!!&quot;))
 
@@ -529,49 +486,43 @@ Example
 ;; Output
 ;; &gt; (@not-number &quot;The 2nd argument of (+) didn&#39;t return Number.&quot;)</code></pre>
 <h3 id="throw">throw</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(throw &lt;Object&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Throws an exception.</li>
 <li>If you use this in (try) function, <code>&lt;Object&gt;</code> is bound to 'exception' symbol.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(try ((throw 123))
      (display exception))
 
 ;; Output
 ;; &gt; 123</code></pre>
 <h3 id="car">car</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(car &lt;Pair or List&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns Car value of <code>&lt;Pair or List&gt;</code></li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (car &#39;(111 . 222)))
 ;; Output
 ;; &gt; 111
@@ -581,24 +532,21 @@ Example
 ;; Output
 ;; &gt; 111</code></pre>
 <h3 id="cdr">cdr</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(cdr &lt;Pair or List&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns Cdr value of <code>&lt;Pair or List&gt;</code></li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (cdr &#39;(111 . 222)))
 ;; Output
 ;; &gt; 222
@@ -608,25 +556,21 @@ Example
 ;; Output
 ;; &gt; (222 333)</code></pre>
 <h3 id="cons">cons</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(cons &lt;Object 1&gt; &lt;Object 2&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns Pair. Car is <code>&lt;Object 1&gt;</code>, Cdr is <code>&lt;Object 2&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
-
 <pre><code>(display (cons 111 222))
 
 ;; Output
@@ -642,26 +586,23 @@ Example
 ;; Output
 ;; &gt; (444 555 666)</code></pre>
 <h3 id="apply">apply</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(apply &lt;Object 1&gt; &lt;Object 2&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Constructs Pair and evaluates it.</li>
 <li><code>&lt;Object 1&gt;</code> is Car, <code>&lt;Object 2&gt;</code> is Cdr.</li>
 <li>It is same as <code>(eval (cons &lt;Object 1&gt; &lt;Object 2&gt;))</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define a &#39;(1 2 3))
 
 (display (apply &#39;+ a))
@@ -670,17 +611,15 @@ Example
 ;; &gt; 6</code></pre>
 <h2 id="conditional-branch-functions">Conditional Branch Functions</h2>
 <h3 id="if">if</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(if &lt;Condition : Boolean&gt; &lt;Then&gt; &lt;Else&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -688,26 +627,23 @@ Description
 </ul></li>
 <li>If <code>&lt;Condition&gt;</code> is true, then (if) evaluates <code>&lt;Then&gt;</code>. If false, then it evaluates <code>&lt;Else&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (if (&lt; 1 2) (+ 3 4) (+ 5 6)))
 
 ;; Output
 ;; &gt; 7</code></pre>
 <h3 id="cond">cond</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(cond (&lt;Condition : Boolean&gt; &lt;Then&gt;)... (else &lt;Else&gt;))</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -717,10 +653,9 @@ Description
 <li>If <code>&lt;Condition&gt;</code> is true, then (cond) returns <code>&lt;Then&gt;</code>. If false, then it evaluates next <code>&lt;Condition&gt;</code>.</li>
 <li>If all <code>&lt;Condition&gt;</code> are false, then (cond) returns <code>&lt;Else&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(cond
     ((&gt; 1 2) (display &quot;Hello&quot;))
     ((&lt; 3 4) (display &quot;World&quot;))
@@ -730,280 +665,223 @@ Example
 ;; &gt; World</code></pre>
 <h2 id="predicate-functions">Predicate Functions</h2>
 <h3 id="equal">equal?</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(equal? &lt;Object&gt;...)</code></li>
-<li><code>(= &lt;Object&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if all <code>&lt;Object&gt;...</code> are same structure. Otherwise, returns #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (equal? &#39;(1 2 (3 4) 5) &#39;(1 2 (3 4) 5)))
 
 ;; Output
 ;; &gt; #t</code></pre>
-<h3 id="not-equal">!=</h3>
-<h6> 
-Usage
-</h6>
-
-<ul>
-<li><code>(!= &lt;Object&gt;...)</code></li>
-</ul>
-<h6> 
-Description
-</h6>
-
-<ul>
-<li>Returns #t if all <code>&lt;Object&gt;...</code> are different structure. Otherwise, returns #f.</li>
-</ul>
-<h6> 
-Example
-</h6>
-
-<pre><code>(display (!= &#39;(1 2 (3 4) 5) &#39;(1 2 (3 4) 5)))
-
-;; Output
-;; &gt; #f</code></pre>
 <h3 id="pair">pair?</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(pair? &lt;Object&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if all <code>&lt;Object&gt;...</code> are Pair. Otherwise, returns #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (pair? &#39;(1 2 3) &#39;(4 5 6)))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="list">list?</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(list? &lt;Object&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if all <code>&lt;Object&gt;...</code> are List. Otherwise, returns #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (list? &#39;(1 2 3) &#39;(4 5 6) ()))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="nil">nil?</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(nil? &lt;Object&gt;...)</code></li>
 <li><code>(null? &lt;Object&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if all <code>&lt;Object&gt;...</code> are Nil. Otherwise, returns #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (nil? ()))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="symbol">symbol?</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(symbol? &lt;Object&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if all <code>&lt;Object&gt;...</code> are Symbol. Otherwise, returns #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (symbol? &#39;x))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="number">number?</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(number? &lt;Object&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if all <code>&lt;Object&gt;...</code> are Number. Otherwise, returns #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (number? 123))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="boolean">boolean?</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(boolean? &lt;Object&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if all <code>&lt;Object&gt;...</code> are Boolean. Otherwise, returns #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (boolean? #f))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="string">string?</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(string? &lt;Object&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if all <code>&lt;Object&gt;...</code> are String. Otherwise, returns #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (string? &quot;Hello&quot;))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="function">function?</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(function? &lt;Object&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if all <code>&lt;Object&gt;...</code> are Function. Otherwise, returns #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define myfunc (lambda (x) (+ x 1)))
 (display (function? myfunc))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="native-function">native-function?</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(native-function? &lt;Object&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if all <code>&lt;Object&gt;...</code> are Native Function. Otherwise, returns #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (native-function? +))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="procedure">procedure?</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(procedure? &lt;Object&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if all <code>&lt;Object&gt;...</code> are Function or Native Function. Otherwise, returns #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define myfunc (lambda (x) (+ x 1)))
 (display (procedure? myfunc))
 
@@ -1016,26 +894,23 @@ Example
 ;; &gt; #t</code></pre>
 <h2 id="looping">Looping</h2>
 <h3 id="while">while</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(while &lt;Condition : Boolean&gt; &lt;S-Expression&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.</li>
 <li>While <code>&lt;Condition&gt;</code> is #t, it iterates <code>&lt;S-Expression&gt;...</code>.</li>
 <li>Returns Object returned by the last S-Expression.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define i 0)
 (while (&lt; i 5)
     (display &quot;Hello &quot; i)
@@ -1054,17 +929,15 @@ Example
 ;; &gt; Hello 4
 ;; &gt; World 4</code></pre>
 <h3 id="for">for</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(for (&lt;Variable : Symbol&gt; &lt;List | String&gt;) &lt;S-Expression&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -1076,10 +949,9 @@ Description
 </ul></li>
 <li>Returns Object returned by the last S-Expression.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define aaa &#39;(1 2 3 4 5))
 
 (for (x aaa)
@@ -1107,24 +979,21 @@ Example
 ;; &gt; o</code></pre>
 <h2 id="io-stream-functions">IO Stream Functions</h2>
 <h3 id="display">display</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(display &lt;Object&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Prints <code>&lt;Object&gt;</code> on Standard Output.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define x 123)
 (display x)
 
@@ -1137,17 +1006,15 @@ Example
 ;; Output
 ;; &gt; x is 123</code></pre>
 <h3 id="stdin">stdin</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(stdin &lt;Message Symbol&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns String from Standard Input.</li>
 <li><code>&lt;Message Symbol&gt;</code> is a message to the input stream.
@@ -1158,10 +1025,9 @@ Description
 </ul></li>
 <li>If Standard Input is already closed, it returns Nil.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>;; Reads and shows one charactor from Standard Input.
 (display (stdin &#39;@get))
 
@@ -1171,73 +1037,64 @@ Example
 ;; Reads and shows all from Standard Input.
 (display (stdin &#39;@read))</code></pre>
 <h3 id="stdout">stdout</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(stdout &lt;String&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Prints <code>&lt;String&gt;</code> on Standard Output.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(stdout (to-string 123))
 (stdout &quot;\n&quot;)
 
 ;; Output
 ;; &gt; 123</code></pre>
 <h3 id="stderr">stderr</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(stderr &lt;String&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Prints <code>&lt;String&gt;</code> on Standard Error.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(stderr (to-string 123))
 (stderr &quot;\n&quot;)
 
 ;; Output
 ;; &gt; 123</code></pre>
 <h3 id="import">import</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(import &lt;File name : String&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Reads <code>&lt;File name&gt;</code> and executes it.</li>
 <li>Returns the last evaluated Object of <code>&lt;File name&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>;; When the following code is written in &#39;hello.scm&#39;
 ;;
 ;; (define a 111)
@@ -1253,27 +1110,24 @@ Example
 :: &gt; a: 111
 :: &gt; b: 222</code></pre>
 <h3 id="output-stream">output-stream</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ol style="list-style-type: decimal">
 <li><code>(output-stream &lt;File name : String&gt;)</code></li>
 <li><code>((output-stream &lt;File name : String&gt;) &lt;String&gt;)</code></li>
 </ol>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>1: Returns Native Function as an output stream of <code>&lt;File name&gt;</code>.</li>
 <li>2: Writes <code>&lt;String&gt;</code> to <code>&lt;File name&gt;</code> and returns itself.</li>
 <li>If you give Nil to the Function, the stream will be closed.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>;; Opens &quot;hello.txt&quot;.
 (define myfile (output-stream &quot;hello.txt&quot;))
 
@@ -1283,18 +1137,16 @@ Example
 ;; Closes &quot;hello.txt&quot;.
 (myfile ())</code></pre>
 <h3 id="input-stream">input-stream</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ol style="list-style-type: decimal">
 <li><code>(input-stream &lt;File name : String&gt;)</code></li>
 <li><code>((input-stream &lt;File name : String&gt;) &lt;Message Symbol : Symbol&gt;)</code></li>
 </ol>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>1: Returns Native Function as an input stream of <code>&lt;File name&gt;</code>.</li>
 <li>2: Returns String from <code>&lt;File name&gt;</code>.</li>
@@ -1307,10 +1159,9 @@ Description
 <li>If you give Nil to the stream, it will be closed.</li>
 <li>If the stream already closed, it returns empty string.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>;; Opens &quot;hello.txt&quot;.
 (define myfile (input-stream &quot;hello.txt&quot;))
 
