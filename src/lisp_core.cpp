@@ -2090,17 +2090,13 @@ R"...(### import ###
 
         return NewBoolean(true);
       };
-      LispObjectPtr func_ptr =
-      NewNativeFunction(global_ptr_->scope_chain_, func);
-      global_ptr_->BindSymbol("equal?", func_ptr);
-      global_ptr_->BindSymbol("=", func_ptr);
-      std::string temp =
+      AddNativeFunction(func, "equal?");
+      help_["equal?"] =
 R"...(### equal? ###
 
 <h6> Usage </h6>
 
 * `(equal? <Object>...)`
-* `(= <Object>...)`
 
 <h6> Description </h6>
 
@@ -2113,52 +2109,6 @@ R"...(### equal? ###
     
     ;; Output
     ;; > #t)...";
-      help_["equal?"] = temp;
-      help_["="] = temp;
-    }
-
-    // %%% !=
-    {
-      auto func = [](LispObjectPtr self, const LispObject& caller,
-      const LispObject& list) -> LispObjectPtr {
-        // 準備。
-        LispIterator<false> list_itr {&list};
-        std::string func_name = (list_itr++)->ToString();
-        int required_args = 1;
-
-        if (!list_itr) {
-          throw GenInsufficientArgumentsError
-          (func_name, required_args, true, list.Length() - 1);
-        }
-        LispObjectPtr first_ptr = caller.Evaluate(*(list_itr++));
-
-        // 比較。
-        for (; list_itr; ++list_itr) {
-          LispObjectPtr result = caller.Evaluate(*list_itr);
-          if (*first_ptr != *result) return NewBoolean(true);
-        }
-
-        return NewBoolean(false);
-      };
-      AddNativeFunction(func, "!=");
-      help_["!="] =
-R"...(### != ###
-
-<h6> Usage </h6>
-
-* `(!= <Object>...)`
-
-<h6> Description </h6>
-
-* Returns #t if all `<Object>...` are different structure.
-  Otherwise, returns #f.
-
-<h6> Example </h6>
-
-    (display (!= '(1 2 (3 4) 5) '(1 2 (3 4) 5)))
-    
-    ;; Output
-    ;; > #f)...";
     }
 
     // %%% pair?
@@ -3482,6 +3432,122 @@ R"...(### length ###
     ;; > 6)...";
     }
 
+    // %%% =
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) -> LispObjectPtr {
+        // 準備。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 最初の数字を得る。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        LispObjectPtr result = caller.Evaluate(*(list_itr++));
+        if (!(result->IsNumber())) {
+          throw GenWrongTypeError
+          (func_name, "Number", std::vector<int> {1}, true);
+        }
+        double first = result->number_value_;
+
+        // 2つ目以降の引数と比較する。
+        int index = 2;
+        for (; list_itr; ++list_itr, ++index) {
+          // 調べたい数字を得る。
+          LispObjectPtr current_ptr = caller.Evaluate(*list_itr);
+          if (!(current_ptr->IsNumber())) {
+            throw GenWrongTypeError
+            (func_name, "Number", std::vector<int> {index}, true);
+          }
+
+          // 比較。
+          if (first != current_ptr->number_value_) return NewBoolean(false);
+        }
+
+        return NewBoolean(true);
+      };
+      AddNativeFunction(func, "=");
+      help_["="] =
+R"...(### = ###
+
+<h6> Usage </h6>
+
+* `(= <Number>...)`
+
+<h6> Description </h6>
+
+* Returns #t if the 1st Number equals the others.
+  Otherwise, return #f.
+
+<h6> Example </h6>
+
+    (display (= 111 111 111))
+    
+    ;; Output
+    ;; > #t)...";
+    }
+
+    // %%% ~=
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) -> LispObjectPtr {
+        // 準備。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 最初の数字を得る。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        LispObjectPtr result = caller.Evaluate(*(list_itr++));
+        if (!(result->IsNumber())) {
+          throw GenWrongTypeError
+          (func_name, "Number", std::vector<int> {1}, true);
+        }
+        double first = result->number_value_;
+
+        // 2つ目以降の引数と比較する。
+        int index = 2;
+        for (; list_itr; ++list_itr, ++index) {
+          // 調べたい数字を得る。
+          LispObjectPtr current_ptr = caller.Evaluate(*list_itr);
+          if (!(current_ptr->IsNumber())) {
+            throw GenWrongTypeError
+            (func_name, "Number", std::vector<int> {index}, true);
+          }
+
+          // 比較。
+          if (first != current_ptr->number_value_) return NewBoolean(true);
+        }
+
+        return NewBoolean(false);
+      };
+      AddNativeFunction(func, "~=");
+      help_["~="] =
+R"...(### ~= ###
+
+<h6> Usage </h6>
+
+* `(~= <Number>...)`
+
+<h6> Description </h6>
+
+* Returns #f if the 1st Number equals the others.
+  Otherwise, return #t.
+
+<h6> Example </h6>
+
+    (display (~= 111 111 111))
+    
+    ;; Output
+    ;; > #f)...";
+    }
+
     // %%% <
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
@@ -3904,7 +3970,7 @@ R"...(### + ###
     ;; > 6)...";
     }
 
-    // %%% +!
+    // %%% add!
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) -> LispObjectPtr {
@@ -3942,13 +4008,13 @@ R"...(### + ###
         caller.RewriteSymbol(symbol, NewNumber(value));
         return ret_ptr;
       };
-      AddNativeFunction(func, "+!");
-      help_["+!"] =
-R"...(### +! ###
+      AddNativeFunction(func, "add!");
+      help_["add!"] =
+R"...(### add! ###
 
 <h6> Usage </h6>
 
-* `(+! <Symbol> <Number>...)`
+* `(add! <Symbol> <Number>...)`
 
 <h6> Description </h6>
 
@@ -3961,7 +4027,7 @@ R"...(### +! ###
 <h6> Example </h6>
 
     (define n 5)
-    (display (+! n 3 4 5))  ;; Returns previous Number.
+    (display (add! n 3 4 5))  ;; Returns previous Number.
     (display n)
     
     ;; Output
@@ -4019,7 +4085,7 @@ R"...(### - ###
     ;; > -2)...";
     }
 
-    // %%% -!
+    // %%% sub!
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
@@ -4065,13 +4131,13 @@ R"...(### - ###
         caller.RewriteSymbol(symbol, NewNumber(value));
         return ret_ptr;
       };
-      AddNativeFunction(func, "-!");
-      help_["-!"] =
-R"...(### -! ###
+      AddNativeFunction(func, "sub!");
+      help_["sub!"] =
+R"...(### sub! ###
 
 <h6> Usage </h6>
 
-* `(-! <Symbol> <Number>...)`
+* `(sub! <Symbol> <Number>...)`
 
 <h6> Description </h6>
 
@@ -4084,7 +4150,7 @@ R"...(### -! ###
 <h6> Example </h6>
 
     (define n 5)
-    (display (-! n 1 2))  ;; Returns previous Number.
+    (display (sub! n 1 2))  ;; Returns previous Number.
     (display n)
     
     ;; Output
@@ -4134,7 +4200,7 @@ R"...(### * ###
     ;; > 24)...";
     }
 
-    // %%% *!
+    // %%% mul!
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
@@ -4172,13 +4238,13 @@ R"...(### * ###
         caller.RewriteSymbol(symbol, NewNumber(value));
         return ret_ptr;
       };
-      AddNativeFunction(func, "*!");
-      help_["*!"] =
-R"...(### *! ###
+      AddNativeFunction(func, "mul!");
+      help_["mul!"] =
+R"...(### mul! ###
 
 <h6> Usage </h6>
 
-* `(*! <Symbol> <Number>...)`
+* `(mul! <Symbol> <Number>...)`
 
 <h6> Description </h6>
 
@@ -4191,7 +4257,7 @@ R"...(### *! ###
 <h6> Example </h6>
 
     (define n 5)
-    (display (*! n 1 2))  ;; Returns previous Number.
+    (display (mul! n 1 2))  ;; Returns previous Number.
     (display n)
     
     ;; Output
@@ -4249,7 +4315,7 @@ R"...(### / ###
     ;; > 4)...";
     }
 
-    // %%% /!
+    // %%% div!
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
@@ -4295,13 +4361,13 @@ R"...(### / ###
         caller.RewriteSymbol(symbol, NewNumber(value));
         return ret_ptr;
       };
-      AddNativeFunction(func, "/!");
-      help_["/!"] =
-R"...(### /! ###
+      AddNativeFunction(func, "div!");
+      help_["div!"] =
+R"...(### div! ###
 
 <h6> Usage </h6>
 
-* `(/! <Symbol> <Number>...)`
+* `(div! <Symbol> <Number>...)`
 
 <h6> Description </h6>
 
@@ -4314,7 +4380,7 @@ R"...(### /! ###
 <h6> Example </h6>
 
     (define n 6)
-    (display (/! n 2 3))  ;; Returns previous Number.
+    (display (div! n 2 3))  ;; Returns previous Number.
     (display n)
     
     ;; Output
@@ -4366,7 +4432,7 @@ R"...(### ++ ###
     ;; > 112)...";
     }
 
-    // %%% ++!
+    // %%% inc!
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
@@ -4394,17 +4460,13 @@ R"...(### ++ ###
 
         return ret_ptr;
       };
-      LispObjectPtr func_ptr =
-      NewNativeFunction(global_ptr_->scope_chain_, func);
-      global_ptr_->BindSymbol("++!", func_ptr);
-      global_ptr_->BindSymbol("inc!", func_ptr);
-      std::string temp =
-R"...(### ++! ###
+      AddNativeFunction(func, "inc!");
+      help_["inc!"] =
+R"...(### inc! ###
 
 <h6> Usage </h6>
 
-* `(++! <Symbol)`
-* `(inc! <Symbol>)`
+* `(inc! <Symbol)`
 
 <h6> Description </h6>
 
@@ -4417,14 +4479,12 @@ R"...(### ++! ###
 <h6> Example </h6>
 
     (define i 111)
-    (display (++! i))
+    (display (inc! i))
     (display i)
     
     ;; Output
     ;; > 111
     ;; > 112)...";
-    help_["++!"] = temp;
-    help_["inc!"] = temp;
     }
 
     // %%% --
@@ -4471,7 +4531,7 @@ R"...(### -- ###
     ;; > 110)...";
     }
 
-    // %%% --!
+    // %%% dec!
     {
       auto func = [](LispObjectPtr self, const LispObject& caller,
       const LispObject& list) ->LispObjectPtr {
@@ -4499,17 +4559,13 @@ R"...(### -- ###
 
         return ret_ptr;
       };
-      LispObjectPtr func_ptr =
-      NewNativeFunction(global_ptr_->scope_chain_, func);
-      global_ptr_->BindSymbol("--!", func_ptr);
-      global_ptr_->BindSymbol("dec!", func_ptr);
-      std::string temp =
-R"...(### --! ###
+      AddNativeFunction(func, "dec!");
+      help_["dec!"] =
+R"...(### dec! ###
 
 <h6> Usage </h6>
 
-* `(--! <Symbol)`
-* `(dec! <Symbol>)`
+* `(dec! <Symbol)`
 
 <h6> Description </h6>
 
@@ -4522,14 +4578,12 @@ R"...(### --! ###
 <h6> Example </h6>
 
     (define i 111)
-    (display (--! i))
+    (display (dec! i))
     (display i)
     
     ;; Output
     ;; > 111
     ;; > 110)...";
-    help_["--!"] = temp;
-    help_["dec!"] = temp;
     }
 
     // %%% string-split

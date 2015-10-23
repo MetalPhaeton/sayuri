@@ -58,6 +58,8 @@
 </ul></li>
 <li><a href="#comparision-function">Comparison Function</a>
 <ul>
+<li><a href="#equal"><code>=</code></a> : Judges whether all Numbers are equal.</li>
+<li><a href="#not-equal"><code>~=</code></a> : Judges whether all Numbers are not equal.</li>
 <li><a href="#less-than"><code>&lt;</code></a> : Judges whether a Number is less than the next Number or not.</li>
 <li><a href="#less-equal"><code>&lt;=</code></a> : Judges whether a Number is less than or equals to the next Number or not.</li>
 <li><a href="#greater-than"><code>&gt;</code></a> : Judges whether a Number is greater than the next Number or not.</li>
@@ -73,12 +75,12 @@
 <li><a href="#div"><code>/</code></a> : Calculates division.</li>
 <li><a href="#inc"><code>++</code></a> : Increment.</li>
 <li><a href="#dec"><code>--</code></a> : Decrement.</li>
-<li><a href="#add2"><code>+!</code></a> : Calculates addition and rewrites.</li>
-<li><a href="#sub2"><code>-!</code></a> : Calculates subtraction and rewrites.</li>
-<li><a href="#mul2"><code>*!</code></a> : Calculates multiplication and rewrites.</li>
-<li><a href="#div2"><code>/!</code></a> : Calculates division and rewrites.</li>
-<li><a href="#inc2"><code>++!</code></a> : Increment and rewrites.</li>
-<li><a href="#dec2"><code>--!</code></a> : Decrement and rewrites.</li>
+<li><a href="#add2"><code>add!</code></a> : Calculates addition and rewrites.</li>
+<li><a href="#sub2"><code>sub!</code></a> : Calculates subtraction and rewrites.</li>
+<li><a href="#mul2"><code>mul!</code></a> : Calculates multiplication and rewrites.</li>
+<li><a href="#div2"><code>div!</code></a> : Calculates division and rewrites.</li>
+<li><a href="#inc2"><code>inc!</code></a> : Increment and rewrites.</li>
+<li><a href="#dec2"><code>dec!</code></a> : Decrement and rewrites.</li>
 </ul></li>
 <li><a href="#mathematics-function">Mathematics Function</a>
 <ul>
@@ -113,10 +115,9 @@
 <hr />
 <h2 id="vector-value-functions">Vector Value Functions</h2>
 <h3 id="append">append</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ol style="list-style-type: decimal">
 <li><code>(append &lt;List&gt; &lt;Object&gt;...)</code></li>
 <li><code>(append &lt;String&gt; &lt;Object&gt;...)</code></li>
@@ -124,18 +125,16 @@ Usage
 <ul>
 <li>or <code>(string-append &lt;String&gt; &lt;Object&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ol style="list-style-type: decimal">
 <li>If the 1st argument is List, appends <code>&lt;Object&gt;...</code> to its Cdr.</li>
 <li>If the 1st argument is String, converts <code>&lt;Object&gt;...</code> into String and concatenates them.</li>
 </ol>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (append &#39;(111 222) &#39;(333 444) &#39;(555 666) 777))
 
 ;; Output
@@ -146,10 +145,9 @@ Example
 ;; Output
 ;; &gt; &quot;Hello 111 World&quot;;</code></pre>
 <h3 id="ref">ref</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ol style="list-style-type: decimal">
 <li><code>(ref &lt;List&gt; &lt;Index : Number&gt;)</code></li>
 </ol>
@@ -162,10 +160,9 @@ Usage
 <ul>
 <li>or <code>(string-ref &lt;String&gt; &lt;Index : Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ol style="list-style-type: decimal">
 <li>If the 1st argument is List, returns a element of <code>&lt;Index&gt;</code>th <code>&lt;List&gt;</code>.</li>
 <li>If the 1st argument is String, returns a letter of <code>&lt;Index&gt;</code>th <code>&lt;String&gt;</code>.</li>
@@ -174,10 +171,9 @@ Description
 <li>The index of 1st element is 0.</li>
 <li>If <code>&lt;Index&gt;</code> is negative number, It counts from the tail of <code>&lt;List | String&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (ref &#39;(111 222 333) 1))
 
 ;; Output
@@ -198,146 +194,128 @@ Example
 ;; Output
 ;; &gt; &quot;r&quot;</code></pre>
 <h3 id="range">range</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(range &lt;Size : Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns List composed with 0...(<code>&lt;Size&gt;</code> - 1).</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (range 10))
 
 ;; Output
 ;; &gt; (0 1 2 3 4 5 6 7 8 9)</code></pre>
 <h3 id="length">length</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(length &lt;List&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns number of <code>&lt;List&gt;</code>.</li>
 <li>If you input Atom, it returns '1'. If Nil, it returns '0'.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (length &#39;(111 222 333 444 555 666)))
 
 ;; Output
 ;; &gt; 6</code></pre>
 <h3 id="list">list</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(list &lt;Object&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns List composed of <code>&lt;Object&gt;...</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (list 111 222 333))
 
 ;; Output
 ;; &gt; (111 222 333)</code></pre>
 <h3 id="list-replace">list-replace</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(list-replace &lt;List&gt; &lt;Index : Number&gt; &lt;Object&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns List which has replaced the <code>&lt;Index&gt;</code>th element of <code>&lt;List&gt;</code> for <code>&lt;Object&gt;</code>.</li>
 <li>The 1st element of <code>&lt;List&gt;</code> is '0'.</li>
 <li>If <code>&lt;Index&gt;</code> is negative number,&quot; It counts from the tail of <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define lst (list 111 222 333))
 (display (list-replace lst 1 &quot;Hello&quot;))
 
 ;; Output
 ;; &gt; (111 &quot;Hello&quot; 333)</code></pre>
 <h3 id="list-remove">list-remove</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(list-remove &lt;List&gt; &lt;Index : Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns List which has removed the <code>&lt;Index&gt;</code>th element of <code>&lt;List&gt;</code>.</li>
 <li>The 1st element of <code>&lt;List&gt;</code> is '0'.</li>
 <li>If <code>&lt;Index&gt;</code> is negative number,&quot; It counts from the tail of <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define lst (list 111 222 333))
 (display (list-remove lst 1))
 
 ;; Output
 ;; &gt; (111 333)</code></pre>
 <h3 id="list-search">list-search</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(list-search &lt;Object&gt; &lt;List&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>If <code>&lt;List&gt;</code> has an object same as <code>&lt;Object&gt;</code>, it returns index number of the object.<br /> Otherwise it returns Nil.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define lst &#39;(111 222 &quot;Hello&quot; #t))
 
 (display (list-search &quot;Hello&quot; lst))
@@ -347,27 +325,24 @@ Example
 ;; &gt;  2
 ;; &gt; ()</code></pre>
 <h3 id="map">map</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(map &lt;Function : Symbol or Function&gt; &lt;Argument list : List&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Applies <code>&lt;Function&gt;</code> to <code>&lt;Argument List&gt;...</code> iteratively and returns List composed with returned object by <code>&lt;Function&gt;</code>.
 <ul>
 <li>It looks like addition of Linear Algebra. See Example.</li>
 </ul></li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (map &#39;+ &#39;(1 2 3 4 5)
                  &#39;(10 20 30 40 50)
                  &#39;(100 200 300 400 500)))
@@ -381,179 +356,156 @@ Example
 ;; Output
 ;; &gt; (111 222 333 444 555)</code></pre>
 <h3 id="string-split">string-split</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(string-split &lt;String&gt; &lt;Delim String&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns List composed of split <code>&lt;String&gt;</code> by <code>&lt;Delim String&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (string-split &quot;aaaaSplit!bbbSplit!ccc&quot; &quot;Split!&quot;))
 
 ;; Output
 ;; &gt; (&quot;aaa&quot; &quot;bbb&quot; &quot;ccc&quot;)</code></pre>
 <h2 id="container-functions">Container Functions</h2>
 <h3 id="front">front</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(front &lt;List&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns the first element of <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (front &#39;(111 222 333)))
 
 ;; Output
 ;; &gt; 111</code></pre>
 <h3 id="back">back</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(back &lt;List&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns the last element of <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (back &#39;(111 222 333)))
 
 ;; Output
 ;; &gt; 333</code></pre>
 <h3 id="push-front">push-front</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(push-front &lt;List&gt; &lt;Object&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns List added <code>&lt;Object&gt;</code> at the first element of <code>&lt;List&gt;</code></li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (push-front &#39;(111 222 333) &quot;Hello&quot;))
 
 ;; Output
 ;; &gt; (&quot;Hello&quot; 111 222 333)</code></pre>
 <h3 id="pop-front">pop-front</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(pop-front &lt;List&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns List removed the first element from <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (pop-front &#39;(111 222 333)))
 
 ;; Output
 ;; &gt; (222 333)</code></pre>
 <h3 id="push-back">push-back</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(push-back &lt;List&gt; &lt;Object&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns List added <code>&lt;Object&gt;</code> at the last element of <code>&lt;List&gt;</code></li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (push-back &#39;(111 222 333) &quot;Hello&quot;))
 
 ;; Output
 ;; &gt; (111 222 333 &quot;Hello&quot;)</code></pre>
 <h3 id="pop-back">pop-back</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(pop-back &lt;List&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns List removed the last element from <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (pop-back &#39;(111 222 333)))
 
 ;; Output
 ;; &gt; (111 222)</code></pre>
 <h3 id="push-front-push-front2">push-front! ### {push-front2}</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(push-front! &lt;Symbol&gt; &lt;Object&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -563,10 +515,9 @@ Description
 <li>Appends to the top of List of <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous List bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define l &#39;(111 222 333))
 (display (push-front! l 444))  ;; Returns previous List.
 (display l)
@@ -575,17 +526,15 @@ Example
 ;; &gt; (111 222 333)
 ;; &gt; (444 111 222 333)</code></pre>
 <h3 id="pop-front2">pop-front!</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(pop-front! &lt;Symbol&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -594,10 +543,9 @@ Description
 <li>Pops out the 1st element of List of <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous List bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define l &#39;(111 222 333))
 (display (pop-front! l))
 (display l)
@@ -606,17 +554,15 @@ Example
 ;; &gt; (111 222 333)
 ;; &gt; (222 333)</code></pre>
 <h3 id="push-back2">push-back!</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(push-back! &lt;Symbol&gt; &lt;Object&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -626,10 +572,9 @@ Description
 <li>Appends to the tail of List of <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous List bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define l &#39;(111 222 333))
 (display (push-back! l 444))
 (display l)
@@ -638,17 +583,15 @@ Example
 ;; &gt; (111 222 333)
 ;; &gt; (111 222 333 444))...&quot;;</code></pre>
 <h3 id="pop-back2">pop-back!</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(pop-back! &lt;Symbol&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -657,10 +600,9 @@ Description
 <li>Pops out the last element of List of <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous List bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define l &#39;(111 222 333))
 (display (pop-back! l))
 (display l)
@@ -670,364 +612,357 @@ Example
 ;; &gt; (111 222)</code></pre>
 <h2 id="boolean-equation-function">Boolean Equation Function</h2>
 <h3 id="not">not</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(not &lt;Boolean&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Turns <code>&lt;Boolean&gt;</code> to opposite value. #t to #f, #f to #t.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (not (= 111 111)))
 
 ;; Output
 ;; &gt; #f</code></pre>
 <h3 id="and">and</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(and &lt;Boolean&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if all <code>&lt;Boolean&gt;...</code> are #t. Otherwise, return #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (and (= 111 111) (= 222 222)))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="or">or</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(or &lt;Boolean&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if one of <code>&lt;Boolean&gt;...</code> is #t. If all <code>&lt;Boolean&gt;</code> are #f, return #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (or (= 111 111) (= 222 333)))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h2 id="comparison-function">Comparison Function</h2>
-<h3 id="less-than">&lt;</h3>
-<h6> 
+<h3 id="equal">=</h3>
+<h6>
 Usage
 </h6>
+<ul>
+<li><code>(= &lt;Number&gt;...)</code></li>
+</ul>
+<h6>
+Description
+</h6>
+<ul>
+<li>Returns #t if the 1st Number equals the others. Otherwise, return #f.</li>
+</ul>
+<h6>
+Example
+</h6>
+<pre><code>(display (= 111 111 111))
 
+;; Output
+;; &gt; #t</code></pre>
+<h3 id="not-equal">~=</h3>
+<h6>
+Usage
+</h6>
+<ul>
+<li><code>(~= &lt;Number&gt;...)</code></li>
+</ul>
+<h6>
+Description
+</h6>
+<ul>
+<li>Returns #f if the 1st Number equals the others. Otherwise, return #t.</li>
+</ul>
+<h6>
+Example
+</h6>
+<pre><code>(display (~= 111 111 111))
+
+;; Output
+;; &gt; #f</code></pre>
+<h3 id="less-than">&lt;</h3>
+<h6>
+Usage
+</h6>
 <ul>
 <li><code>(&lt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if a Number is less than next Number. Otherwise, return #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (&lt; 111 222 333))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="less-equal">&lt;=</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(&lt;= &lt;Number&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if a Number is less or equal than next Number. Otherwise, return #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (&lt; 111 222 333))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="greater-than">&gt;</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if a Number is more than next Number. Otherwise, return #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (&gt; 333 222 111))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="greater-equal">&gt;=</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(&gt;= &lt;Number&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns #t if a Number is more or equal than next Number. Otherwise, return #f.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (&gt;= 333 222 111))
 
 ;; Output
 ;; &gt; #t</code></pre>
 <h3 id="max">max</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(max &lt;Number&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns maximum number of <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (max 1 2 3 4 3 2 1))
 
 ;; Output
 ;; &gt; 4</code></pre>
 <h3 id="min">min</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(min &lt;Number&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns minimum number of <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (min 4 3 2 1 2 3 4))
 
 ;; Output
 ;; &gt; 1</code></pre>
 <h2 id="arithmetic-operation-function">Arithmetic Operation Function</h2>
 <h3 id="add">+</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(+ &lt;Number&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Sums up all <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (+ 1 2 3))
 
 ;; Output
 ;; &gt; 6</code></pre>
 <h3 id="sub">-</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(- &lt;1st number&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Subtracts <code>&lt;Number&gt;...</code> from <code>&lt;1st number&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (- 5 4 3))
 
 ;; Output
 ;; &gt; -2</code></pre>
 <h3 id="mul">*</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(* &lt;Number&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Multiplies all <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (* 2 3 4))
 
 ;; Output
 ;; &gt; 24</code></pre>
 <h3 id="div">/</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(/ &lt;1st number&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Divides <code>&lt;1st number&gt;</code> with <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (/ 32 2 4))
 
 ;; Output
 ;; &gt; 4</code></pre>
 <h3 id="inc">++</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(++ &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Adds <code>&lt;Number&gt;</code> to '1'.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (++ 111))
 
 ;; Output
 ;; &gt; 112</code></pre>
 <h3 id="dec">--</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(-- &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Subtracts '1' from <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (-- 111))
 
 ;; Output
 ;; &gt; 110</code></pre>
-<h3 id="add2">+!</h3>
-<h6> 
+<h3 id="add2">add!</h3>
+<h6>
 Usage
 </h6>
-
 <ul>
-<li><code>(+! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
+<li><code>(add! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -1037,29 +972,26 @@ Description
 <li>Sums up <code>&lt;Number&gt;...</code> and adds it to <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define n 5)
-(display (+! n 3 4 5))  ;; Returns previous Number.
+(display (add! n 3 4 5))  ;; Returns previous Number.
 (display n)
 
 ;; Output
 ;; &gt; 5
 :: &gt; 17</code></pre>
-<h3 id="sub2">-!</h3>
-<h6> 
+<h3 id="sub2">sub!</h3>
+<h6>
 Usage
 </h6>
-
 <ul>
-<li><code>(-! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
+<li><code>(sub! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -1069,29 +1001,26 @@ Description
 <li>Subtracts <code>&lt;Number&gt;...</code> from <code>&lt;Symbol&gt;</code> and rewrite it to <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define n 5)
-(display (-! n 1 2))  ;; Returns previous Number.
+(display (sub! n 1 2))  ;; Returns previous Number.
 (display n)
 
 ;; Output
 ;; &gt; 5
 ;; &gt; 2</code></pre>
-<h3 id="mul2">*!</h3>
-<h6> 
+<h3 id="mul2">mul!</h3>
+<h6>
 Usage
 </h6>
-
 <ul>
-<li><code>(*! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
+<li><code>(mul! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -1101,29 +1030,26 @@ Description
 <li>Multiplies <code>&lt;Symbol&gt;</code> and <code>&lt;Number&gt;...</code> and rewrite it to <Symbol>.</li>
 <li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define n 5)
-(display (*! n 1 2))  ;; Returns previous Number.
+(display (mul! n 1 2))  ;; Returns previous Number.
 (display n)
 
 ;; Output
 ;; &gt; 5
 ;; &gt; 10</code></pre>
-<h3 id="div2">/!</h3>
-<h6> 
+<h3 id="div2">div!</h3>
+<h6>
 Usage
 </h6>
-
 <ul>
-<li><code>(/! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
+<li><code>(div! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -1133,30 +1059,26 @@ Description
 <li>Divides <code>&lt;Symbol&gt;</code> with <code>&lt;Number&gt;...</code> and rewrites it to <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define n 6)
-(display (/! n 2 3))  ;; Returns previous Number.
+(display (div! n 2 3))  ;; Returns previous Number.
 (display n)
 
 ;; Output
 ;; &gt; 6
 ;; &gt; 1</code></pre>
-<h3 id="inc2">++!</h3>
-<h6> 
+<h3 id="inc2">inc!</h3>
+<h6>
 Usage
 </h6>
-
 <ul>
-<li><code>(++! &lt;Symbol)</code></li>
 <li><code>(inc! &lt;Symbol&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -1166,30 +1088,26 @@ Description
 <li>Increments <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define i 111)
-(display (++! i))
+(display (inc! i))
 (display i)
 
 ;; Output
 ;; &gt; 111
 ;; &gt; 112</code></pre>
-<h3 id="dec2">--!</h3>
-<h6> 
+<h3 id="dec2">dec!</h3>
+<h6>
 Usage
 </h6>
-
 <ul>
-<li><code>(--! &lt;Symbol)</code></li>
 <li><code>(dec! &lt;Symbol&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>This is Special Form.
 <ul>
@@ -1199,12 +1117,11 @@ Description
 <li>Decrements <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(define i 111)
-(display (--! i))
+(display (dec! i))
 (display i)
 
 ;; Output
@@ -1212,292 +1129,255 @@ Example
 ;; &gt; 110</code></pre>
 <h2 id="mathematics-function">Mathematics Function</h2>
 <h3 id="pi">PI</h3>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Circular constant.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display PI)
 
 ;; Output
 ;; &gt; 3.14159265358979</code></pre>
 <h3 id="e">E</h3>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Napier's constant.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display E)
 
 ;; Output
 ;; &gt; 2.71828182845905</code></pre>
 <h3 id="sin">sin</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(sin &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Sine. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is radian.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (sin (/ PI 2)))
 
 ;; Output
 ;; &gt; 1</code></pre>
 <h3 id="cos">cos</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(cos &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Cosine. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is radian.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (cos PI))
 
 ;; Output
 ;; &gt; -1</code></pre>
 <h3 id="tan">tan</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(tan &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Tangent. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is radian.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (tan (/ PI 4)))
 
 ;; Output
 ;; &gt; 1</code></pre>
 <h3 id="asin">asin</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(asin &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Arc sine. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is sine.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (asin 0))
 
 ;; Output
 ;; &gt; 0</code></pre>
 <h3 id="acos">acos</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(acos &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Arc cosine. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is cosine.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (acos 1))
 
 ;; Output
 ;; &gt; 0</code></pre>
 <h3 id="atan">atan</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(atan &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Arc tangent. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is tangent.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (atan 0))
 
 ;; Output
 ;; &gt; 0</code></pre>
 <h3 id="sqrt">sqrt</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(sqrt &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns square root of <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (sqrt 4))
 
 ;; Output
 ;; &gt; 2</code></pre>
 <h3 id="abs">abs</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(abs &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns absolute value of <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (abs -111))
 
 ;; Output
 ;; &gt; 111</code></pre>
 <h3 id="ceil">ceil</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(ceil &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Rounds up <code>&lt;Number&gt;</code> into integral value.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (ceil 1.3))
 
 ;; Output
 ;; &gt; 2</code></pre>
 <h3 id="floor">floor</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(floor &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Rounds down <code>&lt;Number&gt;</code> into integral value.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (floor 1.3))
 
 ;; Output
 ;; &gt; 1</code></pre>
 <h3 id="round">round</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(round &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Rounds <code>&lt;Number&gt;</code> into the nearest integral value.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (round 1.5))
 
 ;; Output
@@ -1508,24 +1388,21 @@ Example
 ;; Output
 ;; &gt; 1</code></pre>
 <h3 id="trunc">trunc</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(trunc &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Truncates after decimal point of <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (trunc 1.234))
 
 ;; Output
@@ -1536,141 +1413,123 @@ Example
 ;; Output
 ;; &gt; -1</code></pre>
 <h3 id="exp">exp</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(exp &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Exponent function of <code>&lt;Number&gt;</code>. The base is Napier's constant.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (exp 1))
 
 ;; Output
 ;; &gt; 2.71828</code></pre>
 <h3 id="expt">expt</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(expt &lt;Base&gt; &lt;Exponent&gt;)</code></li>
 <li><code>(^ &lt;Base&gt; &lt;Exponent&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Exponent function of <code>&lt;Exponent&gt;</code>. The base is <code>&lt;Base&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (expt 2 3))
 
 ;; Output
 ;; &gt; 8</code></pre>
 <h3 id="log">log</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(log &lt;Number&gt;)</code></li>
 <li><code>(ln &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Logarithmic function of <code>&lt;Number&gt;</code>. The base is Napier's constant.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (log E))
 
 ;; Output
 ;; &gt; 1</code></pre>
 <h3 id="log2">log2</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(log2 &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Logarithmic function of <code>&lt;Number&gt;</code>. The base is 2.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (log2 8))
 
 ;; Output
 ;; &gt; 3</code></pre>
 <h3 id="log10">log10</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(log10 &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Logarithmic function of <code>&lt;Number&gt;</code>. The base is 10.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (log10 100))
 
 ;; Output
 ;; &gt; 2</code></pre>
 <h3 id="random">random</h3>
-<h6> 
+<h6>
 Usage
 </h6>
-
 <ul>
 <li><code>(random &lt;Number&gt;)</code></li>
 </ul>
-<h6> 
+<h6>
 Description
 </h6>
-
 <ul>
 <li>Returns random number from 0 to <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6> 
+<h6>
 Example
 </h6>
-
 <pre><code>(display (random 10))
 
 ;; Output
