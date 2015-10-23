@@ -2090,17 +2090,13 @@ R"...(### import ###
 
         return NewBoolean(true);
       };
-      LispObjectPtr func_ptr =
-      NewNativeFunction(global_ptr_->scope_chain_, func);
-      global_ptr_->BindSymbol("equal?", func_ptr);
-      global_ptr_->BindSymbol("=", func_ptr);
-      std::string temp =
+      AddNativeFunction(func, "equal?");
+      help_["equal?"] =
 R"...(### equal? ###
 
 <h6> Usage </h6>
 
 * `(equal? <Object>...)`
-* `(= <Object>...)`
 
 <h6> Description </h6>
 
@@ -2113,52 +2109,6 @@ R"...(### equal? ###
     
     ;; Output
     ;; > #t)...";
-      help_["equal?"] = temp;
-      help_["="] = temp;
-    }
-
-    // %%% !=
-    {
-      auto func = [](LispObjectPtr self, const LispObject& caller,
-      const LispObject& list) -> LispObjectPtr {
-        // 準備。
-        LispIterator<false> list_itr {&list};
-        std::string func_name = (list_itr++)->ToString();
-        int required_args = 1;
-
-        if (!list_itr) {
-          throw GenInsufficientArgumentsError
-          (func_name, required_args, true, list.Length() - 1);
-        }
-        LispObjectPtr first_ptr = caller.Evaluate(*(list_itr++));
-
-        // 比較。
-        for (; list_itr; ++list_itr) {
-          LispObjectPtr result = caller.Evaluate(*list_itr);
-          if (*first_ptr != *result) return NewBoolean(true);
-        }
-
-        return NewBoolean(false);
-      };
-      AddNativeFunction(func, "!=");
-      help_["!="] =
-R"...(### != ###
-
-<h6> Usage </h6>
-
-* `(!= <Object>...)`
-
-<h6> Description </h6>
-
-* Returns #t if all `<Object>...` are different structure.
-  Otherwise, returns #f.
-
-<h6> Example </h6>
-
-    (display (!= '(1 2 (3 4) 5) '(1 2 (3 4) 5)))
-    
-    ;; Output
-    ;; > #f)...";
     }
 
     // %%% pair?
@@ -3480,6 +3430,122 @@ R"...(### length ###
     
     ;; Output
     ;; > 6)...";
+    }
+
+    // %%% =
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) -> LispObjectPtr {
+        // 準備。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 最初の数字を得る。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        LispObjectPtr result = caller.Evaluate(*(list_itr++));
+        if (!(result->IsNumber())) {
+          throw GenWrongTypeError
+          (func_name, "Number", std::vector<int> {1}, true);
+        }
+        double first = result->number_value_;
+
+        // 2つ目以降の引数と比較する。
+        int index = 2;
+        for (; list_itr; ++list_itr, ++index) {
+          // 調べたい数字を得る。
+          LispObjectPtr current_ptr = caller.Evaluate(*list_itr);
+          if (!(current_ptr->IsNumber())) {
+            throw GenWrongTypeError
+            (func_name, "Number", std::vector<int> {index}, true);
+          }
+
+          // 比較。
+          if (first != current_ptr->number_value_) return NewBoolean(false);
+        }
+
+        return NewBoolean(true);
+      };
+      AddNativeFunction(func, "=");
+      help_["="] =
+R"...(### = ###
+
+<h6> Usage </h6>
+
+* `(= <Number>...)`
+
+<h6> Description </h6>
+
+* Returns #t if the 1st Number equals the others.
+  Otherwise, return #f.
+
+<h6> Example </h6>
+
+    (display (= 111 111 111))
+    
+    ;; Output
+    ;; > #t)...";
+    }
+
+    // %%% ~=
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) -> LispObjectPtr {
+        // 準備。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 最初の数字を得る。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, true, list.Length() - 1);
+        }
+        LispObjectPtr result = caller.Evaluate(*(list_itr++));
+        if (!(result->IsNumber())) {
+          throw GenWrongTypeError
+          (func_name, "Number", std::vector<int> {1}, true);
+        }
+        double first = result->number_value_;
+
+        // 2つ目以降の引数と比較する。
+        int index = 2;
+        for (; list_itr; ++list_itr, ++index) {
+          // 調べたい数字を得る。
+          LispObjectPtr current_ptr = caller.Evaluate(*list_itr);
+          if (!(current_ptr->IsNumber())) {
+            throw GenWrongTypeError
+            (func_name, "Number", std::vector<int> {index}, true);
+          }
+
+          // 比較。
+          if (first != current_ptr->number_value_) return NewBoolean(true);
+        }
+
+        return NewBoolean(false);
+      };
+      AddNativeFunction(func, "~=");
+      help_["~="] =
+R"...(### ~= ###
+
+<h6> Usage </h6>
+
+* `(~= <Number>...)`
+
+<h6> Description </h6>
+
+* Returns #f if the 1st Number equals the others.
+  Otherwise, return #t.
+
+<h6> Example </h6>
+
+    (display (~= 111 111 111))
+    
+    ;; Output
+    ;; > #f)...";
     }
 
     // %%% <
