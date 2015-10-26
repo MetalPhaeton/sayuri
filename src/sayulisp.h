@@ -1731,6 +1731,24 @@ namespace Sayuri {
        */
       int Run(std::istream* stream_ptr);
 
+      /**
+       * コードをパースする。
+       * @param code パースするコード。
+       * @return パース結果のS式のベクトル。
+       */
+      std::vector<LispObjectPtr> Parse(const std::string& code) {
+        return lisp_ptr_->Parse(code);
+      }
+
+      /**
+       * S式を評価する。。
+       * @param obj 評価するS式。
+       * @return 評価結果。
+       */
+      LispObjectPtr Evaluate(const LispObject& obj) {
+        return lisp_ptr_->Evaluate(obj);
+      }
+
     private:
       // ================ //
       // プライベート関数 //
