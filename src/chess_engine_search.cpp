@@ -348,7 +348,7 @@ namespace Sayuri {
               } else {
                 return ReturnProcess(evaluator_.Evaluate(material), level);
               }
-    }
+            }
           }
         }
       }
