@@ -131,7 +131,11 @@ namespace Sayuri {
     probcut_limit_depth_ = params.probcut_limit_depth();
     probcut_margin_ = params.probcut_margin();
     probcut_search_reduction_ = params.probcut_search_reduction();
-    enable_history_pruning_ = params.enable_history_pruning();
+    if (params.enable_history()) {
+      enable_history_pruning_ = params.enable_history_pruning();
+    } else {
+      enable_history_pruning_ = false;
+    }
     history_pruning_limit_depth_ = params.history_pruning_limit_depth();
     for (unsigned int num_moves = 0; num_moves < (MAX_CANDIDATES + 1);
     ++num_moves) {

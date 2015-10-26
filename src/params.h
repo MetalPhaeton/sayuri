@@ -496,8 +496,7 @@ namespace Sayuri {
        * @param enable 有効無効。
        */
       void enable_history_pruning(bool enable) {
-        if (enable_history_) enable_history_pruning_ = enable;
-        else enable_history_pruning_ = false;
+        enable_history_pruning_ = enable;
       }
       /**
        * ミューテータ - History Pruning - 残り深さ制限。

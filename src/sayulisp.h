@@ -1182,6 +1182,8 @@ namespace Sayuri {
             }
             eval_params_ptr_->opening_position_value_table
             (TYPE, square, list_itr->number_value());
+
+            ++list_itr;
           }
         }
 
@@ -1226,6 +1228,8 @@ namespace Sayuri {
             }
             eval_params_ptr_->ending_position_value_table
             (TYPE, square, list_itr->number_value());
+
+            ++list_itr;
           }
         }
 
