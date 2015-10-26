@@ -761,11 +761,11 @@ namespace Sayuri {
       // パブリック関数 //
       // ============== //
       /**
-       * S式を実行する。
+       * S式を評価する。
        * @param obj 実行するLispObject。
        * @return 実行結果のオブジェクト。
        */
-      LispObjectPtr Execute(const LispObject& obj) {
+      LispObjectPtr Evaluate(const LispObject& obj) {
         return global_ptr_->Evaluate(obj);
       }
 
