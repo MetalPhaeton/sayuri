@@ -2697,7 +2697,7 @@ namespace Sayuri {
         std::vector<LispObjectPtr> obj_vec = lisp_ptr_->Parse(input);
 
         if (!(obj_vec.empty())) {
-          for (auto& obj_ptr : obj_vec) lisp_ptr_->Execute(*obj_ptr);
+          for (auto& obj_ptr : obj_vec) lisp_ptr_->Evaluate(*obj_ptr);
         }
 
         if (!loop) break;

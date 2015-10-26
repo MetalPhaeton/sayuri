@@ -34,7 +34,7 @@ endif(NOT CMAKE_CXX_COMPILER)
 
 # プロジェクト名。
 project(SAYURI)
-set(VERSION "2015.10.23")
+set(VERSION "2015.10.26")
 
 # ソースとヘッダファイルのリスト。
 file(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
