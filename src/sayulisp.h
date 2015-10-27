@@ -1691,7 +1691,7 @@ namespace Sayuri {
   };
 
   /** Sayulisp実行クラス。 */
-  class Sayulisp {
+  class Sayulisp : public Lisp {
     public:
       // ==================== //
       // コンストラクタと代入 //
@@ -1702,22 +1702,28 @@ namespace Sayuri {
        * コピーコンストラクタ。
        * @param sayulisp コピー元。
        */
-      Sayulisp(const Sayulisp& sayulisp);
+      Sayulisp(const Sayulisp& sayulisp) : Lisp(sayulisp) {}
       /**
        * ムーブコンストラクタ。
        * @param sayulisp ムーブ元。
        */
-      Sayulisp(Sayulisp&& sayulisp);
+      Sayulisp(Sayulisp&& sayulisp) : Lisp(sayulisp) {}
       /**
        * コピー代入演算子。
        * @param sayulisp コピー元。
        */
-      Sayulisp& operator=(const Sayulisp& sayulisp);
+      Sayulisp& operator=(const Sayulisp& sayulisp) {
+        Lisp::operator=(sayulisp);
+        return *this;
+      }
       /**
        * ムーブ代入演算子。
        * @param sayulisp ムーブ元。
        */
-      Sayulisp& operator=(Sayulisp&& sayulisp);
+      Sayulisp& operator=(Sayulisp&& sayulisp) {
+        Lisp::operator=(sayulisp);
+        return *this;
+      }
       /** デストラクタ。 */
       virtual ~Sayulisp() {}
 
@@ -1730,24 +1736,6 @@ namespace Sayuri {
        * @return 終了ステータス。
        */
       int Run(std::istream* stream_ptr);
-
-      /**
-       * コードをパースする。
-       * @param code パースするコード。
-       * @return パース結果のS式のベクトル。
-       */
-      std::vector<LispObjectPtr> Parse(const std::string& code) {
-        return lisp_ptr_->Parse(code);
-      }
-
-      /**
-       * S式を評価する。。
-       * @param obj 評価するS式。
-       * @return 評価結果。
-       */
-      LispObjectPtr Evaluate(const LispObject& obj) {
-        return lisp_ptr_->Evaluate(obj);
-      }
 
     private:
       // ================ //
@@ -1850,11 +1838,6 @@ namespace Sayuri {
        * @return 変換後のオブジェクト。
        */
       LispObjectPtr NumberToCastling(const LispObject& obj);
-
-      // ========== //
-      // メンバ変数 //
-      // ========== //
-      std::unique_ptr<Lisp> lisp_ptr_;
   };
 }  // namespace Sayuri
 

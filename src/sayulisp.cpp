@@ -54,7 +54,7 @@ namespace Sayuri {
   // ========== //
   const std::string EngineSuite::SQUARE_SYMBOL[NUM_SQUARES] {
     "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1",
-    "A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2",
+    "A3", "B2", "C2", "D2", "E2", "F2", "G2", "H2",
     "A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3",
     "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4",
     "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5",
@@ -2378,7 +2378,7 @@ namespace Sayuri {
   // コンストラクタと代入 //
   // ==================== //
   // コンストラクタ。
-  Sayulisp::Sayulisp() : lisp_ptr_(new Lisp()) {
+  Sayulisp::Sayulisp() : Lisp() {
     // EngineSuiteを作成する関数を作成。
     {
       auto func = [this]
@@ -2386,44 +2386,44 @@ namespace Sayuri {
       -> LispObjectPtr {
         return this->GenEngine();
       };
-      lisp_ptr_->AddNativeFunction(func, "gen-engine");
+      AddNativeFunction(func, "gen-engine");
     }
 
 
     // 定数をバインドしていく。
     // マスの定数をバインド。
     FOR_SQUARES(square) {
-      lisp_ptr_->BindSymbol(EngineSuite::SQUARE_SYMBOL[square],
+      BindSymbol(EngineSuite::SQUARE_SYMBOL[square],
       Lisp::NewNumber(square));
     }
 
     // ファイルの定数をバインド。
     FOR_FYLES(fyle) {
-      lisp_ptr_->BindSymbol(EngineSuite::FYLE_SYMBOL[fyle],
+      BindSymbol(EngineSuite::FYLE_SYMBOL[fyle],
       Lisp::NewNumber(fyle));
     }
 
     // ランクの定数をバインド。
     FOR_RANKS(rank) {
-      lisp_ptr_->BindSymbol(EngineSuite::RANK_SYMBOL[rank],
+      BindSymbol(EngineSuite::RANK_SYMBOL[rank],
       Lisp::NewNumber(rank));
     }
 
     // サイドの定数をバインド。
     FOR_SIDES(side) {
-      lisp_ptr_->BindSymbol(EngineSuite::SIDE_SYMBOL[side],
+      BindSymbol(EngineSuite::SIDE_SYMBOL[side],
       Lisp::NewNumber(side));
     }
 
     // 駒の定数をバインド。
     FOR_PIECE_TYPES(piece_type) {
-      lisp_ptr_->BindSymbol(EngineSuite::PIECE_TYPE_SYMBOL[piece_type],
+      BindSymbol(EngineSuite::PIECE_TYPE_SYMBOL[piece_type],
       Lisp::NewNumber(piece_type));
     }
 
     // キャスリングの権利の定数をバインド。
     for (int i = 0; i < 5; ++i) {
-      lisp_ptr_->BindSymbol(EngineSuite::CASTLING_SYMBOL[i],
+      BindSymbol(EngineSuite::CASTLING_SYMBOL[i],
       Lisp::NewNumber(i));
     }
 
@@ -2436,7 +2436,7 @@ namespace Sayuri {
       const LispObject& list) -> LispObjectPtr {
         return Lisp::NewString(LICENSE);
       };
-      lisp_ptr_->AddNativeFunction(func, "sayuri-license");
+      AddNativeFunction(func, "sayuri-license");
     }
     {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
@@ -2453,7 +2453,7 @@ namespace Sayuri {
 
         return this->SquareToNumber(*(caller.Evaluate(*list_itr)));
       };
-      lisp_ptr_->AddNativeFunction(func, "square->number");
+      AddNativeFunction(func, "square->number");
     }
     {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
@@ -2470,7 +2470,7 @@ namespace Sayuri {
 
         return this->FyleToNumber(*(caller.Evaluate(*list_itr)));
       };
-      lisp_ptr_->AddNativeFunction(func, "fyle->number");
+      AddNativeFunction(func, "fyle->number");
     }
     {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
@@ -2487,7 +2487,7 @@ namespace Sayuri {
 
         return this->RankToNumber(*(caller.Evaluate(*list_itr)));
       };
-      lisp_ptr_->AddNativeFunction(func, "rank->number");
+      AddNativeFunction(func, "rank->number");
     }
     {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
@@ -2504,7 +2504,7 @@ namespace Sayuri {
 
         return this->SideToNumber(*(caller.Evaluate(*list_itr)));
       };
-      lisp_ptr_->AddNativeFunction(func, "side->number");
+      AddNativeFunction(func, "side->number");
     }
     {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
@@ -2521,7 +2521,7 @@ namespace Sayuri {
 
         return this->PieceTypeToNumber(*(caller.Evaluate(*list_itr)));
       };
-      lisp_ptr_->AddNativeFunction(func, "piece->number");
+      AddNativeFunction(func, "piece->number");
     }
     {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
@@ -2538,7 +2538,7 @@ namespace Sayuri {
 
         return this->CastlingToNumber(*(caller.Evaluate(*list_itr)));
       };
-      lisp_ptr_->AddNativeFunction(func, "castling->number");
+      AddNativeFunction(func, "castling->number");
     }
     {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
@@ -2555,7 +2555,7 @@ namespace Sayuri {
 
         return this->NumberToSquare(*(caller.Evaluate(*list_itr)));
       };
-      lisp_ptr_->AddNativeFunction(func, "number->square");
+      AddNativeFunction(func, "number->square");
     }
     {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
@@ -2572,7 +2572,7 @@ namespace Sayuri {
 
         return this->NumberToFyle(*(caller.Evaluate(*list_itr)));
       };
-      lisp_ptr_->AddNativeFunction(func, "number->fyle");
+      AddNativeFunction(func, "number->fyle");
     }
     {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
@@ -2589,7 +2589,7 @@ namespace Sayuri {
 
         return this->NumberToRank(*(caller.Evaluate(*list_itr)));
       };
-      lisp_ptr_->AddNativeFunction(func, "number->rank");
+      AddNativeFunction(func, "number->rank");
     }
     {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
@@ -2606,7 +2606,7 @@ namespace Sayuri {
 
         return this->NumberToSide(*(caller.Evaluate(*list_itr)));
       };
-      lisp_ptr_->AddNativeFunction(func, "number->side");
+      AddNativeFunction(func, "number->side");
     }
     {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
@@ -2623,7 +2623,7 @@ namespace Sayuri {
 
         return this->NumberToPiece(*(caller.Evaluate(*list_itr)));
       };
-      lisp_ptr_->AddNativeFunction(func, "number->piece");
+      AddNativeFunction(func, "number->piece");
     }
     {
       auto func = [this](LispObjectPtr self, const LispObject& caller,
@@ -2640,23 +2640,8 @@ namespace Sayuri {
 
         return this->NumberToCastling(*(caller.Evaluate(*list_itr)));
       };
-      lisp_ptr_->AddNativeFunction(func, "number->castling");
+      AddNativeFunction(func, "number->castling");
     }
-  }
-  // コピーコンストラクタ。
-  Sayulisp::Sayulisp(const Sayulisp& sayulisp) :
-  lisp_ptr_(new Lisp(*(sayulisp.lisp_ptr_))) {} // ムーブコンストラクタ。
-  Sayulisp::Sayulisp(Sayulisp&& sayulisp) :
-  lisp_ptr_(std::move(sayulisp.lisp_ptr_)) {}
-  // コピー代入演算子。
-  Sayulisp& Sayulisp::operator=(const Sayulisp& sayulisp) {
-    lisp_ptr_.reset(new Lisp(*(sayulisp.lisp_ptr_)));
-    return *this;
-  }
-  // ムーブ代入演算子。
-  Sayulisp& Sayulisp::operator=(Sayulisp&& sayulisp) {
-    lisp_ptr_ = std::move(sayulisp.lisp_ptr_);
-    return *this;
   }
 
   // Sayulispを開始する。
@@ -2688,16 +2673,16 @@ namespace Sayuri {
 
       return Lisp::NewNumber(status);
     };
-    lisp_ptr_->AddNativeFunction(func, "exit");
+    AddNativeFunction(func, "exit");
 
     try {
       std::string input;
       while (std::getline(*(stream_ptr), input)) {
         input += "\n";
-        std::vector<LispObjectPtr> obj_vec = lisp_ptr_->Parse(input);
+        std::vector<LispObjectPtr> obj_vec = Parse(input);
 
         if (!(obj_vec.empty())) {
-          for (auto& obj_ptr : obj_vec) lisp_ptr_->Evaluate(*obj_ptr);
+          for (auto& obj_ptr : obj_vec) Evaluate(*obj_ptr);
         }
 
         if (!loop) break;
@@ -2727,7 +2712,7 @@ namespace Sayuri {
       return (*suite_ptr)(self, caller, list);
     };
 
-    return Lisp::NewNativeFunction(lisp_ptr_->global().scope_chain(), func);
+    return Lisp::NewNativeFunction(global().scope_chain(), func);
   }
 
   // マスのシンボルを数値に変換する。
@@ -3096,7 +3081,7 @@ R"...(### A1 ###
 
 * Constant value of Number that indicates A1 square.
 * Value is '0'.)...";
-    lisp_ptr_->AddHelpDict("A1", temp);
+    AddHelpDict("A1", temp);
 
     temp =
 R"...(### B1 ###
@@ -3105,7 +3090,7 @@ R"...(### B1 ###
 
 * Constant value of Number that indicates B1 square.
 * Value is '1'.)...";
-    lisp_ptr_->AddHelpDict("B1", temp);
+    AddHelpDict("B1", temp);
 
     temp =
 R"...(### C1 ###
@@ -3114,7 +3099,7 @@ R"...(### C1 ###
 
 * Constant value of Number that indicates C1 square.
 * Value is '2'.)...";
-    lisp_ptr_->AddHelpDict("C1", temp);
+    AddHelpDict("C1", temp);
 
     temp =
 R"...(### D1 ###
@@ -3123,7 +3108,7 @@ R"...(### D1 ###
 
 * Constant value of Number that indicates D1 square.
 * Value is '3'.)...";
-    lisp_ptr_->AddHelpDict("D1", temp);
+    AddHelpDict("D1", temp);
 
     temp =
 R"...(### E1 ###
@@ -3132,7 +3117,7 @@ R"...(### E1 ###
 
 * Constant value of Number that indicates E1 square.
 * Value is '4'.)...";
-    lisp_ptr_->AddHelpDict("E1", temp);
+    AddHelpDict("E1", temp);
 
     temp =
 R"...(### F1 ###
@@ -3141,7 +3126,7 @@ R"...(### F1 ###
 
 * Constant value of Number that indicates F1 square.
 * Value is '5'.)...";
-    lisp_ptr_->AddHelpDict("F1", temp);
+    AddHelpDict("F1", temp);
 
     temp =
 R"...(### G1 ###
@@ -3150,7 +3135,7 @@ R"...(### G1 ###
 
 * Constant value of Number that indicates G1 square.
 * Value is '6'.)...";
-    lisp_ptr_->AddHelpDict("G1", temp);
+    AddHelpDict("G1", temp);
 
     temp =
 R"...(### H1 ###
@@ -3158,8 +3143,9 @@ R"...(### H1 ###
 <h6> Description </h6>
 
 * Constant value of Number that indicates H1 square.
-    lisp_ptr_->AddHelpDict("H1", temp);
 * Value is '7'.)...";
+    AddHelpDict("H1", temp);
+
 temp =
 R"...(### A2 ###
 
@@ -3167,7 +3153,7 @@ R"...(### A2 ###
 
 * Constant value of Number that indicates A2 square.
 * Value is '8'.)...";
-    lisp_ptr_->AddHelpDict("A2", temp);
+    AddHelpDict("A2", temp);
 
     temp =
 R"...(### B2 ###
@@ -3176,7 +3162,7 @@ R"...(### B2 ###
 
 * Constant value of Number that indicates B2 square.
 * Value is '9'.)...";
-    lisp_ptr_->AddHelpDict("B2", temp);
+    AddHelpDict("B2", temp);
 
     temp =
 R"...(### C2 ###
@@ -3185,7 +3171,7 @@ R"...(### C2 ###
 
 * Constant value of Number that indicates C2 square.
 * Value is '10'.)...";
-    lisp_ptr_->AddHelpDict("C2", temp);
+    AddHelpDict("C2", temp);
 
     temp =
 R"...(### D2 ###
@@ -3194,7 +3180,7 @@ R"...(### D2 ###
 
 * Constant value of Number that indicates D2 square.
 * Value is '11'.)...";
-    lisp_ptr_->AddHelpDict("D2", temp);
+    AddHelpDict("D2", temp);
 
     temp =
 R"...(### E2 ###
@@ -3203,7 +3189,7 @@ R"...(### E2 ###
 
 * Constant value of Number that indicates E2 square.
 * Value is '12'.)...";
-    lisp_ptr_->AddHelpDict("E2", temp);
+    AddHelpDict("E2", temp);
 
     temp =
 R"...(### F2 ###
@@ -3212,7 +3198,7 @@ R"...(### F2 ###
 
 * Constant value of Number that indicates F2 square.
 * Value is '13'.)...";
-    lisp_ptr_->AddHelpDict("F2", temp);
+    AddHelpDict("F2", temp);
 
     temp =
 R"...(### G2 ###
@@ -3221,7 +3207,7 @@ R"...(### G2 ###
 
 * Constant value of Number that indicates G2 square.
 * Value is '14'.)...";
-    lisp_ptr_->AddHelpDict("G2", temp);
+    AddHelpDict("G2", temp);
 
     temp =
 R"...(### H2 ###
@@ -3230,7 +3216,7 @@ R"...(### H2 ###
 
 * Constant value of Number that indicates H2 square.
 * Value is '15'.)...";
-    lisp_ptr_->AddHelpDict("H2", temp);
+    AddHelpDict("H2", temp);
 
     temp =
 R"...(### A3 ###
@@ -3239,7 +3225,7 @@ R"...(### A3 ###
 
 * Constant value of Number that indicates A3 square.
 * Value is '16'.)...";
-    lisp_ptr_->AddHelpDict("A3", temp);
+    AddHelpDict("A3", temp);
 
     temp =
 R"...(### B3 ###
@@ -3248,7 +3234,7 @@ R"...(### B3 ###
 
 * Constant value of Number that indicates B3 square.
 * Value is '17'.)...";
-    lisp_ptr_->AddHelpDict("B3", temp);
+    AddHelpDict("B3", temp);
 
     temp =
 R"...(### C3 ###
@@ -3257,7 +3243,7 @@ R"...(### C3 ###
 
 * Constant value of Number that indicates C3 square.
 * Value is '18'.)...";
-    lisp_ptr_->AddHelpDict("C3", temp);
+    AddHelpDict("C3", temp);
 
     temp =
 R"...(### D3 ###
@@ -3266,7 +3252,7 @@ R"...(### D3 ###
 
 * Constant value of Number that indicates D3 square.
 * Value is '19'.)...";
-    lisp_ptr_->AddHelpDict("D3", temp);
+    AddHelpDict("D3", temp);
 
     temp =
 R"...(### E3 ###
@@ -3275,7 +3261,7 @@ R"...(### E3 ###
 
 * Constant value of Number that indicates E3 square.
 * Value is '20'.)...";
-    lisp_ptr_->AddHelpDict("E3", temp);
+    AddHelpDict("E3", temp);
 
     temp =
 R"...(### F3 ###
@@ -3284,7 +3270,7 @@ R"...(### F3 ###
 
 * Constant value of Number that indicates F3 square.
 * Value is '21'.)...";
-    lisp_ptr_->AddHelpDict("F3", temp);
+    AddHelpDict("F3", temp);
 
     temp =
 R"...(### G3 ###
@@ -3293,7 +3279,7 @@ R"...(### G3 ###
 
 * Constant value of Number that indicates G3 square.
 * Value is '22'.)...";
-    lisp_ptr_->AddHelpDict("G3", temp);
+    AddHelpDict("G3", temp);
 
     temp =
 R"...(### H3 ###
@@ -3302,7 +3288,7 @@ R"...(### H3 ###
 
 * Constant value of Number that indicates H3 square.
 * Value is '23'.)...";
-    lisp_ptr_->AddHelpDict("H3", temp);
+    AddHelpDict("H3", temp);
 
     temp =
 R"...(### A4 ###
@@ -3311,7 +3297,7 @@ R"...(### A4 ###
 
 * Constant value of Number that indicates A4 square.
 * Value is '24'.)...";
-    lisp_ptr_->AddHelpDict("A4", temp);
+    AddHelpDict("A4", temp);
 
     temp =
 R"...(### B4 ###
@@ -3320,7 +3306,7 @@ R"...(### B4 ###
 
 * Constant value of Number that indicates B4 square.
 * Value is '25'.)...";
-    lisp_ptr_->AddHelpDict("B4", temp);
+    AddHelpDict("B4", temp);
 
     temp =
 R"...(### C4 ###
@@ -3329,7 +3315,7 @@ R"...(### C4 ###
 
 * Constant value of Number that indicates C4 square.
 * Value is '26'.)...";
-    lisp_ptr_->AddHelpDict("C4", temp);
+    AddHelpDict("C4", temp);
 
     temp =
 R"...(### D4 ###
@@ -3338,7 +3324,7 @@ R"...(### D4 ###
 
 * Constant value of Number that indicates D4 square.
 * Value is '27'.)...";
-    lisp_ptr_->AddHelpDict("D4", temp);
+    AddHelpDict("D4", temp);
 
     temp =
 R"...(### E4 ###
@@ -3347,7 +3333,7 @@ R"...(### E4 ###
 
 * Constant value of Number that indicates E4 square.
 * Value is '28'.)...";
-    lisp_ptr_->AddHelpDict("E4", temp);
+    AddHelpDict("E4", temp);
 
     temp =
 R"...(### F4 ###
@@ -3356,7 +3342,7 @@ R"...(### F4 ###
 
 * Constant value of Number that indicates F4 square.
 * Value is '29'.)...";
-    lisp_ptr_->AddHelpDict("F4", temp);
+    AddHelpDict("F4", temp);
 
     temp =
 R"...(### G4 ###
@@ -3365,7 +3351,7 @@ R"...(### G4 ###
 
 * Constant value of Number that indicates G4 square.
 * Value is '30'.)...";
-    lisp_ptr_->AddHelpDict("G4", temp);
+    AddHelpDict("G4", temp);
 
     temp =
 R"...(### H4 ###
@@ -3374,7 +3360,7 @@ R"...(### H4 ###
 
 * Constant value of Number that indicates H4 square.
 * Value is '31'.)...";
-    lisp_ptr_->AddHelpDict("H4", temp);
+    AddHelpDict("H4", temp);
 
     temp =
 R"...(### A5 ###
@@ -3383,7 +3369,7 @@ R"...(### A5 ###
 
 * Constant value of Number that indicates A5 square.
 * Value is '32'.)...";
-    lisp_ptr_->AddHelpDict("A5", temp);
+    AddHelpDict("A5", temp);
 
     temp =
 R"...(### B5 ###
@@ -3392,7 +3378,7 @@ R"...(### B5 ###
 
 * Constant value of Number that indicates B5 square.
 * Value is '33'.)...";
-    lisp_ptr_->AddHelpDict("B5", temp);
+    AddHelpDict("B5", temp);
 
     temp =
 R"...(### C5 ###
@@ -3401,7 +3387,7 @@ R"...(### C5 ###
 
 * Constant value of Number that indicates C5 square.
 * Value is '34'.)...";
-    lisp_ptr_->AddHelpDict("C5", temp);
+    AddHelpDict("C5", temp);
 
     temp =
 R"...(### D5 ###
@@ -3410,7 +3396,7 @@ R"...(### D5 ###
 
 * Constant value of Number that indicates D5 square.
 * Value is '35'.)...";
-    lisp_ptr_->AddHelpDict("D5", temp);
+    AddHelpDict("D5", temp);
 
     temp =
 R"...(### E5 ###
@@ -3419,7 +3405,7 @@ R"...(### E5 ###
 
 * Constant value of Number that indicates E5 square.
 * Value is '36'.)...";
-    lisp_ptr_->AddHelpDict("E5", temp);
+    AddHelpDict("E5", temp);
 
     temp =
 R"...(### F5 ###
@@ -3428,7 +3414,7 @@ R"...(### F5 ###
 
 * Constant value of Number that indicates F5 square.
 * Value is '37'.)...";
-    lisp_ptr_->AddHelpDict("F5", temp);
+    AddHelpDict("F5", temp);
 
     temp =
 R"...(### G5 ###
@@ -3437,7 +3423,7 @@ R"...(### G5 ###
 
 * Constant value of Number that indicates G5 square.
 * Value is '38'.)...";
-    lisp_ptr_->AddHelpDict("G5", temp);
+    AddHelpDict("G5", temp);
 
     temp =
 R"...(### H5 ###
@@ -3446,7 +3432,7 @@ R"...(### H5 ###
 
 * Constant value of Number that indicates H5 square.
 * Value is '39'.)...";
-    lisp_ptr_->AddHelpDict("H5", temp);
+    AddHelpDict("H5", temp);
 
     temp =
 R"...(### A6 ###
@@ -3455,7 +3441,7 @@ R"...(### A6 ###
 
 * Constant value of Number that indicates A6 square.
 * Value is '40'.)...";
-    lisp_ptr_->AddHelpDict("A6", temp);
+    AddHelpDict("A6", temp);
 
     temp =
 R"...(### B6 ###
@@ -3464,7 +3450,7 @@ R"...(### B6 ###
 
 * Constant value of Number that indicates B6 square.
 * Value is '41'.)...";
-    lisp_ptr_->AddHelpDict("B6", temp);
+    AddHelpDict("B6", temp);
 
     temp =
 R"...(### C6 ###
@@ -3473,7 +3459,7 @@ R"...(### C6 ###
 
 * Constant value of Number that indicates C6 square.
 * Value is '42'.)...";
-    lisp_ptr_->AddHelpDict("C6", temp);
+    AddHelpDict("C6", temp);
 
     temp =
 R"...(### D6 ###
@@ -3482,7 +3468,7 @@ R"...(### D6 ###
 
 * Constant value of Number that indicates D6 square.
 * Value is '43'.)...";
-    lisp_ptr_->AddHelpDict("D6", temp);
+    AddHelpDict("D6", temp);
 
     temp =
 R"...(### E6 ###
@@ -3491,7 +3477,7 @@ R"...(### E6 ###
 
 * Constant value of Number that indicates E6 square.
 * Value is '44'.)...";
-    lisp_ptr_->AddHelpDict("E6", temp);
+    AddHelpDict("E6", temp);
 
     temp =
 R"...(### F6 ###
@@ -3500,7 +3486,7 @@ R"...(### F6 ###
 
 * Constant value of Number that indicates F6 square.
 * Value is '45'.)...";
-    lisp_ptr_->AddHelpDict("F6", temp);
+    AddHelpDict("F6", temp);
 
     temp =
 R"...(### G6 ###
@@ -3509,7 +3495,7 @@ R"...(### G6 ###
 
 * Constant value of Number that indicates G6 square.
 * Value is '46'.)...";
-    lisp_ptr_->AddHelpDict("G6", temp);
+    AddHelpDict("G6", temp);
 
     temp =
 R"...(### H6 ###
@@ -3518,7 +3504,7 @@ R"...(### H6 ###
 
 * Constant value of Number that indicates H6 square.
 * Value is '47'.)...";
-    lisp_ptr_->AddHelpDict("H6", temp);
+    AddHelpDict("H6", temp);
 
     temp =
 R"...(### A7 ###
@@ -3527,7 +3513,7 @@ R"...(### A7 ###
 
 * Constant value of Number that indicates A7 square.
 * Value is '48'.)...";
-    lisp_ptr_->AddHelpDict("A7", temp);
+    AddHelpDict("A7", temp);
 
     temp =
 R"...(### B7 ###
@@ -3536,7 +3522,7 @@ R"...(### B7 ###
 
 * Constant value of Number that indicates B7 square.
 * Value is '49'.)...";
-    lisp_ptr_->AddHelpDict("B7", temp);
+    AddHelpDict("B7", temp);
 
     temp =
 R"...(### C7 ###
@@ -3545,7 +3531,7 @@ R"...(### C7 ###
 
 * Constant value of Number that indicates C7 square.
 * Value is '50'.)...";
-    lisp_ptr_->AddHelpDict("C7", temp);
+    AddHelpDict("C7", temp);
 
     temp =
 R"...(### D7 ###
@@ -3554,7 +3540,7 @@ R"...(### D7 ###
 
 * Constant value of Number that indicates D7 square.
 * Value is '51'.)...";
-    lisp_ptr_->AddHelpDict("D7", temp);
+    AddHelpDict("D7", temp);
 
     temp =
 R"...(### E7 ###
@@ -3563,7 +3549,7 @@ R"...(### E7 ###
 
 * Constant value of Number that indicates E7 square.
 * Value is '52'.)...";
-    lisp_ptr_->AddHelpDict("E7", temp);
+    AddHelpDict("E7", temp);
 
     temp =
 R"...(### F7 ###
@@ -3572,7 +3558,7 @@ R"...(### F7 ###
 
 * Constant value of Number that indicates F7 square.
 * Value is '53'.)...";
-    lisp_ptr_->AddHelpDict("F7", temp);
+    AddHelpDict("F7", temp);
 
     temp =
 R"...(### G7 ###
@@ -3581,7 +3567,7 @@ R"...(### G7 ###
 
 * Constant value of Number that indicates G7 square.
 * Value is '54'.)...";
-    lisp_ptr_->AddHelpDict("G7", temp);
+    AddHelpDict("G7", temp);
 
     temp =
 R"...(### H7 ###
@@ -3590,7 +3576,7 @@ R"...(### H7 ###
 
 * Constant value of Number that indicates H7 square.
 * Value is '55'.)...";
-    lisp_ptr_->AddHelpDict("H7", temp);
+    AddHelpDict("H7", temp);
 
     temp =
 R"...(### A8 ###
@@ -3599,7 +3585,7 @@ R"...(### A8 ###
 
 * Constant value of Number that indicates A8 square.
 * Value is '56'.)...";
-    lisp_ptr_->AddHelpDict("A8", temp);
+    AddHelpDict("A8", temp);
 
     temp =
 R"...(### B8 ###
@@ -3608,7 +3594,7 @@ R"...(### B8 ###
 
 * Constant value of Number that indicates B8 square.
 * Value is '57'.)...";
-    lisp_ptr_->AddHelpDict("B8", temp);
+    AddHelpDict("B8", temp);
 
     temp =
 R"...(### C8 ###
@@ -3617,7 +3603,7 @@ R"...(### C8 ###
 
 * Constant value of Number that indicates C8 square.
 * Value is '58'.)...";
-    lisp_ptr_->AddHelpDict("C8", temp);
+    AddHelpDict("C8", temp);
 
     temp =
 R"...(### D8 ###
@@ -3626,7 +3612,7 @@ R"...(### D8 ###
 
 * Constant value of Number that indicates D8 square.
 * Value is '59'.)...";
-    lisp_ptr_->AddHelpDict("D8", temp);
+    AddHelpDict("D8", temp);
 
     temp =
 R"...(### E8 ###
@@ -3635,7 +3621,7 @@ R"...(### E8 ###
 
 * Constant value of Number that indicates E8 square.
 * Value is '60'.)...";
-    lisp_ptr_->AddHelpDict("E8", temp);
+    AddHelpDict("E8", temp);
 
     temp =
 R"...(### F8 ###
@@ -3644,7 +3630,7 @@ R"...(### F8 ###
 
 * Constant value of Number that indicates F8 square.
 * Value is '61'.)...";
-    lisp_ptr_->AddHelpDict("F8", temp);
+    AddHelpDict("F8", temp);
 
     temp =
 R"...(### G8 ###
@@ -3653,7 +3639,7 @@ R"...(### G8 ###
 
 * Constant value of Number that indicates G8 square.
 * Value is '62'.)...";
-    lisp_ptr_->AddHelpDict("G8", temp);
+    AddHelpDict("G8", temp);
 
     temp =
 R"...(### H8 ###
@@ -3662,7 +3648,7 @@ R"...(### H8 ###
 
 * Constant value of Number that indicates H8 square.
 * Value is '63'.)...";
-    lisp_ptr_->AddHelpDict("H8", temp);
+    AddHelpDict("H8", temp);
 
     temp =
 R"...(### FYLE_A ###
@@ -3671,7 +3657,7 @@ R"...(### FYLE_A ###
 
 * Constant value of Number that indicates A-fyle.
 * Value is '0'.)...";
-    lisp_ptr_->AddHelpDict("FYLE_A", temp);
+    AddHelpDict("FYLE_A", temp);
 
     temp =
 R"...(### FYLE_B ###
@@ -3680,7 +3666,7 @@ R"...(### FYLE_B ###
 
 * Constant value of Number that indicates B-fyle.
 * Value is '1'.)...";
-    lisp_ptr_->AddHelpDict("FYLE_B", temp);
+    AddHelpDict("FYLE_B", temp);
 
     temp =
 R"...(### FYLE_C ###
@@ -3689,7 +3675,7 @@ R"...(### FYLE_C ###
 
 * Constant value of Number that indicates C-fyle.
 * Value is '2'.)...";
-    lisp_ptr_->AddHelpDict("FYLE_C", temp);
+    AddHelpDict("FYLE_C", temp);
 
     temp =
 R"...(### FYLE_D ###
@@ -3698,7 +3684,7 @@ R"...(### FYLE_D ###
 
 * Constant value of Number that indicates D-fyle.
 * Value is '3'.)...";
-    lisp_ptr_->AddHelpDict("FYLE_D", temp);
+    AddHelpDict("FYLE_D", temp);
 
     temp =
 R"...(### FYLE_E ###
@@ -3707,7 +3693,7 @@ R"...(### FYLE_E ###
 
 * Constant value of Number that indicates E-fyle.
 * Value is '4'.)...";
-    lisp_ptr_->AddHelpDict("FYLE_E", temp);
+    AddHelpDict("FYLE_E", temp);
 
     temp =
 R"...(### FYLE_F ###
@@ -3716,7 +3702,7 @@ R"...(### FYLE_F ###
 
 * Constant value of Number that indicates F-fyle.
 * Value is '5'.)...";
-    lisp_ptr_->AddHelpDict("FYLE_F", temp);
+    AddHelpDict("FYLE_F", temp);
 
     temp =
 R"...(### FYLE_G ###
@@ -3725,7 +3711,7 @@ R"...(### FYLE_G ###
 
 * Constant value of Number that indicates G-fyle.
 * Value is '6'.)...";
-    lisp_ptr_->AddHelpDict("FYLE_G", temp);
+    AddHelpDict("FYLE_G", temp);
 
     temp =
 R"...(### FYLE_H ###
@@ -3734,7 +3720,7 @@ R"...(### FYLE_H ###
 
 * Constant value of Number that indicates H-fyle.
 * Value is '7'.)...";
-    lisp_ptr_->AddHelpDict("FYLE_H", temp);
+    AddHelpDict("FYLE_H", temp);
 
     temp =
 R"...(### RANK_1 ###
@@ -3743,7 +3729,7 @@ R"...(### RANK_1 ###
 
 * Constant value of Number that indicates the 1st rank.
 * Value is '0'.)...";
-    lisp_ptr_->AddHelpDict("RANK_1", temp);
+    AddHelpDict("RANK_1", temp);
 
     temp =
 R"...(### RANK_2 ###
@@ -3752,7 +3738,7 @@ R"...(### RANK_2 ###
 
 * Constant value of Number that indicates the 2nd rank.
 * Value is '1'.)...";
-    lisp_ptr_->AddHelpDict("RANK_2", temp);
+    AddHelpDict("RANK_2", temp);
 
     temp =
 R"...(### RANK_3 ###
@@ -3761,7 +3747,7 @@ R"...(### RANK_3 ###
 
 * Constant value of Number that indicates the 3rd rank.
 * Value is '2'.)...";
-    lisp_ptr_->AddHelpDict("RANK_3", temp);
+    AddHelpDict("RANK_3", temp);
 
     temp =
 R"...(### RANK_4 ###
@@ -3770,7 +3756,7 @@ R"...(### RANK_4 ###
 
 * Constant value of Number that indicates the 4th rank.
 * Value is '3'.)...";
-    lisp_ptr_->AddHelpDict("RANK_4", temp);
+    AddHelpDict("RANK_4", temp);
 
     temp =
 R"...(### RANK_5 ###
@@ -3779,7 +3765,7 @@ R"...(### RANK_5 ###
 
 * Constant value of Number that indicates the 5th rank.
 * Value is '4'.)...";
-    lisp_ptr_->AddHelpDict("RANK_5", temp);
+    AddHelpDict("RANK_5", temp);
 
     temp =
 R"...(### RANK_6 ###
@@ -3788,7 +3774,7 @@ R"...(### RANK_6 ###
 
 * Constant value of Number that indicates the 6th rank.
 * Value is '5'.)...";
-    lisp_ptr_->AddHelpDict("RANK_6", temp);
+    AddHelpDict("RANK_6", temp);
 
     temp =
 R"...(### RANK_7 ###
@@ -3797,7 +3783,7 @@ R"...(### RANK_7 ###
 
 * Constant value of Number that indicates the 7th rank.
 * Value is '6'.)...";
-    lisp_ptr_->AddHelpDict("RANK_7", temp);
+    AddHelpDict("RANK_7", temp);
 
     temp =
 R"...(### RANK_8 ###
@@ -3806,7 +3792,7 @@ R"...(### RANK_8 ###
 
 * Constant value of Number that indicates the 8th rank.
 * Value is '7'.)...";
-    lisp_ptr_->AddHelpDict("RANK_8", temp);
+    AddHelpDict("RANK_8", temp);
 
     temp =
 R"...(### NO_SIDE ###
@@ -3815,7 +3801,7 @@ R"...(### NO_SIDE ###
 
 * Constant value of Number that indicates neither of sides.
 * Value is '0'.)...";
-    lisp_ptr_->AddHelpDict("NO_SIDE", temp);
+    AddHelpDict("NO_SIDE", temp);
 
     temp =
 R"...(### WHITE ###
@@ -3824,7 +3810,7 @@ R"...(### WHITE ###
 
 * Constant value of Number that indicates White.
 * Value is '1'.)...";
-    lisp_ptr_->AddHelpDict("WHITE", temp);
+    AddHelpDict("WHITE", temp);
 
     temp =
 R"...(### BLACK ###
@@ -3833,7 +3819,7 @@ R"...(### BLACK ###
 
 * Constant value of Number that indicates Black.
 * Value is '2'.)...";
-    lisp_ptr_->AddHelpDict("BLACK", temp);
+    AddHelpDict("BLACK", temp);
 
     temp =
 R"...(### EMPTY ###
@@ -3842,7 +3828,7 @@ R"...(### EMPTY ###
 
 * Constant value of Number that indicates no piece.
 * Value is '0'.)...";
-    lisp_ptr_->AddHelpDict("EMPTY", temp);
+    AddHelpDict("EMPTY", temp);
 
     temp =
 R"...(### PAWN ###
@@ -3851,7 +3837,7 @@ R"...(### PAWN ###
 
 * Constant value of Number that indicates Pawn.
 * Value is '1'.)...";
-    lisp_ptr_->AddHelpDict("PAWN", temp);
+    AddHelpDict("PAWN", temp);
 
     temp =
 R"...(### KNIGHT ###
@@ -3860,7 +3846,7 @@ R"...(### KNIGHT ###
 
 * Constant value of Number that indicates Knight.
 * Value is '2'.)...";
-    lisp_ptr_->AddHelpDict("KNIGHT", temp);
+    AddHelpDict("KNIGHT", temp);
 
     temp =
 R"...(### BISHOP ###
@@ -3869,7 +3855,7 @@ R"...(### BISHOP ###
 
 * Constant value of Number that indicates Bishop.
 * Value is '3'.)...";
-    lisp_ptr_->AddHelpDict("BISHOP", temp);
+    AddHelpDict("BISHOP", temp);
 
     temp =
 R"...(### ROOK ###
@@ -3878,7 +3864,7 @@ R"...(### ROOK ###
 
 * Constant value of Number that indicates Rook.
 * Value is '4'.)...";
-    lisp_ptr_->AddHelpDict("ROOK", temp);
+    AddHelpDict("ROOK", temp);
 
     temp =
 R"...(### QUEEN ###
@@ -3887,7 +3873,7 @@ R"...(### QUEEN ###
 
 * Constant value of Number that indicates Queen.
 * Value is '5'.)...";
-    lisp_ptr_->AddHelpDict("QUEEN", temp);
+    AddHelpDict("QUEEN", temp);
 
     temp =
 R"...(### KING ###
@@ -3896,7 +3882,7 @@ R"...(### KING ###
 
 * Constant value of Number that indicates King.
 * Value is '6'.)...";
-    lisp_ptr_->AddHelpDict("KING", temp);
+    AddHelpDict("KING", temp);
 
     temp =
 R"...(### NO_CASTLING ###
@@ -3905,7 +3891,7 @@ R"...(### NO_CASTLING ###
 
 * Constant value of Number that indicates no one to castle.
 * Value is '0'.)...";
-    lisp_ptr_->AddHelpDict("NO_CASTLING", temp);
+    AddHelpDict("NO_CASTLING", temp);
 
     temp =
 R"...(### WHITE_SHORT_CASTLING ###
@@ -3914,7 +3900,7 @@ R"...(### WHITE_SHORT_CASTLING ###
 
 * Constant value of Number that indicates White's Short Castling.
 * Value is '1'.)...";
-    lisp_ptr_->AddHelpDict("WHITE_SHORT_CASTLING", temp);
+    AddHelpDict("WHITE_SHORT_CASTLING", temp);
 
     temp =
 R"...(### WHITE_LONG_CASTLING ###
@@ -3923,7 +3909,7 @@ R"...(### WHITE_LONG_CASTLING ###
 
 * Constant value of Number that indicates White's Long Castling.
 * Value is '2'.)...";
-    lisp_ptr_->AddHelpDict("WHITE_LONG_CASTLING", temp);
+    AddHelpDict("WHITE_LONG_CASTLING", temp);
 
     temp =
 R"...(### BLACK_SHORT_CASTLING ###
@@ -3932,7 +3918,7 @@ R"...(### BLACK_SHORT_CASTLING ###
 
 * Constant value of Number that indicates Black's Short Castling.
 * Value is '3'.)...";
-    lisp_ptr_->AddHelpDict("BLACK_SHORT_CASTLING", temp);
+    AddHelpDict("BLACK_SHORT_CASTLING", temp);
 
     temp =
 R"...(### BLACK_LONG_CASTLING ###
@@ -3942,7 +3928,7 @@ R"...(### BLACK_LONG_CASTLING ###
 * Constant value of Number that indicates Black's Long Castling.
 * Value is '4'.)...";
 
-    lisp_ptr_->AddHelpDict("BLACK_LONG_CASTLING", temp);
+    AddHelpDict("BLACK_LONG_CASTLING", temp);
     // %%% exit
     temp =
 R"...(### exit ###
@@ -3963,7 +3949,7 @@ R"...(### exit ###
     
     ;; Exit with EXIT_FAILURE.
     (exit 1))...";
-    lisp_ptr_->AddHelpDict("exit", temp);
+    AddHelpDict("exit", temp);
 
     temp =
 R"...(### sayuri-license ###
@@ -4010,7 +3996,7 @@ R"...(### sayuri-license ###
     ;; > ARISING
     ;; > FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
     ;; > DEALINGS IN THE SOFTWARE.)...";
-    lisp_ptr_->AddHelpDict("sayuri-license", temp);
+    AddHelpDict("sayuri-license", temp);
 
     temp =
 R"...(### square->number ###
@@ -4032,7 +4018,7 @@ R"...(### square->number ###
     (display (square->number symbol-list))
     ;; Output
     ;; > (0 1 2 (WHITE 19 28 (37 PAWN 46) 55 BLACK_LONG_CASTLING)))...";
-    lisp_ptr_->AddHelpDict("square->number", temp);
+    AddHelpDict("square->number", temp);
 
     temp =
 R"...(### fyle->number ###
@@ -4054,7 +4040,7 @@ R"...(### fyle->number ###
     (display (fyle->number symbol-list))
     ;; Output
     ;; > (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING)))...";
-    lisp_ptr_->AddHelpDict("fyle->number", temp);
+    AddHelpDict("fyle->number", temp);
 
     temp =
 R"...(### rank->number ###
@@ -4076,7 +4062,7 @@ R"...(### rank->number ###
     (display (rank->number symbol-list))
     ;; Output
     ;; > (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING)))...";
-    lisp_ptr_->AddHelpDict("rank->number", temp);
+    AddHelpDict("rank->number", temp);
 
     temp =
 R"...(### side->number ### {#side-to-number}
@@ -4098,7 +4084,7 @@ R"...(### side->number ### {#side-to-number}
     (display (side->number symbol-list))
     ;; Output
     ;; > (0 1 (FYLE_A 2 E4 (PAWN G6) BLACK_LONG_CASTLING)))...";
-    lisp_ptr_->AddHelpDict("side->number", temp);
+    AddHelpDict("side->number", temp);
 
     temp =
 R"...(### piece->number ###
@@ -4121,7 +4107,7 @@ R"...(### piece->number ###
     (display (piece->number symbol-list))
     ;; Output
     ;; > (0 1 (FYLE_A 5 E4 (RANK_4 G6) 6 BLACK_LONG_CASTLING)))...";
-    lisp_ptr_->AddHelpDict("piece->number", temp);
+    AddHelpDict("piece->number", temp);
 
     temp =
 R"...(### castling->number ###
@@ -4145,7 +4131,7 @@ R"...(### castling->number ###
     (display (castling->number symbol-list))
     ;; Output
     ;; > (0 1 (FYLE_A E4 (RANK_4 G6) KING)))...";
-    lisp_ptr_->AddHelpDict("castling->number", temp);
+    AddHelpDict("castling->number", temp);
 
     temp =
 R"...(### number->square ### {#number-to-square}
@@ -4166,7 +4152,7 @@ R"...(### number->square ### {#number-to-square}
     (display (number->square number-list))
     ;; Output
     ;; > (A1 B1 (C1 (D1 E1 "Hello") F1) 100))...";
-    lisp_ptr_->AddHelpDict("number->square", temp);
+    AddHelpDict("number->square", temp);
 
     temp =
 R"...(### number->fyle ### {#number-to-fyle}
@@ -4187,7 +4173,7 @@ R"...(### number->fyle ### {#number-to-fyle}
     (display (number->fyle number-list))
     ;; Output
     ;; > (FYLE_A FYLE_B (FYLE_C (FYLE_D FYLE_E "Hello") FYLE_F) 100))...";
-    lisp_ptr_->AddHelpDict("number->fyle", temp);
+    AddHelpDict("number->fyle", temp);
 
     temp =
 R"...(### number->rank ### {#number-to-rank}
@@ -4208,7 +4194,7 @@ R"...(### number->rank ### {#number-to-rank}
     (display (number->rank number-list))
     ;; Output
     ;; > (RANK_1 RANK_2 (RANK_3 (RANK_4 RANK_5 "Hello") RANK_6) 100))...";
-    lisp_ptr_->AddHelpDict("number->rank", temp);
+    AddHelpDict("number->rank", temp);
 
     temp =
 R"...(### number->side ### {#number-to-side}
@@ -4229,7 +4215,7 @@ R"...(### number->side ### {#number-to-side}
     (display (number->side number-list))
     ;; Output
     ;; > (NO_SIDE WHITE (BLACK (3 4 "Hello") 5) 100))...";
-    lisp_ptr_->AddHelpDict("number->side", temp);
+    AddHelpDict("number->side", temp);
 
     temp =
 R"...(### number->piece ### {#number-to-piece}
@@ -4250,7 +4236,7 @@ R"...(### number->piece ### {#number-to-piece}
     (display (number->piece number-list))
     ;; Output
     ;; > (EMPTY PAWN (KNIGHT (BISHOP ROOK "Hello") QUEEN) 100))...";
-    lisp_ptr_->AddHelpDict("number->piece", temp);
+    AddHelpDict("number->piece", temp);
 
     temp =
 R"...(### number->castling ### {#number-to-castling}
@@ -4274,7 +4260,7 @@ R"...(### number->castling ### {#number-to-castling}
     ;; > (NO_CASTLING WHITE_SHORT_CASTLING (WHITE_LONG_CASTLING
     ;; > (BLACK_SHORT_CASTLING BLACK_LONG_CASTLING "Hello") 5) 100))...";
 
-    lisp_ptr_->AddHelpDict("number->castling", temp);
+    AddHelpDict("number->castling", temp);
 
     // %%% gen-engine
     temp =
@@ -6288,6 +6274,6 @@ R"...(### gen-engine ###
     ;; Output
     ;; > (111 222))...";
     
-    lisp_ptr_->AddHelpDict("gen-engine", temp);
+    AddHelpDict("gen-engine", temp);
   }
 }  // namespace Sayuri
