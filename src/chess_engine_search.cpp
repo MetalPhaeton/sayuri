@@ -320,7 +320,7 @@ namespace Sayuri {
     int null_reduction = 0;
     if (cache.enable_nmr_) {
       if (node_type == NodeType::NON_PV) {
-        if (!(is_null_searching_) && !is_checked
+        if (!(is_null_searching_ || is_checked)
         && (depth >= cache.nmr_limit_depth_)) {
           // Null Move Reduction。
           Move null_move = 0;
@@ -365,7 +365,7 @@ namespace Sayuri {
     // --- ProbCut --- //
     if (cache.enable_probcut_) {
       if (node_type == NodeType::NON_PV) {
-        if (!(is_null_searching_) && !is_checked
+        if (!(is_null_searching_ || is_checked)
         && (depth >= cache.probcut_limit_depth_)) {
           // 手を作る。
           MoveMaker& maker = maker_table_[level];
@@ -527,12 +527,12 @@ namespace Sayuri {
       // --- Late Move Reduction --- //
       bool do_normal_search = false;
       if (cache.enable_lmr_) {
-        if (!is_checked && !null_reduction
+        if (!(is_checked || null_reduction)
         && (depth >= cache.lmr_limit_depth_)
         && (move_number > lmr_move_number)
-        && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
-        && !EqualMove(move, shared_st_ptr_->killer_stack_[level][0])
-        && !EqualMove(move, shared_st_ptr_->killer_stack_[level][1])) {
+        && !((move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
+        || EqualMove(move, shared_st_ptr_->killer_stack_[level][0])
+        || EqualMove(move, shared_st_ptr_->killer_stack_[level][1]))) {
           score = -Search(NodeType::NON_PV, next_hash,
           depth - cache.lmr_search_reduction_ - 1, level + 1,
           -(temp_alpha + 1), -temp_alpha, next_material);
@@ -574,14 +574,14 @@ namespace Sayuri {
           // --- History Pruning --- //
           int new_depth = depth;
           if (cache.enable_history_pruning_) {
-            if (!is_checked && !null_reduction
+            if (!(is_checked || null_reduction)
             && (depth >= cache.history_pruning_limit_depth_)
             && (move_number > history_pruning_move_number)
             && (shared_st_ptr_->history_[side][from][to]
             < history_pruning_threshold)
-            && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
-            && !EqualMove(move, shared_st_ptr_->killer_stack_[level][0])
-            && !EqualMove(move, shared_st_ptr_->killer_stack_[level][1])) {
+            && !((move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
+            || EqualMove(move, shared_st_ptr_->killer_stack_[level][0])
+            || EqualMove(move, shared_st_ptr_->killer_stack_[level][1]))) {
               new_depth -= cache.history_pruning_reduction_;
             }
           }
@@ -677,7 +677,7 @@ namespace Sayuri {
       // Null Move探索中の局面は登録しない。
       // Null Move Reductionされていた場合、容量節約のため登録しない。
       if (cache.enable_ttable_) {
-        if (!is_null_searching_ && !null_reduction) {
+        if (!(is_null_searching_ || null_reduction)) {
           table_ptr_->Add(pos_hash, depth, job.alpha_, job.score_type_,
           best_move);
         }
@@ -1030,12 +1030,12 @@ namespace Sayuri {
       // --- Late Move Reduction --- //
       bool do_normal_search = false;
       if (cache.enable_lmr_) {
-        if (!(job.is_checked_) && !(job.null_reduction_)
+        if (!(job.is_checked_ || job.null_reduction_)
         && (job.depth_ >= cache.lmr_limit_depth_)
         && (move_number > lmr_move_number)
-        && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
-        && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][0])
-        && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][1])) {
+        && !((move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
+        || EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][0])
+        || EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][1]))) {
           score = -Search(NodeType::NON_PV, next_hash,
           job.depth_ - cache.lmr_search_reduction_ - 1, job.level_ + 1,
           -(temp_alpha + 1), -temp_alpha, next_material);
@@ -1077,15 +1077,15 @@ namespace Sayuri {
           // --- History Pruning --- //
           int new_depth = job.depth_;
           if (cache.enable_history_pruning_) {
-            if (!(job.is_checked_) && !(job.null_reduction_)
+            if (!(job.is_checked_ || job.null_reduction_)
             && (job.depth_ >= cache.history_pruning_limit_depth_)
             && (move_number > history_pruning_move_number)
             && (shared_st_ptr_->history_[side][from][to]
             < history_pruning_threshold)
-            && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
-            && !EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][0])
-            && !EqualMove
-            (move, shared_st_ptr_->killer_stack_[job.level_][1])) {
+            && !((move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
+            || EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][0])
+            || EqualMove
+            (move, shared_st_ptr_->killer_stack_[job.level_][1]))) {
               new_depth -= cache.history_pruning_reduction_;
             }
           }
