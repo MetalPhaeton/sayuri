@@ -286,11 +286,12 @@ namespace Sayuri {
        */
       bool CanWhiteShortCastling() const {
         return (basic_st_.castling_rights_ & WHITE_SHORT_CASTLING)
-        && !(basic_st_.piece_board_[F1])
-        && !(basic_st_.piece_board_[G1])
-        && !IsAttacked(E1, BLACK)
-        && !IsAttacked(F1, BLACK)
-        && !IsAttacked(G1, BLACK);
+        && !((basic_st_.blocker_[R0]
+        & (Util::SQUARE[F1][R0]
+        | Util::SQUARE[G1][R0]))
+        || IsAttacked(E1, BLACK)
+        || IsAttacked(F1, BLACK)
+        || IsAttacked(G1, BLACK));
       }
 
       /**
@@ -299,12 +300,13 @@ namespace Sayuri {
        */
       bool CanWhiteLongCastling() const {
         return (basic_st_.castling_rights_ & WHITE_LONG_CASTLING)
-        && !(basic_st_.piece_board_[D1])
-        && !(basic_st_.piece_board_[C1])
-        && !(basic_st_.piece_board_[B1])
-        && !IsAttacked(E1, BLACK)
-        && !IsAttacked(D1, BLACK)
-        && !IsAttacked(C1, BLACK);
+        && !((basic_st_.blocker_[R0]
+        & (Util::SQUARE[D1][R0]
+        | Util::SQUARE[C1][R0]
+        | Util::SQUARE[B1][R0]))
+        || IsAttacked(E1, BLACK)
+        || IsAttacked(D1, BLACK)
+        || IsAttacked(C1, BLACK));
       }
 
       /**
@@ -313,11 +315,12 @@ namespace Sayuri {
        */
       bool CanBlackShortCastling() const {
         return (basic_st_.castling_rights_ & BLACK_SHORT_CASTLING)
-        && !(basic_st_.piece_board_[F8])
-        && !(basic_st_.piece_board_[G8])
-        && !IsAttacked(E8, WHITE)
-        && !IsAttacked(F8, WHITE)
-        && !IsAttacked(G8, WHITE);
+        && !((basic_st_.blocker_[R0]
+        & (Util::SQUARE[F8][R0]
+        | Util::SQUARE[G8][R0]))
+        || IsAttacked(E8, WHITE)
+        || IsAttacked(F8, WHITE)
+        || IsAttacked(G8, WHITE));
       }
 
       /**
@@ -326,12 +329,13 @@ namespace Sayuri {
        */
       bool CanBlackLongCastling() const {
         return (basic_st_.castling_rights_ & BLACK_LONG_CASTLING)
-        && !(basic_st_.piece_board_[D8])
-        && !(basic_st_.piece_board_[C8])
-        && !(basic_st_.piece_board_[B8])
-        && !IsAttacked(E8, WHITE)
-        && !IsAttacked(D8, WHITE)
-        && !IsAttacked(C8, WHITE);
+        && !((basic_st_.blocker_[R0]
+        & (Util::SQUARE[D8][R0]
+        | Util::SQUARE[C8][R0]
+        | Util::SQUARE[B8][R0]))
+        || IsAttacked(E8, WHITE)
+        || IsAttacked(D8, WHITE)
+        || IsAttacked(C8, WHITE));
       }
 
       /**
