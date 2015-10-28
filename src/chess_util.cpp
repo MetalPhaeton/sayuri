@@ -713,4 +713,86 @@ namespace Sayuri {
     engine_ = std::mt19937(SysClock::to_time_t(SysClock::now()));
     dist_ = std::uniform_int_distribution<Hash>(0, ULLONG_MAX);
   }
+
+  // Algebraic Notationを6文字に変換。
+  std::string Util::ParseAlgebraicNotation(const std::string& note) {
+    // ファイル・ランクの判定関数。
+    auto is_fyle = [](char c) -> bool {return (c >= 'a') && (c <= 'h');};
+    auto is_rank = [](char c) -> bool {return (c >= '1') && (c <= '8');};
+
+    if ((note == "O-O") || (note == "O-O-O")) return note;
+
+    std::string::const_iterator note_itr = note.cbegin();
+    std::string ret = "------";
+
+    // 駒の種類を判定。
+    if (note_itr == note.end()) return ret;
+    if (is_fyle(*note_itr)) {
+      ret[0] = 'P';
+    } else {
+      switch (*note_itr) {
+        case 'N': case 'B': case 'R': case 'Q': case 'K':
+          ret[0] = *note_itr;
+          ++note_itr;
+          break;
+        default:
+          return ret;
+      }
+    }
+
+    // 基点を判定。
+    if (note_itr == note.end()) return ret;
+    if (*note_itr == 'x') {
+      ++note_itr;
+      if (note_itr == note.end()) return ret;
+    }
+    if (is_rank(*note_itr)) {
+      ret[2] = *note_itr;
+      ++note_itr;
+    } else if (is_fyle(*note_itr)) {
+      std::string::const_iterator temp = note_itr;
+      for (++temp; temp != note.end(); ++temp) {
+        if (is_fyle(*temp)) {
+          ret[1] = *note_itr;
+          ++note_itr;
+          if (is_rank(*note_itr)) {
+            ret[2] = *note_itr;
+            ++note_itr;
+          }
+          break;
+        }
+      }
+    } else {
+      return ret;
+    }
+
+    // 終点を判定。
+    if (note_itr == note.end()) return ret;
+    if (*note_itr == 'x') {
+      ++note_itr;
+      if (note_itr == note.end()) return ret;
+    }
+    if (!is_fyle(*note_itr)) return ret;
+    ret[3] = *note_itr;
+    ++note_itr;
+    if (note_itr == note.end()) return ret;
+    if (!is_rank(*note_itr)) return ret;
+    ret[4] = *note_itr;
+    ++note_itr;
+
+    // 昇格を判定。
+    if (note_itr == note.end()) return ret;
+    if (*note_itr != '=') return ret;
+    ++note_itr;
+    if (note_itr == note.end()) return ret;
+    switch (*note_itr) {
+      case 'N': case 'B': case 'R': case 'Q':
+        ret[5] = *note_itr;
+        break;
+      default:
+        return ret;
+    }
+
+    return ret;
+  }
 }  // namespace Sayuri

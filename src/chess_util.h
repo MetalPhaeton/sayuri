@@ -1633,6 +1633,17 @@ namespace Sayuri {
         return ret;
       }
 
+      /**
+       * Algebraic Notationを6文字に変換。
+       * <種類><基点F><基点R><目的地F><目的地R><昇格>
+       * 未知の部分は'-'。
+       * キャスリングの場合はそのまま。
+       * @param alge Algebraic Notation.
+       * @return 6文字。
+       */
+      static std::string ParseAlgebraicNotation(const std::string& note);
+
+
       // ランダムな数値を得る。
       static Hash GetRandomHash() {return dist_(engine_);}
 

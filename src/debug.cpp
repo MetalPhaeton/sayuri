@@ -101,7 +101,7 @@ namespace Sayuri {
 
     // ========================================================================
 
-    DoRepeatTest(*shell_ptr);
+    std::cout << Util::ParseAlgebraicNotation(argv[1]) << std::endl;
 
     return 0;
   }

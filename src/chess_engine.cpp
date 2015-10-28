@@ -494,6 +494,14 @@ namespace Sayuri {
     return ret_vec;
   }
 
+  // Algebraic Notetionの指し手を予測する。
+  std::vector<Move> ChessEngine::GuessNote(const std::string& note) {
+    // まず、候補手を得る。
+    std::vector<Move> legal_move_vec = GetLegalMoves();
+
+    return legal_move_vec;
+  }
+
   // 駒を配置する。
   void ChessEngine::PlacePiece(Square square, PieceType piece_type,
   Side piece_side) {

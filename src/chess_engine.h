@@ -199,6 +199,13 @@ namespace Sayuri {
       std::vector<Move> GetLegalMoves();
 
       /**
+       * 現在の局面からAlgebraic Notationの指し手を予測する。
+       * @param note 予測するAlgebraic Notation。
+       * @return 候補の指し手のベクトル。
+       */
+      std::vector<Move> GuessNote(const std::string& note);
+
+      /**
        * 駒を配置する。
        * (注) お互いのキングは必ず1つになるように配置される。
        * - キングの場所に他の駒を配置できない。
