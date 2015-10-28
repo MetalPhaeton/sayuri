@@ -101,7 +101,40 @@ namespace Sayuri {
 
     // ========================================================================
 
-    std::cout << Util::ParseAlgebraicNotation(argv[1]) << std::endl;
+    Move move = 0;
+    SetFrom(move, H2);
+    SetTo(move, H4);
+    engine_ptr->PlayMove(move);
+    SetFrom(move, A7);
+    SetTo(move, A6);
+    engine_ptr->PlayMove(move);
+    SetFrom(move, H4);
+    SetTo(move, H5);
+    engine_ptr->PlayMove(move);
+    SetFrom(move, A6);
+    SetTo(move, A5);
+    engine_ptr->PlayMove(move);
+    SetFrom(move, H5);
+    SetTo(move, H6);
+    engine_ptr->PlayMove(move);
+    SetFrom(move, A5);
+    SetTo(move, A4);
+    engine_ptr->PlayMove(move);
+    SetFrom(move, H6);
+    SetTo(move, G7);
+    engine_ptr->PlayMove(move);
+    SetFrom(move, A4);
+    SetTo(move, A3);
+    engine_ptr->PlayMove(move);
+    if (argc < 2) return 0;
+    std::vector<Move> move_vec = engine_ptr->GuessNote(argv[1]);
+
+    PositionRecord record(*engine_ptr);
+    PrintPositionRecord(record);
+    for (auto move : move_vec) {
+      std::cout << "----------" << std::endl;
+      PrintMove(move);
+    }
 
     return 0;
   }
@@ -364,24 +397,23 @@ namespace Sayuri {
         break;
     }
     std::cout << std::endl;
-    std::cout << "Castling Rights:" << std::endl;
+
+    std::cout << "Castling Rights: ";
     Castling rights = record.castling_rights();
-    if (rights) {
-      if ((rights & WHITE_SHORT_CASTLING)) {
-        std::cout << "    White Short" << std::endl;
-      }
-      if ((rights & WHITE_LONG_CASTLING)) {
-        std::cout << "    White Long" << std::endl;
-      }
-      if ((rights & BLACK_SHORT_CASTLING)) {
-        std::cout << "    Black Short" << std::endl;
-      }
-      if ((rights & BLACK_LONG_CASTLING)) {
-        std::cout << "    Black Long" << std::endl;
-      }
-    } else {
-      std::cout << "    No One Has Rights" << std::endl;
+    if ((rights & WHITE_SHORT_CASTLING)) {
+      std::cout << "K";
     }
+    if ((rights & WHITE_LONG_CASTLING)) {
+      std::cout << "Q";
+    }
+    if ((rights & BLACK_SHORT_CASTLING)) {
+      std::cout << "k";
+    }
+    if ((rights & BLACK_LONG_CASTLING)) {
+      std::cout << "q";
+    }
+    std::cout << std::endl;
+
     std::cout << "En Passant Square: ";
     Square en_passant = record.en_passant_square();
     if (en_passant) {
@@ -396,7 +428,7 @@ namespace Sayuri {
     } else {
       std::cout << "No Square" << std::endl;
     }
-    std::cout << "Ply 100 Rule: " << record.clock() << std::endl;
+    std::cout << "Clock: " << record.clock() << std::endl;
     std::cout << "Ply: " << record.ply() << std::endl;
     std::cout << "Has Castled:" << std::endl;
     std::cout << "    White: ";

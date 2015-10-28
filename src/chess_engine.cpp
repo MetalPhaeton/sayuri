@@ -496,8 +496,105 @@ namespace Sayuri {
 
   // Algebraic Notetionの指し手を予測する。
   std::vector<Move> ChessEngine::GuessNote(const std::string& note) {
+    // パース。
+    std::string note_2 = Util::ParseAlgebraicNotation(note);
+
     // まず、候補手を得る。
     std::vector<Move> legal_move_vec = GetLegalMoves();
+
+    // 駒の種類で弾く。
+    if (note_2[0] != '-') {
+      std::vector<Move>::iterator itr = legal_move_vec.begin();
+      PieceType piece_type = EMPTY;
+      switch (note_2[0]) {
+        case 'P': piece_type = PAWN; break;
+        case 'N': piece_type = KNIGHT; break;
+        case 'B': piece_type = BISHOP; break;
+        case 'R': piece_type = ROOK; break;
+        case 'Q': piece_type = QUEEN; break;
+        case 'K': piece_type = KING; break;
+      }
+      while (itr != legal_move_vec.end()) {
+        if (basic_st_.piece_board_[GetFrom(*itr)] != piece_type) {
+          legal_move_vec.erase(itr);
+        } else {
+          ++itr;
+        }
+      }
+    }
+
+    // 基点ファイルで弾く。
+    if (note_2[1] != '-') {
+      std::vector<Move>::iterator itr = legal_move_vec.begin();
+      Fyle fyle = note_2[1] - 'a';
+      while (itr != legal_move_vec.end()) {
+        if (Util::SquareToFyle(GetFrom(*itr)) != fyle) {
+          legal_move_vec.erase(itr);
+        } else {
+          ++itr;
+        }
+      }
+    }
+
+    // 基点ランクで弾く。
+    if (note_2[2] != '-') {
+      std::vector<Move>::iterator itr = legal_move_vec.begin();
+      Rank rank = note_2[2] - '1';
+      while (itr != legal_move_vec.end()) {
+        if (Util::SquareToRank(GetFrom(*itr)) != rank) {
+          legal_move_vec.erase(itr);
+        } else {
+          ++itr;
+        }
+      }
+    }
+
+    // 終点ファイルで弾く。
+    if (note_2[3] != '-') {
+      std::vector<Move>::iterator itr = legal_move_vec.begin();
+      Fyle fyle = note_2[3] - 'a';
+      while (itr != legal_move_vec.end()) {
+        if (Util::SquareToFyle(GetTo(*itr)) != fyle) {
+          legal_move_vec.erase(itr);
+        } else {
+          ++itr;
+        }
+      }
+    }
+
+    // 終点ランクで弾く。
+    if (note_2[4] != '-') {
+      std::vector<Move>::iterator itr = legal_move_vec.begin();
+      Rank rank = note_2[4] - '1';
+      while (itr != legal_move_vec.end()) {
+        if (Util::SquareToRank(GetTo(*itr)) != rank) {
+          legal_move_vec.erase(itr);
+        } else {
+          ++itr;
+        }
+      }
+    }
+
+    // 昇格で弾く。
+    if (note_2[5] != '-') {
+      std::vector<Move>::iterator itr = legal_move_vec.begin();
+      PieceType piece_type = EMPTY;
+      switch (note_2[5]) {
+        case 'P': piece_type = PAWN; break;
+        case 'N': piece_type = KNIGHT; break;
+        case 'B': piece_type = BISHOP; break;
+        case 'R': piece_type = ROOK; break;
+        case 'Q': piece_type = QUEEN; break;
+        case 'K': piece_type = KING; break;
+      }
+      while (itr != legal_move_vec.end()) {
+        if (GetPromotion(*itr) != piece_type) {
+          legal_move_vec.erase(itr);
+        } else {
+          ++itr;
+        }
+      }
+    }
 
     return legal_move_vec;
   }
