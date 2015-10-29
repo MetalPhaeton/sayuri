@@ -720,13 +720,19 @@ namespace Sayuri {
     auto is_fyle = [](char c) -> bool {return (c >= 'a') && (c <= 'h');};
     auto is_rank = [](char c) -> bool {return (c >= '1') && (c <= '8');};
 
-    if ((note == "O-O") || (note == "O-O-O")) return note;
+    // おしりのチェック・チェックメイトの印を除く。
+    std::string note_2 = note;
+    if ((note_2.back() == '#') || (note_2.back() == '+')) {
+      note_2.pop_back();
+    }
 
-    std::string::const_iterator note_itr = note.cbegin();
+    if ((note_2 == "O-O") || (note_2 == "O-O-O")) return note_2;
+
+    std::string::const_iterator note_itr = note_2.cbegin();
     std::string ret = "------";
 
     // 駒の種類を判定。
-    if (note_itr == note.end()) return ret;
+    if (note_itr == note_2.end()) return ret;
     if (is_fyle(*note_itr)) {
       ret[0] = 'P';
     } else {
@@ -741,17 +747,17 @@ namespace Sayuri {
     }
 
     // 基点を判定。
-    if (note_itr == note.end()) return ret;
+    if (note_itr == note_2.end()) return ret;
     if (*note_itr == 'x') {
       ++note_itr;
-      if (note_itr == note.end()) return ret;
+      if (note_itr == note_2.end()) return ret;
     }
     if (is_rank(*note_itr)) {
       ret[2] = *note_itr;
       ++note_itr;
     } else if (is_fyle(*note_itr)) {
       std::string::const_iterator temp = note_itr;
-      for (++temp; temp != note.end(); ++temp) {
+      for (++temp; temp != note_2.end(); ++temp) {
         if (is_fyle(*temp)) {
           ret[1] = *note_itr;
           ++note_itr;
@@ -767,24 +773,24 @@ namespace Sayuri {
     }
 
     // 終点を判定。
-    if (note_itr == note.end()) return ret;
+    if (note_itr == note_2.end()) return ret;
     if (*note_itr == 'x') {
       ++note_itr;
-      if (note_itr == note.end()) return ret;
+      if (note_itr == note_2.end()) return ret;
     }
     if (!is_fyle(*note_itr)) return ret;
     ret[3] = *note_itr;
     ++note_itr;
-    if (note_itr == note.end()) return ret;
+    if (note_itr == note_2.end()) return ret;
     if (!is_rank(*note_itr)) return ret;
     ret[4] = *note_itr;
     ++note_itr;
 
     // 昇格を判定。
-    if (note_itr == note.end()) return ret;
+    if (note_itr == note_2.end()) return ret;
     if (*note_itr != '=') return ret;
     ++note_itr;
-    if (note_itr == note.end()) return ret;
+    if (note_itr == note_2.end()) return ret;
     switch (*note_itr) {
       case 'N': case 'B': case 'R': case 'Q':
         ret[5] = *note_itr;

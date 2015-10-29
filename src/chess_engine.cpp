@@ -432,7 +432,7 @@ namespace Sayuri {
   }
 
   // 合法手かどうか判定。
-  bool ChessEngine::IsLegalMove(Move& move) {
+  bool ChessEngine::IsLegalMove(Move& move) const {
     // 合法手かどうか調べる。
     // 手を展開する。
     shared_st_ptr_->history_max_ = 1;  // makerが0の除算をしないように。
@@ -440,67 +440,88 @@ namespace Sayuri {
     maker.GenMoves<GenMoveType::ALL>(0, 0, 0, 0);
 
     // 合法手かどうか調べる。
+    ChessEngine* self = const_cast<ChessEngine*>(this);
     bool is_legal = false;
     Side side = basic_st_.to_move_;
     Side enemy_side = Util::GetOppositeSide(side);
     for (Move temp_move = maker.PickMove(); temp_move;
     temp_move = maker.PickMove()) {
-      MakeMove(temp_move);
+      self->MakeMove(temp_move);
       // temp_moveが合法手かどうか調べる。
       if (IsAttacked(basic_st_.king_[side], enemy_side)) {
-        UnmakeMove(temp_move);
+        self->UnmakeMove(temp_move);
         continue;
       }
 
       // temp_moveと同じ手かどうか調べる。
       if (EqualMove(move, temp_move)) {
-        UnmakeMove(temp_move);
+        self->UnmakeMove(temp_move);
         move = temp_move;
         is_legal = true;
         break;
       }
-      UnmakeMove(temp_move);
+      self->UnmakeMove(temp_move);
     }
 
     return is_legal;
   }
 
   // 合法手のベクトルを得る。
-  std::vector<Move> ChessEngine::GetLegalMoves() {
+  std::vector<Move> ChessEngine::GetLegalMoves() const {
     // 手を展開する。
     shared_st_ptr_->history_max_ = 1;  // makerが0の除算をしないように。
     MoveMaker maker(*this);
     maker.GenMoves<GenMoveType::ALL>(0, 0, 0, 0);
 
     // 合法手かどうか調べながらベクトルに格納していく。
+    ChessEngine* self = const_cast<ChessEngine*>(this);
     std::vector<Move> ret_vec;
     Side side = basic_st_.to_move_;
     Side enemy_side = Util::GetOppositeSide(side);
     for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
-      MakeMove(move);
+      self->MakeMove(move);
 
       // 動かした結果、チェックされているかどうか。
       if (IsAttacked(basic_st_.king_[side], enemy_side)) {
         // チェックされていれば違法。
-        UnmakeMove(move);
+        self->UnmakeMove(move);
         continue;
       }
 
       // 合法手。
       ret_vec.push_back(move);
-      UnmakeMove(move);
+      self->UnmakeMove(move);
     }
 
     return ret_vec;
   }
 
   // Algebraic Notetionの指し手を予測する。
-  std::vector<Move> ChessEngine::GuessNote(const std::string& note) {
+  std::vector<Move> ChessEngine::GuessNote(const std::string& note) const {
     // パース。
     std::string note_2 = Util::ParseAlgebraicNotation(note);
 
     // まず、候補手を得る。
     std::vector<Move> legal_move_vec = GetLegalMoves();
+
+    // キャスリング判定。
+    if (note_2 == "O-O") {
+      for (auto move : legal_move_vec) {
+        MoveType move_type = GetMoveType(move);
+        if ((move_type == CASTLE_WS) || (move_type == CASTLE_BS)) {
+          return std::vector<Move> {move};
+        }
+      }
+      return std::vector<Move>();
+    } else if (note_2 == "O-O-O") {
+      for (auto move : legal_move_vec) {
+        MoveType move_type = GetMoveType(move);
+        if ((move_type == CASTLE_WL) || (move_type == CASTLE_BL)) {
+          return std::vector<Move> {move};
+        }
+      }
+      return std::vector<Move>();
+    }
 
     // 駒の種類で弾く。
     if (note_2[0] != '-') {
@@ -599,6 +620,137 @@ namespace Sayuri {
     return legal_move_vec;
   }
 
+  // Algebraic Notationを作成する。
+  std::string ChessEngine::MoveToNote(Move move) const {
+    // 候補手を得る。
+    std::vector<Move> legal_move_vec = GetLegalMoves();
+
+    // 先ず、moveを検査。 OKなら合法手からコピー。
+    bool is_ok = false;
+    for (auto move_2 : legal_move_vec) {
+      if (EqualMove(move, move_2)) {
+        move = move_2;
+        is_ok = true;
+        break;
+      }
+    }
+    if (!is_ok) return std::string();
+
+    // 情報収集。
+    Square from = GetFrom(move);
+    Square to = GetTo(move);
+    PieceType promotion = GetPromotion(move);
+    PieceType piece_type = basic_st_.piece_board_[from];
+    MoveType move_type = GetMoveType(move);
+
+    std::ostringstream oss;
+
+    // チェック・チェックメイトを調べる。
+    bool is_check = false;
+    bool is_checkmate = false;
+    Side side = basic_st_.to_move_;
+    Side enemy_side = Util::GetOppositeSide(side);
+    ChessEngine* self = const_cast<ChessEngine*>(this);
+    self->MakeMove(move);
+    if (self->IsAttacked(basic_st_.king_[enemy_side], side)) {
+      is_check = true;
+      std::vector<Move> temp = self->GetLegalMoves();
+      if (temp.size() <= 0) {
+        is_checkmate = true;
+      }
+    }
+    self->UnmakeMove(move);
+
+
+    // キャスリング判定。
+    if ((move_type == CASTLE_WS) || (move_type == CASTLE_BS)) {
+      // ショートキャスリング。
+      oss << "O-O";
+      if (is_checkmate) oss << "#";
+      else if (is_check) oss << "+";
+      return oss.str();
+    } else if ((move_type == CASTLE_WL) || (move_type == CASTLE_BL)) {
+      // ロングキャスリング。
+      oss << "O-O-O";
+      if (is_checkmate) oss << "#";
+      else if (is_check) oss << "+";
+      return oss.str();
+    }
+
+    // 駒の種類を書き込む。
+    switch (piece_type) {
+      case KNIGHT: oss << "N"; break;
+      case BISHOP: oss << "B"; break;
+      case ROOK: oss << "R"; break;
+      case QUEEN: oss << "Q"; break;
+      case KING: oss << "K"; break;
+    }
+
+    // 同じ駒の同じ目的地のものを得る。 自分自身は除く。
+    std::vector<Move> same_to;
+    for (auto move_2 : legal_move_vec) {
+      if (EqualMove(move, move_2)) break;
+
+      if (GetTo(move_2) == to) {
+        if (basic_st_.piece_board_[GetFrom(move_2)] == piece_type) {
+          same_to.push_back(move_2);
+        }
+      }
+    }
+
+    // 基点を書き込む。
+    if (same_to.size() >= 1) {
+      // 同じファイルかランクかを判定。
+      bool same_fyle = false;
+      bool same_rank = false;
+      for (auto move_2 : same_to) {
+        if (Util::SquareToFyle(GetFrom(move_2)) == Util::SquareToFyle(from)) {
+          same_fyle = true;
+        }
+        if (Util::SquareToRank(GetFrom(move_2)) == Util::SquareToRank(from)) {
+          same_rank = true;
+        }
+      }
+
+      // 書き込む。 同じファイルがあるときはランクを書く。
+      if (same_fyle) {
+        if (same_rank) {
+          // 同じランクがあるので、ファイルを書く。
+          oss << static_cast<char>('a' + Util::SquareToFyle(from));
+        }
+        oss << static_cast<char>('1' + Util::SquareToRank(from));
+      } else {
+        oss << static_cast<char>('a' + Util::SquareToFyle(from));
+      }
+    }
+
+    // 駒を取る手の印を書き込む。 ポーンの場合は基点も書く。
+    if (GetCapturedPiece(move)) {
+      if (piece_type == PAWN) {
+        oss << static_cast<char>('a' + Util::SquareToFyle(from));
+      }
+      oss << "x";
+    }
+
+    // 終点を書き込む。
+    oss << static_cast<char>('a' + Util::SquareToFyle(to));
+    oss << static_cast<char>('1' + Util::SquareToRank(to));
+
+    // 昇格を書き込む。
+    switch (promotion) {
+      case KNIGHT: oss << "=N"; break;
+      case BISHOP: oss << "=B"; break;
+      case ROOK: oss << "=R"; break;
+      case QUEEN: oss << "=Q"; break;
+    }
+
+    // チェック・チェックメイトを書き込む。
+    if (is_checkmate) oss << "#";
+    else if (is_check) oss << "+";
+
+    return oss.str();
+  }
+
   // 駒を配置する。
   void ChessEngine::PlacePiece(Square square, PieceType piece_type,
   Side piece_side) {
@@ -628,7 +780,7 @@ namespace Sayuri {
   }
 
   // 手を指す。
-  void ChessEngine::PlayMove(Move move) throw (SayuriError) {
+  bool ChessEngine::PlayMove(Move move) {
     if (IsLegalMove(move)) {
       ++(basic_st_.ply_);
       if ((basic_st_.piece_board_[GetFrom(move)] == PAWN)
@@ -642,19 +794,15 @@ namespace Sayuri {
       MakeMove(move);
       shared_st_ptr_->position_history_.push_back(PositionRecord(*this));
 
-      return;
+      return true;
     }
-
-    // 違法手。
-    throw SayuriError("ChessEngine::PlayMove()_1");
+    return false;
   }
 
   // 1手戻す。
-  Move ChessEngine::UndoMove() throw (SayuriError) {
-    // エラー。
-    if (shared_st_ptr_->move_history_.size() <= 0) {
-      throw SayuriError("ChessEngine::UndoMove()_1");
-    }
+  Move ChessEngine::UndoMove() {
+    // 戻せない。
+    if (shared_st_ptr_->move_history_.size() <= 0) return 0;
 
     --(basic_st_.ply_);
     Move move = shared_st_ptr_->move_history_.back();

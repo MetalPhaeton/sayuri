@@ -173,16 +173,15 @@ namespace Sayuri {
       /**
        * 手を指す。
        * @param move 指し手。
-       * @exception SayuriError 合法手でない。
+       * @return 指せればtrue。
        */
-      void PlayMove(Move move) throw (SayuriError);
+      bool PlayMove(Move move);
 
       /**
        * 1手戻す。
-       * @return 戻された手。
-       * @exception SayuriError 手を戻せなかった。
+       * @return 戻された手。 戻せない時は0。
        */
-      Move UndoMove() throw (SayuriError);
+      Move UndoMove();
 
       /**
        * 合法手かどうか判定する。
@@ -190,20 +189,27 @@ namespace Sayuri {
        * @param move 判定したい手。
        * @return 判定結果。 合法手ならtrue。
        */
-      bool IsLegalMove(Move& move);
+      bool IsLegalMove(Move& move) const;
 
       /**
        * 合法手のベクトルを得る。
        * @return 合法手のベクトル。
        */
-      std::vector<Move> GetLegalMoves();
+      std::vector<Move> GetLegalMoves() const;
 
       /**
        * 現在の局面からAlgebraic Notationの指し手を予測する。
        * @param note 予測するAlgebraic Notation。
        * @return 候補の指し手のベクトル。
        */
-      std::vector<Move> GuessNote(const std::string& note);
+      std::vector<Move> GuessNote(const std::string& note) const;
+
+      /**
+       * 現在の局面からAlgebraic Notationを作成する。
+       * @param move 作成したい指し手。
+       * @return Algebraic Notation。
+       */
+      std::string MoveToNote(Move move) const;
 
       /**
        * 駒を配置する。

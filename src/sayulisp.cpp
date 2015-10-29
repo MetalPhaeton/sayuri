@@ -2191,26 +2191,13 @@ namespace Sayuri {
     SetTo(move, to);
     SetPromotion(move, promotion);
 
-    try {
-      engine_ptr_->PlayMove(move);
-    } catch (SayuriError error) {
-      throw Lisp::GenError("@engine-error",
-      "'(" + SQUARE_SYMBOL[from] + " " + SQUARE_SYMBOL[to] + " "
-      + PIECE_TYPE_SYMBOL[promotion] + ")' is not legal move.");
-    }
-
-    return Lisp::NewBoolean(true);
+    return Lisp::NewBoolean(engine_ptr_->PlayMove(move));
   }
 
   // 手を戻す。
   LispObjectPtr EngineSuite::UndoMove() {
-    Move move = 0;
-    try {
-      move = engine_ptr_->UndoMove();
-    } catch (SayuriError error) {
-      throw Lisp::GenError("@engine-error", "Couldn't undo,"
-      " because there are no moves in the engine's move history table.");
-    }
+    Move move = engine_ptr_->UndoMove();
+    if (!move) return Lisp::NewNil();
 
     LispObjectPtr ret_ptr = Lisp::NewList(3);
     ret_ptr->car(Lisp::NewSymbol(SQUARE_SYMBOL[GetFrom(move)]));
@@ -4589,7 +4576,6 @@ R"...(### gen-engine ###
         - `<To>` is a square where you want to move the piece to.
         - `<Promotion>` is a piece type which you want to promote Pawn into.
             - If it can't promote Pawn, `<Promotion>` is EMPTY.
-        - If move is illegal, it throws exception.
         - Returns #t.
 * `@undo-move`
     - Undoes previous move.

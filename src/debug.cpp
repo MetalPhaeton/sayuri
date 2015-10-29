@@ -101,40 +101,24 @@ namespace Sayuri {
 
     // ========================================================================
 
-    Move move = 0;
-    SetFrom(move, H2);
-    SetTo(move, H4);
-    engine_ptr->PlayMove(move);
-    SetFrom(move, A7);
-    SetTo(move, A6);
-    engine_ptr->PlayMove(move);
-    SetFrom(move, H4);
-    SetTo(move, H5);
-    engine_ptr->PlayMove(move);
-    SetFrom(move, A6);
-    SetTo(move, A5);
-    engine_ptr->PlayMove(move);
-    SetFrom(move, H5);
-    SetTo(move, H6);
-    engine_ptr->PlayMove(move);
-    SetFrom(move, A5);
-    SetTo(move, A4);
-    engine_ptr->PlayMove(move);
-    SetFrom(move, H6);
-    SetTo(move, G7);
-    engine_ptr->PlayMove(move);
-    SetFrom(move, A4);
-    SetTo(move, A3);
-    engine_ptr->PlayMove(move);
-    if (argc < 2) return 0;
-    std::vector<Move> move_vec = engine_ptr->GuessNote(argv[1]);
+    std::vector<std::string> note_vec {
+      "f3", "e5", "g4"
+    };
 
-    PositionRecord record(*engine_ptr);
-    PrintPositionRecord(record);
-    for (auto move : move_vec) {
-      std::cout << "----------" << std::endl;
-      PrintMove(move);
+    for (auto& note : note_vec) {
+      std::vector<Move> move_vec = engine_ptr->GuessNote(note);
+      if (move_vec.size()) {
+        engine_ptr->PlayMove(move_vec[0]);
+      }
     }
+
+    PrintPositionRecord(PositionRecord(*engine_ptr));
+
+    Move move = 0;
+    SetFrom(move, D8);
+    SetTo(move, H4);
+    SetPromotion(move, EMPTY);
+    std::cout << engine_ptr->MoveToNote(move) << std::endl;
 
     return 0;
   }
