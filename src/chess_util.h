@@ -1634,15 +1634,21 @@ namespace Sayuri {
       }
 
       /**
+       * Algebraic Notationかどうかを判定。
+       * @param str 判定する文字列。
+       * @return Algebraic Notationならtrue。
+       */
+      static bool IsAlgebraicNotation(const std::string& str);
+
+      /**
        * Algebraic Notationを6文字に変換。
        * <種類><基点F><基点R><目的地F><目的地R><昇格>
        * 未知の部分は'-'。
        * キャスリングの場合はそのまま。
-       * @param alge Algebraic Notation.
+       * @param note Algebraic Notation.
        * @return 6文字。
        */
       static std::string ParseAlgebraicNotation(const std::string& note);
-
 
       // ランダムな数値を得る。
       static Hash GetRandomHash() {return dist_(engine_);}

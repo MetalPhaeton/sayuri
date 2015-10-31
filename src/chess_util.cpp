@@ -714,6 +714,129 @@ namespace Sayuri {
     dist_ = std::uniform_int_distribution<Hash>(0, ULLONG_MAX);
   }
 
+  // Algebraic Notationかどうかを判定。
+  bool Util::IsAlgebraicNotation(const std::string& str) {
+    // キャスリングかどうかを判定。
+    if ((str == "O-O") || (str == "O-O+") || (str == "O-O#")
+    || (str == "O-O-O") || (str == "O-O-O+") || (str == "O-O-O#")) {
+      return true;
+    }
+
+    auto is_piece = [](char c) -> bool {
+      return (c == 'N') || (c == 'B') || (c == 'R')
+      || (c == 'Q') || (c == 'K');
+    };
+    auto is_fyle = [](char c) -> bool {return (c >= 'a') && (c <= 'h');};
+    auto is_rank = [](char c) -> bool {return (c >= '1') && (c <= '8');};
+    auto is_square =
+    [&str, &is_fyle, &is_rank](std::string::const_iterator itr) -> bool {
+      if (itr == str.end()) return false;
+      if (!is_fyle(*itr)) return false;
+      ++itr;
+      if (itr == str.end()) return false;
+      if (!is_rank(*itr)) return false;
+      return true;
+    };
+
+    std::string::const_iterator itr = str.begin();
+
+    // 最初の文字がファイル、または駒。
+    if (!(is_piece(*itr) || is_fyle(*itr))) return false;
+    if (is_piece(*itr)) ++itr;
+
+    // ここで終わったら違う。
+    if (itr == str.end()) return false;
+
+    // fromとtoを判定。
+    if (is_fyle(*itr)) {
+      // 次はランクかxでなくてはらない。
+      ++itr;
+      if (itr == str.end()) return false;
+      if (is_rank(*itr)) {
+        // 次は終了か=+#かxかマスでなくてはなない。
+        ++itr;
+        if (itr == str.end()
+        || (*itr == '=') || (*itr == '+') || (*itr == '#')) {
+          // 無視。
+        } else if (*itr == 'x') {
+          ++itr;
+          // 次はマスでなくてはならない。
+          if (is_square(itr)) {
+            itr += 2;
+          } else {
+            return false;
+          }
+        } else if (is_square(itr)) {
+          itr += 2;
+        } else {
+          return false;
+        }
+      } else if (*itr == 'x') {
+        // 次はマスでなくてはならない。
+        ++itr;
+        if (is_square(itr)) {
+          itr += 2;
+        } else {
+          return false;
+        }
+      } else if (is_square(itr)) {
+        itr += 2;
+      } else {
+        return false;
+      }
+    } else if (is_rank(*itr)) {  // ランク。
+      // 次はxかマスでなくてはならない。
+      ++itr;
+      if (*itr == 'x') {
+        // 次はマスでなくてはならない。
+        ++itr;
+        if (!is_square(itr)) return false;
+        itr += 2;
+      } else if (is_square(itr)) {
+        itr += 2;
+      } else {
+        return false;
+      }
+    } else if (*itr == 'x') {  // 駒を取る記号。
+      // 次はマスでなくてはならない。
+      ++itr;
+      if (!is_square(itr)) return false;
+      itr += 2;
+    } else {
+      return false;
+    }
+
+    // 続きがあるなら続きを判定。
+    if (itr != str.end()) {
+      // 次は=か+か#でなくてはならない。
+      if (*itr == '=') {
+        // 次はNBRQでなくてはなない。
+        ++itr;
+        if (itr == str.end()) return false;
+        if ((*itr == 'N') || (*itr == 'B') || (*itr == 'R') || (*itr == 'Q')) {
+          ++itr;
+          // 次は終了か+#でなくてはならない。
+          if (itr == str.end()) {
+            // 無視。
+          } else if ((*itr == '+') || (*itr == '#')) {
+            ++itr;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
+      } else if ((*itr == '+') || (*itr == '#')) {
+        ++itr;
+      } else {
+        return false;
+      }
+    }
+
+    // しっかり終わっていればtrue。
+    return itr == str.end();
+  }
+
   // Algebraic Notationを6文字に変換。
   std::string Util::ParseAlgebraicNotation(const std::string& note) {
     // ファイル・ランクの判定関数。
