@@ -230,7 +230,7 @@ namespace Sayuri {
       if (in_comment || in_line_comment || in_tag) {
         ret.push(temp);
       } else {
-        if (Util::IsAlgebraicNotation(temp)) {
+        if (is_movetext(temp)) {
           ret.push(temp);
         }
       }
