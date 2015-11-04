@@ -24,7 +24,7 @@
 /**
  * @file pgn.h
  * @author Hironori Ishibashi
- * @brief PGN。
+ * @brief PGNパーサ。
  */
 
 #ifndef PGN_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
@@ -32,11 +32,133 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
+#include <map>
 #include <queue>
+#include <memory>
 #include "common.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
+  struct MoveNode;
+  /** 指し手のノードのポインタ。 */
+  using MoveNodePtr = std::shared_ptr<MoveNode>;
+
+  class PGNGame;
+  /** PGNゲームのポインタ。 */
+  using PGNGamePtr = std::shared_ptr<PGNGame>;
+
+  /** PGNのヘッダ。 */
+  using PGNHeader = std::map<std::string, std::string>;
+
+  /** 指し手のノード。 */
+  struct MoveNode {
+    /** 次の手。 */
+    MoveNodePtr next_;
+    /** 代替手。 */
+    MoveNodePtr alt_;
+    /** 前の手。 */
+    MoveNode* prev_;
+    /** 元の手。 */
+    MoveNode* orig_;
+
+    /** 指し手の文字列。 */
+    std::string text_;
+    /** コメントのベクトル。 */
+    std::vector<std::string> comment_vec_;
+  };
+
+  /** ゲーム。 */
+  class PGNGame {
+    public:
+      // ==================== //
+      // コンストラクタと代入 //
+      // ==================== //
+      /** コンストラクタ。 */
+      PGNGame();
+      /**
+       * コピーコンストラクタ。
+       * @param game コピー元。
+       */
+      PGNGame(const PGNGame& game);
+      /**
+       * ムーブコンストラクタ。
+       * @param game ムーブ元。
+       */
+      PGNGame(PGNGame&& game);
+      /**
+       * コピー代入演算子。
+       * @param game コピー元。
+       */
+      PGNGame& operator=(const PGNGame& game);
+      /**
+       * ムーブ代入演算子。
+       * @param game ムーブ元。
+       */
+      PGNGame& operator=(PGNGame&& game);
+      /** デストラクタ。 */
+      virtual ~PGNGame() {}
+
+      // ======== //
+      // アクセサ //
+      // ======== //
+      /**
+       * アクセサ - ヘッダのベクトル。
+       * @return ヘッダのベクトル。
+       */
+      const std::vector<PGNHeader>& header_vec() const {
+        return header_vec_;
+      }
+      /**
+       * アクセサ - 指し手の木。
+       * @return 指し手の木。
+       */
+      const MoveNode& move_tree() const {return *move_tree_ptr_;}
+      /**
+       * アクセサ - コメントのベクトル。
+       * @return コメントのベクトル。
+       */
+      const std::vector<std::string>& comment_vec() const {
+        return comment_vec_;
+      }
+
+      // ============ //
+      // ミューテータ //
+      // ============ //
+      /**
+       * ミューテータ - ヘッダのベクトル。
+       * @param header_vec ヘッダのベクトル。
+       */
+      void header_vec(const std::vector<PGNHeader>& header_vec) {
+        header_vec_ = header_vec;
+      }
+      /**
+       * ミューテータ - 指し手の木。
+       * @param move_tree_ptr 指し手の木。
+       */
+      void move_tree(MoveNodePtr move_tree_ptr) {
+        move_tree_ptr_ = move_tree_ptr;
+      }
+      /**
+       * ミューテータ - コメントのベクトル。
+       * @param comment_vec コメントのベクトル。
+       */
+      void comment_vec(const std::vector<std::string>& comment_vec) {
+        comment_vec_ = comment_vec;
+      }
+
+    private:
+      // ========== //
+      // メンバ変数 //
+      // ========== //
+      /** ヘッダのベクトル。 */
+      std::vector<PGNHeader> header_vec_;
+      /** 指し手の木。 */
+      MoveNodePtr move_tree_ptr_;
+      /** コメントのベクトル。 */
+      std::vector<std::string> comment_vec_;
+  };
+
   /** PGNパーサ。 */
   class PGN {
     public:
@@ -68,6 +190,51 @@ namespace Sayuri {
       /** デストラクタ。 */
       virtual ~PGN() {}
 
+      // ====== //
+      // 演算子 //
+      // ====== //
+      // ゲームにアクセスする。
+      // @param index ゲームのインデックス。
+      const PGNGame& operator[](int index) const {
+        return *(game_vec_[index]);
+      }
+
+      // ======== //
+      // アクセサ //
+      // ======== //
+      /**
+       * アクセサ - ゲームのベクトル。
+       * @return ゲームのベクトル。
+       */
+      const std::vector<PGNGamePtr> game_vec() const {
+        return game_vec_;
+      }
+      /**
+       * アクセサ - コメントのベクトル。
+       * @return コメントのベクトル。
+       */
+      const std::vector<std::string>& comment_vec() const {
+        return comment_vec_;
+      }
+
+      // ============ //
+      // ミューテータ //
+      // ============ //
+      /**
+       * ミューテータ - ゲームのベクトル。
+       * @param game_vec ゲームのベクトル。
+       */
+      void game_vec(const std::vector<PGNGamePtr>& game_vec) {
+        game_vec_ = game_vec;
+      }
+      /**
+       * ミューテータ - コメントのベクトル。
+       * @param comment_vec コメントのベクトル。
+       */
+      void comment_vec(const std::vector<std::string>& comment_vec) {
+        comment_vec_ = comment_vec;
+      }
+
     private:
       /** フレンド。 */
       friend int DebugMain(int, char**);
@@ -78,6 +245,14 @@ namespace Sayuri {
        * @return トークンのキュー。
        */
       static std::queue<std::string> Tokenize(const std::string& str);
+
+      // ========== //
+      // メンバ変数 //
+      // ========== //
+      /** ゲームのベクトル。 */
+      std::vector<PGNGamePtr> game_vec_;
+      /** コメントのベクトル。 */
+      std::vector<std::string> comment_vec_;
   };
 }  // namespace Sayuri
 
