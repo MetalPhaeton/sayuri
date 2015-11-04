@@ -60,6 +60,17 @@ namespace Sayuri {
       return true;
     };
 
+    // 指し手のリストの文字列かどうかを判断。
+    auto is_movetext =
+    [&result_str, &is_assessment](const std::string& str) -> bool {
+      if (Util::IsAlgebraicNotation(str)
+      || (result_str.find(str) != result_str.end())
+      || is_assessment(str)) {
+        return true;
+      }
+      return false;
+    };
+
     std::queue<std::string> ret;
 
     // 頭とおしりの空白文字を削除。
@@ -148,9 +159,7 @@ namespace Sayuri {
         if (c == ';') {  // 行コメント開始。
           if (oss.str().size()) {
             std::string temp = remove_blank(oss.str());
-            if (Util::IsAlgebraicNotation(temp)
-            || (result_str.find(temp) != result_str.end())
-            || is_assessment(temp)) {
+            if (is_movetext(temp)) {
               ret.push(temp);
             }
             oss.str("");
@@ -160,9 +169,7 @@ namespace Sayuri {
         } else if (c == '{') {  // コメント開始。
           if (oss.str().size()) {
             std::string temp = remove_blank(oss.str());
-            if (Util::IsAlgebraicNotation(temp)
-            || (result_str.find(temp) != result_str.end())
-            || is_assessment(temp)) {
+            if (is_movetext(temp)) {
               ret.push(temp);
             }
             oss.str("");
@@ -172,9 +179,7 @@ namespace Sayuri {
         } else if (c == '['){  // タグ開始。
           if (oss.str().size()) {
             std::string temp = remove_blank(oss.str());
-            if (Util::IsAlgebraicNotation(temp)
-            || (result_str.find(temp) != result_str.end())
-            || is_assessment(temp)) {
+            if (is_movetext(temp)) {
               ret.push(temp);
             }
             oss.str("");
@@ -184,9 +189,7 @@ namespace Sayuri {
         } else if (delim_c.find(c) != delim_c.end()) {  // 区切り文字。
           if (oss.str().size()) {
             std::string temp = remove_blank(oss.str());
-            if (Util::IsAlgebraicNotation(temp)
-            || (result_str.find(temp) != result_str.end())
-            || is_assessment(temp)) {
+            if (is_movetext(temp)) {
               ret.push(temp);
             }
             oss.str("");
@@ -195,9 +198,7 @@ namespace Sayuri {
           // 区切りでかつトークン。
           if (oss.str().size()) {
             std::string temp = remove_blank(oss.str());
-            if (Util::IsAlgebraicNotation(temp)
-            || (result_str.find(temp) != result_str.end())
-            || is_assessment(temp)) {
+            if (is_movetext(temp)) {
               ret.push(temp);
             }
             oss.str("");
@@ -210,9 +211,7 @@ namespace Sayuri {
             oss << c;
           } else {
             if (oss.str().size()) {
-              if (Util::IsAlgebraicNotation(temp)
-              || (result_str.find(temp) != result_str.end())
-              || is_assessment(temp)) {
+              if (is_movetext(temp)) {
                 ret.push(temp);
               }
               oss.str("");
