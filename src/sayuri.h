@@ -37,6 +37,7 @@
 #include "error.h"
 #include "evaluator.h"
 #include "fen.h"
+#include "pgn.h"
 #include "helper_queue.h"
 #include "init.h"
 #include "job.h"

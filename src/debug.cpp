@@ -36,8 +36,10 @@
 #include <memory>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <random>
 #include <vector>
+#include <queue>
 #include <thread>
 #include <functional>
 
@@ -101,24 +103,16 @@ namespace Sayuri {
 
     // ========================================================================
 
-    std::vector<std::string> note_vec {
-      "f3", "e5", "g4"
-    };
-
-    for (auto& note : note_vec) {
-      std::vector<Move> move_vec = engine_ptr->GuessNote(note);
-      if (move_vec.size()) {
-        engine_ptr->PlayMove(move_vec[0]);
+    if (argc >= 2) {
+      std::ifstream ifs(argv[1]);
+      std::ostringstream oss;
+      oss << ifs.rdbuf();
+      std::queue<std::string> token_queue = PGN::Tokenize(oss.str());
+      while (!token_queue.empty()) {
+        std::cout << token_queue.front() << std::endl;
+        token_queue.pop();
       }
     }
-
-    PrintPositionRecord(PositionRecord(*engine_ptr));
-
-    Move move = 0;
-    SetFrom(move, D8);
-    SetTo(move, H4);
-    SetPromotion(move, EMPTY);
-    std::cout << engine_ptr->MoveToNote(move) << std::endl;
 
     return 0;
   }
