@@ -24,7 +24,7 @@
 /**
  * @file pgn.cpp
  * @author Hironori Ishibashi
- * @brief PGNの実装。
+ * @brief PGNパーサの実装。
  */
 
 #include "pgn.h"
@@ -47,10 +47,18 @@ namespace Sayuri {
       ' ', '\n', '\r', '\t', '\f', '\a', '\b', '.'
     };
     // 区切り文字でかつトークン。
-    std::set<char> delim_token_c {'(', ')', '!', '?'};
+    std::set<char> delim_token_c {'(', ')'};
 
     // 結果文字。
     std::set<std::string> result_str {"0-1", "1-0", "1/2-1/2", "*"};
+
+    // 評価文字列かどうかを判定。
+    auto is_assessment = [](const std::string& str) -> bool {
+      for (auto c : str) {
+        if ((c != '!') && (c != '?')) return false;
+      }
+      return true;
+    };
 
     std::queue<std::string> ret;
 
@@ -141,7 +149,8 @@ namespace Sayuri {
           if (oss.str().size()) {
             std::string temp = remove_blank(oss.str());
             if (Util::IsAlgebraicNotation(temp)
-            || (result_str.find(temp) != result_str.end())) {
+            || (result_str.find(temp) != result_str.end())
+            || is_assessment(temp)) {
               ret.push(temp);
             }
             oss.str("");
@@ -152,7 +161,8 @@ namespace Sayuri {
           if (oss.str().size()) {
             std::string temp = remove_blank(oss.str());
             if (Util::IsAlgebraicNotation(temp)
-            || (result_str.find(temp) != result_str.end())) {
+            || (result_str.find(temp) != result_str.end())
+            || is_assessment(temp)) {
               ret.push(temp);
             }
             oss.str("");
@@ -163,7 +173,8 @@ namespace Sayuri {
           if (oss.str().size()) {
             std::string temp = remove_blank(oss.str());
             if (Util::IsAlgebraicNotation(temp)
-            || (result_str.find(temp) != result_str.end())) {
+            || (result_str.find(temp) != result_str.end())
+            || is_assessment(temp)) {
               ret.push(temp);
             }
             oss.str("");
@@ -174,7 +185,8 @@ namespace Sayuri {
           if (oss.str().size()) {
             std::string temp = remove_blank(oss.str());
             if (Util::IsAlgebraicNotation(temp)
-            || (result_str.find(temp) != result_str.end())) {
+            || (result_str.find(temp) != result_str.end())
+            || is_assessment(temp)) {
               ret.push(temp);
             }
             oss.str("");
@@ -184,12 +196,29 @@ namespace Sayuri {
           if (oss.str().size()) {
             std::string temp = remove_blank(oss.str());
             if (Util::IsAlgebraicNotation(temp)
-            || (result_str.find(temp) != result_str.end())) {
+            || (result_str.find(temp) != result_str.end())
+            || is_assessment(temp)) {
               ret.push(temp);
             }
             oss.str("");
           }
           ret.push(std::string(1, c));
+        } else if ((c == '!') || (c == '?')) {  // 評価文字。
+          // oss内の文字が評価文字列なら追加。 違うなら区切って追加。
+          std::string temp = remove_blank(oss.str());
+          if (is_assessment(temp)) {
+            oss << c;
+          } else {
+            if (oss.str().size()) {
+              if (Util::IsAlgebraicNotation(temp)
+              || (result_str.find(temp) != result_str.end())
+              || is_assessment(temp)) {
+                ret.push(temp);
+              }
+              oss.str("");
+            }
+            oss << c;
+          }
         } else {  // それ以外。
           oss << c;
         }
