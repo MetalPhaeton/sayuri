@@ -36,6 +36,7 @@
 #include <map>
 #include <queue>
 #include <memory>
+#include <utility>
 #include "common.h"
 
 /** Sayuri 名前空間。 */
@@ -53,19 +54,37 @@ namespace Sayuri {
 
   /** 指し手のノード。 */
   struct MoveNode {
+    // --- 前後 --- //
     /** 次の手。 */
     MoveNodePtr next_;
-    /** 代替手。 */
-    MoveNodePtr alt_;
     /** 前の手。 */
-    MoveNode* prev_;
+    MoveNode* prev_ = nullptr;
+
+    // --- 左右 --- //
+    /** 代替手。 */
+    MoveNodePtr alt_r_;
     /** 元の手。 */
-    MoveNode* orig_;
+    MoveNode* alt_l_ = nullptr;
 
     /** 指し手の文字列。 */
     std::string text_;
     /** コメントのベクトル。 */
     std::vector<std::string> comment_vec_;
+
+    static MoveNodePtr Clone(const MoveNode& node) {
+      MoveNodePtr ret_ptr(new MoveNode());
+
+      if (node.next_) {
+        ret_ptr->next_ = Clone(*(node.next_));
+        ret_ptr->next_->prev_ = ret_ptr.get();
+      }
+      if (node.alt_r_) {
+        ret_ptr->alt_r_ = Clone(*(node.alt_r_));
+        ret_ptr->alt_r_->alt_l_ = ret_ptr.get();
+      }
+
+      return ret_ptr;
+    }
   };
 
   /** ゲーム。 */
@@ -75,27 +94,43 @@ namespace Sayuri {
       // コンストラクタと代入 //
       // ==================== //
       /** コンストラクタ。 */
-      PGNGame();
+      PGNGame() : move_tree_ptr_(nullptr) {}
       /**
        * コピーコンストラクタ。
        * @param game コピー元。
        */
-      PGNGame(const PGNGame& game);
+      PGNGame(const PGNGame& game) :
+      header_vec_(game.header_vec_),
+      move_tree_ptr_(MoveNode::Clone(*(game.move_tree_ptr_))),
+      comment_vec_(game.comment_vec_) {}
       /**
        * ムーブコンストラクタ。
        * @param game ムーブ元。
        */
-      PGNGame(PGNGame&& game);
+      PGNGame(PGNGame&& game) :
+      header_vec_(std::move(game.header_vec_)),
+      move_tree_ptr_(game.move_tree_ptr_),
+      comment_vec_(std::move(game.comment_vec_)) {}
       /**
        * コピー代入演算子。
        * @param game コピー元。
        */
-      PGNGame& operator=(const PGNGame& game);
+      PGNGame& operator=(const PGNGame& game) {
+        header_vec_ = game.header_vec_;
+        move_tree_ptr_ = MoveNode::Clone(*(game.move_tree_ptr_));
+        comment_vec_ = game.comment_vec_;
+        return *this;
+      }
       /**
        * ムーブ代入演算子。
        * @param game ムーブ元。
        */
-      PGNGame& operator=(PGNGame&& game);
+      PGNGame& operator=(PGNGame&& game) {
+        header_vec_ = std::move(game.header_vec_);
+        move_tree_ptr_ = game.move_tree_ptr_;
+        comment_vec_ = std::move(game.comment_vec_);
+        return *this;
+      }
       /** デストラクタ。 */
       virtual ~PGNGame() {}
 
@@ -148,6 +183,9 @@ namespace Sayuri {
       }
 
     private:
+      // フレンド。
+      friend class PGN;
+
       // ========== //
       // メンバ変数 //
       // ========== //
@@ -166,27 +204,37 @@ namespace Sayuri {
       // コンストラクタと代入 //
       // ==================== //
       /** コンストラクタ。 */
-      PGN();
+      PGN() {}
       /**
        * コピーコンストラクタ。
        * @param pgn コピー元。
        */
-      PGN(const PGN& pgn);
+      PGN(const PGN& pgn) :
+      game_vec_(pgn.game_vec_), comment_vec_(pgn.comment_vec_) {}
       /**
        * ムーブコンストラクタ。
        * @param pgn ムーブ元。
        */
-      PGN(PGN&& pgn);
+      PGN(PGN&& pgn) :
+      game_vec_(std::move(pgn.game_vec_)), comment_vec_(pgn.comment_vec_) {}
       /**
        * コピー代入演算子。
        * @param pgn コピー元。
        */
-      PGN& operator=(const PGN& pgn);
+      PGN& operator=(const PGN& pgn) {
+        game_vec_ = pgn.game_vec_;
+        comment_vec_ = pgn.comment_vec_;
+        return *this;
+      }
       /**
        * ムーブ代入演算子。
        * @param pgn ムーブ元。
        */
-      PGN& operator=(PGN&& pgn);
+      PGN& operator=(PGN&& pgn) {
+        game_vec_ = std::move(pgn.game_vec_);
+        comment_vec_ = std::move(pgn.comment_vec_);
+        return *this;
+      }
       /** デストラクタ。 */
       virtual ~PGN() {}
 
