@@ -62,9 +62,9 @@ namespace Sayuri {
 
     // --- 左右 --- //
     /** 代替手。 */
-    MoveNodePtr alt_r_;
+    MoveNodePtr alt_;
     /** 元の手。 */
-    MoveNode* alt_l_ = nullptr;
+    MoveNode* orig_ = nullptr;
 
     /** 指し手の文字列。 */
     std::string text_;
@@ -78,9 +78,9 @@ namespace Sayuri {
         ret_ptr->next_ = Clone(*(node.next_));
         ret_ptr->next_->prev_ = ret_ptr.get();
       }
-      if (node.alt_r_) {
-        ret_ptr->alt_r_ = Clone(*(node.alt_r_));
-        ret_ptr->alt_r_->alt_l_ = ret_ptr.get();
+      if (node.alt_) {
+        ret_ptr->alt_ = Clone(*(node.alt_));
+        ret_ptr->alt_->orig_ = ret_ptr.get();
       }
 
       return ret_ptr;
@@ -100,7 +100,7 @@ namespace Sayuri {
        * @param game コピー元。
        */
       PGNGame(const PGNGame& game) :
-      header_vec_(game.header_vec_),
+      header_(game.header_),
       move_tree_ptr_(MoveNode::Clone(*(game.move_tree_ptr_))),
       comment_vec_(game.comment_vec_) {}
       /**
@@ -108,7 +108,7 @@ namespace Sayuri {
        * @param game ムーブ元。
        */
       PGNGame(PGNGame&& game) :
-      header_vec_(std::move(game.header_vec_)),
+      header_(std::move(game.header_)),
       move_tree_ptr_(game.move_tree_ptr_),
       comment_vec_(std::move(game.comment_vec_)) {}
       /**
@@ -116,7 +116,7 @@ namespace Sayuri {
        * @param game コピー元。
        */
       PGNGame& operator=(const PGNGame& game) {
-        header_vec_ = game.header_vec_;
+        header_ = game.header_;
         move_tree_ptr_ = MoveNode::Clone(*(game.move_tree_ptr_));
         comment_vec_ = game.comment_vec_;
         return *this;
@@ -126,13 +126,20 @@ namespace Sayuri {
        * @param game ムーブ元。
        */
       PGNGame& operator=(PGNGame&& game) {
-        header_vec_ = std::move(game.header_vec_);
+        header_ = std::move(game.header_);
         move_tree_ptr_ = game.move_tree_ptr_;
         comment_vec_ = std::move(game.comment_vec_);
         return *this;
       }
       /** デストラクタ。 */
       virtual ~PGNGame() {}
+
+      // ============== //
+      // パブリック関数 //
+      // ============== //
+      /**
+       *
+       */
 
       // ======== //
       // アクセサ //
@@ -141,8 +148,8 @@ namespace Sayuri {
        * アクセサ - ヘッダのベクトル。
        * @return ヘッダのベクトル。
        */
-      const std::vector<PGNHeader>& header_vec() const {
-        return header_vec_;
+      const PGNHeader header() const {
+        return header_;
       }
       /**
        * アクセサ - 指し手の木。
@@ -164,8 +171,8 @@ namespace Sayuri {
        * ミューテータ - ヘッダのベクトル。
        * @param header_vec ヘッダのベクトル。
        */
-      void header_vec(const std::vector<PGNHeader>& header_vec) {
-        header_vec_ = header_vec;
+      void header(const PGNHeader& header) {
+        header_ = header;
       }
       /**
        * ミューテータ - 指し手の木。
@@ -185,12 +192,13 @@ namespace Sayuri {
     private:
       // フレンド。
       friend class PGN;
+      friend int DebugMain(int, char**);
 
       // ========== //
       // メンバ変数 //
       // ========== //
-      /** ヘッダのベクトル。 */
-      std::vector<PGNHeader> header_vec_;
+      /** PGNヘッダ。 */
+      PGNHeader header_;
       /** 指し手の木。 */
       MoveNodePtr move_tree_ptr_;
       /** コメントのベクトル。 */
@@ -246,6 +254,15 @@ namespace Sayuri {
       const PGNGame& operator[](int index) const {
         return *(game_vec_[index]);
       }
+
+      // ============== //
+      // パブリック関数 //
+      // ============== //
+      /**
+       * パースする。
+       * @param pgn_str パースするPGN文字列。
+       */
+      void Parse(const std::string& pgn_str);
 
       // ======== //
       // アクセサ //

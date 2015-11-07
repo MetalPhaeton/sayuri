@@ -238,4 +238,215 @@ namespace Sayuri {
 
     return ret;
   }
+
+  namespace {
+    // コメント開始かどうか。
+    bool IsCommentStarting(const std::string& str) {
+      return (str == "{") || (str == ";");
+    }
+
+    // コメントを得る。
+    std::string GetComment(std::queue<std::string>& token_queue) {
+      std::string front = token_queue.front();
+      std::ostringstream oss;
+
+      if (IsCommentStarting(front)) {
+        std::string end_str = "";
+
+        if (front == "{") {
+          end_str = "}";
+        } else if (front == ";") {
+          end_str = "\n";
+        }
+
+        token_queue.pop();
+        while (!(token_queue.empty())) {
+          front = token_queue.front();
+          token_queue.pop();
+          if (front == end_str) break;
+          oss << front;
+        }
+      }
+      return oss.str();
+    }
+
+    // 1ヘッダをパース。
+    std::pair<std::string, std::string>
+    ParseOneHeader(std::queue<std::string>& token_queue) {
+      std::pair<std::string, std::string> ret;
+
+      std::string front = token_queue.front();
+
+      if (front == "[") {
+        token_queue.pop();
+
+        // タグ名。
+        std::ostringstream oss;
+        while (!(token_queue.empty())) {
+          front = token_queue.front();
+          token_queue.pop();
+
+          if ((front == "]") || (front == "\"")) break;
+
+          oss << front;
+        }
+        ret.first = oss.str();  // セット。
+        oss.str("");
+
+        // 値。
+        if (front == "\"") {
+          while (!(token_queue.empty())) {
+            front = token_queue.front();
+            token_queue.pop();
+
+            if ((front == "]") || (front == "\"")) break;
+
+            oss << front;
+          }
+          ret.second = oss.str();  // セット。
+        }
+
+        // ヘッダ終了まで空ループ。
+        while (!(token_queue.empty())) {
+          front = token_queue.front();
+          token_queue.pop();
+
+          if (front == "]") break;
+        }
+      }
+
+      return ret;
+    }
+
+    // 指し手のリストをパース。
+    MoveNodePtr ParseMoveNode(std::queue<std::string>& token_queue) {
+      // 終了判定。
+      auto is_end_str = [](const std::string& str) -> bool {
+        return (str == ")") || (str == "*") || (str == "1-0")
+        || (str == "0-1") || (str == "1/2-1/2");
+      };
+
+      // 指し手の評価かどうか。
+      auto is_assessment = [](const std::string& str) -> bool {
+        for (auto c : str) {
+          if ((c != '!') && (c != '?')) return false;
+        }
+        return true;
+      };
+
+      std::string front = token_queue.front();
+
+      // いきなり終了なら終わる。
+      if (is_end_str(front)) {
+        if (front == ")") token_queue.pop();
+        return MoveNodePtr(nullptr);
+      }
+
+      MoveNodePtr ret_ptr(new MoveNode());
+      std::vector<std::string> ret_comment_vec;
+
+      // 左右方向にパース。
+      bool has_parsed_current = false;
+      while (!(token_queue.empty())) {
+        front  = token_queue.front();
+
+        // 終了なら抜ける。
+        if (is_end_str(front)) {
+          if (front == ")") token_queue.pop();
+          break;
+        }
+
+        // 次のゲームが始まったら抜ける。
+        if (front == "[") break;
+
+        if (!has_parsed_current) {  // まだ現在のノードをパースしていない。
+          if (Util::IsAlgebraicNotation(front)) {
+            ret_ptr->text_ = front;
+            has_parsed_current = true;
+            token_queue.pop();
+          }
+        } else {   // 現在のノードのパース後。
+          if (IsCommentStarting(front)) {
+            ret_ptr->comment_vec_.push_back(GetComment(token_queue));
+          } else if (is_assessment(front)) {
+            ret_ptr->comment_vec_.push_back(front);
+          } else if (Util::IsAlgebraicNotation(front)) {  // 次の手。
+            // 次の手をパースしたらループを抜ける。
+            ret_ptr->next_ = ParseMoveNode(token_queue);
+            if (ret_ptr->next_) {
+              ret_ptr->next_->prev_ = ret_ptr.get();
+            }
+            break;
+          } else if (front == "(") {  // 代替手の合図。
+            token_queue.pop();
+            ret_ptr->alt_ = ParseMoveNode(token_queue);
+            if (ret_ptr->alt_) {
+              ret_ptr->alt_->orig_ = ret_ptr.get();
+            }
+          }
+        }
+      }
+
+      return ret_ptr;
+    }
+
+    // 1ゲームをパース。
+    PGNGamePtr ParseOneGame(std::queue<std::string>& token_queue) {
+      PGNGamePtr ret_ptr(new PGNGame());
+      PGNHeader ret_header;
+      MoveNodePtr ret_tree_ptr(nullptr);
+      std::vector<std::string> ret_comment_vec;
+
+      bool has_moves_started = false;
+      bool has_moves_ended = false;
+      while (!(token_queue.empty())) {
+        std::string front = token_queue.front();
+        if (!has_moves_started) {  // 指し手のリスト前。
+          if (front == "[") {  // ヘッダ。
+            ret_header.emplace(ParseOneHeader(token_queue));
+          } else if (IsCommentStarting(front)) {  // コメント。
+            ret_comment_vec.push_back(GetComment(token_queue));
+          } else {
+            has_moves_started = true;
+          }
+        } else if (has_moves_ended){  // 指し手のリスト終了。
+          if (front == "[") {  // ヘッダ開始なら次のゲーム。
+            break;
+          } else if (IsCommentStarting(front)) {  // コメント。
+            ret_comment_vec.push_back(GetComment(token_queue));
+          }
+        } else {  // 指し手のリスト後。
+          ret_ptr->move_tree(ParseMoveNode(token_queue));
+          has_moves_ended = true;
+        }
+      }
+
+      ret_ptr->header(ret_header);
+      ret_ptr->move_tree(ret_tree_ptr);
+      ret_ptr->comment_vec(ret_comment_vec);
+      return ret_ptr;
+    }
+  }
+
+  // パースする。
+  void PGN::Parse(const std::string& pgn_str) {
+    // 字句解析。
+    std::queue<std::string> token_queue = Tokenize(pgn_str);
+
+    // パース。
+    bool has_started = false;
+    while (!(token_queue.empty())) {
+      std::string front = token_queue.front();
+
+      if (!has_started) {  // ゲームの記述前。
+        if (front == "[") {  // ヘッダ開始。
+          has_started = true;
+        } else if (IsCommentStarting(front)) {  // コメントスタート。
+          comment_vec_.push_back(GetComment(token_queue));
+        }
+      } else {  // ゲームの記述。
+        game_vec_.push_back(ParseOneGame(token_queue));
+      }
+    }
+  }
 }  // namespace Sayuri
