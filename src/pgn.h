@@ -73,6 +73,8 @@ namespace Sayuri {
 
     static MoveNodePtr Clone(const MoveNode& node) {
       MoveNodePtr ret_ptr(new MoveNode());
+      ret_ptr->text_ = node.text_;
+      ret_ptr->comment_vec_ = node.comment_vec_;
 
       if (node.next_) {
         ret_ptr->next_ = Clone(*(node.next_));
@@ -94,7 +96,7 @@ namespace Sayuri {
       // コンストラクタと代入 //
       // ==================== //
       /** コンストラクタ。 */
-      PGNGame() : move_tree_ptr_(nullptr) {}
+      PGNGame() : move_tree_ptr_(nullptr) , current_node_ptr_(nullptr) {}
       /**
        * コピーコンストラクタ。
        * @param game コピー元。
@@ -102,7 +104,9 @@ namespace Sayuri {
       PGNGame(const PGNGame& game) :
       header_(game.header_),
       move_tree_ptr_(MoveNode::Clone(*(game.move_tree_ptr_))),
-      comment_vec_(game.comment_vec_) {}
+      result_(game.result_),
+      comment_vec_(game.comment_vec_),
+      current_node_ptr_(move_tree_ptr_.get()) {}
       /**
        * ムーブコンストラクタ。
        * @param game ムーブ元。
@@ -110,7 +114,9 @@ namespace Sayuri {
       PGNGame(PGNGame&& game) :
       header_(std::move(game.header_)),
       move_tree_ptr_(game.move_tree_ptr_),
-      comment_vec_(std::move(game.comment_vec_)) {}
+      result_(std::move(game.result_)),
+      comment_vec_(std::move(game.comment_vec_)),
+      current_node_ptr_(move_tree_ptr_.get()) {}
       /**
        * コピー代入演算子。
        * @param game コピー元。
@@ -118,7 +124,9 @@ namespace Sayuri {
       PGNGame& operator=(const PGNGame& game) {
         header_ = game.header_;
         move_tree_ptr_ = MoveNode::Clone(*(game.move_tree_ptr_));
+        result_ = game.result_;
         comment_vec_ = game.comment_vec_;
+        current_node_ptr_ = move_tree_ptr_.get();
         return *this;
       }
       /**
@@ -128,7 +136,9 @@ namespace Sayuri {
       PGNGame& operator=(PGNGame&& game) {
         header_ = std::move(game.header_);
         move_tree_ptr_ = game.move_tree_ptr_;
+        result_ = std::move(game.result_);
         comment_vec_ = std::move(game.comment_vec_);
+        current_node_ptr_ = move_tree_ptr_.get();
         return *this;
       }
       /** デストラクタ。 */
@@ -138,8 +148,79 @@ namespace Sayuri {
       // パブリック関数 //
       // ============== //
       /**
-       *
+       * 次のノードへ移動。
+       * @return 移動できればtrue。
        */
+      bool Next() {
+        if (current_node_ptr_->next_) {
+          current_node_ptr_ = current_node_ptr_->next_.get();
+          return true;
+        }
+        return false;
+      }
+      /**
+       * 前のノードへ移動。
+       * @return 移動できればtrue。
+       */
+      bool Prev() {
+        if (current_node_ptr_->prev_) {
+          current_node_ptr_ = current_node_ptr_->prev_;
+          return true;
+        }
+        return false;
+      }
+      /**
+       * 代替手のノードへ移動。
+       * @return 移動できればtrue。
+       */
+      bool Alt() {
+        if (current_node_ptr_->alt_) {
+          current_node_ptr_ = current_node_ptr_->alt_.get();
+          return true;
+        }
+        return false;
+      }
+      /**
+       * オリジナルのノードへ移動。
+       * @return 移動できればtrue。
+       */
+      bool Orig() {
+        if (current_node_ptr_->orig_) {
+          current_node_ptr_ = current_node_ptr_->orig_;
+          return true;
+        }
+        return false;
+      }
+      /**
+       * 前のノードへ移動。 (代替手からも移動できる)
+       * @return 移動できればtrue。
+       */
+      bool Back() {
+        MoveNode* temp = current_node_ptr_;
+        while (true) {
+          if (temp->orig_) {
+            temp = temp->orig_;
+          } else if (temp->prev_) {
+            temp = temp->prev_;
+            break;
+          } else {
+            break;
+          }
+        }
+        if (temp != current_node_ptr_) {
+          current_node_ptr_ = temp;
+          return true;
+        }
+        return false;
+      }
+      /**
+       * ルートに戻る。
+       * @return 移動できればtrue。
+       */
+      bool Rewind() {
+        current_node_ptr_ = move_tree_ptr_.get();
+        return true;
+      }
 
       // ======== //
       // アクセサ //
@@ -157,12 +238,22 @@ namespace Sayuri {
        */
       const MoveNode& move_tree() const {return *move_tree_ptr_;}
       /**
+       * アクセサ - 結果の文字列。
+       * @return 結果の文字列。
+       */
+      const std::string& result() const {return result_;}
+      /**
        * アクセサ - コメントのベクトル。
        * @return コメントのベクトル。
        */
       const std::vector<std::string>& comment_vec() const {
         return comment_vec_;
       }
+      /**
+       * アクセサ - 現在の指し手のノードのポインタ。
+       * @return 現在の指し手のノードのポインタ。
+       */
+      const MoveNode* current_node_ptr() const {return current_node_ptr_;}
 
       // ============ //
       // ミューテータ //
@@ -180,6 +271,14 @@ namespace Sayuri {
        */
       void move_tree(MoveNodePtr move_tree_ptr) {
         move_tree_ptr_ = move_tree_ptr;
+        current_node_ptr_ = move_tree_ptr_.get();
+      }
+      /**
+       * ミューテータ - 結果の文字列。
+       * @param result 結果の文字列。
+       */
+      void result(const std::string result) {
+        result_ = result;
       }
       /**
        * ミューテータ - コメントのベクトル。
@@ -201,8 +300,13 @@ namespace Sayuri {
       PGNHeader header_;
       /** 指し手の木。 */
       MoveNodePtr move_tree_ptr_;
+      /** 結果の文字列。 */
+      std::string result_;
       /** コメントのベクトル。 */
       std::vector<std::string> comment_vec_;
+
+      /** 現在の指し手のノード。 */
+      MoveNode* current_node_ptr_;
   };
 
   /** PGNパーサ。 */

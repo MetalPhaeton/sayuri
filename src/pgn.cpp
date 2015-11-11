@@ -363,13 +363,14 @@ namespace Sayuri {
           if (Util::IsAlgebraicNotation(front)) {
             ret_ptr->text_ = front;
             has_parsed_current = true;
-            token_queue.pop();
           }
+          token_queue.pop();
         } else {   // 現在のノードのパース後。
           if (IsCommentStarting(front)) {
             ret_ptr->comment_vec_.push_back(GetComment(token_queue));
           } else if (is_assessment(front)) {
             ret_ptr->comment_vec_.push_back(front);
+            token_queue.pop();
           } else if (Util::IsAlgebraicNotation(front)) {  // 次の手。
             // 次の手をパースしたらループを抜ける。
             ret_ptr->next_ = ParseMoveNode(token_queue);
@@ -394,7 +395,6 @@ namespace Sayuri {
     PGNGamePtr ParseOneGame(std::queue<std::string>& token_queue) {
       PGNGamePtr ret_ptr(new PGNGame());
       PGNHeader ret_header;
-      MoveNodePtr ret_tree_ptr(nullptr);
       std::vector<std::string> ret_comment_vec;
 
       bool has_moves_started = false;
@@ -414,6 +414,12 @@ namespace Sayuri {
             break;
           } else if (IsCommentStarting(front)) {  // コメント。
             ret_comment_vec.push_back(GetComment(token_queue));
+          } else if ((front == "*") || (front == "1-0") || (front == "0-1")
+          || (front == "1/2-1/2")) {  // 結果の文字列。
+            ret_ptr->result(front);
+            token_queue.pop();
+          } else {
+            token_queue.pop();
           }
         } else {  // 指し手のリスト後。
           ret_ptr->move_tree(ParseMoveNode(token_queue));
@@ -422,7 +428,6 @@ namespace Sayuri {
       }
 
       ret_ptr->header(ret_header);
-      ret_ptr->move_tree(ret_tree_ptr);
       ret_ptr->comment_vec(ret_comment_vec);
       return ret_ptr;
     }
