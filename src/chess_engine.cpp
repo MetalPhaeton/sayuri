@@ -370,7 +370,7 @@ namespace Sayuri {
     basic_st_.clock_ = 0;
 
     // 手数を初期化。
-    basic_st_.ply_ = 1;
+    basic_st_.ply_ = 0;
 
     // キャスリングしたかどうかの初期化。
     FOR_SIDES(side) {

@@ -706,7 +706,7 @@ namespace Sayuri {
        * @param ply 現在の手数。
        */
       void ply(int ply) {
-        basic_st_.ply_ = ply < 1 ? 1 : ply;
+        basic_st_.ply_ = ply < 0 ? 0 : ply;
       }
 
     private:

@@ -51,7 +51,7 @@ namespace Sayuri {
   castling_rights_(ALL_CASTLING),
   en_passant_square_(0),
   clock_(0),
-  ply_(1) {
+  ply_(0) {
     // 駒の配置を初期化。
     INIT_ARRAY(position_);
 
@@ -211,7 +211,7 @@ namespace Sayuri {
     castling_rights_ = ALL_CASTLING;
     en_passant_square_ = 0;
     clock_ = 0;
-    ply_ = 1;
+    ply_ = 0;
 
     // 駒を初期配置にする。
     // ポーン。
