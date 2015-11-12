@@ -104,12 +104,12 @@ namespace Sayuri {
 
     // ========================================================================
 
-    std::string fen = "rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq d3 bm e4; hello world";
+    std::string fen = "rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq d3 11 22";
 
     std::map<std::string, std::string> tree = Util::ParseFEN(fen);
 
     for (auto& pair : tree) {
-      if (pair.first == "position") {
+      if (pair.first == "fen position") {
         std::cout << pair.first << " :" << std::endl;
         int i = 0;
         for (auto c : pair.second) {

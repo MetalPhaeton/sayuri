@@ -744,10 +744,10 @@ namespace Sayuri {
     };
 
     std::map<std::string, std::string> ret;
-    ret["position"] = std::string(64, '-');
-    ret["to_move"] = "-";
-    ret["castling"] = "----";
-    ret["en_passant"] = "-";
+    ret["fen position"] = std::string(64, '-');
+    ret["fen to_move"] = "-";
+    ret["fen castling"] = "----";
+    ret["fen en_passant"] = "-";
 
     // トークンに分ける。
     std::vector<std::string> token_vec;
@@ -832,7 +832,7 @@ namespace Sayuri {
         }
       }
       if (oss.str().size() == 64) {
-        ret["position"] = oss.str();
+        ret["fen position"] = oss.str();
       }
       oss.str("");
       ++fen_itr;
@@ -841,7 +841,7 @@ namespace Sayuri {
     // サイドをパース。
     if (fen_itr != fen_vec.end()) {
       if ((*fen_itr == "w") || (*fen_itr == "b")) {
-        ret["to_move"] = *fen_itr;
+        ret["fen to_move"] = *fen_itr;
       }
       ++fen_itr;
     }
@@ -858,7 +858,7 @@ namespace Sayuri {
           case '-': break;
         }
       }
-      ret["castling"] = temp_str;
+      ret["fen castling"] = temp_str;
       ++fen_itr;
     }
 
@@ -870,7 +870,7 @@ namespace Sayuri {
         if (((fyle_c >= 'a') && (fyle_c <= 'h'))
         && ((rank_c == '3') || (rank_c == '6'))) {
           oss << fyle_c << rank_c;
-          ret["en_passant"] = oss.str();
+          ret["fen en_passant"] = oss.str();
           oss.str("");
         }
       }
@@ -880,7 +880,7 @@ namespace Sayuri {
     // クロックをパース。
     if (fen_itr != fen_vec.end()) {
       if (is_num(*fen_itr)) {
-        ret["clock"] = *fen_itr;
+        ret["fen clock"] = *fen_itr;
       }
       ++fen_itr;
     }
@@ -888,9 +888,12 @@ namespace Sayuri {
     // 手数をパース。 プライで。
     if (fen_itr != fen_vec.end()) {
       if (is_num(*fen_itr)) {
-        unsigned long ply = std::stoul(*(fen_itr++)) * 2;
-        if (ret["to_move"] =="w") ply -= 1;
-        ret["ply"] = std::to_string(ply);
+        int move_count = std::stoll(*fen_itr);
+        if (move_count > 0) {
+          int ply = (move_count - 1) * 2;
+          if (ret["fen to_move"] == "b") ply += 1;
+          ret["fen ply"] = std::to_string(ply);
+        }
       }
       ++fen_itr;
     }
