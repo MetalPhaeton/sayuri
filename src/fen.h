@@ -119,14 +119,6 @@ namespace Sayuri {
       /** スタートポジションにセット。 */
       void SetStartPosition();
 
-      /**
-       * 構文木を作る。
-       * @param fen_str FEN文字列。
-       * @return 構文木。
-       */
-      static std::map<std::string, std::string>
-      ParseFEN(const std::string& fen_str);
-
       // ========== //
       // メンバ変数 //
       // ========== //
