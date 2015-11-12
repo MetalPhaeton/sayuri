@@ -35,6 +35,7 @@
 #include <vector>
 #include <random>
 #include <set>
+#include <map>
 #include <cstdint>
 
 #include "common.h"
@@ -1632,6 +1633,14 @@ namespace Sayuri {
 
         return ret;
       }
+
+      /** 
+       * FEN/EPDをパース。
+       * @param str パースするFEN/EPd文字列。
+       * @return パース後の構文木マップ。
+       */
+      static std::map<std::string, std::string>
+      ParseFEN(const std::string& str);
 
       /**
        * Algebraic Notationかどうかを判定。

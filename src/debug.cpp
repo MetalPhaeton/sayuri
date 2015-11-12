@@ -40,6 +40,7 @@
 #include <random>
 #include <vector>
 #include <queue>
+#include <map>
 #include <thread>
 #include <functional>
 
@@ -103,6 +104,25 @@ namespace Sayuri {
 
     // ========================================================================
 
+    std::string fen = "rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq d3 bm e4; hello world";
+
+    std::map<std::string, std::string> tree = Util::ParseFEN(fen);
+
+    for (auto& pair : tree) {
+      if (pair.first == "position") {
+        std::cout << pair.first << " :" << std::endl;
+        int i = 0;
+        for (auto c : pair.second) {
+          std::cout << c;
+          if ((i % 8) == 7) std::cout << std::endl;
+          ++i;
+        }
+      } else {
+        std::cout << pair.first << " : " << pair.second << std::endl;
+      }
+    }
+
+    /*
     std::ifstream ifs("/home/hironori/Programming/Projects/Sayuri/build/test.pgn");
     std::ostringstream oss;
     oss << ifs.rdbuf();
@@ -112,15 +132,18 @@ namespace Sayuri {
     pgn.Parse(oss.str());
     std::cout << "Parse Completed" << std::endl;
 
-    PGNGame game = *(pgn.game_vec().at(1));
+    PGNGame game = *(pgn.game_vec().at(0));
 
-    auto print_node = [](const MoveNode* node_ptr) {
+    auto print_comment = [](const std::vector<std::string>& comment) {
+      for (auto& x : comment) {
+        std::cout << "{" << x << "} ";
+      }
+    };
+    auto print_node = [&print_comment](const MoveNode* node_ptr) {
       if (node_ptr) {
         std::cout << "text_ : " << node_ptr->text_ << std::endl;
         std::cout << "comment_vec_ : ";
-        for (auto& x : node_ptr->comment_vec_) {
-          std::cout << "{" << x << "} ";
-        }
+        print_comment(node_ptr->comment_vec_);
         std::cout << std::endl;
         std::cout << "Member : ";
         if (node_ptr->next_) std::cout << "next_ ";
@@ -130,6 +153,16 @@ namespace Sayuri {
         std::cout << "\n" << std::endl;
       }
     };
+
+    // ファイルのコメントを表示。
+    std::cout << "File Comment : ";
+    print_comment(pgn.comment_vec());
+    std::cout << "\n" << std::endl;
+
+    // ゲームのコメントを表示。
+    std::cout << "Game Comment : ";
+    print_comment(game.comment_vec());
+    std::cout << "\n" << std::endl;
 
     // ヘッダをプリント。
     for (auto& pair : game.header()) {
@@ -192,6 +225,7 @@ namespace Sayuri {
         << std::endl;
       }
     }
+    */
 
     return 0;
   }
