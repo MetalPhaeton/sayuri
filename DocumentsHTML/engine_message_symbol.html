@@ -471,6 +471,15 @@ Example
 <li>Undoes previous move.</li>
 <li>Returns previous move.</li>
 </ul></li>
+<li><code>@play-note &lt;PGN move text : String&gt;</code>
+<ul>
+<li>Moves one piece legally with <code>&lt;PGN move text&gt;</code>.</li>
+<li>Returns #t if it has succeeded, otherwise returns #f.</li>
+</ul></li>
+<li><code>@move-&gt;note &lt;Move : List&gt;</code>
+<ul>
+<li>Transrates Move into PGN move text according to the current position.</li>
+</ul></li>
 </ul>
 <h6>
 Example

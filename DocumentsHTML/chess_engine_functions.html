@@ -35,6 +35,10 @@
 <li>See <a href="engine_message_symbol.html">Message Symbols of Engine Object</a></li>
 </ul></li>
 </ul></li>
+<li><a href="#pgn-functions">PGN Functions</a>
+<ul>
+<li><a href="#gen-pgn"><code>gen-pgn</code></a> : Generate PGN object.</li>
+</ul></li>
 <li><a href="#utility-functions">Utility Functions</a>
 <ul>
 <li><a href="#sayuri-license">sayuri-license</a></li>
@@ -580,14 +584,22 @@ Example
 <ul>
 <li>If it can't promote Pawn, <code>&lt;Promotion&gt;</code> is EMPTY.</li>
 </ul></li>
-<li>If move is illegal, it throws exception.</li>
-<li>Returns #t.</li>
 </ul></li>
+<li>Returns #t if it has succeeded, otherwise returns #f.</li>
 </ul></li>
 <li><code>@undo-move</code>
 <ul>
 <li>Undoes previous move.</li>
 <li>Returns previous move.</li>
+</ul></li>
+<li><code>@play-note &lt;PGN move text : String&gt;</code>
+<ul>
+<li>Moves one piece legally with <code>&lt;PGN move text&gt;</code>.</li>
+<li>Returns #t if it has succeeded, otherwise returns #f.</li>
+</ul></li>
+<li><code>@move-&gt;note &lt;Move : List&gt;</code>
+<ul>
+<li>Transrates Move into PGN move text according to the current position.</li>
 </ul></li>
 </ul>
 <h6>
@@ -750,11 +762,11 @@ Example
 ;; Output
 ;; &gt; 1.34218e+08
 
-;; Set number of threads to 3.
+;; Set the number of threads to 3.
 (my-engine &#39;@input-uci-command &quot;setoption name threads value 3&quot;)
 
 (display (my-engine &#39;@set-threads 4))
-;; Set number of threads to 4 and return 3.
+;; Set the number of threads to 4 and return 3.
 ;; Output
 ;; &gt; 3</code></pre>
 <ul>
@@ -2115,7 +2127,7 @@ Example
 <ul>
 <li>Weight for Mobility of Pawn.
 <ul>
-<li>Score is Weight times number of squares where it can go to.</li>
+<li>Score is Weight times the number of squares where it can go to.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2124,7 +2136,7 @@ Example
 </ul></li>
 <li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
 </ul></li>
-<li><code>@weight-knight-mobility [&lt;New weight : List&gt;]</code> - Score is Weight times number of squares where it can go to.
+<li><code>@weight-knight-mobility [&lt;New weight : List&gt;]</code> - Score is Weight times the number of squares where it can go to.
 <ul>
 <li>Weight for Mobility of Knight.</li>
 <li>Return Weight as List of 2 elements.
@@ -2138,7 +2150,7 @@ Example
 <ul>
 <li>Weight for Mobility of Bishop.
 <ul>
-<li>Score is Weight times number of squares where it can go to.</li>
+<li>Score is Weight times the number of squares where it can go to.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2151,7 +2163,7 @@ Example
 <ul>
 <li>Weight for Mobility of Rook.
 <ul>
-<li>Score is Weight times number of squares where it can go to.</li>
+<li>Score is Weight times the number of squares where it can go to.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2164,7 +2176,7 @@ Example
 <ul>
 <li>Weight for Mobility of Queen.
 <ul>
-<li>Score is Weight times number of squares where it can go to.</li>
+<li>Score is Weight times the number of squares where it can go to.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2177,7 +2189,7 @@ Example
 <ul>
 <li>Weight for Mobility of King.
 <ul>
-<li>Score is Weight times number of squares where it can go to.</li>
+<li>Score is Weight times the number of squares where it can go to.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2190,7 +2202,7 @@ Example
 <ul>
 <li>Weight for Controlling Center by Pawn.
 <ul>
-<li>Score is Weight times number of Center where it attacks.</li>
+<li>Score is Weight times the number of Center where it attacks.</li>
 <li>&quot;Center&quot; is squares of C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
@@ -2204,7 +2216,7 @@ Example
 <ul>
 <li>Weight for Controlling Center by Knight.
 <ul>
-<li>Score is Weight times number of Center where it attacks.</li>
+<li>Score is Weight times the number of Center where it attacks.</li>
 <li>&quot;Center&quot; is squares of C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
@@ -2218,7 +2230,7 @@ Example
 <ul>
 <li>Weight for Controlling Center by Bishop.
 <ul>
-<li>Score is Weight times number of Center where it attacks.</li>
+<li>Score is Weight times the number of Center where it attacks.</li>
 <li>&quot;Center&quot; is squares of C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
@@ -2232,7 +2244,7 @@ Example
 <ul>
 <li>Weight for Controlling Center by Rook.
 <ul>
-<li>Score is Weight times number of Center where it attacks.</li>
+<li>Score is Weight times the number of Center where it attacks.</li>
 <li>&quot;Center&quot; is squares of C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
@@ -2246,7 +2258,7 @@ Example
 <ul>
 <li>Weight for Controlling Center by Queen.
 <ul>
-<li>Score is Weight times number of Center where it attacks.</li>
+<li>Score is Weight times the number of Center where it attacks.</li>
 <li>&quot;Center&quot; is squares of C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
@@ -2260,7 +2272,7 @@ Example
 <ul>
 <li>Weight for Controlling Center by King.
 <ul>
-<li>Score is Weight times number of Center where it attacks.</li>
+<li>Score is Weight times the number of Center where it attacks.</li>
 <li>&quot;Center&quot; is squares of C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
@@ -2274,7 +2286,7 @@ Example
 <ul>
 <li>Weight for Controlling Sweet Center by Pawn.
 <ul>
-<li>Score is Weight times number of Sweet Center where it attacks.</li>
+<li>Score is Weight times the number of Sweet Center where it attacks.</li>
 <li>&quot;Sweet Center&quot; is squares of D4 D5 E4 E5.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
@@ -2288,7 +2300,7 @@ Example
 <ul>
 <li>Weight for Controlling Sweet Center by Knight.
 <ul>
-<li>Score is Weight times number of Sweet Center where it attacks.</li>
+<li>Score is Weight times the number of Sweet Center where it attacks.</li>
 <li>&quot;Sweet Center&quot; is squares of D4 D5 E4 E5.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
@@ -2302,7 +2314,7 @@ Example
 <ul>
 <li>Weight for Controlling Sweet Center by Bishop.
 <ul>
-<li>Score is Weight times number of Sweet Center where it attacks.</li>
+<li>Score is Weight times the number of Sweet Center where it attacks.</li>
 <li>&quot;Sweet Center&quot; is squares of D4 D5 E4 E5.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
@@ -2316,7 +2328,7 @@ Example
 <ul>
 <li>Weight for Controlling Sweet Center by Rook.
 <ul>
-<li>Score is Weight times number of Sweet Center where it attacks.</li>
+<li>Score is Weight times the number of Sweet Center where it attacks.</li>
 <li>&quot;Sweet Center&quot; is squares of D4 D5 E4 E5.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
@@ -2330,7 +2342,7 @@ Example
 <ul>
 <li>Weight for Controlling Sweet Center by Queen.
 <ul>
-<li>Score is Weight times number of Sweet Center where it attacks.</li>
+<li>Score is Weight times the number of Sweet Center where it attacks.</li>
 <li>&quot;Sweet Center&quot; is squares of D4 D5 E4 E5.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
@@ -2344,7 +2356,7 @@ Example
 <ul>
 <li>Weight for Controlling Sweet Center by King.
 <ul>
-<li>Score is Weight times number of Sweet Center where it attacks.</li>
+<li>Score is Weight times the number of Sweet Center where it attacks.</li>
 <li>&quot;Sweet Center&quot; is squares of D4 D5 E4 E5.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
@@ -2358,7 +2370,7 @@ Example
 <ul>
 <li>Weight for Development of Pawn.
 <ul>
-<li>Score is Weight times number of Pawns not on starting position.</li>
+<li>Score is Weight times the number of Pawns not on starting position.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2371,7 +2383,7 @@ Example
 <ul>
 <li>Weight for Development of Knight.
 <ul>
-<li>Score is Weight times number of Knights not on starting position.</li>
+<li>Score is Weight times the number of Knights not on starting position.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2384,7 +2396,7 @@ Example
 <ul>
 <li>Weight for Development of Bishop.
 <ul>
-<li>Score is Weight times number of Bishops not on starting position.</li>
+<li>Score is Weight times the number of Bishops not on starting position.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2397,7 +2409,7 @@ Example
 <ul>
 <li>Weight for Development of Rook.
 <ul>
-<li>Score is Weight times number of Rooks not on starting position.</li>
+<li>Score is Weight times the number of Rooks not on starting position.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2410,7 +2422,7 @@ Example
 <ul>
 <li>Weight for Development of Queen.
 <ul>
-<li>Score is Weight times number of Queens not on starting position.</li>
+<li>Score is Weight times the number of Queens not on starting position.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2423,7 +2435,7 @@ Example
 <ul>
 <li>Weight for Development of King.
 <ul>
-<li>Score is Weight times number of King not on starting position.</li>
+<li>Score is Weight times the number of King not on starting position.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2436,7 +2448,7 @@ Example
 <ul>
 <li>Weight for Pawn attacking squares around opponent's King.
 <ul>
-<li>Score is Weight times number of attacked squares around opponent's King.</li>
+<li>Score is Weight times the number of attacked squares around opponent's King.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2449,7 +2461,7 @@ Example
 <ul>
 <li>Weight for Knight attacking squares around opponent's King.
 <ul>
-<li>Score is Weight times number of attacked squares around opponent's King.</li>
+<li>Score is Weight times the number of attacked squares around opponent's King.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2462,7 +2474,7 @@ Example
 <ul>
 <li>Weight for Bishop attacking squares around opponent's King.
 <ul>
-<li>Score is Weight times number of attacked squares around opponent's King.</li>
+<li>Score is Weight times the number of attacked squares around opponent's King.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2475,7 +2487,7 @@ Example
 <ul>
 <li>Weight for Rook attacking squares around opponent's King.
 <ul>
-<li>Score is Weight times number of attacked squares around opponent's King.</li>
+<li>Score is Weight times the number of attacked squares around opponent's King.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2488,7 +2500,7 @@ Example
 <ul>
 <li>Weight for Queen attacking squares around opponent's King.
 <ul>
-<li>Score is Weight times number of attacked squares around opponent's King.</li>
+<li>Score is Weight times the number of attacked squares around opponent's King.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2501,7 +2513,7 @@ Example
 <ul>
 <li>Weight for King attacking squares around opponent's King.
 <ul>
-<li>Score is Weight times number of attacked squares around opponent's King.</li>
+<li>Score is Weight times the number of attacked squares around opponent's King.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2514,7 +2526,7 @@ Example
 <ul>
 <li>Weight for Pass Pawn.
 <ul>
-<li>Score is Weight times number of Pass Pawns.</li>
+<li>Score is Weight times the number of Pass Pawns.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2527,7 +2539,7 @@ Example
 <ul>
 <li>Weight for Pass Pawn protected by friend Pawns.
 <ul>
-<li>Score is Weight times number of Pass Pawns protected by friend Pawns.</li>
+<li>Score is Weight times the number of Pass Pawns protected by friend Pawns.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2540,7 +2552,7 @@ Example
 <ul>
 <li>Weight for Double Pawn.
 <ul>
-<li>Score is Weight times number of Double Pawn.
+<li>Score is Weight times the number of Double Pawn.
 <ul>
 <li>If 2 pawns are on same fyle, the number of Double Pawn is '2'.</li>
 </ul></li>
@@ -2556,7 +2568,7 @@ Example
 <ul>
 <li>Weight for Isolated Pawn.
 <ul>
-<li>Score is Weight times number of Isolated Pawn.</li>
+<li>Score is Weight times the number of Isolated Pawn.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2582,7 +2594,7 @@ Example
 <ul>
 <li>Weight for Bad Bishop.
 <ul>
-<li>Score is Weight times number of Pawns on the same colored square where Bishop is placed on.</li>
+<li>Score is Weight times the number of Pawns on the same colored square where Bishop is placed on.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2608,7 +2620,7 @@ Example
 <ul>
 <li>Weight for Rook on semi-open fyle.
 <ul>
-<li>Score is Weight times number of Rooks on semi-open fyle.</li>
+<li>Score is Weight times the number of Rooks on semi-open fyle.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2621,7 +2633,7 @@ Example
 <ul>
 <li>Weight for Rook on open fyle.
 <ul>
-<li>Score is Weight times number of Rooks on open fyle.</li>
+<li>Score is Weight times the number of Rooks on open fyle.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2634,7 +2646,7 @@ Example
 <ul>
 <li>Weight for Queen that has moved too early in the game.
 <ul>
-<li>Score is Weight times number of Minor Pieces on its starting position.</li>
+<li>Score is Weight times the number of Minor Pieces on its starting position.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2648,7 +2660,7 @@ Example
 <li>Weight for Weak Square.
 <ul>
 <li>When King is on A1(A8) or A2(A7) or B1(B8) or B2(B7) or C1(C8) or C2(C7), &quot;Weak Square&quot; is A2(A7) or A3(A6) or B2(B7) or B3(B6) or C2(C7) or C3(C6) squares where Pawn is NOT placed on.<br /> When King is on F1(F8) or F2(F7) or G1(G8) or G2(G7) or H1(H8) or H2(H7), &quot;Weak Square&quot; is F2(F7) or F3(F6) or G2(G7) or G3(G6) or H2(H7) or H3(H6) squares where Pawn is NOT placed on.</li>
-<li>Score is Weight times number of Weak Square.</li>
+<li>Score is Weight times the number of Weak Square.</li>
 </ul></li>
 <li>Return Weight as List of 2 elements.
 <ul>
@@ -2696,6 +2708,103 @@ Example
 (display (my-engine &#39;@weight-pawn-mobility))
 ;; Output
 ;; &gt; (111 222)</code></pre>
+<h2 id="pgn-functions">PGN Functions</h2>
+<h3 id="gen-pgn">gen-pgn</h3>
+<h6>
+Usage
+</h6>
+<ul>
+<li><code>(gen-pgn &lt;PGN string : String&gt;)</code></li>
+</ul>
+<h6>
+Description
+</h6>
+<ul>
+<li>Generates and returns PGN object from <code>&lt;PGN string&gt;</code>.</li>
+<li>PGN object is operated by Message Symbol.</li>
+<li>PGN object has 2 states.
+<ul>
+<li>Current game.
+<ul>
+<li>This can be changed by <code>@set-current-game</code>.</li>
+</ul></li>
+<li>Current move.
+<ul>
+<li>This can be changed by <code>@next-move</code>, <code>@prev-move</code>, <code>@alt-move</code>, <code>@orig-move</code>, <code>@rewind-move</code>.</li>
+</ul></li>
+</ul></li>
+</ul>
+<h6>
+Description of Message Symbols
+</h6>
+<ul>
+<li><code>@get-pgn-comments</code>
+<ul>
+<li>Returns Lists of comments about PGN.</li>
+</ul></li>
+<li><code>@get-current-comments.</code>
+<ul>
+<li>Returns List of comments about the current game.</li>
+</ul></li>
+<li><code>@get-current-move-comments</code>
+<ul>
+<li>Returns List of comments about the current move.</li>
+</ul></li>
+<li><code>@length</code>
+<ul>
+<li>Returns the number of games that PGN has.</li>
+</ul></li>
+<li><code>@set-current-game &lt;Index : Number&gt;</code>
+<ul>
+<li>Sets a current game into the <code>&lt;Index&gt;</code>th game.</li>
+</ul></li>
+<li><code>@get-current-game-headers</code>
+<ul>
+<li>Returns List of Lists composed with headers of the current game.
+<ul>
+<li>The format is &quot;<code>((&lt;Name 1&gt; &lt;value 1&gt;) (&lt;Name 2&gt; &lt;Value 2&gt;)...)</code>&quot;.</li>
+</ul></li>
+</ul></li>
+<li><code>@current-move</code>
+<ul>
+<li>Returns the current move text.</li>
+</ul></li>
+<li><code>@next-move</code>
+<ul>
+<li>Change the current move into the next move and returns the move text.</li>
+</ul></li>
+<li><code>@prev-move</code>
+<ul>
+<li>Change the current move into the previous move and returns the move text.</li>
+</ul></li>
+<li><code>@alt-move</code>
+<ul>
+<li>Change the current move into the alternative move and returns the move text.</li>
+</ul></li>
+<li><code>@orig-move</code>
+<ul>
+<li>If the current move is an alternative move, then change a current move into the original move and returns the move text.</li>
+</ul></li>
+<li><code>@rewind-move</code>
+<ul>
+<li>Change a current move into the first move and returns the move text.</li>
+</ul></li>
+</ul>
+<h6>
+Example
+</h6>
+<pre><code>;; Open PGN File.
+(define pgn-file (input-stream &quot;/path/to/pgnfile.pgn&quot;))
+
+;; Reads the file and generates PGN object.
+(define my-pgn (gen-pgn (pgn-file &#39;@read)))
+
+;; Displays the current game headers.
+(display (my-pgn &#39;@get-current-game-headers))
+
+;; Output
+;; &gt; ((&quot;Black&quot; &quot;Hanako Yamada&quot;) (&quot;Site&quot; &quot;Japan&quot;)
+;; &gt; (&quot;White&quot; &quot;Hironori Ishibashi&quot;))</code></pre>
 <h2 id="utility-functions">Utility Functions</h2>
 <h3 id="sayuri-license">sayuri-license</h3>
 <h6>

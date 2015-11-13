@@ -47,7 +47,8 @@
 </ul></li>
 <li>SayuriLogo : Logo image files.</li>
 <li>SampleGames : Sample game files of Sayuri vs other chess engines.</li>
-<li>DocumentHTML : Documents.</li>
+<li>DocumentsHTML : Documents.</li>
+<li>Tools : Convenient tools.</li>
 </ul>
 <h3 id="files">Files</h3>
 <ul>
@@ -104,6 +105,47 @@
 <li>sayuri-xxxx.xx.xx.tar.gz</li>
 </ul>
 <p>(Note: &quot;xxxx.xx.xx&quot; is the version number.)</p>
+<h2 id="use-as-library">Use as Library</h2>
+<p>Sayuri's source code can be used as library.</p>
+<p>The Library has only one function.</p>
+<pre><code>extern &quot;C&quot;
+const char* ExecuteSayulisp(const char* code)</code></pre>
+<h6>
+Usage
+</h6>
+<ol style="list-style-type: decimal">
+<li><p>Delete <code>main.cpp</code>, because it has <code>main()</code> function.</p></li>
+<li><p>Include <code>sayuri.h</code> with <code>#include &quot;sayuri.h&quot;</code>.</p></li>
+<li>Call <code>const char* ExecuteSayulisp(const char* code)</code>.
+<ul>
+<li><code>code</code> is Sayulisp.</li>
+<li>Returns S-Expression.</li>
+</ul></li>
+</ol>
+<h6>
+Example
+</h6>
+<p>If you want to call Sayuri from Python on Linux, then...</p>
+<ol style="list-style-type: decimal">
+<li><p>Delete <code>main.cpp</code>, because it has <code>main()</code> function.</p></li>
+<li><p>Build &quot;<code>libsayuri.so</code>&quot; by...</p></li>
+</ol>
+<pre><code>$ &lt;g++ | clang++&gt; -std=c++11 -Ofast -pthread -march=native -fno-rtti -shared -fPIC -o libsayuri.so *.cpp</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>Use from Python.</li>
+</ol>
+<pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> ctypes <span class="ch">import</span>*
+
+<span class="co"># Load.</span>
+lib = cdll.LoadLibrary(<span class="st">&quot;/path/to/libsayuri.so&quot;</span>)
+
+<span class="co"># Get ready.</span>
+sayulisp = lib.ExecuteSayulisp
+sayulisp.restype = c_char_p
+sayulisp.argtype = (c_cahr_p)
+
+<span class="co"># Go.</span>
+<span class="dt">print</span>(sayulisp(b<span class="st">&quot;(+ 1 2 3)&quot;</span>))</code></pre>
 <h2 id="uci-options">UCI Options</h2>
 <ul>
 <li>To change size of the hash table. (Default: 32 MB, Max: 8192 MB, Min: 8 MB)

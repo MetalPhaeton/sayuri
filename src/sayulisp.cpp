@@ -4873,10 +4873,18 @@ R"...(### gen-engine ###
         - `<To>` is a square where you want to move the piece to.
         - `<Promotion>` is a piece type which you want to promote Pawn into.
             - If it can't promote Pawn, `<Promotion>` is EMPTY.
-        - Returns #t.
+    + Returns #t if it has succeeded, otherwise returns #f.
+
 * `@undo-move`
-    - Undoes previous move.
-    - Returns previous move.
+    + Undoes previous move.
+    + Returns previous move.
+
+* `@play-note <PGN move text : String>`
+    + Moves one piece legally with `<PGN move text>`.
+    + Returns #t if it has succeeded, otherwise returns #f.
+
+* `@move->note <Move : List>`
+    + Transrates Move into PGN move text according to the current position.
 
 <h6> Example </h6>
 
@@ -5023,11 +5031,11 @@ R"...(### gen-engine ###
     ;; Output
     ;; > 1.34218e+08
     
-    ;; Set number of threads to 3.
+    ;; Set the number of threads to 3.
     (my-engine '@input-uci-command "setoption name threads value 3")
     
     (display (my-engine '@set-threads 4))
-    ;; Set number of threads to 4 and return 3.
+    ;; Set the number of threads to 4 and return 3.
     ;; Output
     ;; > 3
 
@@ -6211,13 +6219,13 @@ R"...(### gen-engine ###
 
 * `@weight-pawn-mobility [<New weight : List>]`
     + Weight for Mobility of Pawn.
-        - Score is Weight times number of squares where it can go to.
+        - Score is Weight times the number of squares where it can go to.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-knight-mobility [<New weight : List>]`
-        - Score is Weight times number of squares where it can go to.
+        - Score is Weight times the number of squares where it can go to.
     + Weight for Mobility of Knight.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6225,35 +6233,35 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-bishop-mobility [<New weight : List>]`
     + Weight for Mobility of Bishop.
-        - Score is Weight times number of squares where it can go to.
+        - Score is Weight times the number of squares where it can go to.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-rook-mobility [<New weight : List>]`
     + Weight for Mobility of Rook.
-        - Score is Weight times number of squares where it can go to.
+        - Score is Weight times the number of squares where it can go to.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-queen-mobility [<New weight : List>]`
     + Weight for Mobility of Queen.
-        - Score is Weight times number of squares where it can go to.
+        - Score is Weight times the number of squares where it can go to.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-king-mobility [<New weight : List>]`
     + Weight for Mobility of King.
-        - Score is Weight times number of squares where it can go to.
+        - Score is Weight times the number of squares where it can go to.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-pawn-center-control [<New weight : List>]`
     + Weight for Controlling Center by Pawn.
-        - Score is Weight times number of Center where it attacks.
+        - Score is Weight times the number of Center where it attacks.
         - "Center" is squares of
           C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
     + Return Weight as List of 2 elements.
@@ -6262,7 +6270,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-knight-center-control [<New weight : List>]`
     + Weight for Controlling Center by Knight.
-        - Score is Weight times number of Center where it attacks.
+        - Score is Weight times the number of Center where it attacks.
         - "Center" is squares of
           C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
     + Return Weight as List of 2 elements.
@@ -6271,7 +6279,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-bishop-center-control [<New weight : List>]`
     + Weight for Controlling Center by Bishop.
-        - Score is Weight times number of Center where it attacks.
+        - Score is Weight times the number of Center where it attacks.
         - "Center" is squares of
           C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
     + Return Weight as List of 2 elements.
@@ -6280,7 +6288,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-rook-center-control [<New weight : List>]`
     + Weight for Controlling Center by Rook.
-        - Score is Weight times number of Center where it attacks.
+        - Score is Weight times the number of Center where it attacks.
         - "Center" is squares of
           C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
     + Return Weight as List of 2 elements.
@@ -6289,7 +6297,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-queen-center-control [<New weight : List>]`
     + Weight for Controlling Center by Queen.
-        - Score is Weight times number of Center where it attacks.
+        - Score is Weight times the number of Center where it attacks.
         - "Center" is squares of
           C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
     + Return Weight as List of 2 elements.
@@ -6298,7 +6306,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-king-center-control [<New weight : List>]`
     + Weight for Controlling Center by King.
-        - Score is Weight times number of Center where it attacks.
+        - Score is Weight times the number of Center where it attacks.
         - "Center" is squares of
           C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
     + Return Weight as List of 2 elements.
@@ -6307,7 +6315,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-pawn-sweet-center-control [<New weight : List>]`
     + Weight for Controlling Sweet Center by Pawn.
-        - Score is Weight times number of Sweet Center where it attacks.
+        - Score is Weight times the number of Sweet Center where it attacks.
         - "Sweet Center" is squares of D4 D5 E4 E5.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6315,7 +6323,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-knight-sweet-center-control [<New weight : List>]`
     + Weight for Controlling Sweet Center by Knight.
-        - Score is Weight times number of Sweet Center where it attacks.
+        - Score is Weight times the number of Sweet Center where it attacks.
         - "Sweet Center" is squares of D4 D5 E4 E5.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6323,7 +6331,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-bishop-sweet-center-control [<New weight : List>]`
     + Weight for Controlling Sweet Center by Bishop.
-        - Score is Weight times number of Sweet Center where it attacks.
+        - Score is Weight times the number of Sweet Center where it attacks.
         - "Sweet Center" is squares of D4 D5 E4 E5.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6331,7 +6339,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-rook-sweet-center-control [<New weight : List>]`
     + Weight for Controlling Sweet Center by Rook.
-        - Score is Weight times number of Sweet Center where it attacks.
+        - Score is Weight times the number of Sweet Center where it attacks.
         - "Sweet Center" is squares of D4 D5 E4 E5.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6339,7 +6347,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-queen-sweet-center-control [<New weight : List>]`
     + Weight for Controlling Sweet Center by Queen.
-        - Score is Weight times number of Sweet Center where it attacks.
+        - Score is Weight times the number of Sweet Center where it attacks.
         - "Sweet Center" is squares of D4 D5 E4 E5.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6347,7 +6355,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-king-sweet-center-control [<New weight : List>]`
     + Weight for Controlling Sweet Center by King.
-        - Score is Weight times number of Sweet Center where it attacks.
+        - Score is Weight times the number of Sweet Center where it attacks.
         - "Sweet Center" is squares of D4 D5 E4 E5.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6355,49 +6363,49 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-pawn-development [<New weight : List>]`
     + Weight for Development of Pawn.
-        - Score is Weight times number of Pawns not on starting position.
+        - Score is Weight times the number of Pawns not on starting position.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-knight-development [<New weight : List>]`
     + Weight for Development of Knight.
-        - Score is Weight times number of Knights not on starting position.
+        - Score is Weight times the number of Knights not on starting position.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-bishop-development [<New weight : List>]`
     + Weight for Development of Bishop.
-        - Score is Weight times number of Bishops not on starting position.
+        - Score is Weight times the number of Bishops not on starting position.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-rook-development [<New weight : List>]`
     + Weight for Development of Rook.
-        - Score is Weight times number of Rooks not on starting position.
+        - Score is Weight times the number of Rooks not on starting position.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-queen-development [<New weight : List>]`
     + Weight for Development of Queen.
-        - Score is Weight times number of Queens not on starting position.
+        - Score is Weight times the number of Queens not on starting position.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-king-development [<New weight : List>]`
     + Weight for Development of King.
-        - Score is Weight times number of King not on starting position.
+        - Score is Weight times the number of King not on starting position.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-pawn-attack-around-king [<New weight : List>]`
     + Weight for Pawn attacking squares around opponent's King.
-        - Score is Weight times number of attacked squares
+        - Score is Weight times the number of attacked squares
           around opponent's King.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6405,7 +6413,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-knight-attack-around-king [<New weight : List>]`
     + Weight for Knight attacking squares around opponent's King.
-        - Score is Weight times number of attacked squares
+        - Score is Weight times the number of attacked squares
           around opponent's King.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6413,7 +6421,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-bishop-attack-around-king [<New weight : List>]`
     + Weight for Bishop attacking squares around opponent's King.
-        - Score is Weight times number of attacked squares
+        - Score is Weight times the number of attacked squares
           around opponent's King.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6421,7 +6429,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-rook-attack-around-king [<New weight : List>]`
     + Weight for Rook attacking squares around opponent's King.
-        - Score is Weight times number of attacked squares
+        - Score is Weight times the number of attacked squares
           around opponent's King.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6429,7 +6437,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-queen-attack-around-king [<New weight : List>]`
     + Weight for Queen attacking squares around opponent's King.
-        - Score is Weight times number of attacked squares
+        - Score is Weight times the number of attacked squares
           around opponent's King.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6437,7 +6445,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-king-attack-around-king [<New weight : List>]`
     + Weight for King attacking squares around opponent's King.
-        - Score is Weight times number of attacked squares
+        - Score is Weight times the number of attacked squares
           around opponent's King.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6445,21 +6453,22 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-pass-pawn [<New weight : List>]`
     + Weight for Pass Pawn.
-        - Score is Weight times number of Pass Pawns.
+        - Score is Weight times the number of Pass Pawns.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-protected-pass-pawn [<New weight : List>]`
     + Weight for Pass Pawn protected by friend Pawns.
-        - Score is Weight times number of Pass Pawns protected by friend Pawns.
+        - Score is Weight times the number of Pass Pawns protected
+          by friend Pawns.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-double-pawn [<New weight : List>]`
     + Weight for Double Pawn.
-        - Score is Weight times number of Double Pawn.
+        - Score is Weight times the number of Double Pawn.
             - If 2 pawns are on same fyle, the number of Double Pawn is '2'.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6467,7 +6476,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-iso-pawn [<New weight : List>]`
     + Weight for Isolated Pawn.
-        - Score is Weight times number of Isolated Pawn.
+        - Score is Weight times the number of Isolated Pawn.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
@@ -6482,7 +6491,7 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-bad-bishop [<New weight : List>]`
     + Weight for Bad Bishop.
-        - Score is Weight times number of Pawns on the same colored square
+        - Score is Weight times the number of Pawns on the same colored square
           where Bishop is placed on.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6497,21 +6506,21 @@ R"...(### gen-engine ###
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-rook-semiopen-fyle [<New weight : List>]`
     + Weight for Rook on semi-open fyle.
-        - Score is Weight times number of Rooks on semi-open fyle.
+        - Score is Weight times the number of Rooks on semi-open fyle.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-rook-open-fyle [<New weight : List>]`
     + Weight for Rook on open fyle.
-        - Score is Weight times number of Rooks on open fyle.
+        - Score is Weight times the number of Rooks on open fyle.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
     + If you specify `<New weight>`, this parameter is updated.
 * `@weight-early-queen-starting [<New weight : List>]`
     + Weight for Queen that has moved too early in the game.
-        - Score is Weight times number of Minor Pieces
+        - Score is Weight times the number of Minor Pieces
           on its starting position.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
@@ -6525,7 +6534,7 @@ R"...(### gen-engine ###
           When King is on F1(F8) or F2(F7) or G1(G8) or G2(G7) or H1(H8)
           or H2(H7), "Weak Square" is F2(F7) or F3(F6) or G2(G7) or G3(G6)
           or H2(H7) or H3(H6) squares where Pawn is NOT placed on.
-        - Score is Weight times number of Weak Square.
+        - Score is Weight times the number of Weak Square.
     + Return Weight as List of 2 elements.
         - 1st : Weight on Opening.
         - 2nd : Weight on Ending.
@@ -6558,5 +6567,84 @@ R"...(### gen-engine ###
     ;; > (111 222))...";
     
     AddHelpDict("gen-engine", temp);
+
+    temp =
+R"...(### gen-pgn ###
+
+<h6> Usage </h6>
+
+* `(gen-pgn <PGN string : String>)`
+
+<h6> Description </h6>
+
+* Generates and returns PGN object from `<PGN string>`.
+* PGN object is operated by Message Symbol.
+* PGN object has 2 states.
+    + Current game.
+        - This can be changed by `@set-current-game`.
+    + Current move.
+        - This can be changed by `@next-move`, `@prev-move`, `@alt-move`,
+          `@orig-move`, `@rewind-move`.
+
+<h6> Description of Message Symbols </h6>
+
+* `@get-pgn-comments`
+    + Returns Lists of comments about PGN.
+
+* `@get-current-comments.`
+    + Returns List of comments about the current game.
+
+* `@get-current-move-comments`
+    + Returns List of comments about the current move.
+
+* `@length`
+    + Returns the number of games that PGN has.
+
+* `@set-current-game <Index : Number>`
+    + Sets a current game into the `<Index>`th game.
+
+* `@get-current-game-headers`
+    + Returns List of Lists composed with headers of the current game.
+        - The format is "`((<Name 1> <value 1>) (<Name 2> <Value 2>)...)`".
+
+* `@current-move`
+    + Returns the current move text.
+
+* `@next-move`
+    + Change the current move into the next move
+      and returns the move text.
+
+* `@prev-move`
+    + Change the current move into the previous move
+      and returns the move text.
+
+* `@alt-move`
+    + Change the current move into the alternative move
+      and returns the move text.
+
+* `@orig-move`
+    + If the current move is an alternative move,
+      then change a current move into the original move
+      and returns the move text.
+
+* `@rewind-move`
+    + Change a current move into the first move
+      and returns the move text.
+
+<h6> Example </h6>
+
+    ;; Open PGN File.
+    (define pgn-file (input-stream "/path/to/pgnfile.pgn"))
+    
+    ;; Reads the file and generates PGN object.
+    (define my-pgn (gen-pgn (pgn-file '@read)))
+    
+    ;; Displays the current game headers.
+    (display (my-pgn '@get-current-game-headers))
+    
+    ;; Output
+    ;; > (("Black" "Hanako Yamada") ("Site" "Japan")
+    ;; > ("White" "Hironori Ishibashi")))...";
+    AddHelpDict("gen-pgn", temp);
   }
 }  // namespace Sayuri

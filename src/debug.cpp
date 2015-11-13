@@ -104,7 +104,6 @@ namespace Sayuri {
   int DebugMain(int argc, char* argv[]) {
     // プログラムの起動。
     // 初期化。
-    /*
     Init();
     // エンジン準備。
     std::unique_ptr<Sayuri::SearchParams>
@@ -122,24 +121,10 @@ namespace Sayuri {
 
     std::unique_ptr<Sayuri::UCIShell>
     shell_ptr(new Sayuri::UCIShell(*engine_ptr));
-    */
 
     // ========================================================================
 
-    const char* code = "(define my-engine (gen-engine))";
-    std::cout << ExecuteSayulisp(code) << std::endl;
-    code = "(my-engine '@play-note \"e4\")";
-    std::cout << ExecuteSayulisp(code) << std::endl;
-    code = "(my-engine '@play-note \"e5\")";
-    std::cout << ExecuteSayulisp(code) << std::endl;
-    code = "(my-engine '@play-note \"Nf3\")";
-    std::cout << ExecuteSayulisp(code) << std::endl;
-    code = "(my-engine '@play-note \"Nc7\")";
-    std::cout << ExecuteSayulisp(code) << std::endl;
-    code = "(import \"/home/hironori/Programming/Projects/Sayuri/build/test.scm\")(print-board my-engine)";
-    std::cout << ExecuteSayulisp(code) << std::endl;
-    /*
-    std::ifstream ifs("/home/hironori/Programming/Projects/Sayuri/build/test.pgn");
+    std::ifstream ifs("/home/hironori/Programming/Projects/Sayuri/SampleGames/sample_games.pgn");
     std::ostringstream oss;
     oss << ifs.rdbuf();
 
@@ -148,7 +133,7 @@ namespace Sayuri {
     pgn.Parse(oss.str());
     std::cout << "Parse Completed" << std::endl;
 
-    PGNGame game = *(pgn.game_vec().at(0));
+    PGNGame game = *(pgn.game_vec().at(39));
 
     auto print_comment = [](const std::vector<std::string>& comment) {
       for (auto& x : comment) {
@@ -241,7 +226,6 @@ namespace Sayuri {
         << std::endl;
       }
     }
-    */
 
     return 0;
   }

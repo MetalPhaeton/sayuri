@@ -29,7 +29,8 @@ Files and Directories
     + Android : Binary file for Android.
 * SayuriLogo : Logo image files.
 * SampleGames : Sample game files of Sayuri vs other chess engines.
-* DocumentHTML : Documents.
+* DocumentsHTML : Documents.
+* Tools : Convenient tools.
 
 ### Files ###
 
@@ -103,6 +104,56 @@ The following packages will be created.
 
 (Note: "xxxx.xx.xx" is the version number.)
 
+
+
+Use as Library
+--------------
+
+Sayuri's source code can be used as library.
+
+The Library has only one function.
+
+    extern "C"
+    const char* ExecuteSayulisp(const char* code)
+
+<h6> Usage </h6>
+
+1. Delete `main.cpp`, because it has `main()` function.
+
+2. Include `sayuri.h` with `#include "sayuri.h"`.
+
+3. Call `const char* ExecuteSayulisp(const char* code)`.
+    + `code` is Sayulisp.
+    + Returns S-Expression.
+
+<h6> Example </h6>
+
+If you want to call Sayuri from Python on Linux, then...
+
+1. Delete `main.cpp`, because it has `main()` function.
+
+2. Build "`libsayuri.so`" by...
+
+~~~~
+$ <g++ | clang++> -std=c++11 -Ofast -pthread -march=native -fno-rtti -shared -fPIC -o libsayuri.so *.cpp
+~~~~
+
+3. Use from Python.
+
+~~~~python
+from ctypes import*
+
+# Load.
+lib = cdll.LoadLibrary("/path/to/libsayuri.so")
+
+# Get ready.
+sayulisp = lib.ExecuteSayulisp
+sayulisp.restype = c_char_p
+sayulisp.argtype = (c_cahr_p)
+
+# Go.
+print(sayulisp(b"(+ 1 2 3)"))
+~~~~
 
 
 UCI Options
