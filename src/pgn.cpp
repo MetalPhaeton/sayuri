@@ -347,6 +347,7 @@ namespace Sayuri {
 
       // 左右方向にパース。
       bool has_parsed_current = false;
+      MoveNode* current_alt = ret_ptr.get();
       while (!(token_queue.empty())) {
         front  = token_queue.front();
 
@@ -380,9 +381,10 @@ namespace Sayuri {
             break;
           } else if (front == "(") {  // 代替手の合図。
             token_queue.pop();
-            ret_ptr->alt_ = ParseMoveNode(token_queue);
-            if (ret_ptr->alt_) {
-              ret_ptr->alt_->orig_ = ret_ptr.get();
+            current_alt->alt_ = ParseMoveNode(token_queue);
+            if (current_alt->alt_) {
+              current_alt->alt_->orig_ = current_alt;
+              current_alt = current_alt->alt_.get();
             }
           }
         }
