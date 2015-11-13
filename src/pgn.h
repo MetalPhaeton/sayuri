@@ -375,7 +375,7 @@ namespace Sayuri {
        * アクセサ - ゲームのベクトル。
        * @return ゲームのベクトル。
        */
-      const std::vector<PGNGamePtr> game_vec() const {
+      const std::vector<PGNGamePtr>& game_vec() const {
         return game_vec_;
       }
       /**

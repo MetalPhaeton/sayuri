@@ -1838,6 +1838,15 @@ namespace Sayuri {
        * @return 変換後のオブジェクト。
        */
       LispObjectPtr NumberToCastling(const LispObject& obj);
+
+      /**
+       * PGNオブジェクトを作成する。
+       * @param pgn_str PGN文字列。
+       * @param caller_scope 呼び出し元のスコープチェイン。。
+       * @return PGNオブジェクト。
+       */
+      LispObjectPtr GenPGN(const std::string& pgn_str,
+      const ScopeChain& caller_scope);
   };
 }  // namespace Sayuri
 

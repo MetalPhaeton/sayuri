@@ -46,6 +46,7 @@
 #include "fen.h"
 #include "position_record.h"
 #include "pv_line.h"
+#include "pgn.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -2629,6 +2630,28 @@ namespace Sayuri {
       };
       AddNativeFunction(func, "number->castling");
     }
+    {
+      auto func = [this](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) -> LispObjectPtr {
+        // 引数チェック。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        if (!list_itr) {
+          throw Lisp::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr result = caller.Evaluate(*list_itr);
+        if (!(result->IsString())) {
+          throw GenWrongTypeError
+          (func_name, "String", std::vector<int> {1}, true);
+        }
+
+        return this->GenPGN(result->string_value(), caller.scope_chain());
+      };
+      AddNativeFunction(func, "gen-pgn");
+    }
   }
 
   // Sayulispを開始する。
@@ -3054,6 +3077,187 @@ namespace Sayuri {
     to_symbol(*copy_ptr);
 
     return copy_ptr;
+  }
+
+  // PGNオブジェクトを作成する。
+  LispObjectPtr Sayulisp::GenPGN(const std::string& pgn_str,
+  const ScopeChain& caller_scope) {
+    // PGNオブジェクト。
+    std::shared_ptr<PGN> pgn_ptr(new PGN());
+    pgn_ptr->Parse(pgn_str);
+
+    // PGN関数オブジェクト。
+    int current_index = 0;
+    auto pgn_func =
+    [pgn_ptr, current_index](LispObjectPtr self, const LispObject& caller,
+    const LispObject& list) mutable -> LispObjectPtr {
+      // 準備。
+      LispIterator<false> list_itr {&list};
+      std::string func_name = (list_itr++)->ToString();
+      int required_args = 2;
+
+      // 現在のゲームと現在の指し手を得る。
+      if (current_index >= static_cast<int>(pgn_ptr->game_vec().size())) {
+        return NewNil();
+      }
+      const PGNGamePtr game_ptr = pgn_ptr->game_vec()[current_index];
+      const MoveNode* move_ptr = game_ptr->current_node_ptr();
+
+      // 第1引数はメッセージシンボル。
+      if (!list_itr) {
+        throw GenInsufficientArgumentsError
+        (func_name, required_args, true, list.Length() - 1);
+      }
+      LispObjectPtr message_ptr = caller.Evaluate(*(list_itr++));
+      if (!(message_ptr->IsSymbol())) {
+        throw GenWrongTypeError
+        (func_name, "Symbol", std::vector<int> {1}, true);
+      }
+      std::string message_symbol = message_ptr->symbol_value();
+
+      // メッセージシンボルに合わせた処理。
+      if (message_symbol == "@get-pgn-comments") {
+        // PGNのコメント。
+        LispObjectPtr ret_ptr = Lisp::NewList(pgn_ptr->comment_vec().size());
+
+        std::vector<std::string>::const_iterator comment_itr =
+        pgn_ptr->comment_vec().begin();
+
+        for (LispIterator<true> itr {ret_ptr.get()};
+        itr; ++itr, ++comment_itr) {
+          itr->type(LispObjectType::STRING);
+          itr->string_value(*comment_itr);
+        }
+
+        return ret_ptr;
+      } else if (message_symbol == "@get-current-game-comments") {
+        // 現在のゲームのコメント。
+        LispObjectPtr ret_ptr = NewList(game_ptr->comment_vec().size());
+
+        std::vector<std::string>::const_iterator comment_itr =
+        game_ptr->comment_vec().begin();
+
+        for (LispIterator<true> itr {ret_ptr.get()};
+        itr; ++itr, ++comment_itr) {
+          itr->type(LispObjectType::STRING);
+          itr->string_value(*comment_itr);
+        }
+
+        return ret_ptr;
+      } else if (message_symbol == "@get-current-move-comments") {
+        // 現在の指し手のコメント。
+        if (move_ptr) {
+          LispObjectPtr ret_ptr = NewList(move_ptr->comment_vec_.size());
+
+          std::vector<std::string>::const_iterator comment_itr =
+          move_ptr->comment_vec_.begin();
+
+          for (LispIterator<true> itr {ret_ptr.get()};
+          itr; ++itr, ++comment_itr) {
+            itr->type(LispObjectType::STRING);
+            itr->string_value(*comment_itr);
+          }
+
+          return ret_ptr;
+        }
+        return NewNil();
+      } else if (message_symbol == "@length") {
+        // ゲームの数を得る。
+        return NewNumber(pgn_ptr->game_vec().size());
+      } else if (message_symbol == "@set-current-game") {
+        // 現在のゲームをセット。
+        // 引数チェック。
+        required_args = 2;
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr index_ptr = caller.Evaluate(*list_itr);
+        if (!(index_ptr->IsNumber())) {
+          throw GenWrongTypeError
+          (func_name, "Number", std::vector<int> {2}, true);
+        }
+
+        // インデックスをチェック。
+        int index = index_ptr->number_value();
+        index = index < 0 ? pgn_ptr->game_vec().size() + index : index;
+        if (!((index >= 0)
+        && (index <= static_cast<int>(pgn_ptr->game_vec().size())))) {
+          throw GenError("@pgn-error",
+          "Game number '" + std::to_string(index) + "' is out of range.");
+        }
+
+        // セット。
+        current_index = index;
+        return NewBoolean(true);
+      } else if (message_symbol == "@get-current-game-headers") {
+        // 現在のゲームのヘッダ。
+        LispObjectPtr ret_ptr = NewList(game_ptr->header().size());
+        LispIterator<true> itr {ret_ptr.get()};
+
+        for (auto& pair : game_ptr->header()) {
+          LispObjectPtr temp = NewList(2);
+          temp->car(NewString(pair.first));
+          temp->cdr()->car(NewString(pair.second));
+          *itr = *temp;
+          ++itr;
+        }
+
+        return ret_ptr;
+      } else if (message_symbol == "@current-move") {
+        // 現在の指し手。
+        if (move_ptr) {
+          return NewString(move_ptr->text_);
+        }
+        return NewString("");
+      } else if (message_symbol == "@next-move") {
+        // 次の指し手へ。
+        if (game_ptr->Next()) {
+          if (game_ptr->current_node_ptr()) {
+            return NewString(game_ptr->current_node_ptr()->text_);
+          }
+        }
+        return NewString("");
+      } else if (message_symbol == "@prev-move") {
+        // 前の指し手へ。
+        if (game_ptr->Back()) {
+          if (game_ptr->current_node_ptr()) {
+            return NewString(game_ptr->current_node_ptr()->text_);
+          }
+        }
+        return NewString("");
+      } else if (message_symbol == "@alt-move") {
+        // 代替手へ。
+        if (game_ptr->Alt()) {
+          if (game_ptr->current_node_ptr()) {
+            return NewString(game_ptr->current_node_ptr()->text_);
+          }
+        }
+        return NewString("");
+      } else if (message_symbol == "@orig-move") {
+        // オリジナルへ。
+        while (game_ptr->Orig()) continue;
+
+        if (game_ptr->current_node_ptr()) {
+          return NewString(game_ptr->current_node_ptr()->text_);
+        }
+
+        return NewString("");
+      } else if (message_symbol == "@rewind-move") {
+        // 最初の指し手へ。
+        if (game_ptr->Rewind()) {
+          if (game_ptr->current_node_ptr()) {
+            return NewString(game_ptr->current_node_ptr()->text_);
+          }
+        }
+        return NewString("");
+      }
+
+      throw GenError("@sayulisp-error", "(" + func_name
+      + ") couldn't understand '" + message_symbol + "'.");
+    };
+
+    return NewNativeFunction(caller_scope, pgn_func);
   }
 
   // ヘルプを作成する。
