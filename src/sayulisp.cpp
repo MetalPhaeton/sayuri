@@ -55,7 +55,7 @@ namespace Sayuri {
   // ========== //
   const std::string EngineSuite::SQUARE_SYMBOL[NUM_SQUARES] {
     "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1",
-    "A3", "B2", "C2", "D2", "E2", "F2", "G2", "H2",
+    "A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2",
     "A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3",
     "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4",
     "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5",
@@ -698,6 +698,27 @@ namespace Sayuri {
         (func_name, "List", std::vector<int> {2}, true);
       }
       return PlayMove(caller, func_name, move_obj);
+
+    } else if (message_symbol == "@play-note") {
+      // 引数をチェック。
+      required_args = 2;
+      if (!list_itr) {
+        throw Lisp::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr note_ptr = caller.Evaluate(*list_itr);
+      if (!(note_ptr->IsString())) {
+        throw Lisp::GenWrongTypeError
+        (func_name, "String", std::vector<int> {2}, true);
+      }
+
+      // 指す。
+      std::vector<Move> move_vec =
+      engine_ptr_->GuessNote(note_ptr->string_value());
+      if (move_vec.size()) {
+        return Lisp::NewBoolean(engine_ptr_->PlayMove(move_vec[0]));
+      }
+      return Lisp::NewBoolean(false);
 
     } else if (message_symbol == "@undo-move") {
       return UndoMove();
