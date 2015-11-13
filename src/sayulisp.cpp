@@ -723,6 +723,77 @@ namespace Sayuri {
     } else if (message_symbol == "@undo-move") {
       return UndoMove();
 
+    } else if (message_symbol == "@move->note") {
+      LispObjectPtr ret_ptr = Lisp::NewString("");
+
+      // 引数をチェック。
+      required_args = 2;
+      if (!list_itr) {
+        throw Lisp::GenInsufficientArgumentsError
+        (func_name, required_args, false, list.Length() - 1);
+      }
+      LispObjectPtr move_ptr = caller.Evaluate(*list_itr);
+      if (!(move_ptr->IsList())) {
+        throw Lisp::GenWrongTypeError
+        (func_name, "List", std::vector<int> {2}, true);
+      }
+
+      // fromをチェック。
+      LispIterator<false> itr {move_ptr.get()};
+      if (!itr) {
+        throw Lisp::GenError
+        ("@engine-error", "Couldn't find 'From' value.");
+      }
+      LispObjectPtr from_ptr = caller.Evaluate(*(itr++));
+      if (!(from_ptr->IsNumber())) {
+        throw Lisp::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2, 1}, true);
+      }
+      Square from = from_ptr->number_value();
+      if (from >= NUM_SQUARES) {
+        throw Lisp::GenError("@engine-error", "The 'From' value '"
+        + std::to_string(from) + "' doesn't indicate any square.");
+      }
+
+      // toをチェック。
+      if (!itr) {
+        throw Lisp::GenError
+        ("@engine-error", "Couldn't find 'To' value.");
+      }
+      LispObjectPtr to_ptr = caller.Evaluate(*(itr++));
+      if (!(to_ptr->IsNumber())) {
+        throw Lisp::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2, 2}, true);
+      }
+      Square to = to_ptr->number_value();
+      if (to >= NUM_SQUARES) {
+        throw Lisp::GenError("@engine-error", "The 'To' value '"
+        + std::to_string(to) + "' doesn't indicate any square.");
+      }
+
+      // promotionをチェック。
+      if (!itr) {
+        throw Lisp::GenError
+        ("@engine-error", "Couldn't find 'Promotion' value.");
+      }
+      LispObjectPtr promotion_ptr = caller.Evaluate(*itr);
+      if (!(promotion_ptr->IsNumber())) {
+        throw Lisp::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {2, 3}, true);
+      }
+      PieceType promotion = promotion_ptr->number_value();
+      if (promotion >= NUM_PIECE_TYPES) {
+        throw Lisp::GenError("@engine-error", "The 'Promotion' value '"
+        + std::to_string(promotion) + "' doesn't indicate any piece type.");
+      }
+
+      Move move = 0;
+      SetFrom(move, from);
+      SetTo(move, to);
+      SetPromotion(move, promotion);
+
+      return Lisp::NewString(engine_ptr_->MoveToNote(move));
+
     } else if (message_symbol == "@input-uci-command") {
       required_args = 2;
       if (!list_itr) {
