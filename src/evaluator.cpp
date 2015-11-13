@@ -47,10 +47,10 @@ namespace Sayuri {
   constexpr Bitboard Evaluator::PAWN_SHIELD_MASK[NUM_SIDES][NUM_SQUARES];
   constexpr Bitboard Evaluator::WEAK_SQUARE_MASK[NUM_SIDES][NUM_SQUARES];
   Bitboard Evaluator::pin_back_table_[NUM_SQUARES][0xff + 1][NUM_ROTS];
+
   // ================ //
   // テンプレート部品 //
   // ================ //
-
   // 評価用ビットボードを作成するテンプレート部品。
   template<Side SIDE, PieceType TYPE>
   struct GenBitboards {
