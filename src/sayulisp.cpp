@@ -3087,16 +3087,17 @@ namespace Sayuri {
     pgn_ptr->Parse(pgn_str);
 
     // PGN関数オブジェクト。
-    int current_index = 0;
+    std::shared_ptr<int> current_index_ptr(new int(0));
     auto pgn_func =
-    [pgn_ptr, current_index](LispObjectPtr self, const LispObject& caller,
-    const LispObject& list) mutable -> LispObjectPtr {
+    [pgn_ptr, current_index_ptr](LispObjectPtr self, const LispObject& caller,
+    const LispObject& list) -> LispObjectPtr {
       // 準備。
       LispIterator<false> list_itr {&list};
       std::string func_name = (list_itr++)->ToString();
       int required_args = 2;
 
       // 現在のゲームと現在の指し手を得る。
+      int current_index = *current_index_ptr;
       if (current_index >= static_cast<int>(pgn_ptr->game_vec().size())) {
         return NewNil();
       }
@@ -3188,7 +3189,7 @@ namespace Sayuri {
         }
 
         // セット。
-        current_index = index;
+        *current_index_ptr = index;
         return NewBoolean(true);
       } else if (message_symbol == "@get-current-game-headers") {
         // 現在のゲームのヘッダ。
