@@ -34,10 +34,14 @@
 #include <memory>
 #include <fstream>
 
-#include "sayuri.h"
+#include "init.h"
+#include "chess_engine.h"
+#include "uci_shell.h"
+#include "params.h"
+#include "sayulisp.h"
 
 // デバッグスイッチ。
-// #define SAYURI_DEBUG_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
+#define SAYURI_DEBUG_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 
 /**
  * UCI出力を標準出力に出力するコールバック関数。

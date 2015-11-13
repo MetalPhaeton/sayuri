@@ -22,29 +22,48 @@
  */
 
 /**
- * @file sayuri.h
+ * @file sayuri.cpp
  * @author Hironori Ishibashi
- * @brief Sayuriへのインターフェイス。
+ * @brief Sayuriへのインターフェイスの実装。
  */
 
-#ifndef SAYURI_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
-#define SAYURI_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
+#include "sayuri.h"
 
-#ifdef __cplusplus
+#include <iostream>
+#include <memory>
+#include <string>
+#include "init.h"
+#include "sayulisp.h"
+#include "lisp_core.h"
+
+/** Sayuri 名前空間。 */
 namespace Sayuri {
+  namespace {
+    std::shared_ptr<Sayulisp> sayulisp_ptr;
+    std::string ret_str;
+  }
+
   extern "C" {
-#endif
+    // Sayulispを実行する。
+    const char* ExecuteSayulisp(const char* code) {
+      if (!sayulisp_ptr) {
+        Init();
+        sayulisp_ptr.reset(new Sayulisp());
+        ret_str = std::string("");
+      }
 
-/** 
- * Sayulispのコードを実行する。
- * @param code Sayulispのコード。
- * @return 結果のS式。
- */
-const char* ExecuteSayulisp(const char* code);
+      LispObjectPtr result = Lisp::NewNil();
 
-#ifdef __cplusplus
-  }  // extgern "C"
+      try {
+        for (auto& ptr : sayulisp_ptr->Parse(code)) {
+          result = sayulisp_ptr->Evaluate(*ptr);
+        }
+      } catch (LispObjectPtr error_ptr) {
+        result = error_ptr;
+      }
+
+      ret_str = result->ToString();
+      return ret_str.c_str();
+    }
+  }
 }  // namespace Sayuri
-#endif
-
-#endif

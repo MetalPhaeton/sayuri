@@ -44,6 +44,26 @@
 #include <thread>
 #include <functional>
 
+#include "chess_def.h"
+#include "chess_engine.h"
+#include "chess_util.h"
+#include "debug.h"
+#include "error.h"
+#include "evaluator.h"
+#include "fen.h"
+#include "pgn.h"
+#include "helper_queue.h"
+#include "init.h"
+#include "job.h"
+#include "move_maker.h"
+#include "position_record.h"
+#include "pv_line.h"
+#include "transposition_table.h"
+#include "uci_shell.h"
+#include "params.h"
+#include "cache.h"
+#include "lisp_core.h"
+#include "sayulisp.h"
 #include "sayuri.h"
 
 /** Sayuri 名前空間。 */
@@ -84,6 +104,7 @@ namespace Sayuri {
   int DebugMain(int argc, char* argv[]) {
     // プログラムの起動。
     // 初期化。
+    /*
     Init();
     // エンジン準備。
     std::unique_ptr<Sayuri::SearchParams>
@@ -101,14 +122,22 @@ namespace Sayuri {
 
     std::unique_ptr<Sayuri::UCIShell>
     shell_ptr(new Sayuri::UCIShell(*engine_ptr));
+    */
 
     // ========================================================================
 
-    FEN fen("rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b Kkq d3 11 22");
-
-    engine_ptr->LoadFEN(fen);
-    PrintPositionRecord(PositionRecord(*engine_ptr));
-
+    const char* code = "(define my-engine (gen-engine))";
+    std::cout << ExecuteSayulisp(code) << std::endl;
+    code = "(my-engine '@play-note \"e4\")";
+    std::cout << ExecuteSayulisp(code) << std::endl;
+    code = "(my-engine '@play-note \"e5\")";
+    std::cout << ExecuteSayulisp(code) << std::endl;
+    code = "(my-engine '@play-note \"Nf3\")";
+    std::cout << ExecuteSayulisp(code) << std::endl;
+    code = "(my-engine '@play-note \"Nc7\")";
+    std::cout << ExecuteSayulisp(code) << std::endl;
+    code = "(import \"/home/hironori/Programming/Projects/Sayuri/build/test.scm\")(print-board my-engine)";
+    std::cout << ExecuteSayulisp(code) << std::endl;
     /*
     std::ifstream ifs("/home/hironori/Programming/Projects/Sayuri/build/test.pgn");
     std::ostringstream oss;
