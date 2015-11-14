@@ -126,26 +126,23 @@ Usage
 Example
 </h6>
 <p>If you want to call Sayuri from Python on Linux, then...</p>
-<ol style="list-style-type: decimal">
-<li><p>Delete <code>main.cpp</code>, because it has <code>main()</code> function.</p></li>
-<li><p>Build &quot;<code>libsayuri.so</code>&quot; by...</p></li>
-</ol>
-<pre><code>$ &lt;g++ | clang++&gt; -std=c++11 -Ofast -pthread -march=native -fno-rtti -shared -fPIC -o libsayuri.so *.cpp</code></pre>
-<ol start="3" style="list-style-type: decimal">
-<li>Use from Python.</li>
-</ol>
-<pre class="sourceCode python"><code class="sourceCode python"><span class="ch">from</span> ctypes <span class="ch">import</span>*
+<p>(Step 1) Delete <code>main.cpp</code>, because it has <code>main()</code> function.</p>
+<p>(Step 2) Build <code>libsayuri.so</code> by...</p>
+<pre><code>$ &lt;g++ | clang++&gt; -std=c++11 -Ofast -pthread -march=native -fno-rtti \
+  -shared -fPIC -o libsayuri.so *.cpp</code></pre>
+<p>(Step 3) Use from Python.</p>
+<pre><code>from ctypes import* 
 
-<span class="co"># Load.</span>
-lib = cdll.LoadLibrary(<span class="st">&quot;/path/to/libsayuri.so&quot;</span>)
+# Load.
+lib = cdll.LoadLibrary(&quot;/path/to/libsayuri.so&quot;)
 
-<span class="co"># Get ready.</span>
+# Get ready.
 sayulisp = lib.ExecuteSayulisp
 sayulisp.restype = c_char_p
 sayulisp.argtype = (c_cahr_p)
 
-<span class="co"># Go.</span>
-<span class="dt">print</span>(sayulisp(b<span class="st">&quot;(+ 1 2 3)&quot;</span>))</code></pre>
+# Go.
+print(sayulisp(b&quot;(+ 1 2 3)&quot;))</code></pre>
 <h2 id="uci-options">UCI Options</h2>
 <ul>
 <li>To change size of the hash table. (Default: 32 MB, Max: 8192 MB, Min: 8 MB)
