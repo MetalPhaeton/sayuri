@@ -130,30 +130,27 @@ The Library has only one function.
 
 If you want to call Sayuri from Python on Linux, then...
 
-1. Delete `main.cpp`, because it has `main()` function.
+(Step 1) Delete `main.cpp`, because it has `main()` function.
 
-2. Build "`libsayuri.so`" by...
+(Step 2) Build `libsayuri.so` by...
 
-~~~~
-$ <g++ | clang++> -std=c++11 -Ofast -pthread -march=native -fno-rtti -shared -fPIC -o libsayuri.so *.cpp
-~~~~
+    $ <g++ | clang++> -std=c++11 -Ofast -pthread -march=native -fno-rtti \
+      -shared -fPIC -o libsayuri.so *.cpp
 
-3. Use from Python.
+(Step 3) Use from Python.
 
-~~~~python
-from ctypes import*
-
-# Load.
-lib = cdll.LoadLibrary("/path/to/libsayuri.so")
-
-# Get ready.
-sayulisp = lib.ExecuteSayulisp
-sayulisp.restype = c_char_p
-sayulisp.argtype = (c_cahr_p)
-
-# Go.
-print(sayulisp(b"(+ 1 2 3)"))
-~~~~
+    from ctypes import* 
+    
+    # Load.
+    lib = cdll.LoadLibrary("/path/to/libsayuri.so")
+    
+    # Get ready.
+    sayulisp = lib.ExecuteSayulisp
+    sayulisp.restype = c_char_p
+    sayulisp.argtype = (c_cahr_p)
+    
+    # Go.
+    print(sayulisp(b"(+ 1 2 3)"))
 
 
 UCI Options
