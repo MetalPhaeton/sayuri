@@ -258,6 +258,11 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
   using Move = std::uint32_t;
 
   // --- 手のビットフィールドの定数 --- //
+  /** ビットフィールド名の定数。 */
+  enum {
+    FROM, TO, PROMOTION, MOVE_TYPE,
+    CAPTURED_PIECE, CASTLING_RIGHTS, EN_PASSANT_SQUARE
+  };
   /** マスのマスク。 6ビット。 */
   constexpr Move SQUARE_MASK = 0x3f;
   /** 駒のマスク。 3ビット。 */
@@ -265,42 +270,46 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
   /** キャスリングのマスク。 4ビット。 */
   constexpr Move CASTLING_MASK = 0xf;
   /** 手の種類のマスク。 3ビット。 */
-  constexpr Move MTYPE_MASK = 0x7;
+  constexpr Move MOVE_TYPE_MASK = 0x7;
 
-  /** 動かす駒の位置のビット位置。 */
-  constexpr unsigned int FROM_SHIFT = 0;
-  /** 移動先の位置のビット位置。 */
-  constexpr unsigned int TO_SHIFT = FROM_SHIFT + 6;
-  /** 昇格する駒の種類のビット位置。 */
-  constexpr unsigned int PROMOTION_SHIFT = TO_SHIFT + 6;
-  /** 手の種類のビット位置。 */
-  constexpr unsigned int MOVE_TYPE_SHIFT = PROMOTION_SHIFT + 3;
-  /** 取った駒の種類のビット位置。 */
-  constexpr unsigned int CAPTURED_PIECE_SHIFT = MOVE_TYPE_SHIFT + 3;
-  /** キャスリングの権利のビット位置。 */
-  constexpr unsigned int CASTLING_RIGHTS_SHIFT = CAPTURED_PIECE_SHIFT + 3;
-  /** アンパッサンの位置のビット位置。 */
-  constexpr unsigned int EN_PASSANT_SQUARE_SHIFT = CASTLING_RIGHTS_SHIFT + 4;
+  /** 各ビットフィールド用シフト。 */
+  constexpr int SHIFT[EN_PASSANT_SQUARE + 1] {
+    /** 動かす駒の位置のビット位置。 */
+    0,
+    /** 移動先の位置のビット位置。 */
+    6,
+    /** 昇格する駒の種類のビット位置。 */
+    6 + 6,
+    /** 手の種類のビット位置。 */
+    6 + 6 + 3,
+    /** 取った駒の種類のビット位置。 */
+    6 + 6 + 3 + 3,
+    /** キャスリングの権利のビット位置。 */
+    6 + 6 + 3 + 3 + 3,
+    /** アンパッサンの位置のビット位置。 */
+    6 + 6 + 3 + 3 + 3 + 4
+  };
 
-  /** 動かす駒の位置のマスク。 */
-  constexpr Move FROM_MASK = SQUARE_MASK << FROM_SHIFT;
-  /** 移動先の位置のマスク。 */
-  constexpr Move TO_MASK = SQUARE_MASK << TO_SHIFT;
-  /** 昇格する駒のマスク。 */
-  constexpr Move PROMOTION_MASK = PIECE_MASK << PROMOTION_SHIFT;
-  /** 手の種類のマスク。 */
-  constexpr Move MOVE_TYPE_MASK = MTYPE_MASK << MOVE_TYPE_SHIFT;
-  /** 取った駒の種類のマスク。 */
-  constexpr Move CAPTURED_PIECE_MASK = PIECE_MASK << CAPTURED_PIECE_SHIFT;
-  /** キャスリングの権利のマスク。 */
-  constexpr Move CASTLING_RIGHTS_MASK =
-  CASTLING_MASK << CASTLING_RIGHTS_SHIFT;
-  /** アンパッサンの位置のマスク。 */
-  constexpr Move EN_PASSANT_SQUARE_MASK =
-  SQUARE_MASK << EN_PASSANT_SQUARE_SHIFT;
+  /** 各ビットフィールド用マスク。 */
+  constexpr Move MASK[EN_PASSANT_SQUARE + 1] {
+    /** 動かす駒の位置のマスク。 */
+    SQUARE_MASK << SHIFT[FROM],
+    /** 移動先の位置のマスク。 */
+    SQUARE_MASK << SHIFT[TO],
+    /** 昇格する駒のマスク。 */
+    PIECE_MASK << SHIFT[PROMOTION],
+    /** 手の種類のマスク。 */
+    MOVE_TYPE_MASK << SHIFT[MOVE_TYPE],
+    /** 取った駒の種類のマスク。 */
+    PIECE_MASK << SHIFT[CAPTURED_PIECE],
+    /** キャスリングの権利のマスク。 */
+    CASTLING_MASK << SHIFT[CASTLING_RIGHTS],
+    /** アンパッサンの位置のマスク。 */
+    SQUARE_MASK << SHIFT[EN_PASSANT_SQUARE]
+  };
 
   /** 手の比較に使うマスク。 */
-  constexpr Move BASE_MASK = FROM_MASK | TO_MASK | PROMOTION_MASK;
+  constexpr Move BASE_MASK = MASK[FROM] | MASK[TO] | MASK[PROMOTION];
 
   // --- 手の種類の定義 --- //
   /** 手の種類の型。 */
@@ -310,135 +319,26 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
     NULL_MOVE, NORMAL, EN_PASSANT, CASTLE_WS, CASTLE_WL, CASTLE_BS, CASTLE_BL
   };
 
-  // --- 手のビットフィールドのアクセサ --- //
   /**
-   * アクセサ - 動かす駒の位置。
+   * アクセサ - Moveの各ビットフィールド。
+   * @param <FIELD> ビットフィールド名。
    * @param move 対象のオブジェクト。
-   * @return 動かす駒の位置。
+   * @return ビットフィールドの値。
    */
-  constexpr inline Square GetFrom(Move move) {
-    return (move & FROM_MASK) >> FROM_SHIFT;
+  template<int FIELD>
+  inline std::uint32_t Get(Move move) {
+    return (move & MASK[FIELD]) >> SHIFT[FIELD];
   }
 
   /**
-   * アクセサ - 移動先の位置。
+   * ミューテータ - Moveの各ビットフィールド。
+   * @param <FIELD> ビットフィールド名。
    * @param move 対象のオブジェクト。
-   * @return 移動先の位置。
+   * @param val セットする値。
    */
-  constexpr inline Square GetTo(Move move) {
-    return (move & TO_MASK) >> TO_SHIFT;
-  }
-
-  /**
-   * アクセサ - 昇格する駒の種類。
-   * @param move 対象のオブジェクト。
-   * @return 昇格する駒の種類。
-   */
-  constexpr inline PieceType GetPromotion(Move move) {
-    return (move & PROMOTION_MASK) >> PROMOTION_SHIFT;
-  }
-
-  /**
-   * アクセサ - 手の種類。
-   * @param move 対象のオブジェクト。
-   * @return 手の種類。
-   */
-  constexpr inline MoveType GetMoveType(Move move) {
-    return (move & MOVE_TYPE_MASK) >> MOVE_TYPE_SHIFT;
-  }
-
-  /**
-   * アクセサ - 取った駒の種類。
-   * @param move 対象のオブジェクト。
-   * @return 取った駒の種類。
-   */
-  constexpr inline PieceType GetCapturedPiece(Move move) {
-    return (move & CAPTURED_PIECE_MASK) >> CAPTURED_PIECE_SHIFT;
-  }
-
-  /**
-   * アクセサ - キャスリングの権利。
-   * @param move 対象のオブジェクト。
-   * @return キャスリングの権利。
-   */
-  constexpr inline Castling GetCastlingRights(Move move) {
-    return (move & CASTLING_RIGHTS_MASK) >> CASTLING_RIGHTS_SHIFT;
-  }
-
-  /**
-   * アクセサ - アンパッサンの位置。
-   * @param move 対象のオブジェクト。
-   * @return アンパッサンの位置。
-   */
-  constexpr inline Square GetEnPassantSquare(Move move) {
-    return (move & EN_PASSANT_SQUARE_MASK) >> EN_PASSANT_SQUARE_SHIFT;
-  }
-
-  // --- 手のビットフィールドのミューテータ --- //
-  /**
-   * ミューテータ - 動かす駒の位置。
-   * @param move 対象のオブジェクト。
-   * @param from 動かす駒の位置。
-   */
-  inline void SetFrom(Move& move, Square from) {
-    UPDATE_FIELD(move, from << FROM_SHIFT, FROM_MASK);
-  }
-
-  /**
-   * ミューテータ - 移動先の位置。
-   * @param move 対象のオブジェクト。
-   * @param to 移動先の位置。
-   */
-  inline void SetTo(Move& move, Square to) {
-    UPDATE_FIELD(move, to << TO_SHIFT, TO_MASK);
-  }
-
-  /**
-   * ミューテータ - 昇格する駒の種類。
-   * @param move 対象のオブジェクト。
-   * @param promotion 昇格する駒の種類。
-   */
-  inline void SetPromotion(Move& move, PieceType promotion) {
-    UPDATE_FIELD(move, promotion << PROMOTION_SHIFT, PROMOTION_MASK);
-  }
-
-  /**
-   * ミューテータ - 手の種類。
-   * @param move 対象のオブジェクト。
-   * @param move_type 手の種類。
-   */
-  inline void SetMoveType(Move& move, MoveType move_type) {
-    UPDATE_FIELD(move, move_type << MOVE_TYPE_SHIFT, MOVE_TYPE_MASK);
-  }
-
-  /**
-   * ミューテータ - 取った駒の種類。
-   * @param move 対象のオブジェクト。
-   * @param captured_piece 取った駒の種類。
-   */
-  inline void SetCapturedPiece(Move& move, PieceType captured_piece) {
-    UPDATE_FIELD(move, captured_piece << CAPTURED_PIECE_SHIFT,
-    CAPTURED_PIECE_MASK);
-  }
-
-  /**
-   * ミューテータ - キャスリングの権利。
-   * @param move 対象のオブジェクト。
-   * @param castling_rights キャスリングの権利。
-   */
-  inline void SetCastlingRights(Move& move, Castling castling_rights) {
-    UPDATE_FIELD(move, castling_rights << CASTLING_RIGHTS_SHIFT,
-    CASTLING_RIGHTS_MASK);
-  }
-
-  /**
-   * ミューテータ - アンパッサンの位置。
-   * @param move 対象のオブジェクト。
-   * @param en_passant_square アンパッサンの位置。
-   */
-  inline void SetEnPassantSquare(Move& move, Square en_passant_square) {
-    UPDATE_FIELD(move, en_passant_square << EN_PASSANT_SQUARE_SHIFT,
-    EN_PASSANT_SQUARE_MASK);
+  template<int FIELD>
+  inline void Set(Move& move, std::uint32_t val) {
+    move = (move & ~(MASK[FIELD])) | (val << SHIFT[FIELD]);
   }
 
   /**
