@@ -523,6 +523,14 @@ namespace Sayuri {
 
       return GetPiece(func_name, square);
 
+    } else if (message_symbol == "@get-all-pieces") {
+      LispObjectPtr ret_ptr = Lisp::NewList(64);
+      LispIterator<true> itr {ret_ptr.get()};
+      for (Square square = 0; square < NUM_SQUARES; ++square, ++itr) {
+        itr.current_->car(GetPiece(func_name, square));
+      }
+      return ret_ptr;
+
     } else if (message_symbol == "@get-to-move") {
       return GetToMove();
 
