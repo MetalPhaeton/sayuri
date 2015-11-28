@@ -140,6 +140,34 @@ Example
 
 ;; Output
 ;; &gt; (WHITE QUEEN)</code></pre>
+<ul>
+<li><code>@get-all-pieces</code>
+<ul>
+<li>Returns pieces of each square on the board as List.</li>
+</ul></li>
+</ul>
+<h6>
+Example
+</h6>
+<pre><code>(define my-engine (gen-engine))
+(display (my-engine &#39;@get-all-pieces))
+
+;; Output
+;; &gt; ((WHITE ROOK) (WHITE KNIGHT) (WHITE BISHOP) (WHITE QUEEN)
+;; &gt; (WHITE KING) (WHITE BISHOP) (WHITE KNIGHT) (WHITE ROOK)
+;; &gt; (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN)
+;; &gt; (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (NO_SIDE EMPTY)
+;; &gt; (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+;; &gt; (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+;; &gt; (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+;; &gt; (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+;; &gt; (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+;; &gt; (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+;; &gt; (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+;; &gt; (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (BLACK PAWN)
+;; &gt; (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN)
+;; &gt; (BLACK PAWN) (BLACK PAWN) (BLACK ROOK) (BLACK KNIGHT) (BLACK BISHOP)
+;; &gt; (BLACK QUEEN) (BLACK KING) (BLACK BISHOP) (BLACK KNIGHT) (BLACK ROOK))</code></pre>
 <h3 id="get-and-set-board-status">Get and Set Board Status</h3>
 <ul>
 <li><code>@get-to-move</code>
