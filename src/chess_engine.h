@@ -406,16 +406,16 @@ namespace Sayuri {
        */
       int GetNextMaterial(int current_material, Move move) const {
         Cache& cache = shared_st_ptr_->cache_;
-        switch (GetMoveType(move)) {
+        switch (Get<MOVE_TYPE>(move)) {
           case NORMAL:
-            if ((move & PROMOTION_MASK)) {
+            if ((move & MASK[PROMOTION])) {
               // プロモーション。
               return -(current_material
-              + cache.material_[basic_st_.piece_board_[GetTo(move)]]
-              + cache.material_[GetPromotion(move)] - cache.material_[PAWN]);
+              + cache.material_[basic_st_.piece_board_[Get<TO>(move)]]
+              + cache.material_[Get<PROMOTION>(move)] - cache.material_[PAWN]);
             }
             return -(current_material
-            + cache.material_[basic_st_.piece_board_[GetTo(move)]]);
+            + cache.material_[basic_st_.piece_board_[Get<TO>(move)]]);
           case EN_PASSANT:  // アンパッサン。
             return -(current_material + cache.material_[PAWN]);
         }
@@ -860,8 +860,8 @@ namespace Sayuri {
         basic_st_.to_move_ = Util::GetOppositeSide(basic_st_.to_move_);
 
         // 情報をメモ。
-        SetCastlingRights(move, basic_st_.castling_rights_);
-        SetEnPassantSquare(move, basic_st_.en_passant_square_);
+        Set<CASTLING_RIGHTS>(move, basic_st_.castling_rights_);
+        Set<EN_PASSANT_SQUARE>(move, basic_st_.en_passant_square_);
 
         // アンパッサンの位置を削除。
         basic_st_.en_passant_square_ = 0;
@@ -876,8 +876,8 @@ namespace Sayuri {
         basic_st_.to_move_ = Util::GetOppositeSide(basic_st_.to_move_);
 
         // 情報を戻す。
-        basic_st_.castling_rights_ = GetCastlingRights(move);
-        basic_st_.en_passant_square_ = GetEnPassantSquare(move);
+        basic_st_.castling_rights_ = Get<CASTLING_RIGHTS>(move);
+        basic_st_.en_passant_square_ = Get<EN_PASSANT_SQUARE>(move);
       }
 
       /**

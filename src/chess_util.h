@@ -1558,9 +1558,9 @@ namespace Sayuri {
       static std::string MoveToString(Move move) {
         // 準備。
         std::string ret = "";
-        Square from = GetFrom(move);
-        Square to = GetTo(move);
-        PieceType promotion = GetPromotion(move);
+        Square from = Get<FROM>(move);
+        Square to = Get<TO>(move);
+        PieceType promotion = Get<PROMOTION>(move);
 
         // 文字列を作成。
         ret.push_back(Util::SquareToFyle(from) + 'a');
@@ -1602,29 +1602,29 @@ namespace Sayuri {
         if (fyle >= NUM_FYLES) return 0;
         Rank rank = str[1] - '1';
         if (rank >= NUM_RANKS) return 0;
-        SetFrom(ret, CoordToSquare(fyle, rank));
+        Set<FROM>(ret, CoordToSquare(fyle, rank));
 
         // toをパース。
         fyle = str[2] - 'a';
         if (fyle >= NUM_FYLES) return 0;
         rank = str[3] - '1';
         if (rank >= NUM_RANKS) return 0;
-        SetTo(ret, CoordToSquare(fyle, rank));
+        Set<TO>(ret, CoordToSquare(fyle, rank));
 
         // 昇格をパース。
         if (str.size() >= 5) {
           switch (str[4]) {
             case 'n':
-              SetPromotion(ret, KNIGHT);
+              Set<PROMOTION>(ret, KNIGHT);
               break;
             case 'b':
-              SetPromotion(ret, BISHOP);
+              Set<PROMOTION>(ret, BISHOP);
               break;
             case 'r':
-              SetPromotion(ret, ROOK);
+              Set<PROMOTION>(ret, ROOK);
               break;
             case 'q':
-              SetPromotion(ret, QUEEN);
+              Set<PROMOTION>(ret, QUEEN);
               break;
             default:
               break;

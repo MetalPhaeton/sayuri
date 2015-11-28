@@ -234,7 +234,7 @@ namespace Sayuri {
 
           if (tt_entry.score_type() == ScoreType::EXACT) {
             // エントリーが正確な値。
-            if (!(tt_entry.best_move() & CAPTURED_PIECE_MASK)
+            if (!(tt_entry.best_move() & MASK[CAPTURED_PIECE])
             && (level < MAX_PLYS)) {
               // キラームーブをセット。
               if (cache.enable_killer_) {
@@ -260,7 +260,7 @@ namespace Sayuri {
           } else {
             // エントリーがベータ値。
             Move best_move = tt_entry.best_move();
-            if (!(tt_entry.best_move() & CAPTURED_PIECE_MASK)
+            if (!(tt_entry.best_move() & MASK[CAPTURED_PIECE])
             && (level < MAX_PLYS)) {
               // キラームーブをセット。
               if (cache.enable_killer_) {
@@ -406,10 +406,10 @@ namespace Sayuri {
               pv_line_table_[level].Insert(pv_line_table_[level + 1]);
 
               // 取らない手。
-              if (!(move & CAPTURED_PIECE_MASK)) {
+              if (!(move & MASK[CAPTURED_PIECE])) {
                 // 手の情報を得る。
-                Square from = GetFrom(move);
-                Square to = GetTo(move);
+                Square from = Get<FROM>(move);
+                Square to = Get<TO>(move);
 
                 // キラームーブ。
                 if (cache.enable_killer_) {
@@ -516,8 +516,8 @@ namespace Sayuri {
       }
 
       // 手の情報を得る。
-      Square from = GetFrom(move);
-      Square to = GetTo(move);
+      Square from = Get<FROM>(move);
+      Square to = Get<TO>(move);
 
       // 探索。
       int score = 0;
@@ -530,7 +530,7 @@ namespace Sayuri {
         if (!(is_checked || null_reduction)
         && (depth >= cache.lmr_limit_depth_)
         && (move_number > lmr_move_number)
-        && !((move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
+        && !((move & (MASK[CAPTURED_PIECE] | MASK[PROMOTION]))
         || EqualMove(move, shared_st_ptr_->killer_stack_[level][0])
         || EqualMove(move, shared_st_ptr_->killer_stack_[level][1]))) {
           score = -Search(NodeType::NON_PV, next_hash,
@@ -579,7 +579,7 @@ namespace Sayuri {
             && (move_number > history_pruning_move_number)
             && (shared_st_ptr_->history_[side][from][to]
             < history_pruning_threshold)
-            && !((move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
+            && !((move & (MASK[CAPTURED_PIECE] | MASK[PROMOTION]))
             || EqualMove(move, shared_st_ptr_->killer_stack_[level][0])
             || EqualMove(move, shared_st_ptr_->killer_stack_[level][1]))) {
               new_depth -= cache.history_pruning_reduction_;
@@ -652,7 +652,7 @@ namespace Sayuri {
 
       // キラームーブ、ヒストリーを記録。
       if (job.score_type_ != ScoreType::ALPHA) {
-        if (!(best_move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))) {
+        if (!(best_move & (MASK[CAPTURED_PIECE] | MASK[PROMOTION]))) {
           // キラームーブ。
           if (cache.enable_killer_) {
             shared_st_ptr_->killer_stack_[level][0] = best_move;
@@ -661,8 +661,8 @@ namespace Sayuri {
 
           // ヒストリー。
           if (cache.enable_history_) {
-            Square from = GetFrom(best_move);
-            Square to = GetTo(best_move);
+            Square from = Get<FROM>(best_move);
+            Square to = Get<TO>(best_move);
 
             shared_st_ptr_->history_[side][from][to] += 
             Util::DepthToHistory(job.depth_);
@@ -868,7 +868,7 @@ namespace Sayuri {
       delta = job.delta_;
 
       // 最善手が取らない手の場合、ヒストリー、キラームーブをセット。
-      if (!(prev_best & CAPTURED_PIECE_MASK)) {
+      if (!(prev_best & MASK[CAPTURED_PIECE])) {
         // キラームーブ。
         if (cache.enable_killer_) {
           shared_st_ptr_->killer_stack_[level][0] = prev_best;
@@ -878,8 +878,8 @@ namespace Sayuri {
         // ヒストリー。
         if (cache.enable_history_) {
           // 手の情報を得る。
-          Square from = GetFrom(prev_best);
-          Square to = GetTo(prev_best);
+          Square from = Get<FROM>(prev_best);
+          Square to = Get<TO>(prev_best);
 
           shared_st_ptr_->history_[side][from][to] +=
           Util::DepthToHistory(job.depth_);
@@ -1019,8 +1019,8 @@ namespace Sayuri {
       }
 
       // 手の情報を得る。
-      Square from = GetFrom(move);
-      Square to = GetTo(move);
+      Square from = Get<FROM>(move);
+      Square to = Get<TO>(move);
 
       // 探索。
       int score = 0;
@@ -1033,7 +1033,7 @@ namespace Sayuri {
         if (!(job.is_checked_ || job.null_reduction_)
         && (job.depth_ >= cache.lmr_limit_depth_)
         && (move_number > lmr_move_number)
-        && !((move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
+        && !((move & (MASK[CAPTURED_PIECE] | MASK[PROMOTION]))
         || EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][0])
         || EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][1]))) {
           score = -Search(NodeType::NON_PV, next_hash,
@@ -1082,7 +1082,7 @@ namespace Sayuri {
             && (move_number > history_pruning_move_number)
             && (shared_st_ptr_->history_[side][from][to]
             < history_pruning_threshold)
-            && !((move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))
+            && !((move & (MASK[CAPTURED_PIECE] | MASK[PROMOTION]))
             || EqualMove(move, shared_st_ptr_->killer_stack_[job.level_][0])
             || EqualMove
             (move, shared_st_ptr_->killer_stack_[job.level_][1]))) {
@@ -1256,7 +1256,7 @@ namespace Sayuri {
           if (!(job.is_checked_)
           && (job.depth_ >= cache.lmr_limit_depth_)
           && (move_number > lmr_move_number)
-          && !(move & (CAPTURED_PIECE_MASK | PROMOTION_MASK))) {
+          && !(move & (MASK[CAPTURED_PIECE] | MASK[PROMOTION]))) {
             // ゼロウィンドウ探索。
             score = -Search(NodeType::NON_PV, next_hash,
             job.depth_ - cache.lmr_search_reduction_ - 1, job.level_ + 1,
@@ -1362,13 +1362,13 @@ namespace Sayuri {
     if (!move) return score;
 
     // 準備。
-    PieceType target = basic_st_.piece_board_[GetTo(move)];
+    PieceType target = basic_st_.piece_board_[Get<TO>(move)];
 
     // 取った時の評価を計算。
     score += cache.material_[target];
-    if (GetMoveType(move) == EN_PASSANT) score += cache.material_[PAWN];
-    if ((move & PROMOTION_MASK)) {
-      score += cache.material_[GetPromotion(move)] - cache.material_[PAWN];
+    if (Get<MOVE_TYPE>(move) == EN_PASSANT) score += cache.material_[PAWN];
+    if ((move & MASK[PROMOTION])) {
+      score += cache.material_[Get<PROMOTION>(move)] - cache.material_[PAWN];
     }
 
     // 取る相手がキングなら帰る。
@@ -1376,10 +1376,10 @@ namespace Sayuri {
 
     // SEEが無効の場合、簡単計算で帰る。
     if (!(cache.enable_see_)) {
-      if ((move & PROMOTION_MASK)) {
-        return cache.material_[GetPromotion(move)] - cache.material_[PAWN];
+      if ((move & MASK[PROMOTION])) {
+        return cache.material_[Get<PROMOTION>(move)] - cache.material_[PAWN];
       } else {
-        return score - cache.material_[basic_st_.piece_board_[GetFrom(move)]];
+        return score - cache.material_[basic_st_.piece_board_[Get<FROM>(move)]];
       }
     }
 
@@ -1393,7 +1393,7 @@ namespace Sayuri {
       return temp_score;
     }
 
-    score -= SEE(GetNextSEEMove(GetTo(move)), -score);
+    score -= SEE(GetNextSEEMove(Get<TO>(move)), -score);
 
     self->UnmakeMove(move);
 
@@ -1444,10 +1444,10 @@ namespace Sayuri {
       }
       if (attackers) {
         Move move = 0;
-        SetFrom(move, Util::GetSquare(attackers));
-        SetTo(move, target);
-        SetPromotion(move, promotion);
-        SetMoveType(move, NORMAL);
+        Set<FROM>(move, Util::GetSquare(attackers));
+        Set<TO>(move, target);
+        Set<PROMOTION>(move, promotion);
+        Set<MOVE_TYPE>(move, NORMAL);
         return move;
       }
     }

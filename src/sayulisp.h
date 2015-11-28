@@ -214,13 +214,13 @@ namespace Sayuri {
       static LispObjectPtr MoveToList(Move move) {
         LispObjectPtr ret_ptr = Lisp::NewList(3);
 
-        ret_ptr->car(Lisp::NewSymbol(SQUARE_SYMBOL[GetFrom(move)]));
+        ret_ptr->car(Lisp::NewSymbol(SQUARE_SYMBOL[Get<FROM>(move)]));
 
         ret_ptr->cdr()->car
-        (Lisp::NewSymbol(SQUARE_SYMBOL[GetTo(move)]));
+        (Lisp::NewSymbol(SQUARE_SYMBOL[Get<TO>(move)]));
 
         ret_ptr->cdr()->cdr()->car
-        (Lisp::NewSymbol(PIECE_TYPE_SYMBOL[GetPromotion(move)]));
+        (Lisp::NewSymbol(PIECE_TYPE_SYMBOL[Get<PROMOTION>(move)]));
 
         return ret_ptr;
       }

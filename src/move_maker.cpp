@@ -242,10 +242,10 @@ namespace Sayuri {
         for (; move_bitboard; NEXT_BITBOARD(move_bitboard)) {
           // 手を作る。
           Move move = 0;
-          SetFrom(move, from);
+          Set<FROM>(move, from);
           Square to = Util::GetSquare(move_bitboard);
-          SetTo(move, to);
-          SetMoveType(move, NORMAL);
+          Set<TO>(move, to);
+          Set<MOVE_TYPE>(move, NORMAL);
 
           // ヒストリーの最大値を更新。 (テンプレート部品)
           UpdateMaxHistory<TYPE>(side, from, to);
@@ -266,17 +266,17 @@ namespace Sayuri {
       for (; move_bitboard; NEXT_BITBOARD(move_bitboard)) {
         // 手を作る。
         Move move = 0;
-        SetFrom(move, from);
+        Set<FROM>(move, from);
         Square to = Util::GetSquare(move_bitboard);
-        SetTo(move, to);
+        Set<TO>(move, to);
 
         // ヒストリーの最大値を更新。 (テンプレート部品)
         UpdateMaxHistory<TYPE>(side, from, to);
 
         if (Util::IsEnPassant(basic_st.en_passant_square_, to)) {
-          SetMoveType(move, EN_PASSANT);
+          Set<MOVE_TYPE>(move, EN_PASSANT);
         } else {
-          SetMoveType(move, NORMAL);
+          Set<MOVE_TYPE>(move, NORMAL);
         }
 
         if (((side == WHITE) && (Util::SquareToRank(to) == RANK_8))
@@ -284,7 +284,7 @@ namespace Sayuri {
           // 昇格を設定。
           for (PieceType piece_type = KNIGHT;
           piece_type <= QUEEN; ++piece_type) {
-            SetPromotion(move, piece_type);
+            Set<PROMOTION>(move, piece_type);
             move_stack_[last_++].move_ = move;
           }
         } else {
@@ -300,14 +300,14 @@ namespace Sayuri {
     Util::GetKingMove(from) & GenBitboardMask<TYPE>(side);
 
     // キャスリングの動きを作る。
-    constexpr Move WS_CASTLING_MOVE = E1 | (G1 << TO_SHIFT)
-    | (CASTLE_WS << MOVE_TYPE_SHIFT);
-    constexpr Move WL_CASTLING_MOVE = E1 | (C1 << TO_SHIFT)
-    | (CASTLE_WL << MOVE_TYPE_SHIFT);
-    constexpr Move BS_CASTLING_MOVE = E8 | (G8 << TO_SHIFT)
-    | (CASTLE_BS << MOVE_TYPE_SHIFT);
-    constexpr Move BL_CASTLING_MOVE = E8 | (C8 << TO_SHIFT)
-    | (CASTLE_BL << MOVE_TYPE_SHIFT);
+    constexpr Move WS_CASTLING_MOVE = E1 | (G1 << SHIFT[TO])
+    | (CASTLE_WS << SHIFT[MOVE_TYPE]);
+    constexpr Move WL_CASTLING_MOVE = E1 | (C1 << SHIFT[TO])
+    | (CASTLE_WL << SHIFT[MOVE_TYPE]);
+    constexpr Move BS_CASTLING_MOVE = E8 | (G8 << SHIFT[TO])
+    | (CASTLE_BS << SHIFT[MOVE_TYPE]);
+    constexpr Move BL_CASTLING_MOVE = E8 | (C8 << SHIFT[TO])
+    | (CASTLE_BL << SHIFT[MOVE_TYPE]);
     if (side == WHITE) {
       if (engine_ptr_->CanWhiteShortCastling()) {
         move_stack_[last_++].move_ = WS_CASTLING_MOVE;
@@ -326,10 +326,10 @@ namespace Sayuri {
 
     for (; move_bitboard; NEXT_BITBOARD(move_bitboard)) {
       Move move = 0;
-      SetFrom(move, from);
+      Set<FROM>(move, from);
       Square to = Util::GetSquare(move_bitboard);
-      SetTo(move, to);
-      SetMoveType(move, NORMAL);
+      Set<TO>(move, to);
+      Set<MOVE_TYPE>(move, NORMAL);
 
       // ヒストリーの最大値を更新。 (テンプレート部品)
       UpdateMaxHistory<TYPE>(side, from, to);
@@ -397,8 +397,8 @@ namespace Sayuri {
     [Util::GetOppositeSide(side)]][R0];
     for (std::uint32_t i = start; i < last_; ++i) {
       // 手の情報を得る。
-      Square from = GetFrom(move_stack_[i].move_);
-      Square to = GetTo(move_stack_[i].move_);
+      Square from = Get<FROM>(move_stack_[i].move_);
+      Square to = Get<TO>(move_stack_[i].move_);
 
       // 相手キングをチェックする手かどうか調べる。
       bool is_checking_move = false;

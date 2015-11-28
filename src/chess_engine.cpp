@@ -507,7 +507,7 @@ namespace Sayuri {
     // キャスリング判定。
     if (note_2 == "O-O") {
       for (auto move : legal_move_vec) {
-        MoveType move_type = GetMoveType(move);
+        MoveType move_type = Get<MOVE_TYPE>(move);
         if ((move_type == CASTLE_WS) || (move_type == CASTLE_BS)) {
           return std::vector<Move> {move};
         }
@@ -515,7 +515,7 @@ namespace Sayuri {
       return std::vector<Move>();
     } else if (note_2 == "O-O-O") {
       for (auto move : legal_move_vec) {
-        MoveType move_type = GetMoveType(move);
+        MoveType move_type = Get<MOVE_TYPE>(move);
         if ((move_type == CASTLE_WL) || (move_type == CASTLE_BL)) {
           return std::vector<Move> {move};
         }
@@ -536,7 +536,7 @@ namespace Sayuri {
         case 'K': piece_type = KING; break;
       }
       while (itr != legal_move_vec.end()) {
-        if (basic_st_.piece_board_[GetFrom(*itr)] != piece_type) {
+        if (basic_st_.piece_board_[Get<FROM>(*itr)] != piece_type) {
           legal_move_vec.erase(itr);
         } else {
           ++itr;
@@ -549,7 +549,7 @@ namespace Sayuri {
       std::vector<Move>::iterator itr = legal_move_vec.begin();
       Fyle fyle = note_2[1] - 'a';
       while (itr != legal_move_vec.end()) {
-        if (Util::SquareToFyle(GetFrom(*itr)) != fyle) {
+        if (Util::SquareToFyle(Get<FROM>(*itr)) != fyle) {
           legal_move_vec.erase(itr);
         } else {
           ++itr;
@@ -562,7 +562,7 @@ namespace Sayuri {
       std::vector<Move>::iterator itr = legal_move_vec.begin();
       Rank rank = note_2[2] - '1';
       while (itr != legal_move_vec.end()) {
-        if (Util::SquareToRank(GetFrom(*itr)) != rank) {
+        if (Util::SquareToRank(Get<FROM>(*itr)) != rank) {
           legal_move_vec.erase(itr);
         } else {
           ++itr;
@@ -575,7 +575,7 @@ namespace Sayuri {
       std::vector<Move>::iterator itr = legal_move_vec.begin();
       Fyle fyle = note_2[3] - 'a';
       while (itr != legal_move_vec.end()) {
-        if (Util::SquareToFyle(GetTo(*itr)) != fyle) {
+        if (Util::SquareToFyle(Get<TO>(*itr)) != fyle) {
           legal_move_vec.erase(itr);
         } else {
           ++itr;
@@ -588,7 +588,7 @@ namespace Sayuri {
       std::vector<Move>::iterator itr = legal_move_vec.begin();
       Rank rank = note_2[4] - '1';
       while (itr != legal_move_vec.end()) {
-        if (Util::SquareToRank(GetTo(*itr)) != rank) {
+        if (Util::SquareToRank(Get<TO>(*itr)) != rank) {
           legal_move_vec.erase(itr);
         } else {
           ++itr;
@@ -609,7 +609,7 @@ namespace Sayuri {
         case 'K': piece_type = KING; break;
       }
       while (itr != legal_move_vec.end()) {
-        if (GetPromotion(*itr) != piece_type) {
+        if (Get<PROMOTION>(*itr) != piece_type) {
           legal_move_vec.erase(itr);
         } else {
           ++itr;
@@ -637,11 +637,11 @@ namespace Sayuri {
     if (!is_ok) return std::string();
 
     // 情報収集。
-    Square from = GetFrom(move);
-    Square to = GetTo(move);
-    PieceType promotion = GetPromotion(move);
+    Square from = Get<FROM>(move);
+    Square to = Get<TO>(move);
+    PieceType promotion = Get<PROMOTION>(move);
     PieceType piece_type = basic_st_.piece_board_[from];
-    MoveType move_type = GetMoveType(move);
+    MoveType move_type = Get<MOVE_TYPE>(move);
 
     std::ostringstream oss;
 
@@ -691,8 +691,8 @@ namespace Sayuri {
     for (auto move_2 : legal_move_vec) {
       if (EqualMove(move, move_2)) break;
 
-      if (GetTo(move_2) == to) {
-        if (basic_st_.piece_board_[GetFrom(move_2)] == piece_type) {
+      if (Get<TO>(move_2) == to) {
+        if (basic_st_.piece_board_[Get<FROM>(move_2)] == piece_type) {
           same_to.push_back(move_2);
         }
       }
@@ -704,10 +704,10 @@ namespace Sayuri {
       bool same_fyle = false;
       bool same_rank = false;
       for (auto move_2 : same_to) {
-        if (Util::SquareToFyle(GetFrom(move_2)) == Util::SquareToFyle(from)) {
+        if (Util::SquareToFyle(Get<FROM>(move_2)) == Util::SquareToFyle(from)) {
           same_fyle = true;
         }
-        if (Util::SquareToRank(GetFrom(move_2)) == Util::SquareToRank(from)) {
+        if (Util::SquareToRank(Get<FROM>(move_2)) == Util::SquareToRank(from)) {
           same_rank = true;
         }
       }
@@ -725,7 +725,7 @@ namespace Sayuri {
     }
 
     // 駒を取る手の印を書き込む。 ポーンの場合は基点も書く。
-    if (GetCapturedPiece(move)) {
+    if (Get<CAPTURED_PIECE>(move)) {
       if (piece_type == PAWN) {
         oss << static_cast<char>('a' + Util::SquareToFyle(from));
       }
@@ -783,8 +783,8 @@ namespace Sayuri {
   bool ChessEngine::PlayMove(Move move) {
     if (IsLegalMove(move)) {
       ++(basic_st_.ply_);
-      if ((basic_st_.piece_board_[GetFrom(move)] == PAWN)
-      || (basic_st_.piece_board_[GetTo(move)] != EMPTY)) {
+      if ((basic_st_.piece_board_[Get<FROM>(move)] == PAWN)
+      || (basic_st_.piece_board_[Get<TO>(move)] != EMPTY)) {
         basic_st_.clock_ = 0;
       } else {
         ++(basic_st_.clock_);
@@ -872,15 +872,15 @@ namespace Sayuri {
     basic_st_.to_move_ = Util::GetOppositeSide(basic_st_.to_move_);
 
     // 動かす前のキャスリングの権利とアンパッサンを記録する。
-    SetCastlingRights(move, basic_st_.castling_rights_);
-    SetEnPassantSquare(move, basic_st_.en_passant_square_);
+    Set<CASTLING_RIGHTS>(move, basic_st_.castling_rights_);
+    Set<EN_PASSANT_SQUARE>(move, basic_st_.en_passant_square_);
 
     // アンパッサンを解除。
     basic_st_.en_passant_square_ = 0;
 
     // 手の要素を得る。
-    Square from = GetFrom(move);
-    Square to = GetTo(move);
+    Square from = Get<FROM>(move);
+    Square to = Get<TO>(move);
 
     // キャスリングの権利を更新。
     if (basic_st_.castling_rights_) {
@@ -908,15 +908,15 @@ namespace Sayuri {
     }
 
     // 手の種類によって分岐する。
-    switch (GetMoveType(move)) {
+    switch (Get<MOVE_TYPE>(move)) {
       case NORMAL:  // 通常の手。
         // 取る駒を登録する。
-        SetCapturedPiece(move, basic_st_.piece_board_[to]);
+        Set<CAPTURED_PIECE>(move, basic_st_.piece_board_[to]);
         // 駒を動かす。
         ReplacePiece(from, to);
         // 駒を昇格させるなら、駒を昇格させる。
-        if (move & PROMOTION_MASK) {
-          PutPiece(to, GetPromotion(move), side);
+        if (move & MASK[PROMOTION]) {
+          PutPiece(to, Get<PROMOTION>(move), side);
         }
 
         // ポーンの2歩の動きの場合はアンパッサンできるようにする。
@@ -927,7 +927,7 @@ namespace Sayuri {
         break;
       case EN_PASSANT:  // アンパッサン。
         // 取った駒をボーンにする。
-        SetCapturedPiece(move, PAWN);
+        Set<CAPTURED_PIECE>(move, PAWN);
         // 動かす。
         ReplacePiece(from, to);
         // アンパッサンのターゲットを消す。
@@ -973,23 +973,23 @@ namespace Sayuri {
     basic_st_.to_move_ = Util::GetOppositeSide(basic_st_.to_move_);
 
     // 動かす前のキャスリングの権利とアンパッサンを復元する。
-    basic_st_.castling_rights_ = GetCastlingRights(move);
-    basic_st_.en_passant_square_ = GetEnPassantSquare(move);
+    basic_st_.castling_rights_ = Get<CASTLING_RIGHTS>(move);
+    basic_st_.en_passant_square_ = Get<EN_PASSANT_SQUARE>(move);
 
     // 手の情報を得る。
-    Square from = GetFrom(move);
-    Square to = GetTo(move);
+    Square from = Get<FROM>(move);
+    Square to = Get<TO>(move);
 
     // 駒の位置を戻す。
     ReplacePiece(to, from);
 
     // 手の種類で分岐する。
-    switch (GetMoveType(move)) {
+    switch (Get<MOVE_TYPE>(move)) {
       case NORMAL:
         // 取った駒を戻す。
-        PutPiece(to, GetCapturedPiece(move), enemy_side);
+        PutPiece(to, Get<CAPTURED_PIECE>(move), enemy_side);
         // 昇格ならポーンに戻す。
-        if (GetPromotion(move)) {
+        if (Get<PROMOTION>(move)) {
           PutPiece(from, PAWN, basic_st_.to_move_);
         }
         break;
@@ -1095,8 +1095,8 @@ namespace Sayuri {
     Cache& cache = shared_st_ptr_->cache_;
 
     // 駒の情報を得る。
-    Square from = GetFrom(move);
-    Square to = GetTo(move);
+    Square from = Get<FROM>(move);
+    Square to = Get<TO>(move);
 
     // 駒の位置の種類とサイドを得る。
     PieceType piece_type = basic_st_.piece_board_[from];
@@ -1106,7 +1106,7 @@ namespace Sayuri {
     PieceType target_type = basic_st_.piece_board_[to];
     Side target_side = basic_st_.side_board_[to];
     Square target_square = to;
-    switch (GetMoveType(move)) {
+    switch (Get<MOVE_TYPE>(move)) {
       case EN_PASSANT:  // アンパッサン。
         {
           target_type = PAWN;
@@ -1148,9 +1148,9 @@ namespace Sayuri {
     cache.piece_hash_value_table_[target_side][target_type][target_square];
 
     // 移動する駒の移動先のハッシュを追加する。
-    if (move & PROMOTION_MASK) {
+    if (move & MASK[PROMOTION]) {
       current_hash ^=
-      cache.piece_hash_value_table_[piece_side][GetPromotion(move)][to];
+      cache.piece_hash_value_table_[piece_side][Get<PROMOTION>(move)][to];
     } else {
       current_hash ^=
       cache.piece_hash_value_table_[piece_side][piece_type][to];

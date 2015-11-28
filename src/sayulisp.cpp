@@ -796,9 +796,9 @@ namespace Sayuri {
       }
 
       Move move = 0;
-      SetFrom(move, from);
-      SetTo(move, to);
-      SetPromotion(move, promotion);
+      Set<FROM>(move, from);
+      Set<TO>(move, to);
+      Set<PROMOTION>(move, promotion);
 
       return Lisp::NewString(engine_ptr_->MoveToNote(move));
 
@@ -1856,11 +1856,11 @@ namespace Sayuri {
     if (best_move) {
       LispObjectPtr ret_ptr = Lisp::NewList(3);
       ret_ptr->car
-      (Lisp::NewSymbol(SQUARE_SYMBOL[GetFrom(best_move)]));
+      (Lisp::NewSymbol(SQUARE_SYMBOL[Get<FROM>(best_move)]));
       ret_ptr->cdr()->car
-      (Lisp::NewSymbol(SQUARE_SYMBOL[GetTo(best_move)]));
+      (Lisp::NewSymbol(SQUARE_SYMBOL[Get<TO>(best_move)]));
       ret_ptr->cdr()->cdr()->car
-      (Lisp::NewSymbol(PIECE_TYPE_SYMBOL[GetPromotion(best_move)]));
+      (Lisp::NewSymbol(PIECE_TYPE_SYMBOL[Get<PROMOTION>(best_move)]));
 
       return ret_ptr;
     }
@@ -1905,7 +1905,7 @@ namespace Sayuri {
       || (square > static_cast<int>(H8))) {
         throw GenWrongSquareError(func_name, square);
       }
-      SetFrom(move, square);
+      Set<FROM>(move, square);
       // to。
       if (!(list_itr->cdr()->car()->IsNumber())) {
         throw Lisp::GenWrongTypeError
@@ -1916,7 +1916,7 @@ namespace Sayuri {
       || (square > static_cast<int>(H8))) {
         throw GenWrongSquareError(func_name, square);
       }
-      SetTo(move, square);
+      Set<TO>(move, square);
       // promotion。
       if (!(list_itr->cdr()->cdr()->car()->IsNumber())) {
         throw Lisp::GenWrongTypeError
@@ -1927,7 +1927,7 @@ namespace Sayuri {
       || (piece_type > static_cast<int>(KING))) {
         throw GenWrongPieceTypeError(func_name, piece_type);
       }
-      SetPromotion(move, piece_type);
+      Set<PROMOTION>(move, piece_type);
 
       // ベクトルにプッシュ。
       ret.push_back(move);
@@ -2288,9 +2288,9 @@ namespace Sayuri {
     }
 
     Move move = 0;
-    SetFrom(move, from);
-    SetTo(move, to);
-    SetPromotion(move, promotion);
+    Set<FROM>(move, from);
+    Set<TO>(move, to);
+    Set<PROMOTION>(move, promotion);
 
     return Lisp::NewBoolean(engine_ptr_->PlayMove(move));
   }
@@ -2301,10 +2301,10 @@ namespace Sayuri {
     if (!move) return Lisp::NewNil();
 
     LispObjectPtr ret_ptr = Lisp::NewList(3);
-    ret_ptr->car(Lisp::NewSymbol(SQUARE_SYMBOL[GetFrom(move)]));
-    ret_ptr->cdr()->car(Lisp::NewSymbol(SQUARE_SYMBOL[GetTo(move)]));
+    ret_ptr->car(Lisp::NewSymbol(SQUARE_SYMBOL[Get<FROM>(move)]));
+    ret_ptr->cdr()->car(Lisp::NewSymbol(SQUARE_SYMBOL[Get<TO>(move)]));
     ret_ptr->cdr()->cdr()->car
-    (Lisp::NewSymbol(PIECE_TYPE_SYMBOL[GetPromotion(move)]));
+    (Lisp::NewSymbol(PIECE_TYPE_SYMBOL[Get<PROMOTION>(move)]));
 
     return ret_ptr;
   }
