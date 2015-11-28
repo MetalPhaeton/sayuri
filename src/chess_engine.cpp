@@ -704,10 +704,12 @@ namespace Sayuri {
       bool same_fyle = false;
       bool same_rank = false;
       for (auto move_2 : same_to) {
-        if (Util::SquareToFyle(Get<FROM>(move_2)) == Util::SquareToFyle(from)) {
+        if (Util::SquareToFyle(Get<FROM>(move_2))
+        == Util::SquareToFyle(from)) {
           same_fyle = true;
         }
-        if (Util::SquareToRank(Get<FROM>(move_2)) == Util::SquareToRank(from)) {
+        if (Util::SquareToRank(Get<FROM>(move_2))
+        == Util::SquareToRank(from)) {
           same_rank = true;
         }
       }

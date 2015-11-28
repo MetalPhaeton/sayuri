@@ -4389,7 +4389,7 @@ R"...(### piece->number ###
 
 * If `<Object>` is Piece Type Symbol, it returns Number indicating
   to Piece Type.
-* If `<Object>` is List, it returns List changed Piece Type Symbol into Number. 
+* If `<Object>` is List, it returns List changed Piece Type Symbol into Number.
 
 <h6> Example </h6>
 

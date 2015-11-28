@@ -1379,7 +1379,8 @@ namespace Sayuri {
       if ((move & MASK[PROMOTION])) {
         return cache.material_[Get<PROMOTION>(move)] - cache.material_[PAWN];
       } else {
-        return score - cache.material_[basic_st_.piece_board_[Get<FROM>(move)]];
+        return score - cache.material_
+        [basic_st_.piece_board_[Get<FROM>(move)]];
       }
     }
 
