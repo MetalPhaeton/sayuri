@@ -526,7 +526,7 @@ namespace Sayuri {
     } else if (message_symbol == "@get-all-pieces") {
       LispObjectPtr ret_ptr = Lisp::NewList(64);
       LispIterator<true> itr {ret_ptr.get()};
-      for (Square square = 0; square < NUM_SQUARES; ++square, ++itr) {
+      FOR_SQUARES(square) {
         itr.current_->car(GetPiece(func_name, square));
       }
       return ret_ptr;
