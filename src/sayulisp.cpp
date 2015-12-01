@@ -528,6 +528,7 @@ namespace Sayuri {
       LispIterator<true> itr {ret_ptr.get()};
       FOR_SQUARES(square) {
         itr.current_->car(GetPiece(func_name, square));
+        ++itr;
       }
       return ret_ptr;
 
@@ -572,7 +573,7 @@ namespace Sayuri {
       return GetCandidateMoves();
 
     } else if (message_symbol == "@place-piece") {
-      required_args = 4;
+      required_args = 3;
       // 駒の位置を得る。
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -583,30 +584,42 @@ namespace Sayuri {
         throw Lisp::GenWrongTypeError
         (func_name, "Number", std::vector<int> {2}, true);
       }
+      Square square = square_ptr->number_value();
 
-      // 駒の種類を得る。
+      // 駒のリストを得る。
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
         (func_name, required_args, false, list.Length() - 1);
       }
-      LispObjectPtr type_ptr = caller.Evaluate(*(list_itr++));
-      if (!(type_ptr->IsNumber())) {
+      LispObjectPtr piece_ptr = caller.Evaluate(*list_itr);
+      if (!(piece_ptr->IsList())) {
         throw Lisp::GenWrongTypeError
-        (func_name, "Number", std::vector<int> {3}, true);
+        (func_name, "List", std::vector<int> {3}, true);
       }
 
-      // 駒のサイドを得る。
-      if (!list_itr) {
-        throw Lisp::GenInsufficientArgumentsError
-        (func_name, required_args, false, list.Length() - 1);
+      // 駒のリストからサイドを得る。
+      LispIterator<true> piece_itr {piece_ptr.get()};
+      if (!piece_itr) {
+        throw Lisp::GenError("@engine-error", "Couldn't find side of piece.");
       }
-      LispObjectPtr side_ptr = caller.Evaluate(*(list_itr));
-      if (!(side_ptr->IsNumber())) {
+      if (!(piece_itr->IsNumber())) {
         throw Lisp::GenWrongTypeError
-        (func_name, "Number", std::vector<int> {4}, true);
+        (func_name, "Number", std::vector<int> {3, 1}, true);
       }
+      Side side = piece_itr->number_value();
+      ++piece_itr;
 
-      return PlacePiece(square_ptr, type_ptr, side_ptr);
+      // 駒のリストからタイプを得る。
+      if (!piece_itr) {
+        throw Lisp::GenError("@engine-error", "Couldn't find type of piece.");
+      }
+      if (!(piece_itr->IsNumber())) {
+        throw Lisp::GenWrongTypeError
+        (func_name, "Number", std::vector<int> {3, 1}, true);
+      }
+      PieceType piece_type = piece_itr->number_value();
+
+      return PlacePiece(square, side, piece_type);
     } else if (message_symbol == "@set-to-move") {
       required_args = 2;
       if (!list_itr) {
@@ -2062,28 +2075,23 @@ namespace Sayuri {
   }
 
   // 駒を置く。
-  LispObjectPtr EngineSuite::PlacePiece(LispObjectPtr square_ptr,
-  LispObjectPtr type_ptr, LispObjectPtr side_ptr) {
-    // 準備。
-    Square square = square_ptr->number_value();
-    PieceType piece_type = type_ptr->number_value();
-    Side side = side_ptr->number_value();
-
+  LispObjectPtr EngineSuite::PlacePiece(Square square,
+  Side side, PieceType piece_type) {
     // 引数チェック。
     if (square >= NUM_SQUARES) {
       throw Lisp::GenError("@engine-error",
       "The square value '" + std::to_string(square)
       + "' doesn't indicate any square.");
     }
-    if (piece_type >= NUM_PIECE_TYPES) {
-      throw Lisp::GenError("@engine-error",
-      "The piece type value '" + std::to_string(piece_type)
-      +  "' doesn't indicate any piece type.");
-    }
     if (side >= NUM_SIDES) {
       throw Lisp::GenError("@engine-error",
       "The side value '" + std::to_string(side)
       + "' doesn't indicate any side.");
+    }
+    if (piece_type >= NUM_PIECE_TYPES) {
+      throw Lisp::GenError("@engine-error",
+      "The piece type value '" + std::to_string(piece_type)
+      +  "' doesn't indicate any piece type.");
     }
     if ((piece_type && !side) || (!piece_type && side)) {
       throw Lisp::GenError("@engine-error",
@@ -2092,8 +2100,8 @@ namespace Sayuri {
     }
 
     // 元の駒の種類とサイドを得る。
-    PieceType origin_type = engine_ptr_->piece_board()[square];
     Side origin_side = engine_ptr_->side_board()[square];
+    PieceType origin_type = engine_ptr_->piece_board()[square];
 
     // もし置き換える前の駒がキングなら置き換えられない。
     if (origin_type == KING) {

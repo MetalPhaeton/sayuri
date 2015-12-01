@@ -320,13 +320,12 @@ namespace Sayuri {
 
       /**
        * 駒を置く。
-       * @param square_ptr 駒を置くマスのNumberオブジェクト。
-       * @param type_ptr 置く駒の種類のNumberオブジェクト。
-       * @param side_ptr 置く駒のサイドのNumberオブジェクト。
+       * @param square 駒を置くマス。
+       * @param side 駒のサイド。
+       * @param piece_type 駒のタイプ。
        * @return 元の位置にあった駒の種類とサイドのリスト。
        */
-      LispObjectPtr PlacePiece(LispObjectPtr square_ptr,
-      LispObjectPtr type_ptr, LispObjectPtr side_ptr);
+      LispObjectPtr PlacePiece(Square square, Side side, PieceType piece_type);
 
       /**
        * 手番をセットする。
