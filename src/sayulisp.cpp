@@ -4576,35 +4576,73 @@ R"...(### gen-engine ###
 * 1: Generates chess engine.
 * 2: The engine executes something according to `<Message Symbol>`.
 * 2: Some `<Message Symbol>` require `<Argument>...`.
+* `(help "engine <MessageSymbol>")`
+    + Returns description for each message symbol.
 
-<h6> Description of Message Symbols </h6>
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    (display (my-engine '@get-white-pawn-position))
+    ;; Output
+    ;; > (A2 B2 C2 D2 E2 F2 G2 H2)
+    
+    (display (help "engine @get-white-pawn-position"))
+    ;; Output
+    ;; > ### Getting squares ###
+    ;; > Returns List of Symbols of squares where specific pieces are on.
+    ;; > 
+    ;; > * `@get-white-pawn-position`
+    ;; > * `@get-white-knight-position`
+    ;; > * `@get-white-bishop-position`
+    ;; > * `@get-white-rook-position`
+    ;; > * `@get-white-queen-position`
+    ;; > * `@get-white-king-position`
+    ;; > * `@get-black-pawn-position`
+    ;; > * `@get-black-knight-position`
+    ;; > * `@get-black-bishop-position`
+    ;; > * `@get-black-rook-position`
+    ;; > * `@get-black-queen-position`
+    ;; > * `@get-black-king-position`
+    ;; > * `@get-empty-square-position`
+    ;; > 
+    ;; > <h6> Example </h6>
+    ;; > 
+    ;; >     (define my-engine (gen-engine))
+    ;; >     (display (my-engine '@get-white-pawn-position))
+    ;; >     
+    ;; >     ;; Output
+    ;; >     ;; > (A2 B2 C2 D2 E2 F2 G2 H2))...";
+    AddHelpDict("gen-pgn", temp);
+
+    temp =
+R"...(### Getting squares ###
 
 * `@get-white-pawn-position`
-    + Returns List of position of White Pawns as Symbol.
+    + Returns List of Symbols of squares where White Pawns are on.
 * `@get-white-knight-position`
-    + Returns List of position of White Knights as Symbol.
+    + Returns List of Symbols of squares where White Knights are on.
 * `@get-white-bishop-position`
-    + Returns List of position of White Bishops as Symbol.
+    + Returns List of Symbols of squares where White Bishops are on.
 * `@get-white-rook-position`
-    + Returns List of position of White Rooks as Symbol.
+    + Returns List of Symbols of squares where White Rooks are on.
 * `@get-white-queen-position`
-    + Returns List of position of White Queens as Symbol.
+    + Returns List of Symbols of squares where White Queens are on.
 * `@get-white-king-position`
-    + Returns List of position of White King as Symbol.
+    + Returns List of Symbols of squares where White King is on.
 * `@get-black-pawn-position`
-    + Returns List of position of White Pawns as Symbol.
+    + Returns List of Symbols of squares where Black Pawns are on.
 * `@get-black-knight-position`
-    + Returns List of position of White Knights as Symbol.
+    + Returns List of Symbols of squares where Black Knights are on.
 * `@get-black-bishop-position`
-    + Returns List of position of White Bishops as Symbol.
+    + Returns List of Symbols of squares where Black Bishops are on.
 * `@get-black-rook-position`
-    + Returns List of position of White Rooks as Symbol.
+    + Returns List of Symbols of squares where Black Rooks are on.
 * `@get-black-queen-position`
-    + Returns List of position of White Queens as Symbol.
+    + Returns List of Symbols of squares where Black Queens are on.
 * `@get-black-king-position`
-    + Returns List of position of White King as Symbol.
+    + Returns List of Symbols of squares where Black King is on.
 * `@get-empty-square-position`
-    + Returns List of position of Empty Squares as Symbol.
+    + Returns List of Symbols of empty squares.
 
 <h6> Example </h6>
 
@@ -4612,11 +4650,28 @@ R"...(### gen-engine ###
     (display (my-engine '@get-white-pawn-position))
     
     ;; Output
-    ;; > (A2 B2 C2 D2 E2 F2 G2 H2)
+    ;; > (A2 B2 C2 D2 E2 F2 G2 H2))...";
+    AddHelpDict("engine @get-white-pawn-position", temp);
+    AddHelpDict("engine @get-white-knight-position", temp);
+    AddHelpDict("engine @get-white-bishop-position", temp);
+    AddHelpDict("engine @get-white-rook-position", temp);
+    AddHelpDict("engine @get-white-queen-position", temp);
+    AddHelpDict("engine @get-white-king-position", temp);
+    AddHelpDict("engine @get-black-pawn-position", temp);
+    AddHelpDict("engine @get-black-knight-position", temp);
+    AddHelpDict("engine @get-black-bishop-position", temp);
+    AddHelpDict("engine @get-black-rook-position", temp);
+    AddHelpDict("engine @get-black-queen-position", temp);
+    AddHelpDict("engine @get-black-king-position", temp);
+
+    temp =
+R"...(### Getting pieces ###
 
 * `@get-piece <Square : Number>`
-    + Returns a side and type of the piece as List that is
-      `(<Side : Symbol>, <Type : Symbol>)`.
+    + Returns a side and type of the piece on `<Square>` as List.
+
+* `@get-all-pieces`
+    + Returns  pieces of each square on the board as List.
 
 <h6> Example </h6>
 
@@ -4625,13 +4680,7 @@ R"...(### gen-engine ###
     
     ;; Output
     ;; > (WHITE QUEEN)
-
-* `@get-all-pieces`
-    + Returns  pieces of each square on the board as List.
-
-<h6> Example </h6>
-
-    (define my-engine (gen-engine))
+    
     (display (my-engine '@get-all-pieces))
     
     ;; Output
@@ -4649,21 +4698,25 @@ R"...(### gen-engine ###
     ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (BLACK PAWN)
     ;; > (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN)
     ;; > (BLACK PAWN) (BLACK PAWN) (BLACK ROOK) (BLACK KNIGHT) (BLACK BISHOP)
-    ;; > (BLACK QUEEN) (BLACK KING) (BLACK BISHOP) (BLACK KNIGHT) (BLACK ROOK))
+    ;; > (BLACK QUEEN) (BLACK KING) (BLACK BISHOP) (BLACK KNIGHT)
+    ;; > (BLACK ROOK)))...";
+    AddHelpDict("engine @get-piece", temp);
+    AddHelpDict("engine @get-all-pieces", temp);
+
+    temp =
+R"...(### Getting states of game ###
 
 * `@get-to-move`
     + Returns turn to move as Symbol.
 * `@get-castling-rights`
-    + Returns List of Symbols indicates castling rights.
+    + Returns castling rights as Symbol.
 * `@get-en-passant-square`
     + Returns en passant square as Symbol if it exists now.
 * `@get-ply`
     + Returns plies of moves from starting of the game.
     + 1 move = 2 plies.
 * `@get-clock`
-    + Returns Clock(plies for 50 Moves Rule).
-        - If Pawn has moved or a piece has been captured,
-          Clock is rewound to zero.
+    + Returns clock(plies for 50 Moves Rule).
 * `@get-white-has-castled`
     + Returns Boolean whether White King has castled or not.
 * `@get-black-has-castled`
@@ -4714,7 +4767,17 @@ R"...(### gen-engine ###
     
     (display (my-engine '@get-black-has-castled))
     ;; Output
-    ;; > #f
+    ;; > #f)...";
+    AddHelpDict("engine @get-to-move", temp);
+    AddHelpDict("engine @get-castling-rights", temp);
+    AddHelpDict("engine @get-en-passant-square", temp);
+    AddHelpDict("engine @get-ply", temp);
+    AddHelpDict("engine @get-clock", temp);
+    AddHelpDict("engine @get-white-has-castled", temp);
+    AddHelpDict("engine @get-black-has-castled", temp);
+
+    temp =
+R"...(### Setting states of game ###
 
 * `@set-to-move <Side : Number>`
     + Sets turn to move.
@@ -4781,19 +4844,27 @@ R"...(### gen-engine ###
     
     (display (my-engine '@get-clock))
     ;; Output
-    ;; > 22
+    ;; > 22)...";
+    AddHelpDict("engine @set-to-move", temp);
+    AddHelpDict("engine @set-castling-rights", temp);
+    AddHelpDict("engine @set-en-passant-square", temp);
+    AddHelpDict("engine @set-ply", temp);
+    AddHelpDict("engine @set-clock", temp);
+
+    temp =
+R"...(### Placing pieces ###
 
 * `@set-new-game`
-    + Sets starting position to the chess engine object.
+    + Sets starting position.
     + Returns #t.
 * `@set-fen <FEN : String>`
-    + Sets FEN position to the chess engine object.
+    + Sets position with FEN.
     + Returns #t.
-* `@place-piece <Square : Number> <Piece type : Number> <Piece side : Number>`
-    + Sets a piece on `<Square>`
+* `@place-piece <Square : Number> <Piece : List>`
+    + Sets a `<Piece>` on `<Square>`
       and returns the previous piece placed on `<Square>`.
-    + `<Piece type>` is piece type.
-    + `<Piece side>` is a color of the piece.
+    + `<Piece>` is `(<Side : Number> <Type : Number>).
+        - For example, White Pawn is `(list WHITE PAWN)`.
 
 <h6> Example </h6>
 
@@ -4807,6 +4878,17 @@ R"...(### gen-engine ###
         "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1"))
     ;; Output
     ;; > #t
+    
+    ;; Sets Black Rook on D1 where White Queen is placed.
+    (display (my-engine '@place-piece D1 (list BLACK ROOK)))
+    ;; Output
+    ;; > (WHITE QUEEN))...";
+    AddHelpDict("engine @set-new-game", temp);
+    AddHelpDict("engine @set-fen", temp);
+    AddHelpDict("engine @place-piece", temp);
+
+    temp =
+R"...(### Getting Candidate Moves ###
 
 * `@get-candidate-moves`
     + Generates and returns List of candidate moves.
@@ -4821,16 +4903,25 @@ R"...(### gen-engine ###
     ;; > (F2 F4 EMPTY) (F2 F3 EMPTY) (E2 E4 EMPTY) (E2 E3 EMPTY) (D2 D4 EMPTY)
     ;; > (D2 D3 EMPTY) (C2 C4 EMPTY) (C2 C3 EMPTY) (B2 B4 EMPTY) (B2 B3 EMPTY)
     ;; > (A2 A4 EMPTY) (A2 A3 EMPTY) (G1 H3 EMPTY) (G1 F3 EMPTY) (B1 C3 EMPTY)
-    ;; > (B1 A3 EMPTY))
+    ;; > (B1 A3 EMPTY)))...";
+    AddHelpDict("engine @get-candidate-moves", temp);
+
+    temp =
+R"...(### Predicate functions ###
+
+Judges each state of the current position.
 
 * `@correct-position?`
-    + Judges whether it is position or not.
-        - If Pawn is on 1st or 8th rank, it returns #f.
-        - When turn to move is White, if Black King is checked,
-          then it returns #f.
-        - When turn to move is Black, if White King is checked,
-          then it returns #f.
-        - Otherwise, returns #t.
+    + If Pawn is on 1st or 8th rank, it returns #f.
+    + When turn to move is White, if Black King is checked,
+      then it returns #f.
+    + When turn to move is Black, if White King is checked,
+      then it returns #f.
+    + Otherwise, returns #t.
+* `@white-checked?`
+* `@black-checked?`
+* `@checkmated?`
+* `@stalemated?`
 
 <h6> Example </h6>
 
@@ -4842,14 +4933,7 @@ R"...(### gen-engine ###
     (display (my-engine '@correct-position?))
     ;; Output
     ;; > #f
-
-* `@white-checked?`
-    + Judges whether White King is checked or not.
-* `@black-checked?`
-    + Judges whether Black King is checked or not.
-
-<h6> Example </h6>
-
+    
     (define my-engine (gen-engine))
     
     ;; Move pieces by UCI command.
@@ -4874,14 +4958,7 @@ R"...(### gen-engine ###
     (display (my-engine '@black-checked?))
     ;; Output
     ;; > #f
-
-* `@checkmated?`
-    + Judges whether either King is checkmated or not.
-* `@stalemated?`
-    + Judges whether either King is stalemated or not.
-
-<h6> Example </h6>
-
+    
     (define my-engine (gen-engine))
     
     ;; Move pieces by UCI command.
@@ -4905,7 +4982,15 @@ R"...(### gen-engine ###
     
     (display (my-engine '@stalemated?))
     ;; Output
-    ;; > #f
+    ;; > #f)...";
+    AddHelpDict("engine @correct-position?", temp);
+    AddHelpDict("engine @white-checked?", temp);
+    AddHelpDict("engine @black-checked?", temp);
+    AddHelpDict("engine @checkmated?", temp);
+    AddHelpDict("engine @stalemated?", temp);
+
+    temp =
+R"...(### Taking a move ###
 
 * `@play-move <One move : List>`
     + Moves one piece legally.
@@ -4913,7 +4998,6 @@ R"...(### gen-engine ###
         - `<From>` is a square which a piece to move is placed on.
         - `<To>` is a square where you want to move the piece to.
         - `<Promotion>` is a piece type which you want to promote Pawn into.
-            - If it can't promote Pawn, `<Promotion>` is EMPTY.
     + Returns #t if it has succeeded, otherwise returns #f.
 
 * `@undo-move`
@@ -4925,7 +5009,7 @@ R"...(### gen-engine ###
     + Returns #t if it has succeeded, otherwise returns #f.
 
 * `@move->note <Move : List>`
-    + Transrates Move into PGN move text according to the current position.
+    + Translates Move into PGN move text according to the current position.
 
 <h6> Example </h6>
 
@@ -4946,12 +5030,31 @@ R"...(### gen-engine ###
     (display (my-engine '@get-white-pawn-position))
     ;; Output
     ;; > (A2 B2 C2 D2 E2 F2 G2 H2)
+    
+    (display (my-engine '@play-note "Nf3"))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@get-white-knight-position))
+    ;; Output
+    ;; > (B1 F3)
+    
+    (display (my-engine '@move->note (list B8 C6 EMPTY)))
+    ;; Output
+    ;; > Nc6)...";
+    AddHelpDict("engine @play-move", temp);
+    AddHelpDict("engine @undo-move", temp);
+    AddHelpDict("engine @play-note", temp);
+    AddHelpDict("engine @move->note", temp);
+
+    temp =
+R"...(### UCI Command ###
 
 * `@input-uci-command <UCI command : String>`
     + Executes `<UCI command>`.
     + If success, returns #t. Otherwise, returns #f.
     + If you have input "go" command,
-      the engine starts to think the best move in background.
+      the engine starts thinking in background.
       So control will come back soon.
 * `@add-uci-output-listener <Listener : Function>`
     + Registers Function to receive UCI output from the engine.
@@ -4981,28 +5084,30 @@ R"...(### gen-engine ###
     ;; > I'm Listener : option name Threads type spin default 1 min 1 max 64
     ;; > I'm Listener : option name UCI_AnalyseMode type check default false
     ;; > I'm Listener : uciok
-    ;; > #t
+    ;; > #t)...";
+    AddHelpDict("engine @input-uci-command", temp);
+    AddHelpDict("engine @add-uci-output-listener", temp);
+    AddHelpDict("engine @run", temp);
+
+    temp =
+R"...(### Searching the best move ###
+
+Thinks and returns the best move in each condition.  
+Different from "go" command,
+the control won't come back until the engine have found the best move.
 
 * `@go-movetime <Milliseconds : Number> [<Candidate move list : List>]`
-    + Thinks for `<Milliseconds>` and returns the best move.
-    + Different from "go" command, until the engine have found the best move,
-      the control won't come back.
+    + Thinks for `<Milliseconds>`.
 * `@go-timelimit <Milliseconds : Number> [<Candidate move list : List>]`
-    + Thinks on the basis of `<Milliseconds>` and returns the best move.
+    + Thinks on the basis of `<Milliseconds>`.
         - If `<Milliseconds>` is more than 600000,
           the engine thinks for 60000 milliseconds.
         - If `<Milliseconds>` is less than 600000,
           the engine thinks for "`<Milliseconds>` / 10" milliseconds.
-    + Different from "go" command, until the engine have found the best move,
-      the control won't come back.
 * `@go-depth <Ply : Number> [<Candidate move list : List>]`
-    + Thinks until to reach `<Ply>`th depth and returns the best move.
-    + Different from "go" command, until the engine have found the best move,
-      the control won't come back.
+    + Thinks until to reach `<Ply>`th depth.
 * `@go-nodes <Nodes : Number> [<Candidate move list : List>]`
-    + Thinks until to search `<Nodes>` nodes and returns the best move.
-    + Different from "go" command, until the engine have found the best move,
-      the control won't come back.
+    + Thinks until to search `<Nodes>` nodes.
 
 <h6> Example </h6>
 
@@ -5051,7 +5156,14 @@ R"...(### gen-engine ###
     ;; > Engine > info time 10000 nodes 5599214 hashfull 390 nps 559921
     ;; > score cp 45 pv e2e4 b8c6 g1f3 g8f6 e4e5 f6g4 d2d4 e7e6 h2h3 f8b4
     ;; > Engine > bestmove e2e4 ponder b8c6
-    ;; > (E2 E4 EMPTY)
+    ;; > (E2 E4 EMPTY))...";
+    AddHelpDict("engine @go-movetime", temp);
+    AddHelpDict("engine @go-timelimit", temp);
+    AddHelpDict("engine @go-depth", temp);
+    AddHelpDict("engine @go-nodes", temp);
+
+    temp =
+R"...(### Hash and threads ###
 
 * `@set-hash-size <Size : Number>`
     + Sets size of Hash Table(Transposition Table)
@@ -5078,7 +5190,12 @@ R"...(### gen-engine ###
     (display (my-engine '@set-threads 4))
     ;; Set the number of threads to 4 and return 3.
     ;; Output
-    ;; > 3
+    ;; > 3)...";
+    AddHelpDict("engine @set-hash-size", temp);
+    AddHelpDict("engine @set-threads", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - Material ###
 
 * `@material [<New materal : List>]`
     + Returns List of material.
@@ -5101,7 +5218,11 @@ R"...(### gen-engine ###
     
     (display (my-engine '@material))
     ;; Output
-    ;; > (0 222 333 444 555 666 777)
+    ;; > (0 222 333 444 555 666 777))...";
+    AddHelpDict("engine @material", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - Quiescence Search ###
 
 * `@enable-quiesce-search [<New setting : Boolean>]`
     + Returns whether Quiescence Search is enabled or not.
@@ -5119,7 +5240,11 @@ R"...(### gen-engine ###
     
     (display (my-engine '@enable-quiesce-search))
     ;; Output
-    :: > #f
+    :: > #f)...";
+    AddHelpDict("engine @enable-quiesce-search", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - Repetition Check ###
 
 * `@enable-repetition-check [<New setting : Boolean>]`
     + Returns whether Repetition Check is enabled or not.
@@ -5137,7 +5262,11 @@ R"...(### gen-engine ###
     
     (display (my-engine '@enable-repetition-check))
     ;; Output
-    ;; > #f
+    ;; > #f)...";
+    AddHelpDict("engine @enable-repetition-check", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - Check Extension ###
 
 * `@enable-check-extension [<New setting : Boolean>]`
     + Returns whether Check Extension is enabled or not.
@@ -5155,7 +5284,11 @@ R"...(### gen-engine ###
     
     (display (my-engine '@enable-check-extension))
     ;; Output
-    ;; > #f
+    ;; > #f)...";
+    AddHelpDict("engine @enable-check-extension", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - YBWC ###
 
 * `@ybwc-limit-depth [<New depth : Number>]`
     + If remaining depth is less than this parameter, YBWC is invalidated.
@@ -5185,7 +5318,12 @@ R"...(### gen-engine ###
     
     (display (my-engine '@ybwc-invalid-moves))
     ;; Output
-    ;; > 10
+    ;; > 10)...";
+    AddHelpDict("engine @ybwc-limit-depth", temp);
+    AddHelpDict("engine @ybwc-invalid-moves", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - Aspiration Windows ###
 
 * `@enable-aspiration-windows [<New setting : Boolean>]`
     + Returns whether Aspiration Windows is enabled or not.
@@ -5227,7 +5365,13 @@ R"...(### gen-engine ###
     
     (display (my-engine '@aspiration-windows-delta))
     ;; Output
-    ;; > 20
+    ;; > 20)...";
+    AddHelpDict("engine @enable-aspiration-windows", temp);
+    AddHelpDict("engine @aspiration-windows-limit-depth", temp);
+    AddHelpDict("engine @aspiration-windows-delta", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - Aspiration Windows ###
 
 * `@enable-see [<New setting : Boolean>]`
     + Returns whether SEE is enabled or not.
@@ -5244,7 +5388,11 @@ R"...(### gen-engine ###
     
     (display (my-engine '@enable-see))
     ;; Output
-    ;; > #f
+    ;; > #f)...";
+    AddHelpDict("engine @enable-see", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - History Heuristics ###
 
 * `@enable-history [<New setting : Boolean>]`
     + Returns whether History Heuristics is enabled or not.
@@ -5262,7 +5410,11 @@ R"...(### gen-engine ###
     
     (display (my-engine '@enable-history))
     ;; Output
-    ;; > #f
+    ;; > #f)...";
+    AddHelpDict("engine @enable-history", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - Killer Move Heuristics ###
 
 * `@enable-killer [<New setting : Boolean>]`
     + Returns whether Killer Move Heuristics is enabled or not.
@@ -5280,7 +5432,11 @@ R"...(### gen-engine ###
     
     (display (my-engine '@enable-killer))
     ;; Output
-    ;; > #f
+    ;; > #f)...";
+    AddHelpDict("engine @enable-killer", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - Hash Table ###
 
 * `@enable-hash-table [<New setting : Boolean>]`
     + Returns whether Transposition Table is enabled or not.
@@ -5298,7 +5454,12 @@ R"...(### gen-engine ###
     
     (display (my-engine '@enable-hash-table))
     ;; Output
-    ;; > #t
+    ;; > #t)...";
+    AddHelpDict("engine @enable-hash-table", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - Internal Iterative Deepening ###
+
 * `@enable-iid [<New setting : Boolean>]`
     + Returns whether Internal Iterative Deepening is enabled or not.
     + If you specify #t to `<New setting>`,
@@ -5340,7 +5501,13 @@ R"...(### gen-engine ###
     
     (display (my-engine '@iid-search-depth))
     ;; Output
-    ;; > 10
+    ;; > 10)...";
+    AddHelpDict("engine @enable-iid", temp);
+    AddHelpDict("engine @iid-limit-depth", temp);
+    AddHelpDict("engine @iid-search-depth", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - Null Move Reduction ###
 
 * `@enable-nmr [<New setting : Boolean>]`
     + Returns whether Null Move Reduction is enabled or not.
@@ -5397,7 +5564,14 @@ R"...(### gen-engine ###
     
     (display (my-engine '@nmr-reduction))
     ;; Output
-    ;; > 10
+    ;; > 10)...";
+    AddHelpDict("engine @enable-nmr", temp);
+    AddHelpDict("engine @nmr-limit-depth", temp);
+    AddHelpDict("engine @nmr-search-reduction", temp);
+    AddHelpDict("engine @nmr-reduction", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - ProbCut ###
 
 * `@enable-probcut [<New setting : Boolean>]`
     + Returns whether ProbCut is enabled or not.
@@ -5450,7 +5624,15 @@ R"...(### gen-engine ###
     
     (display (my-engine '@probcut-search-reduction))
     ;; Output
-    ;; > 10
+    ;; > 10)...";
+    AddHelpDict("engine @enable-probcut", temp);
+    AddHelpDict("engine @probcut-limit-depth", temp);
+    AddHelpDict("engine @probcut-margin", temp);
+    AddHelpDict("engine @probcut-search-reduction", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - History Pruning ###
+
 * `@enable-history-pruning [<New setting : Boolean>]`
     + Returns whether History Pruning is enabled or not.
     + If you specify #t to `<New setting>`,
@@ -5488,55 +5670,64 @@ R"...(### gen-engine ###
 
 <h6> Example </h6>
 
-(define my-engine (gen-engine))
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-history-pruning #t))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@enable-history-pruning))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@history-pruning-limit-depth 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@history-pruning-limit-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@history-pruning-move-threshold 0.8))
+    ;; Output
+    ;; > 0.6
+    
+    (display (my-engine '@history-pruning-move-threshold))
+    ;; Output
+    ;; > 0.8
+    
+    (display (my-engine '@history-pruning-invalid-moves 20))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@history-pruning-invalid-moves))
+    ;; Output
+    ;; > 20
+    
+    (display (my-engine '@history-pruning-threshold 0.8))
+    ;; Output
+    ;; > 0.5
+    
+    (display (my-engine '@history-pruning-threshold))
+    ;; Output
+    ;; > 0.8
+    
+    (display (my-engine '@history-pruning-reduction 10))
+    ;; Output
+    ;; > 1
+    
+    (display (my-engine '@history-pruning-reduction))
+    ;; Output
+    ;; > 10)...";
+    AddHelpDict("engine @enable-history-pruning", temp);
+    AddHelpDict("engine @history-pruning-limit-depth", temp);
+    AddHelpDict("engine @history-pruning-move-threshold", temp);
+    AddHelpDict("engine @history-pruning-invalid-moves", temp);
+    AddHelpDict("engine @history-pruning-threshold", temp);
+    AddHelpDict("engine @history-pruning-reduction", temp);
 
-(display (my-engine '@enable-history-pruning #t))
-;; Output
-;; > #f
-
-(display (my-engine '@enable-history-pruning))
-;; Output
-;; > #t
-
-(display (my-engine '@history-pruning-limit-depth 10))
-;; Output
-;; > 4
-
-(display (my-engine '@history-pruning-limit-depth))
-;; Output
-;; > 10
-
-(display (my-engine '@history-pruning-move-threshold 0.8))
-;; Output
-;; > 0.6
-
-(display (my-engine '@history-pruning-move-threshold))
-;; Output
-;; > 0.8
-
-(display (my-engine '@history-pruning-invalid-moves 20))
-;; Output
-;; > 10
-
-(display (my-engine '@history-pruning-invalid-moves))
-;; Output
-;; > 20
-
-(display (my-engine '@history-pruning-threshold 0.8))
-;; Output
-;; > 0.5
-
-(display (my-engine '@history-pruning-threshold))
-;; Output
-;; > 0.8
-
-(display (my-engine '@history-pruning-reduction 10))
-;; Output
-;; > 1
-
-(display (my-engine '@history-pruning-reduction))
-;; Output
-;; > 10
+    temp =
+R"...(### Customizing Search Algorithm - Late Move Reduction ###
 
 * `@enable-lmr [<New setting : Boolean>]`
     + Returns whether Late Move Reduction is enabled or not.
@@ -5609,7 +5800,14 @@ R"...(### gen-engine ###
     
     (display (my-engine '@lmr-search-reduction))
     ;; Output
-    ;; > 5
+    ;; > 5)...";
+    AddHelpDict("engine @enable-lmr", temp);
+    AddHelpDict("engine @lmr-move-threshold", temp);
+    AddHelpDict("engine @lmr-invalid-moves", temp);
+    AddHelpDict("engine @lmr-search-reduction", temp);
+
+    temp =
+R"...(### Customizing Search Algorithm - Futility Pruning ###
 
 * `@enable-futility-pruning [<New setting : Boolean>]`
     + Returns whether Futility Pruning is enabled or not.
@@ -5651,152 +5849,29 @@ R"...(### gen-engine ###
     
     (display (my-engine '@futility-pruning-margin))
     ;; Output
-    ;; > 1200
+    ;; > 1200)...";
+    AddHelpDict("engine @enable-futility-pruning", temp);
+    AddHelpDict("engine @futility-pruning-depth", temp);
+    AddHelpDict("engine @futility-pruning-margin", temp);
+
+    temp =
+R"...(### Customizing Evaluation Function - Piece Square Table ###
+
+Returns Piece Square Table for each piece type.  
+If you specify `<New table>`, this parameter is updated.
 
 * `@pawn-square-table-opening [<New table : List>]`
-    + Returns Piece Square Table for Pawn at Opening as List composed
-      of 64 numbers. "()" is a square when evaluating Black.
-        - From 1st to 8th : From A1(A8) to H1(H8)
-        - From 9th to 16th : From A2(A7) to H2(H7)
-        - From 17th to 24th : From A3(A6) to H3(H6)
-        - From 25th to 32nd : From A4(A5) to H4(H5)
-        - From 33rd to 40th : From A5(A4) to H5(H4)
-        - From 41st to 48th : From A6(A3) to H6(H3)
-        - From 49th to 56th : From A7(A2) to H7(H2)
-        - From 57th to 64th : From A8(A1) to H8(H1)
-    + If you specify `<New table>`, this parameter is updated.
 * `@knight-square-table-opening [<New table : List>]`
-    + Returns Piece Square Table for Knight at Opening as List composed
-      of 64 numbers. "()" is a square when evaluating Black.
-        - From 1st to 8th : From A1(A8) to H1(H8)
-        - From 9th to 16th : From A2(A7) to H2(H7)
-        - From 17th to 24th : From A3(A6) to H3(H6)
-        - From 25th to 32nd : From A4(A5) to H4(H5)
-        - From 33rd to 40th : From A5(A4) to H5(H4)
-        - From 41st to 48th : From A6(A3) to H6(H3)
-        - From 49th to 56th : From A7(A2) to H7(H2)
-        - From 57th to 64th : From A8(A1) to H8(H1)
-    + If you specify `<New table>`, this parameter is updated.
 * `@bishop-square-table-opening [<New table : List>]`
-    + Returns Piece Square Table for Bishop at Opening as List composed
-      of 64 numbers. "()" is a square when evaluating Black.
-        - From 1st to 8th : From A1(A8) to H1(H8)
-        - From 9th to 16th : From A2(A7) to H2(H7)
-        - From 17th to 24th : From A3(A6) to H3(H6)
-        - From 25th to 32nd : From A4(A5) to H4(H5)
-        - From 33rd to 40th : From A5(A4) to H5(H4)
-        - From 41st to 48th : From A6(A3) to H6(H3)
-        - From 49th to 56th : From A7(A2) to H7(H2)
-        - From 57th to 64th : From A8(A1) to H8(H1)
-    + If you specify `<New table>`, this parameter is updated.
 * `@rook-square-table-opening [<New table : List>]`
-    + Returns Piece Square Table for Rook at Opening as List composed
-      of 64 numbers. "()" is a square when evaluating Black.
-        - From 1st to 8th : From A1(A8) to H1(H8)
-        - From 9th to 16th : From A2(A7) to H2(H7)
-        - From 17th to 24th : From A3(A6) to H3(H6)
-        - From 25th to 32nd : From A4(A5) to H4(H5)
-        - From 33rd to 40th : From A5(A4) to H5(H4)
-        - From 41st to 48th : From A6(A3) to H6(H3)
-        - From 49th to 56th : From A7(A2) to H7(H2)
-        - From 57th to 64th : From A8(A1) to H8(H1)
-    + If you specify `<New table>`, this parameter is updated.
 * `@queen-square-table-opening [<New table : List>]`
-    + Returns Piece Square Table for Queen at Opening as List composed
-      of 64 numbers. "()" is a square when evaluating Black.
-        - From 1st to 8th : From A1(A8) to H1(H8)
-        - From 9th to 16th : From A2(A7) to H2(H7)
-        - From 17th to 24th : From A3(A6) to H3(H6)
-        - From 25th to 32nd : From A4(A5) to H4(H5)
-        - From 33rd to 40th : From A5(A4) to H5(H4)
-        - From 41st to 48th : From A6(A3) to H6(H3)
-        - From 49th to 56th : From A7(A2) to H7(H2)
-        - From 57th to 64th : From A8(A1) to H8(H1)
-    + If you specify `<New table>`, this parameter is updated.
 * `@king-square-table-opening [<New table : List>]`
-    + Returns Piece Square Table for King at Opening as List composed
-      of 64 numbers. "()" is a square when evaluating Black.
-        - From 1st to 8th : From A1(A8) to H1(H8)
-        - From 9th to 16th : From A2(A7) to H2(H7)
-        - From 17th to 24th : From A3(A6) to H3(H6)
-        - From 25th to 32nd : From A4(A5) to H4(H5)
-        - From 33rd to 40th : From A5(A4) to H5(H4)
-        - From 41st to 48th : From A6(A3) to H6(H3)
-        - From 49th to 56th : From A7(A2) to H7(H2)
-        - From 57th to 64th : From A8(A1) to H8(H1)
-    + If you specify `<New table>`, this parameter is updated.
 * `@pawn-square-table-ending [<New table : List>]`
-    + Returns Piece Square Table for Pawn at Ending as List composed
-      of 64 numbers. "()" is a square when evaluating Black.
-        - From 1st to 8th : From A1(A8) to H1(H8)
-        - From 9th to 16th : From A2(A7) to H2(H7)
-        - From 17th to 24th : From A3(A6) to H3(H6)
-        - From 25th to 32nd : From A4(A5) to H4(H5)
-        - From 33rd to 40th : From A5(A4) to H5(H4)
-        - From 41st to 48th : From A6(A3) to H6(H3)
-        - From 49th to 56th : From A7(A2) to H7(H2)
-        - From 57th to 64th : From A8(A1) to H8(H1)
-    + If you specify `<New table>`, this parameter is updated.
 * `@knight-square-table-ending [<New table : List>]`
-    + Returns Piece Square Table for Knight at Ending as List composed
-      of 64 numbers. "()" is a square when evaluating Black.
-        - From 1st to 8th : From A1(A8) to H1(H8)
-        - From 9th to 16th : From A2(A7) to H2(H7)
-        - From 17th to 24th : From A3(A6) to H3(H6)
-        - From 25th to 32nd : From A4(A5) to H4(H5)
-        - From 33rd to 40th : From A5(A4) to H5(H4)
-        - From 41st to 48th : From A6(A3) to H6(H3)
-        - From 49th to 56th : From A7(A2) to H7(H2)
-        - From 57th to 64th : From A8(A1) to H8(H1)
-    + If you specify `<New table>`, this parameter is updated.
 * `@bishop-square-table-ending [<New table : List>]`
-    + Returns Piece Square Table for Bishop at Ending as List composed
-      of 64 numbers. "()" is a square when evaluating Black.
-        - From 1st to 8th : From A1(A8) to H1(H8)
-        - From 9th to 16th : From A2(A7) to H2(H7)
-        - From 17th to 24th : From A3(A6) to H3(H6)
-        - From 25th to 32nd : From A4(A5) to H4(H5)
-        - From 33rd to 40th : From A5(A4) to H5(H4)
-        - From 41st to 48th : From A6(A3) to H6(H3)
-        - From 49th to 56th : From A7(A2) to H7(H2)
-        - From 57th to 64th : From A8(A1) to H8(H1)
-    + If you specify `<New table>`, this parameter is updated.
 * `@rook-square-table-ending [<New table : List>]`
-    + Returns Piece Square Table for Rook at Ending as List composed
-      of 64 numbers. "()" is a square when evaluating Black.
-        - From 1st to 8th : From A1(A8) to H1(H8)
-        - From 9th to 16th : From A2(A7) to H2(H7)
-        - From 17th to 24th : From A3(A6) to H3(H6)
-        - From 25th to 32nd : From A4(A5) to H4(H5)
-        - From 33rd to 40th : From A5(A4) to H5(H4)
-        - From 41st to 48th : From A6(A3) to H6(H3)
-        - From 49th to 56th : From A7(A2) to H7(H2)
-        - From 57th to 64th : From A8(A1) to H8(H1)
-    + If you specify `<New table>`, this parameter is updated.
 * `@queen-square-table-ending [<New table : List>]`
-    + Returns Piece Square Table for Queen at Ending as List composed
-      of 64 numbers. "()" is a square when evaluating Black.
-        - From 1st to 8th : From A1(A8) to H1(H8)
-        - From 9th to 16th : From A2(A7) to H2(H7)
-        - From 17th to 24th : From A3(A6) to H3(H6)
-        - From 25th to 32nd : From A4(A5) to H4(H5)
-        - From 33rd to 40th : From A5(A4) to H5(H4)
-        - From 41st to 48th : From A6(A3) to H6(H3)
-        - From 49th to 56th : From A7(A2) to H7(H2)
-        - From 57th to 64th : From A8(A1) to H8(H1)
-    + If you specify `<New table>`, this parameter is updated.
 * `@king-square-table-ending [<New table : List>]`
-    + Returns Piece Square Table for King at Ending as List composed
-      of 64 numbers. "()" is a square when evaluating Black.
-        - From 1st to 8th : From A1(A8) to H1(H8)
-        - From 9th to 16th : From A2(A7) to H2(H7)
-        - From 17th to 24th : From A3(A6) to H3(H6)
-        - From 25th to 32nd : From A4(A5) to H4(H5)
-        - From 33rd to 40th : From A5(A4) to H5(H4)
-        - From 41st to 48th : From A6(A3) to H6(H3)
-        - From 49th to 56th : From A7(A2) to H7(H2)
-        - From 57th to 64th : From A8(A1) to H8(H1)
-    + If you specify `<New table>`, this parameter is updated.
 
 <h6> Example </h6>
 
@@ -5833,74 +5908,40 @@ R"...(### gen-engine ###
     ;; > 111111 222222 333333 444444 555555 666666 777777 888888
     ;; > 1111111 2222222 3333333 4444444 5555555 6666666 7777777 8888888
     ;; > 11111111 22222222 33333333 44444444 55555555 66666666 77777777
-    ;; > 88888888)
+    ;; > 88888888))...";
+    AddHelpDict("engine @pawn-square-table-opening", temp);
+    AddHelpDict("engine @knight-square-table-opening", temp);
+    AddHelpDict("engine @bishop-square-table-opening", temp);
+    AddHelpDict("engine @rook-square-table-opening", temp);
+    AddHelpDict("engine @queen-square-table-opening", temp);
+    AddHelpDict("engine @king-square-table-opening", temp);
+    AddHelpDict("engine @pawn-square-table-ending", temp);
+    AddHelpDict("engine @knight-square-table-ending", temp);
+    AddHelpDict("engine @bishop-square-table-ending", temp);
+    AddHelpDict("engine @rook-square-table-ending", temp);
+    AddHelpDict("engine @queen-square-table-ending", temp);
+    AddHelpDict("engine @king-square-table-ending", temp);
+
+    temp =
+R"...(### Customizing Evaluation Function - Attack ###
+
+Returns List composed of 7 values of attacking score.  
+1st: Not used. This is always 0. (for EMPTY)  
+2nd: Attacking Pawn.  
+3rd: Attacking Knight.  
+4th: Attacking Bishop.  
+5th: Attacking Rook.  
+6th: Attacking Queen.  
+7th: Attacking King.
+
+If you specify `<New table>`, this parameter is updated.
 
 * `@pawn-attack-table [<New table : List>]`
-    + Returns a value table of Attacking Score for Pawn
-      as List composed of 7 values.
-        - 1st : Not used. This is always '0'. (For EMPTY)
-        - 2nd : Value of attacking Pawn.
-        - 3rd : Value of attacking Knight.
-        - 4th : Value of attacking Bishop.
-        - 5th : Value of attacking Rook.
-        - 6th : Value of attacking Queen.
-        - 7th : Value of attacking King.
-    + If you specify `<New table>`, this parameter is updated.
 * `@knight-attack-table [<New table : List>]`
-    + Returns a value table of Attacking Score for Knight
-      as List composed of 7 values.
-        - 1st : Not used. This is always '0'. (For EMPTY)
-        - 2nd : Value of attacking Pawn.
-        - 3rd : Value of attacking Knight.
-        - 4th : Value of attacking Bishop.
-        - 5th : Value of attacking Rook.
-        - 6th : Value of attacking Queen.
-        - 7th : Value of attacking King.
-    + If you specify `<New table>`, this parameter is updated.
 * `@bishop-attack-table [<New table : List>]`
-    + Returns a value table of Attacking Score for Bishop
-      as List composed of 7 values.
-        - 1st : Not used. This is always '0'. (For EMPTY)
-        - 2nd : Value of attacking Pawn.
-        - 3rd : Value of attacking Knight.
-        - 4th : Value of attacking Bishop.
-        - 5th : Value of attacking Rook.
-        - 6th : Value of attacking Queen.
-        - 7th : Value of attacking King.
-    + If you specify `<New table>`, this parameter is updated.
 * `@rook-attack-table [<New table : List>]`
-    + Returns a value table of Attacking Score for Rook
-      as List composed of 7 values.
-        - 1st : Not used. This is always '0'. (For EMPTY)
-        - 2nd : Value of attacking Pawn.
-        - 3rd : Value of attacking Knight.
-        - 4th : Value of attacking Bishop.
-        - 5th : Value of attacking Rook.
-        - 6th : Value of attacking Queen.
-        - 7th : Value of attacking King.
-    + If you specify `<New table>`, this parameter is updated.
 * `@queen-attack-table [<New table : List>]`
-    + Returns a value table of Attacking Score for Queen
-      as List composed of 7 values.
-        - 1st : Not used. This is always '0'. (For EMPTY)
-        - 2nd : Value of attacking Pawn.
-        - 3rd : Value of attacking Knight.
-        - 4th : Value of attacking Bishop.
-        - 5th : Value of attacking Rook.
-        - 6th : Value of attacking Queen.
-        - 7th : Value of attacking King.
-    + If you specify `<New table>`, this parameter is updated.
 * `@king-attack-table [<New table : List>]`
-    + Returns a value table of Attacking Score for King
-      as List composed of 7 values.
-        - 1st : Not used. This is always '0'. (For EMPTY)
-        - 2nd : Value of attacking Pawn.
-        - 3rd : Value of attacking Knight.
-        - 4th : Value of attacking Bishop.
-        - 5th : Value of attacking Rook.
-        - 6th : Value of attacking Queen.
-        - 7th : Value of attacking King.
-    + If you specify `<New table>`, this parameter is updated.
 
 <h6> Example </h6>
 
@@ -5914,115 +5955,47 @@ R"...(### gen-engine ###
     ;; Output
     ;; > (0 2 3 4 5 6 7)
 
+Returns opening weight and ending weight.  
+If you specify `<New weight>`, this parameter is updated.
+
 * `@weight-pawn-attack [<New weight : List>]`
-    + Return Weight for Attacking Score for Pawn as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
 * `@weight-knight-attack [<New weight : List>]`
-    + Return Weight for Attacking Score for Knight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
 * `@weight-bishop-attack [<New weight : List>]`
-    + Return Weight for Attacking Score for Bishop as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
 * `@weight-rook-attack [<New weight : List>]`
-    + Return Weight for Attacking Score for Rook as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
 * `@weight-queen-attack [<New weight : List>]`
-    + Return Weight for Attacking Score for Queen as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-king-attack [<New weight : List>]`
-    + Return Weight for Attacking Score for King as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-king-attack [<New weight : List>]`)...";
+    AddHelpDict("engine @pawn-attack-table", temp);
+    AddHelpDict("engine @knight-attack-table", temp);
+    AddHelpDict("engine @bishop-attack-table", temp);
+    AddHelpDict("engine @rook-attack-table", temp);
+    AddHelpDict("engine @queen-attack-table", temp);
+    AddHelpDict("engine @king-attack-table", temp);
+    AddHelpDict("engine @weight-pawn-attack", temp);
+    AddHelpDict("engine @weight-knight-attack", temp);
+    AddHelpDict("engine @weight-bishop-attack", temp);
+    AddHelpDict("engine @weight-rook-attack", temp);
+    AddHelpDict("engine @weight-queen-attack", temp);
+    AddHelpDict("engine @weight-king-attack", temp);
 
-<h6> Example </h6>
+    temp =R"...(### Customizing Evaluation Function - Defense ###
 
-    (define my-engine (gen-engine))
-    
-    (display (my-engine '@weight-pawn-attack (list 111 222)))
-    ;; Output
-    ;; > (1 0.3)
-    
-    (display (my-engine '@weight-pawn-attack))
-    ;; Output
-    ;; > (111 222)
+Returns List composed of 7 values of defense score.  
+1st: Not used. This is always 0. (for EMPTY)  
+2nd: Protecting Pawn.  
+3rd: Protecting Knight.  
+4th: Protecting Bishop.  
+5th: Protecting Rook.  
+6th: Protecting Queen.  
+7th: Protecting King.
+
+If you specify `<New table>`, this parameter is updated.
 
 * `@pawn-defense-table [<New table : List>]`
-    + Returns a value table of Defense Score for Pawn
-      as List composed of 7 values.
-        - 1st : Not used. This is always '0'. (For EMPTY)
-        - 2nd : Value of defense Pawn.
-        - 3rd : Value of defense Knight.
-        - 4th : Value of defense Bishop.
-        - 5th : Value of defense Rook.
-        - 6th : Value of defense Queen.
-        - 7th : Value of defense King.
-    + If you specify `<New table>`, this parameter is updated.
 * `@knight-defense-table [<New table : List>]`
-    + Returns a value table of Defense Score for Knight
-      as List composed of 7 values.
-        - 1st : Not used. This is always '0'. (For EMPTY)
-        - 2nd : Value of defense Pawn.
-        - 3rd : Value of defense Knight.
-        - 4th : Value of defense Bishop.
-        - 5th : Value of defense Rook.
-        - 6th : Value of defense Queen.
-        - 7th : Value of defense King.
-    + If you specify `<New table>`, this parameter is updated.
 * `@bishop-defense-table [<New table : List>]`
-    + Returns a value table of Defense Score for Bishop
-      as List composed of 7 values.
-        - 1st : Not used. This is always '0'. (For EMPTY)
-        - 2nd : Value of defense Pawn.
-        - 3rd : Value of defense Knight.
-        - 4th : Value of defense Bishop.
-        - 5th : Value of defense Rook.
-        - 6th : Value of defense Queen.
-        - 7th : Value of defense King.
-    + If you specify `<New table>`, this parameter is updated.
 * `@rook-defense-table [<New table : List>]`
-    + Returns a value table of Defense Score for Rook
-      as List composed of 7 values.
-        - 1st : Not used. This is always '0'. (For EMPTY)
-        - 2nd : Value of defense Pawn.
-        - 3rd : Value of defense Knight.
-        - 4th : Value of defense Bishop.
-        - 5th : Value of defense Rook.
-        - 6th : Value of defense Queen.
-        - 7th : Value of defense King.
-    + If you specify `<New table>`, this parameter is updated.
 * `@queen-defense-table [<New table : List>]`
-    + Returns a value table of Defense Score for Queen
-      as List composed of 7 values.
-        - 1st : Not used. This is always '0'. (For EMPTY)
-        - 2nd : Value of defense Pawn.
-        - 3rd : Value of defense Knight.
-        - 4th : Value of defense Bishop.
-        - 5th : Value of defense Rook.
-        - 6th : Value of defense Queen.
-        - 7th : Value of defense King.
-    + If you specify `<New table>`, this parameter is updated.
 * `@king-defense-table [<New table : List>]`
-    + Returns a value table of Defense Score for King
-      as List composed of 7 values.
-        - 1st : Not used. This is always '0'. (For EMPTY)
-        - 2nd : Value of defense Pawn.
-        - 3rd : Value of defense Knight.
-        - 4th : Value of defense Bishop.
-        - 5th : Value of defense Rook.
-        - 6th : Value of defense Queen.
-        - 7th : Value of defense King.
-    + If you specify `<New table>`, this parameter is updated.
 
 <h6> Example </h6>
 
@@ -6036,101 +6009,52 @@ R"...(### gen-engine ###
     ;; Output
     ;; > (0 2 3 4 5 6 7)
 
+Returns opening weight and ending weight.  
+If you specify `<New weight>`, this parameter is updated.
+
 * `@weight-pawn-defense [<New weight : List>]`
-    + Return Weight for Defense Score for Pawn as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
 * `@weight-knight-defense [<New weight : List>]`
-    + Return Weight for Defense Score for Knight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
 * `@weight-bishop-defense [<New weight : List>]`
-    + Return Weight for Defense Score for Bishop as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
 * `@weight-rook-defense [<New weight : List>]`
-    + Return Weight for Defense Score for Rook as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
 * `@weight-queen-defense [<New weight : List>]`
-    + Return Weight for Defense Score for Queen as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-king-defense [<New weight : List>]`
-    + Return Weight for Defense Score for King as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-king-defense [<New weight : List>]`)...";
+    AddHelpDict("engine @pawn-defense-table", temp);
+    AddHelpDict("engine @knight-defense-table", temp);
+    AddHelpDict("engine @bishop-defense-table", temp);
+    AddHelpDict("engine @rook-defense-table", temp);
+    AddHelpDict("engine @queen-defense-table", temp);
+    AddHelpDict("engine @king-defense-table", temp);
+    AddHelpDict("engine @weight-pawn-defense", temp);
+    AddHelpDict("engine @weight-knight-defense", temp);
+    AddHelpDict("engine @weight-bishop-defense", temp);
+    AddHelpDict("engine @weight-rook-defense", temp);
+    AddHelpDict("engine @weight-queen-defense", temp);
+    AddHelpDict("engine @weight-king-defense", temp);
 
-<h6> Example </h6>
+    temp =
+R"...(### Customizing Evaluation Function - Pin ###
 
-    (define my-engine (gen-engine))
-    
-    (display (my-engine '@weight-pawn-defense (list 111 222)))
-    ;; Output
-    ;; > (1 0.5)
-    
-    (display (my-engine '@weight-pawn-defense))
-    ;; Output
-    ;; > (111 222)
+Returns List of 7 Lists of 7 values.
+
+1st list : Futile list. (For EMPTY)  
+2nd list : A target piece is Pawn.  
+3rd list : A target piece is Knight.  
+4th list : A target piece is Bishop.  
+5th list : A target piece is Rook.  
+6th list : A target piece is Queen.  
+7th list : A target piece is King.
+
+1st value of each list : Futile value.
+2nd value of each list : A piece over the target is Pawn.
+3rd value of each list : A piece over the target is Knight.
+4th value of each list : A piece over the target is Bishop.
+5th value of each list : A piece over the target is Rook.
+6th value of each list : A piece over the target is Queen.
+7th value of each list : A piece over the target is King.
 
 * `@bishop-pin-table [<New value table : List>]`
-    + Return a value table composed of 7 lists.
-      Each list is composed of 7 values.
-        - 1st : Futile list. (For EMPTY)
-        - 2nd : a value list When a target piece is Pawn.
-            - 1st : Futile value. (For EMPTY)
-            - 2nd : a value when pin-board piece is Pawn.
-            - 3rd : a value when pin-board piece is Knight.
-            - 4rd : a value when pin-board piece is Bishop.
-            - 5rd : a value when pin-board piece is Rook.
-            - 6rd : a value when pin-board piece is Queen.
-            - 7rd : a value when pin-board piece is King.
-        - 3rd : a value list When a target piece is Knight.
-            - 1st : Futile value. (For EMPTY)
-            - 2nd : a value when pin-board piece is Pawn.
-            - 3rd : a value when pin-board piece is Knight.
-            - 4rd : a value when pin-board piece is Bishop.
-            - 5rd : a value when pin-board piece is Rook.
-            - 6rd : a value when pin-board piece is Queen.
-            - 7rd : a value when pin-board piece is King.
-        - 4th : a value list When a target piece is Bishop.
-            - 1st : Futile value. (For EMPTY)
-            - 2nd : a value when pin-board piece is Pawn.
-            - 3rd : a value when pin-board piece is Knight.
-            - 4rd : a value when pin-board piece is Bishop.
-            - 5rd : a value when pin-board piece is Rook.
-            - 6rd : a value when pin-board piece is Queen.
-            - 7rd : a value when pin-board piece is King.
-        - 5th : a value list When a target piece is Rook.
-            - 1st : Futile value. (For EMPTY)
-            - 2nd : a value when pin-board piece is Pawn.
-            - 3rd : a value when pin-board piece is Knight.
-            - 4rd : a value when pin-board piece is Bishop.
-            - 5rd : a value when pin-board piece is Rook.
-            - 6rd : a value when pin-board piece is Queen.
-            - 7rd : a value when pin-board piece is King.
-        - 6th : a value list When a target piece is Queen.
-            - 1st : Futile value. (For EMPTY)
-            - 2nd : a value when pin-board piece is Pawn.
-            - 3rd : a value when pin-board piece is Knight.
-            - 4rd : a value when pin-board piece is Bishop.
-            - 5rd : a value when pin-board piece is Rook.
-            - 6rd : a value when pin-board piece is Queen.
-            - 7rd : a value when pin-board piece is King.
-        - 7th : a value list When a target piece is King.
-            - 1st : Futile value. (For EMPTY)
-            - 2nd : a value when pin-board piece is Pawn.
-            - 3rd : a value when pin-board piece is Knight.
-            - 4rd : a value when pin-board piece is Bishop.
-            - 5rd : a value when pin-board piece is Rook.
-            - 6rd : a value when pin-board piece is Queen.
-            - 7rd : a value when pin-board piece is King.
+* `@rook-pin-table [<New value table : List>]`
+* `@queen-pin-table [<New value table : List>]`
 
 <h6> Example </h6>
 
@@ -6163,45 +6087,25 @@ R"...(### gen-engine ###
     ;; > (0 37 38 39 40 41 42)
     ;; > (0 44 45 46 47 48 49))
 
+Returns opening weight and ending weight.  
+If you specify `<New weight>`, this parameter is updated.
+
 * `@weight-bishop-pin [<New weight : List>]`
-    + Return Weight for Pin Score for King as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
 * `@weight-rook-pin [<New weight : List>]`
-    + Return Weight for Pin Score for Rook as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-queen-pin [<New weight : List>]`
-    + Return Weight for Pin Score for Queen as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
+* `@weight-queen-pin [<New weight : List>]`)...";
+    AddHelpDict("engine @bishop-pin-table", temp);
+    AddHelpDict("engine @rook-pin-table", temp);
+    AddHelpDict("engine @queen-pin-table", temp);
+    AddHelpDict("engine @weight-bishop-pin", temp);
+    AddHelpDict("engine @weight-rook-pin", temp);
+    AddHelpDict("engine @weight-queen-pin", temp);
 
-<h6> Example </h6>
-
-    (define my-engine (gen-engine))
-    
-    (display (my-engine '@weight-bishop-pin (list 111 222)))
-    ;; Output
-    ;; > (1 1)
-    
-    (display (my-engine '@weight-bishop-pin))
-    ;; Output
-    ;; > (111 222)
+    temp =
+R"...(### Customizing Evaluation Function - Pawn Shield ###
 
 * `@pawn-shield-table [<New table : List>]`
     + Returns Piece Square Table for Pawn Shield
-      as List composed of 64 numbers. "()" is a square when evaluating Black.
-        - From 1st to 8th : From A1(A8) to H1(H8)
-        - From 9th to 16th : From A2(A7) to H2(H7)
-        - From 17th to 24th : From A3(A6) to H3(H6)
-        - From 25th to 32nd : From A4(A5) to H4(H5)
-        - From 33rd to 40th : From A5(A4) to H5(H4)
-        - From 41st to 48th : From A6(A3) to H6(H3)
-        - From 49th to 56th : From A7(A2) to H7(H2)
-        - From 57th to 64th : From A8(A1) to H8(H1)
+      as List composed of 64 numbers.
     + If you specify `<New table>`, this parameter is updated.
 
 <h6> Example </h6>
@@ -6240,452 +6144,146 @@ R"...(### gen-engine ###
     ;; > 49 50 51 52 53 54 55 56
     ;; > 57 58 59 60 61 62 63 64)
 
-* `@weight-pawn-shield [<New weight : List>]`
-    + Return Weight for Pawn Shield as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
+Returns opening weight and ending weight.  
+If you specify `<New weight>`, this parameter is updated.
 
-<h6> Example </h6>
-
-    (define my-engine (gen-engine))
-    
-    (display (my-engine '@weight-pawn-shield (list 111 222)))
-    ;; Output
-    ;; > (1 0)
-    
-    (display (my-engine '@weight-pawn-shield))
-    ;; Output
-    ;; > (111 222)
-
-* `@weight-pawn-mobility [<New weight : List>]`
-    + Weight for Mobility of Pawn.
-        - Score is Weight times the number of squares where it can go to.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-knight-mobility [<New weight : List>]`
-        - Score is Weight times the number of squares where it can go to.
-    + Weight for Mobility of Knight.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-bishop-mobility [<New weight : List>]`
-    + Weight for Mobility of Bishop.
-        - Score is Weight times the number of squares where it can go to.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-rook-mobility [<New weight : List>]`
-    + Weight for Mobility of Rook.
-        - Score is Weight times the number of squares where it can go to.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-queen-mobility [<New weight : List>]`
-    + Weight for Mobility of Queen.
-        - Score is Weight times the number of squares where it can go to.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-king-mobility [<New weight : List>]`
-    + Weight for Mobility of King.
-        - Score is Weight times the number of squares where it can go to.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-pawn-center-control [<New weight : List>]`
-    + Weight for Controlling Center by Pawn.
-        - Score is Weight times the number of Center where it attacks.
-        - "Center" is squares of
-          C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-knight-center-control [<New weight : List>]`
-    + Weight for Controlling Center by Knight.
-        - Score is Weight times the number of Center where it attacks.
-        - "Center" is squares of
-          C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-bishop-center-control [<New weight : List>]`
-    + Weight for Controlling Center by Bishop.
-        - Score is Weight times the number of Center where it attacks.
-        - "Center" is squares of
-          C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-rook-center-control [<New weight : List>]`
-    + Weight for Controlling Center by Rook.
-        - Score is Weight times the number of Center where it attacks.
-        - "Center" is squares of
-          C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-queen-center-control [<New weight : List>]`
-    + Weight for Controlling Center by Queen.
-        - Score is Weight times the number of Center where it attacks.
-        - "Center" is squares of
-          C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-king-center-control [<New weight : List>]`
-    + Weight for Controlling Center by King.
-        - Score is Weight times the number of Center where it attacks.
-        - "Center" is squares of
-          C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-pawn-sweet-center-control [<New weight : List>]`
-    + Weight for Controlling Sweet Center by Pawn.
-        - Score is Weight times the number of Sweet Center where it attacks.
-        - "Sweet Center" is squares of D4 D5 E4 E5.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-knight-sweet-center-control [<New weight : List>]`
-    + Weight for Controlling Sweet Center by Knight.
-        - Score is Weight times the number of Sweet Center where it attacks.
-        - "Sweet Center" is squares of D4 D5 E4 E5.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-bishop-sweet-center-control [<New weight : List>]`
-    + Weight for Controlling Sweet Center by Bishop.
-        - Score is Weight times the number of Sweet Center where it attacks.
-        - "Sweet Center" is squares of D4 D5 E4 E5.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-rook-sweet-center-control [<New weight : List>]`
-    + Weight for Controlling Sweet Center by Rook.
-        - Score is Weight times the number of Sweet Center where it attacks.
-        - "Sweet Center" is squares of D4 D5 E4 E5.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-queen-sweet-center-control [<New weight : List>]`
-    + Weight for Controlling Sweet Center by Queen.
-        - Score is Weight times the number of Sweet Center where it attacks.
-        - "Sweet Center" is squares of D4 D5 E4 E5.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-king-sweet-center-control [<New weight : List>]`
-    + Weight for Controlling Sweet Center by King.
-        - Score is Weight times the number of Sweet Center where it attacks.
-        - "Sweet Center" is squares of D4 D5 E4 E5.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-pawn-development [<New weight : List>]`
-    + Weight for Development of Pawn.
-        - Score is Weight times the number of Pawns not on starting position.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-knight-development [<New weight : List>]`
-    + Weight for Development of Knight.
-        - Score is Weight times the number of Knights not on starting position.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-bishop-development [<New weight : List>]`
-    + Weight for Development of Bishop.
-        - Score is Weight times the number of Bishops not on starting position.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-rook-development [<New weight : List>]`
-    + Weight for Development of Rook.
-        - Score is Weight times the number of Rooks not on starting position.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-queen-development [<New weight : List>]`
-    + Weight for Development of Queen.
-        - Score is Weight times the number of Queens not on starting position.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-king-development [<New weight : List>]`
-    + Weight for Development of King.
-        - Score is Weight times the number of King not on starting position.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-pawn-attack-around-king [<New weight : List>]`
-    + Weight for Pawn attacking squares around opponent's King.
-        - Score is Weight times the number of attacked squares
-          around opponent's King.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-knight-attack-around-king [<New weight : List>]`
-    + Weight for Knight attacking squares around opponent's King.
-        - Score is Weight times the number of attacked squares
-          around opponent's King.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-bishop-attack-around-king [<New weight : List>]`
-    + Weight for Bishop attacking squares around opponent's King.
-        - Score is Weight times the number of attacked squares
-          around opponent's King.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-rook-attack-around-king [<New weight : List>]`
-    + Weight for Rook attacking squares around opponent's King.
-        - Score is Weight times the number of attacked squares
-          around opponent's King.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-queen-attack-around-king [<New weight : List>]`
-    + Weight for Queen attacking squares around opponent's King.
-        - Score is Weight times the number of attacked squares
-          around opponent's King.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-king-attack-around-king [<New weight : List>]`
-    + Weight for King attacking squares around opponent's King.
-        - Score is Weight times the number of attacked squares
-          around opponent's King.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-pass-pawn [<New weight : List>]`
-    + Weight for Pass Pawn.
-        - Score is Weight times the number of Pass Pawns.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-protected-pass-pawn [<New weight : List>]`
-    + Weight for Pass Pawn protected by friend Pawns.
-        - Score is Weight times the number of Pass Pawns protected
-          by friend Pawns.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-double-pawn [<New weight : List>]`
-    + Weight for Double Pawn.
-        - Score is Weight times the number of Double Pawn.
-            - If 2 pawns are on same fyle, the number of Double Pawn is '2'.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-iso-pawn [<New weight : List>]`
-    + Weight for Isolated Pawn.
-        - Score is Weight times the number of Isolated Pawn.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-bishop-pair [<New weight : List>]`
-    + Weight for Bishop Pair.
-        - Score is Weight if 2 or more Bishops exists
-          on different colored square.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-bad-bishop [<New weight : List>]`
-    + Weight for Bad Bishop.
-        - Score is Weight times the number of Pawns on the same colored square
-          where Bishop is placed on.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-rook-pair [<New weight : List>]`
-    + Weight for Rook Pair.
-        - Score is Weight if 2 or more Rooks exists on the chess board.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-rook-semiopen-fyle [<New weight : List>]`
-    + Weight for Rook on semi-open fyle.
-        - Score is Weight times the number of Rooks on semi-open fyle.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-rook-open-fyle [<New weight : List>]`
-    + Weight for Rook on open fyle.
-        - Score is Weight times the number of Rooks on open fyle.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-early-queen-starting [<New weight : List>]`
-    + Weight for Queen that has moved too early in the game.
-        - Score is Weight times the number of Minor Pieces
-          on its starting position.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-weak-square [<New weight : List>]`
-    + Weight for Weak Square.
-        - When King is on A1(A8) or A2(A7) or B1(B8) or B2(B7) or C1(C8)
-          or C2(C7), "Weak Square" is A2(A7) or A3(A6) or B2(B7) or B3(B6)
-          or C2(C7) or C3(C6) squares where Pawn is NOT placed on.  
-          When King is on F1(F8) or F2(F7) or G1(G8) or G2(G7) or H1(H8)
-          or H2(H7), "Weak Square" is F2(F7) or F3(F6) or G2(G7) or G3(G6)
-          or H2(H7) or H3(H6) squares where Pawn is NOT placed on.
-        - Score is Weight times the number of Weak Square.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-castling [<New weight : List>]`
-    + Weight for Castling.
-        - Score is Weight if King has castled.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-* `@weight-abandoned-castling [<New weight : List>]`
-    + Weight for King abandoned all Castling rights.
-        - Score is Weight if King has abandoned all castling rights.
-    + Return Weight as List of 2 elements.
-        - 1st : Weight on Opening.
-        - 2nd : Weight on Ending.
-    + If you specify `<New weight>`, this parameter is updated.
-
-<h6> Example </h6>
-
-    (define my-engine (gen-engine))
-    
-    (display (my-engine '@weight-pawn-mobility (list 111 222)))
-    ;; Output
-    ;; > (0 0)
-    
-    (display (my-engine '@weight-pawn-mobility))
-    ;; Output
-    ;; > (111 222))...";
-    
-    AddHelpDict("gen-engine", temp);
+* `@weight-pawn-shield [<New weight : List>]`)...";
+    AddHelpDict("engine @pawn-shield-table", temp);
+    AddHelpDict("engine @weight-pawn-shield", temp);
 
     temp =
-R"...(### gen-pgn ###
+R"...(### Customizing Evaluation Function - Mobility ###
 
-<h6> Usage </h6>
+Returns opening weight and ending weight.  
+If you specify `<New weight>`, this parameter is updated.
 
-* `(gen-pgn <PGN string : String>)`
+* `@weight-pawn-mobility [<New weight : List>]`
+* `@weight-knight-mobility [<New weight : List>]`
+* `@weight-bishop-mobility [<New weight : List>]`
+* `@weight-rook-mobility [<New weight : List>]`
+* `@weight-queen-mobility [<New weight : List>]`
+* `@weight-king-mobility [<New weight : List>]`)...";
+    AddHelpDict("engine @weight-pawn-mobility", temp);
+    AddHelpDict("engine @weight-knight-mobility", temp);
+    AddHelpDict("engine @weight-bishop-mobility", temp);
+    AddHelpDict("engine @weight-rook-mobility", temp);
+    AddHelpDict("engine @weight-queen-mobility", temp);
+    AddHelpDict("engine @weight-king-mobility", temp);
 
-<h6> Description </h6>
+    temp =
+R"...(### Customizing Evaluation Function - Controlling Center ###
 
-* Generates and returns PGN object from `<PGN string>`.
-* PGN object is operated by Message Symbol.
-* PGN object has 2 states.
-    + Current game.
-        - This can be changed by `@set-current-game`.
-    + Current move.
-        - This can be changed by `@next-move`, `@prev-move`, `@alt-move`,
-          `@orig-move`, `@rewind-move`.
+Returns opening weight and ending weight.  
+If you specify `<New weight>`, this parameter is updated.
 
-<h6> Description of Message Symbols </h6>
+* `@weight-pawn-center-control [<New weight : List>]`
+* `@weight-knight-center-control [<New weight : List>]`
+* `@weight-bishop-center-control [<New weight : List>]`
+* `@weight-rook-center-control [<New weight : List>]`
+* `@weight-queen-center-control [<New weight : List>]`
+* `@weight-king-center-control [<New weight : List>]`)...";
+    AddHelpDict("engine @weight-pawn-center-control", temp);
+    AddHelpDict("engine @weight-knight-center-control", temp);
+    AddHelpDict("engine @weight-bishop-center-control", temp);
+    AddHelpDict("engine @weight-rook-center-control", temp);
+    AddHelpDict("engine @weight-queen-center-control", temp);
+    AddHelpDict("engine @weight-king-center-control", temp);
 
-* `@get-pgn-comments`
-    + Returns Lists of comments about PGN.
+    temp =
+R"...(### Customizing Evaluation Function - Controlling Sweet Center ###
 
-* `@get-current-comments.`
-    + Returns List of comments about the current game.
+Returns opening weight and ending weight.  
+If you specify `<New weight>`, this parameter is updated.
 
-* `@get-current-move-comments`
-    + Returns List of comments about the current move.
+* `@weight-pawn-sweet-center-control [<New weight : List>]`
+* `@weight-knight-sweet-center-control [<New weight : List>]`
+* `@weight-bishop-sweet-center-control [<New weight : List>]`
+* `@weight-rook-sweet-center-control [<New weight : List>]`
+* `@weight-queen-sweet-center-control [<New weight : List>]`
+* `@weight-king-sweet-center-control [<New weight : List>]`)...";
+    AddHelpDict("engine @weight-pawn-sweet-center-control", temp);
+    AddHelpDict("engine @weight-knight-sweet-center-control", temp);
+    AddHelpDict("engine @weight-bishop-sweet-center-control", temp);
+    AddHelpDict("engine @weight-rook-sweet-center-control", temp);
+    AddHelpDict("engine @weight-queen-sweet-center-control", temp);
+    AddHelpDict("engine @weight-king-sweet-center-control", temp);
 
-* `@length`
-    + Returns the number of games that PGN has.
+    temp =
+R"...(### Customizing Evaluation Function - Development ###
 
-* `@set-current-game <Index : Number>`
-    + Sets a current game into the `<Index>`th game.
+Returns opening weight and ending weight.  
+If you specify `<New weight>`, this parameter is updated.
 
-* `@get-current-game-headers`
-    + Returns List of Lists composed with headers of the current game.
-        - The format is "`((<Name 1> <value 1>) (<Name 2> <Value 2>)...)`".
+* `@weight-pawn-development [<New weight : List>]`
+* `@weight-knight-development [<New weight : List>]`
+* `@weight-bishop-development [<New weight : List>]`
+* `@weight-rook-development [<New weight : List>]`
+* `@weight-queen-development [<New weight : List>]`
+* `@weight-king-development [<New weight : List>]`)...";
+    AddHelpDict("engine @weight-pawn-development", temp);
+    AddHelpDict("engine @weight-knight-development", temp);
+    AddHelpDict("engine @weight-bishop-development", temp);
+    AddHelpDict("engine @weight-rook-development", temp);
+    AddHelpDict("engine @weight-queen-development", temp);
+    AddHelpDict("engine @weight-king-development", temp);
 
-* `@current-move`
-    + Returns the current move text.
+    temp =
+R"...(### Customizing Evaluation Function - Attack around Enemy King ###
 
-* `@next-move`
-    + Change the current move into the next move
-      and returns the move text.
+Returns opening weight and ending weight.  
+If you specify `<New weight>`, this parameter is updated.
 
-* `@prev-move`
-    + Change the current move into the previous move
-      and returns the move text.
+* `@weight-pawn-attack-around-king [<New weight : List>]`
+* `@weight-knight-attack-around-king [<New weight : List>]`
+* `@weight-bishop-attack-around-king [<New weight : List>]`
+* `@weight-rook-attack-around-king [<New weight : List>]`
+* `@weight-queen-attack-around-king [<New weight : List>]`
+* `@weight-king-attack-around-king [<New weight : List>]`)...";
+    AddHelpDict("engine @weight-pawn-attack-around-king", temp);
+    AddHelpDict("engine @weight-knight-attack-around-king", temp);
+    AddHelpDict("engine @weight-bishop-attack-around-king", temp);
+    AddHelpDict("engine @weight-rook-attack-around-king", temp);
+    AddHelpDict("engine @weight-queen-attack-around-king", temp);
+    AddHelpDict("engine @weight-king-attack-around-king", temp);
 
-* `@alt-move`
-    + Change the current move into the alternative move
-      and returns the move text.
+    temp =
+R"...(### Customizing Evaluation Function - Pawn Structure ###
 
-* `@orig-move`
-    + If the current move is an alternative move,
-      then change a current move into the original move
-      and returns the move text.
+Returns opening weight and ending weight.  
+If you specify `<New weight>`, this parameter is updated.
 
-* `@rewind-move`
-    + Change a current move into the first move
-      and returns the move text.
+* `@weight-pass-pawn [<New weight : List>]`
+* `@weight-protected-pass-pawn [<New weight : List>]`
+* `@weight-double-pawn [<New weight : List>]`
+* `@weight-iso-pawn [<New weight : List>]`)...";
+    AddHelpDict("engine @weight-pass-pawn", temp);
+    AddHelpDict("engine @weight-protected-pass-pawn", temp);
+    AddHelpDict("engine @weight-double-pawn", temp);
+    AddHelpDict("engine @weight-iso-pawn", temp);
 
-<h6> Example </h6>
+    temp =
+R"...(### Customizing Evaluation Function - Piece ###
 
-    ;; Open PGN File.
-    (define pgn-file (input-stream "/path/to/pgnfile.pgn"))
-    
-    ;; Reads the file and generates PGN object.
-    (define my-pgn (gen-pgn (pgn-file '@read)))
-    
-    ;; Displays the current game headers.
-    (display (my-pgn '@get-current-game-headers))
-    
-    ;; Output
-    ;; > (("Black" "Hanako Yamada") ("Site" "Japan")
-    ;; > ("White" "Hironori Ishibashi")))...";
-    AddHelpDict("gen-pgn", temp);
+Returns opening weight and ending weight.  
+If you specify `<New weight>`, this parameter is updated.
+
+* `@weight-bishop-pair [<New weight : List>]`
+* `@weight-bad-bishop [<New weight : List>]`
+* `@weight-rook-pair [<New weight : List>]`
+* `@weight-rook-semiopen-fyle [<New weight : List>]`
+* `@weight-rook-open-fyle [<New weight : List>]`
+* `@weight-early-queen-starting [<New weight : List>]`
+* `@weight-weak-square [<New weight : List>]`
+* `@weight-castling [<New weight : List>]`
+* `@weight-abandoned-castling [<New weight : List>]`)...";
+    AddHelpDict("engine @weight-bishop-pair", temp);
+    AddHelpDict("engine @weight-bad-bishop", temp);
+    AddHelpDict("engine @weight-rook-pair", temp);
+    AddHelpDict("engine @weight-rook-semiopen-fyle", temp);
+    AddHelpDict("engine @weight-rook-open-fyle", temp);
+    AddHelpDict("engine @weight-early-queen-starting", temp);
+    AddHelpDict("engine @weight-weak-square", temp);
+    AddHelpDict("engine @weight-castling", temp);
+    AddHelpDict("engine @weight-abandoned-castling", temp);
   }
 }  // namespace Sayuri
