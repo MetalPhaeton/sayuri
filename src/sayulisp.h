@@ -329,24 +329,27 @@ namespace Sayuri {
 
       /**
        * 手番をセットする。
-       * @param to_move_ptr 手番。
+       * @param to_move 手番。
        * @return 変更前の値。
        */
-      LispObjectPtr SetToMove(LispObjectPtr to_move_ptr);
+      LispObjectPtr SetToMove(Side to_move);
       /**
        * キャスリングの権利をセットする。
+       * @param caller 呼び出し元。
        * @param castling_rights_ptr キャスリングの権利のリスト。
        * @param func_name 例外で使う関数名。
        * @return 変更前の値。
        */
-      LispObjectPtr SetCastlingRights(LispObjectPtr castling_rights_ptr,
-      const std::string& func_name);
+      LispObjectPtr SetCastlingRights(const LispObject& caller,
+      LispObjectPtr castling_rights_ptr, const std::string& func_name);
       /**
        * アンパッサンの位置をセットする。
+       * @param caller 呼び出し元。
        * @param en_passant_square_ptr アンパッサンの位置。
        * @return 変更前の値。
        */
-      LispObjectPtr SetEnPassantSquare(LispObjectPtr castling_rights_ptr);
+      LispObjectPtr SetEnPassantSquare(const LispObject& caller,
+      LispObjectPtr castling_rights_ptr);
       /**
        * 手数をセットする。
        * @param ply_ptr 手数。
@@ -1603,6 +1606,20 @@ namespace Sayuri {
        */
       static std::vector<Move> MoveListToVec(const std::string& func_name,
       const LispObject& move_list);
+
+      /** 
+       * LispObjectのシンボルから数字を得る。
+       * @param caller 呼び出し元。
+       * @param obj 数字を得たいオブジェクト。
+       * @return 数字。
+       */
+      static int ToInt(const LispObject& caller, const LispObject& obj) {
+        if (obj.IsSymbol()) {
+          LispObjectPtr result = caller.Evaluate(obj);
+          return result->number_value();
+        }
+        return obj.number_value();
+      }
 
       // ========== //
       // メンバ変数 //

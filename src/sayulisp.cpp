@@ -514,12 +514,12 @@ namespace Sayuri {
         (func_name, required_args, false, list.Length() - 1);
       }
       LispObjectPtr square_ptr = caller.Evaluate(*list_itr);
-      if (!(square_ptr->IsNumber())) {
+      if (!(square_ptr->IsNumber() || square_ptr->IsSymbol())) {
         throw Lisp::GenWrongTypeError
-        (func_name, "Number", std::vector<int> {2}, true);
+        (func_name, "Number or Symbol", std::vector<int> {2}, true);
       }
 
-      Square square = square_ptr->number_value();
+      Square square = ToInt(caller, *square_ptr);
 
       return GetPiece(func_name, square);
 
@@ -580,11 +580,11 @@ namespace Sayuri {
         (func_name, required_args, false, list.Length() - 1);
       }
       LispObjectPtr square_ptr = caller.Evaluate(*(list_itr++));
-      if (!(square_ptr->IsNumber())) {
+      if (!(square_ptr->IsNumber() || square_ptr->IsSymbol())) {
         throw Lisp::GenWrongTypeError
-        (func_name, "Number", std::vector<int> {2}, true);
+        (func_name, "Number or Symbol", std::vector<int> {2}, true);
       }
-      Square square = square_ptr->number_value();
+      Square square = ToInt(caller, *square_ptr);
 
       // 駒のリストを得る。
       if (!list_itr) {
@@ -602,22 +602,22 @@ namespace Sayuri {
       if (!piece_itr) {
         throw Lisp::GenError("@engine-error", "Couldn't find side of piece.");
       }
-      if (!(piece_itr->IsNumber())) {
+      if (!((piece_itr->IsNumber()) || piece_itr->IsSymbol())) {
         throw Lisp::GenWrongTypeError
-        (func_name, "Number", std::vector<int> {3, 1}, true);
+        (func_name, "Number or Symbol", std::vector<int> {3, 1}, true);
       }
-      Side side = piece_itr->number_value();
+      Side side = ToInt(caller, *piece_itr);
       ++piece_itr;
 
       // 駒のリストからタイプを得る。
       if (!piece_itr) {
         throw Lisp::GenError("@engine-error", "Couldn't find type of piece.");
       }
-      if (!(piece_itr->IsNumber())) {
+      if (!((piece_itr->IsNumber()) || piece_itr->IsSymbol())) {
         throw Lisp::GenWrongTypeError
-        (func_name, "Number", std::vector<int> {3, 1}, true);
+        (func_name, "Number or Symbol", std::vector<int> {3, 1}, true);
       }
-      PieceType piece_type = piece_itr->number_value();
+      PieceType piece_type = ToInt(caller, *piece_itr);
 
       return PlacePiece(square, side, piece_type);
     } else if (message_symbol == "@set-to-move") {
@@ -627,12 +627,12 @@ namespace Sayuri {
         (func_name, required_args, false, list.Length() - 1);
       }
       LispObjectPtr to_move_ptr = caller.Evaluate(*list_itr);
-      if (!(to_move_ptr->IsNumber())) {
+      if (!(to_move_ptr->IsNumber() || to_move_ptr->IsSymbol())) {
         throw Lisp::GenWrongTypeError
-        (func_name, "Number", std::vector<int> {2}, true);
+        (func_name, "Number or Symbol", std::vector<int> {2}, true);
       }
 
-      return SetToMove(to_move_ptr);
+      return SetToMove(ToInt(caller, *to_move_ptr));
 
     } else if (message_symbol == "@set-castling-rights") {
       required_args = 2;
@@ -646,7 +646,7 @@ namespace Sayuri {
         (func_name, "List", std::vector<int> {2}, true);
       }
 
-      return SetCastlingRights(castling_rights_ptr, func_name);
+      return SetCastlingRights(caller, castling_rights_ptr, func_name);
 
     } else if (message_symbol == "@set-en-passant-square") {
       required_args = 2;
@@ -655,13 +655,14 @@ namespace Sayuri {
         (func_name, required_args, false, list.Length() - 1);
       }
       LispObjectPtr en_passant_square_ptr = caller.Evaluate(*list_itr);
-      if (!((en_passant_square_ptr->IsNumber())
-      || (en_passant_square_ptr->IsNil()))) {
+      if (!(en_passant_square_ptr->IsNumber()
+      || en_passant_square_ptr->IsSymbol()
+      || en_passant_square_ptr->IsNil())) {
         throw Lisp::GenWrongTypeError
-        (func_name, "Number or Nil", std::vector<int> {2}, true);
+        (func_name, "Number or Symbol or Nil", std::vector<int> {2}, true);
       }
 
-      return SetEnPassantSquare(en_passant_square_ptr);
+      return SetEnPassantSquare(caller, en_passant_square_ptr);
 
     } else if (message_symbol == "@set-ply") {
       required_args = 2;
@@ -765,12 +766,11 @@ namespace Sayuri {
         throw Lisp::GenError
         ("@engine-error", "Couldn't find 'From' value.");
       }
-      LispObjectPtr from_ptr = caller.Evaluate(*(itr++));
-      if (!(from_ptr->IsNumber())) {
+      if (!(itr->IsNumber() || itr->IsSymbol())) {
         throw Lisp::GenWrongTypeError
-        (func_name, "Number", std::vector<int> {2, 1}, true);
+        (func_name, "Number or Symbol", std::vector<int> {2, 1}, true);
       }
-      Square from = from_ptr->number_value();
+      Square from = ToInt(caller, *(itr++));
       if (from >= NUM_SQUARES) {
         throw Lisp::GenError("@engine-error", "The 'From' value '"
         + std::to_string(from) + "' doesn't indicate any square.");
@@ -781,12 +781,11 @@ namespace Sayuri {
         throw Lisp::GenError
         ("@engine-error", "Couldn't find 'To' value.");
       }
-      LispObjectPtr to_ptr = caller.Evaluate(*(itr++));
-      if (!(to_ptr->IsNumber())) {
+      if (!(itr->IsNumber() || itr->IsSymbol())) {
         throw Lisp::GenWrongTypeError
-        (func_name, "Number", std::vector<int> {2, 2}, true);
+        (func_name, "Number or Symbol", std::vector<int> {2, 2}, true);
       }
-      Square to = to_ptr->number_value();
+      Square to = ToInt(caller, *(itr++));
       if (to >= NUM_SQUARES) {
         throw Lisp::GenError("@engine-error", "The 'To' value '"
         + std::to_string(to) + "' doesn't indicate any square.");
@@ -797,12 +796,11 @@ namespace Sayuri {
         throw Lisp::GenError
         ("@engine-error", "Couldn't find 'Promotion' value.");
       }
-      LispObjectPtr promotion_ptr = caller.Evaluate(*itr);
-      if (!(promotion_ptr->IsNumber())) {
+      if (!(itr->IsNumber() || itr->IsSymbol())) {
         throw Lisp::GenWrongTypeError
-        (func_name, "Number", std::vector<int> {2, 3}, true);
+        (func_name, "Number or Symbol", std::vector<int> {2, 3}, true);
       }
-      PieceType promotion = promotion_ptr->number_value();
+      PieceType promotion = ToInt(caller, *itr);
       if (promotion >= NUM_PIECE_TYPES) {
         throw Lisp::GenError("@engine-error", "The 'Promotion' value '"
         + std::to_string(promotion) + "' doesn't indicate any piece type.");
@@ -2124,8 +2122,7 @@ namespace Sayuri {
   }
 
   // 手番をセットする。
-  LispObjectPtr EngineSuite::SetToMove(LispObjectPtr to_move_ptr) {
-    Side to_move = to_move_ptr->number_value();
+  LispObjectPtr EngineSuite::SetToMove(Side to_move) {
     if (to_move >= NUM_SIDES) {
       throw Lisp::GenError("@engine-error",
       "The side value '" + std::to_string(to_move)
@@ -2142,17 +2139,17 @@ namespace Sayuri {
   }
 
   // キャスリングの権利をセットする。
-  LispObjectPtr EngineSuite::SetCastlingRights
-  (LispObjectPtr castling_rights_ptr, const std::string& func_name) {
+  LispObjectPtr EngineSuite::SetCastlingRights (const LispObject& caller,
+  LispObjectPtr castling_rights_ptr, const std::string& func_name) {
     Castling rights = 0;
     int index = 1;
     for (LispIterator<false> itr {castling_rights_ptr.get()};
     itr; ++itr, ++index) {
-      if (!(itr->IsNumber())) {
+      if (!(itr->IsNumber() || itr->IsSymbol())) {
         throw Lisp::GenWrongTypeError
-        (func_name, "Number", std::vector<int> {2, index}, true);
+        (func_name, "Number or Symbol", std::vector<int> {2, index}, true);
       }
-      int num = itr->number_value();
+      int num = ToInt(caller, *itr);
       if (num == 1) rights |= WHITE_SHORT_CASTLING;
       else if (num == 2) rights |= WHITE_LONG_CASTLING;
       else if (num == 3) rights |= BLACK_SHORT_CASTLING;
@@ -2183,8 +2180,8 @@ namespace Sayuri {
   }
 
   // アンパッサンの位置をセットする。
-  LispObjectPtr EngineSuite::SetEnPassantSquare
-  (LispObjectPtr en_passant_square_ptr) {
+  LispObjectPtr EngineSuite::SetEnPassantSquare(const LispObject& caller,
+  LispObjectPtr en_passant_square_ptr) {
     // 引数がNilだった場合、アンパッサンの位置を無効にする。
     if (en_passant_square_ptr->IsNil()) {
       Square origin = engine_ptr_->en_passant_square();
@@ -2197,7 +2194,7 @@ namespace Sayuri {
       return ret_ptr;
     }
 
-    Square square = en_passant_square_ptr->number_value();
+    Square square = ToInt(caller, *en_passant_square_ptr);
 
     // 引数をチェック。
     if (square >= NUM_SQUARES) {
@@ -2252,12 +2249,11 @@ namespace Sayuri {
       throw Lisp::GenError
       ("@engine-error", "Couldn't find 'From' value.");
     }
-    LispObjectPtr from_ptr = caller.Evaluate(*(itr++));
-    if (!(from_ptr->IsNumber())) {
+    if (!(itr->IsNumber() || itr->IsSymbol())) {
       throw Lisp::GenWrongTypeError
-      (func_name, "Number", std::vector<int> {2, 1}, true);
+      (func_name, "Number or Symbol", std::vector<int> {2, 1}, false);
     }
-    Square from = from_ptr->number_value();
+    Square from = ToInt(caller, *(itr++));
     if (from >= NUM_SQUARES) {
       throw Lisp::GenError("@engine-error", "The 'From' value '"
       + std::to_string(from) + "' doesn't indicate any square.");
@@ -2268,12 +2264,11 @@ namespace Sayuri {
       throw Lisp::GenError
       ("@engine-error", "Couldn't find 'To' value.");
     }
-    LispObjectPtr to_ptr = caller.Evaluate(*(itr++));
-    if (!(to_ptr->IsNumber())) {
+    if (!(itr->IsNumber() || itr->IsSymbol())) {
       throw Lisp::GenWrongTypeError
-      (func_name, "Number", std::vector<int> {2, 2}, true);
+      (func_name, "Number or Symbol", std::vector<int> {2, 2}, false);
     }
-    Square to = to_ptr->number_value();
+    Square to = ToInt(caller, *(itr++));
     if (to >= NUM_SQUARES) {
       throw Lisp::GenError("@engine-error", "The 'To' value '"
       + std::to_string(to) + "' doesn't indicate any square.");
@@ -2284,12 +2279,11 @@ namespace Sayuri {
       throw Lisp::GenError
       ("@engine-error", "Couldn't find 'Promotion' value.");
     }
-    LispObjectPtr promotion_ptr = caller.Evaluate(*itr);
-    if (!(promotion_ptr->IsNumber())) {
+    if (!(itr->IsNumber() || itr->IsSymbol())) {
       throw Lisp::GenWrongTypeError
-      (func_name, "Number", std::vector<int> {2, 3}, true);
+      (func_name, "Number or Symbol", std::vector<int> {2, 3}, true);
     }
-    PieceType promotion = promotion_ptr->number_value();
+    PieceType promotion = ToInt(caller, *itr);
     if (promotion >= NUM_PIECE_TYPES) {
       throw Lisp::GenError("@engine-error", "The 'Promotion' value '"
       + std::to_string(promotion) + "' doesn't indicate any piece type.");
