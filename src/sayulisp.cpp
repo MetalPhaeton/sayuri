@@ -4661,7 +4661,7 @@ R"...(### Getting squares ###
     temp =
 R"...(### Getting pieces ###
 
-* `@get-piece <Square : Number>`
+* `@get-piece <Square : Number or Symbol>`
     + Returns a side and type of the piece on `<Square>` as List.
 
 * `@get-all-pieces`
@@ -4773,13 +4773,13 @@ R"...(### Getting states of game ###
     temp =
 R"...(### Setting states of game ###
 
-* `@set-to-move <Side : Number>`
+* `@set-to-move <Side : Number or Symbol>`
     + Sets turn to move.
     + Returns previous setting.
 * `@set-castling_rights <Castling rights : List>`
     + Sets castling rights.
     + Returns previous setting.
-* `@set-en-passant-square <<Square : Number> or <Nil>>`
+* `@set-en-passant-square <<Square : Number or Symbol> or <Nil>>`
     + Sets en passant square.
     + Returns previous setting.
 * `@set-ply <Ply : Number>`
@@ -4854,10 +4854,10 @@ R"...(### Placing pieces ###
 * `@set-fen <FEN : String>`
     + Sets position with FEN.
     + Returns #t.
-* `@place-piece <Square : Number> <Piece : List>`
+* `@place-piece <Square : Number or Symbol> <Piece : List>`
     + Sets a `<Piece>` on `<Square>`
       and returns the previous piece placed on `<Square>`.
-    + `<Piece>` is `(<Side : Number> <Type : Number>).
+    + `<Piece>` is `(<Side : Number or Symbol> <Type : Number or Symbol>).
         - For example, White Pawn is `(list WHITE PAWN)`.
 
 <h6> Example </h6>
@@ -4882,7 +4882,7 @@ R"...(### Placing pieces ###
     AddHelpDict("engine @place-piece", temp);
 
     temp =
-R"...(### Getting Candidate Moves ###
+R"...(### Getting candidate moves ###
 
 * `@get-candidate-moves`
     + Generates and returns List of candidate moves.
@@ -4986,12 +4986,13 @@ Judges each state of the current position.
     temp =
 R"...(### Taking a move ###
 
-* `@play-move <One move : List>`
+A move is represented by List.  The List is  
+`(<From : Number or Symbol>
+  <To : Number or Symbol>
+  <Promotion : Number or Symbol>)`.
+
+* `@play-move <Move : List>`
     + Moves one piece legally.
-    + `<One move>` is `(<From : Number> <To : Number> <Promotion : Number>)`
-        - `<From>` is a square which a piece to move is placed on.
-        - `<To>` is a square where you want to move the piece to.
-        - `<Promotion>` is a piece type which you want to promote Pawn into.
     + Returns #t if it has succeeded, otherwise returns #f.
 
 * `@undo-move`

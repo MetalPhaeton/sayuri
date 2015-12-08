@@ -23,100 +23,63 @@
 </ol>
 <h2 id="contents">Contents</h2>
 <ul>
-<li><a href="#operation-of-chess-board">Operation of Chess Board</a>
-<ul>
-<li><a href="#get-position-of-pieces">Get Position of Pieces</a></li>
-<li><a href="#get-and-set-board-status">Get and Set Board Status</a></li>
-<li><a href="#set-position">Set Position</a></li>
-<li><a href="#move-generation">Move Generation</a></li>
-<li><a href="#check-position">Check Position</a></li>
-<li><a href="#play-game">Play Game</a></li>
+<li><a href="#getting-squares">Getting squares</a></li>
+<li><a href="#getting-pieces">Getting pieces</a></li>
+<li><a href="#getting-states-of-game">Getting states of game</a></li>
+<li><a href="#setting-states-of-game">Setting states of game</a></li>
+<li><a href="#placing-pieces">Placing pieces</a></li>
+<li><a href="#getting-candidate-moves">Getting candidate moves</a></li>
+<li><a href="#predicate-functions">Predicate functions</a></li>
+<li><a href="#taking-a-move">Taking a move</a></li>
 <li><a href="#uci-command">UCI Command</a></li>
-</ul></li>
-<li><a href="#customization-of-search-function">Customization of Search Function</a>
-<ul>
-<li><a href="#material">Material</a></li>
-<li><a href="#quiescence-search">Quiescence Search</a></li>
-<li><a href="#repetition-check">Repetition Check</a></li>
-<li><a href="#check-extension">Check Extension</a></li>
-<li><a href="#ybwc">YBWC</a></li>
-<li><a href="#aspiration-windows">Aspiration Windows</a></li>
-<li><a href="#see">SEE</a></li>
-<li><a href="#history-heuristics">History Heuristics</a></li>
-<li><a href="#killer-move-heuristics">Killer Move Heuristics</a></li>
-<li><a href="#transposition-table">Transposition Table</a></li>
-<li><a href="#internal-iterative-deepening">Internal Iterative Deepening</a></li>
-<li><a href="#null-move-reduction">Null Move Reduction</a></li>
-<li><a href="#probcut">ProbCut</a></li>
-<li><a href="#history-pruning">History Pruning</a></li>
-<li><a href="#late-move-reduction">Late Move Reduction</a></li>
-<li><a href="#futility-pruning">Futility Pruning</a></li>
-</ul></li>
-<li><a href="#customization-of-evaluation-function">Customization of Evaluation Function</a>
-<ul>
-<li><a href="#piece-square-table">Piece Square Table</a></li>
-<li><a href="#attack-score">Attack Score</a></li>
-<li><a href="#defense-score">Defense Score</a></li>
-<li><a href="#pin-score">Pin Score</a></li>
-<li><a href="#pawn-shield-score">Pawn Shield Score</a></li>
-<li><a href="#other-weights">Other Weights</a></li>
-</ul></li>
+<li><a href="#searching-the-best-move">Searching the best move</a></li>
+<li><a href="#hash-and-threads">Hash and threads</a></li>
+<li><a href="#customizing-search-algorithm---material">Customizing Search Algorithm - Material</a></li>
+<li><a href="#customizing-search-algorithm---quiescence-search">Customizing Search Algorithm - Quiescence Search</a></li>
+<li><a href="#customizing-search-algorithm---repetition-check">Customizing Search Algorithm - Repetition Check</a></li>
+<li><a href="#customizing-search-algorithm---check-extension">Customizing Search Algorithm - Check Extension</a></li>
+<li><a href="#customizing-search-algorithm---ybwc">Customizing Search Algorithm - YBWC</a></li>
+<li><a href="#customizing-search-algorithm---aspiration-windows">Customizing Search Algorithm - Aspiration Windows</a></li>
+<li><a href="#customizing-search-algorithm---aspiration-windows">Customizing Search Algorithm - Aspiration Windows</a></li>
+<li><a href="#customizing-search-algorithm---history-heuristics">Customizing Search Algorithm - History Heuristics</a></li>
+<li><a href="#customizing-search-algorithm---killer-move-heuristics">Customizing Search Algorithm - Killer Move Heuristics</a></li>
+<li><a href="#customizing-search-algorithm---hash-table">Customizing Search Algorithm - Hash Table</a></li>
+<li><a href="#customizing-search-algorithm---internal-iterative-deepening">Customizing Search Algorithm - Internal Iterative Deepening</a></li>
+<li><a href="#customizing-search-algorithm---null-move-reduction">Customizing Search Algorithm - Null Move Reduction</a></li>
+<li><a href="#customizing-search-algorithm---probcut">Customizing Search Algorithm - ProbCut</a></li>
+<li><a href="#customizing-search-algorithm---history-pruning">Customizing Search Algorithm - History Pruning</a></li>
+<li><a href="#customizing-search-algorithm---late-move-reduction">Customizing Search Algorithm - Late Move Reduction</a></li>
+<li><a href="#customizing-search-algorithm---futility-pruning">Customizing Search Algorithm - Futility Pruning</a></li>
+<li><a href="#customizing-evaluation-function---piece-square-table">Customizing Evaluation Function - Piece Square Table</a></li>
+<li><a href="#customizing-evaluation-function---attack">Customizing Evaluation Function - Attack</a></li>
+<li><a href="#customizing-evaluation-function---defense">Customizing Evaluation Function - Defense</a></li>
+<li><a href="#customizing-evaluation-function---pin">Customizing Evaluation Function - Pin</a></li>
+<li><a href="#customizing-evaluation-function---pawn-shield">Customizing Evaluation Function - Pawn Shield</a></li>
+<li><a href="#customizing-evaluation-function---mobility">Customizing Evaluation Function - Mobility</a></li>
+<li><a href="#customizing-evaluation-function---controlling-center">Customizing Evaluation Function - Controlling Center</a></li>
+<li><a href="#customizing-evaluation-function---controlling-sweet-center">Customizing Evaluation Function - Controlling Sweet Center</a></li>
+<li><a href="#customizing-evaluation-function---development">Customizing Evaluation Function - Development</a></li>
+<li><a href="#customizing-evaluation-function---attack-around-enemy-king">Customizing Evaluation Function - Attack around Enemy King</a></li>
+<li><a href="#customizing-evaluation-function---pawn-structure">Customizing Evaluation Function - Pawn Structure</a></li>
+<li><a href="#customizing-evaluation-function---piece">Customizing Evaluation Function - Piece</a></li>
 </ul>
-<h2 id="operation-of-chess-board">Operation of Chess Board</h2>
-<h3 id="get-position-of-pieces">Get Position of Pieces</h3>
+<hr />
+<h3 id="getting-squares">Getting squares</h3>
+<p>Returns List of Symbols of squares where specific pieces are on.</p>
 <ul>
-<li><code>@get-white-pawn-position</code>
-<ul>
-<li>Returns List of position of White Pawns as Symbol.</li>
-</ul></li>
-<li><code>@get-white-knight-position</code>
-<ul>
-<li>Returns List of position of White Knights as Symbol.</li>
-</ul></li>
-<li><code>@get-white-bishop-position</code>
-<ul>
-<li>Returns List of position of White Bishops as Symbol.</li>
-</ul></li>
-<li><code>@get-white-rook-position</code>
-<ul>
-<li>Returns List of position of White Rooks as Symbol.</li>
-</ul></li>
-<li><code>@get-white-queen-position</code>
-<ul>
-<li>Returns List of position of White Queens as Symbol.</li>
-</ul></li>
-<li><code>@get-white-king-position</code>
-<ul>
-<li>Returns List of position of White King as Symbol.</li>
-</ul></li>
-<li><code>@get-black-pawn-position</code>
-<ul>
-<li>Returns List of position of White Pawns as Symbol.</li>
-</ul></li>
-<li><code>@get-black-knight-position</code>
-<ul>
-<li>Returns List of position of White Knights as Symbol.</li>
-</ul></li>
-<li><code>@get-black-bishop-position</code>
-<ul>
-<li>Returns List of position of White Bishops as Symbol.</li>
-</ul></li>
-<li><code>@get-black-rook-position</code>
-<ul>
-<li>Returns List of position of White Rooks as Symbol.</li>
-</ul></li>
-<li><code>@get-black-queen-position</code>
-<ul>
-<li>Returns List of position of White Queens as Symbol.</li>
-</ul></li>
-<li><code>@get-black-king-position</code>
-<ul>
-<li>Returns List of position of White King as Symbol.</li>
-</ul></li>
-<li><code>@get-empty-square-position</code>
-<ul>
-<li>Returns List of position of Empty Squares as Symbol.</li>
-</ul></li>
+<li><code>@get-white-pawn-position</code></li>
+<li><code>@get-white-knight-position</code></li>
+<li><code>@get-white-bishop-position</code></li>
+<li><code>@get-white-rook-position</code></li>
+<li><code>@get-white-queen-position</code></li>
+<li><code>@get-white-king-position</code></li>
+<li><code>@get-black-pawn-position</code></li>
+<li><code>@get-black-knight-position</code></li>
+<li><code>@get-black-bishop-position</code></li>
+<li><code>@get-black-rook-position</code></li>
+<li><code>@get-black-queen-position</code></li>
+<li><code>@get-black-king-position</code></li>
+<li><code>@get-empty-square-position</code></li>
 </ul>
 <h6>
 Example
@@ -126,21 +89,12 @@ Example
 
 ;; Output
 ;; &gt; (A2 B2 C2 D2 E2 F2 G2 H2)</code></pre>
+<h3 id="getting-pieces">Getting pieces</h3>
 <ul>
-<li><code>@get-piece &lt;Square : Number&gt;</code>
+<li><code>@get-piece &lt;Square : Number or Symbol&gt;</code>
 <ul>
-<li>Returns a side and type of the piece as List that is <code>(&lt;Side : Symbol&gt;, &lt;Type : Symbol&gt;)</code>.</li>
+<li>Returns a side and type of the piece on <code>&lt;Square&gt;</code> as List.</li>
 </ul></li>
-</ul>
-<h6>
-Example
-</h6>
-<pre><code>(define my-engine (gen-engine))
-(display (my-engine &#39;@get-piece D1))
-
-;; Output
-;; &gt; (WHITE QUEEN)</code></pre>
-<ul>
 <li><code>@get-all-pieces</code>
 <ul>
 <li>Returns pieces of each square on the board as List.</li>
@@ -150,6 +104,11 @@ Example
 Example
 </h6>
 <pre><code>(define my-engine (gen-engine))
+(display (my-engine &#39;@get-piece D1))
+
+;; Output
+;; &gt; (WHITE QUEEN)
+
 (display (my-engine &#39;@get-all-pieces))
 
 ;; Output
@@ -168,7 +127,7 @@ Example
 ;; &gt; (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN)
 ;; &gt; (BLACK PAWN) (BLACK PAWN) (BLACK ROOK) (BLACK KNIGHT) (BLACK BISHOP)
 ;; &gt; (BLACK QUEEN) (BLACK KING) (BLACK BISHOP) (BLACK KNIGHT) (BLACK ROOK))</code></pre>
-<h3 id="get-and-set-board-status">Get and Set Board Status</h3>
+<h3 id="getting-states-of-game">Getting states of game</h3>
 <ul>
 <li><code>@get-to-move</code>
 <ul>
@@ -176,7 +135,7 @@ Example
 </ul></li>
 <li><code>@get-castling-rights</code>
 <ul>
-<li>Returns List of Symbols indicates castling rights.</li>
+<li>Returns castling rights as Symbol.</li>
 </ul></li>
 <li><code>@get-en-passant-square</code>
 <ul>
@@ -189,10 +148,7 @@ Example
 </ul></li>
 <li><code>@get-clock</code>
 <ul>
-<li>Returns Clock(plies for 50 Moves Rule).
-<ul>
-<li>If Pawn has moved or a piece has been captured, Clock is rewound to zero.</li>
-</ul></li>
+<li>Returns clock(plies for 50 Moves Rule).</li>
 </ul></li>
 <li><code>@get-white-has-castled</code>
 <ul>
@@ -250,8 +206,9 @@ Example
 (display (my-engine &#39;@get-black-has-castled))
 ;; Output
 ;; &gt; #f</code></pre>
+<h3 id="setting-states-of-game">Setting states of game</h3>
 <ul>
-<li><code>@set-to-move &lt;Side : Number&gt;</code>
+<li><code>@set-to-move &lt;Side : Number or Symbol&gt;</code>
 <ul>
 <li>Sets turn to move.</li>
 <li>Returns previous setting.</li>
@@ -261,7 +218,7 @@ Example
 <li>Sets castling rights.</li>
 <li>Returns previous setting.</li>
 </ul></li>
-<li><code>@set-en-passant-square &lt;&lt;Square : Number&gt; or &lt;Nil&gt;&gt;</code>
+<li><code>@set-en-passant-square &lt;&lt;Square : Number or Symbol&gt; or &lt;Nil&gt;&gt;</code>
 <ul>
 <li>Sets en passant square.</li>
 <li>Returns previous setting.</li>
@@ -328,23 +285,22 @@ Example
 (display (my-engine &#39;@get-clock))
 ;; Output
 ;; &gt; 22</code></pre>
-<h3 id="set-position">Set Position</h3>
+<h3 id="placing-pieces">Placing pieces</h3>
 <ul>
 <li><code>@set-new-game</code>
 <ul>
-<li>Sets starting position to the chess engine object.</li>
+<li>Sets starting position.</li>
 <li>Returns #t.</li>
 </ul></li>
 <li><code>@set-fen &lt;FEN : String&gt;</code>
 <ul>
-<li>Sets FEN position to the chess engine object.</li>
+<li>Sets position with FEN.</li>
 <li>Returns #t.</li>
 </ul></li>
-<li><code>@place-piece &lt;Square : Number&gt; &lt;Piece type : Number&gt; &lt;Piece side : Number&gt;</code>
+<li><code>@place-piece &lt;Square : Number or Symbol&gt; &lt;Piece : List&gt;</code>
 <ul>
-<li>Sets a piece on <code>&lt;Square&gt;</code> and returns the previous piece placed on <code>&lt;Square&gt;</code>.</li>
-<li><code>&lt;Piece type&gt;</code> is piece type.</li>
-<li><code>&lt;Piece side&gt;</code> is a color of the piece.</li>
+<li>Sets a <code>&lt;Piece&gt;</code> on <code>&lt;Square&gt;</code> and returns the previous piece placed on <code>&lt;Square&gt;</code>.</li>
+<li><code>&lt;Piece&gt;</code> is <code>(&lt;Side : Number or Symbol&gt; &lt;Type : Number or Symbol&gt;). - For example, White Pawn is</code>(list WHITE PAWN)`.</li>
 </ul></li>
 </ul>
 <h6>
@@ -359,8 +315,13 @@ Example
 (display (my-engine &#39;@set-fen
     &quot;r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1&quot;))
 ;; Output
-;; &gt; #t</code></pre>
-<h3 id="move-generation">Move Generation</h3>
+;; &gt; #t
+
+;; Sets Black Rook on D1 where White Queen is placed.
+(display (my-engine &#39;@place-piece D1 (list BLACK ROOK)))
+;; Output
+;; &gt; (WHITE QUEEN)</code></pre>
+<h3 id="getting-candidate-moves">Getting candidate moves</h3>
 <ul>
 <li><code>@get-candidate-moves</code>
 <ul>
@@ -379,18 +340,20 @@ Example
 ;; &gt; (D2 D3 EMPTY) (C2 C4 EMPTY) (C2 C3 EMPTY) (B2 B4 EMPTY) (B2 B3 EMPTY)
 ;; &gt; (A2 A4 EMPTY) (A2 A3 EMPTY) (G1 H3 EMPTY) (G1 F3 EMPTY) (B1 C3 EMPTY)
 ;; &gt; (B1 A3 EMPTY))</code></pre>
-<h3 id="check-position">Check Position</h3>
+<h3 id="predicate-functions">Predicate functions</h3>
+<p>Judges each state of the current position.</p>
 <ul>
 <li><code>@correct-position?</code>
-<ul>
-<li>Judges whether it is position or not.
 <ul>
 <li>If Pawn is on 1st or 8th rank, it returns #f.</li>
 <li>When turn to move is White, if Black King is checked, then it returns #f.</li>
 <li>When turn to move is Black, if White King is checked, then it returns #f.</li>
 <li>Otherwise, returns #t.</li>
 </ul></li>
-</ul></li>
+<li><code>@white-checked?</code></li>
+<li><code>@black-checked?</code></li>
+<li><code>@checkmated?</code></li>
+<li><code>@stalemated?</code></li>
 </ul>
 <h6>
 Example
@@ -402,21 +365,9 @@ Example
 
 (display (my-engine &#39;@correct-position?))
 ;; Output
-;; &gt; #f</code></pre>
-<ul>
-<li><code>@white-checked?</code>
-<ul>
-<li>Judges whether White King is checked or not.</li>
-</ul></li>
-<li><code>@black-checked?</code>
-<ul>
-<li>Judges whether Black King is checked or not.</li>
-</ul></li>
-</ul>
-<h6>
-Example
-</h6>
-<pre><code>(define my-engine (gen-engine))
+;; &gt; #f
+
+(define my-engine (gen-engine))
 
 ;; Move pieces by UCI command.
 ;; 1.d4 e6 2.Nf3 Bb4+
@@ -439,21 +390,9 @@ Example
 
 (display (my-engine &#39;@black-checked?))
 ;; Output
-;; &gt; #f</code></pre>
-<ul>
-<li><code>@checkmated?</code>
-<ul>
-<li>Judges whether either King is checkmated or not.</li>
-</ul></li>
-<li><code>@stalemated?</code>
-<ul>
-<li>Judges whether either King is stalemated or not.</li>
-</ul></li>
-</ul>
-<h6>
-Example
-</h6>
-<pre><code>(define my-engine (gen-engine))
+;; &gt; #f
+
+(define my-engine (gen-engine))
 
 ;; Move pieces by UCI command.
 ;; 1.f3 e5 2.g4 Qh4#
@@ -477,22 +416,13 @@ Example
 (display (my-engine &#39;@stalemated?))
 ;; Output
 ;; &gt; #f</code></pre>
-<h3 id="play-game">Play game</h3>
+<h3 id="taking-a-move">Taking a move</h3>
+<p>A move is represented by List. The List is<br /><code>(&lt;From : Number or Symbol&gt;   &lt;To : Number or Symbol&gt;   &lt;Promotion : Number or Symbol&gt;)</code>.</p>
 <ul>
-<li><code>@play-move &lt;One move : List&gt;</code>
+<li><code>@play-move &lt;Move : List&gt;</code>
 <ul>
 <li>Moves one piece legally.</li>
-<li><code>&lt;One move&gt;</code> is <code>(&lt;From : Number&gt; &lt;To : Number&gt; &lt;Promotion : Number&gt;)</code>
-<ul>
-<li><code>&lt;From&gt;</code> is a square which a piece to move is placed on.</li>
-<li><code>&lt;To&gt;</code> is a square where you want to move the piece to.</li>
-<li><code>&lt;Promotion&gt;</code> is a piece type which you want to promote Pawn into.
-<ul>
-<li>If it can't promote Pawn, <code>&lt;Promotion&gt;</code> is EMPTY.</li>
-</ul></li>
-<li>If move is illegal, it throws exception.</li>
-<li>Returns #t.</li>
-</ul></li>
+<li>Returns #t if it has succeeded, otherwise returns #f.</li>
 </ul></li>
 <li><code>@undo-move</code>
 <ul>
@@ -506,7 +436,7 @@ Example
 </ul></li>
 <li><code>@move-&gt;note &lt;Move : List&gt;</code>
 <ul>
-<li>Transrates Move into PGN move text according to the current position.</li>
+<li>Translates Move into PGN move text according to the current position.</li>
 </ul></li>
 </ul>
 <h6>
@@ -528,14 +458,26 @@ Example
 
 (display (my-engine &#39;@get-white-pawn-position))
 ;; Output
-;; &gt; (A2 B2 C2 D2 E2 F2 G2 H2)</code></pre>
+;; &gt; (A2 B2 C2 D2 E2 F2 G2 H2)
+
+(display (my-engine &#39;@play-note &quot;Nf3&quot;))
+;; Output
+;; &gt; #t
+
+(display (my-engine &#39;@get-white-knight-position))
+;; Output
+;; &gt; (B1 F3)
+
+(display (my-engine &#39;@move-&gt;note (list B8 C6 EMPTY)))
+;; Output
+;; &gt; Nc6</code></pre>
 <h3 id="uci-command">UCI Command</h3>
 <ul>
 <li><code>@input-uci-command &lt;UCI command : String&gt;</code>
 <ul>
 <li>Executes <code>&lt;UCI command&gt;</code>.</li>
 <li>If success, returns #t. Otherwise, returns #f.</li>
-<li>If you have input &quot;go&quot; command, the engine starts to think the best move in background. So control will come back soon.</li>
+<li>If you have input &quot;go&quot; command, the engine starts thinking in background. So control will come back soon.</li>
 </ul></li>
 <li><code>@add-uci-output-listener &lt;Listener : Function&gt;</code>
 <ul>
@@ -571,30 +513,28 @@ Example
 ;; &gt; I&#39;m Listener : option name UCI_AnalyseMode type check default false
 ;; &gt; I&#39;m Listener : uciok
 ;; &gt; #t</code></pre>
+<h3 id="searching-the-best-move">Searching the best move</h3>
+<p>Thinks and returns the best move in each condition.<br />Different from &quot;go&quot; command, the control won't come back until the engine have found the best move.</p>
 <ul>
 <li><code>@go-movetime &lt;Milliseconds : Number&gt; [&lt;Candidate move list : List&gt;]</code>
 <ul>
-<li>Thinks for <code>&lt;Milliseconds&gt;</code> and returns the best move.</li>
-<li>Different from &quot;go&quot; command, until the engine have found the best move, the control won't come back.</li>
+<li>Thinks for <code>&lt;Milliseconds&gt;</code>.</li>
 </ul></li>
 <li><code>@go-timelimit &lt;Milliseconds : Number&gt; [&lt;Candidate move list : List&gt;]</code>
 <ul>
-<li>Thinks on the basis of <code>&lt;Milliseconds&gt;</code> and returns the best move.
+<li>Thinks on the basis of <code>&lt;Milliseconds&gt;</code>.
 <ul>
 <li>If <code>&lt;Milliseconds&gt;</code> is more than 600000, the engine thinks for 60000 milliseconds.</li>
 <li>If <code>&lt;Milliseconds&gt;</code> is less than 600000, the engine thinks for &quot;<code>&lt;Milliseconds&gt;</code> / 10&quot; milliseconds.</li>
 </ul></li>
-<li>Different from &quot;go&quot; command, until the engine have found the best move, the control won't come back.</li>
 </ul></li>
 <li><code>@go-depth &lt;Ply : Number&gt; [&lt;Candidate move list : List&gt;]</code>
 <ul>
-<li>Thinks until to reach <code>&lt;Ply&gt;</code>th depth and returns the best move.</li>
-<li>Different from &quot;go&quot; command, until the engine have found the best move, the control won't come back.</li>
+<li>Thinks until to reach <code>&lt;Ply&gt;</code>th depth.</li>
 </ul></li>
 <li><code>@go-nodes &lt;Nodes : Number&gt; [&lt;Candidate move list : List&gt;]</code>
 <ul>
-<li>Thinks until to search <code>&lt;Nodes&gt;</code> nodes and returns the best move.</li>
-<li>Different from &quot;go&quot; command, until the engine have found the best move, the control won't come back.</li>
+<li>Thinks until to search <code>&lt;Nodes&gt;</code> nodes.</li>
 </ul></li>
 </ul>
 <h6>
@@ -646,6 +586,7 @@ Example
 ;; &gt; score cp 45 pv e2e4 b8c6 g1f3 g8f6 e4e5 f6g4 d2d4 e7e6 h2h3 f8b4
 ;; &gt; Engine &gt; bestmove e2e4 ponder b8c6
 ;; &gt; (E2 E4 EMPTY)</code></pre>
+<h3 id="hash-and-threads">Hash and threads</h3>
 <ul>
 <li><code>@set-hash-size &lt;Size : Number&gt;</code>
 <ul>
@@ -670,16 +611,14 @@ Example
 ;; Output
 ;; &gt; 1.34218e+08
 
-;; Set number of threads to 3.
+;; Set the number of threads to 3.
 (my-engine &#39;@input-uci-command &quot;setoption name threads value 3&quot;)
 
 (display (my-engine &#39;@set-threads 4))
-;; Set number of threads to 4 and return 3.
+;; Set the number of threads to 4 and return 3.
 ;; Output
 ;; &gt; 3</code></pre>
-<h2 id="customization-of-search-function">Customization of Search Function</h2>
-<h3 id="material">Material</h3>
-<p>&quot;Material&quot; is values of pieces.<br />Usually, the value of Pawn is 100 cp(centipawn).</p>
+<h3 id="customizing-search-algorithm---material">Customizing Search Algorithm - Material</h3>
 <ul>
 <li><code>@material [&lt;New materal : List&gt;]</code>
 <ul>
@@ -708,8 +647,7 @@ Example
 (display (my-engine &#39;@material))
 ;; Output
 ;; &gt; (0 222 333 444 555 666 777)</code></pre>
-<h3 id="quiescence-search">Quiescence Search</h3>
-<p>&quot;Quiescence Search&quot; is algorithm for soothing the position.<br />When a search function have reached the leaf node, if King is checked or there are attacked pieces, &quot;Quiescence Search&quot; continues searching until no King is checked or there are no attacked pieces.</p>
+<h3 id="customizing-search-algorithm---quiescence-search">Customizing Search Algorithm - Quiescence Search</h3>
 <ul>
 <li><code>@enable-quiesce-search [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -729,8 +667,7 @@ Example
 (display (my-engine &#39;@enable-quiesce-search))
 ;; Output
 :: &gt; #f</code></pre>
-<h3 id="repetition-check">Repetition Check</h3>
-<p>&quot;Repetition Check&quot; is a function for checking whether the position has repeated or not.<br />If &quot;Repetition Check&quot; has found the position is repeated at the current node, the search function stops searching and returns 0 cp to the parent node.</p>
+<h3 id="customizing-search-algorithm---repetition-check">Customizing Search Algorithm - Repetition Check</h3>
 <ul>
 <li><code>@enable-repetition-check [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -750,8 +687,7 @@ Example
 (display (my-engine &#39;@enable-repetition-check))
 ;; Output
 ;; &gt; #f</code></pre>
-<h3 id="check-extension">Check Extension</h3>
-<p>&quot;Check Extension&quot; is a function to increase depth when King is checked at the current node.</p>
+<h3 id="customizing-search-algorithm---check-extension">Customizing Search Algorithm - Check Extension</h3>
 <ul>
 <li><code>@enable-check-extension [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -771,8 +707,7 @@ Example
 (display (my-engine &#39;@enable-check-extension))
 ;; Output
 ;; &gt; #f</code></pre>
-<h3 id="ybwc">YBWC</h3>
-<p>&quot;YBWC&quot; is algorithm of mulitithreading.<br />&quot;YBWC&quot; searches with one thread during first several candidate moves. After that it asks for other threads to help searching.</p>
+<h3 id="customizing-search-algorithm---ybwc">Customizing Search Algorithm - YBWC</h3>
 <ul>
 <li><code>@ybwc-limit-depth [&lt;New depth : Number&gt;]</code>
 <ul>
@@ -807,8 +742,7 @@ Example
 (display (my-engine &#39;@ybwc-invalid-moves))
 ;; Output
 ;; &gt; 10</code></pre>
-<h3 id="aspiration-windows">Aspiration Windows</h3>
-<p>&quot;Aspiration Windows&quot; is algorithm to optimize window size at the root node.<br />At one repeat on Iterative Deepening, at the root node, first, Alpha is set to the previous score minus Delta and Beta is set to the previous score plus Delta.<br />If Fail-High has been occurred, Delta doubles and Beta is increased to Beta plus Delta and searches again.<br />At the first candidate move, if Fail-Low has been occurred, Delta doubles and Alpha is decreased to Alpha minus Delta and searches again.</p>
+<h3 id="customizing-search-algorithm---aspiration-windows">Customizing Search Algorithm - Aspiration Windows</h3>
 <ul>
 <li><code>@enable-aspiration-windows [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -855,8 +789,7 @@ Example
 (display (my-engine &#39;@aspiration-windows-delta))
 ;; Output
 ;; &gt; 20</code></pre>
-<h3 id="see">SEE</h3>
-<p>&quot;SEE&quot; is a function for Move Ordering.<br />If there are tactical moves(taking an opponent's piece or promoting Pawn), &quot;SEE&quot; sets the moves to temporary score by simplified searching algorithm.</p>
+<h3 id="customizing-search-algorithm---aspiration-windows-1">Customizing Search Algorithm - Aspiration Windows</h3>
 <ul>
 <li><code>@enable-see [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -876,8 +809,7 @@ Example
 (display (my-engine &#39;@enable-see))
 ;; Output
 ;; &gt; #f</code></pre>
-<h3 id="history-heuristics">History Heuristics</h3>
-<p>&quot;History Heuristics&quot; is a function for Move Ordering.<br />&quot;History Heuristics&quot; sets non tactical moves(not taking an opponent's piece and not promoting Pawn) to temporary score by history values.<br />In searching, if Beta Cut has been occurred at non tactical move, the search function adds a history value of the similar moves to &quot;<code>depth * depth</code>&quot;.<br />When ordering moves, &quot;History Heuristics&quot; sets non tactical candidate moves to score referring to the history value.</p>
+<h3 id="customizing-search-algorithm---history-heuristics">Customizing Search Algorithm - History Heuristics</h3>
 <ul>
 <li><code>@enable-history [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -897,8 +829,7 @@ Example
 (display (my-engine &#39;@enable-history))
 ;; Output
 ;; &gt; #f</code></pre>
-<h3 id="killer-move-heuristics">Killer Move Heuristics</h3>
-<p>&quot;Killer Move Heuristics&quot; is a function for Move Ordering.<br />On non tactical moves(not taking an opponent's piece and not promoting Pawn), &quot;Killer Move Heuristics&quot; sets one of candidate moves to the highest priority referring to Killer Move.<br />In searching, if Beta Cut has been occurred at non tactical move, the search function memorizes the move as Killer Move.</p>
+<h3 id="customizing-search-algorithm---killer-move-heuristics">Customizing Search Algorithm - Killer Move Heuristics</h3>
 <ul>
 <li><code>@enable-killer [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -918,8 +849,7 @@ Example
 (display (my-engine &#39;@enable-killer))
 ;; Output
 ;; &gt; #f</code></pre>
-<h3 id="transposition-table">Transposition Table</h3>
-<p>&quot;Transposition Table&quot; is a function to cache a hashed position and its search result.<br />Sayuri uses the cached information for Move Ordering or optimizing to search same position.</p>
+<h3 id="customizing-search-algorithm---hash-table">Customizing Search Algorithm - Hash Table</h3>
 <ul>
 <li><code>@enable-hash-table [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -939,8 +869,7 @@ Example
 (display (my-engine &#39;@enable-hash-table))
 ;; Output
 ;; &gt; #t</code></pre>
-<h3 id="internal-iterative-deepening">Internal Iterative Deepening</h3>
-<p>&quot;Internal Iterative Deepening&quot; is algorithm for Move Ordering.<br />When ordering candidate moves at PV Node, if the best move doesn't exist in Transposition Table, &quot;Internal Iterative Deepening&quot; searches shallowly and finds good move.</p>
+<h3 id="customizing-search-algorithm---internal-iterative-deepening">Customizing Search Algorithm - Internal Iterative Deepening</h3>
 <ul>
 <li><code>@enable-iid [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -988,13 +917,7 @@ Example
 (display (my-engine &#39;@iid-search-depth))
 ;; Output
 ;; &gt; 10</code></pre>
-<h3 id="null-move-reduction">Null Move Reduction</h3>
-<p>&quot;Null Move Reduction&quot; is one of Forward Pruning technique.<br />&quot;Null Move&quot; means that one side gives another side turn to move without moving piece.<br />On Non PV Node...</p>
-<ol style="list-style-type: decimal">
-<li>Does Null Move and searches shallowly and gets score.</li>
-<li>If the score is greater than or equals to Beta, the remaining depth is reduced a few.</li>
-<li>Does normal search with the new remaining depth.</li>
-</ol>
+<h3 id="customizing-search-algorithm---null-move-reduction">Customizing Search Algorithm - Null Move Reduction</h3>
 <ul>
 <li><code>@enable-nmr [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -1056,8 +979,7 @@ Example
 (display (my-engine &#39;@nmr-reduction))
 ;; Output
 ;; &gt; 10</code></pre>
-<h3 id="probcut">ProbCut</h3>
-<p>&quot;ProbCut&quot; is one of Forward Pruning technique.<br />On Non PV Node, by Zero Window Search with temporary Beta(the current Beta plus margin), &quot;ProbCut&quot; judges whether the current node occurs Beta Cut or not.<br />If it has judged that Beta Cut is occurred, it stops searching the current node and returns Beta.</p>
+<h3 id="customizing-search-algorithm---probcut">Customizing Search Algorithm - ProbCut</h3>
 <ul>
 <li><code>@enable-probcut [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -1117,8 +1039,7 @@ Example
 (display (my-engine &#39;@probcut-search-reduction))
 ;; Output
 ;; &gt; 10</code></pre>
-<h3 id="history-pruning">History Pruning</h3>
-<p>&quot;History Pruning&quot; is one of Forward Pruning technique.<br />&quot;History Pruning&quot; uses &quot;History Heuristics&quot;. So If you want to this technique, <a href="#history-heuristics"><code>@enable-history</code></a> must be enabled. On Non PV Node, when searching each candidate moves, if the history value of the move is lower than the max history times the threshold, the move is searched with reduced depth.</p>
+<h3 id="customizing-search-algorithm---history-pruning">Customizing Search Algorithm - History Pruning</h3>
 <ul>
 <li><code>@enable-history-pruning [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -1148,7 +1069,6 @@ Example
 <li><code>@history-pruning-threshold [&lt;New threshold : Number&gt;]</code>
 <ul>
 <li>If the history value of the current candidate move is lower than the max history value times this parameter, History Pruning temporarily reduces the remaining depth.</li>
-<li>This parameter is between 0.0 and 1.0.</li>
 <li>Return this parameter.</li>
 <li>If you specify <code>&lt;New threshold&gt;</code>, this parameter is updated.</li>
 </ul></li>
@@ -1211,8 +1131,7 @@ Example
 (display (my-engine &#39;@history-pruning-reduction))
 ;; Output
 ;; &gt; 10</code></pre>
-<h3 id="late-move-reduction">Late Move Reduction</h3>
-<p>&quot;Late Move Reduction&quot; is one of Forward Pruning technique.<br />When candidate moves are ordered, &quot;Late Move Reduction&quot; regards latter candidate moves as they returns lower score than Alpha and runs shallow Zero Window Search by Alpha.<br />If Fail-Low has been occurred, the move is ignored. But if Fail-Hight has been occurred, the move is searched normally again.</p>
+<h3 id="customizing-search-algorithm---late-move-reduction">Customizing Search Algorithm - Late Move Reduction</h3>
 <ul>
 <li><code>@enable-lmr [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -1290,8 +1209,7 @@ Example
 (display (my-engine &#39;@lmr-search-reduction))
 ;; Output
 ;; &gt; 5</code></pre>
-<h3 id="futility-pruning">Futility Pruning</h3>
-<p>&quot;Futility Pruning&quot; is one of Forward Pruning technique.<br />On near leaf node, &quot;Futility Pruning&quot; judges whether the candidate move should be evaluated or not.<br />If the material after the move is lower than Alpha minus margin, &quot;Futility Pruning&quot; judges that the move doesn't have to be evaluated and skips it.</p>
+<h3 id="customizing-search-algorithm---futility-pruning">Customizing Search Algorithm - Futility Pruning</h3>
 <ul>
 <li><code>@enable-futility-pruning [&lt;New setting : Boolean&gt;]</code>
 <ul>
@@ -1337,192 +1255,21 @@ Example
 (display (my-engine &#39;@futility-pruning-margin))
 ;; Output
 ;; &gt; 1200</code></pre>
-<h2 id="customization-of-evaluation-function">Customization of Evaluation Function</h2>
-<p>In Sayuri, &quot;Opening&quot; is defined when 32 pieces exist on the chess board. &quot;Ending&quot; is defined when only each king exists on the chess board.<br />A value between &quot;Opening&quot; and &quot;Ending&quot; is generated by Linear Function defined by &quot;Opening&quot; value and &quot;Ending&quot; value.</p>
-<p>When Evaluation Function evaluates Black side, definitions of squares are inverted by reflection symmetry. (A1 -&gt; A8, B2 -&gt; B7 , etc.)</p>
-<h3 id="piece-square-table">Piece Square Table</h3>
-<p>&quot;Piece Square Table&quot; is an array to define a positional value for each piece type.</p>
+<h3 id="customizing-evaluation-function---piece-square-table">Customizing Evaluation Function - Piece Square Table</h3>
+<p>Returns Piece Square Table for each piece type.<br />If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</p>
 <ul>
-<li><code>@pawn-square-table-opening [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns Piece Square Table for Pawn at Opening as List composed of 64 numbers. &quot;()&quot; is a square when evaluating Black.
-<ul>
-<li>From 1st to 8th : From A1(A8) to H1(H8)</li>
-<li>From 9th to 16th : From A2(A7) to H2(H7)</li>
-<li>From 17th to 24th : From A3(A6) to H3(H6)</li>
-<li>From 25th to 32nd : From A4(A5) to H4(H5)</li>
-<li>From 33rd to 40th : From A5(A4) to H5(H4)</li>
-<li>From 41st to 48th : From A6(A3) to H6(H3)</li>
-<li>From 49th to 56th : From A7(A2) to H7(H2)</li>
-<li>From 57th to 64th : From A8(A1) to H8(H1)</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@knight-square-table-opening [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns Piece Square Table for Knight at Opening as List composed of 64 numbers. &quot;()&quot; is a square when evaluating Black.
-<ul>
-<li>From 1st to 8th : From A1(A8) to H1(H8)</li>
-<li>From 9th to 16th : From A2(A7) to H2(H7)</li>
-<li>From 17th to 24th : From A3(A6) to H3(H6)</li>
-<li>From 25th to 32nd : From A4(A5) to H4(H5)</li>
-<li>From 33rd to 40th : From A5(A4) to H5(H4)</li>
-<li>From 41st to 48th : From A6(A3) to H6(H3)</li>
-<li>From 49th to 56th : From A7(A2) to H7(H2)</li>
-<li>From 57th to 64th : From A8(A1) to H8(H1)</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@bishop-square-table-opening [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns Piece Square Table for Bishop at Opening as List composed of 64 numbers. &quot;()&quot; is a square when evaluating Black.
-<ul>
-<li>From 1st to 8th : From A1(A8) to H1(H8)</li>
-<li>From 9th to 16th : From A2(A7) to H2(H7)</li>
-<li>From 17th to 24th : From A3(A6) to H3(H6)</li>
-<li>From 25th to 32nd : From A4(A5) to H4(H5)</li>
-<li>From 33rd to 40th : From A5(A4) to H5(H4)</li>
-<li>From 41st to 48th : From A6(A3) to H6(H3)</li>
-<li>From 49th to 56th : From A7(A2) to H7(H2)</li>
-<li>From 57th to 64th : From A8(A1) to H8(H1)</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@rook-square-table-opening [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns Piece Square Table for Rook at Opening as List composed of 64 numbers. &quot;()&quot; is a square when evaluating Black.
-<ul>
-<li>From 1st to 8th : From A1(A8) to H1(H8)</li>
-<li>From 9th to 16th : From A2(A7) to H2(H7)</li>
-<li>From 17th to 24th : From A3(A6) to H3(H6)</li>
-<li>From 25th to 32nd : From A4(A5) to H4(H5)</li>
-<li>From 33rd to 40th : From A5(A4) to H5(H4)</li>
-<li>From 41st to 48th : From A6(A3) to H6(H3)</li>
-<li>From 49th to 56th : From A7(A2) to H7(H2)</li>
-<li>From 57th to 64th : From A8(A1) to H8(H1)</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@queen-square-table-opening [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns Piece Square Table for Queen at Opening as List composed of 64 numbers. &quot;()&quot; is a square when evaluating Black.
-<ul>
-<li>From 1st to 8th : From A1(A8) to H1(H8)</li>
-<li>From 9th to 16th : From A2(A7) to H2(H7)</li>
-<li>From 17th to 24th : From A3(A6) to H3(H6)</li>
-<li>From 25th to 32nd : From A4(A5) to H4(H5)</li>
-<li>From 33rd to 40th : From A5(A4) to H5(H4)</li>
-<li>From 41st to 48th : From A6(A3) to H6(H3)</li>
-<li>From 49th to 56th : From A7(A2) to H7(H2)</li>
-<li>From 57th to 64th : From A8(A1) to H8(H1)</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@king-square-table-opening [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns Piece Square Table for King at Opening as List composed of 64 numbers. &quot;()&quot; is a square when evaluating Black.
-<ul>
-<li>From 1st to 8th : From A1(A8) to H1(H8)</li>
-<li>From 9th to 16th : From A2(A7) to H2(H7)</li>
-<li>From 17th to 24th : From A3(A6) to H3(H6)</li>
-<li>From 25th to 32nd : From A4(A5) to H4(H5)</li>
-<li>From 33rd to 40th : From A5(A4) to H5(H4)</li>
-<li>From 41st to 48th : From A6(A3) to H6(H3)</li>
-<li>From 49th to 56th : From A7(A2) to H7(H2)</li>
-<li>From 57th to 64th : From A8(A1) to H8(H1)</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@pawn-square-table-ending [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns Piece Square Table for Pawn at Ending as List composed of 64 numbers. &quot;()&quot; is a square when evaluating Black.
-<ul>
-<li>From 1st to 8th : From A1(A8) to H1(H8)</li>
-<li>From 9th to 16th : From A2(A7) to H2(H7)</li>
-<li>From 17th to 24th : From A3(A6) to H3(H6)</li>
-<li>From 25th to 32nd : From A4(A5) to H4(H5)</li>
-<li>From 33rd to 40th : From A5(A4) to H5(H4)</li>
-<li>From 41st to 48th : From A6(A3) to H6(H3)</li>
-<li>From 49th to 56th : From A7(A2) to H7(H2)</li>
-<li>From 57th to 64th : From A8(A1) to H8(H1)</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@knight-square-table-ending [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns Piece Square Table for Knight at Ending as List composed of 64 numbers. &quot;()&quot; is a square when evaluating Black.
-<ul>
-<li>From 1st to 8th : From A1(A8) to H1(H8)</li>
-<li>From 9th to 16th : From A2(A7) to H2(H7)</li>
-<li>From 17th to 24th : From A3(A6) to H3(H6)</li>
-<li>From 25th to 32nd : From A4(A5) to H4(H5)</li>
-<li>From 33rd to 40th : From A5(A4) to H5(H4)</li>
-<li>From 41st to 48th : From A6(A3) to H6(H3)</li>
-<li>From 49th to 56th : From A7(A2) to H7(H2)</li>
-<li>From 57th to 64th : From A8(A1) to H8(H1)</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@bishop-square-table-ending [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns Piece Square Table for Bishop at Ending as List composed of 64 numbers. &quot;()&quot; is a square when evaluating Black.
-<ul>
-<li>From 1st to 8th : From A1(A8) to H1(H8)</li>
-<li>From 9th to 16th : From A2(A7) to H2(H7)</li>
-<li>From 17th to 24th : From A3(A6) to H3(H6)</li>
-<li>From 25th to 32nd : From A4(A5) to H4(H5)</li>
-<li>From 33rd to 40th : From A5(A4) to H5(H4)</li>
-<li>From 41st to 48th : From A6(A3) to H6(H3)</li>
-<li>From 49th to 56th : From A7(A2) to H7(H2)</li>
-<li>From 57th to 64th : From A8(A1) to H8(H1)</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@rook-square-table-ending [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns Piece Square Table for Rook at Ending as List composed of 64 numbers. &quot;()&quot; is a square when evaluating Black.
-<ul>
-<li>From 1st to 8th : From A1(A8) to H1(H8)</li>
-<li>From 9th to 16th : From A2(A7) to H2(H7)</li>
-<li>From 17th to 24th : From A3(A6) to H3(H6)</li>
-<li>From 25th to 32nd : From A4(A5) to H4(H5)</li>
-<li>From 33rd to 40th : From A5(A4) to H5(H4)</li>
-<li>From 41st to 48th : From A6(A3) to H6(H3)</li>
-<li>From 49th to 56th : From A7(A2) to H7(H2)</li>
-<li>From 57th to 64th : From A8(A1) to H8(H1)</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@queen-square-table-ending [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns Piece Square Table for Queen at Ending as List composed of 64 numbers. &quot;()&quot; is a square when evaluating Black.
-<ul>
-<li>From 1st to 8th : From A1(A8) to H1(H8)</li>
-<li>From 9th to 16th : From A2(A7) to H2(H7)</li>
-<li>From 17th to 24th : From A3(A6) to H3(H6)</li>
-<li>From 25th to 32nd : From A4(A5) to H4(H5)</li>
-<li>From 33rd to 40th : From A5(A4) to H5(H4)</li>
-<li>From 41st to 48th : From A6(A3) to H6(H3)</li>
-<li>From 49th to 56th : From A7(A2) to H7(H2)</li>
-<li>From 57th to 64th : From A8(A1) to H8(H1)</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@king-square-table-ending [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns Piece Square Table for King at Ending as List composed of 64 numbers. &quot;()&quot; is a square when evaluating Black.
-<ul>
-<li>From 1st to 8th : From A1(A8) to H1(H8)</li>
-<li>From 9th to 16th : From A2(A7) to H2(H7)</li>
-<li>From 17th to 24th : From A3(A6) to H3(H6)</li>
-<li>From 25th to 32nd : From A4(A5) to H4(H5)</li>
-<li>From 33rd to 40th : From A5(A4) to H5(H4)</li>
-<li>From 41st to 48th : From A6(A3) to H6(H3)</li>
-<li>From 49th to 56th : From A7(A2) to H7(H2)</li>
-<li>From 57th to 64th : From A8(A1) to H8(H1)</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
+<li><code>@pawn-square-table-opening [&lt;New table : List&gt;]</code></li>
+<li><code>@knight-square-table-opening [&lt;New table : List&gt;]</code></li>
+<li><code>@bishop-square-table-opening [&lt;New table : List&gt;]</code></li>
+<li><code>@rook-square-table-opening [&lt;New table : List&gt;]</code></li>
+<li><code>@queen-square-table-opening [&lt;New table : List&gt;]</code></li>
+<li><code>@king-square-table-opening [&lt;New table : List&gt;]</code></li>
+<li><code>@pawn-square-table-ending [&lt;New table : List&gt;]</code></li>
+<li><code>@knight-square-table-ending [&lt;New table : List&gt;]</code></li>
+<li><code>@bishop-square-table-ending [&lt;New table : List&gt;]</code></li>
+<li><code>@rook-square-table-ending [&lt;New table : List&gt;]</code></li>
+<li><code>@queen-square-table-ending [&lt;New table : List&gt;]</code></li>
+<li><code>@king-square-table-ending [&lt;New table : List&gt;]</code></li>
 </ul>
 <h6>
 Example
@@ -1561,93 +1308,16 @@ Example
 ;; &gt; 1111111 2222222 3333333 4444444 5555555 6666666 7777777 8888888
 ;; &gt; 11111111 22222222 33333333 44444444 55555555 66666666 77777777
 ;; &gt; 88888888)</code></pre>
-<h3 id="attack-score">Attack Score</h3>
-<p>&quot;Attack Score&quot; is score when a piece attacks opponent's piece.<br />It is calculated by Weight times Value.</p>
+<h3 id="customizing-evaluation-function---attack">Customizing Evaluation Function - Attack</h3>
+<p>Returns List composed of 7 values of attacking score.<br />1st: Not used. This is always 0. (for EMPTY)<br />2nd: Attacking Pawn.<br />3rd: Attacking Knight.<br />4th: Attacking Bishop.<br />5th: Attacking Rook.<br />6th: Attacking Queen.<br />7th: Attacking King.</p>
+<p>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</p>
 <ul>
-<li><code>@pawn-attack-table [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns a value table of Attacking Score for Pawn as List composed of 7 values.
-<ul>
-<li>1st : Not used. This is always '0'. (For EMPTY)</li>
-<li>2nd : Value of attacking Pawn.</li>
-<li>3rd : Value of attacking Knight.</li>
-<li>4th : Value of attacking Bishop.</li>
-<li>5th : Value of attacking Rook.</li>
-<li>6th : Value of attacking Queen.</li>
-<li>7th : Value of attacking King.</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@knight-attack-table [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns a value table of Attacking Score for Knight as List composed of 7 values.
-<ul>
-<li>1st : Not used. This is always '0'. (For EMPTY)</li>
-<li>2nd : Value of attacking Pawn.</li>
-<li>3rd : Value of attacking Knight.</li>
-<li>4th : Value of attacking Bishop.</li>
-<li>5th : Value of attacking Rook.</li>
-<li>6th : Value of attacking Queen.</li>
-<li>7th : Value of attacking King.</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@bishop-attack-table [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns a value table of Attacking Score for Bishop as List composed of 7 values.
-<ul>
-<li>1st : Not used. This is always '0'. (For EMPTY)</li>
-<li>2nd : Value of attacking Pawn.</li>
-<li>3rd : Value of attacking Knight.</li>
-<li>4th : Value of attacking Bishop.</li>
-<li>5th : Value of attacking Rook.</li>
-<li>6th : Value of attacking Queen.</li>
-<li>7th : Value of attacking King.</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@rook-attack-table [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns a value table of Attacking Score for Rook as List composed of 7 values.
-<ul>
-<li>1st : Not used. This is always '0'. (For EMPTY)</li>
-<li>2nd : Value of attacking Pawn.</li>
-<li>3rd : Value of attacking Knight.</li>
-<li>4th : Value of attacking Bishop.</li>
-<li>5th : Value of attacking Rook.</li>
-<li>6th : Value of attacking Queen.</li>
-<li>7th : Value of attacking King.</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@queen-attack-table [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns a value table of Attacking Score for Queen as List composed of 7 values.
-<ul>
-<li>1st : Not used. This is always '0'. (For EMPTY)</li>
-<li>2nd : Value of attacking Pawn.</li>
-<li>3rd : Value of attacking Knight.</li>
-<li>4th : Value of attacking Bishop.</li>
-<li>5th : Value of attacking Rook.</li>
-<li>6th : Value of attacking Queen.</li>
-<li>7th : Value of attacking King.</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@king-attack-table [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns a value table of Attacking Score for King as List composed of 7 values.
-<ul>
-<li>1st : Not used. This is always '0'. (For EMPTY)</li>
-<li>2nd : Value of attacking Pawn.</li>
-<li>3rd : Value of attacking Knight.</li>
-<li>4th : Value of attacking Bishop.</li>
-<li>5th : Value of attacking Rook.</li>
-<li>6th : Value of attacking Queen.</li>
-<li>7th : Value of attacking King.</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
+<li><code>@pawn-attack-table [&lt;New table : List&gt;]</code></li>
+<li><code>@knight-attack-table [&lt;New table : List&gt;]</code></li>
+<li><code>@bishop-attack-table [&lt;New table : List&gt;]</code></li>
+<li><code>@rook-attack-table [&lt;New table : List&gt;]</code></li>
+<li><code>@queen-attack-table [&lt;New table : List&gt;]</code></li>
+<li><code>@king-attack-table [&lt;New table : List&gt;]</code></li>
 </ul>
 <h6>
 Example
@@ -1661,161 +1331,25 @@ Example
 (display (my-engine &#39;@pawn-attack-table))
 ;; Output
 ;; &gt; (0 2 3 4 5 6 7)</code></pre>
+<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
 <ul>
-<li><code>@weight-pawn-attack [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Attacking Score for Pawn as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-knight-attack [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Attacking Score for Knight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-bishop-attack [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Attacking Score for Bishop as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-rook-attack [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Attacking Score for Rook as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-queen-attack [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Attacking Score for Queen as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-king-attack [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Attacking Score for King as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
+<li><code>@weight-pawn-attack [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-knight-attack [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-bishop-attack [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-rook-attack [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-queen-attack [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-king-attack [&lt;New weight : List&gt;]</code></li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define my-engine (gen-engine))
-
-(display (my-engine &#39;@weight-pawn-attack (list 111 222)))
-;; Output
-;; &gt; (1 0.3)
-
-(display (my-engine &#39;@weight-pawn-attack))
-;; Output
-;; &gt; (111 222)</code></pre>
-<h3 id="defense-score">Defense Score</h3>
-<p>&quot;Defense Score&quot; is score when a piece protects(attacks) friend piece.<br />It is calculated by Weight times Value.</p>
+<h3 id="customizing-evaluation-function---defense">Customizing Evaluation Function - Defense</h3>
+<p>Returns List composed of 7 values of defense score.<br />1st: Not used. This is always 0. (for EMPTY)<br />2nd: Protecting Pawn.<br />3rd: Protecting Knight.<br />4th: Protecting Bishop.<br />5th: Protecting Rook.<br />6th: Protecting Queen.<br />7th: Protecting King.</p>
+<p>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</p>
 <ul>
-<li><code>@pawn-defense-table [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns a value table of Defense Score for Pawn as List composed of 7 values.
-<ul>
-<li>1st : Not used. This is always '0'. (For EMPTY)</li>
-<li>2nd : Value of defense Pawn.</li>
-<li>3rd : Value of defense Knight.</li>
-<li>4th : Value of defense Bishop.</li>
-<li>5th : Value of defense Rook.</li>
-<li>6th : Value of defense Queen.</li>
-<li>7th : Value of defense King.</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@knight-defense-table [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns a value table of Defense Score for Knight as List composed of 7 values.
-<ul>
-<li>1st : Not used. This is always '0'. (For EMPTY)</li>
-<li>2nd : Value of defense Pawn.</li>
-<li>3rd : Value of defense Knight.</li>
-<li>4th : Value of defense Bishop.</li>
-<li>5th : Value of defense Rook.</li>
-<li>6th : Value of defense Queen.</li>
-<li>7th : Value of defense King.</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@bishop-defense-table [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns a value table of Defense Score for Bishop as List composed of 7 values.
-<ul>
-<li>1st : Not used. This is always '0'. (For EMPTY)</li>
-<li>2nd : Value of defense Pawn.</li>
-<li>3rd : Value of defense Knight.</li>
-<li>4th : Value of defense Bishop.</li>
-<li>5th : Value of defense Rook.</li>
-<li>6th : Value of defense Queen.</li>
-<li>7th : Value of defense King.</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@rook-defense-table [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns a value table of Defense Score for Rook as List composed of 7 values.
-<ul>
-<li>1st : Not used. This is always '0'. (For EMPTY)</li>
-<li>2nd : Value of defense Pawn.</li>
-<li>3rd : Value of defense Knight.</li>
-<li>4th : Value of defense Bishop.</li>
-<li>5th : Value of defense Rook.</li>
-<li>6th : Value of defense Queen.</li>
-<li>7th : Value of defense King.</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@queen-defense-table [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns a value table of Defense Score for Queen as List composed of 7 values.
-<ul>
-<li>1st : Not used. This is always '0'. (For EMPTY)</li>
-<li>2nd : Value of defense Pawn.</li>
-<li>3rd : Value of defense Knight.</li>
-<li>4th : Value of defense Bishop.</li>
-<li>5th : Value of defense Rook.</li>
-<li>6th : Value of defense Queen.</li>
-<li>7th : Value of defense King.</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@king-defense-table [&lt;New table : List&gt;]</code>
-<ul>
-<li>Returns a value table of Defense Score for King as List composed of 7 values.
-<ul>
-<li>1st : Not used. This is always '0'. (For EMPTY)</li>
-<li>2nd : Value of defense Pawn.</li>
-<li>3rd : Value of defense Knight.</li>
-<li>4th : Value of defense Bishop.</li>
-<li>5th : Value of defense Rook.</li>
-<li>6th : Value of defense Queen.</li>
-<li>7th : Value of defense King.</li>
-</ul></li>
-<li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
-</ul></li>
+<li><code>@pawn-defense-table [&lt;New table : List&gt;]</code></li>
+<li><code>@knight-defense-table [&lt;New table : List&gt;]</code></li>
+<li><code>@bishop-defense-table [&lt;New table : List&gt;]</code></li>
+<li><code>@rook-defense-table [&lt;New table : List&gt;]</code></li>
+<li><code>@queen-defense-table [&lt;New table : List&gt;]</code></li>
+<li><code>@king-defense-table [&lt;New table : List&gt;]</code></li>
 </ul>
 <h6>
 Example
@@ -1829,144 +1363,23 @@ Example
 (display (my-engine &#39;@pawn-defense-table))
 ;; Output
 ;; &gt; (0 2 3 4 5 6 7)</code></pre>
+<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
 <ul>
-<li><code>@weight-pawn-defense [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Defense Score for Pawn as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-knight-defense [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Defense Score for Knight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-bishop-defense [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Defense Score for Bishop as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-rook-defense [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Defense Score for Rook as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-queen-defense [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Defense Score for Queen as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-king-defense [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Defense Score for King as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
+<li><code>@weight-pawn-defense [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-knight-defense [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-bishop-defense [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-rook-defense [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-queen-defense [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-king-defense [&lt;New weight : List&gt;]</code></li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define my-engine (gen-engine))
-
-(display (my-engine &#39;@weight-pawn-defense (list 111 222)))
-;; Output
-;; &gt; (1 0.5)
-
-(display (my-engine &#39;@weight-pawn-defense))
-;; Output
-;; &gt; (111 222)</code></pre>
-<h3 id="pin-score">Pin Score</h3>
-<p>&quot;Pin Score&quot; is score when a piece pins a target piece onto a pin-board piece.<br />Piece types which can pin are Bishop, Rook and Queen.</p>
+<h3 id="customizing-evaluation-function---pin">Customizing Evaluation Function - Pin</h3>
+<p>Returns List of 7 Lists of 7 values.</p>
+<p>1st list : Futile list. (For EMPTY)<br />2nd list : A target piece is Pawn.<br />3rd list : A target piece is Knight.<br />4th list : A target piece is Bishop.<br />5th list : A target piece is Rook.<br />6th list : A target piece is Queen.<br />7th list : A target piece is King.</p>
+<p>1st value of each list : Futile value. 2nd value of each list : A piece over the target is Pawn. 3rd value of each list : A piece over the target is Knight. 4th value of each list : A piece over the target is Bishop. 5th value of each list : A piece over the target is Rook. 6th value of each list : A piece over the target is Queen. 7th value of each list : A piece over the target is King.</p>
 <ul>
-<li><code>@bishop-pin-table [&lt;New value table : List&gt;]</code>
-<ul>
-<li>Return a value table composed of 7 lists. Each list is composed of 7 values.
-<ul>
-<li>1st : Futile list. (For EMPTY)</li>
-<li>2nd : a value list When a target piece is Pawn.
-<ul>
-<li>1st : Futile value. (For EMPTY)</li>
-<li>2nd : a value when pin-board piece is Pawn.</li>
-<li>3rd : a value when pin-board piece is Knight.</li>
-<li>4rd : a value when pin-board piece is Bishop.</li>
-<li>5rd : a value when pin-board piece is Rook.</li>
-<li>6rd : a value when pin-board piece is Queen.</li>
-<li>7rd : a value when pin-board piece is King.</li>
-</ul></li>
-<li>3rd : a value list When a target piece is Knight.
-<ul>
-<li>1st : Futile value. (For EMPTY)</li>
-<li>2nd : a value when pin-board piece is Pawn.</li>
-<li>3rd : a value when pin-board piece is Knight.</li>
-<li>4rd : a value when pin-board piece is Bishop.</li>
-<li>5rd : a value when pin-board piece is Rook.</li>
-<li>6rd : a value when pin-board piece is Queen.</li>
-<li>7rd : a value when pin-board piece is King.</li>
-</ul></li>
-<li>4th : a value list When a target piece is Bishop.
-<ul>
-<li>1st : Futile value. (For EMPTY)</li>
-<li>2nd : a value when pin-board piece is Pawn.</li>
-<li>3rd : a value when pin-board piece is Knight.</li>
-<li>4rd : a value when pin-board piece is Bishop.</li>
-<li>5rd : a value when pin-board piece is Rook.</li>
-<li>6rd : a value when pin-board piece is Queen.</li>
-<li>7rd : a value when pin-board piece is King.</li>
-</ul></li>
-<li>5th : a value list When a target piece is Rook.
-<ul>
-<li>1st : Futile value. (For EMPTY)</li>
-<li>2nd : a value when pin-board piece is Pawn.</li>
-<li>3rd : a value when pin-board piece is Knight.</li>
-<li>4rd : a value when pin-board piece is Bishop.</li>
-<li>5rd : a value when pin-board piece is Rook.</li>
-<li>6rd : a value when pin-board piece is Queen.</li>
-<li>7rd : a value when pin-board piece is King.</li>
-</ul></li>
-<li>6th : a value list When a target piece is Queen.
-<ul>
-<li>1st : Futile value. (For EMPTY)</li>
-<li>2nd : a value when pin-board piece is Pawn.</li>
-<li>3rd : a value when pin-board piece is Knight.</li>
-<li>4rd : a value when pin-board piece is Bishop.</li>
-<li>5rd : a value when pin-board piece is Rook.</li>
-<li>6rd : a value when pin-board piece is Queen.</li>
-<li>7rd : a value when pin-board piece is King.</li>
-</ul></li>
-<li>7th : a value list When a target piece is King.
-<ul>
-<li>1st : Futile value. (For EMPTY)</li>
-<li>2nd : a value when pin-board piece is Pawn.</li>
-<li>3rd : a value when pin-board piece is Knight.</li>
-<li>4rd : a value when pin-board piece is Bishop.</li>
-<li>5rd : a value when pin-board piece is Rook.</li>
-<li>6rd : a value when pin-board piece is Queen.</li>
-<li>7rd : a value when pin-board piece is King.</li>
-</ul></li>
-</ul></li>
-</ul></li>
+<li><code>@bishop-pin-table [&lt;New value table : List&gt;]</code></li>
+<li><code>@rook-pin-table [&lt;New value table : List&gt;]</code></li>
+<li><code>@queen-pin-table [&lt;New value table : List&gt;]</code></li>
 </ul>
 <h6>
 Example
@@ -1999,63 +1412,17 @@ Example
 ;; &gt; (0 30 31 32 33 34 35)
 ;; &gt; (0 37 38 39 40 41 42)
 ;; &gt; (0 44 45 46 47 48 49))</code></pre>
+<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
 <ul>
-<li><code>@weight-bishop-pin [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Pin Score for King as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-rook-pin [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Pin Score for Rook as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-queen-pin [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Pin Score for Queen as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
+<li><code>@weight-bishop-pin [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-rook-pin [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-queen-pin [&lt;New weight : List&gt;]</code></li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define my-engine (gen-engine))
-
-(display (my-engine &#39;@weight-bishop-pin (list 111 222)))
-;; Output
-;; &gt; (1 1)
-
-(display (my-engine &#39;@weight-bishop-pin))
-;; Output
-;; &gt; (111 222)</code></pre>
-<h3 id="pawn-shield-score">Pawn Shield Score</h3>
-<p>&quot;Pawn Shield Score&quot; is score for &quot;Pawn Shield&quot;.<br />&quot;Pawn Shield&quot; is Pawns as a shield of King.<br />In Sayuri, when King is on A1(A8) or A2(A7) or B1(B8) or B2(B7) or C1(C8) or C2(C7), &quot;Pawn Shield&quot; are pawns on A Fyle or B Fyle or C Fyle. When King is on F1(F8) or F2(F7) or G1(G8) or G2(G7) or H1(H8) or H2(H7), &quot;Pawn Shield&quot; are pawns on F Fyle or G Fyle or H Fyle.</p>
+<h3 id="customizing-evaluation-function---pawn-shield">Customizing Evaluation Function - Pawn Shield</h3>
 <ul>
 <li><code>@pawn-shield-table [&lt;New table : List&gt;]</code>
 <ul>
-<li>Returns Piece Square Table for Pawn Shield as List composed of 64 numbers. &quot;()&quot; is a square when evaluating Black.
-<ul>
-<li>From 1st to 8th : From A1(A8) to H1(H8)</li>
-<li>From 9th to 16th : From A2(A7) to H2(H7)</li>
-<li>From 17th to 24th : From A3(A6) to H3(H6)</li>
-<li>From 25th to 32nd : From A4(A5) to H4(H5)</li>
-<li>From 33rd to 40th : From A5(A4) to H5(H4)</li>
-<li>From 41st to 48th : From A6(A3) to H6(H3)</li>
-<li>From 49th to 56th : From A7(A2) to H7(H2)</li>
-<li>From 57th to 64th : From A8(A1) to H8(H1)</li>
-</ul></li>
+<li>Returns Piece Square Table for Pawn Shield as List composed of 64 numbers.</li>
 <li>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</li>
 </ul></li>
 </ul>
@@ -2095,616 +1462,81 @@ Example
 ;; &gt; 41 42 43 44 45 46 47 48
 ;; &gt; 49 50 51 52 53 54 55 56
 ;; &gt; 57 58 59 60 61 62 63 64)</code></pre>
+<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
 <ul>
-<li><code>@weight-pawn-shield [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Return Weight for Pawn Shield as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
+<li><code>@weight-pawn-shield [&lt;New weight : List&gt;]</code></li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define my-engine (gen-engine))
-
-(display (my-engine &#39;@weight-pawn-shield (list 111 222)))
-;; Output
-;; &gt; (1 0)
-
-(display (my-engine &#39;@weight-pawn-shield))
-;; Output
-;; &gt; (111 222)</code></pre>
-<h3 id="other-weights">Other Weights</h3>
-<ul>
-<li><code>@weight-pawn-mobility [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Mobility of Pawn.
-<ul>
-<li>Score is Weight times number of squares where it can go to.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-knight-mobility [&lt;New weight : List&gt;]</code> - Score is Weight times number of squares where it can go to.
-<ul>
-<li>Weight for Mobility of Knight.</li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-bishop-mobility [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Mobility of Bishop.
-<ul>
-<li>Score is Weight times number of squares where it can go to.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-rook-mobility [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Mobility of Rook.
-<ul>
-<li>Score is Weight times number of squares where it can go to.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-queen-mobility [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Mobility of Queen.
-<ul>
-<li>Score is Weight times number of squares where it can go to.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-king-mobility [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Mobility of King.
-<ul>
-<li>Score is Weight times number of squares where it can go to.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-pawn-center-control [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Controlling Center by Pawn.
-<ul>
-<li>Score is Weight times number of Center where it attacks.</li>
-<li>&quot;Center&quot; is squares of C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-knight-center-control [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Controlling Center by Knight.
-<ul>
-<li>Score is Weight times number of Center where it attacks.</li>
-<li>&quot;Center&quot; is squares of C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-bishop-center-control [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Controlling Center by Bishop.
-<ul>
-<li>Score is Weight times number of Center where it attacks.</li>
-<li>&quot;Center&quot; is squares of C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-rook-center-control [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Controlling Center by Rook.
-<ul>
-<li>Score is Weight times number of Center where it attacks.</li>
-<li>&quot;Center&quot; is squares of C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-queen-center-control [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Controlling Center by Queen.
-<ul>
-<li>Score is Weight times number of Center where it attacks.</li>
-<li>&quot;Center&quot; is squares of C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-king-center-control [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Controlling Center by King.
-<ul>
-<li>Score is Weight times number of Center where it attacks.</li>
-<li>&quot;Center&quot; is squares of C3 C4 C5 C6 D3 D4 D5 D6 E3 E4 E5 E6 F3 F4 F5 F6.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-pawn-sweet-center-control [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Controlling Sweet Center by Pawn.
-<ul>
-<li>Score is Weight times number of Sweet Center where it attacks.</li>
-<li>&quot;Sweet Center&quot; is squares of D4 D5 E4 E5.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-knight-sweet-center-control [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Controlling Sweet Center by Knight.
-<ul>
-<li>Score is Weight times number of Sweet Center where it attacks.</li>
-<li>&quot;Sweet Center&quot; is squares of D4 D5 E4 E5.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-bishop-sweet-center-control [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Controlling Sweet Center by Bishop.
-<ul>
-<li>Score is Weight times number of Sweet Center where it attacks.</li>
-<li>&quot;Sweet Center&quot; is squares of D4 D5 E4 E5.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-rook-sweet-center-control [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Controlling Sweet Center by Rook.
-<ul>
-<li>Score is Weight times number of Sweet Center where it attacks.</li>
-<li>&quot;Sweet Center&quot; is squares of D4 D5 E4 E5.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-queen-sweet-center-control [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Controlling Sweet Center by Queen.
-<ul>
-<li>Score is Weight times number of Sweet Center where it attacks.</li>
-<li>&quot;Sweet Center&quot; is squares of D4 D5 E4 E5.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-king-sweet-center-control [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Controlling Sweet Center by King.
-<ul>
-<li>Score is Weight times number of Sweet Center where it attacks.</li>
-<li>&quot;Sweet Center&quot; is squares of D4 D5 E4 E5.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-pawn-development [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Development of Pawn.
-<ul>
-<li>Score is Weight times number of Pawns not on starting position.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-knight-development [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Development of Knight.
-<ul>
-<li>Score is Weight times number of Knights not on starting position.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-bishop-development [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Development of Bishop.
-<ul>
-<li>Score is Weight times number of Bishops not on starting position.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-rook-development [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Development of Rook.
-<ul>
-<li>Score is Weight times number of Rooks not on starting position.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-queen-development [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Development of Queen.
-<ul>
-<li>Score is Weight times number of Queens not on starting position.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-king-development [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Development of King.
-<ul>
-<li>Score is Weight times number of King not on starting position.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-pawn-attack-around-king [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Pawn attacking squares around opponent's King.
-<ul>
-<li>Score is Weight times number of attacked squares around opponent's King.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-knight-attack-around-king [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Knight attacking squares around opponent's King.
-<ul>
-<li>Score is Weight times number of attacked squares around opponent's King.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-bishop-attack-around-king [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Bishop attacking squares around opponent's King.
-<ul>
-<li>Score is Weight times number of attacked squares around opponent's King.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-rook-attack-around-king [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Rook attacking squares around opponent's King.
-<ul>
-<li>Score is Weight times number of attacked squares around opponent's King.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-queen-attack-around-king [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Queen attacking squares around opponent's King.
-<ul>
-<li>Score is Weight times number of attacked squares around opponent's King.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-king-attack-around-king [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for King attacking squares around opponent's King.
-<ul>
-<li>Score is Weight times number of attacked squares around opponent's King.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-pass-pawn [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Pass Pawn.
-<ul>
-<li>Score is Weight times number of Pass Pawns.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-protected-pass-pawn [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Pass Pawn protected by friend Pawns.
-<ul>
-<li>Score is Weight times number of Pass Pawns protected by friend Pawns.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-double-pawn [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Double Pawn.
-<ul>
-<li>Score is Weight times number of Double Pawn.
-<ul>
-<li>If 2 pawns are on same fyle, the number of Double Pawn is '2'.</li>
-</ul></li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-iso-pawn [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Isolated Pawn.
-<ul>
-<li>Score is Weight times number of Isolated Pawn.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-bishop-pair [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Bishop Pair.
-<ul>
-<li>Score is Weight if 2 or more Bishops exists on different colored square.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-bad-bishop [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Bad Bishop.
-<ul>
-<li>Score is Weight times number of Pawns on the same colored square where Bishop is placed on.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-rook-pair [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Rook Pair.
-<ul>
-<li>Score is Weight if 2 or more Rooks exists on the chess board.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-rook-semiopen-fyle [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Rook on semi-open fyle.
-<ul>
-<li>Score is Weight times number of Rooks on semi-open fyle.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-rook-open-fyle [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Rook on open fyle.
-<ul>
-<li>Score is Weight times number of Rooks on open fyle.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-early-queen-starting [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Queen that has moved too early in the game.
-<ul>
-<li>Score is Weight times number of Minor Pieces on its starting position.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-weak-square [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Weak Square.
-<ul>
-<li>When King is on A1(A8) or A2(A7) or B1(B8) or B2(B7) or C1(C8) or C2(C7), &quot;Weak Square&quot; is A2(A7) or A3(A6) or B2(B7) or B3(B6) or C2(C7) or C3(C6) squares where Pawn is NOT placed on.<br /> When King is on F1(F8) or F2(F7) or G1(G8) or G2(G7) or H1(H8) or H2(H7), &quot;Weak Square&quot; is F2(F7) or F3(F6) or G2(G7) or G3(G6) or H2(H7) or H3(H6) squares where Pawn is NOT placed on.</li>
-<li>Score is Weight times number of Weak Square.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-castling [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for Castling.
-<ul>
-<li>Score is Weight if King has castled.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
-<li><code>@weight-abandoned-castling [&lt;New weight : List&gt;]</code>
-<ul>
-<li>Weight for King abandoned all Castling rights.
-<ul>
-<li>Score is Weight if King has abandoned all castling rights.</li>
-</ul></li>
-<li>Return Weight as List of 2 elements.
-<ul>
-<li>1st : Weight on Opening.</li>
-<li>2nd : Weight on Ending.</li>
-</ul></li>
-<li>If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</li>
-</ul></li>
+<h3 id="customizing-evaluation-function---mobility">Customizing Evaluation Function - Mobility</h3>
+<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
+<ul>
+<li><code>@weight-pawn-mobility [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-knight-mobility [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-bishop-mobility [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-rook-mobility [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-queen-mobility [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-king-mobility [&lt;New weight : List&gt;]</code></li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define my-engine (gen-engine))
-
-(display (my-engine &#39;@weight-pawn-mobility (list 111 222)))
-;; Output
-;; &gt; (0 0)
-
-(display (my-engine &#39;@weight-pawn-mobility))
-;; Output
-;; &gt; (111 222)</code></pre>
+<h3 id="customizing-evaluation-function---controlling-center">Customizing Evaluation Function - Controlling Center</h3>
+<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
+<ul>
+<li><code>@weight-pawn-center-control [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-knight-center-control [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-bishop-center-control [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-rook-center-control [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-queen-center-control [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-king-center-control [&lt;New weight : List&gt;]</code></li>
+</ul>
+<h3 id="customizing-evaluation-function---controlling-sweet-center">Customizing Evaluation Function - Controlling Sweet Center</h3>
+<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
+<ul>
+<li><code>@weight-pawn-sweet-center-control [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-knight-sweet-center-control [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-bishop-sweet-center-control [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-rook-sweet-center-control [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-queen-sweet-center-control [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-king-sweet-center-control [&lt;New weight : List&gt;]</code></li>
+</ul>
+<h3 id="customizing-evaluation-function---development">Customizing Evaluation Function - Development</h3>
+<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
+<ul>
+<li><code>@weight-pawn-development [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-knight-development [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-bishop-development [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-rook-development [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-queen-development [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-king-development [&lt;New weight : List&gt;]</code></li>
+</ul>
+<h3 id="customizing-evaluation-function---attack-around-enemy-king">Customizing Evaluation Function - Attack around Enemy King</h3>
+<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
+<ul>
+<li><code>@weight-pawn-attack-around-king [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-knight-attack-around-king [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-bishop-attack-around-king [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-rook-attack-around-king [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-queen-attack-around-king [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-king-attack-around-king [&lt;New weight : List&gt;]</code></li>
+</ul>
+<h3 id="customizing-evaluation-function---pawn-structure">Customizing Evaluation Function - Pawn Structure</h3>
+<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
+<ul>
+<li><code>@weight-pass-pawn [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-protected-pass-pawn [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-double-pawn [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-iso-pawn [&lt;New weight : List&gt;]</code></li>
+</ul>
+<h3 id="customizing-evaluation-function---piece">Customizing Evaluation Function - Piece</h3>
+<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
+<ul>
+<li><code>@weight-bishop-pair [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-bad-bishop [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-rook-pair [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-rook-semiopen-fyle [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-rook-open-fyle [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-early-queen-starting [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-weak-square [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-castling [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-abandoned-castling [&lt;New weight : List&gt;]</code></li>
+</ul>
 
 </section>
 </div>
