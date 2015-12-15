@@ -470,43 +470,56 @@ namespace Sayuri {
     if (message_symbol == "@get-white-pawn-position") {
       return GetPosition<WHITE, PAWN>();
 
-    } else if (message_symbol == "@get-white-knight-position") {
+    }
+    if (message_symbol == "@get-white-knight-position") {
       return GetPosition<WHITE, KNIGHT>();
 
-    } else if (message_symbol == "@get-white-bishop-position") {
+    }
+    if (message_symbol == "@get-white-bishop-position") {
       return GetPosition<WHITE, BISHOP>();
 
-    } else if (message_symbol == "@get-white-rook-position") {
+    }
+    if (message_symbol == "@get-white-rook-position") {
       return GetPosition<WHITE, ROOK>();
 
-    } else if (message_symbol == "@get-white-queen-position") {
+    }
+    if (message_symbol == "@get-white-queen-position") {
       return GetPosition<WHITE, QUEEN>();
 
-    } else if (message_symbol == "@get-white-king-position") {
+    }
+    if (message_symbol == "@get-white-king-position") {
       return GetPosition<WHITE, KING>();
 
-    } else if (message_symbol == "@get-black-pawn-position") {
+    }
+    if (message_symbol == "@get-black-pawn-position") {
       return GetPosition<BLACK, PAWN>();
 
-    } else if (message_symbol == "@get-black-knight-position") {
+    }
+    if (message_symbol == "@get-black-knight-position") {
       return GetPosition<BLACK, KNIGHT>();
 
-    } else if (message_symbol == "@get-black-bishop-position") {
+    }
+    if (message_symbol == "@get-black-bishop-position") {
       return GetPosition<BLACK, BISHOP>();
 
-    } else if (message_symbol == "@get-black-rook-position") {
+    }
+    if (message_symbol == "@get-black-rook-position") {
       return GetPosition<BLACK, ROOK>();
 
-    } else if (message_symbol == "@get-black-queen-position") {
+    }
+    if (message_symbol == "@get-black-queen-position") {
       return GetPosition<BLACK, QUEEN>();
 
-    } else if (message_symbol == "@get-black-king-position") {
+    }
+    if (message_symbol == "@get-black-king-position") {
       return GetPosition<BLACK, KING>();
 
-    } else if (message_symbol == "@get-empty-square-position") {
+    }
+    if (message_symbol == "@get-empty-square-position") {
       return GetPosition<NO_SIDE, EMPTY>();
 
-    } else if (message_symbol == "@get-piece") {
+    }
+    if (message_symbol == "@get-piece") {
       // 駒を得る。
       required_args = 2;
       if (!list_itr) {
@@ -523,7 +536,8 @@ namespace Sayuri {
 
       return GetPiece(func_name, square);
 
-    } else if (message_symbol == "@get-all-pieces") {
+    }
+    if (message_symbol == "@get-all-pieces") {
       LispObjectPtr ret_ptr = Lisp::NewList(64);
       LispIterator<true> itr {ret_ptr.get()};
       FOR_SQUARES(square) {
@@ -532,31 +546,40 @@ namespace Sayuri {
       }
       return ret_ptr;
 
-    } else if (message_symbol == "@get-to-move") {
+    }
+    if (message_symbol == "@get-to-move") {
       return GetToMove();
 
-    } else if (message_symbol == "@get-castling-rights") {
+    }
+    if (message_symbol == "@get-castling-rights") {
       return GetCastlingRights();
 
-    } else if (message_symbol == "@get-en-passant-square") {
+    }
+    if (message_symbol == "@get-en-passant-square") {
       return GetEnPassantSquare();
 
-    } else if (message_symbol == "@get-ply") {
+    }
+    if (message_symbol == "@get-ply") {
       return GetPly();
 
-    } else if (message_symbol == "@get-clock") {
+    }
+    if (message_symbol == "@get-clock") {
       return GetClock();
 
-    } else if (message_symbol == "@get-white-has-castled") {
+    }
+    if (message_symbol == "@get-white-has-castled") {
       return GetWhiteHasCastled();
 
-    } else if (message_symbol == "@get-black-has-castled") {
+    }
+    if (message_symbol == "@get-black-has-castled") {
       return GetBlackHasCastled();
 
-    } else if (message_symbol == "@set-new-game") {
+    }
+    if (message_symbol == "@set-new-game") {
       return SetNewGame();
 
-    } else if (message_symbol == "@set-fen") {
+    }
+    if (message_symbol == "@set-fen") {
       required_args = 2;
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -569,10 +592,12 @@ namespace Sayuri {
       }
       return SetFEN(fen_str_ptr);
 
-    } else if (message_symbol == "@get-candidate-moves") {
+    }
+    if (message_symbol == "@get-candidate-moves") {
       return GetCandidateMoves();
 
-    } else if (message_symbol == "@place-piece") {
+    }
+    if (message_symbol == "@place-piece") {
       required_args = 3;
       // 駒の位置を得る。
       if (!list_itr) {
@@ -620,7 +645,8 @@ namespace Sayuri {
       PieceType piece_type = ToInt(caller, *piece_itr);
 
       return PlacePiece(square, side, piece_type);
-    } else if (message_symbol == "@set-to-move") {
+    }
+    if (message_symbol == "@set-to-move") {
       required_args = 2;
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -634,7 +660,8 @@ namespace Sayuri {
 
       return SetToMove(ToInt(caller, *to_move_ptr));
 
-    } else if (message_symbol == "@set-castling-rights") {
+    }
+    if (message_symbol == "@set-castling-rights") {
       required_args = 2;
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -648,7 +675,8 @@ namespace Sayuri {
 
       return SetCastlingRights(caller, castling_rights_ptr, func_name);
 
-    } else if (message_symbol == "@set-en-passant-square") {
+    }
+    if (message_symbol == "@set-en-passant-square") {
       required_args = 2;
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -664,7 +692,8 @@ namespace Sayuri {
 
       return SetEnPassantSquare(caller, en_passant_square_ptr);
 
-    } else if (message_symbol == "@set-ply") {
+    }
+    if (message_symbol == "@set-ply") {
       required_args = 2;
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -678,7 +707,8 @@ namespace Sayuri {
 
       return SetPly(ply_ptr);
 
-    } else if (message_symbol == "@set-clock") {
+    }
+    if (message_symbol == "@set-clock") {
       required_args = 2;
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -692,22 +722,28 @@ namespace Sayuri {
 
       return SetClock(clock_ptr);
 
-    } else if (message_symbol == "@correct-position?") {
+    }
+    if (message_symbol == "@correct-position?") {
       return IsCorrectPosition();
 
-    } else if (message_symbol == "@white-checked?") {
+    }
+    if (message_symbol == "@white-checked?") {
       return IsWhiteChecked();
 
-    } else if (message_symbol == "@black-checked?") {
+    }
+    if (message_symbol == "@black-checked?") {
       return IsBlackChecked();
 
-    } else if (message_symbol == "@checkmated?") {
+    }
+    if (message_symbol == "@checkmated?") {
       return IsCheckmated();
 
-    } else if (message_symbol == "@stalemated?") {
+    }
+    if (message_symbol == "@stalemated?") {
       return IsStalemated();
 
-    } else if (message_symbol == "@play-move") {
+    }
+    if (message_symbol == "@play-move") {
       // 引数をチェック。
       required_args = 2;
       if (!list_itr) {
@@ -721,7 +757,8 @@ namespace Sayuri {
       }
       return PlayMove(caller, func_name, move_obj);
 
-    } else if (message_symbol == "@play-note") {
+    }
+    if (message_symbol == "@play-note") {
       // 引数をチェック。
       required_args = 2;
       if (!list_itr) {
@@ -742,10 +779,12 @@ namespace Sayuri {
       }
       return Lisp::NewBoolean(false);
 
-    } else if (message_symbol == "@undo-move") {
+    }
+    if (message_symbol == "@undo-move") {
       return UndoMove();
 
-    } else if (message_symbol == "@move->note") {
+    }
+    if (message_symbol == "@move->note") {
       LispObjectPtr ret_ptr = Lisp::NewString("");
 
       // 引数をチェック。
@@ -813,7 +852,8 @@ namespace Sayuri {
 
       return Lisp::NewString(engine_ptr_->MoveToNote(move));
 
-    } else if (message_symbol == "@input-uci-command") {
+    }
+    if (message_symbol == "@input-uci-command") {
       required_args = 2;
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -826,7 +866,8 @@ namespace Sayuri {
       }
       return InputUCICommand(command_ptr);
 
-    } else if (message_symbol == "@add-uci-output-listener") {
+    }
+    if (message_symbol == "@add-uci-output-listener") {
       required_args = 2;
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -847,10 +888,12 @@ namespace Sayuri {
 
       return AddUCIOutputListener(caller, *list_itr);
 
-    } else if (message_symbol == "@run") {
+    }
+    if (message_symbol == "@run") {
       return RunEngine();
 
-    } else if (message_symbol == "@go-movetime") {
+    }
+    if (message_symbol == "@go-movetime") {
       required_args = 2;
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -868,7 +911,8 @@ namespace Sayuri {
       }
       return GoMoveTime(func_name, *move_time_ptr, *move_list_ptr);
 
-    } else if (message_symbol == "@go-timelimit") {
+    }
+    if (message_symbol == "@go-timelimit") {
       required_args = 2;
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -886,7 +930,8 @@ namespace Sayuri {
       }
       return GoTimeLimit(func_name, *time_limit_ptr, *move_list_ptr);
 
-    } else if (message_symbol == "@go-depth") {
+    }
+    if (message_symbol == "@go-depth") {
       required_args = 2;
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -904,7 +949,8 @@ namespace Sayuri {
       }
       return GoDepth(func_name, *depth_ptr, *move_list_ptr);
 
-    } else if (message_symbol == "@go-nodes") {
+    }
+    if (message_symbol == "@go-nodes") {
       required_args = 2;
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -922,7 +968,8 @@ namespace Sayuri {
       }
       return GoNodes(func_name, *nodes_ptr, *move_list_ptr);
 
-    } else if (message_symbol == "@set-hash-size") {
+    }
+    if (message_symbol == "@set-hash-size") {
       required_args = 2;
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -935,7 +982,8 @@ namespace Sayuri {
       }
       return SetHashSize(*hash_size_ptr);
 
-    } else if (message_symbol == "@set-threads") {
+    }
+    if (message_symbol == "@set-threads") {
       required_args = 2;
       if (!list_itr) {
         throw Lisp::GenInsufficientArgumentsError
@@ -948,7 +996,8 @@ namespace Sayuri {
       }
       return SetThreads(*num_threads_ptr);
 
-    } else if (message_symbol == "@material") {
+    }
+    if (message_symbol == "@material") {
       LispObjectPtr material_list_ptr = Lisp::NewNil();
       if (list_itr) {
         material_list_ptr = caller.Evaluate(*list_itr);
@@ -960,7 +1009,8 @@ namespace Sayuri {
 
       return SetMaterial(*material_list_ptr);
 
-    } else if (message_symbol == "@enable-quiesce-search") {
+    }
+    if (message_symbol == "@enable-quiesce-search") {
       LispObjectPtr enable_ptr = Lisp::NewNil();
       if (list_itr) {
         enable_ptr = caller.Evaluate(*list_itr);
@@ -972,7 +1022,8 @@ namespace Sayuri {
 
       return SetEnableQuiesceSearch(*enable_ptr);
 
-    } else if (message_symbol == "@enable-repetition-check") {
+    }
+    if (message_symbol == "@enable-repetition-check") {
       LispObjectPtr enable_ptr = Lisp::NewNil();
       if (list_itr) {
         enable_ptr = caller.Evaluate(*list_itr);
@@ -984,7 +1035,8 @@ namespace Sayuri {
 
       return SetEnableRepetitionCheck(*enable_ptr);
 
-    } else if (message_symbol == "@enable-check-extension") {
+    }
+    if (message_symbol == "@enable-check-extension") {
       LispObjectPtr enable_ptr = Lisp::NewNil();
       if (list_itr) {
         enable_ptr = caller.Evaluate(*list_itr);
@@ -996,7 +1048,8 @@ namespace Sayuri {
 
       return SetEnableCheckExtension(*enable_ptr);
 
-    } else if (message_symbol == "@ybwc-limit-depth") {
+    }
+    if (message_symbol == "@ybwc-limit-depth") {
       LispObjectPtr depth_ptr = Lisp::NewNil();
       if (list_itr) {
         depth_ptr = caller.Evaluate(*list_itr);
@@ -1008,7 +1061,8 @@ namespace Sayuri {
 
       return SetYBWCLimitDepth(*depth_ptr);
 
-    } else if (message_symbol == "@ybwc-invalid-moves") {
+    }
+    if (message_symbol == "@ybwc-invalid-moves") {
       LispObjectPtr num_moves_ptr = Lisp::NewNil();
       if (list_itr) {
         num_moves_ptr = caller.Evaluate(*list_itr);
@@ -1020,7 +1074,8 @@ namespace Sayuri {
 
       return SetYBWCInvalidMoves(*num_moves_ptr);
 
-    } else if (message_symbol == "@enable-aspiration-windows") {
+    }
+    if (message_symbol == "@enable-aspiration-windows") {
       LispObjectPtr enable_ptr = Lisp::NewNil();
       if (list_itr) {
         enable_ptr = caller.Evaluate(*list_itr);
@@ -1032,7 +1087,8 @@ namespace Sayuri {
 
       return SetEnableAspirationWindows(*enable_ptr);
 
-    } else if (message_symbol == "@aspiration-windows-limit-depth") {
+    }
+    if (message_symbol == "@aspiration-windows-limit-depth") {
       LispObjectPtr depth_ptr = Lisp::NewNil();
       if (list_itr) {
         depth_ptr = caller.Evaluate(*list_itr);
@@ -1044,7 +1100,8 @@ namespace Sayuri {
 
       return SetAspirationWindowsLimitDepth(*depth_ptr);
 
-    } else if (message_symbol == "@aspiration-windows-delta") {
+    }
+    if (message_symbol == "@aspiration-windows-delta") {
       LispObjectPtr delta_ptr = Lisp::NewNil();
       if (list_itr) {
         delta_ptr = caller.Evaluate(*list_itr);
@@ -1056,7 +1113,8 @@ namespace Sayuri {
 
       return SetAspirationWindowsDelta(*delta_ptr);
 
-    } else if (message_symbol == "@enable-see") {
+    }
+    if (message_symbol == "@enable-see") {
       LispObjectPtr enable_ptr = Lisp::NewNil();
       if (list_itr) {
         enable_ptr = caller.Evaluate(*list_itr);
@@ -1068,7 +1126,8 @@ namespace Sayuri {
 
       return SetEnableSEE(*enable_ptr);
 
-    } else if (message_symbol == "@enable-history") {
+    }
+    if (message_symbol == "@enable-history") {
       LispObjectPtr enable_ptr = Lisp::NewNil();
       if (list_itr) {
         enable_ptr = caller.Evaluate(*list_itr);
@@ -1080,7 +1139,8 @@ namespace Sayuri {
 
       return SetEnableHistory(*enable_ptr);
 
-    } else if (message_symbol == "@enable-killer") {
+    }
+    if (message_symbol == "@enable-killer") {
       LispObjectPtr enable_ptr = Lisp::NewNil();
       if (list_itr) {
         enable_ptr = caller.Evaluate(*list_itr);
@@ -1092,7 +1152,8 @@ namespace Sayuri {
 
       return SetEnableKiller(*enable_ptr);
 
-    } else if (message_symbol == "@enable-hash-table") {
+    }
+    if (message_symbol == "@enable-hash-table") {
       LispObjectPtr enable_ptr = Lisp::NewNil();
       if (list_itr) {
         enable_ptr = caller.Evaluate(*list_itr);
@@ -1104,7 +1165,8 @@ namespace Sayuri {
 
       return SetEnableHashTable(*enable_ptr);
 
-    } else if (message_symbol == "@enable-iid") {
+    }
+    if (message_symbol == "@enable-iid") {
       LispObjectPtr enable_ptr = Lisp::NewNil();
       if (list_itr) {
         enable_ptr = caller.Evaluate(*list_itr);
@@ -1116,7 +1178,8 @@ namespace Sayuri {
 
       return SetEnableIID(*enable_ptr);
 
-    } else if (message_symbol == "@iid-limit-depth") {
+    }
+    if (message_symbol == "@iid-limit-depth") {
       LispObjectPtr depth_ptr = Lisp::NewNil();
       if (list_itr) {
         depth_ptr = caller.Evaluate(*list_itr);
@@ -1128,7 +1191,8 @@ namespace Sayuri {
 
       return SetIIDLimitDepth(*depth_ptr);
 
-    } else if (message_symbol == "@iid-search-depth") {
+    }
+    if (message_symbol == "@iid-search-depth") {
       LispObjectPtr depth_ptr = Lisp::NewNil();
       if (list_itr) {
         depth_ptr = caller.Evaluate(*list_itr);
@@ -1140,7 +1204,8 @@ namespace Sayuri {
 
       return SetIIDSearchDepth(*depth_ptr);
 
-    } else if (message_symbol == "@enable-nmr") {
+    }
+    if (message_symbol == "@enable-nmr") {
       LispObjectPtr enable_ptr = Lisp::NewNil();
       if (list_itr) {
         enable_ptr = caller.Evaluate(*list_itr);
@@ -1152,7 +1217,8 @@ namespace Sayuri {
 
       return SetEnableNMR(*enable_ptr);
 
-    } else if (message_symbol == "@nmr-limit-depth") {
+    }
+    if (message_symbol == "@nmr-limit-depth") {
       LispObjectPtr depth_ptr = Lisp::NewNil();
       if (list_itr) {
         depth_ptr = caller.Evaluate(*list_itr);
@@ -1164,7 +1230,8 @@ namespace Sayuri {
 
       return SetNMRLimitDepth(*depth_ptr);
 
-    } else if (message_symbol == "@nmr-search-reduction") {
+    }
+    if (message_symbol == "@nmr-search-reduction") {
       LispObjectPtr reduction_ptr = Lisp::NewNil();
       if (list_itr) {
         reduction_ptr = caller.Evaluate(*list_itr);
@@ -1176,7 +1243,8 @@ namespace Sayuri {
 
       return SetNMRSearchReduction(*reduction_ptr);
 
-    } else if (message_symbol == "@nmr-reduction") {
+    }
+    if (message_symbol == "@nmr-reduction") {
       LispObjectPtr reduction_ptr = Lisp::NewNil();
       if (list_itr) {
         reduction_ptr = caller.Evaluate(*list_itr);
@@ -1188,7 +1256,8 @@ namespace Sayuri {
 
       return SetNMRReduction(*reduction_ptr);
 
-    } else if (message_symbol == "@enable-probcut") {
+    }
+    if (message_symbol == "@enable-probcut") {
       LispObjectPtr enable_ptr = Lisp::NewNil();
       if (list_itr) {
         enable_ptr = caller.Evaluate(*list_itr);
@@ -1200,7 +1269,8 @@ namespace Sayuri {
 
       return SetEnableProbCut(*enable_ptr);
 
-    } else if (message_symbol == "@probcut-limit-depth") {
+    }
+    if (message_symbol == "@probcut-limit-depth") {
       LispObjectPtr depth_ptr = Lisp::NewNil();
       if (list_itr) {
         depth_ptr = caller.Evaluate(*list_itr);
@@ -1212,7 +1282,8 @@ namespace Sayuri {
 
       return SetProbCutLimitDepth(*depth_ptr);
 
-    } else if (message_symbol == "@probcut-margin") {
+    }
+    if (message_symbol == "@probcut-margin") {
       LispObjectPtr margin_ptr = Lisp::NewNil();
       if (list_itr) {
         margin_ptr = caller.Evaluate(*list_itr);
@@ -1224,7 +1295,8 @@ namespace Sayuri {
 
       return SetProbCutMargin(*margin_ptr);
 
-    } else if (message_symbol == "@probcut-search-reduction") {
+    }
+    if (message_symbol == "@probcut-search-reduction") {
       LispObjectPtr reduction_ptr = Lisp::NewNil();
       if (list_itr) {
         reduction_ptr = caller.Evaluate(*list_itr);
@@ -1236,7 +1308,8 @@ namespace Sayuri {
 
       return SetProbCutSearchReduction(*reduction_ptr);
 
-    } else if (message_symbol == "@enable-history-pruning") {
+    }
+    if (message_symbol == "@enable-history-pruning") {
       LispObjectPtr enable_ptr = Lisp::NewNil();
       if (list_itr) {
         enable_ptr = caller.Evaluate(*list_itr);
@@ -1248,7 +1321,8 @@ namespace Sayuri {
 
       return SetEnableHistoryPruning(*enable_ptr);
 
-    } else if (message_symbol == "@history-pruning-limit-depth") {
+    }
+    if (message_symbol == "@history-pruning-limit-depth") {
       LispObjectPtr depth_ptr = Lisp::NewNil();
       if (list_itr) {
         depth_ptr = caller.Evaluate(*list_itr);
@@ -1260,7 +1334,8 @@ namespace Sayuri {
 
       return SetHistoryPruningLimitDepth(*depth_ptr);
 
-    } else if (message_symbol == "@history-pruning-move-threshold") {
+    }
+    if (message_symbol == "@history-pruning-move-threshold") {
       LispObjectPtr threshold_ptr = Lisp::NewNil();
       if (list_itr) {
         threshold_ptr = caller.Evaluate(*list_itr);
@@ -1272,7 +1347,8 @@ namespace Sayuri {
 
       return SetHistoryPruningMoveThreshold(*threshold_ptr);
 
-    } else if (message_symbol == "@history-pruning-invalid-moves") {
+    }
+    if (message_symbol == "@history-pruning-invalid-moves") {
       LispObjectPtr num_moves_ptr = Lisp::NewNil();
       if (list_itr) {
         num_moves_ptr = caller.Evaluate(*list_itr);
@@ -1284,7 +1360,8 @@ namespace Sayuri {
 
       return SetHistoryPruningInvalidMoves(*num_moves_ptr);
 
-    } else if (message_symbol == "@history-pruning-threshold") {
+    }
+    if (message_symbol == "@history-pruning-threshold") {
       LispObjectPtr threshold_ptr = Lisp::NewNil();
       if (list_itr) {
         threshold_ptr = caller.Evaluate(*list_itr);
@@ -1296,7 +1373,8 @@ namespace Sayuri {
 
       return SetHistoryPruningThreshold(*threshold_ptr);
 
-    } else if (message_symbol == "@history-pruning-reduction") {
+    }
+    if (message_symbol == "@history-pruning-reduction") {
       LispObjectPtr reduction_ptr = Lisp::NewNil();
       if (list_itr) {
         reduction_ptr = caller.Evaluate(*list_itr);
@@ -1308,7 +1386,8 @@ namespace Sayuri {
 
       return SetHistoryPruningReduction(*reduction_ptr);
 
-    } else if (message_symbol == "@enable-lmr") {
+    }
+    if (message_symbol == "@enable-lmr") {
       LispObjectPtr enable_ptr = Lisp::NewNil();
       if (list_itr) {
         enable_ptr = caller.Evaluate(*list_itr);
@@ -1320,7 +1399,8 @@ namespace Sayuri {
 
       return SetEnableLMR(*enable_ptr);
 
-    } else if (message_symbol == "@lmr-limit-depth") {
+    }
+    if (message_symbol == "@lmr-limit-depth") {
       LispObjectPtr depth_ptr = Lisp::NewNil();
       if (list_itr) {
         depth_ptr = caller.Evaluate(*list_itr);
@@ -1332,7 +1412,8 @@ namespace Sayuri {
 
       return SetLMRLimitDepth(*depth_ptr);
 
-    } else if (message_symbol == "@lmr-move-threshold") {
+    }
+    if (message_symbol == "@lmr-move-threshold") {
       LispObjectPtr threshold_ptr = Lisp::NewNil();
       if (list_itr) {
         threshold_ptr = caller.Evaluate(*list_itr);
@@ -1344,7 +1425,8 @@ namespace Sayuri {
 
       return SetLMRMoveThreshold(*threshold_ptr);
 
-    } else if (message_symbol == "@lmr-invalid-moves") {
+    }
+    if (message_symbol == "@lmr-invalid-moves") {
       LispObjectPtr num_moves_ptr = Lisp::NewNil();
       if (list_itr) {
         num_moves_ptr = caller.Evaluate(*list_itr);
@@ -1356,7 +1438,8 @@ namespace Sayuri {
 
       return SetLMRInvalidMoves(*num_moves_ptr);
 
-    } else if (message_symbol == "@lmr-search-reduction") {
+    }
+    if (message_symbol == "@lmr-search-reduction") {
       LispObjectPtr reduction_ptr = Lisp::NewNil();
       if (list_itr) {
         reduction_ptr = caller.Evaluate(*list_itr);
@@ -1368,7 +1451,8 @@ namespace Sayuri {
 
       return SetLMRSearchReduction(*reduction_ptr);
 
-    } else if (message_symbol == "@enable-futility-pruning") {
+    }
+    if (message_symbol == "@enable-futility-pruning") {
       LispObjectPtr enable_ptr = Lisp::NewNil();
       if (list_itr) {
         enable_ptr = caller.Evaluate(*list_itr);
@@ -1380,7 +1464,8 @@ namespace Sayuri {
 
       return SetEnableFutilityPruning(*enable_ptr);
 
-    } else if (message_symbol == "@futility-pruning-depth") {
+    }
+    if (message_symbol == "@futility-pruning-depth") {
       LispObjectPtr depth_ptr = Lisp::NewNil();
       if (list_itr) {
         depth_ptr = caller.Evaluate(*list_itr);
@@ -1392,7 +1477,8 @@ namespace Sayuri {
 
       return SetFutilityPruningDepth(*depth_ptr);
 
-    } else if (message_symbol == "@futility-pruning-margin") {
+    }
+    if (message_symbol == "@futility-pruning-margin") {
       LispObjectPtr margin_ptr = Lisp::NewNil();
       if (list_itr) {
         margin_ptr = caller.Evaluate(*list_itr);
@@ -1404,7 +1490,8 @@ namespace Sayuri {
 
       return SetFutilityPruningMargin(*margin_ptr);
 
-    } else if ((message_symbol == "@pawn-square-table-opening")
+    }
+    if ((message_symbol == "@pawn-square-table-opening")
     || (message_symbol == "@knight-square-table-opening")
     || (message_symbol == "@bishop-square-table-opening")
     || (message_symbol == "@rook-square-table-opening")
@@ -1422,24 +1509,28 @@ namespace Sayuri {
       if (message_symbol == "@pawn-square-table-opening") {
         return SetPieceSquareTableOpening<PAWN>
         (func_name, message_symbol, *table_ptr);
-      } else if (message_symbol == "@knight-square-table-opening") {
+      }
+      if (message_symbol == "@knight-square-table-opening") {
         return SetPieceSquareTableOpening<KNIGHT>
         (func_name, message_symbol, *table_ptr);
-      } else if (message_symbol == "@bishop-square-table-opening") {
+      }
+      if (message_symbol == "@bishop-square-table-opening") {
         return SetPieceSquareTableOpening<BISHOP>
         (func_name, message_symbol, *table_ptr);
-      } else if (message_symbol == "@rook-square-table-opening") {
+      }
+      if (message_symbol == "@rook-square-table-opening") {
         return SetPieceSquareTableOpening<ROOK>
         (func_name, message_symbol, *table_ptr);
-      } else if (message_symbol == "@queen-square-table-opening") {
+      }
+      if (message_symbol == "@queen-square-table-opening") {
         return SetPieceSquareTableOpening<QUEEN>
         (func_name, message_symbol, *table_ptr);
-      } else {
-        return SetPieceSquareTableOpening<KING>
-        (func_name, message_symbol, *table_ptr);
       }
+      return SetPieceSquareTableOpening<KING>
+      (func_name, message_symbol, *table_ptr);
 
-    } else if ((message_symbol == "@pawn-square-table-ending")
+    }
+    if ((message_symbol == "@pawn-square-table-ending")
     || (message_symbol == "@knight-square-table-ending")
     || (message_symbol == "@bishop-square-table-ending")
     || (message_symbol == "@rook-square-table-ending")
@@ -1457,24 +1548,28 @@ namespace Sayuri {
       if (message_symbol == "@pawn-square-table-ending") {
         return SetPieceSquareTableEnding<PAWN>
         (func_name, message_symbol, *table_ptr);
-      } else if (message_symbol == "@knight-square-table-ending") {
+      }
+      if (message_symbol == "@knight-square-table-ending") {
         return SetPieceSquareTableEnding<KNIGHT>
         (func_name, message_symbol, *table_ptr);
-      } else if (message_symbol == "@bishop-square-table-ending") {
+      }
+      if (message_symbol == "@bishop-square-table-ending") {
         return SetPieceSquareTableEnding<BISHOP>
         (func_name, message_symbol, *table_ptr);
-      } else if (message_symbol == "@rook-square-table-ending") {
+      }
+      if (message_symbol == "@rook-square-table-ending") {
         return SetPieceSquareTableEnding<ROOK>
         (func_name, message_symbol, *table_ptr);
-      } else if (message_symbol == "@queen-square-table-ending") {
+      }
+      if (message_symbol == "@queen-square-table-ending") {
         return SetPieceSquareTableEnding<QUEEN>
         (func_name, message_symbol, *table_ptr);
-      } else {
-        return SetPieceSquareTableEnding<KING>
-        (func_name, message_symbol, *table_ptr);
       }
+      return SetPieceSquareTableEnding<KING>
+      (func_name, message_symbol, *table_ptr);
 
-    } else if ((message_symbol == "@pawn-attack-table")
+    }
+    if ((message_symbol == "@pawn-attack-table")
     || (message_symbol == "@knight-attack-table")
     || (message_symbol == "@bishop-attack-table")
     || (message_symbol == "@rook-attack-table")
@@ -1492,24 +1587,28 @@ namespace Sayuri {
       if (message_symbol == "@pawn-attack-table") {
         return SetAttackValueTable<PAWN>
         (func_name, message_symbol, *value_list_ptr);
-      } else if (message_symbol == "@knight-attack-table") {
+      }
+      if (message_symbol == "@knight-attack-table") {
         return SetAttackValueTable<KNIGHT>
         (func_name, message_symbol, *value_list_ptr);
-      } else if (message_symbol == "@bishop-attack-table") {
+      }
+      if (message_symbol == "@bishop-attack-table") {
         return SetAttackValueTable<BISHOP>
         (func_name, message_symbol, *value_list_ptr);
-      } else if (message_symbol == "@rook-attack-table") {
+      }
+      if (message_symbol == "@rook-attack-table") {
         return SetAttackValueTable<ROOK>
         (func_name, message_symbol, *value_list_ptr);
-      } else if (message_symbol == "@queen-attack-table") {
+      }
+      if (message_symbol == "@queen-attack-table") {
         return SetAttackValueTable<QUEEN>
         (func_name, message_symbol, *value_list_ptr);
-      } else {
-        return SetAttackValueTable<KING>
-        (func_name, message_symbol, *value_list_ptr);
       }
+      return SetAttackValueTable<KING>
+      (func_name, message_symbol, *value_list_ptr);
 
-    } else if ((message_symbol == "@pawn-defense-table")
+    }
+    if ((message_symbol == "@pawn-defense-table")
     || (message_symbol == "@knight-defense-table")
     || (message_symbol == "@bishop-defense-table")
     || (message_symbol == "@rook-defense-table")
@@ -1527,24 +1626,28 @@ namespace Sayuri {
       if (message_symbol == "@pawn-defense-table") {
         return SetDefenseValueTable<PAWN>
         (func_name, message_symbol, *value_list_ptr);
-      } else if (message_symbol == "@knight-defense-table") {
+      }
+      if (message_symbol == "@knight-defense-table") {
         return SetDefenseValueTable<KNIGHT>
         (func_name, message_symbol, *value_list_ptr);
-      } else if (message_symbol == "@bishop-defense-table") {
+      }
+      if (message_symbol == "@bishop-defense-table") {
         return SetDefenseValueTable<BISHOP>
         (func_name, message_symbol, *value_list_ptr);
-      } else if (message_symbol == "@rook-defense-table") {
+      }
+      if (message_symbol == "@rook-defense-table") {
         return SetDefenseValueTable<ROOK>
         (func_name, message_symbol, *value_list_ptr);
-      } else if (message_symbol == "@queen-defense-table") {
+      }
+      if (message_symbol == "@queen-defense-table") {
         return SetDefenseValueTable<QUEEN>
         (func_name, message_symbol, *value_list_ptr);
-      } else {
-        return SetDefenseValueTable<KING>
-        (func_name, message_symbol, *value_list_ptr);
       }
+      return SetDefenseValueTable<KING>
+      (func_name, message_symbol, *value_list_ptr);
 
-    } else if ((message_symbol == "@bishop-pin-table")
+    }
+    if ((message_symbol == "@bishop-pin-table")
     || (message_symbol == "@rook-pin-table")
     || (message_symbol == "@queen-pin-table")) {
       LispObjectPtr value_list_ptr = Lisp::NewNil();
@@ -1559,15 +1662,16 @@ namespace Sayuri {
       if (message_symbol == "@bishop-pin-table") {
         return SetPinValueTable<BISHOP>
         (func_name, message_symbol, *value_list_ptr);
-      } else if (message_symbol == "@rook-pin-table") {
+      }
+      if (message_symbol == "@rook-pin-table") {
         return SetPinValueTable<ROOK>
         (func_name, message_symbol, *value_list_ptr);
-      } else {
-        return SetPinValueTable<QUEEN>
-        (func_name, message_symbol, *value_list_ptr);
       }
+      return SetPinValueTable<QUEEN>
+      (func_name, message_symbol, *value_list_ptr);
 
-    } else if (message_symbol == "@pawn-shield-table") {
+    }
+    if (message_symbol == "@pawn-shield-table") {
       LispObjectPtr table_ptr = Lisp::NewNil();
       if (list_itr) {
         table_ptr = caller.Evaluate(*list_itr);
@@ -1580,7 +1684,8 @@ namespace Sayuri {
       return SetPawnShieldValueTable
       (func_name, message_symbol, *table_ptr);
 
-    } else if ((message_symbol == "@weight-pawn-mobility")
+    }
+    if ((message_symbol == "@weight-pawn-mobility")
     || (message_symbol == "@weight-knight-mobility")
     || (message_symbol == "@weight-bishop-mobility")
     || (message_symbol == "@weight-rook-mobility")
@@ -1652,178 +1757,236 @@ namespace Sayuri {
       if (message_symbol == "@weight-pawn-mobility") {
         return SetWeight1<WEIGHT_MOBILITY, PAWN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-knight-mobility") {
+      }
+      if (message_symbol == "@weight-knight-mobility") {
         return SetWeight1<WEIGHT_MOBILITY, KNIGHT>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-bishop-mobility") {
+      }
+      if (message_symbol == "@weight-bishop-mobility") {
         return SetWeight1<WEIGHT_MOBILITY, BISHOP>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-rook-mobility") {
+      }
+      if (message_symbol == "@weight-rook-mobility") {
         return SetWeight1<WEIGHT_MOBILITY, ROOK>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-queen-mobility") {
+      }
+      if (message_symbol == "@weight-queen-mobility") {
         return SetWeight1<WEIGHT_MOBILITY, QUEEN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-king-mobility") {
+      }
+      if (message_symbol == "@weight-king-mobility") {
         return SetWeight1<WEIGHT_MOBILITY, KING>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-pawn-center-control") {
+      }
+      if (message_symbol == "@weight-pawn-center-control") {
         return SetWeight1<WEIGHT_CENTER_CONTROL, PAWN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-knight-center-control") {
+      }
+      if (message_symbol == "@weight-knight-center-control") {
         return SetWeight1<WEIGHT_CENTER_CONTROL, KNIGHT>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-bishop-center-control") {
+      }
+      if (message_symbol == "@weight-bishop-center-control") {
         return SetWeight1<WEIGHT_CENTER_CONTROL, BISHOP>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-rook-center-control") {
+      }
+      if (message_symbol == "@weight-rook-center-control") {
         return SetWeight1<WEIGHT_CENTER_CONTROL, ROOK>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-queen-center-control") {
+      }
+      if (message_symbol == "@weight-queen-center-control") {
         return SetWeight1<WEIGHT_CENTER_CONTROL, QUEEN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-king-center-control") {
+      }
+      if (message_symbol == "@weight-king-center-control") {
         return SetWeight1<WEIGHT_CENTER_CONTROL, KING>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-pawn-sweet-center-control") {
+      }
+      if (message_symbol == "@weight-pawn-sweet-center-control") {
         return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, PAWN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-knight-sweet-center-control") {
+      }
+      if (message_symbol == "@weight-knight-sweet-center-control") {
         return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, KNIGHT>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-bishop-sweet-center-control") {
+      }
+      if (message_symbol == "@weight-bishop-sweet-center-control") {
         return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, BISHOP>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-rook-sweet-center-control") {
+      }
+      if (message_symbol == "@weight-rook-sweet-center-control") {
         return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, ROOK>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-queen-sweet-center-control") {
+      }
+      if (message_symbol == "@weight-queen-sweet-center-control") {
         return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, QUEEN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-king-sweet-center-control") {
+      }
+      if (message_symbol == "@weight-king-sweet-center-control") {
         return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, KING>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-pawn-development") {
+      }
+      if (message_symbol == "@weight-pawn-development") {
         return SetWeight1<WEIGHT_DEVELOPMENT, PAWN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-knight-development") {
+      }
+      if (message_symbol == "@weight-knight-development") {
         return SetWeight1<WEIGHT_DEVELOPMENT, KNIGHT>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-bishop-development") {
+      }
+      if (message_symbol == "@weight-bishop-development") {
         return SetWeight1<WEIGHT_DEVELOPMENT, BISHOP>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-rook-development") {
+      }
+      if (message_symbol == "@weight-rook-development") {
         return SetWeight1<WEIGHT_DEVELOPMENT, ROOK>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-queen-development") {
+      }
+      if (message_symbol == "@weight-queen-development") {
         return SetWeight1<WEIGHT_DEVELOPMENT, QUEEN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-king-development") {
+      }
+      if (message_symbol == "@weight-king-development") {
         return SetWeight1<WEIGHT_DEVELOPMENT, KING>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-pawn-attack") {
+      }
+      if (message_symbol == "@weight-pawn-attack") {
         return SetWeight1<WEIGHT_ATTACK, PAWN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-knight-attack") {
+      }
+      if (message_symbol == "@weight-knight-attack") {
         return SetWeight1<WEIGHT_ATTACK, KNIGHT>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-bishop-attack") {
+      }
+      if (message_symbol == "@weight-bishop-attack") {
         return SetWeight1<WEIGHT_ATTACK, BISHOP>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-rook-attack") {
+      }
+      if (message_symbol == "@weight-rook-attack") {
         return SetWeight1<WEIGHT_ATTACK, ROOK>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-queen-attack") {
+      }
+      if (message_symbol == "@weight-queen-attack") {
         return SetWeight1<WEIGHT_ATTACK, QUEEN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-king-attack") {
+      }
+      if (message_symbol == "@weight-king-attack") {
         return SetWeight1<WEIGHT_ATTACK, KING>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-pawn-defense") {
+      }
+      if (message_symbol == "@weight-pawn-defense") {
         return SetWeight1<WEIGHT_DEFENSE, PAWN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-knight-defense") {
+      }
+      if (message_symbol == "@weight-knight-defense") {
         return SetWeight1<WEIGHT_DEFENSE, KNIGHT>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-bishop-defense") {
+      }
+      if (message_symbol == "@weight-bishop-defense") {
         return SetWeight1<WEIGHT_DEFENSE, BISHOP>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-rook-defense") {
+      }
+      if (message_symbol == "@weight-rook-defense") {
         return SetWeight1<WEIGHT_DEFENSE, ROOK>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-queen-defense") {
+      }
+      if (message_symbol == "@weight-queen-defense") {
         return SetWeight1<WEIGHT_DEFENSE, QUEEN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-king-defense"){
+      }
+      if (message_symbol == "@weight-king-defense"){
         return SetWeight1<WEIGHT_DEFENSE, KING>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-bishop-pin") {
+      }
+      if (message_symbol == "@weight-bishop-pin") {
         return SetWeight1<WEIGHT_PIN, BISHOP>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-rook-pin") {
+      }
+      if (message_symbol == "@weight-rook-pin") {
         return SetWeight1<WEIGHT_PIN, ROOK>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-queen-pin") {
+      }
+      if (message_symbol == "@weight-queen-pin") {
         return SetWeight1<WEIGHT_PIN, QUEEN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-pawn-attack-around-king") {
+      }
+      if (message_symbol == "@weight-pawn-attack-around-king") {
         return SetWeight1<WEIGHT_ATTACK_AROUND_KING, PAWN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-knight-attack-around-king") {
+      }
+      if (message_symbol == "@weight-knight-attack-around-king") {
         return SetWeight1<WEIGHT_ATTACK_AROUND_KING, KNIGHT>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-bishop-attack-around-king") {
+      }
+      if (message_symbol == "@weight-bishop-attack-around-king") {
         return SetWeight1<WEIGHT_ATTACK_AROUND_KING, BISHOP>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-rook-attack-around-king") {
+      }
+      if (message_symbol == "@weight-rook-attack-around-king") {
         return SetWeight1<WEIGHT_ATTACK_AROUND_KING, ROOK>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-queen-attack-around-king") {
+      }
+      if (message_symbol == "@weight-queen-attack-around-king") {
         return SetWeight1<WEIGHT_ATTACK_AROUND_KING, QUEEN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-king-attack-around-king"){
+      }
+      if (message_symbol == "@weight-king-attack-around-king"){
         return SetWeight1<WEIGHT_ATTACK_AROUND_KING, KING>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-pass-pawn"){
+      }
+      if (message_symbol == "@weight-pass-pawn"){
         return SetWeight2<WEIGHT_PASS_PAWN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-protected-pass-pawn"){
+      }
+      if (message_symbol == "@weight-protected-pass-pawn"){
         return SetWeight2<WEIGHT_PROTECTED_PASS_PAWN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-double-pawn"){
+      }
+      if (message_symbol == "@weight-double-pawn"){
         return SetWeight2<WEIGHT_DOUBLE_PAWN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-iso-pawn"){
+      }
+      if (message_symbol == "@weight-iso-pawn"){
         return SetWeight2<WEIGHT_ISO_PAWN>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-pawn-shield"){
+      }
+      if (message_symbol == "@weight-pawn-shield"){
         return SetWeight2<WEIGHT_PAWN_SHIELD>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-bishop-pair"){
+      }
+      if (message_symbol == "@weight-bishop-pair"){
         return SetWeight2<WEIGHT_BISHOP_PAIR>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-bad-bishop"){
+      }
+      if (message_symbol == "@weight-bad-bishop"){
         return SetWeight2<WEIGHT_BAD_BISHOP>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-rook-pair"){
+      }
+      if (message_symbol == "@weight-rook-pair"){
         return SetWeight2<WEIGHT_ROOK_PAIR>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-rook-semiopen-fyle"){
+      }
+      if (message_symbol == "@weight-rook-semiopen-fyle"){
         return SetWeight2<WEIGHT_ROOK_SEMIOPEN_FYLE>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-rook-open-fyle"){
+      }
+      if (message_symbol == "@weight-rook-open-fyle"){
         return SetWeight2<WEIGHT_ROOK_OPEN_FYLE>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-early-queen-starting"){
+      }
+      if (message_symbol == "@weight-early-queen-starting"){
         return SetWeight2<WEIGHT_EARLY_QUEEN_STARTING>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-weak-square"){
+      }
+      if (message_symbol == "@weight-weak-square"){
         return SetWeight2<WEIGHT_WEAK_SQUARE>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-castling"){
+      }
+      if (message_symbol == "@weight-castling"){
         return SetWeight2<WEIGHT_CASTLING>
         (func_name, message_symbol, *weight_params_ptr);
-      } else if (message_symbol == "@weight-abandoned-castling"){
+      }
+      if (message_symbol == "@weight-abandoned-castling"){
         return SetWeight2<WEIGHT_ABANDONED_CASTLING>
         (func_name, message_symbol, *weight_params_ptr);
       }
@@ -3233,7 +3396,8 @@ namespace Sayuri {
         }
 
         return ret_ptr;
-      } else if (message_symbol == "@get-current-game-comments") {
+      }
+      if (message_symbol == "@get-current-game-comments") {
         // 現在のゲームのコメント。
         LispObjectPtr ret_ptr = NewList(game_ptr->comment_vec().size());
 
@@ -3247,7 +3411,8 @@ namespace Sayuri {
         }
 
         return ret_ptr;
-      } else if (message_symbol == "@get-current-move-comments") {
+      }
+      if (message_symbol == "@get-current-move-comments") {
         // 現在の指し手のコメント。
         if (move_ptr) {
           LispObjectPtr ret_ptr = NewList(move_ptr->comment_vec_.size());
@@ -3264,10 +3429,12 @@ namespace Sayuri {
           return ret_ptr;
         }
         return NewNil();
-      } else if (message_symbol == "@length") {
+      }
+      if (message_symbol == "@length") {
         // ゲームの数を得る。
         return NewNumber(pgn_ptr->game_vec().size());
-      } else if (message_symbol == "@set-current-game") {
+      }
+      if (message_symbol == "@set-current-game") {
         // 現在のゲームをセット。
         // 引数チェック。
         required_args = 2;
@@ -3293,7 +3460,8 @@ namespace Sayuri {
         // セット。
         *current_index_ptr = index;
         return NewBoolean(true);
-      } else if (message_symbol == "@get-current-game-headers") {
+      }
+      if (message_symbol == "@get-current-game-headers") {
         // 現在のゲームのヘッダ。
         LispObjectPtr ret_ptr = NewList(game_ptr->header().size());
         LispIterator<true> itr {ret_ptr.get()};
@@ -3307,13 +3475,15 @@ namespace Sayuri {
         }
 
         return ret_ptr;
-      } else if (message_symbol == "@current-move") {
+      }
+      if (message_symbol == "@current-move") {
         // 現在の指し手。
         if (move_ptr) {
           return NewString(move_ptr->text_);
         }
         return NewString("");
-      } else if (message_symbol == "@next-move") {
+      }
+      if (message_symbol == "@next-move") {
         // 次の指し手へ。
         if (game_ptr->Next()) {
           if (game_ptr->current_node_ptr()) {
@@ -3321,7 +3491,8 @@ namespace Sayuri {
           }
         }
         return NewString("");
-      } else if (message_symbol == "@prev-move") {
+      }
+      if (message_symbol == "@prev-move") {
         // 前の指し手へ。
         if (game_ptr->Back()) {
           if (game_ptr->current_node_ptr()) {
@@ -3329,7 +3500,8 @@ namespace Sayuri {
           }
         }
         return NewString("");
-      } else if (message_symbol == "@alt-move") {
+      }
+      if (message_symbol == "@alt-move") {
         // 代替手へ。
         if (game_ptr->Alt()) {
           if (game_ptr->current_node_ptr()) {
@@ -3337,7 +3509,8 @@ namespace Sayuri {
           }
         }
         return NewString("");
-      } else if (message_symbol == "@orig-move") {
+      }
+      if (message_symbol == "@orig-move") {
         // オリジナルへ。
         while (game_ptr->Orig()) continue;
 
@@ -3346,7 +3519,8 @@ namespace Sayuri {
         }
 
         return NewString("");
-      } else if (message_symbol == "@rewind-move") {
+      }
+      if (message_symbol == "@rewind-move") {
         // 最初の指し手へ。
         if (game_ptr->Rewind()) {
           if (game_ptr->current_node_ptr()) {
