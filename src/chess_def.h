@@ -38,6 +38,13 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
+
+#if defined(_WIN32)  // Visual Studio用。
+
+#pragma warning(disable: 4146)  // 符号なしへのマイナス符号の警告を無効。
+
+#endif
+
   // ============ //
   // エンジン情報 //
   // ============ //

@@ -39,6 +39,7 @@
 #include <map>
 #include <cstdint>
 #include <algorithm>
+#include <iterator>
 #include "common.h"
 
 /** Sayuri 名前空間。 */
