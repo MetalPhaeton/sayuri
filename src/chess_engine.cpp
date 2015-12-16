@@ -423,7 +423,7 @@ namespace Sayuri {
     Util::UpdateMax(num_threads, 1);
     Util::UpdateMin(num_threads, UCI_MAX_THREADS);
     thread_vec_.resize(num_threads);
-    return std::move(SearchRoot(moves_to_search, shell));
+    return SearchRoot(moves_to_search, shell);
   }
 
   // 探索を終了させる。
