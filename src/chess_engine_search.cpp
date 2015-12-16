@@ -510,12 +510,11 @@ namespace Sayuri {
       Square to = Get<TO>(move);
 
       // 探索。
-      int score = 0;
       int temp_alpha = job.alpha_;
       int temp_beta = job.beta_;
+      int score = temp_alpha;
 
       // --- Late Move Reduction --- //
-      bool do_normal_search = false;
       if (cache.enable_lmr_) {
         if (!(is_checked || null_reduction)
         && (depth >= cache.lmr_limit_depth_)
@@ -526,18 +525,16 @@ namespace Sayuri {
           score = -Search(NodeType::NON_PV, next_hash,
           depth - cache.lmr_search_reduction_ - 1, level + 1,
           -(temp_alpha + 1), -temp_alpha, next_material);
-
-          do_normal_search = score > temp_alpha;
         } else {
-          do_normal_search = true;
+          ++score;
         }
       } else {
-        do_normal_search = true;
+        ++score;
       }
 
       // Late Move Reduction失敗。
       // PVノードの探索とNON_PVノードの探索に分ける。
-      if (do_normal_search) {
+      if (score > temp_alpha) {
         if (node_type == NodeType::PV) {
           // PV。
           // --- PVSearch --- //
@@ -1011,12 +1008,11 @@ namespace Sayuri {
       Square to = Get<TO>(move);
 
       // 探索。
-      int score = 0;
       int temp_alpha = job.alpha_;
       int temp_beta = job.beta_;
+      int score = temp_alpha;
 
       // --- Late Move Reduction --- //
-      bool do_normal_search = false;
       if (cache.enable_lmr_) {
         if (!(job.is_checked_ || job.null_reduction_)
         && (job.depth_ >= cache.lmr_limit_depth_)
@@ -1027,18 +1023,16 @@ namespace Sayuri {
           score = -Search(NodeType::NON_PV, next_hash,
           job.depth_ - cache.lmr_search_reduction_ - 1, job.level_ + 1,
           -(temp_alpha + 1), -temp_alpha, next_material);
-
-          do_normal_search = score > temp_alpha;
         } else {
-          do_normal_search = true;
+          ++score;
         }
       } else {
-        do_normal_search = true;
+        ++score;
       }
 
       // Late Move Reduction失敗時。
       // PVノードの探索とNON_PVノードの探索に分ける。
-      if (do_normal_search) {
+      if (score > temp_alpha) {
         if (node_type == NodeType::PV) {
           // PV。
           // --- PVSearch --- //
@@ -1174,9 +1168,9 @@ namespace Sayuri {
       job.Unlock();  // ロック解除。
 
       // --- PVSearch --- //
-      int score = 0;
       int temp_alpha = job.alpha_;
       int temp_beta = job.beta_;
+      int score = temp_alpha;
       if (move_number <= 1) {
         while (true) {
           // 探索終了。
@@ -1239,7 +1233,6 @@ namespace Sayuri {
         }
       } else {
         // --- Late Move Reduction --- //
-        bool do_normal_search = false;
         if (cache.enable_lmr_) {
           if (!(job.is_checked_)
           && (job.depth_ >= cache.lmr_limit_depth_)
@@ -1249,17 +1242,15 @@ namespace Sayuri {
             score = -Search(NodeType::NON_PV, next_hash,
             job.depth_ - cache.lmr_search_reduction_ - 1, job.level_ + 1,
             -(temp_alpha + 1), -temp_alpha, next_material);
-
-            do_normal_search = score > temp_alpha;
           } else {
-            do_normal_search = true;
+            ++score;
           }
         } else {
-          do_normal_search = true;
+          ++score;
         }
 
         // 普通の探索。
-        if (do_normal_search) {
+        if (score > temp_alpha) {
           // ゼロウィンドウ探索。
           score = -Search(NodeType::NON_PV, next_hash,
           job.depth_ - 1, job.level_ + 1, -(temp_alpha + 1), -temp_alpha,
