@@ -126,11 +126,9 @@ namespace Sayuri {
       }
 
       // Futility Pruning。
-      if (margin) {
-        if ((-next_material + margin) <= alpha) {
-          UnmakeMove(move);
-          continue;
-        }
+      if ((-next_material + margin) <= alpha) {
+        UnmakeMove(move);
+        continue;
       }
 
       // 次の手を探索。
@@ -508,11 +506,9 @@ namespace Sayuri {
       move_number = job.Count();
 
       // -- Futility Pruning --- //
-      if (margin) {
-        if ((-next_material + margin) <= job.alpha_) {
-          UnmakeMove(move);
-          continue;
-        }
+      if ((-next_material + margin) <= job.alpha_) {
+        UnmakeMove(move);
+        continue;
       }
 
       // 手の情報を得る。
@@ -1011,11 +1007,9 @@ namespace Sayuri {
       job.has_legal_move_ = true;
 
       // --- Futility Pruning --- //
-      if (margin) {
-        if ((-next_material + margin) <= job.alpha_) {
-          UnmakeMove(move);
-          continue;
-        }
+      if ((-next_material + margin) <= job.alpha_) {
+        UnmakeMove(move);
+        continue;
       }
 
       // 手の情報を得る。

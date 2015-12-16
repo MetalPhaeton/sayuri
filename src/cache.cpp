@@ -165,10 +165,10 @@ namespace Sayuri {
             params.futility_pruning_margin() * depth;
           }
         } else {
-          futility_pruning_margin_[depth] = 0;
+          futility_pruning_margin_[depth] = 3 * SCORE_WIN;
         }
       } else {
-        futility_pruning_margin_[depth] = 0;
+        futility_pruning_margin_[depth] = 3 * SCORE_WIN;
       }
     }
   }
