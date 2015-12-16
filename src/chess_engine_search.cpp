@@ -533,7 +533,7 @@ namespace Sayuri {
           depth - cache.lmr_search_reduction_ - 1, level + 1,
           -(temp_alpha + 1), -temp_alpha, next_material);
 
-          if (score > temp_alpha) do_normal_search = true;
+          do_normal_search = score > temp_alpha;
         } else {
           do_normal_search = true;
         }
@@ -1034,7 +1034,7 @@ namespace Sayuri {
           job.depth_ - cache.lmr_search_reduction_ - 1, job.level_ + 1,
           -(temp_alpha + 1), -temp_alpha, next_material);
 
-          if (score > temp_alpha) do_normal_search = true;
+          do_normal_search = score > temp_alpha;
         } else {
           do_normal_search = true;
         }
@@ -1256,7 +1256,7 @@ namespace Sayuri {
             job.depth_ - cache.lmr_search_reduction_ - 1, job.level_ + 1,
             -(temp_alpha + 1), -temp_alpha, next_material);
 
-            if (score > temp_alpha) do_normal_search = true;
+            do_normal_search = score > temp_alpha;
           } else {
             do_normal_search = true;
           }
