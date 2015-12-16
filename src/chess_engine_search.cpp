@@ -295,57 +295,53 @@ namespace Sayuri {
     }
 
     // --- Internal Iterative Deepening --- //
-    if (cache.enable_iid_) {
-      if (node_type == NodeType::PV) {
-        // 前回の繰り返しの最善手があればIIDしない。
-        if (prev_best) {
-          shared_st_ptr_->iid_stack_[level] = prev_best;
-        } else {
-          if (!is_checked
-          && (depth >= cache.iid_limit_depth_)) {
-            // Internal Iterative Deepening。
-            Search(NodeType::PV, pos_hash, cache.iid_search_depth_,
-            level, alpha, beta, material);
+    if (cache.enable_iid_ && (node_type == NodeType::PV)) {
+      // 前回の繰り返しの最善手があればIIDしない。
+      if (prev_best) {
+        shared_st_ptr_->iid_stack_[level] = prev_best;
+      } else {
+        if (!is_checked
+        && (depth >= cache.iid_limit_depth_)) {
+          // Internal Iterative Deepening。
+          Search(NodeType::PV, pos_hash, cache.iid_search_depth_,
+          level, alpha, beta, material);
 
-            shared_st_ptr_->iid_stack_[level] =
-            pv_line_table_[level][0];
-          }
+          shared_st_ptr_->iid_stack_[level] =
+          pv_line_table_[level][0];
         }
       }
     }
 
     // --- Null Move Reduction --- //
     int null_reduction = 0;
-    if (cache.enable_nmr_) {
-      if (node_type == NodeType::NON_PV) {
-        if (!(is_null_searching_ || is_checked)
-        && (depth >= cache.nmr_limit_depth_)) {
-          // Null Move Reduction。
-          Move null_move = 0;
+    if (cache.enable_nmr_ && (node_type == NodeType::NON_PV)) {
+      if (!(is_null_searching_ || is_checked)
+      && (depth >= cache.nmr_limit_depth_)) {
+        // Null Move Reduction。
+        Move null_move = 0;
 
-          is_null_searching_ = true;
-          MakeNullMove(null_move);
+        is_null_searching_ = true;
+        MakeNullMove(null_move);
 
-          // Null Move Search。
-          int score = -(Search(NodeType::NON_PV, pos_hash,
-          depth - cache.nmr_search_reduction_ - 1, level + 1, -(beta),
-          -(beta - 1), -material));
+        // Null Move Search。
+        int score = -(Search(NodeType::NON_PV, pos_hash,
+        depth - cache.nmr_search_reduction_ - 1, level + 1, -(beta),
+        -(beta - 1), -material));
 
-          UnmakeNullMove(null_move);
-          is_null_searching_ = false;
+        UnmakeNullMove(null_move);
+        is_null_searching_ = false;
 
-          if (score >= beta) {
-            null_reduction = cache.nmr_reduction_;
-            depth = depth - null_reduction;
-            if (depth <= 0) {
-              if (cache.enable_quiesce_search_) {
-                // クイース探索ノードに移行するため、ノード数を減らしておく。
-                --(shared_st_ptr_->searched_nodes_);
-                return ReturnProcess
-                (Quiesce(level, alpha, beta, material), level);
-              } else {
-                return ReturnProcess(evaluator_.Evaluate(material), level);
-              }
+        if (score >= beta) {
+          null_reduction = cache.nmr_reduction_;
+          depth = depth - null_reduction;
+          if (depth <= 0) {
+            if (cache.enable_quiesce_search_) {
+              // クイース探索ノードに移行するため、ノード数を減らしておく。
+              --(shared_st_ptr_->searched_nodes_);
+              return ReturnProcess
+              (Quiesce(level, alpha, beta, material), level);
+            } else {
+              return ReturnProcess(evaluator_.Evaluate(material), level);
             }
           }
         }
@@ -361,78 +357,76 @@ namespace Sayuri {
     ScoreType score_type = ScoreType::ALPHA;
 
     // --- ProbCut --- //
-    if (cache.enable_probcut_) {
-      if (node_type == NodeType::NON_PV) {
-        if (!(is_null_searching_ || is_checked)
-        && (depth >= cache.probcut_limit_depth_)) {
-          // 手を作る。
-          MoveMaker& maker = maker_table_[level];
-          maker.RegenMoves();
+    if (cache.enable_probcut_ && (node_type == NodeType::NON_PV)) {
+      if (!(is_null_searching_ || is_checked)
+      && (depth >= cache.probcut_limit_depth_)) {
+        // 手を作る。
+        MoveMaker& maker = maker_table_[level];
+        maker.RegenMoves();
 
-          // 浅読みパラメータ。
-          int prob_beta = beta + cache.probcut_margin_;
-          int prob_depth = depth - cache.probcut_search_reduction_;
+        // 浅読みパラメータ。
+        int prob_beta = beta + cache.probcut_margin_;
+        int prob_depth = depth - cache.probcut_search_reduction_;
 
-          // 探索。
-          for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
-            if (JudgeToStop(job)) return ReturnProcess(alpha, level);
+        // 探索。
+        for (Move move = maker.PickMove(); move; move = maker.PickMove()) {
+          if (JudgeToStop(job)) return ReturnProcess(alpha, level);
 
-            // 次のノードへの準備。
-            Hash next_hash = GetNextHash(pos_hash, move);
-            int next_material = GetNextMaterial(material, move);
+          // 次のノードへの準備。
+          Hash next_hash = GetNextHash(pos_hash, move);
+          int next_material = GetNextMaterial(material, move);
 
-            MakeMove(move);
+          MakeMove(move);
 
-            // 合法手じゃなければ次の手へ。
-            if (IsAttacked(basic_st_.king_[side], enemy_side)) {
-              UnmakeMove(move);
-              continue;
-            }
-
-            int score = -Search(NodeType::NON_PV, next_hash,
-            prob_depth - 1, level + 1, -prob_beta, -(prob_beta - 1),
-            next_material);
-
+          // 合法手じゃなければ次の手へ。
+          if (IsAttacked(basic_st_.king_[side], enemy_side)) {
             UnmakeMove(move);
+            continue;
+          }
 
-            if (JudgeToStop(job)) return ReturnProcess(alpha, level);
+          int score = -Search(NodeType::NON_PV, next_hash,
+          prob_depth - 1, level + 1, -prob_beta, -(prob_beta - 1),
+          next_material);
 
-            // ベータカット。
-            if (score >= prob_beta) {
-              // PVライン。
-              pv_line_table_[level].SetMove(move);
-              pv_line_table_[level].Insert(pv_line_table_[level + 1]);
+          UnmakeMove(move);
 
-              // 取らない手。
-              if (!(move & MASK[CAPTURED_PIECE])) {
-                // 手の情報を得る。
-                Square from = Get<FROM>(move);
-                Square to = Get<TO>(move);
+          if (JudgeToStop(job)) return ReturnProcess(alpha, level);
 
-                // キラームーブ。
-                if (cache.enable_killer_) {
-                  shared_st_ptr_->killer_stack_[level][0] = move;
-                  shared_st_ptr_->killer_stack_[level + 2][1] = move;
-                }
+          // ベータカット。
+          if (score >= prob_beta) {
+            // PVライン。
+            pv_line_table_[level].SetMove(move);
+            pv_line_table_[level].Insert(pv_line_table_[level + 1]);
 
-                // ヒストリー。
-                if (cache.enable_history_) {
-                  shared_st_ptr_->history_[side][from][to] +=
-                  Util::DepthToHistory(depth);
+            // 取らない手。
+            if (!(move & MASK[CAPTURED_PIECE])) {
+              // 手の情報を得る。
+              Square from = Get<FROM>(move);
+              Square to = Get<TO>(move);
 
-                  Util::UpdateMax
-                  (shared_st_ptr_->history_[side][from][to],
-                  shared_st_ptr_->history_max_);
-                }
+              // キラームーブ。
+              if (cache.enable_killer_) {
+                shared_st_ptr_->killer_stack_[level][0] = move;
+                shared_st_ptr_->killer_stack_[level + 2][1] = move;
               }
 
-              // トランスポジションテーブルに登録。
-              if (!null_reduction) {
-                table_ptr_->Add(pos_hash, depth, beta, ScoreType::BETA, move);
-              }
+              // ヒストリー。
+              if (cache.enable_history_) {
+                shared_st_ptr_->history_[side][from][to] +=
+                Util::DepthToHistory(depth);
 
-              return ReturnProcess(beta, level);
+                Util::UpdateMax
+                (shared_st_ptr_->history_[side][from][to],
+                shared_st_ptr_->history_max_);
+              }
             }
+
+            // トランスポジションテーブルに登録。
+            if (!null_reduction) {
+              table_ptr_->Add(pos_hash, depth, beta, ScoreType::BETA, move);
+            }
+
+            return ReturnProcess(beta, level);
           }
         }
       }
