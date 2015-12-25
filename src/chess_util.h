@@ -1643,6 +1643,14 @@ namespace Sayuri {
       ParseFEN(const std::string& str);
 
       /**
+       * ビットボードの配列からFENの駒の配置の文字列に変換する。
+       * @param position 変換するビットボードの配列。
+       * @return FENの駒の配置の文字列。
+       */
+      static std::string ToFENPosition
+      (const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]);
+
+      /**
        * Algebraic Notationかどうかを判定。
        * @param str 判定する文字列。
        * @return Algebraic Notationならtrue。

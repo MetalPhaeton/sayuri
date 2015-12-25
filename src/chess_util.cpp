@@ -925,6 +925,70 @@ namespace Sayuri {
     return ret;
   }
 
+  // FENの駒の配置の文字列に変換する。
+  std::string Util::ToFENPosition
+  (const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]) {
+    std::ostringstream oss;
+
+    // 64文字の文字列にする。
+    Bitboard pos = 1ULL;
+    FOR_SQUARES(square) {
+      if ((position[WHITE][PAWN] & pos)) oss << 'P';
+      else if ((position[WHITE][KNIGHT] & pos)) oss << 'N';
+      else if ((position[WHITE][BISHOP] & pos)) oss << 'B';
+      else if ((position[WHITE][ROOK] & pos)) oss << 'R';
+      else if ((position[WHITE][QUEEN] & pos)) oss << 'Q';
+      else if ((position[WHITE][KING] & pos)) oss << 'K';
+      else if ((position[BLACK][PAWN] & pos)) oss << 'p';
+      else if ((position[BLACK][KNIGHT] & pos)) oss << 'n';
+      else if ((position[BLACK][BISHOP] & pos)) oss << 'b';
+      else if ((position[BLACK][ROOK] & pos)) oss << 'r';
+      else if ((position[BLACK][QUEEN] & pos)) oss << 'q';
+      else if ((position[BLACK][KING] & pos)) oss << 'k';
+      else oss << '-';
+      pos <<= 1;
+    }
+
+    // ランクに分ける。
+    std::vector<std::string> temp_vec;
+    for (Square i = 0; i < NUM_SQUARES; i += 8) {
+      temp_vec.push_back(oss.str().substr(i, 8));
+    }
+
+    // 各ランクの空のマスの連なりを数字に変換する。
+    // ついでに一続きにする。
+    oss.str("");
+    for (int i = 7; i >= 0; --i) {
+      bool in_empty = false;
+      int count = 0;
+      for (auto c : temp_vec[i]) {
+        if (in_empty) {
+          if (c != '-') {
+            oss << count << c;
+            in_empty = false;
+            count = 0;
+          } else {
+            ++count;
+          }
+        } else {
+          if (c == '-') {
+            count = 1;
+            in_empty = true;
+          } else {
+            oss << c;
+          }
+        }
+      }
+      if (count) oss << count;
+      oss << '/';
+    }
+
+    // 一番後ろのスラッシュを消して返す。
+    std::string ret = oss.str();
+    ret.pop_back();
+    return ret;
+  }
+
   // Algebraic Notationかどうかを判定。
   bool Util::IsAlgebraicNotation(const std::string& str) {
     // キャスリングかどうかを判定。
