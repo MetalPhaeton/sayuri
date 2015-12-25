@@ -640,7 +640,7 @@ namespace Sayuri {
       }
       if (!((piece_itr->IsNumber()) || piece_itr->IsSymbol())) {
         throw Lisp::GenWrongTypeError
-        (func_name, "Number or Symbol", std::vector<int> {3, 1}, true);
+        (func_name, "Number or Symbol", std::vector<int> {3, 2}, true);
       }
       PieceType piece_type = ToInt(caller, *piece_itr);
 
