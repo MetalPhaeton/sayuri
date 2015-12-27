@@ -3567,6 +3567,13 @@ namespace Sayuri {
 
     std::map<std::string, std::string> fen_map = Util::ParseFEN(fen_str);
 
+    // リストの要素を作る関数。
+    auto gen_elm =
+    [](const std::string& tag, LispObjectPtr value) -> LispObject {
+      return LispObject(NewPair(NewString(tag), NewPair(value, NewNil())),
+      NewNil());
+    };
+
     for (auto& pair : fen_map) {
       if (pair.first == "fen position") {
         // ポジションのリストを作る。
@@ -3632,16 +3639,13 @@ namespace Sayuri {
           itr.current_->car(temp);
           ++itr;
         }
-        *ptr = LispObject(NewPair(NewString(pair.first),
-        NewPair(position_ptr, NewNil())), NewNil());
+        *ptr = gen_elm(pair.first, position_ptr);
       } else if (pair.first == "fen to_move") {
         // 指し手のリストを作る。
         if (pair.second == "w") {
-          *ptr = LispObject(NewPair(NewString(pair.first),
-          NewPair(NewSymbol("WHITE"), NewNil())), NewNil());
+          *ptr = gen_elm(pair.first, NewSymbol("WHITE"));
         } else {
-          *ptr = LispObject(NewPair(NewString(pair.first),
-          NewPair(NewSymbol("BLACK"), NewNil())), NewNil());
+          *ptr = gen_elm(pair.first, NewSymbol("BLACK"));
         }
       } else if (pair.first == "fen castling") {
         // キャスリングのリストを作る。
@@ -3663,9 +3667,7 @@ namespace Sayuri {
           *temp_ptr = LispObject(NewSymbol("BLACK_LONG_CASTLING"), NewNil());
           temp_ptr = temp_ptr->cdr().get();
         }
-
-        *ptr = LispObject(NewPair(NewString(pair.first),
-        NewPair(temp, NewNil())), NewNil());
+        *ptr = gen_elm(pair.first, temp);
       } else if (pair.first == "fen en_passant") {
         // アンパッサンのリストを作る。
         if (pair.second != "-") {
@@ -3680,12 +3682,10 @@ namespace Sayuri {
         }
       } else if ((pair.first == "fen ply") || (pair.first == "fen clock")) {
         // 手数、クロック。
-        *ptr = LispObject(NewPair(NewString(pair.first),
-        NewPair(NewNumber(std::stod(pair.second)), NewNil())), NewNil());
+        *ptr = gen_elm(pair.first, NewNumber(std::stod(pair.second)));
       } else {
         // EPDの拡張部分。
-        *ptr = LispObject(NewPair(NewString(pair.first),
-        NewPair(NewString(pair.second), NewNil())), NewNil());
+        *ptr = gen_elm(pair.first, NewString(pair.second));
       }
       ptr = ptr->cdr().get();
     }
