@@ -37,6 +37,7 @@
 #include <functional>
 #include <climits>
 #include <sstream>
+#include <map>
 #include "common.h"
 #include "params.h"
 #include "chess_engine.h"
@@ -2917,6 +2918,28 @@ namespace Sayuri {
       };
       AddNativeFunction(func, "gen-pgn");
     }
+    {
+      auto func = [this](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) -> LispObjectPtr {
+        // 引数チェック。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        if (!list_itr) {
+          throw Lisp::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr fen_ptr = caller.Evaluate(*list_itr);
+        if (!(fen_ptr->IsString())) {
+          throw GenWrongTypeError
+          (func_name, "String", std::vector<int> {1}, true);
+        }
+
+        return this->ParseFENEPD(fen_ptr->string_value());
+      };
+      AddNativeFunction(func, "parse-fen/epd");
+    }
   }
 
   // Sayulispを開始する。
@@ -3535,6 +3558,139 @@ namespace Sayuri {
     };
 
     return NewNativeFunction(caller_scope, pgn_func);
+  }
+
+  // FEN/EPDをパースする。
+  LispObjectPtr Sayulisp::ParseFENEPD(const std::string& fen_str) {
+    LispObjectPtr ret_ptr = NewNil();
+    LispObject* ptr = ret_ptr.get();
+
+    std::map<std::string, std::string> fen_map = Util::ParseFEN(fen_str);
+
+    for (auto& pair : fen_map) {
+      if (pair.first == "fen position") {
+        // ポジションのリストを作る。
+        LispObjectPtr position_ptr = NewList(NUM_SQUARES);
+        LispIterator<true> itr {position_ptr.get()};
+        for (auto c : pair.second) {
+          LispObjectPtr temp = NewList(2);
+          switch (c) {
+            case 'P':
+              temp->car(NewSymbol("WHITE"));
+              temp->cdr()->car(NewSymbol("PAWN"));
+              break;
+            case 'N':
+              temp->car(NewSymbol("WHITE"));
+              temp->cdr()->car(NewSymbol("KNIGHT"));
+              break;
+            case 'B':
+              temp->car(NewSymbol("WHITE"));
+              temp->cdr()->car(NewSymbol("BISHOP"));
+              break;
+            case 'R':
+              temp->car(NewSymbol("WHITE"));
+              temp->cdr()->car(NewSymbol("ROOK"));
+              break;
+            case 'Q':
+              temp->car(NewSymbol("WHITE"));
+              temp->cdr()->car(NewSymbol("QUEEN"));
+              break;
+            case 'K':
+              temp->car(NewSymbol("WHITE"));
+              temp->cdr()->car(NewSymbol("KING"));
+              break;
+            case 'p':
+              temp->car(NewSymbol("BLACK"));
+              temp->cdr()->car(NewSymbol("PAWN"));
+              break;
+            case 'n':
+              temp->car(NewSymbol("BLACK"));
+              temp->cdr()->car(NewSymbol("KNIGHT"));
+              break;
+            case 'b':
+              temp->car(NewSymbol("BLACK"));
+              temp->cdr()->car(NewSymbol("BISHOP"));
+              break;
+            case 'r':
+              temp->car(NewSymbol("BLACK"));
+              temp->cdr()->car(NewSymbol("ROOK"));
+              break;
+            case 'q':
+              temp->car(NewSymbol("BLACK"));
+              temp->cdr()->car(NewSymbol("QUEEN"));
+              break;
+            case 'k':
+              temp->car(NewSymbol("BLACK"));
+              temp->cdr()->car(NewSymbol("KING"));
+              break;
+            default:
+              temp->car(NewSymbol("NO_SIDE"));
+              temp->cdr()->car(NewSymbol("EMPTY"));
+              break;
+          }
+
+          itr.current_->car(temp);
+          ++itr;
+        }
+        *ptr = LispObject(NewPair(NewString(pair.first),
+        NewPair(position_ptr, NewNil())), NewNil());
+      } else if (pair.first == "fen to_move") {
+        // 指し手のリストを作る。
+        if (pair.second == "w") {
+          *ptr = LispObject(NewPair(NewString(pair.first),
+          NewPair(NewSymbol("WHITE"), NewNil())), NewNil());
+        } else {
+          *ptr = LispObject(NewPair(NewString(pair.first),
+          NewPair(NewSymbol("BLACK"), NewNil())), NewNil());
+        }
+      } else if (pair.first == "fen castling") {
+        // キャスリングのリストを作る。
+        LispObjectPtr temp = NewNil();
+        LispObject* temp_ptr = temp.get();
+        if (pair.second[0] != '-') {
+          *temp_ptr = LispObject(NewSymbol("WHITE_SHORT_CASTLING"), NewNil());
+          temp_ptr = temp_ptr->cdr().get();
+        }
+        if (pair.second[1] != '-') {
+          *temp_ptr = LispObject(NewSymbol("WHITE_LONG_CASTLING"), NewNil());
+          temp_ptr = temp_ptr->cdr().get();
+        }
+        if (pair.second[2] != '-') {
+          *temp_ptr = LispObject(NewSymbol("BLACK_SHORT_CASTLING"), NewNil());
+          temp_ptr = temp_ptr->cdr().get();
+        }
+        if (pair.second[3] != '-') {
+          *temp_ptr = LispObject(NewSymbol("BLACK_LONG_CASTLING"), NewNil());
+          temp_ptr = temp_ptr->cdr().get();
+        }
+
+        *ptr = LispObject(NewPair(NewString(pair.first),
+        NewPair(temp, NewNil())), NewNil());
+      } else if (pair.first == "fen en_passant") {
+        // アンパッサンのリストを作る。
+        if (pair.second != "-") {
+          char temp[3] {
+            static_cast<char>(pair.second[0] - 'a' + 'A'), pair.second[1], '\0'
+          };
+          *ptr = LispObject(NewPair(NewString(pair.first),
+          NewPair(NewSymbol(temp), NewNil())), NewNil());
+        } else {
+          *ptr = LispObject(NewPair(NewString(pair.first),
+          NewPair(NewNil(), NewNil())), NewNil());
+        }
+      } else if ((pair.first == "fen ply") || (pair.first == "fen clock")) {
+        // 手数、クロック。
+        *ptr = LispObject(NewPair(NewString(pair.first),
+        NewPair(NewNumber(std::stod(pair.second)), NewNil())), NewNil());
+      } else {
+        // EPDの拡張部分。
+        *ptr = LispObject(NewPair(NewString(pair.first),
+        NewPair(NewString(pair.second), NewNil())), NewNil());
+      }
+      ptr = ptr->cdr().get();
+    }
+
+    return ret_ptr;
   }
 
   // ヘルプを作成する。

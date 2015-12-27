@@ -1863,6 +1863,13 @@ namespace Sayuri {
        */
       LispObjectPtr GenPGN(const std::string& pgn_str,
       const ScopeChain& caller_scope);
+
+      /**
+       * FEN/EPD文字列をパースする。
+       * @param fen_str パースするFEN/EPD文字列。
+       * @return パース後のリスト。
+       */
+      LispObjectPtr ParseFENEPD(const std::string& fen_str);
   };
 }  // namespace Sayuri
 
