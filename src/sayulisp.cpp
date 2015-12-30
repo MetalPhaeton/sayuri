@@ -5034,7 +5034,7 @@ R"...(### gen-engine ###
     ;; >     
     ;; >     ;; Output
     ;; >     ;; > (A2 B2 C2 D2 E2 F2 G2 H2))...";
-    AddHelpDict("gen-pgn", temp);
+    AddHelpDict("gen-engine", temp);
 
     temp =
 R"...(### Getting squares ###
@@ -5143,6 +5143,8 @@ R"...(### Getting states of game ###
     + Returns Boolean whether White King has castled or not.
 * `@get-black-has-castled`
     + Returns Boolean whether Black King has castled or not.
+* `@get-fen`
+    + Returns FEN of current position.
 
 <h6> Example </h6>
 
@@ -5189,7 +5191,12 @@ R"...(### Getting states of game ###
     
     (display (my-engine '@get-black-has-castled))
     ;; Output
-    ;; > #f)...";
+    ;; > #f
+    
+    (display (my-engine '@get-fen))
+    ;; Output
+    ;; > r1bqk1nr/ppp2ppp/2n5/2bpp3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w kq d6 0 5
+    )...";
     AddHelpDict("engine @get-to-move", temp);
     AddHelpDict("engine @get-castling-rights", temp);
     AddHelpDict("engine @get-en-passant-square", temp);
@@ -6708,5 +6715,159 @@ If you specify `<New weight>`, this parameter is updated.
     AddHelpDict("engine @weight-weak-square", temp);
     AddHelpDict("engine @weight-castling", temp);
     AddHelpDict("engine @weight-abandoned-castling", temp);
+
+    temp =
+R"...(### gen-pgn ###
+
+<h6> Usage </h6>
+
+* `(gen-pgn <PGN string : String>)`
+
+<h6> Description </h6>
+
+* Generates and returns PGN object from `<PGN string>`.
+* PGN object is operated by Message Symbol.
+* PGN object has 2 states.
+    + Current game.
+        - This can be changed by `@set-current-game`.
+    + Current move.
+        - This can be changed by `@next-move`, `@prev-move`, `@alt-move`,
+          `@orig-move`, `@rewind-move`.
+
+<h6> Description of Message Symbols </h6>
+
+* `@get-pgn-comments`
+    + Returns Lists of comments about PGN.
+
+* `@get-current-comments.`
+    + Returns List of comments about the current game.
+
+* `@get-current-move-comments`
+    + Returns List of comments about the current move.
+
+* `@length`
+    + Returns the number of games that PGN has.
+
+* `@set-current-game <Index : Number>`
+    + Sets a current game into the `<Index>`th game.
+
+* `@get-current-game-headers`
+    + Returns List of Lists composed with headers of the current game.
+        - The format is "`((<Name 1> <value 1>) (<Name 2> <Value 2>)...)`".
+
+* `@current-move`
+    + Returns the current move text.
+
+* `@next-move`
+    + Change the current move into the next move
+      and returns the move text.
+
+* `@prev-move`
+    + Change the current move into the previous move
+      and returns the move text.
+
+* `@alt-move`
+    + Change the current move into the alternative move
+      and returns the move text.
+
+* `@orig-move`
+    + If the current move is an alternative move,
+      then change a current move into the original move
+      and returns the move text.
+
+* `@rewind-move`
+    + Change a current move into the first move
+      and returns the move text.
+
+<h6> Example </h6>
+
+    ;; Open PGN File.
+    (define pgn-file (input-stream "/path/to/pgnfile.pgn"))
+    
+    ;; Reads the file and generates PGN object.
+    (define my-pgn (gen-pgn (pgn-file '@read)))
+    
+    ;; Displays the current game headers.
+    (display (my-pgn '@get-current-game-headers))
+    
+    ;; Output
+    ;; > (("Black" "Hanako Yamada") ("Site" "Japan")
+    ;; > ("White" "Hironori Ishibashi")))...";
+    AddHelpDict("gen-pgn", temp);
+
+    temp =
+R"...(### parse-fen/epd ###
+
+<h6> Usage </h6>
+
+* `(parse-fen/epd <FEN or EPD : String>)`
+
+<h6> Description </h6>
+
+* Parses `<FEN or EPD>` and returns result value.
+    +  A result value is `((<Tag 1 : String> <Object 1>)...)`.
+
+<h6> Example </h6>
+
+    (display (parse-fen/epd
+        "rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq d3 0 3"))
+    ;; Output
+    ;; > (("fen castling" (WHITE_SHORT_CASTLING
+    ;; > WHITE_LONG_CASTLING BLACK_SHORT_CASTLING BLACK_LONG_CASTLING))
+    ;; > ("fen clock" 0)
+    ;; > ("fen en_passant" D3)
+    ;; > ("fen ply" 5)
+    ;; > ("fen position" ((WHITE ROOK) (WHITE KNIGHT) (WHITE BISHOP)
+    ;; > (WHITE QUEEN) (WHITE KING) (WHITE BISHOP) (NO_SIDE EMPTY)
+    ;; > (WHITE ROOK) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (WHITE KNIGHT) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (WHITE PAWN)
+    ;; > (WHITE PAWN) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (BLACK PAWN) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (BLACK PAWN)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (BLACK PAWN) (BLACK PAWN) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK ROOK)
+    ;; > (BLACK KNIGHT) (BLACK BISHOP) (BLACK QUEEN) (BLACK KING)
+    ;; > (BLACK BISHOP) (BLACK KNIGHT) (BLACK ROOK)))
+    ;; > ("fen to_move" BLACK)))...";
+    AddHelpDict("parse-fen/epd", temp);
+
+    temp =
+R"...(### to-fen-position ###
+
+<h6> Usage </h6>
+
+* `(to-fen-position <Pieces list : List>)`
+
+<h6> Description </h6>
+
+* Analyses `<Pieces list>` and returns FEN position.
+
+<h6> Example </h6>
+
+    (display (to-fen-position
+        '((WHITE KING) (WHITE KING)(WHITE KING) (WHITE KING)
+        (WHITE QUEEN) (WHITE QUEEN)(WHITE QUEEN) (WHITE QUEEN)
+        (WHITE ROOK) (WHITE ROOK)(WHITE ROOK) (WHITE ROOK)
+        (WHITE BISHOP) (WHITE BISHOP)(WHITE BISHOP) (WHITE BISHOP)
+        (WHITE KNIGHT) (WHITE KNIGHT)(WHITE KNIGHT) (WHITE KNIGHT)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (BLACK KNIGHT) (BLACK KNIGHT)(BLACK KNIGHT) (BLACK KNIGHT)
+        (BLACK BISHOP) (BLACK BISHOP)(BLACK BISHOP) (BLACK BISHOP)
+        (BLACK ROOK) (BLACK ROOK)(BLACK ROOK) (BLACK ROOK)
+        (BLACK QUEEN) (BLACK QUEEN)(BLACK QUEEN) (BLACK QUEEN)
+        (BLACK KING) (BLACK KING)(BLACK KING) (BLACK KING))))
+    ;; Output
+    ;; > qqqqkkkk/bbbbrrrr/4nnnn/8/8/NNNN4/RRRRBBBB/KKKKQQQQ)...";
+    AddHelpDict("to-fen-position", temp);
   }
 }  // namespace Sayuri
