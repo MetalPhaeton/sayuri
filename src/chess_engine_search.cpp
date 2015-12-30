@@ -181,16 +181,9 @@ namespace Sayuri {
     // --- 繰り返しチェック (繰り返しなら0点。) --- //
     basic_st_.position_memo_[level] = pos_hash;
     if (cache.enable_repetition_check_) {
-      if (level <= 2) {
-        // お互いの初手。 (今までの配置を調べる。)
-        for (auto& position : shared_st_ptr_->position_history_) {
-          if (position == *this) {
-            return ReturnProcess(SCORE_DRAW, level);
-          }
-        }
-      } else if (level <= 4) {
+      if (level <= 4) {
         // お互いの2手目。
-        int index = shared_st_ptr_->position_history_.size() - (-level + 5);
+        int index = (shared_st_ptr_->position_history_.size() - 5) + level;
         if ((index >= 0)
         && (shared_st_ptr_->position_history_[index].pos_hash()
         == pos_hash)) {
