@@ -2145,7 +2145,7 @@ namespace Sayuri {
     }
     if ((rights & WHITE_LONG_CASTLING)) {
       ret_ptr->Append(Lisp::NewPair
-      (Lisp::NewSymbol(CASTLING_SYMBOL[2]),
+      (Lisp::NewSymbol(CASTLING_SYMBOL[4]),
       Lisp::NewNil()));
     }
     if ((rights & BLACK_SHORT_CASTLING)) {
@@ -2940,6 +2940,28 @@ namespace Sayuri {
       };
       AddNativeFunction(func, "parse-fen/epd");
     }
+    {
+      auto func = [this](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) -> LispObjectPtr {
+        // 引数チェック。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        if (!list_itr) {
+          throw Lisp::GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr position_ptr = caller.Evaluate(*list_itr);
+        if (!(position_ptr->IsList())) {
+          throw GenWrongTypeError
+          (func_name, "List", std::vector<int> {1}, true);
+        }
+
+        return this->ToFENPosition(func_name, *position_ptr);
+      };
+      AddNativeFunction(func, "to-fen-position");
+    }
   }
 
   // Sayulispを開始する。
@@ -3691,6 +3713,79 @@ namespace Sayuri {
     }
 
     return ret_ptr;
+  }
+
+  // FENの配置の文字列に変換する。
+  LispObjectPtr Sayulisp::ToFENPosition(const std::string& func_name,
+  const LispObject& piece_list) {
+    // 準備。
+    Bitboard position[NUM_SIDES][NUM_PIECE_TYPES];
+    INIT_ARRAY(position);
+    LispIterator<false> piece_list_itr {&piece_list};
+    auto to_int = [this](const LispObject& obj) -> int {
+      return obj.IsSymbol() ? global_ptr_->Evaluate(obj)->number_value()
+      : obj.number_value();
+    };
+
+    FOR_SQUARES(square) {
+      // 要素があるかチェック。
+      if (!piece_list_itr) {
+        throw GenError("@sayulisp-error",
+        "List of pieces must be 64 elements. Given "
+        + std::to_string(square + 1) + " elements.");
+      }
+
+      // 要素をチェック。
+      if (!(piece_list_itr->IsList())) {
+        throw GenError("@sayulisp-error",
+        "Piece must be indicate by '(<Side> <Piece Type>).");
+      }
+
+      // 駒のサイドの要素があるかどうかをチェック。
+      if (!(piece_list_itr->IsPair())) {
+        throw GenError("@sayulisp-error", "Couldn't found side value.");
+      }
+
+      // 駒のサイドをチェック。
+      if (!(piece_list_itr->car()->IsNumber()
+      || piece_list_itr->car()->IsSymbol())) {
+        throw GenError("@sayulisp-error",
+        "Side must be indicate by Symbol or Number.");
+      }
+      Side side = to_int(*(piece_list_itr->car()));
+      if (side >= NUM_SIDES) {
+        throw GenError("@sayulisp-error",
+        "The side value '" + std::to_string(side)
+        + "' doesn't indicate any side.");
+      }
+
+      // 駒の種類の要素があるかどうかをチェック。
+      if (!(piece_list_itr->cdr()->IsPair())) {
+        throw GenError("@sayulisp-error", "Couldn't found piece type value.");
+      }
+
+      // 駒の種類をチェック。
+      if (!(piece_list_itr->cdr()->car()->IsNumber()
+      || piece_list_itr->cdr()->car()->IsSymbol())) {
+        throw GenError("@sayulisp-error",
+        "Side must be indicate by Symbol or Number.");
+      }
+      PieceType piece_type = to_int(*(piece_list_itr->cdr()->car()));
+      if (piece_type >= NUM_PIECE_TYPES) {
+        throw GenError("@sayulisp-error",
+        "The piece type value '" + std::to_string(piece_type)
+        +  "' doesn't indicate any piece type.");
+      }
+
+      // ビットボードにセット。
+      if (side && piece_type) {
+        position[side][piece_type] |= Util::SQUARE[square][R0];
+      }
+
+      ++piece_list_itr;
+    }
+
+    return NewString(Util::ToFENPosition(position));
   }
 
   // ヘルプを作成する。

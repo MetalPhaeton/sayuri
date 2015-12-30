@@ -1048,6 +1048,15 @@ namespace Sayuri {
        */
       const HelpDict& help() const {return help_;}
 
+    protected:
+      // ========== //
+      // メンバ変数 //
+      // ========== //
+      /** グローバルオブジェクト。 */
+      LispObjectPtr global_ptr_;
+      /** ヘルプ辞書。 */
+      HelpDict help_;
+
     private:
       // ================ //
       // プライベート関数 //
@@ -1078,11 +1087,6 @@ namespace Sayuri {
       // ========== //
       // メンバ変数 //
       // ========== //
-      /** グローバルオブジェクト。 */
-      LispObjectPtr global_ptr_;
-      /** ヘルプ辞書。 */
-      HelpDict help_;
-
       /** トークンを入れるキュー。 */
       std::queue<std::string> token_queue_;
       /** 解析用ストリーム。 */

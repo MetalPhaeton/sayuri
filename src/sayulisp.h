@@ -1870,6 +1870,15 @@ namespace Sayuri {
        * @return パース後のリスト。
        */
       LispObjectPtr ParseFENEPD(const std::string& fen_str);
+
+      /**
+       * 駒の配列のリストをFENの文字列に変換する。
+       * @param func_name 関数の名前。
+       * @param piece_list 駒の配列のリスト。
+       * @return 変換後の文字列オブジェクト。
+       */
+      LispObjectPtr ToFENPosition(const std::string& func_name,
+      const LispObject& piece_list);
   };
 }  // namespace Sayuri
 
