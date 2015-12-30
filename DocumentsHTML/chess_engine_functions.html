@@ -54,6 +54,8 @@
 <li><a href="#number-to-side">number-&gt;side</a></li>
 <li><a href="#number-to-piece">number-&gt;piece</a></li>
 <li><a href="#number-to-castling">number-&gt;castling</a></li>
+<li><a href="#parse-fenepd">parse-fen/epd</a></li>
+<li><a href="#to-fen-position">to-fen-position</a></li>
 </ul></li>
 </ul>
 <hr />
@@ -655,6 +657,85 @@ Example
 ;; Output
 ;; &gt; (NO_CASTLING WHITE_SHORT_CASTLING (WHITE_LONG_CASTLING
 ;; &gt; (BLACK_SHORT_CASTLING BLACK_LONG_CASTLING &quot;Hello&quot;) 5) 100)</code></pre>
+<h3 id="parse-fenepd">parse-fen/epd</h3>
+<h6>
+Usage
+</h6>
+<ul>
+<li><code>(parse-fen/epd &lt;FEN or EPD : String&gt;)</code></li>
+</ul>
+<h6>
+Description
+</h6>
+<ul>
+<li>Parses <code>&lt;FEN or EPD&gt;</code> and returns result value.
+<ul>
+<li>A result value is <code>((&lt;Tag 1 : String&gt; &lt;Object 1&gt;)...)</code>.</li>
+</ul></li>
+</ul>
+<h6>
+Example
+</h6>
+<pre><code>(display (parse-fen/epd
+    &quot;rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq d3 0 3&quot;))
+;; Output
+;; &gt; ((&quot;fen castling&quot; (WHITE_SHORT_CASTLING
+;; &gt; WHITE_LONG_CASTLING BLACK_SHORT_CASTLING BLACK_LONG_CASTLING))
+;; &gt; (&quot;fen clock&quot; 0)
+;; &gt; (&quot;fen en_passant&quot; D3)
+;; &gt; (&quot;fen ply&quot; 5)
+;; &gt; (&quot;fen position&quot; ((WHITE ROOK) (WHITE KNIGHT) (WHITE BISHOP)
+;; &gt; (WHITE QUEEN) (WHITE KING) (WHITE BISHOP) (NO_SIDE EMPTY)
+;; &gt; (WHITE ROOK) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (NO_SIDE EMPTY)
+;; &gt; (NO_SIDE EMPTY) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN)
+;; &gt; (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+;; &gt; (NO_SIDE EMPTY) (WHITE KNIGHT) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+;; &gt; (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (WHITE PAWN)
+;; &gt; (WHITE PAWN) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+;; &gt; (NO_SIDE EMPTY) (NO_SIDE EMPTY) (BLACK PAWN) (NO_SIDE EMPTY)
+;; &gt; (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+;; &gt; (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (BLACK PAWN)
+;; &gt; (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+;; &gt; (BLACK PAWN) (BLACK PAWN) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+;; &gt; (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK ROOK)
+;; &gt; (BLACK KNIGHT) (BLACK BISHOP) (BLACK QUEEN) (BLACK KING)
+;; &gt; (BLACK BISHOP) (BLACK KNIGHT) (BLACK ROOK)))
+;; &gt; (&quot;fen to_move&quot; BLACK))</code></pre>
+<h3 id="to-fen-position">to-fen-position</h3>
+<h6>
+Usage
+</h6>
+<ul>
+<li><code>(to-fen-position &lt;Pieces list : List&gt;)</code></li>
+</ul>
+<h6>
+Description
+</h6>
+<ul>
+<li>Analyses <code>&lt;Pieces list&gt;</code> and returns FEN position.</li>
+</ul>
+<h6>
+Example
+</h6>
+<pre><code>(display (to-fen-position
+    &#39;((WHITE KING) (WHITE KING)(WHITE KING) (WHITE KING)
+    (WHITE QUEEN) (WHITE QUEEN)(WHITE QUEEN) (WHITE QUEEN)
+    (WHITE ROOK) (WHITE ROOK)(WHITE ROOK) (WHITE ROOK)
+    (WHITE BISHOP) (WHITE BISHOP)(WHITE BISHOP) (WHITE BISHOP)
+    (WHITE KNIGHT) (WHITE KNIGHT)(WHITE KNIGHT) (WHITE KNIGHT)
+    (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    (BLACK KNIGHT) (BLACK KNIGHT)(BLACK KNIGHT) (BLACK KNIGHT)
+    (BLACK BISHOP) (BLACK BISHOP)(BLACK BISHOP) (BLACK BISHOP)
+    (BLACK ROOK) (BLACK ROOK)(BLACK ROOK) (BLACK ROOK)
+    (BLACK QUEEN) (BLACK QUEEN)(BLACK QUEEN) (BLACK QUEEN)
+    (BLACK KING) (BLACK KING)(BLACK KING) (BLACK KING))))
+;; Output
+;; &gt; qqqqkkkk/bbbbrrrr/4nnnn/8/8/NNNN4/RRRRBBBB/KKKKQQQQ</code></pre>
 
 </section>
 </div>

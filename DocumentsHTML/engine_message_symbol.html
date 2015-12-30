@@ -158,6 +158,10 @@ Example
 <ul>
 <li>Returns Boolean whether Black King has castled or not.</li>
 </ul></li>
+<li><code>@get-fen</code>
+<ul>
+<li>Returns FEN of current position.</li>
+</ul></li>
 </ul>
 <h6>
 Example
@@ -205,7 +209,11 @@ Example
 
 (display (my-engine &#39;@get-black-has-castled))
 ;; Output
-;; &gt; #f</code></pre>
+;; &gt; #f
+
+(display (my-engine &#39;@get-fen))
+;; Output
+;; &gt; r1bqk1nr/ppp2ppp/2n5/2bpp3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w kq d6 0 5</code></pre>
 <h3 id="setting-states-of-game">Setting states of game</h3>
 <ul>
 <li><code>@set-to-move &lt;Side : Number or Symbol&gt;</code>
