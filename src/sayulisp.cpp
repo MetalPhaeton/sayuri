@@ -576,6 +576,9 @@ namespace Sayuri {
       return GetBlackHasCastled();
 
     }
+    if (message_symbol == "@get-fen") {
+      return Lisp::NewString(engine_ptr_->GetFENString());
+    }
     if (message_symbol == "@set-new-game") {
       return SetNewGame();
 

@@ -817,6 +817,54 @@ namespace Sayuri {
     return move;
   }
 
+  // FEN文字列を返す。
+  std::string ChessEngine::GetFENString() const {
+    std::ostringstream oss;
+
+    // 駒の配置。
+    oss << Util::ToFENPosition(basic_st_.position_) << " ";
+
+    // 手番。
+    oss << (basic_st_.to_move_ == WHITE ? "w " : "b ");
+
+    // キャスリングの権利。
+    if (basic_st_.castling_rights_) {
+      if ((basic_st_.castling_rights_ & WHITE_SHORT_CASTLING)) {
+        oss << "K";
+      }
+      if ((basic_st_.castling_rights_ & WHITE_LONG_CASTLING)) {
+        oss << "Q";
+      }
+      if ((basic_st_.castling_rights_ & BLACK_SHORT_CASTLING)) {
+        oss << "k";
+      }
+      if ((basic_st_.castling_rights_ & BLACK_LONG_CASTLING)) {
+        oss << "q";
+      }
+      oss << " ";
+    } else {
+      oss << "- ";
+    }
+
+    // アンパッサン。
+    if (basic_st_.en_passant_square_) {
+      oss << static_cast<char>('a'
+      + Util::SquareToFyle(basic_st_.en_passant_square_))
+      << static_cast<char>('1'
+      + Util::SquareToRank(basic_st_.en_passant_square_)) << " ";
+    } else {
+      oss << "- ";
+    }
+
+    // クロック。
+    oss << std::to_string(basic_st_.clock_) << " ";
+
+    // 手数。
+    oss << std::to_string((basic_st_.ply_ / 2) + 1);
+
+    return oss.str();
+  }
+
   // 駒を置く。
   void ChessEngine::PutPiece(Square square, PieceType piece_type, Side side) {
     // 置く位置の現在の駒の種類を入手する。

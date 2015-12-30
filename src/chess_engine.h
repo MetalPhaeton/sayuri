@@ -254,6 +254,12 @@ namespace Sayuri {
         return true;
       }
 
+      /**
+       * 現在の状態をFEN文字列にする。
+       * @return 現在の状態のFEN文字列。
+       */
+      std::string GetFENString() const;
+
       // --- 利き筋関連 --- //
       /**
        * ボードの状態からビショップの利き筋を作る。
