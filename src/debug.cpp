@@ -124,8 +124,7 @@ namespace Sayuri {
 
     // ========================================================================
 
-    std::cout << Util::ToFENPosition(engine_ptr->basic_st_.position_)
-    << std::endl;;
+    PrintBitboard(INIT_ISO_PAWN_MASK(FYLE_E));
 
     return 0;
   }

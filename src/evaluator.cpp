@@ -42,8 +42,8 @@ namespace Sayuri {
   // ========== //
   constexpr Bitboard Evaluator::START_POSITION[NUM_SIDES][NUM_PIECE_TYPES];
   constexpr Bitboard Evaluator::NOT_START_POSITION[NUM_SIDES][NUM_PIECE_TYPES];
-  Bitboard Evaluator::pass_pawn_mask_[NUM_SIDES][NUM_SQUARES];
-  Bitboard Evaluator::iso_pawn_mask_[NUM_SQUARES];
+  constexpr Bitboard Evaluator::PASS_PAWN_MASK[NUM_SIDES][NUM_SQUARES];
+  constexpr Bitboard Evaluator::ISO_PAWN_MASK[NUM_SQUARES];
   constexpr Bitboard Evaluator::PAWN_SHIELD_MASK[NUM_SIDES][NUM_SQUARES];
   constexpr Bitboard Evaluator::WEAK_SQUARE_MASK[NUM_SIDES][NUM_SQUARES];
   Bitboard Evaluator::pin_back_table_[NUM_SQUARES][0xff + 1][NUM_ROTS];
@@ -183,7 +183,7 @@ namespace Sayuri {
 
       // パスポーンを計算。
       if (!(basic_st.position_[ENEMY_SIDE][PAWN]
-      & Evaluator::pass_pawn_mask_[SIDE][square])) {
+      & Evaluator::PASS_PAWN_MASK[SIDE][square])) {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->pass_pawn_cache_;
 
         // 守られたパスポーン。
@@ -202,7 +202,7 @@ namespace Sayuri {
 
       // 孤立ポーンを計算。
       if (!(basic_st.position_[SIDE][PAWN]
-      & Evaluator::iso_pawn_mask_[square])) {
+      & Evaluator::ISO_PAWN_MASK[square])) {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->iso_pawn_cache_;
       }
 
@@ -457,10 +457,6 @@ namespace Sayuri {
   // ======================= //
   // static変数の初期化。
   void Evaluator::InitEvaluator() {
-    // pass_pawn_mask_[][]を初期化する。
-    InitPassPawnMask();
-    // iso_pawn_mask_[]を初期化する。
-    InitIsoPawnMask();
     // pin_back_table_[][][][][]を初期化する。
     InitPinBackTable();
   }
@@ -679,60 +675,6 @@ namespace Sayuri {
   // ======================== //
   // その他のプライベート関数 //
   // ======================== //
-  // pass_pawn_mask_[][]を初期化する。
-  void Evaluator::InitPassPawnMask() {
-    // マスクを作って初期化する。
-    FOR_SIDES(side) {
-      FOR_SQUARES(square) {
-        Bitboard mask = 0;
-        if (side == NO_SIDE) {  // どちらのサイドでもなければ0。
-          pass_pawn_mask_[side][square] = 0;
-        } else {
-          // 自分のファイルと隣のファイルのマスクを作る。
-          Fyle fyle = Util::SquareToFyle(square);
-          mask |= Util::FYLE[fyle];
-          if (fyle == FYLE_A) {  // aファイルのときはbファイルが隣り。
-            mask |= Util::FYLE[fyle + 1];
-          } else if (fyle == FYLE_H) {  // hファイルのときはgファイルが隣り。
-            mask |= Util::FYLE[fyle - 1];
-          } else {  // それ以外のときは両隣。
-            mask |= Util::FYLE[fyle + 1];
-            mask |= Util::FYLE[fyle - 1];
-          }
-
-          // 自分の位置より手前のランクは消す。
-          if (side == WHITE) {
-            Bitboard temp = (Util::SQUARE[square][R0] - 1)
-            | Util::RANK[Util::SquareToRank(square)];
-            mask &= ~temp;
-          } else {
-            Bitboard temp = ~(Util::SQUARE[square][R0] - 1)
-            | Util::RANK[Util::SquareToRank(square)];
-            mask &= ~temp;
-          }
-
-          // マスクをセット。
-          pass_pawn_mask_[side][square] = mask;
-        }
-      }
-    }
-  }
-
-  // iso_pawn_mask_[]を初期化する。
-  void Evaluator::InitIsoPawnMask() {
-    FOR_SQUARES(square) {
-      Fyle fyle = Util::SquareToFyle(square);
-      if (fyle == FYLE_A) {
-        iso_pawn_mask_[square] = Util::FYLE[fyle + 1];
-      } else if (fyle == FYLE_H) {
-        iso_pawn_mask_[square] = Util::FYLE[fyle - 1];
-      } else {
-        iso_pawn_mask_[square] =
-        Util::FYLE[fyle + 1] | Util::FYLE[fyle - 1];
-      }
-    }
-  }
-
   // pin_back_table_[][][][][]を初期化する。
   void Evaluator::InitPinBackTable() {
     // 初期化。
