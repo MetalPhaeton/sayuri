@@ -39,9 +39,24 @@
 #include <cstdint>
 
 #include "common.h"
+#include "num_bit16_table.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
+  // ==================== //
+  // Utilで使う定数用関数 //
+  // ==================== //
+  /*
+  inline constexpr Bitboard FYLE_BB(Fyle fyle) {
+    return 0x0101010101010101ULL << fyle;
+  }
+  inline constexpr Bitboard RANK_BB(Rank rank) {
+    return 0xffULL << (8 * rank);
+  }
+  inline constexpr Bitboard SHIFT_R(Bitboard bitboard) {
+    return (bitboard & ~FYLE_BB(FYLE_H)) << 1;
+  }
+  */
   /**
    * Sayuri用便利ツールのクラス。
    */
@@ -1465,10 +1480,10 @@ namespace Sayuri {
        * @return 立っているビットボードの数。
        */
       static int CountBits(Bitboard bitboard) {
-        return num_bit16_table_[bitboard & 0xffff]
-        + num_bit16_table_[(bitboard >> 16) & 0xffff]
-        + num_bit16_table_[(bitboard >> 32) & 0xffff]
-        + num_bit16_table_[(bitboard >> 48) & 0xffff];
+        return NUM_BIT16_TABLE[bitboard & 0xffff]
+        + NUM_BIT16_TABLE[(bitboard >> 16) & 0xffff]
+        + NUM_BIT16_TABLE[(bitboard >> 32) & 0xffff]
+        + NUM_BIT16_TABLE[(bitboard >> 48) & 0xffff];
       }
 
       /**
@@ -1687,17 +1702,6 @@ namespace Sayuri {
       virtual ~Util();
 
     private:
-
-      // ============================ //
-      // ビットを数えるときに使うもの //
-      // ============================ //
-      /**
-       * 下位16ビットのビットの数が入った配列。 [下位16ビット]
-       */
-      static std::uint8_t num_bit16_table_[0xffff + 1];
-      /** num_bit16_table_[]を初期化する。 */
-      static void InitNumBit16Table();
-
       // ========== //
       // マジック用 //
       // ========== //

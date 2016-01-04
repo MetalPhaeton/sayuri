@@ -44,22 +44,6 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
-  /** 無名名前空間。 */
-  namespace {
-    /** 
-     * 立っているビットの数を数える。
-     * @param bits 対象のビット。
-     * @return 立っているビットの数。
-     */
-    std::uint8_t GetNumBits(unsigned int bits) {
-      std::uint8_t num = 0;
-      for (; bits; bits &= bits - 1) {
-        ++num;
-      }
-      return num;
-    }
-  }
-
   // ========== //
   // static定数 //
   // ========== //
@@ -90,8 +74,6 @@ namespace Sayuri {
   Bitboard Util::queen_move_[NUM_SQUARES];
   Bitboard Util::between_[NUM_SQUARES][NUM_SQUARES];
   void Util::InitUtil() {
-    // num_bit16_table_[]を初期化する。
-    InitNumBit16Table();
     // attack_table_[][][]を初期化する。
     InitAttackTable();
     // pawn_movable_table_[][][]を初期化する。
@@ -131,18 +113,6 @@ namespace Sayuri {
     InitKingMove();
     // ランダム関連を初期化する。
     InitRandom();
-  }
-
-  // ============================ //
-  // ビットを数えるときに使うもの //
-  // ============================ //
-  // 下位16ビットのビットの数が入った配列。 [下位16ビット]
-  std::uint8_t Util::num_bit16_table_[0xffff + 1];
-  // num_bit16_table_[]を初期化する。
-  void Util::InitNumBit16Table() {
-    for (unsigned int index = 0; index <= 0xffff; ++index) {
-      num_bit16_table_[index] = GetNumBits(index);
-    }
   }
 
   // ======== //
