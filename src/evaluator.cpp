@@ -195,8 +195,8 @@ namespace Sayuri {
       }
 
       // ダブルポーンを計算。
-      if (Util::CountBits(basic_st.position_[SIDE][PAWN]
-      & Util::FYLE[Util::SquareToFyle(square)]) >= 2) {
+      if ((basic_st.position_[SIDE][PAWN]
+      & Util::FYLE[Util::SquareToFyle(square)] & ~Util::SQUARE[square][R0])) {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->double_pawn_cache_;
       }
 
