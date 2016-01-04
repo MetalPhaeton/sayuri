@@ -330,17 +330,15 @@ namespace Sayuri {
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // クイーンの早過ぎる始動を計算。
-      int value = 0;
       if (!(Util::SQUARE[square][R0]
       & Evaluator::START_POSITION[SIDE][QUEEN])) {
-        value += Util::CountBits((basic_st.position_[SIDE][KNIGHT]
+        evaluator.score_ +=
+        SIGN * evaluator.cache_ptr_->early_queen_starting_cache_
+        [Util::CountBits((basic_st.position_[SIDE][KNIGHT]
         & Evaluator::START_POSITION[SIDE][KNIGHT])
         | (basic_st.position_[SIDE][BISHOP]
-        & Evaluator::START_POSITION[SIDE][BISHOP]));
+        & Evaluator::START_POSITION[SIDE][BISHOP]))];
       }
-
-      evaluator.score_ +=
-      SIGN * evaluator.cache_ptr_->early_queen_starting_cache_[value];
 
       // ピンを計算。
       // ピンのターゲットと裏駒を作成。
