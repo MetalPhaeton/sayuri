@@ -410,12 +410,13 @@ namespace Sayuri {
       SIGN * evaluator.cache_ptr_->weak_square_cache_[value];
 
       // --- キャスリングを計算する --- //
-      Castling rights_mask = SIDE == WHITE ? WHITE_CASTLING : BLACK_CASTLING;
+      constexpr Castling RIGHTS_MASK =
+      SIDE == WHITE ? WHITE_CASTLING : BLACK_CASTLING;
       if (basic_st.has_castled_[SIDE]) {
         // キャスリングした。
         evaluator.score_ += SIGN * evaluator.cache_ptr_->castling_cache_;
       } else {
-        if (!(basic_st.castling_rights_ & rights_mask)) {
+        if (!(basic_st.castling_rights_ & RIGHTS_MASK)) {
           // キャスリングの権利を放棄した。
           evaluator.score_ +=
           SIGN * evaluator.cache_ptr_->abandoned_castling_cache_;
