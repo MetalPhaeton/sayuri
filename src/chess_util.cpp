@@ -76,21 +76,11 @@ namespace Sayuri {
   // ================== //
   // static変数の初期化。
   Bitboard Util::queen_move_[NUM_SQUARES];
-  Bitboard Util::between_[NUM_SQUARES][NUM_SQUARES];
   void Util::InitUtil() {
     // attack_table_[][][]を初期化する。
     InitAttackTable();
     // pawn_movable_table_[][][]を初期化する。
     InitPawnMovableTable();
-    // line_[][]を初期化する。
-    InitLine();
-    // between_[][]を初期化する。
-    FOR_SQUARES(square_1) {
-      FOR_SQUARES(square_2) {
-        between_[square_1][square_2] = line_[square_1][square_2]
-        & ~(SQUARE[square_1][R0] | SQUARE[square_2][R0]);
-      }
-    }
     // bishop_move_[]を初期化する。
     InitBishopMove();
     // rook_move_[]を初期化する。
@@ -320,114 +310,12 @@ namespace Sayuri {
   // ================== //
   // ビットボードの配列 //
   // ================== //
-  // 直線の入った配列。 [端点][端点]
-  Bitboard Util::line_[NUM_SQUARES][NUM_SQUARES];
   // ビショップの動きの配列。 [マス]
   Bitboard Util::bishop_move_[NUM_SQUARES];
   // ルークの動きの配列。 [マス]
   Bitboard Util::rook_move_[NUM_SQUARES];
   // キングの動きの配列。 [マス]
   Bitboard Util::king_move_[NUM_SQUARES];
-  // line_[][]を初期化する。
-  void Util::InitLine() {
-    // line_を作る。
-    FOR_SQUARES(square_1) {
-      FOR_SQUARES(square_2) {
-        // 端点を入手する。
-        Bitboard point_1 = SQUARE[square_1][R0];
-        Bitboard point_2 = SQUARE[square_2][R0];
-
-        // 右から調べていく。
-        Bitboard temp = point_1;
-        Bitboard between = 0;
-        while ((temp = GetRightBitboard(temp))) {
-          between |= temp;
-          // 端点に達したらline_に直線を入れる。
-          if (temp & point_2) {
-            line_[square_1][square_2] = point_1 | between;
-            break;
-          }
-        }
-        // 左から調べていく。
-        temp = point_1;
-        between = 0;
-        while ((temp = GetLeftBitboard(temp))) {
-          between |= temp;
-          // 端点に達したらline_に直線を入れる。
-          if (temp & point_2) {
-            line_[square_1][square_2] = point_1 | between;
-            break;
-          }
-        }
-        // 上から調べていく。
-        temp = point_1;
-        between = 0;
-        while ((temp = GetUpBitboard(temp))) {
-          between |= temp;
-          // 端点に達したらline_に直線を入れる。
-          if (temp & point_2) {
-            line_[square_1][square_2] = point_1 | between;
-            break;
-          }
-        }
-        // 下から調べていく。
-        temp = point_1;
-        between = 0;
-        while ((temp = GetDownBitboard(temp))) {
-          between |= temp;
-          // 端点に達したらline_に直線を入れる。
-          if (temp & point_2) {
-            line_[square_1][square_2] = point_1 | between;
-            break;
-          }
-        }
-        // 右上から調べていく。
-        temp = point_1;
-        between = 0;
-        while ((temp = GetRightUpBitboard(temp))) {
-          between |= temp;
-          // 端点に達したらline_に直線を入れる。
-          if (temp & point_2) {
-            line_[square_1][square_2] = point_1 | between;
-            break;
-          }
-        }
-        // 右下から調べていく。
-        temp = point_1;
-        between = 0;
-        while ((temp = GetRightDownBitboard(temp))) {
-          between |= temp;
-          // 端点に達したらline_に直線を入れる。
-          if (temp & point_2) {
-            line_[square_1][square_2] = point_1 | between;
-            break;
-          }
-        }
-        // 左上から調べていく。
-        temp = point_1;
-        between = 0;
-        while ((temp = GetLeftUpBitboard(temp))) {
-          between |= temp;
-          // 端点に達したらline_に直線を入れる。
-          if (temp & point_2) {
-            line_[square_1][square_2] = point_1 | between;
-            break;
-          }
-        }
-        // 左下から調べていく。
-        temp = point_1;
-        between = 0;
-        while ((temp = GetLeftDownBitboard(temp))) {
-          between |= temp;
-          // 端点に達したらline_に直線を入れる。
-          if (temp & point_2) {
-            line_[square_1][square_2] = point_1 | between;
-            break;
-          }
-        }
-      }
-    }
-  }
   // bishop_move_[]を初期化する。
   void Util::InitBishopMove() {
     // 動きを入れる。

@@ -39,7 +39,7 @@
 #include <cstdint>
 
 #include "common.h"
-#include "num_bit16_table.h"
+#include "chess_util_extra.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -1821,7 +1821,7 @@ namespace Sayuri {
        * @return 直線のビットボード。
        */
       static Bitboard GetLine(Square point_1, Square point_2) {
-        return line_[point_1][point_2];
+        return LINE[point_1][point_2];
       }
       /**
        * 2点を結ぶ直線のビットボードを得る。 (2点を除く。)
@@ -1830,7 +1830,7 @@ namespace Sayuri {
        * @return 直線のビットボード。
        */
       static Bitboard GetBetween(Square point_1, Square point_2) {
-        return between_[point_1][point_2];
+        return BETWEEN[point_1][point_2];
       }
       /**
        * ビショップの動きのビットボードを得る。
@@ -2184,10 +2184,6 @@ namespace Sayuri {
       // ================== //
       // ビットボードの配列 //
       // ================== //
-      /** 直線の入った配列。 [端点][端点] */
-      static Bitboard line_[NUM_SQUARES][NUM_SQUARES];
-      /** 直線の入った配列。 (端点を除く。) [端点][端点] */
-      static Bitboard between_[NUM_SQUARES][NUM_SQUARES];
       /** ビショップの動きの配列。 [マス] */
       static Bitboard bishop_move_[NUM_SQUARES];
       /** ルークの動きの配列。 [マス] */

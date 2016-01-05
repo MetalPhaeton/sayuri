@@ -124,7 +124,17 @@ namespace Sayuri {
 
     // ========================================================================
 
-    PrintBitboard(INIT_PAWN_ATTACK(WHITE, E4));
+    bool check = true;
+    FOR_SQUARES(square1) {
+      FOR_SQUARES(square2) {
+        if (BETWEEN[square1][square2] != Util::GetBetween(square1, square2)) {
+          check = false;
+          std::cout << square1 << " : " << square2 << std::endl;
+        }
+      }
+    }
+
+    std::cout << (check ? "Good" : "Bad") << std::endl;
 
     return 0;
   }
