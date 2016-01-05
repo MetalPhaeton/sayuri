@@ -124,7 +124,7 @@ namespace Sayuri {
 
     // ========================================================================
 
-    PrintBitboard(INIT_ISO_PAWN_MASK(FYLE_E));
+    PrintBitboard(INIT_PAWN_ATTACK(WHITE, E4));
 
     return 0;
   }

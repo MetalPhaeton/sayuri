@@ -66,6 +66,9 @@ namespace Sayuri {
   constexpr Bitboard Util::MAGIC_MASK_V[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK_D[NUM_SQUARES];
   constexpr Bitboard Util::MAGIC_MASK[NUM_SQUARES][NUM_ROTS];
+  constexpr Bitboard Util::PAWN_MOVE[NUM_SIDES][NUM_SQUARES];
+  constexpr Bitboard Util::PAWN_2STEP_MOVE[NUM_SIDES][NUM_SQUARES];
+  constexpr Bitboard Util::PAWN_ATTACK[NUM_SIDES][NUM_SQUARES];
 
   // ================== //
   // Utilクラスの初期化 //
@@ -87,12 +90,6 @@ namespace Sayuri {
         & ~(SQUARE[square_1][R0] | SQUARE[square_2][R0]);
       }
     }
-    // pawn_move_[][]を初期化する。
-    InitPawnMove();
-    // pawn_2step_move_[][]を初期化する。
-    InitPawn2StepMove();
-    // pawn_attack_[][]を初期化する。
-    InitPawnAttack();
     // knight_move_[]を初期化する。
     InitKnightMove();
     // bishop_move_[]を初期化する。
@@ -326,12 +323,6 @@ namespace Sayuri {
   // ================== //
   // 直線の入った配列。 [端点][端点]
   Bitboard Util::line_[NUM_SQUARES][NUM_SQUARES];
-  // ポーンの通常の動きの配列。 [サイド][マス]
-  Bitboard Util::pawn_move_[NUM_SIDES][NUM_SQUARES];
-  // ポーンの2歩の動きの配列。 [サイド][マス]
-  Bitboard Util::pawn_2step_move_[NUM_SIDES][NUM_SQUARES];
-  // ポーンの攻撃筋の配列。 [サイド][マス]
-  Bitboard Util::pawn_attack_[NUM_SIDES][NUM_SQUARES];
   // ナイトの動きの配列。 [マス]
   Bitboard Util::knight_move_[NUM_SQUARES];
   // ビショップの動きの配列。 [マス]
@@ -438,57 +429,6 @@ namespace Sayuri {
           }
         }
       }
-    }
-  }
-  // pawn_move_[][]を初期化する。
-  void Util::InitPawnMove() {
-    // ポーンの動きを作る。
-    FOR_SQUARES(square) {
-      Bitboard point = SQUARE[square][R0];
-      // どちらのサイドでもない。
-      pawn_move_[NO_SIDE][square] = 0;
-      // 白。
-      pawn_move_[WHITE][square] = GetUpBitboard(point);
-      // 黒。
-      pawn_move_[BLACK][square] = GetDownBitboard(point);
-    }
-  }
-  // pawn_2step_move_[][]を初期化する。
-  void Util::InitPawn2StepMove() {
-    // ポーンの2歩の動きを作る。
-    FOR_SQUARES(square) {
-      Bitboard point = SQUARE[square][R0];
-
-      // とりあえず0で初期化する。
-      pawn_2step_move_[NO_SIDE][square] = 0;
-      pawn_2step_move_[WHITE][square] = 0;
-      pawn_2step_move_[BLACK][square] = 0;
-
-      // ランク2の時は白に2歩の動きを入れる。
-      // ランク7の時は黒に2歩の動きを入れる。
-      if (point & RANK[RANK_2]) {
-        pawn_2step_move_[WHITE][square] =
-        GetUpBitboard(GetUpBitboard(point));
-      } else if (point & RANK[RANK_7]) {
-        pawn_2step_move_[BLACK][square] =
-        GetDownBitboard(GetDownBitboard(point));
-      }
-    }
-  }
-  // pawn_attack_[][]を初期化する。
-  void Util::InitPawnAttack() {
-    // 攻撃筋を入れる。
-    FOR_SQUARES(square) {
-      Bitboard point = SQUARE[square][R0];
-
-      // どちらでもない。
-      pawn_attack_[NO_SIDE][square] = 0;
-      // 白。
-      pawn_attack_[WHITE][square] =
-      GetRightUpBitboard(point) | GetLeftUpBitboard(point);
-      // 黒。
-      pawn_attack_[BLACK][square] =
-      GetRightDownBitboard(point) | GetLeftDownBitboard(point);
     }
   }
   // knight_move_[]を初期化する。
