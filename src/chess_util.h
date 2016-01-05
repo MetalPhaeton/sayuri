@@ -46,17 +46,159 @@ namespace Sayuri {
   // ==================== //
   // Utilで使う定数用関数 //
   // ==================== //
-  /*
+  /**
+   * マスのビットボードを作成。
+   * @param square マス。
+   * @return ビットボード。
+   */
+  inline constexpr Bitboard SQUARE_BB(Square square) {
+    return 0x1ULL << square;
+  }
+  /**
+   * ファイルのビットボードを作成。
+   * @param fyle ファイル。
+   * @return ビットボード。
+   */
   inline constexpr Bitboard FYLE_BB(Fyle fyle) {
     return 0x0101010101010101ULL << fyle;
   }
+  /**
+   * ランクのビットボードを作成。
+   * @param rank ランク。
+   * @return ビットボード。
+   */
   inline constexpr Bitboard RANK_BB(Rank rank) {
     return 0xffULL << (8 * rank);
   }
-  inline constexpr Bitboard SHIFT_R(Bitboard bitboard) {
-    return (bitboard & ~FYLE_BB(FYLE_H)) << 1;
+  /**
+   * 右にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_R(Bitboard bb) {
+    return (bb & ~FYLE_BB(FYLE_H)) << 1;
   }
-  */
+  /**
+   * 左にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_L(Bitboard bb) {
+    return (bb & ~FYLE_BB(FYLE_A)) >> 1;
+  }
+  /**
+   * 上にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_U(Bitboard bb) {
+    return (bb & ~RANK_BB(RANK_8)) << 8;
+  }
+  /**
+   * 下にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_D(Bitboard bb) {
+    return (bb & ~RANK_BB(RANK_1)) >> 8;
+  }
+  /**
+   * 右上にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_RU(Bitboard bb) {
+    return (bb & ~(RANK_BB(RANK_8) | FYLE_BB(FYLE_H))) << 9;
+  }
+  /**
+   * 右下にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_RD(Bitboard bb) {
+    return (bb & ~(RANK_BB(RANK_1) | FYLE_BB(FYLE_H))) >> 7;
+  }
+  /**
+   * 左上にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_LU(Bitboard bb) {
+    return (bb & ~(RANK_BB(RANK_8) | FYLE_BB(FYLE_A))) << 7;
+  }
+  /**
+   * 左下にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_LD(Bitboard bb) {
+    return (bb & ~(RANK_BB(RANK_1) | FYLE_BB(FYLE_A))) >> 9;
+  }
+  /**
+   * 右右上にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_RRU(Bitboard bb) {
+    return (bb & ~(RANK_BB(RANK_8) | FYLE_BB(FYLE_H) | FYLE_BB(FYLE_G))) << 10;
+  }
+  /**
+   * 右上上にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_RUU(Bitboard bb) {
+    return (bb & ~(RANK_BB(RANK_8) | RANK_BB(RANK_7) | FYLE_BB(FYLE_H))) << 17;
+  }
+  /**
+   * 右右下にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_RRD(Bitboard bb) {
+    return (bb & ~(RANK_BB(RANK_1) | FYLE_BB(FYLE_H) | FYLE_BB(FYLE_G))) >> 6;
+  }
+  /**
+   * 右下下にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_RDD(Bitboard bb) {
+    return (bb & ~(RANK_BB(RANK_1) | RANK_BB(RANK_2) | FYLE_BB(FYLE_H))) >> 15;
+  }
+  /**
+   * 左左上にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_LLU(Bitboard bb) {
+    return (bb & ~(RANK_BB(RANK_8) | FYLE_BB(FYLE_A) | FYLE_BB(FYLE_B))) << 6;
+  }
+  /**
+   * 左上上にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_LUU(Bitboard bb) {
+    return (bb & ~(RANK_BB(RANK_8) | RANK_BB(RANK_7) | FYLE_BB(FYLE_A))) << 15;
+  }
+  /**
+   * 左左下にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_LLD(Bitboard bb) {
+    return (bb & ~(RANK_BB(RANK_1) | FYLE_BB(FYLE_A) | FYLE_BB(FYLE_B))) >> 10;
+  }
+  /**
+   * 左下下にビットボードをシフト。
+   * @param bb ビットボード。
+   * @return シフト後のビットボード。
+   */
+  inline constexpr Bitboard SHIFT_LDD(Bitboard bb) {
+    return (bb & ~(RANK_BB(RANK_1) | RANK_BB(RANK_2) | FYLE_BB(FYLE_A))) >> 17;
+  }
+
   /**
    * Sayuri用便利ツールのクラス。
    */
@@ -186,22 +328,29 @@ namespace Sayuri {
       // ================== //
       /** 0度のマスのビットボード。 [マス] */
       static constexpr Bitboard SQUARE0[NUM_SQUARES] {
-        0x1ULL, 0x1ULL << 1, 0x1ULL << 2, 0x1ULL << 3,
-        0x1ULL << 4, 0x1ULL << 5, 0x1ULL << 6, 0x1ULL << 7,
-        0x1ULL << 8, 0x1ULL << 9, 0x1ULL << 10, 0x1ULL << 11,
-        0x1ULL << 12, 0x1ULL << 13, 0x1ULL << 14, 0x1ULL << 15,
-        0x1ULL << 16, 0x1ULL << 17, 0x1ULL << 18, 0x1ULL << 19,
-        0x1ULL << 20, 0x1ULL << 21, 0x1ULL << 22, 0x1ULL << 23,
-        0x1ULL << 24, 0x1ULL << 25, 0x1ULL << 26, 0x1ULL << 27,
-        0x1ULL << 28, 0x1ULL << 29, 0x1ULL << 30, 0x1ULL << 31,
-        0x1ULL << 32, 0x1ULL << 33, 0x1ULL << 34, 0x1ULL << 35,
-        0x1ULL << 36, 0x1ULL << 37, 0x1ULL << 38, 0x1ULL << 39,
-        0x1ULL << 40, 0x1ULL << 41, 0x1ULL << 42, 0x1ULL << 43,
-        0x1ULL << 44, 0x1ULL << 45, 0x1ULL << 46, 0x1ULL << 47,
-        0x1ULL << 48, 0x1ULL << 49, 0x1ULL << 50, 0x1ULL << 51,
-        0x1ULL << 52, 0x1ULL << 53, 0x1ULL << 54, 0x1ULL << 55,
-        0x1ULL << 56, 0x1ULL << 57, 0x1ULL << 58, 0x1ULL << 59,
-        0x1ULL << 60, 0x1ULL << 61, 0x1ULL << 62, 0x1ULL << 63
+        SQUARE_BB(A1), SQUARE_BB(B1), SQUARE_BB(C1), SQUARE_BB(D1),
+        SQUARE_BB(E1), SQUARE_BB(F1), SQUARE_BB(G1), SQUARE_BB(H1),
+
+        SQUARE_BB(A2), SQUARE_BB(B2), SQUARE_BB(C2), SQUARE_BB(D2),
+        SQUARE_BB(E2), SQUARE_BB(F2), SQUARE_BB(G2), SQUARE_BB(H2),
+
+        SQUARE_BB(A3), SQUARE_BB(B3), SQUARE_BB(C3), SQUARE_BB(D3),
+        SQUARE_BB(E3), SQUARE_BB(F3), SQUARE_BB(G3), SQUARE_BB(H3),
+
+        SQUARE_BB(A4), SQUARE_BB(B4), SQUARE_BB(C4), SQUARE_BB(D4),
+        SQUARE_BB(E4), SQUARE_BB(F4), SQUARE_BB(G4), SQUARE_BB(H4),
+
+        SQUARE_BB(A5), SQUARE_BB(B5), SQUARE_BB(C5), SQUARE_BB(D5),
+        SQUARE_BB(E5), SQUARE_BB(F5), SQUARE_BB(G5), SQUARE_BB(H5),
+
+        SQUARE_BB(A6), SQUARE_BB(B6), SQUARE_BB(C6), SQUARE_BB(D6),
+        SQUARE_BB(E6), SQUARE_BB(F6), SQUARE_BB(G6), SQUARE_BB(H6),
+
+        SQUARE_BB(A7), SQUARE_BB(B7), SQUARE_BB(C7), SQUARE_BB(D7),
+        SQUARE_BB(E7), SQUARE_BB(F7), SQUARE_BB(G7), SQUARE_BB(H7),
+
+        SQUARE_BB(A8), SQUARE_BB(B8), SQUARE_BB(C8), SQUARE_BB(D8),
+        SQUARE_BB(E8), SQUARE_BB(F8), SQUARE_BB(G8), SQUARE_BB(H8)
       };
 
       static constexpr Bitboard SQUARE[NUM_SQUARES][NUM_ROTS] {
@@ -472,26 +621,14 @@ namespace Sayuri {
 
       /** ファイルのビットボード。 [ファイル] */
       static constexpr Bitboard FYLE[NUM_FYLES] {
-        0x0101010101010101ULL,
-        0x0101010101010101ULL << 1,
-        0x0101010101010101ULL << 2,
-        0x0101010101010101ULL << 3,
-        0x0101010101010101ULL << 4,
-        0x0101010101010101ULL << 5,
-        0x0101010101010101ULL << 6,
-        0x0101010101010101ULL << 7
+        FYLE_BB(FYLE_A), FYLE_BB(FYLE_B), FYLE_BB(FYLE_C), FYLE_BB(FYLE_D),
+        FYLE_BB(FYLE_E), FYLE_BB(FYLE_F), FYLE_BB(FYLE_G), FYLE_BB(FYLE_H)
       };
 
       /** ランクのビットボード。 [ランク] */
       static constexpr Bitboard RANK[NUM_RANKS] {
-        0xffULL,
-        0xffULL << (1 * 8),
-        0xffULL << (2 * 8),
-        0xffULL << (3 * 8),
-        0xffULL << (4 * 8),
-        0xffULL << (5 * 8),
-        0xffULL << (6 * 8),
-        0xffULL << (7 * 8)
+        RANK_BB(RANK_1), RANK_BB(RANK_2), RANK_BB(RANK_3), RANK_BB(RANK_4),
+        RANK_BB(RANK_5), RANK_BB(RANK_6), RANK_BB(RANK_7), RANK_BB(RANK_8)
       };
 
       /** マスの色のビットボード。 [色 (サイド)] */
@@ -1104,7 +1241,7 @@ namespace Sayuri {
        * @return 「bitboard」を右に移動したビットボード。
        */
       static constexpr Bitboard GetRightBitboard(Bitboard bitboard) {
-        return (bitboard & ~FYLE[FYLE_H]) << 1;
+        return SHIFT_R(bitboard);
       }
       /**
        * 左に移動したビットボードを得る。
@@ -1112,7 +1249,7 @@ namespace Sayuri {
        * @return 「bitboard」を左に移動したビットボード。
        */
       static constexpr Bitboard GetLeftBitboard(Bitboard bitboard) {
-        return (bitboard & ~FYLE[FYLE_A]) >> 1;
+        return SHIFT_L(bitboard);
       }
       /**
        * 上に移動したビットボードを得る。
@@ -1120,7 +1257,7 @@ namespace Sayuri {
        * @return 「bitboard」を上に移動したビットボード。
        */
       static constexpr Bitboard GetUpBitboard(Bitboard bitboard) {
-        return (bitboard & ~RANK[RANK_8]) << 8;
+        return SHIFT_U(bitboard);
       }
       /**
        * 下に移動したビットボードを得る。
@@ -1128,7 +1265,7 @@ namespace Sayuri {
        * @return 「bitboard」を下に移動したビットボード。
        */
       static constexpr Bitboard GetDownBitboard(Bitboard bitboard) {
-        return (bitboard & ~RANK[RANK_1]) >> 8;
+        return SHIFT_D(bitboard);
       }
       /**
        * 右上に移動したビットボードを得る。
@@ -1136,7 +1273,7 @@ namespace Sayuri {
        * @return 「bitboard」を右上に移動したビットボード。
        */
       static constexpr Bitboard GetRightUpBitboard(Bitboard bitboard) {
-        return (bitboard & ~(RANK[RANK_8] | FYLE[FYLE_H])) << 9;
+        return SHIFT_RU(bitboard);
       }
       /**
        * 右下に移動したビットボードを得る。
@@ -1144,7 +1281,7 @@ namespace Sayuri {
        * @return 「bitboard」を右下に移動したビットボード。
        */
       static constexpr Bitboard GetRightDownBitboard(Bitboard bitboard) {
-        return (bitboard & ~(RANK[RANK_1] | FYLE[FYLE_H])) >> 7;
+        return SHIFT_RD(bitboard);
       }
       /**
        * 左上に移動したビットボードを得る。
@@ -1152,7 +1289,7 @@ namespace Sayuri {
        * @return 「bitboard」を左上に移動したビットボード。
        */
       static constexpr Bitboard GetLeftUpBitboard(Bitboard bitboard) {
-        return (bitboard & ~(RANK[RANK_8] | FYLE[FYLE_A])) << 7;
+        return SHIFT_LU(bitboard);
       }
       /**
        * 左下に移動したビットボードを得る。
@@ -1160,7 +1297,7 @@ namespace Sayuri {
        * @return 「bitboard」を左下に移動したビットボード。
        */
       static constexpr Bitboard GetLeftDownBitboard(Bitboard bitboard) {
-        return (bitboard & ~(RANK[RANK_1] | FYLE[FYLE_A])) >> 9;
+        return SHIFT_LD(bitboard);
       }
       /**
        * 右右上に移動したビットボードを得る。
@@ -1168,8 +1305,7 @@ namespace Sayuri {
        * @return 「bitboard」を右右上に移動したビットボード。
        */
       static constexpr Bitboard GetRightRightUpBitboard(Bitboard bitboard) {
-        return (bitboard & ~(RANK[RANK_8] | FYLE[FYLE_H] | FYLE[FYLE_G]))
-        << 10;
+        return SHIFT_RRU(bitboard);
       }
       /**
        * 右上上に移動したビットボードを得る。
@@ -1177,8 +1313,7 @@ namespace Sayuri {
        * @return 「bitboard」を右上上に移動したビットボード。
        */
       static constexpr Bitboard GetRightUpUpBitboard(Bitboard bitboard) {
-        return (bitboard & ~(RANK[RANK_8] | RANK[RANK_7] | FYLE[FYLE_H]))
-        << 17;
+        return SHIFT_RUU(bitboard);
       }
       /**
        * 右右下に移動したビットボードを得る。
@@ -1186,8 +1321,7 @@ namespace Sayuri {
        * @return 「bitboard」を右右下に移動したビットボード。
        */
       static constexpr Bitboard GetRightRightDownBitboard(Bitboard bitboard) {
-        return (bitboard & ~(RANK[RANK_1] | FYLE[FYLE_H] | FYLE[FYLE_G]))
-        >> 6;
+        return SHIFT_RRD(bitboard);
       }
       /**
        * 右下下に移動したビットボードを得る。
@@ -1195,8 +1329,7 @@ namespace Sayuri {
        * @return 「bitboard」を右下下に移動したビットボード。
        */
       static constexpr Bitboard GetRightDownDownBitboard(Bitboard bitboard) {
-        return (bitboard & ~(RANK[RANK_1] | RANK[RANK_2] | FYLE[FYLE_H]))
-        >> 15;
+        return SHIFT_RDD(bitboard);
       }
       /**
        * 左左上に移動したビットボードを得る。
@@ -1204,8 +1337,7 @@ namespace Sayuri {
        * @return 「bitboard」を左左上に移動したビットボード。
        */
       static constexpr Bitboard GetLeftLeftUpBitboard(Bitboard bitboard) {
-        return (bitboard & ~(RANK[RANK_8] | FYLE[FYLE_A] | FYLE[FYLE_B]))
-        << 6;
+        return SHIFT_LLU(bitboard);
       }
       /**
        * 左上上に移動したビットボードを得る。
@@ -1213,8 +1345,7 @@ namespace Sayuri {
        * @return 「bitboard」を左上上に移動したビットボード。
        */
       static constexpr Bitboard GetLeftUpUpBitboard(Bitboard bitboard) {
-        return (bitboard & ~(RANK[RANK_8] | RANK[RANK_7] | FYLE[FYLE_A]))
-        << 15;
+        return SHIFT_LUU(bitboard);
       }
       /**
        * 左左下に移動したビットボードを得る。
@@ -1222,8 +1353,7 @@ namespace Sayuri {
        * @return 「bitboard」を左左下に移動したビットボード。
        */
       static constexpr Bitboard GetLeftLeftDownBitboard(Bitboard bitboard) {
-        return (bitboard & ~(RANK[RANK_1] | FYLE[FYLE_A] | FYLE[FYLE_B]))
-        >> 10;
+        return SHIFT_LLD(bitboard);
       }
       /**
        * 左下下に移動したビットボードを得る。
@@ -1231,8 +1361,7 @@ namespace Sayuri {
        * @return 「bitboard」を左下下に移動したビットボード。
        */
       static constexpr Bitboard GetLeftDownDownBitboard(Bitboard bitboard) {
-        return (bitboard & ~(RANK[RANK_1] | RANK[RANK_2] | FYLE[FYLE_A]))
-        >> 17;
+        return SHIFT_LDD(bitboard);
       }
 
       // ====================== //
