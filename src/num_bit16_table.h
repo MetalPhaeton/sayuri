@@ -21,6 +21,12 @@
  * IN THE SOFTWARE.
  */
 
+/**
+ * @file num_bit16_table.h
+ * @author Hironori Ishibashi
+ * @brief CountBitsで使うテーブルの定義。 (Pythonで生成)
+ */
+
 #ifndef NUM_BIT16_TABLE_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 #define NUM_BIT16_TABLE_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 
