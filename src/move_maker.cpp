@@ -189,7 +189,7 @@ namespace Sayuri {
   template<>
   inline Bitboard MoveMaker::GenPawnBitboard<GenMoveType::CAPTURE>
   (Side side, Square from) const {
-    Bitboard bb = Util::GetPawnAttack(side, from);
+    Bitboard bb = Util::PAWN_ATTACK[side][from];
     return (bb & engine_ptr_->side_pieces()[Util::GetOppositeSide(side)])
       | (engine_ptr_->basic_st_.en_passant_square_
       ? (Util::SQUARE[engine_ptr_->basic_st_.en_passant_square_][R0] & bb)
@@ -220,7 +220,7 @@ namespace Sayuri {
         switch (piece_type) {
           case KNIGHT:
             move_bitboard =
-            Util::GetKnightMove(from) & GenBitboardMask<TYPE>(side);
+            Util::KNIGHT_MOVE[from] & GenBitboardMask<TYPE>(side);
             break;
           case BISHOP:
             move_bitboard =
@@ -404,12 +404,12 @@ namespace Sayuri {
       bool is_checking_move = false;
       switch (engine_ptr_->basic_st_.piece_board_[from]) {
         case PAWN:
-          if ((enemy_king_bb & Util::GetPawnAttack(side, to))) {
+          if ((enemy_king_bb & Util::PAWN_ATTACK[side][to])) {
             is_checking_move = true;
           }
           break;
         case KNIGHT:
-          if ((enemy_king_bb & Util::GetKnightMove(to))) {
+          if ((enemy_king_bb & Util::KNIGHT_MOVE[to])) {
             is_checking_move = true;
           }
           break;

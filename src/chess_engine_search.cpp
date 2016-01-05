@@ -1381,9 +1381,10 @@ namespace Sayuri {
       PieceType promotion = EMPTY;
       switch (piece_type) {
         case PAWN:
-          attackers = Util::GetPawnAttack
-          (Util::GetOppositeSide(basic_st_.to_move_), target)
+          attackers =
+          Util::PAWN_ATTACK[Util::GetOppositeSide(basic_st_.to_move_)][target]
           & basic_st_.position_[basic_st_.to_move_][PAWN];
+
           if (((basic_st_.to_move_ == WHITE)
           && (Util::SquareToRank(target) == RANK_8))
           || ((basic_st_.to_move_ == BLACK)
@@ -1392,7 +1393,7 @@ namespace Sayuri {
           }
           break;
         case KNIGHT:
-          attackers = Util::GetKnightMove(target)
+          attackers = Util::KNIGHT_MOVE[target]
           & basic_st_.position_[basic_st_.to_move_][KNIGHT];
           break;
         case BISHOP:

@@ -67,7 +67,7 @@ namespace Sayuri {
       pawn_moves = engine.GetPawnStep(SIDE, square);
 
       // 攻撃。
-      attacks = Util::GetPawnAttack(SIDE, square);
+      attacks = Util::PAWN_ATTACK[SIDE][square];
 
       // アンパッサン。
       if (engine.basic_st_.en_passant_square_
@@ -82,7 +82,7 @@ namespace Sayuri {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square, Bitboard& attacks, Bitboard& pawn_moves,
     Bitboard& en_passant) {
-      attacks = Util::GetKnightMove(square);
+      attacks = Util::KNIGHT_MOVE[square];
     }
   };
   template<Side SIDE>
@@ -188,7 +188,7 @@ namespace Sayuri {
 
         // 守られたパスポーン。
         if (basic_st.position_[SIDE][PAWN]
-        & Util::GetPawnAttack(ENEMY_SIDE, square)) {
+        & Util::PAWN_ATTACK[ENEMY_SIDE][square]) {
           evaluator.score_ +=
           SIGN * evaluator.cache_ptr_->protected_pass_pawn_cache_;
         }

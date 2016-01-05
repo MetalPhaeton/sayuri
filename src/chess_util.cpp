@@ -69,6 +69,7 @@ namespace Sayuri {
   constexpr Bitboard Util::PAWN_MOVE[NUM_SIDES][NUM_SQUARES];
   constexpr Bitboard Util::PAWN_2STEP_MOVE[NUM_SIDES][NUM_SQUARES];
   constexpr Bitboard Util::PAWN_ATTACK[NUM_SIDES][NUM_SQUARES];
+  constexpr Bitboard Util::KNIGHT_MOVE[NUM_SQUARES];
 
   // ================== //
   // Utilクラスの初期化 //
@@ -90,8 +91,6 @@ namespace Sayuri {
         & ~(SQUARE[square_1][R0] | SQUARE[square_2][R0]);
       }
     }
-    // knight_move_[]を初期化する。
-    InitKnightMove();
     // bishop_move_[]を初期化する。
     InitBishopMove();
     // rook_move_[]を初期化する。
@@ -323,8 +322,6 @@ namespace Sayuri {
   // ================== //
   // 直線の入った配列。 [端点][端点]
   Bitboard Util::line_[NUM_SQUARES][NUM_SQUARES];
-  // ナイトの動きの配列。 [マス]
-  Bitboard Util::knight_move_[NUM_SQUARES];
   // ビショップの動きの配列。 [マス]
   Bitboard Util::bishop_move_[NUM_SQUARES];
   // ルークの動きの配列。 [マス]
@@ -429,22 +426,6 @@ namespace Sayuri {
           }
         }
       }
-    }
-  }
-  // knight_move_[]を初期化する。
-  void Util::InitKnightMove() {
-    // 動きを入れる。
-    FOR_SQUARES(square) {
-      Bitboard point = SQUARE[square][R0];
-
-      knight_move_[square] = GetRightRightUpBitboard(point)
-      | GetRightUpUpBitboard(point)
-      | GetRightRightDownBitboard(point)
-      | GetRightDownDownBitboard(point)
-      | GetLeftLeftUpBitboard(point)
-      | GetLeftUpUpBitboard(point)
-      | GetLeftLeftDownBitboard(point)
-      | GetLeftDownDownBitboard(point);
     }
   }
   // bishop_move_[]を初期化する。

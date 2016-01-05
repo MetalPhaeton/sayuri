@@ -1074,12 +1074,11 @@ namespace Sayuri {
   // その位置が他の位置の駒に攻撃されているかどうかチェックする。
   bool ChessEngine::IsAttacked(Square square, Side side) const {
     // ポーンに攻撃されているかどうか調べる。
-    Bitboard attack =
-    Util::GetPawnAttack(Util::GetOppositeSide(side), square);
+    Bitboard attack = Util::PAWN_ATTACK[Util::GetOppositeSide(side)][square];
     if (attack & basic_st_.position_[side][PAWN]) return true;
 
     // ナイトに攻撃されているかどうか調べる。
-    attack = Util::GetKnightMove(square);
+    attack = Util::KNIGHT_MOVE[square];
     if (attack & basic_st_.position_[side][KNIGHT]) return true;
 
     // ビショップとクイーンの斜めに攻撃されているかどうか調べる。
