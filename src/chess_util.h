@@ -240,6 +240,7 @@ namespace Sayuri {
 
     : 0);
   }
+
   /**
    * ナイトの動きのビットボードを作る。
    * @param side サイド。
@@ -251,6 +252,75 @@ namespace Sayuri {
     | SHIFT_RRD(SQUARE_BB(square)) | SHIFT_RDD(SQUARE_BB(square))
     | SHIFT_LLU(SQUARE_BB(square)) | SHIFT_LUU(SQUARE_BB(square))
     | SHIFT_LLD(SQUARE_BB(square)) | SHIFT_LDD(SQUARE_BB(square));
+  }
+
+  inline constexpr Bitboard DIG_R(Bitboard bb) {
+    return SHIFT_R(bb) ? SHIFT_R(bb) | DIG_R(SHIFT_R(bb)) : 0;
+  }
+  inline constexpr Bitboard DIG_L(Bitboard bb) {
+    return SHIFT_L(bb) ? SHIFT_L(bb) | DIG_L(SHIFT_L(bb)) : 0;
+  }
+  inline constexpr Bitboard DIG_U(Bitboard bb) {
+    return SHIFT_U(bb) ? SHIFT_U(bb) | DIG_U(SHIFT_U(bb)) : 0;
+  }
+  inline constexpr Bitboard DIG_D(Bitboard bb) {
+    return SHIFT_D(bb) ? SHIFT_D(bb) | DIG_D(SHIFT_D(bb)) : 0;
+  }
+  inline constexpr Bitboard DIG_RU(Bitboard bb) {
+    return SHIFT_RU(bb) ? SHIFT_RU(bb) | DIG_RU(SHIFT_RU(bb)) : 0;
+  }
+  inline constexpr Bitboard DIG_RD(Bitboard bb) {
+    return SHIFT_RD(bb) ? SHIFT_RD(bb) | DIG_RD(SHIFT_RD(bb)) : 0;
+  }
+  inline constexpr Bitboard DIG_LU(Bitboard bb) {
+    return SHIFT_LU(bb) ? SHIFT_LU(bb) | DIG_LU(SHIFT_LU(bb)) : 0;
+  }
+  inline constexpr Bitboard DIG_LD(Bitboard bb) {
+    return SHIFT_LD(bb) ? SHIFT_LD(bb) | DIG_LD(SHIFT_LD(bb)) : 0;
+  }
+  /**
+   * ビショップの動きのビットボードを作る。
+   * @param side サイド。
+   * @param square マス。
+   * @return 結果のビットボード。
+   */
+  inline constexpr Bitboard INIT_BISHOP_MOVE(Square square) {
+    return DIG_RU(SQUARE_BB(square)) | DIG_RD(SQUARE_BB(square))
+    | DIG_LU(SQUARE_BB(square)) | DIG_LD(SQUARE_BB(square));
+  }
+
+  /**
+   * ルークの動きのビットボードを作る。
+   * @param side サイド。
+   * @param square マス。
+   * @return 結果のビットボード。
+   */
+  inline constexpr Bitboard INIT_ROOK_MOVE(Square square) {
+    return DIG_R(SQUARE_BB(square)) | DIG_L(SQUARE_BB(square))
+    | DIG_U(SQUARE_BB(square)) | DIG_D(SQUARE_BB(square));
+  }
+
+  /**
+   * クイーンの動きのビットボードを作る。
+   * @param side サイド。
+   * @param square マス。
+   * @return 結果のビットボード。
+   */
+  inline constexpr Bitboard INIT_QUEEN_MOVE(Square square) {
+    return INIT_BISHOP_MOVE(square) | INIT_ROOK_MOVE(square);
+  }
+
+  /**
+   * キングの動きのビットボードを作る。
+   * @param side サイド。
+   * @param square マス。
+   * @return 結果のビットボード。
+   */
+  inline constexpr Bitboard INIT_KING_MOVE(Square square) {
+    return SHIFT_R(SQUARE_BB(square)) | SHIFT_L(SQUARE_BB(square))
+    | SHIFT_U(SQUARE_BB(square)) | SHIFT_D(SQUARE_BB(square))
+    | SHIFT_RU(SQUARE_BB(square)) | SHIFT_RD(SQUARE_BB(square))
+    | SHIFT_LU(SQUARE_BB(square)) | SHIFT_LD(SQUARE_BB(square));
   }
 
   /**
@@ -1009,6 +1079,178 @@ namespace Sayuri {
         INIT_KNIGHT_MOVE(C8), INIT_KNIGHT_MOVE(D8),
         INIT_KNIGHT_MOVE(E8), INIT_KNIGHT_MOVE(F8),
         INIT_KNIGHT_MOVE(G8), INIT_KNIGHT_MOVE(H8)
+      };
+
+      /** ビショップの動きの配列。 [マス] */
+      static constexpr Bitboard BISHOP_MOVE[NUM_SQUARES] {
+        INIT_BISHOP_MOVE(A1), INIT_BISHOP_MOVE(B1),
+        INIT_BISHOP_MOVE(C1), INIT_BISHOP_MOVE(D1),
+        INIT_BISHOP_MOVE(E1), INIT_BISHOP_MOVE(F1),
+        INIT_BISHOP_MOVE(G1), INIT_BISHOP_MOVE(H1),
+
+        INIT_BISHOP_MOVE(A2), INIT_BISHOP_MOVE(B2),
+        INIT_BISHOP_MOVE(C2), INIT_BISHOP_MOVE(D2),
+        INIT_BISHOP_MOVE(E2), INIT_BISHOP_MOVE(F2),
+        INIT_BISHOP_MOVE(G2), INIT_BISHOP_MOVE(H2),
+
+        INIT_BISHOP_MOVE(A3), INIT_BISHOP_MOVE(B3),
+        INIT_BISHOP_MOVE(C3), INIT_BISHOP_MOVE(D3),
+        INIT_BISHOP_MOVE(E3), INIT_BISHOP_MOVE(F3),
+        INIT_BISHOP_MOVE(G3), INIT_BISHOP_MOVE(H3),
+
+        INIT_BISHOP_MOVE(A4), INIT_BISHOP_MOVE(B4),
+        INIT_BISHOP_MOVE(C4), INIT_BISHOP_MOVE(D4),
+        INIT_BISHOP_MOVE(E4), INIT_BISHOP_MOVE(F4),
+        INIT_BISHOP_MOVE(G4), INIT_BISHOP_MOVE(H4),
+
+        INIT_BISHOP_MOVE(A5), INIT_BISHOP_MOVE(B5),
+        INIT_BISHOP_MOVE(C5), INIT_BISHOP_MOVE(D5),
+        INIT_BISHOP_MOVE(E5), INIT_BISHOP_MOVE(F5),
+        INIT_BISHOP_MOVE(G5), INIT_BISHOP_MOVE(H5),
+
+        INIT_BISHOP_MOVE(A6), INIT_BISHOP_MOVE(B6),
+        INIT_BISHOP_MOVE(C6), INIT_BISHOP_MOVE(D6),
+        INIT_BISHOP_MOVE(E6), INIT_BISHOP_MOVE(F6),
+        INIT_BISHOP_MOVE(G6), INIT_BISHOP_MOVE(H6),
+
+        INIT_BISHOP_MOVE(A7), INIT_BISHOP_MOVE(B7),
+        INIT_BISHOP_MOVE(C7), INIT_BISHOP_MOVE(D7),
+        INIT_BISHOP_MOVE(E7), INIT_BISHOP_MOVE(F7),
+        INIT_BISHOP_MOVE(G7), INIT_BISHOP_MOVE(H7),
+
+        INIT_BISHOP_MOVE(A8), INIT_BISHOP_MOVE(B8),
+        INIT_BISHOP_MOVE(C8), INIT_BISHOP_MOVE(D8),
+        INIT_BISHOP_MOVE(E8), INIT_BISHOP_MOVE(F8),
+        INIT_BISHOP_MOVE(G8), INIT_BISHOP_MOVE(H8)
+      };
+
+      /** ルークの動きの配列。 [マス] */
+      static constexpr Bitboard ROOK_MOVE[NUM_SQUARES] {
+        INIT_ROOK_MOVE(A1), INIT_ROOK_MOVE(B1),
+        INIT_ROOK_MOVE(C1), INIT_ROOK_MOVE(D1),
+        INIT_ROOK_MOVE(E1), INIT_ROOK_MOVE(F1),
+        INIT_ROOK_MOVE(G1), INIT_ROOK_MOVE(H1),
+
+        INIT_ROOK_MOVE(A2), INIT_ROOK_MOVE(B2),
+        INIT_ROOK_MOVE(C2), INIT_ROOK_MOVE(D2),
+        INIT_ROOK_MOVE(E2), INIT_ROOK_MOVE(F2),
+        INIT_ROOK_MOVE(G2), INIT_ROOK_MOVE(H2),
+
+        INIT_ROOK_MOVE(A3), INIT_ROOK_MOVE(B3),
+        INIT_ROOK_MOVE(C3), INIT_ROOK_MOVE(D3),
+        INIT_ROOK_MOVE(E3), INIT_ROOK_MOVE(F3),
+        INIT_ROOK_MOVE(G3), INIT_ROOK_MOVE(H3),
+
+        INIT_ROOK_MOVE(A4), INIT_ROOK_MOVE(B4),
+        INIT_ROOK_MOVE(C4), INIT_ROOK_MOVE(D4),
+        INIT_ROOK_MOVE(E4), INIT_ROOK_MOVE(F4),
+        INIT_ROOK_MOVE(G4), INIT_ROOK_MOVE(H4),
+
+        INIT_ROOK_MOVE(A5), INIT_ROOK_MOVE(B5),
+        INIT_ROOK_MOVE(C5), INIT_ROOK_MOVE(D5),
+        INIT_ROOK_MOVE(E5), INIT_ROOK_MOVE(F5),
+        INIT_ROOK_MOVE(G5), INIT_ROOK_MOVE(H5),
+
+        INIT_ROOK_MOVE(A6), INIT_ROOK_MOVE(B6),
+        INIT_ROOK_MOVE(C6), INIT_ROOK_MOVE(D6),
+        INIT_ROOK_MOVE(E6), INIT_ROOK_MOVE(F6),
+        INIT_ROOK_MOVE(G6), INIT_ROOK_MOVE(H6),
+
+        INIT_ROOK_MOVE(A7), INIT_ROOK_MOVE(B7),
+        INIT_ROOK_MOVE(C7), INIT_ROOK_MOVE(D7),
+        INIT_ROOK_MOVE(E7), INIT_ROOK_MOVE(F7),
+        INIT_ROOK_MOVE(G7), INIT_ROOK_MOVE(H7),
+
+        INIT_ROOK_MOVE(A8), INIT_ROOK_MOVE(B8),
+        INIT_ROOK_MOVE(C8), INIT_ROOK_MOVE(D8),
+        INIT_ROOK_MOVE(E8), INIT_ROOK_MOVE(F8),
+        INIT_ROOK_MOVE(G8), INIT_ROOK_MOVE(H8)
+      };
+
+      /** クイーンの動きの配列。 [マス] */
+      static constexpr Bitboard QUEEN_MOVE[NUM_SQUARES] {
+        INIT_QUEEN_MOVE(A1), INIT_QUEEN_MOVE(B1),
+        INIT_QUEEN_MOVE(C1), INIT_QUEEN_MOVE(D1),
+        INIT_QUEEN_MOVE(E1), INIT_QUEEN_MOVE(F1),
+        INIT_QUEEN_MOVE(G1), INIT_QUEEN_MOVE(H1),
+
+        INIT_QUEEN_MOVE(A2), INIT_QUEEN_MOVE(B2),
+        INIT_QUEEN_MOVE(C2), INIT_QUEEN_MOVE(D2),
+        INIT_QUEEN_MOVE(E2), INIT_QUEEN_MOVE(F2),
+        INIT_QUEEN_MOVE(G2), INIT_QUEEN_MOVE(H2),
+
+        INIT_QUEEN_MOVE(A3), INIT_QUEEN_MOVE(B3),
+        INIT_QUEEN_MOVE(C3), INIT_QUEEN_MOVE(D3),
+        INIT_QUEEN_MOVE(E3), INIT_QUEEN_MOVE(F3),
+        INIT_QUEEN_MOVE(G3), INIT_QUEEN_MOVE(H3),
+
+        INIT_QUEEN_MOVE(A4), INIT_QUEEN_MOVE(B4),
+        INIT_QUEEN_MOVE(C4), INIT_QUEEN_MOVE(D4),
+        INIT_QUEEN_MOVE(E4), INIT_QUEEN_MOVE(F4),
+        INIT_QUEEN_MOVE(G4), INIT_QUEEN_MOVE(H4),
+
+        INIT_QUEEN_MOVE(A5), INIT_QUEEN_MOVE(B5),
+        INIT_QUEEN_MOVE(C5), INIT_QUEEN_MOVE(D5),
+        INIT_QUEEN_MOVE(E5), INIT_QUEEN_MOVE(F5),
+        INIT_QUEEN_MOVE(G5), INIT_QUEEN_MOVE(H5),
+
+        INIT_QUEEN_MOVE(A6), INIT_QUEEN_MOVE(B6),
+        INIT_QUEEN_MOVE(C6), INIT_QUEEN_MOVE(D6),
+        INIT_QUEEN_MOVE(E6), INIT_QUEEN_MOVE(F6),
+        INIT_QUEEN_MOVE(G6), INIT_QUEEN_MOVE(H6),
+
+        INIT_QUEEN_MOVE(A7), INIT_QUEEN_MOVE(B7),
+        INIT_QUEEN_MOVE(C7), INIT_QUEEN_MOVE(D7),
+        INIT_QUEEN_MOVE(E7), INIT_QUEEN_MOVE(F7),
+        INIT_QUEEN_MOVE(G7), INIT_QUEEN_MOVE(H7),
+
+        INIT_QUEEN_MOVE(A8), INIT_QUEEN_MOVE(B8),
+        INIT_QUEEN_MOVE(C8), INIT_QUEEN_MOVE(D8),
+        INIT_QUEEN_MOVE(E8), INIT_QUEEN_MOVE(F8),
+        INIT_QUEEN_MOVE(G8), INIT_QUEEN_MOVE(H8)
+      };
+
+      /** キングの動きの配列。 [マス] */
+      static constexpr Bitboard KING_MOVE[NUM_SQUARES] {
+        INIT_KING_MOVE(A1), INIT_KING_MOVE(B1),
+        INIT_KING_MOVE(C1), INIT_KING_MOVE(D1),
+        INIT_KING_MOVE(E1), INIT_KING_MOVE(F1),
+        INIT_KING_MOVE(G1), INIT_KING_MOVE(H1),
+
+        INIT_KING_MOVE(A2), INIT_KING_MOVE(B2),
+        INIT_KING_MOVE(C2), INIT_KING_MOVE(D2),
+        INIT_KING_MOVE(E2), INIT_KING_MOVE(F2),
+        INIT_KING_MOVE(G2), INIT_KING_MOVE(H2),
+
+        INIT_KING_MOVE(A3), INIT_KING_MOVE(B3),
+        INIT_KING_MOVE(C3), INIT_KING_MOVE(D3),
+        INIT_KING_MOVE(E3), INIT_KING_MOVE(F3),
+        INIT_KING_MOVE(G3), INIT_KING_MOVE(H3),
+
+        INIT_KING_MOVE(A4), INIT_KING_MOVE(B4),
+        INIT_KING_MOVE(C4), INIT_KING_MOVE(D4),
+        INIT_KING_MOVE(E4), INIT_KING_MOVE(F4),
+        INIT_KING_MOVE(G4), INIT_KING_MOVE(H4),
+
+        INIT_KING_MOVE(A5), INIT_KING_MOVE(B5),
+        INIT_KING_MOVE(C5), INIT_KING_MOVE(D5),
+        INIT_KING_MOVE(E5), INIT_KING_MOVE(F5),
+        INIT_KING_MOVE(G5), INIT_KING_MOVE(H5),
+
+        INIT_KING_MOVE(A6), INIT_KING_MOVE(B6),
+        INIT_KING_MOVE(C6), INIT_KING_MOVE(D6),
+        INIT_KING_MOVE(E6), INIT_KING_MOVE(F6),
+        INIT_KING_MOVE(G6), INIT_KING_MOVE(H6),
+
+        INIT_KING_MOVE(A7), INIT_KING_MOVE(B7),
+        INIT_KING_MOVE(C7), INIT_KING_MOVE(D7),
+        INIT_KING_MOVE(E7), INIT_KING_MOVE(F7),
+        INIT_KING_MOVE(G7), INIT_KING_MOVE(H7),
+
+        INIT_KING_MOVE(A8), INIT_KING_MOVE(B8),
+        INIT_KING_MOVE(C8), INIT_KING_MOVE(D8),
+        INIT_KING_MOVE(E8), INIT_KING_MOVE(F8),
+        INIT_KING_MOVE(G8), INIT_KING_MOVE(H8)
       };
 
       // ======== //
@@ -1832,38 +2074,6 @@ namespace Sayuri {
       static Bitboard GetBetween(Square point_1, Square point_2) {
         return BETWEEN[point_1][point_2];
       }
-      /**
-       * ビショップの動きのビットボードを得る。
-       * @param square 基点。
-       * @return ビショップの動きのビットボード。
-       */
-      static Bitboard GetBishopMove(Square square) {
-        return bishop_move_[square];
-      }
-      /**
-       * ルークの動きのビットボードを得る。
-       * @param square 基点。
-       * @return ルークの動きのビットボード。
-       */
-      static Bitboard GetRookMove(Square square) {
-        return rook_move_[square];
-      }
-      /**
-       * クイーンの動きのビットボードを得る。
-       * @param square 基点。
-       * @return クイーンの動きのビットボード。
-       */
-      static Bitboard GetQueenMove(Square square) {
-        return queen_move_[square];
-      }
-      /**
-       * キングの動きのビットボードを得る。
-       * @param square 基点。
-       * @return キングの動きのビットボード。
-       */
-      static Bitboard GetKingMove(Square square) {
-        return king_move_[square];
-      }
 
       // ========== //
       // 位置の変換 //
@@ -1978,7 +2188,7 @@ namespace Sayuri {
        * @return 距離。
        */
       static int GetDistance(Square square_1, Square square_2) {
-        return distance_table_[square_1][square_2];
+        return DISTANCE[square_1][square_2];
       }
 
       /**
@@ -1988,7 +2198,7 @@ namespace Sayuri {
        * @return アンパッサンならtrue。
        */
       static bool IsEnPassant(Square en_passant_square, Square to) {
-        return is_en_passant_table_[en_passant_square][to];
+        return IS_EN_PASSANT[en_passant_square][to];
       }
 
       /**
@@ -1998,7 +2208,7 @@ namespace Sayuri {
        * @return 2歩の動きならtrue。
        */
       static bool Is2StepMove(Square from, Square to) {
-        return is_2step_move_table_[from][to];
+        return IS_2STEP_MOVE[from][to];
       }
 
       /**
@@ -2180,47 +2390,6 @@ namespace Sayuri {
       static Bitboard pawn_movable_table_[NUM_SIDES][NUM_SQUARES][0xff + 1];
       /** pawn_movable_table_[][][]を初期化する。 */
       static void InitPawnMovableTable();
-
-      // ================== //
-      // ビットボードの配列 //
-      // ================== //
-      /** ビショップの動きの配列。 [マス] */
-      static Bitboard bishop_move_[NUM_SQUARES];
-      /** ルークの動きの配列。 [マス] */
-      static Bitboard rook_move_[NUM_SQUARES];
-      /** クイーンの動きの配列。 [マス] */
-      static Bitboard queen_move_[NUM_SQUARES];
-      /** キングの動きの配列。 [マス] */
-      static Bitboard king_move_[NUM_SQUARES];
-      /** line_[][]を初期化する。 */
-      static void InitLine();
-      /** bishop_move_[]を初期化する。 */
-      static void InitBishopMove();
-      /** rook_move_[]を初期化する。 */
-      static void InitRookMove();
-      /** king_move_[]を初期化する。 */
-      static void InitKingMove();
-
-      // ============ //
-      // その他の配列 //
-      // ============ //
-      /** マス間の距離の配列。 [マス1][マス2] */
-      static int distance_table_[NUM_SQUARES][NUM_SQUARES];
-      /** distance_table_[][]を初期化する。 */
-      static void InitDistanceTable();
-
-      /**
-       * 指し手がアンパッサンかどうかを判定する配列。
-       * [en_passant_square][to]
-       */
-      static bool is_en_passant_table_[NUM_SQUARES][NUM_SQUARES];
-      /** is_en_passant_table_[][]を初期化する。 */
-      static void InitIsEnPassantTable();
-
-      /** ポーンの2歩の動きかどうかを判定する。 [from][to] */
-      static bool is_2step_move_table_[NUM_SQUARES][NUM_SQUARES];
-      /** is_2step_move_table_[][]を初期化する。 */
-      static void InitIs2StepMoveTable();
 
       // ================== //
       // その他のstatic変数 //

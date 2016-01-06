@@ -114,7 +114,7 @@ namespace Sayuri {
     static void F(Evaluator& evaluator, const ChessEngine& engine,
     Square square, Bitboard& attacks, Bitboard& pawn_moves,
     Bitboard& en_passant) {
-      attacks = Util::GetKingMove(square);
+      attacks = Util::KING_MOVE[square];
     }
   };
 
@@ -652,7 +652,7 @@ namespace Sayuri {
 
     // 相手キング周辺への攻撃を計算。
     score_ += SIGN * cache_ptr_->attack_around_king_cache_[TYPE]
-    [Util::CountBits(attacks & Util::GetKingMove(basic_st.king_[ENEMY_SIDE]))];
+    [Util::CountBits(attacks & Util::KING_MOVE[basic_st.king_[ENEMY_SIDE]])];
 
     // 各駒専用の価値を計算。
     CalSpecial<SIDE, TYPE>::F(*this, basic_st, piece_square, attacks);

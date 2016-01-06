@@ -1409,7 +1409,7 @@ namespace Sayuri {
           & basic_st_.position_[basic_st_.to_move_][QUEEN];
           break;
         case KING:
-          attackers = Util::GetKingMove(target)
+          attackers = Util::KING_MOVE[target]
           & basic_st_.position_[basic_st_.to_move_][KING];
           break;
         default:

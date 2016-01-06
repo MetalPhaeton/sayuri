@@ -1092,7 +1092,7 @@ namespace Sayuri {
     | basic_st_.position_[side][QUEEN])) return true;
 
     // キングに攻撃されているかどうか調べる。
-    attack = Util::GetKingMove(square);
+    attack = Util::KING_MOVE[square];
     if (attack & basic_st_.position_[side][KING]) return true;
 
     // 何にも攻撃されていない。

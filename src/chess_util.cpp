@@ -70,33 +70,20 @@ namespace Sayuri {
   constexpr Bitboard Util::PAWN_2STEP_MOVE[NUM_SIDES][NUM_SQUARES];
   constexpr Bitboard Util::PAWN_ATTACK[NUM_SIDES][NUM_SQUARES];
   constexpr Bitboard Util::KNIGHT_MOVE[NUM_SQUARES];
+  constexpr Bitboard Util::BISHOP_MOVE[NUM_SQUARES];
+  constexpr Bitboard Util::ROOK_MOVE[NUM_SQUARES];
+  constexpr Bitboard Util::QUEEN_MOVE[NUM_SQUARES];
+  constexpr Bitboard Util::KING_MOVE[NUM_SQUARES];
 
   // ================== //
   // Utilクラスの初期化 //
   // ================== //
   // static変数の初期化。
-  Bitboard Util::queen_move_[NUM_SQUARES];
   void Util::InitUtil() {
     // attack_table_[][][]を初期化する。
     InitAttackTable();
     // pawn_movable_table_[][][]を初期化する。
     InitPawnMovableTable();
-    // bishop_move_[]を初期化する。
-    InitBishopMove();
-    // rook_move_[]を初期化する。
-    InitRookMove();
-    // queen_move_[]を初期化する。
-    FOR_SQUARES(square) {
-      queen_move_[square] = bishop_move_[square] | rook_move_[square];
-    }
-    // distance_table_[][]を初期化する。
-    InitDistanceTable();
-    // is_en_passant_table_[][]を初期化する。
-    InitIsEnPassantTable();
-    // is_2step_move_table_[][]を初期化する。
-    InitIs2StepMoveTable();
-    // king_move_[]を初期化する。
-    InitKingMove();
     // ランダム関連を初期化する。
     InitRandom();
   }
@@ -307,91 +294,6 @@ namespace Sayuri {
     }
   }
 
-  // ================== //
-  // ビットボードの配列 //
-  // ================== //
-  // ビショップの動きの配列。 [マス]
-  Bitboard Util::bishop_move_[NUM_SQUARES];
-  // ルークの動きの配列。 [マス]
-  Bitboard Util::rook_move_[NUM_SQUARES];
-  // キングの動きの配列。 [マス]
-  Bitboard Util::king_move_[NUM_SQUARES];
-  // bishop_move_[]を初期化する。
-  void Util::InitBishopMove() {
-    // 動きを入れる。
-    FOR_SQUARES(square) {
-      Bitboard point = SQUARE[square][R0];
-      bishop_move_[square] = 0;
-
-      // 右上の動きを入れる。
-      Bitboard temp = point;
-      while ((temp = GetRightUpBitboard(temp))) {
-        bishop_move_[square] |= temp;
-      }
-      // 右下の動きを入れる。
-      temp = point;
-      while ((temp = GetRightDownBitboard(temp))) {
-        bishop_move_[square] |= temp;
-      }
-      // 左上の動きを入れる。
-      temp = point;
-      while ((temp = GetLeftUpBitboard(temp))) {
-        bishop_move_[square] |= temp;
-      }
-      // 左下の動きを入れる。
-      temp = point;
-      while ((temp = GetLeftDownBitboard(temp))) {
-        bishop_move_[square] |= temp;
-      }
-    }
-  }
-  // rook_move_[]を初期化する。
-  void Util::InitRookMove() {
-    // 動きを入れる。
-    FOR_SQUARES(square) {
-      Bitboard point = SQUARE[square][R0];
-      rook_move_[square] = 0;
-
-      // 右の動きを入れる。
-      Bitboard temp = point;
-      while ((temp = GetRightBitboard(temp))) {
-        rook_move_[square] |= temp;
-      }
-      // 左の動きを入れる。
-      temp = point;
-      while ((temp = GetLeftBitboard(temp))) {
-        rook_move_[square] |= temp;
-      }
-      // 上の動きを入れる。
-      temp = point;
-      while ((temp = GetUpBitboard(temp))) {
-        rook_move_[square] |= temp;
-      }
-      // 下の動きを入れる。
-      temp = point;
-      while ((temp = GetDownBitboard(temp))) {
-        rook_move_[square] |= temp;
-      }
-    }
-  }
-  // king_move_[]を初期化する。
-  void Util::InitKingMove() {
-    // 動きを入れる。
-    FOR_SQUARES(square) {
-      Bitboard point = SQUARE[square][R0];
-
-      // 動きを入れる。
-      king_move_[square] = GetRightBitboard(point)
-      | GetLeftBitboard(point)
-      | GetUpBitboard(point)
-      | GetDownBitboard(point)
-      | GetRightUpBitboard(point)
-      | GetRightDownBitboard(point)
-      | GetLeftUpBitboard(point)
-      | GetLeftDownBitboard(point);
-    }
-  }
-
   // ================ //
   // その他の便利関数 //
   // ================ //
@@ -436,57 +338,6 @@ namespace Sayuri {
   template std::vector<std::basic_string<wchar_t>> Util::Split<wchar_t>
   (const std::basic_string<wchar_t>& str,
   const std::set<wchar_t>& delim, const std::set<wchar_t>& delim_and_word);
-
-  // マス間の距離の配列。
-  int Util::distance_table_[NUM_SQUARES][NUM_SQUARES];
-  void Util::InitDistanceTable() {
-    FOR_SQUARES(square_1) {
-      FOR_SQUARES(square_2) {
-        Fyle fyle_1 = SquareToFyle(square_1);
-        Rank rank_1 = SquareToRank(square_1);
-        Fyle fyle_2 = SquareToFyle(square_2);
-        Rank rank_2 = SquareToRank(square_2);
-
-        int fyle_diff = fyle_1 >= fyle_2
-        ? (fyle_1 - fyle_2) : (fyle_2 - fyle_1);
-        int rank_diff = rank_1 >= rank_2
-        ? (rank_1 - rank_2) : (rank_2 - rank_1);
-
-        distance_table_[square_1][square_2] = GetMax(fyle_diff, rank_diff);
-      }
-    }
-  }
-
-  // アンパッサン判定配列。
-  bool Util::is_en_passant_table_[NUM_SQUARES][NUM_SQUARES];
-  void Util::InitIsEnPassantTable() {
-    FOR_SQUARES(en_passant_square) {
-      FOR_SQUARES(to) {
-        is_en_passant_table_[en_passant_square][to] = false;
-        if (en_passant_square == to) {
-          if ((SquareToRank(en_passant_square) == RANK_3)
-          || (SquareToRank(en_passant_square) == RANK_6)) {
-            is_en_passant_table_[en_passant_square][to] = true;
-          }
-        }
-      }
-    }
-  }
-
-  // ポーンの2歩の動き判定テーブル。
-  bool Util::is_2step_move_table_[NUM_SQUARES][NUM_SQUARES];
-  void Util::InitIs2StepMoveTable() {
-    FOR_SQUARES(from) {
-      FOR_SQUARES(to) {
-        is_2step_move_table_[from][to] = false;
-        if (SquareToRank(from) == RANK_2) {
-          if (to == (from + 16)) is_2step_move_table_[from][to] = true;
-        } else if (SquareToRank(from) == RANK_7) {
-          if (to == (from - 16)) is_2step_move_table_[from][to] = true;
-        }
-      }
-    }
-  }
 
   // --- ランダム関連 --- //
   std::mt19937 Util::engine_;

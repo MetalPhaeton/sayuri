@@ -297,7 +297,7 @@ namespace Sayuri {
     // キングの動きを作る。
     Square from = basic_st.king_[side];
     Bitboard move_bitboard =
-    Util::GetKingMove(from) & GenBitboardMask<TYPE>(side);
+    Util::KING_MOVE[from] & GenBitboardMask<TYPE>(side);
 
     // キャスリングの動きを作る。
     constexpr Move WS_CASTLING_MOVE = E1 | (G1 << SHIFT[TO])
