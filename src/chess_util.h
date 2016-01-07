@@ -43,284 +43,295 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
-  // ==================== //
-  // Utilで使う定数用関数 //
-  // ==================== //
-  /**
-   * マスのビットボードを作成。
-   * @param square マス。
-   * @return ビットボード。
-   */
-  inline constexpr Bitboard SQUARE_BB(Square square) {
-    return 0x1ULL << square;
-  }
-  /**
-   * ファイルのビットボードを作成。
-   * @param fyle ファイル。
-   * @return ビットボード。
-   */
-  inline constexpr Bitboard FYLE_BB(Fyle fyle) {
-    return 0x0101010101010101ULL << fyle;
-  }
-  /**
-   * ランクのビットボードを作成。
-   * @param rank ランク。
-   * @return ビットボード。
-   */
-  inline constexpr Bitboard RANK_BB(Rank rank) {
-    return 0xffULL << (8 * rank);
-  }
-  /**
-   * 右にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_R(Bitboard bb) {
-    return (bb & ~FYLE_BB(FYLE_H)) << 1;
-  }
-  /**
-   * 左にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_L(Bitboard bb) {
-    return (bb & ~FYLE_BB(FYLE_A)) >> 1;
-  }
-  /**
-   * 上にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_U(Bitboard bb) {
-    return (bb & ~RANK_BB(RANK_8)) << 8;
-  }
-  /**
-   * 下にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_D(Bitboard bb) {
-    return (bb & ~RANK_BB(RANK_1)) >> 8;
-  }
-  /**
-   * 右上にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_RU(Bitboard bb) {
-    return (bb & ~(RANK_BB(RANK_8) | FYLE_BB(FYLE_H))) << 9;
-  }
-  /**
-   * 右下にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_RD(Bitboard bb) {
-    return (bb & ~(RANK_BB(RANK_1) | FYLE_BB(FYLE_H))) >> 7;
-  }
-  /**
-   * 左上にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_LU(Bitboard bb) {
-    return (bb & ~(RANK_BB(RANK_8) | FYLE_BB(FYLE_A))) << 7;
-  }
-  /**
-   * 左下にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_LD(Bitboard bb) {
-    return (bb & ~(RANK_BB(RANK_1) | FYLE_BB(FYLE_A))) >> 9;
-  }
-  /**
-   * 右右上にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_RRU(Bitboard bb) {
-    return (bb & ~(RANK_BB(RANK_8) | FYLE_BB(FYLE_H) | FYLE_BB(FYLE_G))) << 10;
-  }
-  /**
-   * 右上上にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_RUU(Bitboard bb) {
-    return (bb & ~(RANK_BB(RANK_8) | RANK_BB(RANK_7) | FYLE_BB(FYLE_H))) << 17;
-  }
-  /**
-   * 右右下にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_RRD(Bitboard bb) {
-    return (bb & ~(RANK_BB(RANK_1) | FYLE_BB(FYLE_H) | FYLE_BB(FYLE_G))) >> 6;
-  }
-  /**
-   * 右下下にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_RDD(Bitboard bb) {
-    return (bb & ~(RANK_BB(RANK_1) | RANK_BB(RANK_2) | FYLE_BB(FYLE_H))) >> 15;
-  }
-  /**
-   * 左左上にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_LLU(Bitboard bb) {
-    return (bb & ~(RANK_BB(RANK_8) | FYLE_BB(FYLE_A) | FYLE_BB(FYLE_B))) << 6;
-  }
-  /**
-   * 左上上にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_LUU(Bitboard bb) {
-    return (bb & ~(RANK_BB(RANK_8) | RANK_BB(RANK_7) | FYLE_BB(FYLE_A))) << 15;
-  }
-  /**
-   * 左左下にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_LLD(Bitboard bb) {
-    return (bb & ~(RANK_BB(RANK_1) | FYLE_BB(FYLE_A) | FYLE_BB(FYLE_B))) >> 10;
-  }
-  /**
-   * 左下下にビットボードをシフト。
-   * @param bb ビットボード。
-   * @return シフト後のビットボード。
-   */
-  inline constexpr Bitboard SHIFT_LDD(Bitboard bb) {
-    return (bb & ~(RANK_BB(RANK_1) | RANK_BB(RANK_2) | FYLE_BB(FYLE_A))) >> 17;
-  }
+  /** Util用メタ関数名前空間。 */
+  namespace MetaUtil {
+    // ==================== //
+    // Utilで使う定数用関数 //
+    // ==================== //
+    /**
+     * マスのビットボードを作成。
+     * @param square マス。
+     * @return ビットボード。
+     */
+    inline constexpr Bitboard SQUARE_BB(Square square) {
+      return 0x1ULL << square;
+    }
+    /**
+     * ファイルのビットボードを作成。
+     * @param fyle ファイル。
+     * @return ビットボード。
+     */
+    inline constexpr Bitboard FYLE_BB(Fyle fyle) {
+      return 0x0101010101010101ULL << fyle;
+    }
+    /**
+     * ランクのビットボードを作成。
+     * @param rank ランク。
+     * @return ビットボード。
+     */
+    inline constexpr Bitboard RANK_BB(Rank rank) {
+      return 0xffULL << (8 * rank);
+    }
+    /**
+     * 右にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_R(Bitboard bb) {
+      return (bb & ~FYLE_BB(FYLE_H)) << 1;
+    }
+    /**
+     * 左にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_L(Bitboard bb) {
+      return (bb & ~FYLE_BB(FYLE_A)) >> 1;
+    }
+    /**
+     * 上にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_U(Bitboard bb) {
+      return (bb & ~RANK_BB(RANK_8)) << 8;
+    }
+    /**
+     * 下にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_D(Bitboard bb) {
+      return (bb & ~RANK_BB(RANK_1)) >> 8;
+    }
+    /**
+     * 右上にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_RU(Bitboard bb) {
+      return (bb & ~(RANK_BB(RANK_8) | FYLE_BB(FYLE_H))) << 9;
+    }
+    /**
+     * 右下にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_RD(Bitboard bb) {
+      return (bb & ~(RANK_BB(RANK_1) | FYLE_BB(FYLE_H))) >> 7;
+    }
+    /**
+     * 左上にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_LU(Bitboard bb) {
+      return (bb & ~(RANK_BB(RANK_8) | FYLE_BB(FYLE_A))) << 7;
+    }
+    /**
+     * 左下にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_LD(Bitboard bb) {
+      return (bb & ~(RANK_BB(RANK_1) | FYLE_BB(FYLE_A))) >> 9;
+    }
+    /**
+     * 右右上にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_RRU(Bitboard bb) {
+      return (bb & ~(RANK_BB(RANK_8) | FYLE_BB(FYLE_H) | FYLE_BB(FYLE_G)))
+      << 10;
+    }
+    /**
+     * 右上上にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_RUU(Bitboard bb) {
+      return (bb & ~(RANK_BB(RANK_8) | RANK_BB(RANK_7) | FYLE_BB(FYLE_H)))
+      << 17;
+    }
+    /**
+     * 右右下にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_RRD(Bitboard bb) {
+      return (bb & ~(RANK_BB(RANK_1) | FYLE_BB(FYLE_H) | FYLE_BB(FYLE_G)))
+      >> 6;
+    }
+    /**
+     * 右下下にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_RDD(Bitboard bb) {
+      return (bb & ~(RANK_BB(RANK_1) | RANK_BB(RANK_2) | FYLE_BB(FYLE_H)))
+      >> 15;
+    }
+    /**
+     * 左左上にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_LLU(Bitboard bb) {
+      return (bb & ~(RANK_BB(RANK_8) | FYLE_BB(FYLE_A) | FYLE_BB(FYLE_B)))
+      << 6;
+    }
+    /**
+     * 左上上にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_LUU(Bitboard bb) {
+      return (bb & ~(RANK_BB(RANK_8) | RANK_BB(RANK_7) | FYLE_BB(FYLE_A)))
+      << 15;
+    }
+    /**
+     * 左左下にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_LLD(Bitboard bb) {
+      return (bb & ~(RANK_BB(RANK_1) | FYLE_BB(FYLE_A) | FYLE_BB(FYLE_B)))
+      >> 10;
+    }
+    /**
+     * 左下下にビットボードをシフト。
+     * @param bb ビットボード。
+     * @return シフト後のビットボード。
+     */
+    inline constexpr Bitboard SHIFT_LDD(Bitboard bb) {
+      return (bb & ~(RANK_BB(RANK_1) | RANK_BB(RANK_2) | FYLE_BB(FYLE_A)))
+      >> 17;
+    }
 
-  /**
-   * ポーンの普通の動きのビットボードを作る。
-   * @param side サイド。
-   * @param square マス。
-   * @return 結果のビットボード。
-   */
-  inline constexpr Bitboard INIT_PAWN_MOVE(Side side, Square square) {
-    return side == WHITE ? SHIFT_U(SQUARE_BB(square))
-    : (side == BLACK ? SHIFT_D(SQUARE_BB(square))
-    : 0);
-  }
-  /**
-   * ポーンの2歩の動きのビットボードを作る。
-   * @param side サイド。
-   * @param square マス。
-   * @return 結果のビットボード。
-   */
-  inline constexpr Bitboard INIT_PAWN_2STEP_MOVE(Side side, Square square) {
-    return (side == WHITE) && ((SQUARE_BB(square) & RANK_BB(RANK_2)))
-    ? SHIFT_U(SHIFT_U(SQUARE_BB(square)))
+    /**
+     * ポーンの普通の動きのビットボードを作る。
+     * @param side サイド。
+     * @param square マス。
+     * @return 結果のビットボード。
+     */
+    inline constexpr Bitboard INIT_PAWN_MOVE(Side side, Square square) {
+      return side == WHITE ? SHIFT_U(SQUARE_BB(square))
+      : (side == BLACK ? SHIFT_D(SQUARE_BB(square))
+      : 0);
+    }
+    /**
+     * ポーンの2歩の動きのビットボードを作る。
+     * @param side サイド。
+     * @param square マス。
+     * @return 結果のビットボード。
+     */
+    inline constexpr Bitboard INIT_PAWN_2STEP_MOVE(Side side, Square square) {
+      return (side == WHITE) && ((SQUARE_BB(square) & RANK_BB(RANK_2)))
+      ? SHIFT_U(SHIFT_U(SQUARE_BB(square)))
 
-    : ((side == BLACK) && ((SQUARE_BB(square) & RANK_BB(RANK_7)))
-    ? SHIFT_D(SHIFT_D(SQUARE_BB(square)))
+      : ((side == BLACK) && ((SQUARE_BB(square) & RANK_BB(RANK_7)))
+      ? SHIFT_D(SHIFT_D(SQUARE_BB(square)))
 
-    : 0);
-  }
-  /**
-   * ポーンの攻撃のビットボードを作る。
-   * @param side サイド。
-   * @param square マス。
-   * @return 結果のビットボード。
-   */
-  inline constexpr Bitboard INIT_PAWN_ATTACK(Side side, Square square) {
-    return side == WHITE
-    ? (SHIFT_RU(SQUARE_BB(square)) | SHIFT_LU(SQUARE_BB(square)))
-    
-    : (side == BLACK
-    ? (SHIFT_RD(SQUARE_BB(square)) | SHIFT_LD(SQUARE_BB(square)))
+      : 0);
+    }
+    /**
+     * ポーンの攻撃のビットボードを作る。
+     * @param side サイド。
+     * @param square マス。
+     * @return 結果のビットボード。
+     */
+    inline constexpr Bitboard INIT_PAWN_ATTACK(Side side, Square square) {
+      return side == WHITE
+      ? (SHIFT_RU(SQUARE_BB(square)) | SHIFT_LU(SQUARE_BB(square)))
+      
+      : (side == BLACK
+      ? (SHIFT_RD(SQUARE_BB(square)) | SHIFT_LD(SQUARE_BB(square)))
 
-    : 0);
-  }
+      : 0);
+    }
 
-  /**
-   * ナイトの動きのビットボードを作る。
-   * @param side サイド。
-   * @param square マス。
-   * @return 結果のビットボード。
-   */
-  inline constexpr Bitboard INIT_KNIGHT_MOVE(Square square) {
-    return SHIFT_RRU(SQUARE_BB(square)) | SHIFT_RUU(SQUARE_BB(square))
-    | SHIFT_RRD(SQUARE_BB(square)) | SHIFT_RDD(SQUARE_BB(square))
-    | SHIFT_LLU(SQUARE_BB(square)) | SHIFT_LUU(SQUARE_BB(square))
-    | SHIFT_LLD(SQUARE_BB(square)) | SHIFT_LDD(SQUARE_BB(square));
-  }
+    /**
+     * ナイトの動きのビットボードを作る。
+     * @param side サイド。
+     * @param square マス。
+     * @return 結果のビットボード。
+     */
+    inline constexpr Bitboard INIT_KNIGHT_MOVE(Square square) {
+      return SHIFT_RRU(SQUARE_BB(square)) | SHIFT_RUU(SQUARE_BB(square))
+      | SHIFT_RRD(SQUARE_BB(square)) | SHIFT_RDD(SQUARE_BB(square))
+      | SHIFT_LLU(SQUARE_BB(square)) | SHIFT_LUU(SQUARE_BB(square))
+      | SHIFT_LLD(SQUARE_BB(square)) | SHIFT_LDD(SQUARE_BB(square));
+    }
 
-  inline constexpr Bitboard DIG_R(Bitboard bb) {
-    return SHIFT_R(bb) ? SHIFT_R(bb) | DIG_R(SHIFT_R(bb)) : 0;
-  }
-  inline constexpr Bitboard DIG_L(Bitboard bb) {
-    return SHIFT_L(bb) ? SHIFT_L(bb) | DIG_L(SHIFT_L(bb)) : 0;
-  }
-  inline constexpr Bitboard DIG_U(Bitboard bb) {
-    return SHIFT_U(bb) ? SHIFT_U(bb) | DIG_U(SHIFT_U(bb)) : 0;
-  }
-  inline constexpr Bitboard DIG_D(Bitboard bb) {
-    return SHIFT_D(bb) ? SHIFT_D(bb) | DIG_D(SHIFT_D(bb)) : 0;
-  }
-  inline constexpr Bitboard DIG_RU(Bitboard bb) {
-    return SHIFT_RU(bb) ? SHIFT_RU(bb) | DIG_RU(SHIFT_RU(bb)) : 0;
-  }
-  inline constexpr Bitboard DIG_RD(Bitboard bb) {
-    return SHIFT_RD(bb) ? SHIFT_RD(bb) | DIG_RD(SHIFT_RD(bb)) : 0;
-  }
-  inline constexpr Bitboard DIG_LU(Bitboard bb) {
-    return SHIFT_LU(bb) ? SHIFT_LU(bb) | DIG_LU(SHIFT_LU(bb)) : 0;
-  }
-  inline constexpr Bitboard DIG_LD(Bitboard bb) {
-    return SHIFT_LD(bb) ? SHIFT_LD(bb) | DIG_LD(SHIFT_LD(bb)) : 0;
-  }
-  /**
-   * ビショップの動きのビットボードを作る。
-   * @param side サイド。
-   * @param square マス。
-   * @return 結果のビットボード。
-   */
-  inline constexpr Bitboard INIT_BISHOP_MOVE(Square square) {
-    return DIG_RU(SQUARE_BB(square)) | DIG_RD(SQUARE_BB(square))
-    | DIG_LU(SQUARE_BB(square)) | DIG_LD(SQUARE_BB(square));
-  }
+    inline constexpr Bitboard DIG_R(Bitboard bb) {
+      return SHIFT_R(bb) ? SHIFT_R(bb) | DIG_R(SHIFT_R(bb)) : 0;
+    }
+    inline constexpr Bitboard DIG_L(Bitboard bb) {
+      return SHIFT_L(bb) ? SHIFT_L(bb) | DIG_L(SHIFT_L(bb)) : 0;
+    }
+    inline constexpr Bitboard DIG_U(Bitboard bb) {
+      return SHIFT_U(bb) ? SHIFT_U(bb) | DIG_U(SHIFT_U(bb)) : 0;
+    }
+    inline constexpr Bitboard DIG_D(Bitboard bb) {
+      return SHIFT_D(bb) ? SHIFT_D(bb) | DIG_D(SHIFT_D(bb)) : 0;
+    }
+    inline constexpr Bitboard DIG_RU(Bitboard bb) {
+      return SHIFT_RU(bb) ? SHIFT_RU(bb) | DIG_RU(SHIFT_RU(bb)) : 0;
+    }
+    inline constexpr Bitboard DIG_RD(Bitboard bb) {
+      return SHIFT_RD(bb) ? SHIFT_RD(bb) | DIG_RD(SHIFT_RD(bb)) : 0;
+    }
+    inline constexpr Bitboard DIG_LU(Bitboard bb) {
+      return SHIFT_LU(bb) ? SHIFT_LU(bb) | DIG_LU(SHIFT_LU(bb)) : 0;
+    }
+    inline constexpr Bitboard DIG_LD(Bitboard bb) {
+      return SHIFT_LD(bb) ? SHIFT_LD(bb) | DIG_LD(SHIFT_LD(bb)) : 0;
+    }
+    /**
+     * ビショップの動きのビットボードを作る。
+     * @param side サイド。
+     * @param square マス。
+     * @return 結果のビットボード。
+     */
+    inline constexpr Bitboard INIT_BISHOP_MOVE(Square square) {
+      return DIG_RU(SQUARE_BB(square)) | DIG_RD(SQUARE_BB(square))
+      | DIG_LU(SQUARE_BB(square)) | DIG_LD(SQUARE_BB(square));
+    }
 
-  /**
-   * ルークの動きのビットボードを作る。
-   * @param side サイド。
-   * @param square マス。
-   * @return 結果のビットボード。
-   */
-  inline constexpr Bitboard INIT_ROOK_MOVE(Square square) {
-    return DIG_R(SQUARE_BB(square)) | DIG_L(SQUARE_BB(square))
-    | DIG_U(SQUARE_BB(square)) | DIG_D(SQUARE_BB(square));
-  }
+    /**
+     * ルークの動きのビットボードを作る。
+     * @param side サイド。
+     * @param square マス。
+     * @return 結果のビットボード。
+     */
+    inline constexpr Bitboard INIT_ROOK_MOVE(Square square) {
+      return DIG_R(SQUARE_BB(square)) | DIG_L(SQUARE_BB(square))
+      | DIG_U(SQUARE_BB(square)) | DIG_D(SQUARE_BB(square));
+    }
 
-  /**
-   * クイーンの動きのビットボードを作る。
-   * @param side サイド。
-   * @param square マス。
-   * @return 結果のビットボード。
-   */
-  inline constexpr Bitboard INIT_QUEEN_MOVE(Square square) {
-    return INIT_BISHOP_MOVE(square) | INIT_ROOK_MOVE(square);
-  }
+    /**
+     * クイーンの動きのビットボードを作る。
+     * @param side サイド。
+     * @param square マス。
+     * @return 結果のビットボード。
+     */
+    inline constexpr Bitboard INIT_QUEEN_MOVE(Square square) {
+      return INIT_BISHOP_MOVE(square) | INIT_ROOK_MOVE(square);
+    }
 
-  /**
-   * キングの動きのビットボードを作る。
-   * @param side サイド。
-   * @param square マス。
-   * @return 結果のビットボード。
-   */
-  inline constexpr Bitboard INIT_KING_MOVE(Square square) {
-    return SHIFT_R(SQUARE_BB(square)) | SHIFT_L(SQUARE_BB(square))
-    | SHIFT_U(SQUARE_BB(square)) | SHIFT_D(SQUARE_BB(square))
-    | SHIFT_RU(SQUARE_BB(square)) | SHIFT_RD(SQUARE_BB(square))
-    | SHIFT_LU(SQUARE_BB(square)) | SHIFT_LD(SQUARE_BB(square));
+    /**
+     * キングの動きのビットボードを作る。
+     * @param side サイド。
+     * @param square マス。
+     * @return 結果のビットボード。
+     */
+    inline constexpr Bitboard INIT_KING_MOVE(Square square) {
+      return SHIFT_R(SQUARE_BB(square)) | SHIFT_L(SQUARE_BB(square))
+      | SHIFT_U(SQUARE_BB(square)) | SHIFT_D(SQUARE_BB(square))
+      | SHIFT_RU(SQUARE_BB(square)) | SHIFT_RD(SQUARE_BB(square))
+      | SHIFT_LU(SQUARE_BB(square)) | SHIFT_LD(SQUARE_BB(square));
+    }
   }
 
   /**
@@ -452,29 +463,45 @@ namespace Sayuri {
       // ================== //
       /** 0度のマスのビットボード。 [マス] */
       static constexpr Bitboard SQUARE0[NUM_SQUARES] {
-        SQUARE_BB(A1), SQUARE_BB(B1), SQUARE_BB(C1), SQUARE_BB(D1),
-        SQUARE_BB(E1), SQUARE_BB(F1), SQUARE_BB(G1), SQUARE_BB(H1),
+        MetaUtil::SQUARE_BB(A1), MetaUtil::SQUARE_BB(B1),
+        MetaUtil::SQUARE_BB(C1), MetaUtil::SQUARE_BB(D1),
+        MetaUtil::SQUARE_BB(E1), MetaUtil::SQUARE_BB(F1),
+        MetaUtil::SQUARE_BB(G1), MetaUtil::SQUARE_BB(H1),
 
-        SQUARE_BB(A2), SQUARE_BB(B2), SQUARE_BB(C2), SQUARE_BB(D2),
-        SQUARE_BB(E2), SQUARE_BB(F2), SQUARE_BB(G2), SQUARE_BB(H2),
+        MetaUtil::SQUARE_BB(A2), MetaUtil::SQUARE_BB(B2),
+        MetaUtil::SQUARE_BB(C2), MetaUtil::SQUARE_BB(D2),
+        MetaUtil::SQUARE_BB(E2), MetaUtil::SQUARE_BB(F2),
+        MetaUtil::SQUARE_BB(G2), MetaUtil::SQUARE_BB(H2),
 
-        SQUARE_BB(A3), SQUARE_BB(B3), SQUARE_BB(C3), SQUARE_BB(D3),
-        SQUARE_BB(E3), SQUARE_BB(F3), SQUARE_BB(G3), SQUARE_BB(H3),
+        MetaUtil::SQUARE_BB(A3), MetaUtil::SQUARE_BB(B3),
+        MetaUtil::SQUARE_BB(C3), MetaUtil::SQUARE_BB(D3),
+        MetaUtil::SQUARE_BB(E3), MetaUtil::SQUARE_BB(F3),
+        MetaUtil::SQUARE_BB(G3), MetaUtil::SQUARE_BB(H3),
 
-        SQUARE_BB(A4), SQUARE_BB(B4), SQUARE_BB(C4), SQUARE_BB(D4),
-        SQUARE_BB(E4), SQUARE_BB(F4), SQUARE_BB(G4), SQUARE_BB(H4),
+        MetaUtil::SQUARE_BB(A4), MetaUtil::SQUARE_BB(B4),
+        MetaUtil::SQUARE_BB(C4), MetaUtil::SQUARE_BB(D4),
+        MetaUtil::SQUARE_BB(E4), MetaUtil::SQUARE_BB(F4),
+        MetaUtil::SQUARE_BB(G4), MetaUtil::SQUARE_BB(H4),
 
-        SQUARE_BB(A5), SQUARE_BB(B5), SQUARE_BB(C5), SQUARE_BB(D5),
-        SQUARE_BB(E5), SQUARE_BB(F5), SQUARE_BB(G5), SQUARE_BB(H5),
+        MetaUtil::SQUARE_BB(A5), MetaUtil::SQUARE_BB(B5),
+        MetaUtil::SQUARE_BB(C5), MetaUtil::SQUARE_BB(D5),
+        MetaUtil::SQUARE_BB(E5), MetaUtil::SQUARE_BB(F5),
+        MetaUtil::SQUARE_BB(G5), MetaUtil::SQUARE_BB(H5),
 
-        SQUARE_BB(A6), SQUARE_BB(B6), SQUARE_BB(C6), SQUARE_BB(D6),
-        SQUARE_BB(E6), SQUARE_BB(F6), SQUARE_BB(G6), SQUARE_BB(H6),
+        MetaUtil::SQUARE_BB(A6), MetaUtil::SQUARE_BB(B6),
+        MetaUtil::SQUARE_BB(C6), MetaUtil::SQUARE_BB(D6),
+        MetaUtil::SQUARE_BB(E6), MetaUtil::SQUARE_BB(F6),
+        MetaUtil::SQUARE_BB(G6), MetaUtil::SQUARE_BB(H6),
 
-        SQUARE_BB(A7), SQUARE_BB(B7), SQUARE_BB(C7), SQUARE_BB(D7),
-        SQUARE_BB(E7), SQUARE_BB(F7), SQUARE_BB(G7), SQUARE_BB(H7),
+        MetaUtil::SQUARE_BB(A7), MetaUtil::SQUARE_BB(B7),
+        MetaUtil::SQUARE_BB(C7), MetaUtil::SQUARE_BB(D7),
+        MetaUtil::SQUARE_BB(E7), MetaUtil::SQUARE_BB(F7),
+        MetaUtil::SQUARE_BB(G7), MetaUtil::SQUARE_BB(H7),
 
-        SQUARE_BB(A8), SQUARE_BB(B8), SQUARE_BB(C8), SQUARE_BB(D8),
-        SQUARE_BB(E8), SQUARE_BB(F8), SQUARE_BB(G8), SQUARE_BB(H8)
+        MetaUtil::SQUARE_BB(A8), MetaUtil::SQUARE_BB(B8),
+        MetaUtil::SQUARE_BB(C8), MetaUtil::SQUARE_BB(D8),
+        MetaUtil::SQUARE_BB(E8), MetaUtil::SQUARE_BB(F8),
+        MetaUtil::SQUARE_BB(G8), MetaUtil::SQUARE_BB(H8)
       };
 
       static constexpr Bitboard SQUARE[NUM_SQUARES][NUM_ROTS] {
@@ -745,14 +772,18 @@ namespace Sayuri {
 
       /** ファイルのビットボード。 [ファイル] */
       static constexpr Bitboard FYLE[NUM_FYLES] {
-        FYLE_BB(FYLE_A), FYLE_BB(FYLE_B), FYLE_BB(FYLE_C), FYLE_BB(FYLE_D),
-        FYLE_BB(FYLE_E), FYLE_BB(FYLE_F), FYLE_BB(FYLE_G), FYLE_BB(FYLE_H)
+        MetaUtil::FYLE_BB(FYLE_A), MetaUtil::FYLE_BB(FYLE_B),
+        MetaUtil::FYLE_BB(FYLE_C), MetaUtil::FYLE_BB(FYLE_D),
+        MetaUtil::FYLE_BB(FYLE_E), MetaUtil::FYLE_BB(FYLE_F),
+        MetaUtil::FYLE_BB(FYLE_G), MetaUtil::FYLE_BB(FYLE_H)
       };
 
       /** ランクのビットボード。 [ランク] */
       static constexpr Bitboard RANK[NUM_RANKS] {
-        RANK_BB(RANK_1), RANK_BB(RANK_2), RANK_BB(RANK_3), RANK_BB(RANK_4),
-        RANK_BB(RANK_5), RANK_BB(RANK_6), RANK_BB(RANK_7), RANK_BB(RANK_8)
+        MetaUtil::RANK_BB(RANK_1), MetaUtil::RANK_BB(RANK_2),
+        MetaUtil::RANK_BB(RANK_3), MetaUtil::RANK_BB(RANK_4),
+        MetaUtil::RANK_BB(RANK_5), MetaUtil::RANK_BB(RANK_6),
+        MetaUtil::RANK_BB(RANK_7), MetaUtil::RANK_BB(RANK_8)
       };
 
       /** マスの色のビットボード。 [色 (サイド)] */
@@ -771,86 +802,150 @@ namespace Sayuri {
           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
         },
         {
-          INIT_PAWN_MOVE(WHITE, A1), INIT_PAWN_MOVE(WHITE, B1),
-          INIT_PAWN_MOVE(WHITE, C1), INIT_PAWN_MOVE(WHITE, D1),
-          INIT_PAWN_MOVE(WHITE, E1), INIT_PAWN_MOVE(WHITE, F1),
-          INIT_PAWN_MOVE(WHITE, G1), INIT_PAWN_MOVE(WHITE, H1),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, A1),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, B1),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, C1),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, D1),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, E1),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, F1),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, G1),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, H1),
 
-          INIT_PAWN_MOVE(WHITE, A2), INIT_PAWN_MOVE(WHITE, B2),
-          INIT_PAWN_MOVE(WHITE, C2), INIT_PAWN_MOVE(WHITE, D2),
-          INIT_PAWN_MOVE(WHITE, E2), INIT_PAWN_MOVE(WHITE, F2),
-          INIT_PAWN_MOVE(WHITE, G2), INIT_PAWN_MOVE(WHITE, H2),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, A2),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, B2),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, C2),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, D2),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, E2),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, F2),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, G2),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, H2),
 
-          INIT_PAWN_MOVE(WHITE, A3), INIT_PAWN_MOVE(WHITE, B3),
-          INIT_PAWN_MOVE(WHITE, C3), INIT_PAWN_MOVE(WHITE, D3),
-          INIT_PAWN_MOVE(WHITE, E3), INIT_PAWN_MOVE(WHITE, F3),
-          INIT_PAWN_MOVE(WHITE, G3), INIT_PAWN_MOVE(WHITE, H3),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, A3),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, B3),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, C3),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, D3),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, E3),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, F3),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, G3),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, H3),
 
-          INIT_PAWN_MOVE(WHITE, A4), INIT_PAWN_MOVE(WHITE, B4),
-          INIT_PAWN_MOVE(WHITE, C4), INIT_PAWN_MOVE(WHITE, D4),
-          INIT_PAWN_MOVE(WHITE, E4), INIT_PAWN_MOVE(WHITE, F4),
-          INIT_PAWN_MOVE(WHITE, G4), INIT_PAWN_MOVE(WHITE, H4),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, A4),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, B4),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, C4),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, D4),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, E4),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, F4),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, G4),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, H4),
 
-          INIT_PAWN_MOVE(WHITE, A5), INIT_PAWN_MOVE(WHITE, B5),
-          INIT_PAWN_MOVE(WHITE, C5), INIT_PAWN_MOVE(WHITE, D5),
-          INIT_PAWN_MOVE(WHITE, E5), INIT_PAWN_MOVE(WHITE, F5),
-          INIT_PAWN_MOVE(WHITE, G5), INIT_PAWN_MOVE(WHITE, H5),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, A5),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, B5),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, C5),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, D5),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, E5),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, F5),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, G5),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, H5),
 
-          INIT_PAWN_MOVE(WHITE, A6), INIT_PAWN_MOVE(WHITE, B6),
-          INIT_PAWN_MOVE(WHITE, C6), INIT_PAWN_MOVE(WHITE, D6),
-          INIT_PAWN_MOVE(WHITE, E6), INIT_PAWN_MOVE(WHITE, F6),
-          INIT_PAWN_MOVE(WHITE, G6), INIT_PAWN_MOVE(WHITE, H6),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, A6),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, B6),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, C6),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, D6),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, E6),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, F6),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, G6),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, H6),
 
-          INIT_PAWN_MOVE(WHITE, A7), INIT_PAWN_MOVE(WHITE, B7),
-          INIT_PAWN_MOVE(WHITE, C7), INIT_PAWN_MOVE(WHITE, D7),
-          INIT_PAWN_MOVE(WHITE, E7), INIT_PAWN_MOVE(WHITE, F7),
-          INIT_PAWN_MOVE(WHITE, G7), INIT_PAWN_MOVE(WHITE, H7),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, A7),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, B7),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, C7),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, D7),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, E7),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, F7),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, G7),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, H7),
 
-          INIT_PAWN_MOVE(WHITE, A8), INIT_PAWN_MOVE(WHITE, B8),
-          INIT_PAWN_MOVE(WHITE, C8), INIT_PAWN_MOVE(WHITE, D8),
-          INIT_PAWN_MOVE(WHITE, E8), INIT_PAWN_MOVE(WHITE, F8),
-          INIT_PAWN_MOVE(WHITE, G8), INIT_PAWN_MOVE(WHITE, H8)
+          MetaUtil::INIT_PAWN_MOVE(WHITE, A8),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, B8),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, C8),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, D8),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, E8),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, F8),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, G8),
+          MetaUtil::INIT_PAWN_MOVE(WHITE, H8)
         },
         {
-          INIT_PAWN_MOVE(BLACK, A1), INIT_PAWN_MOVE(BLACK, B1),
-          INIT_PAWN_MOVE(BLACK, C1), INIT_PAWN_MOVE(BLACK, D1),
-          INIT_PAWN_MOVE(BLACK, E1), INIT_PAWN_MOVE(BLACK, F1),
-          INIT_PAWN_MOVE(BLACK, G1), INIT_PAWN_MOVE(BLACK, H1),
+          MetaUtil:: INIT_PAWN_MOVE(BLACK, A1),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, B1),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, C1),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, D1),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, E1),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, F1),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, G1),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, H1),
 
-          INIT_PAWN_MOVE(BLACK, A2), INIT_PAWN_MOVE(BLACK, B2),
-          INIT_PAWN_MOVE(BLACK, C2), INIT_PAWN_MOVE(BLACK, D2),
-          INIT_PAWN_MOVE(BLACK, E2), INIT_PAWN_MOVE(BLACK, F2),
-          INIT_PAWN_MOVE(BLACK, G2), INIT_PAWN_MOVE(BLACK, H2),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, A2),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, B2),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, C2),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, D2),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, E2),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, F2),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, G2),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, H2),
 
-          INIT_PAWN_MOVE(BLACK, A3), INIT_PAWN_MOVE(BLACK, B3),
-          INIT_PAWN_MOVE(BLACK, C3), INIT_PAWN_MOVE(BLACK, D3),
-          INIT_PAWN_MOVE(BLACK, E3), INIT_PAWN_MOVE(BLACK, F3),
-          INIT_PAWN_MOVE(BLACK, G3), INIT_PAWN_MOVE(BLACK, H3),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, A3),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, B3),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, C3),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, D3),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, E3),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, F3),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, G3),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, H3),
 
-          INIT_PAWN_MOVE(BLACK, A4), INIT_PAWN_MOVE(BLACK, B4),
-          INIT_PAWN_MOVE(BLACK, C4), INIT_PAWN_MOVE(BLACK, D4),
-          INIT_PAWN_MOVE(BLACK, E4), INIT_PAWN_MOVE(BLACK, F4),
-          INIT_PAWN_MOVE(BLACK, G4), INIT_PAWN_MOVE(BLACK, H4),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, A4),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, B4),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, C4),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, D4),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, E4),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, F4),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, G4),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, H4),
 
-          INIT_PAWN_MOVE(BLACK, A5), INIT_PAWN_MOVE(BLACK, B5),
-          INIT_PAWN_MOVE(BLACK, C5), INIT_PAWN_MOVE(BLACK, D5),
-          INIT_PAWN_MOVE(BLACK, E5), INIT_PAWN_MOVE(BLACK, F5),
-          INIT_PAWN_MOVE(BLACK, G5), INIT_PAWN_MOVE(BLACK, H5),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, A5),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, B5),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, C5),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, D5),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, E5),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, F5),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, G5),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, H5),
 
-          INIT_PAWN_MOVE(BLACK, A6), INIT_PAWN_MOVE(BLACK, B6),
-          INIT_PAWN_MOVE(BLACK, C6), INIT_PAWN_MOVE(BLACK, D6),
-          INIT_PAWN_MOVE(BLACK, E6), INIT_PAWN_MOVE(BLACK, F6),
-          INIT_PAWN_MOVE(BLACK, G6), INIT_PAWN_MOVE(BLACK, H6),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, A6),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, B6),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, C6),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, D6),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, E6),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, F6),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, G6),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, H6),
 
-          INIT_PAWN_MOVE(BLACK, A7), INIT_PAWN_MOVE(BLACK, B7),
-          INIT_PAWN_MOVE(BLACK, C7), INIT_PAWN_MOVE(BLACK, D7),
-          INIT_PAWN_MOVE(BLACK, E7), INIT_PAWN_MOVE(BLACK, F7),
-          INIT_PAWN_MOVE(BLACK, G7), INIT_PAWN_MOVE(BLACK, H7),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, A7),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, B7),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, C7),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, D7),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, E7),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, F7),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, G7),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, H7),
 
-          INIT_PAWN_MOVE(BLACK, A8), INIT_PAWN_MOVE(BLACK, B8),
-          INIT_PAWN_MOVE(BLACK, C8), INIT_PAWN_MOVE(BLACK, D8),
-          INIT_PAWN_MOVE(BLACK, E8), INIT_PAWN_MOVE(BLACK, F8),
-          INIT_PAWN_MOVE(BLACK, G8), INIT_PAWN_MOVE(BLACK, H8)
+          MetaUtil::INIT_PAWN_MOVE(BLACK, A8),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, B8),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, C8),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, D8),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, E8),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, F8),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, G8),
+          MetaUtil::INIT_PAWN_MOVE(BLACK, H8)
         }
       };
 
@@ -863,86 +958,150 @@ namespace Sayuri {
           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
         },
         {
-          INIT_PAWN_2STEP_MOVE(WHITE, A1), INIT_PAWN_2STEP_MOVE(WHITE, B1),
-          INIT_PAWN_2STEP_MOVE(WHITE, C1), INIT_PAWN_2STEP_MOVE(WHITE, D1),
-          INIT_PAWN_2STEP_MOVE(WHITE, E1), INIT_PAWN_2STEP_MOVE(WHITE, F1),
-          INIT_PAWN_2STEP_MOVE(WHITE, G1), INIT_PAWN_2STEP_MOVE(WHITE, H1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, A1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, B1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, C1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, D1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, E1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, F1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, G1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, H1),
 
-          INIT_PAWN_2STEP_MOVE(WHITE, A2), INIT_PAWN_2STEP_MOVE(WHITE, B2),
-          INIT_PAWN_2STEP_MOVE(WHITE, C2), INIT_PAWN_2STEP_MOVE(WHITE, D2),
-          INIT_PAWN_2STEP_MOVE(WHITE, E2), INIT_PAWN_2STEP_MOVE(WHITE, F2),
-          INIT_PAWN_2STEP_MOVE(WHITE, G2), INIT_PAWN_2STEP_MOVE(WHITE, H2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, A2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, B2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, C2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, D2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, E2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, F2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, G2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, H2),
 
-          INIT_PAWN_2STEP_MOVE(WHITE, A3), INIT_PAWN_2STEP_MOVE(WHITE, B3),
-          INIT_PAWN_2STEP_MOVE(WHITE, C3), INIT_PAWN_2STEP_MOVE(WHITE, D3),
-          INIT_PAWN_2STEP_MOVE(WHITE, E3), INIT_PAWN_2STEP_MOVE(WHITE, F3),
-          INIT_PAWN_2STEP_MOVE(WHITE, G3), INIT_PAWN_2STEP_MOVE(WHITE, H3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, A3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, B3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, C3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, D3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, E3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, F3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, G3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, H3),
 
-          INIT_PAWN_2STEP_MOVE(WHITE, A4), INIT_PAWN_2STEP_MOVE(WHITE, B4),
-          INIT_PAWN_2STEP_MOVE(WHITE, C4), INIT_PAWN_2STEP_MOVE(WHITE, D4),
-          INIT_PAWN_2STEP_MOVE(WHITE, E4), INIT_PAWN_2STEP_MOVE(WHITE, F4),
-          INIT_PAWN_2STEP_MOVE(WHITE, G4), INIT_PAWN_2STEP_MOVE(WHITE, H4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, A4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, B4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, C4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, D4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, E4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, F4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, G4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, H4),
 
-          INIT_PAWN_2STEP_MOVE(WHITE, A5), INIT_PAWN_2STEP_MOVE(WHITE, B5),
-          INIT_PAWN_2STEP_MOVE(WHITE, C5), INIT_PAWN_2STEP_MOVE(WHITE, D5),
-          INIT_PAWN_2STEP_MOVE(WHITE, E5), INIT_PAWN_2STEP_MOVE(WHITE, F5),
-          INIT_PAWN_2STEP_MOVE(WHITE, G5), INIT_PAWN_2STEP_MOVE(WHITE, H5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, A5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, B5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, C5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, D5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, E5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, F5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, G5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, H5),
 
-          INIT_PAWN_2STEP_MOVE(WHITE, A6), INIT_PAWN_2STEP_MOVE(WHITE, B6),
-          INIT_PAWN_2STEP_MOVE(WHITE, C6), INIT_PAWN_2STEP_MOVE(WHITE, D6),
-          INIT_PAWN_2STEP_MOVE(WHITE, E6), INIT_PAWN_2STEP_MOVE(WHITE, F6),
-          INIT_PAWN_2STEP_MOVE(WHITE, G6), INIT_PAWN_2STEP_MOVE(WHITE, H6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, A6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, B6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, C6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, D6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, E6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, F6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, G6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, H6),
 
-          INIT_PAWN_2STEP_MOVE(WHITE, A7), INIT_PAWN_2STEP_MOVE(WHITE, B7),
-          INIT_PAWN_2STEP_MOVE(WHITE, C7), INIT_PAWN_2STEP_MOVE(WHITE, D7),
-          INIT_PAWN_2STEP_MOVE(WHITE, E7), INIT_PAWN_2STEP_MOVE(WHITE, F7),
-          INIT_PAWN_2STEP_MOVE(WHITE, G7), INIT_PAWN_2STEP_MOVE(WHITE, H7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, A7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, B7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, C7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, D7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, E7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, F7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, G7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, H7),
 
-          INIT_PAWN_2STEP_MOVE(WHITE, A8), INIT_PAWN_2STEP_MOVE(WHITE, B8),
-          INIT_PAWN_2STEP_MOVE(WHITE, C8), INIT_PAWN_2STEP_MOVE(WHITE, D8),
-          INIT_PAWN_2STEP_MOVE(WHITE, E8), INIT_PAWN_2STEP_MOVE(WHITE, F8),
-          INIT_PAWN_2STEP_MOVE(WHITE, G8), INIT_PAWN_2STEP_MOVE(WHITE, H8)
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, A8),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, B8),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, C8),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, D8),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, E8),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, F8),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, G8),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(WHITE, H8)
         },
         {
-          INIT_PAWN_2STEP_MOVE(BLACK, A1), INIT_PAWN_2STEP_MOVE(BLACK, B1),
-          INIT_PAWN_2STEP_MOVE(BLACK, C1), INIT_PAWN_2STEP_MOVE(BLACK, D1),
-          INIT_PAWN_2STEP_MOVE(BLACK, E1), INIT_PAWN_2STEP_MOVE(BLACK, F1),
-          INIT_PAWN_2STEP_MOVE(BLACK, G1), INIT_PAWN_2STEP_MOVE(BLACK, H1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, A1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, B1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, C1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, D1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, E1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, F1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, G1),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, H1),
 
-          INIT_PAWN_2STEP_MOVE(BLACK, A2), INIT_PAWN_2STEP_MOVE(BLACK, B2),
-          INIT_PAWN_2STEP_MOVE(BLACK, C2), INIT_PAWN_2STEP_MOVE(BLACK, D2),
-          INIT_PAWN_2STEP_MOVE(BLACK, E2), INIT_PAWN_2STEP_MOVE(BLACK, F2),
-          INIT_PAWN_2STEP_MOVE(BLACK, G2), INIT_PAWN_2STEP_MOVE(BLACK, H2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, A2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, B2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, C2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, D2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, E2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, F2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, G2),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, H2),
 
-          INIT_PAWN_2STEP_MOVE(BLACK, A3), INIT_PAWN_2STEP_MOVE(BLACK, B3),
-          INIT_PAWN_2STEP_MOVE(BLACK, C3), INIT_PAWN_2STEP_MOVE(BLACK, D3),
-          INIT_PAWN_2STEP_MOVE(BLACK, E3), INIT_PAWN_2STEP_MOVE(BLACK, F3),
-          INIT_PAWN_2STEP_MOVE(BLACK, G3), INIT_PAWN_2STEP_MOVE(BLACK, H3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, A3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, B3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, C3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, D3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, E3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, F3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, G3),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, H3),
 
-          INIT_PAWN_2STEP_MOVE(BLACK, A4), INIT_PAWN_2STEP_MOVE(BLACK, B4),
-          INIT_PAWN_2STEP_MOVE(BLACK, C4), INIT_PAWN_2STEP_MOVE(BLACK, D4),
-          INIT_PAWN_2STEP_MOVE(BLACK, E4), INIT_PAWN_2STEP_MOVE(BLACK, F4),
-          INIT_PAWN_2STEP_MOVE(BLACK, G4), INIT_PAWN_2STEP_MOVE(BLACK, H4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, A4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, B4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, C4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, D4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, E4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, F4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, G4),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, H4),
 
-          INIT_PAWN_2STEP_MOVE(BLACK, A5), INIT_PAWN_2STEP_MOVE(BLACK, B5),
-          INIT_PAWN_2STEP_MOVE(BLACK, C5), INIT_PAWN_2STEP_MOVE(BLACK, D5),
-          INIT_PAWN_2STEP_MOVE(BLACK, E5), INIT_PAWN_2STEP_MOVE(BLACK, F5),
-          INIT_PAWN_2STEP_MOVE(BLACK, G5), INIT_PAWN_2STEP_MOVE(BLACK, H5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, A5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, B5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, C5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, D5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, E5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, F5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, G5),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, H5),
 
-          INIT_PAWN_2STEP_MOVE(BLACK, A6), INIT_PAWN_2STEP_MOVE(BLACK, B6),
-          INIT_PAWN_2STEP_MOVE(BLACK, C6), INIT_PAWN_2STEP_MOVE(BLACK, D6),
-          INIT_PAWN_2STEP_MOVE(BLACK, E6), INIT_PAWN_2STEP_MOVE(BLACK, F6),
-          INIT_PAWN_2STEP_MOVE(BLACK, G6), INIT_PAWN_2STEP_MOVE(BLACK, H6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, A6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, B6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, C6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, D6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, E6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, F6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, G6),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, H6),
 
-          INIT_PAWN_2STEP_MOVE(BLACK, A7), INIT_PAWN_2STEP_MOVE(BLACK, B7),
-          INIT_PAWN_2STEP_MOVE(BLACK, C7), INIT_PAWN_2STEP_MOVE(BLACK, D7),
-          INIT_PAWN_2STEP_MOVE(BLACK, E7), INIT_PAWN_2STEP_MOVE(BLACK, F7),
-          INIT_PAWN_2STEP_MOVE(BLACK, G7), INIT_PAWN_2STEP_MOVE(BLACK, H7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, A7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, B7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, C7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, D7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, E7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, F7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, G7),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, H7),
 
-          INIT_PAWN_2STEP_MOVE(BLACK, A8), INIT_PAWN_2STEP_MOVE(BLACK, B8),
-          INIT_PAWN_2STEP_MOVE(BLACK, C8), INIT_PAWN_2STEP_MOVE(BLACK, D8),
-          INIT_PAWN_2STEP_MOVE(BLACK, E8), INIT_PAWN_2STEP_MOVE(BLACK, F8),
-          INIT_PAWN_2STEP_MOVE(BLACK, G8), INIT_PAWN_2STEP_MOVE(BLACK, H8)
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, A8),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, B8),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, C8),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, D8),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, E8),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, F8),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, G8),
+          MetaUtil::INIT_PAWN_2STEP_MOVE(BLACK, H8)
         }
       };
 
@@ -955,302 +1114,366 @@ namespace Sayuri {
           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
         },
         {
-          INIT_PAWN_ATTACK(WHITE, A1), INIT_PAWN_ATTACK(WHITE, B1),
-          INIT_PAWN_ATTACK(WHITE, C1), INIT_PAWN_ATTACK(WHITE, D1),
-          INIT_PAWN_ATTACK(WHITE, E1), INIT_PAWN_ATTACK(WHITE, F1),
-          INIT_PAWN_ATTACK(WHITE, G1), INIT_PAWN_ATTACK(WHITE, H1),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, A1),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, B1),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, C1),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, D1),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, E1),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, F1),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, G1),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, H1),
 
-          INIT_PAWN_ATTACK(WHITE, A2), INIT_PAWN_ATTACK(WHITE, B2),
-          INIT_PAWN_ATTACK(WHITE, C2), INIT_PAWN_ATTACK(WHITE, D2),
-          INIT_PAWN_ATTACK(WHITE, E2), INIT_PAWN_ATTACK(WHITE, F2),
-          INIT_PAWN_ATTACK(WHITE, G2), INIT_PAWN_ATTACK(WHITE, H2),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, A2),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, B2),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, C2),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, D2),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, E2),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, F2),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, G2),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, H2),
 
-          INIT_PAWN_ATTACK(WHITE, A3), INIT_PAWN_ATTACK(WHITE, B3),
-          INIT_PAWN_ATTACK(WHITE, C3), INIT_PAWN_ATTACK(WHITE, D3),
-          INIT_PAWN_ATTACK(WHITE, E3), INIT_PAWN_ATTACK(WHITE, F3),
-          INIT_PAWN_ATTACK(WHITE, G3), INIT_PAWN_ATTACK(WHITE, H3),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, A3),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, B3),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, C3),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, D3),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, E3),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, F3),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, G3),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, H3),
 
-          INIT_PAWN_ATTACK(WHITE, A4), INIT_PAWN_ATTACK(WHITE, B4),
-          INIT_PAWN_ATTACK(WHITE, C4), INIT_PAWN_ATTACK(WHITE, D4),
-          INIT_PAWN_ATTACK(WHITE, E4), INIT_PAWN_ATTACK(WHITE, F4),
-          INIT_PAWN_ATTACK(WHITE, G4), INIT_PAWN_ATTACK(WHITE, H4),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, A4),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, B4),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, C4),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, D4),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, E4),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, F4),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, G4),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, H4),
 
-          INIT_PAWN_ATTACK(WHITE, A5), INIT_PAWN_ATTACK(WHITE, B5),
-          INIT_PAWN_ATTACK(WHITE, C5), INIT_PAWN_ATTACK(WHITE, D5),
-          INIT_PAWN_ATTACK(WHITE, E5), INIT_PAWN_ATTACK(WHITE, F5),
-          INIT_PAWN_ATTACK(WHITE, G5), INIT_PAWN_ATTACK(WHITE, H5),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, A5),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, B5),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, C5),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, D5),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, E5),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, F5),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, G5),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, H5),
 
-          INIT_PAWN_ATTACK(WHITE, A6), INIT_PAWN_ATTACK(WHITE, B6),
-          INIT_PAWN_ATTACK(WHITE, C6), INIT_PAWN_ATTACK(WHITE, D6),
-          INIT_PAWN_ATTACK(WHITE, E6), INIT_PAWN_ATTACK(WHITE, F6),
-          INIT_PAWN_ATTACK(WHITE, G6), INIT_PAWN_ATTACK(WHITE, H6),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, A6),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, B6),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, C6),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, D6),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, E6),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, F6),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, G6),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, H6),
 
-          INIT_PAWN_ATTACK(WHITE, A7), INIT_PAWN_ATTACK(WHITE, B7),
-          INIT_PAWN_ATTACK(WHITE, C7), INIT_PAWN_ATTACK(WHITE, D7),
-          INIT_PAWN_ATTACK(WHITE, E7), INIT_PAWN_ATTACK(WHITE, F7),
-          INIT_PAWN_ATTACK(WHITE, G7), INIT_PAWN_ATTACK(WHITE, H7),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, A7),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, B7),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, C7),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, D7),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, E7),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, F7),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, G7),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, H7),
 
-          INIT_PAWN_ATTACK(WHITE, A8), INIT_PAWN_ATTACK(WHITE, B8),
-          INIT_PAWN_ATTACK(WHITE, C8), INIT_PAWN_ATTACK(WHITE, D8),
-          INIT_PAWN_ATTACK(WHITE, E8), INIT_PAWN_ATTACK(WHITE, F8),
-          INIT_PAWN_ATTACK(WHITE, G8), INIT_PAWN_ATTACK(WHITE, H8)
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, A8),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, B8),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, C8),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, D8),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, E8),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, F8),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, G8),
+          MetaUtil::INIT_PAWN_ATTACK(WHITE, H8)
         },
         {
-          INIT_PAWN_ATTACK(BLACK, A1), INIT_PAWN_ATTACK(BLACK, B1),
-          INIT_PAWN_ATTACK(BLACK, C1), INIT_PAWN_ATTACK(BLACK, D1),
-          INIT_PAWN_ATTACK(BLACK, E1), INIT_PAWN_ATTACK(BLACK, F1),
-          INIT_PAWN_ATTACK(BLACK, G1), INIT_PAWN_ATTACK(BLACK, H1),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, A1),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, B1),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, C1),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, D1),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, E1),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, F1),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, G1),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, H1),
 
-          INIT_PAWN_ATTACK(BLACK, A2), INIT_PAWN_ATTACK(BLACK, B2),
-          INIT_PAWN_ATTACK(BLACK, C2), INIT_PAWN_ATTACK(BLACK, D2),
-          INIT_PAWN_ATTACK(BLACK, E2), INIT_PAWN_ATTACK(BLACK, F2),
-          INIT_PAWN_ATTACK(BLACK, G2), INIT_PAWN_ATTACK(BLACK, H2),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, A2),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, B2),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, C2),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, D2),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, E2),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, F2),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, G2),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, H2),
 
-          INIT_PAWN_ATTACK(BLACK, A3), INIT_PAWN_ATTACK(BLACK, B3),
-          INIT_PAWN_ATTACK(BLACK, C3), INIT_PAWN_ATTACK(BLACK, D3),
-          INIT_PAWN_ATTACK(BLACK, E3), INIT_PAWN_ATTACK(BLACK, F3),
-          INIT_PAWN_ATTACK(BLACK, G3), INIT_PAWN_ATTACK(BLACK, H3),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, A3),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, B3),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, C3),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, D3),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, E3),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, F3),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, G3),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, H3),
 
-          INIT_PAWN_ATTACK(BLACK, A4), INIT_PAWN_ATTACK(BLACK, B4),
-          INIT_PAWN_ATTACK(BLACK, C4), INIT_PAWN_ATTACK(BLACK, D4),
-          INIT_PAWN_ATTACK(BLACK, E4), INIT_PAWN_ATTACK(BLACK, F4),
-          INIT_PAWN_ATTACK(BLACK, G4), INIT_PAWN_ATTACK(BLACK, H4),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, A4),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, B4),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, C4),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, D4),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, E4),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, F4),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, G4),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, H4),
 
-          INIT_PAWN_ATTACK(BLACK, A5), INIT_PAWN_ATTACK(BLACK, B5),
-          INIT_PAWN_ATTACK(BLACK, C5), INIT_PAWN_ATTACK(BLACK, D5),
-          INIT_PAWN_ATTACK(BLACK, E5), INIT_PAWN_ATTACK(BLACK, F5),
-          INIT_PAWN_ATTACK(BLACK, G5), INIT_PAWN_ATTACK(BLACK, H5),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, A5),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, B5),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, C5),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, D5),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, E5),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, F5),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, G5),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, H5),
 
-          INIT_PAWN_ATTACK(BLACK, A6), INIT_PAWN_ATTACK(BLACK, B6),
-          INIT_PAWN_ATTACK(BLACK, C6), INIT_PAWN_ATTACK(BLACK, D6),
-          INIT_PAWN_ATTACK(BLACK, E6), INIT_PAWN_ATTACK(BLACK, F6),
-          INIT_PAWN_ATTACK(BLACK, G6), INIT_PAWN_ATTACK(BLACK, H6),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, A6),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, B6),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, C6),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, D6),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, E6),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, F6),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, G6),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, H6),
 
-          INIT_PAWN_ATTACK(BLACK, A7), INIT_PAWN_ATTACK(BLACK, B7),
-          INIT_PAWN_ATTACK(BLACK, C7), INIT_PAWN_ATTACK(BLACK, D7),
-          INIT_PAWN_ATTACK(BLACK, E7), INIT_PAWN_ATTACK(BLACK, F7),
-          INIT_PAWN_ATTACK(BLACK, G7), INIT_PAWN_ATTACK(BLACK, H7),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, A7),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, B7),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, C7),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, D7),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, E7),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, F7),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, G7),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, H7),
 
-          INIT_PAWN_ATTACK(BLACK, A8), INIT_PAWN_ATTACK(BLACK, B8),
-          INIT_PAWN_ATTACK(BLACK, C8), INIT_PAWN_ATTACK(BLACK, D8),
-          INIT_PAWN_ATTACK(BLACK, E8), INIT_PAWN_ATTACK(BLACK, F8),
-          INIT_PAWN_ATTACK(BLACK, G8), INIT_PAWN_ATTACK(BLACK, H8)
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, A8),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, B8),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, C8),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, D8),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, E8),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, F8),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, G8),
+          MetaUtil::INIT_PAWN_ATTACK(BLACK, H8)
         }
       };
 
       /** ナイトの動きの配列。 [マス] */
       static constexpr Bitboard KNIGHT_MOVE[NUM_SQUARES] {
-        INIT_KNIGHT_MOVE(A1), INIT_KNIGHT_MOVE(B1),
-        INIT_KNIGHT_MOVE(C1), INIT_KNIGHT_MOVE(D1),
-        INIT_KNIGHT_MOVE(E1), INIT_KNIGHT_MOVE(F1),
-        INIT_KNIGHT_MOVE(G1), INIT_KNIGHT_MOVE(H1),
+        MetaUtil::INIT_KNIGHT_MOVE(A1), MetaUtil::INIT_KNIGHT_MOVE(B1),
+        MetaUtil::INIT_KNIGHT_MOVE(C1), MetaUtil::INIT_KNIGHT_MOVE(D1),
+        MetaUtil::INIT_KNIGHT_MOVE(E1), MetaUtil::INIT_KNIGHT_MOVE(F1),
+        MetaUtil::INIT_KNIGHT_MOVE(G1), MetaUtil::INIT_KNIGHT_MOVE(H1),
 
-        INIT_KNIGHT_MOVE(A2), INIT_KNIGHT_MOVE(B2),
-        INIT_KNIGHT_MOVE(C2), INIT_KNIGHT_MOVE(D2),
-        INIT_KNIGHT_MOVE(E2), INIT_KNIGHT_MOVE(F2),
-        INIT_KNIGHT_MOVE(G2), INIT_KNIGHT_MOVE(H2),
+        MetaUtil::INIT_KNIGHT_MOVE(A2), MetaUtil::INIT_KNIGHT_MOVE(B2),
+        MetaUtil::INIT_KNIGHT_MOVE(C2), MetaUtil::INIT_KNIGHT_MOVE(D2),
+        MetaUtil::INIT_KNIGHT_MOVE(E2), MetaUtil::INIT_KNIGHT_MOVE(F2),
+        MetaUtil::INIT_KNIGHT_MOVE(G2), MetaUtil::INIT_KNIGHT_MOVE(H2),
 
-        INIT_KNIGHT_MOVE(A3), INIT_KNIGHT_MOVE(B3),
-        INIT_KNIGHT_MOVE(C3), INIT_KNIGHT_MOVE(D3),
-        INIT_KNIGHT_MOVE(E3), INIT_KNIGHT_MOVE(F3),
-        INIT_KNIGHT_MOVE(G3), INIT_KNIGHT_MOVE(H3),
+        MetaUtil::INIT_KNIGHT_MOVE(A3), MetaUtil::INIT_KNIGHT_MOVE(B3),
+        MetaUtil::INIT_KNIGHT_MOVE(C3), MetaUtil::INIT_KNIGHT_MOVE(D3),
+        MetaUtil::INIT_KNIGHT_MOVE(E3), MetaUtil::INIT_KNIGHT_MOVE(F3),
+        MetaUtil::INIT_KNIGHT_MOVE(G3), MetaUtil::INIT_KNIGHT_MOVE(H3),
 
-        INIT_KNIGHT_MOVE(A4), INIT_KNIGHT_MOVE(B4),
-        INIT_KNIGHT_MOVE(C4), INIT_KNIGHT_MOVE(D4),
-        INIT_KNIGHT_MOVE(E4), INIT_KNIGHT_MOVE(F4),
-        INIT_KNIGHT_MOVE(G4), INIT_KNIGHT_MOVE(H4),
+        MetaUtil::INIT_KNIGHT_MOVE(A4), MetaUtil::INIT_KNIGHT_MOVE(B4),
+        MetaUtil::INIT_KNIGHT_MOVE(C4), MetaUtil::INIT_KNIGHT_MOVE(D4),
+        MetaUtil::INIT_KNIGHT_MOVE(E4), MetaUtil::INIT_KNIGHT_MOVE(F4),
+        MetaUtil::INIT_KNIGHT_MOVE(G4), MetaUtil::INIT_KNIGHT_MOVE(H4),
 
-        INIT_KNIGHT_MOVE(A5), INIT_KNIGHT_MOVE(B5),
-        INIT_KNIGHT_MOVE(C5), INIT_KNIGHT_MOVE(D5),
-        INIT_KNIGHT_MOVE(E5), INIT_KNIGHT_MOVE(F5),
-        INIT_KNIGHT_MOVE(G5), INIT_KNIGHT_MOVE(H5),
+        MetaUtil::INIT_KNIGHT_MOVE(A5), MetaUtil::INIT_KNIGHT_MOVE(B5),
+        MetaUtil::INIT_KNIGHT_MOVE(C5), MetaUtil::INIT_KNIGHT_MOVE(D5),
+        MetaUtil::INIT_KNIGHT_MOVE(E5), MetaUtil::INIT_KNIGHT_MOVE(F5),
+        MetaUtil::INIT_KNIGHT_MOVE(G5), MetaUtil::INIT_KNIGHT_MOVE(H5),
 
-        INIT_KNIGHT_MOVE(A6), INIT_KNIGHT_MOVE(B6),
-        INIT_KNIGHT_MOVE(C6), INIT_KNIGHT_MOVE(D6),
-        INIT_KNIGHT_MOVE(E6), INIT_KNIGHT_MOVE(F6),
-        INIT_KNIGHT_MOVE(G6), INIT_KNIGHT_MOVE(H6),
+        MetaUtil::INIT_KNIGHT_MOVE(A6), MetaUtil::INIT_KNIGHT_MOVE(B6),
+        MetaUtil::INIT_KNIGHT_MOVE(C6), MetaUtil::INIT_KNIGHT_MOVE(D6),
+        MetaUtil::INIT_KNIGHT_MOVE(E6), MetaUtil::INIT_KNIGHT_MOVE(F6),
+        MetaUtil::INIT_KNIGHT_MOVE(G6), MetaUtil::INIT_KNIGHT_MOVE(H6),
 
-        INIT_KNIGHT_MOVE(A7), INIT_KNIGHT_MOVE(B7),
-        INIT_KNIGHT_MOVE(C7), INIT_KNIGHT_MOVE(D7),
-        INIT_KNIGHT_MOVE(E7), INIT_KNIGHT_MOVE(F7),
-        INIT_KNIGHT_MOVE(G7), INIT_KNIGHT_MOVE(H7),
+        MetaUtil::INIT_KNIGHT_MOVE(A7), MetaUtil::INIT_KNIGHT_MOVE(B7),
+        MetaUtil::INIT_KNIGHT_MOVE(C7), MetaUtil::INIT_KNIGHT_MOVE(D7),
+        MetaUtil::INIT_KNIGHT_MOVE(E7), MetaUtil::INIT_KNIGHT_MOVE(F7),
+        MetaUtil::INIT_KNIGHT_MOVE(G7), MetaUtil::INIT_KNIGHT_MOVE(H7),
 
-        INIT_KNIGHT_MOVE(A8), INIT_KNIGHT_MOVE(B8),
-        INIT_KNIGHT_MOVE(C8), INIT_KNIGHT_MOVE(D8),
-        INIT_KNIGHT_MOVE(E8), INIT_KNIGHT_MOVE(F8),
-        INIT_KNIGHT_MOVE(G8), INIT_KNIGHT_MOVE(H8)
+        MetaUtil::INIT_KNIGHT_MOVE(A8), MetaUtil::INIT_KNIGHT_MOVE(B8),
+        MetaUtil::INIT_KNIGHT_MOVE(C8), MetaUtil::INIT_KNIGHT_MOVE(D8),
+        MetaUtil::INIT_KNIGHT_MOVE(E8), MetaUtil::INIT_KNIGHT_MOVE(F8),
+        MetaUtil::INIT_KNIGHT_MOVE(G8), MetaUtil::INIT_KNIGHT_MOVE(H8)
       };
 
       /** ビショップの動きの配列。 [マス] */
       static constexpr Bitboard BISHOP_MOVE[NUM_SQUARES] {
-        INIT_BISHOP_MOVE(A1), INIT_BISHOP_MOVE(B1),
-        INIT_BISHOP_MOVE(C1), INIT_BISHOP_MOVE(D1),
-        INIT_BISHOP_MOVE(E1), INIT_BISHOP_MOVE(F1),
-        INIT_BISHOP_MOVE(G1), INIT_BISHOP_MOVE(H1),
+        MetaUtil::INIT_BISHOP_MOVE(A1), MetaUtil::INIT_BISHOP_MOVE(B1),
+        MetaUtil::INIT_BISHOP_MOVE(C1), MetaUtil::INIT_BISHOP_MOVE(D1),
+        MetaUtil::INIT_BISHOP_MOVE(E1), MetaUtil::INIT_BISHOP_MOVE(F1),
+        MetaUtil::INIT_BISHOP_MOVE(G1), MetaUtil::INIT_BISHOP_MOVE(H1),
 
-        INIT_BISHOP_MOVE(A2), INIT_BISHOP_MOVE(B2),
-        INIT_BISHOP_MOVE(C2), INIT_BISHOP_MOVE(D2),
-        INIT_BISHOP_MOVE(E2), INIT_BISHOP_MOVE(F2),
-        INIT_BISHOP_MOVE(G2), INIT_BISHOP_MOVE(H2),
+        MetaUtil::INIT_BISHOP_MOVE(A2), MetaUtil::INIT_BISHOP_MOVE(B2),
+        MetaUtil::INIT_BISHOP_MOVE(C2), MetaUtil::INIT_BISHOP_MOVE(D2),
+        MetaUtil::INIT_BISHOP_MOVE(E2), MetaUtil::INIT_BISHOP_MOVE(F2),
+        MetaUtil::INIT_BISHOP_MOVE(G2), MetaUtil::INIT_BISHOP_MOVE(H2),
 
-        INIT_BISHOP_MOVE(A3), INIT_BISHOP_MOVE(B3),
-        INIT_BISHOP_MOVE(C3), INIT_BISHOP_MOVE(D3),
-        INIT_BISHOP_MOVE(E3), INIT_BISHOP_MOVE(F3),
-        INIT_BISHOP_MOVE(G3), INIT_BISHOP_MOVE(H3),
+        MetaUtil::INIT_BISHOP_MOVE(A3), MetaUtil::INIT_BISHOP_MOVE(B3),
+        MetaUtil::INIT_BISHOP_MOVE(C3), MetaUtil::INIT_BISHOP_MOVE(D3),
+        MetaUtil::INIT_BISHOP_MOVE(E3), MetaUtil::INIT_BISHOP_MOVE(F3),
+        MetaUtil::INIT_BISHOP_MOVE(G3), MetaUtil::INIT_BISHOP_MOVE(H3),
 
-        INIT_BISHOP_MOVE(A4), INIT_BISHOP_MOVE(B4),
-        INIT_BISHOP_MOVE(C4), INIT_BISHOP_MOVE(D4),
-        INIT_BISHOP_MOVE(E4), INIT_BISHOP_MOVE(F4),
-        INIT_BISHOP_MOVE(G4), INIT_BISHOP_MOVE(H4),
+        MetaUtil::INIT_BISHOP_MOVE(A4), MetaUtil::INIT_BISHOP_MOVE(B4),
+        MetaUtil::INIT_BISHOP_MOVE(C4), MetaUtil::INIT_BISHOP_MOVE(D4),
+        MetaUtil::INIT_BISHOP_MOVE(E4), MetaUtil::INIT_BISHOP_MOVE(F4),
+        MetaUtil::INIT_BISHOP_MOVE(G4), MetaUtil::INIT_BISHOP_MOVE(H4),
 
-        INIT_BISHOP_MOVE(A5), INIT_BISHOP_MOVE(B5),
-        INIT_BISHOP_MOVE(C5), INIT_BISHOP_MOVE(D5),
-        INIT_BISHOP_MOVE(E5), INIT_BISHOP_MOVE(F5),
-        INIT_BISHOP_MOVE(G5), INIT_BISHOP_MOVE(H5),
+        MetaUtil::INIT_BISHOP_MOVE(A5), MetaUtil::INIT_BISHOP_MOVE(B5),
+        MetaUtil::INIT_BISHOP_MOVE(C5), MetaUtil::INIT_BISHOP_MOVE(D5),
+        MetaUtil::INIT_BISHOP_MOVE(E5), MetaUtil::INIT_BISHOP_MOVE(F5),
+        MetaUtil::INIT_BISHOP_MOVE(G5), MetaUtil::INIT_BISHOP_MOVE(H5),
 
-        INIT_BISHOP_MOVE(A6), INIT_BISHOP_MOVE(B6),
-        INIT_BISHOP_MOVE(C6), INIT_BISHOP_MOVE(D6),
-        INIT_BISHOP_MOVE(E6), INIT_BISHOP_MOVE(F6),
-        INIT_BISHOP_MOVE(G6), INIT_BISHOP_MOVE(H6),
+        MetaUtil::INIT_BISHOP_MOVE(A6), MetaUtil::INIT_BISHOP_MOVE(B6),
+        MetaUtil::INIT_BISHOP_MOVE(C6), MetaUtil::INIT_BISHOP_MOVE(D6),
+        MetaUtil::INIT_BISHOP_MOVE(E6), MetaUtil::INIT_BISHOP_MOVE(F6),
+        MetaUtil::INIT_BISHOP_MOVE(G6), MetaUtil::INIT_BISHOP_MOVE(H6),
 
-        INIT_BISHOP_MOVE(A7), INIT_BISHOP_MOVE(B7),
-        INIT_BISHOP_MOVE(C7), INIT_BISHOP_MOVE(D7),
-        INIT_BISHOP_MOVE(E7), INIT_BISHOP_MOVE(F7),
-        INIT_BISHOP_MOVE(G7), INIT_BISHOP_MOVE(H7),
+        MetaUtil::INIT_BISHOP_MOVE(A7), MetaUtil::INIT_BISHOP_MOVE(B7),
+        MetaUtil::INIT_BISHOP_MOVE(C7), MetaUtil::INIT_BISHOP_MOVE(D7),
+        MetaUtil::INIT_BISHOP_MOVE(E7), MetaUtil::INIT_BISHOP_MOVE(F7),
+        MetaUtil::INIT_BISHOP_MOVE(G7), MetaUtil::INIT_BISHOP_MOVE(H7),
 
-        INIT_BISHOP_MOVE(A8), INIT_BISHOP_MOVE(B8),
-        INIT_BISHOP_MOVE(C8), INIT_BISHOP_MOVE(D8),
-        INIT_BISHOP_MOVE(E8), INIT_BISHOP_MOVE(F8),
-        INIT_BISHOP_MOVE(G8), INIT_BISHOP_MOVE(H8)
+        MetaUtil::INIT_BISHOP_MOVE(A8), MetaUtil::INIT_BISHOP_MOVE(B8),
+        MetaUtil::INIT_BISHOP_MOVE(C8), MetaUtil::INIT_BISHOP_MOVE(D8),
+        MetaUtil::INIT_BISHOP_MOVE(E8), MetaUtil::INIT_BISHOP_MOVE(F8),
+        MetaUtil::INIT_BISHOP_MOVE(G8), MetaUtil::INIT_BISHOP_MOVE(H8)
       };
 
       /** ルークの動きの配列。 [マス] */
       static constexpr Bitboard ROOK_MOVE[NUM_SQUARES] {
-        INIT_ROOK_MOVE(A1), INIT_ROOK_MOVE(B1),
-        INIT_ROOK_MOVE(C1), INIT_ROOK_MOVE(D1),
-        INIT_ROOK_MOVE(E1), INIT_ROOK_MOVE(F1),
-        INIT_ROOK_MOVE(G1), INIT_ROOK_MOVE(H1),
+        MetaUtil::INIT_ROOK_MOVE(A1), MetaUtil::INIT_ROOK_MOVE(B1),
+        MetaUtil::INIT_ROOK_MOVE(C1), MetaUtil::INIT_ROOK_MOVE(D1),
+        MetaUtil::INIT_ROOK_MOVE(E1), MetaUtil::INIT_ROOK_MOVE(F1),
+        MetaUtil::INIT_ROOK_MOVE(G1), MetaUtil::INIT_ROOK_MOVE(H1),
 
-        INIT_ROOK_MOVE(A2), INIT_ROOK_MOVE(B2),
-        INIT_ROOK_MOVE(C2), INIT_ROOK_MOVE(D2),
-        INIT_ROOK_MOVE(E2), INIT_ROOK_MOVE(F2),
-        INIT_ROOK_MOVE(G2), INIT_ROOK_MOVE(H2),
+        MetaUtil::INIT_ROOK_MOVE(A2), MetaUtil::INIT_ROOK_MOVE(B2),
+        MetaUtil::INIT_ROOK_MOVE(C2), MetaUtil::INIT_ROOK_MOVE(D2),
+        MetaUtil::INIT_ROOK_MOVE(E2), MetaUtil::INIT_ROOK_MOVE(F2),
+        MetaUtil::INIT_ROOK_MOVE(G2), MetaUtil::INIT_ROOK_MOVE(H2),
 
-        INIT_ROOK_MOVE(A3), INIT_ROOK_MOVE(B3),
-        INIT_ROOK_MOVE(C3), INIT_ROOK_MOVE(D3),
-        INIT_ROOK_MOVE(E3), INIT_ROOK_MOVE(F3),
-        INIT_ROOK_MOVE(G3), INIT_ROOK_MOVE(H3),
+        MetaUtil::INIT_ROOK_MOVE(A3), MetaUtil::INIT_ROOK_MOVE(B3),
+        MetaUtil::INIT_ROOK_MOVE(C3), MetaUtil::INIT_ROOK_MOVE(D3),
+        MetaUtil::INIT_ROOK_MOVE(E3), MetaUtil::INIT_ROOK_MOVE(F3),
+        MetaUtil::INIT_ROOK_MOVE(G3), MetaUtil::INIT_ROOK_MOVE(H3),
 
-        INIT_ROOK_MOVE(A4), INIT_ROOK_MOVE(B4),
-        INIT_ROOK_MOVE(C4), INIT_ROOK_MOVE(D4),
-        INIT_ROOK_MOVE(E4), INIT_ROOK_MOVE(F4),
-        INIT_ROOK_MOVE(G4), INIT_ROOK_MOVE(H4),
+        MetaUtil::INIT_ROOK_MOVE(A4), MetaUtil::INIT_ROOK_MOVE(B4),
+        MetaUtil::INIT_ROOK_MOVE(C4), MetaUtil::INIT_ROOK_MOVE(D4),
+        MetaUtil::INIT_ROOK_MOVE(E4), MetaUtil::INIT_ROOK_MOVE(F4),
+        MetaUtil::INIT_ROOK_MOVE(G4), MetaUtil::INIT_ROOK_MOVE(H4),
 
-        INIT_ROOK_MOVE(A5), INIT_ROOK_MOVE(B5),
-        INIT_ROOK_MOVE(C5), INIT_ROOK_MOVE(D5),
-        INIT_ROOK_MOVE(E5), INIT_ROOK_MOVE(F5),
-        INIT_ROOK_MOVE(G5), INIT_ROOK_MOVE(H5),
+        MetaUtil::INIT_ROOK_MOVE(A5), MetaUtil::INIT_ROOK_MOVE(B5),
+        MetaUtil::INIT_ROOK_MOVE(C5), MetaUtil::INIT_ROOK_MOVE(D5),
+        MetaUtil::INIT_ROOK_MOVE(E5), MetaUtil::INIT_ROOK_MOVE(F5),
+        MetaUtil::INIT_ROOK_MOVE(G5), MetaUtil::INIT_ROOK_MOVE(H5),
 
-        INIT_ROOK_MOVE(A6), INIT_ROOK_MOVE(B6),
-        INIT_ROOK_MOVE(C6), INIT_ROOK_MOVE(D6),
-        INIT_ROOK_MOVE(E6), INIT_ROOK_MOVE(F6),
-        INIT_ROOK_MOVE(G6), INIT_ROOK_MOVE(H6),
+        MetaUtil::INIT_ROOK_MOVE(A6), MetaUtil::INIT_ROOK_MOVE(B6),
+        MetaUtil::INIT_ROOK_MOVE(C6), MetaUtil::INIT_ROOK_MOVE(D6),
+        MetaUtil::INIT_ROOK_MOVE(E6), MetaUtil::INIT_ROOK_MOVE(F6),
+        MetaUtil::INIT_ROOK_MOVE(G6), MetaUtil::INIT_ROOK_MOVE(H6),
 
-        INIT_ROOK_MOVE(A7), INIT_ROOK_MOVE(B7),
-        INIT_ROOK_MOVE(C7), INIT_ROOK_MOVE(D7),
-        INIT_ROOK_MOVE(E7), INIT_ROOK_MOVE(F7),
-        INIT_ROOK_MOVE(G7), INIT_ROOK_MOVE(H7),
+        MetaUtil::INIT_ROOK_MOVE(A7), MetaUtil::INIT_ROOK_MOVE(B7),
+        MetaUtil::INIT_ROOK_MOVE(C7), MetaUtil::INIT_ROOK_MOVE(D7),
+        MetaUtil::INIT_ROOK_MOVE(E7), MetaUtil::INIT_ROOK_MOVE(F7),
+        MetaUtil::INIT_ROOK_MOVE(G7), MetaUtil::INIT_ROOK_MOVE(H7),
 
-        INIT_ROOK_MOVE(A8), INIT_ROOK_MOVE(B8),
-        INIT_ROOK_MOVE(C8), INIT_ROOK_MOVE(D8),
-        INIT_ROOK_MOVE(E8), INIT_ROOK_MOVE(F8),
-        INIT_ROOK_MOVE(G8), INIT_ROOK_MOVE(H8)
+        MetaUtil::INIT_ROOK_MOVE(A8), MetaUtil::INIT_ROOK_MOVE(B8),
+        MetaUtil::INIT_ROOK_MOVE(C8), MetaUtil::INIT_ROOK_MOVE(D8),
+        MetaUtil::INIT_ROOK_MOVE(E8), MetaUtil::INIT_ROOK_MOVE(F8),
+        MetaUtil::INIT_ROOK_MOVE(G8), MetaUtil::INIT_ROOK_MOVE(H8)
       };
 
       /** クイーンの動きの配列。 [マス] */
       static constexpr Bitboard QUEEN_MOVE[NUM_SQUARES] {
-        INIT_QUEEN_MOVE(A1), INIT_QUEEN_MOVE(B1),
-        INIT_QUEEN_MOVE(C1), INIT_QUEEN_MOVE(D1),
-        INIT_QUEEN_MOVE(E1), INIT_QUEEN_MOVE(F1),
-        INIT_QUEEN_MOVE(G1), INIT_QUEEN_MOVE(H1),
+        MetaUtil::INIT_QUEEN_MOVE(A1), MetaUtil::INIT_QUEEN_MOVE(B1),
+        MetaUtil::INIT_QUEEN_MOVE(C1), MetaUtil::INIT_QUEEN_MOVE(D1),
+        MetaUtil::INIT_QUEEN_MOVE(E1), MetaUtil::INIT_QUEEN_MOVE(F1),
+        MetaUtil::INIT_QUEEN_MOVE(G1), MetaUtil::INIT_QUEEN_MOVE(H1),
 
-        INIT_QUEEN_MOVE(A2), INIT_QUEEN_MOVE(B2),
-        INIT_QUEEN_MOVE(C2), INIT_QUEEN_MOVE(D2),
-        INIT_QUEEN_MOVE(E2), INIT_QUEEN_MOVE(F2),
-        INIT_QUEEN_MOVE(G2), INIT_QUEEN_MOVE(H2),
+        MetaUtil::INIT_QUEEN_MOVE(A2), MetaUtil::INIT_QUEEN_MOVE(B2),
+        MetaUtil::INIT_QUEEN_MOVE(C2), MetaUtil::INIT_QUEEN_MOVE(D2),
+        MetaUtil::INIT_QUEEN_MOVE(E2), MetaUtil::INIT_QUEEN_MOVE(F2),
+        MetaUtil::INIT_QUEEN_MOVE(G2), MetaUtil::INIT_QUEEN_MOVE(H2),
 
-        INIT_QUEEN_MOVE(A3), INIT_QUEEN_MOVE(B3),
-        INIT_QUEEN_MOVE(C3), INIT_QUEEN_MOVE(D3),
-        INIT_QUEEN_MOVE(E3), INIT_QUEEN_MOVE(F3),
-        INIT_QUEEN_MOVE(G3), INIT_QUEEN_MOVE(H3),
+        MetaUtil::INIT_QUEEN_MOVE(A3), MetaUtil::INIT_QUEEN_MOVE(B3),
+        MetaUtil::INIT_QUEEN_MOVE(C3), MetaUtil::INIT_QUEEN_MOVE(D3),
+        MetaUtil::INIT_QUEEN_MOVE(E3), MetaUtil::INIT_QUEEN_MOVE(F3),
+        MetaUtil::INIT_QUEEN_MOVE(G3), MetaUtil::INIT_QUEEN_MOVE(H3),
 
-        INIT_QUEEN_MOVE(A4), INIT_QUEEN_MOVE(B4),
-        INIT_QUEEN_MOVE(C4), INIT_QUEEN_MOVE(D4),
-        INIT_QUEEN_MOVE(E4), INIT_QUEEN_MOVE(F4),
-        INIT_QUEEN_MOVE(G4), INIT_QUEEN_MOVE(H4),
+        MetaUtil::INIT_QUEEN_MOVE(A4), MetaUtil::INIT_QUEEN_MOVE(B4),
+        MetaUtil::INIT_QUEEN_MOVE(C4), MetaUtil::INIT_QUEEN_MOVE(D4),
+        MetaUtil::INIT_QUEEN_MOVE(E4), MetaUtil::INIT_QUEEN_MOVE(F4),
+        MetaUtil::INIT_QUEEN_MOVE(G4), MetaUtil::INIT_QUEEN_MOVE(H4),
 
-        INIT_QUEEN_MOVE(A5), INIT_QUEEN_MOVE(B5),
-        INIT_QUEEN_MOVE(C5), INIT_QUEEN_MOVE(D5),
-        INIT_QUEEN_MOVE(E5), INIT_QUEEN_MOVE(F5),
-        INIT_QUEEN_MOVE(G5), INIT_QUEEN_MOVE(H5),
+        MetaUtil::INIT_QUEEN_MOVE(A5), MetaUtil::INIT_QUEEN_MOVE(B5),
+        MetaUtil::INIT_QUEEN_MOVE(C5), MetaUtil::INIT_QUEEN_MOVE(D5),
+        MetaUtil::INIT_QUEEN_MOVE(E5), MetaUtil::INIT_QUEEN_MOVE(F5),
+        MetaUtil::INIT_QUEEN_MOVE(G5), MetaUtil::INIT_QUEEN_MOVE(H5),
 
-        INIT_QUEEN_MOVE(A6), INIT_QUEEN_MOVE(B6),
-        INIT_QUEEN_MOVE(C6), INIT_QUEEN_MOVE(D6),
-        INIT_QUEEN_MOVE(E6), INIT_QUEEN_MOVE(F6),
-        INIT_QUEEN_MOVE(G6), INIT_QUEEN_MOVE(H6),
+        MetaUtil::INIT_QUEEN_MOVE(A6), MetaUtil::INIT_QUEEN_MOVE(B6),
+        MetaUtil::INIT_QUEEN_MOVE(C6), MetaUtil::INIT_QUEEN_MOVE(D6),
+        MetaUtil::INIT_QUEEN_MOVE(E6), MetaUtil::INIT_QUEEN_MOVE(F6),
+        MetaUtil::INIT_QUEEN_MOVE(G6), MetaUtil::INIT_QUEEN_MOVE(H6),
 
-        INIT_QUEEN_MOVE(A7), INIT_QUEEN_MOVE(B7),
-        INIT_QUEEN_MOVE(C7), INIT_QUEEN_MOVE(D7),
-        INIT_QUEEN_MOVE(E7), INIT_QUEEN_MOVE(F7),
-        INIT_QUEEN_MOVE(G7), INIT_QUEEN_MOVE(H7),
+        MetaUtil::INIT_QUEEN_MOVE(A7), MetaUtil::INIT_QUEEN_MOVE(B7),
+        MetaUtil::INIT_QUEEN_MOVE(C7), MetaUtil::INIT_QUEEN_MOVE(D7),
+        MetaUtil::INIT_QUEEN_MOVE(E7), MetaUtil::INIT_QUEEN_MOVE(F7),
+        MetaUtil::INIT_QUEEN_MOVE(G7), MetaUtil::INIT_QUEEN_MOVE(H7),
 
-        INIT_QUEEN_MOVE(A8), INIT_QUEEN_MOVE(B8),
-        INIT_QUEEN_MOVE(C8), INIT_QUEEN_MOVE(D8),
-        INIT_QUEEN_MOVE(E8), INIT_QUEEN_MOVE(F8),
-        INIT_QUEEN_MOVE(G8), INIT_QUEEN_MOVE(H8)
+        MetaUtil::INIT_QUEEN_MOVE(A8), MetaUtil::INIT_QUEEN_MOVE(B8),
+        MetaUtil::INIT_QUEEN_MOVE(C8), MetaUtil::INIT_QUEEN_MOVE(D8),
+        MetaUtil::INIT_QUEEN_MOVE(E8), MetaUtil::INIT_QUEEN_MOVE(F8),
+        MetaUtil::INIT_QUEEN_MOVE(G8), MetaUtil::INIT_QUEEN_MOVE(H8)
       };
 
       /** キングの動きの配列。 [マス] */
       static constexpr Bitboard KING_MOVE[NUM_SQUARES] {
-        INIT_KING_MOVE(A1), INIT_KING_MOVE(B1),
-        INIT_KING_MOVE(C1), INIT_KING_MOVE(D1),
-        INIT_KING_MOVE(E1), INIT_KING_MOVE(F1),
-        INIT_KING_MOVE(G1), INIT_KING_MOVE(H1),
+        MetaUtil::INIT_KING_MOVE(A1), MetaUtil::INIT_KING_MOVE(B1),
+        MetaUtil::INIT_KING_MOVE(C1), MetaUtil::INIT_KING_MOVE(D1),
+        MetaUtil::INIT_KING_MOVE(E1), MetaUtil::INIT_KING_MOVE(F1),
+        MetaUtil::INIT_KING_MOVE(G1), MetaUtil::INIT_KING_MOVE(H1),
 
-        INIT_KING_MOVE(A2), INIT_KING_MOVE(B2),
-        INIT_KING_MOVE(C2), INIT_KING_MOVE(D2),
-        INIT_KING_MOVE(E2), INIT_KING_MOVE(F2),
-        INIT_KING_MOVE(G2), INIT_KING_MOVE(H2),
+        MetaUtil::INIT_KING_MOVE(A2), MetaUtil::INIT_KING_MOVE(B2),
+        MetaUtil::INIT_KING_MOVE(C2), MetaUtil::INIT_KING_MOVE(D2),
+        MetaUtil::INIT_KING_MOVE(E2), MetaUtil::INIT_KING_MOVE(F2),
+        MetaUtil::INIT_KING_MOVE(G2), MetaUtil::INIT_KING_MOVE(H2),
 
-        INIT_KING_MOVE(A3), INIT_KING_MOVE(B3),
-        INIT_KING_MOVE(C3), INIT_KING_MOVE(D3),
-        INIT_KING_MOVE(E3), INIT_KING_MOVE(F3),
-        INIT_KING_MOVE(G3), INIT_KING_MOVE(H3),
+        MetaUtil::INIT_KING_MOVE(A3), MetaUtil::INIT_KING_MOVE(B3),
+        MetaUtil::INIT_KING_MOVE(C3), MetaUtil::INIT_KING_MOVE(D3),
+        MetaUtil::INIT_KING_MOVE(E3), MetaUtil::INIT_KING_MOVE(F3),
+        MetaUtil::INIT_KING_MOVE(G3), MetaUtil::INIT_KING_MOVE(H3),
 
-        INIT_KING_MOVE(A4), INIT_KING_MOVE(B4),
-        INIT_KING_MOVE(C4), INIT_KING_MOVE(D4),
-        INIT_KING_MOVE(E4), INIT_KING_MOVE(F4),
-        INIT_KING_MOVE(G4), INIT_KING_MOVE(H4),
+        MetaUtil::INIT_KING_MOVE(A4), MetaUtil::INIT_KING_MOVE(B4),
+        MetaUtil::INIT_KING_MOVE(C4), MetaUtil::INIT_KING_MOVE(D4),
+        MetaUtil::INIT_KING_MOVE(E4), MetaUtil::INIT_KING_MOVE(F4),
+        MetaUtil::INIT_KING_MOVE(G4), MetaUtil::INIT_KING_MOVE(H4),
 
-        INIT_KING_MOVE(A5), INIT_KING_MOVE(B5),
-        INIT_KING_MOVE(C5), INIT_KING_MOVE(D5),
-        INIT_KING_MOVE(E5), INIT_KING_MOVE(F5),
-        INIT_KING_MOVE(G5), INIT_KING_MOVE(H5),
+        MetaUtil::INIT_KING_MOVE(A5), MetaUtil::INIT_KING_MOVE(B5),
+        MetaUtil::INIT_KING_MOVE(C5), MetaUtil::INIT_KING_MOVE(D5),
+        MetaUtil::INIT_KING_MOVE(E5), MetaUtil::INIT_KING_MOVE(F5),
+        MetaUtil::INIT_KING_MOVE(G5), MetaUtil::INIT_KING_MOVE(H5),
 
-        INIT_KING_MOVE(A6), INIT_KING_MOVE(B6),
-        INIT_KING_MOVE(C6), INIT_KING_MOVE(D6),
-        INIT_KING_MOVE(E6), INIT_KING_MOVE(F6),
-        INIT_KING_MOVE(G6), INIT_KING_MOVE(H6),
+        MetaUtil::INIT_KING_MOVE(A6), MetaUtil::INIT_KING_MOVE(B6),
+        MetaUtil::INIT_KING_MOVE(C6), MetaUtil::INIT_KING_MOVE(D6),
+        MetaUtil::INIT_KING_MOVE(E6), MetaUtil::INIT_KING_MOVE(F6),
+        MetaUtil::INIT_KING_MOVE(G6), MetaUtil::INIT_KING_MOVE(H6),
 
-        INIT_KING_MOVE(A7), INIT_KING_MOVE(B7),
-        INIT_KING_MOVE(C7), INIT_KING_MOVE(D7),
-        INIT_KING_MOVE(E7), INIT_KING_MOVE(F7),
-        INIT_KING_MOVE(G7), INIT_KING_MOVE(H7),
+        MetaUtil::INIT_KING_MOVE(A7), MetaUtil::INIT_KING_MOVE(B7),
+        MetaUtil::INIT_KING_MOVE(C7), MetaUtil::INIT_KING_MOVE(D7),
+        MetaUtil::INIT_KING_MOVE(E7), MetaUtil::INIT_KING_MOVE(F7),
+        MetaUtil::INIT_KING_MOVE(G7), MetaUtil::INIT_KING_MOVE(H7),
 
-        INIT_KING_MOVE(A8), INIT_KING_MOVE(B8),
-        INIT_KING_MOVE(C8), INIT_KING_MOVE(D8),
-        INIT_KING_MOVE(E8), INIT_KING_MOVE(F8),
-        INIT_KING_MOVE(G8), INIT_KING_MOVE(H8)
+        MetaUtil::INIT_KING_MOVE(A8), MetaUtil::INIT_KING_MOVE(B8),
+        MetaUtil::INIT_KING_MOVE(C8), MetaUtil::INIT_KING_MOVE(D8),
+        MetaUtil::INIT_KING_MOVE(E8), MetaUtil::INIT_KING_MOVE(F8),
+        MetaUtil::INIT_KING_MOVE(G8), MetaUtil::INIT_KING_MOVE(H8)
       };
 
       // ======== //
@@ -1856,7 +2079,7 @@ namespace Sayuri {
        * @return 「bitboard」を右に移動したビットボード。
        */
       static constexpr Bitboard GetRightBitboard(Bitboard bitboard) {
-        return SHIFT_R(bitboard);
+        return MetaUtil::SHIFT_R(bitboard);
       }
       /**
        * 左に移動したビットボードを得る。
@@ -1864,7 +2087,7 @@ namespace Sayuri {
        * @return 「bitboard」を左に移動したビットボード。
        */
       static constexpr Bitboard GetLeftBitboard(Bitboard bitboard) {
-        return SHIFT_L(bitboard);
+        return MetaUtil::SHIFT_L(bitboard);
       }
       /**
        * 上に移動したビットボードを得る。
@@ -1872,7 +2095,7 @@ namespace Sayuri {
        * @return 「bitboard」を上に移動したビットボード。
        */
       static constexpr Bitboard GetUpBitboard(Bitboard bitboard) {
-        return SHIFT_U(bitboard);
+        return MetaUtil::SHIFT_U(bitboard);
       }
       /**
        * 下に移動したビットボードを得る。
@@ -1880,7 +2103,7 @@ namespace Sayuri {
        * @return 「bitboard」を下に移動したビットボード。
        */
       static constexpr Bitboard GetDownBitboard(Bitboard bitboard) {
-        return SHIFT_D(bitboard);
+        return MetaUtil::SHIFT_D(bitboard);
       }
       /**
        * 右上に移動したビットボードを得る。
@@ -1888,7 +2111,7 @@ namespace Sayuri {
        * @return 「bitboard」を右上に移動したビットボード。
        */
       static constexpr Bitboard GetRightUpBitboard(Bitboard bitboard) {
-        return SHIFT_RU(bitboard);
+        return MetaUtil::SHIFT_RU(bitboard);
       }
       /**
        * 右下に移動したビットボードを得る。
@@ -1896,7 +2119,7 @@ namespace Sayuri {
        * @return 「bitboard」を右下に移動したビットボード。
        */
       static constexpr Bitboard GetRightDownBitboard(Bitboard bitboard) {
-        return SHIFT_RD(bitboard);
+        return MetaUtil::SHIFT_RD(bitboard);
       }
       /**
        * 左上に移動したビットボードを得る。
@@ -1904,7 +2127,7 @@ namespace Sayuri {
        * @return 「bitboard」を左上に移動したビットボード。
        */
       static constexpr Bitboard GetLeftUpBitboard(Bitboard bitboard) {
-        return SHIFT_LU(bitboard);
+        return MetaUtil::SHIFT_LU(bitboard);
       }
       /**
        * 左下に移動したビットボードを得る。
@@ -1912,7 +2135,7 @@ namespace Sayuri {
        * @return 「bitboard」を左下に移動したビットボード。
        */
       static constexpr Bitboard GetLeftDownBitboard(Bitboard bitboard) {
-        return SHIFT_LD(bitboard);
+        return MetaUtil::SHIFT_LD(bitboard);
       }
       /**
        * 右右上に移動したビットボードを得る。
@@ -1920,7 +2143,7 @@ namespace Sayuri {
        * @return 「bitboard」を右右上に移動したビットボード。
        */
       static constexpr Bitboard GetRightRightUpBitboard(Bitboard bitboard) {
-        return SHIFT_RRU(bitboard);
+        return MetaUtil::SHIFT_RRU(bitboard);
       }
       /**
        * 右上上に移動したビットボードを得る。
@@ -1928,7 +2151,7 @@ namespace Sayuri {
        * @return 「bitboard」を右上上に移動したビットボード。
        */
       static constexpr Bitboard GetRightUpUpBitboard(Bitboard bitboard) {
-        return SHIFT_RUU(bitboard);
+        return MetaUtil::SHIFT_RUU(bitboard);
       }
       /**
        * 右右下に移動したビットボードを得る。
@@ -1936,7 +2159,7 @@ namespace Sayuri {
        * @return 「bitboard」を右右下に移動したビットボード。
        */
       static constexpr Bitboard GetRightRightDownBitboard(Bitboard bitboard) {
-        return SHIFT_RRD(bitboard);
+        return MetaUtil::SHIFT_RRD(bitboard);
       }
       /**
        * 右下下に移動したビットボードを得る。
@@ -1944,7 +2167,7 @@ namespace Sayuri {
        * @return 「bitboard」を右下下に移動したビットボード。
        */
       static constexpr Bitboard GetRightDownDownBitboard(Bitboard bitboard) {
-        return SHIFT_RDD(bitboard);
+        return MetaUtil::SHIFT_RDD(bitboard);
       }
       /**
        * 左左上に移動したビットボードを得る。
@@ -1952,7 +2175,7 @@ namespace Sayuri {
        * @return 「bitboard」を左左上に移動したビットボード。
        */
       static constexpr Bitboard GetLeftLeftUpBitboard(Bitboard bitboard) {
-        return SHIFT_LLU(bitboard);
+        return MetaUtil::SHIFT_LLU(bitboard);
       }
       /**
        * 左上上に移動したビットボードを得る。
@@ -1960,7 +2183,7 @@ namespace Sayuri {
        * @return 「bitboard」を左上上に移動したビットボード。
        */
       static constexpr Bitboard GetLeftUpUpBitboard(Bitboard bitboard) {
-        return SHIFT_LUU(bitboard);
+        return MetaUtil::SHIFT_LUU(bitboard);
       }
       /**
        * 左左下に移動したビットボードを得る。
@@ -1968,7 +2191,7 @@ namespace Sayuri {
        * @return 「bitboard」を左左下に移動したビットボード。
        */
       static constexpr Bitboard GetLeftLeftDownBitboard(Bitboard bitboard) {
-        return SHIFT_LLD(bitboard);
+        return MetaUtil::SHIFT_LLD(bitboard);
       }
       /**
        * 左下下に移動したビットボードを得る。
@@ -1976,7 +2199,7 @@ namespace Sayuri {
        * @return 「bitboard」を左下下に移動したビットボード。
        */
       static constexpr Bitboard GetLeftDownDownBitboard(Bitboard bitboard) {
-        return SHIFT_LDD(bitboard);
+        return MetaUtil::SHIFT_LDD(bitboard);
       }
 
       // ====================== //
@@ -2063,7 +2286,7 @@ namespace Sayuri {
        * @return 直線のビットボード。
        */
       static Bitboard GetLine(Square point_1, Square point_2) {
-        return LINE[point_1][point_2];
+        return MetaUtil::LINE[point_1][point_2];
       }
       /**
        * 2点を結ぶ直線のビットボードを得る。 (2点を除く。)
@@ -2072,7 +2295,7 @@ namespace Sayuri {
        * @return 直線のビットボード。
        */
       static Bitboard GetBetween(Square point_1, Square point_2) {
-        return BETWEEN[point_1][point_2];
+        return MetaUtil::BETWEEN[point_1][point_2];
       }
 
       // ========== //
@@ -2157,10 +2380,10 @@ namespace Sayuri {
        * @return 立っているビットボードの数。
        */
       static int CountBits(Bitboard bitboard) {
-        return NUM_BIT16_TABLE[bitboard & 0xffff]
-        + NUM_BIT16_TABLE[(bitboard >> 16) & 0xffff]
-        + NUM_BIT16_TABLE[(bitboard >> 32) & 0xffff]
-        + NUM_BIT16_TABLE[(bitboard >> 48) & 0xffff];
+        return MetaUtil::NUM_BIT16_TABLE[bitboard & 0xffff]
+        + MetaUtil::NUM_BIT16_TABLE[(bitboard >> 16) & 0xffff]
+        + MetaUtil::NUM_BIT16_TABLE[(bitboard >> 32) & 0xffff]
+        + MetaUtil::NUM_BIT16_TABLE[(bitboard >> 48) & 0xffff];
       }
 
       /**
@@ -2188,7 +2411,7 @@ namespace Sayuri {
        * @return 距離。
        */
       static int GetDistance(Square square_1, Square square_2) {
-        return DISTANCE[square_1][square_2];
+        return MetaUtil::DISTANCE[square_1][square_2];
       }
 
       /**
@@ -2198,7 +2421,7 @@ namespace Sayuri {
        * @return アンパッサンならtrue。
        */
       static bool IsEnPassant(Square en_passant_square, Square to) {
-        return IS_EN_PASSANT[en_passant_square][to];
+        return MetaUtil::IS_EN_PASSANT[en_passant_square][to];
       }
 
       /**
@@ -2208,7 +2431,7 @@ namespace Sayuri {
        * @return 2歩の動きならtrue。
        */
       static bool Is2StepMove(Square from, Square to) {
-        return IS_2STEP_MOVE[from][to];
+        return MetaUtil::IS_2STEP_MOVE[from][to];
       }
 
       /**

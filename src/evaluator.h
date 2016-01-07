@@ -39,47 +39,50 @@ namespace Sayuri {
   class ChessEngine;
   struct EvalCache;
 
-  // ========================= //
-  // Evaluator定数初期化用関数 //
-  // ========================= //
-  /** 
-   * Evaluator::ISO_PAWN_MASKを初期化する。
-   * @param fyle そのマスのファイル。
-   * @return そのマスに対応したISO_PAWN_MASK。
-   */
-  inline constexpr Bitboard INIT_ISO_PAWN_MASK(Fyle fyle) {
-    return fyle == FYLE_A ? Util::FYLE[FYLE_B]
-    : (fyle == FYLE_H ? Util::FYLE[FYLE_G]
-    : (Util::FYLE[fyle + 1] | Util::FYLE[fyle - 1]));
-  }
+  /** Evaluator用メタ関数名前空間。 */
+  namespace MetaEvaluator {
+    // ========================= //
+    // Evaluator定数初期化用関数 //
+    // ========================= //
+    /** 
+     * Evaluator::ISO_PAWN_MASKを初期化する。
+     * @param fyle そのマスのファイル。
+     * @return そのマスに対応したISO_PAWN_MASK。
+     */
+    inline constexpr Bitboard INIT_ISO_PAWN_MASK(Fyle fyle) {
+      return fyle == FYLE_A ? Util::FYLE[FYLE_B]
+      : (fyle == FYLE_H ? Util::FYLE[FYLE_G]
+      : (Util::FYLE[fyle + 1] | Util::FYLE[fyle - 1]));
+    }
 
-  inline constexpr Bitboard TEMP_FUNC_1(Fyle fyle) {
-    return Util::FYLE[fyle] | INIT_ISO_PAWN_MASK(fyle);
-  }
-  inline constexpr Bitboard TEMP_FUNC_2(Rank rank) {
-    return rank == RANK_1 ? Util::RANK[RANK_1]
-   : (Util::RANK[rank] | TEMP_FUNC_2(rank - 1));
-  }
-  inline constexpr Bitboard TEMP_FUNC_3(Rank rank) {
-    return rank == RANK_8 ? Util::RANK[RANK_8]
-   : (Util::RANK[rank] | TEMP_FUNC_3(rank + 1));
-  }
-  /**
-   * PASS_PAWN_MASKを初期化する。
-   * @param side サイド。
-   * @param square マス。
-   * @return パスポーン判定用マスク。
-   */
-  inline constexpr Bitboard INIT_PASS_PAWN_MASK(Side side, Square square) {
-    return side == WHITE
-    ? (TEMP_FUNC_1(Util::SquareToFyle(square))
-    & ~TEMP_FUNC_2(Util::SquareToRank(square)))
+    inline constexpr Bitboard TEMP_FUNC_1(Fyle fyle) {
+      return Util::FYLE[fyle] | INIT_ISO_PAWN_MASK(fyle);
+    }
+    inline constexpr Bitboard TEMP_FUNC_2(Rank rank) {
+      return rank == RANK_1 ? Util::RANK[RANK_1]
+     : (Util::RANK[rank] | TEMP_FUNC_2(rank - 1));
+    }
+    inline constexpr Bitboard TEMP_FUNC_3(Rank rank) {
+      return rank == RANK_8 ? Util::RANK[RANK_8]
+     : (Util::RANK[rank] | TEMP_FUNC_3(rank + 1));
+    }
+    /**
+     * PASS_PAWN_MASKを初期化する。
+     * @param side サイド。
+     * @param square マス。
+     * @return パスポーン判定用マスク。
+     */
+    inline constexpr Bitboard INIT_PASS_PAWN_MASK(Side side, Square square) {
+      return side == WHITE
+      ? (TEMP_FUNC_1(Util::SquareToFyle(square))
+      & ~TEMP_FUNC_2(Util::SquareToRank(square)))
 
-    : (side == BLACK
-    ? (TEMP_FUNC_1(Util::SquareToFyle(square))
-    & ~TEMP_FUNC_3(Util::SquareToRank(square)))
+      : (side == BLACK
+      ? (TEMP_FUNC_1(Util::SquareToFyle(square))
+      & ~TEMP_FUNC_3(Util::SquareToRank(square)))
 
-    : 0);
+      : 0);
+    }
   }
 
   /** 評価関数クラス。 */
@@ -237,130 +240,226 @@ namespace Sayuri {
           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
         },
         {
-          INIT_PASS_PAWN_MASK(WHITE, A1), INIT_PASS_PAWN_MASK(WHITE, B1),
-          INIT_PASS_PAWN_MASK(WHITE, C1), INIT_PASS_PAWN_MASK(WHITE, D1),
-          INIT_PASS_PAWN_MASK(WHITE, E1), INIT_PASS_PAWN_MASK(WHITE, F1),
-          INIT_PASS_PAWN_MASK(WHITE, G1), INIT_PASS_PAWN_MASK(WHITE, H1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, A1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, B1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, C1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, D1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, E1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, F1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, G1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, H1),
 
-          INIT_PASS_PAWN_MASK(WHITE, A2), INIT_PASS_PAWN_MASK(WHITE, B2),
-          INIT_PASS_PAWN_MASK(WHITE, C2), INIT_PASS_PAWN_MASK(WHITE, D2),
-          INIT_PASS_PAWN_MASK(WHITE, E2), INIT_PASS_PAWN_MASK(WHITE, F2),
-          INIT_PASS_PAWN_MASK(WHITE, G2), INIT_PASS_PAWN_MASK(WHITE, H2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, A2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, B2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, C2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, D2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, E2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, F2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, G2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, H2),
 
-          INIT_PASS_PAWN_MASK(WHITE, A3), INIT_PASS_PAWN_MASK(WHITE, B3),
-          INIT_PASS_PAWN_MASK(WHITE, C3), INIT_PASS_PAWN_MASK(WHITE, D3),
-          INIT_PASS_PAWN_MASK(WHITE, E3), INIT_PASS_PAWN_MASK(WHITE, F3),
-          INIT_PASS_PAWN_MASK(WHITE, G3), INIT_PASS_PAWN_MASK(WHITE, H3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, A3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, B3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, C3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, D3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, E3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, F3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, G3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, H3),
 
-          INIT_PASS_PAWN_MASK(WHITE, A4), INIT_PASS_PAWN_MASK(WHITE, B4),
-          INIT_PASS_PAWN_MASK(WHITE, C4), INIT_PASS_PAWN_MASK(WHITE, D4),
-          INIT_PASS_PAWN_MASK(WHITE, E4), INIT_PASS_PAWN_MASK(WHITE, F4),
-          INIT_PASS_PAWN_MASK(WHITE, G4), INIT_PASS_PAWN_MASK(WHITE, H4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, A4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, B4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, C4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, D4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, E4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, F4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, G4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, H4),
 
-          INIT_PASS_PAWN_MASK(WHITE, A5), INIT_PASS_PAWN_MASK(WHITE, B5),
-          INIT_PASS_PAWN_MASK(WHITE, C5), INIT_PASS_PAWN_MASK(WHITE, D5),
-          INIT_PASS_PAWN_MASK(WHITE, E5), INIT_PASS_PAWN_MASK(WHITE, F5),
-          INIT_PASS_PAWN_MASK(WHITE, G5), INIT_PASS_PAWN_MASK(WHITE, H5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, A5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, B5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, C5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, D5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, E5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, F5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, G5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, H5),
 
-          INIT_PASS_PAWN_MASK(WHITE, A6), INIT_PASS_PAWN_MASK(WHITE, B6),
-          INIT_PASS_PAWN_MASK(WHITE, C6), INIT_PASS_PAWN_MASK(WHITE, D6),
-          INIT_PASS_PAWN_MASK(WHITE, E6), INIT_PASS_PAWN_MASK(WHITE, F6),
-          INIT_PASS_PAWN_MASK(WHITE, G6), INIT_PASS_PAWN_MASK(WHITE, H6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, A6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, B6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, C6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, D6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, E6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, F6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, G6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, H6),
 
-          INIT_PASS_PAWN_MASK(WHITE, A7), INIT_PASS_PAWN_MASK(WHITE, B7),
-          INIT_PASS_PAWN_MASK(WHITE, C7), INIT_PASS_PAWN_MASK(WHITE, D7),
-          INIT_PASS_PAWN_MASK(WHITE, E7), INIT_PASS_PAWN_MASK(WHITE, F7),
-          INIT_PASS_PAWN_MASK(WHITE, G7), INIT_PASS_PAWN_MASK(WHITE, H7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, A7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, B7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, C7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, D7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, E7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, F7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, G7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, H7),
 
-          INIT_PASS_PAWN_MASK(WHITE, A8), INIT_PASS_PAWN_MASK(WHITE, B8),
-          INIT_PASS_PAWN_MASK(WHITE, C8), INIT_PASS_PAWN_MASK(WHITE, D8),
-          INIT_PASS_PAWN_MASK(WHITE, E8), INIT_PASS_PAWN_MASK(WHITE, F8),
-          INIT_PASS_PAWN_MASK(WHITE, G8), INIT_PASS_PAWN_MASK(WHITE, H8)
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, A8),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, B8),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, C8),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, D8),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, E8),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, F8),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, G8),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(WHITE, H8)
         },
         {
-          INIT_PASS_PAWN_MASK(BLACK, A1), INIT_PASS_PAWN_MASK(BLACK, B1),
-          INIT_PASS_PAWN_MASK(BLACK, C1), INIT_PASS_PAWN_MASK(BLACK, D1),
-          INIT_PASS_PAWN_MASK(BLACK, E1), INIT_PASS_PAWN_MASK(BLACK, F1),
-          INIT_PASS_PAWN_MASK(BLACK, G1), INIT_PASS_PAWN_MASK(BLACK, H1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, A1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, B1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, C1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, D1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, E1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, F1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, G1),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, H1),
 
-          INIT_PASS_PAWN_MASK(BLACK, A2), INIT_PASS_PAWN_MASK(BLACK, B2),
-          INIT_PASS_PAWN_MASK(BLACK, C2), INIT_PASS_PAWN_MASK(BLACK, D2),
-          INIT_PASS_PAWN_MASK(BLACK, E2), INIT_PASS_PAWN_MASK(BLACK, F2),
-          INIT_PASS_PAWN_MASK(BLACK, G2), INIT_PASS_PAWN_MASK(BLACK, H2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, A2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, B2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, C2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, D2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, E2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, F2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, G2),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, H2),
 
-          INIT_PASS_PAWN_MASK(BLACK, A3), INIT_PASS_PAWN_MASK(BLACK, B3),
-          INIT_PASS_PAWN_MASK(BLACK, C3), INIT_PASS_PAWN_MASK(BLACK, D3),
-          INIT_PASS_PAWN_MASK(BLACK, E3), INIT_PASS_PAWN_MASK(BLACK, F3),
-          INIT_PASS_PAWN_MASK(BLACK, G3), INIT_PASS_PAWN_MASK(BLACK, H3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, A3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, B3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, C3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, D3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, E3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, F3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, G3),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, H3),
 
-          INIT_PASS_PAWN_MASK(BLACK, A4), INIT_PASS_PAWN_MASK(BLACK, B4),
-          INIT_PASS_PAWN_MASK(BLACK, C4), INIT_PASS_PAWN_MASK(BLACK, D4),
-          INIT_PASS_PAWN_MASK(BLACK, E4), INIT_PASS_PAWN_MASK(BLACK, F4),
-          INIT_PASS_PAWN_MASK(BLACK, G4), INIT_PASS_PAWN_MASK(BLACK, H4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, A4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, B4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, C4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, D4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, E4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, F4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, G4),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, H4),
 
-          INIT_PASS_PAWN_MASK(BLACK, A5), INIT_PASS_PAWN_MASK(BLACK, B5),
-          INIT_PASS_PAWN_MASK(BLACK, C5), INIT_PASS_PAWN_MASK(BLACK, D5),
-          INIT_PASS_PAWN_MASK(BLACK, E5), INIT_PASS_PAWN_MASK(BLACK, F5),
-          INIT_PASS_PAWN_MASK(BLACK, G5), INIT_PASS_PAWN_MASK(BLACK, H5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, A5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, B5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, C5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, D5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, E5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, F5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, G5),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, H5),
 
-          INIT_PASS_PAWN_MASK(BLACK, A6), INIT_PASS_PAWN_MASK(BLACK, B6),
-          INIT_PASS_PAWN_MASK(BLACK, C6), INIT_PASS_PAWN_MASK(BLACK, D6),
-          INIT_PASS_PAWN_MASK(BLACK, E6), INIT_PASS_PAWN_MASK(BLACK, F6),
-          INIT_PASS_PAWN_MASK(BLACK, G6), INIT_PASS_PAWN_MASK(BLACK, H6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, A6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, B6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, C6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, D6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, E6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, F6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, G6),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, H6),
 
-          INIT_PASS_PAWN_MASK(BLACK, A7), INIT_PASS_PAWN_MASK(BLACK, B7),
-          INIT_PASS_PAWN_MASK(BLACK, C7), INIT_PASS_PAWN_MASK(BLACK, D7),
-          INIT_PASS_PAWN_MASK(BLACK, E7), INIT_PASS_PAWN_MASK(BLACK, F7),
-          INIT_PASS_PAWN_MASK(BLACK, G7), INIT_PASS_PAWN_MASK(BLACK, H7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, A7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, B7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, C7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, D7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, E7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, F7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, G7),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, H7),
 
-          INIT_PASS_PAWN_MASK(BLACK, A8), INIT_PASS_PAWN_MASK(BLACK, B8),
-          INIT_PASS_PAWN_MASK(BLACK, C8), INIT_PASS_PAWN_MASK(BLACK, D8),
-          INIT_PASS_PAWN_MASK(BLACK, E8), INIT_PASS_PAWN_MASK(BLACK, F8),
-          INIT_PASS_PAWN_MASK(BLACK, G8), INIT_PASS_PAWN_MASK(BLACK, H8)
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, A8),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, B8),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, C8),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, D8),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, E8),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, F8),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, G8),
+          MetaEvaluator::INIT_PASS_PAWN_MASK(BLACK, H8)
         }
       };
 
       /** 孤立ポーンの両脇ファイルのマスク。 [マス] */
       static constexpr Bitboard ISO_PAWN_MASK[NUM_SQUARES] {
-        INIT_ISO_PAWN_MASK(FYLE_A), INIT_ISO_PAWN_MASK(FYLE_B),
-        INIT_ISO_PAWN_MASK(FYLE_C), INIT_ISO_PAWN_MASK(FYLE_D),
-        INIT_ISO_PAWN_MASK(FYLE_E), INIT_ISO_PAWN_MASK(FYLE_F),
-        INIT_ISO_PAWN_MASK(FYLE_G), INIT_ISO_PAWN_MASK(FYLE_H),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_A),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_B),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_C),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_D),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_E),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_F),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_G),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_H),
 
-        INIT_ISO_PAWN_MASK(FYLE_A), INIT_ISO_PAWN_MASK(FYLE_B),
-        INIT_ISO_PAWN_MASK(FYLE_C), INIT_ISO_PAWN_MASK(FYLE_D),
-        INIT_ISO_PAWN_MASK(FYLE_E), INIT_ISO_PAWN_MASK(FYLE_F),
-        INIT_ISO_PAWN_MASK(FYLE_G), INIT_ISO_PAWN_MASK(FYLE_H),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_A),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_B),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_C),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_D),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_E),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_F),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_G),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_H),
 
-        INIT_ISO_PAWN_MASK(FYLE_A), INIT_ISO_PAWN_MASK(FYLE_B),
-        INIT_ISO_PAWN_MASK(FYLE_C), INIT_ISO_PAWN_MASK(FYLE_D),
-        INIT_ISO_PAWN_MASK(FYLE_E), INIT_ISO_PAWN_MASK(FYLE_F),
-        INIT_ISO_PAWN_MASK(FYLE_G), INIT_ISO_PAWN_MASK(FYLE_H),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_A),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_B),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_C),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_D),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_E),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_F),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_G),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_H),
 
-        INIT_ISO_PAWN_MASK(FYLE_A), INIT_ISO_PAWN_MASK(FYLE_B),
-        INIT_ISO_PAWN_MASK(FYLE_C), INIT_ISO_PAWN_MASK(FYLE_D),
-        INIT_ISO_PAWN_MASK(FYLE_E), INIT_ISO_PAWN_MASK(FYLE_F),
-        INIT_ISO_PAWN_MASK(FYLE_G), INIT_ISO_PAWN_MASK(FYLE_H),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_A),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_B),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_C),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_D),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_E),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_F),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_G),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_H),
 
-        INIT_ISO_PAWN_MASK(FYLE_A), INIT_ISO_PAWN_MASK(FYLE_B),
-        INIT_ISO_PAWN_MASK(FYLE_C), INIT_ISO_PAWN_MASK(FYLE_D),
-        INIT_ISO_PAWN_MASK(FYLE_E), INIT_ISO_PAWN_MASK(FYLE_F),
-        INIT_ISO_PAWN_MASK(FYLE_G), INIT_ISO_PAWN_MASK(FYLE_H),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_A),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_B),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_C),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_D),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_E),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_F),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_G),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_H),
 
-        INIT_ISO_PAWN_MASK(FYLE_A), INIT_ISO_PAWN_MASK(FYLE_B),
-        INIT_ISO_PAWN_MASK(FYLE_C), INIT_ISO_PAWN_MASK(FYLE_D),
-        INIT_ISO_PAWN_MASK(FYLE_E), INIT_ISO_PAWN_MASK(FYLE_F),
-        INIT_ISO_PAWN_MASK(FYLE_G), INIT_ISO_PAWN_MASK(FYLE_H),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_A),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_B),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_C),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_D),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_E),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_F),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_G),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_H),
 
-        INIT_ISO_PAWN_MASK(FYLE_A), INIT_ISO_PAWN_MASK(FYLE_B),
-        INIT_ISO_PAWN_MASK(FYLE_C), INIT_ISO_PAWN_MASK(FYLE_D),
-        INIT_ISO_PAWN_MASK(FYLE_E), INIT_ISO_PAWN_MASK(FYLE_F),
-        INIT_ISO_PAWN_MASK(FYLE_G), INIT_ISO_PAWN_MASK(FYLE_H),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_A),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_B),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_C),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_D),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_E),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_F),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_G),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_H),
 
-        INIT_ISO_PAWN_MASK(FYLE_A), INIT_ISO_PAWN_MASK(FYLE_B),
-        INIT_ISO_PAWN_MASK(FYLE_C), INIT_ISO_PAWN_MASK(FYLE_D),
-        INIT_ISO_PAWN_MASK(FYLE_E), INIT_ISO_PAWN_MASK(FYLE_F),
-        INIT_ISO_PAWN_MASK(FYLE_G), INIT_ISO_PAWN_MASK(FYLE_H)
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_A),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_B),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_C),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_D),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_E),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_F),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_G),
+        MetaEvaluator::INIT_ISO_PAWN_MASK(FYLE_H)
       };
 
       /** クイーンサイドのポーンシールドのマスク。 */
