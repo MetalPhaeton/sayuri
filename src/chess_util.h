@@ -2337,7 +2337,7 @@ namespace Sayuri {
        * @return val_1とval_2の大きい方。
        */
       template<class T, class S>
-      constexpr static auto GetMax(T val_1, S val_2)
+      static constexpr auto GetMax(T val_1, S val_2)
       -> decltype(val_1 + val_2) {
         return val_1 > val_2 ? val_1 : val_2;
       }
@@ -2349,7 +2349,7 @@ namespace Sayuri {
        * @return val_1とval_2の小さい方。
        */
       template<class T, class S>
-      constexpr static auto GetMin(T val_1, S val_2)
+      static constexpr auto GetMin(T val_1, S val_2)
       -> decltype(val_1 + val_2) {
         return val_1 < val_2 ? val_1 : val_2;
       }
@@ -2379,7 +2379,7 @@ namespace Sayuri {
        * @param bitboard 対象のビットボード。
        * @return 立っているビットボードの数。
        */
-      static int CountBits(Bitboard bitboard) {
+      static constexpr int CountBits(Bitboard bitboard) {
         return MetaUtil::NUM_BIT16_TABLE[bitboard & 0xffff]
         + MetaUtil::NUM_BIT16_TABLE[(bitboard >> 16) & 0xffff]
         + MetaUtil::NUM_BIT16_TABLE[(bitboard >> 32) & 0xffff]
@@ -2391,7 +2391,7 @@ namespace Sayuri {
        * @param bitboard 対象のビットボード。
        * @最下位で連続しているゼロビットの数。
        */
-      static int CountZero(Bitboard bitboard) {
+      static constexpr int CountZero(Bitboard bitboard) {
         return CountBits((bitboard & (-bitboard)) - 1);
       }
 
@@ -2400,7 +2400,7 @@ namespace Sayuri {
        * @param bitboard 対象のビットボード。
        * @return マス。
        */
-      static Square GetSquare(Bitboard bitboard) {
+      static constexpr Square GetSquare(Bitboard bitboard) {
         return CountZero(bitboard);
       }
 
@@ -2410,7 +2410,7 @@ namespace Sayuri {
        * @param square_1 マス2。
        * @return 距離。
        */
-      static int GetDistance(Square square_1, Square square_2) {
+      static constexpr int GetDistance(Square square_1, Square square_2) {
         return MetaUtil::DISTANCE[square_1][square_2];
       }
 
@@ -2420,7 +2420,7 @@ namespace Sayuri {
        * @param to 指し手の移動先のマス。
        * @return アンパッサンならtrue。
        */
-      static bool IsEnPassant(Square en_passant_square, Square to) {
+      static constexpr bool IsEnPassant(Square en_passant_square, Square to) {
         return MetaUtil::IS_EN_PASSANT[en_passant_square][to];
       }
 
@@ -2430,7 +2430,7 @@ namespace Sayuri {
        * @param to 移動先。
        * @return 2歩の動きならtrue。
        */
-      static bool Is2StepMove(Square from, Square to) {
+      static constexpr bool Is2StepMove(Square from, Square to) {
         return MetaUtil::IS_2STEP_MOVE[from][to];
       }
 
@@ -2439,7 +2439,7 @@ namespace Sayuri {
        * @param depth 探索深さ。
        * @return ヒストリー値。
        */
-      constexpr static int DepthToHistory(int depth) {
+      static constexpr int DepthToHistory(int depth) {
         return depth * depth;
       }
 
@@ -2448,7 +2448,7 @@ namespace Sayuri {
        * @param side 元のサイド。
        * @return 逆サイド。
        */
-      constexpr static Side GetOppositeSide(Side side) {
+      static constexpr Side GetOppositeSide(Side side) {
         return side ^ 0x3;
       }
 
