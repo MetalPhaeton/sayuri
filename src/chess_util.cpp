@@ -80,8 +80,6 @@ namespace Sayuri {
   // ================== //
   // static変数の初期化。
   void Util::InitUtil() {
-    // attack_table_[][][]を初期化する。
-    InitAttackTable();
     // pawn_movable_table_[][][]を初期化する。
     InitPawnMovableTable();
     // ランダム関連を初期化する。
@@ -91,123 +89,6 @@ namespace Sayuri {
   // ======== //
   // マジック //
   // ======== //
-  // マジックビットボードの配列。
-  Bitboard Util::attack_table_[NUM_SQUARES][0xff + 1][NUM_ROTS];
-  // attack_table_[][]を初期化する。
-  void Util::InitAttackTable() {
-    // 初期化。
-    INIT_ARRAY(attack_table_);
-
-    FOR_SQUARES(square) {
-      for (Bitboard pattern = 0; pattern <= 0xff; ++pattern) {
-        // 各角度のポイント。
-        Bitboard point[NUM_ROTS] {
-          (Util::SQUARE[square][R0] >> Util::MAGIC_SHIFT[square][R0])
-          & Util::MAGIC_MASK[square][R0],
-          (Util::SQUARE[square][R45] >> Util::MAGIC_SHIFT[square][R45])
-          & Util::MAGIC_MASK[square][R45],
-          (Util::SQUARE[square][R90] >> Util::MAGIC_SHIFT[square][R90])
-          & Util::MAGIC_MASK[square][R90],
-          (Util::SQUARE[square][R135] >> Util::MAGIC_SHIFT[square][R135])
-          & Util::MAGIC_MASK[square][R135]
-        };
-        Bitboard temp[NUM_ROTS] {0, 0, 0, 0};
-
-        // 先ず左。
-        COPY_ARRAY(temp, point);
-        for (int i = 0; i < 8; ++i) {
-          // シフト。
-          temp[R0] = (temp[R0] << 1) & Util::MAGIC_MASK[square][R0];
-          temp[R45] = (temp[R45] << 1) & Util::MAGIC_MASK[square][R45];
-          temp[R90] = (temp[R90] << 1) & Util::MAGIC_MASK[square][R90];
-          temp[R135] = (temp[R135] << 1) & Util::MAGIC_MASK[square][R135];
-
-          // 0度。
-          if (temp[R0]) {
-            attack_table_[square][pattern][R0] |=
-            temp[R0] << Util::MAGIC_SHIFT[square][R0];
-
-            // もし他の駒にぶつかったら終了。
-            if (temp[R0] & pattern) temp[R0] = 0;
-          }
-          // 45度。
-          if (temp[R45]) {
-            attack_table_[square][pattern][R45] |=
-            Util::SQUARE[Util::R_ROT45[Util::GetSquare(temp[R45]
-            << Util::MAGIC_SHIFT[square][R45])]][R0];
-
-            // もし他の駒にぶつかったら終了。
-            if (temp[R45] & pattern) temp[R45] = 0;
-          }
-          // 90度。
-          if (temp[R90]) {
-            attack_table_[square][pattern][R90] |=
-            Util::SQUARE[Util::R_ROT90[Util::GetSquare(temp[R90]
-            << Util::MAGIC_SHIFT[square][R90])]][R0];
-
-            // もし他の駒にぶつかったら終了。
-            if (temp[R90] & pattern) temp[R90] = 0;
-          }
-          // 135度。
-          if (temp[R135]) {
-            attack_table_[square][pattern][R135] |=
-            Util::SQUARE[Util::R_ROT135[Util::GetSquare(temp[R135]
-            << Util::MAGIC_SHIFT[square][R135])]][R0];
-
-            // もし他の駒にぶつかったら終了。
-            if (temp[R135] & pattern) temp[R135] = 0;
-          }
-        }
-
-        // 次は右。
-        COPY_ARRAY(temp, point);
-        for (int i = 0; i < 8; ++i) {
-          // シフト。
-          temp[R0] = (temp[R0] >> 1) & Util::MAGIC_MASK[square][R0];
-          temp[R45] = (temp[R45] >> 1) & Util::MAGIC_MASK[square][R45];
-          temp[R90] = (temp[R90] >> 1) & Util::MAGIC_MASK[square][R90];
-          temp[R135] = (temp[R135] >> 1) & Util::MAGIC_MASK[square][R135];
-
-          // 0度。
-          if (temp[R0]) {
-            attack_table_[square][pattern][R0] |=
-            temp[R0] << Util::MAGIC_SHIFT[square][R0];
-
-            // もし他の駒にぶつかったら終了。
-            if (temp[R0] & pattern) temp[R0] = 0;
-          }
-          // 45度。
-          if (temp[R45]) {
-            attack_table_[square][pattern][R45] |=
-            Util::SQUARE[Util::R_ROT45[Util::GetSquare(temp[R45]
-            << Util::MAGIC_SHIFT[square][R45])]][R0];
-
-            // もし他の駒にぶつかったら終了。
-            if (temp[R45] & pattern) temp[R45] = 0;
-          }
-          // 90度。
-          if (temp[R90]) {
-            attack_table_[square][pattern][R90] |=
-            Util::SQUARE[Util::R_ROT90[Util::GetSquare(temp[R90]
-            << Util::MAGIC_SHIFT[square][R90])]][R0];
-
-            // もし他の駒にぶつかったら終了。
-            if (temp[R90] & pattern) temp[R90] = 0;
-          }
-          // 135度。
-          if (temp[R135]) {
-            attack_table_[square][pattern][R135] |=
-            Util::SQUARE[Util::R_ROT135[Util::GetSquare(temp[R135]
-            << Util::MAGIC_SHIFT[square][R135])]][R0];
-
-            // もし他の駒にぶつかったら終了。
-            if (temp[R135] & pattern) temp[R135] = 0;
-          }
-        }
-      }
-    }
-  }
-
   // ポーンの動ける位置の配列。
   Bitboard Util::pawn_movable_table_[NUM_SIDES][NUM_SQUARES][0xff + 1];
   void Util::InitPawnMovableTable() {

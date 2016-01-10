@@ -2214,10 +2214,10 @@ namespace Sayuri {
        */
       static Bitboard GetBishopMagic(Square square,
       Bitboard blocker_45, Bitboard blocker_135) {
-        return attack_table_[square]
+        return MetaUtil::ATTACK_TABLE[square]
         [(blocker_45 >> MAGIC_SHIFT[square][R45])
         & MAGIC_MASK[square][R45]][R45]
-        | attack_table_[square]
+        | MetaUtil::ATTACK_TABLE[square]
         [(blocker_135 >> MAGIC_SHIFT[square][R135])
         & MAGIC_MASK[square][R135]][R135];
       }
@@ -2230,10 +2230,10 @@ namespace Sayuri {
        */
       static Bitboard GetRookMagic(Square square,
       Bitboard blocker_0, Bitboard blocker_90) {
-        return attack_table_[square]
+        return MetaUtil::ATTACK_TABLE[square]
         [(blocker_0 >> MAGIC_SHIFT[square][R0])
         & MAGIC_MASK[square][R0]][R0]
-        | attack_table_[square]
+        | MetaUtil::ATTACK_TABLE[square]
         [(blocker_90 >> MAGIC_SHIFT[square][R90])
         & MAGIC_MASK[square][R90]][R90];
       }
@@ -2249,16 +2249,16 @@ namespace Sayuri {
       static Bitboard GetQueenMagic(Square square,
       Bitboard blocker_0, Bitboard blocker_45,
       Bitboard blocker_90, Bitboard blocker_135) {
-        return attack_table_[square]
+        return MetaUtil::ATTACK_TABLE[square]
         [(blocker_0 >> MAGIC_SHIFT[square][R0])
         & MAGIC_MASK[square][R0]][R0]
-        | attack_table_[square]
+        | MetaUtil::ATTACK_TABLE[square]
         [(blocker_45 >> MAGIC_SHIFT[square][R45])
         & MAGIC_MASK[square][R45]][R45]
-        | attack_table_[square]
+        | MetaUtil::ATTACK_TABLE[square]
         [(blocker_90 >> MAGIC_SHIFT[square][R90])
         & MAGIC_MASK[square][R90]][R90]
-        | attack_table_[square]
+        | MetaUtil::ATTACK_TABLE[square]
         [(blocker_135 >> MAGIC_SHIFT[square][R135])
         & MAGIC_MASK[square][R135]][R135];
       }
@@ -2601,18 +2601,15 @@ namespace Sayuri {
       /** デストラクタ。 */
       virtual ~Util();
 
-    private:
+    //private:
       // ========== //
       // マジック用 //
       // ========== //
-      /** マジックビットボードの配列。 [サイド][マス][パターン][角度] */
-      static Bitboard attack_table_[NUM_SQUARES][0xff + 1][NUM_ROTS];
-      /** attack_table_[][][]を初期化する。 */
-      static void InitAttackTable();
       /** ポーンの動ける位置の配列。 [サイド][マス][パターン] */
       static Bitboard pawn_movable_table_[NUM_SIDES][NUM_SQUARES][0xff + 1];
       /** pawn_movable_table_[][][]を初期化する。 */
       static void InitPawnMovableTable();
+    private:  // Test
 
       // ================== //
       // その他のstatic変数 //

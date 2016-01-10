@@ -124,14 +124,6 @@ namespace Sayuri {
 
     // ========================================================================
 
-    FOR_SQUARES(square1) {
-      FOR_SQUARES(square2) {
-        if (MetaUtil::IS_2STEP_MOVE[square1][square2]
-        != Util::Is2StepMove(square1, square2)) {
-          std::cout << square1 << " : " << square2 << std::endl;
-        }
-      }
-    }
     std::cout << "End" << std::endl;
 
     return 0;
