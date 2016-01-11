@@ -2212,7 +2212,7 @@ namespace Sayuri {
        * @param blocker_135 135度のブロッカー。
        * @return ビットボード。
        */
-      static Bitboard GetBishopMagic(Square square,
+      static constexpr Bitboard GetBishopMagic(Square square,
       Bitboard blocker_45, Bitboard blocker_135) {
         return MetaUtil::ATTACK_TABLE[square]
         [(blocker_45 >> MAGIC_SHIFT[square][R45])
@@ -2228,7 +2228,7 @@ namespace Sayuri {
        * @param blocker_90 90度のブロッカー。
        * @return ビットボード。
        */
-      static Bitboard GetRookMagic(Square square,
+      static constexpr Bitboard GetRookMagic(Square square,
       Bitboard blocker_0, Bitboard blocker_90) {
         return MetaUtil::ATTACK_TABLE[square]
         [(blocker_0 >> MAGIC_SHIFT[square][R0])
@@ -2246,7 +2246,7 @@ namespace Sayuri {
        * @param blocker_135 135度のブロッカー。
        * @return ビットボード。
        */
-      static Bitboard GetQueenMagic(Square square,
+      static constexpr Bitboard GetQueenMagic(Square square,
       Bitboard blocker_0, Bitboard blocker_45,
       Bitboard blocker_90, Bitboard blocker_135) {
         return MetaUtil::ATTACK_TABLE[square]
@@ -2269,9 +2269,9 @@ namespace Sayuri {
        * @param blocker_90 全駒の配置のビットボード。 角度90度。
        * @return ポーン動ける位置。
        */
-      static Bitboard GetPawnMovable(Side side, Square square,
+      static constexpr Bitboard GetPawnMovable(Side side, Square square,
       Bitboard blocker_90) {
-        return pawn_movable_table_[side][square]
+        return MetaUtil::PAWN_MOVABLE_TABLE[side][square]
         [(blocker_90 >> MAGIC_SHIFT[square][R90])
         & MAGIC_MASK[square][R90]];
       }
@@ -2601,16 +2601,7 @@ namespace Sayuri {
       /** デストラクタ。 */
       virtual ~Util();
 
-    //private:
-      // ========== //
-      // マジック用 //
-      // ========== //
-      /** ポーンの動ける位置の配列。 [サイド][マス][パターン] */
-      static Bitboard pawn_movable_table_[NUM_SIDES][NUM_SQUARES][0xff + 1];
-      /** pawn_movable_table_[][][]を初期化する。 */
-      static void InitPawnMovableTable();
-    private:  // Test
-
+    private:
       // ================== //
       // その他のstatic変数 //
       // ================== //
