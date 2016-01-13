@@ -124,6 +124,7 @@ namespace Sayuri {
 
     // ========================================================================
 
+    /*
     FOR_SQUARES(square) {
       for (int pattern = 0; pattern < (0xff + 1); ++pattern) {
         for (int rot = 0; rot < NUM_ROTS; ++rot) {
@@ -135,6 +136,7 @@ namespace Sayuri {
         }
       }
     }
+    */
     std::cout << "End" << std::endl;
 
     return 0;

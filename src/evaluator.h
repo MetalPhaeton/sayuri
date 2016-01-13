@@ -581,16 +581,6 @@ namespace Sayuri {
         }
       };
 
-      // --- ピン用便利ツール --- //
-      /**
-       * ピン用のテーブル。
-       * マス、パターン、方向を指定すると、
-       * ピンバックのビットボードが得られる。 [マス][マジックパターン][角度]
-       */
-      static Bitboard pin_back_table_[NUM_SQUARES][0xff + 1][NUM_ROTS];
-      /** pin_table[][][][]を初期化する。 */
-      static void InitPinBackTable();
-
       // ========== //
       // メンバ変数 //
       // ========== //

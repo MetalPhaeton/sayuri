@@ -46,7 +46,6 @@ namespace Sayuri {
   constexpr Bitboard Evaluator::ISO_PAWN_MASK[NUM_SQUARES];
   constexpr Bitboard Evaluator::PAWN_SHIELD_MASK[NUM_SIDES][NUM_SQUARES];
   constexpr Bitboard Evaluator::WEAK_SQUARE_MASK[NUM_SIDES][NUM_SQUARES];
-  Bitboard Evaluator::pin_back_table_[NUM_SQUARES][0xff + 1][NUM_ROTS];
 
   // ================ //
   // テンプレート部品 //
@@ -241,10 +240,10 @@ namespace Sayuri {
       // ピンを計算。
       // ピンのターゲットと裏駒を作成。
       Bitboard pin_target = attacks & basic_st.side_pieces_[ENEMY_SIDE];
-      Bitboard pin_back = (Evaluator::pin_back_table_[square]
+      Bitboard pin_back = (MetaEvaluator::PIN_BACK_TABLE[square]
       [(basic_st.blocker_[R45] >> Util::MAGIC_SHIFT[square][R45])
       & Util::MAGIC_MASK[square][R45]][R45]
-      | Evaluator::pin_back_table_[square]
+      | MetaEvaluator::PIN_BACK_TABLE[square]
       [(basic_st.blocker_[R135] >> Util::MAGIC_SHIFT[square][R135])
       & Util::MAGIC_MASK[square][R135]][R135])
       & basic_st.side_pieces_[ENEMY_SIDE];
@@ -293,10 +292,10 @@ namespace Sayuri {
       // ピンを計算。
       // ピンのターゲットと裏駒を作成。
       Bitboard pin_target = attacks & basic_st.side_pieces_[ENEMY_SIDE];
-      Bitboard pin_back = (Evaluator::pin_back_table_[square]
+      Bitboard pin_back = (MetaEvaluator::PIN_BACK_TABLE[square]
       [(basic_st.blocker_[R0] >> Util::MAGIC_SHIFT[square][R0])
       & Util::MAGIC_MASK[square][R0]][R0]
-      | Evaluator::pin_back_table_[square]
+      | MetaEvaluator::PIN_BACK_TABLE[square]
       [(basic_st.blocker_[R90] >> Util::MAGIC_SHIFT[square][R90])
       & Util::MAGIC_MASK[square][R90]][R90])
       & basic_st.side_pieces_[ENEMY_SIDE];
@@ -344,16 +343,16 @@ namespace Sayuri {
       // ピンのターゲットと裏駒を作成。
       Bitboard pin_target =
       attacks & basic_st.side_pieces_[ENEMY_SIDE];
-      Bitboard pin_back = (Evaluator::pin_back_table_[square]
+      Bitboard pin_back = (MetaEvaluator::PIN_BACK_TABLE[square]
       [(basic_st.blocker_[R0] >> Util::MAGIC_SHIFT[square][R0])
       & Util::MAGIC_MASK[square][R0]][R0]
-      | Evaluator::pin_back_table_[square]
+      | MetaEvaluator::PIN_BACK_TABLE[square]
       [(basic_st.blocker_[R45] >> Util::MAGIC_SHIFT[square][R45])
       & Util::MAGIC_MASK[square][R45]][R45]
-      | Evaluator::pin_back_table_[square]
+      | MetaEvaluator::PIN_BACK_TABLE[square]
       [(basic_st.blocker_[R90] >> Util::MAGIC_SHIFT[square][R90])
       & Util::MAGIC_MASK[square][R90]][R90]
-      | Evaluator::pin_back_table_[square]
+      | MetaEvaluator::PIN_BACK_TABLE[square]
       [(basic_st.blocker_[R135] >> Util::MAGIC_SHIFT[square][R135])
       & Util::MAGIC_MASK[square][R135]][R135])
       & basic_st.side_pieces_[ENEMY_SIDE];
@@ -457,8 +456,6 @@ namespace Sayuri {
   // ======================= //
   // static変数の初期化。
   void Evaluator::InitEvaluator() {
-    // pin_back_table_[][][][][]を初期化する。
-    InitPinBackTable();
   }
 
   // ============== //
@@ -671,212 +668,4 @@ namespace Sayuri {
   template void Evaluator::CalValue<BLACK, ROOK>(Square);
   template void Evaluator::CalValue<BLACK, QUEEN>(Square);
   template void Evaluator::CalValue<BLACK, KING>(Square);
-
-  // ======================== //
-  // その他のプライベート関数 //
-  // ======================== //
-  // pin_back_table_[][][][][]を初期化する。
-  void Evaluator::InitPinBackTable() {
-    // 初期化。
-    INIT_ARRAY(pin_back_table_);
-
-    FOR_SQUARES(square) {
-      for (Bitboard pattern = 0; pattern <= 0xff; ++pattern) {
-        // 各角度のポイント。
-        Bitboard point[NUM_ROTS] {
-          (Util::SQUARE[square][R0] >> Util::MAGIC_SHIFT[square][R0])
-          & Util::MAGIC_MASK[square][R0],
-          (Util::SQUARE[square][R45] >> Util::MAGIC_SHIFT[square][R45])
-          & Util::MAGIC_MASK[square][R45],
-          (Util::SQUARE[square][R90] >> Util::MAGIC_SHIFT[square][R90])
-          & Util::MAGIC_MASK[square][R90],
-          (Util::SQUARE[square][R135] >> Util::MAGIC_SHIFT[square][R135])
-          & Util::MAGIC_MASK[square][R135]
-        };
-        Bitboard temp[NUM_ROTS] {0, 0, 0, 0};
-        bool find_target[NUM_ROTS] {false, false, false, false};
-
-        // 先ず、左。
-        COPY_ARRAY(temp, point);
-        find_target[R0] = false;
-        find_target[R45] = false;
-        find_target[R90] = false;
-        find_target[R135] = false;
-        for (int i = 0; i < 8; ++i) {
-          // シフト。
-          temp[R0] = (temp[R0] << 1) & Util::MAGIC_MASK[square][R0];
-          temp[R45] = (temp[R45] << 1) & Util::MAGIC_MASK[square][R45];
-          temp[R90] = (temp[R90] << 1) & Util::MAGIC_MASK[square][R90];
-          temp[R135] = (temp[R135] << 1) & Util::MAGIC_MASK[square][R135];
-
-          // 0度。
-          if (temp[R0]) {
-            if (!find_target[R0]) {
-              // ターゲットを見つける。
-              if ((temp[R0] & pattern)) {
-                find_target[R0] = true;
-              }
-            } else {
-              // バックを見つける。
-              if ((temp[R0] & pattern)) {
-                pin_back_table_[square][pattern][R0] |=
-                temp[R0] << Util::MAGIC_SHIFT[square][R0];
-
-                // もう必要ない。
-                temp[R0] = 0;
-              }
-            }
-          }
-          // 45度。
-          if (temp[R45]) {
-            if (!find_target[R45]) {
-              // ターゲットを見つける。
-              if ((temp[R45] & pattern)) {
-                find_target[R45] = true;
-              }
-            } else {
-              // バックを見つける。
-              if ((temp[R45] & pattern)) {
-                pin_back_table_[square][pattern][R45] |=
-                Util::SQUARE[Util::R_ROT45[Util::GetSquare(temp[R45]
-                << Util::MAGIC_SHIFT[square][R45])]][R0];
-
-                // もう必要ない。
-                temp[R45] = 0;
-              }
-            }
-          }
-          // 90度。
-          if (temp[R90]) {
-            if (!find_target[R90]) {
-              // ターゲットを見つける。
-              if ((temp[R90] & pattern)) {
-                find_target[R90] = true;
-              }
-            } else {
-              // バックを見つける。
-              if ((temp[R90] & pattern)) {
-                pin_back_table_[square][pattern][R90] |=
-                Util::SQUARE[Util::R_ROT90[Util::GetSquare(temp[R90]
-                << Util::MAGIC_SHIFT[square][R90])]][R0];
-
-                // もう必要ない。
-                temp[R90] = 0;
-              }
-            }
-          }
-          // 135度。
-          if (temp[R135]) {
-            if (!find_target[R135]) {
-              // ターゲットを見つける。
-              if ((temp[R135] & pattern)) {
-                find_target[R135] = true;
-              }
-            } else {
-              // バックを見つける。
-              if ((temp[R135] & pattern)) {
-                pin_back_table_[square][pattern][R135] |=
-                Util::SQUARE[Util::R_ROT135[Util::GetSquare(temp[R135]
-                << Util::MAGIC_SHIFT[square][R135])]][R0];
-
-                // もう必要ない。
-                temp[R135] = 0;
-              }
-            }
-          }
-        }
-
-        // 次、右。
-        COPY_ARRAY(temp, point);
-        find_target[R0] = false;
-        find_target[R45] = false;
-        find_target[R90] = false;
-        find_target[R135] = false;
-        for (int i = 0; i < 8; ++i) {
-          // シフト。
-          temp[R0] = (temp[R0] >> 1) & Util::MAGIC_MASK[square][R0];
-          temp[R45] = (temp[R45] >> 1) & Util::MAGIC_MASK[square][R45];
-          temp[R90] = (temp[R90] >> 1) & Util::MAGIC_MASK[square][R90];
-          temp[R135] = (temp[R135] >> 1) & Util::MAGIC_MASK[square][R135];
-
-          // 0度。
-          if (temp[R0]) {
-            if (!find_target[R0]) {
-              // ターゲットを見つける。
-              if ((temp[R0] & pattern)) {
-                find_target[R0] = true;
-              }
-            } else {
-              // バックを見つける。
-              if ((temp[R0] & pattern)) {
-                pin_back_table_[square][pattern][R0] |=
-                Util::SQUARE[Util::GetSquare(temp[R0]
-                << Util::MAGIC_SHIFT[square][R0])][R0];
-
-                // もう必要ない。
-                temp[R0] = 0;
-              }
-            }
-          }
-          // 45度。
-          if (temp[R45]) {
-            if (!find_target[R45]) {
-              // ターゲットを見つける。
-              if ((temp[R45] & pattern)) {
-                find_target[R45] = true;
-              }
-            } else {
-              // バックを見つける。
-              if ((temp[R45] & pattern)) {
-                pin_back_table_[square][pattern][R45] |=
-                Util::SQUARE[Util::R_ROT45[Util::GetSquare(temp[R45]
-                << Util::MAGIC_SHIFT[square][R45])]][R0];
-
-                // もう必要ない。
-                temp[R45] = 0;
-              }
-            }
-          }
-          // 90度。
-          if (temp[R90]) {
-            if (!find_target[R90]) {
-              // ターゲットを見つける。
-              if ((temp[R90] & pattern)) {
-                find_target[R90] = true;
-              }
-            } else {
-              // バックを見つける。
-              if ((temp[R90] & pattern)) {
-                pin_back_table_[square][pattern][R90] |=
-                Util::SQUARE[Util::R_ROT90[Util::GetSquare(temp[R90]
-                << Util::MAGIC_SHIFT[square][R90])]][R0];
-
-                // もう必要ない。
-                temp[R90] = 0;
-              }
-            }
-          }
-          // 135度。
-          if (temp[R135]) {
-            if (!find_target[R135]) {
-              // ターゲットを見つける。
-              if ((temp[R135] & pattern)) {
-                find_target[R135] = true;
-              }
-            } else {
-              // バックを見つける。
-              if ((temp[R135] & pattern)) {
-                pin_back_table_[square][pattern][R135] |=
-                Util::SQUARE[Util::R_ROT135[Util::GetSquare(temp[R135]
-                << Util::MAGIC_SHIFT[square][R135])]][R0];
-
-                // もう必要ない。
-                temp[R135] = 0;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
 }  // namespace Sayuri
