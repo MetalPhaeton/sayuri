@@ -124,19 +124,17 @@ namespace Sayuri {
 
     // ========================================================================
 
-    /*
-    FOR_SIDES(side) {
-      FOR_SQUARES(square) {
-        for (int pattern = 0; pattern < (0xff + 1); ++pattern) {
-          if (MetaUtil::PAWN_MOVABLE_TABLE[side][square][pattern]
-          != Util::pawn_movable_table_[side][square][pattern]) {
-            std::cout << side << " : " << square << " : " << pattern
+    FOR_SQUARES(square) {
+      for (int pattern = 0; pattern < (0xff + 1); ++pattern) {
+        for (int rot = 0; rot < NUM_ROTS; ++rot) {
+          if (MetaEvaluator::PIN_BACK_TABLE[square][pattern][rot]
+          != Evaluator::pin_back_table_[square][pattern][rot]) {
+            std::cout << square << " : " << pattern << " : " << rot
             << std::endl;
           }
         }
       }
     }
-    */
     std::cout << "End" << std::endl;
 
     return 0;
