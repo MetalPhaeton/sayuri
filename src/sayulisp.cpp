@@ -6290,6 +6290,8 @@ R"...(### Customizing Evaluation Function - Piece Square Table ###
 Returns Piece Square Table for each piece type.  
 If you specify `<New table>`, this parameter is updated.
 
+`score = weight * value_table[square]`
+
 * `@pawn-square-table-opening [<New table : List>]`
 * `@knight-square-table-opening [<New table : List>]`
 * `@bishop-square-table-opening [<New table : List>]`
@@ -6366,6 +6368,8 @@ Returns List composed of 7 values of attacking score.
 
 If you specify `<New table>`, this parameter is updated.
 
+`score = weight * value_table[attacking_piece][attacked_piece]`
+
 * `@pawn-attack-table [<New table : List>]`
 * `@knight-attack-table [<New table : List>]`
 * `@bishop-attack-table [<New table : List>]`
@@ -6388,6 +6392,10 @@ If you specify `<New table>`, this parameter is updated.
 Returns opening weight and ending weight.  
 If you specify `<New weight>`, this parameter is updated.
 
+`num_of_pieces := pieces on the current board except Kings`  
+`weight =
+(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
+
 * `@weight-pawn-attack [<New weight : List>]`
 * `@weight-knight-attack [<New weight : List>]`
 * `@weight-bishop-attack [<New weight : List>]`
@@ -6407,7 +6415,8 @@ If you specify `<New weight>`, this parameter is updated.
     AddHelpDict("engine @weight-queen-attack", temp);
     AddHelpDict("engine @weight-king-attack", temp);
 
-    temp =R"...(### Customizing Evaluation Function - Defense ###
+    temp =
+R"...(### Customizing Evaluation Function - Defense ###
 
 Returns List composed of 7 values of defense score.  
 1st: Not used. This is always 0. (for EMPTY)  
@@ -6419,6 +6428,8 @@ Returns List composed of 7 values of defense score.
 7th: Protecting King.
 
 If you specify `<New table>`, this parameter is updated.
+
+`score = weight * value_table[defensing_piece][defensed_piece]`
 
 * `@pawn-defense-table [<New table : List>]`
 * `@knight-defense-table [<New table : List>]`
@@ -6441,6 +6452,10 @@ If you specify `<New table>`, this parameter is updated.
 
 Returns opening weight and ending weight.  
 If you specify `<New weight>`, this parameter is updated.
+
+`num_of_pieces := pieces on the current board except Kings`  
+`weight =
+(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
 
 * `@weight-pawn-defense [<New weight : List>]`
 * `@weight-knight-defense [<New weight : List>]`
@@ -6482,6 +6497,8 @@ Returns List of 7 Lists of 7 values.
 6th value of each list : A piece over the target is Queen.
 7th value of each list : A piece over the target is King.
 
+`score = weight * value_table[pinning_piece][target][over_the_target]`
+
 * `@bishop-pin-table [<New value table : List>]`
 * `@rook-pin-table [<New value table : List>]`
 * `@queen-pin-table [<New value table : List>]`
@@ -6520,6 +6537,10 @@ Returns List of 7 Lists of 7 values.
 Returns opening weight and ending weight.  
 If you specify `<New weight>`, this parameter is updated.
 
+`num_of_pieces := pieces on the current board except Kings`  
+`weight =
+(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
+
 * `@weight-bishop-pin [<New weight : List>]`
 * `@weight-rook-pin [<New weight : List>]`
 * `@weight-queen-pin [<New weight : List>]`)...";
@@ -6533,10 +6554,18 @@ If you specify `<New weight>`, this parameter is updated.
     temp =
 R"...(### Customizing Evaluation Function - Pawn Shield ###
 
+If King on f1(f8) f2(f7) g1(g8) g2(g7) h1(h8) h2(h7),
+then Pawn Shield is pawns on f g h files.  
+If King on a1(a8) a2(a7) b1(b8) b2(b7) c1(c8) c2(c7),
+then Pawn Shield is pawns on a b c files.
+
+`score = weight * value_table[square]`
+
 * `@pawn-shield-table [<New table : List>]`
     + Returns Piece Square Table for Pawn Shield
       as List composed of 64 numbers.
     + If you specify `<New table>`, this parameter is updated.
+
 
 <h6> Example </h6>
 
@@ -6577,6 +6606,10 @@ R"...(### Customizing Evaluation Function - Pawn Shield ###
 Returns opening weight and ending weight.  
 If you specify `<New weight>`, this parameter is updated.
 
+`num_of_pieces := pieces on the current board except Kings`  
+`weight =
+(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
+
 * `@weight-pawn-shield [<New weight : List>]`)...";
     AddHelpDict("engine @pawn-shield-table", temp);
     AddHelpDict("engine @weight-pawn-shield", temp);
@@ -6586,6 +6619,12 @@ R"...(### Customizing Evaluation Function - Mobility ###
 
 Returns opening weight and ending weight.  
 If you specify `<New weight>`, this parameter is updated.
+
+`score = weight * num_of_squares_that_piece_can_move_to`
+
+`num_of_pieces := pieces on the current board except Kings`  
+`weight =
+(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
 
 * `@weight-pawn-mobility [<New weight : List>]`
 * `@weight-knight-mobility [<New weight : List>]`
@@ -6606,6 +6645,14 @@ R"...(### Customizing Evaluation Function - Controlling Center ###
 Returns opening weight and ending weight.  
 If you specify `<New weight>`, this parameter is updated.
 
+Center square are c3 c4 c5 c6 d3 d4 d5 d6 e3 e4 e5 e6 f3 f4 f5 f6.
+
+`score = weight * num_of_center_square_that_piece_attacks`
+
+`num_of_pieces := pieces on the current board except Kings`  
+`weight =
+(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
+
 * `@weight-pawn-center-control [<New weight : List>]`
 * `@weight-knight-center-control [<New weight : List>]`
 * `@weight-bishop-center-control [<New weight : List>]`
@@ -6624,6 +6671,14 @@ R"...(### Customizing Evaluation Function - Controlling Sweet Center ###
 
 Returns opening weight and ending weight.  
 If you specify `<New weight>`, this parameter is updated.
+
+Sweet Center square are d3 d4 d5 d6 e3 e4 e5 e6.
+
+`score = weight * num_of_sweet_center_square_that_piece_attacks`
+
+`num_of_pieces := pieces on the current board except Kings`  
+`weight =
+(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
 
 * `@weight-pawn-sweet-center-control [<New weight : List>]`
 * `@weight-knight-sweet-center-control [<New weight : List>]`
@@ -6644,6 +6699,12 @@ R"...(### Customizing Evaluation Function - Development ###
 Returns opening weight and ending weight.  
 If you specify `<New weight>`, this parameter is updated.
 
+`score = weight * num_of_minor_pieces_on_starting_position`
+
+`num_of_pieces := pieces on the current board except Kings`  
+`weight =
+(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
+
 * `@weight-pawn-development [<New weight : List>]`
 * `@weight-knight-development [<New weight : List>]`
 * `@weight-bishop-development [<New weight : List>]`
@@ -6662,6 +6723,12 @@ R"...(### Customizing Evaluation Function - Attack around Enemy King ###
 
 Returns opening weight and ending weight.  
 If you specify `<New weight>`, this parameter is updated.
+
+`score = weight * num_of_squares_around_enemy_king_attacked_by_pieces.`
+
+`num_of_pieces := pieces on the current board except Kings`  
+`weight =
+(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
 
 * `@weight-pawn-attack-around-king [<New weight : List>]`
 * `@weight-knight-attack-around-king [<New weight : List>]`
@@ -6682,10 +6749,18 @@ R"...(### Customizing Evaluation Function - Pawn Structure ###
 Returns opening weight and ending weight.  
 If you specify `<New weight>`, this parameter is updated.
 
+`num_of_pieces := pieces on the current board except Kings`  
+`weight =
+(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
+
 * `@weight-pass-pawn [<New weight : List>]`
+    + `score = weight * num_of_pass_pawns`
 * `@weight-protected-pass-pawn [<New weight : List>]`
+    + `score = weight * num_of_protected_pass_pawns`
 * `@weight-double-pawn [<New weight : List>]`
-* `@weight-iso-pawn [<New weight : List>]`)...";
+    + `score = weight * num_of_doubled_pawns`
+* `@weight-iso-pawn [<New weight : List>]`
+    + `score = weight * num_of_isorated_pawns`)...";
     AddHelpDict("engine @weight-pass-pawn", temp);
     AddHelpDict("engine @weight-protected-pass-pawn", temp);
     AddHelpDict("engine @weight-double-pawn", temp);
@@ -6697,8 +6772,15 @@ R"...(### Customizing Evaluation Function - Piece ###
 Returns opening weight and ending weight.  
 If you specify `<New weight>`, this parameter is updated.
 
+`num_of_pieces := pieces on the current board except Kings`  
+`weight =
+(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
+
 * `@weight-bishop-pair [<New weight : List>]`
+    + `score = weight * if_bishop_pair_exists_then_1_else_0`
 * `@weight-bad-bishop [<New weight : List>]`
+    + `score = weight * num_of_pawns_on_same_colored_square_as_bishop_on`
+
 * `@weight-rook-pair [<New weight : List>]`
 * `@weight-rook-semiopen-fyle [<New weight : List>]`
 * `@weight-rook-open-fyle [<New weight : List>]`
