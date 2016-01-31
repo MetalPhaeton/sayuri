@@ -101,7 +101,7 @@ R"...(Usage:
         Runs Sayuri as Sayulisp Interpreter.
         <file name> is Sayulisp script.
         If <file name> is '-', Sayuri reads script from standard input.
-        <argv> is bound to Symbol 'argv'.)...";
+        <argv> is bound to Symbol 'argv' as List.)...";
     std::cout << usage_str << std::endl;
   } else if ((argc >= 2)
   && (std::strcmp(argv[1], "--version") == 0)) {
