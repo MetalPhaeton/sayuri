@@ -89,6 +89,10 @@
 <li><a href="#output-stream"><code>output-stream</code></a> : Generates an output file stream.</li>
 <li><a href="#input-stream"><code>input-stream</code></a> : Generates an input file stream.</li>
 </ul></li>
+<li><a href="#utilityes">Utilities</a>
+<ul>
+<li><a href="#system"><code>system</code></a> : Execute command line.</li>
+</ul></li>
 </ul>
 <hr />
 <h2 id="most-important-functions">Most Important Functions</h2>
@@ -1176,6 +1180,30 @@ Example
 
 ;; Closes &quot;hello.txt&quot;.
 (myfile ())</code></pre>
+<h2 id="utilities">Utilities</h2>
+<h3 id="system">system</h3>
+<h6>
+Usage
+</h6>
+<ul>
+<li><code>(system &lt;Command line : String&gt;)</code></li>
+</ul>
+<h6>
+Description
+</h6>
+<ul>
+<li>Executes <code>&lt;Command line&gt;</code> and returns its status.
+<ul>
+<li>This is same as <code>system()</code> of libc.</li>
+</ul></li>
+</ul>
+<h6>
+Example
+</h6>
+<pre><code>(display (system &quot;echo &#39;Hello World&#39;&quot;))
+;; Output
+;; &gt; Hello World
+;; &gt; 0</code></pre>
 
 </section>
 </div>

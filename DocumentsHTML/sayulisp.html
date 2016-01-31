@@ -36,8 +36,19 @@
 </div>
 <h2 id="run-sayuri-with-sayulisp-mode">Run Sayuri with Sayulisp Mode</h2>
 <p>Run the following command.</p>
-<pre><code>$ sayuri --sayulisp &lt;file name&gt;</code></pre>
-<p>If you give '<code>-</code>' to '<code>&lt;file name&gt;</code>', Sayulisp reads code from Standard Input.</p>
+<pre><code>$ sayuri --sayulisp &lt;file name&gt; [&lt;argv&gt;...]</code></pre>
+<ul>
+<li>If you give '<code>-</code>' to '<code>&lt;file name&gt;</code>', Sayulisp reads code from Standard Input.</li>
+<li><code>[&lt;argv&gt;...]</code> is optional. it is bound to Symbol <code>argv</code> as List.</li>
+</ul>
+<h6>
+Example
+</h6>
+<pre><code>(display argv)
+;; Command line :
+;;     $ sayuri --sayulisp test.scm Hello World
+;; Output
+;; &gt; (&quot;test.scm&quot; &quot;Hello&quot; &quot;World&quot;)</code></pre>
 <h2 id="basic-of-sayulisp">Basic of Sayulisp</h2>
 <ul>
 <li>Sayulisp is based on Scheme. You can use many features of Scheme.
