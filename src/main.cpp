@@ -97,10 +97,11 @@ R"...(Usage:
     --help
         Shows help.
 
-    --sayulisp <file name>
+    --sayulisp <file name> [<argv>...]
         Runs Sayuri as Sayulisp Interpreter.
         <file name> is Sayulisp script.
-        If <file name> is '-', Sayuri reads script from standard input.)...";
+        If <file name> is '-', Sayuri reads script from standard input.
+        <argv> is bound to Symbol 'argv'.)...";
     std::cout << usage_str << std::endl;
   } else if ((argc >= 2)
   && (std::strcmp(argv[1], "--version") == 0)) {
@@ -140,6 +141,14 @@ R"...(Usage:
       }
       stream_ptr = &file;
     }
+
+    // 引数の作成。
+    Sayuri::LispObjectPtr argv_list = Sayuri::Lisp::NewList(argc - 2);
+    Sayuri::LispIterator<true> itr {argv_list.get()};
+    for (int i = 2; i < argc; ++i, ++itr) {
+      itr.current_->car(Sayuri::Lisp::NewString(argv[i]));
+    }
+    sayulisp_ptr->BindSymbol("argv", argv_list);  // 登録。
 
     // 実行。
     int status = 0;
