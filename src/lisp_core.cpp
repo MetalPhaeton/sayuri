@@ -2803,6 +2803,50 @@ R"...(### input-stream ###
     ;; Closes "hello.txt".
     (myfile ()))...";
     }
+
+    // %%% system
+    {
+      auto func = [](LispObjectPtr self, const LispObject& caller,
+      const LispObject& list) ->LispObjectPtr {
+        // 準備。
+        LispIterator<false> list_itr {&list};
+        std::string func_name = (list_itr++)->ToString();
+        int required_args = 1;
+
+        // 第1引数をチェック。
+        if (!list_itr) {
+          throw GenInsufficientArgumentsError
+          (func_name, required_args, false, list.Length() - 1);
+        }
+        LispObjectPtr command_line = caller.Evaluate(*list_itr);
+        if (!(command_line->IsString())) {
+          throw GenWrongTypeError
+          (func_name, "String", std::vector<int> {1}, true);
+        }
+
+        // Cのsystem()を実行。
+        return NewNumber(std::system(command_line->str_value_.c_str()));
+      };
+      AddNativeFunction(func, "system");
+      help_["system"] =
+R"...(### system ###
+
+<h6> Usage </h6>
+
+* `(system <Command line : String>)`
+
+<h6> Description </h6>
+
+* Executes `<Command line>` and returns its status.
+    + This is same as `system()` of libc.
+
+<h6> Example </h6>
+
+    (display (system "echo 'Hello World'"))
+    ;; Output
+    ;; > Hello World
+    ;; > 0)...";
+    }
   }
 
   void Lisp::SetBasicFunctions() {
