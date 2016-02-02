@@ -80,10 +80,10 @@ IN THE SOFTWARE.)...";
   // UCIオプション //
   // ============= //
   /** トランスポジションテーブルのデフォルトサイズ。 */
-  constexpr std::size_t UCI_DEFAULT_TABLE_SIZE = 32ULL * 1024ULL * 1024ULL;
+  constexpr std::size_t UCI_DEFAULT_TABLE_SIZE = 1ULL * 1024ULL * 1024ULL;
 
   /** トランスポジションテーブルの最小サイズ。 */
-  constexpr std::size_t UCI_MIN_TABLE_SIZE = 8ULL * 1024ULL * 1024ULL;
+  constexpr std::size_t UCI_MIN_TABLE_SIZE = 1ULL * 1024ULL * 1024ULL;
 
 #if defined(__arm__)  // ARMのCPU用定数。
   /** トランスポジションテーブルの最大サイズ。 (ARM用) */
