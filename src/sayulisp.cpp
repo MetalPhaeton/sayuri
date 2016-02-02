@@ -6821,7 +6821,7 @@ R"...(### gen-pgn ###
 * `@get-pgn-comments`
     + Returns Lists of comments about PGN.
 
-* `@get-current-comments.`
+* `@get-current-game-comments.`
     + Returns List of comments about the current game.
 
 * `@get-current-move-comments`
