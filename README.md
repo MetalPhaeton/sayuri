@@ -156,7 +156,7 @@ If you want to call Sayuri from Python on Linux, then...
 UCI Options
 -----------
 
-* To change size of the hash table. (Default: 32 MB, Max: 8192 MB, Min: 8 MB)
+* To change size of the hash table. (Default: 1 MB, Max: 8192 MB, Min: 1 MB)
     + `setoption name Hash value <Size(MB)>`  
       (Note!!) `<Size(MB)>` must be 2^n. (e.g. 128, 256, 512, 1024,...)
 
