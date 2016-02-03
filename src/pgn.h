@@ -152,7 +152,7 @@ namespace Sayuri {
        * @return 移動できればtrue。
        */
       bool Next() {
-        if (current_node_ptr_ && current_node_ptr_->next_) {
+        if (current_node_ptr_) {
           current_node_ptr_ = current_node_ptr_->next_.get();
           return true;
         }
@@ -174,7 +174,7 @@ namespace Sayuri {
        * @return 移動できればtrue。
        */
       bool Alt() {
-        if (current_node_ptr_ && current_node_ptr_->alt_) {
+        if (current_node_ptr_) {
           current_node_ptr_ = current_node_ptr_->alt_.get();
           return true;
         }
