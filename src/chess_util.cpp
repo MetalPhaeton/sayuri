@@ -538,8 +538,11 @@ namespace Sayuri {
     auto is_fyle = [](char c) -> bool {return (c >= 'a') && (c <= 'h');};
     auto is_rank = [](char c) -> bool {return (c >= '1') && (c <= '8');};
 
+    std::string ret = "------";
+
     // おしりのチェック・チェックメイトの印を除く。
     std::string note_2 = note;
+    if (note_2.empty()) return ret;
     if ((note_2.back() == '#') || (note_2.back() == '+')) {
       note_2.pop_back();
     }
@@ -547,7 +550,6 @@ namespace Sayuri {
     if ((note_2 == "O-O") || (note_2 == "O-O-O")) return note_2;
 
     std::string::const_iterator note_itr = note_2.cbegin();
-    std::string ret = "------";
 
     // 駒の種類を判定。
     if (note_itr == note_2.end()) return ret;

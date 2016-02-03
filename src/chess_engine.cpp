@@ -542,6 +542,9 @@ namespace Sayuri {
           ++itr;
         }
       }
+    } else {
+      // 駒の種類は必須。
+      return std::vector<Move>();
     }
 
     // 基点ファイルで弾く。
@@ -581,7 +584,11 @@ namespace Sayuri {
           ++itr;
         }
       }
+    } else {
+      // 終点ファイルは必須。
+      return std::vector<Move>();
     }
+
 
     // 終点ランクで弾く。
     if (note_2[4] != '-') {
@@ -594,6 +601,9 @@ namespace Sayuri {
           ++itr;
         }
       }
+    } else {
+      // 終点ランクは必須。
+      return std::vector<Move>();
     }
 
     // 昇格で弾く。

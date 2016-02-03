@@ -152,7 +152,7 @@ namespace Sayuri {
        * @return 移動できればtrue。
        */
       bool Next() {
-        if (current_node_ptr_->next_) {
+        if (current_node_ptr_ && current_node_ptr_->next_) {
           current_node_ptr_ = current_node_ptr_->next_.get();
           return true;
         }
@@ -163,7 +163,7 @@ namespace Sayuri {
        * @return 移動できればtrue。
        */
       bool Prev() {
-        if (current_node_ptr_->prev_) {
+        if (current_node_ptr_ && current_node_ptr_->prev_) {
           current_node_ptr_ = current_node_ptr_->prev_;
           return true;
         }
@@ -174,7 +174,7 @@ namespace Sayuri {
        * @return 移動できればtrue。
        */
       bool Alt() {
-        if (current_node_ptr_->alt_) {
+        if (current_node_ptr_ && current_node_ptr_->alt_) {
           current_node_ptr_ = current_node_ptr_->alt_.get();
           return true;
         }
@@ -185,7 +185,7 @@ namespace Sayuri {
        * @return 移動できればtrue。
        */
       bool Orig() {
-        if (current_node_ptr_->orig_) {
+        if (current_node_ptr_ && current_node_ptr_->orig_) {
           current_node_ptr_ = current_node_ptr_->orig_;
           return true;
         }
@@ -196,6 +196,8 @@ namespace Sayuri {
        * @return 移動できればtrue。
        */
       bool Back() {
+        if (!current_node_ptr_) return false;
+
         MoveNode* temp = current_node_ptr_;
         while (true) {
           if (temp->orig_) {
@@ -218,8 +220,11 @@ namespace Sayuri {
        * @return 移動できればtrue。
        */
       bool Rewind() {
-        current_node_ptr_ = move_tree_ptr_.get();
-        return true;
+        if (move_tree_ptr_) {
+          current_node_ptr_ = move_tree_ptr_.get();
+          return true;
+        }
+        return false;
       }
 
       // ======== //
