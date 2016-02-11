@@ -41,6 +41,7 @@
 #include "common.h"
 #include "params.h"
 #include "chess_engine.h"
+#include "board.h"
 #include "transposition_table.h"
 #include "uci_shell.h"
 #include "lisp_core.h"
@@ -1632,6 +1633,8 @@ namespace Sayuri {
       std::unique_ptr<TranspositionTable> table_ptr_;
       /** チェスエンジンのポインタ。 */
       std::unique_ptr<ChessEngine> engine_ptr_;
+      /** エンジンのチェスボードのポインタ。 */
+      const Board* board_ptr_;
       /** UCIShellのポインタ。 */
       std::unique_ptr<UCIShell> shell_ptr_;
       /** UCIのアウトプットリスナー。 */

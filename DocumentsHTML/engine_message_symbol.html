@@ -162,6 +162,10 @@ Example
 <ul>
 <li>Returns FEN of current position.</li>
 </ul></li>
+<li><code>@to-string</code>
+<ul>
+<li>Returns visualized board.</li>
+</ul></li>
 </ul>
 <h6>
 Example
@@ -213,7 +217,24 @@ Example
 
 (display (my-engine &#39;@get-fen))
 ;; Output
-;; &gt; r1bqk1nr/ppp2ppp/2n5/2bpp3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w kq d6 0 5</code></pre>
+;; &gt; r1bqk1nr/ppp2ppp/2n5/2bpp3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w kq d6 0 5
+
+(display (my-engine &#39;@to-string))
+;; Output
+;; &gt;  +-----------------+
+;; &gt; 8| r . b q k . n r |
+;; &gt; 7| p p p . . p p p |
+;; &gt; 6| . . n . . . . . |
+;; &gt; 5| . . b p p . . . |
+;; &gt; 4| . . B . P . . . |
+;; &gt; 3| . . . . . N . . |
+;; &gt; 2| P P P P . P P P |
+;; &gt; 1| R N B Q . R K . |
+;; &gt;  +-----------------+
+;; &gt;    a b c d e f g h
+;; &gt; To Move: w | Clock: 0 | Ply: 8
+;; &gt; En Passant Square: d6
+;; &gt; Castling Rights : kq</code></pre>
 <h3 id="setting-states-of-game">Setting states of game</h3>
 <ul>
 <li><code>@set-to-move &lt;Side : Number or Symbol&gt;</code>

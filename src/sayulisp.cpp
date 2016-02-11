@@ -41,6 +41,7 @@
 #include "common.h"
 #include "params.h"
 #include "chess_engine.h"
+#include "board.h"
 #include "transposition_table.h"
 #include "uci_shell.h"
 #include "lisp_core.h"
@@ -95,6 +96,7 @@ namespace Sayuri {
   table_ptr_(new TranspositionTable(UCI_DEFAULT_TABLE_SIZE)),
   engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
   *table_ptr_)),
+  board_ptr_(&(engine_ptr_->board())),
   shell_ptr_(new UCIShell(*engine_ptr_)) {
     // 出力リスナー。
     shell_ptr_->AddOutputListener
@@ -110,6 +112,7 @@ namespace Sayuri {
   table_ptr_(new TranspositionTable(suite.table_ptr_->GetSizeBytes())),
   engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
   *table_ptr_)),
+  board_ptr_(&(engine_ptr_->board())),
   shell_ptr_(new UCIShell(*engine_ptr_)) {
     PositionRecord record(*(suite.engine_ptr_));
     engine_ptr_->LoadRecord(record);
@@ -127,6 +130,7 @@ namespace Sayuri {
   eval_params_ptr_(std::move(suite.eval_params_ptr_)),
   table_ptr_(std::move(suite.table_ptr_)),
   engine_ptr_(std::move(suite.engine_ptr_)),
+  board_ptr_(&(engine_ptr_->board())),
   shell_ptr_(std::move(suite.shell_ptr_)) {
     SetWeightFunctions();
   }
@@ -138,6 +142,7 @@ namespace Sayuri {
     table_ptr_.reset(new TranspositionTable(suite.table_ptr_->GetSizeBytes()));
     engine_ptr_.reset(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
     *table_ptr_));
+    board_ptr_ = &(engine_ptr_->board());
     shell_ptr_.reset(new UCIShell(*engine_ptr_));
 
     PositionRecord record(*(suite.engine_ptr_));
@@ -158,6 +163,7 @@ namespace Sayuri {
     eval_params_ptr_ = std::move(suite.eval_params_ptr_);
     table_ptr_ = std::move(suite.table_ptr_);
     engine_ptr_ = std::move(suite.engine_ptr_);
+    board_ptr_ = &(engine_ptr_->board());
     shell_ptr_ = std::move(suite.shell_ptr_);
 
     SetWeightFunctions();
@@ -578,6 +584,9 @@ namespace Sayuri {
     }
     if (message_symbol == "@get-fen") {
       return Lisp::NewString(engine_ptr_->GetFENString());
+    }
+    if (message_symbol == "@to-string") {
+      return Lisp::NewString(Board::ToString(*board_ptr_));
     }
     if (message_symbol == "@set-new-game") {
       return SetNewGame();
@@ -5145,6 +5154,8 @@ R"...(### Getting states of game ###
     + Returns Boolean whether Black King has castled or not.
 * `@get-fen`
     + Returns FEN of current position.
+* `@to-string`
+    + Returns visualized board.
 
 <h6> Example </h6>
 
@@ -5196,7 +5207,23 @@ R"...(### Getting states of game ###
     (display (my-engine '@get-fen))
     ;; Output
     ;; > r1bqk1nr/ppp2ppp/2n5/2bpp3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w kq d6 0 5
-    )...";
+    
+    (display (my-engine '@to-string))
+    ;; Output
+    ;; >  +-----------------+
+    ;; > 8| r . b q k . n r |
+    ;; > 7| p p p . . p p p |
+    ;; > 6| . . n . . . . . |
+    ;; > 5| . . b p p . . . |
+    ;; > 4| . . B . P . . . |
+    ;; > 3| . . . . . N . . |
+    ;; > 2| P P P P . P P P |
+    ;; > 1| R N B Q . R K . |
+    ;; >  +-----------------+
+    ;; >    a b c d e f g h
+    ;; > To Move: w | Clock: 0 | Ply: 8
+    ;; > En Passant Square: d6
+    ;; > Castling Rights : kq)...";
     AddHelpDict("engine @get-to-move", temp);
     AddHelpDict("engine @get-castling-rights", temp);
     AddHelpDict("engine @get-en-passant-square", temp);
