@@ -31,6 +31,7 @@
 #define POSITION_RECORD_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 
 #include <iostream>
+#include "board.h"
 #include "common.h"
 
 /** Sayuri 名前空間。 */
@@ -38,7 +39,7 @@ namespace Sayuri {
   class ChessEngine;
 
   /** エンジンのボードの状態を記録するクラス。 */
-  class PositionRecord {
+  class PositionRecord : protected Board {
     public:
       // ==================== //
       // コンストラクタと代入 //
@@ -94,6 +95,11 @@ namespace Sayuri {
       // ======== //
       // アクセサ //
       // ======== //
+      /**
+       * アクセサ - チェスボード。
+       * @return チェスボード。
+       */
+      const Board& board() const {return *this;}
       /**
        * アクセサ - 駒の配置のビットボード。 [サイド][駒の種類]
        * @return 駒の配置のビットボード。
@@ -191,30 +197,6 @@ namespace Sayuri {
       // ========== //
       // メンバ変数 //
       // ========== //
-      /** 駒の配置のビットボード。 */
-      Bitboard position_[NUM_SIDES][NUM_PIECE_TYPES];
-      /** 駒の種類の配置。 [マス] */
-      PieceType piece_board_[NUM_SQUARES];
-      /** サイドの配置。 [マス] */
-      Side side_board_[NUM_SQUARES];
-      /** 各サイドの駒の配置のビットボード。 [サイド] */
-      Bitboard side_pieces_[NUM_SIDES];
-      /** 全駒の配置のビットボード。 [角度] */
-      Bitboard blocker_[NUM_ROTS];
-      /** 各サイドのキングの位置。 [サイド] */
-      Square king_[NUM_SIDES];
-      /** 手番。 */
-      Side to_move_;
-      /** キャスリングの権利。 */
-      Castling castling_rights_;
-      /** アンパッサンの位置。 */
-      Square en_passant_square_;
-      /** 50手ルールの手数。 */
-      int clock_;
-      /** 手数。 */
-      int ply_;
-      /** キャスリングしたかどうかのフラグ。 */
-      bool has_castled_[NUM_SIDES];
       /** 探索中の配置のメモ。 */
       Hash position_memo_[MAX_PLYS + 1];
       /** 現在の局面のハッシュ。 */

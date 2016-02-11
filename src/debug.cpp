@@ -65,6 +65,7 @@
 #include "lisp_core.h"
 #include "sayulisp.h"
 #include "sayuri.h"
+#include "board.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -124,20 +125,7 @@ namespace Sayuri {
 
     // ========================================================================
 
-    /*
-    FOR_SQUARES(square) {
-      for (int pattern = 0; pattern < (0xff + 1); ++pattern) {
-        for (int rot = 0; rot < NUM_ROTS; ++rot) {
-          if (MetaEvaluator::PIN_BACK_TABLE[square][pattern][rot]
-          != Evaluator::pin_back_table_[square][pattern][rot]) {
-            std::cout << square << " : " << pattern << " : " << rot
-            << std::endl;
-          }
-        }
-      }
-    }
-    */
-    std::cout << "End" << std::endl;
+    std::cout << Board::ToString(engine_ptr->board()) << std::endl;
 
     return 0;
   }

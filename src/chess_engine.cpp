@@ -41,6 +41,7 @@
 #include <cstring>
 #include <climits>
 #include "common.h"
+#include "board.h"
 #include "transposition_table.h"
 #include "fen.h"
 #include "move_maker.h"
@@ -261,25 +262,8 @@ namespace Sayuri {
 
   // PositionRecordから局面読み込む。
   void ChessEngine::LoadRecord(const PositionRecord& record) {
-    COPY_ARRAY(basic_st_.position_, record.position_);
-
-    COPY_ARRAY(basic_st_.piece_board_, record.piece_board_);
-
-    COPY_ARRAY(basic_st_.side_board_, record.side_board_);
-
-    COPY_ARRAY(basic_st_.side_pieces_, record.side_pieces_);
-
-    // 全駒のコピー。
-    COPY_ARRAY(basic_st_.blocker_, record.blocker_);
-
-    // その他のコピー。
-    COPY_ARRAY(basic_st_.king_, record.king_);
-    basic_st_.to_move_ = record.to_move_;
-    basic_st_.castling_rights_ = record.castling_rights_;
-    basic_st_.en_passant_square_ = record.en_passant_square_;
-    basic_st_.clock_ = record.clock_;
-    basic_st_.ply_ = record.ply_;
-    COPY_ARRAY(basic_st_.has_castled_, record.has_castled_);
+    Board& this_base = basic_st_;
+    this_base = record;
     COPY_ARRAY(basic_st_.position_memo_, record.position_memo_);
   }
 

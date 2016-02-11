@@ -42,6 +42,7 @@
 #include <climits>
 #include <queue>
 #include "common.h"
+#include "board.h"
 #include "evaluator.h"
 #include "position_record.h"
 #include "helper_queue.h"
@@ -481,6 +482,11 @@ namespace Sayuri {
       // アクセサ //
       // ======== //
       /**
+       * アクセサ - ボードの構造体。
+       * @return ボードの構造体。
+       */
+      const Board& board() const {return basic_st_;}
+      /**
        * アクセサ - 駒の配置のビットボード。
        * @return 駒の配置のビットボード。 [サイド][駒の種類]
        */
@@ -911,31 +917,7 @@ namespace Sayuri {
       // 基本メンバ //
       // ========== //
       /** 基本メンバ構造体。 (ボードのコピーを用意にするための構造体) */
-      struct BasicStruct {
-        /** 駒の配置のビットボード。 [サイド][駒の種類] */
-        Bitboard position_[NUM_SIDES][NUM_PIECE_TYPES];
-        /** 駒の種類の配置。 [マス] */
-        PieceType piece_board_[NUM_SQUARES];
-        /** サイドの配置。 [マス] */
-        Side side_board_[NUM_SQUARES];
-        /** 各サイドの駒の配置のビットボード。 [サイド] */
-        Bitboard side_pieces_[NUM_SIDES];
-        /** 全駒の配置のビットボード。 [角度]。 */
-        Bitboard blocker_[NUM_ROTS];
-        /** 各サイドのキングの位置。 [サイド] */
-        Square king_[NUM_SIDES];
-        /** 手番。 */
-        Side to_move_;
-        /** キャスリングの権利。 */
-        Castling castling_rights_;
-        /** アンパッサンの位置。アンパッサンできなければ0。 */
-        Square en_passant_square_;
-        /** 50手ルールの手数。 */
-        int clock_;
-        /** 現在の手数。 */
-        int ply_;
-        /** 各サイドのキャスリングしたかどうかのフラグ。 [サイド] */
-        bool has_castled_[NUM_SIDES];
+      struct BasicStruct : public Board {
         /** 探索中の配置のメモ。 */
         Hash position_memo_[MAX_PLYS + 1];
       } basic_st_;
