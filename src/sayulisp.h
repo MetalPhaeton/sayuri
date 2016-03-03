@@ -38,6 +38,8 @@
 #include <vector>
 #include <sstream>
 #include <functional>
+#include <map>
+#include <set>
 #include "common.h"
 #include "params.h"
 #include "chess_engine.h"
@@ -1715,6 +1717,11 @@ namespace Sayuri {
       // ==================== //
       // コンストラクタと代入 //
       // ==================== //
+      /**
+       * コンストラクタ。
+       * @param argv コマンド引数。
+       */
+      Sayulisp(const std::vector<std::string>& argv) : Lisp(argv) {}
       /** コンストラクタ。 */
       Sayulisp();
       /**
@@ -1747,6 +1754,34 @@ namespace Sayuri {
       virtual ~Sayulisp() {}
 
       // ============== //
+      // パブリック定数 //
+      // ============== //
+      /** マスの定数のマップ。 */
+      static const std::map<std::string, Square> SQUARE_MAP;
+      /** ファイルの定数のマップ。 */
+      static const std::map<std::string, Fyle> FYLE_MAP;
+      /** ランクの定数のマップ。 */
+      static const std::map<std::string, Rank> RANK_MAP;
+      /** サイドの定数のマップ。 */
+      static const std::map<std::string, Side> SIDE_MAP;
+      /** 駒の種類の定数のマップ。 */
+      static const std::map<std::string, PieceType> PIECE_MAP;
+      /** キャスリングの定数のマップ。 */
+      static const std::map<std::string, int> CASTLING_MAP;
+      /** マスの定数の逆マップ。 */
+      static const std::map<Square, std::string> SQUARE_MAP_INV;
+      /** ファイルの定数の逆マップ。 */
+      static const std::map<Fyle, std::string> FYLE_MAP_INV;
+      /** ランクの定数の逆マップ。 */
+      static const std::map<Rank, std::string> RANK_MAP_INV;
+      /** サイドの定数の逆マップ。 */
+      static const std::map<Side, std::string> SIDE_MAP_INV;
+      /** 駒の種類の定数の逆マップ。 */
+      static const std::map<PieceType, std::string> PIECE_MAP_INV;
+      /** キャスリングの定数の逆マップ。 */
+      static const std::map<int, std::string> CASTLING_MAP_INV;
+
+      // ============== //
       // パブリック関数 //
       // ============== //
       /**
@@ -1756,6 +1791,114 @@ namespace Sayuri {
        */
       int Run(std::istream* stream_ptr);
 
+      // ========================== //
+      // Lisp関数オブジェクト用関数 //
+      // ========================== //
+      /**
+       * エンジン関数オブジェクトを生成する。
+       */
+      LPointer GenEngine(LPointer self, LObject* caller, const LObject& args);
+
+      /**
+       * ライセンスを表示する。
+       */
+      LPointer SayuriLicense(LPointer self, LObject* caller,
+      const LObject& args) {
+        return NewString(LICENSE);
+      }
+
+      /**
+       * マスのシンボルを数値に変換する。
+       */
+      LPointer SquareToNumber(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /**
+       * ファイルのシンボルを数値に変換する。
+       */
+      LPointer FyleToNumber(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /**
+       * ランクのシンボルを数値に変換する。
+       */
+      LPointer RankToNumber(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /**
+       * サイドのシンボルを数値に変換する。
+       */
+      LPointer SideToNumber(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /**
+       * 駒の種類のシンボルを数値に変換する。
+       */
+      LPointer PieceTypeToNumber(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /**
+       * キャスリングのシンボルを数値に変換する。
+       */
+      LPointer CastlingToNumber(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /**
+       * 数値をマスのシンボルに変換する。
+       */
+      LPointer NumberToSquare(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /**
+       * 数値をファイルのシンボルに変換する。
+       */
+      LPointer NumberToFyle(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /**
+       * 数値をランクのシンボルに変換する。
+       */
+      LPointer NumberToRank(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /**
+       * 数値をサイドのシンボルに変換する。
+       */
+      LPointer NumberToSide(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /**
+       * 数値を駒の種類のシンボルに変換する。
+       */
+      LPointer NumberToPiece(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /**
+       * 数値をキャスリングのシンボルに変換する。
+       * @param obj 変換したいオブジェクト。
+       * @return 変換後のオブジェクト。
+       */
+      LPointer NumberToCastling(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /**
+       * PGNオブジェクトを作成する。
+       */
+      LPointer GenPGN(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /**
+       * FEN/EPD文字列をパースする。
+       */
+      LPointer ParseFENEPD(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /**
+       * 駒の配列のリストをFENの文字列に変換する。
+       */
+      LPointer ToFENPosition(LPointer self, LObject* caller,
+      const LObject& args);
+
     private:
       // ================ //
       // プライベート関数 //
@@ -1764,124 +1907,6 @@ namespace Sayuri {
        * ヘルプを作成する。
        */
       void SetHelp();
-
-      // ========================== //
-      // Lisp関数オブジェクト用関数 //
-      // ========================== //
-      /**
-       * エンジン関数オブジェクトを生成する。
-       * @return エンジン関数オブジェクト。
-       */
-      LispObjectPtr GenEngine();
-
-      /**
-       * マスのシンボルを数値に変換する。
-       * @param obj 変換したいオブジェクト。
-       * @return 変換後のオブジェクト。
-       */
-      LispObjectPtr SquareToNumber(const LispObject& obj);
-
-      /**
-       * ファイルのシンボルを数値に変換する。
-       * @param obj 変換したいオブジェクト。
-       * @return 変換後のオブジェクト。
-       */
-      LispObjectPtr FyleToNumber(const LispObject& obj);
-
-      /**
-       * ランクのシンボルを数値に変換する。
-       * @param obj 変換したいオブジェクト。
-       * @return 変換後のオブジェクト。
-       */
-      LispObjectPtr RankToNumber(const LispObject& obj);
-
-      /**
-       * サイドのシンボルを数値に変換する。
-       * @param obj 変換したいオブジェクト。
-       * @return 変換後のオブジェクト。
-       */
-      LispObjectPtr SideToNumber(const LispObject& obj);
-
-      /**
-       * 駒の種類のシンボルを数値に変換する。
-       * @param obj 変換したいオブジェクト。
-       * @return 変換後のオブジェクト。
-       */
-      LispObjectPtr PieceTypeToNumber(const LispObject& obj);
-
-      /**
-       * キャスリングのシンボルを数値に変換する。
-       * @param obj 変換したいオブジェクト。
-       * @return 変換後のオブジェクト。
-       */
-      LispObjectPtr CastlingToNumber(const LispObject& obj);
-
-      /**
-       * 数値をマスのシンボルに変換する。
-       * @param obj 変換したいオブジェクト。
-       * @return 変換後のオブジェクト。
-       */
-      LispObjectPtr NumberToSquare(const LispObject& obj);
-
-      /**
-       * 数値をファイルのシンボルに変換する。
-       * @param obj 変換したいオブジェクト。
-       * @return 変換後のオブジェクト。
-       */
-      LispObjectPtr NumberToFyle(const LispObject& obj);
-
-      /**
-       * 数値をランクのシンボルに変換する。
-       * @param obj 変換したいオブジェクト。
-       * @return 変換後のオブジェクト。
-       */
-      LispObjectPtr NumberToRank(const LispObject& obj);
-
-      /**
-       * 数値をサイドのシンボルに変換する。
-       * @param obj 変換したいオブジェクト。
-       * @return 変換後のオブジェクト。
-       */
-      LispObjectPtr NumberToSide(const LispObject& obj);
-
-      /**
-       * 数値を駒の種類のシンボルに変換する。
-       * @param obj 変換したいオブジェクト。
-       * @return 変換後のオブジェクト。
-       */
-      LispObjectPtr NumberToPiece(const LispObject& obj);
-
-      /**
-       * 数値をキャスリングのシンボルに変換する。
-       * @param obj 変換したいオブジェクト。
-       * @return 変換後のオブジェクト。
-       */
-      LispObjectPtr NumberToCastling(const LispObject& obj);
-
-      /**
-       * PGNオブジェクトを作成する。
-       * @param pgn_str PGN文字列。
-       * @param caller_scope 呼び出し元のスコープチェイン。。
-       * @return PGNオブジェクト。
-       */
-      LispObjectPtr GenPGN(const std::string& pgn_str,
-      const ScopeChain& caller_scope);
-
-      /**
-       * FEN/EPD文字列をパースする。
-       * @param fen_str パースするFEN/EPD文字列。
-       * @return パース後のリスト。
-       */
-      LispObjectPtr ParseFENEPD(const std::string& fen_str);
-
-      /**
-       * 駒の配列のリストをFENの文字列に変換する。
-       * @param func_name 関数の名前。
-       * @param piece_list 駒の配列のリスト。
-       * @return 変換後の文字列オブジェクト。
-       */
-      LispObjectPtr ToFENPosition(const std::string& func_name,
-      const LispObject& piece_list);
   };
 }  // namespace Sayuri
 
