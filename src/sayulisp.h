@@ -1769,17 +1769,17 @@ namespace Sayuri {
       /** キャスリングの定数のマップ。 */
       static const std::map<std::string, int> CASTLING_MAP;
       /** マスの定数の逆マップ。 */
-      static const std::map<Square, std::string> SQUARE_MAP_INV;
+      static const std::string SQUARE_MAP_INV[NUM_SQUARES];
       /** ファイルの定数の逆マップ。 */
-      static const std::map<Fyle, std::string> FYLE_MAP_INV;
+      static const std::string FYLE_MAP_INV[NUM_FYLES];
       /** ランクの定数の逆マップ。 */
-      static const std::map<Rank, std::string> RANK_MAP_INV;
+      static const std::string RANK_MAP_INV[NUM_RANKS];
       /** サイドの定数の逆マップ。 */
-      static const std::map<Side, std::string> SIDE_MAP_INV;
+      static const std::string SIDE_MAP_INV[NUM_SIDES];
       /** 駒の種類の定数の逆マップ。 */
-      static const std::map<PieceType, std::string> PIECE_MAP_INV;
+      static const std::string PIECE_MAP_INV[NUM_PIECE_TYPES];
       /** キャスリングの定数の逆マップ。 */
-      static const std::map<int, std::string> CASTLING_MAP_INV;
+      static const std::string CASTLING_MAP_INV[5];
 
       // ============== //
       // パブリック関数 //

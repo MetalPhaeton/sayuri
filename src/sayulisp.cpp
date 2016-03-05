@@ -2686,48 +2686,33 @@ namespace Sayuri {
     {"WHITE_SHORT_CASTLING", 1}, {"WHITE_LONG_CASTLING", 2},
     {"BLACK_SHORT_CASTLING", 3}, {"BLACK_LONG_CASTLING", 4}
   };
-  const std::map<Square, std::string> Sayulisp::SQUARE_MAP_INV {
-    {A1, "A1"}, {B1, "B1"}, {C1, "C1"}, {D1, "D1"},
-    {E1, "E1"}, {F1, "F1"}, {G1, "G1"}, {H1, "H1"},
-    {A2, "A2"}, {B2, "B2"}, {C2, "C2"}, {D2, "D2"},
-    {E2, "E2"}, {F2, "F2"}, {G2, "G2"}, {H2, "H2"},
-    {A3, "A3"}, {B3, "B3"}, {C3, "C3"}, {D3, "D3"},
-    {E3, "E3"}, {F3, "F3"}, {G3, "G3"}, {H3, "H3"},
-    {A4, "A4"}, {B4, "B4"}, {C4, "C4"}, {D4, "D4"},
-    {E4, "E4"}, {F4, "F4"}, {G4, "G4"}, {H4, "H4"},
-    {A5, "A5"}, {B5, "B5"}, {C5, "C5"}, {D5, "D5"},
-    {E5, "E5"}, {F5, "F5"}, {G5, "G5"}, {H5, "H5"},
-    {A6, "A6"}, {B6, "B6"}, {C6, "C6"}, {D6, "D6"},
-    {E6, "E6"}, {F6, "F6"}, {G6, "G6"}, {H6, "H6"},
-    {A7, "A7"}, {B7, "B7"}, {C7, "C7"}, {D7, "D7"},
-    {E7, "E7"}, {F7, "F7"}, {G7, "G7"}, {H7, "H7"},
-    {A8, "A8"}, {B8, "B8"}, {C8, "C8"}, {D8, "D8"},
-    {E8, "E8"}, {F8, "F8"}, {G8, "G8"}, {H8, "H8"}
+  const std::string Sayulisp::SQUARE_MAP_INV[NUM_SQUARES] {
+    "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1",
+    "A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2",
+    "A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3",
+    "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4",
+    "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5",
+    "A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6",
+    "A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7",
+    "A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"
   };
-  const std::map<Fyle, std::string> Sayulisp::FYLE_MAP_INV {
-    {FYLE_A, "FYLE_A"}, {FYLE_B, "FYLE_B"},
-    {FYLE_C, "FYLE_C"}, {FYLE_D, "FYLE_D"},
-    {FYLE_E, "FYLE_E"}, {FYLE_F, "FYLE_F"},
-    {FYLE_G, "FYLE_G"}, {FYLE_H, "FYLE_H"},
+  const std::string Sayulisp::FYLE_MAP_INV[NUM_FYLES] {
+    "FYLE_A", "FYLE_B", "FYLE_C", "FYLE_D",
+    "FYLE_E", "FYLE_F", "FYLE_G", "FYLE_H"
   };
-  const std::map<Rank, std::string> Sayulisp::RANK_MAP_INV {
-    {RANK_1, "RANK_1"}, {RANK_2, "RANK_2"},
-    {RANK_3, "RANK_3"}, {RANK_4, "RANK_4"},
-    {RANK_5, "RANK_5"}, {RANK_6, "RANK_6"},
-    {RANK_7, "RANK_7"}, {RANK_8, "RANK_8"},
+  const std::string Sayulisp::RANK_MAP_INV[NUM_RANKS] {
+    "RANK_1", "RANK_2", "RANK_3", "RANK_4",
+    "RANK_5", "RANK_6", "RANK_7", "RANK_8"
   };
-  const std::map<Side, std::string> Sayulisp::SIDE_MAP_INV {
-    {NO_SIDE, "NO_SIDE"}, {WHITE, "WHITE"}, {BLACK, "BLACK"}
+  const std::string Sayulisp::SIDE_MAP_INV[NUM_SIDES] {
+    "NO_SIDE", "WHITE", "BLACK"
   };
-  const std::map<PieceType, std::string> Sayulisp::PIECE_MAP_INV {
-    {EMPTY, "EMPTY"},
-    {PAWN, "PAWN"}, {KNIGHT, "KNIGHT"}, {BISHOP, "BISHOP"},
-    {ROOK, "ROOK"}, {QUEEN, "QUEEN"}, {KING, "KING"}
+  const std::string Sayulisp::PIECE_MAP_INV[NUM_PIECE_TYPES] {
+    "EMPTY", "PAWN", "KNIGHT", "BISHOP", "ROOK", "QUEEN", "KING"
   };
-  const std::map<int, std::string> Sayulisp::CASTLING_MAP_INV {
-    {0, "NO_CASTLING"},
-    {1, "WHITE_SHORT_CASTLING"}, {2, "WHITE_LONG_CASTLING"},
-    {3, "BLACK_SHORT_CASTLING"}, {4, "BLACK_LONG_CASTLING"}
+  const std::string Sayulisp::CASTLING_MAP_INV[5] {
+    "NO_CASTLING", "WHITE_SHORT_CASTLING", "WHITE_LONG_CASTLING",
+    "BLACK_SHORT_CASTLING", "BLACK_LONG_CASTLING"
   };
 
   // ==================== //
