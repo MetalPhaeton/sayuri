@@ -124,9 +124,15 @@ R"...(Usage:
     // エンジン初期化。
     Sayuri::Init();
 
+    // 引数リストを作る。
+    std::vector<std::string> argv_vec;
+    for (int i = 0; i < (argc - 3); ++i) {
+      argv_vec.push_back(argv[i]);
+    }
+
     // Sayurlispを作成。
     std::unique_ptr<Sayuri::Sayulisp>
-    sayulisp_ptr(new Sayuri::Sayulisp());
+    sayulisp_ptr(new Sayuri::Sayulisp(argv_vec));
 
     // 入力ストリームを得る。
     std::istream* stream_ptr = nullptr;
@@ -142,19 +148,12 @@ R"...(Usage:
       stream_ptr = &file;
     }
 
-    // 引数の作成。
-    Sayuri::LispObjectPtr argv_list = Sayuri::Lisp::NewList(argc - 2);
-    Sayuri::LispIterator<true> itr {argv_list.get()};
-    for (int i = 2; i < argc; ++i, ++itr) {
-      itr.current_->car(Sayuri::Lisp::NewString(argv[i]));
-    }
-    sayulisp_ptr->BindSymbol("argv", argv_list);  // 登録。
-
     // 実行。
     int status = 0;
     try {
       status = sayulisp_ptr->Run(stream_ptr);
-    } catch (Sayuri::LispObjectPtr error) {
+    } catch (Sayuri::LPointer error) {
+      Sayuri::Lisp::PrintError(error);
       return 1;
     }
 

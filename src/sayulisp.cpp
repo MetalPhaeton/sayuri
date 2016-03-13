@@ -2637,84 +2637,84 @@ namespace Sayuri {
 //    return ret_ptr;
 //  }
 //
-//  // ======== //
-//  // Sayulisp //
-//  // ======== //
-//  // ========== //
-//  // static定数 //
-//  // ========== //
-//  const std::map<std::string, Square> Sayulisp::SQUARE_MAP {
-//    {"A1", A1}, {"B1", B1}, {"C1", C1}, {"D1", D1},
-//    {"E1", E1}, {"F1", F1}, {"G1", G1}, {"H1", H1},
-//    {"A2", A2}, {"B2", B2}, {"C2", C2}, {"D2", D2},
-//    {"E2", E2}, {"F2", F2}, {"G2", G2}, {"H2", H2},
-//    {"A3", A3}, {"B3", B3}, {"C3", C3}, {"D3", D3},
-//    {"E3", E3}, {"F3", F3}, {"G3", G3}, {"H3", H3},
-//    {"A4", A4}, {"B4", B4}, {"C4", C4}, {"D4", D4},
-//    {"E4", E4}, {"F4", F4}, {"G4", G4}, {"H4", H4},
-//    {"A5", A5}, {"B5", B5}, {"C5", C5}, {"D5", D5},
-//    {"E5", E5}, {"F5", F5}, {"G5", G5}, {"H5", H5},
-//    {"A6", A6}, {"B6", B6}, {"C6", C6}, {"D6", D6},
-//    {"E6", E6}, {"F6", F6}, {"G6", G6}, {"H6", H6},
-//    {"A7", A7}, {"B7", B7}, {"C7", C7}, {"D7", D7},
-//    {"E7", E7}, {"F7", F7}, {"G7", G7}, {"H7", H7},
-//    {"A8", A8}, {"B8", B8}, {"C8", C8}, {"D8", D8},
-//    {"E8", E8}, {"F8", F8}, {"G8", G8}, {"H8", H8}
-//  };
-//  const std::map<std::string, Fyle> Sayulisp::FYLE_MAP {
-//    {"FYLE_A", FYLE_A}, {"FYLE_B", FYLE_B},
-//    {"FYLE_C", FYLE_C}, {"FYLE_D", FYLE_D},
-//    {"FYLE_E", FYLE_E}, {"FYLE_F", FYLE_F},
-//    {"FYLE_G", FYLE_G}, {"FYLE_H", FYLE_H},
-//  };
-//  const std::map<std::string, Rank> Sayulisp::RANK_MAP {
-//    {"RANK_1", RANK_1}, {"RANK_2", RANK_2},
-//    {"RANK_3", RANK_3}, {"RANK_4", RANK_4},
-//    {"RANK_5", RANK_5}, {"RANK_6", RANK_6},
-//    {"RANK_7", RANK_7}, {"RANK_8", RANK_8},
-//  };
-//  const std::map<std::string, Side> Sayulisp::SIDE_MAP {
-//    {"NO_SIDE", NO_SIDE}, {"WHITE", WHITE}, {"BLACK", BLACK}
-//  };
-//  const std::map<std::string, PieceType> Sayulisp::PIECE_MAP {
-//    {"EMPTY", EMPTY},
-//    {"PAWN", PAWN}, {"KNIGHT", KNIGHT}, {"BISHOP", BISHOP},
-//    {"ROOK", ROOK}, {"QUEEN", QUEEN}, {"KING", KING}
-//  };
-//  const std::map<std::string, int> Sayulisp::CASTLING_MAP {
-//    {"NO_CASTLING", 0},
-//    {"WHITE_SHORT_CASTLING", 1}, {"WHITE_LONG_CASTLING", 2},
-//    {"BLACK_SHORT_CASTLING", 3}, {"BLACK_LONG_CASTLING", 4}
-//  };
-//  const std::string Sayulisp::SQUARE_MAP_INV[NUM_SQUARES] {
-//    "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1",
-//    "A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2",
-//    "A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3",
-//    "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4",
-//    "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5",
-//    "A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6",
-//    "A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7",
-//    "A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"
-//  };
-//  const std::string Sayulisp::FYLE_MAP_INV[NUM_FYLES] {
-//    "FYLE_A", "FYLE_B", "FYLE_C", "FYLE_D",
-//    "FYLE_E", "FYLE_F", "FYLE_G", "FYLE_H"
-//  };
-//  const std::string Sayulisp::RANK_MAP_INV[NUM_RANKS] {
-//    "RANK_1", "RANK_2", "RANK_3", "RANK_4",
-//    "RANK_5", "RANK_6", "RANK_7", "RANK_8"
-//  };
-//  const std::string Sayulisp::SIDE_MAP_INV[NUM_SIDES] {
-//    "NO_SIDE", "WHITE", "BLACK"
-//  };
-//  const std::string Sayulisp::PIECE_MAP_INV[NUM_PIECE_TYPES] {
-//    "EMPTY", "PAWN", "KNIGHT", "BISHOP", "ROOK", "QUEEN", "KING"
-//  };
-//  const std::string Sayulisp::CASTLING_MAP_INV[5] {
-//    "NO_CASTLING", "WHITE_SHORT_CASTLING", "WHITE_LONG_CASTLING",
-//    "BLACK_SHORT_CASTLING", "BLACK_LONG_CASTLING"
-//  };
-//
+  // ======== //
+  // Sayulisp //
+  // ======== //
+  // ========== //
+  // static定数 //
+  // ========== //
+  const std::map<std::string, Square> Sayulisp::SQUARE_MAP {
+    {"A1", A1}, {"B1", B1}, {"C1", C1}, {"D1", D1},
+    {"E1", E1}, {"F1", F1}, {"G1", G1}, {"H1", H1},
+    {"A2", A2}, {"B2", B2}, {"C2", C2}, {"D2", D2},
+    {"E2", E2}, {"F2", F2}, {"G2", G2}, {"H2", H2},
+    {"A3", A3}, {"B3", B3}, {"C3", C3}, {"D3", D3},
+    {"E3", E3}, {"F3", F3}, {"G3", G3}, {"H3", H3},
+    {"A4", A4}, {"B4", B4}, {"C4", C4}, {"D4", D4},
+    {"E4", E4}, {"F4", F4}, {"G4", G4}, {"H4", H4},
+    {"A5", A5}, {"B5", B5}, {"C5", C5}, {"D5", D5},
+    {"E5", E5}, {"F5", F5}, {"G5", G5}, {"H5", H5},
+    {"A6", A6}, {"B6", B6}, {"C6", C6}, {"D6", D6},
+    {"E6", E6}, {"F6", F6}, {"G6", G6}, {"H6", H6},
+    {"A7", A7}, {"B7", B7}, {"C7", C7}, {"D7", D7},
+    {"E7", E7}, {"F7", F7}, {"G7", G7}, {"H7", H7},
+    {"A8", A8}, {"B8", B8}, {"C8", C8}, {"D8", D8},
+    {"E8", E8}, {"F8", F8}, {"G8", G8}, {"H8", H8}
+  };
+  const std::map<std::string, Fyle> Sayulisp::FYLE_MAP {
+    {"FYLE_A", FYLE_A}, {"FYLE_B", FYLE_B},
+    {"FYLE_C", FYLE_C}, {"FYLE_D", FYLE_D},
+    {"FYLE_E", FYLE_E}, {"FYLE_F", FYLE_F},
+    {"FYLE_G", FYLE_G}, {"FYLE_H", FYLE_H},
+  };
+  const std::map<std::string, Rank> Sayulisp::RANK_MAP {
+    {"RANK_1", RANK_1}, {"RANK_2", RANK_2},
+    {"RANK_3", RANK_3}, {"RANK_4", RANK_4},
+    {"RANK_5", RANK_5}, {"RANK_6", RANK_6},
+    {"RANK_7", RANK_7}, {"RANK_8", RANK_8},
+  };
+  const std::map<std::string, Side> Sayulisp::SIDE_MAP {
+    {"NO_SIDE", NO_SIDE}, {"WHITE", WHITE}, {"BLACK", BLACK}
+  };
+  const std::map<std::string, PieceType> Sayulisp::PIECE_MAP {
+    {"EMPTY", EMPTY},
+    {"PAWN", PAWN}, {"KNIGHT", KNIGHT}, {"BISHOP", BISHOP},
+    {"ROOK", ROOK}, {"QUEEN", QUEEN}, {"KING", KING}
+  };
+  const std::map<std::string, int> Sayulisp::CASTLING_MAP {
+    {"NO_CASTLING", 0},
+    {"WHITE_SHORT_CASTLING", 1}, {"WHITE_LONG_CASTLING", 2},
+    {"BLACK_SHORT_CASTLING", 3}, {"BLACK_LONG_CASTLING", 4}
+  };
+  const std::string Sayulisp::SQUARE_MAP_INV[NUM_SQUARES] {
+    "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1",
+    "A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2",
+    "A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3",
+    "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4",
+    "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5",
+    "A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6",
+    "A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7",
+    "A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"
+  };
+  const std::string Sayulisp::FYLE_MAP_INV[NUM_FYLES] {
+    "FYLE_A", "FYLE_B", "FYLE_C", "FYLE_D",
+    "FYLE_E", "FYLE_F", "FYLE_G", "FYLE_H"
+  };
+  const std::string Sayulisp::RANK_MAP_INV[NUM_RANKS] {
+    "RANK_1", "RANK_2", "RANK_3", "RANK_4",
+    "RANK_5", "RANK_6", "RANK_7", "RANK_8"
+  };
+  const std::string Sayulisp::SIDE_MAP_INV[NUM_SIDES] {
+    "NO_SIDE", "WHITE", "BLACK"
+  };
+  const std::string Sayulisp::PIECE_MAP_INV[NUM_PIECE_TYPES] {
+    "EMPTY", "PAWN", "KNIGHT", "BISHOP", "ROOK", "QUEEN", "KING"
+  };
+  const std::string Sayulisp::CASTLING_MAP_INV[5] {
+    "NO_CASTLING", "WHITE_SHORT_CASTLING", "WHITE_LONG_CASTLING",
+    "BLACK_SHORT_CASTLING", "BLACK_LONG_CASTLING"
+  };
+
 //  // ==================== //
 //  // コンストラクタと代入 //
 //  // ==================== //
@@ -3044,62 +3044,391 @@ namespace Sayuri {
 //    }
 //  }
 //
-//  // Sayulispを開始する。
-//  int Sayulisp::Run(std::istream* stream_ptr) {
-//    // 終了ステータス。
-//    int status = 0;
-//
-//    // (exit)関数を作成。
-//    bool loop = true;
-//    auto func = [&status, &loop](LispObjectPtr self, const LispObject& caller,
-//    const LispObject& list) -> LispObjectPtr {
-//      // 準備。
-//      LispIterator<false> list_itr{&list};
-//      std::string func_name = (list_itr++)->ToString();
-//
-//      // ループをセット。
-//      loop = false;
-//
-//      // 引数があった場合は終了ステータスあり。
-//      if (list_itr) {
-//        LispObjectPtr status_ptr = caller.Evaluate(*list_itr);
-//        if (!(status_ptr->IsNumber())) {
-//          throw Lisp::GenWrongTypeError
-//          (func_name, "Number", std::vector<int> {1}, true);
-//        }
-//
-//        status = status_ptr->number_value();
-//      }
-//
-//      return Lisp::NewNumber(status);
-//    };
-//    AddNativeFunction(func, "exit");
-//
-//    try {
-//      std::string input;
-//      while (std::getline(*(stream_ptr), input)) {
-//        input += "\n";
-//        std::vector<LispObjectPtr> obj_vec = Parse(input);
-//
-//        if (!(obj_vec.empty())) {
-//          for (auto& obj_ptr : obj_vec) Evaluate(*obj_ptr);
-//        }
-//
-//        if (!loop) break;
-//      }
-//    } catch (LispObjectPtr error) {
-//      if (error->IsList() && (error->Length() == 2)
-//      && (error->car()->IsSymbol()) && (error->cdr()->car()->IsString())) {
-//        std::cerr << "Error: " << error->car()->symbol_value() << std::endl;
-//        std::cerr << error->cdr()->car()->string_value() << std::endl;
-//        throw error;
-//      } else {
-//        throw error;
-//      }
-//    }
-//
-//    return status;
-//  }
+  // Sayulispの関数を設定する。
+  void Sayulisp::SetSayulispFunction() {
+    LC_Function func;
+    std::string help;
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->SquareToNumber(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("square->number",
+    NewN_Function(func, scope_chain_));
+    help =
+R"...(### square->number ###
+
+<h6> Usage </h6>
+
+* `(square->number <Object>)`
+
+<h6> Description </h6>
+
+* If `<Object>` is Square Symbol, it returns Number indicating to Square.
+* If `<Object>` is List, it returns List changed Square Symbol into Number. 
+
+<h6> Example </h6>
+
+    (define symbol-list
+      '(A1 B1 C1 (WHITE D3 E4 (F5 PAWN G6) H7 BLACK_LONG_CASTLING)))
+    
+    (display (square->number symbol-list))
+    ;; Output
+    ;; > (0 1 2 (WHITE 19 28 (37 PAWN 46) 55 BLACK_LONG_CASTLING)))...";
+    help_dict_.emplace("square->number", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->FyleToNumber(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("fyle->number",
+    NewN_Function(func, scope_chain_));
+    help =
+R"...(### fyle->number ###
+
+<h6> Usage </h6>
+
+* `(fyle->number <Object>)`
+
+<h6> Description </h6>
+
+* If `<Object>` is Fyle Symbol, it returns Number indicating to Fyle.
+* If `<Object>` is List, it returns List changed Fyle Symbol into Number. 
+
+<h6> Example </h6>
+
+    (define symbol-list
+      '(FYLE_A FYLE_B (WHITE FYLE_D E4 (PAWN G6) FYLE_H BLACK_LONG_CASTLING)))
+    
+    (display (fyle->number symbol-list))
+    ;; Output
+    ;; > (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING)))...";
+    help_dict_.emplace("fyle->number", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->RankToNumber(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("rank->number",
+    NewN_Function(func, scope_chain_));
+    help =
+R"...(### rank->number ###
+
+<h6> Usage </h6>
+
+* `(rank->number <Object>)`
+
+<h6> Description </h6>
+
+* If `<Object>` is Rank Symbol, it returns Number indicating to Rank.
+* If `<Object>` is List, it returns List changed Rank Symbol into Number. 
+
+<h6> Example </h6>
+
+    (define symbol-list
+      '(RANK_1 RANK_2 (WHITE RANK_4 E4 (PAWN G6) RANK_8 BLACK_LONG_CASTLING)))
+    
+    (display (rank->number symbol-list))
+    ;; Output
+    ;; > (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING)))...";
+    help_dict_.emplace("rank->number", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->SideToNumber(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("side->number",
+    NewN_Function(func, scope_chain_));
+    help =
+R"...(### side->number ### {#side-to-number}
+
+<h6> Usage </h6>
+
+* `(side->number <Object>)`
+
+<h6> Description </h6>
+
+* If `<Object>` is Side Symbol, it returns Number indicating to Side.
+* If `<Object>` is List, it returns List changed Side Symbol into Number. 
+
+<h6> Example </h6>
+
+    (define symbol-list
+      '(NO_SIDE WHITE (FYLE_A BLACK E4 (PAWN G6) BLACK_LONG_CASTLING)))
+    
+    (display (side->number symbol-list))
+    ;; Output
+    ;; > (0 1 (FYLE_A 2 E4 (PAWN G6) BLACK_LONG_CASTLING)))...";
+    help_dict_.emplace("side->number", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->PieceToNumber(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("piece->number",
+    NewN_Function(func, scope_chain_));
+    help =
+R"...(### piece->number ###
+
+<h6> Usage </h6>
+
+* `(piece->number <Object>)`
+
+<h6> Description </h6>
+
+* If `<Object>` is Piece Type Symbol, it returns Number indicating
+  to Piece Type.
+* If `<Object>` is List, it returns List changed Piece Type Symbol into Number.
+
+<h6> Example </h6>
+
+    (define symbol-list
+      '(EMPTY PAWN (FYLE_A QUEEN E4 (RANK_4 G6) KING BLACK_LONG_CASTLING)))
+    
+    (display (piece->number symbol-list))
+    ;; Output
+    ;; > (0 1 (FYLE_A 5 E4 (RANK_4 G6) 6 BLACK_LONG_CASTLING)))...";
+    help_dict_.emplace("piece->number", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->CastlingToNumber(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("castling->number",
+    NewN_Function(func, scope_chain_));
+    help =
+R"...(### castling->number ###
+
+<h6> Usage </h6>
+
+* `(castling->number <Object>)`
+
+<h6> Description </h6>
+
+* If `<Object>` is Castling Right Symbol, it returns Number indicating
+  to Piece Type.
+* If `<Object>` is List, it returns List changed Castling Right Symbol
+  into Number. 
+
+<h6> Example </h6>
+
+    (define symbol-list
+      '(NO_CASTLING WHITE_SHORT_CASTLING (FYLE_A E4 (RANK_4 G6) KING)))
+    
+    (display (castling->number symbol-list))
+    ;; Output
+    ;; > (0 1 (FYLE_A E4 (RANK_4 G6) KING)))...";
+    help_dict_.emplace("castling->number", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->NumberToSquare(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("number->square",
+    NewN_Function(func, scope_chain_));
+    help =
+R"...(### number->square ### {#number-to-square}
+
+<h6> Usage </h6>
+
+* `(number->square <Object>)`
+
+<h6> Description </h6>
+
+* If `<Object>` is Number, it returns Square Symbol.
+* If `<Object>` is List, it returns List changed Number into Square Symbol.
+
+<h6> Example </h6>
+
+    (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+    
+    (display (number->square number-list))
+    ;; Output
+    ;; > (A1 B1 (C1 (D1 E1 "Hello") F1) 100))...";
+    help_dict_.emplace("number->square", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->NumberToFyle(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("number->fyle",
+    NewN_Function(func, scope_chain_));
+    help =
+R"...(### number->fyle ### {#number-to-fyle}
+
+<h6> Usage </h6>
+
+* `(number->fyle <Object>)`
+
+<h6> Description </h6>
+
+* If `<Object>` is Number, it returns Fyle Symbol.
+* If `<Object>` is List, it returns List changed Number into Fyle Symbol.
+
+<h6> Example </h6>
+
+    (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+    
+    (display (number->fyle number-list))
+    ;; Output
+    ;; > (FYLE_A FYLE_B (FYLE_C (FYLE_D FYLE_E "Hello") FYLE_F) 100))...";
+    help_dict_.emplace("number->fyle", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->NumberToRank(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("number->rank",
+    NewN_Function(func, scope_chain_));
+    help =
+R"...(### number->rank ### {#number-to-rank}
+
+<h6> Usage </h6>
+
+* `(number->rank <Object>)`
+
+<h6> Description </h6>
+
+* If `<Object>` is Number, it returns Rank Symbol.
+* If `<Object>` is List, it returns List changed Number into Rank Symbol.
+
+<h6> Example </h6>
+
+    (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+    
+    (display (number->rank number-list))
+    ;; Output
+    ;; > (RANK_1 RANK_2 (RANK_3 (RANK_4 RANK_5 "Hello") RANK_6) 100))...";
+    help_dict_.emplace("number->rank", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->NumberToSide(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("number->side",
+    NewN_Function(func, scope_chain_));
+    help =
+R"...(### number->side ### {#number-to-side}
+
+<h6> Usage </h6>
+
+* `(number->side <Object>)`
+
+<h6> Description </h6>
+
+* If `<Object>` is Number, it returns Side Symbol.
+* If `<Object>` is List, it returns List changed Number into Side Symbol.
+
+<h6> Example </h6>
+
+    (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+    
+    (display (number->side number-list))
+    ;; Output
+    ;; > (NO_SIDE WHITE (BLACK (3 4 "Hello") 5) 100))...";
+    help_dict_.emplace("number->side", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->NumberToPiece(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("number->piece",
+    NewN_Function(func, scope_chain_));
+    help =
+R"...(### number->piece ### {#number-to-piece}
+
+<h6> Usage </h6>
+
+* `(number->piece <Object>)`
+
+<h6> Description </h6>
+
+* If `<Object>` is Number, it returns Piece Type Symbol.
+* If `<Object>` is List, it returns List changed Number into Piece Type Symbol.
+
+<h6> Example </h6>
+
+    (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+    
+    (display (number->piece number-list))
+    ;; Output
+    ;; > (EMPTY PAWN (KNIGHT (BISHOP ROOK "Hello") QUEEN) 100))...";
+    help_dict_.emplace("number->piece", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->NumberToCastling(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("number->castling",
+    NewN_Function(func, scope_chain_));
+    help =
+R"...(### number->castling ### {#number-to-castling}
+
+<h6> Usage </h6>
+
+* `(number->castling <Object>)`
+
+<h6> Description </h6>
+
+* If `<Object>` is Number, it returns Castling Rights Symbol.
+* If `<Object>` is List, it returns List changed Number
+  into CAstling Rights Symbol.
+
+<h6> Example </h6>
+
+    (define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+    
+    (display (number->castling number-list))
+    ;; Output
+    ;; > (NO_CASTLING WHITE_SHORT_CASTLING (WHITE_LONG_CASTLING
+    ;; > (BLACK_SHORT_CASTLING BLACK_LONG_CASTLING "Hello") 5) 100))...";
+    help_dict_.emplace("number->castling", help);
+  }
+
+  // Sayulispを開始する。
+  int Sayulisp::Run(std::istream* stream_ptr) {
+    // 終了ステータス。
+    int status = 0;
+
+    // (exit)関数を作成。
+    bool loop = true;
+    auto func = [&status, &loop](LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      // 準備。
+      LObject* args_ptr = args.cdr().get();
+
+      // ループをセット。
+      loop = false;
+
+      // 引数があった場合は終了ステータスあり。
+      if (args_ptr->IsPair()) {
+        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        status = result->number();
+      }
+
+      return Lisp::NewNumber(status);
+    };
+    scope_chain_.InsertSymbol("exit", NewN_Function(func, scope_chain_));
+
+    try {
+      std::string input;
+      while (std::getline(*(stream_ptr), input)) {
+        input += "\n";
+        Tokenize(input);
+        LPointerVec s_tree = Parse();
+
+        for (auto& s : s_tree) {
+          Evaluate(*s);
+        }
+
+        if (!loop) break;
+      }
+    } catch (LPointer error) {
+      PrintError(error);
+    }
+
+    return status;
+  }
 //
 //  // エンジンを生成する。
 //  LispObjectPtr Sayulisp::GenEngine() {
@@ -3212,7 +3541,7 @@ namespace Sayuri {
   }
 
   // 駒の種類のシンボルを数値に変換する。
-  LPointer Sayulisp::PieceTypeToNumber(LPointer self, LObject* caller,
+  LPointer Sayulisp::PieceToNumber(LPointer self, LObject* caller,
   const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;

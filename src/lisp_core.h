@@ -1444,6 +1444,7 @@ namespace Sayuri {
        * @return 同じならtrue。
        */
       virtual bool operator==(const LObject& obj) const override {
+        /*
         if (obj.IsN_Function()) {
           LC_Function* target_ptr = obj.c_function().target<LC_Function>();
           if (c_function_.target<LC_Function>() != target_ptr) return false;
@@ -1455,6 +1456,7 @@ namespace Sayuri {
           }
           return true;
         }
+        */
         return false;
       }
       /**
@@ -1471,7 +1473,8 @@ namespace Sayuri {
        */
       virtual std::string ToString() const override {
         std::ostringstream oss;
-        oss << "Native Function: " << c_function_.target<LC_Function>();
+        //oss << "Native Function: " << c_function_.target<LC_Function>();
+        oss << "Native Function";
         return oss.str();
       }
 
@@ -3117,6 +3120,10 @@ namespace Sayuri {
         return NewNumber(min);
       }
 
+    protected:
+      /** ヘルプ辞書。 */
+      LHelpDict help_dict_;
+
     private:
       // ================ //
       // プライベート関数 //
@@ -3145,9 +3152,6 @@ namespace Sayuri {
       bool in_string_;
       /** トークンのベクトル。 */
       std::queue<std::string> token_queue_;
-
-      /** ヘルプ辞書。 */
-      LHelpDict help_dict_;
   };
 }  // namespace Sayuri
 

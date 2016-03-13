@@ -52,13 +52,14 @@ namespace Sayuri {
         ret_str = std::string("");
       }
 
-      LispObjectPtr result = Lisp::NewNil();
+      LPointer result = Lisp::NewNil();
 
       try {
-        for (auto& ptr : sayulisp_ptr->Parse(code)) {
+        sayulisp_ptr->Tokenize(code);
+        for (auto& ptr : sayulisp_ptr->Parse()) {
           result = sayulisp_ptr->Evaluate(*ptr);
         }
-      } catch (LispObjectPtr error_ptr) {
+      } catch (LPointer error_ptr) {
         result = error_ptr;
       }
 

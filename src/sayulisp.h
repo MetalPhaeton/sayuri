@@ -1721,9 +1721,13 @@ namespace Sayuri {
        * コンストラクタ。
        * @param argv コマンド引数。
        */
-      Sayulisp(const std::vector<std::string>& argv) : Lisp(argv) {}
+      Sayulisp(const std::vector<std::string>& argv) : Lisp(argv) {
+        SetSayulispFunction();
+      }
       /** コンストラクタ。 */
-      Sayulisp();
+      Sayulisp() {
+        SetSayulispFunction();
+      }
       /**
        * コピーコンストラクタ。
        * @param sayulisp コピー元。
@@ -1785,6 +1789,11 @@ namespace Sayuri {
       // パブリック関数 //
       // ============== //
       /**
+       * Sayulispの関数をセットする。
+       */
+      void SetSayulispFunction();
+
+      /**
        * Sayulispを開始する。
        * @param stream_ptr 入力に使うストリームのポインタ。
        * @return 終了ステータス。
@@ -1834,7 +1843,7 @@ namespace Sayuri {
       /**
        * 駒の種類のシンボルを数値に変換する。
        */
-      LPointer PieceTypeToNumber(LPointer self, LObject* caller,
+      LPointer PieceToNumber(LPointer self, LObject* caller,
       const LObject& args);
 
       /**
@@ -1881,23 +1890,23 @@ namespace Sayuri {
       LPointer NumberToCastling(LPointer self, LObject* caller,
       const LObject& args);
 
-      /**
-       * PGNオブジェクトを作成する。
-       */
-      LPointer GenPGN(LPointer self, LObject* caller,
-      const LObject& args);
-
-      /**
-       * FEN/EPD文字列をパースする。
-       */
-      LPointer ParseFENEPD(LPointer self, LObject* caller,
-      const LObject& args);
-
-      /**
-       * 駒の配列のリストをFENの文字列に変換する。
-       */
-      LPointer ToFENPosition(LPointer self, LObject* caller,
-      const LObject& args);
+//      /**
+//       * PGNオブジェクトを作成する。
+//       */
+//      LPointer GenPGN(LPointer self, LObject* caller,
+//      const LObject& args);
+//
+//      /**
+//       * FEN/EPD文字列をパースする。
+//       */
+//      LPointer ParseFENEPD(LPointer self, LObject* caller,
+//      const LObject& args);
+//
+//      /**
+//       * 駒の配列のリストをFENの文字列に変換する。
+//       */
+//      LPointer ToFENPosition(LPointer self, LObject* caller,
+//      const LObject& args);
 
     private:
       // ================ //
