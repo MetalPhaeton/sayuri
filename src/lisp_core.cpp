@@ -156,8 +156,10 @@ namespace Sayuri {
   Lisp::Lisp(const std::vector<std::string>& argv) : LN_Function(),
   parenth_counter_(0),
   in_string_(false) {
-    LN_Function::c_function(*this);
-    LN_Function::scope_chain(LScopeChain());
+    c_function_ = *this;
+    func_id_ = "Lisp";
+    scope_chain_ = LScopeChain();
+
     SetCoreFunctions();
     SetBasicFunctions();
 
@@ -174,8 +176,10 @@ namespace Sayuri {
   Lisp::Lisp() : LN_Function(),
   parenth_counter_(0),
   in_string_(false) {
-    LN_Function::c_function(*this);
-    LN_Function::scope_chain(LScopeChain());
+    c_function_ = *this;
+    func_id_ = "Lisp";
+    scope_chain_ = LScopeChain();
+
     SetCoreFunctions();
     SetBasicFunctions();
     scope_chain_.InsertSymbol("argv", NewNil());
@@ -549,7 +553,8 @@ namespace Sayuri {
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Help(self, caller, args);
     };
-    scope_chain_.InsertSymbol("help", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("help",
+    NewN_Function(func, "Lisp:help", scope_chain_));
     help =
 R"...(### help ###
 
@@ -592,7 +597,8 @@ R"...(### help ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Eval(self, caller, args);
     };
-    scope_chain_.InsertSymbol("eval", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("eval",
+    NewN_Function(func, "Lisp:eval", scope_chain_));
     help =
 R"...(### eval ###
 
@@ -619,15 +625,16 @@ R"...(### eval ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->ParseFunc(self, caller, args);
     };
-    scope_chain_.InsertSymbol("parse", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("parse",
+    NewN_Function(func, "Lisp:parse", scope_chain_));
     scope_chain_.InsertSymbol("string->symbol",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:string->symbol", scope_chain_));
     scope_chain_.InsertSymbol("string->number",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:string->number", scope_chain_));
     scope_chain_.InsertSymbol("string->boolean",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:string->boolean", scope_chain_));
     scope_chain_.InsertSymbol("string->list",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:string->list", scope_chain_));
     help =
 R"...(### parse ###
 
@@ -659,7 +666,8 @@ R"...(### parse ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Parval(self, caller, args);
     };
-    scope_chain_.InsertSymbol("parval", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("parval",
+    NewN_Function(func, "Lisp:parval", scope_chain_));
     help =
 R"...(### parval ###
 
@@ -686,15 +694,15 @@ R"...(### parval ###
       return this->ToStringFunc(self, caller, args);
     };
     scope_chain_.InsertSymbol("to-string",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:to-string", scope_chain_));
     scope_chain_.InsertSymbol("symbol->string",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:symbol->string", scope_chain_));
     scope_chain_.InsertSymbol("number->string",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:number->string", scope_chain_));
     scope_chain_.InsertSymbol("boolean->string",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:boolean->string", scope_chain_));
     scope_chain_.InsertSymbol("list->string",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:list->string", scope_chain_));
     help =
 R"...(### to-string ###
 
@@ -732,7 +740,8 @@ R"...(### to-string ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Try(self, caller, args);
     };
-    scope_chain_.InsertSymbol("try", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("try",
+    NewN_Function(func, "Lisp:try", scope_chain_));
     help =
 R"...(### try ###
 
@@ -770,7 +779,8 @@ R"...(### try ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Throw(self, caller, args);
     };
-    scope_chain_.InsertSymbol("throw", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("throw",
+    NewN_Function(func, "Lisp:throw", scope_chain_));
     help =
 R"...(### throw ###
 
@@ -797,7 +807,8 @@ R"...(### throw ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->CarFunc(self, caller, args);
     };
-    scope_chain_.InsertSymbol("car", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("car",
+    NewN_Function(func, "Lisp:car", scope_chain_));
     help =
 R"...(### car ###
 
@@ -825,7 +836,8 @@ R"...(### car ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->CdrFunc(self, caller, args);
     };
-    scope_chain_.InsertSymbol("cdr", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("cdr",
+    NewN_Function(func, "Lisp:cdr", scope_chain_));
     help =
 R"...(### cdr ###
 
@@ -853,7 +865,8 @@ R"...(### cdr ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Cons(self, caller, args);
     };
-    scope_chain_.InsertSymbol("cons", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("cons",
+    NewN_Function(func, "Lisp:cons", scope_chain_));
     help =
 R"...(### cons ###
 
@@ -888,7 +901,8 @@ R"...(### cons ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Apply(self, caller, args);
     };
-    scope_chain_.InsertSymbol("apply", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("apply",
+    NewN_Function(func, "Lisp:apply", scope_chain_));
     help =
 R"...(### apply ###
 
@@ -916,7 +930,8 @@ R"...(### apply ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Quote(self, caller, args);
     };
-    scope_chain_.InsertSymbol("quote", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("quote",
+    NewN_Function(func, "Lisp:quote", scope_chain_));
     help =
 R"...(### quote ###
 
@@ -956,7 +971,8 @@ R"...(### quote ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Lambda(self, caller, args);
     };
-    scope_chain_.InsertSymbol("lambda", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("lambda",
+    NewN_Function(func, "Lisp:lambda", scope_chain_));
     help =
 R"...(### lambda ###
 
@@ -992,7 +1008,8 @@ R"...(### lambda ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Let(self, caller, args);
     };
-    scope_chain_.InsertSymbol("let", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("let",
+    NewN_Function(func, "Lisp:let", scope_chain_));
     help =
 R"...(### let ###
 
@@ -1025,7 +1042,8 @@ R"...(### let ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->While(self, caller, args);
     };
-    scope_chain_.InsertSymbol("while", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("while",
+    NewN_Function(func, "Lisp:while", scope_chain_));
     help =
 R"...(### while ###
 
@@ -1064,7 +1082,8 @@ R"...(### while ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->For(self, caller, args);
     };
-    scope_chain_.InsertSymbol("for", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("for",
+    NewN_Function(func, "Lisp:for", scope_chain_));
     help =
 R"...(### for ###
 
@@ -1113,7 +1132,8 @@ R"...(### for ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Define(self, caller, args);
     };
-    scope_chain_.InsertSymbol("define", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("define",
+    NewN_Function(func, "Lisp:define", scope_chain_));
     help =
 R"...(### define ###
 
@@ -1151,7 +1171,8 @@ R"...(### define ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Set(self, caller, args);
     };
-    scope_chain_.InsertSymbol("set!", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("set!",
+    NewN_Function(func, "Lisp:set!", scope_chain_));
     help =
 R"...(### set! ###
 
@@ -1189,7 +1210,8 @@ R"...(### set! ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->If(self, caller, args);
     };
-    scope_chain_.InsertSymbol("if", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("if",
+    NewN_Function(func, "Lisp:if", scope_chain_));
     help =
 R"...(### if ###
 
@@ -1216,7 +1238,8 @@ R"...(### if ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Cond(self, caller, args);
     };
-    scope_chain_.InsertSymbol("cond", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("cond",
+    NewN_Function(func, "Lisp:cond", scope_chain_));
     help =
 R"...(### cond ###
 
@@ -1248,7 +1271,8 @@ R"...(### cond ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Begin(self, caller, args);
     };
-    scope_chain_.InsertSymbol("begin", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("begin",
+    NewN_Function(func, "Lisp:begin", scope_chain_));
     help =
 R"...(### begin ###
 
@@ -1276,7 +1300,8 @@ R"...(### begin ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Display(self, caller, args);
     };
-    scope_chain_.InsertSymbol("display", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("display",
+    NewN_Function(func, "Lisp:display", scope_chain_));
     help =
 R"...(### display ###
 
@@ -1307,7 +1332,8 @@ R"...(### display ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Stdin(self, caller, args);
     };
-    scope_chain_.InsertSymbol("stdin", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("stdin",
+    NewN_Function(func, "Lisp:stdin", scope_chain_));
     help =
 R"...(### stdin ###
 
@@ -1340,7 +1366,8 @@ R"...(### stdin ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Stdout(self, caller, args);
     };
-    scope_chain_.InsertSymbol("stdout", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("stdout",
+    NewN_Function(func, "Lisp:stdout", scope_chain_));
     help =
 R"...(### stdout ###
 
@@ -1365,7 +1392,8 @@ R"...(### stdout ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Stderr(self, caller, args);
     };
-    scope_chain_.InsertSymbol("stderr", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("stderr",
+    NewN_Function(func, "Lisp:stderr", scope_chain_));
     help =
 R"...(### stderr ###
 
@@ -1390,7 +1418,8 @@ R"...(### stderr ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Import(self, caller, args);
     };
-    scope_chain_.InsertSymbol("import", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("import",
+    NewN_Function(func, "Lisp:import", scope_chain_));
     help =
 R"...(### import ###
 
@@ -1425,7 +1454,8 @@ R"...(### import ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->EqualQ(self, caller, args);
     };
-    scope_chain_.InsertSymbol("equal?", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("equal?",
+    NewN_Function(func, "Lisp:equal?", scope_chain_));
     help =
 R"...(### equal? ###
 
@@ -1450,8 +1480,10 @@ R"...(### equal? ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->QFunc<LType::NIL>(self, caller, args);
     };
-    scope_chain_.InsertSymbol("nil?", NewN_Function(func, scope_chain_));
-    scope_chain_.InsertSymbol("null?", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("nil?",
+    NewN_Function(func, "Lisp:nil?", scope_chain_));
+    scope_chain_.InsertSymbol("null?",
+    NewN_Function(func, "Lisp:null?", scope_chain_));
     help =
 R"...(### nil? ###
 
@@ -1478,7 +1510,8 @@ R"...(### nil? ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->QFunc<LType::PAIR>(self, caller, args);
     };
-    scope_chain_.InsertSymbol("pair?", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("pair?",
+    NewN_Function(func, "Lisp:pair?", scope_chain_));
     help =
 R"...(### pair? ###
 
@@ -1503,7 +1536,8 @@ R"...(### pair? ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->QFunc<LType::SYMBOL>(self, caller, args);
     };
-    scope_chain_.InsertSymbol("symbol?", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("symbol?",
+    NewN_Function(func, "Lisp:symbol?", scope_chain_));
     help =
 R"...(### symbol? ###
 
@@ -1528,7 +1562,8 @@ R"...(### symbol? ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->QFunc<LType::NUMBER>(self, caller, args);
     };
-    scope_chain_.InsertSymbol("number?", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("number?",
+    NewN_Function(func, "Lisp:number?", scope_chain_));
     help =
 R"...(### number? ###
 
@@ -1553,7 +1588,8 @@ R"...(### number? ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->QFunc<LType::BOOLEAN>(self, caller, args);
     };
-    scope_chain_.InsertSymbol("boolean?", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("boolean?",
+    NewN_Function(func, "Lisp:boolean?", scope_chain_));
     help =
 R"...(### boolean? ###
 
@@ -1578,7 +1614,8 @@ R"...(### boolean? ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->QFunc<LType::STRING>(self, caller, args);
     };
-    scope_chain_.InsertSymbol("string?", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("string?",
+    NewN_Function(func, "Lisp:string?", scope_chain_));
     help =
 R"...(### string? ###
 
@@ -1604,7 +1641,7 @@ R"...(### string? ###
       return this->QFunc<LType::FUNCTION>(self, caller, args);
     };
     scope_chain_.InsertSymbol("function?",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:function?", scope_chain_));
     help =
 R"...(### function? ###
 
@@ -1631,7 +1668,7 @@ R"...(### function? ###
       return this->QFunc<LType::N_FUNCTION>(self, caller, args);
     };
     scope_chain_.InsertSymbol("native-function?",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:native-function?", scope_chain_));
     help =
 R"...(### native-function? ###
 
@@ -1657,7 +1694,7 @@ R"...(### native-function? ###
       return this->ProcedureQ(self, caller, args);
     };
     scope_chain_.InsertSymbol("procedure?",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:procedure?", scope_chain_));
     help =
 R"...(### procedure? ###
 
@@ -1689,7 +1726,7 @@ R"...(### procedure? ###
       return this->OutputStream(self, caller, args);
     };
     scope_chain_.InsertSymbol("output-stream",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:output-stream", scope_chain_));
     help =
 R"...(### output-stream ###
 
@@ -1721,7 +1758,7 @@ R"...(### output-stream ###
       return this->InputStream(self, caller, args);
     };
     scope_chain_.InsertSymbol("input-stream",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:input-stream", scope_chain_));
     help =
 R"...(### input-stream ###
 
@@ -1763,7 +1800,8 @@ R"...(### input-stream ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->System(self, caller, args);
     };
-    scope_chain_.InsertSymbol("system", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("system",
+    NewN_Function(func, "Lisp:system", scope_chain_));
     help =
 R"...(### system ###
 
@@ -1794,9 +1832,10 @@ R"...(### system ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Append(self, caller, args);
     };
-    scope_chain_.InsertSymbol("append", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("append",
+    NewN_Function(func, "Lisp:append", scope_chain_));
     scope_chain_.InsertSymbol("string-append",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:string-append", scope_chain_));
     help =
 R"...(### append ###
 
@@ -1830,11 +1869,12 @@ R"...(### append ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Ref(self, caller, args);
     };
-    scope_chain_.InsertSymbol("ref", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("ref",
+    NewN_Function(func, "Lisp:ref", scope_chain_));
     scope_chain_.InsertSymbol("list-ref",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:list-ref", scope_chain_));
     scope_chain_.InsertSymbol("string-ref",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:string-ref", scope_chain_));
     help =
 R"...(### ref ###
 
@@ -1882,7 +1922,8 @@ R"...(### ref ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->List(self, caller, args);
     };
-    scope_chain_.InsertSymbol("list", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("list",
+    NewN_Function(func, "Lisp:list", scope_chain_));
     help =
 R"...(### list ###
 
@@ -1908,7 +1949,7 @@ R"...(### list ###
       return this->ListReplace(self, caller, args);
     };
     scope_chain_.InsertSymbol("list-replace",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:list-replace", scope_chain_));
     help =
 R"...(### list-replace ###
 
@@ -1937,7 +1978,7 @@ R"...(### list-replace ###
       return this->ListRemove(self, caller, args);
     };
     scope_chain_.InsertSymbol("list-remove",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:list-remove", scope_chain_));
     help =
 R"...(### list-remove ###
 
@@ -1965,7 +2006,7 @@ R"...(### list-remove ###
       return this->ListSearch(self, caller, args);
     };
     scope_chain_.InsertSymbol("list-search",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Lisp:list-search", scope_chain_));
     help =
 R"...(### list-search ###
 
@@ -1995,7 +2036,8 @@ R"...(### list-search ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Map(self, caller, args);
     };
-    scope_chain_.InsertSymbol("map", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("map",
+    NewN_Function(func, "Lisp:map", scope_chain_));
     help =
 R"...(### map ###
 
@@ -2029,7 +2071,8 @@ R"...(### map ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Range(self, caller, args);
     };
-    scope_chain_.InsertSymbol("range", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("range",
+    NewN_Function(func, "Lisp:range", scope_chain_));
     help =
 R"...(### range ###
 
@@ -2053,7 +2096,8 @@ R"...(### range ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->LengthFunc(self, caller, args);
     };
-    scope_chain_.InsertSymbol("length", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("length",
+    NewN_Function(func, "Lisp:length", scope_chain_));
     help =
 R"...(### length ###
 
@@ -2082,7 +2126,8 @@ R"...(### length ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->NumEqual(self, caller, args);
     };
-    scope_chain_.InsertSymbol("=", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("=",
+    NewN_Function(func, "Lisp:=", scope_chain_));
     help =
 R"...(### = ###
 
@@ -2107,7 +2152,8 @@ R"...(### = ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->NumNotEqual(self, caller, args);
     };
-    scope_chain_.InsertSymbol("~=", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("~=",
+    NewN_Function(func, "Lisp:~=", scope_chain_));
     help =
 R"...(### ~= ###
 
@@ -2132,7 +2178,8 @@ R"...(### ~= ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->NumGT(self, caller, args);
     };
-    scope_chain_.InsertSymbol(">", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol(">",
+    NewN_Function(func, "Lisp:>", scope_chain_));
     help =
 R"...(### > ###
 
@@ -2157,7 +2204,8 @@ R"...(### > ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->NumGE(self, caller, args);
     };
-    scope_chain_.InsertSymbol(">=", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol(">=",
+    NewN_Function(func, "Lisp:>=", scope_chain_));
     help =
 R"...(### >= ###
 
@@ -2182,7 +2230,8 @@ R"...(### >= ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->NumLT(self, caller, args);
     };
-    scope_chain_.InsertSymbol("<", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("<",
+    NewN_Function(func, "Lisp:<", scope_chain_));
     help =
 R"...(### < ###
 
@@ -2207,7 +2256,8 @@ R"...(### < ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->NumLE(self, caller, args);
     };
-    scope_chain_.InsertSymbol("<=", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("<=",
+    NewN_Function(func, "Lisp:<=", scope_chain_));
     help =
 R"...(### <= ###
 
@@ -2232,7 +2282,8 @@ R"...(### <= ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Not(self, caller, args);
     };
-    scope_chain_.InsertSymbol("not", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("not",
+    NewN_Function(func, "Lisp:not", scope_chain_));
     help =
 R"...(### not ###
 
@@ -2256,7 +2307,8 @@ R"...(### not ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->And(self, caller, args);
     };
-    scope_chain_.InsertSymbol("and", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("and",
+    NewN_Function(func, "Lisp:and", scope_chain_));
     help =
 R"...(### and ###
 
@@ -2281,7 +2333,8 @@ R"...(### and ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Or(self, caller, args);
     };
-    scope_chain_.InsertSymbol("or", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("or",
+    NewN_Function(func, "Lisp:or", scope_chain_));
     help =
 R"...(### or ###
 
@@ -2306,7 +2359,8 @@ R"...(### or ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Addition(self, caller, args);
     };
-    scope_chain_.InsertSymbol("+", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("+",
+    NewN_Function(func, "Lisp:+", scope_chain_));
     help =
 R"...(### + ###
 
@@ -2330,7 +2384,8 @@ R"...(### + ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->ExclamToSet(2, "+", self, caller, args);
     };
-    scope_chain_.InsertSymbol("add!", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("add!",
+    NewN_Function(func, "Lisp:add!", scope_chain_));
     help =
 R"...(### add! ###
 
@@ -2361,7 +2416,8 @@ R"...(### add! ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Subtraction(self, caller, args);
     };
-    scope_chain_.InsertSymbol("-", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("-",
+    NewN_Function(func, "Lisp:-", scope_chain_));
     help =
 R"...(### - ###
 
@@ -2385,7 +2441,8 @@ R"...(### - ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->ExclamToSet(2, "-", self, caller, args);
     };
-    scope_chain_.InsertSymbol("sub!", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("sub!",
+    NewN_Function(func, "Lisp:sub!", scope_chain_));
     help =
 R"...(### sub! ###
 
@@ -2416,7 +2473,8 @@ R"...(### sub! ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Multiplication(self, caller, args);
     };
-    scope_chain_.InsertSymbol("*", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("*",
+    NewN_Function(func, "Lisp:*", scope_chain_));
     help =
 R"...(### * ###
 
@@ -2440,7 +2498,8 @@ R"...(### * ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->ExclamToSet(2, "*", self, caller, args);
     };
-    scope_chain_.InsertSymbol("mul!", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("mul!",
+    NewN_Function(func, "Lisp:mul!", scope_chain_));
     help =
 R"...(### mul! ###
 
@@ -2471,7 +2530,8 @@ R"...(### mul! ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Division(self, caller, args);
     };
-    scope_chain_.InsertSymbol("/", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("/",
+    NewN_Function(func, "Lisp:/", scope_chain_));
     help =
 R"...(### / ###
 
@@ -2495,7 +2555,8 @@ R"...(### / ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->ExclamToSet(2, "/", self, caller, args);
     };
-    scope_chain_.InsertSymbol("div!", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("div!",
+    NewN_Function(func, "Lisp:div!", scope_chain_));
     help =
 R"...(### div! ###
 
@@ -2526,7 +2587,8 @@ R"...(### div! ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Inc(self, caller, args);
     };
-    scope_chain_.InsertSymbol("++", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("++",
+    NewN_Function(func, "Lisp:++", scope_chain_));
     help =
 R"...(### ++ ###
 
@@ -2550,7 +2612,8 @@ R"...(### ++ ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->ExclamToSet(1, "++", self, caller, args);
     };
-    scope_chain_.InsertSymbol("inc!", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("inc!",
+    NewN_Function(func, "Lisp:inc!", scope_chain_));
     help =
 R"...(### inc! ###
 
@@ -2581,7 +2644,8 @@ R"...(### inc! ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Dec(self, caller, args);
     };
-    scope_chain_.InsertSymbol("--", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("--",
+    NewN_Function(func, "Lisp:--", scope_chain_));
     help =
 R"...(### -- ###
 
@@ -2605,7 +2669,8 @@ R"...(### -- ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->ExclamToSet(1, "--", self, caller, args);
     };
-    scope_chain_.InsertSymbol("dec!", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("dec!",
+    NewN_Function(func, "Lisp:dec!", scope_chain_));
     help =
 R"...(### dec! ###
 
@@ -2637,7 +2702,8 @@ R"...(### dec! ###
       return this->StringSplit(self, caller, args);
     };
     scope_chain_.InsertSymbol("string-split",
-    NewN_Function(func, scope_chain_));
+   
+    NewN_Function(func, "Lisp:string-split", scope_chain_));
     help =
 R"...(### string-split ###
 
@@ -2661,7 +2727,8 @@ R"...(### string-split ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Front(self, caller, args);
     };
-    scope_chain_.InsertSymbol("front", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("front",
+    NewN_Function(func, "Lisp:front", scope_chain_));
     help =
 R"...(### front ###
 
@@ -2685,7 +2752,8 @@ R"...(### front ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Back(self, caller, args);
     };
-    scope_chain_.InsertSymbol("back", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("back",
+    NewN_Function(func, "Lisp:back", scope_chain_));
     help =
 R"...(### back ###
 
@@ -2710,7 +2778,8 @@ R"...(### back ###
       return this->PushFront(self, caller, args);
     };
     scope_chain_.InsertSymbol("push-front",
-    NewN_Function(func, scope_chain_));
+   
+    NewN_Function(func, "Lisp:push-front", scope_chain_));
     help =
 R"...(### push-front ###
 
@@ -2735,7 +2804,8 @@ R"...(### push-front ###
       return this->ExclamToSet(2, "push-front", self, caller, args);
     };
     scope_chain_.InsertSymbol("push-front!",
-    NewN_Function(func, scope_chain_));
+   
+    NewN_Function(func, "Lisp:push-front!", scope_chain_));
     help =
 R"...(### push-front! ###
 
@@ -2767,7 +2837,8 @@ R"...(### push-front! ###
       return this->PopFront(self, caller, args);
     };
     scope_chain_.InsertSymbol("pop-front",
-    NewN_Function(func, scope_chain_));
+   
+    NewN_Function(func, "Lisp:pop-front", scope_chain_));
     help =
 R"...(### pop-front ###
 
@@ -2792,7 +2863,8 @@ R"...(### pop-front ###
       return this->ExclamToSet(1, "pop-front", self, caller, args);
     };
     scope_chain_.InsertSymbol("pop-front!",
-    NewN_Function(func, scope_chain_));
+   
+    NewN_Function(func, "Lisp:pop-front!", scope_chain_));
     help =
 R"...(### pop-front! ###
 
@@ -2823,7 +2895,8 @@ R"...(### pop-front! ###
       return this->PushBack(self, caller, args);
     };
     scope_chain_.InsertSymbol("push-back",
-    NewN_Function(func, scope_chain_));
+   
+    NewN_Function(func, "Lisp:push-back", scope_chain_));
     help =
 R"...(### push-back ###
 
@@ -2848,7 +2921,8 @@ R"...(### push-back ###
       return this->ExclamToSet(2, "push-back", self, caller, args);
     };
     scope_chain_.InsertSymbol("push-back!",
-    NewN_Function(func, scope_chain_));
+   
+    NewN_Function(func, "Lisp:push-back!", scope_chain_));
     help =
 R"...(### push-back! ###
 
@@ -2880,7 +2954,8 @@ R"...(### push-back! ###
       return this->PopBack(self, caller, args);
     };
     scope_chain_.InsertSymbol("pop-back",
-    NewN_Function(func, scope_chain_));
+   
+    NewN_Function(func, "Lisp:pop-back", scope_chain_));
     help =
 R"...(### pop-back ###
 
@@ -2905,7 +2980,8 @@ R"...(### pop-back ###
       return this->ExclamToSet(1, "pop-back", self, caller, args);
     };
     scope_chain_.InsertSymbol("pop-back!",
-    NewN_Function(func, scope_chain_));
+   
+    NewN_Function(func, "Lisp:pop-back!", scope_chain_));
     help =
 R"...(### pop-back! ###
 
@@ -2967,7 +3043,8 @@ R"...(### E ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Sin(self, caller, args);
     };
-    scope_chain_.InsertSymbol("sin", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("sin",
+    NewN_Function(func, "Lisp:sin", scope_chain_));
     help =
 R"...(### sin ###
 
@@ -2992,7 +3069,8 @@ R"...(### sin ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Cos(self, caller, args);
     };
-    scope_chain_.InsertSymbol("cos", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("cos",
+    NewN_Function(func, "Lisp:cos", scope_chain_));
     help =
 R"...(### cos ###
 
@@ -3017,7 +3095,8 @@ R"...(### cos ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Tan(self, caller, args);
     };
-    scope_chain_.InsertSymbol("tan", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("tan",
+    NewN_Function(func, "Lisp:tan", scope_chain_));
     help =
 R"...(### tan ###
 
@@ -3042,7 +3121,8 @@ R"...(### tan ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->ASin(self, caller, args);
     };
-    scope_chain_.InsertSymbol("asin", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("asin",
+    NewN_Function(func, "Lisp:asin", scope_chain_));
     help =
 R"...(### asin ###
 
@@ -3067,7 +3147,8 @@ R"...(### asin ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->ACos(self, caller, args);
     };
-    scope_chain_.InsertSymbol("acos", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("acos",
+    NewN_Function(func, "Lisp:acos", scope_chain_));
     help =
 R"...(### acos ###
 
@@ -3092,7 +3173,8 @@ R"...(### acos ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->ATan(self, caller, args);
     };
-    scope_chain_.InsertSymbol("atan", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("atan",
+    NewN_Function(func, "Lisp:atan", scope_chain_));
     help =
 R"...(### atan ###
 
@@ -3117,7 +3199,8 @@ R"...(### atan ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Sqrt(self, caller, args);
     };
-    scope_chain_.InsertSymbol("sqrt", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("sqrt",
+    NewN_Function(func, "Lisp:sqrt", scope_chain_));
     help =
 R"...(### sqrt ###
 
@@ -3141,7 +3224,8 @@ R"...(### sqrt ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Abs(self, caller, args);
     };
-    scope_chain_.InsertSymbol("abs", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("abs",
+    NewN_Function(func, "Lisp:abs", scope_chain_));
     help =
 R"...(### abs ###
 
@@ -3165,7 +3249,8 @@ R"...(### abs ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Ceil(self, caller, args);
     };
-    scope_chain_.InsertSymbol("ceil", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("ceil",
+    NewN_Function(func, "Lisp:ceil", scope_chain_));
     help =
 R"...(### ceil ###
 
@@ -3189,7 +3274,8 @@ R"...(### ceil ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Floor(self, caller, args);
     };
-    scope_chain_.InsertSymbol("floor", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("floor",
+    NewN_Function(func, "Lisp:floor", scope_chain_));
     help =
 R"...(### floor ###
 
@@ -3213,7 +3299,8 @@ R"...(### floor ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Round(self, caller, args);
     };
-    scope_chain_.InsertSymbol("round", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("round",
+    NewN_Function(func, "Lisp:round", scope_chain_));
     help =
 R"...(### round ###
 
@@ -3242,7 +3329,8 @@ R"...(### round ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Trunc(self, caller, args);
     };
-    scope_chain_.InsertSymbol("trunc", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("trunc",
+    NewN_Function(func, "Lisp:trunc", scope_chain_));
     help =
 R"...(### trunc ###
 
@@ -3271,7 +3359,8 @@ R"...(### trunc ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Exp(self, caller, args);
     };
-    scope_chain_.InsertSymbol("exp", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("exp",
+    NewN_Function(func, "Lisp:exp", scope_chain_));
     help =
 R"...(### exp ###
 
@@ -3295,7 +3384,8 @@ R"...(### exp ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Expt(self, caller, args);
     };
-    scope_chain_.InsertSymbol("expt", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("expt",
+    NewN_Function(func, "Lisp:expt", scope_chain_));
     help =
 R"...(### expt ###
 
@@ -3320,7 +3410,8 @@ R"...(### expt ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Log(self, caller, args);
     };
-    scope_chain_.InsertSymbol("log", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("log",
+    NewN_Function(func, "Lisp:log", scope_chain_));
     help =
 R"...(### log ###
 
@@ -3345,7 +3436,8 @@ R"...(### log ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Log2(self, caller, args);
     };
-    scope_chain_.InsertSymbol("log2", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("log2",
+    NewN_Function(func, "Lisp:log2", scope_chain_));
     help =
 R"...(### log2 ###
 
@@ -3369,7 +3461,8 @@ R"...(### log2 ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Log10(self, caller, args);
     };
-    scope_chain_.InsertSymbol("log10", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("log10",
+    NewN_Function(func, "Lisp:log10", scope_chain_));
     help =
 R"...(### log10 ###
 
@@ -3396,7 +3489,8 @@ R"...(### log10 ###
     (LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Random(*engine_ptr, self, caller, args);
     };
-    scope_chain_.InsertSymbol("random", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("random",
+    NewN_Function(func, "Lisp:random", scope_chain_));
     help =
 R"...(### random ###
 
@@ -3425,7 +3519,8 @@ R"...(### random ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Max(self, caller, args);
     };
-    scope_chain_.InsertSymbol("max", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("max",
+    NewN_Function(func, "Lisp:max", scope_chain_));
     help =
 R"...(### max ###
 
@@ -3449,7 +3544,8 @@ R"...(### max ###
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Min(self, caller, args);
     };
-    scope_chain_.InsertSymbol("min", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("min",
+    NewN_Function(func, "Lisp:min", scope_chain_));
     help =
 R"...(### min ###
 
@@ -4029,7 +4125,8 @@ R"...(### min ###
       return self;
     };
 
-    return NewN_Function(c_function, caller->scope_chain());
+    return NewN_Function(c_function,
+    "Lisp:output-stream:" + args.car()->ToString(), caller->scope_chain());
   }
 
   // %%% input-stream
@@ -4090,7 +4187,8 @@ R"...(### min ###
       + symbol + "'.");
     };
 
-    return NewN_Function(c_function, caller->scope_chain());
+    return NewN_Function(c_function,
+    "Lisp:input-stream:" + args.car()->ToString(), caller->scope_chain());
   }
 
   // %%% append

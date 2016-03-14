@@ -2784,210 +2784,6 @@ namespace Sayuri {
 //          throw Lisp::GenInsufficientArgumentsError
 //          (func_name, required_args, false, list.Length() - 1);
 //        }
-//
-//        return this->SquareToNumber(*(caller.Evaluate(*list_itr)));
-//      };
-//      AddNativeFunction(func, "square->number");
-//    }
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//
-//        return this->FyleToNumber(*(caller.Evaluate(*list_itr)));
-//      };
-//      AddNativeFunction(func, "fyle->number");
-//    }
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//
-//        return this->RankToNumber(*(caller.Evaluate(*list_itr)));
-//      };
-//      AddNativeFunction(func, "rank->number");
-//    }
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//
-//        return this->SideToNumber(*(caller.Evaluate(*list_itr)));
-//      };
-//      AddNativeFunction(func, "side->number");
-//    }
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//
-//        return this->PieceTypeToNumber(*(caller.Evaluate(*list_itr)));
-//      };
-//      AddNativeFunction(func, "piece->number");
-//    }
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//
-//        return this->CastlingToNumber(*(caller.Evaluate(*list_itr)));
-//      };
-//      AddNativeFunction(func, "castling->number");
-//    }
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//
-//        return this->NumberToSquare(*(caller.Evaluate(*list_itr)));
-//      };
-//      AddNativeFunction(func, "number->square");
-//    }
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//
-//        return this->NumberToFyle(*(caller.Evaluate(*list_itr)));
-//      };
-//      AddNativeFunction(func, "number->fyle");
-//    }
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//
-//        return this->NumberToRank(*(caller.Evaluate(*list_itr)));
-//      };
-//      AddNativeFunction(func, "number->rank");
-//    }
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//
-//        return this->NumberToSide(*(caller.Evaluate(*list_itr)));
-//      };
-//      AddNativeFunction(func, "number->side");
-//    }
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//
-//        return this->NumberToPiece(*(caller.Evaluate(*list_itr)));
-//      };
-//      AddNativeFunction(func, "number->piece");
-//    }
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//
-//        return this->NumberToCastling(*(caller.Evaluate(*list_itr)));
-//      };
-//      AddNativeFunction(func, "number->castling");
-//    }
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
 //        LispObjectPtr result = caller.Evaluate(*list_itr);
 //        if (!(result->IsString())) {
 //          throw GenWrongTypeError
@@ -3054,7 +2850,7 @@ namespace Sayuri {
       return this->SquareToNumber(self, caller, args);
     };
     scope_chain_.InsertSymbol("square->number",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Sayulisp:square->number", scope_chain_));
     help =
 R"...(### square->number ###
 
@@ -3082,7 +2878,7 @@ R"...(### square->number ###
       return this->FyleToNumber(self, caller, args);
     };
     scope_chain_.InsertSymbol("fyle->number",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Sayulisp:fyle->number", scope_chain_));
     help =
 R"...(### fyle->number ###
 
@@ -3110,7 +2906,7 @@ R"...(### fyle->number ###
       return this->RankToNumber(self, caller, args);
     };
     scope_chain_.InsertSymbol("rank->number",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Sayulisp:rank->number", scope_chain_));
     help =
 R"...(### rank->number ###
 
@@ -3138,7 +2934,7 @@ R"...(### rank->number ###
       return this->SideToNumber(self, caller, args);
     };
     scope_chain_.InsertSymbol("side->number",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Sayulisp:side->number", scope_chain_));
     help =
 R"...(### side->number ### {#side-to-number}
 
@@ -3166,7 +2962,8 @@ R"...(### side->number ### {#side-to-number}
       return this->PieceToNumber(self, caller, args);
     };
     scope_chain_.InsertSymbol("piece->number",
-    NewN_Function(func, scope_chain_));
+   
+    NewN_Function(func, "Sayulisp:piece->number", scope_chain_));
     help =
 R"...(### piece->number ###
 
@@ -3195,7 +2992,7 @@ R"...(### piece->number ###
       return this->CastlingToNumber(self, caller, args);
     };
     scope_chain_.InsertSymbol("castling->number",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Sayulisp:castling->number", scope_chain_));
     help =
 R"...(### castling->number ###
 
@@ -3225,7 +3022,7 @@ R"...(### castling->number ###
       return this->NumberToSquare(self, caller, args);
     };
     scope_chain_.InsertSymbol("number->square",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Sayulisp:number->square", scope_chain_));
     help =
 R"...(### number->square ### {#number-to-square}
 
@@ -3252,7 +3049,7 @@ R"...(### number->square ### {#number-to-square}
       return this->NumberToFyle(self, caller, args);
     };
     scope_chain_.InsertSymbol("number->fyle",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Sayulisp:number->fyle", scope_chain_));
     help =
 R"...(### number->fyle ### {#number-to-fyle}
 
@@ -3279,7 +3076,7 @@ R"...(### number->fyle ### {#number-to-fyle}
       return this->NumberToRank(self, caller, args);
     };
     scope_chain_.InsertSymbol("number->rank",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Sayulisp:number->rank", scope_chain_));
     help =
 R"...(### number->rank ### {#number-to-rank}
 
@@ -3306,7 +3103,7 @@ R"...(### number->rank ### {#number-to-rank}
       return this->NumberToSide(self, caller, args);
     };
     scope_chain_.InsertSymbol("number->side",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Sayulisp:number->side", scope_chain_));
     help =
 R"...(### number->side ### {#number-to-side}
 
@@ -3333,7 +3130,7 @@ R"...(### number->side ### {#number-to-side}
       return this->NumberToPiece(self, caller, args);
     };
     scope_chain_.InsertSymbol("number->piece",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Sayulisp:number->piece", scope_chain_));
     help =
 R"...(### number->piece ### {#number-to-piece}
 
@@ -3360,7 +3157,7 @@ R"...(### number->piece ### {#number-to-piece}
       return this->NumberToCastling(self, caller, args);
     };
     scope_chain_.InsertSymbol("number->castling",
-    NewN_Function(func, scope_chain_));
+    NewN_Function(func, "Sayulisp:number->castling", scope_chain_));
     help =
 R"...(### number->castling ### {#number-to-castling}
 
@@ -3408,7 +3205,8 @@ R"...(### number->castling ### {#number-to-castling}
 
       return Lisp::NewNumber(status);
     };
-    scope_chain_.InsertSymbol("exit", NewN_Function(func, scope_chain_));
+    scope_chain_.InsertSymbol("exit",
+    NewN_Function(func, "Sayulisp:exit", scope_chain_));
 
     try {
       std::string input;

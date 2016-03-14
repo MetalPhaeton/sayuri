@@ -1722,10 +1722,12 @@ namespace Sayuri {
        * @param argv コマンド引数。
        */
       Sayulisp(const std::vector<std::string>& argv) : Lisp(argv) {
+        func_id_ = "Sayulisp";
         SetSayulispFunction();
       }
       /** コンストラクタ。 */
       Sayulisp() {
+        func_id_ = "Sayulisp";
         SetSayulispFunction();
       }
       /**

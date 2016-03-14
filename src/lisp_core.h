@@ -325,6 +325,11 @@ namespace Sayuri {
        */
       virtual LC_Function c_function() const {return LC_Function();}
       /**
+       * アクセサ - ネイティブ関数用識別文字列。
+       * @return ネイティブ関数用識別文字列。
+       */
+      virtual std::string func_id() const {return std::string("");}
+      /**
        * アクセサ - スコープチェーン。
        * @return スコープチェーン。
        */
@@ -375,6 +380,11 @@ namespace Sayuri {
        * @param c_function ネイティブ関数の実体。
        */
       virtual void c_function(const LC_Function& c_function) {}
+      /**
+       * アクセサ - ネイティブ関数用識別文字列。
+       * @return ネイティブ関数用識別文字列。
+       */
+      virtual void func_id(const std::string& id) {}
       /**
        * ミューテータ - スコープチェーン。
        * @param scope_chain スコープチェーン。
@@ -1285,10 +1295,6 @@ namespace Sayuri {
           for (unsigned int i = 0; i < expression_.size(); ++i) {
             if (expression_[i] != target_expression[i]) return false;
           }
-          if (scope_chain_.size() != target_chain.size()) return false;
-          for (unsigned int i = 0; i < scope_chain_.size(); ++i) {
-            if (scope_chain_[i] != target_chain[i]) return false;
-          }
           return true;
         }
         return false;
@@ -1389,8 +1395,9 @@ namespace Sayuri {
        * @param scope_chain スコープチェーン。
        */
       LN_Function(const LC_Function& c_function,
-      const LScopeChain& scope_chain) :
-      c_function_(c_function), scope_chain_(scope_chain) {}
+      const std::string& func_id, const LScopeChain& scope_chain) :
+      c_function_(c_function),
+      func_id_(func_id), scope_chain_(scope_chain) {}
       /** コンストラクタ。 */
       LN_Function() {}
       /**
@@ -1399,6 +1406,7 @@ namespace Sayuri {
        */
       LN_Function(const LN_Function& obj) :
       c_function_(obj.c_function_),
+      func_id_(obj.func_id_),
       scope_chain_(obj.scope_chain_) {}
       /**
        * ムーブコンストラクタ。
@@ -1406,6 +1414,7 @@ namespace Sayuri {
        */
       LN_Function(LN_Function&& obj) :
       c_function_(std::move(obj.c_function_)),
+      func_id_(std::move(obj.func_id_)),
       scope_chain_(std::move(obj.scope_chain_)) {}
       /**
        * コピー代入演算子。
@@ -1413,6 +1422,7 @@ namespace Sayuri {
        */
       virtual LN_Function& operator=(const LN_Function& obj) {
         c_function_ = obj.c_function_;
+        func_id_ = obj.func_id_;
         scope_chain_ = obj.scope_chain_;
         return *this;
       }
@@ -1422,6 +1432,7 @@ namespace Sayuri {
        */
       virtual LN_Function& operator=(LN_Function&& obj) {
         c_function_ = std::move(obj.c_function_);
+        func_id_ = std::move(obj.func_id_);
         scope_chain_ = std::move(obj.scope_chain_);
         return *this;
       }
@@ -1444,19 +1455,11 @@ namespace Sayuri {
        * @return 同じならtrue。
        */
       virtual bool operator==(const LObject& obj) const override {
-        /*
         if (obj.IsN_Function()) {
-          LC_Function* target_ptr = obj.c_function().target<LC_Function>();
-          if (c_function_.target<LC_Function>() != target_ptr) return false;
-
-          LScopeChain target_chain = obj.scope_chain();
-          if (scope_chain_.size() != target_chain.size()) return false;
-          for (unsigned int i = 0; i < scope_chain_.size(); ++i) {
-            if (scope_chain_[i] != target_chain[i]) return false;
+          if (func_id_ == obj.func_id()) {
+            return true;
           }
-          return true;
         }
-        */
         return false;
       }
       /**
@@ -1486,6 +1489,13 @@ namespace Sayuri {
         return c_function_;
       }
       /**
+       * アクセサ - ネイティブ関数用識別文字列。
+       * @return ネイティブ関数用識別文字列。
+       */
+      virtual std::string func_id() const override {
+        return func_id_;
+      }
+      /**
        * アクセサ - スコープチェーン。
        * @return スコープチェーン。
        */
@@ -1501,6 +1511,13 @@ namespace Sayuri {
         c_function_ = c_function;
       }
       /**
+       * ミューテータ - ネイティブ関数用識別文字列。
+       * @param func_id ネイティブ関数用識別文字列。
+       */
+      virtual void func_id(const std::string& func_id) override {
+        func_id_ = func_id;
+      }
+      /**
        * ミューテータ - スコープチェーン。
        * @param scope_chain スコープチェーン。
        */
@@ -1514,6 +1531,8 @@ namespace Sayuri {
       // ========== //
       /** C言語関数。 */
       LC_Function c_function_;
+      /** 関数用識別文字列。 */
+      std::string func_id_;
       /** スコープチェーン。 */
       LScopeChain scope_chain_;
   };
@@ -1628,12 +1647,15 @@ namespace Sayuri {
       }
       /**
        * ネイティブ関数オブジェクトを作る。
+       * @param c_function ネイティブ関数。
+       * @param func_id 識別文字列。
        * @param scope_chain スコープチェーン。
        * @return オブジェクトのポインタ。
        */
       static LPointer NewN_Function(const LC_Function& c_function,
+      const std::string& func_id,
       const LScopeChain& scope_chain) {
-        return LPointer(new LN_Function(c_function, scope_chain));
+        return LPointer(new LN_Function(c_function, func_id, scope_chain));
       }
 
       /**
@@ -1884,11 +1906,12 @@ namespace Sayuri {
        * 関数を登録する。
        * @param symbol 関数のシンボル。
        * @param c_function 登録すす関数。
+       * @param func_id 関数の識別文字列。
        */
       void AddFunction(const std::string& symbol,
-      const LC_Function& c_function) {
+      const LC_Function& c_function, const std::string& func_id) {
         scope_chain_.InsertSymbol(symbol,
-        NewN_Function(c_function, scope_chain_));
+        NewN_Function(c_function, func_id, scope_chain_));
       }
 
       /**
