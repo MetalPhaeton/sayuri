@@ -2813,6 +2813,59 @@ namespace Sayuri {
 
     func =
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->SayuriLicense(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("sayuri-license",
+    NewN_Function(func, "Sayulisp:sayuri-license", scope_chain_));
+    help =
+R"...(### sayuri-license ###
+
+<h6> Usage </h6>
+
+* `(sayuri-license)`
+
+<h6> Description </h6>
+
+* Returns String of license terms of Sayuri.
+
+<h6> Example </h6>
+
+    (display (sayuri-license))
+    
+    ;; Output
+    ;; > Copyright (c) 2013-2016 Hironori Ishibashi
+    ;; > 
+    ;; > Permission is hereby granted, free of charge, to any person obtaining
+    :: > a copy
+    ;; > of this software and associated documentation files (the "Software"),
+    ;; > to
+    ;; > deal in the Software without restriction, including without limitation
+    ;; > the
+    ;; > rights to use, copy, modify, merge, publish, distribute, sublicense,
+    ;; > and/or
+    ;; > sell copies of the Software, and to permit persons to whom the
+    ;; > Software is
+    ;; > furnished to do so, subject to the following conditions:
+    ;; > 
+    ;; > The above copyright notice and this permission notice shall be
+    ;; > included in
+    ;; > all copies or substantial portions of the Software.
+    ;; > 
+    ;; > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    ;; > EXPRESS OR
+    ;; > IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    ;; > MERCHANTABILITY,
+    ;; > FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+    ;; > SHALL THE
+    ;; > AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    ;; > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+    ;; > ARISING
+    ;; > FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    ;; > DEALINGS IN THE SOFTWARE.)...";
+    help_dict_.emplace("sayuri-license", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->SquareToNumber(self, caller, args);
     };
     scope_chain_.InsertSymbol("square->number",
@@ -4840,73 +4893,6 @@ R"...(### gen-engine ###
 //
 //    AddHelpDict("BLACK_LONG_CASTLING", temp);
 //    // %%% exit
-//    temp =
-//R"...(### exit ###
-//
-//<h6> Usage </h6>
-//
-//* `(exit [<Status : Number>])`
-//
-//<h6> Description </h6>
-//
-//* Exit from Sayulisp.
-//* `<Status>` is Exit Status. Default is '0'.
-//
-//<h6> Example </h6>
-//
-//    ;; Exit from Sayulisp.
-//    (exit)
-//    
-//    ;; Exit with EXIT_FAILURE.
-//    (exit 1))...";
-//    AddHelpDict("exit", temp);
-//
-//    temp =
-//R"...(### sayuri-license ###
-//
-//<h6> Usage </h6>
-//
-//* `(sayuri-license)`
-//
-//<h6> Description </h6>
-//
-//* Returns String of license terms of Sayuri.
-//
-//<h6> Example </h6>
-//
-//    (display (sayuri-license))
-//    
-//    ;; Output
-//    ;; > Copyright (c) 2013-2016 Hironori Ishibashi
-//    ;; > 
-//    ;; > Permission is hereby granted, free of charge, to any person obtaining
-//    :: > a copy
-//    ;; > of this software and associated documentation files (the "Software"),
-//    ;; > to
-//    ;; > deal in the Software without restriction, including without limitation
-//    ;; > the
-//    ;; > rights to use, copy, modify, merge, publish, distribute, sublicense,
-//    ;; > and/or
-//    ;; > sell copies of the Software, and to permit persons to whom the
-//    ;; > Software is
-//    ;; > furnished to do so, subject to the following conditions:
-//    ;; > 
-//    ;; > The above copyright notice and this permission notice shall be
-//    ;; > included in
-//    ;; > all copies or substantial portions of the Software.
-//    ;; > 
-//    ;; > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-//    ;; > EXPRESS OR
-//    ;; > IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-//    ;; > MERCHANTABILITY,
-//    ;; > FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
-//    ;; > SHALL THE
-//    ;; > AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//    ;; > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-//    ;; > ARISING
-//    ;; > FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//    ;; > DEALINGS IN THE SOFTWARE.)...";
-//    AddHelpDict("sayuri-license", temp);
 //
 //    temp =
 //R"...(### Getting squares ###
