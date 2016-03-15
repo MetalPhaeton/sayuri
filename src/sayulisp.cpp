@@ -52,90 +52,81 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
-//  // =========== //
-//  // EngineSuite //
-//  // =========== //
-//  // コンストラクタ。
-//  EngineSuite::EngineSuite() :
-//  search_params_ptr_(new SearchParams()),
-//  eval_params_ptr_(new EvalParams()),
-//  table_ptr_(new TranspositionTable(UCI_DEFAULT_TABLE_SIZE)),
-//  engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
-//  *table_ptr_)),
-//  board_ptr_(&(engine_ptr_->board())),
-//  shell_ptr_(new UCIShell(*engine_ptr_)) {
-//    // 出力リスナー。
-//    shell_ptr_->AddOutputListener
-//    ([this](const std::string& message) {this->ListenUCIOutput(message);});
-//
-//    SetWeightFunctions();
-//  }
-//
-//  // コピーコンストラクタ。
-//  EngineSuite::EngineSuite(const EngineSuite& suite) :
-//  search_params_ptr_(new SearchParams(*(suite.search_params_ptr_))),
-//  eval_params_ptr_(new EvalParams(*(suite.eval_params_ptr_))),
-//  table_ptr_(new TranspositionTable(suite.table_ptr_->GetSizeBytes())),
-//  engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
-//  *table_ptr_)),
-//  board_ptr_(&(engine_ptr_->board())),
-//  shell_ptr_(new UCIShell(*engine_ptr_)) {
-//    PositionRecord record(*(suite.engine_ptr_));
-//    engine_ptr_->LoadRecord(record);
-//
-//    // 出力リスナー。
-//    shell_ptr_->AddOutputListener
-//    ([this](const std::string& message) {this->ListenUCIOutput(message);});
-//
-//    SetWeightFunctions();
-//  }
-//
-//  // ムーブコンストラクタ。
-//  EngineSuite::EngineSuite(EngineSuite&& suite) :
-//  search_params_ptr_(std::move(suite.search_params_ptr_)),
-//  eval_params_ptr_(std::move(suite.eval_params_ptr_)),
-//  table_ptr_(std::move(suite.table_ptr_)),
-//  engine_ptr_(std::move(suite.engine_ptr_)),
-//  board_ptr_(&(engine_ptr_->board())),
-//  shell_ptr_(std::move(suite.shell_ptr_)) {
-//    SetWeightFunctions();
-//  }
-//
-//  // コピー代入演算子。
-//  EngineSuite& EngineSuite::operator=(const EngineSuite& suite) {
-//    search_params_ptr_.reset(new SearchParams(*(suite.search_params_ptr_)));
-//    eval_params_ptr_.reset(new EvalParams(*(suite.eval_params_ptr_)));
-//    table_ptr_.reset(new TranspositionTable(suite.table_ptr_->GetSizeBytes()));
-//    engine_ptr_.reset(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
-//    *table_ptr_));
-//    board_ptr_ = &(engine_ptr_->board());
-//    shell_ptr_.reset(new UCIShell(*engine_ptr_));
-//
-//    PositionRecord record(*(suite.engine_ptr_));
-//    engine_ptr_->LoadRecord(record);
-//
-//    // 出力リスナー。
-//    shell_ptr_->AddOutputListener
-//    ([this](const std::string& message) {this->ListenUCIOutput(message);});
-//
-//    SetWeightFunctions();
-//
-//    return *this;
-//  }
-//
-//  // ムーブ代入演算子。
-//  EngineSuite& EngineSuite::operator=(EngineSuite&& suite) {
-//    search_params_ptr_ = std::move(suite.search_params_ptr_);
-//    eval_params_ptr_ = std::move(suite.eval_params_ptr_);
-//    table_ptr_ = std::move(suite.table_ptr_);
-//    engine_ptr_ = std::move(suite.engine_ptr_);
-//    board_ptr_ = &(engine_ptr_->board());
-//    shell_ptr_ = std::move(suite.shell_ptr_);
-//
-//    SetWeightFunctions();
-//
-//    return *this;
-//  }
+  // =========== //
+  // EngineSuite //
+  // =========== //
+  // コンストラクタ。
+  EngineSuite::EngineSuite() :
+  search_params_ptr_(new SearchParams()),
+  eval_params_ptr_(new EvalParams()),
+  table_ptr_(new TranspositionTable(UCI_DEFAULT_TABLE_SIZE)),
+  engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
+  *table_ptr_)),
+  board_ptr_(&(engine_ptr_->board())),
+  shell_ptr_(new UCIShell(*engine_ptr_)) {
+    // 出力リスナー。
+    shell_ptr_->AddOutputListener
+    ([this](const std::string& message) {this->ListenUCIOutput(message);});
+  }
+
+  // コピーコンストラクタ。
+  EngineSuite::EngineSuite(const EngineSuite& suite) :
+  search_params_ptr_(new SearchParams(*(suite.search_params_ptr_))),
+  eval_params_ptr_(new EvalParams(*(suite.eval_params_ptr_))),
+  table_ptr_(new TranspositionTable(suite.table_ptr_->GetSizeBytes())),
+  engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
+  *table_ptr_)),
+  board_ptr_(&(engine_ptr_->board())),
+  shell_ptr_(new UCIShell(*engine_ptr_)) {
+    PositionRecord record(*(suite.engine_ptr_));
+    engine_ptr_->LoadRecord(record);
+
+    // 出力リスナー。
+    shell_ptr_->AddOutputListener
+    ([this](const std::string& message) {this->ListenUCIOutput(message);});
+  }
+
+  // ムーブコンストラクタ。
+  EngineSuite::EngineSuite(EngineSuite&& suite) :
+  search_params_ptr_(std::move(suite.search_params_ptr_)),
+  eval_params_ptr_(std::move(suite.eval_params_ptr_)),
+  table_ptr_(std::move(suite.table_ptr_)),
+  engine_ptr_(std::move(suite.engine_ptr_)),
+  board_ptr_(&(engine_ptr_->board())),
+  shell_ptr_(std::move(suite.shell_ptr_)) {
+  }
+
+  // コピー代入演算子。
+  EngineSuite& EngineSuite::operator=(const EngineSuite& suite) {
+    search_params_ptr_.reset(new SearchParams(*(suite.search_params_ptr_)));
+    eval_params_ptr_.reset(new EvalParams(*(suite.eval_params_ptr_)));
+    table_ptr_.reset(new TranspositionTable(suite.table_ptr_->GetSizeBytes()));
+    engine_ptr_.reset(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
+    *table_ptr_));
+    board_ptr_ = &(engine_ptr_->board());
+    shell_ptr_.reset(new UCIShell(*engine_ptr_));
+
+    PositionRecord record(*(suite.engine_ptr_));
+    engine_ptr_->LoadRecord(record);
+
+    // 出力リスナー。
+    shell_ptr_->AddOutputListener
+    ([this](const std::string& message) {this->ListenUCIOutput(message);});
+
+    return *this;
+  }
+
+  // ムーブ代入演算子。
+  EngineSuite& EngineSuite::operator=(EngineSuite&& suite) {
+    search_params_ptr_ = std::move(suite.search_params_ptr_);
+    eval_params_ptr_ = std::move(suite.eval_params_ptr_);
+    table_ptr_ = std::move(suite.table_ptr_);
+    engine_ptr_ = std::move(suite.engine_ptr_);
+    board_ptr_ = &(engine_ptr_->board());
+    shell_ptr_ = std::move(suite.shell_ptr_);
+
+    return *this;
+  }
 //
 //  // ウェイト関数オブジェクトをセット。
 //  void EngineSuite::SetWeightFunctions() {
@@ -417,6 +408,11 @@ namespace Sayuri {
 //  // ========================== //
 //  // Lisp関数オブジェクト用関数 //
 //  // ========================== //
+  // 関数オブジェクト。
+  LPointer EngineSuite::operator()(LPointer self, LObject* caller,
+  const LObject& args) {
+    return Lisp::NewNil();
+  }
 //  // 関数オブジェクト。
 //  LispObjectPtr EngineSuite::operator()
 //  (LispObjectPtr self, const LispObject& caller, const LispObject& list) {
