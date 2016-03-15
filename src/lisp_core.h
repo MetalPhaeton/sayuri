@@ -1476,8 +1476,7 @@ namespace Sayuri {
        */
       virtual std::string ToString() const override {
         std::ostringstream oss;
-        //oss << "Native Function: " << c_function_.target<LC_Function>();
-        oss << "Native Function";
+        oss << "Native Function: " << func_id();
         return oss.str();
       }
 

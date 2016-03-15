@@ -52,40 +52,6 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
-//  // ========== //
-//  // static定数 //
-//  // ========== //
-//  const std::string EngineSuite::SQUARE_SYMBOL[NUM_SQUARES] {
-//    "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1",
-//    "A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2",
-//    "A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3",
-//    "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4",
-//    "A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5",
-//    "A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6",
-//    "A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7",
-//    "A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"
-//  };
-//  const std::string EngineSuite::FYLE_SYMBOL[NUM_FYLES] {
-//    "FYLE_A", "FYLE_B", "FYLE_C", "FYLE_D",
-//    "FYLE_E", "FYLE_F", "FYLE_G", "FYLE_H"
-//  };
-//  const std::string EngineSuite::RANK_SYMBOL[NUM_RANKS] {
-//    "RANK_1", "RANK_2", "RANK_3", "RANK_4",
-//    "RANK_5", "RANK_6", "RANK_7", "RANK_8"
-//  };
-//  const std::string EngineSuite::SIDE_SYMBOL[NUM_SIDES] {
-//    "NO_SIDE", "WHITE", "BLACK"
-//  };
-//  const std::string EngineSuite::PIECE_TYPE_SYMBOL[NUM_PIECE_TYPES] {
-//    "EMPTY", "PAWN", "KNIGHT", "BISHOP", "ROOK", "QUEEN", "KING"
-//  };
-//  const std::string EngineSuite::CASTLING_SYMBOL[5] {
-//    "NO_CASTLING",
-//    "WHITE_SHORT_CASTLING", "WHITE_LONG_CASTLING",
-//    "BLACK_SHORT_CASTLING", "BLACK_LONG_CASTLING"
-//  };
-//
-//
 //  // =========== //
 //  // EngineSuite //
 //  // =========== //
@@ -3180,6 +3146,63 @@ R"...(### number->castling ### {#number-to-castling}
     ;; > (NO_CASTLING WHITE_SHORT_CASTLING (WHITE_LONG_CASTLING
     ;; > (BLACK_SHORT_CASTLING BLACK_LONG_CASTLING "Hello") 5) 100))...";
     help_dict_.emplace("number->castling", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->GenEngine(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("gen-engine",
+    NewN_Function(func, "Sayulisp:gen-engine", scope_chain_));
+    help =
+R"...(### gen-engine ###
+
+<h6> Usage </h6>
+
+1. `(gen-engine)`
+2. `((gen-engine) <Message Symbol> [<Arguments>...])`
+
+<h6> Description </h6>
+
+* 1: Generates chess engine.
+* 2: The engine executes something according to `<Message Symbol>`.
+* 2: Some `<Message Symbol>` require `<Argument>...`.
+* `(help "engine <MessageSymbol>")`
+    + Returns description for each message symbol.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    (display (my-engine '@get-white-pawn-position))
+    ;; Output
+    ;; > (A2 B2 C2 D2 E2 F2 G2 H2)
+    
+    (display (help "engine @get-white-pawn-position"))
+    ;; Output
+    ;; > ### Getting squares ###
+    ;; > Returns List of Symbols of squares where specific pieces are on.
+    ;; > 
+    ;; > * `@get-white-pawn-position`
+    ;; > * `@get-white-knight-position`
+    ;; > * `@get-white-bishop-position`
+    ;; > * `@get-white-rook-position`
+    ;; > * `@get-white-queen-position`
+    ;; > * `@get-white-king-position`
+    ;; > * `@get-black-pawn-position`
+    ;; > * `@get-black-knight-position`
+    ;; > * `@get-black-bishop-position`
+    ;; > * `@get-black-rook-position`
+    ;; > * `@get-black-queen-position`
+    ;; > * `@get-black-king-position`
+    ;; > * `@get-empty-square-position`
+    ;; > 
+    ;; > <h6> Example </h6>
+    ;; > 
+    ;; >     (define my-engine (gen-engine))
+    ;; >     (display (my-engine '@get-white-pawn-position))
+    ;; >     
+    ;; >     ;; Output
+    ;; >     ;; > (A2 B2 C2 D2 E2 F2 G2 H2))...";
+    help_dict_.emplace("gen-engine", help);
   }
 
   // Sayulispを開始する。
@@ -3227,20 +3250,23 @@ R"...(### number->castling ### {#number-to-castling}
 
     return status;
   }
-//
-//  // エンジンを生成する。
-//  LispObjectPtr Sayulisp::GenEngine() {
-//    // スイートを作成。
-//    std::shared_ptr<EngineSuite> suite_ptr(new EngineSuite());
-//
-//    // ネイティブ関数オブジェクトを作成。
-//    auto func = [suite_ptr](LispObjectPtr self, const LispObject& caller,
-//    const LispObject& list) -> LispObjectPtr {
-//      return (*suite_ptr)(self, caller, list);
-//    };
-//
-//    return Lisp::NewNativeFunction(global().scope_chain(), func);
-//  }
+
+  // エンジンを生成する。
+  LPointer Sayulisp::GenEngine(LPointer self, LObject* caller,
+  const LObject& args) {
+    // スイートを作成。
+    std::shared_ptr<EngineSuite> suite_ptr(new EngineSuite());
+
+    // ネイティブ関数オブジェクトを作成。
+    auto func = [suite_ptr](LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return (*suite_ptr)(self, caller, args);
+    };
+
+    return NewN_Function(func, "Sayulisp:gen-engine:"
+    + std::to_string(reinterpret_cast<std::size_t>(suite_ptr.get())),
+    caller->scope_chain());
+  }
 
   // マスのシンボルを数値に変換する。
   LPointer Sayulisp::SquareToNumber(LPointer self, LObject* caller,

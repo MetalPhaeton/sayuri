@@ -4103,7 +4103,7 @@ R"...(### min ###
     }
 
     // 関数オブジェクトを作成。
-    LC_Function c_function = [ofs_ptr](LPointer self, LObject* caller,
+    auto c_function = [ofs_ptr](LPointer self, LObject* caller,
     const LObject& args) -> LPointer {
       // ストリームが閉じていれば終了。
       if (!(*ofs_ptr)) return NewNil();
@@ -4125,8 +4125,9 @@ R"...(### min ###
       return self;
     };
 
-    return NewN_Function(c_function,
-    "Lisp:output-stream:" + args.car()->ToString(), caller->scope_chain());
+    return NewN_Function(c_function, "Lisp:output-stream:"
+    + std::to_string(reinterpret_cast<std::size_t>(ofs_ptr.get())),
+    caller->scope_chain());
   }
 
   // %%% input-stream
@@ -4187,8 +4188,9 @@ R"...(### min ###
       + symbol + "'.");
     };
 
-    return NewN_Function(c_function,
-    "Lisp:input-stream:" + args.car()->ToString(), caller->scope_chain());
+    return NewN_Function(c_function, "Lisp:input-stream:"
+    + std::to_string(reinterpret_cast<std::size_t>(ifs_ptr.get())),
+    caller->scope_chain());
   }
 
   // %%% append

@@ -57,75 +57,52 @@ namespace Sayuri {
   class UCIShell;
 
   /** Sayulisp用エンジンセット。 */
-//  class EngineSuite {
-//    public:
-//      // 定数配列。
-//      /** 各マスのシンボルのテーブル。 */
-//      static const std::string SQUARE_SYMBOL[NUM_SQUARES];
-//
-//      /** 各ファイルのシンボルテーブル。 */
-//      static const std::string FYLE_SYMBOL[NUM_FYLES];
-//
-//      /** 各ランクのシンボルテーブル。 */
-//      static const std::string RANK_SYMBOL[NUM_RANKS];
-//
-//      /** 各サイドのシンボルテーブル。 */
-//      static const std::string SIDE_SYMBOL[NUM_SIDES];
-//
-//      /** 各駒のシンボルテーブル。 */
-//      static const std::string PIECE_TYPE_SYMBOL[NUM_PIECE_TYPES];
-//
-//      /**
-//       * 各キャスリングのシンボルテーブル。
-//       * - NO_CASTLING : 0
-//       * - WHITE_SHORT_CASTLING : 1
-//       * - WHITE_LONG_CASTLING : 2
-//       * - BLACK_SHORT_CASTLING : 3
-//       * - BLACK_LONG_CASTLING : 4
-//       */
-//      static const std::string CASTLING_SYMBOL[5];
-//
-//      // ==================== //
-//      // コンストラクタと代入 //
-//      // ==================== //
-//      /** コンストラクタ。 */
-//      EngineSuite();
-//      /**
-//       * コピーコンストラクタ。
-//       * @param suite コピー元。
-//       */
-//      EngineSuite(const EngineSuite& suite);
-//      /**
-//       * ムーブコンストラクタ。
-//       * @param suite ムーブ元。
-//       */
-//      EngineSuite(EngineSuite&& suite);
-//      /**
-//       * コピー代入演算子。
-//       * @param suite コピー元。
-//       */
-//      EngineSuite& operator=(const EngineSuite& suite);
-//      /**
-//       * ムーブ代入演算子。
-//       * @param suite ムーブ元。
-//       */
-//      EngineSuite& operator=(EngineSuite&& suite);
-//      /** デストラクタ。 */
-//      virtual ~EngineSuite() {}
-//
-//      // ============== //
-//      // パブリック関数 //
-//      // ============== //
-//      /**
-//       * 関数オブジェクト。
-//       * @param self 自分自身。
-//       * @param caller 呼び出し元の関数オブジェクト。
-//       * @param list 呼び出しに使用されたリスト。
-//       * @return 戻り値オブジェクト。
-//       */
-//      LispObjectPtr operator()
-//      (LispObjectPtr self, const LispObject& caller, const LispObject& list);
-//
+  class EngineSuite : public LN_Function {
+    public:
+      /**
+       * メッセージシンボル関数型。
+       * LC_Functionにシンボル名の引数を追加したもの。
+       */
+      using MessageFunction = std::function
+      <LPointer(const std::string&, LPointer, LObject*, const LObject&)>;
+
+      // ==================== //
+      // コンストラクタと代入 //
+      // ==================== //
+      /** コンストラクタ。 */
+      EngineSuite();
+      /**
+       * コピーコンストラクタ。
+       * @param suite コピー元。
+       */
+      EngineSuite(const EngineSuite& suite);
+      /**
+       * ムーブコンストラクタ。
+       * @param suite ムーブ元。
+       */
+      EngineSuite(EngineSuite&& suite);
+      /**
+       * コピー代入演算子。
+       * @param suite コピー元。
+       */
+      EngineSuite& operator=(const EngineSuite& suite);
+      /**
+       * ムーブ代入演算子。
+       * @param suite ムーブ元。
+       */
+      EngineSuite& operator=(EngineSuite&& suite);
+      /** デストラクタ。 */
+      virtual ~EngineSuite() {}
+
+      // ============== //
+      // パブリック関数 //
+      // ============== //
+      // ========== //
+      // Lisp用関数 //
+      // ========== //
+      /** 関数オブジェクト。 */
+      LPointer operator()(LPointer self, LObject* caller, const LObject& args);
+
 //      /**
 //       * 間違ったマスの指定のエラーを作成する。
 //       * @param func_name 関数名。
@@ -227,7 +204,7 @@ namespace Sayuri {
 //
 //        return ret_ptr;
 //      }
-//
+
 //      // ========================== //
 //      // Lisp関数オブジェクト用関数 //
 //      // ========================== //
@@ -1546,50 +1523,55 @@ namespace Sayuri {
 //
 //        return ret_ptr;
 //      }
-//
-//      // ======== //
-//      // アクセサ //
-//      // ======== //
-//      /**
-//       * アクセサ - 探索関数用パラメータ。
-//       * @return 探索関数用パラメータ。
-//       */
-//      const SearchParams& search_params() const {return *search_params_ptr_;}
-//      /**
-//       * アクセサ - 評価関数用パラメータ。
-//       * @return 評価関数用パラメータ。
-//       */
-//      const EvalParams& eval_params() const {return *eval_params_ptr_;}
-//      /**
-//       * アクセサ - トランスポジションテーブル。
-//       * @return トランスポジションテーブル。
-//       */
-//      const TranspositionTable& table() const {return *table_ptr_;}
-//      /**
-//       * アクセサ - チェスエンジン。
-//       * @return チェスエンジン。
-//       */
-//      const ChessEngine& engine() const {return *engine_ptr_;}
-//      /**
-//       * アクセサ - UCIShell。
-//       * @return UCIShell。
-//       */
-//      const UCIShell& shell() const {return *shell_ptr_;}
-//
-//    private:
-//      // ================ //
-//      // プライベート関数 //
-//      // ================ //
-//      /**
-//       * UCIのアウトプットリスナー。
-//       * @param message アウトプット。
-//       */
-//      void ListenUCIOutput(const std::string& message) {
-//        for (auto& callback : callback_vec_) {
-//          callback(message);
-//        }
-//      }
-//
+
+      // ======== //
+      // アクセサ //
+      // ======== //
+      /**
+       * アクセサ - 探索関数用パラメータ。
+       * @return 探索関数用パラメータ。
+       */
+      const SearchParams& search_params() const {return *search_params_ptr_;}
+      /**
+       * アクセサ - 評価関数用パラメータ。
+       * @return 評価関数用パラメータ。
+       */
+      const EvalParams& eval_params() const {return *eval_params_ptr_;}
+      /**
+       * アクセサ - トランスポジションテーブル。
+       * @return トランスポジションテーブル。
+       */
+      const TranspositionTable& table() const {return *table_ptr_;}
+      /**
+       * アクセサ - チェスエンジン。
+       * @return チェスエンジン。
+       */
+      const ChessEngine& engine() const {return *engine_ptr_;}
+      /**
+       * アクセサ - UCIShell。
+       * @return UCIShell。
+       */
+      const UCIShell& shell() const {return *shell_ptr_;}
+
+    private:
+      // ================ //
+      // プライベート関数 //
+      // ================ //
+      /**
+       * UCIのアウトプットリスナー。
+       * @param message アウトプット。
+       */
+      void ListenUCIOutput(const std::string& message) {
+        for (auto& callback : callback_vec_) {
+          callback(message);
+        }
+      }
+
+      /**
+       * メッセージシンボルによる関数を設定。
+       */
+      void SetMessageFunctions();
+
 //      /**
 //       * 最善手を得る。
 //       * @param depth 探索する深さ。
@@ -1623,24 +1605,29 @@ namespace Sayuri {
 //        }
 //        return obj.number_value();
 //      }
-//
-//      // ========== //
-//      // メンバ変数 //
-//      // ========== //
-//      /** 探索関数用パラメータのポインタ。 */
-//      std::unique_ptr<SearchParams> search_params_ptr_;
-//      /** 評価関数用パラメータのポインタ。 */
-//      std::unique_ptr<EvalParams> eval_params_ptr_;
-//      /** トランスポジションテーブルのポインタ。 */
-//      std::unique_ptr<TranspositionTable> table_ptr_;
-//      /** チェスエンジンのポインタ。 */
-//      std::unique_ptr<ChessEngine> engine_ptr_;
-//      /** エンジンのチェスボードのポインタ。 */
-//      const Board* board_ptr_;
-//      /** UCIShellのポインタ。 */
-//      std::unique_ptr<UCIShell> shell_ptr_;
-//      /** UCIのアウトプットリスナー。 */
-//      std::vector<std::function<void(const std::string&)>> callback_vec_;
+
+      // ========== //
+      // メンバ変数 //
+      // ========== //
+      /** 探索関数用パラメータのポインタ。 */
+      std::unique_ptr<SearchParams> search_params_ptr_;
+      /** 評価関数用パラメータのポインタ。 */
+      std::unique_ptr<EvalParams> eval_params_ptr_;
+      /** トランスポジションテーブルのポインタ。 */
+      std::unique_ptr<TranspositionTable> table_ptr_;
+      /** チェスエンジンのポインタ。 */
+      std::unique_ptr<ChessEngine> engine_ptr_;
+      /** エンジンのチェスボードのポインタ。 */
+      const Board* board_ptr_;
+      /** UCIShellのポインタ。 */
+      std::unique_ptr<UCIShell> shell_ptr_;
+
+      /** UCIのアウトプットリスナー。 */
+      std::vector<std::function<void(const std::string&)>> callback_vec_;
+
+      /** 各メッセージシンボル毎の関数オブジェクトのマップ。 */
+      std::map<std::string, MessageFunction> func_map_;
+
 //      /** ウェイト用定数。 その1。 */
 //      enum {
 //        /** ウェイト用定数 - オープニング時のポジション。 */
@@ -1709,7 +1696,7 @@ namespace Sayuri {
 //      weight_2_mutator_[WEIGHT_ABANDONED_CASTLING + 1];
 //      /** ウェイト関数オブジェクトをセットする。 */
 //      void SetWeightFunctions();
-//  };
+  };
 
   /** Sayulisp実行クラス。 */
   class Sayulisp : public Lisp {
@@ -1805,90 +1792,60 @@ namespace Sayuri {
       // ========================== //
       // Lisp関数オブジェクト用関数 //
       // ========================== //
-      /**
-       * エンジン関数オブジェクトを生成する。
-       */
+      /** エンジン関数オブジェクトを生成する。 */
       LPointer GenEngine(LPointer self, LObject* caller, const LObject& args);
 
-      /**
-       * ライセンスを表示する。
-       */
+      /** ライセンスを表示する。 */
       LPointer SayuriLicense(LPointer self, LObject* caller,
       const LObject& args) {
         return NewString(LICENSE);
       }
 
-      /**
-       * マスのシンボルを数値に変換する。
-       */
+      /** マスのシンボルを数値に変換する。 */
       LPointer SquareToNumber(LPointer self, LObject* caller,
       const LObject& args);
 
-      /**
-       * ファイルのシンボルを数値に変換する。
-       */
+      /** ファイルのシンボルを数値に変換する。 */
       LPointer FyleToNumber(LPointer self, LObject* caller,
       const LObject& args);
 
-      /**
-       * ランクのシンボルを数値に変換する。
-       */
+      /** ランクのシンボルを数値に変換する。 */
       LPointer RankToNumber(LPointer self, LObject* caller,
       const LObject& args);
 
-      /**
-       * サイドのシンボルを数値に変換する。
-       */
+      /** サイドのシンボルを数値に変換する。 */
       LPointer SideToNumber(LPointer self, LObject* caller,
       const LObject& args);
 
-      /**
-       * 駒の種類のシンボルを数値に変換する。
-       */
+      /** 駒の種類のシンボルを数値に変換する。 */
       LPointer PieceToNumber(LPointer self, LObject* caller,
       const LObject& args);
 
-      /**
-       * キャスリングのシンボルを数値に変換する。
-       */
+      /** キャスリングのシンボルを数値に変換する。 */
       LPointer CastlingToNumber(LPointer self, LObject* caller,
       const LObject& args);
 
-      /**
-       * 数値をマスのシンボルに変換する。
-       */
+      /** 数値をマスのシンボルに変換する。 */
       LPointer NumberToSquare(LPointer self, LObject* caller,
       const LObject& args);
 
-      /**
-       * 数値をファイルのシンボルに変換する。
-       */
+      /** 数値をファイルのシンボルに変換する。 */
       LPointer NumberToFyle(LPointer self, LObject* caller,
       const LObject& args);
 
-      /**
-       * 数値をランクのシンボルに変換する。
-       */
+      /** 数値をランクのシンボルに変換する。 */
       LPointer NumberToRank(LPointer self, LObject* caller,
       const LObject& args);
 
-      /**
-       * 数値をサイドのシンボルに変換する。
-       */
+      /** 数値をサイドのシンボルに変換する。 */
       LPointer NumberToSide(LPointer self, LObject* caller,
       const LObject& args);
 
-      /**
-       * 数値を駒の種類のシンボルに変換する。
-       */
+      /** 数値を駒の種類のシンボルに変換する。 */
       LPointer NumberToPiece(LPointer self, LObject* caller,
       const LObject& args);
 
-      /**
-       * 数値をキャスリングのシンボルに変換する。
-       * @param obj 変換したいオブジェクト。
-       * @return 変換後のオブジェクト。
-       */
+      /** 数値をキャスリングのシンボルに変換する。 */
       LPointer NumberToCastling(LPointer self, LObject* caller,
       const LObject& args);
 
