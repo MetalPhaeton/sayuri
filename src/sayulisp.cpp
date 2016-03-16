@@ -67,6 +67,9 @@ namespace Sayuri {
     // 出力リスナー。
     shell_ptr_->AddOutputListener
     ([this](const std::string& message) {this->ListenUCIOutput(message);});
+
+    // メッセージシンボル関数の登録。
+    SetMessageFunctions();
   }
 
   // コピーコンストラクタ。
@@ -84,6 +87,9 @@ namespace Sayuri {
     // 出力リスナー。
     shell_ptr_->AddOutputListener
     ([this](const std::string& message) {this->ListenUCIOutput(message);});
+
+    // メッセージシンボル関数の登録。
+    SetMessageFunctions();
   }
 
   // ムーブコンストラクタ。
@@ -93,7 +99,8 @@ namespace Sayuri {
   table_ptr_(std::move(suite.table_ptr_)),
   engine_ptr_(std::move(suite.engine_ptr_)),
   board_ptr_(&(engine_ptr_->board())),
-  shell_ptr_(std::move(suite.shell_ptr_)) {
+  shell_ptr_(std::move(suite.shell_ptr_)),
+  message_func_map_(std::move(suite.message_func_map_)) {
   }
 
   // コピー代入演算子。
@@ -126,6 +133,10 @@ namespace Sayuri {
     shell_ptr_ = std::move(suite.shell_ptr_);
 
     return *this;
+  }
+
+  // メッセージシンボル関数を登録する。
+  void EngineSuite::SetMessageFunctions() {
   }
 //
 //  // ウェイト関数オブジェクトをセット。
@@ -411,8 +422,39 @@ namespace Sayuri {
   // 関数オブジェクト。
   LPointer EngineSuite::operator()(LPointer self, LObject* caller,
   const LObject& args) {
-    return Lisp::NewNil();
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Lisp::GetReadyForFunction(args, 1, &args_ptr);
+
+    // メッセージシンボルを抽出。
+    LPointer result = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*result, LType::SYMBOL);
+    std::string symbol = result->symbol();
+
+    if (message_func_map_.find(symbol) != message_func_map_.end()) {
+      return message_func_map_.at(symbol)(symbol, self, caller, args);
+    }
+
+    throw Lisp::GenError("@engine-error",
+    "There is no message symbol that is called '" + symbol + "'.");
   }
+
+  // メッセージシンボル関数の準備をする。
+  void EngineSuite::GetReadyForMessageFunction(const std::string& symbol,
+  const LObject& args, int required_args, LObject** args_ptr_ptr) {
+    LPointer message_args_ptr = args.cdr()->cdr();
+
+    int ret = Lisp::CountList(*message_args_ptr);
+    if (ret < required_args) {
+      throw Lisp::GenError("@engine-error",
+      "'" + symbol + "' requires "
+      + std::to_string(required_args) + " arguments and more. Not "
+      + std::to_string(ret) + ".");
+    }
+
+    *args_ptr_ptr = message_args_ptr.get();
+  }
+
 //  // 関数オブジェクト。
 //  LispObjectPtr EngineSuite::operator()
 //  (LispObjectPtr self, const LispObject& caller, const LispObject& list) {

@@ -1858,25 +1858,22 @@ namespace Sayuri {
        * @param args 引数リスト。 (関数名を含む)
        * @param required_args 要求される引数の数。
        * @param args_ptr_ptr 引数リストへのポインタのポインタ。
-       * @return 引数の数。
        */
-      static int GetReadyForFunction(const LObject& args,
+      static void GetReadyForFunction(const LObject& args,
       int required_args, LObject** args_ptr_ptr) {
         // 引数の数をカウント。
-        int ret = CountList(args) - 1;
+        int num_args = CountList(args) - 1;
 
         // 第一引数のポインタを得る。
-        if (ret >= 1) *args_ptr_ptr = args.cdr().get();
+        if (num_args >= 1) *args_ptr_ptr = args.cdr().get();
 
         // 引数の数をチェック。
-        if (ret < required_args) {
+        if (num_args < required_args) {
           throw GenError("@insufficient-arguments", "'"
           + args.car()->ToString() + "' requires "
           + std::to_string(required_args) + " arguments and more. Not "
-          + std::to_string(ret) + ".");
+          + std::to_string(num_args) + ".");
         }
-
-        return ret;
       }
 
       // ============== //

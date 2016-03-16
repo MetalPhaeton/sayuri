@@ -103,6 +103,24 @@ namespace Sayuri {
       /** 関数オブジェクト。 */
       LPointer operator()(LPointer self, LObject* caller, const LObject& args);
 
+      /**
+       * メッセージシンボル関数の準備をする。
+       * @param symbol メッセージシンボル。
+       * @param args 引数リスト。 (関数名を含む)
+       * @param required_args 要求される引数の数。
+       * @param args_ptr_ptr 引数リストへのポインタのポインタ。
+       */
+      static void GetReadyForMessageFunction(const std::string& symbol,
+      const LObject& args, int required_args, LObject** args_ptr_ptr);
+
+      // ====================== //
+      // メッセージシンボル関数 //
+      // ====================== //
+      /** 駒の配置を得る。 */
+      template<Side SIDE, PieceType PIECE_TYPE>
+      LPointer GetPosition(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
 //      /**
 //       * 間違ったマスの指定のエラーを作成する。
 //       * @param func_name 関数名。
@@ -1568,7 +1586,7 @@ namespace Sayuri {
       }
 
       /**
-       * メッセージシンボルによる関数を設定。
+       * メッセージシンボル関数を設定する。
        */
       void SetMessageFunctions();
 
@@ -1625,8 +1643,8 @@ namespace Sayuri {
       /** UCIのアウトプットリスナー。 */
       std::vector<std::function<void(const std::string&)>> callback_vec_;
 
-      /** 各メッセージシンボル毎の関数オブジェクトのマップ。 */
-      std::map<std::string, MessageFunction> func_map_;
+      /** 各メッセージシンボル関数オブジェクトのマップ。 */
+      std::map<std::string, MessageFunction> message_func_map_;
 
 //      /** ウェイト用定数。 その1。 */
 //      enum {
