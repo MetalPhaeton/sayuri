@@ -137,6 +137,77 @@ namespace Sayuri {
 
   // メッセージシンボル関数を登録する。
   void EngineSuite::SetMessageFunctions() {
+    message_func_map_["@get-white-pawn-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<WHITE, PAWN>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-white-knight-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<WHITE, KNIGHT>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-white-bishop-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<WHITE, BISHOP>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-white-rook-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<WHITE, ROOK>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-white-queen-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<WHITE, QUEEN>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-white-king-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<WHITE, KING>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-black-pawn-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<BLACK, PAWN>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-black-knight-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<BLACK, KNIGHT>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-black-bishop-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<BLACK, BISHOP>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-black-rook-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<BLACK, ROOK>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-black-queen-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<BLACK, QUEEN>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-black-king-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<BLACK, KING>(symbol, self, caller, args);
+    };
   }
 //
 //  // ウェイト関数オブジェクトをセット。
@@ -455,6 +526,62 @@ namespace Sayuri {
     *args_ptr_ptr = message_args_ptr.get();
   }
 
+  // ====================== //
+  // メッセージシンボル関数 //
+  // ====================== //
+  // %%% @get-white-pawn-position
+  // %%% @get-white-knight-position
+  // %%% @get-white-bishop-position
+  // %%% @get-white-rook-position
+  // %%% @get-white-queen-position
+  // %%% @get-white-king-position
+  // %%% @get-black-pawn-position
+  // %%% @get-black-knight-position
+  // %%% @get-black-bishop-position
+  // %%% @get-black-rook-position
+  // %%% @get-black-queen-position
+  // %%% @get-black-king-position
+  template<Side SIDE, PieceType PIECE_TYPE>
+  LPointer EngineSuite::GetPosition(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 0, &args_ptr);
+
+    LPointerVec ret_vec;
+    for (Bitboard bb = board_ptr_->position_[SIDE][PIECE_TYPE]; bb;
+    NEXT_BITBOARD(bb)) {
+      ret_vec.push_back(Lisp::NewSymbol
+      (Sayulisp::SQUARE_MAP_INV[Util::GetSquare(bb)]));
+    }
+
+    return Lisp::LPointerVecToList(ret_vec);
+  }
+  template LPointer EngineSuite::GetPosition<WHITE, PAWN>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<WHITE, KNIGHT>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<WHITE, BISHOP>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<WHITE, ROOK>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<WHITE, QUEEN>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<WHITE, KING>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<BLACK, PAWN>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<BLACK, KNIGHT>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<BLACK, BISHOP>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<BLACK, ROOK>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<BLACK, QUEEN>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<BLACK, KING>
+  (const std::string&, LPointer, LObject*, const LObject&);
+
 //  // 関数オブジェクト。
 //  LispObjectPtr EngineSuite::operator()
 //  (LispObjectPtr self, const LispObject& caller, const LispObject& list) {
@@ -477,55 +604,6 @@ namespace Sayuri {
 //    }
 //    std::string message_symbol = message_ptr->symbol_value();
 //
-//    // メッセージシンボルに合わせて分岐する。
-//    if (message_symbol == "@get-white-pawn-position") {
-//      return GetPosition<WHITE, PAWN>();
-//
-//    }
-//    if (message_symbol == "@get-white-knight-position") {
-//      return GetPosition<WHITE, KNIGHT>();
-//
-//    }
-//    if (message_symbol == "@get-white-bishop-position") {
-//      return GetPosition<WHITE, BISHOP>();
-//
-//    }
-//    if (message_symbol == "@get-white-rook-position") {
-//      return GetPosition<WHITE, ROOK>();
-//
-//    }
-//    if (message_symbol == "@get-white-queen-position") {
-//      return GetPosition<WHITE, QUEEN>();
-//
-//    }
-//    if (message_symbol == "@get-white-king-position") {
-//      return GetPosition<WHITE, KING>();
-//
-//    }
-//    if (message_symbol == "@get-black-pawn-position") {
-//      return GetPosition<BLACK, PAWN>();
-//
-//    }
-//    if (message_symbol == "@get-black-knight-position") {
-//      return GetPosition<BLACK, KNIGHT>();
-//
-//    }
-//    if (message_symbol == "@get-black-bishop-position") {
-//      return GetPosition<BLACK, BISHOP>();
-//
-//    }
-//    if (message_symbol == "@get-black-rook-position") {
-//      return GetPosition<BLACK, ROOK>();
-//
-//    }
-//    if (message_symbol == "@get-black-queen-position") {
-//      return GetPosition<BLACK, QUEEN>();
-//
-//    }
-//    if (message_symbol == "@get-black-king-position") {
-//      return GetPosition<BLACK, KING>();
-//
-//    }
 //    if (message_symbol == "@get-empty-square-position") {
 //      return GetPosition<NO_SIDE, EMPTY>();
 //

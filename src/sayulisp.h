@@ -228,29 +228,6 @@ namespace Sayuri {
 //      // ========================== //
 //      // --- エンジンの状態にアクセス --- //
 //      /**
-//       * 駒の配置を得る。
-//       * @return 戻り値のオブジェクト。
-//       */
-//      template<Side SIDE, PieceType TYPE>
-//      LispObjectPtr GetPosition() const {
-//        Bitboard bb = 0;
-//        if (TYPE == EMPTY) {
-//          bb = ~(engine_ptr_->blocker()[R0]);
-//        } else {
-//          bb = engine_ptr_->position()[SIDE][TYPE];
-//        }
-//
-//        LispObjectPtr ret_ptr = Lisp::NewList(Util::CountBits(bb));
-//        LispObject* ptr = ret_ptr.get();
-//        for (; bb; NEXT_BITBOARD(bb)) {
-//          ptr->car(Lisp::NewSymbol(SQUARE_SYMBOL[Util::GetSquare(bb)]));
-//          ptr = ptr->cdr().get();
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
 //       * その位置の駒を得る。
 //       * @param func_name 関数名。
 //       * @param square マスを表す定数。
