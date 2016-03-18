@@ -121,108 +121,91 @@ namespace Sayuri {
       LPointer GetPosition(const std::string& symbol,
       LPointer self, LObject* caller, const LObject& args);
 
-//      /**
-//       * 間違ったマスの指定のエラーを作成する。
-//       * @param func_name 関数名。
-//       * @param square 間違ったマス。
-//       * @return エラーオブジェクト。
-//       */
-//      static LispObjectPtr GenWrongSquareError
-//      (const std::string& func_name, Square square) {
-//        std::string message = "The value '" + std::to_string(square)
-//        + "' given to (" + func_name + ") does not exist on chess board.";
-//
-//        return Lisp::GenError("@not-square", message);
-//      }
-//
-//      /**
-//       * 間違った駒の種類の指定のエラーを作成する。
-//       * @param func_name 関数名。
-//       * @param piece_type 間違ったマス。
-//       * @return エラーオブジェクト。
-//       */
-//      static LispObjectPtr GenWrongPieceTypeError
-//      (const std::string& func_name, PieceType piece_type) {
-//        std::string message = "The value '" + std::to_string(piece_type)
-//        + "' given to (" + func_name + ") is not a piece type.";
-//
-//        return Lisp::GenError("@not-piece-type", message);
-//      }
-//
-//      /**
-//       * 間違ったファイルの指定のエラーを作成する。
-//       * @param func_name 関数名。
-//       * @param fyle 間違ったファイル。
-//       * @return エラーオブジェクト。
-//       */
-//      static LispObjectPtr GenWrongFyleError
-//      (const std::string& func_name, Fyle fyle) {
-//        std::string message = "The value '" + std::to_string(fyle)
-//        + "' given to (" + func_name + ") does not exist on chess board.";
-//
-//        return Lisp::GenError("@not-fyle", message);
-//      }
-//
-//      /**
-//       * 間違ったランクの指定のエラーを作成する。
-//       * @param func_name 関数名。
-//       * @param rank 間違ったファイル。
-//       * @return エラーオブジェクト。
-//       */
-//      static LispObjectPtr GenWrongRankError
-//      (const std::string& func_name, Rank rank) {
-//        std::string message = "The value '" + std::to_string(rank)
-//        + "' given to (" + func_name + ") does not exist on chess board.";
-//
-//        return Lisp::GenError("@not-rank", message);
-//      }
-//
-//      /**
-//       * 間違ったサイドの指定のエラーを作成する。
-//       * @param func_name 関数名。
-//       * @param side 間違ったサイド。
-//       * @return エラーオブジェクト。
-//       */
-//      static LispObjectPtr GenWrongSideError
-//      (const std::string& func_name, Side side) {
-//        std::string message = "The value '" + std::to_string(side)
-//        + "' given to (" + func_name + ") is not side.";
-//
-//        return Lisp::GenError("@not-side", message);
-//      }
-//
-//      /**
-//       * 間違ったキャスリングの指定のエラーを作成する。
-//       * @param func_name 関数名。
-//       * @param castling 間違ったサイド。
-//       * @return エラーオブジェクト。
-//       */
-//      static LispObjectPtr GenWrongCastlingError
-//      (const std::string& func_name, int castling) {
-//        std::string message = "The value '" + std::to_string(castling)
-//        + "' given to (" + func_name + ") does not indicate any castlings.";
-//        return Lisp::GenError("@not-castling", message);
-//      }
-//
-//      /**
-//       * Moveをリストに変換する。
-//       * @param move 変換したいMove。
-//       * @return 変換結果のリスト。
-//       */
-//      static LispObjectPtr MoveToList(Move move) {
-//        LispObjectPtr ret_ptr = Lisp::NewList(3);
-//
-//        ret_ptr->car(Lisp::NewSymbol(SQUARE_SYMBOL[Get<FROM>(move)]));
-//
-//        ret_ptr->cdr()->car
-//        (Lisp::NewSymbol(SQUARE_SYMBOL[Get<TO>(move)]));
-//
-//        ret_ptr->cdr()->cdr()->car
-//        (Lisp::NewSymbol(PIECE_TYPE_SYMBOL[Get<PROMOTION>(move)]));
-//
-//        return ret_ptr;
-//      }
+      /**
+       * マスを表しているかどうかをチェックする。
+       * @param obj チェックするマスの数字のオブジェクト。
+       */
+      static void CheckSquare(const LObject& obj) {
+        Lisp::CheckType(obj, LType::NUMBER);
+        Square square = obj.number();
 
+        if (square >= NUM_SQUARES) {
+          throw Lisp::GenError("@not-square", "'" + std::to_string(square)
+          + "' doesn't indicate any square. Square is from '0' to '63'.");
+        }
+      }
+      /**
+       * 駒の種類を表しているかどうかをチェックする。
+       * @param obj チェックする駒の種類の数字のオブジェクト。
+       */
+      static void CheckPieceType(const LObject& obj) {
+        Lisp::CheckType(obj, LType::NUMBER);
+        PieceType piece_type = obj.number();
+
+        if (piece_type >= NUM_PIECE_TYPES) {
+          throw Lisp::GenError("@not-piece-type",
+          "'" + std::to_string(piece_type)
+          + "' doesn't indicate any piece type. "
+          "Pieced type is from '0' to '6'.");
+        }
+      }
+      /**
+       * ファイルを表しているかどうかをチェックする。
+       * @param obj チェックするファイルの数字のオブジェクト。
+       */
+      static void CheckFyle(const LObject& obj) {
+        Lisp::CheckType(obj, LType::NUMBER);
+        Fyle fyle = obj.number();
+
+        if (fyle >= NUM_FYLES) {
+          throw Lisp::GenError("@not-fyle",
+          "'" + std::to_string(fyle)
+          + "' doesn't indicate any fyle. Fyle is from '0' to '7'.");
+        }
+      }
+      /**
+       * ランクを表しているかどうかをチェックする。
+       * @param obj チェックするランクの数字のオブジェクト。
+       */
+      static void CheckRank(const LObject& obj) {
+        Lisp::CheckType(obj, LType::NUMBER);
+        Rank rank = obj.number();
+
+        if (rank >= NUM_RANKS) {
+          throw Lisp::GenError("@not-rank",
+          "'" + std::to_string(rank)
+          + "' doesn't indicate any rank. Rank is from '0' to '7'.");
+        }
+      }
+      /**
+       * サイドを表しているかどうかをチェックする。
+       * @param obj チェックするサイドの数字のオブジェクト。
+       */
+      static void CheckSide(const LObject& obj) {
+        Lisp::CheckType(obj, LType::NUMBER);
+        Side side = obj.number();
+
+        if (side >= NUM_SIDES) {
+          throw Lisp::GenError("@not-side",
+          "'" + std::to_string(side)
+          + "' doesn't indicate any side. Side is from '0' to '2'.");
+        }
+      }
+      /**
+       * キャスリングを表しているかどうかをチェックする。
+       * @param obj チェックするキャスリングの数字のオブジェクト。
+       */
+      static void CheckCastling(const LObject& obj) {
+        Lisp::CheckType(obj, LType::NUMBER);
+        int castling = obj.number();
+
+        if (castling >= 5) {
+          throw Lisp::GenError("@not-castling",
+          "'" + std::to_string(castling)
+          + "' doesn't indicate any castling right. "
+          "Castling right is from '0' to '4'.");
+        }
+      }
 //      // ========================== //
 //      // Lisp関数オブジェクト用関数 //
 //      // ========================== //
@@ -1783,6 +1766,20 @@ namespace Sayuri {
        * @return 終了ステータス。
        */
       int Run(std::istream* stream_ptr);
+
+      /**
+       * 指し手をリストに変換する。
+       */
+      static LPointer MoveToList(Move move) {
+        LPointer ret_ptr = NewList(3);
+
+        ret_ptr->car(NewSymbol(SQUARE_MAP_INV[Get<FROM>(move)]));
+        ret_ptr->cdr()->car(NewSymbol(SQUARE_MAP_INV[Get<TO>(move)]));
+        ret_ptr->cdr()->cdr()->car
+        (NewSymbol(PIECE_MAP_INV[Get<PROMOTION>(move)]));
+
+        return ret_ptr;
+      }
 
       // ========================== //
       // Lisp関数オブジェクト用関数 //
