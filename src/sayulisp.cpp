@@ -208,6 +208,18 @@ namespace Sayuri {
     const LObject& args) -> LPointer {
       return this->GetPosition<BLACK, KING>(symbol, self, caller, args);
     };
+
+    message_func_map_["@get-piece"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPiece(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-all-pieces"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetAllPieces(symbol, self, caller, args);
+    };
   }
 //
 //  // ウェイト関数オブジェクトをセット。
@@ -582,6 +594,53 @@ namespace Sayuri {
   template LPointer EngineSuite::GetPosition<BLACK, KING>
   (const std::string&, LPointer, LObject*, const LObject&);
 
+  // %%% @get-piece
+  LPointer EngineSuite::GetPiece(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 引数のチェック。
+    LPointer result = caller->Evaluate(*(args_ptr->car()));
+    CheckSquare(*result);
+    Square square = result->number();
+
+    // サイドと駒の種類を得る。
+    LPointer ret_ptr = Lisp::NewList(2);
+    ret_ptr->car(Lisp::NewSymbol
+    (Sayulisp::SIDE_MAP_INV[board_ptr_->side_board_[square]]));
+    ret_ptr->cdr()->car(Lisp::NewSymbol
+    (Sayulisp::PIECE_MAP_INV[board_ptr_->piece_board_[square]]));
+
+    return ret_ptr;
+  }
+
+  // %%% @get-all-pieces
+  LPointer EngineSuite::GetAllPieces(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 0, &args_ptr);
+
+    LPointerVec ret_vec(NUM_SQUARES);
+    LPointerVec::iterator itr = ret_vec.begin();
+
+    // 各マスの駒のリストを作る。
+    LPointer elm_ptr;
+    FOR_SQUARES(square) {
+      elm_ptr = Lisp::NewList(2);
+      elm_ptr->car(Lisp::NewSymbol
+      (Sayulisp::SIDE_MAP_INV[board_ptr_->side_board_[square]]));
+      elm_ptr->cdr()->car(Lisp::NewSymbol
+      (Sayulisp::PIECE_MAP_INV[board_ptr_->piece_board_[square]]));
+
+      *itr = elm_ptr;
+      ++itr;
+    }
+
+    return Lisp::LPointerVecToList(ret_vec);
+  }
 //  // 関数オブジェクト。
 //  LispObjectPtr EngineSuite::operator()
 //  (LispObjectPtr self, const LispObject& caller, const LispObject& list) {
@@ -2924,6 +2983,27 @@ namespace Sayuri {
 //
   // Sayulispの関数を設定する。
   void Sayulisp::SetSayulispFunction() {
+    // 定数を登録。
+    for (auto& pair : SQUARE_MAP) {
+      scope_chain_.InsertSymbol(pair.first, NewNumber(pair.second));
+    }
+    for (auto& pair : FYLE_MAP) {
+      scope_chain_.InsertSymbol(pair.first, NewNumber(pair.second));
+    }
+    for (auto& pair : RANK_MAP) {
+      scope_chain_.InsertSymbol(pair.first, NewNumber(pair.second));
+    }
+    for (auto& pair : SIDE_MAP) {
+      scope_chain_.InsertSymbol(pair.first, NewNumber(pair.second));
+    }
+    for (auto& pair : PIECE_MAP) {
+      scope_chain_.InsertSymbol(pair.first, NewNumber(pair.second));
+    }
+    for (auto& pair : CASTLING_MAP) {
+      scope_chain_.InsertSymbol(pair.first, NewNumber(pair.second));
+    }
+
+    // 関数を登録。
     LC_Function func;
     std::string help;
 

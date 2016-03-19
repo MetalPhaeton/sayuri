@@ -113,14 +113,6 @@ namespace Sayuri {
       static void GetReadyForMessageFunction(const std::string& symbol,
       const LObject& args, int required_args, LObject** args_ptr_ptr);
 
-      // ====================== //
-      // メッセージシンボル関数 //
-      // ====================== //
-      /** 駒の配置を得る。 */
-      template<Side SIDE, PieceType PIECE_TYPE>
-      LPointer GetPosition(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
-
       /**
        * マスを表しているかどうかをチェックする。
        * @param obj チェックするマスの数字のオブジェクト。
@@ -206,19 +198,26 @@ namespace Sayuri {
           "Castling right is from '0' to '4'.");
         }
       }
+
+      // ====================== //
+      // メッセージシンボル関数 //
+      // ====================== //
+      /** 駒の配置を得る。 */
+      template<Side SIDE, PieceType PIECE_TYPE>
+      LPointer GetPosition(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** 駒を得る。 */
+      LPointer GetPiece(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** すべての駒を得る。 */
+      LPointer GetAllPieces(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
 //      // ========================== //
 //      // Lisp関数オブジェクト用関数 //
 //      // ========================== //
 //      // --- エンジンの状態にアクセス --- //
-//      /**
-//       * その位置の駒を得る。
-//       * @param func_name 関数名。
-//       * @param square マスを表す定数。
-//       * @return 戻り値のオブジェクト。
-//       */
-//      LispObjectPtr GetPiece
-//      (const std::string& func_name, Square square) const;
-//
 //      /**
 //       * 手番を得る。
 //       * @return 戻り値のオブジェクト。
