@@ -220,6 +220,48 @@ namespace Sayuri {
     const LObject& args) -> LPointer {
       return this->GetAllPieces(symbol, self, caller, args);
     };
+
+    message_func_map_["@get-to-move"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetToMove(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-castling-rights"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetCastlingRights(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-en-passant-square"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetEnPassantSquare(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-ply"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPly(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-clock"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetClock(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-white-has-castled"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetHasCastled<WHITE>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-black-has-castled"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetHasCastled<BLACK>(symbol, self, caller, args);
+    };
   }
 //
 //  // ウェイト関数オブジェクトをセット。
@@ -556,10 +598,6 @@ namespace Sayuri {
   template<Side SIDE, PieceType PIECE_TYPE>
   LPointer EngineSuite::GetPosition(const std::string& symbol,
   LPointer self, LObject* caller, const LObject& args) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 0, &args_ptr);
-
     LPointerVec ret_vec;
     for (Bitboard bb = board_ptr_->position_[SIDE][PIECE_TYPE]; bb;
     NEXT_BITBOARD(bb)) {
@@ -619,10 +657,6 @@ namespace Sayuri {
   // %%% @get-all-pieces
   LPointer EngineSuite::GetAllPieces(const std::string& symbol,
   LPointer self, LObject* caller, const LObject& args) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 0, &args_ptr);
-
     LPointerVec ret_vec(NUM_SQUARES);
     LPointerVec::iterator itr = ret_vec.begin();
 
@@ -2262,78 +2296,6 @@ namespace Sayuri {
 //    }
 //
 //    return ret;
-//  }
-//
-//  // 駒を得る。
-//  LispObjectPtr EngineSuite::GetPiece(const std::string& func_name,
-//  Square square) const {
-//    LispObjectPtr ret_ptr = Lisp::NewList(2);
-//    if (square >= NUM_SQUARES) {
-//      throw GenWrongSquareError(func_name, square);
-//    }
-//
-//    ret_ptr->car(Lisp::NewSymbol
-//    (SIDE_SYMBOL[engine_ptr_->side_board()[square]]));
-//
-//    ret_ptr->cdr()->car(Lisp::NewSymbol
-//    (PIECE_TYPE_SYMBOL[engine_ptr_->piece_board()[square]]));
-//
-//    return ret_ptr;
-//  }
-//
-//  // 手番にアクセス。
-//  LispObjectPtr EngineSuite::GetToMove() const {
-//    return Lisp::NewSymbol(SIDE_SYMBOL[engine_ptr_->to_move()]);
-//  }
-//
-//  // キャスリングの権利にアクセス。
-//  LispObjectPtr EngineSuite::GetCastlingRights() const {
-//    Castling rights = engine_ptr_->castling_rights();
-//
-//    LispObjectPtr ret_ptr = Lisp::NewNil();
-//    if ((rights & WHITE_SHORT_CASTLING)) {
-//      ret_ptr->Append(Lisp::NewPair
-//      (Lisp::NewSymbol(CASTLING_SYMBOL[1]),
-//      Lisp::NewNil()));
-//    }
-//    if ((rights & WHITE_LONG_CASTLING)) {
-//      ret_ptr->Append(Lisp::NewPair
-//      (Lisp::NewSymbol(CASTLING_SYMBOL[4]),
-//      Lisp::NewNil()));
-//    }
-//    if ((rights & BLACK_SHORT_CASTLING)) {
-//      ret_ptr->Append(Lisp::NewPair
-//      (Lisp::NewSymbol(CASTLING_SYMBOL[3]),
-//      Lisp::NewNil()));
-//    }
-//    if ((rights & BLACK_LONG_CASTLING)) {
-//      ret_ptr->Append(Lisp::NewPair
-//      (Lisp::NewSymbol(CASTLING_SYMBOL[4]),
-//      Lisp::NewNil()));
-//    }
-//
-//    return ret_ptr;
-//  }
-//
-//  // アンパッサンのマスにアクセス。
-//  LispObjectPtr EngineSuite::GetEnPassantSquare() const {
-//    Square en_passant_square = engine_ptr_->en_passant_square();
-//
-//    if (en_passant_square) {
-//      return Lisp::NewSymbol(SQUARE_SYMBOL[en_passant_square]);
-//    }
-//
-//    return Lisp::NewNil();
-//  }
-//
-//  // 手数にアクセス。
-//  LispObjectPtr EngineSuite::GetPly() const {
-//    return Lisp::NewNumber(engine_ptr_->ply());
-//  }
-//
-//  // 50手ルールの手数にアクセス。
-//  LispObjectPtr EngineSuite::GetClock() const {
-//    return Lisp::NewNumber(engine_ptr_->clock());
 //  }
 //
 //  // 白がキャスリングしたかどうかのフラグにアクセス。

@@ -55,6 +55,200 @@ namespace Sayuri {
   class ChessEngine;
   class TranspositionTable;
   class UCIShell;
+  class EngineSuite;
+
+  /** Sayulisp実行クラス。 */
+  class Sayulisp : public Lisp {
+    public:
+      // ==================== //
+      // コンストラクタと代入 //
+      // ==================== //
+      /**
+       * コンストラクタ。
+       * @param argv コマンド引数。
+       */
+      Sayulisp(const std::vector<std::string>& argv) : Lisp(argv) {
+        func_id_ = "Sayulisp";
+        SetSayulispFunction();
+      }
+      /** コンストラクタ。 */
+      Sayulisp() {
+        func_id_ = "Sayulisp";
+        SetSayulispFunction();
+      }
+      /**
+       * コピーコンストラクタ。
+       * @param sayulisp コピー元。
+       */
+      Sayulisp(const Sayulisp& sayulisp) : Lisp(sayulisp) {}
+      /**
+       * ムーブコンストラクタ。
+       * @param sayulisp ムーブ元。
+       */
+      Sayulisp(Sayulisp&& sayulisp) : Lisp(sayulisp) {}
+      /**
+       * コピー代入演算子。
+       * @param sayulisp コピー元。
+       */
+      Sayulisp& operator=(const Sayulisp& sayulisp) {
+        Lisp::operator=(sayulisp);
+        return *this;
+      }
+      /**
+       * ムーブ代入演算子。
+       * @param sayulisp ムーブ元。
+       */
+      Sayulisp& operator=(Sayulisp&& sayulisp) {
+        Lisp::operator=(sayulisp);
+        return *this;
+      }
+      /** デストラクタ。 */
+      virtual ~Sayulisp() {}
+
+      // ============== //
+      // パブリック定数 //
+      // ============== //
+      /** マスの定数のマップ。 */
+      static const std::map<std::string, Square> SQUARE_MAP;
+      /** ファイルの定数のマップ。 */
+      static const std::map<std::string, Fyle> FYLE_MAP;
+      /** ランクの定数のマップ。 */
+      static const std::map<std::string, Rank> RANK_MAP;
+      /** サイドの定数のマップ。 */
+      static const std::map<std::string, Side> SIDE_MAP;
+      /** 駒の種類の定数のマップ。 */
+      static const std::map<std::string, PieceType> PIECE_MAP;
+      /** キャスリングの定数のマップ。 */
+      static const std::map<std::string, int> CASTLING_MAP;
+      /** マスの定数の逆マップ。 */
+      static const std::string SQUARE_MAP_INV[NUM_SQUARES];
+      /** ファイルの定数の逆マップ。 */
+      static const std::string FYLE_MAP_INV[NUM_FYLES];
+      /** ランクの定数の逆マップ。 */
+      static const std::string RANK_MAP_INV[NUM_RANKS];
+      /** サイドの定数の逆マップ。 */
+      static const std::string SIDE_MAP_INV[NUM_SIDES];
+      /** 駒の種類の定数の逆マップ。 */
+      static const std::string PIECE_MAP_INV[NUM_PIECE_TYPES];
+      /** キャスリングの定数の逆マップ。 */
+      static const std::string CASTLING_MAP_INV[5];
+
+      // ============== //
+      // パブリック関数 //
+      // ============== //
+      /**
+       * Sayulispの関数をセットする。
+       */
+      void SetSayulispFunction();
+
+      /**
+       * Sayulispを開始する。
+       * @param stream_ptr 入力に使うストリームのポインタ。
+       * @return 終了ステータス。
+       */
+      int Run(std::istream* stream_ptr);
+
+      /**
+       * 指し手をリストに変換する。
+       */
+      static LPointer MoveToList(Move move) {
+        LPointer ret_ptr = NewList(3);
+
+        ret_ptr->car(NewSymbol(SQUARE_MAP_INV[Get<FROM>(move)]));
+        ret_ptr->cdr()->car(NewSymbol(SQUARE_MAP_INV[Get<TO>(move)]));
+        ret_ptr->cdr()->cdr()->car
+        (NewSymbol(PIECE_MAP_INV[Get<PROMOTION>(move)]));
+
+        return ret_ptr;
+      }
+
+      // ========================== //
+      // Lisp関数オブジェクト用関数 //
+      // ========================== //
+      /** エンジン関数オブジェクトを生成する。 */
+      LPointer GenEngine(LPointer self, LObject* caller, const LObject& args);
+
+      /** ライセンスを表示する。 */
+      LPointer SayuriLicense(LPointer self, LObject* caller,
+      const LObject& args) {
+        return NewString(LICENSE);
+      }
+
+      /** マスのシンボルを数値に変換する。 */
+      LPointer SquareToNumber(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /** ファイルのシンボルを数値に変換する。 */
+      LPointer FyleToNumber(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /** ランクのシンボルを数値に変換する。 */
+      LPointer RankToNumber(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /** サイドのシンボルを数値に変換する。 */
+      LPointer SideToNumber(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /** 駒の種類のシンボルを数値に変換する。 */
+      LPointer PieceToNumber(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /** キャスリングのシンボルを数値に変換する。 */
+      LPointer CastlingToNumber(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /** 数値をマスのシンボルに変換する。 */
+      LPointer NumberToSquare(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /** 数値をファイルのシンボルに変換する。 */
+      LPointer NumberToFyle(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /** 数値をランクのシンボルに変換する。 */
+      LPointer NumberToRank(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /** 数値をサイドのシンボルに変換する。 */
+      LPointer NumberToSide(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /** 数値を駒の種類のシンボルに変換する。 */
+      LPointer NumberToPiece(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /** 数値をキャスリングのシンボルに変換する。 */
+      LPointer NumberToCastling(LPointer self, LObject* caller,
+      const LObject& args);
+
+//      /**
+//       * PGNオブジェクトを作成する。
+//       */
+//      LPointer GenPGN(LPointer self, LObject* caller,
+//      const LObject& args);
+//
+//      /**
+//       * FEN/EPD文字列をパースする。
+//       */
+//      LPointer ParseFENEPD(LPointer self, LObject* caller,
+//      const LObject& args);
+//
+//      /**
+//       * 駒の配列のリストをFENの文字列に変換する。
+//       */
+//      LPointer ToFENPosition(LPointer self, LObject* caller,
+//      const LObject& args);
+
+    private:
+      // ================ //
+      // プライベート関数 //
+      // ================ //
+      /**
+       * ヘルプを作成する。
+       */
+      void SetHelp();
+  };
 
   /** Sayulisp用エンジンセット。 */
   class EngineSuite : public LN_Function {
@@ -214,48 +408,74 @@ namespace Sayuri {
       /** すべての駒を得る。 */
       LPointer GetAllPieces(const std::string& symbol,
       LPointer self, LObject* caller, const LObject& args);
+
+      // %%% @get-to-move
+      /** 現在のサイドを得る。 */
+      LPointer GetToMove(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args) {
+        return Lisp::NewSymbol(Sayulisp::SIDE_MAP_INV[board_ptr_->to_move_]);
+      }
+
+      // %%% @get-castling-rights
+      /** 現在のキャスリングの権利を得る。 */
+      LPointer GetCastlingRights(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args) {
+        LPointerVec ret_vec;
+        Castling rights = board_ptr_->castling_rights_;
+
+        if ((rights & WHITE_SHORT_CASTLING)) {
+          ret_vec.push_back(Lisp::NewSymbol(Sayulisp::CASTLING_MAP_INV[1]));
+        }
+        if ((rights & WHITE_LONG_CASTLING)) {
+          ret_vec.push_back(Lisp::NewSymbol(Sayulisp::CASTLING_MAP_INV[2]));
+        }
+        if ((rights & BLACK_SHORT_CASTLING)) {
+          ret_vec.push_back(Lisp::NewSymbol(Sayulisp::CASTLING_MAP_INV[3]));
+        }
+        if ((rights & BLACK_LONG_CASTLING)) {
+          ret_vec.push_back(Lisp::NewSymbol(Sayulisp::CASTLING_MAP_INV[4]));
+        }
+
+        return Lisp::LPointerVecToList(ret_vec);
+      }
+
+      // %%% @get-en-passant-square
+      /** 現在のアンパッサンのマスを得る。 */
+      LPointer GetEnPassantSquare(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args) {
+        if (board_ptr_->en_passant_square_) {
+          return Lisp::NewSymbol
+          (Sayulisp::SQUARE_MAP_INV[board_ptr_->en_passant_square_]);
+        }
+        return Lisp::NewNil();
+      }
+
+      // %%% @get-ply
+      /** 現在の手数を得る。 */
+      LPointer GetPly(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args) {
+        return Lisp::NewNumber(board_ptr_->ply_);
+      }
+
+      // %%% @get-clock
+      /** 現在のクロックを得る。 */
+      LPointer GetClock(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args) {
+        return Lisp::NewNumber(board_ptr_->clock_);
+      }
+
+      // %%% @get-white-has-castled
+      // %%% @get-black-has-castled
+      /** 現在のキャスリングしたかどうかを得る。 */
+      template<Side SIDE>
+      LPointer GetHasCastled(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args) {
+        return Lisp::NewBoolean(board_ptr_->has_castled_[SIDE]);
+      }
+
 //      // ========================== //
 //      // Lisp関数オブジェクト用関数 //
 //      // ========================== //
-//      // --- エンジンの状態にアクセス --- //
-//      /**
-//       * 手番を得る。
-//       * @return 戻り値のオブジェクト。
-//       */
-//      LispObjectPtr GetToMove() const;
-//
-//      /**
-//       * キャスリングの権利を得る。
-//       */
-//      LispObjectPtr GetCastlingRights() const;
-//
-//      /**
-//       * アンパッサンのマスを得る。
-//       * @return 戻り値のオブジェクト。
-//       */
-//      LispObjectPtr GetEnPassantSquare() const;
-//
-//      /**
-//       * 手数を得る。
-//       */
-//      LispObjectPtr GetPly() const;
-//
-//      /**
-//       * 50手ルールの手数を得る。
-//       */
-//      LispObjectPtr GetClock() const;
-//
-//      /**
-//       * 白がキャスリングしたかどうかのフラグを得る。
-//       * @return 戻り値のオブジェクト。
-//       */
-//      LispObjectPtr GetWhiteHasCastled() const;
-//      /**
-//       * 黒がキャスリングしたかどうかのフラグを得る。
-//       * @return 戻り値のオブジェクト。
-//       */
-//      LispObjectPtr GetBlackHasCastled() const;
-//
 //      /**
 //       * ボードを初期状態にする。
 //       * @return trueのBooleanオブジェクト。
@@ -1673,199 +1893,6 @@ namespace Sayuri {
 //      weight_2_mutator_[WEIGHT_ABANDONED_CASTLING + 1];
 //      /** ウェイト関数オブジェクトをセットする。 */
 //      void SetWeightFunctions();
-  };
-
-  /** Sayulisp実行クラス。 */
-  class Sayulisp : public Lisp {
-    public:
-      // ==================== //
-      // コンストラクタと代入 //
-      // ==================== //
-      /**
-       * コンストラクタ。
-       * @param argv コマンド引数。
-       */
-      Sayulisp(const std::vector<std::string>& argv) : Lisp(argv) {
-        func_id_ = "Sayulisp";
-        SetSayulispFunction();
-      }
-      /** コンストラクタ。 */
-      Sayulisp() {
-        func_id_ = "Sayulisp";
-        SetSayulispFunction();
-      }
-      /**
-       * コピーコンストラクタ。
-       * @param sayulisp コピー元。
-       */
-      Sayulisp(const Sayulisp& sayulisp) : Lisp(sayulisp) {}
-      /**
-       * ムーブコンストラクタ。
-       * @param sayulisp ムーブ元。
-       */
-      Sayulisp(Sayulisp&& sayulisp) : Lisp(sayulisp) {}
-      /**
-       * コピー代入演算子。
-       * @param sayulisp コピー元。
-       */
-      Sayulisp& operator=(const Sayulisp& sayulisp) {
-        Lisp::operator=(sayulisp);
-        return *this;
-      }
-      /**
-       * ムーブ代入演算子。
-       * @param sayulisp ムーブ元。
-       */
-      Sayulisp& operator=(Sayulisp&& sayulisp) {
-        Lisp::operator=(sayulisp);
-        return *this;
-      }
-      /** デストラクタ。 */
-      virtual ~Sayulisp() {}
-
-      // ============== //
-      // パブリック定数 //
-      // ============== //
-      /** マスの定数のマップ。 */
-      static const std::map<std::string, Square> SQUARE_MAP;
-      /** ファイルの定数のマップ。 */
-      static const std::map<std::string, Fyle> FYLE_MAP;
-      /** ランクの定数のマップ。 */
-      static const std::map<std::string, Rank> RANK_MAP;
-      /** サイドの定数のマップ。 */
-      static const std::map<std::string, Side> SIDE_MAP;
-      /** 駒の種類の定数のマップ。 */
-      static const std::map<std::string, PieceType> PIECE_MAP;
-      /** キャスリングの定数のマップ。 */
-      static const std::map<std::string, int> CASTLING_MAP;
-      /** マスの定数の逆マップ。 */
-      static const std::string SQUARE_MAP_INV[NUM_SQUARES];
-      /** ファイルの定数の逆マップ。 */
-      static const std::string FYLE_MAP_INV[NUM_FYLES];
-      /** ランクの定数の逆マップ。 */
-      static const std::string RANK_MAP_INV[NUM_RANKS];
-      /** サイドの定数の逆マップ。 */
-      static const std::string SIDE_MAP_INV[NUM_SIDES];
-      /** 駒の種類の定数の逆マップ。 */
-      static const std::string PIECE_MAP_INV[NUM_PIECE_TYPES];
-      /** キャスリングの定数の逆マップ。 */
-      static const std::string CASTLING_MAP_INV[5];
-
-      // ============== //
-      // パブリック関数 //
-      // ============== //
-      /**
-       * Sayulispの関数をセットする。
-       */
-      void SetSayulispFunction();
-
-      /**
-       * Sayulispを開始する。
-       * @param stream_ptr 入力に使うストリームのポインタ。
-       * @return 終了ステータス。
-       */
-      int Run(std::istream* stream_ptr);
-
-      /**
-       * 指し手をリストに変換する。
-       */
-      static LPointer MoveToList(Move move) {
-        LPointer ret_ptr = NewList(3);
-
-        ret_ptr->car(NewSymbol(SQUARE_MAP_INV[Get<FROM>(move)]));
-        ret_ptr->cdr()->car(NewSymbol(SQUARE_MAP_INV[Get<TO>(move)]));
-        ret_ptr->cdr()->cdr()->car
-        (NewSymbol(PIECE_MAP_INV[Get<PROMOTION>(move)]));
-
-        return ret_ptr;
-      }
-
-      // ========================== //
-      // Lisp関数オブジェクト用関数 //
-      // ========================== //
-      /** エンジン関数オブジェクトを生成する。 */
-      LPointer GenEngine(LPointer self, LObject* caller, const LObject& args);
-
-      /** ライセンスを表示する。 */
-      LPointer SayuriLicense(LPointer self, LObject* caller,
-      const LObject& args) {
-        return NewString(LICENSE);
-      }
-
-      /** マスのシンボルを数値に変換する。 */
-      LPointer SquareToNumber(LPointer self, LObject* caller,
-      const LObject& args);
-
-      /** ファイルのシンボルを数値に変換する。 */
-      LPointer FyleToNumber(LPointer self, LObject* caller,
-      const LObject& args);
-
-      /** ランクのシンボルを数値に変換する。 */
-      LPointer RankToNumber(LPointer self, LObject* caller,
-      const LObject& args);
-
-      /** サイドのシンボルを数値に変換する。 */
-      LPointer SideToNumber(LPointer self, LObject* caller,
-      const LObject& args);
-
-      /** 駒の種類のシンボルを数値に変換する。 */
-      LPointer PieceToNumber(LPointer self, LObject* caller,
-      const LObject& args);
-
-      /** キャスリングのシンボルを数値に変換する。 */
-      LPointer CastlingToNumber(LPointer self, LObject* caller,
-      const LObject& args);
-
-      /** 数値をマスのシンボルに変換する。 */
-      LPointer NumberToSquare(LPointer self, LObject* caller,
-      const LObject& args);
-
-      /** 数値をファイルのシンボルに変換する。 */
-      LPointer NumberToFyle(LPointer self, LObject* caller,
-      const LObject& args);
-
-      /** 数値をランクのシンボルに変換する。 */
-      LPointer NumberToRank(LPointer self, LObject* caller,
-      const LObject& args);
-
-      /** 数値をサイドのシンボルに変換する。 */
-      LPointer NumberToSide(LPointer self, LObject* caller,
-      const LObject& args);
-
-      /** 数値を駒の種類のシンボルに変換する。 */
-      LPointer NumberToPiece(LPointer self, LObject* caller,
-      const LObject& args);
-
-      /** 数値をキャスリングのシンボルに変換する。 */
-      LPointer NumberToCastling(LPointer self, LObject* caller,
-      const LObject& args);
-
-//      /**
-//       * PGNオブジェクトを作成する。
-//       */
-//      LPointer GenPGN(LPointer self, LObject* caller,
-//      const LObject& args);
-//
-//      /**
-//       * FEN/EPD文字列をパースする。
-//       */
-//      LPointer ParseFENEPD(LPointer self, LObject* caller,
-//      const LObject& args);
-//
-//      /**
-//       * 駒の配列のリストをFENの文字列に変換する。
-//       */
-//      LPointer ToFENPosition(LPointer self, LObject* caller,
-//      const LObject& args);
-
-    private:
-      // ================ //
-      // プライベート関数 //
-      // ================ //
-      /**
-       * ヘルプを作成する。
-       */
-      void SetHelp();
   };
 }  // namespace Sayuri
 
