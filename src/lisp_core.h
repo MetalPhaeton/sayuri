@@ -2179,6 +2179,9 @@ namespace Sayuri {
       /** ネイティブ関数 - import */
       LPointer Import(LPointer self, LObject* caller, const LObject& args);
 
+      /** ネイティブ関数 - export */
+      LPointer Export(LPointer self, LObject* caller, const LObject& args);
+
       // %%% equal?
       /** ネイティブ関数 - equal? */
       LPointer EqualQ(LPointer self, LObject* caller, const LObject& args) {

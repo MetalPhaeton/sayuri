@@ -1452,6 +1452,35 @@ R"...(### import ###
 
     func =
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->Export(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("export",
+    NewN_Function(func, "Lisp:export", scope_chain_));
+    help =
+R"...(### export ###
+
+<h6> Usage </h6>
+
+* `(export <File name : String> <Object>)`
+
+<h6> Description </h6>
+
+* Converts `<Object>` into String and writes it to `<File name>`.
+* Returns `<Object>`.
+
+<h6> Example </h6>
+
+(define my-list '("Hello" 123 "World"))
+(display (export "hello.txt" my-list))
+;; Output
+;; > ("Hello" 123 "World")
+;;
+;; In "hello.txt"
+;; > ("Hello" 123 "World"))...";
+    help_dict_.emplace("export", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->EqualQ(self, caller, args);
     };
     scope_chain_.InsertSymbol("equal?",
@@ -4081,6 +4110,35 @@ R"...(### min ###
     }
 
     return ret_ptr;
+  }
+
+  // %%% export
+  LPointer Lisp::Export(LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 2, &args_ptr);
+
+    // ファイル名をパース。
+    LPointer filename_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*filename_ptr, LType::STRING);
+    Next(&args_ptr);
+
+    // オブジェクトをパース。
+    LPointer obj_ptr = caller->Evaluate(*(args_ptr->car()));
+
+    // ファイルを開く。
+    std::ofstream ofs(filename_ptr->string());
+    if (!ofs) {
+      throw GenError("@function-error",
+      "Couldn't open '" + filename_ptr->string() + "'.");
+    }
+
+    // 文字列に変換して書き込む。
+    ofs << obj_ptr->ToString() << std::flush;
+
+    // 閉じて終了。
+    ofs.close();
+    return obj_ptr;
   }
 
   // %%% output-stream
