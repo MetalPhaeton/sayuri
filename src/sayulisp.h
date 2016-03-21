@@ -473,6 +473,20 @@ namespace Sayuri {
         return Lisp::NewBoolean(board_ptr_->has_castled_[SIDE]);
       }
 
+      // %%% @get-fen
+      /** 現在の状態のFENを得る。 */
+      LPointer GetFEN(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args) {
+        return Lisp::NewString(engine_ptr_->GetFENString());
+      }
+
+      // %%% @to-string
+      /** 現在の状態のFENを得る。 */
+      LPointer BoardToString(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args) {
+        return Lisp::NewString(Board::ToString(*board_ptr_));
+      }
+
 //      // ========================== //
 //      // Lisp関数オブジェクト用関数 //
 //      // ========================== //

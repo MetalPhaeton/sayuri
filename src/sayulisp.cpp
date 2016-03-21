@@ -262,6 +262,18 @@ namespace Sayuri {
     const LObject& args) -> LPointer {
       return this->GetHasCastled<BLACK>(symbol, self, caller, args);
     };
+
+    message_func_map_["@get-fen"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetFEN(symbol, self, caller, args);
+    };
+
+    message_func_map_["@to-string"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->BoardToString(symbol, self, caller, args);
+    };
   }
 //
 //  // ウェイト関数オブジェクトをセット。
