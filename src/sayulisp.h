@@ -336,6 +336,23 @@ namespace Sayuri {
         }
       }
       /**
+       * 駒を表しているかどうかをチェックする。
+       * @param obj チェックする駒のオブジェクト。
+       */
+      static void CheckPiece(const LObject& obj) {
+        // リストをチェック。
+        Lisp::CheckList(obj);
+        if (Lisp::CountList(obj) < 2) {
+          throw Lisp::GenError("@not-piece",
+          "'" + obj.ToString() + "' doesn't indicate any piece. "
+          "Format of piece must be `(<Side> <Piece type>)`.");
+        }
+
+        // サイドと駒の種類チェック。
+        CheckSide(*(obj.car()));
+        CheckPieceType(*(obj.cdr()->car()));
+      }
+      /**
        * ファイルを表しているかどうかをチェックする。
        * @param obj チェックするファイルの数字のオブジェクト。
        */
@@ -481,11 +498,31 @@ namespace Sayuri {
       }
 
       // %%% @to-string
-      /** 現在の状態のFENを得る。 */
+      /** 現在の状態の文字列を得る。 */
       LPointer BoardToString(const std::string& symbol,
       LPointer self, LObject* caller, const LObject& args) {
         return Lisp::NewString(Board::ToString(*board_ptr_));
       }
+
+      // %%% @set-new-game
+      /** ボードの状態を初期状態にする。 */
+      LPointer SetNewGame(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args) {
+        engine_ptr_->SetNewGame();
+        return Lisp::NewBoolean(true);
+      }
+
+      /** FENをセットする。 */
+      LPointer SetFEN(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** 駒を置く。 */
+      LPointer PlacePiece(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** 候補手を得る。 */
+      LPointer GetCandidateMoves(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
 
 //      // ========================== //
 //      // Lisp関数オブジェクト用関数 //

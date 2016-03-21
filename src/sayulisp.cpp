@@ -274,6 +274,30 @@ namespace Sayuri {
     const LObject& args) -> LPointer {
       return this->BoardToString(symbol, self, caller, args);
     };
+
+    message_func_map_["@set-new-game"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->SetNewGame(symbol, self, caller, args);
+    };
+
+    message_func_map_["@set-fen"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->SetFEN(symbol, self, caller, args);
+    };
+
+    message_func_map_["@place-piece"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->PlacePiece(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-candidate-moves"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetCandidateMoves(symbol, self, caller, args);
+    };
   }
 //
 //  // ウェイト関数オブジェクトをセット。
@@ -686,6 +710,89 @@ namespace Sayuri {
     }
 
     return Lisp::LPointerVecToList(ret_vec);
+  }
+
+  // %%% @set-fen
+  LPointer EngineSuite::SetFEN(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // FENを得る。
+    LPointer fen_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*fen_ptr, LType::STRING);
+
+    // パースする。
+    FEN fen;
+    try {
+      fen = FEN(fen_ptr->string());
+    } catch (...) {
+      throw Lisp::GenError("@engine-error", "Couldn't parse FEN.");
+    }
+
+    // キングの数をチェック。
+    if ((Util::CountBits(fen.position()[WHITE][KING]) != 1)
+    || (Util::CountBits(fen.position()[BLACK][KING]) != 1)) {
+      throw Lisp::GenError("@engine-error", "This FEN is invalid position.");
+    }
+
+    engine_ptr_->LoadFEN(fen);
+    return Lisp::NewBoolean(true);
+  }
+
+  // %%% @place-piece
+  LPointer EngineSuite::PlacePiece(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 2, &args_ptr);
+
+    // マスを得る。
+    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckSquare(*square_ptr);
+    Lisp::Next(&args_ptr);
+    Square square = square_ptr->number();
+
+    // 駒を得る。
+    LPointer piece_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckPiece(*piece_ptr);
+    Side side = piece_ptr->car()->number();
+    PieceType piece_type = piece_ptr->cdr()->car()->number();
+
+    // キングを置き換えることはできない。
+    if (board_ptr_->piece_board_[square] == KING) {
+      throw Lisp::GenError("@engine-error", "Couldn't overwrite King.");
+    }
+
+    // 前の駒のリストを作る。
+    LPointer ret_ptr = Lisp::NewList(2);
+    ret_ptr->car(Lisp::NewSymbol
+    (Sayulisp::SIDE_MAP_INV[board_ptr_->side_board_[square]]));
+    ret_ptr->cdr()->car(Lisp::NewSymbol
+    (Sayulisp::PIECE_MAP_INV[board_ptr_->piece_board_[square]]));
+
+    // 置き換える。
+    engine_ptr_->PlacePiece(square, piece_type, side);
+
+    return ret_ptr;
+  }
+
+  // %%% @get-candidate-moves
+  LPointer EngineSuite::GetCandidateMoves(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 指し手の生成。
+    std::vector<Move> move_vec = engine_ptr_->GetLegalMoves();
+    LPointer ret_ptr = Lisp::NewList(move_vec.size());
+
+    // リストに代入していく。
+    LObject* ptr = ret_ptr.get();
+    for (auto move : move_vec) {
+      ptr->car(Sayulisp::MoveToList(move));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
   }
 //  // 関数オブジェクト。
 //  LispObjectPtr EngineSuite::operator()
@@ -2308,43 +2415,6 @@ namespace Sayuri {
 //    }
 //
 //    return ret;
-//  }
-//
-//  // 白がキャスリングしたかどうかのフラグにアクセス。
-//  LispObjectPtr EngineSuite::GetWhiteHasCastled() const {
-//    return Lisp::NewBoolean(engine_ptr_->has_castled()[WHITE]);
-//  }
-//  // 黒がキャスリングしたかどうかのフラグにアクセス。
-//  LispObjectPtr EngineSuite::GetBlackHasCastled() const {
-//    return Lisp::NewBoolean(engine_ptr_->has_castled()[BLACK]);
-//  }
-//
-//  // ボードを初期状態にする。
-//  LispObjectPtr EngineSuite::SetNewGame() {
-//    engine_ptr_->SetNewGame();
-//    return Lisp::NewBoolean(true);
-//  }
-//
-//  // FENの配置にする。
-//  LispObjectPtr EngineSuite::SetFEN(LispObjectPtr fen_str_ptr) {
-//    FEN fen;
-//    try {
-//      fen = FEN(fen_str_ptr->string_value());
-//    } catch (...) {
-//      throw Lisp::GenError("@engine-error", "Couldn't parse FEN.");
-//    }
-//
-//    // 必ずそれぞれキングが1つずつでなくてはならない。
-//    // そうでなければ配置失敗。
-//    int num_white_king = Util::CountBits(fen.position()[WHITE][KING]);
-//    int num_black_king = Util::CountBits(fen.position()[BLACK][KING]);
-//    if ((num_white_king != 1) || (num_black_king != 1)) {
-//      throw Lisp::GenError("@engine-error",
-//      "This FEN indicates invalid position.");
-//    }
-//
-//    engine_ptr_->LoadFEN(fen);
-//    return Lisp::NewBoolean(true);
 //  }
 //
 //  // 候補手のリストを得る。
