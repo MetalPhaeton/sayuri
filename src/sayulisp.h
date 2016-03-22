@@ -162,6 +162,104 @@ namespace Sayuri {
         return ret_ptr;
       }
 
+      /**
+       * マスを表しているかどうかをチェックする。
+       * @param obj チェックするマスの数字のオブジェクト。
+       */
+      static void CheckSquare(const LObject& obj) {
+        CheckType(obj, LType::NUMBER);
+        Square square = obj.number();
+
+        if (square >= NUM_SQUARES) {
+          throw GenError("@not-square", "'" + std::to_string(square)
+          + "' doesn't indicate any square. Square is from '0' to '63'.");
+        }
+      }
+      /**
+       * 駒の種類を表しているかどうかをチェックする。
+       * @param obj チェックする駒の種類の数字のオブジェクト。
+       */
+      static void CheckPieceType(const LObject& obj) {
+        CheckType(obj, LType::NUMBER);
+        PieceType piece_type = obj.number();
+
+        if (piece_type >= NUM_PIECE_TYPES) {
+          throw GenError("@not-piece-type", "'" + std::to_string(piece_type)
+          + "' doesn't indicate any piece type. "
+          "Pieced type is from '0' to '6'.");
+        }
+      }
+      /**
+       * 駒を表しているかどうかをチェックする。
+       * @param obj チェックする駒のオブジェクト。
+       */
+      static void CheckPiece(const LObject& obj) {
+        // リストをチェック。
+        CheckList(obj);
+        if (CountList(obj) < 2) {
+          throw GenError("@not-piece", "'" + obj.ToString()
+          + "' doesn't indicate any piece. "
+          "Format of piece must be `(<Side> <Piece type>)`.");
+        }
+
+        // サイドと駒の種類チェック。
+        CheckSide(*(obj.car()));
+        CheckPieceType(*(obj.cdr()->car()));
+      }
+      /**
+       * ファイルを表しているかどうかをチェックする。
+       * @param obj チェックするファイルの数字のオブジェクト。
+       */
+      static void CheckFyle(const LObject& obj) {
+        CheckType(obj, LType::NUMBER);
+        Fyle fyle = obj.number();
+
+        if (fyle >= NUM_FYLES) {
+          throw GenError("@not-fyle", "'" + std::to_string(fyle)
+          + "' doesn't indicate any fyle. Fyle is from '0' to '7'.");
+        }
+      }
+      /**
+       * ランクを表しているかどうかをチェックする。
+       * @param obj チェックするランクの数字のオブジェクト。
+       */
+      static void CheckRank(const LObject& obj) {
+        CheckType(obj, LType::NUMBER);
+        Rank rank = obj.number();
+
+        if (rank >= NUM_RANKS) {
+          throw GenError("@not-rank", "'" + std::to_string(rank)
+          + "' doesn't indicate any rank. Rank is from '0' to '7'.");
+        }
+      }
+      /**
+       * サイドを表しているかどうかをチェックする。
+       * @param obj チェックするサイドの数字のオブジェクト。
+       */
+      static void CheckSide(const LObject& obj) {
+        CheckType(obj, LType::NUMBER);
+        Side side = obj.number();
+
+        if (side >= NUM_SIDES) {
+          throw GenError("@not-side", "'" + std::to_string(side)
+          + "' doesn't indicate any side. Side is from '0' to '2'.");
+        }
+      }
+      /**
+       * キャスリングを表しているかどうかをチェックする。
+       * @param obj チェックするキャスリングの数字のオブジェクト。
+       */
+      static void CheckCastling(const LObject& obj) {
+        CheckType(obj, LType::NUMBER);
+        int castling = obj.number();
+
+        if (castling >= 5) {
+          throw GenError("@not-castling", "'" + std::to_string(castling)
+          + "' doesn't indicate any castling right. "
+          "Castling right is from '0' to '4'.");
+        }
+      }
+
       // ========================== //
       // Lisp関数オブジェクト用関数 //
       // ========================== //
@@ -307,109 +405,6 @@ namespace Sayuri {
       static void GetReadyForMessageFunction(const std::string& symbol,
       const LObject& args, int required_args, LObject** args_ptr_ptr);
 
-      /**
-       * マスを表しているかどうかをチェックする。
-       * @param obj チェックするマスの数字のオブジェクト。
-       */
-      static void CheckSquare(const LObject& obj) {
-        Lisp::CheckType(obj, LType::NUMBER);
-        Square square = obj.number();
-
-        if (square >= NUM_SQUARES) {
-          throw Lisp::GenError("@not-square", "'" + std::to_string(square)
-          + "' doesn't indicate any square. Square is from '0' to '63'.");
-        }
-      }
-      /**
-       * 駒の種類を表しているかどうかをチェックする。
-       * @param obj チェックする駒の種類の数字のオブジェクト。
-       */
-      static void CheckPieceType(const LObject& obj) {
-        Lisp::CheckType(obj, LType::NUMBER);
-        PieceType piece_type = obj.number();
-
-        if (piece_type >= NUM_PIECE_TYPES) {
-          throw Lisp::GenError("@not-piece-type",
-          "'" + std::to_string(piece_type)
-          + "' doesn't indicate any piece type. "
-          "Pieced type is from '0' to '6'.");
-        }
-      }
-      /**
-       * 駒を表しているかどうかをチェックする。
-       * @param obj チェックする駒のオブジェクト。
-       */
-      static void CheckPiece(const LObject& obj) {
-        // リストをチェック。
-        Lisp::CheckList(obj);
-        if (Lisp::CountList(obj) < 2) {
-          throw Lisp::GenError("@not-piece",
-          "'" + obj.ToString() + "' doesn't indicate any piece. "
-          "Format of piece must be `(<Side> <Piece type>)`.");
-        }
-
-        // サイドと駒の種類チェック。
-        CheckSide(*(obj.car()));
-        CheckPieceType(*(obj.cdr()->car()));
-      }
-      /**
-       * ファイルを表しているかどうかをチェックする。
-       * @param obj チェックするファイルの数字のオブジェクト。
-       */
-      static void CheckFyle(const LObject& obj) {
-        Lisp::CheckType(obj, LType::NUMBER);
-        Fyle fyle = obj.number();
-
-        if (fyle >= NUM_FYLES) {
-          throw Lisp::GenError("@not-fyle",
-          "'" + std::to_string(fyle)
-          + "' doesn't indicate any fyle. Fyle is from '0' to '7'.");
-        }
-      }
-      /**
-       * ランクを表しているかどうかをチェックする。
-       * @param obj チェックするランクの数字のオブジェクト。
-       */
-      static void CheckRank(const LObject& obj) {
-        Lisp::CheckType(obj, LType::NUMBER);
-        Rank rank = obj.number();
-
-        if (rank >= NUM_RANKS) {
-          throw Lisp::GenError("@not-rank",
-          "'" + std::to_string(rank)
-          + "' doesn't indicate any rank. Rank is from '0' to '7'.");
-        }
-      }
-      /**
-       * サイドを表しているかどうかをチェックする。
-       * @param obj チェックするサイドの数字のオブジェクト。
-       */
-      static void CheckSide(const LObject& obj) {
-        Lisp::CheckType(obj, LType::NUMBER);
-        Side side = obj.number();
-
-        if (side >= NUM_SIDES) {
-          throw Lisp::GenError("@not-side",
-          "'" + std::to_string(side)
-          + "' doesn't indicate any side. Side is from '0' to '2'.");
-        }
-      }
-      /**
-       * キャスリングを表しているかどうかをチェックする。
-       * @param obj チェックするキャスリングの数字のオブジェクト。
-       */
-      static void CheckCastling(const LObject& obj) {
-        Lisp::CheckType(obj, LType::NUMBER);
-        int castling = obj.number();
-
-        if (castling >= 5) {
-          throw Lisp::GenError("@not-castling",
-          "'" + std::to_string(castling)
-          + "' doesn't indicate any castling right. "
-          "Castling right is from '0' to '4'.");
-        }
-      }
-
       // ====================== //
       // メッセージシンボル関数 //
       // ====================== //
@@ -522,6 +517,26 @@ namespace Sayuri {
 
       /** 候補手を得る。 */
       LPointer GetCandidateMoves(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** 手番をセットする。 */
+      LPointer SetToMove(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** キャスリングの権利をセットする。 */
+      LPointer SetCastlingRights(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** アンパッサンのマスをセットする。 */
+      LPointer SetEnPassantSquare(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** 手数をセットする。 */
+      LPointer SetPly(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** クロックをセットする。 */
+      LPointer SetClock(const std::string& symbol,
       LPointer self, LObject* caller, const LObject& args);
 
 //      // ========================== //

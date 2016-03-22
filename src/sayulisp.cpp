@@ -298,6 +298,36 @@ namespace Sayuri {
     const LObject& args) -> LPointer {
       return this->GetCandidateMoves(symbol, self, caller, args);
     };
+
+    message_func_map_["@set-to-move"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->SetToMove(symbol, self, caller, args);
+    };
+
+    message_func_map_["@set-castling-rights"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->SetCastlingRights(symbol, self, caller, args);
+    };
+
+    message_func_map_["@set-en-passant-square"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->SetEnPassantSquare(symbol, self, caller, args);
+    };
+
+    message_func_map_["@set-ply"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->SetPly(symbol, self, caller, args);
+    };
+
+    message_func_map_["@set-clock"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->SetClock(symbol, self, caller, args);
+    };
   }
 //
 //  // ウェイト関数オブジェクトをセット。
@@ -677,7 +707,7 @@ namespace Sayuri {
 
     // 引数のチェック。
     LPointer result = caller->Evaluate(*(args_ptr->car()));
-    CheckSquare(*result);
+    Sayulisp::CheckSquare(*result);
     Square square = result->number();
 
     // サイドと駒の種類を得る。
@@ -750,13 +780,13 @@ namespace Sayuri {
 
     // マスを得る。
     LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
-    CheckSquare(*square_ptr);
+    Sayulisp::CheckSquare(*square_ptr);
     Lisp::Next(&args_ptr);
     Square square = square_ptr->number();
 
     // 駒を得る。
     LPointer piece_ptr = caller->Evaluate(*(args_ptr->car()));
-    CheckPiece(*piece_ptr);
+    Sayulisp::CheckPiece(*piece_ptr);
     Side side = piece_ptr->car()->number();
     PieceType piece_type = piece_ptr->cdr()->car()->number();
 
@@ -792,6 +822,180 @@ namespace Sayuri {
       Lisp::Next(&ptr);
     }
 
+    return ret_ptr;
+  }
+
+  // %%% @set-to-move
+  LPointer EngineSuite::SetToMove(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 指し手を得る。
+    LPointer to_move_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSide(*to_move_ptr);
+    Side to_move = to_move_ptr->number();
+
+    // NO_SIDEはダメ。
+    if (to_move == NO_SIDE) {
+      throw Lisp::GenError("@engine-error", "NO_SIDE is not allowed.");
+    }
+
+    // 前の状態。
+    LPointer ret_ptr =
+    Lisp::NewSymbol(Sayulisp::SIDE_MAP_INV[board_ptr_->to_move_]);
+
+    engine_ptr_->to_move(to_move);
+    return ret_ptr;
+  }
+
+  // %%% @set-castling-rights
+  LPointer EngineSuite::SetCastlingRights(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // キャスリングの権利を得る。
+    LPointer castling_list_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckList(*castling_list_ptr);
+
+    // キャスリングの権利フラグを作成。
+    Castling rights = 0;
+    LPointer result;
+    int rights_number = 0;
+    for (LObject* ptr = castling_list_ptr.get(); ptr->IsPair();
+    Lisp::Next(&ptr)) {
+      result = caller->Evaluate(*(ptr->car()));
+      Sayulisp::CheckCastling(*result);
+
+      rights_number = result->number();
+      switch (rights_number) {
+        case 1:
+          rights |= WHITE_SHORT_CASTLING;
+          break;
+        case 2:
+          rights |= WHITE_LONG_CASTLING;
+          break;
+        case 3:
+          rights |= BLACK_SHORT_CASTLING;
+          break;
+        case 4:
+          rights |= BLACK_LONG_CASTLING;
+          break;
+      }
+    }
+
+    // 前のキャスリングの権利を得る。
+    Castling origin_rights = board_ptr_->castling_rights_;
+    LPointerVec ret_vec;
+    if ((origin_rights & WHITE_SHORT_CASTLING)) {
+      ret_vec.push_back(Lisp::NewSymbol("WHITE_SHORT_CASTLING"));
+    }
+    if ((origin_rights & WHITE_LONG_CASTLING)) {
+      ret_vec.push_back(Lisp::NewSymbol("WHITE_LONG_CASTLING"));
+    }
+    if ((origin_rights & BLACK_SHORT_CASTLING)) {
+      ret_vec.push_back(Lisp::NewSymbol("BLACK_SHORT_CASTLING"));
+    }
+    if ((origin_rights & BLACK_LONG_CASTLING)) {
+      ret_vec.push_back(Lisp::NewSymbol("BLACK_LONG_CASTLING"));
+    }
+
+    // セットして返す。
+    engine_ptr_->castling_rights(rights);
+    return Lisp::LPointerVecToList(ret_vec);
+  }
+
+  // %%% set-en-passant-square
+  LPointer EngineSuite::SetEnPassantSquare(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // マスを得る。
+    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSquare(*square_ptr);
+    Square square = square_ptr->number();
+
+    // 前のアンパッサンのマスを作る。
+    LPointer ret_ptr = Lisp::NewNil();
+    if (board_ptr_->en_passant_square_) {
+      ret_ptr = Lisp::NewNumber(board_ptr_->en_passant_square_);
+    }
+
+    // マスがアンパッサンのマスのチェック。
+    if (board_ptr_->to_move_ == WHITE) {
+      // 白番の時は黒側のアンパッサン。
+      if (Util::SquareToRank(square) == RANK_6) {
+        // 一つ上にポーンがいて、アンパッサンのマスが空の時にセットできる。
+        if ((board_ptr_->piece_board_[square] == EMPTY)
+        && (board_ptr_->side_board_[square - 8] == BLACK)
+        && (board_ptr_->piece_board_[square - 8] == PAWN)) {
+          engine_ptr_->en_passant_square(square);
+          return ret_ptr;
+        }
+      }
+    } else {
+      // 黒番の時は白側のアンパッサン。
+      if (Util::SquareToRank(square) == RANK_3) {
+        // 一つ上にポーンがいて、アンパッサンのマスが空の時にセットできる。
+        if ((board_ptr_->piece_board_[square] == EMPTY)
+        && (board_ptr_->side_board_[square + 8] == WHITE)
+        && (board_ptr_->piece_board_[square + 8] == PAWN)) {
+          engine_ptr_->en_passant_square(square);
+          return ret_ptr;
+        }
+      }
+    }
+
+    throw Lisp::GenError("@engine-error", "'" + square_ptr->ToString()
+    + "' couldn't be en passant square.");
+  }
+
+  // %%% @set-play
+  LPointer EngineSuite::SetPly(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 手数を得る。
+    LPointer ply_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*ply_ptr, LType::NUMBER);
+    int ply = ply_ptr->number();
+
+    // 手数はプラスでないとダメ。
+    if (ply < 0) {
+      throw Lisp::GenError("@engine-error", "Ply must be positive number.");
+    }
+
+    LPointer ret_ptr = Lisp::NewNumber(board_ptr_->ply_);
+    engine_ptr_->ply(ply);
+    return ret_ptr;
+  }
+
+  // %%% @set-clock
+  LPointer EngineSuite::SetClock(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 手数を得る。
+    LPointer clock_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*clock_ptr, LType::NUMBER);
+    int clock = clock_ptr->number();
+
+    // 手数はプラスでないとダメ。
+    if (clock < 0) {
+      throw Lisp::GenError("@engine-error", "Clock must be positive number.");
+    }
+
+    LPointer ret_ptr = Lisp::NewNumber(board_ptr_->clock_);
+    engine_ptr_->clock(clock);
     return ret_ptr;
   }
 //  // 関数オブジェクト。
