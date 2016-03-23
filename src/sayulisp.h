@@ -539,59 +539,56 @@ namespace Sayuri {
       LPointer SetClock(const std::string& symbol,
       LPointer self, LObject* caller, const LObject& args);
 
-//      // ========================== //
-//      // Lisp関数オブジェクト用関数 //
-//      // ========================== //
-//      /**
-//       * 正しい駒の配置かどうか。
-//       * @return 正しければ#t。
-//       */
-//      LispObjectPtr IsCorrectPosition() const {
-//        return Lisp::NewBoolean(engine_ptr_->IsCorrectPosition());
-//      }
-//      /**
-//       * 白キングがチェックされているかどうか。
-//       * @return チェックされていれば#t。
-//       */
-//      LispObjectPtr IsWhiteChecked() const {
-//        return Lisp::NewBoolean
-//        (engine_ptr_->IsAttacked(engine_ptr_->king()[WHITE], BLACK));
-//      }
-//      /**
-//       * 黒キングがチェックされているかどうか。
-//       * @return チェックされていれば#t。
-//       */
-//      LispObjectPtr IsBlackChecked() const {
-//        return Lisp::NewBoolean
-//        (engine_ptr_->IsAttacked(engine_ptr_->king()[BLACK], WHITE));
-//      }
-//      /**
-//       * チェックメイトかどうか。
-//       * @return チェックメイトなら#t。
-//       */
-//      LispObjectPtr IsCheckmated() {
-//        Side side = engine_ptr_->to_move();
-//        if (engine_ptr_->IsAttacked
-//        (engine_ptr_->king()[side], Util::GetOppositeSide(side))) {
-//          std::vector<Move> move = engine_ptr_->GetLegalMoves();
-//          if (move.size() == 0) return Lisp::NewBoolean(true);
-//        }
-//        return Lisp::NewBoolean(false);
-//      }
-//      /**
-//       * ステールメイトかどうか。
-//       * @return ステールメイトなら#t。
-//       */
-//      LispObjectPtr IsStalemated() {
-//        Side side = engine_ptr_->to_move();
-//        if (!(engine_ptr_->IsAttacked
-//        (engine_ptr_->king()[side], Util::GetOppositeSide(side)))) {
-//          std::vector<Move> move = engine_ptr_->GetLegalMoves();
-//          if (move.size() == 0) return Lisp::NewBoolean(true);
-//        }
-//        return Lisp::NewBoolean(false);
-//      }
-//
+      // %%% @correct-position?
+      /** 正しい配置かどうか。 */
+      LPointer IsCorrectPosition(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args) {
+        return Lisp::NewBoolean(engine_ptr_->IsCorrectPosition());
+      }
+
+      // %%% @white-checked?
+      // %%% @black-checked?
+      /** チェックがかかっているかどうか。 */
+      template<Side SIDE>
+      LPointer IsChecked(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args) {
+        constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
+        return Lisp::NewBoolean
+        (engine_ptr_->IsAttacked(board_ptr_->king_[SIDE], ENEMY_SIDE));
+      }
+
+      // %%% @checkmated?
+      /** 正しい配置かどうか。 */
+      LPointer IsCheckmated(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args) {
+        Side to_move = board_ptr_->to_move_;
+
+        if (engine_ptr_->GetLegalMoves().size() == 0) {
+          if (engine_ptr_->IsAttacked(board_ptr_->king_[to_move],
+          Util::GetOppositeSide(to_move))) {
+            return Lisp::NewBoolean(true);
+          }
+        }
+
+        return Lisp::NewBoolean(false);
+      }
+
+      // %%% @stalemated?
+      /** 正しい配置かどうか。 */
+      LPointer IsStalemated(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args) {
+        Side to_move = board_ptr_->to_move_;
+
+        if (engine_ptr_->GetLegalMoves().size() == 0) {
+          if (!(engine_ptr_->IsAttacked(board_ptr_->king_[to_move],
+          Util::GetOppositeSide(to_move)))) {
+            return Lisp::NewBoolean(true);
+          }
+        }
+
+        return Lisp::NewBoolean(false);
+      }
+
 //      /**
 //       * 1手指す。
 //       * @param caller 呼び出し元の関数。

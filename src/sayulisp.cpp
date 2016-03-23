@@ -328,6 +328,36 @@ namespace Sayuri {
     const LObject& args) -> LPointer {
       return this->SetClock(symbol, self, caller, args);
     };
+
+    message_func_map_["@correct-position?"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->IsCorrectPosition(symbol, self, caller, args);
+    };
+
+    message_func_map_["@white-checked?"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->IsChecked<WHITE>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@black-checked?"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->IsChecked<BLACK>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@checkmated?"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->IsCheckmated(symbol, self, caller, args);
+    };
+
+    message_func_map_["@stalemated?"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->IsStalemated(symbol, self, caller, args);
+    };
   }
 //
 //  // ウェイト関数オブジェクトをセット。
