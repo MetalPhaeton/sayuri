@@ -3661,7 +3661,12 @@ R"...(### min ###
     LPointer result = caller->Evaluate(*(args_ptr->car()));
     CheckType(*result, LType::STRING);
 
-    // 初期化する。
+    // パース用のメンバ変数を退避する。
+    std::queue<std::string> origin_token_queue = std::move(token_queue_);
+    int origin_parenth_counter = parenth_counter_;
+    bool origin_in_string = in_string_;
+
+    // パースのために初期化する。
     token_queue_ = std::queue<std::string>();
     parenth_counter_ = 0;
     in_string_ = false;
@@ -3671,6 +3676,12 @@ R"...(### min ###
 
     // 解析できたかチェック。
     if ((parenth_counter_ != 0) || in_string_) {
+      // 退避したメンバを戻す。
+      token_queue_ = std::move(origin_token_queue);
+      parenth_counter_ = origin_parenth_counter;
+      in_string_ = origin_in_string;
+
+      // エラー。
       throw GenError("@parse-error",
       "Couldn't parse '" + args_ptr->car()->ToString() + "'.");
     }
@@ -3678,9 +3689,20 @@ R"...(### min ###
     // パースする。
     LPointerVec parse_result = Parse();
     if (parse_result.size() <= 0) {
+      // 退避したメンバを戻す。
+      token_queue_ = std::move(origin_token_queue);
+      parenth_counter_ = origin_parenth_counter;
+      in_string_ = origin_in_string;
+
+      // エラー。
       throw GenError("@parse-error",
       "Couldn't parse '" + args_ptr->car()->ToString() + "'.");
     }
+
+    // 退避したメンバを戻す。
+    token_queue_ = std::move(origin_token_queue);
+    parenth_counter_ = origin_parenth_counter;
+    in_string_ = origin_in_string;
 
     // 一番最後にパースした式を返す。
     return parse_result.at(parse_result.size() - 1);
