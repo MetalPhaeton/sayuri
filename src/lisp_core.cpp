@@ -122,7 +122,7 @@ namespace Sayuri {
           if (names_itr != names_end) {
             // 引数名があった場合。
             name = names_itr->c_str();
-            if (name[0] == '`') {
+            if (name[0] == '^') {
               // マクロ引数。
               is_macro = true;
             }
@@ -1063,8 +1063,8 @@ R"...(### lambda ###
 * (lambda) inherits parent's scope and creates its own local scope.
   So using (lambda) in (lambda), you can create closure function.
 * `<Args>...` is Symbols as name of arguments.
-    + If an argument name is started with back-quote,
-      the argument is Macro Argument.
+    + If an argument name is started with `^`,
+      the argument is Macro-Like Argument.
 
 <h6> Example </h6>
 
@@ -1079,8 +1079,8 @@ R"...(### lambda ###
     ;; Output
     ;; > 150
     
-    ;; Example of Macro Argument.
-    (define gen-func2 (lambda (`funcn-name) (lambda (x y) (`func-name x y))))
+    ;; Example of Macro-Like Argument.
+    (define gen-func2 (lambda (^funcn-name) (lambda (x y) (^func-name x y))))
     (define myfunc3 (gen-func2 +))
     (define myfunc4 (gen-func2 *))
     (display (myfunc3 10 20))
@@ -1125,22 +1125,7 @@ R"...(### let ###
     (display (myfunc))
     
     ;; Output
-    ;; > 30
-    
-    ;; Example of Macro Argument.
-    (define (gen-func2 `func-name) (lambda (x y) (`func-name x y)))
-    (define myfunc2 (gen-func2 +))
-    (define myfunc3 (gen-func2 *))
-    (display (myfunc2 10 20))
-    (display (myfunc3 10 20))
-    ;; Output
-    ;; > 30 
-    ;; > 200 
-    (display (to-string myfunc2))
-    (display (to-string myfunc3))
-    ;; Output
-    ;; > (lambda (x y) (+ x y))
-    ;; > (lambda (x y) (* x y)))...";
+    ;; > 30)...";
     help_dict_.emplace("let", help);
 
     func =
@@ -1256,8 +1241,8 @@ R"...(### define ###
 * 1: Binds `<Object>` to `<Symbol>`.
 * 2: Defines `<S-Expression>` as Function named `<Name>`,
      and `<Args>...` is names of its arguments.
-    + If an argument name is started with back-quote,
-      the argument won't evaluate when the calling function.
+    + If an argument name is started with `^`,
+      the argument is Macro-Like Argument.
 
 <h6> Example </h6>
 
@@ -1273,13 +1258,20 @@ R"...(### define ###
     ;; Output
     ;; > 15
     
-    (define a 111)
-    (define b 222)
-    (define (myfunc2 x `y) (display x) (display y))
-    (myfunc2 a b)
+    ;; Example of Macro-Like Argument.
+    (define (gen-func2 ^funcn-name) (lambda (x y) (^func-name x y)))
+    (define myfunc3 (gen-func2 +))
+    (define myfunc4 (gen-func2 *))
+    (display (myfunc3 10 20))
+    (display (myfunc4 10 20))
     ;; Output
-    ;; > 111
-    ;; > Symbol: b)...";
+    ;; > 30 
+    ;; > 200 
+    (display (to-string myfunc3))
+    (display (to-string myfunc4))
+    ;; Output
+    ;; > (lambda (x y) (+ x y))
+    ;; > (lambda (x y) (* x y)))...";
     help_dict_.emplace("define", help);
 
     func =
