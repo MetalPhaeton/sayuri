@@ -358,6 +358,30 @@ namespace Sayuri {
     const LObject& args) -> LPointer {
       return this->IsStalemated(symbol, self, caller, args);
     };
+
+    message_func_map_["@play-move"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->PlayMoveOrNote(symbol, self, caller, args);
+    };
+
+    message_func_map_["@play-note"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->PlayMoveOrNote(symbol, self, caller, args);
+    };
+
+    message_func_map_["@undo-move"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->UndoMove(symbol, self, caller, args);
+    };
+
+    message_func_map_["@move->note"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->MoveToNote(symbol, self, caller, args);
+    };
   }
 //
 //  // ウェイト関数オブジェクトをセット。
@@ -1027,6 +1051,53 @@ namespace Sayuri {
     LPointer ret_ptr = Lisp::NewNumber(board_ptr_->clock_);
     engine_ptr_->clock(clock);
     return ret_ptr;
+  }
+
+  // %%% @play-move
+  // %%% @play-note
+  /** 手を指す。 */
+  LPointer EngineSuite::PlayMoveOrNote(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 指し手を得る。
+    LPointer result = caller->Evaluate(*(args_ptr->car()));
+    Move move = 0;
+    if (symbol == "@play-move") {  // @play-move
+      move = Sayulisp::ListToMove(*result);
+    } else {  // @play-note
+      Lisp::CheckType(*result, LType::STRING);
+      std::vector<Move> move_vec = engine_ptr_->GuessNote(result->string());
+      if (move_vec.size() == 0) return Lisp::NewBoolean(false);
+      move = move_vec[0];
+    }
+
+    return Lisp::NewBoolean(engine_ptr_->PlayMove(move));
+  }
+
+  /** 指し手を戻す。 */
+  LPointer EngineSuite::UndoMove(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    Move move = engine_ptr_->UndoMove();
+    if (!move) return Lisp::NewNil();
+
+    return Sayulisp::MoveToList(move);
+  }
+
+  /** 指し手をPGNの指し手の文字列に変換する。 */
+  LPointer EngineSuite::MoveToNote(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 指し手を得る。
+    LPointer move_ptr = caller->Evaluate(*(args_ptr->car()));
+
+    return Lisp::NewString(engine_ptr_->MoveToNote
+    (Sayulisp::ListToMove(*move_ptr)));
   }
 //  // 関数オブジェクト。
 //  LispObjectPtr EngineSuite::operator()

@@ -163,8 +163,24 @@ namespace Sayuri {
       }
 
       /**
+       * 指し手のリストを指し手に変換する。
+       * @param obj 指し手のリスト。
+       * @return 変換後の指し手。
+       */
+      static Move ListToMove(const LObject& obj) {
+        CheckMove(obj);
+
+        Move move = 0;
+        Sayuri::Set<FROM>(move, obj.car()->number());
+        Sayuri::Set<TO>(move, obj.cdr()->car()->number());
+        Sayuri::Set<PROMOTION>(move, obj.cdr()->cdr()->car()->number());
+
+        return move;
+      }
+
+      /**
        * マスを表しているかどうかをチェックする。
-       * @param obj チェックするマスの数字のオブジェクト。
+       * @param obj チェックするマスのオブジェクト。
        */
       static void CheckSquare(const LObject& obj) {
         CheckType(obj, LType::NUMBER);
@@ -177,7 +193,7 @@ namespace Sayuri {
       }
       /**
        * 駒の種類を表しているかどうかをチェックする。
-       * @param obj チェックする駒の種類の数字のオブジェクト。
+       * @param obj チェックする駒の種類のオブジェクト。
        */
       static void CheckPieceType(const LObject& obj) {
         CheckType(obj, LType::NUMBER);
@@ -208,7 +224,7 @@ namespace Sayuri {
       }
       /**
        * ファイルを表しているかどうかをチェックする。
-       * @param obj チェックするファイルの数字のオブジェクト。
+       * @param obj チェックするファイルのオブジェクト。
        */
       static void CheckFyle(const LObject& obj) {
         CheckType(obj, LType::NUMBER);
@@ -221,7 +237,7 @@ namespace Sayuri {
       }
       /**
        * ランクを表しているかどうかをチェックする。
-       * @param obj チェックするランクの数字のオブジェクト。
+       * @param obj チェックするランクのオブジェクト。
        */
       static void CheckRank(const LObject& obj) {
         CheckType(obj, LType::NUMBER);
@@ -234,7 +250,7 @@ namespace Sayuri {
       }
       /**
        * サイドを表しているかどうかをチェックする。
-       * @param obj チェックするサイドの数字のオブジェクト。
+       * @param obj チェックするサイドのオブジェクト。
        */
       static void CheckSide(const LObject& obj) {
         CheckType(obj, LType::NUMBER);
@@ -247,7 +263,7 @@ namespace Sayuri {
       }
       /**
        * キャスリングを表しているかどうかをチェックする。
-       * @param obj チェックするキャスリングの数字のオブジェクト。
+       * @param obj チェックするキャスリングのオブジェクト。
        */
       static void CheckCastling(const LObject& obj) {
         CheckType(obj, LType::NUMBER);
@@ -258,6 +274,21 @@ namespace Sayuri {
           + "' doesn't indicate any castling right. "
           "Castling right is from '0' to '4'.");
         }
+      }
+      /**
+       * 指し手を表しているかどうかをチェックする。
+       * @param obj チェックする指し手のオブジェクト。
+       */
+      static void CheckMove(const LObject& obj) {
+        CheckList(obj);
+        if (CountList(obj) >= 3) {
+          CheckSquare(*(obj.car()));
+          CheckSquare(*(obj.cdr()->car()));
+          CheckPieceType(*(obj.cdr()->cdr()->car()));
+          return;
+        }
+
+        throw GenError("@not-move", "Move must be (<From> <To> <Promotion>).");
       }
 
       // ========================== //
@@ -589,21 +620,18 @@ namespace Sayuri {
         return Lisp::NewBoolean(false);
       }
 
-//      /**
-//       * 1手指す。
-//       * @param caller 呼び出し元の関数。
-//       * @param func_name 呼びだされた関数名。
-//       * @param move_ptr (From To Promotion) のリストのポインタ。
-//       * @return #t。
-//       */
-//      LispObjectPtr PlayMove(const LispObject& caller,
-//      const std::string& func_name, LispObjectPtr move_ptr);
-//      /**
-//       * 手を戻す。
-//       * @return 戻された手のリスト。
-//       */
-//      LispObjectPtr UndoMove();
-//
+      /** 手を指す。 */
+      LPointer PlayMoveOrNote(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** 指し手を戻す。 */
+      LPointer UndoMove(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** 指し手をPGNの指し手の文字列に変換する。 */
+      LPointer MoveToNote(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
 //      /**
 //       * UCIコマンドを入力する。
 //       * @param command_ptr UCIコマンドの文字列。
