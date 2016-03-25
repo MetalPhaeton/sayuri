@@ -138,7 +138,7 @@ namespace Sayuri {
        * @param symbol 追加するシンボル。 一番近くのスコープに追加される。
        * @param ptr シンボルにバインドするオブジェクトのポインタ。
        */
-      void InsertSymbol(const std::string& symbol, const LPointer& ptr) {
+      void InsertSymbol(const std::string& symbol, const LPointer& ptr) const {
         back()->emplace(symbol, ptr);
       }
       /**
@@ -146,7 +146,7 @@ namespace Sayuri {
        * @param symbol 更新するシンボル。
        * @param ptr シンボルにバインドするオブジェクトのポインタ。
        */
-      void UpdateSymbol(const std::string& symbol, const LPointer& ptr) {
+      void UpdateSymbol(const std::string& symbol, const LPointer& ptr) const {
         // 手前のスコープから順番に調べる。
         LScopeChain::const_reverse_iterator citr = crbegin();
         for (; citr != crend(); ++citr) {
@@ -161,7 +161,7 @@ namespace Sayuri {
        * シンボルを削除。
        * @param symbol 削除するシンボル。
        */
-      void DeleteSymbol(const std::string& symbol) {
+      void DeleteSymbol(const std::string& symbol) const {
         // 手前のスコープから順番に調べる。
         LScopeChain::const_reverse_iterator citr = crbegin();
         for (; citr != crend(); ++citr) {
@@ -293,7 +293,7 @@ namespace Sayuri {
        * アクセサ - シンボル。
        * @return シンボル。
        */
-      virtual std::string symbol() const {return std::string("");}
+      virtual const std::string& symbol() const {return dummy_str_;}
       /**
        * アクセサ - 数字。
        * @return 数字。
@@ -308,32 +308,34 @@ namespace Sayuri {
        * アクセサ - 文字列。
        * @return 文字列。
        */
-      virtual std::string string() const {return std::string("");}
+      virtual const std::string& string() const {return dummy_str_;}
       /**
        * アクセサ - 関数の引数名ベクトル。
        * @return 関数の引数名ベクトル。
        */
-      virtual LArgNames arg_names() const {return LArgNames();}
+      virtual const LArgNames& arg_names() const {return dummy_arg_names_;}
       /**
        * アクセサ - 関数の式。
        * @return 関数の式。
        */
-      virtual LPointerVec expression() const {return LPointerVec();}
+      virtual const LPointerVec& expression() const {return dummy_ptr_vec_;}
       /**
        * アクセサ - ネイティブ関数の実体。
        * @return ネイティブ関数の実体。
        */
-      virtual LC_Function c_function() const {return LC_Function();}
+      virtual const LC_Function& c_function() const {return dummy_c_function_;}
       /**
        * アクセサ - ネイティブ関数用識別文字列。
        * @return ネイティブ関数用識別文字列。
        */
-      virtual std::string func_id() const {return std::string("");}
+      virtual const std::string& func_id() const {return dummy_str_;}
       /**
        * アクセサ - スコープチェーン。
        * @return スコープチェーン。
        */
-      virtual LScopeChain scope_chain() const {return LScopeChain();}
+      virtual const LScopeChain& scope_chain() const {
+        return dummy_scope_chain_;
+      }
 
       /**
        * ミューテータ - Car。
@@ -432,6 +434,18 @@ namespace Sayuri {
        * @return ネイティブ関数ならtrue。
        */
       virtual bool IsN_Function() const {return type() == LType::N_FUNCTION;}
+
+    protected:
+      /** ダミー文字列。 */
+      static const std::string dummy_str_;
+      /** ダミー引数名ベクトル。 */
+      static const LArgNames dummy_arg_names_;
+      /** ダミー関数の式のベクトル。 */
+      static const LPointerVec dummy_ptr_vec_;
+      /** ダミーC関数。 */
+      static const LC_Function dummy_c_function_;
+      /** ダミースコープチェーン。 */
+      static const LScopeChain dummy_scope_chain_;
   };
 
   /** Nilオブジェクト。 */
@@ -732,7 +746,7 @@ namespace Sayuri {
        * アクセサ - シンボル。
        * @return シンボル。
        */
-      virtual std::string symbol() const override {
+      virtual const std::string& symbol() const override {
         return symbol_;
       }
       /**
@@ -1191,7 +1205,7 @@ namespace Sayuri {
        * アクセサ - 文字列。
        * @return 文字列。
        */
-      virtual std::string string() const override {
+      virtual const std::string& string() const override {
         return string_;
       }
 
@@ -1313,16 +1327,16 @@ namespace Sayuri {
        */
       virtual std::string ToString() const override {
         std::ostringstream oss;
-        oss << "Function: (lambda (";
+        oss << "(lambda (";
         for (auto& name : arg_names_) {
           oss << name << " ";
         }
-        oss.seekp(oss.str().size() - 1);
+        if (arg_names_.size()) oss.seekp(oss.str().size() - 1);
         oss << ") ";
         for (auto& expr : expression_) {
           oss << expr->ToString() << " ";
         }
-        oss.seekp(oss.str().size() - 1);
+        if (expression_.size()) oss.seekp(oss.str().size() - 1);
         oss << ")";
         return oss.str();
       }
@@ -1331,21 +1345,21 @@ namespace Sayuri {
        * アクセサ - 関数の引数名ベクトル。
        * @return 関数の引数名ベクトル。
        */
-      virtual LArgNames arg_names() const override {
+      virtual const LArgNames& arg_names() const override {
         return arg_names_;
       }
       /**
        * アクセサ - 関数の式。
        * @return 関数の式。
        */
-      virtual LPointerVec expression() const override {
+      virtual const LPointerVec& expression() const override {
         return expression_;
       }
       /**
        * アクセサ - スコープチェーン。
        * @return スコープチェーン。
        */
-      virtual LScopeChain scope_chain() const override {
+      virtual const LScopeChain& scope_chain() const override {
         return scope_chain_;
       }
 
@@ -1484,21 +1498,21 @@ namespace Sayuri {
        * アクセサ - ネイティブ関数の実体。
        * @return ネイティブ関数の実体。
        */
-      virtual LC_Function c_function() const override {
+      virtual const LC_Function& c_function() const override {
         return c_function_;
       }
       /**
        * アクセサ - ネイティブ関数用識別文字列。
        * @return ネイティブ関数用識別文字列。
        */
-      virtual std::string func_id() const override {
+      virtual const std::string& func_id() const override {
         return func_id_;
       }
       /**
        * アクセサ - スコープチェーン。
        * @return スコープチェーン。
        */
-      virtual LScopeChain scope_chain() const override {
+      virtual const LScopeChain& scope_chain() const override {
         return scope_chain_;
       }
 

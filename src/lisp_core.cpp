@@ -47,6 +47,15 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
+  // ========== //
+  // static定数 //
+  // ========== //
+  const std::string LObject::dummy_str_;
+  const LArgNames LObject::dummy_arg_names_;
+  const LPointerVec LObject::dummy_ptr_vec_;
+  const LScopeChain LObject::dummy_scope_chain_;
+  const LC_Function LObject::dummy_c_function_;
+
   // 式を評価する。
   LPointer LObject::Evaluate(const LObject& target) {
     // 自分が関数でなければ、何もしない。
@@ -103,18 +112,19 @@ namespace Sayuri {
 
         // 各引数を評価。
         LPointer result;
-        bool evaluatable;
+        std::map<std::string, LPointer> macro_args;
+        bool is_macro = false;
         const char* name;
         for (LObject* ptr = arguments.get(); ptr->IsPair();
         Lisp::Next(&ptr), Lisp::Next(&at_ptr)) {
           // 引数の準備。
-          // 一文字目がバッククオートなら評価するフラグをfalse。
-          evaluatable = true;
+          is_macro = false;
           if (names_itr != names_end) {
+            // 引数名があった場合。
             name = names_itr->c_str();
-            if ((names_itr->size() >= 2) && (*names_itr)[0] == '`') {
-              ++name;  // バッククオートをとばす。
-              evaluatable = false;
+            if (name[0] == '`') {
+              // マクロ引数。
+              is_macro = true;
             }
             ++names_itr;
           } else {
@@ -122,23 +132,23 @@ namespace Sayuri {
           }
 
           // 引数を評価。
-          if (evaluatable) {
+          if (!is_macro) {
             result = Evaluate(*(ptr->car()));
             if (!result) {
               throw Lisp::GenError("@evaluating-error",
               "Couldn't evaluate '" + ptr->car()->ToString() + "'.");
             }
+
+            // ローカルスコープにバインド。
+            if (name) {
+              local_chain.InsertSymbol(name, result);
+            }
+
+            // $@に追加。
+            at_ptr->car(result);
           } else {
-            result = ptr->car()->Clone();
+            macro_args[name] = ptr->car();
           }
-
-          // ローカルスコープにバインド。
-          if (name) {
-            local_chain.InsertSymbol(name, result);
-          }
-
-          // $@に追加。
-          at_ptr->car(result);
         }
 
         // 引数リストをバインド。
@@ -147,9 +157,55 @@ namespace Sayuri {
         // ローカルスコープをセット。
         func_obj->scope_chain(local_chain);
 
+        // --- マクロ引数を展開 --- //
+        LPointerVec expression = func_obj->expression();
+        if (macro_args.size()) {
+          std::map<std::string, LPointer>::iterator
+          macro_end = macro_args.end();
+
+          // 展開用関数。
+          std::function<void(LObject& obj)> core;
+          core = [&core, &macro_args, &macro_end](LObject& obj) {
+            // まずはcar。
+            LPointer temp = obj.car();
+            if (temp->IsPair()) {
+              core(*temp);
+            } else if (temp->IsSymbol()) {
+              std::string symbol = temp->symbol();
+              if (macro_args.find(symbol) != macro_end) {
+                obj.car(macro_args.at(symbol)->Clone());
+              }
+            }
+
+            // 次はcdr。
+            temp = obj.cdr();
+            if (temp->IsPair()) {
+              core(*temp);
+            } else if (temp->IsSymbol()) {
+              std::string symbol = temp->symbol();
+              if (macro_args.find(symbol) != macro_end) {
+                obj.cdr(macro_args.at(symbol)->Clone());
+              }
+            }
+          };
+
+          // 展開。
+          for (auto& expr_ptr : expression) {
+            expr_ptr = expr_ptr->Clone();
+            if (expr_ptr->IsPair()) {
+              core(*expr_ptr);
+            } else if (expr_ptr->IsSymbol()) {
+              std::string symbol = expr_ptr->symbol();
+              if (macro_args.find(symbol) != macro_end) {
+                expr_ptr = macro_args.at(symbol)->Clone();
+              }
+            }
+          }
+        }
+
         // --- 関数呼び出し --- //
         LPointer ret_ptr = Lisp::NewNil();
-        for (auto& expr : func_obj->expression()) {
+        for (auto& expr : expression) {
           ret_ptr = func_obj->Evaluate(*expr);
         }
 
@@ -1008,7 +1064,7 @@ R"...(### lambda ###
   So using (lambda) in (lambda), you can create closure function.
 * `<Args>...` is Symbols as name of arguments.
     + If an argument name is started with back-quote,
-      the argument won't evaluate when the calling function.
+      the argument is Macro Argument.
 
 <h6> Example </h6>
 
@@ -1023,13 +1079,20 @@ R"...(### lambda ###
     ;; Output
     ;; > 150
     
-    (define a 111)
-    (define b 222)
-    (define myfunc3 (lambda (x `y) (display x) (display y)))
-    (myfunc3 a b)
+    ;; Example of Macro Argument.
+    (define gen-func2 (lambda (`funcn-name) (lambda (x y) (`func-name x y))))
+    (define myfunc3 (gen-func2 +))
+    (define myfunc4 (gen-func2 *))
+    (display (myfunc3 10 20))
+    (display (myfunc4 10 20))
     ;; Output
-    ;; > 111
-    ;; > Symbol: b)...";
+    ;; > 30 
+    ;; > 200 
+    (display (to-string myfunc3))
+    (display (to-string myfunc4))
+    ;; Output
+    ;; > (lambda (x y) (+ x y))
+    ;; > (lambda (x y) (* x y)))...";
     help_dict_.emplace("lambda", help);
     func =
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
@@ -1062,7 +1125,22 @@ R"...(### let ###
     (display (myfunc))
     
     ;; Output
-    ;; > 30)...";
+    ;; > 30
+    
+    ;; Example of Macro Argument.
+    (define (gen-func2 `func-name) (lambda (x y) (`func-name x y)))
+    (define myfunc2 (gen-func2 +))
+    (define myfunc3 (gen-func2 *))
+    (display (myfunc2 10 20))
+    (display (myfunc3 10 20))
+    ;; Output
+    ;; > 30 
+    ;; > 200 
+    (display (to-string myfunc2))
+    (display (to-string myfunc3))
+    ;; Output
+    ;; > (lambda (x y) (+ x y))
+    ;; > (lambda (x y) (* x y)))...";
     help_dict_.emplace("let", help);
 
     func =
