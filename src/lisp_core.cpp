@@ -103,19 +103,38 @@ namespace Sayuri {
 
         // 各引数を評価。
         LPointer result;
+        bool evaluatable;
+        const char* name;
         for (LObject* ptr = arguments.get(); ptr->IsPair();
         Lisp::Next(&ptr), Lisp::Next(&at_ptr)) {
+          // 引数の準備。
+          // 一文字目がバッククオートなら評価するフラグをfalse。
+          evaluatable = true;
+          if (names_itr != names_end) {
+            name = names_itr->c_str();
+            if ((names_itr->size() >= 2) && (*names_itr)[0] == '`') {
+              ++name;  // バッククオートをとばす。
+              evaluatable = false;
+            }
+            ++names_itr;
+          } else {
+            name = nullptr;
+          }
+
           // 引数を評価。
-          result = Evaluate(*(ptr->car()));
-          if (!result) {
-            throw Lisp::GenError("@evaluating-error",
-            "Couldn't evaluate '" + ptr->car()->ToString() + "'.");
+          if (evaluatable) {
+            result = Evaluate(*(ptr->car()));
+            if (!result) {
+              throw Lisp::GenError("@evaluating-error",
+              "Couldn't evaluate '" + ptr->car()->ToString() + "'.");
+            }
+          } else {
+            result = ptr->car()->Clone();
           }
 
           // ローカルスコープにバインド。
-          if (names_itr != names_end) {
-            local_chain.InsertSymbol(*names_itr, result);
-            ++names_itr;
+          if (name) {
+            local_chain.InsertSymbol(name, result);
           }
 
           // $@に追加。
@@ -988,21 +1007,29 @@ R"...(### lambda ###
 * (lambda) inherits parent's scope and creates its own local scope.
   So using (lambda) in (lambda), you can create closure function.
 * `<Args>...` is Symbols as name of arguments.
+    + If an argument name is started with back-quote,
+      the argument won't evaluate when the calling function.
 
 <h6> Example </h6>
 
     (define myfunc (lambda (x) (+ x 100)))
     (display (myfunc 5))
-    
     ;; Output
     ;; > 105
     
     (define gen-func (lambda (x) (lambda () (+ x 100))))
     (define myfunc2 (gen-func 50))
     (display (myfunc2))
-    
     ;; Output
-    ;; > 150)...";
+    ;; > 150
+    
+    (define a 111)
+    (define b 222)
+    (define myfunc3 (lambda (x `y) (display x) (display y)))
+    (myfunc3 a b)
+    ;; Output
+    ;; > 111
+    ;; > Symbol: b)...";
     help_dict_.emplace("lambda", help);
     func =
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
@@ -1151,6 +1178,8 @@ R"...(### define ###
 * 1: Binds `<Object>` to `<Symbol>`.
 * 2: Defines `<S-Expression>` as Function named `<Name>`,
      and `<Args>...` is names of its arguments.
+    + If an argument name is started with back-quote,
+      the argument won't evaluate when the calling function.
 
 <h6> Example </h6>
 
@@ -1164,7 +1193,15 @@ R"...(### define ###
     (display (myfunc 5))
     
     ;; Output
-    ;; > 15)...";
+    ;; > 15
+    
+    (define a 111)
+    (define b 222)
+    (define (myfunc2 x `y) (display x) (display y))
+    (myfunc2 a b)
+    ;; Output
+    ;; > 111
+    ;; > Symbol: b)...";
     help_dict_.emplace("define", help);
 
     func =
