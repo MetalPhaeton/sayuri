@@ -2130,6 +2130,10 @@ namespace Sayuri {
       /** ネイティブ関数 - lambda */
       LPointer Lambda(LPointer self, LObject* caller, const LObject& args);
 
+      /** ネイティブ関数 - func->lambda */
+      LPointer FuncToLambda
+      (LPointer self, LObject* caller, const LObject& args);
+
       /** ネイティブ関数 - let */
       LPointer Let(LPointer self, LObject* caller, const LObject& args);
 

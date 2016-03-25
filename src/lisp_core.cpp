@@ -1094,6 +1094,32 @@ R"...(### lambda ###
     ;; > (lambda (x y) (+ x y))
     ;; > (lambda (x y) (* x y)))...";
     help_dict_.emplace("lambda", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->FuncToLambda(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("func->lambda",
+    NewN_Function(func, "Lisp:func->lambda", scope_chain_));
+    help =
+R"...(### func->lambda ###
+
+<h6> Usage </h6>
+
+* `(func->lambda <Function : Function>)`
+
+<h6> Description </h6>
+
+* Converts Function to S-Expression and returns.
+
+<h6> Example </h6>
+
+    (define (myfunc x) (display x))
+    (display (func->lambda myfunc))
+    ;; Output
+    ;; > (lambda (x) (display x)))...";
+    help_dict_.emplace("func->lambda", help);
+
     func =
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->Let(self, caller, args);
@@ -3867,6 +3893,30 @@ R"...(### min ###
     // 関数オブジェクトにして返す。
     return GenFunction(args_ptr->car(), args_ptr->cdr(),
     caller->scope_chain());
+  }
+
+  // %%% func->Lambda
+  LPointer Lisp::FuncToLambda
+  (LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    // 関数オブジェクトを得る。
+    LPointer func_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*func_ptr, LType::FUNCTION);
+
+    // 引数名リストを得る。
+    const LArgNames& arg_names = func_ptr->arg_names();
+    LPointer arg_names_list = NewList(arg_names.size());
+    LObject* arg_names_list_ptr = arg_names_list.get();
+    for (auto& name : arg_names) {
+      arg_names_list_ptr->car(NewSymbol(name));
+      Next(&arg_names_list_ptr);
+    }
+
+    return NewPair(NewSymbol("lambda"), NewPair(arg_names_list,
+    LPointerVecToList(func_ptr->expression())));
   }
 
   // %%% let
