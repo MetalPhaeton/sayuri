@@ -2107,6 +2107,9 @@ namespace Sayuri {
         return args_ptr->car()->Clone();
       }
 
+      /** ネイティブ関数 - template */
+      LPointer Template(LPointer self, LObject* caller, const LObject& args);
+
       /**
        * !関数用シンボル上書き関数。
        * @param chain 対象のチェーン。

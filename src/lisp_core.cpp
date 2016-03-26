@@ -115,8 +115,8 @@ namespace Sayuri {
         std::map<std::string, LPointer> macro_args;
         bool is_macro = false;
         const char* name;
-        for (LObject* ptr = arguments.get(); ptr->IsPair();
-        Lisp::Next(&ptr), Lisp::Next(&at_ptr)) {
+        for (LPointer ptr = arguments; ptr->IsPair();
+        ptr = ptr->cdr(), Lisp::Next(&at_ptr)) {
           // 引数の準備。
           is_macro = false;
           if (names_itr != names_end) {
@@ -125,6 +125,11 @@ namespace Sayuri {
             if (name[0] == '^') {
               // マクロ引数。
               is_macro = true;
+            } else if (name[0] == '&') {
+              // マクロリスト引数。
+              // 残りをまとめてマクロ引数にしてループを抜ける。
+              macro_args[name] = ptr;
+              break;
             }
             ++names_itr;
           } else {
@@ -1063,7 +1068,7 @@ R"...(### lambda ###
 * (lambda) inherits parent's scope and creates its own local scope.
   So using (lambda) in (lambda), you can create closure function.
 * `<Args>...` is Symbols as name of arguments.
-    + If an argument name is started with `^`,
+    + If an argument name is started with `^` or `&`,
       the argument is Macro-Like Argument.
 
 <h6> Example </h6>
@@ -1080,19 +1085,20 @@ R"...(### lambda ###
     ;; > 150
     
     ;; Example of Macro-Like Argument.
-    (define gen-func2 (lambda (^funcn-name) (lambda (x y) (^func-name x y))))
-    (define myfunc3 (gen-func2 +))
-    (define myfunc4 (gen-func2 *))
-    (display (myfunc3 10 20))
-    (display (myfunc4 10 20))
+    (define gen-func2
+      (lambda (^x &y) (lambda () (display (apply '^x '&y)))))
+    (define func1 (gen-func2 + 111 222))
+    (define func2 (gen-func2 * 333 444 555))
+    (func1)
+    (func2)
     ;; Output
-    ;; > 30 
-    ;; > 200 
-    (display (to-string myfunc3))
-    (display (to-string myfunc4))
+    ;; > 333
+    ;; > 82057860
+    (display (to-string func1))
+    (display (to-string func2))
     ;; Output
-    ;; > (lambda (x y) (+ x y))
-    ;; > (lambda (x y) (* x y)))...";
+    ;; > (lambda () (display (apply (quote +) (quote (111 222)))))
+    ;; > (lambda () (display (apply (quote *) (quote (333 444 555))))))...";
     help_dict_.emplace("lambda", help);
 
     func =
@@ -1267,7 +1273,7 @@ R"...(### define ###
 * 1: Binds `<Object>` to `<Symbol>`.
 * 2: Defines `<S-Expression>` as Function named `<Name>`,
      and `<Args>...` is names of its arguments.
-    + If an argument name is started with `^`,
+    + If an argument name is started with `^` or `&`,
       the argument is Macro-Like Argument.
 
 <h6> Example </h6>
@@ -1285,19 +1291,19 @@ R"...(### define ###
     ;; > 15
     
     ;; Example of Macro-Like Argument.
-    (define (gen-func2 ^funcn-name) (lambda (x y) (^func-name x y)))
-    (define myfunc3 (gen-func2 +))
-    (define myfunc4 (gen-func2 *))
-    (display (myfunc3 10 20))
-    (display (myfunc4 10 20))
+    (define (gen-func ^x &y) (^x &y) (lambda () (display (apply '^x '&y))))
+    (define func1 (gen-func + 111 222))
+    (define func2 (gen-func * 333 444 555))
+    (func1)
+    (func2)
     ;; Output
-    ;; > 30 
-    ;; > 200 
-    (display (to-string myfunc3))
-    (display (to-string myfunc4))
+    ;; > 333
+    ;; > 82057860
+    (display (to-string func1))
+    (display (to-string func2))
     ;; Output
-    ;; > (lambda (x y) (+ x y))
-    ;; > (lambda (x y) (* x y)))...";
+    ;; > (lambda () (display (apply (quote +) (quote (111 222)))))
+    ;; > (lambda () (display (apply (quote *) (quote (333 444 555))))))...";
     help_dict_.emplace("define", help);
 
     func =
@@ -3840,6 +3846,16 @@ R"...(### min ###
     // 一番最後にパースした式を返す。
     return parse_result.at(parse_result.size() - 1);
   }
+
+  // %%% template
+//  LPointer Lisp::Template(LPointer self, LObject* caller,
+//  const LObject& args) {
+//    // 準備。
+//    LObject* args_ptr = nullptr;
+//    GetReadyForFunction(args, 1, &args_ptr);
+//
+//    LPointer tpl = args_ptr->car()->Clone();
+//  }
 
   // %%% define
   LPointer Lisp::Define(LPointer self, LObject* caller, const LObject& args) {
