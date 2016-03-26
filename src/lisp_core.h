@@ -1328,15 +1328,19 @@ namespace Sayuri {
       virtual std::string ToString() const override {
         std::ostringstream oss;
         oss << "(lambda (";
-        for (auto& name : arg_names_) {
-          oss << name << " ";
+        if (arg_names_.size()) {
+          for (auto& name : arg_names_) {
+            oss << name << " ";
+          }
+          oss.seekp(oss.str().size() - 1);
         }
-        if (arg_names_.size()) oss.seekp(oss.str().size() - 1);
         oss << ") ";
-        for (auto& expr : expression_) {
-          oss << expr->ToString() << " ";
+        if (expression_.size()) {
+          for (auto& expr : expression_) {
+            oss << expr->ToString() << " ";
+          }
+          oss.seekp(oss.str().size() - 1);
         }
-        if (expression_.size()) oss.seekp(oss.str().size() - 1);
         oss << ")";
         return oss.str();
       }
