@@ -674,7 +674,7 @@ namespace Sayuri {
     // メッセージシンボルを抽出。
     LPointer result = caller->Evaluate(*(args_ptr->car()));
     Lisp::CheckType(*result, LType::SYMBOL);
-    std::string symbol = result->symbol();
+    const std::string& symbol = result->symbol();
 
     if (message_func_map_.find(symbol) != message_func_map_.end()) {
       return message_func_map_.at(symbol)(symbol, self, caller, args);
