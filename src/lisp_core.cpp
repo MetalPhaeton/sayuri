@@ -388,6 +388,20 @@ namespace Sayuri {
       push();
       return ret;
     }
+
+    // コンマをパースする。
+    inline std::string ParseComma(std::string::const_iterator& itr,
+    const std::string::const_iterator& end_itr) {
+      std::ostringstream oss;
+      oss << *itr;
+      if ((itr + 1) == end_itr) return oss.str();
+      if (*(itr + 1) == '@') {
+        ++itr;
+        oss << *itr;
+        return oss.str();
+      }
+      return oss.str();
+    }
   }
 
   // 字句解析する。
@@ -478,6 +492,20 @@ namespace Sayuri {
         continue;
       }
 
+      // テンプレートの糖衣構文。
+      if (*itr == '`') {
+        // 今までと自身をプッシュする。
+        PushString(token_queue_, oss, *itr);
+        continue;
+      }
+
+      // コンマ。
+      if (*itr == ',') {
+        PushString(token_queue_, oss);
+        token_queue_.push(ParseComma(itr, end_itr));
+        continue;
+      }
+
       // 普通の文字。
       oss << *itr;
     }
@@ -554,6 +582,45 @@ namespace Sayuri {
       if (front == "'") {
         // quoteシンボルの入ったペア。
         LPointer ret = NewPair(NewSymbol("quote"), NewPair());
+
+        // 次をパースする。
+        LPointer result = ParseCore();
+
+        // quoteの次にセットして返る。
+        ret->cdr()->car(result);
+        return ret;
+      }
+
+      // templateの糖衣構文。
+      if (front == "`") {
+        // quoteシンボルの入ったペア。
+        LPointer ret = NewPair(NewSymbol("template"), NewPair());
+
+        // 次をパースする。
+        LPointer result = ParseCore();
+
+        // quoteの次にセットして返る。
+        ret->cdr()->car(result);
+        return ret;
+      }
+
+      // unquoteの糖衣構文。
+      if (front == ",") {
+        // quoteシンボルの入ったペア。
+        LPointer ret = NewPair(NewSymbol("unquote"), NewPair());
+
+        // 次をパースする。
+        LPointer result = ParseCore();
+
+        // quoteの次にセットして返る。
+        ret->cdr()->car(result);
+        return ret;
+      }
+
+      // unquote-splicingの糖衣構文。
+      if (front == ",@") {
+        // quoteシンボルの入ったペア。
+        LPointer ret = NewPair(NewSymbol("unquote-splicing"), NewPair());
 
         // 次をパースする。
         LPointer result = ParseCore();
@@ -1046,6 +1113,72 @@ R"...(### quote ###
     ;; > 123
     ;; > Symbol: x)...";
     help_dict_.emplace("quote", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->Template(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("template",
+    NewN_Function(func, "Lisp:template", scope_chain_));
+    help =
+R"...(### template ###
+
+<h6> Usage </h6>
+
+* `(template <Object>)`
+
+<h6> Description </h6>
+
+* This is Special Form.
+    + `<Object>` is treated as template.
+        - An object next to `,` or `,@` is evaluated. the others is not.
+* Returns an object after template process.
+* Syntactic suger is backquote.
+
+<h6> Example </h6>
+
+    (define a 111)
+    (define b 222)
+    (define c 333)
+    (define d '(444 555 666))
+    (define e '())
+    
+    (display (template (a b c)))
+    (display `(a b c))
+    ;; Output
+    ;; > (a b c)
+    ;; > (a b c)
+    
+    (display (template (a ,b c)))
+    (display `(a ,b c))
+    ;; Output
+    ;; > (a 222 c)
+    ;; > (a 222 c)
+    
+    (display (template (a ,d c)))
+    (display `(a ,d c))
+    ;; Output
+    ;; > (a (444 555 666) c)
+    ;; > (a (444 555 666) c)
+    
+    (display (template (a ,@d c)))
+    (display `(a ,@d c))
+    ;; Output
+    ;; > (a 444 555 666 c)
+    ;; > (a 444 555 666 c)
+    
+    (display (template (a (a ,@d c) c)))
+    (display `(a (a ,@d c) c))
+    ;; Output
+    ;; > (a (a 444 555 666 c) c)
+    ;; > (a (a 444 555 666 c) c)
+    
+    (display (template (a ,@e c)))
+    (display `(a ,@e c))
+    ;; Output
+    ;; > (a c)
+    ;; > (a c))...";
+    help_dict_.emplace("template", help);
 
     func =
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
@@ -3848,14 +3981,103 @@ R"...(### min ###
   }
 
   // %%% template
-//  LPointer Lisp::Template(LPointer self, LObject* caller,
-//  const LObject& args) {
-//    // 準備。
-//    LObject* args_ptr = nullptr;
-//    GetReadyForFunction(args, 1, &args_ptr);
-//
-//    LPointer tpl = args_ptr->car()->Clone();
-//  }
+  LPointer Lisp::Template(LPointer self, LObject* caller,
+  const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    std::function<void(LPointer)> core;
+    core = [&core, &caller](LPointer pair) {
+      LObject* ptr = pair.get();
+
+      // ptr->cdr------------------>cddr
+      // |    |
+      // car  cdar------->cdadr
+      //      |           |
+      //      cdaar       cdadar
+      //      (unquote)   (object)
+      //
+      // リストの終端cdrにunqoteがあった場合。
+      // ptr->cdr--------->cddr----->Nil
+      // |    |            |
+      // car  cdar         cddar
+      //      (unquote)    (objct)
+      LPointer car, cdr, cddr, cdar, cdaar, cdadr, cdadar, cddar;
+      LPointer result, temp;
+
+      for (; ptr->IsPair(); Next(&ptr)) {
+        car = ptr->car();
+        cdr = ptr->cdr();
+
+        // carの処理。
+        if (car->IsPair()) {
+          temp = NewPair(NewNil(), car);
+          core(temp);
+          ptr->car(temp->cdr());
+        }
+
+        // cdrの処理。
+        if (cdr->IsPair()) {
+          cdar = cdr->car();
+          cddr = cdr->cdr();
+          if (cdar->IsPair()) {
+            cdaar = cdar->car();
+            cdadr = cdar->cdr();
+            if (cdaar->IsSymbol() && cdadr->IsPair()) {
+              cdadar = cdadr->car();
+              if (cdaar->symbol() == "unquote") {
+                // コンマ。
+                // 評価する。
+                cdadr->car(caller->Evaluate(*cdadar));
+
+                // つなぎ替える。
+                cdadr->cdr(cddr);
+                ptr->cdr(cdadr);
+              } else if (cdaar->symbol() == "unquote-splicing") {
+                // コンマアット。
+                // 評価する。
+                result = caller->Evaluate(*cdadar);
+
+                if (result->IsPair()) {
+                  // ペア。
+                  // つなぎ替える。
+                  LObject* result_ptr = result.get();
+                  for (; result_ptr->cdr()->IsPair(); Next(&result_ptr)) {
+                    continue;
+                  }
+                  result_ptr->cdr(cddr);
+
+                  ptr->cdr(result);
+                } else if (result->IsNil()) {
+                  // Nil。 なかったことにする。
+                  ptr->cdr(cddr);
+                } else {
+                  // リストじゃなかったので、コンマの動作。
+                  cdadr->car(result);
+                  cdadr->cdr(cddr);
+                  ptr->cdr(cdadr);
+                }
+              }
+            }
+          } else if ((cdar->IsSymbol()) && (cddr->IsPair())) {
+            // リストの終端cdrにunquoteがあった場合。 両方同じ処理。
+            cddar = cddr->car();
+            if ((cdar->symbol() == "unquote")
+            || (cdar->symbol() == "unquote-splicing")) {
+              ptr->cdr(caller->Evaluate(*cddar));
+            }
+          }
+        }
+      }
+    };
+
+    // 頭にダミーをつけて実行。
+    LPointer temp = NewPair(NewNil(), args_ptr->car()->Clone());
+    core(temp);
+
+    return temp->cdr();
+  }
 
   // %%% define
   LPointer Lisp::Define(LPointer self, LObject* caller, const LObject& args) {
