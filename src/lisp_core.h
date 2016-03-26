@@ -2098,7 +2098,6 @@ namespace Sayuri {
         // シンボルを得る。
         LPointer symbol_ptr = args_ptr->car();
         CheckType(*symbol_ptr, LType::SYMBOL);
-        std::string symbol =  symbol_ptr->symbol();
 
         // スコープチェーンを得る。
         LScopeChain chain = caller->scope_chain();

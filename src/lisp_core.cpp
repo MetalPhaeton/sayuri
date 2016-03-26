@@ -106,9 +106,9 @@ namespace Sayuri {
         LObject* at_ptr = at_list.get();
 
         // 引数名。
-        LArgNames names = func_obj->arg_names();
-        LArgNames::iterator names_itr = names.begin();
-        LArgNames::iterator names_end = names.end();
+        const LArgNames& names = func_obj->arg_names();
+        LArgNames::const_iterator names_itr = names.begin();
+        LArgNames::const_iterator names_end = names.end();
 
         // 各引数を評価。
         LPointer result;
@@ -171,7 +171,7 @@ namespace Sayuri {
             if (temp->IsPair()) {
               core(*temp);
             } else if (temp->IsSymbol()) {
-              std::string symbol = temp->symbol();
+              const std::string& symbol = temp->symbol();
               if (macro_args.find(symbol) != macro_end) {
                 obj.car(macro_args.at(symbol)->Clone());
               }
@@ -182,7 +182,7 @@ namespace Sayuri {
             if (temp->IsPair()) {
               core(*temp);
             } else if (temp->IsSymbol()) {
-              std::string symbol = temp->symbol();
+              const std::string& symbol = temp->symbol();
               if (macro_args.find(symbol) != macro_end) {
                 obj.cdr(macro_args.at(symbol)->Clone());
               }
@@ -195,7 +195,7 @@ namespace Sayuri {
             if (expr_ptr->IsPair()) {
               core(*expr_ptr);
             } else if (expr_ptr->IsSymbol()) {
-              std::string symbol = expr_ptr->symbol();
+              const std::string& symbol = expr_ptr->symbol();
               if (macro_args.find(symbol) != macro_end) {
                 expr_ptr = macro_args.at(symbol)->Clone();
               }
@@ -3767,7 +3767,7 @@ R"...(### min ###
       // キーを得る。
       LPointer result = caller->Evaluate(*(args.cdr()->car()));
       CheckType(*result, LType::STRING);
-      std::string help = result->string();
+      const std::string& help = result->string();
 
       if (help_dict_.find(help) != help_dict_.end()) {
         oss << help_dict_.at(help);
@@ -4014,13 +4014,13 @@ R"...(### min ###
     LPointer item = range_expr->car();
     LPointer range = caller->Evaluate(*(range_expr->cdr()->car()));
     CheckType(*item, LType::SYMBOL);
-    std::string item_symbol = item->symbol();
+    const std::string& item_symbol = item->symbol();
 
     // リストか文字列の次の要素を取り出す関数と終了判定関数。。
     std::function<LPointer()> get_next_elm;
     std::function<bool()> is_not_end;
     LObject* range_ptr = range.get();
-    std::string str = range->string();
+    const std::string& str = range->string();
     unsigned int str_i = 0;
     std::size_t str_size = str.size();
     if (range->IsList()) {
@@ -4182,7 +4182,7 @@ R"...(### min ###
     // メッセージシンボルを得る。
     LPointer symbol_ptr = caller->Evaluate(*(args_ptr->car()));
     CheckType(*symbol_ptr, LType::SYMBOL);
-    std::string symbol = symbol_ptr->symbol();
+    const std::string& symbol = symbol_ptr->symbol();
 
     // メッセージシンボルに合わせて分岐。
     if (symbol == "@read") {
@@ -4403,7 +4403,7 @@ R"...(### min ###
         return self;
       }
       CheckType(*symbol_ptr, LType::SYMBOL);
-      std::string symbol = symbol_ptr->symbol();
+      const std::string& symbol = symbol_ptr->symbol();
 
       // メッセージシンボルに合わせて分岐。
       if (symbol == "@read") {
@@ -4552,7 +4552,7 @@ R"...(### min ###
     // 文字列の場合。
     if (target_ptr->IsString()) {
       // インデックスを整理。
-      std::string target_str = target_ptr->string();
+      const std::string& target_str = target_ptr->string();
       if (index < 0) index =  target_str.size() + index;
 
       // 範囲違反。
@@ -4751,7 +4751,7 @@ R"...(### min ###
     // 第2引数。 区切り文字列。
     result = caller->Evaluate(*(args_ptr->cdr()->car()));
     CheckType(*result, LType::STRING);
-    std::string delim_str = result->string();
+    const std::string& delim_str = result->string();
 
     // 区切ってプッシュしていく。
     LPointerVec ret_vec;
