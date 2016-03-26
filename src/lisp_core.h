@@ -673,6 +673,11 @@ namespace Sayuri {
        * @param symbol シンボル。
        */
       LSymbol(const std::string& symbol) : symbol_(symbol) {}
+      /**
+       * コンストラクタ2。
+       * @param symbol シンボル。
+       */
+      LSymbol(std::string&& symbol) : symbol_(symbol) {}
       /** コンストラクタ。 */
       LSymbol() : symbol_("") {}
       /**
@@ -754,6 +759,13 @@ namespace Sayuri {
        * @param symbol シンボル。
        */
       virtual void symbol(const std::string& symbol) override {
+        symbol_ = symbol;
+      }
+      /**
+       * ミューテータ - シンボル。
+       * @param symbol シンボル。
+       */
+      virtual void symbol(std::string&& symbol) {
         symbol_ = symbol;
       }
 
@@ -1073,6 +1085,11 @@ namespace Sayuri {
        * @param string 文字列。
        */
       LString(const std::string& string) : string_(string) {}
+      /**
+       * コンストラクタ2。
+       * @param string 文字列。
+       */
+      LString(std::string&& string) : string_(string) {}
       /** コンストラクタ。 */
       LString() : string_("") {}
       /**
@@ -1214,6 +1231,14 @@ namespace Sayuri {
        * @param string 文字列。
        */
       virtual void string(const std::string& string) override {
+        string_ = string;
+      }
+
+      /**
+       * ミューテータ - 文字列。
+       * @param string 文字列。
+       */
+      virtual void string(std::string&& string) {
         string_ = string;
       }
 
@@ -1628,6 +1653,14 @@ namespace Sayuri {
         return LPointer(new LSymbol(symbol));
       }
       /**
+       * シンボルを作る2。
+       * @param symbol シンボル。
+       * @return オブジェクトのポインタ。
+       */
+      static LPointer NewSymbol(std::string&& symbol) {
+        return LPointer(new LSymbol(symbol));
+      }
+      /**
        * 数字を作る。
        * @param number 数字。
        * @return オブジェクトのポインタ。
@@ -1649,6 +1682,14 @@ namespace Sayuri {
        * @return オブジェクトのポインタ。
        */
       static LPointer NewString(const std::string& string) {
+        return LPointer(new LString(string));
+      }
+      /**
+       * 文字列を作る2。
+       * @param string 文字列。
+       * @return オブジェクトのポインタ。
+       */
+      static LPointer NewString(std::string&& string) {
         return LPointer(new LString(string));
       }
       /**
