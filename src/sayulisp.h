@@ -632,69 +632,53 @@ namespace Sayuri {
       LPointer MoveToNote(const std::string& symbol,
       LPointer self, LObject* caller, const LObject& args);
 
-//      /**
-//       * UCIコマンドを入力する。
-//       * @param command_ptr UCIコマンドの文字列。
-//       * @return コマンドが実行されれば#t。
-//       */
-//      LispObjectPtr InputUCICommand(LispObjectPtr command_ptr);
-//
-//      /**
-//       * UCIのアウトプットリスナーを登録する。
-//       * @param caller 関数呼び出し元。
-//       * @param symbol リスナーのシンボル。
-//       * @return #t。
-//       */
-//      LispObjectPtr AddUCIOutputListener(const LispObject& caller,
-//      const LispObject& symbol);
-//
-//      /**
-//       * UCIエンジンとして実行する。
-//       * @return #t。
-//       */
-//      LispObjectPtr RunEngine();
-//
-//      /**
-//       * move_timeミリ秒間思考する。 最善手が見つかるまで戻らない。
-//       * 思考中の出力はAddUCIOutputListener()で登録した関数で得られる。
-//       * @param func_name 関数名。
-//       * @param move_time 思考時間。 (ミリ秒)
-//       * @param move_list 探索したい候補手。
-//       * @return 最善手。
-//       */
-//      LispObjectPtr GoMoveTime(const std::string& func_name,
-//      const LispObject& move_time, const LispObject& move_list);
-//      /**
-//       * 持ち時間time(ミリ秒)で思考する。 最善手が見つかるまで戻らない。
-//       * 思考中の出力はAddUCIOutputListener()で登録した関数で得られる。
-//       * @param func_name 関数名。
-//       * @param time 持ち時間。 (ミリ秒)
-//       * @param move_list 探索したい候補手。
-//       * @return 最善手。
-//       */
-//      LispObjectPtr GoTimeLimit(const std::string& func_name,
-//      const LispObject& time, const LispObject& move_list);
-//      /**
-//       * 深さdepthまで思考する。 最善手が見つかるまで戻らない。
-//       * 思考中の出力はAddUCIOutputListener()で登録した関数で得られる。
-//       * @param func_name 関数名。
-//       * @param depth 深さ。
-//       * @param move_list 探索したい候補手。
-//       * @return 最善手。
-//       */
-//      LispObjectPtr GoDepth(const std::string& func_name,
-//      const LispObject& depth, const LispObject& move_list);
-//      /**
-//       * nodesのノード数まで思考する。 最善手が見つかるまで戻らない。
-//       * 思考中の出力はAddUCIOutputListener()で登録した関数で得られる。
-//       * @param func_name 関数名。
-//       * @param nodes ノード数。
-//       * @param move_list 探索したい候補手。
-//       * @return 最善手。
-//       */
-//      LispObjectPtr GoNodes(const std::string& func_name,
-//      const LispObject& nodes, const LispObject& move_list);
-//
+      /** UCIコマンドを入力する。 */
+      LPointer InputUCICommand(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** UCIコマンドの出力リスナーを登録する。 */
+      LPointer AddUCIOutputListener(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** エンジンとして実行する。 */
+      LPointer RunEngine(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /**
+       * Go...()で使う関数
+       * @param depth 探索深さ。
+       * @param nodes 探索するノード数。
+       * @param thinking_time 思考するミリ秒。
+       * @param candidate_list 探索する候補手のリスト。 (Nilなら全て。)
+       * @return PVラインのリスト。
+       */
+      LPointer GoFunc(std::uint32_t depth, std::uint64_t nodes,
+      int thinking_time, const LObject& candidate_list);
+
+      /** ミリ秒で思考する。。 */
+      LPointer GoMoveTime(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** 持ち時間ミリ秒以内で思考する。。 */
+      LPointer GoTimeLimit(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** 指定深さで思考する。。 */
+      LPointer GoDepth(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** 指定ノード数で思考する。。 */
+      LPointer GoNodes(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** 指定ノード数で思考する。。 */
+      LPointer SetHashSize(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** 指定ノード数で思考する。。 */
+      LPointer SetThreads(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
 //      /**
 //       * トランスポジションテーブルのサイズを変更する。
 //       * @param hash_size テーブルのサイズ。
@@ -1774,40 +1758,6 @@ namespace Sayuri {
        * メッセージシンボル関数を設定する。
        */
       void SetMessageFunctions();
-
-//      /**
-//       * 最善手を得る。
-//       * @param depth 探索する深さ。
-//       * @param nodes 探索するノード数。
-//       * @param thinking_time 思考時間。 (ミリ秒)
-//       * @param move_vec 探索したい候補手。
-//       * @retrun 最善手のリスト。
-//       */
-//      LispObjectPtr GetBestMove(std::uint32_t depth, std::uint64_t nodes,
-//      int thinking_time, const std::vector<Move>& move_vec);
-//
-//      /**
-//       * 手のリストから手のベクトルを作る。
-//       * @param func_name 関数名。
-//       * @param move_list 手のリスト。
-//       * @return 手のベクトル。
-//       */
-//      static std::vector<Move> MoveListToVec(const std::string& func_name,
-//      const LispObject& move_list);
-//
-//      /** 
-//       * LispObjectのシンボルから数字を得る。
-//       * @param caller 呼び出し元。
-//       * @param obj 数字を得たいオブジェクト。
-//       * @return 数字。
-//       */
-//      static int ToInt(const LispObject& caller, const LispObject& obj) {
-//        if (obj.IsSymbol()) {
-//          LispObjectPtr result = caller.Evaluate(obj);
-//          return result->number_value();
-//        }
-//        return obj.number_value();
-//      }
 
       // ========== //
       // メンバ変数 //

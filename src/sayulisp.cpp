@@ -382,6 +382,60 @@ namespace Sayuri {
     const LObject& args) -> LPointer {
       return this->MoveToNote(symbol, self, caller, args);
     };
+
+    message_func_map_["@input-uci-command"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->InputUCICommand(symbol, self, caller, args);
+    };
+
+    message_func_map_["@add-uci-output-listener"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->AddUCIOutputListener(symbol, self, caller, args);
+    };
+
+    message_func_map_["@run"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->RunEngine(symbol, self, caller, args);
+    };
+
+    message_func_map_["@go-movetime"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GoMoveTime(symbol, self, caller, args);
+    };
+
+    message_func_map_["@go-timelimit"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GoTimeLimit(symbol, self, caller, args);
+    };
+
+    message_func_map_["@go-depth"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GoDepth(symbol, self, caller, args);
+    };
+
+    message_func_map_["@go-nodes"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GoNodes(symbol, self, caller, args);
+    };
+
+    message_func_map_["@set-hash-size"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->SetHashSize(symbol, self, caller, args);
+    };
+
+    message_func_map_["@set-threads"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->SetThreads(symbol, self, caller, args);
+    };
   }
 //
 //  // ウェイト関数オブジェクトをセット。
@@ -1077,7 +1131,7 @@ namespace Sayuri {
     return Lisp::NewBoolean(engine_ptr_->PlayMove(move));
   }
 
-  /** 指し手を戻す。 */
+  // %%% @undo-move
   LPointer EngineSuite::UndoMove(const std::string& symbol,
   LPointer self, LObject* caller, const LObject& args) {
     Move move = engine_ptr_->UndoMove();
@@ -1086,7 +1140,7 @@ namespace Sayuri {
     return Sayulisp::MoveToList(move);
   }
 
-  /** 指し手をPGNの指し手の文字列に変換する。 */
+  // %%% @move->note
   LPointer EngineSuite::MoveToNote(const std::string& symbol,
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
@@ -1098,6 +1152,264 @@ namespace Sayuri {
 
     return Lisp::NewString(engine_ptr_->MoveToNote
     (Sayulisp::ListToMove(*move_ptr)));
+  }
+
+  // %%% @input-uci-command
+  LPointer EngineSuite::InputUCICommand(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    LPointer command_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*command_ptr, LType::STRING);
+
+    return Lisp::NewBoolean(shell_ptr_->InputCommand(command_ptr->string()));
+  }
+
+  // %%% @add-uci-output-listener
+  LPointer EngineSuite::AddUCIOutputListener(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    LPointer result = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*result, LType::FUNCTION);
+
+    // リストを作る。
+    LPointer listener_ptr =
+    Lisp::NewPair(result, Lisp::NewPair(Lisp::NewString(""), Lisp::NewNil()));
+
+    // callerと同じスコープの関数オブジェクトを作る。
+    LPointer caller_scope =
+    Lisp::NewN_Function(LC_Function(), "", caller->scope_chain());
+
+    // コールバック関数を作成。
+    auto callback =
+    [caller_scope, listener_ptr](const std::string& message) {
+      listener_ptr->cdr()->car()->string(message);
+      caller_scope->Evaluate(*listener_ptr);
+    };
+
+    // コールバック関数を登録。
+    callback_vec_.push_back(callback);
+
+    return Lisp::NewBoolean(true);
+  }
+
+  // %%% @run
+  LPointer EngineSuite::RunEngine(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 出力リスナー。
+    auto callback = [](const std::string& message) {
+      std::cout << message << std::endl;
+    };
+    callback_vec_.push_back(callback);
+
+    // quitが来るまでループ。
+    std::string input;
+    while (true) {
+      std::getline(std::cin, input);
+      if (input == "quit") break;
+      shell_ptr_->InputCommand(input);
+    }
+
+    return Lisp::NewBoolean(true);
+  }
+
+  // Go...()で使う関数。
+  LPointer EngineSuite::GoFunc(std::uint32_t depth, std::uint64_t nodes,
+  int thinking_time, const LObject& candidate_list) {
+    // 候補手のリストを作成。
+    std::vector<Move> candidate_vec(Lisp::CountList(candidate_list));
+    std::vector<Move>::iterator candidate_itr = candidate_vec.begin();
+    LPointer car;
+    for (const LObject* ptr = &candidate_list; ptr->IsPair();
+    ptr = ptr->cdr().get(), ++candidate_itr) {
+      car = ptr->car();
+      Sayulisp::CheckMove(*car);
+      *candidate_itr = Sayulisp::ListToMove(*car);
+    }
+
+    // ストッパーを登録。
+    engine_ptr_->SetStopper(Util::GetMin(depth, MAX_PLYS),
+    Util::GetMin(nodes, MAX_NODES),
+    Chrono::milliseconds(thinking_time), false);
+
+    // テーブルの年齢を上げる。
+    table_ptr_->GrowOld();
+
+    // 思考開始。
+    PVLine pv_line = engine_ptr_->Calculate(shell_ptr_->num_threads(),
+    candidate_vec, *shell_ptr_);
+
+    // 最善手、Ponderをアウトプットリスナーに送る。
+    std::ostringstream oss;
+    int len = pv_line.length();
+    if (len) {
+      oss << "bestmove " << Util::MoveToString(pv_line[0]);
+      if (len >= 2) {
+        oss << " ponder " << Util::MoveToString(pv_line[1]);
+      }
+      for (auto& callback : callback_vec_) callback(oss.str());
+    }
+
+    // PVラインのリストを作る。
+    LPointer ret_ptr = Lisp::NewList(len + 2);
+    LObject* ptr = ret_ptr.get();
+    ptr->car(Lisp::NewNumber(pv_line.score()));
+    Lisp::Next(&ptr);
+    ptr->car(Lisp::NewNumber(pv_line.mate_in()));
+    Lisp::Next(&ptr);
+    for (int i = 0; i < len; ++i, Lisp::Next(&ptr)) {
+      ptr->car(Sayulisp::MoveToList(pv_line[i]));
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @go-movetime
+  LPointer EngineSuite::GoMoveTime(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 思考時間を得る。
+    LPointer time_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*time_ptr, LType::NUMBER);
+    int time = time_ptr->number();
+    Lisp::Next(&args_ptr);
+
+    // もしあるなら、候補手のリストを得る。
+    LPointer candidate_list_ptr = Lisp::NewNil();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+      candidate_list_ptr = result;
+    }
+
+    // GoFuncに渡して終わる。
+    return GoFunc(MAX_PLYS, MAX_NODES, time, *candidate_list_ptr);
+  }
+
+  // %%% @go-timelimit
+  LPointer EngineSuite::GoTimeLimit(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 持ち時間を得る。
+    LPointer time_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*time_ptr, LType::NUMBER);
+    int time = TimeLimitToMoveTime(time_ptr->number());
+    Lisp::Next(&args_ptr);
+
+    // もしあるなら、候補手のリストを得る。
+    LPointer candidate_list_ptr = Lisp::NewNil();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+      candidate_list_ptr = result;
+    }
+
+    // GoFuncに渡して終わる。
+    return GoFunc(MAX_PLYS, MAX_NODES, time, *candidate_list_ptr);
+  }
+
+  // %%% @go-depth
+  LPointer EngineSuite::GoDepth(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 深さを得る。
+    LPointer depth_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*depth_ptr, LType::NUMBER);
+    std::uint32_t depth = depth_ptr->number();
+    Lisp::Next(&args_ptr);
+
+    // もしあるなら、候補手のリストを得る。
+    LPointer candidate_list_ptr = Lisp::NewNil();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+      candidate_list_ptr = result;
+    }
+
+    // GoFuncに渡して終わる。
+    return GoFunc(depth, MAX_NODES, INT_MAX, *candidate_list_ptr);
+  }
+
+  // %%% @go-nodes
+  LPointer EngineSuite::GoNodes(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // ノード数を得る。
+    LPointer node_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*node_ptr, LType::NUMBER);
+    std::uint64_t node = node_ptr->number();
+    Lisp::Next(&args_ptr);
+
+    // もしあるなら、候補手のリストを得る。
+    LPointer candidate_list_ptr = Lisp::NewNil();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+      candidate_list_ptr = result;
+    }
+
+    // GoFuncに渡して終わる。
+    return GoFunc(MAX_PLYS, node, INT_MAX, *candidate_list_ptr);
+  }
+
+  // %%% @set-hash-size
+  LPointer EngineSuite::SetHashSize(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // サイズを得る。
+    LPointer size_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*size_ptr, LType::NUMBER);
+    std::size_t size = Util::GetMax(size_ptr->number(),
+    TTEntry::TTENTRY_HARD_CODED_SIZE);
+
+    // 古いサイズ。
+    LPointer ret_ptr = Lisp::NewNumber(table_ptr_->GetSizeBytes());
+
+    // サイズを更新。
+    table_ptr_->SetSize(size);
+
+    return ret_ptr;
+  }
+
+  // %%% @set-threads
+  LPointer EngineSuite::SetThreads(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // スレッド数を得る。
+    LPointer threads_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*threads_ptr, LType::NUMBER);
+    int threads = Util::GetMax(threads_ptr->number(), 1);
+
+    // 古いスレッド数。
+    LPointer ret_ptr = Lisp::NewNumber(shell_ptr_->num_threads());
+
+    // スレッド数を更新。
+    shell_ptr_->num_threads(threads);
+
+    return ret_ptr;
   }
 //  // 関数オブジェクト。
 //  LispObjectPtr EngineSuite::operator()
@@ -2606,365 +2918,6 @@ namespace Sayuri {
 //
 //    throw Lisp::GenError("@engine-error", "(" + func_name
 //    + ") couldn't understand '" + message_symbol + "'.");
-//  }
-//
-//  LispObjectPtr EngineSuite::GetBestMove(std::uint32_t depth,
-//  std::uint64_t nodes, int thinking_time, const std::vector<Move>& move_vec) {
-//    // ストッパーを登録。
-//    engine_ptr_->SetStopper(Util::GetMin(depth, MAX_PLYS),
-//    Util::GetMin(nodes, MAX_NODES),
-//    Chrono::milliseconds(thinking_time), false);
-//
-//    // テーブルの年齢を上げる。
-//    table_ptr_->GrowOld();
-//
-//    // 思考開始。
-//    PVLine pv_line = engine_ptr_->Calculate(shell_ptr_->num_threads(),
-//    move_vec, *shell_ptr_);
-//    Move best_move = pv_line.length() >= 1 ? pv_line[0] : 0;
-//
-//    std::ostringstream stream;
-//    if (best_move) {
-//      stream << "bestmove "<< Util::MoveToString(best_move);
-//
-//      // 2手目があるならponderで表示。
-//      if (pv_line.length() >= 2) {
-//        stream << " ponder " << Util::MoveToString(pv_line[1]);
-//      }
-//    }
-//
-//    // UCIアウトプットリスナーに最善手を送る。
-//    for (auto& callback : callback_vec_) {
-//      callback(stream.str());
-//    }
-//
-//    // 戻り値の最善手を作る。
-//    if (best_move) {
-//      LispObjectPtr ret_ptr = Lisp::NewList(3);
-//      ret_ptr->car
-//      (Lisp::NewSymbol(SQUARE_SYMBOL[Get<FROM>(best_move)]));
-//      ret_ptr->cdr()->car
-//      (Lisp::NewSymbol(SQUARE_SYMBOL[Get<TO>(best_move)]));
-//      ret_ptr->cdr()->cdr()->car
-//      (Lisp::NewSymbol(PIECE_TYPE_SYMBOL[Get<PROMOTION>(best_move)]));
-//
-//      return ret_ptr;
-//    }
-//
-//    return Lisp::NewNil();
-//  }
-//
-//  // 手のリストから手のベクトルを作る。
-//  std::vector<Move> EngineSuite::MoveListToVec
-//  (const std::string& func_name, const LispObject& move_list) {
-//    if (!(move_list.IsList())) {
-//      throw Lisp::GenWrongTypeError
-//      (func_name, "List", std::vector<int> {3}, true);
-//    }
-//
-//    std::vector<Move> ret;
-//
-//    LispIterator<false> list_itr {&move_list};
-//    for (int index = 1; list_itr; ++list_itr, ++index) {
-//      // リストかどうか。
-//      if (!(list_itr->IsList())) {
-//        throw Lisp::GenWrongTypeError
-//        (func_name, "List", std::vector<int> {3, index}, true);
-//      }
-//
-//      // 長さは3?。
-//      if (list_itr->Length() != 3) {
-//        throw Lisp::GenError("@engine-error",
-//        "The " + std::to_string(index) + "th move of move list of ("
-//        + func_name + ") must be 3 elements. Given "
-//        + std::to_string(list_itr->Length()) + ".");
-//      }
-//
-//      Move move = 0;
-//      // from。
-//      if (!(list_itr->car()->IsNumber())) {
-//        throw Lisp::GenWrongTypeError
-//        (func_name, "Number", std::vector<int> {3, index, 1}, true);
-//      }
-//      int square = list_itr->car()->number_value();
-//      if ((square < static_cast<int>(A1))
-//      || (square > static_cast<int>(H8))) {
-//        throw GenWrongSquareError(func_name, square);
-//      }
-//      Set<FROM>(move, square);
-//      // to。
-//      if (!(list_itr->cdr()->car()->IsNumber())) {
-//        throw Lisp::GenWrongTypeError
-//        (func_name, "Number", std::vector<int> {3, index, 2}, true);
-//      }
-//      square = list_itr->cdr()->car()->number_value();
-//      if ((square < static_cast<int>(A1))
-//      || (square > static_cast<int>(H8))) {
-//        throw GenWrongSquareError(func_name, square);
-//      }
-//      Set<TO>(move, square);
-//      // promotion。
-//      if (!(list_itr->cdr()->cdr()->car()->IsNumber())) {
-//        throw Lisp::GenWrongTypeError
-//        (func_name, "Number", std::vector<int> {3, index, 3}, true);
-//      }
-//      int piece_type = list_itr->cdr()->cdr()->car()->number_value();
-//      if ((piece_type < static_cast<int>(EMPTY))
-//      || (piece_type > static_cast<int>(KING))) {
-//        throw GenWrongPieceTypeError(func_name, piece_type);
-//      }
-//      Set<PROMOTION>(move, piece_type);
-//
-//      // ベクトルにプッシュ。
-//      ret.push_back(move);
-//    }
-//
-//    return ret;
-//  }
-//
-//  // 候補手のリストを得る。
-//  LispObjectPtr EngineSuite::GetCandidateMoves() {
-//    LispObjectPtr ret_ptr = Lisp::NewNil();
-//
-//    // 手の生成。
-//    std::vector<Move> move_vec = engine_ptr_->GetLegalMoves();
-//
-//    // 手をリストに追加していく。
-//    for (auto move : move_vec) {
-//      ret_ptr->Append
-//      (Lisp::NewPair(MoveToList(move), Lisp::NewNil()));
-//    }
-//
-//    return ret_ptr;
-//  }
-//
-//  // 駒を置く。
-//  LispObjectPtr EngineSuite::PlacePiece(Square square,
-//  Side side, PieceType piece_type) {
-//    // 引数チェック。
-//    if (square >= NUM_SQUARES) {
-//      throw Lisp::GenError("@engine-error",
-//      "The square value '" + std::to_string(square)
-//      + "' doesn't indicate any square.");
-//    }
-//    if (side >= NUM_SIDES) {
-//      throw Lisp::GenError("@engine-error",
-//      "The side value '" + std::to_string(side)
-//      + "' doesn't indicate any side.");
-//    }
-//    if (piece_type >= NUM_PIECE_TYPES) {
-//      throw Lisp::GenError("@engine-error",
-//      "The piece type value '" + std::to_string(piece_type)
-//      +  "' doesn't indicate any piece type.");
-//    }
-//    if ((piece_type && !side) || (!piece_type && side)) {
-//      throw Lisp::GenError("@engine-error",
-//      "'" + SIDE_SYMBOL[side] + " " + PIECE_TYPE_SYMBOL[piece_type]
-//      + "' doesn't exist in the world.");
-//    }
-//
-//    // 元の駒の種類とサイドを得る。
-//    Side origin_side = engine_ptr_->side_board()[square];
-//    PieceType origin_type = engine_ptr_->piece_board()[square];
-//
-//    // もし置き換える前の駒がキングなら置き換えられない。
-//    if (origin_type == KING) {
-//      throw Lisp::GenError("@engine-error",
-//      "Couldn't place the piece, because " + SIDE_SYMBOL[origin_side]
-//      + " " + PIECE_TYPE_SYMBOL[origin_type] + " is placed there."
-//      " Each side must have just one King.");
-//    }
-//
-//    // チェック終了したので置き換える。
-//    engine_ptr_->PlacePiece(square, piece_type, side);
-//
-//    // 戻り値を作る。
-//    LispObjectPtr ret_ptr = Lisp::NewList(2);
-//    ret_ptr->car(Lisp::NewSymbol(SIDE_SYMBOL[origin_side]));
-//    ret_ptr->cdr()->car
-//    (Lisp::NewSymbol(PIECE_TYPE_SYMBOL[origin_type]));
-//
-//    return ret_ptr;
-//  }
-//  // 1手指す。
-//  LispObjectPtr EngineSuite::PlayMove(const LispObject& caller,
-//  const std::string& func_name, LispObjectPtr move_ptr) {
-//    LispIterator<false> itr {move_ptr.get()};
-//
-//    // 引数をチェック。
-//    // fromをチェック。
-//    if (!itr) {
-//      throw Lisp::GenError
-//      ("@engine-error", "Couldn't find 'From' value.");
-//    }
-//    if (!(itr->IsNumber() || itr->IsSymbol())) {
-//      throw Lisp::GenWrongTypeError
-//      (func_name, "Number or Symbol", std::vector<int> {2, 1}, false);
-//    }
-//    Square from = ToInt(caller, *(itr++));
-//    if (from >= NUM_SQUARES) {
-//      throw Lisp::GenError("@engine-error", "The 'From' value '"
-//      + std::to_string(from) + "' doesn't indicate any square.");
-//    }
-//
-//    // toをチェック。
-//    if (!itr) {
-//      throw Lisp::GenError
-//      ("@engine-error", "Couldn't find 'To' value.");
-//    }
-//    if (!(itr->IsNumber() || itr->IsSymbol())) {
-//      throw Lisp::GenWrongTypeError
-//      (func_name, "Number or Symbol", std::vector<int> {2, 2}, false);
-//    }
-//    Square to = ToInt(caller, *(itr++));
-//    if (to >= NUM_SQUARES) {
-//      throw Lisp::GenError("@engine-error", "The 'To' value '"
-//      + std::to_string(to) + "' doesn't indicate any square.");
-//    }
-//
-//    // promotionをチェック。
-//    if (!itr) {
-//      throw Lisp::GenError
-//      ("@engine-error", "Couldn't find 'Promotion' value.");
-//    }
-//    if (!(itr->IsNumber() || itr->IsSymbol())) {
-//      throw Lisp::GenWrongTypeError
-//      (func_name, "Number or Symbol", std::vector<int> {2, 3}, true);
-//    }
-//    PieceType promotion = ToInt(caller, *itr);
-//    if (promotion >= NUM_PIECE_TYPES) {
-//      throw Lisp::GenError("@engine-error", "The 'Promotion' value '"
-//      + std::to_string(promotion) + "' doesn't indicate any piece type.");
-//    }
-//
-//    Move move = 0;
-//    Set<FROM>(move, from);
-//    Set<TO>(move, to);
-//    Set<PROMOTION>(move, promotion);
-//
-//    return Lisp::NewBoolean(engine_ptr_->PlayMove(move));
-//  }
-//
-//  // 手を戻す。
-//  LispObjectPtr EngineSuite::UndoMove() {
-//    Move move = engine_ptr_->UndoMove();
-//    if (!move) return Lisp::NewNil();
-//
-//    LispObjectPtr ret_ptr = Lisp::NewList(3);
-//    ret_ptr->car(Lisp::NewSymbol(SQUARE_SYMBOL[Get<FROM>(move)]));
-//    ret_ptr->cdr()->car(Lisp::NewSymbol(SQUARE_SYMBOL[Get<TO>(move)]));
-//    ret_ptr->cdr()->cdr()->car
-//    (Lisp::NewSymbol(PIECE_TYPE_SYMBOL[Get<PROMOTION>(move)]));
-//
-//    return ret_ptr;
-//  }
-//
-//  // UCIコマンドを入力する。
-//  LispObjectPtr EngineSuite::InputUCICommand(LispObjectPtr command_ptr) {
-//    return Lisp::NewBoolean
-//    (shell_ptr_->InputCommand(command_ptr->string_value()));
-//  }
-//
-//  // UCIアウトプットリスナーを登録する。
-//  LispObjectPtr EngineSuite::AddUCIOutputListener(const LispObject& caller,
-//  const LispObject& symbol) {
-//    // コールバック用S式を作成。
-//    LispObjectPtr s_expr = Lisp::NewList(2);
-//    s_expr->car(symbol.Clone());
-//    s_expr->cdr()->car(Lisp::NewString(""));
-//
-//    // 呼び出し元のポインタ。
-//    LispObjectPtr caller_ptr = caller.Clone();
-//
-//    // リスナーを作成。
-//    std::function<void(const std::string&)> callback =
-//    [this, s_expr, caller_ptr](const std::string& message) {
-//      s_expr->cdr()->car()->string_value(message);
-//      caller_ptr->Evaluate(*s_expr);
-//    };
-//
-//    callback_vec_.push_back(callback);
-//
-//    return Lisp::NewBoolean(true);
-//  }
-//
-//  // UCIエンジンとして実行する。
-//  LispObjectPtr EngineSuite::RunEngine() {
-//    volatile bool loop = true;
-//
-//    // 自分用アウトプットリスナーを登録する。
-//    std::function<void(const std::string&)> callback =
-//    [this](const std::string& message) {
-//      std::cout << message << std::endl;
-//    };
-//    callback_vec_.push_back(callback);
-//
-//    // quitが来るまでループ。
-//    std::string input;
-//    while (loop) {
-//      std::getline(std::cin, input);
-//      if (input == "quit") loop = false;
-//
-//      shell_ptr_->InputCommand(input);
-//    }
-//
-//    return Lisp::NewBoolean(true);
-//  }
-//
-//  // move_timeミリ秒間思考する。 最善手が見つかるまで戻らない。
-//  LispObjectPtr EngineSuite::GoMoveTime(const std::string& func_name,
-//  const LispObject& move_time, const LispObject& move_list) {
-//    int move_time_2 = move_time.number_value();
-//    if (move_time_2 < 0) {
-//      throw Lisp::GenError("@engine-error",
-//      "Move time must be 0 milliseconds and more. Given "
-//      + std::to_string(move_time_2) + " milliseconds.");
-//    }
-//
-//    return GetBestMove(MAX_PLYS, MAX_NODES, move_time_2,
-//    MoveListToVec(func_name, move_list));
-//  }
-//
-//  // 持ち時間time(ミリ秒)で思考する。 最善手が見つかるまで戻らない。
-//  LispObjectPtr EngineSuite::GoTimeLimit(const std::string& func_name,
-//  const LispObject& time, const LispObject& move_list) {
-//    int time_2 = time.number_value();
-//    if (time_2 < 0) {
-//      throw Lisp::GenError("@engine-error",
-//      "Time limit must be 0 milliseconds and more. Given "
-//      + std::to_string(time_2) + " milliseconds.");
-//    }
-//
-//    return GetBestMove(MAX_PLYS, MAX_NODES, TimeLimitToMoveTime(time_2),
-//    MoveListToVec(func_name, move_list));
-//  }
-//
-//  // 深さdepthまで思考する。 最善手が見つかるまで戻らない。
-//  LispObjectPtr EngineSuite::GoDepth(const std::string& func_name,
-//  const LispObject& depth, const LispObject& move_list) {
-//    int depth_2 = depth.number_value();
-//    if (depth_2 < 0) {
-//      throw Lisp::GenError("@engine-error",
-//      "Depth must be 0 and more. Given "
-//      + std::to_string(depth_2) + ".");
-//    }
-//
-//    return GetBestMove(depth_2, MAX_NODES, INT_MAX,
-//    MoveListToVec(func_name, move_list));
-//  }
-//
-//  // nodesのノード数まで思考する。 最善手が見つかるまで戻らない。
-//  LispObjectPtr EngineSuite::GoNodes(const std::string& func_name,
-//  const LispObject& nodes, const LispObject& move_list) {
-//    long long nodes_2 = nodes.number_value();
-//    if (nodes_2 < 0) {
-//      throw Lisp::GenError("@engine-error",
-//      "Nodes must be 0 and more. Given "
-//      + std::to_string(nodes_2) + ".");
-//    }
-//
-//    return GetBestMove(MAX_PLYS, nodes_2, INT_MAX,
-//    MoveListToVec(func_name, move_list));
 //  }
 //
 //  // SearchParams - マテリアル。
