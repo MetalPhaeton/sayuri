@@ -2107,8 +2107,8 @@ namespace Sayuri {
         return args_ptr->car()->Clone();
       }
 
-      /** ネイティブ関数 - template */
-      LPointer Template(LPointer self, LObject* caller, const LObject& args);
+      /** ネイティブ関数 - backquote */
+      LPointer Backquote(LPointer self, LObject* caller, const LObject& args);
 
       /**
        * !関数用シンボル上書き関数。

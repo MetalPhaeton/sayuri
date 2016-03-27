@@ -591,10 +591,10 @@ namespace Sayuri {
         return ret;
       }
 
-      // templateの糖衣構文。
+      // backquoteの糖衣構文。
       if (front == "`") {
         // quoteシンボルの入ったペア。
-        LPointer ret = NewPair(NewSymbol("template"), NewPair());
+        LPointer ret = NewPair(NewSymbol("backquote"), NewPair());
 
         // 次をパースする。
         LPointer result = ParseCore();
@@ -1116,16 +1116,16 @@ R"...(### quote ###
 
     func =
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->Template(self, caller, args);
+      return this->Backquote(self, caller, args);
     };
-    scope_chain_.InsertSymbol("template",
-    NewN_Function(func, "Lisp:template", scope_chain_));
+    scope_chain_.InsertSymbol("backquote",
+    NewN_Function(func, "Lisp:backquote", scope_chain_));
     help =
-R"...(### template ###
+R"...(### backquote ###
 
 <h6> Usage </h6>
 
-* `(template <Object>)`
+* `(backquote <Object>)`
 
 <h6> Description </h6>
 
@@ -1143,42 +1143,42 @@ R"...(### template ###
     (define d '(444 555 666))
     (define e '())
     
-    (display (template (a b c)))
+    (display (backquote (a b c)))
     (display `(a b c))
     ;; Output
     ;; > (a b c)
     ;; > (a b c)
     
-    (display (template (a ,b c)))
+    (display (backquote (a ,b c)))
     (display `(a ,b c))
     ;; Output
     ;; > (a 222 c)
     ;; > (a 222 c)
     
-    (display (template (a ,d c)))
+    (display (backquote (a ,d c)))
     (display `(a ,d c))
     ;; Output
     ;; > (a (444 555 666) c)
     ;; > (a (444 555 666) c)
     
-    (display (template (a ,@d c)))
+    (display (backquote (a ,@d c)))
     (display `(a ,@d c))
     ;; Output
     ;; > (a 444 555 666 c)
     ;; > (a 444 555 666 c)
     
-    (display (template (a (a ,@d c) c)))
+    (display (backquote (a (a ,@d c) c)))
     (display `(a (a ,@d c) c))
     ;; Output
     ;; > (a (a 444 555 666 c) c)
     ;; > (a (a 444 555 666 c) c)
     
-    (display (template (a ,@e c)))
+    (display (backquote (a ,@e c)))
     (display `(a ,@e c))
     ;; Output
     ;; > (a c)
     ;; > (a c))...";
-    help_dict_.emplace("template", help);
+    help_dict_.emplace("backquote", help);
 
     func =
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
@@ -3980,8 +3980,8 @@ R"...(### min ###
     return parse_result.at(parse_result.size() - 1);
   }
 
-  // %%% template
-  LPointer Lisp::Template(LPointer self, LObject* caller,
+  // %%% backquote
+  LPointer Lisp::Backquote(LPointer self, LObject* caller,
   const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
