@@ -2393,6 +2393,9 @@ namespace Sayuri {
         return ret_ptr;
       }
 
+      /** ネイティブ関数 - for-range */
+      LPointer ForRange(LPointer self, LObject* caller, const LObject& args);
+
       // %%% length
       /** ネイティブ関数 - length */
       LPointer LengthFunc(LPointer self, LObject* caller,

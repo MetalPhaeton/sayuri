@@ -2395,6 +2395,33 @@ R"...(### range ###
 
     func =
     [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->ForRange(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("for-range",
+    NewN_Function(func, "Lisp:for-range", scope_chain_));
+    help =
+R"...(### for-range ###
+
+<h6> Usage </h6>
+
+* `(for-range <Start : Number> <Size : Number> <Increment : Number>)`
+
+<h6> Description </h6>
+
+* Returns List of `<Size>` elements.
+    + The 1st element is `<Start>`.
+    + From the 2nd element, the previous element plus `<Increment>`.
+
+<h6> Example </h6>
+
+    (display (for-range 2 6 -0.5))
+    
+    ;; Output
+    ;; > (2 1.5 1 0.5 0 -0.5))...";
+    help_dict_.emplace("for-range", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
       return this->LengthFunc(self, caller, args);
     };
     scope_chain_.InsertSymbol("length",
@@ -4972,6 +4999,44 @@ R"...(### min ###
     }
 
     return LPointerVecToList(ret_vec);
+  }
+
+  // %%% for-range
+  LPointer Lisp::ForRange(LPointer self, LObject* caller,
+  const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 3, &args_ptr);
+
+    // スタートの数字。
+    LPointer result = caller->Evaluate((*args_ptr->car()));
+    CheckType(*result, LType::NUMBER);
+    double start = result->number();
+    Next(&args_ptr);
+
+    // 個数。
+    result = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*result, LType::NUMBER);
+    int num = result->number();
+    if (num <= 0) {
+      throw GenError("@function-error",
+      "The 2nd argument must be 1 and more.");
+    }
+    Next(&args_ptr);
+
+    // インクリメント。
+    result = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*result, LType::NUMBER);
+    double inc = result->number();
+
+    // リストを作成する。
+    LPointer ret_ptr = NewList(num);
+    for (LObject* ptr = ret_ptr.get(); ptr->IsPair();
+    Next(&ptr), start += inc) {
+      ptr->car(NewNumber(start));
+    }
+
+    return ret_ptr;
   }
 
   // %%% string-split
