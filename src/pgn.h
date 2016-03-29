@@ -234,7 +234,7 @@ namespace Sayuri {
        * アクセサ - ヘッダのベクトル。
        * @return ヘッダのベクトル。
        */
-      const PGNHeader header() const {
+      const PGNHeader& header() const {
         return header_;
       }
       /**

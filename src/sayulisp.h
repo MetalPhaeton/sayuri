@@ -60,6 +60,13 @@ namespace Sayuri {
   /** Sayulisp実行クラス。 */
   class Sayulisp : public Lisp {
     public:
+      /**
+       * メッセージシンボル関数型。
+       * LC_Functionにシンボル名の引数を追加したもの。
+       */
+      using MessageFunction = std::function
+      <LPointer(const std::string&, LPointer, LObject*, const LObject&)>;
+
       // ==================== //
       // コンストラクタと代入 //
       // ==================== //
@@ -291,6 +298,16 @@ namespace Sayuri {
         throw GenError("@not-move", "Move must be (<From> <To> <Promotion>).");
       }
 
+      /**
+       * メッセージシンボル関数の準備をする。
+       * @param symbol メッセージシンボル。
+       * @param args 引数リスト。 (関数名を含む)
+       * @param required_args 要求される引数の数。
+       * @param args_ptr_ptr 引数リストへのポインタのポインタ。
+       */
+      static void GetReadyForMessageFunction(const std::string& symbol,
+      const LObject& args, int required_args, LObject** args_ptr_ptr);
+
       // ========================== //
       // Lisp関数オブジェクト用関数 //
       // ========================== //
@@ -351,11 +368,8 @@ namespace Sayuri {
       LPointer NumberToCastling(LPointer self, LObject* caller,
       const LObject& args);
 
-//      /**
-//       * PGNオブジェクトを作成する。
-//       */
-//      LPointer GenPGN(LPointer self, LObject* caller,
-//      const LObject& args);
+      /** PGNオブジェクトを作成する。 */
+      LPointer GenPGN(LPointer self, LObject* caller, const LObject& args);
 //
 //      /**
 //       * FEN/EPD文字列をパースする。
@@ -382,13 +396,6 @@ namespace Sayuri {
   /** Sayulisp用エンジンセット。 */
   class EngineSuite : public LN_Function {
     public:
-      /**
-       * メッセージシンボル関数型。
-       * LC_Functionにシンボル名の引数を追加したもの。
-       */
-      using MessageFunction = std::function
-      <LPointer(const std::string&, LPointer, LObject*, const LObject&)>;
-
       // ==================== //
       // コンストラクタと代入 //
       // ==================== //
@@ -425,16 +432,6 @@ namespace Sayuri {
       // ========== //
       /** 関数オブジェクト。 */
       LPointer operator()(LPointer self, LObject* caller, const LObject& args);
-
-      /**
-       * メッセージシンボル関数の準備をする。
-       * @param symbol メッセージシンボル。
-       * @param args 引数リスト。 (関数名を含む)
-       * @param required_args 要求される引数の数。
-       * @param args_ptr_ptr 引数リストへのポインタのポインタ。
-       */
-      static void GetReadyForMessageFunction(const std::string& symbol,
-      const LObject& args, int required_args, LObject** args_ptr_ptr);
 
       // ====================== //
       // メッセージシンボル関数 //
@@ -679,32 +676,6 @@ namespace Sayuri {
       LPointer SetThreads(const std::string& symbol,
       LPointer self, LObject* caller, const LObject& args);
 
-//      /**
-//       * トランスポジションテーブルのサイズを変更する。
-//       * @param hash_size テーブルのサイズ。
-//       * @return 変更前のテーブルのサイズ。
-//       */
-//      LispObjectPtr SetHashSize(const LispObject& hash_size) {
-//        std::size_t old_size = table_ptr_->GetSizeBytes();
-//
-//        table_ptr_->SetSize(hash_size.number_value());
-//
-//        return Lisp::NewNumber(old_size);
-//      }
-//
-//      /**
-//       * スレッドの数を変更する。
-//       * @param hash_size スレッドの数。
-//       * @return 変更前のスレッドの数。
-//       */
-//      LispObjectPtr SetThreads(const LispObject& num_threads) {
-//        int old_threads = shell_ptr_->num_threads();
-//
-//        shell_ptr_->num_threads(num_threads.number_value());
-//
-//        return Lisp::NewNumber(old_threads);
-//      }
-//
 //      /**
 //       * SearchParams - マテリアル。
 //       * @param material_list マテリアルが記されたリスト。
@@ -1779,7 +1750,7 @@ namespace Sayuri {
       std::vector<std::function<void(const std::string&)>> callback_vec_;
 
       /** 各メッセージシンボル関数オブジェクトのマップ。 */
-      std::map<std::string, MessageFunction> message_func_map_;
+      std::map<std::string, Sayulisp::MessageFunction> message_func_map_;
 
 //      /** ウェイト用定数。 その1。 */
 //      enum {

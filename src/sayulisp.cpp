@@ -735,23 +735,7 @@ namespace Sayuri {
     }
 
     throw Lisp::GenError("@engine-error",
-    "There is no message symbol that is called '" + symbol + "'.");
-  }
-
-  // メッセージシンボル関数の準備をする。
-  void EngineSuite::GetReadyForMessageFunction(const std::string& symbol,
-  const LObject& args, int required_args, LObject** args_ptr_ptr) {
-    LPointer message_args_ptr = args.cdr()->cdr();
-
-    int ret = Lisp::CountList(*message_args_ptr);
-    if (ret < required_args) {
-      throw Lisp::GenError("@engine-error",
-      "'" + symbol + "' requires "
-      + std::to_string(required_args) + " arguments and more. Not "
-      + std::to_string(ret) + ".");
-    }
-
-    *args_ptr_ptr = message_args_ptr.get();
+    "'" + symbol + "' is not message symbol.");
   }
 
   // ====================== //
@@ -811,7 +795,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 引数のチェック。
     LPointer result = caller->Evaluate(*(args_ptr->car()));
@@ -855,7 +839,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // FENを得る。
     LPointer fen_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -884,7 +868,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 2, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 2, &args_ptr);
 
     // マスを得る。
     LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -938,7 +922,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 指し手を得る。
     LPointer to_move_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -963,7 +947,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // キャスリングの権利を得る。
     LPointer castling_list_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -1021,7 +1005,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // マスを得る。
     LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -1068,7 +1052,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 手数を得る。
     LPointer ply_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -1090,7 +1074,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 手数を得る。
     LPointer clock_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -1114,7 +1098,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 指し手を得る。
     LPointer result = caller->Evaluate(*(args_ptr->car()));
@@ -1145,7 +1129,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 指し手を得る。
     LPointer move_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -1159,7 +1143,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     LPointer command_ptr = caller->Evaluate(*(args_ptr->car()));
     Lisp::CheckType(*command_ptr, LType::STRING);
@@ -1172,7 +1156,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     LPointer result = caller->Evaluate(*(args_ptr->car()));
     Lisp::CheckType(*result, LType::FUNCTION);
@@ -1274,7 +1258,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 思考時間を得る。
     LPointer time_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -1299,7 +1283,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 持ち時間を得る。
     LPointer time_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -1324,7 +1308,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 深さを得る。
     LPointer depth_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -1349,7 +1333,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // ノード数を得る。
     LPointer node_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -1374,7 +1358,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // サイズを得る。
     LPointer size_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -1396,7 +1380,7 @@ namespace Sayuri {
   LPointer self, LObject* caller, const LObject& args) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // スレッド数を得る。
     LPointer threads_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -3636,6 +3620,91 @@ R"...(### gen-engine ###
     ;; >     ;; Output
     ;; >     ;; > (A2 B2 C2 D2 E2 F2 G2 H2))...";
     help_dict_.emplace("gen-engine", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->GenPGN(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("gen-pgn",
+    NewN_Function(func, "Sayulisp:gen-pgn", scope_chain_));
+    help =
+R"...(### gen-pgn ###
+
+<h6> Usage </h6>
+
+* `(gen-pgn <PGN string : String>)`
+
+<h6> Description </h6>
+
+* Generates and returns PGN object from `<PGN string>`.
+* PGN object is operated by Message Symbol.
+* PGN object has 2 states.
+    + Current game.
+        - This can be changed by `@set-current-game`.
+    + Current move.
+        - This can be changed by `@next-move`, `@prev-move`, `@alt-move`,
+          `@orig-move`, `@rewind-move`.
+
+<h6> Description of Message Symbols </h6>
+
+* `@get-pgn-comments`
+    + Returns Lists of comments about PGN.
+
+* `@get-current-game-comments.`
+    + Returns List of comments about the current game.
+
+* `@get-current-move-comments`
+    + Returns List of comments about the current move.
+
+* `@length`
+    + Returns the number of games that PGN has.
+
+* `@set-current-game <Index : Number>`
+    + Sets a current game into the `<Index>`th game.
+
+* `@get-current-game-headers`
+    + Returns List of Lists composed with headers of the current game.
+        - The format is "`((<Name 1> <value 1>) (<Name 2> <Value 2>)...)`".
+
+* `@current-move`
+    + Returns the current move text.
+
+* `@next-move`
+    + Change the current move into the next move
+      and returns the move text.
+
+* `@prev-move`
+    + Change the current move into the previous move
+      and returns the move text.
+
+* `@alt-move`
+    + Change the current move into the alternative move
+      and returns the move text.
+
+* `@orig-move`
+    + If the current move is an alternative move,
+      then change a current move into the original move
+      and returns the move text.
+
+* `@rewind-move`
+    + Change a current move into the first move
+      and returns the move text.
+
+<h6> Example </h6>
+
+    ;; Open PGN File.
+    (define pgn-file (input-stream "/path/to/pgnfile.pgn"))
+    
+    ;; Reads the file and generates PGN object.
+    (define my-pgn (gen-pgn (pgn-file '@read)))
+    
+    ;; Displays the current game headers.
+    (display (my-pgn '@get-current-game-headers))
+    
+    ;; Output
+    ;; > (("Black" "Hanako Yamada") ("Site" "Japan")
+    ;; > ("White" "Hironori Ishibashi")))...";
+    help_dict_.emplace("gen-pgn", help);
   }
 
   // Sayulispを開始する。
@@ -3682,6 +3751,22 @@ R"...(### gen-engine ###
     }
 
     return status;
+  }
+
+  // メッセージシンボル関数の準備をする。
+  void Sayulisp::GetReadyForMessageFunction(const std::string& symbol,
+  const LObject& args, int required_args, LObject** args_ptr_ptr) {
+    const LPointer& message_args_ptr = args.cdr()->cdr();
+
+    int ret = Lisp::CountList(*message_args_ptr);
+    if (ret < required_args) {
+      throw Lisp::GenError("@engine-error",
+      "'" + symbol + "' requires "
+      + std::to_string(required_args) + " arguments and more. Not "
+      + std::to_string(ret) + ".");
+    }
+
+    *args_ptr_ptr = message_args_ptr.get();
   }
 
   // エンジンを生成する。
@@ -4011,6 +4096,252 @@ R"...(### gen-engine ###
     };
 
     return func(caller->Evaluate(*(args_ptr->car())));
+  }
+
+
+  LPointer Sayulisp::GenPGN(LPointer self, LObject* caller,
+  const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    // PGN文字列を得る。
+    LPointer pgn_str_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*pgn_str_ptr, LType::STRING);
+    std::shared_ptr<PGN> pgn_ptr(new PGN());
+    pgn_ptr->Parse(pgn_str_ptr->string());
+
+    // 現在のゲームのインデックス。
+    std::shared_ptr<int> current_index_ptr(new int(0));
+
+    // メッセージシンボル用オブジェクトを作る。
+    std::map<std::string, MessageFunction> message_func_map;
+
+    message_func_map["@get-pgn-comments"] =
+    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
+    LObject* caller, const LObject& args) -> LPointer {
+      // 準備。
+      const std::vector<std::string>& comment_vec = pgn_ptr->comment_vec();
+      std::size_t len = comment_vec.size();
+
+      LPointerVec ret_vec(len);
+
+      // コメントをコピーする。
+      for (unsigned int i = 0; i < len; ++i) {
+        ret_vec[i] = NewString(comment_vec[i]);
+      }
+
+      return LPointerVecToList(ret_vec);
+    };
+
+    message_func_map["@get-current-game-comments"] =
+    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
+    LObject* caller, const LObject& args) -> LPointer {
+      // 現在のゲームのコメントを得る。
+      if (pgn_ptr->game_vec().empty()) return NewNil();
+      const std::vector<std::string>& comment_vec =
+      pgn_ptr->game_vec()[*current_index_ptr]->comment_vec();
+      int len = comment_vec.size();
+
+      LPointerVec ret_vec(len);
+      for (int i = 0; i < len; ++i) {
+        ret_vec[i] = NewString(comment_vec[i]);
+      }
+
+      return LPointerVecToList(ret_vec);
+    };
+
+    message_func_map["@get-current-move-comments"] =
+    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
+    LObject* caller, const LObject& args) -> LPointer {
+      // 現在の指し手のコメントを得る。
+      if (pgn_ptr->game_vec().empty()) return NewNil();
+      const std::vector<std::string>& comment_vec =
+      pgn_ptr->game_vec()[*current_index_ptr]->current_node_ptr()->
+      comment_vec_;
+
+      int len = comment_vec.size();
+
+      LPointerVec ret_vec(len);
+      for (int i = 0; i < len; ++i) {
+        ret_vec[i] = NewString(comment_vec[i]);
+      }
+
+      return LPointerVecToList(ret_vec);
+    };
+
+    message_func_map["@length"] =
+    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
+    LObject* caller, const LObject& args) -> LPointer {
+      return NewNumber(pgn_ptr->game_vec().size());
+    };
+
+    message_func_map["@set-current-game"] =
+    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
+    LObject* caller, const LObject& args) -> LPointer {
+      // 準備。
+      LObject* args_ptr = nullptr;
+      Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+      // インデックス番号を得る。
+      LPointer index_ptr = caller->Evaluate(*(args_ptr->car()));
+      CheckType(*index_ptr, LType::NUMBER);
+      int len = pgn_ptr->game_vec().size();
+      int index = index_ptr->number();
+      index = index < 0 ? len + index : index;
+      if ((index < 0) || (index >= len)) {
+        throw GenError("@function-error", "Index '" + index_ptr->ToString()
+        + "'is out of range.");
+      }
+
+      int old_index = *current_index_ptr;
+      *current_index_ptr = index;
+
+      return NewNumber(old_index);
+    };
+
+    message_func_map["@get-current-game-headers"] =
+    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
+    LObject* caller, const LObject& args) -> LPointer {
+      // 現在のゲームのヘッダを得る。
+      if (pgn_ptr->game_vec().empty()) return NewNil();
+      const PGNHeader& header =
+      pgn_ptr->game_vec()[*current_index_ptr]->header();
+      int len = header.size();
+
+      LPointerVec ret_vec(len);
+      LPointer temp;
+      int i = 0;
+      for (auto& pair : header) {
+        ret_vec[i] = NewPair(NewString(pair.first),
+        NewPair(NewString(pair.second), NewNil()));
+        ++i;
+      }
+
+      return LPointerVecToList(ret_vec);
+    };
+
+    message_func_map["@current-move"] =
+    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
+    LObject* caller, const LObject& args) -> LPointer {
+      // 現在の指し手を得る。
+      if (pgn_ptr->game_vec().empty()) return NewNil();
+      const MoveNode* node_ptr =
+      pgn_ptr->game_vec()[*current_index_ptr]->current_node_ptr();
+
+      return NewString(node_ptr->text_);
+    };
+
+    message_func_map["@next-move"] =
+    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
+    LObject* caller, const LObject& args) -> LPointer {
+      if (pgn_ptr->game_vec().empty()) return NewNil();
+
+      // 次の手へ。
+      PGNGamePtr game_ptr = pgn_ptr->game_vec()[*current_index_ptr];
+      if (game_ptr->Next()) {
+        const MoveNode* node_ptr = game_ptr->current_node_ptr();
+        if (node_ptr) {
+          return NewString(node_ptr->text_);
+        }
+      }
+
+      return NewString("");
+    };
+
+    message_func_map["@prev-move"] =
+    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
+    LObject* caller, const LObject& args) -> LPointer {
+      if (pgn_ptr->game_vec().empty()) return NewNil();
+
+      // 前の手へ。
+      PGNGamePtr game_ptr = pgn_ptr->game_vec()[*current_index_ptr];
+      if (game_ptr->Back()) {
+        const MoveNode* node_ptr = game_ptr->current_node_ptr();
+        if (node_ptr) {
+          return NewString(node_ptr->text_);
+        }
+      }
+
+      return NewString("");
+    };
+
+    message_func_map["@alt-move"] =
+    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
+    LObject* caller, const LObject& args) -> LPointer {
+      if (pgn_ptr->game_vec().empty()) return NewNil();
+
+      // 代替手へ。
+      PGNGamePtr game_ptr = pgn_ptr->game_vec()[*current_index_ptr];
+      if (game_ptr->Alt()) {
+        const MoveNode* node_ptr = game_ptr->current_node_ptr();
+        if (node_ptr) {
+          return NewString(node_ptr->text_);
+        }
+      }
+
+      return NewString("");
+    };
+
+    message_func_map["@orig-move"] =
+    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
+    LObject* caller, const LObject& args) -> LPointer {
+      if (pgn_ptr->game_vec().empty()) return NewNil();
+
+      // オリジナルへ。
+      PGNGamePtr game_ptr = pgn_ptr->game_vec()[*current_index_ptr];
+      if (game_ptr->Orig()) {
+        const MoveNode* node_ptr = game_ptr->current_node_ptr();
+        if (node_ptr) {
+          return NewString(node_ptr->text_);
+        }
+      }
+
+      return NewString("");
+    };
+
+    message_func_map["@rewind-move"] =
+    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
+    LObject* caller, const LObject& args) -> LPointer {
+      if (pgn_ptr->game_vec().empty()) return NewNil();
+
+      // オリジナルへ。
+      PGNGamePtr game_ptr = pgn_ptr->game_vec()[*current_index_ptr];
+      if (game_ptr->Rewind()) {
+        const MoveNode* node_ptr = game_ptr->current_node_ptr();
+        if (node_ptr) {
+          return NewString(node_ptr->text_);
+        }
+      }
+
+      return NewString("");
+    };
+
+    // PGNオブジェクトを作成。
+    auto pgn_func =
+    [message_func_map](LPointer self, LObject* caller, const LObject& args)
+    -> LPointer {
+      // 準備。
+      LObject* args_ptr = nullptr;
+      GetReadyForFunction(args, 1, &args_ptr);
+
+      // メッセージシンボルを得る。
+      LPointer symbol_ptr = caller->Evaluate(*(args_ptr->car()));
+      CheckType(*symbol_ptr, LType::SYMBOL);
+      std::string symbol = symbol_ptr->symbol();
+
+      // メッセージシンボル関数を呼び出す。
+      if (message_func_map.find(symbol) != message_func_map.end()) {
+        return message_func_map.at(symbol)(symbol, self, caller, args);
+      }
+
+      throw Lisp::GenError("@engine-error",
+      "'" + symbol + "' is not message symbol.");
+    };
+
+    return NewN_Function(pgn_func, "Sayulisp:gen-pgn:"
+    + std::to_string(reinterpret_cast<std::size_t>(pgn_ptr.get())),
+    caller->scope_chain());
   }
 
 //  // PGNオブジェクトを作成する。
