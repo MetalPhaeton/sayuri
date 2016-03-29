@@ -50,6 +50,7 @@ namespace Sayuri {
   // ========== //
   // static定数 //
   // ========== //
+  const LPointer LObject::dummy_ptr_;
   const std::string LObject::dummy_str_;
   const LArgNames LObject::dummy_arg_names_;
   const LPointerVec LObject::dummy_ptr_vec_;
@@ -66,7 +67,7 @@ namespace Sayuri {
 
     // シンボル、バインドされているオブジェクトを返す。
     if (target.IsSymbol()) {
-      LPointer result = scope_chain().SelectSymbol(target.symbol());
+      const LPointer& result = scope_chain().SelectSymbol(target.symbol());
 
       // あればクローン。 なければnullptr。
       if (result) return result->Clone();
@@ -99,7 +100,7 @@ namespace Sayuri {
       // リスプの関数。
       if (func_obj->IsFunction()) {
         // --- 引数をローカルスコープにバインド --- //
-        LPointer arguments = target.cdr();
+        const LPointer& arguments = target.cdr();
 
         // $@のリスト。
         LPointer at_list = Lisp::NewList(Lisp::CountList(*arguments));
@@ -172,22 +173,22 @@ namespace Sayuri {
           std::function<void(LObject& obj)> core;
           core = [&core, &macro_args, &macro_end](LObject& obj) {
             // まずはcar。
-            LPointer temp = obj.car();
-            if (temp->IsPair()) {
-              core(*temp);
-            } else if (temp->IsSymbol()) {
-              const std::string& symbol = temp->symbol();
+            const LPointer& temp_car = obj.car();
+            if (temp_car->IsPair()) {
+              core(*temp_car);
+            } else if (temp_car->IsSymbol()) {
+              const std::string& symbol = temp_car->symbol();
               if (macro_args.find(symbol) != macro_end) {
                 obj.car(macro_args.at(symbol)->Clone());
               }
             }
 
             // 次はcdr。
-            temp = obj.cdr();
-            if (temp->IsPair()) {
-              core(*temp);
-            } else if (temp->IsSymbol()) {
-              const std::string& symbol = temp->symbol();
+            const LPointer& temp_cdr = obj.cdr();
+            if (temp_cdr->IsPair()) {
+              core(*temp_cdr);
+            } else if (temp_cdr->IsSymbol()) {
+              const std::string& symbol = temp_cdr->symbol();
               if (macro_args.find(symbol) != macro_end) {
                 obj.cdr(macro_args.at(symbol)->Clone());
               }
@@ -3908,10 +3909,9 @@ R"...(### min ###
       LArgNames arg_names(Lisp::CountList(*names_ptr));
       if (arg_names.size()) {
         LArgNames::iterator itr = arg_names.begin();
-        LPointer elm_ptr;
         for (LObject* ptr = names_ptr.get(); ptr->IsPair();
         Lisp::Next(&ptr), ++itr) {
-          elm_ptr = ptr->car();
+          const LPointer& elm_ptr = ptr->car();
           Lisp::CheckType(*elm_ptr, LType::SYMBOL);
           *itr = elm_ptr->symbol();
         }
@@ -4030,12 +4030,11 @@ R"...(### min ###
       // |    |            |
       // car  cdar         cddar
       //      (unquote)    (objct)
-      LPointer car, cdr, cddr, cdar, cdaar, cdadr, cdadar, cddar;
       LPointer result, temp;
 
       for (; ptr->IsPair(); Next(&ptr)) {
-        car = ptr->car();
-        cdr = ptr->cdr();
+        const LPointer& car = ptr->car();
+        const LPointer& cdr = ptr->cdr();
 
         // carの処理。
         if (car->IsPair()) {
@@ -4046,13 +4045,13 @@ R"...(### min ###
 
         // cdrの処理。
         if (cdr->IsPair()) {
-          cdar = cdr->car();
-          cddr = cdr->cdr();
+          const LPointer& cdar = cdr->car();
+          const LPointer& cddr = cdr->cdr();
           if (cdar->IsPair()) {
-            cdaar = cdar->car();
-            cdadr = cdar->cdr();
+            const LPointer& cdaar = cdar->car();
+            const LPointer& cdadr = cdar->cdr();
             if (cdaar->IsSymbol() && cdadr->IsPair()) {
-              cdadar = cdadr->car();
+              const LPointer& cdadar = cdadr->car();
               if (cdaar->symbol() == "unquote") {
                 // コンマ。
                 // 評価する。
@@ -4089,7 +4088,7 @@ R"...(### min ###
             }
           } else if ((cdar->IsSymbol()) && (cddr->IsPair())) {
             // リストの終端cdrにunquoteがあった場合。 両方同じ処理。
-            cddar = cddr->car();
+            const LPointer& cddar = cddr->car();
             if ((cdar->symbol() == "unquote")
             || (cdar->symbol() == "unquote-splicing")) {
               ptr->cdr(caller->Evaluate(*cddar));
@@ -4113,7 +4112,7 @@ R"...(### min ###
     GetReadyForFunction(args, 2, &args_ptr);
 
     // 第1引数。
-    LPointer first_arg = args_ptr->car();
+    const LPointer& first_arg = args_ptr->car();
 
     // シンボルならバインド、ペアなら関数定義。
     if (first_arg->IsSymbol()) {
@@ -4134,10 +4133,10 @@ R"...(### min ###
       // 関数定義。
       // (define (<func_name_ptr> <first_args->cdr>...) <args_ptr->cdr>...)
       // 関数名を得る。
-      LPointer func_name_ptr = first_arg->car();
+      const LPointer& func_name_ptr = first_arg->car();
 
       // スコープチェーンを得る。
-      LScopeChain chain = caller->scope_chain();
+      const LScopeChain& chain = caller->scope_chain();
 
       // スコープチェーンにバインド。
       chain.InsertSymbol(func_name_ptr->symbol(),
@@ -4196,7 +4195,7 @@ R"...(### min ###
     self->scope_chain(local_chain);
 
     // ローカル変数をローカルチェーンにバインドしていく。
-    LPointer first_ptr = args_ptr->car();
+    const LPointer& first_ptr = args_ptr->car();
     CheckList(*first_ptr);
     LPointer local_pair;
     for (LObject* ptr = first_ptr.get(); ptr->IsPair(); Next(&ptr)) {
@@ -4208,7 +4207,7 @@ R"...(### min ###
       }
 
       // ローカル変数名。
-      LPointer local_pair_first = local_pair->car();
+      const LPointer& local_pair_first = local_pair->car();
       CheckType(*local_pair_first, LType::SYMBOL);
 
       // ローカル変数の初期値。
@@ -4241,7 +4240,7 @@ R"...(### min ###
 
     // ループする。
     LPointer ret_ptr = NewNil();
-    LPointer condition_expr = args_ptr->car();
+    const LPointer& condition_expr = args_ptr->car();
     Next(&args_ptr);
     while (true) {
       // 条件を評価。 falseなら抜ける。
@@ -4270,13 +4269,13 @@ R"...(### min ###
     self->scope_chain(local_chain);
 
     // ループの範囲の準備をする。
-    LPointer range_expr = args_ptr->car();
+    const LPointer& range_expr = args_ptr->car();
     CheckList(*range_expr);
     if (CountList(*range_expr) < 2) {
       throw GenError("@function-error",
       "'" + range_expr->ToString() + "' doesn't have 2 elements and more.");
     }
-    LPointer item = range_expr->car();
+    const LPointer& item = range_expr->car();
     LPointer range = caller->Evaluate(*(range_expr->cdr()->car()));
     CheckType(*item, LType::SYMBOL);
     const std::string& item_symbol = item->symbol();
@@ -4291,7 +4290,7 @@ R"...(### min ###
     if (range->IsList()) {
       // リスト用。
       get_next_elm = [&range_ptr]() -> LPointer {
-        LPointer ret = range_ptr->car();
+        const LPointer& ret = range_ptr->car();
         Next(&range_ptr);
         return ret;
       };
@@ -4338,10 +4337,9 @@ R"...(### min ###
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
 
-    LPointer sentence;
     for (; args_ptr->IsPair(); Next(&args_ptr)) {
       // 条件文リストを得る。
-      sentence = args_ptr->car();
+      const LPointer& sentence = args_ptr->car();
       CheckList(*sentence);
       if (CountList(*sentence) < 2) {
         throw GenError("@function-error",
@@ -4349,8 +4347,8 @@ R"...(### min ###
       }
 
       // 1要素目がelseかどうか。
-      LPointer result = sentence->car();
-      if (result->symbol() == "else") {
+      LPointer result;
+      if (sentence->car()->symbol() == "else") {
         result = NewBoolean(true);
       } else {
         result = caller->Evaluate(*result);
@@ -4379,7 +4377,7 @@ R"...(### min ###
     GetReadyForFunction(args, 2, &args_ptr);
 
     // 第位1引数はエラー検出する式のリスト。
-    LPointer first_ptr = args_ptr->car();
+    const LPointer& first_ptr = args_ptr->car();
     CheckList(*first_ptr);
 
     LPointer ret_ptr = NewNil();

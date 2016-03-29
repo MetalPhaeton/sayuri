@@ -122,7 +122,7 @@ namespace Sayuri {
        * @param symbol 参照するシンボル。
        * @return そのシンボルにバインドされているオブジェクトのポインタ。
        */
-      LPointer SelectSymbol(const std::string& symbol) const {
+      const LPointer& SelectSymbol(const std::string& symbol) const {
         // 手前のスコープから順番に調べる。
         LScopeChain::const_reverse_iterator citr = crbegin();
         for (; citr != crend(); ++citr) {
@@ -131,7 +131,8 @@ namespace Sayuri {
           }
         }
 
-        return LPointer(nullptr);
+        static const LPointer dummy_;
+        return dummy_;
       }
       /**
        * シンボルを追加。
@@ -283,12 +284,12 @@ namespace Sayuri {
        * アクセサ - Car。
        * @return Car。
        */
-      virtual LPointer car() const {return LPointer(nullptr);}
+      virtual const LPointer& car() const {return dummy_ptr_;}
       /**
        * アクセサ - Cdr。
        * @return Cdr。
        */
-      virtual LPointer cdr() const {return LPointer(nullptr);}
+      virtual const LPointer& cdr() const {return dummy_ptr_;}
       /**
        * アクセサ - シンボル。
        * @return シンボル。
@@ -436,6 +437,8 @@ namespace Sayuri {
       virtual bool IsN_Function() const {return type() == LType::N_FUNCTION;}
 
     protected:
+      /** ダミーポインタ。 */
+      static const LPointer dummy_ptr_;
       /** ダミー文字列。 */
       static const std::string dummy_str_;
       /** ダミー引数名ベクトル。 */
@@ -634,12 +637,12 @@ namespace Sayuri {
        * アクセサ - Car。
        * @return Car。
        */
-      virtual LPointer car() const override {return car_;}
+      virtual const LPointer& car() const override {return car_;}
       /**
        * アクセサ - Cdr。
        * @return Cdr。
        */
-      virtual LPointer cdr() const override {return cdr_;}
+      virtual const LPointer& cdr() const override {return cdr_;}
 
       /**
        * ミューテータ - Car。
@@ -2117,10 +2120,10 @@ namespace Sayuri {
        * @param ptr 上書きするポインタ。
        * @return 前の値。
        */
-      LPointer SetCore(LScopeChain& chain, const std::string& symbol,
+      const LPointer& SetCore(LScopeChain& chain, const std::string& symbol,
       const LPointer& ptr) {
         // 前の値を得る。
-        LPointer prev = chain.SelectSymbol(symbol);
+        const LPointer& prev = chain.SelectSymbol(symbol);
         if (!prev) {
           throw GenError("@unbound",
           "'" + symbol + "' doesn't bind any value.");
@@ -2140,7 +2143,7 @@ namespace Sayuri {
         GetReadyForFunction(args, 2, &args_ptr);
 
         // シンボルを得る。
-        LPointer symbol_ptr = args_ptr->car();
+        const LPointer& symbol_ptr = args_ptr->car();
         CheckType(*symbol_ptr, LType::SYMBOL);
 
         // スコープチェーンを得る。
@@ -2163,7 +2166,7 @@ namespace Sayuri {
         GetReadyForFunction(args, required_args, &args_ptr);
 
         // 第1引数はシンボル。
-        LPointer symbol_ptr = args_ptr->car();
+        const LPointer& symbol_ptr = args_ptr->car();
 
         // (set! ...)に変えて評価する。
         return caller->Evaluate(LPair(NewSymbol("set!"), NewPair(symbol_ptr,
