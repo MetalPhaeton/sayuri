@@ -312,72 +312,57 @@ namespace Sayuri {
       // Lisp関数オブジェクト用関数 //
       // ========================== //
       /** エンジン関数オブジェクトを生成する。 */
-      LPointer GenEngine(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(GenEngine);
 
       /** ライセンスを表示する。 */
-      LPointer SayuriLicense(LPointer self, LObject* caller,
-      const LObject& args) {
+      DEF_LC_FUNCTION(SayuriLicense) {
         return NewString(LICENSE);
       }
 
       /** マスのシンボルを数値に変換する。 */
-      LPointer SquareToNumber(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(SquareToNumber) ;
 
       /** ファイルのシンボルを数値に変換する。 */
-      LPointer FyleToNumber(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(FyleToNumber) ;
 
       /** ランクのシンボルを数値に変換する。 */
-      LPointer RankToNumber(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(RankToNumber) ;
 
       /** サイドのシンボルを数値に変換する。 */
-      LPointer SideToNumber(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(SideToNumber) ;
 
       /** 駒の種類のシンボルを数値に変換する。 */
-      LPointer PieceToNumber(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(PieceToNumber) ;
 
       /** キャスリングのシンボルを数値に変換する。 */
-      LPointer CastlingToNumber(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(CastlingToNumber) ;
 
       /** 数値をマスのシンボルに変換する。 */
-      LPointer NumberToSquare(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(NumberToSquare) ;
 
       /** 数値をファイルのシンボルに変換する。 */
-      LPointer NumberToFyle(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(NumberToFyle) ;
 
       /** 数値をランクのシンボルに変換する。 */
-      LPointer NumberToRank(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(NumberToRank) ;
 
       /** 数値をサイドのシンボルに変換する。 */
-      LPointer NumberToSide(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(NumberToSide) ;
 
       /** 数値を駒の種類のシンボルに変換する。 */
-      LPointer NumberToPiece(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(NumberToPiece) ;
 
       /** 数値をキャスリングのシンボルに変換する。 */
-      LPointer NumberToCastling(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(NumberToCastling) ;
 
       /** PGNオブジェクトを作成する。 */
-      LPointer GenPGN(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(GenPGN) ;
 
       /** FEN/EPDをパースする。 */
-      LPointer ParseFENEPD(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(ParseFENEPD) ;
 
       /** 駒の配列リストをFENの駒の配置文字列に変換する。 */
-      LPointer ToFENPosition(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(ToFENPosition) ;
 
     private:
       // ================ //
@@ -427,7 +412,7 @@ namespace Sayuri {
       // Lisp用関数 //
       // ========== //
       /** 関数オブジェクト。 */
-      LPointer operator()(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(operator());
 
       // ====================== //
       // メッセージシンボル関数 //

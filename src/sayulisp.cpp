@@ -725,8 +725,7 @@ namespace Sayuri {
 //  // Lisp関数オブジェクト用関数 //
 //  // ========================== //
   // 関数オブジェクト。
-  LPointer EngineSuite::operator()(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(EngineSuite::operator()) {
     // 準備。
     LObject* args_ptr = nullptr;
     Lisp::GetReadyForFunction(args, 1, &args_ptr);
@@ -3178,12 +3177,8 @@ namespace Sayuri {
     LC_Function func;
     std::string help;
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->SayuriLicense(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("sayuri-license",
-    NewN_Function(func, "Sayulisp:sayuri-license", scope_chain_));
+    func = LC_FUNCTION_OBJ(SayuriLicense);
+    INSERT_LC_FUNCTION(func, "sayuri-license", "Sayulisp:sayuri-license");
     help =
 R"...(### sayuri-license ###
 
@@ -3231,12 +3226,8 @@ R"...(### sayuri-license ###
     ;; > DEALINGS IN THE SOFTWARE.)...";
     help_dict_.emplace("sayuri-license", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->SquareToNumber(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("square->number",
-    NewN_Function(func, "Sayulisp:square->number", scope_chain_));
+    func = LC_FUNCTION_OBJ(SquareToNumber);
+    INSERT_LC_FUNCTION(func, "square->number", "Sayulisp:square->number");
     help =
 R"...(### square->number ###
 
@@ -3259,12 +3250,8 @@ R"...(### square->number ###
     ;; > (0 1 2 (WHITE 19 28 (37 PAWN 46) 55 BLACK_LONG_CASTLING)))...";
     help_dict_.emplace("square->number", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->FyleToNumber(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("fyle->number",
-    NewN_Function(func, "Sayulisp:fyle->number", scope_chain_));
+    func = LC_FUNCTION_OBJ(FyleToNumber);
+    INSERT_LC_FUNCTION(func, "fyle->number", "Sayulisp:fyle->number");
     help =
 R"...(### fyle->number ###
 
@@ -3287,12 +3274,8 @@ R"...(### fyle->number ###
     ;; > (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING)))...";
     help_dict_.emplace("fyle->number", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->RankToNumber(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("rank->number",
-    NewN_Function(func, "Sayulisp:rank->number", scope_chain_));
+    func = LC_FUNCTION_OBJ(RankToNumber);
+    INSERT_LC_FUNCTION(func, "rank->number", "Sayulisp:rank->number");
     help =
 R"...(### rank->number ###
 
@@ -3315,12 +3298,8 @@ R"...(### rank->number ###
     ;; > (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING)))...";
     help_dict_.emplace("rank->number", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->SideToNumber(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("side->number",
-    NewN_Function(func, "Sayulisp:side->number", scope_chain_));
+    func = LC_FUNCTION_OBJ(SideToNumber);
+    INSERT_LC_FUNCTION(func, "side->number", "Sayulisp:side->number");
     help =
 R"...(### side->number ### {#side-to-number}
 
@@ -3343,13 +3322,8 @@ R"...(### side->number ### {#side-to-number}
     ;; > (0 1 (FYLE_A 2 E4 (PAWN G6) BLACK_LONG_CASTLING)))...";
     help_dict_.emplace("side->number", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->PieceToNumber(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("piece->number",
-   
-    NewN_Function(func, "Sayulisp:piece->number", scope_chain_));
+    func = LC_FUNCTION_OBJ(PieceToNumber);
+    INSERT_LC_FUNCTION(func, "piece->number", "Sayulisp:piece->number");
     help =
 R"...(### piece->number ###
 
@@ -3373,12 +3347,8 @@ R"...(### piece->number ###
     ;; > (0 1 (FYLE_A 5 E4 (RANK_4 G6) 6 BLACK_LONG_CASTLING)))...";
     help_dict_.emplace("piece->number", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->CastlingToNumber(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("castling->number",
-    NewN_Function(func, "Sayulisp:castling->number", scope_chain_));
+    func = LC_FUNCTION_OBJ(CastlingToNumber);
+    INSERT_LC_FUNCTION(func, "castling->number", "Sayulisp:castling->number");
     help =
 R"...(### castling->number ###
 
@@ -3403,12 +3373,8 @@ R"...(### castling->number ###
     ;; > (0 1 (FYLE_A E4 (RANK_4 G6) KING)))...";
     help_dict_.emplace("castling->number", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->NumberToSquare(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("number->square",
-    NewN_Function(func, "Sayulisp:number->square", scope_chain_));
+    func = LC_FUNCTION_OBJ(NumberToSquare);
+    INSERT_LC_FUNCTION(func, "number->square", "Sayulisp:number->square");
     help =
 R"...(### number->square ### {#number-to-square}
 
@@ -3430,12 +3396,8 @@ R"...(### number->square ### {#number-to-square}
     ;; > (A1 B1 (C1 (D1 E1 "Hello") F1) 100))...";
     help_dict_.emplace("number->square", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->NumberToFyle(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("number->fyle",
-    NewN_Function(func, "Sayulisp:number->fyle", scope_chain_));
+    func = LC_FUNCTION_OBJ(NumberToFyle);
+    INSERT_LC_FUNCTION(func, "number->fyle", "Sayulisp:number->fyle");
     help =
 R"...(### number->fyle ### {#number-to-fyle}
 
@@ -3457,12 +3419,8 @@ R"...(### number->fyle ### {#number-to-fyle}
     ;; > (FYLE_A FYLE_B (FYLE_C (FYLE_D FYLE_E "Hello") FYLE_F) 100))...";
     help_dict_.emplace("number->fyle", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->NumberToRank(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("number->rank",
-    NewN_Function(func, "Sayulisp:number->rank", scope_chain_));
+    func = LC_FUNCTION_OBJ(NumberToRank);
+    INSERT_LC_FUNCTION(func, "number->rank", "Sayulisp:number->rank");
     help =
 R"...(### number->rank ### {#number-to-rank}
 
@@ -3484,12 +3442,8 @@ R"...(### number->rank ### {#number-to-rank}
     ;; > (RANK_1 RANK_2 (RANK_3 (RANK_4 RANK_5 "Hello") RANK_6) 100))...";
     help_dict_.emplace("number->rank", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->NumberToSide(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("number->side",
-    NewN_Function(func, "Sayulisp:number->side", scope_chain_));
+    func = LC_FUNCTION_OBJ(NumberToSide);
+    INSERT_LC_FUNCTION(func, "number->side", "Sayulisp:number->side");
     help =
 R"...(### number->side ### {#number-to-side}
 
@@ -3511,12 +3465,8 @@ R"...(### number->side ### {#number-to-side}
     ;; > (NO_SIDE WHITE (BLACK (3 4 "Hello") 5) 100))...";
     help_dict_.emplace("number->side", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->NumberToPiece(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("number->piece",
-    NewN_Function(func, "Sayulisp:number->piece", scope_chain_));
+    func = LC_FUNCTION_OBJ(NumberToPiece);
+    INSERT_LC_FUNCTION(func, "number->piece", "Sayulisp:number->piece");
     help =
 R"...(### number->piece ### {#number-to-piece}
 
@@ -3538,12 +3488,8 @@ R"...(### number->piece ### {#number-to-piece}
     ;; > (EMPTY PAWN (KNIGHT (BISHOP ROOK "Hello") QUEEN) 100))...";
     help_dict_.emplace("number->piece", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->NumberToCastling(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("number->castling",
-    NewN_Function(func, "Sayulisp:number->castling", scope_chain_));
+    func = LC_FUNCTION_OBJ(NumberToCastling);
+    INSERT_LC_FUNCTION(func, "number->castling", "Sayulisp:number->castling");
     help =
 R"...(### number->castling ### {#number-to-castling}
 
@@ -3567,12 +3513,8 @@ R"...(### number->castling ### {#number-to-castling}
     ;; > (BLACK_SHORT_CASTLING BLACK_LONG_CASTLING "Hello") 5) 100))...";
     help_dict_.emplace("number->castling", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->GenEngine(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("gen-engine",
-    NewN_Function(func, "Sayulisp:gen-engine", scope_chain_));
+    func = LC_FUNCTION_OBJ(GenEngine);
+    INSERT_LC_FUNCTION(func, "gen-engine", "Sayulisp:gen-engine");
     help =
 R"...(### gen-engine ###
 
@@ -3624,12 +3566,8 @@ R"...(### gen-engine ###
     ;; >     ;; > (A2 B2 C2 D2 E2 F2 G2 H2))...";
     help_dict_.emplace("gen-engine", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->GenPGN(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("gen-pgn",
-    NewN_Function(func, "Sayulisp:gen-pgn", scope_chain_));
+    func = LC_FUNCTION_OBJ(GenPGN);
+    INSERT_LC_FUNCTION(func, "gen-pgn", "Sayulisp:gen-pgn");
     help =
 R"...(### gen-pgn ###
 
@@ -3709,12 +3647,8 @@ R"...(### gen-pgn ###
     ;; > ("White" "Hironori Ishibashi")))...";
     help_dict_.emplace("gen-pgn", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->ParseFENEPD(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("parse-fen/epd",
-    NewN_Function(func, "Sayulisp:parse-fen/epd", scope_chain_));
+    func = LC_FUNCTION_OBJ(ParseFENEPD);
+    INSERT_LC_FUNCTION(func, "parse-fen/epd", "Sayulisp:parse-fen/epd");
     help =
 R"...(### parse-fen/epd ###
 
@@ -3756,12 +3690,8 @@ R"...(### parse-fen/epd ###
     ;; > ("fen to_move" BLACK)))...";
     help_dict_.emplace("parse-fen/epd", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->ToFENPosition(self, caller, args);
-    };
-    scope_chain_.InsertSymbol("to-fen-position",
-    NewN_Function(func, "Sayulisp:to-fen-position", scope_chain_));
+    func = LC_FUNCTION_OBJ(ToFENPosition);
+    INSERT_LC_FUNCTION(func, "to-fen-position", "Sayulisp:to-fen-position");
     help =
 R"...(### to-fen-position ###
 
@@ -3860,8 +3790,7 @@ R"...(### to-fen-position ###
   }
 
   // エンジンを生成する。
-  LPointer Sayulisp::GenEngine(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::GenEngine) {
     // スイートを作成。
     std::shared_ptr<EngineSuite> suite_ptr(new EngineSuite());
 
@@ -3877,8 +3806,7 @@ R"...(### to-fen-position ###
   }
 
   // マスのシンボルを数値に変換する。
-  LPointer Sayulisp::SquareToNumber(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::SquareToNumber) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
@@ -3901,8 +3829,7 @@ R"...(### to-fen-position ###
   }
 
   // ファイルのシンボルを数値に変換する。
-  LPointer Sayulisp::FyleToNumber(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::FyleToNumber) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
@@ -3925,8 +3852,7 @@ R"...(### to-fen-position ###
   }
 
   // ランクのシンボルを数値に変換する。
-  LPointer Sayulisp::RankToNumber(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::RankToNumber) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
@@ -3949,8 +3875,7 @@ R"...(### to-fen-position ###
   }
 
   // サイドのシンボルを数値に変換する。
-  LPointer Sayulisp::SideToNumber(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::SideToNumber) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
@@ -3973,8 +3898,7 @@ R"...(### to-fen-position ###
   }
 
   // 駒の種類のシンボルを数値に変換する。
-  LPointer Sayulisp::PieceToNumber(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::PieceToNumber) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
@@ -3997,8 +3921,7 @@ R"...(### to-fen-position ###
   }
 
   // キャスリングのシンボルを数値に変換する。
-  LPointer Sayulisp::CastlingToNumber(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::CastlingToNumber) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
@@ -4021,8 +3944,7 @@ R"...(### to-fen-position ###
   }
 
   // 数値をマスのシンボルに変換する。
-  LPointer Sayulisp::NumberToSquare(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::NumberToSquare) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
@@ -4049,8 +3971,7 @@ R"...(### to-fen-position ###
   }
 
   // 数値をファイルのシンボルに変換する。
-  LPointer Sayulisp::NumberToFyle(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::NumberToFyle) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
@@ -4077,8 +3998,7 @@ R"...(### to-fen-position ###
   }
 
   // 数値をランクのシンボルに変換する。
-  LPointer Sayulisp::NumberToRank(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::NumberToRank) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
@@ -4105,8 +4025,7 @@ R"...(### to-fen-position ###
   }
 
   // 数値をサイドのシンボルに変換する。
-  LPointer Sayulisp::NumberToSide(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::NumberToSide) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
@@ -4133,8 +4052,7 @@ R"...(### to-fen-position ###
   }
 
   // 数値を駒の種類のシンボルに変換する。
-  LPointer Sayulisp::NumberToPiece(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::NumberToPiece) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
@@ -4161,8 +4079,7 @@ R"...(### to-fen-position ###
   }
 
   // 数値をキャスリングのシンボルに変換する。
-  LPointer Sayulisp::NumberToCastling(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::NumberToCastling) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
@@ -4189,8 +4106,7 @@ R"...(### to-fen-position ###
   }
 
 
-  LPointer Sayulisp::GenPGN(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::GenPGN) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
@@ -4435,8 +4351,7 @@ R"...(### to-fen-position ###
   }
 
   // %%% parse-fen/epd
-  LPointer Sayulisp::ParseFENEPD(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::ParseFENEPD) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
@@ -4592,8 +4507,7 @@ R"...(### to-fen-position ###
   }
 
   // to-fen-position
-  LPointer Sayulisp::ToFENPosition(LPointer self, LObject* caller,
-  const LObject& args) {
+  DEF_LC_FUNCTION(Sayulisp::ToFENPosition) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
