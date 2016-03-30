@@ -188,6 +188,20 @@ namespace Sayuri {
   using LC_Function =
   std::function<LPointer(LPointer, LObject*, const LObject&)>;
 
+  /** C言語関数宣言マクロ。 */
+#define DEF_LC_FUNCTION(func_name) \
+  LPointer func_name(LPointer self, LObject* caller, const LObject& args)
+
+  /** 登録用C言語関数ラムダオブジェクトマクロ。 */
+#define LC_FUNCTION_OBJ(func_name) \
+  [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {\
+    return this->func_name(self, caller, args);\
+  }
+
+  /** スコープチェーン登録マクロ。 */
+#define INSERT_LC_FUNCTION(funcobj, symbol, id) \
+  scope_chain_.InsertSymbol(symbol, NewN_Function(funcobj, id, scope_chain_))
+
   /** オブジェクトのインターフェイス。 */
   class LObject {
     public:
@@ -1955,8 +1969,7 @@ namespace Sayuri {
       /**
        * 関数オブジェクト。 (LC_Function)
        */
-      LPointer operator()(LPointer self, LObject* caller,
-      const LObject& abs) {
+      DEF_LC_FUNCTION(operator()) {
         return NewNil();
       }
 
@@ -2006,11 +2019,11 @@ namespace Sayuri {
       // ネイティブ関数 //
       // ============== //
       /** ネイティブ関数 - help */
-      LPointer Help(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Help);
 
       // %%% eval
       /** ネイティブ関数 - eval */
-      LPointer Eval(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Eval) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2019,19 +2032,18 @@ namespace Sayuri {
       }
 
       /** ネイティブ関数 - parse */
-      LPointer ParseFunc(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(ParseFunc);
 
       // %%% parval
       /** ネイティブ関数 - parval */
-      LPointer Parval(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Parval) {
         LPointer result = ParseFunc(self, caller, args);
         return caller->Evaluate(*result);
       }
 
       // %%% to-string
       /** ネイティブ関数 - to-string */
-      LPointer ToStringFunc(LPointer self, LObject* caller,
-      const LObject& args) {
+      DEF_LC_FUNCTION(ToStringFunc) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2040,11 +2052,11 @@ namespace Sayuri {
       }
 
       /** ネイティブ関数 - try */
-      LPointer Try(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Try) ;
 
       // %%% throw
       /** ネイティブ関数 - throw */
-      LPointer Throw(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Throw) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2054,7 +2066,7 @@ namespace Sayuri {
 
       // %%% car
       /** ネイティブ関数 - car */
-      LPointer CarFunc(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(CarFunc) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2069,7 +2081,7 @@ namespace Sayuri {
 
       // %%% cdr
       /** ネイティブ関数 - cdr */
-      LPointer CdrFunc(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(CdrFunc) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2084,7 +2096,7 @@ namespace Sayuri {
 
       // %%% cons
       /** ネイティブ関数 - cons */
-      LPointer Cons(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Cons) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 2, &args_ptr);
@@ -2095,14 +2107,14 @@ namespace Sayuri {
 
       // %%% apply
       /** ネイティブ関数 - apply */
-      LPointer Apply(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Apply) {
         // consしてeval。
         return caller->Evaluate(*(Cons(self, caller, args)));
       }
 
       // %%% quote
       /** ネイティブ関数 - quote */
-      LPointer Quote(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Quote) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2111,7 +2123,7 @@ namespace Sayuri {
       }
 
       /** ネイティブ関数 - backquote */
-      LPointer Backquote(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Backquote);
 
       /**
        * !関数用シンボル上書き関数。
@@ -2137,7 +2149,7 @@ namespace Sayuri {
 
       // %%% set!
       /** ネイティブ関数 - set! */
-      LPointer Set(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Set) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 2, &args_ptr);
@@ -2175,27 +2187,26 @@ namespace Sayuri {
       }
 
       /** ネイティブ関数 - define */
-      LPointer Define(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Define);
 
       /** ネイティブ関数 - lambda */
-      LPointer Lambda(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Lambda);
 
       /** ネイティブ関数 - func->lambda */
-      LPointer FuncToLambda
-      (LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(FuncToLambda);
 
       /** ネイティブ関数 - let */
-      LPointer Let(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Let);
 
       /** ネイティブ関数 - while */
-      LPointer While(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(While);
 
       /** ネイティブ関数 - for */
-      LPointer For(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(For);
 
       // %%% if
       /** ネイティブ関数 - if */
-      LPointer If(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(If) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 3, &args_ptr);
@@ -2214,11 +2225,11 @@ namespace Sayuri {
       }
 
       /** ネイティブ関数 - cond */
-      LPointer Cond(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Cond);
 
       // %%% begin
       /** ネイティブ関数 - begin */
-      LPointer Begin(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Begin) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2233,26 +2244,26 @@ namespace Sayuri {
       }
 
       /** ネイティブ関数 - display */
-      LPointer Display(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Display);
 
       /** ネイティブ関数 - stdin */
-      LPointer Stdin(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Stdin);
 
       /** ネイティブ関数 - stdout */
-      LPointer Stdout(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Stdout);
 
       /** ネイティブ関数 - stderr */
-      LPointer Stderr(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Stderr);
 
       /** ネイティブ関数 - import */
-      LPointer Import(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Import);
 
       /** ネイティブ関数 - export */
-      LPointer Export(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Export);
 
       // %%% equal?
       /** ネイティブ関数 - equal? */
-      LPointer EqualQ(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(EqualQ) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 2, &args_ptr);
@@ -2279,7 +2290,7 @@ namespace Sayuri {
       // %%% function?
       // %%% native-function?
       template<LType LTYPE>
-      LPointer QFunc(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(QFunc) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2295,8 +2306,7 @@ namespace Sayuri {
       }
 
       // %%% procedure?
-      LPointer ProcedureQ(LPointer self, LObject* caller,
-      const LObject& args) {
+      DEF_LC_FUNCTION(ProcedureQ) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2314,16 +2324,14 @@ namespace Sayuri {
       }
 
       /** ネイティブ関数 - output-stream */
-      LPointer OutputStream(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(OutputStream);
 
       /** ネイティブ関数 - input-stream */
-      LPointer InputStream(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(InputStream);
 
       // %%% system
       /** ネイティブ関数 - system */
-      LPointer System(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(System) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2335,14 +2343,14 @@ namespace Sayuri {
       }
 
       /** ネイティブ関数 - append */
-      LPointer Append(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Append);
 
       /** ネイティブ関数 - ref */
-      LPointer Ref(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Ref);
 
       // %%% list
       /** ネイティブ関数 - list */
-      LPointer List(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(List) {
         // 準備。
         LObject* args_ptr = args.cdr().get();
         LPointer ret_ptr = NewList(CountList(*args_ptr));
@@ -2356,23 +2364,20 @@ namespace Sayuri {
       }
 
       /** ネイティブ関数 - list-replace */
-      LPointer ListReplace(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(ListReplace);
 
       /** ネイティブ関数 - list-remove */
-      LPointer ListRemove(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(ListRemove);
 
       /** ネイティブ関数 - list-search */
-      LPointer ListSearch(LPointer self, LObject* caller,
-      const LObject& args);
+      DEF_LC_FUNCTION(ListSearch);
 
       /** ネイティブ関数 - map */
-      LPointer Map(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(Map);
 
       // %%% range
       /** ネイティブ関数 - range */
-      LPointer Range(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Range) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2397,12 +2402,11 @@ namespace Sayuri {
       }
 
       /** ネイティブ関数 - for-range */
-      LPointer ForRange(LPointer self, LObject* caller, const LObject& args);
+      DEF_LC_FUNCTION(ForRange);
 
       // %%% length
       /** ネイティブ関数 - length */
-      LPointer LengthFunc(LPointer self, LObject* caller,
-      const LObject& args) {
+      DEF_LC_FUNCTION(LengthFunc) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2430,7 +2434,7 @@ namespace Sayuri {
 
       // %%% =
       /** ネイティブ関数 - = */
-      LPointer NumEqual(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(NumEqual) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 2, &args_ptr);
@@ -2457,8 +2461,7 @@ namespace Sayuri {
 
       // %%% ~=
       /** ネイティブ関数 - ~= */
-      LPointer NumNotEqual(LPointer self, LObject* caller,
-      const LObject& args) {
+      DEF_LC_FUNCTION(NumNotEqual) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 2, &args_ptr);
@@ -2485,7 +2488,7 @@ namespace Sayuri {
 
       // %%% >
       /** ネイティブ関数 - > */
-      LPointer NumGT(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(NumGT) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 2, &args_ptr);
@@ -2518,7 +2521,7 @@ namespace Sayuri {
 
       // %%% >=
       /** ネイティブ関数 - >= */
-      LPointer NumGE(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(NumGE) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 2, &args_ptr);
@@ -2551,7 +2554,7 @@ namespace Sayuri {
 
       // %%% <
       /** ネイティブ関数 - < */
-      LPointer NumLT(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(NumLT) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 2, &args_ptr);
@@ -2584,7 +2587,7 @@ namespace Sayuri {
 
       // %%% <=
       /** ネイティブ関数 - <= */
-      LPointer NumLE(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(NumLE) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 2, &args_ptr);
@@ -2617,7 +2620,7 @@ namespace Sayuri {
 
       // %%% not 
       /** ネイティブ関数 - not */
-      LPointer Not(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Not) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2631,7 +2634,7 @@ namespace Sayuri {
 
       // %%% and 
       /** ネイティブ関数 - and */
-      LPointer And(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(And) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2650,7 +2653,7 @@ namespace Sayuri {
 
       // %%% or 
       /** ネイティブ関数 - or */
-      LPointer Or(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Or) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2669,7 +2672,7 @@ namespace Sayuri {
 
       // %%% +
       /** ネイティブ関数 - + */
-      LPointer Addition(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Addition) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2693,8 +2696,7 @@ namespace Sayuri {
 
       // %%% -
       /** ネイティブ関数 - - */
-      LPointer Subtraction(LPointer self, LObject* caller,
-      const LObject& args) {
+      DEF_LC_FUNCTION(Subtraction) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2721,8 +2723,7 @@ namespace Sayuri {
 
       // %%% *
       /** ネイティブ関数 - * */
-      LPointer Multiplication(LPointer self, LObject* caller,
-      const LObject& args) {
+      DEF_LC_FUNCTION(Multiplication) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2747,7 +2748,7 @@ namespace Sayuri {
 
       // %%% /
       /** ネイティブ関数 - / */
-      LPointer Division(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Division) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2774,7 +2775,7 @@ namespace Sayuri {
 
       // %%% ++
       /** ネイティブ関数 - ++ */
-      LPointer Inc(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Inc) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2788,7 +2789,7 @@ namespace Sayuri {
 
       // %%% --
       /** ネイティブ関数 - -- */
-      LPointer Dec(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Dec) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2801,12 +2802,11 @@ namespace Sayuri {
       }
 
       /** ネイティブ関数 - string-split */
-      LPointer StringSplit(LPointer self, LObject* caller,
-      const LObject& args); 
+      DEF_LC_FUNCTION(StringSplit); 
 
       // %%% front
       /** ネイティブ関数 - front */
-      LPointer Front(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Front) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2822,7 +2822,7 @@ namespace Sayuri {
 
       // %%% back
       /** ネイティブ関数 - back */
-      LPointer Back(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Back) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2842,8 +2842,7 @@ namespace Sayuri {
 
       // %%% push-front
       /** ネイティブ関数 - push-front */
-      LPointer PushFront(LPointer self, LObject* caller,
-      const LObject& args) {
+      DEF_LC_FUNCTION(PushFront) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 2, &args_ptr);
@@ -2859,8 +2858,7 @@ namespace Sayuri {
 
       // %%% pop-front
       /** ネイティブ関数 - pop-front */
-      LPointer PopFront(LPointer self, LObject* caller,
-      const LObject& args) {
+      DEF_LC_FUNCTION(PopFront) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2875,7 +2873,7 @@ namespace Sayuri {
 
       // %%% push-back
       /** ネイティブ関数 - push-front */
-      LPointer PushBack(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(PushBack) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 2, &args_ptr);
@@ -2903,7 +2901,7 @@ namespace Sayuri {
 
       // %%% pop-back
       /** ネイティブ関数 - pop-back */
-      LPointer PopBack(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(PopBack) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2934,7 +2932,7 @@ namespace Sayuri {
 
       // %%% sin
       /** ネイティブ関数 - sin */
-      LPointer Sin(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Sin) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2947,7 +2945,7 @@ namespace Sayuri {
 
       // %%% cos
       /** ネイティブ関数 - cos */
-      LPointer Cos(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Cos) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2960,7 +2958,7 @@ namespace Sayuri {
 
       // %%% tan
       /** ネイティブ関数 - tan */
-      LPointer Tan(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Tan) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2973,7 +2971,7 @@ namespace Sayuri {
 
       // %%% asin
       /** ネイティブ関数 - asin */
-      LPointer ASin(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(ASin) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2986,7 +2984,7 @@ namespace Sayuri {
 
       // %%% acos
       /** ネイティブ関数 - acos */
-      LPointer ACos(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(ACos) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -2999,7 +2997,7 @@ namespace Sayuri {
 
       // %%% atan
       /** ネイティブ関数 - atan */
-      LPointer ATan(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(ATan) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -3012,7 +3010,7 @@ namespace Sayuri {
 
       // %%% sqrt
       /** ネイティブ関数 - sqrt */
-      LPointer Sqrt(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Sqrt) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -3025,7 +3023,7 @@ namespace Sayuri {
 
       // %%% abs
       /** ネイティブ関数 - abs */
-      LPointer Abs(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Abs) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -3038,7 +3036,7 @@ namespace Sayuri {
 
       // %%% ceil
       /** ネイティブ関数 - ceil */
-      LPointer Ceil(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Ceil) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -3051,7 +3049,7 @@ namespace Sayuri {
 
       // %%% floor
       /** ネイティブ関数 - floor */
-      LPointer Floor(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Floor) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -3064,7 +3062,7 @@ namespace Sayuri {
 
       // %%% round
       /** ネイティブ関数 - round */
-      LPointer Round(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Round) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -3077,7 +3075,7 @@ namespace Sayuri {
 
       // %%% trunc
       /** ネイティブ関数 - trunc */
-      LPointer Trunc(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Trunc) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -3090,7 +3088,7 @@ namespace Sayuri {
 
       // %%% exp
       /** ネイティブ関数 - exp */
-      LPointer Exp(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Exp) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -3103,7 +3101,7 @@ namespace Sayuri {
 
       // %%% expt
       /** ネイティブ関数 - expt */
-      LPointer Expt(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Expt) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -3119,7 +3117,7 @@ namespace Sayuri {
 
       // %%% log
       /** ネイティブ関数 - log */
-      LPointer Log(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Log) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -3132,7 +3130,7 @@ namespace Sayuri {
 
       // %%% log2
       /** ネイティブ関数 - log2 */
-      LPointer Log2(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Log2) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -3145,7 +3143,7 @@ namespace Sayuri {
 
       // %%% log10
       /** ネイティブ関数 - log10 */
-      LPointer Log10(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Log10) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -3173,7 +3171,7 @@ namespace Sayuri {
 
       // %%% max
       /** ネイティブ関数 - max */
-      LPointer Max(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Max) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -3194,7 +3192,7 @@ namespace Sayuri {
 
       // %%% min
       /** ネイティブ関数 - min */
-      LPointer Min(LPointer self, LObject* caller, const LObject& args) {
+      DEF_LC_FUNCTION(Min) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
