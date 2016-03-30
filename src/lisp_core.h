@@ -2264,7 +2264,7 @@ namespace Sayuri {
         LPointer result;
         for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
           result = caller->Evaluate(*(args_ptr->car()));
-          if (first != result) return NewBoolean(false);
+          if (*first != *result) return NewBoolean(false);
         }
 
         return NewBoolean(true);
