@@ -648,37 +648,38 @@ namespace Sayuri {
       LPointer GoFunc(std::uint32_t depth, std::uint64_t nodes,
       int thinking_time, const LObject& candidate_list);
 
-      /** ミリ秒で思考する。。 */
+      /** ミリ秒で思考する。 */
       LPointer GoMoveTime(const std::string& symbol,
       LPointer self, LObject* caller, const LObject& args);
 
-      /** 持ち時間ミリ秒以内で思考する。。 */
+      /** 持ち時間ミリ秒以内で思考する。 */
       LPointer GoTimeLimit(const std::string& symbol,
       LPointer self, LObject* caller, const LObject& args);
 
-      /** 指定深さで思考する。。 */
+      /** 指定深さで思考する。 */
       LPointer GoDepth(const std::string& symbol,
       LPointer self, LObject* caller, const LObject& args);
 
-      /** 指定ノード数で思考する。。 */
+      /** 指定ノード数で思考する。 */
       LPointer GoNodes(const std::string& symbol,
       LPointer self, LObject* caller, const LObject& args);
 
-      /** 指定ノード数で思考する。。 */
+      /** ハッシュテーブルのサイズを設定する。 */
       LPointer SetHashSize(const std::string& symbol,
       LPointer self, LObject* caller, const LObject& args);
 
-      /** 指定ノード数で思考する。。 */
+      /** スレッド数を設定する。 */
       LPointer SetThreads(const std::string& symbol,
       LPointer self, LObject* caller, const LObject& args);
 
-//      /**
-//       * SearchParams - マテリアル。
-//       * @param material_list マテリアルが記されたリスト。
-//       * @return セットされていたマテリアルのリスト。
-//       */
-//      LispObjectPtr SetMaterial(const LispObject& material_list);
-//
+      /** マテリアルを設定する。 */
+      LPointer SetMaterial(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
+      /** マテリアルを設定する。 */
+      LPointer SetEnabelQuiesceSearch(const std::string& symbol,
+      LPointer self, LObject* caller, const LObject& args);
+
 //      /**
 //       * SearchParams - クイース探索の有効無効。
 //       * @param enable クイース探索の有効無効。

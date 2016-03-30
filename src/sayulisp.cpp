@@ -436,6 +436,12 @@ namespace Sayuri {
     const LObject& args) -> LPointer {
       return this->SetThreads(symbol, self, caller, args);
     };
+
+    message_func_map_["@material"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->SetMaterial(symbol, self, caller, args);
+    };
   }
 //
 //  // ウェイト関数オブジェクトをセット。
@@ -1394,6 +1400,45 @@ namespace Sayuri {
     shell_ptr_->num_threads(threads);
 
     return ret_ptr;
+  }
+
+  // %%% @material
+  LPointer EngineSuite::SetMaterial(const std::string& symbol,
+  LPointer self, LObject* caller, const LObject& args) {
+    // 古い設定を得る。
+    const int (& material)[NUM_PIECE_TYPES] = search_params_ptr_->material();
+    LPointerVec ret_vec(7);
+    FOR_PIECE_TYPES(piece_type) {
+      ret_vec[piece_type] = Lisp::NewNumber(material[piece_type]);
+    }
+
+    // もし引数があるなら設定。
+    LObject* args_ptr = args.cdr()->cdr().get();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+
+      int len = Lisp::CountList(*result);
+      if (len < 7) {
+        throw Lisp::GenError("@engine-error",
+        "'" + symbol + "'"" requires List of 7 elements.");
+      }
+
+      int new_material[NUM_PIECE_TYPES];
+      LObject* ptr = result.get();
+      FOR_PIECE_TYPES(piece_type) {
+        if (piece_type == EMPTY) {
+          new_material[piece_type] = 0;
+        } else {
+          new_material[piece_type] = ptr->car()->number();
+        }
+        Lisp::Next(&ptr);
+      }
+
+      search_params_ptr_->material(new_material);
+    }
+
+    return Lisp::LPointerVecToList(ret_vec);
   }
 //  // 関数オブジェクト。
 //  LispObjectPtr EngineSuite::operator()
@@ -2902,48 +2947,6 @@ namespace Sayuri {
 //
 //    throw Lisp::GenError("@engine-error", "(" + func_name
 //    + ") couldn't understand '" + message_symbol + "'.");
-//  }
-//
-//  // SearchParams - マテリアル。
-//  LispObjectPtr EngineSuite::SetMaterial(const LispObject& material_list) {
-//    // 長さをチェック。
-//    unsigned int len = material_list.Length();
-//    if (len > 0) {
-//      if (len < 7) {
-//        throw Lisp::GenError("@engine-error",
-//        "Not enough length of material list. Needs 7. Given "
-//        + std::to_string(len) + ".");
-//      }
-//    }
-//
-//    // 返すオブジェクトを作成しながら配列にセットする。
-//    int material[NUM_PIECE_TYPES] {0, 0, 0, 0, 0, 0, 0};
-//
-//    LispObjectPtr ret_ptr = Lisp::NewList(7);
-//    LispIterator<true> ret_itr {ret_ptr.get()};
-//    ret_itr.current_->car(Lisp::NewNumber(0));  // Emptyの分。
-//    ++ret_itr;
-//
-//    LispIterator<false> itr {&material_list};
-//    ++itr;  // Emptyの分を飛ばす。
-//    for (PieceType piece_type = PAWN; piece_type < NUM_PIECE_TYPES;
-//    ++piece_type) {
-//      ret_itr.current_->car
-//      (Lisp::NewNumber(search_params_ptr_->material()[piece_type]));
-//
-//      ++ret_itr;
-//
-//      if (len != 0) {
-//        material[piece_type] = (itr++)->number_value();
-//      }
-//    }
-//
-//    // セットする。
-//    if (len != 0) {
-//      search_params_ptr_->material(material);
-//    }
-//
-//    return ret_ptr;
 //  }
 //
   // ======== //
