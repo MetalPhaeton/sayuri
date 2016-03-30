@@ -3705,6 +3705,93 @@ R"...(### gen-pgn ###
     ;; > (("Black" "Hanako Yamada") ("Site" "Japan")
     ;; > ("White" "Hironori Ishibashi")))...";
     help_dict_.emplace("gen-pgn", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->ParseFENEPD(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("parse-fen/epd",
+    NewN_Function(func, "Sayulisp:parse-fen/epd", scope_chain_));
+    help =
+R"...(### parse-fen/epd ###
+
+<h6> Usage </h6>
+
+* `(parse-fen/epd <FEN or EPD : String>)`
+
+<h6> Description </h6>
+
+* Parses `<FEN or EPD>` and returns result value.
+    +  A result value is `((<Tag 1 : String> <Object 1>)...)`.
+
+<h6> Example </h6>
+
+    (display (parse-fen/epd
+        "rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq d3 0 3"))
+    ;; Output
+    ;; > (("fen castling" (WHITE_SHORT_CASTLING
+    ;; > WHITE_LONG_CASTLING BLACK_SHORT_CASTLING BLACK_LONG_CASTLING))
+    ;; > ("fen clock" 0)
+    ;; > ("fen en_passant" D3)
+    ;; > ("fen ply" 5)
+    ;; > ("fen position" ((WHITE ROOK) (WHITE KNIGHT) (WHITE BISHOP)
+    ;; > (WHITE QUEEN) (WHITE KING) (WHITE BISHOP) (NO_SIDE EMPTY)
+    ;; > (WHITE ROOK) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (WHITE KNIGHT) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (WHITE PAWN)
+    ;; > (WHITE PAWN) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (BLACK PAWN) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (BLACK PAWN)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (BLACK PAWN) (BLACK PAWN) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK ROOK)
+    ;; > (BLACK KNIGHT) (BLACK BISHOP) (BLACK QUEEN) (BLACK KING)
+    ;; > (BLACK BISHOP) (BLACK KNIGHT) (BLACK ROOK)))
+    ;; > ("fen to_move" BLACK)))...";
+    help_dict_.emplace("parse-fen/epd", help);
+
+    func =
+    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      return this->ToFENPosition(self, caller, args);
+    };
+    scope_chain_.InsertSymbol("to-fen-position",
+    NewN_Function(func, "Sayulisp:to-fen-position", scope_chain_));
+    help =
+R"...(### to-fen-position ###
+
+<h6> Usage </h6>
+
+* `(to-fen-position <Pieces list : List>)`
+
+<h6> Description </h6>
+
+* Analyses `<Pieces list>` and returns FEN position.
+
+<h6> Example </h6>
+
+    (display (to-fen-position
+        '((WHITE KING) (WHITE KING)(WHITE KING) (WHITE KING)
+        (WHITE QUEEN) (WHITE QUEEN)(WHITE QUEEN) (WHITE QUEEN)
+        (WHITE ROOK) (WHITE ROOK)(WHITE ROOK) (WHITE ROOK)
+        (WHITE BISHOP) (WHITE BISHOP)(WHITE BISHOP) (WHITE BISHOP)
+        (WHITE KNIGHT) (WHITE KNIGHT)(WHITE KNIGHT) (WHITE KNIGHT)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (BLACK KNIGHT) (BLACK KNIGHT)(BLACK KNIGHT) (BLACK KNIGHT)
+        (BLACK BISHOP) (BLACK BISHOP)(BLACK BISHOP) (BLACK BISHOP)
+        (BLACK ROOK) (BLACK ROOK)(BLACK ROOK) (BLACK ROOK)
+        (BLACK QUEEN) (BLACK QUEEN)(BLACK QUEEN) (BLACK QUEEN)
+        (BLACK KING) (BLACK KING)(BLACK KING) (BLACK KING))))
+    ;; Output
+    ;; > qqqqkkkk/bbbbrrrr/4nnnn/8/8/NNNN4/RRRRBBBB/KKKKQQQQ)...";
+    help_dict_.emplace("to-fen-position", help);
   }
 
   // Sayulispを開始する。
@@ -4344,199 +4431,199 @@ R"...(### gen-pgn ###
     caller->scope_chain());
   }
 
-//  // PGNオブジェクトを作成する。
-//  LispObjectPtr Sayulisp::GenPGN(const std::string& pgn_str,
-//  const ScopeChain& caller_scope) {
-//    // PGNオブジェクト。
-//    std::shared_ptr<PGN> pgn_ptr(new PGN());
-//    pgn_ptr->Parse(pgn_str);
-//
-//    // PGN関数オブジェクト。
-//    std::shared_ptr<int> current_index_ptr(new int(0));
-//    auto pgn_func =
-//    [pgn_ptr, current_index_ptr](LispObjectPtr self, const LispObject& caller,
-//    const LispObject& list) -> LispObjectPtr {
-//      // 準備。
-//      LispIterator<false> list_itr {&list};
-//      std::string func_name = (list_itr++)->ToString();
-//      int required_args = 2;
-//
-//      // 現在のゲームと現在の指し手を得る。
-//      int current_index = *current_index_ptr;
-//      if (current_index >= static_cast<int>(pgn_ptr->game_vec().size())) {
-//        return NewNil();
-//      }
-//      const PGNGamePtr game_ptr = pgn_ptr->game_vec()[current_index];
-//      const MoveNode* move_ptr = game_ptr->current_node_ptr();
-//
-//      // 第1引数はメッセージシンボル。
-//      if (!list_itr) {
-//        throw GenInsufficientArgumentsError
-//        (func_name, required_args, true, list.Length() - 1);
-//      }
-//      LispObjectPtr message_ptr = caller.Evaluate(*(list_itr++));
-//      if (!(message_ptr->IsSymbol())) {
-//        throw GenWrongTypeError
-//        (func_name, "Symbol", std::vector<int> {1}, true);
-//      }
-//      std::string message_symbol = message_ptr->symbol_value();
-//
-//      // メッセージシンボルに合わせた処理。
-//      if (message_symbol == "@get-pgn-comments") {
-//        // PGNのコメント。
-//        LispObjectPtr ret_ptr = Lisp::NewList(pgn_ptr->comment_vec().size());
-//
-//        std::vector<std::string>::const_iterator comment_itr =
-//        pgn_ptr->comment_vec().begin();
-//
-//        for (LispIterator<true> itr {ret_ptr.get()};
-//        itr; ++itr, ++comment_itr) {
-//          itr->type(LispObjectType::STRING);
-//          itr->string_value(*comment_itr);
-//        }
-//
-//        return ret_ptr;
-//      }
-//      if (message_symbol == "@get-current-game-comments") {
-//        // 現在のゲームのコメント。
-//        LispObjectPtr ret_ptr = NewList(game_ptr->comment_vec().size());
-//
-//        std::vector<std::string>::const_iterator comment_itr =
-//        game_ptr->comment_vec().begin();
-//
-//        for (LispIterator<true> itr {ret_ptr.get()};
-//        itr; ++itr, ++comment_itr) {
-//          itr->type(LispObjectType::STRING);
-//          itr->string_value(*comment_itr);
-//        }
-//
-//        return ret_ptr;
-//      }
-//      if (message_symbol == "@get-current-move-comments") {
-//        // 現在の指し手のコメント。
-//        if (move_ptr) {
-//          LispObjectPtr ret_ptr = NewList(move_ptr->comment_vec_.size());
-//
-//          std::vector<std::string>::const_iterator comment_itr =
-//          move_ptr->comment_vec_.begin();
-//
-//          for (LispIterator<true> itr {ret_ptr.get()};
-//          itr; ++itr, ++comment_itr) {
-//            itr->type(LispObjectType::STRING);
-//            itr->string_value(*comment_itr);
-//          }
-//
-//          return ret_ptr;
-//        }
-//        return NewNil();
-//      }
-//      if (message_symbol == "@length") {
-//        // ゲームの数を得る。
-//        return NewNumber(pgn_ptr->game_vec().size());
-//      }
-//      if (message_symbol == "@set-current-game") {
-//        // 現在のゲームをセット。
-//        // 引数チェック。
-//        required_args = 2;
-//        if (!list_itr) {
-//          throw GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//        LispObjectPtr index_ptr = caller.Evaluate(*list_itr);
-//        if (!(index_ptr->IsNumber())) {
-//          throw GenWrongTypeError
-//          (func_name, "Number", std::vector<int> {2}, true);
-//        }
-//
-//        // インデックスをチェック。
-//        int index = index_ptr->number_value();
-//        index = index < 0 ? pgn_ptr->game_vec().size() + index : index;
-//        if (!((index >= 0)
-//        && (index <= static_cast<int>(pgn_ptr->game_vec().size())))) {
-//          throw GenError("@pgn-error",
-//          "Game number '" + std::to_string(index) + "' is out of range.");
-//        }
-//
-//        // セット。
-//        *current_index_ptr = index;
-//        return NewBoolean(true);
-//      }
-//      if (message_symbol == "@get-current-game-headers") {
-//        // 現在のゲームのヘッダ。
-//        LispObjectPtr ret_ptr = NewList(game_ptr->header().size());
-//        LispIterator<true> itr {ret_ptr.get()};
-//
-//        for (auto& pair : game_ptr->header()) {
-//          LispObjectPtr temp = NewList(2);
-//          temp->car(NewString(pair.first));
-//          temp->cdr()->car(NewString(pair.second));
-//          *itr = *temp;
-//          ++itr;
-//        }
-//
-//        return ret_ptr;
-//      }
-//      if (message_symbol == "@current-move") {
-//        // 現在の指し手。
-//        if (move_ptr) {
-//          return NewString(move_ptr->text_);
-//        }
-//        return NewString("");
-//      }
-//      if (message_symbol == "@next-move") {
-//        // 次の指し手へ。
-//        if (game_ptr->Next()) {
-//          if (game_ptr->current_node_ptr()) {
-//            return NewString(game_ptr->current_node_ptr()->text_);
-//          }
-//        }
-//        return NewString("");
-//      }
-//      if (message_symbol == "@prev-move") {
-//        // 前の指し手へ。
-//        if (game_ptr->Back()) {
-//          if (game_ptr->current_node_ptr()) {
-//            return NewString(game_ptr->current_node_ptr()->text_);
-//          }
-//        }
-//        return NewString("");
-//      }
-//      if (message_symbol == "@alt-move") {
-//        // 代替手へ。
-//        if (game_ptr->Alt()) {
-//          if (game_ptr->current_node_ptr()) {
-//            return NewString(game_ptr->current_node_ptr()->text_);
-//          }
-//        }
-//        return NewString("");
-//      }
-//      if (message_symbol == "@orig-move") {
-//        // オリジナルへ。
-//        while (game_ptr->Orig()) continue;
-//
-//        if (game_ptr->current_node_ptr()) {
-//          return NewString(game_ptr->current_node_ptr()->text_);
-//        }
-//
-//        return NewString("");
-//      }
-//      if (message_symbol == "@rewind-move") {
-//        // 最初の指し手へ。
-//        if (game_ptr->Rewind()) {
-//          if (game_ptr->current_node_ptr()) {
-//            return NewString(game_ptr->current_node_ptr()->text_);
-//          }
-//        }
-//        return NewString("");
-//      }
-//
-//      throw GenError("@sayulisp-error", "(" + func_name
-//      + ") couldn't understand '" + message_symbol + "'.");
-//    };
-//
-//    return NewNativeFunction(caller_scope, pgn_func);
-//  }
-//
+  // %%% parse-fen/epd
+  LPointer Sayulisp::ParseFENEPD(LPointer self, LObject* caller,
+  const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    // 文字列を得る。
+    LPointer fen_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*fen_ptr, LType::STRING);
+
+    // パースする。
+    std::map<std::string, std::string> fen_map =
+    Util::ParseFEN(fen_ptr->string());
+
+    // パース結果を格納していく。
+    LPointerVec ret_vec(fen_map.size());
+    LPointerVec::iterator ret_itr = ret_vec.begin();
+    LPointer tuple;
+    for (auto& pair : fen_map) {
+      tuple = NewList(2);
+      tuple->car(NewString(pair.first));
+
+      // ポジションをパース。
+      if (pair.first == "fen position") {
+        LPointerVec position_vec(NUM_SQUARES);
+        LPointerVec::iterator position_itr = position_vec.begin();
+        for (auto c : pair.second) {
+          switch (c) {
+            case 'P':
+              *position_itr = NewPair(NewSymbol("WHITE"),
+              NewPair(NewSymbol("PAWN"), NewNil()));
+              break;
+            case 'N':
+              *position_itr = NewPair(NewSymbol("WHITE"),
+              NewPair(NewSymbol("KNIGHT"), NewNil()));
+              break;
+            case 'B':
+              *position_itr = NewPair(NewSymbol("WHITE"),
+              NewPair(NewSymbol("BISHOP"), NewNil()));
+              break;
+            case 'R':
+              *position_itr = NewPair(NewSymbol("WHITE"),
+              NewPair(NewSymbol("ROOK"), NewNil()));
+              break;
+            case 'Q':
+              *position_itr = NewPair(NewSymbol("WHITE"),
+              NewPair(NewSymbol("QUEEN"), NewNil()));
+              break;
+            case 'K':
+              *position_itr = NewPair(NewSymbol("WHITE"),
+              NewPair(NewSymbol("KING"), NewNil()));
+              break;
+            case 'p':
+              *position_itr = NewPair(NewSymbol("BLACK"),
+              NewPair(NewSymbol("PAWN"), NewNil()));
+              break;
+            case 'n':
+              *position_itr = NewPair(NewSymbol("BLACK"),
+              NewPair(NewSymbol("KNIGHT"), NewNil()));
+              break;
+            case 'b':
+              *position_itr = NewPair(NewSymbol("BLACK"),
+              NewPair(NewSymbol("BISHOP"), NewNil()));
+              break;
+            case 'r':
+              *position_itr = NewPair(NewSymbol("BLACK"),
+              NewPair(NewSymbol("ROOK"), NewNil()));
+              break;
+            case 'q':
+              *position_itr = NewPair(NewSymbol("BLACK"),
+              NewPair(NewSymbol("QUEEN"), NewNil()));
+              break;
+            case 'k':
+              *position_itr = NewPair(NewSymbol("BLACK"),
+              NewPair(NewSymbol("KING"), NewNil()));
+              break;
+            default:
+              *position_itr = NewPair(NewSymbol("NO_SIDE"),
+              NewPair(NewSymbol("EMPTY"), NewNil()));
+              break;
+          }
+          ++position_itr;
+        }
+
+        tuple->cdr()->car(LPointerVecToList(position_vec));
+        *ret_itr = tuple;
+
+        ++ret_itr;
+        continue;
+      }
+
+      if (pair.first == "fen to_move") {
+        if (pair.second == "w") tuple->cdr()->car(NewSymbol("WHITE"));
+        else tuple->cdr()->car(NewSymbol("BLACK"));
+
+        *ret_itr = tuple;
+
+        ++ret_itr;
+        continue;
+      }
+
+      if (pair.first == "fen castling") {
+        LPointerVec castling_vec;
+        if (pair.second[0] != '-') {
+          castling_vec.push_back(NewSymbol("WHITE_SHORT_CASTLING"));
+        }
+        if (pair.second[1] != '-') {
+          castling_vec.push_back(NewSymbol("WHITE_LONG_CASTLING"));
+        }
+        if (pair.second[2] != '-') {
+          castling_vec.push_back(NewSymbol("BLACK_SHORT_CASTLING"));
+        }
+        if (pair.second[3] != '-') {
+          castling_vec.push_back(NewSymbol("BLACK_LONG_CASTLING"));
+        }
+
+        tuple->cdr()->car(LPointerVecToList(castling_vec));
+        *ret_itr = tuple;
+
+        ++ret_itr;
+        continue;
+      }
+
+      if (pair.first == "fen en_passant") {
+        if (pair.second != "-") {
+          char temp[3] {
+            static_cast<char>(pair.second[0] - 'a' + 'A'),
+            pair.second[1],
+            '\0'
+          };
+          tuple->cdr()->car(NewSymbol(temp));
+        } else {
+          tuple->cdr()->car(NewNil());
+        }
+
+        *ret_itr = tuple;
+        ++ret_itr;
+        continue;
+      }
+
+      if ((pair.first == "fen ply") || (pair.first == "fen clock")) {
+        tuple->cdr()->car(NewNumber(std::stod(pair.second)));
+        *ret_itr = tuple;
+        ++ret_itr;
+        continue;
+      }
+
+      // EPD拡張部分。
+      tuple->cdr()->car(NewString(pair.second));
+      *ret_itr = tuple;
+      ++ret_itr;
+    }
+
+    return LPointerVecToList(ret_vec);
+  }
+
+  // to-fen-position
+  LPointer Sayulisp::ToFENPosition(LPointer self, LObject* caller,
+  const LObject& args) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    // 文字列を得る。
+    LPointer position_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*position_ptr);
+
+    // ビットボードを作る。
+    Bitboard position[NUM_SIDES][NUM_PIECE_TYPES];
+    INIT_ARRAY(position);
+
+    // ビットボードにビットをセット。
+    LObject* ptr = position_ptr.get();
+    FOR_SQUARES(square) {
+      // 要素をチェック。
+      if (!ptr) {
+        throw GenError("@sayulisp-error",
+        "Not enough elements. Required 64 elemsents.");
+      }
+      CheckPiece(*(ptr->car()));
+
+      // セット。
+      Side side = ptr->car()->car()->number();
+      PieceType piece_type = ptr->car()->cdr()->car()->number();
+      position[side][piece_type] |= Util::SQUARE[square][R0];
+
+      Next(&ptr);
+    }
+
+    return NewString(Util::ToFENPosition(position));
+  }
+
 //  // FEN/EPDをパースする。
 //  LispObjectPtr Sayulisp::ParseFENEPD(const std::string& fen_str) {
 //    LispObjectPtr ret_ptr = NewNil();

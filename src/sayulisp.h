@@ -370,6 +370,14 @@ namespace Sayuri {
 
       /** PGNオブジェクトを作成する。 */
       LPointer GenPGN(LPointer self, LObject* caller, const LObject& args);
+
+      /** FEN/EPDをパースする。 */
+      LPointer ParseFENEPD(LPointer self, LObject* caller,
+      const LObject& args);
+
+      /** 駒の配列リストをFENの駒の配置文字列に変換する。 */
+      LPointer ToFENPosition(LPointer self, LObject* caller,
+      const LObject& args);
 //
 //      /**
 //       * FEN/EPD文字列をパースする。
