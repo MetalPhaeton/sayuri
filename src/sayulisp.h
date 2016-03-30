@@ -378,18 +378,6 @@ namespace Sayuri {
       /** 駒の配列リストをFENの駒の配置文字列に変換する。 */
       LPointer ToFENPosition(LPointer self, LObject* caller,
       const LObject& args);
-//
-//      /**
-//       * FEN/EPD文字列をパースする。
-//       */
-//      LPointer ParseFENEPD(LPointer self, LObject* caller,
-//      const LObject& args);
-//
-//      /**
-//       * 駒の配列のリストをFENの文字列に変換する。
-//       */
-//      LPointer ToFENPosition(LPointer self, LObject* caller,
-//      const LObject& args);
 
     private:
       // ================ //
