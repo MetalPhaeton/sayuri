@@ -210,238 +210,121 @@ namespace Sayuri {
     };
 
     message_func_map_["@get-piece"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetPiece(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GetPiece);
 
     message_func_map_["@get-all-pieces"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetAllPieces(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GetAllPieces);
 
     message_func_map_["@get-to-move"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetToMove(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GetToMove);
 
     message_func_map_["@get-castling-rights"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetCastlingRights(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GetCastlingRights);
 
     message_func_map_["@get-en-passant-square"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetEnPassantSquare(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GetEnPassantSquare);
 
     message_func_map_["@get-ply"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetPly(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GetPly);
 
     message_func_map_["@get-clock"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetClock(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GetClock);
 
     message_func_map_["@get-white-has-castled"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetHasCastled<WHITE>(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GetHasCastled<WHITE>);
 
     message_func_map_["@get-black-has-castled"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetHasCastled<BLACK>(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GetHasCastled<BLACK>);
 
     message_func_map_["@get-fen"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetFEN(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GetFEN);
 
     message_func_map_["@to-string"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->BoardToString(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(BoardToString);
 
     message_func_map_["@set-new-game"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->SetNewGame(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(SetNewGame);
 
     message_func_map_["@set-fen"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->SetFEN(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(SetFEN);
 
     message_func_map_["@place-piece"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->PlacePiece(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(PlacePiece);
 
     message_func_map_["@get-candidate-moves"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetCandidateMoves(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GetCandidateMoves);
 
     message_func_map_["@set-to-move"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->SetToMove(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(SetToMove);
 
     message_func_map_["@set-castling-rights"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->SetCastlingRights(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(SetCastlingRights);
 
     message_func_map_["@set-en-passant-square"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->SetEnPassantSquare(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(SetEnPassantSquare);
 
     message_func_map_["@set-ply"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->SetPly(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(SetPly);
 
     message_func_map_["@set-clock"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->SetClock(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(SetClock);
 
     message_func_map_["@correct-position?"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->IsCorrectPosition(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(IsCorrectPosition);
 
     message_func_map_["@white-checked?"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->IsChecked<WHITE>(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(IsChecked<WHITE>);
 
     message_func_map_["@black-checked?"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->IsChecked<BLACK>(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(IsChecked<BLACK>);
 
     message_func_map_["@checkmated?"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->IsCheckmated(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(IsCheckmated);
 
     message_func_map_["@stalemated?"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->IsStalemated(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(IsStalemated);
 
     message_func_map_["@play-move"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->PlayMoveOrNote(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(PlayMoveOrNote);
 
     message_func_map_["@play-note"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->PlayMoveOrNote(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(PlayMoveOrNote);
 
     message_func_map_["@undo-move"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->UndoMove(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(UndoMove);
 
     message_func_map_["@move->note"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->MoveToNote(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(MoveToNote);
 
     message_func_map_["@input-uci-command"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->InputUCICommand(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(InputUCICommand);
 
     message_func_map_["@add-uci-output-listener"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->AddUCIOutputListener(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(AddUCIOutputListener);
 
     message_func_map_["@run"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->RunEngine(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(RunEngine);
 
     message_func_map_["@go-movetime"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GoMoveTime(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GoMoveTime);
 
     message_func_map_["@go-timelimit"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GoTimeLimit(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GoTimeLimit);
 
     message_func_map_["@go-depth"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GoDepth(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GoDepth);
 
     message_func_map_["@go-nodes"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GoNodes(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(GoNodes);
 
     message_func_map_["@set-hash-size"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->SetHashSize(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(SetHashSize);
 
     message_func_map_["@set-threads"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->SetThreads(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(SetThreads);
 
     message_func_map_["@material"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->SetMaterial(symbol, self, caller, args);
-    };
+    INSERT_MESSAGE_FUNCTION(SetMaterial);
   }
 //
 //  // ウェイト関数オブジェクトをセット。
@@ -759,8 +642,7 @@ namespace Sayuri {
   // %%% @get-black-queen-position
   // %%% @get-black-king-position
   template<Side SIDE, PieceType PIECE_TYPE>
-  LPointer EngineSuite::GetPosition(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::GetPosition) {
     LPointerVec ret_vec;
     for (Bitboard bb = board_ptr_->position_[SIDE][PIECE_TYPE]; bb;
     NEXT_BITBOARD(bb)) {
@@ -796,8 +678,7 @@ namespace Sayuri {
   (const std::string&, LPointer, LObject*, const LObject&);
 
   // %%% @get-piece
-  LPointer EngineSuite::GetPiece(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::GetPiece) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -818,8 +699,7 @@ namespace Sayuri {
   }
 
   // %%% @get-all-pieces
-  LPointer EngineSuite::GetAllPieces(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::GetAllPieces) {
     LPointerVec ret_vec(NUM_SQUARES);
     LPointerVec::iterator itr = ret_vec.begin();
 
@@ -840,8 +720,7 @@ namespace Sayuri {
   }
 
   // %%% @set-fen
-  LPointer EngineSuite::SetFEN(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetFEN) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -869,8 +748,7 @@ namespace Sayuri {
   }
 
   // %%% @place-piece
-  LPointer EngineSuite::PlacePiece(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::PlacePiece) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 2, &args_ptr);
@@ -906,8 +784,7 @@ namespace Sayuri {
   }
 
   // %%% @get-candidate-moves
-  LPointer EngineSuite::GetCandidateMoves(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::GetCandidateMoves) {
     // 指し手の生成。
     std::vector<Move> move_vec = engine_ptr_->GetLegalMoves();
     LPointer ret_ptr = Lisp::NewList(move_vec.size());
@@ -923,8 +800,7 @@ namespace Sayuri {
   }
 
   // %%% @set-to-move
-  LPointer EngineSuite::SetToMove(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetToMove) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -948,8 +824,7 @@ namespace Sayuri {
   }
 
   // %%% @set-castling-rights
-  LPointer EngineSuite::SetCastlingRights(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetCastlingRights) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -1006,8 +881,7 @@ namespace Sayuri {
   }
 
   // %%% set-en-passant-square
-  LPointer EngineSuite::SetEnPassantSquare(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetEnPassantSquare) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -1053,8 +927,7 @@ namespace Sayuri {
   }
 
   // %%% @set-play
-  LPointer EngineSuite::SetPly(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPly) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -1075,8 +948,7 @@ namespace Sayuri {
   }
 
   // %%% @set-clock
-  LPointer EngineSuite::SetClock(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetClock) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -1099,8 +971,7 @@ namespace Sayuri {
   // %%% @play-move
   // %%% @play-note
   /** 手を指す。 */
-  LPointer EngineSuite::PlayMoveOrNote(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::PlayMoveOrNote) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -1121,8 +992,7 @@ namespace Sayuri {
   }
 
   // %%% @undo-move
-  LPointer EngineSuite::UndoMove(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::UndoMove) {
     Move move = engine_ptr_->UndoMove();
     if (!move) return Lisp::NewNil();
 
@@ -1130,8 +1000,7 @@ namespace Sayuri {
   }
 
   // %%% @move->note
-  LPointer EngineSuite::MoveToNote(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::MoveToNote) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -1144,8 +1013,7 @@ namespace Sayuri {
   }
 
   // %%% @input-uci-command
-  LPointer EngineSuite::InputUCICommand(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::InputUCICommand) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -1157,8 +1025,7 @@ namespace Sayuri {
   }
 
   // %%% @add-uci-output-listener
-  LPointer EngineSuite::AddUCIOutputListener(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::AddUCIOutputListener) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -1188,8 +1055,7 @@ namespace Sayuri {
   }
 
   // %%% @run
-  LPointer EngineSuite::RunEngine(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::RunEngine) {
     // 出力リスナー。
     auto callback = [](const std::string& message) {
       std::cout << message << std::endl;
@@ -1259,8 +1125,7 @@ namespace Sayuri {
   }
 
   // %%% @go-movetime
-  LPointer EngineSuite::GoMoveTime(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::GoMoveTime) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -1284,8 +1149,7 @@ namespace Sayuri {
   }
 
   // %%% @go-timelimit
-  LPointer EngineSuite::GoTimeLimit(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::GoTimeLimit) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -1309,8 +1173,7 @@ namespace Sayuri {
   }
 
   // %%% @go-depth
-  LPointer EngineSuite::GoDepth(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::GoDepth) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -1334,8 +1197,7 @@ namespace Sayuri {
   }
 
   // %%% @go-nodes
-  LPointer EngineSuite::GoNodes(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::GoNodes) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -1359,8 +1221,7 @@ namespace Sayuri {
   }
 
   // %%% @set-hash-size
-  LPointer EngineSuite::SetHashSize(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetHashSize) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -1381,8 +1242,7 @@ namespace Sayuri {
   }
 
   // %%% @set-threads
-  LPointer EngineSuite::SetThreads(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetThreads) {
     // 準備。
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -1402,8 +1262,7 @@ namespace Sayuri {
   }
 
   // %%% @material
-  LPointer EngineSuite::SetMaterial(const std::string& symbol,
-  LPointer self, LObject* caller, const LObject& args) {
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetMaterial) {
     // 古い設定を得る。
     const int (& material)[NUM_PIECE_TYPES] = search_params_ptr_->material();
     LPointerVec ret_vec(7);

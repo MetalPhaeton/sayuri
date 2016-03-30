@@ -67,6 +67,18 @@ namespace Sayuri {
       using MessageFunction = std::function
       <LPointer(const std::string&, LPointer, LObject*, const LObject&)>;
 
+      /** メッセージシンボル関数宣言マクロ。 */
+#define DEF_MESSAGE_FUNCTION(func_name) \
+      LPointer func_name(const std::string& symbol, LPointer self, \
+      LObject* caller, const LObject& args)
+
+      /** メッセージシンボル関数オブジェクト登録マクロ。 */
+#define INSERT_MESSAGE_FUNCTION(func_name) \
+    [this](const std::string& symbol, LPointer self, LObject* caller, \
+    const LObject& args) -> LPointer {\
+      return this->func_name(symbol, self, caller, args);\
+    }
+
       // ==================== //
       // コンストラクタと代入 //
       // ==================== //
@@ -419,28 +431,23 @@ namespace Sayuri {
       // ====================== //
       /** 駒の配置を得る。 */
       template<Side SIDE, PieceType PIECE_TYPE>
-      LPointer GetPosition(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(GetPosition);
 
       /** 駒を得る。 */
-      LPointer GetPiece(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(GetPiece);
 
       /** すべての駒を得る。 */
-      LPointer GetAllPieces(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(GetAllPieces);
 
       // %%% @get-to-move
       /** 現在のサイドを得る。 */
-      LPointer GetToMove(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args) {
+      DEF_MESSAGE_FUNCTION(GetToMove) {
         return Lisp::NewSymbol(Sayulisp::SIDE_MAP_INV[board_ptr_->to_move_]);
       }
 
       // %%% @get-castling-rights
       /** 現在のキャスリングの権利を得る。 */
-      LPointer GetCastlingRights(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args) {
+      DEF_MESSAGE_FUNCTION(GetCastlingRights) {
         LPointerVec ret_vec;
         Castling rights = board_ptr_->castling_rights_;
 
@@ -462,8 +469,7 @@ namespace Sayuri {
 
       // %%% @get-en-passant-square
       /** 現在のアンパッサンのマスを得る。 */
-      LPointer GetEnPassantSquare(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args) {
+      DEF_MESSAGE_FUNCTION(GetEnPassantSquare) {
         if (board_ptr_->en_passant_square_) {
           return Lisp::NewSymbol
           (Sayulisp::SQUARE_MAP_INV[board_ptr_->en_passant_square_]);
@@ -473,15 +479,13 @@ namespace Sayuri {
 
       // %%% @get-ply
       /** 現在の手数を得る。 */
-      LPointer GetPly(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args) {
+      DEF_MESSAGE_FUNCTION(GetPly) {
         return Lisp::NewNumber(board_ptr_->ply_);
       }
 
       // %%% @get-clock
       /** 現在のクロックを得る。 */
-      LPointer GetClock(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args) {
+      DEF_MESSAGE_FUNCTION(GetClock) {
         return Lisp::NewNumber(board_ptr_->clock_);
       }
 
@@ -489,69 +493,56 @@ namespace Sayuri {
       // %%% @get-black-has-castled
       /** 現在のキャスリングしたかどうかを得る。 */
       template<Side SIDE>
-      LPointer GetHasCastled(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args) {
+      DEF_MESSAGE_FUNCTION(GetHasCastled) {
         return Lisp::NewBoolean(board_ptr_->has_castled_[SIDE]);
       }
 
       // %%% @get-fen
       /** 現在の状態のFENを得る。 */
-      LPointer GetFEN(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args) {
+      DEF_MESSAGE_FUNCTION(GetFEN) {
         return Lisp::NewString(engine_ptr_->GetFENString());
       }
 
       // %%% @to-string
       /** 現在の状態の文字列を得る。 */
-      LPointer BoardToString(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args) {
+      DEF_MESSAGE_FUNCTION(BoardToString) {
         return Lisp::NewString(Board::ToString(*board_ptr_));
       }
 
       // %%% @set-new-game
       /** ボードの状態を初期状態にする。 */
-      LPointer SetNewGame(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args) {
+      DEF_MESSAGE_FUNCTION(SetNewGame) {
         engine_ptr_->SetNewGame();
         return Lisp::NewBoolean(true);
       }
 
       /** FENをセットする。 */
-      LPointer SetFEN(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(SetFEN);
 
       /** 駒を置く。 */
-      LPointer PlacePiece(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(PlacePiece);
 
       /** 候補手を得る。 */
-      LPointer GetCandidateMoves(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(GetCandidateMoves);
 
       /** 手番をセットする。 */
-      LPointer SetToMove(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(SetToMove);
 
       /** キャスリングの権利をセットする。 */
-      LPointer SetCastlingRights(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(SetCastlingRights);
 
       /** アンパッサンのマスをセットする。 */
-      LPointer SetEnPassantSquare(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(SetEnPassantSquare);
 
       /** 手数をセットする。 */
-      LPointer SetPly(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(SetPly);
 
       /** クロックをセットする。 */
-      LPointer SetClock(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(SetClock);
 
       // %%% @correct-position?
       /** 正しい配置かどうか。 */
-      LPointer IsCorrectPosition(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args) {
+      DEF_MESSAGE_FUNCTION(IsCorrectPosition) {
         return Lisp::NewBoolean(engine_ptr_->IsCorrectPosition());
       }
 
@@ -559,8 +550,7 @@ namespace Sayuri {
       // %%% @black-checked?
       /** チェックがかかっているかどうか。 */
       template<Side SIDE>
-      LPointer IsChecked(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args) {
+      DEF_MESSAGE_FUNCTION(IsChecked) {
         constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
         return Lisp::NewBoolean
         (engine_ptr_->IsAttacked(board_ptr_->king_[SIDE], ENEMY_SIDE));
@@ -568,8 +558,7 @@ namespace Sayuri {
 
       // %%% @checkmated?
       /** 正しい配置かどうか。 */
-      LPointer IsCheckmated(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args) {
+      DEF_MESSAGE_FUNCTION(IsCheckmated) {
         Side to_move = board_ptr_->to_move_;
 
         if (engine_ptr_->GetLegalMoves().size() == 0) {
@@ -584,8 +573,7 @@ namespace Sayuri {
 
       // %%% @stalemated?
       /** 正しい配置かどうか。 */
-      LPointer IsStalemated(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args) {
+      DEF_MESSAGE_FUNCTION(IsStalemated) {
         Side to_move = board_ptr_->to_move_;
 
         if (engine_ptr_->GetLegalMoves().size() == 0) {
@@ -599,28 +587,22 @@ namespace Sayuri {
       }
 
       /** 手を指す。 */
-      LPointer PlayMoveOrNote(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(PlayMoveOrNote);
 
       /** 指し手を戻す。 */
-      LPointer UndoMove(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(UndoMove);
 
       /** 指し手をPGNの指し手の文字列に変換する。 */
-      LPointer MoveToNote(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(MoveToNote);
 
       /** UCIコマンドを入力する。 */
-      LPointer InputUCICommand(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(InputUCICommand);
 
       /** UCIコマンドの出力リスナーを登録する。 */
-      LPointer AddUCIOutputListener(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(AddUCIOutputListener);
 
       /** エンジンとして実行する。 */
-      LPointer RunEngine(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(RunEngine);
 
       /**
        * Go...()で使う関数
@@ -634,36 +616,28 @@ namespace Sayuri {
       int thinking_time, const LObject& candidate_list);
 
       /** ミリ秒で思考する。 */
-      LPointer GoMoveTime(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(GoMoveTime);
 
       /** 持ち時間ミリ秒以内で思考する。 */
-      LPointer GoTimeLimit(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(GoTimeLimit);
 
       /** 指定深さで思考する。 */
-      LPointer GoDepth(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(GoDepth);
 
       /** 指定ノード数で思考する。 */
-      LPointer GoNodes(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(GoNodes);
 
       /** ハッシュテーブルのサイズを設定する。 */
-      LPointer SetHashSize(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(SetHashSize);
 
       /** スレッド数を設定する。 */
-      LPointer SetThreads(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(SetThreads);
 
       /** マテリアルを設定する。 */
-      LPointer SetMaterial(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(SetMaterial);
 
       /** マテリアルを設定する。 */
-      LPointer SetEnabelQuiesceSearch(const std::string& symbol,
-      LPointer self, LObject* caller, const LObject& args);
+      DEF_MESSAGE_FUNCTION(SetEnabelQuiesceSearch);
 
 //      /**
 //       * SearchParams - クイース探索の有効無効。
