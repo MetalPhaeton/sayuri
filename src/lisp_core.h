@@ -3211,6 +3211,9 @@ namespace Sayuri {
         return NewNumber(min);
       }
 
+      /** ネイティブ関数 - re-match */
+      DEF_LC_FUNCTION(ReMatch);
+
     protected:
       /** ヘルプ辞書。 */
       LHelpDict help_dict_;

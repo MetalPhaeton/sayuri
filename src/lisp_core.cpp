@@ -44,6 +44,7 @@
 #include <cmath>
 #include <random>
 #include <chrono>
+#include <regex>
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -3490,6 +3491,29 @@ R"...(### min ###
     ;; Output
     ;; > 1)...";
     help_dict_.emplace("min", help);
+
+    func = LC_FUNCTION_OBJ(ReMatch);
+    INSERT_LC_FUNCTION(func, "re-match", "Lisp:re-match");
+    help =
+R"...(### re-match ###
+
+<h6> Usage </h6>
+
+* `(re-match <Regex : String> <Target : String>)`
+
+<h6> Description </h6>
+
+* Search `<Regex>` from `<Target>` and returns List of results.
+    + The 1st element of results is match of whole `<Target>`.
+    + From the 2nd element, each group.
+
+<h6> Example </h6>
+
+    (define target "Hello World")
+    (display (re-match "(Hel).* (Wor).*" target))
+    ;; Output
+    ;; > ("Hello World" "Hel" "Wor"))...";
+    help_dict_.emplace("re-match", help);
   }
 
   // ============== //
@@ -4653,4 +4677,32 @@ R"...(### min ###
 
     return LPointerVecToList(ret_vec);
   } 
+
+  // %%% re-match
+  DEF_LC_FUNCTION(Lisp::ReMatch) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 2, &args_ptr);
+
+    // 正規表現を得る。
+    LPointer reg_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*reg_ptr, LType::STRING);
+    Next(&args_ptr);
+    std::regex reg(reg_ptr->string(), std::regex_constants::ECMAScript);
+
+    // 対象文字列を得る。
+    LPointer str_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*str_ptr, LType::STRING);
+
+    // マッチしたものを探す。
+    LPointerVec ret_vec;
+    std::smatch result;
+    if (std::regex_search(str_ptr->string(), result, reg)) {
+      for (auto& token : result) {
+        ret_vec.push_back(NewString(token));
+      }
+    }
+
+    return LPointerVecToList(ret_vec);
+  }
 }  // namespace Sayuri
