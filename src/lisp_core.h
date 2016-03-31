@@ -3211,8 +3211,8 @@ namespace Sayuri {
         return NewNumber(min);
       }
 
-      /** ネイティブ関数 - re-match */
-      DEF_LC_FUNCTION(ReMatch);
+      /** ネイティブ関数 - regex-search */
+      DEF_LC_FUNCTION(RegexSearch);
 
     protected:
       /** ヘルプ辞書。 */

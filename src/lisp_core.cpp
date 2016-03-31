@@ -3492,14 +3492,14 @@ R"...(### min ###
     ;; > 1)...";
     help_dict_.emplace("min", help);
 
-    func = LC_FUNCTION_OBJ(ReMatch);
-    INSERT_LC_FUNCTION(func, "re-match", "Lisp:re-match");
+    func = LC_FUNCTION_OBJ(RegexSearch);
+    INSERT_LC_FUNCTION(func, "regex-search", "Lisp:regex-search");
     help =
-R"...(### re-match ###
+R"...(### regex-search ###
 
 <h6> Usage </h6>
 
-* `(re-match <Regex : String> <Target : String>)`
+* `(regex-search <Regex : String> <Target : String>)`
 
 <h6> Description </h6>
 
@@ -3510,10 +3510,10 @@ R"...(### re-match ###
 <h6> Example </h6>
 
     (define target "Hello World")
-    (display (re-match "(Hel).* (Wor).*" target))
+    (display (regex-search "(Hel).* (Wor).*" target))
     ;; Output
     ;; > ("Hello World" "Hel" "Wor"))...";
-    help_dict_.emplace("re-match", help);
+    help_dict_.emplace("regex-search", help);
   }
 
   // ============== //
@@ -4678,8 +4678,8 @@ R"...(### re-match ###
     return LPointerVecToList(ret_vec);
   } 
 
-  // %%% re-match
-  DEF_LC_FUNCTION(Lisp::ReMatch) {
+  // %%% regex-search
+  DEF_LC_FUNCTION(Lisp::RegexSearch) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 2, &args_ptr);
