@@ -325,6 +325,114 @@ namespace Sayuri {
 
     message_func_map_["@material"] =
     INSERT_MESSAGE_FUNCTION(SetMaterial);
+
+    message_func_map_["@enable-quiesce-search"] =
+    INSERT_MESSAGE_FUNCTION(SetEnabelQuiesceSearch);
+
+    message_func_map_["@enable-repetition-check"] =
+    INSERT_MESSAGE_FUNCTION(SetEnabelRepetitionCheck);
+
+    message_func_map_["@enable-check-extension"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableCheckExtension);
+
+    message_func_map_["@ybwc-limit-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetYBWCLimitDepth);
+
+    message_func_map_["@ybwc-invalid-moves"] =
+    INSERT_MESSAGE_FUNCTION(SetYBWCInvalidMoves);
+
+    message_func_map_["@enable-aspiration-windows"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableAspirationWindows);
+
+    message_func_map_["@aspiration-windows-limit-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetAspirationWindowsLimitDepth);
+
+    message_func_map_["@aspiration-windows-delta"] =
+    INSERT_MESSAGE_FUNCTION(SetAspirationWindowsDelta);
+
+    message_func_map_["@enable-see"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableSEE);
+
+    message_func_map_["@enable-history"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableHistory);
+
+    message_func_map_["@enable-killer"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableKiller);
+
+    message_func_map_["@enable-hash-table"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableHashTable);
+
+    message_func_map_["@enable-iid"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableIID);
+
+    message_func_map_["@iid-limit-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetIIDLimitDepth);
+
+    message_func_map_["@iid-search-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetIIDSearchDepth);
+
+    message_func_map_["@enable-nmr"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableNMR);
+
+    message_func_map_["@nmr-limit-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetNMRLimitDepth);
+
+    message_func_map_["@nmr-search-reduction"] =
+    INSERT_MESSAGE_FUNCTION(SetNMRSearchReduction);
+
+    message_func_map_["@nmr-reduction"] =
+    INSERT_MESSAGE_FUNCTION(SetNMRReduction);
+
+    message_func_map_["@enable-probcut"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableProbCut);
+
+    message_func_map_["@probcut-limit-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetProbCutLimitDepth);
+
+    message_func_map_["@probcut-margin"] =
+    INSERT_MESSAGE_FUNCTION(SetProbCutMargin);
+
+    message_func_map_["@probcut-search-reduction"] =
+    INSERT_MESSAGE_FUNCTION(SetProbCutSearchReduction);
+
+    message_func_map_["@enable-history-pruning"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableHistoryPruning);
+
+    message_func_map_["@history-pruning-limit-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetHistoryPruningLimitDepth);
+
+    message_func_map_["@history-pruning-move-threshold"] =
+    INSERT_MESSAGE_FUNCTION(SetHistoryPruningMoveThreshold);
+
+    message_func_map_["@history-pruning-threshold"] =
+    INSERT_MESSAGE_FUNCTION(SetHistoryPruningThreshold);
+
+    message_func_map_["@history-pruning-reduction"] =
+    INSERT_MESSAGE_FUNCTION(SetHistoryPruningReduction);
+
+    message_func_map_["@enable-lmr"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableLMR);
+
+    message_func_map_["@lmr-limit-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetLMRLimitDepth);
+
+    message_func_map_["@lmr-move-threshold"] =
+    INSERT_MESSAGE_FUNCTION(SetLMRMoveThreshold);
+
+    message_func_map_["@lmr-invalid-moves"] =
+    INSERT_MESSAGE_FUNCTION(SetLMRInvalidMoves);
+
+    message_func_map_["@lmr-search-reduction"] =
+    INSERT_MESSAGE_FUNCTION(SetLMRSearchReduction);
+
+    message_func_map_["@enable-futility-pruning"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableFutilityPruning);
+
+    message_func_map_["@futility-pruning-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetFutilityPruningDepth);
+
+    message_func_map_["@futility-pruning-margin"] =
+    INSERT_MESSAGE_FUNCTION(SetFutilityPruningMargin);
   }
 //
 //  // ウェイト関数オブジェクトをセット。

@@ -636,484 +636,251 @@ namespace Sayuri {
       /** マテリアルを設定する。 */
       DEF_MESSAGE_FUNCTION(SetMaterial);
 
-      /** マテリアルを設定する。 */
-      DEF_MESSAGE_FUNCTION(SetEnabelQuiesceSearch);
+      /** Search ParamsのBoolean型パラメータの設定マクロ。 */
+#define SET_BOOLEAN_PARAM(accessor) \
+      LPointer ret_ptr =\
+      Lisp::NewBoolean(search_params_ptr_->accessor());\
+      \
+      LObject* args_ptr = args.cdr()->cdr().get();\
+      if (args_ptr->IsPair()) {\
+        LPointer result = caller->Evaluate(*(args_ptr->car()));\
+        Lisp::CheckType(*result, LType::BOOLEAN);\
+        \
+        search_params_ptr_->accessor(result->boolean());\
+      };\
+      \
+      return ret_ptr
 
-//      /**
-//       * SearchParams - クイース探索の有効無効。
-//       * @param enable クイース探索の有効無効。
-//       * @return セットされていたクイース探索の有効無効。
-//       */
-//      LispObjectPtr SetEnableQuiesceSearch(const LispObject& enable) {
-//        LispObjectPtr ret_ptr =
-//        Lisp::NewBoolean(search_params_ptr_->enable_quiesce_search());
-//
-//        if (enable.IsBoolean()) {
-//          search_params_ptr_->enable_quiesce_search(enable.boolean_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - 繰り返しチェックの有効無効。
-//       * @param enable 繰り返しチェックの有効無効。
-//       * @return セットされていた繰り返しチェックの有効無効。
-//       */
-//      LispObjectPtr SetEnableRepetitionCheck(const LispObject& enable) {
-//        LispObjectPtr ret_ptr =
-//        Lisp::NewBoolean(search_params_ptr_->enable_repetition_check());
-//
-//        if (enable.IsBoolean()) {
-//          search_params_ptr_->enable_repetition_check(enable.boolean_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - Check Extensionの有効無効。
-//       * @param enable Check Extensionの有効無効。
-//       * @return セットされていたCheck Extensionの有効無効。
-//       */
-//      LispObjectPtr SetEnableCheckExtension(const LispObject& enable) {
-//        LispObjectPtr ret_ptr =
-//        Lisp::NewBoolean(search_params_ptr_->enable_check_extension());
-//
-//        if (enable.IsBoolean()) {
-//          search_params_ptr_->enable_check_extension(enable.boolean_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - YBWCの深さ制限。
-//       * @param depth 深さ。
-//       * @return セットされていたYBWCの深さ制限。
-//       */
-//      LispObjectPtr SetYBWCLimitDepth(const LispObject& depth) {
-//        LispObjectPtr ret_ptr =
-//        Lisp::NewNumber(search_params_ptr_->ybwc_limit_depth());
-//
-//        if (depth.IsNumber()) {
-//          search_params_ptr_->ybwc_limit_depth(depth.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - YBWCを無効にする最初の候補手の数。
-//       * @param num_moves 候補手の数。
-//       * @return セットされていたYBWCを無効にする最初の候補手の数。
-//       */
-//      LispObjectPtr SetYBWCInvalidMoves(const LispObject& num_moves) {
-//        LispObjectPtr ret_ptr =
-//        Lisp::NewNumber(search_params_ptr_->ybwc_invalid_moves());
-//
-//        if (num_moves.IsNumber()) {
-//          search_params_ptr_->ybwc_invalid_moves(num_moves.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - Aspiration Windowsの有効無効。
-//       * @param enable Aspiration Windowsの有効無効。
-//       * @return セットされていたAspiration Windowsの有効無効。
-//       */
-//      LispObjectPtr SetEnableAspirationWindows(const LispObject& enable) {
-//        LispObjectPtr ret_ptr = Lisp::NewBoolean
-//        (search_params_ptr_->enable_aspiration_windows());
-//
-//        if (enable.IsBoolean()) {
-//          search_params_ptr_->enable_aspiration_windows
-//          (enable.boolean_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - Aspiration Windowsの深さ制限。
-//       * @param depth 深さ。
-//       * @return セットされていたAspiration Windowsの深さ制限。
-//       */
-//      LispObjectPtr SetAspirationWindowsLimitDepth(const LispObject& depth) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->aspiration_windows_limit_depth());
-//
-//        if (depth.IsNumber()) {
-//          search_params_ptr_->aspiration_windows_limit_depth
-//          (depth.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - Aspiration Windowsのデルタ値。
-//       * @param delta デルタ値。
-//       * @return セットされていたAspiration Windowsのデルタ値。
-//       */
-//      LispObjectPtr SetAspirationWindowsDelta(const LispObject& delta) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->aspiration_windows_delta());
-//
-//        if (delta.IsNumber()) {
-//          search_params_ptr_->aspiration_windows_delta
-//          (delta.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - SEEの有効無効。
-//       * @param enable SEEの有効無効。
-//       * @return セットされていたSEEの有効無効。
-//       */
-//      LispObjectPtr SetEnableSEE(const LispObject& enable) {
-//        LispObjectPtr ret_ptr = Lisp::NewBoolean
-//        (search_params_ptr_->enable_see());
-//
-//        if (enable.IsBoolean()) {
-//          search_params_ptr_->enable_see(enable.boolean_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - ヒストリーの有効無効。
-//       * @param enable ヒストリーの有効無効。
-//       * @return セットされていたヒストリーの有効無効。
-//       */
-//      LispObjectPtr SetEnableHistory(const LispObject& enable) {
-//        LispObjectPtr ret_ptr = Lisp::NewBoolean
-//        (search_params_ptr_->enable_history());
-//
-//        if (enable.IsBoolean()) {
-//          search_params_ptr_->enable_history(enable.boolean_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - キラームーブの有効無効。
-//       * @param enable キラームーブの有効無効。
-//       * @return セットされていたキラームーブの有効無効。
-//       */
-//      LispObjectPtr SetEnableKiller(const LispObject& enable) {
-//        LispObjectPtr ret_ptr = Lisp::NewBoolean
-//        (search_params_ptr_->enable_killer());
-//
-//        if (enable.IsBoolean()) {
-//          search_params_ptr_->enable_killer(enable.boolean_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - トランスポジションテーブルの有効無効。
-//       * @param enable トランスポジションテーブルの有効無効。
-//       * @return セットされていたトランスポジションテーブルの有効無効。
-//       */
-//      LispObjectPtr SetEnableHashTable(const LispObject& enable) {
-//        LispObjectPtr ret_ptr = Lisp::NewBoolean
-//        (search_params_ptr_->enable_ttable());
-//
-//        if (enable.IsBoolean()) {
-//          search_params_ptr_->enable_ttable(enable.boolean_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - IIDの有効無効。
-//       * @param enable IIDの有効無効。
-//       * @return セットされていたIIDの有効無効。
-//       */
-//      LispObjectPtr SetEnableIID(const LispObject& enable) {
-//        LispObjectPtr ret_ptr = Lisp::NewBoolean
-//        (search_params_ptr_->enable_iid());
-//
-//        if (enable.IsBoolean()) {
-//          search_params_ptr_->enable_iid(enable.boolean_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - IIDの深さ制限。
-//       * @param depth 深さ。
-//       * @return セットされていたIIDの深さ制限。
-//       */
-//      LispObjectPtr SetIIDLimitDepth(const LispObject& depth) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->iid_limit_depth());
-//
-//        if (depth.IsNumber()) {
-//          search_params_ptr_->iid_limit_depth(depth.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - IIDの探索深さ。
-//       * @param depth 深さ。
-//       * @return セットされていたIIDの探索深さ。
-//       */
-//      LispObjectPtr SetIIDSearchDepth(const LispObject& depth) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->iid_search_depth());
-//
-//        if (depth.IsNumber()) {
-//          search_params_ptr_->iid_search_depth(depth.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - NMRの有効無効。
-//       * @param enable NMRの有効無効。
-//       * @return セットされていたNMRの有効無効。
-//       */
-//      LispObjectPtr SetEnableNMR(const LispObject& enable) {
-//        LispObjectPtr ret_ptr = Lisp::NewBoolean
-//        (search_params_ptr_->enable_nmr());
-//
-//        if (enable.IsBoolean()) {
-//          search_params_ptr_->enable_nmr(enable.boolean_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - NMRの深さ制限。
-//       * @param depth 深さ。
-//       * @return セットされていたNMRの深さ制限。
-//       */
-//      LispObjectPtr SetNMRLimitDepth(const LispObject& depth) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->nmr_limit_depth());
-//
-//        if (depth.IsNumber()) {
-//          search_params_ptr_->nmr_limit_depth(depth.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - NMRの探索時のリダクション。
-//       * @param reduction リダクション。
-//       * @return セットされていたNMRの探索時のリダクション。
-//       */
-//      LispObjectPtr SetNMRSearchReduction(const LispObject& reduction) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->nmr_search_reduction());
-//
-//        if (reduction.IsNumber()) {
-//          search_params_ptr_->nmr_search_reduction(reduction.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - NMRの結果のリダクション。
-//       * @param reduction リダクション。
-//       * @return セットされていたNMRの結果のリダクション。
-//       */
-//      LispObjectPtr SetNMRReduction(const LispObject& reduction) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->nmr_reduction());
-//
-//        if (reduction.IsNumber()) {
-//          search_params_ptr_->nmr_reduction(reduction.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - ProbCutの有効無効。
-//       * @param enable ProbCutの有効無効。
-//       * @return セットされていたProbCutの有効無効。
-//       */
-//      LispObjectPtr SetEnableProbCut(const LispObject& enable) {
-//        LispObjectPtr ret_ptr = Lisp::NewBoolean
-//        (search_params_ptr_->enable_probcut());
-//
-//        if (enable.IsBoolean()) {
-//          search_params_ptr_->enable_probcut(enable.boolean_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - ProbCutの深さ制限。
-//       * @param depth 深さ。
-//       * @return セットされていたProbCutの深さ制限。
-//       */
-//      LispObjectPtr SetProbCutLimitDepth(const LispObject& depth) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->probcut_limit_depth());
-//
-//        if (depth.IsNumber()) {
-//          search_params_ptr_->probcut_limit_depth(depth.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - ProbCutのベータ値のマージン。
-//       * @param margin マージン。
-//       * @return セットされていたProbCutのベータ値のマージン。
-//       */
-//      LispObjectPtr SetProbCutMargin(const LispObject& margin) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->probcut_margin());
-//
-//        if (margin.IsNumber()) {
-//          search_params_ptr_->probcut_margin(margin.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - ProbCutの探索時のリダクション。
-//       * @param reduction リダクション。
-//       * @return セットされていたProbCutの探索時のリダクション。
-//       */
-//      LispObjectPtr SetProbCutSearchReduction(const LispObject& reduction) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->probcut_search_reduction());
-//
-//        if (reduction.IsNumber()) {
-//          search_params_ptr_->probcut_search_reduction
-//          (reduction.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - History Pruningの有効無効。
-//       * @param enable History Pruningの有効無効。
-//       * @return セットされていたHistory Pruningの有効無効。
-//       */
-//      LispObjectPtr SetEnableHistoryPruning(const LispObject& enable) {
-//        LispObjectPtr ret_ptr = Lisp::NewBoolean
-//        (search_params_ptr_->enable_history_pruning());
-//
-//        if (enable.IsBoolean()) {
-//          search_params_ptr_->enable_history_pruning(enable.boolean_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - History Pruningの深さ制限。
-//       * @param depth 深さ。
-//       * @return セットされていたHistory Pruningの深さ制限。
-//       */
-//      LispObjectPtr SetHistoryPruningLimitDepth(const LispObject& depth) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->history_pruning_limit_depth());
-//
-//        if (depth.IsNumber()) {
-//          search_params_ptr_->history_pruning_limit_depth
-//          (depth.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - History Pruningの候補手の閾値。
-//       * @param threshold 閾値。
-//       * @return セットされていたHistory Pruningの候補手の閾値。
-//       */
-//      LispObjectPtr SetHistoryPruningMoveThreshold
-//      (const LispObject& threshold) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->history_pruning_move_threshold());
-//
-//        if (threshold.IsNumber()) {
-//          search_params_ptr_->history_pruning_move_threshold
-//          (threshold.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - History Pruningを無効にする最初の候補手の数。
-//       * @param num_moves 候補手の数。
-//       * @return セットされていたHistory Pruningを無効にする最初の候補手の数。
-//       */
-//      LispObjectPtr SetHistoryPruningInvalidMoves
-//      (const LispObject& num_moves) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->history_pruning_invalid_moves());
-//
-//        if (num_moves.IsNumber()) {
-//          search_params_ptr_->history_pruning_invalid_moves
-//          (num_moves.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - History Pruningのヒストリー値の閾値。
-//       * @param threshold 閾値。
-//       * @return セットされていたHistory Pruningのヒストリー値の閾値。
-//       */
-//      LispObjectPtr SetHistoryPruningThreshold(const LispObject& threshold) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->history_pruning_threshold());
-//
-//        if (threshold.IsNumber()) {
-//          search_params_ptr_->history_pruning_threshold
-//          (threshold.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * SearchParams - History Pruningのリダクション。
-//       * @param reduction リダクション。
-//       * @return セットされていたHistory Pruningのリダクション。
-//       */
-//      LispObjectPtr SetHistoryPruningReduction(const LispObject& reduction) {
-//        LispObjectPtr ret_ptr = Lisp::NewNumber
-//        (search_params_ptr_->history_pruning_reduction());
-//
-//        if (reduction.IsNumber()) {
-//          search_params_ptr_->history_pruning_reduction
-//          (reduction.number_value());
-//        }
-//
-//        return ret_ptr;
-//      }
-//
+      /** Search ParamsのNumber型パラメータの設定マクロ。 */
+#define SET_NUMBER_PARAM(accessor) \
+      LPointer ret_ptr =\
+      Lisp::NewNumber(search_params_ptr_->accessor());\
+      \
+      LObject* args_ptr = args.cdr()->cdr().get();\
+      if (args_ptr->IsPair()) {\
+        LPointer result = caller->Evaluate(*(args_ptr->car()));\
+        Lisp::CheckType(*result, LType::NUMBER);\
+        \
+        search_params_ptr_->accessor(result->number());\
+      };\
+      \
+      return ret_ptr
+
+      // %%% @enable-quiesce-search
+      /** Search Params - enable-quiesce-search */
+      DEF_MESSAGE_FUNCTION(SetEnabelQuiesceSearch) {
+        SET_BOOLEAN_PARAM(enable_quiesce_search);
+      }
+
+      // %%% @enable-repetition-check
+      /** SearchParams - enable-repetition-check */
+      DEF_MESSAGE_FUNCTION(SetEnabelRepetitionCheck) {
+        SET_BOOLEAN_PARAM(enable_repetition_check);
+      }
+
+      // %%% @enable-check-extension
+      /** SearchParams - enable-check-extension */
+      DEF_MESSAGE_FUNCTION(SetEnableCheckExtension) {
+        SET_BOOLEAN_PARAM(enable_check_extension);
+      }
+
+      // %%% @ybwc-limit-depth
+      /** SearchParams - ybwc-limit-depth */
+      DEF_MESSAGE_FUNCTION(SetYBWCLimitDepth) {
+        SET_NUMBER_PARAM(ybwc_limit_depth);
+      }
+
+      // %%% @ybwc-invalid-moves
+      /** SearchParams - ybwc-invalid-moves */
+      DEF_MESSAGE_FUNCTION(SetYBWCInvalidMoves) {
+        SET_NUMBER_PARAM(ybwc_invalid_moves);
+      }
+
+      // %%% @enable-aspiration-windows
+      /** SearchParams - enable-aspiration-windows */
+      DEF_MESSAGE_FUNCTION(SetEnableAspirationWindows) {
+        SET_BOOLEAN_PARAM(enable_aspiration_windows);
+      }
+
+      // %%% @aspiration-windows-limit-depth
+      /** SearchParams - aspiration-windows-limit-depth */
+      DEF_MESSAGE_FUNCTION(SetAspirationWindowsLimitDepth) {
+        SET_NUMBER_PARAM(aspiration_windows_limit_depth);
+      }
+
+      // %%% @aspiration-windows-delta
+      /** SearchParams - aspiration-windows-delta */
+      DEF_MESSAGE_FUNCTION(SetAspirationWindowsDelta) {
+        SET_NUMBER_PARAM(aspiration_windows_delta);
+      }
+
+      // %%% @enable-see
+      /** SearchParams - enable-see */
+      DEF_MESSAGE_FUNCTION(SetEnableSEE) {
+        SET_BOOLEAN_PARAM(enable_see);
+      }
+
+      // %%% @enable-history
+      /** SearchParams - enable-history */
+      DEF_MESSAGE_FUNCTION(SetEnableHistory) {
+        SET_BOOLEAN_PARAM(enable_history);
+      }
+
+      // %%% @enable-killer
+      /** SearchParams - enable-killer */
+      DEF_MESSAGE_FUNCTION(SetEnableKiller) {
+        SET_BOOLEAN_PARAM(enable_killer);
+      }
+
+      // %%% @enable-hash-table
+      /** SearchParams - enable-hash-table */
+      DEF_MESSAGE_FUNCTION(SetEnableHashTable) {
+        SET_BOOLEAN_PARAM(enable_ttable);
+      }
+
+      // %%% @enable-iid
+      /** SearchParams - enable-iid */
+      DEF_MESSAGE_FUNCTION(SetEnableIID) {
+        SET_BOOLEAN_PARAM(enable_iid);
+      }
+
+      // %%% @iid-limit-depth
+      /** SearchParams - iid-limit-depth */
+      DEF_MESSAGE_FUNCTION(SetIIDLimitDepth) {
+        SET_NUMBER_PARAM(iid_limit_depth);
+      }
+
+      // %%% @iid-search-depth
+      /** SearchParams - iid-search-depth */
+      DEF_MESSAGE_FUNCTION(SetIIDSearchDepth) {
+        SET_NUMBER_PARAM(iid_search_depth);
+      }
+
+      // %%% @enable-iid
+      /** SearchParams - enable-iid */
+      DEF_MESSAGE_FUNCTION(SetEnableNMR) {
+        SET_BOOLEAN_PARAM(enable_nmr);
+      }
+
+      // %%% @nmr-limit-depth
+      /** SearchParams - nmr-limit-depth */
+      DEF_MESSAGE_FUNCTION(SetNMRLimitDepth) {
+        SET_NUMBER_PARAM(nmr_limit_depth);
+      }
+
+      // %%% @nmr-search-reduction
+      /** SearchParams - nmr-search-reduction */
+      DEF_MESSAGE_FUNCTION(SetNMRSearchReduction) {
+        SET_NUMBER_PARAM(nmr_search_reduction);
+      }
+
+      // %%% @nmr-reduction
+      /** SearchParams - nmr-reduction */
+      DEF_MESSAGE_FUNCTION(SetNMRReduction) {
+        SET_NUMBER_PARAM(nmr_reduction);
+      }
+
+      // %%% @enable-probcut
+      /** SearchParams - enable-probcut */
+      DEF_MESSAGE_FUNCTION(SetEnableProbCut) {
+        SET_BOOLEAN_PARAM(enable_probcut);
+      }
+
+      // %%% @probcut-limit-depth
+      /** SearchParams - probcut-limit-depth */
+      DEF_MESSAGE_FUNCTION(SetProbCutLimitDepth) {
+        SET_NUMBER_PARAM(probcut_limit_depth);
+      }
+
+      // %%% @probcut-margin
+      /** SearchParams - probcut-margin */
+      DEF_MESSAGE_FUNCTION(SetProbCutMargin) {
+        SET_NUMBER_PARAM(probcut_margin);
+      }
+
+      // %%% @probcut-search-reduction
+      /** SearchParams - probcut-search-reduction */
+      DEF_MESSAGE_FUNCTION(SetProbCutSearchReduction) {
+        SET_NUMBER_PARAM(probcut_search_reduction);
+      }
+
+      // %%% @enable-history-pruning
+      /** SearchParams - enable-history-pruning */
+      DEF_MESSAGE_FUNCTION(SetEnableHistoryPruning) {
+        SET_BOOLEAN_PARAM(enable_history_pruning);
+      }
+
+      // %%% @history-pruning-limit-depth
+      /** SearchParams - history-pruning-limit-depth */
+      DEF_MESSAGE_FUNCTION(SetHistoryPruningLimitDepth) {
+        SET_NUMBER_PARAM(history_pruning_limit_depth);
+      }
+
+      // %%% @history-pruning-move-threshold
+      /** SearchParams - history-pruning-move-threshold */
+      DEF_MESSAGE_FUNCTION(SetHistoryPruningMoveThreshold) {
+        SET_NUMBER_PARAM(history_pruning_move_threshold);
+      }
+
+      // %%% @history-pruning-threshold
+      /** SearchParams - history-pruning-threshold */
+      DEF_MESSAGE_FUNCTION(SetHistoryPruningThreshold) {
+        SET_NUMBER_PARAM(history_pruning_threshold);
+      }
+
+      // %%% @history-pruning-reduction
+      /** SearchParams - history-pruning-reduction */
+      DEF_MESSAGE_FUNCTION(SetHistoryPruningReduction) {
+        SET_NUMBER_PARAM(history_pruning_reduction);
+      }
+
+      // %%% @enable-lmr
+      /** SearchParams - enable-lmr */
+      DEF_MESSAGE_FUNCTION(SetEnableLMR) {
+        SET_BOOLEAN_PARAM(enable_lmr);
+      }
+
+      // %%% @lmr-limit-depth
+      /** SearchParams - lmr-limit-depth */
+      DEF_MESSAGE_FUNCTION(SetLMRLimitDepth) {
+        SET_NUMBER_PARAM(lmr_limit_depth);
+      }
+
+      // %%% @lmr-move-threshold
+      /** SearchParams - lmr-move-threshold */
+      DEF_MESSAGE_FUNCTION(SetLMRMoveThreshold) {
+        SET_NUMBER_PARAM(lmr_move_threshold);
+      }
+
+      // %%% @lmr-invalid-moves
+      /** SearchParams - lmr-invalid-moves */
+      DEF_MESSAGE_FUNCTION(SetLMRInvalidMoves) {
+        SET_NUMBER_PARAM(lmr_invalid_moves);
+      }
+
+      // %%% @lmr-search-reduction
+      /** SearchParams - lmr-search-reduction */
+      DEF_MESSAGE_FUNCTION(SetLMRSearchReduction) {
+        SET_NUMBER_PARAM(lmr_search_reduction);
+      }
+
+      // %%% @enable-futility-pruning
+      /** SearchParams - enable-futility-pruning */
+      DEF_MESSAGE_FUNCTION(SetEnableFutilityPruning) {
+        SET_BOOLEAN_PARAM(enable_futility_pruning);
+      }
+
+      // %%% @futility-pruning-depth
+      /** SearchParams - futility-pruning-depth */
+      DEF_MESSAGE_FUNCTION(SetFutilityPruningDepth) {
+        SET_NUMBER_PARAM(futility_pruning_depth);
+      }
+
+      // %%% @futility-pruning-margin
+      /** SearchParams - futility-pruning-margin */
+      DEF_MESSAGE_FUNCTION(SetFutilityPruningMargin) {
+        SET_NUMBER_PARAM(futility_pruning_margin);
+      }
 //      /**
 //       * SearchParams - LMRの有効無効。
 //       * @param enable LMRの有効無効。
