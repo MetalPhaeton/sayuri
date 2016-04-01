@@ -4547,13 +4547,14 @@ R"...(### regex-search ###
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 2, &args_ptr);
 
-    // 第1引数。 ターゲットのリスト。
-    LPointer target_ptr = caller->Evaluate(*(args_ptr->car()));
-    CheckList(*target_ptr);
+
+    // 第1引数。 検索語。
+    LPointer elm_ptr = caller->Evaluate(*(args_ptr->car()));
     Next(&args_ptr);
 
-    // 第2引数。 検索語。
-    LPointer elm_ptr = caller->Evaluate(*(args_ptr->car()));
+    // 第2引数。 ターゲットのリスト。
+    LPointer target_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*target_ptr);
 
     // インデックスを得る。
     int index = 0;

@@ -806,7 +806,7 @@ namespace Sayuri {
        * @param num_pieces 駒の数。
        * @return ウェイト。
        */
-      double operator()(int num_pieces) {
+      double operator()(int num_pieces) const {
         // 準備。
         std::size_t len = this->size();
         if (len <= 0) return 0.0;
@@ -849,7 +849,7 @@ namespace Sayuri {
        * 要素を返す。
        * @return 要素のタプル。
        */
-      const std::tuple<int, double>& At(std::size_t index) {
+      const std::tuple<int, double>& At(std::size_t index) const {
         return this->at(index);
       }
 
@@ -896,6 +896,9 @@ namespace Sayuri {
 
       /**
        * オープニングとエンディングの値からウェイトを作成する。
+       * @param opening_weight オープニングのウェイト。
+       * @param ending_weight エンディングのウェイト。
+       * @return 完成したウェイトオブジェクト。
        */
       static Weight CreateWeight(double opening_weight, double ending_weight) {
         Weight op {{OPENING_START, opening_weight}, {OPENING_END, 0.0}};

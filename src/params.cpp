@@ -169,20 +169,20 @@ namespace Sayuri {
   // ========== //
   // コンストラクタ。
   EvalParams::EvalParams() :
-  weight_pass_pawn_(20.0, 30.0),
-  weight_protected_pass_pawn_(10.0, 10.0),
-  weight_double_pawn_(-10.0, -20.0),
-  weight_iso_pawn_(-10.0, -5.0),
-  weight_pawn_shield_(1.0, 0.0),
-  weight_bishop_pair_(60.0, 60.0),
-  weight_bad_bishop_(-1.5, 0.0),
-  weight_rook_pair_(10.0, 20.0),
-  weight_rook_semiopen_fyle_(7.5, 7.5),
-  weight_rook_open_fyle_(7.5, 7.5),
-  weight_early_queen_starting_(-20.0, 0.0),
-  weight_weak_square_(-5.0, 0.0),
-  weight_castling_(20.0, 0.0),
-  weight_abandoned_castling_(-110.0, 0.0) {
+  weight_pass_pawn_(Weight::CreateWeight(20.0, 30.0)),
+  weight_protected_pass_pawn_(Weight::CreateWeight(10.0, 10.0)),
+  weight_double_pawn_(Weight::CreateWeight(-10.0, -20.0)),
+  weight_iso_pawn_(Weight::CreateWeight(-10.0, -5.0)),
+  weight_pawn_shield_(Weight::CreateWeight(1.0, 0.0)),
+  weight_bishop_pair_(Weight::CreateWeight(60.0, 60.0)),
+  weight_bad_bishop_(Weight::CreateWeight(-1.5, 0.0)),
+  weight_rook_pair_(Weight::CreateWeight(10.0, 20.0)),
+  weight_rook_semiopen_fyle_(Weight::CreateWeight(7.5, 7.5)),
+  weight_rook_open_fyle_(Weight::CreateWeight(7.5, 7.5)),
+  weight_early_queen_starting_(Weight::CreateWeight(-20.0, 0.0)),
+  weight_weak_square_(Weight::CreateWeight(-5.0, 0.0)),
+  weight_castling_(Weight::CreateWeight(20.0, 0.0)),
+  weight_abandoned_castling_(Weight::CreateWeight(-110.0, 0.0)) {
     // オープニング時の駒の配置の価値テーブルの初期化。
     static const double OPENING_POSITION[NUM_PIECE_TYPES][NUM_SQUARES] {
       {  // EMPTY。
@@ -449,94 +449,94 @@ namespace Sayuri {
     COPY_ARRAY(pawn_shield_value_table_, PAWN_SHIELD);
 
     // オープニング時の駒の配置のウェイトを初期化。
-    weight_opening_position_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_opening_position_[PAWN] = Weight(1.0, 0.0);  // ポーン。
-    weight_opening_position_[KNIGHT] = Weight(1.0, 0.0);  // ナイト。
-    weight_opening_position_[BISHOP] = Weight(1.0, 0.0);  // ビショップ。
-    weight_opening_position_[ROOK] = Weight(1.0, 0.0);  // ルーク。
-    weight_opening_position_[QUEEN] = Weight(1.0, 0.0);  // クイーン。
-    weight_opening_position_[KING] = Weight(1.0, 0.0);  // キング。
+    weight_opening_position_[EMPTY] = Weight::CreateWeight(0.0, 0.0);
+    weight_opening_position_[PAWN] = Weight::CreateWeight(1.0, 0.0);
+    weight_opening_position_[KNIGHT] = Weight::CreateWeight(1.0, 0.0);
+    weight_opening_position_[BISHOP] = Weight::CreateWeight(1.0, 0.0);
+    weight_opening_position_[ROOK] = Weight::CreateWeight(1.0, 0.0);
+    weight_opening_position_[QUEEN] = Weight::CreateWeight(1.0, 0.0);
+    weight_opening_position_[KING] = Weight::CreateWeight(1.0, 0.0);
 
     // エンディング時の駒の配置のウェイトを初期化。
-    weight_ending_position_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_ending_position_[PAWN] = Weight(0.0, 1.0);  // ポーン。
-    weight_ending_position_[KNIGHT] = Weight(0.0, 1.0);  // ナイト。
-    weight_ending_position_[BISHOP] = Weight(0.0, 1.0);  // ビショップ。
-    weight_ending_position_[ROOK] = Weight(0.0, 1.0);  // ルーク。
-    weight_ending_position_[QUEEN] = Weight(0.0, 1.0);  // クイーン。
-    weight_ending_position_[KING] = Weight(0.0, 1.0);  // キング。
+    weight_ending_position_[EMPTY] = Weight::CreateWeight(0.0, 0.0);
+    weight_ending_position_[PAWN] = Weight::CreateWeight(0.0, 1.0);
+    weight_ending_position_[KNIGHT] = Weight::CreateWeight(0.0, 1.0);
+    weight_ending_position_[BISHOP] = Weight::CreateWeight(0.0, 1.0);
+    weight_ending_position_[ROOK] = Weight::CreateWeight(0.0, 1.0);
+    weight_ending_position_[QUEEN] = Weight::CreateWeight(0.0, 1.0);
+    weight_ending_position_[KING] = Weight::CreateWeight(0.0, 1.0);
 
     // 機動力のウェイトを初期化。
-    weight_mobility_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_mobility_[PAWN] = Weight(0.0, 0.0);  // ポーン。
-    weight_mobility_[KNIGHT] = Weight(1.0, 2.0);  // ナイト。
-    weight_mobility_[BISHOP] = Weight(1.5, 3.0);  // ビショップ。
-    weight_mobility_[ROOK] = Weight(1.0, 2.0);  // ルーク。
-    weight_mobility_[QUEEN] = Weight(1.0, 2.0);  // クイーン。
-    weight_mobility_[KING] = Weight(0.0, 0.0);  // キング。
+    weight_mobility_[EMPTY] = Weight::CreateWeight(0.0, 0.0);
+    weight_mobility_[PAWN] = Weight::CreateWeight(0.0, 0.0);
+    weight_mobility_[KNIGHT] = Weight::CreateWeight(1.0, 2.0);
+    weight_mobility_[BISHOP] = Weight::CreateWeight(1.5, 3.0);
+    weight_mobility_[ROOK] = Weight::CreateWeight(1.0, 2.0);
+    weight_mobility_[QUEEN] = Weight::CreateWeight(1.0, 2.0);
+    weight_mobility_[KING] = Weight::CreateWeight(0.0, 0.0);
 
     // センターコントロールのウェイトを初期化。
-    weight_center_control_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_center_control_[PAWN] = Weight(5.0, 0.0);  // ポーン。
-    weight_center_control_[KNIGHT] = Weight(4.0, 0.0);  //ナイト。
-    weight_center_control_[BISHOP] = Weight(2.5, 0.0);  // ビショップ。
-    weight_center_control_[ROOK] = Weight(2.5, 0.0);  // ルーク。
-    weight_center_control_[QUEEN] = Weight(2.5, 0.0);  // クイーン。
-    weight_center_control_[KING] = Weight(0.0, 0.0);  // キング。
+    weight_center_control_[EMPTY] = Weight::CreateWeight(0.0, 0.0);
+    weight_center_control_[PAWN] = Weight::CreateWeight(5.0, 0.0);
+    weight_center_control_[KNIGHT] = Weight::CreateWeight(4.0, 0.0);
+    weight_center_control_[BISHOP] = Weight::CreateWeight(2.5, 0.0);
+    weight_center_control_[ROOK] = Weight::CreateWeight(2.5, 0.0);
+    weight_center_control_[QUEEN] = Weight::CreateWeight(2.5, 0.0);
+    weight_center_control_[KING] = Weight::CreateWeight(0.0, 0.0);
 
     // スウィートセンターのコントロールのウェイトを初期化。
-    weight_sweet_center_control_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_sweet_center_control_[PAWN] = Weight(5.0, 0.0);  // ポーン。
-    weight_sweet_center_control_[KNIGHT] = Weight(4.0, 0.0);  //ナイト。
-    weight_sweet_center_control_[BISHOP] = Weight(2.5, 0.0);  // ビショップ。
-    weight_sweet_center_control_[ROOK] = Weight(2.5, 0.0);  // ルーク。
-    weight_sweet_center_control_[QUEEN] = Weight(2.5, 0.0);  // クイーン。
-    weight_sweet_center_control_[KING] = Weight(0.0, 0.0);  // キング。
+    weight_sweet_center_control_[EMPTY] = Weight::CreateWeight(0.0, 0.0);
+    weight_sweet_center_control_[PAWN] = Weight::CreateWeight(5.0, 0.0);
+    weight_sweet_center_control_[KNIGHT] = Weight::CreateWeight(4.0, 0.0);
+    weight_sweet_center_control_[BISHOP] = Weight::CreateWeight(2.5, 0.0);
+    weight_sweet_center_control_[ROOK] = Weight::CreateWeight(2.5, 0.0);
+    weight_sweet_center_control_[QUEEN] = Weight::CreateWeight(2.5, 0.0);
+    weight_sweet_center_control_[KING] = Weight::CreateWeight(0.0, 0.0);
 
     // 展開のウェイトを初期化。
-    weight_development_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_development_[PAWN] = Weight(0.0, 0.0);  // ポーン。
-    weight_development_[KNIGHT] = Weight(15.0, 0.0);  //ナイト。
-    weight_development_[BISHOP] = Weight(15.0, 0.0);  // ビショップ。
-    weight_development_[ROOK] = Weight(0.0, 0.0);  // ルーク。
-    weight_development_[QUEEN] = Weight(0.0, 0.0);  // クイーン。
-    weight_development_[KING] = Weight(0.0, 0.0);  // キング。
+    weight_development_[EMPTY] = Weight::CreateWeight(0.0, 0.0);
+    weight_development_[PAWN] = Weight::CreateWeight(0.0, 0.0);
+    weight_development_[KNIGHT] = Weight::CreateWeight(15.0, 0.0);
+    weight_development_[BISHOP] = Weight::CreateWeight(15.0, 0.0);
+    weight_development_[ROOK] = Weight::CreateWeight(0.0, 0.0);
+    weight_development_[QUEEN] = Weight::CreateWeight(0.0, 0.0);
+    weight_development_[KING] = Weight::CreateWeight(0.0, 0.0);
 
     // 相手への攻撃のウェイトを初期化。
-    weight_attack_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_attack_[PAWN] = Weight(1.0, 0.3);  // ポーン。
-    weight_attack_[KNIGHT] = Weight(1.0, 0.3);  //ナイト。
-    weight_attack_[BISHOP] = Weight(1.0, 0.3);  // ビショップ。
-    weight_attack_[ROOK] = Weight(1.0, 0.3);  // ルーク。
-    weight_attack_[QUEEN] = Weight(1.0, 0.3);  // クイーン。
-    weight_attack_[KING] = Weight(1.0, 0.0);  // キング。
+    weight_attack_[EMPTY] = Weight::CreateWeight(0.0, 0.0);
+    weight_attack_[PAWN] = Weight::CreateWeight(1.0, 0.3);
+    weight_attack_[KNIGHT] = Weight::CreateWeight(1.0, 0.3);
+    weight_attack_[BISHOP] = Weight::CreateWeight(1.0, 0.3);
+    weight_attack_[ROOK] = Weight::CreateWeight(1.0, 0.3);
+    weight_attack_[QUEEN] = Weight::CreateWeight(1.0, 0.3);
+    weight_attack_[KING] = Weight::CreateWeight(1.0, 0.0);
 
     // 味方への防御のウェイトを初期化。
-    weight_defense_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_defense_[PAWN] = Weight(1.0, 0.5);  // ポーン。
-    weight_defense_[KNIGHT] = Weight(1.0, 0.5);  //ナイト。
-    weight_defense_[BISHOP] = Weight(1.0, 0.5);  // ビショップ。
-    weight_defense_[ROOK] = Weight(1.0, 0.5);  // ルーク。
-    weight_defense_[QUEEN] = Weight(1.0, 0.5);  // クイーン。
-    weight_defense_[KING] = Weight(1.0, 3.0);  // キング。
+    weight_defense_[EMPTY] = Weight::CreateWeight(0.0, 0.0);
+    weight_defense_[PAWN] = Weight::CreateWeight(1.0, 0.5);
+    weight_defense_[KNIGHT] = Weight::CreateWeight(1.0, 0.5);
+    weight_defense_[BISHOP] = Weight::CreateWeight(1.0, 0.5);
+    weight_defense_[ROOK] = Weight::CreateWeight(1.0, 0.5);
+    weight_defense_[QUEEN] = Weight::CreateWeight(1.0, 0.5);
+    weight_defense_[KING] = Weight::CreateWeight(1.0, 3.0);
 
     // ピンのウェイトを初期化。
-    weight_pin_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_pin_[PAWN] = Weight(0.0, 0.0);  // ポーン。
-    weight_pin_[KNIGHT] = Weight(0.0, 0.0);  //ナイト。
-    weight_pin_[BISHOP] = Weight(1.0, 1.0);  // ビショップ。
-    weight_pin_[ROOK] = Weight(1.0, 1.0);  // ルーク。
-    weight_pin_[QUEEN] = Weight(1.0, 1.0);  // クイーン。
-    weight_pin_[KING] = Weight(0.0, 0.0);  // キング。
+    weight_pin_[EMPTY] = Weight::CreateWeight(0.0, 0.0);
+    weight_pin_[PAWN] = Weight::CreateWeight(0.0, 0.0);
+    weight_pin_[KNIGHT] = Weight::CreateWeight(0.0, 0.0);
+    weight_pin_[BISHOP] = Weight::CreateWeight(1.0, 1.0);
+    weight_pin_[ROOK] = Weight::CreateWeight(1.0, 1.0);
+    weight_pin_[QUEEN] = Weight::CreateWeight(1.0, 1.0);
+    weight_pin_[KING] = Weight::CreateWeight(0.0, 0.0);
 
     // 相手キング周辺への攻撃のウェイトを初期化。
-    weight_attack_around_king_[EMPTY] = Weight(0.0, 0.0);  // EMPTY。
-    weight_attack_around_king_[PAWN] = Weight(3.0, 1.5);  // ポーン。
-    weight_attack_around_king_[KNIGHT] = Weight(3.0, 1.5);  //ナイト。
-    weight_attack_around_king_[BISHOP] = Weight(3.0, 1.5);  // ビショップ。
-    weight_attack_around_king_[ROOK] = Weight(3.0, 1.5);  // ルーク。
-    weight_attack_around_king_[QUEEN] = Weight(3.0, 1.5);  // クイーン。
-    weight_attack_around_king_[KING] = Weight(0.0, 5.0);  // キング。
+    weight_attack_around_king_[EMPTY] = Weight::CreateWeight(0.0, 0.0);
+    weight_attack_around_king_[PAWN] = Weight::CreateWeight(3.0, 1.5);
+    weight_attack_around_king_[KNIGHT] = Weight::CreateWeight(3.0, 1.5);
+    weight_attack_around_king_[BISHOP] = Weight::CreateWeight(3.0, 1.5);
+    weight_attack_around_king_[ROOK] = Weight::CreateWeight(3.0, 1.5);
+    weight_attack_around_king_[QUEEN] = Weight::CreateWeight(3.0, 1.5);
+    weight_attack_around_king_[KING] = Weight::CreateWeight(0.0, 5.0);
   }
 
   // コピーコンストラクタ。
