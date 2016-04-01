@@ -31,6 +31,10 @@
 #define PARAMS_H_dd1bb50e_83bf_4b24_af8b_7c7bf60bc063
 
 #include <iostream>
+#include <vector>
+#include <tuple>
+#include <initializer_list>
+#include <algorithm>
 #include <cstdint>
 #include "common.h"
 
@@ -731,135 +735,189 @@ namespace Sayuri {
   };
 
   /** 評価関数用パラメータのウェイトのクラス。 */
-  class Weight {
+  class Weight : protected std::vector<std::tuple<int, double>> {
+    protected:
+      using Super = std::vector<std::tuple<int, double>>;
+      using InitList = std::initializer_list<std::initializer_list<double>>;
+
     public:
+      // 駒の数とフェーズの関係。
+      /** オープニング開始時。 */
+      static constexpr int OPENING_START = 32;
+      /** オープニング終了時。 */
+      static constexpr int OPENING_END = 14;
+      /** エンディング開始時。 */
+      static constexpr int ENDING_START = 26;
+      /** エンディング終了時。 */
+      static constexpr int ENDING_END = 2;
+
       // ==================== //
       // コンストラクタと代入 //
       // ==================== //
       /**
        * コンストラクタ。
-       * @param opening_weight キング以外の駒が30個の時のウェイト。
-       * @param ending_weight キング以外の駒が0個の時のウェイト。
+       * @param list 初期化リスト。
        */
-      Weight(double opening_weight, double ending_weight) :
-      opening_weight_(opening_weight),
-      ending_weight_(ending_weight) {
-        SetSlope();
+      Weight(InitList list) {
+        for (auto& elm : list) {
+          if (elm.size() >= 2) {
+            std::initializer_list<double>::iterator itr = elm.begin();
+            this->push_back(std::tuple<int, double>(*itr, *(itr + 1)));
+          }
+        }
+
+        // ソート。
+        Sort();
       }
       /** コンストラクタ。 */
-      Weight() :
-      opening_weight_(0.0),
-      ending_weight_(0.0),
-      slope_(0.0) {}
+      Weight() : Super() {}
       /**
        * コピーコンストラクタ。
        * @param weight コピー元。
        */
-      Weight(const Weight& weight) :
-      opening_weight_(weight.opening_weight_),
-      ending_weight_(weight.ending_weight_),
-      slope_(weight.slope_) {}
+      Weight(const Weight& weight) : Super(weight) {}
       /**
        * ムーブコンストラクタ。
        * @param weight ムーブ元。
        */
-      Weight(Weight&& weight) :
-      opening_weight_(weight.opening_weight_),
-      ending_weight_(weight.ending_weight_),
-      slope_(weight.slope_) {}
+      Weight(Weight&& weight) : Super(weight) {}
       /**
        * コピー代入演算子。
-       * @param weight コピー元。
+       * @param bbb コピー元。
        */
       Weight& operator=(const Weight& weight) {
-        opening_weight_ = weight.opening_weight_;
-        ending_weight_ = weight.ending_weight_;
-        slope_ = weight.slope_;
-
+        Super::operator=(weight);
         return *this;
       }
       /**
        * ムーブ代入演算子。
-       * @param weight ムーブ元。
+       * @param bbb ムーブ元。
        */
       Weight& operator=(Weight&& weight) {
-        opening_weight_ = weight.opening_weight_;
-        ending_weight_ = weight.ending_weight_;
-        slope_ = weight.slope_;
-
+        Super::operator=(weight);
         return *this;
       }
       /** デストラクタ。 */
       virtual ~Weight() {}
 
-      // ====== //
-      // 演算子 //
-      // ====== //
+
       /**
        * ウェイトを返す。
        * @param num_pieces 駒の数。
        * @return ウェイト。
        */
-      double operator()(unsigned int num_pieces) const {
-        return (slope_ * (num_pieces - 2)) + ending_weight_;
+      double operator()(int num_pieces) {
+        // 準備。
+        std::size_t len = this->size();
+        if (len <= 0) return 0.0;
+
+        // 最小値未満。
+        if (num_pieces < std::get<0>(this->at(0))) {
+          return std::get<1>(this->at(0));
+        }
+
+        // 最大値以上。
+        if (num_pieces >= std::get<0>(this->at(len - 1))) {
+          return std::get<1>(this->at(len - 1));
+        }
+
+        // 最小値以上、最大値未満。
+        for (std::size_t i = 1; i < len; ++i) {
+          // 点を得る。
+          const std::tuple<int, double>& low = this->at(i - 1);
+          const std::tuple<int, double>& high = this->at(i);
+
+          if ((num_pieces >= std::get<0>(low))
+          && (num_pieces < std::get<0>(high))) {
+            return (((std::get<1>(high) - std::get<1>(low))
+            / (std::get<0>(high) - std::get<0>(low)))
+            * (num_pieces - std::get<0>(low)))
+            + std::get<1>(low);
+          }
+        }
+
+        return 0.0;
       }
 
-      // ======== //
-      // アクセサ //
-      // ======== //
       /**
-       * アクセサ - オープニング時のウェイト。
-       * @return オープニング時のウェイト。
+       * サイズを返す。
+       * @return サイズ。
        */
-      double opening_weight() const {return opening_weight_;}
-      /**
-       * アクセサ - エンディング時のウェイト。
-       * @return エンディング時のウェイト。
-       */
-      double ending_weight() const {return ending_weight_;}
+      std::size_t Size() const {return this->size();}
 
-      // ============ //
-      // ミューテータ //
-      // ============ //
       /**
-       * ミューテータ - オープニング時のウェイト。
-       * @param opening_weight オープニング時のウェイト。
+       * 要素を返す。
+       * @return 要素のタプル。
        */
-      void opening_weight(double opening_weight) {
-        opening_weight_ = opening_weight;
-        SetSlope();
-      }
-      /**
-       * ミューテータ - エンディング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void ending_weight(double ending_weight) {
-        ending_weight_ = ending_weight;
-        SetSlope();
-      }
-      /**
-       * ミューテータ - オープニング時とエンディング時のウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weights(double opening_weight, double ending_weight) {
-        opening_weight_ = opening_weight;
-        ending_weight_ = ending_weight;
-        SetSlope();
+      const std::tuple<int, double>& At(std::size_t index) {
+        return this->at(index);
       }
 
-    private:
-      /** 傾きをセットする。 */
-      void SetSlope() {
-        slope_ = (opening_weight_ - ending_weight_) / 30.0;
+      /**
+       * 点を追加。
+       * @param num_piece 駒の数。
+       * @param weight_val その時のウェイト。
+       */
+      void Add(int num_pieces, double weight_val) {
+        this->push_back(std::tuple<int, double>(num_pieces, weight_val));
+        Sort();
       }
-      /** オープニング時のウェイト。 (駒の数 32個) */
-      double opening_weight_;
-      /** エンディング時のウェイト。 (駒の数 2個) */
-      double ending_weight_;
 
-      /** 傾き。 */
-      double slope_;
+      /**
+       * 点を更新。
+       * @param num_piece 駒の数。
+       * @param weight_val その時のウェイト。
+       */
+      void Update(int num_pieces, double weight_val) {
+        // 更新する点を探す。
+        for (Weight::iterator itr = this->begin(); itr != this->end(); ++itr) {
+          if (std::get<0>(*itr) == num_pieces) {
+            *itr = std::tuple<int, double>(num_pieces, weight_val);
+            return;
+          }
+        }
+
+        // どこにもなかったので、追加。
+        Add(num_pieces, weight_val);
+      }
+
+      /**
+       * 点を削除。
+       * @param num_piece 駒の数。
+       */
+      void Delete(int num_pieces) {
+        for (Weight::iterator itr = this->begin(); itr != this->end(); ++itr) {
+          if (std::get<0>(*itr) == num_pieces) {
+            this->erase(itr);
+            break;
+          }
+        }
+      }
+
+      /**
+       * オープニングとエンディングの値からウェイトを作成する。
+       */
+      static Weight CreateWeight(double opening_weight, double ending_weight) {
+        Weight op {{OPENING_START, opening_weight}, {OPENING_END, 0.0}};
+        Weight ed {{ENDING_START, 0.0}, {ENDING_END, ending_weight}};
+
+        // オープニング終了時に、その時のエンディングの値。
+        // エンディング開始時に、その時のオープニングの値。
+        return Weight {
+          {OPENING_START, opening_weight}, {OPENING_END, ed(OPENING_END)},
+          {ENDING_START, op(ENDING_START)}, {ENDING_END, ending_weight}
+        };
+      }
+
+    protected:
+      /** ソートする。 */
+      void Sort() {
+        std::sort(this->begin(), this->end(),
+        [](const std::tuple<int, double>& a,
+        std::tuple<int, double>& b) -> bool {
+          return std::get<0>(a) < std::get<0>(b);
+        });
+      }
   };
 
   /** 評価関数用パラメータのクラス。 */
@@ -1345,9 +1403,8 @@ namespace Sayuri {
        * @param ending_weight エンディング時のウェイト。
        */
       void weight_opening_position(PieceType piece_type,
-      double opening_weight, double ending_weight) {
-        weight_opening_position_[piece_type].weights
-        (opening_weight, ending_weight);
+      const Weight& weight) {
+        weight_opening_position_[piece_type] = weight;
       }
       /**
        * ミューテータ 2 - エンディング時の駒の配置のウェイト。
@@ -1356,9 +1413,8 @@ namespace Sayuri {
        * @param ending_weight エンディング時のウェイト。
        */
       void weight_ending_position(PieceType piece_type,
-      double opening_weight, double ending_weight) {
-        weight_ending_position_[piece_type].weights
-        (opening_weight, ending_weight);
+      const Weight& weight) {
+        weight_ending_position_[piece_type] = weight;
       }
       /**
        * ミューテータ 2 - 機動力のウェイト。
@@ -1367,8 +1423,8 @@ namespace Sayuri {
        * @param ending_weight エンディング時のウェイト。
        */
       void weight_mobility(PieceType piece_type,
-      double opening_weight, double ending_weight) {
-        weight_mobility_[piece_type].weights(opening_weight, ending_weight);
+      const Weight& weight) {
+        weight_mobility_[piece_type] = weight;
       }
       /**
        * ミューテータ 2 - センターコントロールのウェイト。
@@ -1377,9 +1433,8 @@ namespace Sayuri {
        * @param ending_weight エンディング時のウェイト。
        */
       void weight_center_control(PieceType piece_type,
-      double opening_weight, double ending_weight) {
-        weight_center_control_[piece_type].weights
-        (opening_weight, ending_weight);
+      const Weight& weight) {
+        weight_center_control_[piece_type] = weight;
       }
       /**
        * ミューテータ 2 - スウィートセンターコントロールのウェイト。
@@ -1388,9 +1443,8 @@ namespace Sayuri {
        * @param ending_weight エンディング時のウェイト。
        */
       void weight_sweet_center_control(PieceType piece_type,
-      double opening_weight, double ending_weight) {
-        weight_sweet_center_control_[piece_type].weights
-        (opening_weight, ending_weight);
+      const Weight& weight) {
+        weight_sweet_center_control_[piece_type] = weight;
       }
       /**
        * ミューテータ 2 - 駒の展開のウェイト。
@@ -1399,8 +1453,8 @@ namespace Sayuri {
        * @param ending_weight エンディング時のウェイト。
        */
       void weight_development(PieceType piece_type,
-      double opening_weight, double ending_weight) {
-        weight_development_[piece_type].weights(opening_weight, ending_weight);
+      const Weight& weight) {
+        weight_development_[piece_type] = weight;
       }
       /**
        * ミューテータ 2 - 相手への攻撃のウェイト。
@@ -1409,8 +1463,8 @@ namespace Sayuri {
        * @param ending_weight エンディング時のウェイト。
        */
       void weight_attack(PieceType piece_type,
-      double opening_weight, double ending_weight) {
-        weight_attack_[piece_type].weights(opening_weight, ending_weight);
+      const Weight& weight) {
+        weight_attack_[piece_type] = weight;
       }
       /**
        * ミューテータ 2 - 味方への防御のウェイト。
@@ -1419,8 +1473,8 @@ namespace Sayuri {
        * @param ending_weight エンディング時のウェイト。
        */
       void weight_defense(PieceType piece_type,
-      double opening_weight, double ending_weight) {
-        weight_defense_[piece_type].weights(opening_weight, ending_weight);
+      const Weight& weight) {
+        weight_defense_[piece_type] = weight;
       }
       /**
        * ミューテータ 2 - ピンのウェイト。
@@ -1429,8 +1483,8 @@ namespace Sayuri {
        * @param ending_weight エンディング時のウェイト。
        */
       void weight_pin(PieceType piece_type,
-      double opening_weight, double ending_weight) {
-        weight_pin_[piece_type].weights(opening_weight, ending_weight);
+      const Weight& weight) {
+        weight_pin_[piece_type] = weight;
       }
       /**
        * ミューテータ 2 - 相手キング周辺への攻撃のウェイト。
@@ -1439,126 +1493,8 @@ namespace Sayuri {
        * @param ending_weight エンディング時のウェイト。
        */
       void weight_attack_around_king(PieceType piece_type,
-      double opening_weight, double ending_weight) {
-        weight_attack_around_king_[piece_type].weights
-        (opening_weight, ending_weight);
-      }
-      /**
-       * ミューテータ 2 - パスポーンのウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_pass_pawn(double opening_weight, double ending_weight) {
-        weight_pass_pawn_.weights(opening_weight, ending_weight);
-      }
-      /**
-       * ミューテータ 2 - 守られたパスポーンのウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_protected_pass_pawn(double opening_weight,
-      double ending_weight) {
-        weight_protected_pass_pawn_.weights(opening_weight, ending_weight);
-      }
-      /**
-       * ミューテータ 2 - ダブルポーンのウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_double_pawn(double opening_weight, double ending_weight) {
-        weight_double_pawn_.weights(opening_weight, ending_weight);
-      }
-      /**
-       * ミューテータ 2 - 孤立ポーンのウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_iso_pawn(double opening_weight, double ending_weight) {
-        weight_iso_pawn_.weights(opening_weight, ending_weight);
-      }
-      /**
-       * ミューテータ 2 - ポーンの盾のウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_pawn_shield(double opening_weight, double ending_weight) {
-        weight_pawn_shield_.weights(opening_weight, ending_weight);
-      }
-      /**
-       * ミューテータ 2 - ビショップペアのウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_bishop_pair(double opening_weight, double ending_weight) {
-        weight_bishop_pair_.weights(opening_weight, ending_weight);
-      }
-      /**
-       * ミューテータ 2 - バッドビショップのウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_bad_bishop(double opening_weight, double ending_weight) {
-        weight_bad_bishop_.weights(opening_weight, ending_weight);
-      }
-      /**
-       * ミューテータ 2 - ルークペアのウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_rook_pair(double opening_weight, double ending_weight) {
-        weight_rook_pair_.weights(opening_weight, ending_weight);
-      }
-      /**
-       * ミューテータ 2 - セミオープンファイルのルークのウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_rook_semiopen_fyle(double opening_weight,
-      double ending_weight) {
-        weight_rook_semiopen_fyle_.weights(opening_weight, ending_weight);
-      }
-      /**
-       * ミューテータ 2 - オープンファイルのルークのウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_rook_open_fyle(double opening_weight,
-      double ending_weight) {
-        weight_rook_open_fyle_.weights(opening_weight, ending_weight);
-      }
-      /**
-       * ミューテータ 2 - 早すぎるクイーンの始動のウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_early_queen_starting(double opening_weight,
-      double ending_weight) {
-        weight_early_queen_starting_.weights(opening_weight, ending_weight);
-      }
-      /**
-       * ミューテータ 2 - キング周りの弱いマスのウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_weak_square(double opening_weight, double ending_weight) {
-        weight_weak_square_.weights(opening_weight, ending_weight);
-      }
-      /**
-       * ミューテータ 2 - キャスリングのウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_castling(double opening_weight, double ending_weight) {
-        weight_castling_.weights(opening_weight, ending_weight);
-      }
-      /**
-       * ミューテータ 2 - キャスリングの放棄のウェイト。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_abandoned_castling(double opening_weight,
-      double ending_weight) {
-        weight_abandoned_castling_.weights(opening_weight, ending_weight);
+      const Weight& weight) {
+        weight_attack_around_king_[piece_type] = weight;
       }
 
     private:
