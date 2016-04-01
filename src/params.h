@@ -900,16 +900,12 @@ namespace Sayuri {
        * @param ending_weight エンディングのウェイト。
        * @return 完成したウェイトオブジェクト。
        */
+      /**
+       * オープニングとエンディングの値からウェイトを作成する。
+       */
       static Weight CreateWeight(double opening_weight, double ending_weight) {
-        Weight op {{OPENING_START, opening_weight}, {OPENING_END, 0.0}};
-        Weight ed {{ENDING_START, 0.0}, {ENDING_END, ending_weight}};
-
-        // オープニング終了時に、その時のエンディングの値。
-        // エンディング開始時に、その時のオープニングの値。
-        return Weight {
-          {OPENING_START, opening_weight}, {OPENING_END, ed(OPENING_END)},
-          {ENDING_START, op(ENDING_START)}, {ENDING_END, ending_weight}
-        };
+        return {{OPENING_START, opening_weight},
+        {OPENING_END, ending_weight}, {ENDING_END, ending_weight}};
       }
 
     protected:
