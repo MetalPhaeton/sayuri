@@ -881,6 +881,14 @@ namespace Sayuri {
       DEF_MESSAGE_FUNCTION(SetFutilityPruningMargin) {
         SET_NUMBER_PARAM(futility_pruning_margin);
       }
+
+      /** 駒の配置の価値テーブル。 オープニング。 */
+      template<PieceType TYPE>
+      DEF_MESSAGE_FUNCTION(SetPieceSquareTableOpening);
+
+      /** 駒の配置の価値テーブル。 エンディング。 */
+      template<PieceType TYPE>
+      DEF_MESSAGE_FUNCTION(SetPieceSquareTableEnding);
 //      /**
 //       * EvalParams - ポジションの価値テーブル。
 //       * @param func_name 関数名。

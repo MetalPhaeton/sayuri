@@ -52,388 +52,7 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
-  // =========== //
-  // EngineSuite //
-  // =========== //
-  // コンストラクタ。
-  EngineSuite::EngineSuite() :
-  search_params_ptr_(new SearchParams()),
-  eval_params_ptr_(new EvalParams()),
-  table_ptr_(new TranspositionTable(UCI_DEFAULT_TABLE_SIZE)),
-  engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
-  *table_ptr_)),
-  board_ptr_(&(engine_ptr_->board())),
-  shell_ptr_(new UCIShell(*engine_ptr_)) {
-    // 出力リスナー。
-    shell_ptr_->AddOutputListener
-    ([this](const std::string& message) {this->ListenUCIOutput(message);});
 
-    // メッセージシンボル関数の登録。
-    SetMessageFunctions();
-  }
-
-  // コピーコンストラクタ。
-  EngineSuite::EngineSuite(const EngineSuite& suite) :
-  search_params_ptr_(new SearchParams(*(suite.search_params_ptr_))),
-  eval_params_ptr_(new EvalParams(*(suite.eval_params_ptr_))),
-  table_ptr_(new TranspositionTable(suite.table_ptr_->GetSizeBytes())),
-  engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
-  *table_ptr_)),
-  board_ptr_(&(engine_ptr_->board())),
-  shell_ptr_(new UCIShell(*engine_ptr_)) {
-    PositionRecord record(*(suite.engine_ptr_));
-    engine_ptr_->LoadRecord(record);
-
-    // 出力リスナー。
-    shell_ptr_->AddOutputListener
-    ([this](const std::string& message) {this->ListenUCIOutput(message);});
-
-    // メッセージシンボル関数の登録。
-    SetMessageFunctions();
-  }
-
-  // ムーブコンストラクタ。
-  EngineSuite::EngineSuite(EngineSuite&& suite) :
-  search_params_ptr_(std::move(suite.search_params_ptr_)),
-  eval_params_ptr_(std::move(suite.eval_params_ptr_)),
-  table_ptr_(std::move(suite.table_ptr_)),
-  engine_ptr_(std::move(suite.engine_ptr_)),
-  board_ptr_(&(engine_ptr_->board())),
-  shell_ptr_(std::move(suite.shell_ptr_)),
-  message_func_map_(std::move(suite.message_func_map_)) {
-  }
-
-  // コピー代入演算子。
-  EngineSuite& EngineSuite::operator=(const EngineSuite& suite) {
-    search_params_ptr_.reset(new SearchParams(*(suite.search_params_ptr_)));
-    eval_params_ptr_.reset(new EvalParams(*(suite.eval_params_ptr_)));
-    table_ptr_.reset(new TranspositionTable(suite.table_ptr_->GetSizeBytes()));
-    engine_ptr_.reset(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
-    *table_ptr_));
-    board_ptr_ = &(engine_ptr_->board());
-    shell_ptr_.reset(new UCIShell(*engine_ptr_));
-
-    PositionRecord record(*(suite.engine_ptr_));
-    engine_ptr_->LoadRecord(record);
-
-    // 出力リスナー。
-    shell_ptr_->AddOutputListener
-    ([this](const std::string& message) {this->ListenUCIOutput(message);});
-
-    return *this;
-  }
-
-  // ムーブ代入演算子。
-  EngineSuite& EngineSuite::operator=(EngineSuite&& suite) {
-    search_params_ptr_ = std::move(suite.search_params_ptr_);
-    eval_params_ptr_ = std::move(suite.eval_params_ptr_);
-    table_ptr_ = std::move(suite.table_ptr_);
-    engine_ptr_ = std::move(suite.engine_ptr_);
-    board_ptr_ = &(engine_ptr_->board());
-    shell_ptr_ = std::move(suite.shell_ptr_);
-
-    return *this;
-  }
-
-  // メッセージシンボル関数を登録する。
-  void EngineSuite::SetMessageFunctions() {
-    message_func_map_["@get-white-pawn-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetPosition<WHITE, PAWN>(symbol, self, caller, args);
-    };
-
-    message_func_map_["@get-white-knight-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetPosition<WHITE, KNIGHT>(symbol, self, caller, args);
-    };
-
-    message_func_map_["@get-white-bishop-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetPosition<WHITE, BISHOP>(symbol, self, caller, args);
-    };
-
-    message_func_map_["@get-white-rook-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetPosition<WHITE, ROOK>(symbol, self, caller, args);
-    };
-
-    message_func_map_["@get-white-queen-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetPosition<WHITE, QUEEN>(symbol, self, caller, args);
-    };
-
-    message_func_map_["@get-white-king-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetPosition<WHITE, KING>(symbol, self, caller, args);
-    };
-
-    message_func_map_["@get-black-pawn-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetPosition<BLACK, PAWN>(symbol, self, caller, args);
-    };
-
-    message_func_map_["@get-black-knight-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetPosition<BLACK, KNIGHT>(symbol, self, caller, args);
-    };
-
-    message_func_map_["@get-black-bishop-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetPosition<BLACK, BISHOP>(symbol, self, caller, args);
-    };
-
-    message_func_map_["@get-black-rook-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetPosition<BLACK, ROOK>(symbol, self, caller, args);
-    };
-
-    message_func_map_["@get-black-queen-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetPosition<BLACK, QUEEN>(symbol, self, caller, args);
-    };
-
-    message_func_map_["@get-black-king-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return this->GetPosition<BLACK, KING>(symbol, self, caller, args);
-    };
-
-    message_func_map_["@get-piece"] =
-    INSERT_MESSAGE_FUNCTION(GetPiece);
-
-    message_func_map_["@get-all-pieces"] =
-    INSERT_MESSAGE_FUNCTION(GetAllPieces);
-
-    message_func_map_["@get-to-move"] =
-    INSERT_MESSAGE_FUNCTION(GetToMove);
-
-    message_func_map_["@get-castling-rights"] =
-    INSERT_MESSAGE_FUNCTION(GetCastlingRights);
-
-    message_func_map_["@get-en-passant-square"] =
-    INSERT_MESSAGE_FUNCTION(GetEnPassantSquare);
-
-    message_func_map_["@get-ply"] =
-    INSERT_MESSAGE_FUNCTION(GetPly);
-
-    message_func_map_["@get-clock"] =
-    INSERT_MESSAGE_FUNCTION(GetClock);
-
-    message_func_map_["@get-white-has-castled"] =
-    INSERT_MESSAGE_FUNCTION(GetHasCastled<WHITE>);
-
-    message_func_map_["@get-black-has-castled"] =
-    INSERT_MESSAGE_FUNCTION(GetHasCastled<BLACK>);
-
-    message_func_map_["@get-fen"] =
-    INSERT_MESSAGE_FUNCTION(GetFEN);
-
-    message_func_map_["@to-string"] =
-    INSERT_MESSAGE_FUNCTION(BoardToString);
-
-    message_func_map_["@set-new-game"] =
-    INSERT_MESSAGE_FUNCTION(SetNewGame);
-
-    message_func_map_["@set-fen"] =
-    INSERT_MESSAGE_FUNCTION(SetFEN);
-
-    message_func_map_["@place-piece"] =
-    INSERT_MESSAGE_FUNCTION(PlacePiece);
-
-    message_func_map_["@get-candidate-moves"] =
-    INSERT_MESSAGE_FUNCTION(GetCandidateMoves);
-
-    message_func_map_["@set-to-move"] =
-    INSERT_MESSAGE_FUNCTION(SetToMove);
-
-    message_func_map_["@set-castling-rights"] =
-    INSERT_MESSAGE_FUNCTION(SetCastlingRights);
-
-    message_func_map_["@set-en-passant-square"] =
-    INSERT_MESSAGE_FUNCTION(SetEnPassantSquare);
-
-    message_func_map_["@set-ply"] =
-    INSERT_MESSAGE_FUNCTION(SetPly);
-
-    message_func_map_["@set-clock"] =
-    INSERT_MESSAGE_FUNCTION(SetClock);
-
-    message_func_map_["@correct-position?"] =
-    INSERT_MESSAGE_FUNCTION(IsCorrectPosition);
-
-    message_func_map_["@white-checked?"] =
-    INSERT_MESSAGE_FUNCTION(IsChecked<WHITE>);
-
-    message_func_map_["@black-checked?"] =
-    INSERT_MESSAGE_FUNCTION(IsChecked<BLACK>);
-
-    message_func_map_["@checkmated?"] =
-    INSERT_MESSAGE_FUNCTION(IsCheckmated);
-
-    message_func_map_["@stalemated?"] =
-    INSERT_MESSAGE_FUNCTION(IsStalemated);
-
-    message_func_map_["@play-move"] =
-    INSERT_MESSAGE_FUNCTION(PlayMoveOrNote);
-
-    message_func_map_["@play-note"] =
-    INSERT_MESSAGE_FUNCTION(PlayMoveOrNote);
-
-    message_func_map_["@undo-move"] =
-    INSERT_MESSAGE_FUNCTION(UndoMove);
-
-    message_func_map_["@move->note"] =
-    INSERT_MESSAGE_FUNCTION(MoveToNote);
-
-    message_func_map_["@input-uci-command"] =
-    INSERT_MESSAGE_FUNCTION(InputUCICommand);
-
-    message_func_map_["@add-uci-output-listener"] =
-    INSERT_MESSAGE_FUNCTION(AddUCIOutputListener);
-
-    message_func_map_["@run"] =
-    INSERT_MESSAGE_FUNCTION(RunEngine);
-
-    message_func_map_["@go-movetime"] =
-    INSERT_MESSAGE_FUNCTION(GoMoveTime);
-
-    message_func_map_["@go-timelimit"] =
-    INSERT_MESSAGE_FUNCTION(GoTimeLimit);
-
-    message_func_map_["@go-depth"] =
-    INSERT_MESSAGE_FUNCTION(GoDepth);
-
-    message_func_map_["@go-nodes"] =
-    INSERT_MESSAGE_FUNCTION(GoNodes);
-
-    message_func_map_["@set-hash-size"] =
-    INSERT_MESSAGE_FUNCTION(SetHashSize);
-
-    message_func_map_["@set-threads"] =
-    INSERT_MESSAGE_FUNCTION(SetThreads);
-
-    message_func_map_["@material"] =
-    INSERT_MESSAGE_FUNCTION(SetMaterial);
-
-    message_func_map_["@enable-quiesce-search"] =
-    INSERT_MESSAGE_FUNCTION(SetEnabelQuiesceSearch);
-
-    message_func_map_["@enable-repetition-check"] =
-    INSERT_MESSAGE_FUNCTION(SetEnabelRepetitionCheck);
-
-    message_func_map_["@enable-check-extension"] =
-    INSERT_MESSAGE_FUNCTION(SetEnableCheckExtension);
-
-    message_func_map_["@ybwc-limit-depth"] =
-    INSERT_MESSAGE_FUNCTION(SetYBWCLimitDepth);
-
-    message_func_map_["@ybwc-invalid-moves"] =
-    INSERT_MESSAGE_FUNCTION(SetYBWCInvalidMoves);
-
-    message_func_map_["@enable-aspiration-windows"] =
-    INSERT_MESSAGE_FUNCTION(SetEnableAspirationWindows);
-
-    message_func_map_["@aspiration-windows-limit-depth"] =
-    INSERT_MESSAGE_FUNCTION(SetAspirationWindowsLimitDepth);
-
-    message_func_map_["@aspiration-windows-delta"] =
-    INSERT_MESSAGE_FUNCTION(SetAspirationWindowsDelta);
-
-    message_func_map_["@enable-see"] =
-    INSERT_MESSAGE_FUNCTION(SetEnableSEE);
-
-    message_func_map_["@enable-history"] =
-    INSERT_MESSAGE_FUNCTION(SetEnableHistory);
-
-    message_func_map_["@enable-killer"] =
-    INSERT_MESSAGE_FUNCTION(SetEnableKiller);
-
-    message_func_map_["@enable-hash-table"] =
-    INSERT_MESSAGE_FUNCTION(SetEnableHashTable);
-
-    message_func_map_["@enable-iid"] =
-    INSERT_MESSAGE_FUNCTION(SetEnableIID);
-
-    message_func_map_["@iid-limit-depth"] =
-    INSERT_MESSAGE_FUNCTION(SetIIDLimitDepth);
-
-    message_func_map_["@iid-search-depth"] =
-    INSERT_MESSAGE_FUNCTION(SetIIDSearchDepth);
-
-    message_func_map_["@enable-nmr"] =
-    INSERT_MESSAGE_FUNCTION(SetEnableNMR);
-
-    message_func_map_["@nmr-limit-depth"] =
-    INSERT_MESSAGE_FUNCTION(SetNMRLimitDepth);
-
-    message_func_map_["@nmr-search-reduction"] =
-    INSERT_MESSAGE_FUNCTION(SetNMRSearchReduction);
-
-    message_func_map_["@nmr-reduction"] =
-    INSERT_MESSAGE_FUNCTION(SetNMRReduction);
-
-    message_func_map_["@enable-probcut"] =
-    INSERT_MESSAGE_FUNCTION(SetEnableProbCut);
-
-    message_func_map_["@probcut-limit-depth"] =
-    INSERT_MESSAGE_FUNCTION(SetProbCutLimitDepth);
-
-    message_func_map_["@probcut-margin"] =
-    INSERT_MESSAGE_FUNCTION(SetProbCutMargin);
-
-    message_func_map_["@probcut-search-reduction"] =
-    INSERT_MESSAGE_FUNCTION(SetProbCutSearchReduction);
-
-    message_func_map_["@enable-history-pruning"] =
-    INSERT_MESSAGE_FUNCTION(SetEnableHistoryPruning);
-
-    message_func_map_["@history-pruning-limit-depth"] =
-    INSERT_MESSAGE_FUNCTION(SetHistoryPruningLimitDepth);
-
-    message_func_map_["@history-pruning-move-threshold"] =
-    INSERT_MESSAGE_FUNCTION(SetHistoryPruningMoveThreshold);
-
-    message_func_map_["@history-pruning-threshold"] =
-    INSERT_MESSAGE_FUNCTION(SetHistoryPruningThreshold);
-
-    message_func_map_["@history-pruning-reduction"] =
-    INSERT_MESSAGE_FUNCTION(SetHistoryPruningReduction);
-
-    message_func_map_["@enable-lmr"] =
-    INSERT_MESSAGE_FUNCTION(SetEnableLMR);
-
-    message_func_map_["@lmr-limit-depth"] =
-    INSERT_MESSAGE_FUNCTION(SetLMRLimitDepth);
-
-    message_func_map_["@lmr-move-threshold"] =
-    INSERT_MESSAGE_FUNCTION(SetLMRMoveThreshold);
-
-    message_func_map_["@lmr-invalid-moves"] =
-    INSERT_MESSAGE_FUNCTION(SetLMRInvalidMoves);
-
-    message_func_map_["@lmr-search-reduction"] =
-    INSERT_MESSAGE_FUNCTION(SetLMRSearchReduction);
-
-    message_func_map_["@enable-futility-pruning"] =
-    INSERT_MESSAGE_FUNCTION(SetEnableFutilityPruning);
-
-    message_func_map_["@futility-pruning-depth"] =
-    INSERT_MESSAGE_FUNCTION(SetFutilityPruningDepth);
-
-    message_func_map_["@futility-pruning-margin"] =
-    INSERT_MESSAGE_FUNCTION(SetFutilityPruningMargin);
-  }
 //
 //  // ウェイト関数オブジェクトをセット。
 //  void EngineSuite::SetWeightFunctions() {
@@ -715,697 +334,6 @@ namespace Sayuri {
 //  // ========================== //
 //  // Lisp関数オブジェクト用関数 //
 //  // ========================== //
-  // 関数オブジェクト。
-  DEF_LC_FUNCTION(EngineSuite::operator()) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Lisp::GetReadyForFunction(args, 1, &args_ptr);
-
-    // メッセージシンボルを抽出。
-    LPointer result = caller->Evaluate(*(args_ptr->car()));
-    Lisp::CheckType(*result, LType::SYMBOL);
-    const std::string& symbol = result->symbol();
-
-    if (message_func_map_.find(symbol) != message_func_map_.end()) {
-      return message_func_map_.at(symbol)(symbol, self, caller, args);
-    }
-
-    throw Lisp::GenError("@engine-error",
-    "'" + symbol + "' is not message symbol.");
-  }
-
-  // ====================== //
-  // メッセージシンボル関数 //
-  // ====================== //
-  // %%% @get-white-pawn-position
-  // %%% @get-white-knight-position
-  // %%% @get-white-bishop-position
-  // %%% @get-white-rook-position
-  // %%% @get-white-queen-position
-  // %%% @get-white-king-position
-  // %%% @get-black-pawn-position
-  // %%% @get-black-knight-position
-  // %%% @get-black-bishop-position
-  // %%% @get-black-rook-position
-  // %%% @get-black-queen-position
-  // %%% @get-black-king-position
-  template<Side SIDE, PieceType PIECE_TYPE>
-  DEF_MESSAGE_FUNCTION(EngineSuite::GetPosition) {
-    LPointerVec ret_vec;
-    for (Bitboard bb = board_ptr_->position_[SIDE][PIECE_TYPE]; bb;
-    NEXT_BITBOARD(bb)) {
-      ret_vec.push_back(Lisp::NewSymbol
-      (Sayulisp::SQUARE_MAP_INV[Util::GetSquare(bb)]));
-    }
-
-    return Lisp::LPointerVecToList(ret_vec);
-  }
-  template LPointer EngineSuite::GetPosition<WHITE, PAWN>
-  (const std::string&, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::GetPosition<WHITE, KNIGHT>
-  (const std::string&, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::GetPosition<WHITE, BISHOP>
-  (const std::string&, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::GetPosition<WHITE, ROOK>
-  (const std::string&, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::GetPosition<WHITE, QUEEN>
-  (const std::string&, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::GetPosition<WHITE, KING>
-  (const std::string&, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::GetPosition<BLACK, PAWN>
-  (const std::string&, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::GetPosition<BLACK, KNIGHT>
-  (const std::string&, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::GetPosition<BLACK, BISHOP>
-  (const std::string&, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::GetPosition<BLACK, ROOK>
-  (const std::string&, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::GetPosition<BLACK, QUEEN>
-  (const std::string&, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::GetPosition<BLACK, KING>
-  (const std::string&, LPointer, LObject*, const LObject&);
-
-  // %%% @get-piece
-  DEF_MESSAGE_FUNCTION(EngineSuite::GetPiece) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // 引数のチェック。
-    LPointer result = caller->Evaluate(*(args_ptr->car()));
-    Sayulisp::CheckSquare(*result);
-    Square square = result->number();
-
-    // サイドと駒の種類を得る。
-    LPointer ret_ptr = Lisp::NewList(2);
-    ret_ptr->car(Lisp::NewSymbol
-    (Sayulisp::SIDE_MAP_INV[board_ptr_->side_board_[square]]));
-    ret_ptr->cdr()->car(Lisp::NewSymbol
-    (Sayulisp::PIECE_MAP_INV[board_ptr_->piece_board_[square]]));
-
-    return ret_ptr;
-  }
-
-  // %%% @get-all-pieces
-  DEF_MESSAGE_FUNCTION(EngineSuite::GetAllPieces) {
-    LPointerVec ret_vec(NUM_SQUARES);
-    LPointerVec::iterator itr = ret_vec.begin();
-
-    // 各マスの駒のリストを作る。
-    LPointer elm_ptr;
-    FOR_SQUARES(square) {
-      elm_ptr = Lisp::NewList(2);
-      elm_ptr->car(Lisp::NewSymbol
-      (Sayulisp::SIDE_MAP_INV[board_ptr_->side_board_[square]]));
-      elm_ptr->cdr()->car(Lisp::NewSymbol
-      (Sayulisp::PIECE_MAP_INV[board_ptr_->piece_board_[square]]));
-
-      *itr = elm_ptr;
-      ++itr;
-    }
-
-    return Lisp::LPointerVecToList(ret_vec);
-  }
-
-  // %%% @set-fen
-  DEF_MESSAGE_FUNCTION(EngineSuite::SetFEN) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // FENを得る。
-    LPointer fen_ptr = caller->Evaluate(*(args_ptr->car()));
-    Lisp::CheckType(*fen_ptr, LType::STRING);
-
-    // パースする。
-    FEN fen;
-    try {
-      fen = FEN(fen_ptr->string());
-    } catch (...) {
-      throw Lisp::GenError("@engine-error", "Couldn't parse FEN.");
-    }
-
-    // キングの数をチェック。
-    if ((Util::CountBits(fen.position()[WHITE][KING]) != 1)
-    || (Util::CountBits(fen.position()[BLACK][KING]) != 1)) {
-      throw Lisp::GenError("@engine-error", "This FEN is invalid position.");
-    }
-
-    engine_ptr_->LoadFEN(fen);
-    return Lisp::NewBoolean(true);
-  }
-
-  // %%% @place-piece
-  DEF_MESSAGE_FUNCTION(EngineSuite::PlacePiece) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 2, &args_ptr);
-
-    // マスを得る。
-    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
-    Sayulisp::CheckSquare(*square_ptr);
-    Lisp::Next(&args_ptr);
-    Square square = square_ptr->number();
-
-    // 駒を得る。
-    LPointer piece_ptr = caller->Evaluate(*(args_ptr->car()));
-    Sayulisp::CheckPiece(*piece_ptr);
-    Side side = piece_ptr->car()->number();
-    PieceType piece_type = piece_ptr->cdr()->car()->number();
-
-    // キングを置き換えることはできない。
-    if (board_ptr_->piece_board_[square] == KING) {
-      throw Lisp::GenError("@engine-error", "Couldn't overwrite King.");
-    }
-
-    // 前の駒のリストを作る。
-    LPointer ret_ptr = Lisp::NewList(2);
-    ret_ptr->car(Lisp::NewSymbol
-    (Sayulisp::SIDE_MAP_INV[board_ptr_->side_board_[square]]));
-    ret_ptr->cdr()->car(Lisp::NewSymbol
-    (Sayulisp::PIECE_MAP_INV[board_ptr_->piece_board_[square]]));
-
-    // 置き換える。
-    engine_ptr_->PlacePiece(square, piece_type, side);
-
-    return ret_ptr;
-  }
-
-  // %%% @get-candidate-moves
-  DEF_MESSAGE_FUNCTION(EngineSuite::GetCandidateMoves) {
-    // 指し手の生成。
-    std::vector<Move> move_vec = engine_ptr_->GetLegalMoves();
-    LPointer ret_ptr = Lisp::NewList(move_vec.size());
-
-    // リストに代入していく。
-    LObject* ptr = ret_ptr.get();
-    for (auto move : move_vec) {
-      ptr->car(Sayulisp::MoveToList(move));
-      Lisp::Next(&ptr);
-    }
-
-    return ret_ptr;
-  }
-
-  // %%% @set-to-move
-  DEF_MESSAGE_FUNCTION(EngineSuite::SetToMove) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // 指し手を得る。
-    LPointer to_move_ptr = caller->Evaluate(*(args_ptr->car()));
-    Sayulisp::CheckSide(*to_move_ptr);
-    Side to_move = to_move_ptr->number();
-
-    // NO_SIDEはダメ。
-    if (to_move == NO_SIDE) {
-      throw Lisp::GenError("@engine-error", "NO_SIDE is not allowed.");
-    }
-
-    // 前の状態。
-    LPointer ret_ptr =
-    Lisp::NewSymbol(Sayulisp::SIDE_MAP_INV[board_ptr_->to_move_]);
-
-    engine_ptr_->to_move(to_move);
-    return ret_ptr;
-  }
-
-  // %%% @set-castling-rights
-  DEF_MESSAGE_FUNCTION(EngineSuite::SetCastlingRights) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // キャスリングの権利を得る。
-    LPointer castling_list_ptr = caller->Evaluate(*(args_ptr->car()));
-    Lisp::CheckList(*castling_list_ptr);
-
-    // キャスリングの権利フラグを作成。
-    Castling rights = 0;
-    LPointer result;
-    int rights_number = 0;
-    for (LObject* ptr = castling_list_ptr.get(); ptr->IsPair();
-    Lisp::Next(&ptr)) {
-      result = caller->Evaluate(*(ptr->car()));
-      Sayulisp::CheckCastling(*result);
-
-      rights_number = result->number();
-      switch (rights_number) {
-        case 1:
-          rights |= WHITE_SHORT_CASTLING;
-          break;
-        case 2:
-          rights |= WHITE_LONG_CASTLING;
-          break;
-        case 3:
-          rights |= BLACK_SHORT_CASTLING;
-          break;
-        case 4:
-          rights |= BLACK_LONG_CASTLING;
-          break;
-      }
-    }
-
-    // 前のキャスリングの権利を得る。
-    Castling origin_rights = board_ptr_->castling_rights_;
-    LPointerVec ret_vec;
-    if ((origin_rights & WHITE_SHORT_CASTLING)) {
-      ret_vec.push_back(Lisp::NewSymbol("WHITE_SHORT_CASTLING"));
-    }
-    if ((origin_rights & WHITE_LONG_CASTLING)) {
-      ret_vec.push_back(Lisp::NewSymbol("WHITE_LONG_CASTLING"));
-    }
-    if ((origin_rights & BLACK_SHORT_CASTLING)) {
-      ret_vec.push_back(Lisp::NewSymbol("BLACK_SHORT_CASTLING"));
-    }
-    if ((origin_rights & BLACK_LONG_CASTLING)) {
-      ret_vec.push_back(Lisp::NewSymbol("BLACK_LONG_CASTLING"));
-    }
-
-    // セットして返す。
-    engine_ptr_->castling_rights(rights);
-    return Lisp::LPointerVecToList(ret_vec);
-  }
-
-  // %%% set-en-passant-square
-  DEF_MESSAGE_FUNCTION(EngineSuite::SetEnPassantSquare) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // マスを得る。
-    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
-    Sayulisp::CheckSquare(*square_ptr);
-    Square square = square_ptr->number();
-
-    // 前のアンパッサンのマスを作る。
-    LPointer ret_ptr = Lisp::NewNil();
-    if (board_ptr_->en_passant_square_) {
-      ret_ptr = Lisp::NewNumber(board_ptr_->en_passant_square_);
-    }
-
-    // マスがアンパッサンのマスのチェック。
-    if (board_ptr_->to_move_ == WHITE) {
-      // 白番の時は黒側のアンパッサン。
-      if (Util::SquareToRank(square) == RANK_6) {
-        // 一つ上にポーンがいて、アンパッサンのマスが空の時にセットできる。
-        if ((board_ptr_->piece_board_[square] == EMPTY)
-        && (board_ptr_->side_board_[square - 8] == BLACK)
-        && (board_ptr_->piece_board_[square - 8] == PAWN)) {
-          engine_ptr_->en_passant_square(square);
-          return ret_ptr;
-        }
-      }
-    } else {
-      // 黒番の時は白側のアンパッサン。
-      if (Util::SquareToRank(square) == RANK_3) {
-        // 一つ上にポーンがいて、アンパッサンのマスが空の時にセットできる。
-        if ((board_ptr_->piece_board_[square] == EMPTY)
-        && (board_ptr_->side_board_[square + 8] == WHITE)
-        && (board_ptr_->piece_board_[square + 8] == PAWN)) {
-          engine_ptr_->en_passant_square(square);
-          return ret_ptr;
-        }
-      }
-    }
-
-    throw Lisp::GenError("@engine-error", "'" + square_ptr->ToString()
-    + "' couldn't be en passant square.");
-  }
-
-  // %%% @set-play
-  DEF_MESSAGE_FUNCTION(EngineSuite::SetPly) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // 手数を得る。
-    LPointer ply_ptr = caller->Evaluate(*(args_ptr->car()));
-    Lisp::CheckType(*ply_ptr, LType::NUMBER);
-    int ply = ply_ptr->number();
-
-    // 手数はプラスでないとダメ。
-    if (ply < 0) {
-      throw Lisp::GenError("@engine-error", "Ply must be positive number.");
-    }
-
-    LPointer ret_ptr = Lisp::NewNumber(board_ptr_->ply_);
-    engine_ptr_->ply(ply);
-    return ret_ptr;
-  }
-
-  // %%% @set-clock
-  DEF_MESSAGE_FUNCTION(EngineSuite::SetClock) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // 手数を得る。
-    LPointer clock_ptr = caller->Evaluate(*(args_ptr->car()));
-    Lisp::CheckType(*clock_ptr, LType::NUMBER);
-    int clock = clock_ptr->number();
-
-    // 手数はプラスでないとダメ。
-    if (clock < 0) {
-      throw Lisp::GenError("@engine-error", "Clock must be positive number.");
-    }
-
-    LPointer ret_ptr = Lisp::NewNumber(board_ptr_->clock_);
-    engine_ptr_->clock(clock);
-    return ret_ptr;
-  }
-
-  // %%% @play-move
-  // %%% @play-note
-  /** 手を指す。 */
-  DEF_MESSAGE_FUNCTION(EngineSuite::PlayMoveOrNote) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // 指し手を得る。
-    LPointer result = caller->Evaluate(*(args_ptr->car()));
-    Move move = 0;
-    if (symbol == "@play-move") {  // @play-move
-      move = Sayulisp::ListToMove(*result);
-    } else {  // @play-note
-      Lisp::CheckType(*result, LType::STRING);
-      std::vector<Move> move_vec = engine_ptr_->GuessNote(result->string());
-      if (move_vec.size() == 0) return Lisp::NewBoolean(false);
-      move = move_vec[0];
-    }
-
-    return Lisp::NewBoolean(engine_ptr_->PlayMove(move));
-  }
-
-  // %%% @undo-move
-  DEF_MESSAGE_FUNCTION(EngineSuite::UndoMove) {
-    Move move = engine_ptr_->UndoMove();
-    if (!move) return Lisp::NewNil();
-
-    return Sayulisp::MoveToList(move);
-  }
-
-  // %%% @move->note
-  DEF_MESSAGE_FUNCTION(EngineSuite::MoveToNote) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // 指し手を得る。
-    LPointer move_ptr = caller->Evaluate(*(args_ptr->car()));
-
-    return Lisp::NewString(engine_ptr_->MoveToNote
-    (Sayulisp::ListToMove(*move_ptr)));
-  }
-
-  // %%% @input-uci-command
-  DEF_MESSAGE_FUNCTION(EngineSuite::InputUCICommand) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    LPointer command_ptr = caller->Evaluate(*(args_ptr->car()));
-    Lisp::CheckType(*command_ptr, LType::STRING);
-
-    return Lisp::NewBoolean(shell_ptr_->InputCommand(command_ptr->string()));
-  }
-
-  // %%% @add-uci-output-listener
-  DEF_MESSAGE_FUNCTION(EngineSuite::AddUCIOutputListener) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    LPointer result = caller->Evaluate(*(args_ptr->car()));
-    Lisp::CheckType(*result, LType::FUNCTION);
-
-    // リストを作る。
-    LPointer listener_ptr =
-    Lisp::NewPair(result, Lisp::NewPair(Lisp::NewString(""), Lisp::NewNil()));
-
-    // callerと同じスコープの関数オブジェクトを作る。
-    LPointer caller_scope =
-    Lisp::NewN_Function(LC_Function(), "", caller->scope_chain());
-
-    // コールバック関数を作成。
-    auto callback =
-    [caller_scope, listener_ptr](const std::string& message) {
-      listener_ptr->cdr()->car()->string(message);
-      caller_scope->Evaluate(*listener_ptr);
-    };
-
-    // コールバック関数を登録。
-    callback_vec_.push_back(callback);
-
-    return Lisp::NewBoolean(true);
-  }
-
-  // %%% @run
-  DEF_MESSAGE_FUNCTION(EngineSuite::RunEngine) {
-    // 出力リスナー。
-    auto callback = [](const std::string& message) {
-      std::cout << message << std::endl;
-    };
-    callback_vec_.push_back(callback);
-
-    // quitが来るまでループ。
-    std::string input;
-    while (true) {
-      std::getline(std::cin, input);
-      if (input == "quit") break;
-      shell_ptr_->InputCommand(input);
-    }
-
-    return Lisp::NewBoolean(true);
-  }
-
-  // Go...()で使う関数。
-  LPointer EngineSuite::GoFunc(std::uint32_t depth, std::uint64_t nodes,
-  int thinking_time, const LObject& candidate_list) {
-    // 候補手のリストを作成。
-    std::vector<Move> candidate_vec(Lisp::CountList(candidate_list));
-    std::vector<Move>::iterator candidate_itr = candidate_vec.begin();
-    LPointer car;
-    for (const LObject* ptr = &candidate_list; ptr->IsPair();
-    ptr = ptr->cdr().get(), ++candidate_itr) {
-      car = ptr->car();
-      Sayulisp::CheckMove(*car);
-      *candidate_itr = Sayulisp::ListToMove(*car);
-    }
-
-    // ストッパーを登録。
-    engine_ptr_->SetStopper(Util::GetMin(depth, MAX_PLYS),
-    Util::GetMin(nodes, MAX_NODES),
-    Chrono::milliseconds(thinking_time), false);
-
-    // テーブルの年齢を上げる。
-    table_ptr_->GrowOld();
-
-    // 思考開始。
-    PVLine pv_line = engine_ptr_->Calculate(shell_ptr_->num_threads(),
-    candidate_vec, *shell_ptr_);
-
-    // 最善手、Ponderをアウトプットリスナーに送る。
-    std::ostringstream oss;
-    int len = pv_line.length();
-    if (len) {
-      oss << "bestmove " << Util::MoveToString(pv_line[0]);
-      if (len >= 2) {
-        oss << " ponder " << Util::MoveToString(pv_line[1]);
-      }
-      for (auto& callback : callback_vec_) callback(oss.str());
-    }
-
-    // PVラインのリストを作る。
-    LPointer ret_ptr = Lisp::NewList(len + 2);
-    LObject* ptr = ret_ptr.get();
-    ptr->car(Lisp::NewNumber(pv_line.score()));
-    Lisp::Next(&ptr);
-    ptr->car(Lisp::NewNumber(pv_line.mate_in()));
-    Lisp::Next(&ptr);
-    for (int i = 0; i < len; ++i, Lisp::Next(&ptr)) {
-      ptr->car(Sayulisp::MoveToList(pv_line[i]));
-    }
-
-    return ret_ptr;
-  }
-
-  // %%% @go-movetime
-  DEF_MESSAGE_FUNCTION(EngineSuite::GoMoveTime) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // 思考時間を得る。
-    LPointer time_ptr = caller->Evaluate(*(args_ptr->car()));
-    Lisp::CheckType(*time_ptr, LType::NUMBER);
-    int time = time_ptr->number();
-    Lisp::Next(&args_ptr);
-
-    // もしあるなら、候補手のリストを得る。
-    LPointer candidate_list_ptr = Lisp::NewNil();
-    if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
-      Lisp::CheckList(*result);
-      candidate_list_ptr = result;
-    }
-
-    // GoFuncに渡して終わる。
-    return GoFunc(MAX_PLYS, MAX_NODES, time, *candidate_list_ptr);
-  }
-
-  // %%% @go-timelimit
-  DEF_MESSAGE_FUNCTION(EngineSuite::GoTimeLimit) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // 持ち時間を得る。
-    LPointer time_ptr = caller->Evaluate(*(args_ptr->car()));
-    Lisp::CheckType(*time_ptr, LType::NUMBER);
-    int time = TimeLimitToMoveTime(time_ptr->number());
-    Lisp::Next(&args_ptr);
-
-    // もしあるなら、候補手のリストを得る。
-    LPointer candidate_list_ptr = Lisp::NewNil();
-    if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
-      Lisp::CheckList(*result);
-      candidate_list_ptr = result;
-    }
-
-    // GoFuncに渡して終わる。
-    return GoFunc(MAX_PLYS, MAX_NODES, time, *candidate_list_ptr);
-  }
-
-  // %%% @go-depth
-  DEF_MESSAGE_FUNCTION(EngineSuite::GoDepth) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // 深さを得る。
-    LPointer depth_ptr = caller->Evaluate(*(args_ptr->car()));
-    Lisp::CheckType(*depth_ptr, LType::NUMBER);
-    std::uint32_t depth = depth_ptr->number();
-    Lisp::Next(&args_ptr);
-
-    // もしあるなら、候補手のリストを得る。
-    LPointer candidate_list_ptr = Lisp::NewNil();
-    if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
-      Lisp::CheckList(*result);
-      candidate_list_ptr = result;
-    }
-
-    // GoFuncに渡して終わる。
-    return GoFunc(depth, MAX_NODES, INT_MAX, *candidate_list_ptr);
-  }
-
-  // %%% @go-nodes
-  DEF_MESSAGE_FUNCTION(EngineSuite::GoNodes) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // ノード数を得る。
-    LPointer node_ptr = caller->Evaluate(*(args_ptr->car()));
-    Lisp::CheckType(*node_ptr, LType::NUMBER);
-    std::uint64_t node = node_ptr->number();
-    Lisp::Next(&args_ptr);
-
-    // もしあるなら、候補手のリストを得る。
-    LPointer candidate_list_ptr = Lisp::NewNil();
-    if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
-      Lisp::CheckList(*result);
-      candidate_list_ptr = result;
-    }
-
-    // GoFuncに渡して終わる。
-    return GoFunc(MAX_PLYS, node, INT_MAX, *candidate_list_ptr);
-  }
-
-  // %%% @set-hash-size
-  DEF_MESSAGE_FUNCTION(EngineSuite::SetHashSize) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // サイズを得る。
-    LPointer size_ptr = caller->Evaluate(*(args_ptr->car()));
-    Lisp::CheckType(*size_ptr, LType::NUMBER);
-    std::size_t size = Util::GetMax(size_ptr->number(),
-    TTEntry::TTENTRY_HARD_CODED_SIZE);
-
-    // 古いサイズ。
-    LPointer ret_ptr = Lisp::NewNumber(table_ptr_->GetSizeBytes());
-
-    // サイズを更新。
-    table_ptr_->SetSize(size);
-
-    return ret_ptr;
-  }
-
-  // %%% @set-threads
-  DEF_MESSAGE_FUNCTION(EngineSuite::SetThreads) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // スレッド数を得る。
-    LPointer threads_ptr = caller->Evaluate(*(args_ptr->car()));
-    Lisp::CheckType(*threads_ptr, LType::NUMBER);
-    int threads = Util::GetMax(threads_ptr->number(), 1);
-
-    // 古いスレッド数。
-    LPointer ret_ptr = Lisp::NewNumber(shell_ptr_->num_threads());
-
-    // スレッド数を更新。
-    shell_ptr_->num_threads(threads);
-
-    return ret_ptr;
-  }
-
-  // %%% @material
-  DEF_MESSAGE_FUNCTION(EngineSuite::SetMaterial) {
-    // 古い設定を得る。
-    const int (& material)[NUM_PIECE_TYPES] = search_params_ptr_->material();
-    LPointerVec ret_vec(7);
-    FOR_PIECE_TYPES(piece_type) {
-      ret_vec[piece_type] = Lisp::NewNumber(material[piece_type]);
-    }
-
-    // もし引数があるなら設定。
-    LObject* args_ptr = args.cdr()->cdr().get();
-    if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
-      Lisp::CheckList(*result);
-
-      int len = Lisp::CountList(*result);
-      if (len < 7) {
-        throw Lisp::GenError("@engine-error",
-        "'" + symbol + "'"" requires List of 7 elements.");
-      }
-
-      int new_material[NUM_PIECE_TYPES];
-      LObject* ptr = result.get();
-      FOR_PIECE_TYPES(piece_type) {
-        if (piece_type == EMPTY) {
-          new_material[piece_type] = 0;
-        } else {
-          new_material[piece_type] = ptr->car()->number();
-        }
-        Lisp::Next(&ptr);
-      }
-
-      search_params_ptr_->material(new_material);
-    }
-
-    return Lisp::LPointerVecToList(ret_vec);
-  }
 //  // 関数オブジェクト。
 //  LispObjectPtr EngineSuite::operator()
 //  (LispObjectPtr self, const LispObject& caller, const LispObject& list) {
@@ -4507,7 +3435,6 @@ R"...(### to-fen-position ###
 
     return NewString(Util::ToFENPosition(position));
   }
-
 //  // ヘルプを作成する。
 //  void Sayulisp::SetHelp() {
 //    std::string temp = "";
@@ -7304,4 +6231,1227 @@ R"...(### to-fen-position ###
 //    ;; > qqqqkkkk/bbbbrrrr/4nnnn/8/8/NNNN4/RRRRBBBB/KKKKQQQQ)...";
 //    AddHelpDict("to-fen-position", temp);
 //  }
+
+  // =========== //
+  // EngineSuite //
+  // =========== //
+  // コンストラクタ。
+  EngineSuite::EngineSuite() :
+  search_params_ptr_(new SearchParams()),
+  eval_params_ptr_(new EvalParams()),
+  table_ptr_(new TranspositionTable(UCI_DEFAULT_TABLE_SIZE)),
+  engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
+  *table_ptr_)),
+  board_ptr_(&(engine_ptr_->board())),
+  shell_ptr_(new UCIShell(*engine_ptr_)) {
+    // 出力リスナー。
+    shell_ptr_->AddOutputListener
+    ([this](const std::string& message) {this->ListenUCIOutput(message);});
+
+    // メッセージシンボル関数の登録。
+    SetMessageFunctions();
+  }
+
+  // コピーコンストラクタ。
+  EngineSuite::EngineSuite(const EngineSuite& suite) :
+  search_params_ptr_(new SearchParams(*(suite.search_params_ptr_))),
+  eval_params_ptr_(new EvalParams(*(suite.eval_params_ptr_))),
+  table_ptr_(new TranspositionTable(suite.table_ptr_->GetSizeBytes())),
+  engine_ptr_(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
+  *table_ptr_)),
+  board_ptr_(&(engine_ptr_->board())),
+  shell_ptr_(new UCIShell(*engine_ptr_)) {
+    PositionRecord record(*(suite.engine_ptr_));
+    engine_ptr_->LoadRecord(record);
+
+    // 出力リスナー。
+    shell_ptr_->AddOutputListener
+    ([this](const std::string& message) {this->ListenUCIOutput(message);});
+
+    // メッセージシンボル関数の登録。
+    SetMessageFunctions();
+  }
+
+  // ムーブコンストラクタ。
+  EngineSuite::EngineSuite(EngineSuite&& suite) :
+  search_params_ptr_(std::move(suite.search_params_ptr_)),
+  eval_params_ptr_(std::move(suite.eval_params_ptr_)),
+  table_ptr_(std::move(suite.table_ptr_)),
+  engine_ptr_(std::move(suite.engine_ptr_)),
+  board_ptr_(&(engine_ptr_->board())),
+  shell_ptr_(std::move(suite.shell_ptr_)),
+  message_func_map_(std::move(suite.message_func_map_)) {
+  }
+
+  // コピー代入演算子。
+  EngineSuite& EngineSuite::operator=(const EngineSuite& suite) {
+    search_params_ptr_.reset(new SearchParams(*(suite.search_params_ptr_)));
+    eval_params_ptr_.reset(new EvalParams(*(suite.eval_params_ptr_)));
+    table_ptr_.reset(new TranspositionTable(suite.table_ptr_->GetSizeBytes()));
+    engine_ptr_.reset(new ChessEngine(*search_params_ptr_, *eval_params_ptr_,
+    *table_ptr_));
+    board_ptr_ = &(engine_ptr_->board());
+    shell_ptr_.reset(new UCIShell(*engine_ptr_));
+
+    PositionRecord record(*(suite.engine_ptr_));
+    engine_ptr_->LoadRecord(record);
+
+    // 出力リスナー。
+    shell_ptr_->AddOutputListener
+    ([this](const std::string& message) {this->ListenUCIOutput(message);});
+
+    return *this;
+  }
+
+  // ムーブ代入演算子。
+  EngineSuite& EngineSuite::operator=(EngineSuite&& suite) {
+    search_params_ptr_ = std::move(suite.search_params_ptr_);
+    eval_params_ptr_ = std::move(suite.eval_params_ptr_);
+    table_ptr_ = std::move(suite.table_ptr_);
+    engine_ptr_ = std::move(suite.engine_ptr_);
+    board_ptr_ = &(engine_ptr_->board());
+    shell_ptr_ = std::move(suite.shell_ptr_);
+
+    return *this;
+  }
+
+  // メッセージシンボル関数を登録する。
+  void EngineSuite::SetMessageFunctions() {
+    message_func_map_["@get-white-pawn-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<WHITE, PAWN>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-white-knight-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<WHITE, KNIGHT>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-white-bishop-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<WHITE, BISHOP>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-white-rook-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<WHITE, ROOK>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-white-queen-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<WHITE, QUEEN>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-white-king-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<WHITE, KING>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-black-pawn-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<BLACK, PAWN>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-black-knight-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<BLACK, KNIGHT>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-black-bishop-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<BLACK, BISHOP>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-black-rook-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<BLACK, ROOK>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-black-queen-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<BLACK, QUEEN>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-black-king-position"] =
+    [this](const std::string& symbol, LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return this->GetPosition<BLACK, KING>(symbol, self, caller, args);
+    };
+
+    message_func_map_["@get-piece"] =
+    INSERT_MESSAGE_FUNCTION(GetPiece);
+
+    message_func_map_["@get-all-pieces"] =
+    INSERT_MESSAGE_FUNCTION(GetAllPieces);
+
+    message_func_map_["@get-to-move"] =
+    INSERT_MESSAGE_FUNCTION(GetToMove);
+
+    message_func_map_["@get-castling-rights"] =
+    INSERT_MESSAGE_FUNCTION(GetCastlingRights);
+
+    message_func_map_["@get-en-passant-square"] =
+    INSERT_MESSAGE_FUNCTION(GetEnPassantSquare);
+
+    message_func_map_["@get-ply"] =
+    INSERT_MESSAGE_FUNCTION(GetPly);
+
+    message_func_map_["@get-clock"] =
+    INSERT_MESSAGE_FUNCTION(GetClock);
+
+    message_func_map_["@get-white-has-castled"] =
+    INSERT_MESSAGE_FUNCTION(GetHasCastled<WHITE>);
+
+    message_func_map_["@get-black-has-castled"] =
+    INSERT_MESSAGE_FUNCTION(GetHasCastled<BLACK>);
+
+    message_func_map_["@get-fen"] =
+    INSERT_MESSAGE_FUNCTION(GetFEN);
+
+    message_func_map_["@to-string"] =
+    INSERT_MESSAGE_FUNCTION(BoardToString);
+
+    message_func_map_["@set-new-game"] =
+    INSERT_MESSAGE_FUNCTION(SetNewGame);
+
+    message_func_map_["@set-fen"] =
+    INSERT_MESSAGE_FUNCTION(SetFEN);
+
+    message_func_map_["@place-piece"] =
+    INSERT_MESSAGE_FUNCTION(PlacePiece);
+
+    message_func_map_["@get-candidate-moves"] =
+    INSERT_MESSAGE_FUNCTION(GetCandidateMoves);
+
+    message_func_map_["@set-to-move"] =
+    INSERT_MESSAGE_FUNCTION(SetToMove);
+
+    message_func_map_["@set-castling-rights"] =
+    INSERT_MESSAGE_FUNCTION(SetCastlingRights);
+
+    message_func_map_["@set-en-passant-square"] =
+    INSERT_MESSAGE_FUNCTION(SetEnPassantSquare);
+
+    message_func_map_["@set-ply"] =
+    INSERT_MESSAGE_FUNCTION(SetPly);
+
+    message_func_map_["@set-clock"] =
+    INSERT_MESSAGE_FUNCTION(SetClock);
+
+    message_func_map_["@correct-position?"] =
+    INSERT_MESSAGE_FUNCTION(IsCorrectPosition);
+
+    message_func_map_["@white-checked?"] =
+    INSERT_MESSAGE_FUNCTION(IsChecked<WHITE>);
+
+    message_func_map_["@black-checked?"] =
+    INSERT_MESSAGE_FUNCTION(IsChecked<BLACK>);
+
+    message_func_map_["@checkmated?"] =
+    INSERT_MESSAGE_FUNCTION(IsCheckmated);
+
+    message_func_map_["@stalemated?"] =
+    INSERT_MESSAGE_FUNCTION(IsStalemated);
+
+    message_func_map_["@play-move"] =
+    INSERT_MESSAGE_FUNCTION(PlayMoveOrNote);
+
+    message_func_map_["@play-note"] =
+    INSERT_MESSAGE_FUNCTION(PlayMoveOrNote);
+
+    message_func_map_["@undo-move"] =
+    INSERT_MESSAGE_FUNCTION(UndoMove);
+
+    message_func_map_["@move->note"] =
+    INSERT_MESSAGE_FUNCTION(MoveToNote);
+
+    message_func_map_["@input-uci-command"] =
+    INSERT_MESSAGE_FUNCTION(InputUCICommand);
+
+    message_func_map_["@add-uci-output-listener"] =
+    INSERT_MESSAGE_FUNCTION(AddUCIOutputListener);
+
+    message_func_map_["@run"] =
+    INSERT_MESSAGE_FUNCTION(RunEngine);
+
+    message_func_map_["@go-movetime"] =
+    INSERT_MESSAGE_FUNCTION(GoMoveTime);
+
+    message_func_map_["@go-timelimit"] =
+    INSERT_MESSAGE_FUNCTION(GoTimeLimit);
+
+    message_func_map_["@go-depth"] =
+    INSERT_MESSAGE_FUNCTION(GoDepth);
+
+    message_func_map_["@go-nodes"] =
+    INSERT_MESSAGE_FUNCTION(GoNodes);
+
+    message_func_map_["@set-hash-size"] =
+    INSERT_MESSAGE_FUNCTION(SetHashSize);
+
+    message_func_map_["@set-threads"] =
+    INSERT_MESSAGE_FUNCTION(SetThreads);
+
+    message_func_map_["@material"] =
+    INSERT_MESSAGE_FUNCTION(SetMaterial);
+
+    message_func_map_["@enable-quiesce-search"] =
+    INSERT_MESSAGE_FUNCTION(SetEnabelQuiesceSearch);
+
+    message_func_map_["@enable-repetition-check"] =
+    INSERT_MESSAGE_FUNCTION(SetEnabelRepetitionCheck);
+
+    message_func_map_["@enable-check-extension"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableCheckExtension);
+
+    message_func_map_["@ybwc-limit-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetYBWCLimitDepth);
+
+    message_func_map_["@ybwc-invalid-moves"] =
+    INSERT_MESSAGE_FUNCTION(SetYBWCInvalidMoves);
+
+    message_func_map_["@enable-aspiration-windows"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableAspirationWindows);
+
+    message_func_map_["@aspiration-windows-limit-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetAspirationWindowsLimitDepth);
+
+    message_func_map_["@aspiration-windows-delta"] =
+    INSERT_MESSAGE_FUNCTION(SetAspirationWindowsDelta);
+
+    message_func_map_["@enable-see"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableSEE);
+
+    message_func_map_["@enable-history"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableHistory);
+
+    message_func_map_["@enable-killer"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableKiller);
+
+    message_func_map_["@enable-hash-table"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableHashTable);
+
+    message_func_map_["@enable-iid"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableIID);
+
+    message_func_map_["@iid-limit-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetIIDLimitDepth);
+
+    message_func_map_["@iid-search-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetIIDSearchDepth);
+
+    message_func_map_["@enable-nmr"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableNMR);
+
+    message_func_map_["@nmr-limit-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetNMRLimitDepth);
+
+    message_func_map_["@nmr-search-reduction"] =
+    INSERT_MESSAGE_FUNCTION(SetNMRSearchReduction);
+
+    message_func_map_["@nmr-reduction"] =
+    INSERT_MESSAGE_FUNCTION(SetNMRReduction);
+
+    message_func_map_["@enable-probcut"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableProbCut);
+
+    message_func_map_["@probcut-limit-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetProbCutLimitDepth);
+
+    message_func_map_["@probcut-margin"] =
+    INSERT_MESSAGE_FUNCTION(SetProbCutMargin);
+
+    message_func_map_["@probcut-search-reduction"] =
+    INSERT_MESSAGE_FUNCTION(SetProbCutSearchReduction);
+
+    message_func_map_["@enable-history-pruning"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableHistoryPruning);
+
+    message_func_map_["@history-pruning-limit-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetHistoryPruningLimitDepth);
+
+    message_func_map_["@history-pruning-move-threshold"] =
+    INSERT_MESSAGE_FUNCTION(SetHistoryPruningMoveThreshold);
+
+    message_func_map_["@history-pruning-threshold"] =
+    INSERT_MESSAGE_FUNCTION(SetHistoryPruningThreshold);
+
+    message_func_map_["@history-pruning-reduction"] =
+    INSERT_MESSAGE_FUNCTION(SetHistoryPruningReduction);
+
+    message_func_map_["@enable-lmr"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableLMR);
+
+    message_func_map_["@lmr-limit-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetLMRLimitDepth);
+
+    message_func_map_["@lmr-move-threshold"] =
+    INSERT_MESSAGE_FUNCTION(SetLMRMoveThreshold);
+
+    message_func_map_["@lmr-invalid-moves"] =
+    INSERT_MESSAGE_FUNCTION(SetLMRInvalidMoves);
+
+    message_func_map_["@lmr-search-reduction"] =
+    INSERT_MESSAGE_FUNCTION(SetLMRSearchReduction);
+
+    message_func_map_["@enable-futility-pruning"] =
+    INSERT_MESSAGE_FUNCTION(SetEnableFutilityPruning);
+
+    message_func_map_["@futility-pruning-depth"] =
+    INSERT_MESSAGE_FUNCTION(SetFutilityPruningDepth);
+
+    message_func_map_["@futility-pruning-margin"] =
+    INSERT_MESSAGE_FUNCTION(SetFutilityPruningMargin);
+
+    message_func_map_["@pawn-square-table-opening"] =
+    INSERT_MESSAGE_FUNCTION(SetPieceSquareTableOpening<PAWN>);
+
+    message_func_map_["@knight-square-table-opening"] =
+    INSERT_MESSAGE_FUNCTION(SetPieceSquareTableOpening<KNIGHT>);
+
+    message_func_map_["@bishop-square-table-opening"] =
+    INSERT_MESSAGE_FUNCTION(SetPieceSquareTableOpening<BISHOP>);
+
+    message_func_map_["@rook-square-table-opening"] =
+    INSERT_MESSAGE_FUNCTION(SetPieceSquareTableOpening<ROOK>);
+
+    message_func_map_["@queen-square-table-opening"] =
+    INSERT_MESSAGE_FUNCTION(SetPieceSquareTableOpening<QUEEN>);
+
+    message_func_map_["@king-square-table-opening"] =
+    INSERT_MESSAGE_FUNCTION(SetPieceSquareTableOpening<KING>);
+
+    message_func_map_["@pawn-square-table-ending"] =
+    INSERT_MESSAGE_FUNCTION(SetPieceSquareTableEnding<PAWN>);
+
+    message_func_map_["@knight-square-table-ending"] =
+    INSERT_MESSAGE_FUNCTION(SetPieceSquareTableEnding<KNIGHT>);
+
+    message_func_map_["@bishop-square-table-ending"] =
+    INSERT_MESSAGE_FUNCTION(SetPieceSquareTableEnding<BISHOP>);
+
+    message_func_map_["@rook-square-table-ending"] =
+    INSERT_MESSAGE_FUNCTION(SetPieceSquareTableEnding<ROOK>);
+
+    message_func_map_["@queen-square-table-ending"] =
+    INSERT_MESSAGE_FUNCTION(SetPieceSquareTableEnding<QUEEN>);
+
+    message_func_map_["@king-square-table-ending"] =
+    INSERT_MESSAGE_FUNCTION(SetPieceSquareTableEnding<KING>);
+  }
+
+  // 関数オブジェクト。
+  DEF_LC_FUNCTION(EngineSuite::operator()) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Lisp::GetReadyForFunction(args, 1, &args_ptr);
+
+    // メッセージシンボルを抽出。
+    LPointer result = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*result, LType::SYMBOL);
+    const std::string& symbol = result->symbol();
+
+    if (message_func_map_.find(symbol) != message_func_map_.end()) {
+      return message_func_map_.at(symbol)(symbol, self, caller, args);
+    }
+
+    throw Lisp::GenError("@engine-error",
+    "'" + symbol + "' is not message symbol.");
+  }
+
+  // ====================== //
+  // メッセージシンボル関数 //
+  // ====================== //
+  // %%% @get-white-pawn-position
+  // %%% @get-white-knight-position
+  // %%% @get-white-bishop-position
+  // %%% @get-white-rook-position
+  // %%% @get-white-queen-position
+  // %%% @get-white-king-position
+  // %%% @get-black-pawn-position
+  // %%% @get-black-knight-position
+  // %%% @get-black-bishop-position
+  // %%% @get-black-rook-position
+  // %%% @get-black-queen-position
+  // %%% @get-black-king-position
+  template<Side SIDE, PieceType PIECE_TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::GetPosition) {
+    LPointerVec ret_vec;
+    for (Bitboard bb = board_ptr_->position_[SIDE][PIECE_TYPE]; bb;
+    NEXT_BITBOARD(bb)) {
+      ret_vec.push_back(Lisp::NewSymbol
+      (Sayulisp::SQUARE_MAP_INV[Util::GetSquare(bb)]));
+    }
+
+    return Lisp::LPointerVecToList(ret_vec);
+  }
+  template LPointer EngineSuite::GetPosition<WHITE, PAWN>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<WHITE, KNIGHT>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<WHITE, BISHOP>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<WHITE, ROOK>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<WHITE, QUEEN>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<WHITE, KING>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<BLACK, PAWN>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<BLACK, KNIGHT>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<BLACK, BISHOP>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<BLACK, ROOK>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<BLACK, QUEEN>
+  (const std::string&, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::GetPosition<BLACK, KING>
+  (const std::string&, LPointer, LObject*, const LObject&);
+
+  // %%% @get-piece
+  DEF_MESSAGE_FUNCTION(EngineSuite::GetPiece) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 引数のチェック。
+    LPointer result = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSquare(*result);
+    Square square = result->number();
+
+    // サイドと駒の種類を得る。
+    LPointer ret_ptr = Lisp::NewList(2);
+    ret_ptr->car(Lisp::NewSymbol
+    (Sayulisp::SIDE_MAP_INV[board_ptr_->side_board_[square]]));
+    ret_ptr->cdr()->car(Lisp::NewSymbol
+    (Sayulisp::PIECE_MAP_INV[board_ptr_->piece_board_[square]]));
+
+    return ret_ptr;
+  }
+
+  // %%% @get-all-pieces
+  DEF_MESSAGE_FUNCTION(EngineSuite::GetAllPieces) {
+    LPointerVec ret_vec(NUM_SQUARES);
+    LPointerVec::iterator itr = ret_vec.begin();
+
+    // 各マスの駒のリストを作る。
+    LPointer elm_ptr;
+    FOR_SQUARES(square) {
+      elm_ptr = Lisp::NewList(2);
+      elm_ptr->car(Lisp::NewSymbol
+      (Sayulisp::SIDE_MAP_INV[board_ptr_->side_board_[square]]));
+      elm_ptr->cdr()->car(Lisp::NewSymbol
+      (Sayulisp::PIECE_MAP_INV[board_ptr_->piece_board_[square]]));
+
+      *itr = elm_ptr;
+      ++itr;
+    }
+
+    return Lisp::LPointerVecToList(ret_vec);
+  }
+
+  // %%% @set-fen
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetFEN) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // FENを得る。
+    LPointer fen_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*fen_ptr, LType::STRING);
+
+    // パースする。
+    FEN fen;
+    try {
+      fen = FEN(fen_ptr->string());
+    } catch (...) {
+      throw Lisp::GenError("@engine-error", "Couldn't parse FEN.");
+    }
+
+    // キングの数をチェック。
+    if ((Util::CountBits(fen.position()[WHITE][KING]) != 1)
+    || (Util::CountBits(fen.position()[BLACK][KING]) != 1)) {
+      throw Lisp::GenError("@engine-error", "This FEN is invalid position.");
+    }
+
+    engine_ptr_->LoadFEN(fen);
+    return Lisp::NewBoolean(true);
+  }
+
+  // %%% @place-piece
+  DEF_MESSAGE_FUNCTION(EngineSuite::PlacePiece) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 2, &args_ptr);
+
+    // マスを得る。
+    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSquare(*square_ptr);
+    Lisp::Next(&args_ptr);
+    Square square = square_ptr->number();
+
+    // 駒を得る。
+    LPointer piece_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckPiece(*piece_ptr);
+    Side side = piece_ptr->car()->number();
+    PieceType piece_type = piece_ptr->cdr()->car()->number();
+
+    // キングを置き換えることはできない。
+    if (board_ptr_->piece_board_[square] == KING) {
+      throw Lisp::GenError("@engine-error", "Couldn't overwrite King.");
+    }
+
+    // 前の駒のリストを作る。
+    LPointer ret_ptr = Lisp::NewList(2);
+    ret_ptr->car(Lisp::NewSymbol
+    (Sayulisp::SIDE_MAP_INV[board_ptr_->side_board_[square]]));
+    ret_ptr->cdr()->car(Lisp::NewSymbol
+    (Sayulisp::PIECE_MAP_INV[board_ptr_->piece_board_[square]]));
+
+    // 置き換える。
+    engine_ptr_->PlacePiece(square, piece_type, side);
+
+    return ret_ptr;
+  }
+
+  // %%% @get-candidate-moves
+  DEF_MESSAGE_FUNCTION(EngineSuite::GetCandidateMoves) {
+    // 指し手の生成。
+    std::vector<Move> move_vec = engine_ptr_->GetLegalMoves();
+    LPointer ret_ptr = Lisp::NewList(move_vec.size());
+
+    // リストに代入していく。
+    LObject* ptr = ret_ptr.get();
+    for (auto move : move_vec) {
+      ptr->car(Sayulisp::MoveToList(move));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @set-to-move
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetToMove) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 指し手を得る。
+    LPointer to_move_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSide(*to_move_ptr);
+    Side to_move = to_move_ptr->number();
+
+    // NO_SIDEはダメ。
+    if (to_move == NO_SIDE) {
+      throw Lisp::GenError("@engine-error", "NO_SIDE is not allowed.");
+    }
+
+    // 前の状態。
+    LPointer ret_ptr =
+    Lisp::NewSymbol(Sayulisp::SIDE_MAP_INV[board_ptr_->to_move_]);
+
+    engine_ptr_->to_move(to_move);
+    return ret_ptr;
+  }
+
+  // %%% @set-castling-rights
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetCastlingRights) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // キャスリングの権利を得る。
+    LPointer castling_list_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckList(*castling_list_ptr);
+
+    // キャスリングの権利フラグを作成。
+    Castling rights = 0;
+    LPointer result;
+    int rights_number = 0;
+    for (LObject* ptr = castling_list_ptr.get(); ptr->IsPair();
+    Lisp::Next(&ptr)) {
+      result = caller->Evaluate(*(ptr->car()));
+      Sayulisp::CheckCastling(*result);
+
+      rights_number = result->number();
+      switch (rights_number) {
+        case 1:
+          rights |= WHITE_SHORT_CASTLING;
+          break;
+        case 2:
+          rights |= WHITE_LONG_CASTLING;
+          break;
+        case 3:
+          rights |= BLACK_SHORT_CASTLING;
+          break;
+        case 4:
+          rights |= BLACK_LONG_CASTLING;
+          break;
+      }
+    }
+
+    // 前のキャスリングの権利を得る。
+    Castling origin_rights = board_ptr_->castling_rights_;
+    LPointerVec ret_vec;
+    if ((origin_rights & WHITE_SHORT_CASTLING)) {
+      ret_vec.push_back(Lisp::NewSymbol("WHITE_SHORT_CASTLING"));
+    }
+    if ((origin_rights & WHITE_LONG_CASTLING)) {
+      ret_vec.push_back(Lisp::NewSymbol("WHITE_LONG_CASTLING"));
+    }
+    if ((origin_rights & BLACK_SHORT_CASTLING)) {
+      ret_vec.push_back(Lisp::NewSymbol("BLACK_SHORT_CASTLING"));
+    }
+    if ((origin_rights & BLACK_LONG_CASTLING)) {
+      ret_vec.push_back(Lisp::NewSymbol("BLACK_LONG_CASTLING"));
+    }
+
+    // セットして返す。
+    engine_ptr_->castling_rights(rights);
+    return Lisp::LPointerVecToList(ret_vec);
+  }
+
+  // %%% set-en-passant-square
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetEnPassantSquare) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // マスを得る。
+    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSquare(*square_ptr);
+    Square square = square_ptr->number();
+
+    // 前のアンパッサンのマスを作る。
+    LPointer ret_ptr = Lisp::NewNil();
+    if (board_ptr_->en_passant_square_) {
+      ret_ptr = Lisp::NewNumber(board_ptr_->en_passant_square_);
+    }
+
+    // マスがアンパッサンのマスのチェック。
+    if (board_ptr_->to_move_ == WHITE) {
+      // 白番の時は黒側のアンパッサン。
+      if (Util::SquareToRank(square) == RANK_6) {
+        // 一つ上にポーンがいて、アンパッサンのマスが空の時にセットできる。
+        if ((board_ptr_->piece_board_[square] == EMPTY)
+        && (board_ptr_->side_board_[square - 8] == BLACK)
+        && (board_ptr_->piece_board_[square - 8] == PAWN)) {
+          engine_ptr_->en_passant_square(square);
+          return ret_ptr;
+        }
+      }
+    } else {
+      // 黒番の時は白側のアンパッサン。
+      if (Util::SquareToRank(square) == RANK_3) {
+        // 一つ上にポーンがいて、アンパッサンのマスが空の時にセットできる。
+        if ((board_ptr_->piece_board_[square] == EMPTY)
+        && (board_ptr_->side_board_[square + 8] == WHITE)
+        && (board_ptr_->piece_board_[square + 8] == PAWN)) {
+          engine_ptr_->en_passant_square(square);
+          return ret_ptr;
+        }
+      }
+    }
+
+    throw Lisp::GenError("@engine-error", "'" + square_ptr->ToString()
+    + "' couldn't be en passant square.");
+  }
+
+  // %%% @set-play
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPly) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 手数を得る。
+    LPointer ply_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*ply_ptr, LType::NUMBER);
+    int ply = ply_ptr->number();
+
+    // 手数はプラスでないとダメ。
+    if (ply < 0) {
+      throw Lisp::GenError("@engine-error", "Ply must be positive number.");
+    }
+
+    LPointer ret_ptr = Lisp::NewNumber(board_ptr_->ply_);
+    engine_ptr_->ply(ply);
+    return ret_ptr;
+  }
+
+  // %%% @set-clock
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetClock) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 手数を得る。
+    LPointer clock_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*clock_ptr, LType::NUMBER);
+    int clock = clock_ptr->number();
+
+    // 手数はプラスでないとダメ。
+    if (clock < 0) {
+      throw Lisp::GenError("@engine-error", "Clock must be positive number.");
+    }
+
+    LPointer ret_ptr = Lisp::NewNumber(board_ptr_->clock_);
+    engine_ptr_->clock(clock);
+    return ret_ptr;
+  }
+
+  // %%% @play-move
+  // %%% @play-note
+  /** 手を指す。 */
+  DEF_MESSAGE_FUNCTION(EngineSuite::PlayMoveOrNote) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 指し手を得る。
+    LPointer result = caller->Evaluate(*(args_ptr->car()));
+    Move move = 0;
+    if (symbol == "@play-move") {  // @play-move
+      move = Sayulisp::ListToMove(*result);
+    } else {  // @play-note
+      Lisp::CheckType(*result, LType::STRING);
+      std::vector<Move> move_vec = engine_ptr_->GuessNote(result->string());
+      if (move_vec.size() == 0) return Lisp::NewBoolean(false);
+      move = move_vec[0];
+    }
+
+    return Lisp::NewBoolean(engine_ptr_->PlayMove(move));
+  }
+
+  // %%% @undo-move
+  DEF_MESSAGE_FUNCTION(EngineSuite::UndoMove) {
+    Move move = engine_ptr_->UndoMove();
+    if (!move) return Lisp::NewNil();
+
+    return Sayulisp::MoveToList(move);
+  }
+
+  // %%% @move->note
+  DEF_MESSAGE_FUNCTION(EngineSuite::MoveToNote) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 指し手を得る。
+    LPointer move_ptr = caller->Evaluate(*(args_ptr->car()));
+
+    return Lisp::NewString(engine_ptr_->MoveToNote
+    (Sayulisp::ListToMove(*move_ptr)));
+  }
+
+  // %%% @input-uci-command
+  DEF_MESSAGE_FUNCTION(EngineSuite::InputUCICommand) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    LPointer command_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*command_ptr, LType::STRING);
+
+    return Lisp::NewBoolean(shell_ptr_->InputCommand(command_ptr->string()));
+  }
+
+  // %%% @add-uci-output-listener
+  DEF_MESSAGE_FUNCTION(EngineSuite::AddUCIOutputListener) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    LPointer result = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*result, LType::FUNCTION);
+
+    // リストを作る。
+    LPointer listener_ptr =
+    Lisp::NewPair(result, Lisp::NewPair(Lisp::NewString(""), Lisp::NewNil()));
+
+    // callerと同じスコープの関数オブジェクトを作る。
+    LPointer caller_scope =
+    Lisp::NewN_Function(LC_Function(), "", caller->scope_chain());
+
+    // コールバック関数を作成。
+    auto callback =
+    [caller_scope, listener_ptr](const std::string& message) {
+      listener_ptr->cdr()->car()->string(message);
+      caller_scope->Evaluate(*listener_ptr);
+    };
+
+    // コールバック関数を登録。
+    callback_vec_.push_back(callback);
+
+    return Lisp::NewBoolean(true);
+  }
+
+  // %%% @run
+  DEF_MESSAGE_FUNCTION(EngineSuite::RunEngine) {
+    // 出力リスナー。
+    auto callback = [](const std::string& message) {
+      std::cout << message << std::endl;
+    };
+    callback_vec_.push_back(callback);
+
+    // quitが来るまでループ。
+    std::string input;
+    while (true) {
+      std::getline(std::cin, input);
+      if (input == "quit") break;
+      shell_ptr_->InputCommand(input);
+    }
+
+    return Lisp::NewBoolean(true);
+  }
+
+  // Go...()で使う関数。
+  LPointer EngineSuite::GoFunc(std::uint32_t depth, std::uint64_t nodes,
+  int thinking_time, const LObject& candidate_list) {
+    // 候補手のリストを作成。
+    std::vector<Move> candidate_vec(Lisp::CountList(candidate_list));
+    std::vector<Move>::iterator candidate_itr = candidate_vec.begin();
+    LPointer car;
+    for (const LObject* ptr = &candidate_list; ptr->IsPair();
+    ptr = ptr->cdr().get(), ++candidate_itr) {
+      car = ptr->car();
+      Sayulisp::CheckMove(*car);
+      *candidate_itr = Sayulisp::ListToMove(*car);
+    }
+
+    // ストッパーを登録。
+    engine_ptr_->SetStopper(Util::GetMin(depth, MAX_PLYS),
+    Util::GetMin(nodes, MAX_NODES),
+    Chrono::milliseconds(thinking_time), false);
+
+    // テーブルの年齢を上げる。
+    table_ptr_->GrowOld();
+
+    // 思考開始。
+    PVLine pv_line = engine_ptr_->Calculate(shell_ptr_->num_threads(),
+    candidate_vec, *shell_ptr_);
+
+    // 最善手、Ponderをアウトプットリスナーに送る。
+    std::ostringstream oss;
+    int len = pv_line.length();
+    if (len) {
+      oss << "bestmove " << Util::MoveToString(pv_line[0]);
+      if (len >= 2) {
+        oss << " ponder " << Util::MoveToString(pv_line[1]);
+      }
+      for (auto& callback : callback_vec_) callback(oss.str());
+    }
+
+    // PVラインのリストを作る。
+    LPointer ret_ptr = Lisp::NewList(len + 2);
+    LObject* ptr = ret_ptr.get();
+    ptr->car(Lisp::NewNumber(pv_line.score()));
+    Lisp::Next(&ptr);
+    ptr->car(Lisp::NewNumber(pv_line.mate_in()));
+    Lisp::Next(&ptr);
+    for (int i = 0; i < len; ++i, Lisp::Next(&ptr)) {
+      ptr->car(Sayulisp::MoveToList(pv_line[i]));
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @go-movetime
+  DEF_MESSAGE_FUNCTION(EngineSuite::GoMoveTime) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 思考時間を得る。
+    LPointer time_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*time_ptr, LType::NUMBER);
+    int time = time_ptr->number();
+    Lisp::Next(&args_ptr);
+
+    // もしあるなら、候補手のリストを得る。
+    LPointer candidate_list_ptr = Lisp::NewNil();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+      candidate_list_ptr = result;
+    }
+
+    // GoFuncに渡して終わる。
+    return GoFunc(MAX_PLYS, MAX_NODES, time, *candidate_list_ptr);
+  }
+
+  // %%% @go-timelimit
+  DEF_MESSAGE_FUNCTION(EngineSuite::GoTimeLimit) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 持ち時間を得る。
+    LPointer time_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*time_ptr, LType::NUMBER);
+    int time = TimeLimitToMoveTime(time_ptr->number());
+    Lisp::Next(&args_ptr);
+
+    // もしあるなら、候補手のリストを得る。
+    LPointer candidate_list_ptr = Lisp::NewNil();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+      candidate_list_ptr = result;
+    }
+
+    // GoFuncに渡して終わる。
+    return GoFunc(MAX_PLYS, MAX_NODES, time, *candidate_list_ptr);
+  }
+
+  // %%% @go-depth
+  DEF_MESSAGE_FUNCTION(EngineSuite::GoDepth) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 深さを得る。
+    LPointer depth_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*depth_ptr, LType::NUMBER);
+    std::uint32_t depth = depth_ptr->number();
+    Lisp::Next(&args_ptr);
+
+    // もしあるなら、候補手のリストを得る。
+    LPointer candidate_list_ptr = Lisp::NewNil();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+      candidate_list_ptr = result;
+    }
+
+    // GoFuncに渡して終わる。
+    return GoFunc(depth, MAX_NODES, INT_MAX, *candidate_list_ptr);
+  }
+
+  // %%% @go-nodes
+  DEF_MESSAGE_FUNCTION(EngineSuite::GoNodes) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // ノード数を得る。
+    LPointer node_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*node_ptr, LType::NUMBER);
+    std::uint64_t node = node_ptr->number();
+    Lisp::Next(&args_ptr);
+
+    // もしあるなら、候補手のリストを得る。
+    LPointer candidate_list_ptr = Lisp::NewNil();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+      candidate_list_ptr = result;
+    }
+
+    // GoFuncに渡して終わる。
+    return GoFunc(MAX_PLYS, node, INT_MAX, *candidate_list_ptr);
+  }
+
+  // %%% @set-hash-size
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetHashSize) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // サイズを得る。
+    LPointer size_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*size_ptr, LType::NUMBER);
+    std::size_t size = Util::GetMax(size_ptr->number(),
+    TTEntry::TTENTRY_HARD_CODED_SIZE);
+
+    // 古いサイズ。
+    LPointer ret_ptr = Lisp::NewNumber(table_ptr_->GetSizeBytes());
+
+    // サイズを更新。
+    table_ptr_->SetSize(size);
+
+    return ret_ptr;
+  }
+
+  // %%% @set-threads
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetThreads) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // スレッド数を得る。
+    LPointer threads_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*threads_ptr, LType::NUMBER);
+    int threads = Util::GetMax(threads_ptr->number(), 1);
+
+    // 古いスレッド数。
+    LPointer ret_ptr = Lisp::NewNumber(shell_ptr_->num_threads());
+
+    // スレッド数を更新。
+    shell_ptr_->num_threads(threads);
+
+    return ret_ptr;
+  }
+
+  // %%% @material
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetMaterial) {
+    // 古い設定を得る。
+    const int (& material)[NUM_PIECE_TYPES] = search_params_ptr_->material();
+    LPointerVec ret_vec(7);
+    FOR_PIECE_TYPES(piece_type) {
+      ret_vec[piece_type] = Lisp::NewNumber(material[piece_type]);
+    }
+
+    // もし引数があるなら設定。
+    LObject* args_ptr = args.cdr()->cdr().get();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+
+      int len = Lisp::CountList(*result);
+      if (len < 7) {
+        throw Lisp::GenError("@engine-error",
+        "'" + symbol + "'"" requires List of 7 elements.");
+      }
+
+      int new_material[NUM_PIECE_TYPES];
+      LObject* ptr = result.get();
+      FOR_PIECE_TYPES(piece_type) {
+        if (piece_type == EMPTY) {
+          new_material[piece_type] = 0;
+        } else {
+          new_material[piece_type] = ptr->car()->number();
+        }
+        Lisp::Next(&ptr);
+      }
+
+      search_params_ptr_->material(new_material);
+    }
+
+    return Lisp::LPointerVecToList(ret_vec);
+  }
+
+// @pawn-square-table-opening
+// @knight-square-table-opening
+// @bishop-square-table-opening
+// @rook-square-table-opening
+// @queen-square-table-opening
+// @king-square-table-opening
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableOpening) {
+    // 古い設定を得る。
+    LPointerVec ret_vec(NUM_SQUARES);
+    const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
+    eval_params_ptr_->opening_position_value_table();
+    FOR_SQUARES(square) {
+      ret_vec[square] = Lisp::NewNumber(table[TYPE][square]);
+    }
+
+    // 引数があれば設定する。
+    LObject* args_ptr = args.cdr()->cdr().get();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+
+      // マスの数がちゃんとあるかどうか。
+      if (Lisp::CountList(*result) < static_cast<int>(NUM_SQUARES)) {
+        throw Lisp::GenError("@engine-error",
+        "'" + symbol + "' requires List of 64 elements.");
+      }
+
+      // セットする。
+      LObject* ptr = result.get();
+      FOR_SQUARES(square) {
+        Lisp::CheckType(*(ptr->car()), LType::NUMBER);
+
+        eval_params_ptr_->opening_position_value_table
+        (TYPE, square, ptr->car()->number());
+
+        Lisp::Next(&ptr);
+      }
+    }
+
+    return Lisp::LPointerVecToList(ret_vec);
+  }
+  // インスタンス化。
+  template LPointer EngineSuite::SetPieceSquareTableOpening<PAWN>
+  (const std::string& symbol, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::SetPieceSquareTableOpening<KNIGHT>
+  (const std::string& symbol, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::SetPieceSquareTableOpening<BISHOP>
+  (const std::string& symbol, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::SetPieceSquareTableOpening<ROOK>
+  (const std::string& symbol, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::SetPieceSquareTableOpening<QUEEN>
+  (const std::string& symbol, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::SetPieceSquareTableOpening<KING>
+  (const std::string& symbol, LPointer, LObject*, const LObject&);
+
+// @pawn-square-table-ending
+// @knight-square-table-ending
+// @bishop-square-table-ending
+// @rook-square-table-ending
+// @queen-square-table-ending
+// @king-square-table-ending
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableEnding) {
+    // 古い設定を得る。
+    LPointerVec ret_vec(NUM_SQUARES);
+    const double (& table)[NUM_PIECE_TYPES][NUM_SQUARES] =
+    eval_params_ptr_->ending_position_value_table();
+    FOR_SQUARES(square) {
+      ret_vec[square] = Lisp::NewNumber(table[TYPE][square]);
+    }
+
+    // 引数があれば設定する。
+    LObject* args_ptr = args.cdr()->cdr().get();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+
+      // マスの数がちゃんとあるかどうか。
+      if (Lisp::CountList(*result) < static_cast<int>(NUM_SQUARES)) {
+        throw Lisp::GenError("@engine-error",
+        "'" + symbol + "' requires List of 64 elements.");
+      }
+
+      // セットする。
+      LObject* ptr = result.get();
+      FOR_SQUARES(square) {
+        Lisp::CheckType(*(ptr->car()), LType::NUMBER);
+
+        eval_params_ptr_->ending_position_value_table
+        (TYPE, square, ptr->car()->number());
+
+        Lisp::Next(&ptr);
+      }
+    }
+
+    return Lisp::LPointerVecToList(ret_vec);
+  }
+  // インスタンス化。
+  template LPointer EngineSuite::SetPieceSquareTableEnding<PAWN>
+  (const std::string& symbol, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::SetPieceSquareTableEnding<KNIGHT>
+  (const std::string& symbol, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::SetPieceSquareTableEnding<BISHOP>
+  (const std::string& symbol, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::SetPieceSquareTableEnding<ROOK>
+  (const std::string& symbol, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::SetPieceSquareTableEnding<QUEEN>
+  (const std::string& symbol, LPointer, LObject*, const LObject&);
+  template LPointer EngineSuite::SetPieceSquareTableEnding<KING>
+  (const std::string& symbol, LPointer, LObject*, const LObject&);
 }  // namespace Sayuri
