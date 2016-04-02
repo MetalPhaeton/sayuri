@@ -356,30 +356,6 @@ namespace Sayuri {
 //    }
 //    std::string message_symbol = message_ptr->symbol_value();
 //
-//    if ((message_symbol == "@bishop-pin-table")
-//    || (message_symbol == "@rook-pin-table")
-//    || (message_symbol == "@queen-pin-table")) {
-//      LispObjectPtr value_list_ptr = Lisp::NewNil();
-//      if (list_itr) {
-//        value_list_ptr = caller.Evaluate(*list_itr);
-//        if (!(value_list_ptr->IsList())) {
-//          throw Lisp::GenWrongTypeError
-//          (func_name, "List", std::vector<int> {2}, true);
-//        }
-//      }
-//
-//      if (message_symbol == "@bishop-pin-table") {
-//        return SetPinValueTable<BISHOP>
-//        (func_name, message_symbol, *value_list_ptr);
-//      }
-//      if (message_symbol == "@rook-pin-table") {
-//        return SetPinValueTable<ROOK>
-//        (func_name, message_symbol, *value_list_ptr);
-//      }
-//      return SetPinValueTable<QUEEN>
-//      (func_name, message_symbol, *value_list_ptr);
-//
-//    }
 //    if (message_symbol == "@pawn-shield-table") {
 //      LispObjectPtr table_ptr = Lisp::NewNil();
 //      if (list_itr) {
@@ -5547,6 +5523,15 @@ R"...(### to-fen-position ###
 
     message_func_map_["@king-defense-table"] =
     INSERT_MESSAGE_FUNCTION(SetDefenseTable<KING>);
+
+    message_func_map_["@bishop-pin-table"] =
+    INSERT_MESSAGE_FUNCTION(SetPinTable<BISHOP>);
+
+    message_func_map_["@rook-pin-table"] =
+    INSERT_MESSAGE_FUNCTION(SetPinTable<ROOK>);
+
+    message_func_map_["@queen-pin-table"] =
+    INSERT_MESSAGE_FUNCTION(SetPinTable<QUEEN>);
   }
 
   // 関数オブジェクト。
@@ -6454,4 +6439,74 @@ R"...(### to-fen-position ###
   template DEF_MESSAGE_FUNCTION(EngineSuite::SetDefenseTable<ROOK>);
   template DEF_MESSAGE_FUNCTION(EngineSuite::SetDefenseTable<QUEEN>);
   template DEF_MESSAGE_FUNCTION(EngineSuite::SetDefenseTable<KING>);
+
+  // @bishop-pin-tab
+  // @rook-pin-table
+  // @queen-pin-table
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPinTable) {
+    // 古い設定を得る。
+    LPointerVec ret_vec(NUM_PIECE_TYPES);
+    const double (& table)
+    [NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES] =
+    eval_params_ptr_->pin_value_table();
+    FOR_PIECE_TYPES(piece_type_1) {
+      LPointerVec temp_vec(NUM_PIECE_TYPES);
+
+      FOR_PIECE_TYPES(piece_type_2) {
+        temp_vec[piece_type_2] =
+        Lisp::NewNumber(table[TYPE][piece_type_1][piece_type_2]);
+      }
+
+      ret_vec[piece_type_1] = Lisp::LPointerVecToList(temp_vec);
+    }
+
+    // 引数があれば設定する。
+    LObject* args_ptr = args.cdr()->cdr().get();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+
+      // マスの数がちゃんとあるかどうか。
+      if (Lisp::CountList(*result) < static_cast<int>(NUM_PIECE_TYPES)) {
+        throw Lisp::GenError("@engine-error",
+        "'" + symbol + "' requires List of "
+        + std::to_string(NUM_PIECE_TYPES) + " x "
+        + std::to_string(NUM_PIECE_TYPES) + " elements.");
+      }
+
+      // セットする。
+      LObject* ptr = result.get();
+      FOR_PIECE_TYPES(piece_type_1) {
+        const LPointer& car = ptr->car();
+
+        // チェックする。
+        Lisp::CheckList(*car);
+        if (Lisp::CountList(*car) < static_cast<int>(NUM_PIECE_TYPES)) {
+          throw Lisp::GenError("@engine-error",
+          "'" + symbol + "' requires List of "
+          + std::to_string(NUM_PIECE_TYPES) + "x"
+          + std::to_string(NUM_PIECE_TYPES) + " elements.");
+        }
+
+        // 内側のループ。
+        LObject* ptr_2 = car.get();
+        FOR_PIECE_TYPES(piece_type_2) {
+          Lisp::CheckType(*(ptr_2->car()), LType::NUMBER);
+
+          eval_params_ptr_->pin_value_table
+          (TYPE, piece_type_1, piece_type_2, ptr_2->car()->number());
+
+          Lisp::Next(&ptr_2);
+        }
+
+        Lisp::Next(&ptr);
+      }
+    }
+
+    return Lisp::LPointerVecToList(ret_vec);
+  }
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetPinTable<BISHOP>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetPinTable<ROOK>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetPinTable<QUEEN>);
 }  // namespace Sayuri
