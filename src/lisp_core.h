@@ -2401,8 +2401,8 @@ namespace Sayuri {
         return ret_ptr;
       }
 
-      /** ネイティブ関数 - for-range */
-      DEF_LC_FUNCTION(ForRange);
+      /** ネイティブ関数 - start-size-inc */
+      DEF_LC_FUNCTION(StartSizeInc);
 
       // %%% length
       /** ネイティブ関数 - length */

@@ -2183,14 +2183,14 @@ R"...(### range ###
     ;; > (0 1 2 3 4 5 6 7 8 9))...";
     help_dict_.emplace("range", help);
 
-    func = LC_FUNCTION_OBJ(ForRange);
-    INSERT_LC_FUNCTION(func, "for-range", "Lisp:for-range");
+    func = LC_FUNCTION_OBJ(StartSizeInc);
+    INSERT_LC_FUNCTION(func, "start-size-inc", "Lisp:start-size-inc");
     help =
-R"...(### for-range ###
+R"...(### start-size-inc ###
 
 <h6> Usage </h6>
 
-* `(for-range <Start : Number> <Size : Number> <Increment : Number>)`
+* `(start-size-inc <Start : Number> <Size : Number> <Increment : Number>)`
 
 <h6> Description </h6>
 
@@ -2200,11 +2200,11 @@ R"...(### for-range ###
 
 <h6> Example </h6>
 
-    (display (for-range 2 6 -0.5))
+    (display (start-size-inc 2 6 -0.5))
     
     ;; Output
     ;; > (2 1.5 1 0.5 0 -0.5))...";
-    help_dict_.emplace("for-range", help);
+    help_dict_.emplace("start-size-inc", help);
 
     func = LC_FUNCTION_OBJ(LengthFunc);
     INSERT_LC_FUNCTION(func, "length", "Lisp:length");
@@ -4609,8 +4609,8 @@ R"...(### regex-search ###
     return LPointerVecToList(ret_vec);
   }
 
-  // %%% for-range
-  DEF_LC_FUNCTION(Lisp::ForRange) {
+  // %%% start-size-inc
+  DEF_LC_FUNCTION(Lisp::StartSizeInc) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 3, &args_ptr);
@@ -4625,9 +4625,9 @@ R"...(### regex-search ###
     result = caller->Evaluate(*(args_ptr->car()));
     CheckType(*result, LType::NUMBER);
     int num = result->number();
-    if (num <= 0) {
+    if (num < 0) {
       throw GenError("@function-error",
-      "The 2nd argument must be 1 and more.");
+      "The 2nd argument must be 0 and more.");
     }
     Next(&args_ptr);
 
