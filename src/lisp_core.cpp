@@ -4547,14 +4547,13 @@ R"...(### regex-search ###
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 2, &args_ptr);
 
-
-    // 第1引数。 検索語。
-    LPointer elm_ptr = caller->Evaluate(*(args_ptr->car()));
-    Next(&args_ptr);
-
-    // 第2引数。 ターゲットのリスト。
+    // 第1引数。 ターゲットのリスト。
     LPointer target_ptr = caller->Evaluate(*(args_ptr->car()));
     CheckList(*target_ptr);
+    Next(&args_ptr);
+
+    // 第2引数。 検索語。
+    LPointer elm_ptr = caller->Evaluate(*(args_ptr->car()));
 
     // インデックスを得る。
     int index = 0;
@@ -4572,12 +4571,9 @@ R"...(### regex-search ###
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 2, &args_ptr);
 
-    // 第1引数は関数オブジェクト。
-    LPointer func_obj = caller->Evaluate(*(args_ptr->car()));
-    if (!(func_obj->IsFunction() || func_obj->IsN_Function())) {
-      throw GenTypeError(*func_obj, "Function or Native Function");
-    }
-    LPointer func_pair = NewPair(func_obj, NewNil());
+    // 第1引数は関数名。 carに入れておく。
+    LPointer func_pair =
+    NewPair(caller->Evaluate(*(args_ptr->car())), NewNil());
 
     // 第2引数以降のベクトル。
     Next(&args_ptr);
