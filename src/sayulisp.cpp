@@ -5589,6 +5589,42 @@ R"...(### to-fen-position ###
 
     message_func_map_["@king-square-table-ending"] =
     INSERT_MESSAGE_FUNCTION(SetPieceSquareTableEnding<KING>);
+
+    message_func_map_["@pawn-attack-table"] =
+    INSERT_MESSAGE_FUNCTION(SetAttackTable<PAWN>);
+
+    message_func_map_["@knight-attack-table"] =
+    INSERT_MESSAGE_FUNCTION(SetAttackTable<KNIGHT>);
+
+    message_func_map_["@bishop-attack-table"] =
+    INSERT_MESSAGE_FUNCTION(SetAttackTable<BISHOP>);
+
+    message_func_map_["@rook-attack-table"] =
+    INSERT_MESSAGE_FUNCTION(SetAttackTable<ROOK>);
+
+    message_func_map_["@queen-attack-table"] =
+    INSERT_MESSAGE_FUNCTION(SetAttackTable<QUEEN>);
+
+    message_func_map_["@king-attack-table"] =
+    INSERT_MESSAGE_FUNCTION(SetAttackTable<KING>);
+
+    message_func_map_["@pawn-defense-table"] =
+    INSERT_MESSAGE_FUNCTION(SetDefenseTable<PAWN>);
+
+    message_func_map_["@knight-defense-table"] =
+    INSERT_MESSAGE_FUNCTION(SetDefenseTable<KNIGHT>);
+
+    message_func_map_["@bishop-defense-table"] =
+    INSERT_MESSAGE_FUNCTION(SetDefenseTable<BISHOP>);
+
+    message_func_map_["@rook-defense-table"] =
+    INSERT_MESSAGE_FUNCTION(SetDefenseTable<ROOK>);
+
+    message_func_map_["@queen-defense-table"] =
+    INSERT_MESSAGE_FUNCTION(SetDefenseTable<QUEEN>);
+
+    message_func_map_["@king-defense-table"] =
+    INSERT_MESSAGE_FUNCTION(SetDefenseTable<KING>);
   }
 
   // 関数オブジェクト。
@@ -6308,7 +6344,8 @@ R"...(### to-fen-position ###
       // マスの数がちゃんとあるかどうか。
       if (Lisp::CountList(*result) < static_cast<int>(NUM_SQUARES)) {
         throw Lisp::GenError("@engine-error",
-        "'" + symbol + "' requires List of 64 elements.");
+        "'" + symbol + "' requires List of "
+        + std::to_string(NUM_SQUARES) + " elements.");
       }
 
       // セットする。
@@ -6326,18 +6363,18 @@ R"...(### to-fen-position ###
     return Lisp::LPointerVecToList(ret_vec);
   }
   // インスタンス化。
-  template LPointer EngineSuite::SetPieceSquareTableOpening<PAWN>
-  (const std::string& symbol, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::SetPieceSquareTableOpening<KNIGHT>
-  (const std::string& symbol, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::SetPieceSquareTableOpening<BISHOP>
-  (const std::string& symbol, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::SetPieceSquareTableOpening<ROOK>
-  (const std::string& symbol, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::SetPieceSquareTableOpening<QUEEN>
-  (const std::string& symbol, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::SetPieceSquareTableOpening<KING>
-  (const std::string& symbol, LPointer, LObject*, const LObject&);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableOpening<PAWN>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableOpening<KNIGHT>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableOpening<BISHOP>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableOpening<ROOK>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableOpening<QUEEN>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableOpening<KING>);
 
 // @pawn-square-table-ending
 // @knight-square-table-ending
@@ -6364,7 +6401,8 @@ R"...(### to-fen-position ###
       // マスの数がちゃんとあるかどうか。
       if (Lisp::CountList(*result) < static_cast<int>(NUM_SQUARES)) {
         throw Lisp::GenError("@engine-error",
-        "'" + symbol + "' requires List of 64 elements.");
+        "'" + symbol + "' requires List of "
+        + std::to_string(NUM_SQUARES) + " elements.");
       }
 
       // セットする。
@@ -6382,16 +6420,116 @@ R"...(### to-fen-position ###
     return Lisp::LPointerVecToList(ret_vec);
   }
   // インスタンス化。
-  template LPointer EngineSuite::SetPieceSquareTableEnding<PAWN>
-  (const std::string& symbol, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::SetPieceSquareTableEnding<KNIGHT>
-  (const std::string& symbol, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::SetPieceSquareTableEnding<BISHOP>
-  (const std::string& symbol, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::SetPieceSquareTableEnding<ROOK>
-  (const std::string& symbol, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::SetPieceSquareTableEnding<QUEEN>
-  (const std::string& symbol, LPointer, LObject*, const LObject&);
-  template LPointer EngineSuite::SetPieceSquareTableEnding<KING>
-  (const std::string& symbol, LPointer, LObject*, const LObject&);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableEnding<PAWN>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableEnding<KNIGHT>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableEnding<BISHOP>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableEnding<ROOK>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableEnding<QUEEN>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableEnding<KING>);
+
+  // %%% @pawn-attack-table
+  // %%% @knight-attack-table
+  // %%% @bishop-attack-table
+  // %%% @rook-attack-table
+  // %%% @queen-attack-table
+  // %%% @king-attack-table
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetAttackTable) {
+    // 古い設定を得る。
+    LPointerVec ret_vec(NUM_PIECE_TYPES);
+    const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES] =
+    eval_params_ptr_->attack_value_table();
+    FOR_PIECE_TYPES(piece_type) {
+      ret_vec[piece_type] = Lisp::NewNumber(table[TYPE][piece_type]);
+    }
+
+    // 引数があれば設定する。
+    LObject* args_ptr = args.cdr()->cdr().get();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+
+      // マスの数がちゃんとあるかどうか。
+      if (Lisp::CountList(*result) < static_cast<int>(NUM_PIECE_TYPES)) {
+        throw Lisp::GenError("@engine-error",
+        "'" + symbol + "' requires List of "
+        + std::to_string(NUM_PIECE_TYPES) + " elements.");
+      }
+
+      // セットする。
+      LObject* ptr = result.get();
+      FOR_PIECE_TYPES(piece_type) {
+        Lisp::CheckType(*(ptr->car()), LType::NUMBER);
+
+        eval_params_ptr_->attack_value_table
+        (TYPE, piece_type, ptr->car()->number());
+
+        Lisp::Next(&ptr);
+      }
+    }
+
+    return Lisp::LPointerVecToList(ret_vec);
+  }
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetAttackTable<PAWN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetAttackTable<KNIGHT>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetAttackTable<BISHOP>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetAttackTable<ROOK>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetAttackTable<QUEEN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetAttackTable<KING>);
+
+  // %%% @pawn-defense-table
+  // %%% @knight-defense-table
+  // %%% @bishop-defense-table
+  // %%% @rook-defense-table
+  // %%% @queen-defense-table
+  // %%% @king-defense-table
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetDefenseTable) {
+    // 古い設定を得る。
+    LPointerVec ret_vec(NUM_PIECE_TYPES);
+    const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES] =
+    eval_params_ptr_->defense_value_table();
+    FOR_PIECE_TYPES(piece_type) {
+      ret_vec[piece_type] = Lisp::NewNumber(table[TYPE][piece_type]);
+    }
+
+    // 引数があれば設定する。
+    LObject* args_ptr = args.cdr()->cdr().get();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+
+      // マスの数がちゃんとあるかどうか。
+      if (Lisp::CountList(*result) < static_cast<int>(NUM_PIECE_TYPES)) {
+        throw Lisp::GenError("@engine-error",
+        "'" + symbol + "' requires List of "
+        + std::to_string(NUM_PIECE_TYPES) + " elements.");
+      }
+
+      // セットする。
+      LObject* ptr = result.get();
+      FOR_PIECE_TYPES(piece_type) {
+        Lisp::CheckType(*(ptr->car()), LType::NUMBER);
+
+        eval_params_ptr_->defense_value_table
+        (TYPE, piece_type, ptr->car()->number());
+
+        Lisp::Next(&ptr);
+      }
+    }
+
+    return Lisp::LPointerVecToList(ret_vec);
+  }
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetDefenseTable<PAWN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetDefenseTable<KNIGHT>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetDefenseTable<BISHOP>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetDefenseTable<ROOK>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetDefenseTable<QUEEN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetDefenseTable<KING>);
 }  // namespace Sayuri

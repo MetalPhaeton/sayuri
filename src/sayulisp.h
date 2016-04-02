@@ -889,96 +889,14 @@ namespace Sayuri {
       /** 駒の配置の価値テーブル。 エンディング。 */
       template<PieceType TYPE>
       DEF_MESSAGE_FUNCTION(SetPieceSquareTableEnding);
-//      /**
-//       * EvalParams - ポジションの価値テーブル。
-//       * @param func_name 関数名。
-//       * @param symbol_name シンボル名。
-//       * @param square_list テーブル。
-//       * @return セットされていたテーブル。
-//       */
-//      template<PieceType TYPE>
-//      LispObjectPtr SetPieceSquareTableOpening(const std::string& func_name,
-//      const std::string& symbol_name, const LispObject& square_list) {
-//        // 先ず返すリストを作る。
-//        LispObjectPtr ret_ptr = Lisp::NewList(64);
-//        LispIterator<false> itr {ret_ptr.get()};
-//        FOR_SQUARES(square) {
-//          itr->type(LispObjectType::NUMBER);
-//          itr->number_value
-//          (eval_params_ptr_->opening_position_value_table()[TYPE][square]);
-//
-//          ++itr;
-//        }
-//
-//        // セットする。
-//        if (!(square_list.IsNil())) {
-//          if (square_list.Length() != 64) {
-//            throw Lisp::GenError("@engine-error",
-//            symbol_name + " needs List of 64 parameters. Given "
-//            + std::to_string(square_list.Length()) + ".");
-//          }
-//          LispIterator<false> list_itr {&square_list};
-//          FOR_SQUARES(square) {
-//            if (!(list_itr->IsNumber())) {
-//              throw Lisp::GenWrongTypeError(func_name, "Number",
-//              std::vector<int> {2, static_cast<int>(square + 1)}, false);
-//            }
-//            eval_params_ptr_->opening_position_value_table
-//            (TYPE, square, list_itr->number_value());
-//
-//            ++list_itr;
-//          }
-//        }
-//
-//        return ret_ptr;
-//      }
-//
-//      /**
-//       * EvalParams - エンディング時のポジションの価値テーブル。
-//       * @param func_name 関数名。
-//       * @param symbol_name シンボル名。
-//       * @param square_list テーブル。
-//       * @return セットされていたテーブル。
-//       */
-//      template<PieceType TYPE>
-//      LispObjectPtr SetPieceSquareTableEnding(const std::string& func_name,
-//      const std::string& symbol_name, const LispObject& square_list) {
-//        // 先ず返すリストを作る。
-//        LispObjectPtr ret_ptr = Lisp::NewList(64);
-//        LispIterator<false> itr {ret_ptr.get()};
-//        FOR_SQUARES(square) {
-//          itr->type(LispObjectType::NUMBER);
-//          itr->number_value
-//          (eval_params_ptr_->ending_position_value_table()[TYPE][square]);
-//
-//          ++itr;
-//        }
-//
-//        // セットする。
-//        if (!(square_list.IsNil())) {
-//          if (square_list.Length() != 64) {
-//            throw Lisp::GenError("@engine-error",
-//            symbol_name + " needs List of 64 parameters. Given "
-//            + std::to_string(square_list.Length()) + ".");
-//          }
-//
-//          // 値を変更。
-//          LispIterator<false> list_itr {&square_list};
-//          FOR_SQUARES(square) {
-//            if (!(list_itr->IsNumber())) {
-//              throw Lisp::GenWrongTypeError(func_name, "Number",
-//              std::vector<int> {2, static_cast<int>(square + 1)}, false);
-//            }
-//            eval_params_ptr_->ending_position_value_table
-//            (TYPE, square, list_itr->number_value());
-//
-//            ++list_itr;
-//          }
-//        }
-//
-//        return ret_ptr;
-//      }
-//
+
+      /** 攻撃の価値テーブル。 */
+      template<PieceType TYPE>
+      DEF_MESSAGE_FUNCTION(SetAttackTable);
+
+      /** 防御の価値テーブル。 */
+      template<PieceType TYPE>
+      DEF_MESSAGE_FUNCTION(SetDefenseTable);
 //      /**
 //       * EvalParams - 攻撃の価値テーブル。
 //       * @param func_name 関数名。
