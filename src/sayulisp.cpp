@@ -356,20 +356,6 @@ namespace Sayuri {
 //    }
 //    std::string message_symbol = message_ptr->symbol_value();
 //
-//    if (message_symbol == "@pawn-shield-table") {
-//      LispObjectPtr table_ptr = Lisp::NewNil();
-//      if (list_itr) {
-//        table_ptr = caller.Evaluate(*list_itr);
-//        if (!(table_ptr->IsList())) {
-//          throw Lisp::GenWrongTypeError
-//          (func_name, "List", std::vector<int> {2}, true);
-//        }
-//      }
-//
-//      return SetPawnShieldValueTable
-//      (func_name, message_symbol, *table_ptr);
-//
-//    }
 //    if ((message_symbol == "@weight-pawn-mobility")
 //    || (message_symbol == "@weight-knight-mobility")
 //    || (message_symbol == "@weight-bishop-mobility")
@@ -5532,6 +5518,9 @@ R"...(### to-fen-position ###
 
     message_func_map_["@queen-pin-table"] =
     INSERT_MESSAGE_FUNCTION(SetPinTable<QUEEN>);
+
+    message_func_map_["@pawn-shield-table"] =
+    INSERT_MESSAGE_FUNCTION(SetPawnShieldTable);
   }
 
   // 関数オブジェクト。
@@ -6509,4 +6498,41 @@ R"...(### to-fen-position ###
   template DEF_MESSAGE_FUNCTION(EngineSuite::SetPinTable<BISHOP>);
   template DEF_MESSAGE_FUNCTION(EngineSuite::SetPinTable<ROOK>);
   template DEF_MESSAGE_FUNCTION(EngineSuite::SetPinTable<QUEEN>);
+
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetPawnShieldTable) {
+    // 古い設定を得る。
+    LPointerVec ret_vec(NUM_SQUARES);
+    const double (& table)[NUM_SQUARES] =
+    eval_params_ptr_->pawn_shield_value_table();
+    FOR_SQUARES(square) {
+      ret_vec[square] = Lisp::NewNumber(table[square]);
+    }
+
+    // 引数があれば設定する。
+    LObject* args_ptr = args.cdr()->cdr().get();
+    if (args_ptr->IsPair()) {
+      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      Lisp::CheckList(*result);
+
+      // マスの数がちゃんとあるかどうか。
+      if (Lisp::CountList(*result) < static_cast<int>(NUM_SQUARES)) {
+        throw Lisp::GenError("@engine-error",
+        "'" + symbol + "' requires List of "
+        + std::to_string(NUM_SQUARES) + " elements.");
+      }
+
+      // セットする。
+      LObject* ptr = result.get();
+      FOR_SQUARES(square) {
+        Lisp::CheckType(*(ptr->car()), LType::NUMBER);
+
+        eval_params_ptr_->pawn_shield_value_table
+        (square, ptr->car()->number());
+
+        Lisp::Next(&ptr);
+      }
+    }
+
+    return Lisp::LPointerVecToList(ret_vec);
+  }
 }  // namespace Sayuri
