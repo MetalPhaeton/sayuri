@@ -904,6 +904,88 @@ namespace Sayuri {
 
       /** ポーンの盾の価値テーブル。 */
       DEF_MESSAGE_FUNCTION(SetPawnShieldTable);
+
+      /** オープニングの配置のウェイト。 */
+      template<PieceType TYPE>
+      DEF_MESSAGE_FUNCTION(SetWeightOpeningPosition);
+
+      /** エンディングの配置のウェイト。 */
+      template<PieceType TYPE>
+      DEF_MESSAGE_FUNCTION(SetWeightEndingPosition);
+
+      /** 機動力のウェイト。 */
+      template<PieceType TYPE>
+      DEF_MESSAGE_FUNCTION(SetWeightMobility);
+
+      /** センター支配のウェイト。 */
+      template<PieceType TYPE>
+      DEF_MESSAGE_FUNCTION(SetWeightCenterControll);
+
+      /** スウィートセンター支配のウェイト。 */
+      template<PieceType TYPE>
+      DEF_MESSAGE_FUNCTION(SetWeightSweetCenterControll);
+
+      /** 展開のウェイト。 */
+      template<PieceType TYPE>
+      DEF_MESSAGE_FUNCTION(SetWeightDevelopment);
+
+      /** 攻撃のウェイト。 */
+      template<PieceType TYPE>
+      DEF_MESSAGE_FUNCTION(SetWeightAttack);
+
+      /** 防御のウェイト。 */
+      template<PieceType TYPE>
+      DEF_MESSAGE_FUNCTION(SetWeightDefense);
+
+      /** ピンのウェイト。 */
+      template<PieceType TYPE>
+      DEF_MESSAGE_FUNCTION(SetWeightPin);
+
+      /** キング周辺への攻撃のウェイト。 */
+      template<PieceType TYPE>
+      DEF_MESSAGE_FUNCTION(SetWeightAttackAroundKing);
+
+      /** パスポーンのウェイト。 */
+      DEF_MESSAGE_FUNCTION(SetWeightPassPawn);
+
+      /** 守られたパスポーンのウェイト。 */
+      DEF_MESSAGE_FUNCTION(SetWeightProtectedPassPawn);
+
+      /** ダブルポーンのウェイト。 */
+      DEF_MESSAGE_FUNCTION(SetWeightDoublePawn);
+
+      /** 孤立ポーンのウェイト。 */
+      DEF_MESSAGE_FUNCTION(SetWeightIsoPawn);
+
+      /** ポーンの盾のウェイト。 */
+      DEF_MESSAGE_FUNCTION(SetWeightPawnShield);
+
+      /** ビショップペアのウェイト。 */
+      DEF_MESSAGE_FUNCTION(SetWeightBishopPair);
+
+      /** バッドビショップのウェイト。 */
+      DEF_MESSAGE_FUNCTION(SetWeightBadBishop);
+
+      /** ルークペアのウェイト。 */
+      DEF_MESSAGE_FUNCTION(SetWeightRookPair);
+
+      /** セミオープンファイルのルークのウェイト。 */
+      DEF_MESSAGE_FUNCTION(SetWeightRookSemiopenFyle);
+
+      /** オープンファイルのルークのウェイト。 */
+      DEF_MESSAGE_FUNCTION(SetWeightRookOpenFyle);
+
+      /** 早すぎるクイーンの始動のウェイト。 */
+      DEF_MESSAGE_FUNCTION(SetWeightEarlyQueenStarting);
+
+      /** キング周りの弱いマスのウェイト。 */
+      DEF_MESSAGE_FUNCTION(SetWeightWeakSquare);
+
+      /** キャスリングのウェイト。 */
+      DEF_MESSAGE_FUNCTION(SetWeightCastling);
+
+      /** キャスリングの放棄。 */
+      DEF_MESSAGE_FUNCTION(SetWeightAbandonedCastling);
 //      /**
 //       * EvalParams - タイプ1のウェイト。
 //       * @param func_name 関数名。

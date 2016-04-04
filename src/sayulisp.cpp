@@ -38,6 +38,7 @@
 #include <climits>
 #include <sstream>
 #include <map>
+#include <tuple>
 #include "common.h"
 #include "params.h"
 #include "chess_engine.h"
@@ -52,621 +53,6 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
-
-//
-//  // ウェイト関数オブジェクトをセット。
-//  void EngineSuite::SetWeightFunctions() {
-//    weight_1_accessor_[WEIGHT_OPENING_POSITION] =
-//    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
-//      return this->eval_params_ptr_->weight_opening_position();
-//    };
-//
-//    weight_1_accessor_[WEIGHT_ENDING_POSITION] =
-//    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
-//      return this->eval_params_ptr_->weight_ending_position();
-//    };
-//
-//    weight_1_accessor_[WEIGHT_MOBILITY] =
-//    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
-//      return this->eval_params_ptr_->weight_mobility();
-//    };
-//
-//    weight_1_accessor_[WEIGHT_CENTER_CONTROL] =
-//    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
-//      return this->eval_params_ptr_->weight_center_control();
-//    };
-//
-//    weight_1_accessor_[WEIGHT_SWEET_CENTER_CONTROL] =
-//    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
-//      return this->eval_params_ptr_->weight_sweet_center_control();
-//    };
-//
-//    weight_1_accessor_[WEIGHT_DEVELOPMENT] =
-//    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
-//      return this->eval_params_ptr_->weight_development();
-//    };
-//
-//    weight_1_accessor_[WEIGHT_ATTACK] =
-//    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
-//      return this->eval_params_ptr_->weight_attack();
-//    };
-//
-//    weight_1_accessor_[WEIGHT_DEFENSE] =
-//    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
-//      return this->eval_params_ptr_->weight_defense();
-//    };
-//
-//    weight_1_accessor_[WEIGHT_PIN] =
-//    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
-//      return this->eval_params_ptr_->weight_pin();
-//    };
-//
-//    weight_1_accessor_[WEIGHT_ATTACK_AROUND_KING] =
-//    [this]() -> const Weight (&)[NUM_PIECE_TYPES] {
-//      return this->eval_params_ptr_->weight_attack_around_king();
-//    };
-//
-//    weight_2_accessor_[WEIGHT_PASS_PAWN] =
-//    [this]() -> const Weight& {
-//      return this->eval_params_ptr_->weight_pass_pawn();
-//    };
-//
-//    weight_2_accessor_[WEIGHT_PROTECTED_PASS_PAWN] =
-//    [this]() -> const Weight& {
-//      return this->eval_params_ptr_->weight_protected_pass_pawn();
-//    };
-//
-//    weight_2_accessor_[WEIGHT_DOUBLE_PAWN] =
-//    [this]() -> const Weight& {
-//      return this->eval_params_ptr_->weight_double_pawn();
-//    };
-//
-//    weight_2_accessor_[WEIGHT_ISO_PAWN] =
-//    [this]() -> const Weight& {
-//      return this->eval_params_ptr_->weight_iso_pawn();
-//    };
-//
-//    weight_2_accessor_[WEIGHT_PAWN_SHIELD] =
-//    [this]() -> const Weight& {
-//      return this->eval_params_ptr_->weight_pawn_shield();
-//    };
-//
-//    weight_2_accessor_[WEIGHT_BISHOP_PAIR] =
-//    [this]() -> const Weight& {
-//      return this->eval_params_ptr_->weight_bishop_pair();
-//    };
-//
-//    weight_2_accessor_[WEIGHT_BAD_BISHOP] =
-//    [this]() -> const Weight& {
-//      return this->eval_params_ptr_->weight_bad_bishop();
-//    };
-//
-//    weight_2_accessor_[WEIGHT_ROOK_PAIR] =
-//    [this]() -> const Weight& {
-//      return this->eval_params_ptr_->weight_rook_pair();
-//    };
-//
-//    weight_2_accessor_[WEIGHT_ROOK_SEMIOPEN_FYLE] =
-//    [this]() -> const Weight& {
-//      return this->eval_params_ptr_->weight_rook_semiopen_fyle();
-//    };
-//
-//    weight_2_accessor_[WEIGHT_ROOK_OPEN_FYLE] =
-//    [this]() -> const Weight& {
-//      return this->eval_params_ptr_->weight_rook_open_fyle();
-//    };
-//
-//    weight_2_accessor_[WEIGHT_EARLY_QUEEN_STARTING] =
-//    [this]() -> const Weight& {
-//      return this->eval_params_ptr_->weight_early_queen_starting();
-//    };
-//
-//    weight_2_accessor_[WEIGHT_WEAK_SQUARE] =
-//    [this]() -> const Weight& {
-//      return this->eval_params_ptr_->weight_weak_square();
-//    };
-//
-//    weight_2_accessor_[WEIGHT_CASTLING] =
-//    [this]() -> const Weight& {
-//      return this->eval_params_ptr_->weight_castling();
-//    };
-//
-//    weight_2_accessor_[WEIGHT_ABANDONED_CASTLING] =
-//    [this]() -> const Weight& {
-//      return this->eval_params_ptr_->weight_abandoned_castling();
-//    };
-//
-//    weight_1_mutator_[WEIGHT_OPENING_POSITION] =
-//    [this](PieceType piece_type, double opening_weight,
-//    double ending_weight) {
-//      this->eval_params_ptr_->weight_opening_position
-//      (piece_type, opening_weight, ending_weight);
-//    };
-//
-//    weight_1_mutator_[WEIGHT_ENDING_POSITION] =
-//    [this](PieceType piece_type, double opening_weight,
-//    double ending_weight) {
-//      this->eval_params_ptr_->weight_ending_position
-//      (piece_type, opening_weight, ending_weight);
-//    };
-//
-//    weight_1_mutator_[WEIGHT_MOBILITY] =
-//    [this](PieceType piece_type, double opening_weight,
-//    double ending_weight) {
-//      this->eval_params_ptr_->weight_mobility
-//      (piece_type, opening_weight, ending_weight);
-//    };
-//
-//    weight_1_mutator_[WEIGHT_CENTER_CONTROL] =
-//    [this](PieceType piece_type, double opening_weight,
-//    double ending_weight) {
-//      this->eval_params_ptr_->weight_center_control
-//      (piece_type, opening_weight, ending_weight);
-//    };
-//
-//    weight_1_mutator_[WEIGHT_SWEET_CENTER_CONTROL] =
-//    [this](PieceType piece_type, double opening_weight,
-//    double ending_weight) {
-//      this->eval_params_ptr_->weight_sweet_center_control
-//      (piece_type, opening_weight, ending_weight);
-//    };
-//
-//    weight_1_mutator_[WEIGHT_DEVELOPMENT] =
-//    [this](PieceType piece_type, double opening_weight,
-//    double ending_weight) {
-//      this->eval_params_ptr_->weight_development
-//      (piece_type, opening_weight, ending_weight);
-//    };
-//
-//    weight_1_mutator_[WEIGHT_ATTACK] =
-//    [this](PieceType piece_type, double opening_weight,
-//    double ending_weight) {
-//      this->eval_params_ptr_->weight_attack
-//      (piece_type, opening_weight, ending_weight);
-//    };
-//
-//    weight_1_mutator_[WEIGHT_DEFENSE] =
-//    [this](PieceType piece_type, double opening_weight,
-//    double ending_weight) {
-//      this->eval_params_ptr_->weight_defense
-//      (piece_type, opening_weight, ending_weight);
-//    };
-//
-//    weight_1_mutator_[WEIGHT_PIN] =
-//    [this](PieceType piece_type, double opening_weight,
-//    double ending_weight) {
-//      this->eval_params_ptr_->weight_pin
-//      (piece_type, opening_weight, ending_weight);
-//    };
-//
-//    weight_1_mutator_[WEIGHT_ATTACK_AROUND_KING] =
-//    [this](PieceType piece_type, double opening_weight,
-//    double ending_weight) {
-//      this->eval_params_ptr_->weight_attack_around_king
-//      (piece_type, opening_weight, ending_weight);
-//    };
-//
-//    weight_2_mutator_[WEIGHT_PASS_PAWN] =
-//    [this](double opening_weight, double ending_weight) {
-//      this->eval_params_ptr_->weight_pass_pawn
-//      (opening_weight, ending_weight);
-//    };
-//
-//    weight_2_mutator_[WEIGHT_PROTECTED_PASS_PAWN] =
-//    [this](double opening_weight, double ending_weight) {
-//      this->eval_params_ptr_->weight_protected_pass_pawn
-//      (opening_weight, ending_weight);
-//    };
-//
-//    weight_2_mutator_[WEIGHT_DOUBLE_PAWN] =
-//    [this](double opening_weight, double ending_weight) {
-//      this->eval_params_ptr_->weight_double_pawn
-//      (opening_weight, ending_weight);
-//    };
-//
-//    weight_2_mutator_[WEIGHT_ISO_PAWN] =
-//    [this](double opening_weight, double ending_weight) {
-//      this->eval_params_ptr_->weight_iso_pawn
-//      (opening_weight, ending_weight);
-//    };
-//
-//    weight_2_mutator_[WEIGHT_PAWN_SHIELD] =
-//    [this](double opening_weight, double ending_weight) {
-//      this->eval_params_ptr_->weight_pawn_shield
-//      (opening_weight, ending_weight);
-//    };
-//
-//    weight_2_mutator_[WEIGHT_BISHOP_PAIR] =
-//    [this](double opening_weight, double ending_weight) {
-//      this->eval_params_ptr_->weight_bishop_pair
-//      (opening_weight, ending_weight);
-//    };
-//
-//    weight_2_mutator_[WEIGHT_BAD_BISHOP] =
-//    [this](double opening_weight, double ending_weight) {
-//      this->eval_params_ptr_->weight_bad_bishop
-//      (opening_weight, ending_weight);
-//    };
-//
-//    weight_2_mutator_[WEIGHT_ROOK_PAIR] =
-//    [this](double opening_weight, double ending_weight) {
-//      this->eval_params_ptr_->weight_rook_pair
-//      (opening_weight, ending_weight);
-//    };
-//
-//    weight_2_mutator_[WEIGHT_ROOK_SEMIOPEN_FYLE] =
-//    [this](double opening_weight, double ending_weight) {
-//      this->eval_params_ptr_->weight_rook_semiopen_fyle
-//      (opening_weight, ending_weight);
-//    };
-//
-//    weight_2_mutator_[WEIGHT_ROOK_OPEN_FYLE] =
-//    [this](double opening_weight, double ending_weight) {
-//      this->eval_params_ptr_->weight_rook_open_fyle
-//      (opening_weight, ending_weight);
-//    };
-//
-//    weight_2_mutator_[WEIGHT_EARLY_QUEEN_STARTING] =
-//    [this](double opening_weight, double ending_weight) {
-//      this->eval_params_ptr_->weight_early_queen_starting
-//      (opening_weight, ending_weight);
-//    };
-//
-//    weight_2_mutator_[WEIGHT_WEAK_SQUARE] =
-//    [this](double opening_weight, double ending_weight) {
-//      this->eval_params_ptr_->weight_weak_square
-//      (opening_weight, ending_weight);
-//    };
-//
-//    weight_2_mutator_[WEIGHT_CASTLING] =
-//    [this](double opening_weight, double ending_weight) {
-//      this->eval_params_ptr_->weight_castling
-//      (opening_weight, ending_weight);
-//    };
-//
-//    weight_2_mutator_[WEIGHT_ABANDONED_CASTLING] =
-//    [this](double opening_weight, double ending_weight) {
-//      this->eval_params_ptr_->weight_abandoned_castling
-//      (opening_weight, ending_weight);
-//    };
-//  }
-//
-//  // ========================== //
-//  // Lisp関数オブジェクト用関数 //
-//  // ========================== //
-//  // 関数オブジェクト。
-//  LispObjectPtr EngineSuite::operator()
-//  (LispObjectPtr self, const LispObject& caller, const LispObject& list) {
-//    // 準備。
-//    LispIterator<false> list_itr {&list};
-//    std::string func_name = (list_itr++)->ToString();
-//    int required_args = 1;
-//
-//    // 引数チェック。
-//    if (!list_itr) {
-//      throw Lisp::GenInsufficientArgumentsError
-//      (func_name, required_args, true, list.Length() - 1);
-//    }
-//
-//    // メッセージシンボルを得る。
-//    LispObjectPtr message_ptr = caller.Evaluate(*(list_itr++));
-//    if (!(message_ptr->IsSymbol())) {
-//      throw Lisp::GenWrongTypeError
-//      (func_name, "Symbol", std::vector<int> {1}, true);
-//    }
-//    std::string message_symbol = message_ptr->symbol_value();
-//
-//    if ((message_symbol == "@weight-pawn-mobility")
-//    || (message_symbol == "@weight-knight-mobility")
-//    || (message_symbol == "@weight-bishop-mobility")
-//    || (message_symbol == "@weight-rook-mobility")
-//    || (message_symbol == "@weight-queen-mobility")
-//    || (message_symbol == "@weight-king-mobility")
-//    || (message_symbol == "@weight-pawn-center-control")
-//    || (message_symbol == "@weight-knight-center-control")
-//    || (message_symbol == "@weight-bishop-center-control")
-//    || (message_symbol == "@weight-rook-center-control")
-//    || (message_symbol == "@weight-queen-center-control")
-//    || (message_symbol == "@weight-king-center-control")
-//    || (message_symbol == "@weight-pawn-sweet-center-control")
-//    || (message_symbol == "@weight-knight-sweet-center-control")
-//    || (message_symbol == "@weight-bishop-sweet-center-control")
-//    || (message_symbol == "@weight-rook-sweet-center-control")
-//    || (message_symbol == "@weight-queen-sweet-center-control")
-//    || (message_symbol == "@weight-king-sweet-center-control")
-//    || (message_symbol == "@weight-pawn-development")
-//    || (message_symbol == "@weight-knight-development")
-//    || (message_symbol == "@weight-bishop-development")
-//    || (message_symbol == "@weight-rook-development")
-//    || (message_symbol == "@weight-queen-development")
-//    || (message_symbol == "@weight-king-development")
-//    || (message_symbol == "@weight-pawn-attack")
-//    || (message_symbol == "@weight-knight-attack")
-//    || (message_symbol == "@weight-bishop-attack")
-//    || (message_symbol == "@weight-rook-attack")
-//    || (message_symbol == "@weight-queen-attack")
-//    || (message_symbol == "@weight-king-attack")
-//    || (message_symbol == "@weight-pawn-defense")
-//    || (message_symbol == "@weight-knight-defense")
-//    || (message_symbol == "@weight-bishop-defense")
-//    || (message_symbol == "@weight-rook-defense")
-//    || (message_symbol == "@weight-queen-defense")
-//    || (message_symbol == "@weight-king-defense")
-//    || (message_symbol == "@weight-bishop-pin")
-//    || (message_symbol == "@weight-rook-pin")
-//    || (message_symbol == "@weight-queen-pin")
-//    || (message_symbol == "@weight-pawn-attack-around-king")
-//    || (message_symbol == "@weight-knight-attack-around-king")
-//    || (message_symbol == "@weight-bishop-attack-around-king")
-//    || (message_symbol == "@weight-rook-attack-around-king")
-//    || (message_symbol == "@weight-queen-attack-around-king")
-//    || (message_symbol == "@weight-king-attack-around-king")
-//    || (message_symbol == "@weight-pass-pawn")
-//    || (message_symbol == "@weight-protected-pass-pawn")
-//    || (message_symbol == "@weight-double-pawn")
-//    || (message_symbol == "@weight-iso-pawn")
-//    || (message_symbol == "@weight-pawn-shield")
-//    || (message_symbol == "@weight-bishop-pair")
-//    || (message_symbol == "@weight-bad-bishop")
-//    || (message_symbol == "@weight-rook-pair")
-//    || (message_symbol == "@weight-rook-semiopen-fyle")
-//    || (message_symbol == "@weight-rook-open-fyle")
-//    || (message_symbol == "@weight-early-queen-starting")
-//    || (message_symbol == "@weight-weak-square")
-//    || (message_symbol == "@weight-castling")
-//    || (message_symbol == "@weight-abandoned-castling")
-//    ) {
-//      LispObjectPtr weight_params_ptr = Lisp::NewNil();
-//      if (list_itr) {
-//        weight_params_ptr = caller.Evaluate(*list_itr);
-//        if (!(weight_params_ptr->IsList())) {
-//          throw Lisp::GenWrongTypeError
-//          (func_name, "List", std::vector<int> {2}, true);
-//        }
-//      }
-//
-//      if (message_symbol == "@weight-pawn-mobility") {
-//        return SetWeight1<WEIGHT_MOBILITY, PAWN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-knight-mobility") {
-//        return SetWeight1<WEIGHT_MOBILITY, KNIGHT>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-bishop-mobility") {
-//        return SetWeight1<WEIGHT_MOBILITY, BISHOP>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-rook-mobility") {
-//        return SetWeight1<WEIGHT_MOBILITY, ROOK>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-queen-mobility") {
-//        return SetWeight1<WEIGHT_MOBILITY, QUEEN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-king-mobility") {
-//        return SetWeight1<WEIGHT_MOBILITY, KING>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-pawn-center-control") {
-//        return SetWeight1<WEIGHT_CENTER_CONTROL, PAWN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-knight-center-control") {
-//        return SetWeight1<WEIGHT_CENTER_CONTROL, KNIGHT>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-bishop-center-control") {
-//        return SetWeight1<WEIGHT_CENTER_CONTROL, BISHOP>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-rook-center-control") {
-//        return SetWeight1<WEIGHT_CENTER_CONTROL, ROOK>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-queen-center-control") {
-//        return SetWeight1<WEIGHT_CENTER_CONTROL, QUEEN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-king-center-control") {
-//        return SetWeight1<WEIGHT_CENTER_CONTROL, KING>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-pawn-sweet-center-control") {
-//        return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, PAWN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-knight-sweet-center-control") {
-//        return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, KNIGHT>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-bishop-sweet-center-control") {
-//        return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, BISHOP>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-rook-sweet-center-control") {
-//        return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, ROOK>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-queen-sweet-center-control") {
-//        return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, QUEEN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-king-sweet-center-control") {
-//        return SetWeight1<WEIGHT_SWEET_CENTER_CONTROL, KING>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-pawn-development") {
-//        return SetWeight1<WEIGHT_DEVELOPMENT, PAWN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-knight-development") {
-//        return SetWeight1<WEIGHT_DEVELOPMENT, KNIGHT>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-bishop-development") {
-//        return SetWeight1<WEIGHT_DEVELOPMENT, BISHOP>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-rook-development") {
-//        return SetWeight1<WEIGHT_DEVELOPMENT, ROOK>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-queen-development") {
-//        return SetWeight1<WEIGHT_DEVELOPMENT, QUEEN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-king-development") {
-//        return SetWeight1<WEIGHT_DEVELOPMENT, KING>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-pawn-attack") {
-//        return SetWeight1<WEIGHT_ATTACK, PAWN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-knight-attack") {
-//        return SetWeight1<WEIGHT_ATTACK, KNIGHT>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-bishop-attack") {
-//        return SetWeight1<WEIGHT_ATTACK, BISHOP>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-rook-attack") {
-//        return SetWeight1<WEIGHT_ATTACK, ROOK>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-queen-attack") {
-//        return SetWeight1<WEIGHT_ATTACK, QUEEN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-king-attack") {
-//        return SetWeight1<WEIGHT_ATTACK, KING>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-pawn-defense") {
-//        return SetWeight1<WEIGHT_DEFENSE, PAWN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-knight-defense") {
-//        return SetWeight1<WEIGHT_DEFENSE, KNIGHT>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-bishop-defense") {
-//        return SetWeight1<WEIGHT_DEFENSE, BISHOP>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-rook-defense") {
-//        return SetWeight1<WEIGHT_DEFENSE, ROOK>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-queen-defense") {
-//        return SetWeight1<WEIGHT_DEFENSE, QUEEN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-king-defense"){
-//        return SetWeight1<WEIGHT_DEFENSE, KING>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-bishop-pin") {
-//        return SetWeight1<WEIGHT_PIN, BISHOP>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-rook-pin") {
-//        return SetWeight1<WEIGHT_PIN, ROOK>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-queen-pin") {
-//        return SetWeight1<WEIGHT_PIN, QUEEN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-pawn-attack-around-king") {
-//        return SetWeight1<WEIGHT_ATTACK_AROUND_KING, PAWN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-knight-attack-around-king") {
-//        return SetWeight1<WEIGHT_ATTACK_AROUND_KING, KNIGHT>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-bishop-attack-around-king") {
-//        return SetWeight1<WEIGHT_ATTACK_AROUND_KING, BISHOP>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-rook-attack-around-king") {
-//        return SetWeight1<WEIGHT_ATTACK_AROUND_KING, ROOK>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-queen-attack-around-king") {
-//        return SetWeight1<WEIGHT_ATTACK_AROUND_KING, QUEEN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-king-attack-around-king"){
-//        return SetWeight1<WEIGHT_ATTACK_AROUND_KING, KING>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-pass-pawn"){
-//        return SetWeight2<WEIGHT_PASS_PAWN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-protected-pass-pawn"){
-//        return SetWeight2<WEIGHT_PROTECTED_PASS_PAWN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-double-pawn"){
-//        return SetWeight2<WEIGHT_DOUBLE_PAWN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-iso-pawn"){
-//        return SetWeight2<WEIGHT_ISO_PAWN>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-pawn-shield"){
-//        return SetWeight2<WEIGHT_PAWN_SHIELD>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-bishop-pair"){
-//        return SetWeight2<WEIGHT_BISHOP_PAIR>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-bad-bishop"){
-//        return SetWeight2<WEIGHT_BAD_BISHOP>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-rook-pair"){
-//        return SetWeight2<WEIGHT_ROOK_PAIR>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-rook-semiopen-fyle"){
-//        return SetWeight2<WEIGHT_ROOK_SEMIOPEN_FYLE>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-rook-open-fyle"){
-//        return SetWeight2<WEIGHT_ROOK_OPEN_FYLE>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-early-queen-starting"){
-//        return SetWeight2<WEIGHT_EARLY_QUEEN_STARTING>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-weak-square"){
-//        return SetWeight2<WEIGHT_WEAK_SQUARE>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-castling"){
-//        return SetWeight2<WEIGHT_CASTLING>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//      if (message_symbol == "@weight-abandoned-castling"){
-//        return SetWeight2<WEIGHT_ABANDONED_CASTLING>
-//        (func_name, message_symbol, *weight_params_ptr);
-//      }
-//    }
-//
-//    throw Lisp::GenError("@engine-error", "(" + func_name
-//    + ") couldn't understand '" + message_symbol + "'.");
-//  }
-//
   // ======== //
   // Sayulisp //
   // ======== //
@@ -745,131 +131,6 @@ namespace Sayuri {
     "BLACK_SHORT_CASTLING", "BLACK_LONG_CASTLING"
   };
 
-//  // ==================== //
-//  // コンストラクタと代入 //
-//  // ==================== //
-//  // コンストラクタ。
-//  Sayulisp::Sayulisp() : Lisp() {
-//    // EngineSuiteを作成する関数を作成。
-//    {
-//      auto func = [this]
-//      (LispObjectPtr self, const LispObject& caller, const LispObject& list)
-//      -> LispObjectPtr {
-//        return this->GenEngine();
-//      };
-//      AddNativeFunction(func, "gen-engine");
-//    }
-//
-//
-//    // 定数をバインドしていく。
-//    // マスの定数をバインド。
-//    FOR_SQUARES(square) {
-//      BindSymbol(EngineSuite::SQUARE_SYMBOL[square],
-//      Lisp::NewNumber(square));
-//    }
-//
-//    // ファイルの定数をバインド。
-//    FOR_FYLES(fyle) {
-//      BindSymbol(EngineSuite::FYLE_SYMBOL[fyle],
-//      Lisp::NewNumber(fyle));
-//    }
-//
-//    // ランクの定数をバインド。
-//    FOR_RANKS(rank) {
-//      BindSymbol(EngineSuite::RANK_SYMBOL[rank],
-//      Lisp::NewNumber(rank));
-//    }
-//
-//    // サイドの定数をバインド。
-//    FOR_SIDES(side) {
-//      BindSymbol(EngineSuite::SIDE_SYMBOL[side],
-//      Lisp::NewNumber(side));
-//    }
-//
-//    // 駒の定数をバインド。
-//    FOR_PIECE_TYPES(piece_type) {
-//      BindSymbol(EngineSuite::PIECE_TYPE_SYMBOL[piece_type],
-//      Lisp::NewNumber(piece_type));
-//    }
-//
-//    // キャスリングの権利の定数をバインド。
-//    for (int i = 0; i < 5; ++i) {
-//      BindSymbol(EngineSuite::CASTLING_SYMBOL[i],
-//      Lisp::NewNumber(i));
-//    }
-//
-//    // ヘルプ辞書を作成。
-//    SetHelp();
-//
-//    // --- 便利関数 --- //
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//        LispObjectPtr result = caller.Evaluate(*list_itr);
-//        if (!(result->IsString())) {
-//          throw GenWrongTypeError
-//          (func_name, "String", std::vector<int> {1}, true);
-//        }
-//
-//        return this->GenPGN(result->string_value(), caller.scope_chain());
-//      };
-//      AddNativeFunction(func, "gen-pgn");
-//    }
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//        LispObjectPtr fen_ptr = caller.Evaluate(*list_itr);
-//        if (!(fen_ptr->IsString())) {
-//          throw GenWrongTypeError
-//          (func_name, "String", std::vector<int> {1}, true);
-//        }
-//
-//        return this->ParseFENEPD(fen_ptr->string_value());
-//      };
-//      AddNativeFunction(func, "parse-fen/epd");
-//    }
-//    {
-//      auto func = [this](LispObjectPtr self, const LispObject& caller,
-//      const LispObject& list) -> LispObjectPtr {
-//        // 引数チェック。
-//        LispIterator<false> list_itr {&list};
-//        std::string func_name = (list_itr++)->ToString();
-//        int required_args = 1;
-//
-//        if (!list_itr) {
-//          throw Lisp::GenInsufficientArgumentsError
-//          (func_name, required_args, false, list.Length() - 1);
-//        }
-//        LispObjectPtr position_ptr = caller.Evaluate(*list_itr);
-//        if (!(position_ptr->IsList())) {
-//          throw GenWrongTypeError
-//          (func_name, "List", std::vector<int> {1}, true);
-//        }
-//
-//        return this->ToFENPosition(func_name, *position_ptr);
-//      };
-//      AddNativeFunction(func, "to-fen-position");
-//    }
-//  }
-//
   // Sayulispの関数を設定する。
   void Sayulisp::SetSayulispFunction() {
     // 定数を登録。
@@ -5521,6 +4782,172 @@ R"...(### to-fen-position ###
 
     message_func_map_["@pawn-shield-table"] =
     INSERT_MESSAGE_FUNCTION(SetPawnShieldTable);
+
+    message_func_map_["@weight-pawn-opening-position"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightOpeningPosition<PAWN>);
+    message_func_map_["@weight-knight-opening-position"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightOpeningPosition<KNIGHT>);
+    message_func_map_["@weight-bishop-opening-position"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightOpeningPosition<BISHOP>);
+    message_func_map_["@weight-rook-opening-position"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightOpeningPosition<ROOK>);
+    message_func_map_["@weight-queen-opening-position"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightOpeningPosition<QUEEN>);
+    message_func_map_["@weight-king-opening-position"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightOpeningPosition<KING>);
+
+    message_func_map_["@weight-pawn-ending-position"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightEndingPosition<PAWN>);
+    message_func_map_["@weight-knight-ending-position"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightEndingPosition<KNIGHT>);
+    message_func_map_["@weight-bishop-ending-position"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightEndingPosition<BISHOP>);
+    message_func_map_["@weight-rook-ending-position"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightEndingPosition<ROOK>);
+    message_func_map_["@weight-queen-ending-position"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightEndingPosition<QUEEN>);
+    message_func_map_["@weight-king-ending-position"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightEndingPosition<KING>);
+
+    message_func_map_["@weight-pawn-mobility"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightMobility<PAWN>);
+    message_func_map_["@weight-knight-mobility"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightMobility<KNIGHT>);
+    message_func_map_["@weight-bishop-mobility"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightMobility<BISHOP>);
+    message_func_map_["@weight-rook-mobility"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightMobility<ROOK>);
+    message_func_map_["@weight-queen-mobility"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightMobility<QUEEN>);
+    message_func_map_["@weight-king-mobility"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightMobility<KING>);
+
+    message_func_map_["@weight-pawn-center-control"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightCenterControll<PAWN>);
+    message_func_map_["@weight-knight-center-control"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightCenterControll<KNIGHT>);
+    message_func_map_["@weight-bishop-center-control"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightCenterControll<BISHOP>);
+    message_func_map_["@weight-rook-center-control"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightCenterControll<ROOK>);
+    message_func_map_["@weight-queen-center-control"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightCenterControll<QUEEN>);
+    message_func_map_["@weight-king-center-control"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightCenterControll<KING>);
+
+    message_func_map_["@weight-pawn-sweet-center-control"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightSweetCenterControll<PAWN>);
+    message_func_map_["@weight-knight-sweet-center-control"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightSweetCenterControll<KNIGHT>);
+    message_func_map_["@weight-bishop-sweet-center-control"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightSweetCenterControll<BISHOP>);
+    message_func_map_["@weight-rook-sweet-center-control"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightSweetCenterControll<ROOK>);
+    message_func_map_["@weight-queen-sweet-center-control"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightSweetCenterControll<QUEEN>);
+    message_func_map_["@weight-king-sweet-center-control"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightSweetCenterControll<KING>);
+
+    message_func_map_["@weight-pawn-development"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightDevelopment<PAWN>);
+    message_func_map_["@weight-knight-development"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightDevelopment<KNIGHT>);
+    message_func_map_["@weight-bishop-development"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightDevelopment<BISHOP>);
+    message_func_map_["@weight-rook-development"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightDevelopment<ROOK>);
+    message_func_map_["@weight-queen-development"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightDevelopment<QUEEN>);
+    message_func_map_["@weight-king-development"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightDevelopment<KING>);
+
+    message_func_map_["@weight-pawn-attack"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightAttack<PAWN>);
+    message_func_map_["@weight-knight-attack"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightAttack<KNIGHT>);
+    message_func_map_["@weight-bishop-attack"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightAttack<BISHOP>);
+    message_func_map_["@weight-rook-attack"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightAttack<ROOK>);
+    message_func_map_["@weight-queen-attack"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightAttack<QUEEN>);
+    message_func_map_["@weight-king-attack"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightAttack<KING>);
+
+    message_func_map_["@weight-pawn-defense"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightDefense<PAWN>);
+    message_func_map_["@weight-knight-defense"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightDefense<KNIGHT>);
+    message_func_map_["@weight-bishop-defense"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightDefense<BISHOP>);
+    message_func_map_["@weight-rook-defense"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightDefense<ROOK>);
+    message_func_map_["@weight-queen-defense"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightDefense<QUEEN>);
+    message_func_map_["@weight-king-defense"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightDefense<KING>);
+
+    message_func_map_["@weight-bishop-pin"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightPin<BISHOP>);
+    message_func_map_["@weight-rook-pin"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightPin<ROOK>);
+    message_func_map_["@weight-queen-pin"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightPin<QUEEN>);
+
+    message_func_map_["@weight-pawn-attack-around-king"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightAttackAroundKing<PAWN>);
+    message_func_map_["@weight-knight-attack-around-king"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightAttackAroundKing<KNIGHT>);
+    message_func_map_["@weight-bishop-attack-around-king"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightAttackAroundKing<BISHOP>);
+    message_func_map_["@weight-rook-attack-around-king"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightAttackAroundKing<ROOK>);
+    message_func_map_["@weight-queen-attack-around-king"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightAttackAroundKing<QUEEN>);
+    message_func_map_["@weight-king-attack-around-king"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightAttackAroundKing<KING>);
+
+    message_func_map_["@weight-pass-pawn"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightPassPawn);
+
+    message_func_map_["@weight-protected-pass-pawn"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightProtectedPassPawn);
+
+    message_func_map_["@weight-double-pawn"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightDoublePawn);
+
+    message_func_map_["@weight-iso-pawn"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightIsoPawn);
+
+    message_func_map_["@weight-pawn-shield"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightPawnShield);
+
+    message_func_map_["@weight-bishop-pair"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightBishopPair);
+
+    message_func_map_["@weight-bad-bishop"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightBadBishop);
+
+    message_func_map_["@weight-rook-pair"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightRookPair);
+
+    message_func_map_["@weight-rook-semiopen-fyle"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightRookSemiopenFyle);
+
+    message_func_map_["@weight-rook-open-fyle"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightRookOpenFyle);
+
+    message_func_map_["@weight-early-queen-starting"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightEarlyQueenStarting);
+
+    message_func_map_["@weight-weak-square"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightWeakSquare);
+
+    message_func_map_["@weight-castling"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightCastling);
+
+    message_func_map_["@weight-abandoned-castling"] =
+    INSERT_MESSAGE_FUNCTION(SetWeightAbandonedCastling);
   }
 
   // 関数オブジェクト。
@@ -6534,5 +5961,362 @@ R"...(### to-fen-position ###
     }
 
     return Lisp::LPointerVecToList(ret_vec);
+  }
+
+#define SET_PIECE_WEIGHT(accessor) \
+    const Weight& old = eval_params_ptr_->accessor()[TYPE];\
+    std::size_t len = old.Size();\
+    LPointerVec ret_vec(len);\
+    for (std::size_t i = 0; i < len; ++i) {\
+      ret_vec[i] = Lisp::NewPair(Lisp::NewNumber(std::get<0>(old.At(i))),\
+      Lisp::NewPair(Lisp::NewNumber(std::get<1>(old.At(i))), Lisp::NewNil()));\
+    }\
+    \
+    LObject* args_ptr = args.cdr()->cdr().get();\
+    if (args_ptr->IsPair()) {\
+      LPointer car = caller->Evaluate(*(args_ptr->car()));\
+      \
+      if (car->IsNumber()) {\
+        const LPointer& cdr = args_ptr->cdr();\
+        if (cdr->IsPair()) {\
+          LPointer cdar = caller->Evaluate(*(cdr->car()));\
+          Lisp::CheckType(*cdar, LType::NUMBER);\
+          \
+          eval_params_ptr_->accessor\
+          (TYPE, Weight::CreateWeight(car->number(), cdar->number()));\
+          \
+          return Lisp::LPointerVecToList(ret_vec);\
+        }\
+      } else if (car->IsList()) {\
+        Weight weight;\
+        for (LObject* ptr = car.get(); ptr->IsPair(); Lisp::Next(&ptr)) {\
+          const LPointer& temp = ptr->car();\
+          \
+          Lisp::CheckList(*temp);\
+          if (Lisp::CountList(*temp) < 2) {\
+            throw Lisp::GenError("@engine-error", "If you want to set weight, "\
+            "the arguments are 2 numbers or List of Lists composed with 2 "\
+            "numbers.");\
+          }\
+          \
+          const LPointer& temp_car = temp->car();\
+          Lisp::CheckType(*temp_car, LType::NUMBER);\
+          const LPointer& temp_cdar = temp->cdr()->car();\
+          Lisp::CheckType(*temp_cdar, LType::NUMBER);\
+          \
+          weight.Add(temp_car->number(), temp_cdar->number());\
+        }\
+        \
+        eval_params_ptr_->accessor(TYPE, weight);\
+        \
+        return Lisp::LPointerVecToList(ret_vec);\
+      }\
+      \
+      throw Lisp::GenError("@engine-error", "If you want to set weight, "\
+      "the arguments are 2 numbers or List of Lists composed with 2 numbers.");\
+    }\
+    \
+    return Lisp::LPointerVecToList(ret_vec)
+
+  // %%% @weight-pawn-opening-position
+  // %%% @weight-knight-opening-position
+  // %%% @weight-bishop-opening-position
+  // %%% @weight-rook-opening-position
+  // %%% @weight-queen-opening-position
+  // %%% @weight-king-opening-position
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightOpeningPosition) {
+    SET_PIECE_WEIGHT(weight_opening_position);
+  }
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightOpeningPosition<PAWN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightOpeningPosition<KNIGHT>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightOpeningPosition<BISHOP>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightOpeningPosition<ROOK>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightOpeningPosition<QUEEN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightOpeningPosition<KING>);
+
+  // %%% @weight-pawn-ending-position
+  // %%% @weight-knight-ending-position
+  // %%% @weight-bishop-ending-position
+  // %%% @weight-rook-ending-position
+  // %%% @weight-queen-ending-position
+  // %%% @weight-king-ending-position
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightEndingPosition) {
+    SET_PIECE_WEIGHT(weight_ending_position);
+  }
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightEndingPosition<PAWN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightEndingPosition<KNIGHT>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightEndingPosition<BISHOP>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightEndingPosition<ROOK>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightEndingPosition<QUEEN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightEndingPosition<KING>);
+
+  // %%% @weight-pawn-mobility
+  // %%% @weight-knight-mobility
+  // %%% @weight-bishop-mobility
+  // %%% @weight-rook-mobility
+  // %%% @weight-queen-mobility
+  // %%% @weight-king-mobility
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightMobility) {
+    SET_PIECE_WEIGHT(weight_mobility);
+  }
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightMobility<PAWN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightMobility<KNIGHT>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightMobility<BISHOP>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightMobility<ROOK>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightMobility<QUEEN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightMobility<KING>);
+
+
+  // %%% @weight-pawn-center-control
+  // %%% @weight-knight-center-control
+  // %%% @weight-bishop-center-control
+  // %%% @weight-rook-center-control
+  // %%% @weight-queen-center-control
+  // %%% @weight-king-center-control
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightCenterControll) {
+    SET_PIECE_WEIGHT(weight_center_control);
+  }
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightCenterControll<PAWN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightCenterControll<KNIGHT>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightCenterControll<BISHOP>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightCenterControll<ROOK>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightCenterControll<QUEEN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightCenterControll<KING>);
+
+  // %%% @weight-pawn-sweet-center-control
+  // %%% @weight-knight-sweet-center-control
+  // %%% @weight-bishop-sweet-center-control
+  // %%% @weight-rook-sweet-center-control
+  // %%% @weight-queen-sweet-center-control
+  // %%% @weight-king-sweet-center-control
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightSweetCenterControll) {
+    SET_PIECE_WEIGHT(weight_sweet_center_control);
+  }
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightSweetCenterControll<PAWN>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightSweetCenterControll<KNIGHT>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightSweetCenterControll<BISHOP>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightSweetCenterControll<ROOK>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightSweetCenterControll<QUEEN>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightSweetCenterControll<KING>);
+
+  // %%% @weight-pawn-development
+  // %%% @weight-knight-development
+  // %%% @weight-bishop-development
+  // %%% @weight-rook-development
+  // %%% @weight-queen-development
+  // %%% @weight-king-development
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDevelopment) {
+    SET_PIECE_WEIGHT(weight_development);
+  }
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDevelopment<PAWN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDevelopment<KNIGHT>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDevelopment<BISHOP>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDevelopment<ROOK>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDevelopment<QUEEN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDevelopment<KING>);
+
+  // %%% @weight-pawn-attack
+  // %%% @weight-knight-attack
+  // %%% @weight-bishop-attack
+  // %%% @weight-rook-attack
+  // %%% @weight-queen-attack
+  // %%% @weight-king-attack
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAttack) {
+    SET_PIECE_WEIGHT(weight_attack);
+  }
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAttack<PAWN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAttack<KNIGHT>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAttack<BISHOP>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAttack<ROOK>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAttack<QUEEN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAttack<KING>);
+
+  // %%% @weight-pawn-defense
+  // %%% @weight-knight-defense
+  // %%% @weight-bishop-defense
+  // %%% @weight-rook-defense
+  // %%% @weight-queen-defense
+  // %%% @weight-king-defense
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDefense) {
+    SET_PIECE_WEIGHT(weight_defense);
+  }
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDefense<PAWN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDefense<KNIGHT>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDefense<BISHOP>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDefense<ROOK>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDefense<QUEEN>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDefense<KING>);
+
+  // %%% @weight-bishop-pin
+  // %%% @weight-rook-pin
+  // %%% @weight-queen-pin
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightPin) {
+    SET_PIECE_WEIGHT(weight_pin);
+  }
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightPin<BISHOP>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightPin<ROOK>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightPin<QUEEN>);
+
+  // %%% @weight-pawn-attack-around-king
+  // %%% @weight-knight-attack-around-king
+  // %%% @weight-bishop-attack-around-king
+  // %%% @weight-rook-attack-around-king
+  // %%% @weight-queen-attack-around-king
+  // %%% @weight-king-attack-around-king
+  template<PieceType TYPE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAttackAroundKing) {
+    SET_PIECE_WEIGHT(weight_attack_around_king);
+  }
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAttackAroundKing<PAWN>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAttackAroundKing<KNIGHT>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAttackAroundKing<BISHOP>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAttackAroundKing<ROOK>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAttackAroundKing<QUEEN>);
+  template
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAttackAroundKing<KING>);
+
+#define SET_WEIGHT(accessor) \
+    const Weight& old = eval_params_ptr_->accessor();\
+    std::size_t len = old.Size();\
+    LPointerVec ret_vec(len);\
+    for (std::size_t i = 0; i < len; ++i) {\
+      ret_vec[i] = Lisp::NewPair(Lisp::NewNumber(std::get<0>(old.At(i))),\
+      Lisp::NewPair(Lisp::NewNumber(std::get<1>(old.At(i))), Lisp::NewNil()));\
+    }\
+    \
+    LObject* args_ptr = args.cdr()->cdr().get();\
+    if (args_ptr->IsPair()) {\
+      LPointer car = caller->Evaluate(*(args_ptr->car()));\
+      \
+      if (car->IsNumber()) {\
+        const LPointer& cdr = args_ptr->cdr();\
+        if (cdr->IsPair()) {\
+          LPointer cdar = caller->Evaluate(*(cdr->car()));\
+          Lisp::CheckType(*cdar, LType::NUMBER);\
+          \
+          eval_params_ptr_->accessor\
+          (Weight::CreateWeight(car->number(), cdar->number()));\
+          \
+          return Lisp::LPointerVecToList(ret_vec);\
+        }\
+      } else if (car->IsList()) {\
+        Weight weight;\
+        for (LObject* ptr = car.get(); ptr->IsPair(); Lisp::Next(&ptr)) {\
+          const LPointer& temp = ptr->car();\
+          \
+          Lisp::CheckList(*temp);\
+          if (Lisp::CountList(*temp) < 2) {\
+            throw Lisp::GenError("@engine-error", "If you want to set weight, "\
+            "the arguments are 2 numbers or List of Lists composed with 2 "\
+            "numbers.");\
+          }\
+          \
+          const LPointer& temp_car = temp->car();\
+          Lisp::CheckType(*temp_car, LType::NUMBER);\
+          const LPointer& temp_cdar = temp->cdr()->car();\
+          Lisp::CheckType(*temp_cdar, LType::NUMBER);\
+          \
+          weight.Add(temp_car->number(), temp_cdar->number());\
+        }\
+        \
+        eval_params_ptr_->accessor(weight);\
+        \
+        return Lisp::LPointerVecToList(ret_vec);\
+      }\
+      \
+      throw Lisp::GenError("@engine-error", "If you want to set weight, "\
+      "the arguments are 2 numbers or List of Lists composed with 2 numbers.");\
+    }\
+    \
+    return Lisp::LPointerVecToList(ret_vec)
+
+  // %%% @weight-pass-pawn
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightPassPawn) {
+    SET_WEIGHT(weight_pass_pawn);
+  }
+
+  // %%% @weight-protected-pass-pawn
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightProtectedPassPawn) {
+    SET_WEIGHT(weight_protected_pass_pawn);
+  }
+
+  // %%% @weight-double-pawn
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDoublePawn) {
+    SET_WEIGHT(weight_double_pawn);
+  }
+
+  // %%% @weight-iso-pawn
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightIsoPawn) {
+    SET_WEIGHT(weight_iso_pawn);
+  }
+
+  // %%% @weight-pawn-shield
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightPawnShield) {
+    SET_WEIGHT(weight_pawn_shield);
+  }
+
+  // %%% @weight-bishop-pair
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightBishopPair) {
+    SET_WEIGHT(weight_bishop_pair);
+  }
+
+  // %%% @weight-bad-bishop
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightBadBishop) {
+    SET_WEIGHT(weight_bad_bishop);
+  }
+
+  // %%% @weight-rook-pair
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightRookPair) {
+    SET_WEIGHT(weight_rook_pair);
+  }
+
+  // %%% @weight-rook-semiopen-fyle
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightRookSemiopenFyle) {
+    SET_WEIGHT(weight_rook_semiopen_fyle);
+  }
+
+  // %%% @weight-rook-open-fyle
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightRookOpenFyle) {
+    SET_WEIGHT(weight_rook_open_fyle);
+  }
+
+  // %%% @weight-early-queen-starting
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightEarlyQueenStarting) {
+    SET_WEIGHT(weight_early_queen_starting);
+  }
+
+  // %%% @weight-weak-square
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightWeakSquare) {
+    SET_WEIGHT(weight_weak_square);
+  }
+
+  // %%% @weight-castling
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightCastling) {
+    SET_WEIGHT(weight_castling);
+  }
+
+  // %%% @weight-abandoned-castling
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAbandonedCastling) {
+    SET_WEIGHT(weight_abandoned_castling);
   }
 }  // namespace Sayuri
