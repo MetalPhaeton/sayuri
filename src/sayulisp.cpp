@@ -5013,12 +5013,12 @@ R"...(### to-fen-position ###
     return Lisp::LPointerVecToList(ret_vec);
   }
 
-// @pawn-square-table-opening
-// @knight-square-table-opening
-// @bishop-square-table-opening
-// @rook-square-table-opening
-// @queen-square-table-opening
-// @king-square-table-opening
+  // @pawn-square-table-opening
+  // @knight-square-table-opening
+  // @bishop-square-table-opening
+  // @rook-square-table-opening
+  // @queen-square-table-opening
+  // @king-square-table-opening
   template<PieceType TYPE>
   DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableOpening) {
     // 古い設定を得る。
@@ -5070,12 +5070,12 @@ R"...(### to-fen-position ###
   template
   DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableOpening<KING>);
 
-// @pawn-square-table-ending
-// @knight-square-table-ending
-// @bishop-square-table-ending
-// @rook-square-table-ending
-// @queen-square-table-ending
-// @king-square-table-ending
+  // @pawn-square-table-ending
+  // @knight-square-table-ending
+  // @bishop-square-table-ending
+  // @rook-square-table-ending
+  // @queen-square-table-ending
+  // @king-square-table-ending
   template<PieceType TYPE>
   DEF_MESSAGE_FUNCTION(EngineSuite::SetPieceSquareTableEnding) {
     // 古い設定を得る。
