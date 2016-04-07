@@ -1520,2802 +1520,2173 @@ R"...(### to-fen-position ###
 
     return NewString(Util::ToFENPosition(position));
   }
-//  // ヘルプを作成する。
-//  void Sayulisp::SetHelp() {
-//    std::string temp = "";
-//
-//    // --- 定数 --- //
-//    temp =
-//R"...(### A1 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates A1 square.
-//* Value is '0'.)...";
-//    AddHelpDict("A1", temp);
-//
-//    temp =
-//R"...(### B1 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates B1 square.
-//* Value is '1'.)...";
-//    AddHelpDict("B1", temp);
-//
-//    temp =
-//R"...(### C1 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates C1 square.
-//* Value is '2'.)...";
-//    AddHelpDict("C1", temp);
-//
-//    temp =
-//R"...(### D1 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates D1 square.
-//* Value is '3'.)...";
-//    AddHelpDict("D1", temp);
-//
-//    temp =
-//R"...(### E1 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates E1 square.
-//* Value is '4'.)...";
-//    AddHelpDict("E1", temp);
-//
-//    temp =
-//R"...(### F1 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates F1 square.
-//* Value is '5'.)...";
-//    AddHelpDict("F1", temp);
-//
-//    temp =
-//R"...(### G1 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates G1 square.
-//* Value is '6'.)...";
-//    AddHelpDict("G1", temp);
-//
-//    temp =
-//R"...(### H1 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates H1 square.
-//* Value is '7'.)...";
-//    AddHelpDict("H1", temp);
-//
-//temp =
-//R"...(### A2 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates A2 square.
-//* Value is '8'.)...";
-//    AddHelpDict("A2", temp);
-//
-//    temp =
-//R"...(### B2 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates B2 square.
-//* Value is '9'.)...";
-//    AddHelpDict("B2", temp);
-//
-//    temp =
-//R"...(### C2 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates C2 square.
-//* Value is '10'.)...";
-//    AddHelpDict("C2", temp);
-//
-//    temp =
-//R"...(### D2 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates D2 square.
-//* Value is '11'.)...";
-//    AddHelpDict("D2", temp);
-//
-//    temp =
-//R"...(### E2 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates E2 square.
-//* Value is '12'.)...";
-//    AddHelpDict("E2", temp);
-//
-//    temp =
-//R"...(### F2 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates F2 square.
-//* Value is '13'.)...";
-//    AddHelpDict("F2", temp);
-//
-//    temp =
-//R"...(### G2 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates G2 square.
-//* Value is '14'.)...";
-//    AddHelpDict("G2", temp);
-//
-//    temp =
-//R"...(### H2 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates H2 square.
-//* Value is '15'.)...";
-//    AddHelpDict("H2", temp);
-//
-//    temp =
-//R"...(### A3 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates A3 square.
-//* Value is '16'.)...";
-//    AddHelpDict("A3", temp);
-//
-//    temp =
-//R"...(### B3 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates B3 square.
-//* Value is '17'.)...";
-//    AddHelpDict("B3", temp);
-//
-//    temp =
-//R"...(### C3 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates C3 square.
-//* Value is '18'.)...";
-//    AddHelpDict("C3", temp);
-//
-//    temp =
-//R"...(### D3 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates D3 square.
-//* Value is '19'.)...";
-//    AddHelpDict("D3", temp);
-//
-//    temp =
-//R"...(### E3 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates E3 square.
-//* Value is '20'.)...";
-//    AddHelpDict("E3", temp);
-//
-//    temp =
-//R"...(### F3 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates F3 square.
-//* Value is '21'.)...";
-//    AddHelpDict("F3", temp);
-//
-//    temp =
-//R"...(### G3 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates G3 square.
-//* Value is '22'.)...";
-//    AddHelpDict("G3", temp);
-//
-//    temp =
-//R"...(### H3 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates H3 square.
-//* Value is '23'.)...";
-//    AddHelpDict("H3", temp);
-//
-//    temp =
-//R"...(### A4 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates A4 square.
-//* Value is '24'.)...";
-//    AddHelpDict("A4", temp);
-//
-//    temp =
-//R"...(### B4 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates B4 square.
-//* Value is '25'.)...";
-//    AddHelpDict("B4", temp);
-//
-//    temp =
-//R"...(### C4 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates C4 square.
-//* Value is '26'.)...";
-//    AddHelpDict("C4", temp);
-//
-//    temp =
-//R"...(### D4 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates D4 square.
-//* Value is '27'.)...";
-//    AddHelpDict("D4", temp);
-//
-//    temp =
-//R"...(### E4 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates E4 square.
-//* Value is '28'.)...";
-//    AddHelpDict("E4", temp);
-//
-//    temp =
-//R"...(### F4 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates F4 square.
-//* Value is '29'.)...";
-//    AddHelpDict("F4", temp);
-//
-//    temp =
-//R"...(### G4 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates G4 square.
-//* Value is '30'.)...";
-//    AddHelpDict("G4", temp);
-//
-//    temp =
-//R"...(### H4 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates H4 square.
-//* Value is '31'.)...";
-//    AddHelpDict("H4", temp);
-//
-//    temp =
-//R"...(### A5 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates A5 square.
-//* Value is '32'.)...";
-//    AddHelpDict("A5", temp);
-//
-//    temp =
-//R"...(### B5 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates B5 square.
-//* Value is '33'.)...";
-//    AddHelpDict("B5", temp);
-//
-//    temp =
-//R"...(### C5 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates C5 square.
-//* Value is '34'.)...";
-//    AddHelpDict("C5", temp);
-//
-//    temp =
-//R"...(### D5 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates D5 square.
-//* Value is '35'.)...";
-//    AddHelpDict("D5", temp);
-//
-//    temp =
-//R"...(### E5 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates E5 square.
-//* Value is '36'.)...";
-//    AddHelpDict("E5", temp);
-//
-//    temp =
-//R"...(### F5 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates F5 square.
-//* Value is '37'.)...";
-//    AddHelpDict("F5", temp);
-//
-//    temp =
-//R"...(### G5 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates G5 square.
-//* Value is '38'.)...";
-//    AddHelpDict("G5", temp);
-//
-//    temp =
-//R"...(### H5 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates H5 square.
-//* Value is '39'.)...";
-//    AddHelpDict("H5", temp);
-//
-//    temp =
-//R"...(### A6 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates A6 square.
-//* Value is '40'.)...";
-//    AddHelpDict("A6", temp);
-//
-//    temp =
-//R"...(### B6 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates B6 square.
-//* Value is '41'.)...";
-//    AddHelpDict("B6", temp);
-//
-//    temp =
-//R"...(### C6 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates C6 square.
-//* Value is '42'.)...";
-//    AddHelpDict("C6", temp);
-//
-//    temp =
-//R"...(### D6 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates D6 square.
-//* Value is '43'.)...";
-//    AddHelpDict("D6", temp);
-//
-//    temp =
-//R"...(### E6 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates E6 square.
-//* Value is '44'.)...";
-//    AddHelpDict("E6", temp);
-//
-//    temp =
-//R"...(### F6 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates F6 square.
-//* Value is '45'.)...";
-//    AddHelpDict("F6", temp);
-//
-//    temp =
-//R"...(### G6 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates G6 square.
-//* Value is '46'.)...";
-//    AddHelpDict("G6", temp);
-//
-//    temp =
-//R"...(### H6 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates H6 square.
-//* Value is '47'.)...";
-//    AddHelpDict("H6", temp);
-//
-//    temp =
-//R"...(### A7 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates A7 square.
-//* Value is '48'.)...";
-//    AddHelpDict("A7", temp);
-//
-//    temp =
-//R"...(### B7 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates B7 square.
-//* Value is '49'.)...";
-//    AddHelpDict("B7", temp);
-//
-//    temp =
-//R"...(### C7 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates C7 square.
-//* Value is '50'.)...";
-//    AddHelpDict("C7", temp);
-//
-//    temp =
-//R"...(### D7 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates D7 square.
-//* Value is '51'.)...";
-//    AddHelpDict("D7", temp);
-//
-//    temp =
-//R"...(### E7 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates E7 square.
-//* Value is '52'.)...";
-//    AddHelpDict("E7", temp);
-//
-//    temp =
-//R"...(### F7 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates F7 square.
-//* Value is '53'.)...";
-//    AddHelpDict("F7", temp);
-//
-//    temp =
-//R"...(### G7 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates G7 square.
-//* Value is '54'.)...";
-//    AddHelpDict("G7", temp);
-//
-//    temp =
-//R"...(### H7 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates H7 square.
-//* Value is '55'.)...";
-//    AddHelpDict("H7", temp);
-//
-//    temp =
-//R"...(### A8 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates A8 square.
-//* Value is '56'.)...";
-//    AddHelpDict("A8", temp);
-//
-//    temp =
-//R"...(### B8 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates B8 square.
-//* Value is '57'.)...";
-//    AddHelpDict("B8", temp);
-//
-//    temp =
-//R"...(### C8 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates C8 square.
-//* Value is '58'.)...";
-//    AddHelpDict("C8", temp);
-//
-//    temp =
-//R"...(### D8 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates D8 square.
-//* Value is '59'.)...";
-//    AddHelpDict("D8", temp);
-//
-//    temp =
-//R"...(### E8 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates E8 square.
-//* Value is '60'.)...";
-//    AddHelpDict("E8", temp);
-//
-//    temp =
-//R"...(### F8 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates F8 square.
-//* Value is '61'.)...";
-//    AddHelpDict("F8", temp);
-//
-//    temp =
-//R"...(### G8 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates G8 square.
-//* Value is '62'.)...";
-//    AddHelpDict("G8", temp);
-//
-//    temp =
-//R"...(### H8 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates H8 square.
-//* Value is '63'.)...";
-//    AddHelpDict("H8", temp);
-//
-//    temp =
-//R"...(### FYLE_A ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates A-fyle.
-//* Value is '0'.)...";
-//    AddHelpDict("FYLE_A", temp);
-//
-//    temp =
-//R"...(### FYLE_B ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates B-fyle.
-//* Value is '1'.)...";
-//    AddHelpDict("FYLE_B", temp);
-//
-//    temp =
-//R"...(### FYLE_C ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates C-fyle.
-//* Value is '2'.)...";
-//    AddHelpDict("FYLE_C", temp);
-//
-//    temp =
-//R"...(### FYLE_D ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates D-fyle.
-//* Value is '3'.)...";
-//    AddHelpDict("FYLE_D", temp);
-//
-//    temp =
-//R"...(### FYLE_E ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates E-fyle.
-//* Value is '4'.)...";
-//    AddHelpDict("FYLE_E", temp);
-//
-//    temp =
-//R"...(### FYLE_F ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates F-fyle.
-//* Value is '5'.)...";
-//    AddHelpDict("FYLE_F", temp);
-//
-//    temp =
-//R"...(### FYLE_G ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates G-fyle.
-//* Value is '6'.)...";
-//    AddHelpDict("FYLE_G", temp);
-//
-//    temp =
-//R"...(### FYLE_H ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates H-fyle.
-//* Value is '7'.)...";
-//    AddHelpDict("FYLE_H", temp);
-//
-//    temp =
-//R"...(### RANK_1 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates the 1st rank.
-//* Value is '0'.)...";
-//    AddHelpDict("RANK_1", temp);
-//
-//    temp =
-//R"...(### RANK_2 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates the 2nd rank.
-//* Value is '1'.)...";
-//    AddHelpDict("RANK_2", temp);
-//
-//    temp =
-//R"...(### RANK_3 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates the 3rd rank.
-//* Value is '2'.)...";
-//    AddHelpDict("RANK_3", temp);
-//
-//    temp =
-//R"...(### RANK_4 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates the 4th rank.
-//* Value is '3'.)...";
-//    AddHelpDict("RANK_4", temp);
-//
-//    temp =
-//R"...(### RANK_5 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates the 5th rank.
-//* Value is '4'.)...";
-//    AddHelpDict("RANK_5", temp);
-//
-//    temp =
-//R"...(### RANK_6 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates the 6th rank.
-//* Value is '5'.)...";
-//    AddHelpDict("RANK_6", temp);
-//
-//    temp =
-//R"...(### RANK_7 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates the 7th rank.
-//* Value is '6'.)...";
-//    AddHelpDict("RANK_7", temp);
-//
-//    temp =
-//R"...(### RANK_8 ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates the 8th rank.
-//* Value is '7'.)...";
-//    AddHelpDict("RANK_8", temp);
-//
-//    temp =
-//R"...(### NO_SIDE ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates neither of sides.
-//* Value is '0'.)...";
-//    AddHelpDict("NO_SIDE", temp);
-//
-//    temp =
-//R"...(### WHITE ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates White.
-//* Value is '1'.)...";
-//    AddHelpDict("WHITE", temp);
-//
-//    temp =
-//R"...(### BLACK ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates Black.
-//* Value is '2'.)...";
-//    AddHelpDict("BLACK", temp);
-//
-//    temp =
-//R"...(### EMPTY ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates no piece.
-//* Value is '0'.)...";
-//    AddHelpDict("EMPTY", temp);
-//
-//    temp =
-//R"...(### PAWN ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates Pawn.
-//* Value is '1'.)...";
-//    AddHelpDict("PAWN", temp);
-//
-//    temp =
-//R"...(### KNIGHT ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates Knight.
-//* Value is '2'.)...";
-//    AddHelpDict("KNIGHT", temp);
-//
-//    temp =
-//R"...(### BISHOP ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates Bishop.
-//* Value is '3'.)...";
-//    AddHelpDict("BISHOP", temp);
-//
-//    temp =
-//R"...(### ROOK ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates Rook.
-//* Value is '4'.)...";
-//    AddHelpDict("ROOK", temp);
-//
-//    temp =
-//R"...(### QUEEN ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates Queen.
-//* Value is '5'.)...";
-//    AddHelpDict("QUEEN", temp);
-//
-//    temp =
-//R"...(### KING ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates King.
-//* Value is '6'.)...";
-//    AddHelpDict("KING", temp);
-//
-//    temp =
-//R"...(### NO_CASTLING ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates no one to castle.
-//* Value is '0'.)...";
-//    AddHelpDict("NO_CASTLING", temp);
-//
-//    temp =
-//R"...(### WHITE_SHORT_CASTLING ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates White's Short Castling.
-//* Value is '1'.)...";
-//    AddHelpDict("WHITE_SHORT_CASTLING", temp);
-//
-//    temp =
-//R"...(### WHITE_LONG_CASTLING ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates White's Long Castling.
-//* Value is '2'.)...";
-//    AddHelpDict("WHITE_LONG_CASTLING", temp);
-//
-//    temp =
-//R"...(### BLACK_SHORT_CASTLING ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates Black's Short Castling.
-//* Value is '3'.)...";
-//    AddHelpDict("BLACK_SHORT_CASTLING", temp);
-//
-//    temp =
-//R"...(### BLACK_LONG_CASTLING ###
-//
-//<h6> Description </h6>
-//
-//* Constant value of Number that indicates Black's Long Castling.
-//* Value is '4'.)...";
-//
-//    AddHelpDict("BLACK_LONG_CASTLING", temp);
-//    // %%% exit
-//
-//    temp =
-//R"...(### Getting squares ###
-//
-//* `@get-white-pawn-position`
-//    + Returns List of Symbols of squares where White Pawns are on.
-//* `@get-white-knight-position`
-//    + Returns List of Symbols of squares where White Knights are on.
-//* `@get-white-bishop-position`
-//    + Returns List of Symbols of squares where White Bishops are on.
-//* `@get-white-rook-position`
-//    + Returns List of Symbols of squares where White Rooks are on.
-//* `@get-white-queen-position`
-//    + Returns List of Symbols of squares where White Queens are on.
-//* `@get-white-king-position`
-//    + Returns List of Symbols of squares where White King is on.
-//* `@get-black-pawn-position`
-//    + Returns List of Symbols of squares where Black Pawns are on.
-//* `@get-black-knight-position`
-//    + Returns List of Symbols of squares where Black Knights are on.
-//* `@get-black-bishop-position`
-//    + Returns List of Symbols of squares where Black Bishops are on.
-//* `@get-black-rook-position`
-//    + Returns List of Symbols of squares where Black Rooks are on.
-//* `@get-black-queen-position`
-//    + Returns List of Symbols of squares where Black Queens are on.
-//* `@get-black-king-position`
-//    + Returns List of Symbols of squares where Black King is on.
-//* `@get-empty-square-position`
-//    + Returns List of Symbols of empty squares.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    (display (my-engine '@get-white-pawn-position))
-//    
-//    ;; Output
-//    ;; > (A2 B2 C2 D2 E2 F2 G2 H2))...";
-//    AddHelpDict("engine @get-white-pawn-position", temp);
-//    AddHelpDict("engine @get-white-knight-position", temp);
-//    AddHelpDict("engine @get-white-bishop-position", temp);
-//    AddHelpDict("engine @get-white-rook-position", temp);
-//    AddHelpDict("engine @get-white-queen-position", temp);
-//    AddHelpDict("engine @get-white-king-position", temp);
-//    AddHelpDict("engine @get-black-pawn-position", temp);
-//    AddHelpDict("engine @get-black-knight-position", temp);
-//    AddHelpDict("engine @get-black-bishop-position", temp);
-//    AddHelpDict("engine @get-black-rook-position", temp);
-//    AddHelpDict("engine @get-black-queen-position", temp);
-//    AddHelpDict("engine @get-black-king-position", temp);
-//
-//    temp =
-//R"...(### Getting pieces ###
-//
-//* `@get-piece <Square : Number or Symbol>`
-//    + Returns a side and type of the piece on `<Square>` as List.
-//
-//* `@get-all-pieces`
-//    + Returns  pieces of each square on the board as List.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    (display (my-engine '@get-piece D1))
-//    
-//    ;; Output
-//    ;; > (WHITE QUEEN)
-//    
-//    (display (my-engine '@get-all-pieces))
-//    
-//    ;; Output
-//    ;; > ((WHITE ROOK) (WHITE KNIGHT) (WHITE BISHOP) (WHITE QUEEN)
-//    ;; > (WHITE KING) (WHITE BISHOP) (WHITE KNIGHT) (WHITE ROOK)
-//    ;; > (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN)
-//    ;; > (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (NO_SIDE EMPTY)
-//    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (BLACK PAWN)
-//    ;; > (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN)
-//    ;; > (BLACK PAWN) (BLACK PAWN) (BLACK ROOK) (BLACK KNIGHT) (BLACK BISHOP)
-//    ;; > (BLACK QUEEN) (BLACK KING) (BLACK BISHOP) (BLACK KNIGHT)
-//    ;; > (BLACK ROOK)))...";
-//    AddHelpDict("engine @get-piece", temp);
-//    AddHelpDict("engine @get-all-pieces", temp);
-//
-//    temp =
-//R"...(### Getting states of game ###
-//
-//* `@get-to-move`
-//    + Returns turn to move as Symbol.
-//* `@get-castling-rights`
-//    + Returns castling rights as Symbol.
-//* `@get-en-passant-square`
-//    + Returns en passant square as Symbol if it exists now.
-//* `@get-ply`
-//    + Returns plies of moves from starting of the game.
-//    + 1 move = 2 plies.
-//* `@get-clock`
-//    + Returns clock(plies for 50 Moves Rule).
-//* `@get-white-has-castled`
-//    + Returns Boolean whether White King has castled or not.
-//* `@get-black-has-castled`
-//    + Returns Boolean whether Black King has castled or not.
-//* `@get-fen`
-//    + Returns FEN of current position.
-//* `@to-string`
-//    + Returns visualized board.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    ;; Move pieces by UCI command.
-//    ;; 1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.O-O d5
-//    ;; +---------------+
-//    ;; |r . b q k . n r|
-//    ;; |p p p . . p p p|
-//    ;; |. . n . . . . .|
-//    ;; |. . b p p . . .|
-//    ;; |. . B . P . . .|
-//    ;; |. . . . . N . .|
-//    ;; |P P P P . P P P|
-//    ;; |R N B Q . R K .|
-//    ;; +---------------+
-//    (my-engine '@input-uci-command
-//        "position startpos moves e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 e1g1 d7d5")
-//    
-//    (display (my-engine '@get-to-move))
-//    ;; Output
-//    ;; > Symbol: WHITE
-//    
-//    (display (my-engine '@get-castling-rights))
-//    ;; Output
-//    ;; > (BLACK_SHORT_CASTLING BLACK_LONG_CASTLING)
-//    
-//    (display (my-engine '@get-en-passant-square))
-//    ;; Output
-//    ;; > Symbol: D6
-//    
-//    (display (my-engine '@get-ply))
-//    ;; Output
-//    ;; > 9
-//    
-//    (display (my-engine '@get-clock))
-//    ;; Output
-//    ;; > 0
-//    
-//    (display (my-engine '@get-white-has-castled))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@get-black-has-castled))
-//    ;; Output
-//    ;; > #f
-//    
-//    (display (my-engine '@get-fen))
-//    ;; Output
-//    ;; > r1bqk1nr/ppp2ppp/2n5/2bpp3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w kq d6 0 5
-//    
-//    (display (my-engine '@to-string))
-//    ;; Output
-//    ;; >  +-----------------+
-//    ;; > 8| r . b q k . n r |
-//    ;; > 7| p p p . . p p p |
-//    ;; > 6| . . n . . . . . |
-//    ;; > 5| . . b p p . . . |
-//    ;; > 4| . . B . P . . . |
-//    ;; > 3| . . . . . N . . |
-//    ;; > 2| P P P P . P P P |
-//    ;; > 1| R N B Q . R K . |
-//    ;; >  +-----------------+
-//    ;; >    a b c d e f g h
-//    ;; > To Move: w | Clock: 0 | Ply: 8
-//    ;; > En Passant Square: d6
-//    ;; > Castling Rights : kq)...";
-//    AddHelpDict("engine @get-to-move", temp);
-//    AddHelpDict("engine @get-castling-rights", temp);
-//    AddHelpDict("engine @get-en-passant-square", temp);
-//    AddHelpDict("engine @get-ply", temp);
-//    AddHelpDict("engine @get-clock", temp);
-//    AddHelpDict("engine @get-white-has-castled", temp);
-//    AddHelpDict("engine @get-black-has-castled", temp);
-//
-//    temp =
-//R"...(### Setting states of game ###
-//
-//* `@set-to-move <Side : Number or Symbol>`
-//    + Sets turn to move.
-//    + Returns previous setting.
-//* `@set-castling_rights <Castling rights : List>`
-//    + Sets castling rights.
-//    + Returns previous setting.
-//* `@set-en-passant-square <<Square : Number or Symbol> or <Nil>>`
-//    + Sets en passant square.
-//    + Returns previous setting.
-//* `@set-ply <Ply : Number>`
-//    + Sets plies(a half of one move).
-//    + Returns previous setting.
-//* `@set-clock <Ply : Number>`
-//    + Sets clock(plies for 50 moves rule).
-//    + Returns previous setting.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    (my-engine '@place-piece E4 PAWN WHITE)
-//    
-//    (display (my-engine '@set-to-move BLACK))
-//    ;; Output
-//    ;; > Symbol: WHITE
-//    
-//    (display (my-engine '@set-castling-rights
-//        (list WHITE_LONG_CASTLING BLACK_LONG_CASTLING)))
-//    ;; Output
-//    ;; > (WHITE_SHORT_CASTLING WHITE_LONG_CASTLING
-//    ;; > BLACK_SHORT_CASTLING BLACK_LONG_CASTLING)
-//    
-//    (display (my-engine '@set-en-passant-square E3))
-//    ;; Output
-//    ;; > ()
-//    
-//    (display (my-engine '@set-ply 111))
-//    ;; Output
-//    ;; > 1
-//    
-//    (display (my-engine '@set-clock 22))
-//    ;; Output
-//    ;; > 0
-//    
-//    ;; ---------------- ;;
-//    ;; Current Settings ;;
-//    ;; ---------------- ;;
-//    
-//    (display (my-engine '@get-to-move))
-//    ;; Output
-//    ;; > Symbol: BLACK
-//    
-//    (display (my-engine '@get-castling-rights))
-//    ;; Output
-//    ;; > (WHITE_LONG_CASTLING BLACK_LONG_CASTLING)
-//    
-//    (display (my-engine '@get-en-passant-square))
-//    ;; Output
-//    ;; > Symbol: E3
-//    
-//    (display (my-engine '@get-ply))
-//    ;; Output
-//    ;; > 111
-//    
-//    (display (my-engine '@get-clock))
-//    ;; Output
-//    ;; > 22)...";
-//    AddHelpDict("engine @set-to-move", temp);
-//    AddHelpDict("engine @set-castling-rights", temp);
-//    AddHelpDict("engine @set-en-passant-square", temp);
-//    AddHelpDict("engine @set-ply", temp);
-//    AddHelpDict("engine @set-clock", temp);
-//
-//    temp =
-//R"...(### Placing pieces ###
-//
-//* `@set-new-game`
-//    + Sets starting position.
-//    + Returns #t.
-//* `@set-fen <FEN : String>`
-//    + Sets position with FEN.
-//    + Returns #t.
-//* `@place-piece <Square : Number or Symbol> <Piece : List>`
-//    + Sets a `<Piece>` on `<Square>`
-//      and returns the previous piece placed on `<Square>`.
-//    + `<Piece>` is `(<Side : Number or Symbol> <Type : Number or Symbol>).
-//        - For example, White Pawn is `(list WHITE PAWN)`.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@set-new-game))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@set-fen
-//        "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1"))
-//    ;; Output
-//    ;; > #t
-//    
-//    ;; Sets Black Rook on D1 where White Queen is placed.
-//    (display (my-engine '@place-piece D1 (list BLACK ROOK)))
-//    ;; Output
-//    ;; > (WHITE QUEEN))...";
-//    AddHelpDict("engine @set-new-game", temp);
-//    AddHelpDict("engine @set-fen", temp);
-//    AddHelpDict("engine @place-piece", temp);
-//
-//    temp =
-//R"...(### Getting candidate moves ###
-//
-//* `@get-candidate-moves`
-//    + Generates and returns List of candidate moves.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@get-candidate-moves))
-//    ;; Output
-//    ;; >  ((H2 H4 EMPTY) (H2 H3 EMPTY) (G2 G4 EMPTY) (G2 G3 EMPTY)
-//    ;; > (F2 F4 EMPTY) (F2 F3 EMPTY) (E2 E4 EMPTY) (E2 E3 EMPTY) (D2 D4 EMPTY)
-//    ;; > (D2 D3 EMPTY) (C2 C4 EMPTY) (C2 C3 EMPTY) (B2 B4 EMPTY) (B2 B3 EMPTY)
-//    ;; > (A2 A4 EMPTY) (A2 A3 EMPTY) (G1 H3 EMPTY) (G1 F3 EMPTY) (B1 C3 EMPTY)
-//    ;; > (B1 A3 EMPTY)))...";
-//    AddHelpDict("engine @get-candidate-moves", temp);
-//
-//    temp =
-//R"...(### Predicate functions ###
-//
-//Judges each state of the current position.
-//
-//* `@correct-position?`
-//    + If Pawn is on 1st or 8th rank, it returns #f.
-//    + When turn to move is White, if Black King is checked,
-//      then it returns #f.
-//    + When turn to move is Black, if White King is checked,
-//      then it returns #f.
-//    + Otherwise, returns #t.
-//* `@white-checked?`
-//* `@black-checked?`
-//* `@checkmated?`
-//* `@stalemated?`
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    ;; Put Pawn on 1st rank.
-//    (my-engine '@place-piece D1 PAWN WHITE)
-//    
-//    (display (my-engine '@correct-position?))
-//    ;; Output
-//    ;; > #f
-//    
-//    (define my-engine (gen-engine))
-//    
-//    ;; Move pieces by UCI command.
-//    ;; 1.d4 e6 2.Nf3 Bb4+
-//    ;; +---------------+
-//    ;; |r n b q k . n r|
-//    ;; |p p p p . p p p|
-//    ;; |. . . . p . . .|
-//    ;; |. . . . . . . .|
-//    ;; |. b . P . . . .|
-//    ;; |. . . . . N . .|
-//    ;; |P P P . P P P P|
-//    ;; |R N B Q K B . R|
-//    ;; +---------------+
-//    (my-engine '@input-uci-command
-//        "position startpos moves d2d4 e7e6 g1f3 f8b4")
-//    
-//    (display (my-engine '@white-checked?))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@black-checked?))
-//    ;; Output
-//    ;; > #f
-//    
-//    (define my-engine (gen-engine))
-//    
-//    ;; Move pieces by UCI command.
-//    ;; 1.f3 e5 2.g4 Qh4#
-//    ;; +---------------+
-//    ;; |r n b . k b n r|
-//    ;; |p p p p . p p p|
-//    ;; |. . . . . . . .|
-//    ;; |. . . . p . . .|
-//    ;; |. . . . . . P q|
-//    ;; |. . . . . P . .|
-//    ;; |P P P P P . . P|
-//    ;; |R N B Q K B N R|
-//    ;; +---------------+
-//    (my-engine '@input-uci-command
-//        "position startpos moves f2f3 e7e5 g2g4 d8h4")
-//    
-//    (display (my-engine '@checkmated?))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@stalemated?))
-//    ;; Output
-//    ;; > #f)...";
-//    AddHelpDict("engine @correct-position?", temp);
-//    AddHelpDict("engine @white-checked?", temp);
-//    AddHelpDict("engine @black-checked?", temp);
-//    AddHelpDict("engine @checkmated?", temp);
-//    AddHelpDict("engine @stalemated?", temp);
-//
-//    temp =
-//R"...(### Taking a move ###
-//
-//A move is represented by List.  The List is  
-//`(<From : Number or Symbol>
-//  <To : Number or Symbol>
-//  <Promotion : Number or Symbol>)`.
-//
-//* `@play-move <Move : List>`
-//    + Moves one piece legally.
-//    + Returns #t if it has succeeded, otherwise returns #f.
-//
-//* `@undo-move`
-//    + Undoes previous move.
-//    + Returns previous move.
-//
-//* `@play-note <PGN move text : String>`
-//    + Moves one piece legally with `<PGN move text>`.
-//    + Returns #t if it has succeeded, otherwise returns #f.
-//
-//* `@move->note <Move : List>`
-//    + Translates Move into PGN move text according to the current position.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@play-move (list E2 E4 EMPTY)))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@get-white-pawn-position))
-//    ;; Output
-//    ;; > (A2 B2 C2 D2 F2 G2 H2 E4)
-//    
-//    (display (my-engine '@undo-move))
-//    ;; Output
-//    ;; > (E2 E4 EMPTY)
-//    
-//    (display (my-engine '@get-white-pawn-position))
-//    ;; Output
-//    ;; > (A2 B2 C2 D2 E2 F2 G2 H2)
-//    
-//    (display (my-engine '@play-note "Nf3"))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@get-white-knight-position))
-//    ;; Output
-//    ;; > (B1 F3)
-//    
-//    (display (my-engine '@move->note (list B8 C6 EMPTY)))
-//    ;; Output
-//    ;; > Nc6)...";
-//    AddHelpDict("engine @play-move", temp);
-//    AddHelpDict("engine @undo-move", temp);
-//    AddHelpDict("engine @play-note", temp);
-//    AddHelpDict("engine @move->note", temp);
-//
-//    temp =
-//R"...(### UCI Command ###
-//
-//* `@input-uci-command <UCI command : String>`
-//    + Executes `<UCI command>`.
-//    + If success, returns #t. Otherwise, returns #f.
-//    + If you have input "go" command,
-//      the engine starts thinking in background.
-//      So control will come back soon.
-//* `@add-uci-output-listener <Listener : Function>`
-//    + Registers Function to receive UCI output from the engine.
-//    + `<Listener>` is Function that has one argument(UCI output).
-//* `@run`
-//    + Runs as UCI Chess Engine until the engine gets "quit" command.
-//    + The control doesn't come back while the engine is running.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    ;; Create a listener.
-//    (define (listener message)
-//        (display "I'm Listener : " message))
-//    
-//    ;; Register the listener.
-//    (my-engine '@add-uci-output-listener listener)
-//    
-//    (display (my-engine '@input-uci-command "uci"))
-//    ;; Output
-//    ;; > I'm Listener : id name Sayuri 2015.03.27 devel
-//    ;; > I'm Listener : id author Hironori Ishibashi
-//    ;; > I'm Listener : option name Hash type spin default 32 min 8 max 8192
-//    ;; > I'm Listener : option name Clear Hash type button
-//    ;; > I'm Listener : option name Ponder type check default true
-//    ;; > I'm Listener : option name Threads type spin default 1 min 1 max 64
-//    ;; > I'm Listener : option name UCI_AnalyseMode type check default false
-//    ;; > I'm Listener : uciok
-//    ;; > #t)...";
-//    AddHelpDict("engine @input-uci-command", temp);
-//    AddHelpDict("engine @add-uci-output-listener", temp);
-//    AddHelpDict("engine @run", temp);
-//
-//    temp =
-//R"...(### Searching the best move ###
-//
-//Thinks and returns the best move in each condition.  
-//Different from "go" command,
-//the control won't come back until the engine have found the best move.
-//
-//* `@go-movetime <Milliseconds : Number> [<Candidate move list : List>]`
-//    + Thinks for `<Milliseconds>`.
-//* `@go-timelimit <Milliseconds : Number> [<Candidate move list : List>]`
-//    + Thinks on the basis of `<Milliseconds>`.
-//        - If `<Milliseconds>` is more than 600000,
-//          the engine thinks for 60000 milliseconds.
-//        - If `<Milliseconds>` is less than 600000,
-//          the engine thinks for "`<Milliseconds>` / 10" milliseconds.
-//* `@go-depth <Ply : Number> [<Candidate move list : List>]`
-//    + Thinks until to reach `<Ply>`th depth.
-//* `@go-nodes <Nodes : Number> [<Candidate move list : List>]`
-//    + Thinks until to search `<Nodes>` nodes.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    ;; Register a listener.
-//    (define (listener message) (display "Engine > " message))
-//    (my-engine '@add-uci-output-listener listener)
-//    
-//    (display (my-engine '@go-movetime 10000))
-//    ;; Output
-//    ;; > Engine > info depth 1
-//    ;; > Engine > info currmove h2h4 currmovenumber 1
-//    ;; > Engine > info depth 1 seldepth 1 score cp 12 time 0 nodes 2 pv h2h4
-//    ;; > Engine > info currmove h2h3 currmovenumber 2
-//    ;; > Engine > info depth 1 seldepth 1 score cp 22 time 1 nodes 4 pv h2h3
-//    ;; > Engine > info currmove g2g4 currmovenumber 3
-//    ;; > Engine > info depth 1 seldepth 1 score cp 23 time 1 nodes 6 pv g2g4
-//    ;; > Engine > info currmove g2g3 currmovenumber 4
-//    ;; > Engine > info depth 1 seldepth 1 score cp 33 time 1 nodes 8 pv g2g3
-//    ;; > Engine > info currmove f2f4 currmovenumber 5
-//    ;; > Engine > info currmove f2f3 currmovenumber 6
-//    ;; > Engine > info depth 1 seldepth 1 score cp 36 time 1 nodes 11 pv f2f3
-//    ;; > Engine > info currmove e2e4 currmovenumber 7
-//    ;; > Engine > info depth 1 seldepth 1 score cp 45 time 1 nodes 13 pv e2e4
-//    ;; > Engine > info currmove e2e3 currmovenumber 8
-//    ;; > Engine > info currmove d2d4 currmovenumber 9
-//    ;; > Engine > info depth 1 seldepth 1 score cp 50 time 1 nodes 16 pv d2d4
-//    ;; > Engine > info currmove d2d3 currmovenumber 10
-//    ;; > Engine > info currmove c2c4 currmovenumber 11
-//    ;; > Engine > info currmove c2c3 currmovenumber 12
-//    ;; > Engine > info currmove b2b4 currmovenumber 13
-//    ;; > Engine > info currmove b2b3 currmovenumber 14
-//    ;; > Engine > info currmove a2a4 currmovenumber 15
-//    ;; > Engine > info currmove a2a3 currmovenumber 16
-//    ;; > Engine > info currmove g1h3 currmovenumber 17
-//    ;; > Engine > info currmove g1f3 currmovenumber 18
-//    ;; > Engine > info depth 1 seldepth 1 score cp 68 time 1 nodes 26 pv g1f3
-//    ;; > Engine > info currmove b1c3 currmovenumber 19
-//    ;; > Engine > info currmove b1a3 currmovenumber 20
-//    ;;
-//    ;; (Omitted)
-//    ;;
-//    ;; > Engine > info depth 11
-//    ;; > Engine > info currmove e2e4 currmovenumber 1
-//    ;; > Engine > info time 10000 nodes 5599214 hashfull 390 nps 559921
-//    ;; > score cp 45 pv e2e4 b8c6 g1f3 g8f6 e4e5 f6g4 d2d4 e7e6 h2h3 f8b4
-//    ;; > Engine > bestmove e2e4 ponder b8c6
-//    ;; > (E2 E4 EMPTY))...";
-//    AddHelpDict("engine @go-movetime", temp);
-//    AddHelpDict("engine @go-timelimit", temp);
-//    AddHelpDict("engine @go-depth", temp);
-//    AddHelpDict("engine @go-nodes", temp);
-//
-//    temp =
-//R"...(### Hash and threads ###
-//
-//* `@set-hash-size <Size : Number>`
-//    + Sets size of Hash Table(Transposition Table)
-//      and returns the previous size.
-//    + The unit of size is "byte".
-//* `@set-threads <Number of threads : Number>`
-//    + Sets `<Number of threads>` and returns the previous number.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    ;; Set size of Hash Table to 128 MB.
-//    (my-engine '@input-uci-command "setoption name hash value 128")
-//    
-//    (display (my-engine '@set-hash-size (* 256 1024 1024)))
-//    ;; Set size of Hash Table to 256 MB and return 128 * 1024 * 1024 bytes.
-//    ;; Output
-//    ;; > 1.34218e+08
-//    
-//    ;; Set the number of threads to 3.
-//    (my-engine '@input-uci-command "setoption name threads value 3")
-//    
-//    (display (my-engine '@set-threads 4))
-//    ;; Set the number of threads to 4 and return 3.
-//    ;; Output
-//    ;; > 3)...";
-//    AddHelpDict("engine @set-hash-size", temp);
-//    AddHelpDict("engine @set-threads", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - Material ###
-//
-//* `@material [<New materal : List>]`
-//    + Returns List of material.
-//        - 1st : Empty (It is always 0)
-//        - 2nd : Pawn
-//        - 3rd : Knight
-//        - 4th : Bishop
-//        - 5th : Rook
-//        - 6th : Queen
-//        - 7th : King
-//    + If you specify `<New materal>`, the material is updated.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@material (list 111 222 333 444 555 666 777)))
-//    ;; Output
-//    ;; > (0 100 400 400 600 1200 1e+06)
-//    
-//    (display (my-engine '@material))
-//    ;; Output
-//    ;; > (0 222 333 444 555 666 777))...";
-//    AddHelpDict("engine @material", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - Quiescence Search ###
-//
-//* `@enable-quiesce-search [<New setting : Boolean>]`
-//    + Returns whether Quiescence Search is enabled or not.
-//    + If you specify #t to `<New setting>`,
-//      Quiescence Search is set to be enabled.
-//      Otherwise, it is set to be disabled.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@enable-quiesce-search #f))
-//    ;; Output
-//    :: > #t
-//    
-//    (display (my-engine '@enable-quiesce-search))
-//    ;; Output
-//    :: > #f)...";
-//    AddHelpDict("engine @enable-quiesce-search", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - Repetition Check ###
-//
-//* `@enable-repetition-check [<New setting : Boolean>]`
-//    + Returns whether Repetition Check is enabled or not.
-//    + If you specify #t to `<New setting>`,
-//      Repetition Check is set to be enabled.
-//      Otherwise, it is set to be disabled.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@enable-repetition-check #f))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@enable-repetition-check))
-//    ;; Output
-//    ;; > #f)...";
-//    AddHelpDict("engine @enable-repetition-check", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - Check Extension ###
-//
-//* `@enable-check-extension [<New setting : Boolean>]`
-//    + Returns whether Check Extension is enabled or not.
-//    + If you specify #t to `<New setting>`,
-//      Check Extension is set to be enabled.
-//      Otherwise, it is set to be disabled.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@enable-check-extension #f))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@enable-check-extension))
-//    ;; Output
-//    ;; > #f)...";
-//    AddHelpDict("engine @enable-check-extension", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - YBWC ###
-//
-//* `@ybwc-limit-depth [<New depth : Number>]`
-//    + If remaining depth is less than this parameter, YBWC is invalidated.
-//    + Return this parameter.
-//    + If you specify `<New depth>`, this parameter is updated.
-//
-//* `@ybwc-invalid-moves [<New number of moves : Number>]`
-//    + YBWC searches with one thread during this parameter of candidate moves.
-//    + Return this parameter.
-//    + If you specify `<New number of moves>`, this parameter is updated.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@ybwc-limit-depth 10))
-//    ;; Output
-//    ;; > 4
-//    
-//    (display (my-engine '@ybwc-limit-depth))
-//    ;; Output
-//    ;; > 10
-//    
-//    (display (my-engine '@ybwc-invalid-moves 10))
-//    ;; Output
-//    ;; > 3
-//    
-//    (display (my-engine '@ybwc-invalid-moves))
-//    ;; Output
-//    ;; > 10)...";
-//    AddHelpDict("engine @ybwc-limit-depth", temp);
-//    AddHelpDict("engine @ybwc-invalid-moves", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - Aspiration Windows ###
-//
-//* `@enable-aspiration-windows [<New setting : Boolean>]`
-//    + Returns whether Aspiration Windows is enabled or not.
-//    + If you specify #t to `<New setting>`,
-//      Aspiration Windows is set to be enabled.
-//      Otherwise, it is set to be disabled.
-//* `@aspiration-windows-limit-depth [<New depth : Number>]`
-//    + If remaining depth is less than this parameter at the root node,
-//      Aspiration Windows is invalidated.
-//    + Return this parameter.
-//    + If you specify `<New depth>`, this parameter is updated.
-//* `@aspiration-windows-delta [<New delta : Number>]`
-//    + Return Delta.
-//    + If you specify `<New delta>`, Delta is updated.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@enable-aspiration-windows #f))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@enable-aspiration-windows))
-//    ;; Output
-//    ;; > #f
-//    
-//    (display (my-engine '@aspiration-windows-limit-depth 10))
-//    ;; Output
-//    ;; > 5
-//    
-//    (display (my-engine '@aspiration-windows-limit-depth))
-//    ;; Output
-//    ;; > 10
-//    
-//    (display (my-engine '@aspiration-windows-delta 20))
-//    ;; Output
-//    ;; > 15
-//    
-//    (display (my-engine '@aspiration-windows-delta))
-//    ;; Output
-//    ;; > 20)...";
-//    AddHelpDict("engine @enable-aspiration-windows", temp);
-//    AddHelpDict("engine @aspiration-windows-limit-depth", temp);
-//    AddHelpDict("engine @aspiration-windows-delta", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - Aspiration Windows ###
-//
-//* `@enable-see [<New setting : Boolean>]`
-//    + Returns whether SEE is enabled or not.
-//    + If you specify #t to `<New setting>`,
-//      SEE is set to be enabled. Otherwise, it is set to be disabled.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@enable-see #f))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@enable-see))
-//    ;; Output
-//    ;; > #f)...";
-//    AddHelpDict("engine @enable-see", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - History Heuristics ###
-//
-//* `@enable-history [<New setting : Boolean>]`
-//    + Returns whether History Heuristics is enabled or not.
-//    + If you specify #t to `<New setting>`,
-//      History Heuristics is set to be enabled.
-//      Otherwise, it is set to be disabled.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@enable-history #f))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@enable-history))
-//    ;; Output
-//    ;; > #f)...";
-//    AddHelpDict("engine @enable-history", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - Killer Move Heuristics ###
-//
-//* `@enable-killer [<New setting : Boolean>]`
-//    + Returns whether Killer Move Heuristics is enabled or not.
-//    + If you specify #t to `<New setting>`,
-//      Killer Move Hiuristics is set to be enabled.
-//      Otherwise, it is set to be disabled.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@enable-killer #f))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@enable-killer))
-//    ;; Output
-//    ;; > #f)...";
-//    AddHelpDict("engine @enable-killer", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - Hash Table ###
-//
-//* `@enable-hash-table [<New setting : Boolean>]`
-//    + Returns whether Transposition Table is enabled or not.
-//    + If you specify #t to `<New setting>`,
-//      Transposition Table is set to be enabled.
-//      Otherwise, it is set to be disabled.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@enable-hash-table #f))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@enable-hash-table))
-//    ;; Output
-//    ;; > #t)...";
-//    AddHelpDict("engine @enable-hash-table", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - Internal Iterative Deepening ###
-//
-//* `@enable-iid [<New setting : Boolean>]`
-//    + Returns whether Internal Iterative Deepening is enabled or not.
-//    + If you specify #t to `<New setting>`,
-//      Internal Iterative Deepening is set to be enabled.
-//      Otherwise, it is set to be disabled.
-//* `@iid-limit-depth [<New depth : Number>]`
-//    + If remaining depth is less than this parameter,
-//      Internal Iterative Deepening is invalidated.
-//    + Return this parameter.
-//    + If you specify `<New depth>`, this parameter is updated.
-//* `@iid-search-depth [<New depth : Number>]`
-//    + Internal Iterative Deepening searches until depth of this parameter.
-//    + Return this parameter.
-//    + If you specify `<New depth>`, this parameter is updated.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@enable-iid #f))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@enable-iid))
-//    ;; Output
-//    ;; > #f
-//    
-//    (display (my-engine '@iid-limit-depth 10))
-//    ;; Output
-//    ;; > 5
-//    
-//    (display (my-engine '@iid-limit-depth))
-//    ;; Output
-//    ;; > 10
-//    
-//    (display (my-engine '@iid-search-depth 10))
-//    ;; Output
-//    ;; > 4
-//    
-//    (display (my-engine '@iid-search-depth))
-//    ;; Output
-//    ;; > 10)...";
-//    AddHelpDict("engine @enable-iid", temp);
-//    AddHelpDict("engine @iid-limit-depth", temp);
-//    AddHelpDict("engine @iid-search-depth", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - Null Move Reduction ###
-//
-//* `@enable-nmr [<New setting : Boolean>]`
-//    + Returns whether Null Move Reduction is enabled or not.
-//    + If you specify #t to `<New setting>`,
-//      Null Move Reduction is set to be enabled.
-//      Otherwise, it is set to be disabled.
-//* `@nmr-limit-depth [<New depth : Number>]`
-//    + If remaining depth is less than this parameter,
-//      Null Move Reduction is invalidated.
-//    + Return this parameter.
-//    + If you specify `<New depth>`, this parameter is updated.
-//* `@nmr-search-reduction [<New reduction : Number>]`
-//    + When searching shallowly, the depth is the actual depth
-//      minus this parameter.
-//    + Return this parameter.
-//    + If you specify `<New reduction>`, this parameter is updated.
-//* `@nmr-reduction [<New reduction : Number>]`
-//    + If the score is greater than or equals to Beta,
-//      the remaining depth is reduced by this parameter.
-//    + Return this parameter.
-//    + If you specify `<New reduction>`, this parameter is updated.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@enable-nmr #f))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@enable-nmr))
-//    ;; Output
-//    ;; > #f
-//    
-//    (display (my-engine '@nmr-limit-depth 10))
-//    ;; Output
-//    ;; > 4
-//    
-//    (display (my-engine '@nmr-limit-depth))
-//    ;; Output
-//    ;; > 10
-//    
-//    (display (my-engine '@nmr-search-reduction 10))
-//    ;; Output
-//    ;; > 4
-//    
-//    (display (my-engine '@nmr-search-reduction))
-//    ;; Output
-//    ;; > 10
-//    
-//    (display (my-engine '@nmr-reduction 10))
-//    ;; Output
-//    ;; > 3
-//    
-//    (display (my-engine '@nmr-reduction))
-//    ;; Output
-//    ;; > 10)...";
-//    AddHelpDict("engine @enable-nmr", temp);
-//    AddHelpDict("engine @nmr-limit-depth", temp);
-//    AddHelpDict("engine @nmr-search-reduction", temp);
-//    AddHelpDict("engine @nmr-reduction", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - ProbCut ###
-//
-//* `@enable-probcut [<New setting : Boolean>]`
-//    + Returns whether ProbCut is enabled or not.
-//    + If you specify #t to `<New setting>`, ProbCut is set to be enabled.
-//      Otherwise, it is set to be disabled.
-//* `@probcut-limit-depth [<New depth : Number>]`
-//    + If remaining depth is less than this parameter, ProbCut is invalidated.
-//    + Return this parameter.
-//    + If you specify `<New depth>`, this parameter is updated.
-//* `@probcut-margin [<New margin : Number>]`
-//    + When Zero Window Search,
-//      ProbCut uses the current Beta plus this parameter as temporary Beta.
-//* `@probcut-search-reduction [<New reduction : Number>]`
-//    + When Zero Window Search, the depth is the actual depth
-//      minus this parameter.
-//    + Return this parameter.
-//    + If you specify `<New reduction>`, this parameter is updated.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@enable-probcut #t))
-//    ;; Output
-//    ;; > #f
-//    
-//    (display (my-engine '@enable-probcut))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@probcut-limit-depth 10))
-//    ;; Output
-//    ;; > 4
-//    
-//    (display (my-engine '@probcut-limit-depth))
-//    ;; Output
-//    ;; > 10
-//    
-//    (display (my-engine '@probcut-margin 1200))
-//    ;; Output
-//    ;; > 400
-//    
-//    (display (my-engine '@probcut-margin))
-//    ;; Output
-//    ;; > 1200
-//    
-//    (display (my-engine '@probcut-search-reduction 10))
-//    ;; Output
-//    ;; > 3
-//    
-//    (display (my-engine '@probcut-search-reduction))
-//    ;; Output
-//    ;; > 10)...";
-//    AddHelpDict("engine @enable-probcut", temp);
-//    AddHelpDict("engine @probcut-limit-depth", temp);
-//    AddHelpDict("engine @probcut-margin", temp);
-//    AddHelpDict("engine @probcut-search-reduction", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - History Pruning ###
-//
-//* `@enable-history-pruning [<New setting : Boolean>]`
-//    + Returns whether History Pruning is enabled or not.
-//    + If you specify #t to `<New setting>`,
-//      History Pruning is set to be enabled.
-//      Otherwise, it is set to be disabled.
-//* `@history-pruning-limit-depth [<New depth : Number>]`
-//    + If remaining depth is less than this parameter,
-//      History Pruning is invalidated.
-//    + Return this parameter.
-//    + If you specify `<New depth>`, this parameter is updated.
-//* `@history-pruning-move-threshold [<New threshold : Number>]`
-//    + If the number of the candidate move is less
-//      than the number of all moves times this parameter,
-//      History Pruning is invalidated.
-//    + This parameter is between 0.0 and 1.0.
-//    + Return this parameter.
-//    + If you specify `<New threshold>`, this parameter is updated.
-//* `@history-pruning-invalid-moves [<New number of moves : Number>]`
-//    + If the number of the candidate moves is less than this parameter,
-//      History Pruning is invalidated.
-//    + This parameter is given priority to `@history-pruning-move-threshold`.
-//    + Return this parameter.
-//    + If you specify `<New number of moves>`, this parameter is updated.
-//* `@history-pruning-threshold [<New threshold : Number>]`
-//    + If the history value of the current candidate move is lower
-//      than the max history value times this parameter,
-//      History Pruning temporarily reduces the remaining depth.
-//    + Return this parameter.
-//    + If you specify `<New threshold>`, this parameter is updated.
-//* `@history-pruning-reduction [<New reduction : Number>]`
-//    + When History Pruning reduces the remaining depth,
-//      a new depth is the current depth minus this parameter.
-//    + Return this parameter.
-//    + If you specify `<New reduction>`, this parameter is updated.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@enable-history-pruning #t))
-//    ;; Output
-//    ;; > #f
-//    
-//    (display (my-engine '@enable-history-pruning))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@history-pruning-limit-depth 10))
-//    ;; Output
-//    ;; > 4
-//    
-//    (display (my-engine '@history-pruning-limit-depth))
-//    ;; Output
-//    ;; > 10
-//    
-//    (display (my-engine '@history-pruning-move-threshold 0.8))
-//    ;; Output
-//    ;; > 0.6
-//    
-//    (display (my-engine '@history-pruning-move-threshold))
-//    ;; Output
-//    ;; > 0.8
-//    
-//    (display (my-engine '@history-pruning-invalid-moves 20))
-//    ;; Output
-//    ;; > 10
-//    
-//    (display (my-engine '@history-pruning-invalid-moves))
-//    ;; Output
-//    ;; > 20
-//    
-//    (display (my-engine '@history-pruning-threshold 0.8))
-//    ;; Output
-//    ;; > 0.5
-//    
-//    (display (my-engine '@history-pruning-threshold))
-//    ;; Output
-//    ;; > 0.8
-//    
-//    (display (my-engine '@history-pruning-reduction 10))
-//    ;; Output
-//    ;; > 1
-//    
-//    (display (my-engine '@history-pruning-reduction))
-//    ;; Output
-//    ;; > 10)...";
-//    AddHelpDict("engine @enable-history-pruning", temp);
-//    AddHelpDict("engine @history-pruning-limit-depth", temp);
-//    AddHelpDict("engine @history-pruning-move-threshold", temp);
-//    AddHelpDict("engine @history-pruning-invalid-moves", temp);
-//    AddHelpDict("engine @history-pruning-threshold", temp);
-//    AddHelpDict("engine @history-pruning-reduction", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - Late Move Reduction ###
-//
-//* `@enable-lmr [<New setting : Boolean>]`
-//    + Returns whether Late Move Reduction is enabled or not.
-//    + If you specify #t to `<New setting>`,
-//      Late Move Reduction is set to be enabled.
-//      Otherwise, it is set to be disabled.
-//* `@lmr-limit-depth [<New depth : Number>]`
-//    + If remaining depth is less than this parameter,
-//      Late Move Reduction is invalidated.
-//    + Return this parameter.
-//    + If you specify `<New depth>`, this parameter is updated.
-//* `@lmr-move-threshold [<New threshold : Number>]`
-//    + If the number of the candidate move is less
-//      than the number of all moves times this parameter,
-//      Late Move Reduction is invalidated.
-//    + This parameter is between 0.0 and 1.0.
-//    + Return this parameter.
-//    + If you specify `<New threshold>`, this parameter is updated.
-//* `@lmr-invalid-moves [<New number of moves : Number>]`
-//    + If the number of the candidate moves is less than this parameter,
-//      Late Move Reduction is invalidated.
-//    + This parameter is given priority to `@lmr-move-threshold`.
-//    + Return this parameter.
-//    + If you specify `<New number of moves>`, this parameter is updated.
-//* `@lmr-search-reduction [<New reduction : Number>]`
-//    + When searching shallowly, the depth is the actual depth
-//      minus this parameter.
-//    + Return this parameter.
-//    + If you specify `<New reduction>`, this parameter is updated.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@enable-lmr #f))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@enable-lmr))
-//    ;; Output
-//    ;; > #f
-//    
-//    (display (my-engine '@lmr-limit-depth 10))
-//    ;; Output
-//    ;; > 4
-//    
-//    (display (my-engine '@lmr-limit-depth))
-//    ;; Output
-//    ;; > 10
-//    
-//    (display (my-engine '@lmr-move-threshold 0.8))
-//    ;; Output
-//    ;; > 0.3
-//    
-//    (display (my-engine '@lmr-move-threshold))
-//    ;; Output
-//    ;; > 0.8
-//    
-//    (display (my-engine '@lmr-invalid-moves 10))
-//    ;; Output
-//    ;; > 4
-//    
-//    (display (my-engine '@lmr-invalid-moves))
-//    ;; Output
-//    ;; > 10
-//    
-//    (display (my-engine '@lmr-search-reduction 5))
-//    ;; Output
-//    ;; > 1
-//    
-//    (display (my-engine '@lmr-search-reduction))
-//    ;; Output
-//    ;; > 5)...";
-//    AddHelpDict("engine @enable-lmr", temp);
-//    AddHelpDict("engine @lmr-move-threshold", temp);
-//    AddHelpDict("engine @lmr-invalid-moves", temp);
-//    AddHelpDict("engine @lmr-search-reduction", temp);
-//
-//    temp =
-//R"...(### Customizing Search Algorithm - Futility Pruning ###
-//
-//* `@enable-futility-pruning [<New setting : Boolean>]`
-//    + Returns whether Futility Pruning is enabled or not.
-//    + If you specify #t to `<New setting>`,
-//      Futility Pruning is set to be enabled.
-//      Otherwise, it is set to be disabled.
-//* `@futility-pruning-depth [<New depth : Number>]`
-//    + If the remaining depth is less than or equals to this parameter,
-//      Futility Pruning is executed.
-//    + Return this parameter.
-//    + If you specify `<New reduction>`, this parameter is updated.
-//* `@futility-pruning-margin [<New margin : Number>]`
-//    + If the material after the move is lower than Alpha minus this parameter,
-//      the move is not evaluated.
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@enable-futility-pruning #f))
-//    ;; Output
-//    ;; > #t
-//    
-//    (display (my-engine '@enable-futility-pruning))
-//    ;; Output
-//    ;; > #f
-//    
-//    (display (my-engine '@futility-pruning-depth 10))
-//    ;; Output
-//    ;; > 3
-//    
-//    (display (my-engine '@futility-pruning-depth))
-//    ;; Output
-//    ;; > 10
-//    
-//    (display (my-engine '@futility-pruning-margin 1200))
-//    ;; Output
-//    ;; > 400
-//    
-//    (display (my-engine '@futility-pruning-margin))
-//    ;; Output
-//    ;; > 1200)...";
-//    AddHelpDict("engine @enable-futility-pruning", temp);
-//    AddHelpDict("engine @futility-pruning-depth", temp);
-//    AddHelpDict("engine @futility-pruning-margin", temp);
-//
-//    temp =
-//R"...(### Customizing Evaluation Function - Piece Square Table ###
-//
-//Returns Piece Square Table for each piece type.  
-//If you specify `<New table>`, this parameter is updated.
-//
-//`score = weight * value_table[square]`
-//
-//* `@pawn-square-table-opening [<New table : List>]`
-//* `@knight-square-table-opening [<New table : List>]`
-//* `@bishop-square-table-opening [<New table : List>]`
-//* `@rook-square-table-opening [<New table : List>]`
-//* `@queen-square-table-opening [<New table : List>]`
-//* `@king-square-table-opening [<New table : List>]`
-//* `@pawn-square-table-ending [<New table : List>]`
-//* `@knight-square-table-ending [<New table : List>]`
-//* `@bishop-square-table-ending [<New table : List>]`
-//* `@rook-square-table-ending [<New table : List>]`
-//* `@queen-square-table-ending [<New table : List>]`
-//* `@king-square-table-ending [<New table : List>]`
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@pawn-square-table-opening
-//    (list
-//      1 2 3 4 5 6 7 8
-//      11 22 33 44 55 66 77 88
-//      111 222 333 444 555 666 777 888
-//      1111 2222 3333 4444 5555 6666 7777 8888
-//      11111 22222 33333 44444 55555 66666 77777 88888
-//      111111 222222 333333 444444 555555 666666 777777 888888
-//      1111111 2222222 3333333 4444444 5555555 6666666 7777777 8888888
-//      11111111 22222222 33333333 44444444 55555555 66666666 77777777 88888888
-//    )))
-//    ;; Output
-//    ;; > (0 0 0 0 0 0 0 0
-//    ;; > 0 0 0 0 0 0 0 0
-//    ;; > 5 10 15 20 20 15 10 5
-//    ;; > 10 20 30 40 40 30 20 10
-//    ;; > 15 30 45 60 60 45 30 15
-//    ;; > 20 40 60 80 80 60 40 20
-//    ;; > 25 50 75 100 100 75 50 25
-//    ;; > 30 60 90 120 120 90 60 30)
-//    
-//    (display (my-engine '@pawn-square-table-opening))
-//    ;; Output
-//    ;; > (1 2 3 4 5 6 7 8
-//    ;; > 11 22 33 44 55 66 77 88
-//    ;; > 111 222 333 444 555 666 777 888
-//    ;; > 1111 2222 3333 4444 5555 6666 7777 8888
-//    ;; > 11111 22222 33333 44444 55555 66666 77777 88888
-//    ;; > 111111 222222 333333 444444 555555 666666 777777 888888
-//    ;; > 1111111 2222222 3333333 4444444 5555555 6666666 7777777 8888888
-//    ;; > 11111111 22222222 33333333 44444444 55555555 66666666 77777777
-//    ;; > 88888888))...";
-//    AddHelpDict("engine @pawn-square-table-opening", temp);
-//    AddHelpDict("engine @knight-square-table-opening", temp);
-//    AddHelpDict("engine @bishop-square-table-opening", temp);
-//    AddHelpDict("engine @rook-square-table-opening", temp);
-//    AddHelpDict("engine @queen-square-table-opening", temp);
-//    AddHelpDict("engine @king-square-table-opening", temp);
-//    AddHelpDict("engine @pawn-square-table-ending", temp);
-//    AddHelpDict("engine @knight-square-table-ending", temp);
-//    AddHelpDict("engine @bishop-square-table-ending", temp);
-//    AddHelpDict("engine @rook-square-table-ending", temp);
-//    AddHelpDict("engine @queen-square-table-ending", temp);
-//    AddHelpDict("engine @king-square-table-ending", temp);
-//
-//    temp =
-//R"...(### Customizing Evaluation Function - Attack ###
-//
-//Returns List composed of 7 values of attacking score.  
-//1st: Not used. This is always 0. (for EMPTY)  
-//2nd: Attacking Pawn.  
-//3rd: Attacking Knight.  
-//4th: Attacking Bishop.  
-//5th: Attacking Rook.  
-//6th: Attacking Queen.  
-//7th: Attacking King.
-//
-//If you specify `<New table>`, this parameter is updated.
-//
-//`score = weight * value_table[attacking_piece][attacked_piece]`
-//
-//* `@pawn-attack-table [<New table : List>]`
-//* `@knight-attack-table [<New table : List>]`
-//* `@bishop-attack-table [<New table : List>]`
-//* `@rook-attack-table [<New table : List>]`
-//* `@queen-attack-table [<New table : List>]`
-//* `@king-attack-table [<New table : List>]`
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@pawn-attack-table (list 1 2 3 4 5 6 7)))
-//    ;; Output
-//    ;; > (0 10 12 14 16 18 20)
-//    
-//    (display (my-engine '@pawn-attack-table))
-//    ;; Output
-//    ;; > (0 2 3 4 5 6 7)
-//
-//Returns opening weight and ending weight.  
-//If you specify `<New weight>`, this parameter is updated.
-//
-//`num_of_pieces := pieces on the current board except Kings`  
-//`weight =
-//(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
-//
-//* `@weight-pawn-attack [<New weight : List>]`
-//* `@weight-knight-attack [<New weight : List>]`
-//* `@weight-bishop-attack [<New weight : List>]`
-//* `@weight-rook-attack [<New weight : List>]`
-//* `@weight-queen-attack [<New weight : List>]`
-//* `@weight-king-attack [<New weight : List>]`)...";
-//    AddHelpDict("engine @pawn-attack-table", temp);
-//    AddHelpDict("engine @knight-attack-table", temp);
-//    AddHelpDict("engine @bishop-attack-table", temp);
-//    AddHelpDict("engine @rook-attack-table", temp);
-//    AddHelpDict("engine @queen-attack-table", temp);
-//    AddHelpDict("engine @king-attack-table", temp);
-//    AddHelpDict("engine @weight-pawn-attack", temp);
-//    AddHelpDict("engine @weight-knight-attack", temp);
-//    AddHelpDict("engine @weight-bishop-attack", temp);
-//    AddHelpDict("engine @weight-rook-attack", temp);
-//    AddHelpDict("engine @weight-queen-attack", temp);
-//    AddHelpDict("engine @weight-king-attack", temp);
-//
-//    temp =
-//R"...(### Customizing Evaluation Function - Defense ###
-//
-//Returns List composed of 7 values of defense score.  
-//1st: Not used. This is always 0. (for EMPTY)  
-//2nd: Protecting Pawn.  
-//3rd: Protecting Knight.  
-//4th: Protecting Bishop.  
-//5th: Protecting Rook.  
-//6th: Protecting Queen.  
-//7th: Protecting King.
-//
-//If you specify `<New table>`, this parameter is updated.
-//
-//`score = weight * value_table[defensing_piece][defensed_piece]`
-//
-//* `@pawn-defense-table [<New table : List>]`
-//* `@knight-defense-table [<New table : List>]`
-//* `@bishop-defense-table [<New table : List>]`
-//* `@rook-defense-table [<New table : List>]`
-//* `@queen-defense-table [<New table : List>]`
-//* `@king-defense-table [<New table : List>]`
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@pawn-defense-table (list 1 2 3 4 5 6 7)))
-//    ;; Output
-//    ;; > (0 10 0 0 0 0 0)
-//    
-//    (display (my-engine '@pawn-defense-table))
-//    ;; Output
-//    ;; > (0 2 3 4 5 6 7)
-//
-//Returns opening weight and ending weight.  
-//If you specify `<New weight>`, this parameter is updated.
-//
-//`num_of_pieces := pieces on the current board except Kings`  
-//`weight =
-//(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
-//
-//* `@weight-pawn-defense [<New weight : List>]`
-//* `@weight-knight-defense [<New weight : List>]`
-//* `@weight-bishop-defense [<New weight : List>]`
-//* `@weight-rook-defense [<New weight : List>]`
-//* `@weight-queen-defense [<New weight : List>]`
-//* `@weight-king-defense [<New weight : List>]`)...";
-//    AddHelpDict("engine @pawn-defense-table", temp);
-//    AddHelpDict("engine @knight-defense-table", temp);
-//    AddHelpDict("engine @bishop-defense-table", temp);
-//    AddHelpDict("engine @rook-defense-table", temp);
-//    AddHelpDict("engine @queen-defense-table", temp);
-//    AddHelpDict("engine @king-defense-table", temp);
-//    AddHelpDict("engine @weight-pawn-defense", temp);
-//    AddHelpDict("engine @weight-knight-defense", temp);
-//    AddHelpDict("engine @weight-bishop-defense", temp);
-//    AddHelpDict("engine @weight-rook-defense", temp);
-//    AddHelpDict("engine @weight-queen-defense", temp);
-//    AddHelpDict("engine @weight-king-defense", temp);
-//
-//    temp =
-//R"...(### Customizing Evaluation Function - Pin ###
-//
-//Returns List of 7 Lists of 7 values.
-//
-//1st list : Futile list. (For EMPTY)  
-//2nd list : A target piece is Pawn.  
-//3rd list : A target piece is Knight.  
-//4th list : A target piece is Bishop.  
-//5th list : A target piece is Rook.  
-//6th list : A target piece is Queen.  
-//7th list : A target piece is King.
-//
-//1st value of each list : Futile value.
-//2nd value of each list : A piece over the target is Pawn.
-//3rd value of each list : A piece over the target is Knight.
-//4th value of each list : A piece over the target is Bishop.
-//5th value of each list : A piece over the target is Rook.
-//6th value of each list : A piece over the target is Queen.
-//7th value of each list : A piece over the target is King.
-//
-//`score = weight * value_table[pinning_piece][target][over_the_target]`
-//
-//* `@bishop-pin-table [<New value table : List>]`
-//* `@rook-pin-table [<New value table : List>]`
-//* `@queen-pin-table [<New value table : List>]`
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (display (my-engine '@bishop-pin-table
-//      (list (list 1 2 3 4 5 6 7)
-//            (list 8 9 10 11 12 13 14)
-//            (list 15 16 17 18 19 20 21)
-//            (list 22 23 24 25 26 27 28)
-//            (list 29 30 31 32 33 34 35)
-//            (list 36 37 38 39 40 41 42)
-//            (list 43 44 45 46 47 48 49))))
-//    ;; Output
-//    ;; > ((0 0 0 0 0 0 0)
-//    ;; > (0 0 0 0 5 5 5)
-//    ;; > (0 0 0 0 10 10 10)
-//    ;; > (0 0 0 0 0 0 0)
-//    ;; > (0 0 0 0 20 30 40)
-//    ;; > (0 0 0 0 30 40 50)
-//    ;; > (0 0 0 0 40 50 0))
-//    
-//    (display (my-engine '@bishop-pin-table))
-//    ;; Output
-//    ;; >  ((0 0 0 0 0 0 0)
-//    ;; > (0 9 10 11 12 13 14)
-//    ;; > (0 16 17 18 19 20 21)
-//    ;; > (0 23 24 25 26 27 28)
-//    ;; > (0 30 31 32 33 34 35)
-//    ;; > (0 37 38 39 40 41 42)
-//    ;; > (0 44 45 46 47 48 49))
-//
-//Returns opening weight and ending weight.  
-//If you specify `<New weight>`, this parameter is updated.
-//
-//`num_of_pieces := pieces on the current board except Kings`  
-//`weight =
-//(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
-//
-//* `@weight-bishop-pin [<New weight : List>]`
-//* `@weight-rook-pin [<New weight : List>]`
-//* `@weight-queen-pin [<New weight : List>]`)...";
-//    AddHelpDict("engine @bishop-pin-table", temp);
-//    AddHelpDict("engine @rook-pin-table", temp);
-//    AddHelpDict("engine @queen-pin-table", temp);
-//    AddHelpDict("engine @weight-bishop-pin", temp);
-//    AddHelpDict("engine @weight-rook-pin", temp);
-//    AddHelpDict("engine @weight-queen-pin", temp);
-//
-//    temp =
-//R"...(### Customizing Evaluation Function - Pawn Shield ###
-//
-//If King on f1(f8) f2(f7) g1(g8) g2(g7) h1(h8) h2(h7),
-//then Pawn Shield is pawns on f g h files.  
-//If King on a1(a8) a2(a7) b1(b8) b2(b7) c1(c8) c2(c7),
-//then Pawn Shield is pawns on a b c files.
-//
-//`score = weight * value_table[square]`
-//
-//* `@pawn-shield-table [<New table : List>]`
-//    + Returns Piece Square Table for Pawn Shield
-//      as List composed of 64 numbers.
-//    + If you specify `<New table>`, this parameter is updated.
-//
-//
-//<h6> Example </h6>
-//
-//    (define my-engine (gen-engine))
-//    
-//    (define table
-//      (list 1 2 3 4 5 6 7 8
-//            9 10 11 12 13 14 15 16
-//            17 18 19 20 21 22 23 24
-//            25 26 27 28 29 30 31 32
-//            33 34 35 36 37 38 39 40
-//            41 42 43 44 45 46 47 48
-//            49 50 51 52 53 54 55 56
-//            57 58 59 60 61 62 63 64))
-//    
-//    (display (my-engine '@pawn-shield-table table))
-//    ;; Output
-//    ;; > (0 0 0 0 0 0 0 0
-//    ;; > 30 30 30 30 30 30 30 30
-//    ;; > 0 0 0 0 0 0 0 0
-//    ;; > -30 -30 -30 -30 -30 -30 -30 -30
-//    ;; > -60 -60 -60 -60 -60 -60 -60 -60
-//    ;; > -90 -90 -90 -90 -90 -90 -90 -90
-//    ;; > -60 -60 -60 -60 -60 -60 -60 -60
-//    ;; > -30 -30 -30 -30 -30 -30 -30 -30)
-//    
-//    (display (my-engine '@pawn-shield-table))
-//    ;; Output
-//    ;; > (1 2 3 4 5 6 7 8
-//    ;; > 9 10 11 12 13 14 15 16
-//    ;; > 17 18 19 20 21 22 23 24
-//    ;; > 25 26 27 28 29 30 31 32
-//    ;; > 33 34 35 36 37 38 39 40
-//    ;; > 41 42 43 44 45 46 47 48
-//    ;; > 49 50 51 52 53 54 55 56
-//    ;; > 57 58 59 60 61 62 63 64)
-//
-//Returns opening weight and ending weight.  
-//If you specify `<New weight>`, this parameter is updated.
-//
-//`num_of_pieces := pieces on the current board except Kings`  
-//`weight =
-//(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
-//
-//* `@weight-pawn-shield [<New weight : List>]`)...";
-//    AddHelpDict("engine @pawn-shield-table", temp);
-//    AddHelpDict("engine @weight-pawn-shield", temp);
-//
-//    temp =
-//R"...(### Customizing Evaluation Function - Mobility ###
-//
-//Returns opening weight and ending weight.  
-//If you specify `<New weight>`, this parameter is updated.
-//
-//`score = weight * num_of_squares_that_piece_can_move_to`
-//
-//`num_of_pieces := pieces on the current board except Kings`  
-//`weight =
-//(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
-//
-//* `@weight-pawn-mobility [<New weight : List>]`
-//* `@weight-knight-mobility [<New weight : List>]`
-//* `@weight-bishop-mobility [<New weight : List>]`
-//* `@weight-rook-mobility [<New weight : List>]`
-//* `@weight-queen-mobility [<New weight : List>]`
-//* `@weight-king-mobility [<New weight : List>]`)...";
-//    AddHelpDict("engine @weight-pawn-mobility", temp);
-//    AddHelpDict("engine @weight-knight-mobility", temp);
-//    AddHelpDict("engine @weight-bishop-mobility", temp);
-//    AddHelpDict("engine @weight-rook-mobility", temp);
-//    AddHelpDict("engine @weight-queen-mobility", temp);
-//    AddHelpDict("engine @weight-king-mobility", temp);
-//
-//    temp =
-//R"...(### Customizing Evaluation Function - Controlling Center ###
-//
-//Returns opening weight and ending weight.  
-//If you specify `<New weight>`, this parameter is updated.
-//
-//Center square are c3 c4 c5 c6 d3 d4 d5 d6 e3 e4 e5 e6 f3 f4 f5 f6.
-//
-//`score = weight * num_of_center_square_that_piece_attacks`
-//
-//`num_of_pieces := pieces on the current board except Kings`  
-//`weight =
-//(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
-//
-//* `@weight-pawn-center-control [<New weight : List>]`
-//* `@weight-knight-center-control [<New weight : List>]`
-//* `@weight-bishop-center-control [<New weight : List>]`
-//* `@weight-rook-center-control [<New weight : List>]`
-//* `@weight-queen-center-control [<New weight : List>]`
-//* `@weight-king-center-control [<New weight : List>]`)...";
-//    AddHelpDict("engine @weight-pawn-center-control", temp);
-//    AddHelpDict("engine @weight-knight-center-control", temp);
-//    AddHelpDict("engine @weight-bishop-center-control", temp);
-//    AddHelpDict("engine @weight-rook-center-control", temp);
-//    AddHelpDict("engine @weight-queen-center-control", temp);
-//    AddHelpDict("engine @weight-king-center-control", temp);
-//
-//    temp =
-//R"...(### Customizing Evaluation Function - Controlling Sweet Center ###
-//
-//Returns opening weight and ending weight.  
-//If you specify `<New weight>`, this parameter is updated.
-//
-//Sweet Center square are d3 d4 d5 d6 e3 e4 e5 e6.
-//
-//`score = weight * num_of_sweet_center_square_that_piece_attacks`
-//
-//`num_of_pieces := pieces on the current board except Kings`  
-//`weight =
-//(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
-//
-//* `@weight-pawn-sweet-center-control [<New weight : List>]`
-//* `@weight-knight-sweet-center-control [<New weight : List>]`
-//* `@weight-bishop-sweet-center-control [<New weight : List>]`
-//* `@weight-rook-sweet-center-control [<New weight : List>]`
-//* `@weight-queen-sweet-center-control [<New weight : List>]`
-//* `@weight-king-sweet-center-control [<New weight : List>]`)...";
-//    AddHelpDict("engine @weight-pawn-sweet-center-control", temp);
-//    AddHelpDict("engine @weight-knight-sweet-center-control", temp);
-//    AddHelpDict("engine @weight-bishop-sweet-center-control", temp);
-//    AddHelpDict("engine @weight-rook-sweet-center-control", temp);
-//    AddHelpDict("engine @weight-queen-sweet-center-control", temp);
-//    AddHelpDict("engine @weight-king-sweet-center-control", temp);
-//
-//    temp =
-//R"...(### Customizing Evaluation Function - Development ###
-//
-//Returns opening weight and ending weight.  
-//If you specify `<New weight>`, this parameter is updated.
-//
-//`score = weight * num_of_minor_pieces_on_starting_position`
-//
-//`num_of_pieces := pieces on the current board except Kings`  
-//`weight =
-//(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
-//
-//* `@weight-pawn-development [<New weight : List>]`
-//* `@weight-knight-development [<New weight : List>]`
-//* `@weight-bishop-development [<New weight : List>]`
-//* `@weight-rook-development [<New weight : List>]`
-//* `@weight-queen-development [<New weight : List>]`
-//* `@weight-king-development [<New weight : List>]`)...";
-//    AddHelpDict("engine @weight-pawn-development", temp);
-//    AddHelpDict("engine @weight-knight-development", temp);
-//    AddHelpDict("engine @weight-bishop-development", temp);
-//    AddHelpDict("engine @weight-rook-development", temp);
-//    AddHelpDict("engine @weight-queen-development", temp);
-//    AddHelpDict("engine @weight-king-development", temp);
-//
-//    temp =
-//R"...(### Customizing Evaluation Function - Attack around Enemy King ###
-//
-//Returns opening weight and ending weight.  
-//If you specify `<New weight>`, this parameter is updated.
-//
-//`score = weight * num_of_squares_around_enemy_king_attacked_by_pieces.`
-//
-//`num_of_pieces := pieces on the current board except Kings`  
-//`weight =
-//(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
-//
-//* `@weight-pawn-attack-around-king [<New weight : List>]`
-//* `@weight-knight-attack-around-king [<New weight : List>]`
-//* `@weight-bishop-attack-around-king [<New weight : List>]`
-//* `@weight-rook-attack-around-king [<New weight : List>]`
-//* `@weight-queen-attack-around-king [<New weight : List>]`
-//* `@weight-king-attack-around-king [<New weight : List>]`)...";
-//    AddHelpDict("engine @weight-pawn-attack-around-king", temp);
-//    AddHelpDict("engine @weight-knight-attack-around-king", temp);
-//    AddHelpDict("engine @weight-bishop-attack-around-king", temp);
-//    AddHelpDict("engine @weight-rook-attack-around-king", temp);
-//    AddHelpDict("engine @weight-queen-attack-around-king", temp);
-//    AddHelpDict("engine @weight-king-attack-around-king", temp);
-//
-//    temp =
-//R"...(### Customizing Evaluation Function - Pawn Structure ###
-//
-//Returns opening weight and ending weight.  
-//If you specify `<New weight>`, this parameter is updated.
-//
-//`num_of_pieces := pieces on the current board except Kings`  
-//`weight =
-//(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
-//
-//* `@weight-pass-pawn [<New weight : List>]`
-//    + `score = weight * num_of_pass_pawns`
-//* `@weight-protected-pass-pawn [<New weight : List>]`
-//    + `score = weight * num_of_protected_pass_pawns`
-//* `@weight-double-pawn [<New weight : List>]`
-//    + `score = weight * num_of_doubled_pawns`
-//* `@weight-iso-pawn [<New weight : List>]`
-//    + `score = weight * num_of_isorated_pawns`)...";
-//    AddHelpDict("engine @weight-pass-pawn", temp);
-//    AddHelpDict("engine @weight-protected-pass-pawn", temp);
-//    AddHelpDict("engine @weight-double-pawn", temp);
-//    AddHelpDict("engine @weight-iso-pawn", temp);
-//
-//    temp =
-//R"...(### Customizing Evaluation Function - Piece ###
-//
-//Returns opening weight and ending weight.  
-//If you specify `<New weight>`, this parameter is updated.
-//
-//`num_of_pieces := pieces on the current board except Kings`  
-//`weight =
-//(((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight`
-//
-//* `@weight-bishop-pair [<New weight : List>]`
-//    + `score = weight * if_bishop_pair_exists_then_1_else_0`
-//* `@weight-bad-bishop [<New weight : List>]`
-//    + `score = weight * num_of_pawns_on_same_colored_square_as_bishop_on`
-//
-//* `@weight-rook-pair [<New weight : List>]`
-//* `@weight-rook-semiopen-fyle [<New weight : List>]`
-//* `@weight-rook-open-fyle [<New weight : List>]`
-//* `@weight-early-queen-starting [<New weight : List>]`
-//* `@weight-weak-square [<New weight : List>]`
-//* `@weight-castling [<New weight : List>]`
-//* `@weight-abandoned-castling [<New weight : List>]`)...";
-//    AddHelpDict("engine @weight-bishop-pair", temp);
-//    AddHelpDict("engine @weight-bad-bishop", temp);
-//    AddHelpDict("engine @weight-rook-pair", temp);
-//    AddHelpDict("engine @weight-rook-semiopen-fyle", temp);
-//    AddHelpDict("engine @weight-rook-open-fyle", temp);
-//    AddHelpDict("engine @weight-early-queen-starting", temp);
-//    AddHelpDict("engine @weight-weak-square", temp);
-//    AddHelpDict("engine @weight-castling", temp);
-//    AddHelpDict("engine @weight-abandoned-castling", temp);
-//
-//    temp =
-//R"...(### gen-pgn ###
-//
-//<h6> Usage </h6>
-//
-//* `(gen-pgn <PGN string : String>)`
-//
-//<h6> Description </h6>
-//
-//* Generates and returns PGN object from `<PGN string>`.
-//* PGN object is operated by Message Symbol.
-//* PGN object has 2 states.
-//    + Current game.
-//        - This can be changed by `@set-current-game`.
-//    + Current move.
-//        - This can be changed by `@next-move`, `@prev-move`, `@alt-move`,
-//          `@orig-move`, `@rewind-move`.
-//
-//<h6> Description of Message Symbols </h6>
-//
-//* `@get-pgn-comments`
-//    + Returns Lists of comments about PGN.
-//
-//* `@get-current-game-comments.`
-//    + Returns List of comments about the current game.
-//
-//* `@get-current-move-comments`
-//    + Returns List of comments about the current move.
-//
-//* `@length`
-//    + Returns the number of games that PGN has.
-//
-//* `@set-current-game <Index : Number>`
-//    + Sets a current game into the `<Index>`th game.
-//
-//* `@get-current-game-headers`
-//    + Returns List of Lists composed with headers of the current game.
-//        - The format is "`((<Name 1> <value 1>) (<Name 2> <Value 2>)...)`".
-//
-//* `@current-move`
-//    + Returns the current move text.
-//
-//* `@next-move`
-//    + Change the current move into the next move
-//      and returns the move text.
-//
-//* `@prev-move`
-//    + Change the current move into the previous move
-//      and returns the move text.
-//
-//* `@alt-move`
-//    + Change the current move into the alternative move
-//      and returns the move text.
-//
-//* `@orig-move`
-//    + If the current move is an alternative move,
-//      then change a current move into the original move
-//      and returns the move text.
-//
-//* `@rewind-move`
-//    + Change a current move into the first move
-//      and returns the move text.
-//
-//<h6> Example </h6>
-//
-//    ;; Open PGN File.
-//    (define pgn-file (input-stream "/path/to/pgnfile.pgn"))
-//    
-//    ;; Reads the file and generates PGN object.
-//    (define my-pgn (gen-pgn (pgn-file '@read)))
-//    
-//    ;; Displays the current game headers.
-//    (display (my-pgn '@get-current-game-headers))
-//    
-//    ;; Output
-//    ;; > (("Black" "Hanako Yamada") ("Site" "Japan")
-//    ;; > ("White" "Hironori Ishibashi")))...";
-//    AddHelpDict("gen-pgn", temp);
-//
-//    temp =
-//R"...(### parse-fen/epd ###
-//
-//<h6> Usage </h6>
-//
-//* `(parse-fen/epd <FEN or EPD : String>)`
-//
-//<h6> Description </h6>
-//
-//* Parses `<FEN or EPD>` and returns result value.
-//    +  A result value is `((<Tag 1 : String> <Object 1>)...)`.
-//
-//<h6> Example </h6>
-//
-//    (display (parse-fen/epd
-//        "rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq d3 0 3"))
-//    ;; Output
-//    ;; > (("fen castling" (WHITE_SHORT_CASTLING
-//    ;; > WHITE_LONG_CASTLING BLACK_SHORT_CASTLING BLACK_LONG_CASTLING))
-//    ;; > ("fen clock" 0)
-//    ;; > ("fen en_passant" D3)
-//    ;; > ("fen ply" 5)
-//    ;; > ("fen position" ((WHITE ROOK) (WHITE KNIGHT) (WHITE BISHOP)
-//    ;; > (WHITE QUEEN) (WHITE KING) (WHITE BISHOP) (NO_SIDE EMPTY)
-//    ;; > (WHITE ROOK) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (NO_SIDE EMPTY)
-//    ;; > (NO_SIDE EMPTY) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN)
-//    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//    ;; > (NO_SIDE EMPTY) (WHITE KNIGHT) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (WHITE PAWN)
-//    ;; > (WHITE PAWN) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (BLACK PAWN) (NO_SIDE EMPTY)
-//    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (BLACK PAWN)
-//    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//    ;; > (BLACK PAWN) (BLACK PAWN) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//    ;; > (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK ROOK)
-//    ;; > (BLACK KNIGHT) (BLACK BISHOP) (BLACK QUEEN) (BLACK KING)
-//    ;; > (BLACK BISHOP) (BLACK KNIGHT) (BLACK ROOK)))
-//    ;; > ("fen to_move" BLACK)))...";
-//    AddHelpDict("parse-fen/epd", temp);
-//
-//    temp =
-//R"...(### to-fen-position ###
-//
-//<h6> Usage </h6>
-//
-//* `(to-fen-position <Pieces list : List>)`
-//
-//<h6> Description </h6>
-//
-//* Analyses `<Pieces list>` and returns FEN position.
-//
-//<h6> Example </h6>
-//
-//    (display (to-fen-position
-//        '((WHITE KING) (WHITE KING)(WHITE KING) (WHITE KING)
-//        (WHITE QUEEN) (WHITE QUEEN)(WHITE QUEEN) (WHITE QUEEN)
-//        (WHITE ROOK) (WHITE ROOK)(WHITE ROOK) (WHITE ROOK)
-//        (WHITE BISHOP) (WHITE BISHOP)(WHITE BISHOP) (WHITE BISHOP)
-//        (WHITE KNIGHT) (WHITE KNIGHT)(WHITE KNIGHT) (WHITE KNIGHT)
-//        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-//        (BLACK KNIGHT) (BLACK KNIGHT)(BLACK KNIGHT) (BLACK KNIGHT)
-//        (BLACK BISHOP) (BLACK BISHOP)(BLACK BISHOP) (BLACK BISHOP)
-//        (BLACK ROOK) (BLACK ROOK)(BLACK ROOK) (BLACK ROOK)
-//        (BLACK QUEEN) (BLACK QUEEN)(BLACK QUEEN) (BLACK QUEEN)
-//        (BLACK KING) (BLACK KING)(BLACK KING) (BLACK KING))))
-//    ;; Output
-//    ;; > qqqqkkkk/bbbbrrrr/4nnnn/8/8/NNNN4/RRRRBBBB/KKKKQQQQ)...";
-//    AddHelpDict("to-fen-position", temp);
-//  }
+  // ヘルプを作成する。
+  void Sayulisp::SetHelp() {
+    std::string help = "";
+
+    // --- 定数 --- //
+    help =
+R"...(### Constants of Squares ###
+
+<h6> Description </h6>
+
+* Symbols of squares are from 'A1' to 'H8'.
+* Each symbol binds Number.
+
+      +---+---+---+---+---+---+---+---+
+    8 | 56| 57| 58| 59| 60| 61| 62| 63|
+      +---+---+---+---+---+---+---+---+
+    7 | 48| 49| 50| 51| 52| 53| 54| 55|
+      +---+---+---+---+---+---+---+---+
+    6 | 40| 41| 42| 43| 44| 45| 46| 47|
+      +---+---+---+---+---+---+---+---+
+    5 | 32| 33| 34| 35| 36| 37| 38| 39|
+      +---+---+---+---+---+---+---+---+
+    4 | 24| 25| 26| 27| 28| 29| 30| 31|
+      +---+---+---+---+---+---+---+---+
+    3 | 16| 17| 18| 19| 20| 21| 22| 23|
+      +---+---+---+---+---+---+---+---+
+    2 |  8|  9| 10| 11| 12| 13| 14| 15|
+      +---+---+---+---+---+---+---+---+
+    1 |  0|  1|  2|  3|  4|  5|  6|  7|
+      +---+---+---+---+---+---+---+---+
+        a   b   c   d   e   f   g   h)..." ;
+    AddHelp("A1", help);
+    AddHelp("A2", help);
+    AddHelp("A3", help);
+    AddHelp("A4", help);
+    AddHelp("A5", help);
+    AddHelp("A6", help);
+    AddHelp("A7", help);
+    AddHelp("A8", help);
+    AddHelp("B1", help);
+    AddHelp("B2", help);
+    AddHelp("B3", help);
+    AddHelp("B4", help);
+    AddHelp("B5", help);
+    AddHelp("B6", help);
+    AddHelp("B7", help);
+    AddHelp("B8", help);
+    AddHelp("C1", help);
+    AddHelp("C2", help);
+    AddHelp("C3", help);
+    AddHelp("C4", help);
+    AddHelp("C5", help);
+    AddHelp("C6", help);
+    AddHelp("C7", help);
+    AddHelp("C8", help);
+    AddHelp("D1", help);
+    AddHelp("D2", help);
+    AddHelp("D3", help);
+    AddHelp("D4", help);
+    AddHelp("D5", help);
+    AddHelp("D6", help);
+    AddHelp("D7", help);
+    AddHelp("D8", help);
+    AddHelp("E1", help);
+    AddHelp("E2", help);
+    AddHelp("E3", help);
+    AddHelp("E4", help);
+    AddHelp("E5", help);
+    AddHelp("E6", help);
+    AddHelp("E7", help);
+    AddHelp("E8", help);
+    AddHelp("F1", help);
+    AddHelp("F2", help);
+    AddHelp("F3", help);
+    AddHelp("F4", help);
+    AddHelp("F5", help);
+    AddHelp("F6", help);
+    AddHelp("F7", help);
+    AddHelp("F8", help);
+    AddHelp("G1", help);
+    AddHelp("G2", help);
+    AddHelp("G3", help);
+    AddHelp("G4", help);
+    AddHelp("G5", help);
+    AddHelp("G6", help);
+    AddHelp("G7", help);
+    AddHelp("G8", help);
+    AddHelp("H1", help);
+    AddHelp("H2", help);
+    AddHelp("H3", help);
+    AddHelp("H4", help);
+    AddHelp("H5", help);
+    AddHelp("H6", help);
+    AddHelp("H7", help);
+    AddHelp("H8", help);
+
+    help =
+R"...(### Constants of Fyles ###
+
+<h6> Description </h6>
+
+* Symbols of fyles are form 'FYLE_A' to 'FYLE_H'.
+* Each symbol binds Number.
+    + 'FYLE_A' is '0'.
+    + 'FYLE_B' is '1'.
+    + 'FYLE_C' is '2'.
+    + 'FYLE_D' is '3'.
+    + 'FYLE_E' is '4'.
+    + 'FYLE_F' is '5'.
+    + 'FYLE_G' is '6'.
+    + 'FYLE_H' is '7'.)...";
+    AddHelp("FYLE_A", help);
+    AddHelp("FYLE_B", help);
+    AddHelp("FYLE_C", help);
+    AddHelp("FYLE_D", help);
+    AddHelp("FYLE_E", help);
+    AddHelp("FYLE_F", help);
+    AddHelp("FYLE_G", help);
+    AddHelp("FYLE_H", help);
+
+    help =
+R"...(### Constants of Ranks ###
+
+<h6> Description </h6>
+
+* Symbols of ranks are form 'RANK_1' to 'RANK_8'.
+* Each symbol binds Number.
+    + 'RANK_1' is '0'.
+    + 'RANK_2' is '1'.
+    + 'RANK_3' is '2'.
+    + 'RANK_4' is '3'.
+    + 'RANK_5' is '4'.
+    + 'RANK_6' is '5'.
+    + 'RANK_7' is '6'.
+    + 'RANK_8' is '7'.)...";
+    AddHelp("RANK_1", help);
+    AddHelp("RANK_2", help);
+    AddHelp("RANK_3", help);
+    AddHelp("RANK_4", help);
+    AddHelp("RANK_5", help);
+    AddHelp("RANK_6", help);
+    AddHelp("RANK_7", help);
+    AddHelp("RANK_8", help);
+
+    help =
+R"...(### Constants of Sides ###
+
+<h6> Description </h6>
+
+* Each symbol binds Number.
+    + 'NO_SIDE' is '0'.
+    + 'WHITE' is '1'.
+    + 'BLACK' is '2'.)...";
+    AddHelp("NO_SIDE", help);
+    AddHelp("WHITE", help);
+    AddHelp("BLACK", help);
+
+    help =
+R"...(### Constants of Pieces ###
+
+<h6> Description </h6>
+
+* Each symbol binds Number.
+    + 'EMPTY' is '0'.
+    + 'PAWN' is '1'.
+    + 'KNIGHT' is '2'.
+    + 'BISHOP' is '3'.
+    + 'ROOK' is '4'.
+    + 'QUEEN' is '5'.
+    + 'KING' is '6'.)...";
+    AddHelp("EMPTY", help);
+    AddHelp("PAWN", help);
+    AddHelp("KNIGHT", help);
+    AddHelp("BISHOP", help);
+    AddHelp("ROOK", help);
+    AddHelp("QUEEN", help);
+    AddHelp("KING", help);
+
+    help =
+R"...(### Constants of Castling Rights ###
+
+<h6> Description </h6>
+
+* Each symbol binds Number.
+    + 'NO_CASTLING' is '0'.
+    + 'WHITE_SHORT_CASTLING' is '1'.
+    + 'WHITE_LONG_CASTLING' is '2'.
+    + 'BLACK_SHORT_CASTLING' is '3'.
+    + 'BLACK_LONG_CASTLING' is '4'.)...";
+    AddHelp("NO_CASTLING", help);
+    AddHelp("WHITE_SHORT_CASTLING", help);
+    AddHelp("WHITE_LONG_CASTLING", help);
+    AddHelp("BLACK_SHORT_CASTLING", help);
+    AddHelp("BLACK_LONG_CASTLING", help);
+
+    help =
+R"...(### Getting squares ###
+
+* `@get-white-pawn-position`
+    + Returns List of Symbols of squares where White Pawns are on.
+* `@get-white-knight-position`
+    + Returns List of Symbols of squares where White Knights are on.
+* `@get-white-bishop-position`
+    + Returns List of Symbols of squares where White Bishops are on.
+* `@get-white-rook-position`
+    + Returns List of Symbols of squares where White Rooks are on.
+* `@get-white-queen-position`
+    + Returns List of Symbols of squares where White Queens are on.
+* `@get-white-king-position`
+    + Returns List of Symbols of squares where White King is on.
+* `@get-black-pawn-position`
+    + Returns List of Symbols of squares where Black Pawns are on.
+* `@get-black-knight-position`
+    + Returns List of Symbols of squares where Black Knights are on.
+* `@get-black-bishop-position`
+    + Returns List of Symbols of squares where Black Bishops are on.
+* `@get-black-rook-position`
+    + Returns List of Symbols of squares where Black Rooks are on.
+* `@get-black-queen-position`
+    + Returns List of Symbols of squares where Black Queens are on.
+* `@get-black-king-position`
+    + Returns List of Symbols of squares where Black King is on.
+* `@get-empty-square-position`
+    + Returns List of Symbols of empty squares.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    (display (my-engine '@get-white-pawn-position))
+    
+    ;; Output
+    ;; > (A2 B2 C2 D2 E2 F2 G2 H2))...";
+    AddHelp("engine @get-white-pawn-position", help);
+    AddHelp("engine @get-white-knight-position", help);
+    AddHelp("engine @get-white-bishop-position", help);
+    AddHelp("engine @get-white-rook-position", help);
+    AddHelp("engine @get-white-queen-position", help);
+    AddHelp("engine @get-white-king-position", help);
+    AddHelp("engine @get-black-pawn-position", help);
+    AddHelp("engine @get-black-knight-position", help);
+    AddHelp("engine @get-black-bishop-position", help);
+    AddHelp("engine @get-black-rook-position", help);
+    AddHelp("engine @get-black-queen-position", help);
+    AddHelp("engine @get-black-king-position", help);
+
+    help =
+R"...(### Getting pieces ###
+
+* `@get-piece <Square : Number or Symbol>`
+    + Returns a side and type of the piece on `<Square>` as List.
+
+* `@get-all-pieces`
+    + Returns  pieces of each square on the board as List.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    (display (my-engine '@get-piece D1))
+    
+    ;; Output
+    ;; > (WHITE QUEEN)
+    
+    (display (my-engine '@get-all-pieces))
+    
+    ;; Output
+    ;; > ((WHITE ROOK) (WHITE KNIGHT) (WHITE BISHOP) (WHITE QUEEN)
+    ;; > (WHITE KING) (WHITE BISHOP) (WHITE KNIGHT) (WHITE ROOK)
+    ;; > (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN)
+    ;; > (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (BLACK PAWN)
+    ;; > (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN)
+    ;; > (BLACK PAWN) (BLACK PAWN) (BLACK ROOK) (BLACK KNIGHT) (BLACK BISHOP)
+    ;; > (BLACK QUEEN) (BLACK KING) (BLACK BISHOP) (BLACK KNIGHT)
+    ;; > (BLACK ROOK)))...";
+    AddHelp("engine @get-piece", help);
+    AddHelp("engine @get-all-pieces", help);
+
+    help =
+R"...(### Getting states of game ###
+
+* `@get-to-move`
+    + Returns turn to move as Symbol.
+* `@get-castling-rights`
+    + Returns castling rights as Symbol.
+* `@get-en-passant-square`
+    + Returns en passant square as Symbol if it exists now.
+* `@get-ply`
+    + Returns plies of moves from starting of the game.
+    + 1 move = 2 plies.
+* `@get-clock`
+    + Returns clock(plies for 50 Moves Rule).
+* `@get-white-has-castled`
+    + Returns Boolean whether White King has castled or not.
+* `@get-black-has-castled`
+    + Returns Boolean whether Black King has castled or not.
+* `@get-fen`
+    + Returns FEN of current position.
+* `@to-string`
+    + Returns visualized board.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    ;; Move pieces by UCI command.
+    ;; 1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.O-O d5
+    ;; +---------------+
+    ;; |r . b q k . n r|
+    ;; |p p p . . p p p|
+    ;; |. . n . . . . .|
+    ;; |. . b p p . . .|
+    ;; |. . B . P . . .|
+    ;; |. . . . . N . .|
+    ;; |P P P P . P P P|
+    ;; |R N B Q . R K .|
+    ;; +---------------+
+    (my-engine '@input-uci-command
+        "position startpos moves e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 e1g1 d7d5")
+    
+    (display (my-engine '@get-to-move))
+    ;; Output
+    ;; > Symbol: WHITE
+    
+    (display (my-engine '@get-castling-rights))
+    ;; Output
+    ;; > (BLACK_SHORT_CASTLING BLACK_LONG_CASTLING)
+    
+    (display (my-engine '@get-en-passant-square))
+    ;; Output
+    ;; > Symbol: D6
+    
+    (display (my-engine '@get-ply))
+    ;; Output
+    ;; > 9
+    
+    (display (my-engine '@get-clock))
+    ;; Output
+    ;; > 0
+    
+    (display (my-engine '@get-white-has-castled))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@get-black-has-castled))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@get-fen))
+    ;; Output
+    ;; > r1bqk1nr/ppp2ppp/2n5/2bpp3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 w kq d6 0 5
+    
+    (display (my-engine '@to-string))
+    ;; Output
+    ;; >  +-----------------+
+    ;; > 8| r . b q k . n r |
+    ;; > 7| p p p . . p p p |
+    ;; > 6| . . n . . . . . |
+    ;; > 5| . . b p p . . . |
+    ;; > 4| . . B . P . . . |
+    ;; > 3| . . . . . N . . |
+    ;; > 2| P P P P . P P P |
+    ;; > 1| R N B Q . R K . |
+    ;; >  +-----------------+
+    ;; >    a b c d e f g h
+    ;; > To Move: w | Clock: 0 | Ply: 8
+    ;; > En Passant Square: d6
+    ;; > Castling Rights : kq)...";
+    AddHelp("engine @get-to-move", help);
+    AddHelp("engine @get-castling-rights", help);
+    AddHelp("engine @get-en-passant-square", help);
+    AddHelp("engine @get-ply", help);
+    AddHelp("engine @get-clock", help);
+    AddHelp("engine @get-white-has-castled", help);
+    AddHelp("engine @get-black-has-castled", help);
+
+    help =
+R"...(### Setting states of game ###
+
+* `@set-to-move <Side : Number or Symbol>`
+    + Sets turn to move.
+    + Returns previous setting.
+* `@set-castling_rights <Castling rights : List>`
+    + Sets castling rights.
+    + Returns previous setting.
+* `@set-en-passant-square <<Square : Number or Symbol> or <Nil>>`
+    + Sets en passant square.
+    + Returns previous setting.
+* `@set-ply <Ply : Number>`
+    + Sets plies(a half of one move).
+    + Returns previous setting.
+* `@set-clock <Ply : Number>`
+    + Sets clock(plies for 50 moves rule).
+    + Returns previous setting.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    (my-engine '@place-piece E4 PAWN WHITE)
+    
+    (display (my-engine '@set-to-move BLACK))
+    ;; Output
+    ;; > Symbol: WHITE
+    
+    (display (my-engine '@set-castling-rights
+        (list WHITE_LONG_CASTLING BLACK_LONG_CASTLING)))
+    ;; Output
+    ;; > (WHITE_SHORT_CASTLING WHITE_LONG_CASTLING
+    ;; > BLACK_SHORT_CASTLING BLACK_LONG_CASTLING)
+    
+    (display (my-engine '@set-en-passant-square E3))
+    ;; Output
+    ;; > ()
+    
+    (display (my-engine '@set-ply 111))
+    ;; Output
+    ;; > 1
+    
+    (display (my-engine '@set-clock 22))
+    ;; Output
+    ;; > 0
+    
+    ;; ---------------- ;;
+    ;; Current Settings ;;
+    ;; ---------------- ;;
+    
+    (display (my-engine '@get-to-move))
+    ;; Output
+    ;; > Symbol: BLACK
+    
+    (display (my-engine '@get-castling-rights))
+    ;; Output
+    ;; > (WHITE_LONG_CASTLING BLACK_LONG_CASTLING)
+    
+    (display (my-engine '@get-en-passant-square))
+    ;; Output
+    ;; > Symbol: E3
+    
+    (display (my-engine '@get-ply))
+    ;; Output
+    ;; > 111
+    
+    (display (my-engine '@get-clock))
+    ;; Output
+    ;; > 22)...";
+    AddHelp("engine @set-to-move", help);
+    AddHelp("engine @set-castling-rights", help);
+    AddHelp("engine @set-en-passant-square", help);
+    AddHelp("engine @set-ply", help);
+    AddHelp("engine @set-clock", help);
+
+    help =
+R"...(### Placing pieces ###
+
+* `@set-new-game`
+    + Sets starting position.
+    + Returns #t.
+* `@set-fen <FEN : String>`
+    + Sets position with FEN.
+    + Returns #t.
+* `@place-piece <Square : Number or Symbol> <Piece : List>`
+    + Sets a `<Piece>` on `<Square>`
+      and returns the previous piece placed on `<Square>`.
+    + `<Piece>` is `(<Side : Number or Symbol> <Type : Number or Symbol>).
+        - For example, White Pawn is `(list WHITE PAWN)`.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@set-new-game))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@set-fen
+        "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1"))
+    ;; Output
+    ;; > #t
+    
+    ;; Sets Black Rook on D1 where White Queen is placed.
+    (display (my-engine '@place-piece D1 (list BLACK ROOK)))
+    ;; Output
+    ;; > (WHITE QUEEN))...";
+    AddHelp("engine @set-new-game", help);
+    AddHelp("engine @set-fen", help);
+    AddHelp("engine @place-piece", help);
+
+    help =
+R"...(### Getting candidate moves ###
+
+* `@get-candidate-moves`
+    + Generates and returns List of candidate moves.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@get-candidate-moves))
+    ;; Output
+    ;; >  ((H2 H4 EMPTY) (H2 H3 EMPTY) (G2 G4 EMPTY) (G2 G3 EMPTY)
+    ;; > (F2 F4 EMPTY) (F2 F3 EMPTY) (E2 E4 EMPTY) (E2 E3 EMPTY) (D2 D4 EMPTY)
+    ;; > (D2 D3 EMPTY) (C2 C4 EMPTY) (C2 C3 EMPTY) (B2 B4 EMPTY) (B2 B3 EMPTY)
+    ;; > (A2 A4 EMPTY) (A2 A3 EMPTY) (G1 H3 EMPTY) (G1 F3 EMPTY) (B1 C3 EMPTY)
+    ;; > (B1 A3 EMPTY)))...";
+    AddHelp("engine @get-candidate-moves", help);
+
+    help =
+R"...(### Predicate functions ###
+
+Judges each state of the current position.
+
+* `@correct-position?`
+    + If Pawn is on 1st or 8th rank, it returns #f.
+    + When turn to move is White, if Black King is checked,
+      then it returns #f.
+    + When turn to move is Black, if White King is checked,
+      then it returns #f.
+    + Otherwise, returns #t.
+* `@white-checked?`
+* `@black-checked?`
+* `@checkmated?`
+* `@stalemated?`
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    ;; Put Pawn on 1st rank.
+    (my-engine '@place-piece D1 PAWN WHITE)
+    
+    (display (my-engine '@correct-position?))
+    ;; Output
+    ;; > #f
+    
+    (define my-engine (gen-engine))
+    
+    ;; Move pieces by UCI command.
+    ;; 1.d4 e6 2.Nf3 Bb4+
+    ;; +---------------+
+    ;; |r n b q k . n r|
+    ;; |p p p p . p p p|
+    ;; |. . . . p . . .|
+    ;; |. . . . . . . .|
+    ;; |. b . P . . . .|
+    ;; |. . . . . N . .|
+    ;; |P P P . P P P P|
+    ;; |R N B Q K B . R|
+    ;; +---------------+
+    (my-engine '@input-uci-command
+        "position startpos moves d2d4 e7e6 g1f3 f8b4")
+    
+    (display (my-engine '@white-checked?))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@black-checked?))
+    ;; Output
+    ;; > #f
+    
+    (define my-engine (gen-engine))
+    
+    ;; Move pieces by UCI command.
+    ;; 1.f3 e5 2.g4 Qh4#
+    ;; +---------------+
+    ;; |r n b . k b n r|
+    ;; |p p p p . p p p|
+    ;; |. . . . . . . .|
+    ;; |. . . . p . . .|
+    ;; |. . . . . . P q|
+    ;; |. . . . . P . .|
+    ;; |P P P P P . . P|
+    ;; |R N B Q K B N R|
+    ;; +---------------+
+    (my-engine '@input-uci-command
+        "position startpos moves f2f3 e7e5 g2g4 d8h4")
+    
+    (display (my-engine '@checkmated?))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@stalemated?))
+    ;; Output
+    ;; > #f)...";
+    AddHelp("engine @correct-position?", help);
+    AddHelp("engine @white-checked?", help);
+    AddHelp("engine @black-checked?", help);
+    AddHelp("engine @checkmated?", help);
+    AddHelp("engine @stalemated?", help);
+
+    help =
+R"...(### Taking a move ###
+
+A move is represented by List.  The List is  
+`(<From : Number or Symbol>
+  <To : Number or Symbol>
+  <Promotion : Number or Symbol>)`.
+
+* `@play-move <Move : List>`
+    + Moves one piece legally.
+    + Returns #t if it has succeeded, otherwise returns #f.
+
+* `@undo-move`
+    + Undoes previous move.
+    + Returns previous move.
+
+* `@play-note <PGN move text : String>`
+    + Moves one piece legally with `<PGN move text>`.
+    + Returns #t if it has succeeded, otherwise returns #f.
+
+* `@move->note <Move : List>`
+    + Translates Move into PGN move text according to the current position.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@play-move (list E2 E4 EMPTY)))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@get-white-pawn-position))
+    ;; Output
+    ;; > (A2 B2 C2 D2 F2 G2 H2 E4)
+    
+    (display (my-engine '@undo-move))
+    ;; Output
+    ;; > (E2 E4 EMPTY)
+    
+    (display (my-engine '@get-white-pawn-position))
+    ;; Output
+    ;; > (A2 B2 C2 D2 E2 F2 G2 H2)
+    
+    (display (my-engine '@play-note "Nf3"))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@get-white-knight-position))
+    ;; Output
+    ;; > (B1 F3)
+    
+    (display (my-engine '@move->note (list B8 C6 EMPTY)))
+    ;; Output
+    ;; > Nc6)...";
+    AddHelp("engine @play-move", help);
+    AddHelp("engine @undo-move", help);
+    AddHelp("engine @play-note", help);
+    AddHelp("engine @move->note", help);
+
+    help =
+R"...(### UCI Command ###
+
+* `@input-uci-command <UCI command : String>`
+    + Executes `<UCI command>`.
+    + If success, returns #t. Otherwise, returns #f.
+    + If you have input "go" command,
+      the engine starts thinking in background.
+      So control will come back soon.
+* `@add-uci-output-listener <Listener : Function>`
+    + Registers Function to receive UCI output from the engine.
+    + `<Listener>` is Function that has one argument(UCI output).
+* `@run`
+    + Runs as UCI Chess Engine until the engine gets "quit" command.
+    + The control doesn't come back while the engine is running.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    ;; Create a listener.
+    (define (listener message)
+        (display "I'm Listener : " message))
+    
+    ;; Register the listener.
+    (my-engine '@add-uci-output-listener listener)
+    
+    (display (my-engine '@input-uci-command "uci"))
+    ;; Output
+    ;; > I'm Listener : id name Sayuri 2015.03.27 devel
+    ;; > I'm Listener : id author Hironori Ishibashi
+    ;; > I'm Listener : option name Hash type spin default 32 min 8 max 8192
+    ;; > I'm Listener : option name Clear Hash type button
+    ;; > I'm Listener : option name Ponder type check default true
+    ;; > I'm Listener : option name Threads type spin default 1 min 1 max 64
+    ;; > I'm Listener : option name UCI_AnalyseMode type check default false
+    ;; > I'm Listener : uciok
+    ;; > #t)...";
+    AddHelp("engine @input-uci-command", help);
+    AddHelp("engine @add-uci-output-listener", help);
+    AddHelp("engine @run", help);
+
+    help =
+R"...(### Searching the best move ###
+
+Thinks and returns the best move in each condition.  
+Different from "go" command,
+the control won't come back until the engine have found the best move.
+
+* `@go-movetime <Milliseconds : Number> [<Candidate move list : List>]`
+    + Thinks for `<Milliseconds>`.
+* `@go-timelimit <Milliseconds : Number> [<Candidate move list : List>]`
+    + Thinks on the basis of `<Milliseconds>`.
+        - If `<Milliseconds>` is more than 600000,
+          the engine thinks for 60000 milliseconds.
+        - If `<Milliseconds>` is less than 600000,
+          the engine thinks for "`<Milliseconds>` / 10" milliseconds.
+* `@go-depth <Ply : Number> [<Candidate move list : List>]`
+    + Thinks until to reach `<Ply>`th depth.
+* `@go-nodes <Nodes : Number> [<Candidate move list : List>]`
+    + Thinks until to search `<Nodes>` nodes.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    ;; Register a listener.
+    (define (listener message) (display "Engine > " message))
+    (my-engine '@add-uci-output-listener listener)
+    
+    (display (my-engine '@go-movetime 10000))
+    ;; Output
+    ;; > Engine > info depth 1
+    ;; > Engine > info currmove h2h4 currmovenumber 1
+    ;; > Engine > info depth 1 seldepth 1 score cp 12 time 0 nodes 2 pv h2h4
+    ;; > Engine > info currmove h2h3 currmovenumber 2
+    ;; > Engine > info depth 1 seldepth 1 score cp 22 time 1 nodes 4 pv h2h3
+    ;; > Engine > info currmove g2g4 currmovenumber 3
+    ;; > Engine > info depth 1 seldepth 1 score cp 23 time 1 nodes 6 pv g2g4
+    ;; > Engine > info currmove g2g3 currmovenumber 4
+    ;; > Engine > info depth 1 seldepth 1 score cp 33 time 1 nodes 8 pv g2g3
+    ;; > Engine > info currmove f2f4 currmovenumber 5
+    ;; > Engine > info currmove f2f3 currmovenumber 6
+    ;; > Engine > info depth 1 seldepth 1 score cp 36 time 1 nodes 11 pv f2f3
+    ;; > Engine > info currmove e2e4 currmovenumber 7
+    ;; > Engine > info depth 1 seldepth 1 score cp 45 time 1 nodes 13 pv e2e4
+    ;; > Engine > info currmove e2e3 currmovenumber 8
+    ;; > Engine > info currmove d2d4 currmovenumber 9
+    ;; > Engine > info depth 1 seldepth 1 score cp 50 time 1 nodes 16 pv d2d4
+    ;; > Engine > info currmove d2d3 currmovenumber 10
+    ;; > Engine > info currmove c2c4 currmovenumber 11
+    ;; > Engine > info currmove c2c3 currmovenumber 12
+    ;; > Engine > info currmove b2b4 currmovenumber 13
+    ;; > Engine > info currmove b2b3 currmovenumber 14
+    ;; > Engine > info currmove a2a4 currmovenumber 15
+    ;; > Engine > info currmove a2a3 currmovenumber 16
+    ;; > Engine > info currmove g1h3 currmovenumber 17
+    ;; > Engine > info currmove g1f3 currmovenumber 18
+    ;; > Engine > info depth 1 seldepth 1 score cp 68 time 1 nodes 26 pv g1f3
+    ;; > Engine > info currmove b1c3 currmovenumber 19
+    ;; > Engine > info currmove b1a3 currmovenumber 20
+    ;;
+    ;; (Omitted)
+    ;;
+    ;; > Engine > info depth 11
+    ;; > Engine > info currmove e2e4 currmovenumber 1
+    ;; > Engine > info time 10000 nodes 5599214 hashfull 390 nps 559921
+    ;; > score cp 45 pv e2e4 b8c6 g1f3 g8f6 e4e5 f6g4 d2d4 e7e6 h2h3 f8b4
+    ;; > Engine > bestmove e2e4 ponder b8c6
+    ;; > (E2 E4 EMPTY))...";
+    AddHelp("engine @go-movetime", help);
+    AddHelp("engine @go-timelimit", help);
+    AddHelp("engine @go-depth", help);
+    AddHelp("engine @go-nodes", help);
+
+    help =
+R"...(### Hash and threads ###
+
+* `@set-hash-size <Size : Number>`
+    + Sets size of Hash Table(Transposition Table)
+      and returns the previous size.
+    + The unit of size is "byte".
+* `@set-threads <Number of threads : Number>`
+    + Sets `<Number of threads>` and returns the previous number.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    ;; Set size of Hash Table to 128 MB.
+    (my-engine '@input-uci-command "setoption name hash value 128")
+    
+    (display (my-engine '@set-hash-size (* 256 1024 1024)))
+    ;; Set size of Hash Table to 256 MB and return 128 * 1024 * 1024 bytes.
+    ;; Output
+    ;; > 1.34218e+08
+    
+    ;; Set the number of threads to 3.
+    (my-engine '@input-uci-command "setoption name threads value 3")
+    
+    (display (my-engine '@set-threads 4))
+    ;; Set the number of threads to 4 and return 3.
+    ;; Output
+    ;; > 3)...";
+    AddHelp("engine @set-hash-size", help);
+    AddHelp("engine @set-threads", help);
+
+    help =
+R"...(### Customizing Search Algorithm - Material ###
+
+* `@material [<New materal : List>]`
+    + Returns List of material.
+        - 1st : Empty (It is always 0)
+        - 2nd : Pawn
+        - 3rd : Knight
+        - 4th : Bishop
+        - 5th : Rook
+        - 6th : Queen
+        - 7th : King
+    + If you specify `<New materal>`, the material is updated.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@material (list 111 222 333 444 555 666 777)))
+    ;; Output
+    ;; > (0 100 400 400 600 1200 1e+06)
+    
+    (display (my-engine '@material))
+    ;; Output
+    ;; > (0 222 333 444 555 666 777))...";
+    AddHelp("engine @material", help);
+
+    help =
+R"...(### Customizing Search Algorithm - Quiescence Search ###
+
+* `@enable-quiesce-search [<New setting : Boolean>]`
+    + Returns whether Quiescence Search is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Quiescence Search is set to be enabled.
+      Otherwise, it is set to be disabled.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-quiesce-search #f))
+    ;; Output
+    :: > #t
+    
+    (display (my-engine '@enable-quiesce-search))
+    ;; Output
+    :: > #f)...";
+    AddHelp("engine @enable-quiesce-search", help);
+
+    help =
+R"...(### Customizing Search Algorithm - Repetition Check ###
+
+* `@enable-repetition-check [<New setting : Boolean>]`
+    + Returns whether Repetition Check is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Repetition Check is set to be enabled.
+      Otherwise, it is set to be disabled.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-repetition-check #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-repetition-check))
+    ;; Output
+    ;; > #f)...";
+    AddHelp("engine @enable-repetition-check", help);
+
+    help =
+R"...(### Customizing Search Algorithm - Check Extension ###
+
+* `@enable-check-extension [<New setting : Boolean>]`
+    + Returns whether Check Extension is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Check Extension is set to be enabled.
+      Otherwise, it is set to be disabled.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-check-extension #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-check-extension))
+    ;; Output
+    ;; > #f)...";
+    AddHelp("engine @enable-check-extension", help);
+
+    help =
+R"...(### Customizing Search Algorithm - YBWC ###
+
+* `@ybwc-limit-depth [<New depth : Number>]`
+    + If remaining depth is less than this parameter, YBWC is invalidated.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+
+* `@ybwc-invalid-moves [<New number of moves : Number>]`
+    + YBWC searches with one thread during this parameter of candidate moves.
+    + Return this parameter.
+    + If you specify `<New number of moves>`, this parameter is updated.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@ybwc-limit-depth 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@ybwc-limit-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@ybwc-invalid-moves 10))
+    ;; Output
+    ;; > 3
+    
+    (display (my-engine '@ybwc-invalid-moves))
+    ;; Output
+    ;; > 10)...";
+    AddHelp("engine @ybwc-limit-depth", help);
+    AddHelp("engine @ybwc-invalid-moves", help);
+
+    help =
+R"...(### Customizing Search Algorithm - Aspiration Windows ###
+
+* `@enable-aspiration-windows [<New setting : Boolean>]`
+    + Returns whether Aspiration Windows is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Aspiration Windows is set to be enabled.
+      Otherwise, it is set to be disabled.
+* `@aspiration-windows-limit-depth [<New depth : Number>]`
+    + If remaining depth is less than this parameter at the root node,
+      Aspiration Windows is invalidated.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+* `@aspiration-windows-delta [<New delta : Number>]`
+    + Return Delta.
+    + If you specify `<New delta>`, Delta is updated.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-aspiration-windows #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-aspiration-windows))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@aspiration-windows-limit-depth 10))
+    ;; Output
+    ;; > 5
+    
+    (display (my-engine '@aspiration-windows-limit-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@aspiration-windows-delta 20))
+    ;; Output
+    ;; > 15
+    
+    (display (my-engine '@aspiration-windows-delta))
+    ;; Output
+    ;; > 20)...";
+    AddHelp("engine @enable-aspiration-windows", help);
+    AddHelp("engine @aspiration-windows-limit-depth", help);
+    AddHelp("engine @aspiration-windows-delta", help);
+
+    help =
+R"...(### Customizing Search Algorithm - Aspiration Windows ###
+
+* `@enable-see [<New setting : Boolean>]`
+    + Returns whether SEE is enabled or not.
+    + If you specify #t to `<New setting>`,
+      SEE is set to be enabled. Otherwise, it is set to be disabled.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-see #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-see))
+    ;; Output
+    ;; > #f)...";
+    AddHelp("engine @enable-see", help);
+
+    help =
+R"...(### Customizing Search Algorithm - History Heuristics ###
+
+* `@enable-history [<New setting : Boolean>]`
+    + Returns whether History Heuristics is enabled or not.
+    + If you specify #t to `<New setting>`,
+      History Heuristics is set to be enabled.
+      Otherwise, it is set to be disabled.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-history #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-history))
+    ;; Output
+    ;; > #f)...";
+    AddHelp("engine @enable-history", help);
+
+    help =
+R"...(### Customizing Search Algorithm - Killer Move Heuristics ###
+
+* `@enable-killer [<New setting : Boolean>]`
+    + Returns whether Killer Move Heuristics is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Killer Move Hiuristics is set to be enabled.
+      Otherwise, it is set to be disabled.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-killer #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-killer))
+    ;; Output
+    ;; > #f)...";
+    AddHelp("engine @enable-killer", help);
+
+    help =
+R"...(### Customizing Search Algorithm - Hash Table ###
+
+* `@enable-hash-table [<New setting : Boolean>]`
+    + Returns whether Transposition Table is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Transposition Table is set to be enabled.
+      Otherwise, it is set to be disabled.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-hash-table #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-hash-table))
+    ;; Output
+    ;; > #t)...";
+    AddHelp("engine @enable-hash-table", help);
+
+    help =
+R"...(### Customizing Search Algorithm - Internal Iterative Deepening ###
+
+* `@enable-iid [<New setting : Boolean>]`
+    + Returns whether Internal Iterative Deepening is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Internal Iterative Deepening is set to be enabled.
+      Otherwise, it is set to be disabled.
+* `@iid-limit-depth [<New depth : Number>]`
+    + If remaining depth is less than this parameter,
+      Internal Iterative Deepening is invalidated.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+* `@iid-search-depth [<New depth : Number>]`
+    + Internal Iterative Deepening searches until depth of this parameter.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-iid #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-iid))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@iid-limit-depth 10))
+    ;; Output
+    ;; > 5
+    
+    (display (my-engine '@iid-limit-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@iid-search-depth 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@iid-search-depth))
+    ;; Output
+    ;; > 10)...";
+    AddHelp("engine @enable-iid", help);
+    AddHelp("engine @iid-limit-depth", help);
+    AddHelp("engine @iid-search-depth", help);
+
+    help =
+R"...(### Customizing Search Algorithm - Null Move Reduction ###
+
+* `@enable-nmr [<New setting : Boolean>]`
+    + Returns whether Null Move Reduction is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Null Move Reduction is set to be enabled.
+      Otherwise, it is set to be disabled.
+* `@nmr-limit-depth [<New depth : Number>]`
+    + If remaining depth is less than this parameter,
+      Null Move Reduction is invalidated.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+* `@nmr-search-reduction [<New reduction : Number>]`
+    + When searching shallowly, the depth is the actual depth
+      minus this parameter.
+    + Return this parameter.
+    + If you specify `<New reduction>`, this parameter is updated.
+* `@nmr-reduction [<New reduction : Number>]`
+    + If the score is greater than or equals to Beta,
+      the remaining depth is reduced by this parameter.
+    + Return this parameter.
+    + If you specify `<New reduction>`, this parameter is updated.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-nmr #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-nmr))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@nmr-limit-depth 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@nmr-limit-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@nmr-search-reduction 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@nmr-search-reduction))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@nmr-reduction 10))
+    ;; Output
+    ;; > 3
+    
+    (display (my-engine '@nmr-reduction))
+    ;; Output
+    ;; > 10)...";
+    AddHelp("engine @enable-nmr", help);
+    AddHelp("engine @nmr-limit-depth", help);
+    AddHelp("engine @nmr-search-reduction", help);
+    AddHelp("engine @nmr-reduction", help);
+
+    help =
+R"...(### Customizing Search Algorithm - ProbCut ###
+
+* `@enable-probcut [<New setting : Boolean>]`
+    + Returns whether ProbCut is enabled or not.
+    + If you specify #t to `<New setting>`, ProbCut is set to be enabled.
+      Otherwise, it is set to be disabled.
+* `@probcut-limit-depth [<New depth : Number>]`
+    + If remaining depth is less than this parameter, ProbCut is invalidated.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+* `@probcut-margin [<New margin : Number>]`
+    + When Zero Window Search,
+      ProbCut uses the current Beta plus this parameter as temporary Beta.
+* `@probcut-search-reduction [<New reduction : Number>]`
+    + When Zero Window Search, the depth is the actual depth
+      minus this parameter.
+    + Return this parameter.
+    + If you specify `<New reduction>`, this parameter is updated.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-probcut #t))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@enable-probcut))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@probcut-limit-depth 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@probcut-limit-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@probcut-margin 1200))
+    ;; Output
+    ;; > 400
+    
+    (display (my-engine '@probcut-margin))
+    ;; Output
+    ;; > 1200
+    
+    (display (my-engine '@probcut-search-reduction 10))
+    ;; Output
+    ;; > 3
+    
+    (display (my-engine '@probcut-search-reduction))
+    ;; Output
+    ;; > 10)...";
+    AddHelp("engine @enable-probcut", help);
+    AddHelp("engine @probcut-limit-depth", help);
+    AddHelp("engine @probcut-margin", help);
+    AddHelp("engine @probcut-search-reduction", help);
+
+    help =
+R"...(### Customizing Search Algorithm - History Pruning ###
+
+* `@enable-history-pruning [<New setting : Boolean>]`
+    + Returns whether History Pruning is enabled or not.
+    + If you specify #t to `<New setting>`,
+      History Pruning is set to be enabled.
+      Otherwise, it is set to be disabled.
+* `@history-pruning-limit-depth [<New depth : Number>]`
+    + If remaining depth is less than this parameter,
+      History Pruning is invalidated.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+* `@history-pruning-move-threshold [<New threshold : Number>]`
+    + If the number of the candidate move is less
+      than the number of all moves times this parameter,
+      History Pruning is invalidated.
+    + This parameter is between 0.0 and 1.0.
+    + Return this parameter.
+    + If you specify `<New threshold>`, this parameter is updated.
+* `@history-pruning-invalid-moves [<New number of moves : Number>]`
+    + If the number of the candidate moves is less than this parameter,
+      History Pruning is invalidated.
+    + This parameter is given priority to `@history-pruning-move-threshold`.
+    + Return this parameter.
+    + If you specify `<New number of moves>`, this parameter is updated.
+* `@history-pruning-threshold [<New threshold : Number>]`
+    + If the history value of the current candidate move is lower
+      than the max history value times this parameter,
+      History Pruning temporarily reduces the remaining depth.
+    + Return this parameter.
+    + If you specify `<New threshold>`, this parameter is updated.
+* `@history-pruning-reduction [<New reduction : Number>]`
+    + When History Pruning reduces the remaining depth,
+      a new depth is the current depth minus this parameter.
+    + Return this parameter.
+    + If you specify `<New reduction>`, this parameter is updated.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-history-pruning #t))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@enable-history-pruning))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@history-pruning-limit-depth 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@history-pruning-limit-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@history-pruning-move-threshold 0.8))
+    ;; Output
+    ;; > 0.6
+    
+    (display (my-engine '@history-pruning-move-threshold))
+    ;; Output
+    ;; > 0.8
+    
+    (display (my-engine '@history-pruning-invalid-moves 20))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@history-pruning-invalid-moves))
+    ;; Output
+    ;; > 20
+    
+    (display (my-engine '@history-pruning-threshold 0.8))
+    ;; Output
+    ;; > 0.5
+    
+    (display (my-engine '@history-pruning-threshold))
+    ;; Output
+    ;; > 0.8
+    
+    (display (my-engine '@history-pruning-reduction 10))
+    ;; Output
+    ;; > 1
+    
+    (display (my-engine '@history-pruning-reduction))
+    ;; Output
+    ;; > 10)...";
+    AddHelp("engine @enable-history-pruning", help);
+    AddHelp("engine @history-pruning-limit-depth", help);
+    AddHelp("engine @history-pruning-move-threshold", help);
+    AddHelp("engine @history-pruning-invalid-moves", help);
+    AddHelp("engine @history-pruning-threshold", help);
+    AddHelp("engine @history-pruning-reduction", help);
+
+    help =
+R"...(### Customizing Search Algorithm - Late Move Reduction ###
+
+* `@enable-lmr [<New setting : Boolean>]`
+    + Returns whether Late Move Reduction is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Late Move Reduction is set to be enabled.
+      Otherwise, it is set to be disabled.
+* `@lmr-limit-depth [<New depth : Number>]`
+    + If remaining depth is less than this parameter,
+      Late Move Reduction is invalidated.
+    + Return this parameter.
+    + If you specify `<New depth>`, this parameter is updated.
+* `@lmr-move-threshold [<New threshold : Number>]`
+    + If the number of the candidate move is less
+      than the number of all moves times this parameter,
+      Late Move Reduction is invalidated.
+    + This parameter is between 0.0 and 1.0.
+    + Return this parameter.
+    + If you specify `<New threshold>`, this parameter is updated.
+* `@lmr-invalid-moves [<New number of moves : Number>]`
+    + If the number of the candidate moves is less than this parameter,
+      Late Move Reduction is invalidated.
+    + This parameter is given priority to `@lmr-move-threshold`.
+    + Return this parameter.
+    + If you specify `<New number of moves>`, this parameter is updated.
+* `@lmr-search-reduction [<New reduction : Number>]`
+    + When searching shallowly, the depth is the actual depth
+      minus this parameter.
+    + Return this parameter.
+    + If you specify `<New reduction>`, this parameter is updated.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-lmr #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-lmr))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@lmr-limit-depth 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@lmr-limit-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@lmr-move-threshold 0.8))
+    ;; Output
+    ;; > 0.3
+    
+    (display (my-engine '@lmr-move-threshold))
+    ;; Output
+    ;; > 0.8
+    
+    (display (my-engine '@lmr-invalid-moves 10))
+    ;; Output
+    ;; > 4
+    
+    (display (my-engine '@lmr-invalid-moves))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@lmr-search-reduction 5))
+    ;; Output
+    ;; > 1
+    
+    (display (my-engine '@lmr-search-reduction))
+    ;; Output
+    ;; > 5)...";
+    AddHelp("engine @enable-lmr", help);
+    AddHelp("engine @lmr-move-threshold", help);
+    AddHelp("engine @lmr-invalid-moves", help);
+    AddHelp("engine @lmr-search-reduction", help);
+
+    help =
+R"...(### Customizing Search Algorithm - Futility Pruning ###
+
+* `@enable-futility-pruning [<New setting : Boolean>]`
+    + Returns whether Futility Pruning is enabled or not.
+    + If you specify #t to `<New setting>`,
+      Futility Pruning is set to be enabled.
+      Otherwise, it is set to be disabled.
+* `@futility-pruning-depth [<New depth : Number>]`
+    + If the remaining depth is less than or equals to this parameter,
+      Futility Pruning is executed.
+    + Return this parameter.
+    + If you specify `<New reduction>`, this parameter is updated.
+* `@futility-pruning-margin [<New margin : Number>]`
+    + If the material after the move is lower than Alpha minus this parameter,
+      the move is not evaluated.
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@enable-futility-pruning #f))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@enable-futility-pruning))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@futility-pruning-depth 10))
+    ;; Output
+    ;; > 3
+    
+    (display (my-engine '@futility-pruning-depth))
+    ;; Output
+    ;; > 10
+    
+    (display (my-engine '@futility-pruning-margin 1200))
+    ;; Output
+    ;; > 400
+    
+    (display (my-engine '@futility-pruning-margin))
+    ;; Output
+    ;; > 1200)...";
+    AddHelp("engine @enable-futility-pruning", help);
+    AddHelp("engine @futility-pruning-depth", help);
+    AddHelp("engine @futility-pruning-margin", help);
+
+    help = R"...( Sayuri Weight System
+--------------------
+
+### Weight by Polygonal Line Graph ###
+
+<h6> Definition </h6>
+
+`Point := a List that (number_of_pieces, weight)`
+
+`Weight Graph := a List of Points.`
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    (define weight-list '((1 111) (2 222) (3 333) (4 444) (5 555)))
+    
+    (display (my-engine '@weight-pass-pawn weight-list))
+    (display (my-engine '@weight-pass-pawn))
+    ;; > ((2 30) (14 30) (32 20))
+    ;; > ((1 111) (2 222) (3 333) (4 444) (5 555))
+
+
+### Weight by Opening weight and Ending weight ###
+
+<h6> Definition </h6>
+
+`Opening := From 32 to 15 pieces are on the board.`
+
+`Ending := From 14 to 2 pieces are on the board.`
+
+<h6> Calculation Formulas </h6>
+
+On Opening :
+
+    slope = (opening_weight - ending_weight) / (32 - 14)
+    weight = slope * (x - 14) + ending_weight
+
+On Ending :
+
+    weight = ending_weight
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    (define opening-weight 99.9)
+    (define ending-weight 88.8)
+    
+    (display (my-engine '@weight-pass-pawn opening-weight ending-weight))
+    (display (my-engine '@weight-pass-pawn))
+    ;; Output
+    ;; > ((2 30) (14 30) (32 20))
+    ;; > ((2 88.8) (14 88.8) (32 99.9)))...";
+    AddHelp("sayuri weight system", help);
+
+    help =
+R"...(### Customizing Evaluation Function - Piece Square Table ###
+
+Returns Piece Square Table for each piece type.  
+If you specify `<New table>`, this parameter is updated.
+
+`score = weight * value_table[square]`
+
+* `@pawn-square-table-opening [<New table : List>]`
+* `@knight-square-table-opening [<New table : List>]`
+* `@bishop-square-table-opening [<New table : List>]`
+* `@rook-square-table-opening [<New table : List>]`
+* `@queen-square-table-opening [<New table : List>]`
+* `@king-square-table-opening [<New table : List>]`
+* `@pawn-square-table-ending [<New table : List>]`
+* `@knight-square-table-ending [<New table : List>]`
+* `@bishop-square-table-ending [<New table : List>]`
+* `@rook-square-table-ending [<New table : List>]`
+* `@queen-square-table-ending [<New table : List>]`
+* `@king-square-table-ending [<New table : List>]`
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@pawn-square-table-opening
+    (list
+      1 2 3 4 5 6 7 8
+      11 22 33 44 55 66 77 88
+      111 222 333 444 555 666 777 888
+      1111 2222 3333 4444 5555 6666 7777 8888
+      11111 22222 33333 44444 55555 66666 77777 88888
+      111111 222222 333333 444444 555555 666666 777777 888888
+      1111111 2222222 3333333 4444444 5555555 6666666 7777777 8888888
+      11111111 22222222 33333333 44444444 55555555 66666666 77777777 88888888
+    )))
+    ;; Output
+    ;; > (0 0 0 0 0 0 0 0
+    ;; > 0 0 0 0 0 0 0 0
+    ;; > 5 10 15 20 20 15 10 5
+    ;; > 10 20 30 40 40 30 20 10
+    ;; > 15 30 45 60 60 45 30 15
+    ;; > 20 40 60 80 80 60 40 20
+    ;; > 25 50 75 100 100 75 50 25
+    ;; > 30 60 90 120 120 90 60 30)
+    
+    (display (my-engine '@pawn-square-table-opening))
+    ;; Output
+    ;; > (1 2 3 4 5 6 7 8
+    ;; > 11 22 33 44 55 66 77 88
+    ;; > 111 222 333 444 555 666 777 888
+    ;; > 1111 2222 3333 4444 5555 6666 7777 8888
+    ;; > 11111 22222 33333 44444 55555 66666 77777 88888
+    ;; > 111111 222222 333333 444444 555555 666666 777777 888888
+    ;; > 1111111 2222222 3333333 4444444 5555555 6666666 7777777 8888888
+    ;; > 11111111 22222222 33333333 44444444 55555555 66666666 77777777
+    ;; > 88888888)
+
+<h6> Weights </h6>
+
+Usage : Run `(help "sayuri weight system")`
+
+* Opening Position
+    + `@weight-pawn-opening-position`
+    + `@weight-knight-opening-position`
+    + `@weight-bishop-opening-position`
+    + `@weight-rook-opening-position`
+    + `@weight-queen-opening-position`
+    + `@weight-king-opening-position`
+* Ending Position
+    + `@weight-pawn-ending-position`
+    + `@weight-knight-ending-position`
+    + `@weight-bishop-ending-position`
+    + `@weight-rook-ending-position`
+    + `@weight-queen-ending-position`
+    + `@weight-king-ending-position`)...";
+    AddHelp("engine @pawn-square-table-opening", help);
+    AddHelp("engine @knight-square-table-opening", help);
+    AddHelp("engine @bishop-square-table-opening", help);
+    AddHelp("engine @rook-square-table-opening", help);
+    AddHelp("engine @queen-square-table-opening", help);
+    AddHelp("engine @king-square-table-opening", help);
+    AddHelp("engine @pawn-square-table-ending", help);
+    AddHelp("engine @knight-square-table-ending", help);
+    AddHelp("engine @bishop-square-table-ending", help);
+    AddHelp("engine @rook-square-table-ending", help);
+    AddHelp("engine @queen-square-table-ending", help);
+    AddHelp("engine @king-square-table-ending", help);
+    AddHelp("engine @weight-pawn-opening-position", help);
+    AddHelp("engine @weight-knight-opening-position", help);
+    AddHelp("engine @weight-bishop-opening-position", help);
+    AddHelp("engine @weight-rook-opening-position", help);
+    AddHelp("engine @weight-queen-opening-position", help);
+    AddHelp("engine @weight-king-opening-position", help);
+    AddHelp("engine @weight-pawn-ending-position", help);
+    AddHelp("engine @weight-knight-ending-position", help);
+    AddHelp("engine @weight-bishop-ending-position", help);
+    AddHelp("engine @weight-rook-ending-position", help);
+    AddHelp("engine @weight-queen-ending-position", help);
+    AddHelp("engine @weight-king-ending-position", help);
+
+    help =
+R"...(### Customizing Evaluation Function - Attack ###
+
+Returns List composed of 7 values of attacking score.  
+1st: Not used. This is always 0. (for EMPTY)  
+2nd: Attacking Pawn.  
+3rd: Attacking Knight.  
+4th: Attacking Bishop.  
+5th: Attacking Rook.  
+6th: Attacking Queen.  
+7th: Attacking King.
+
+If you specify `<New table>`, this parameter is updated.
+
+`score = weight * value_table[attacking_piece][attacked_piece]`
+
+* `@pawn-attack-table [<New table : List>]`
+* `@knight-attack-table [<New table : List>]`
+* `@bishop-attack-table [<New table : List>]`
+* `@rook-attack-table [<New table : List>]`
+* `@queen-attack-table [<New table : List>]`
+* `@king-attack-table [<New table : List>]`
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@pawn-attack-table (list 1 2 3 4 5 6 7)))
+    ;; Output
+    ;; > (0 10 12 14 16 18 20)
+    
+    (display (my-engine '@pawn-attack-table))
+    ;; Output
+    ;; > (0 2 3 4 5 6 7)
+    
+<h6> Weights </h6>
+
+Usage : Run `(help "sayuri weight system")`
+
+* `@weight-pawn-attack`
+* `@weight-knight-attack`
+* `@weight-bishop-attack`
+* `@weight-rook-attack`
+* `@weight-queen-attack`
+* `@weight-king-attack`)...";
+    AddHelp("engine @pawn-attack-table", help);
+    AddHelp("engine @knight-attack-table", help);
+    AddHelp("engine @bishop-attack-table", help);
+    AddHelp("engine @rook-attack-table", help);
+    AddHelp("engine @queen-attack-table", help);
+    AddHelp("engine @king-attack-table", help);
+    AddHelp("engine @weight-pawn-attack", help);
+    AddHelp("engine @weight-knight-attack", help);
+    AddHelp("engine @weight-bishop-attack", help);
+    AddHelp("engine @weight-rook-attack", help);
+    AddHelp("engine @weight-queen-attack", help);
+    AddHelp("engine @weight-king-attack", help);
+
+    help =
+R"...(### Customizing Evaluation Function - Defense ###
+
+Returns List composed of 7 values of defense score.  
+1st: Not used. This is always 0. (for EMPTY)  
+2nd: Protecting Pawn.  
+3rd: Protecting Knight.  
+4th: Protecting Bishop.  
+5th: Protecting Rook.  
+6th: Protecting Queen.  
+7th: Protecting King.
+
+If you specify `<New table>`, this parameter is updated.
+
+`score = weight * value_table[defensing_piece][defensed_piece]`
+
+* `@pawn-defense-table [<New table : List>]`
+* `@knight-defense-table [<New table : List>]`
+* `@bishop-defense-table [<New table : List>]`
+* `@rook-defense-table [<New table : List>]`
+* `@queen-defense-table [<New table : List>]`
+* `@king-defense-table [<New table : List>]`
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@pawn-defense-table (list 1 2 3 4 5 6 7)))
+    ;; Output
+    ;; > (0 10 0 0 0 0 0)
+    
+    (display (my-engine '@pawn-defense-table))
+    ;; Output
+    ;; > (0 2 3 4 5 6 7)
+    
+<h6> Weights </h6>
+
+Usage : Run `(help "sayuri weight system")`
+
+* `@weight-pawn-defense`
+* `@weight-knight-defense`
+* `@weight-bishop-defense`
+* `@weight-rook-defense`
+* `@weight-queen-defense`
+* `@weight-king-defense`)...";
+    AddHelp("engine @pawn-defense-table", help);
+    AddHelp("engine @knight-defense-table", help);
+    AddHelp("engine @bishop-defense-table", help);
+    AddHelp("engine @rook-defense-table", help);
+    AddHelp("engine @queen-defense-table", help);
+    AddHelp("engine @king-defense-table", help);
+    AddHelp("engine @weight-pawn-defense", help);
+    AddHelp("engine @weight-knight-defense", help);
+    AddHelp("engine @weight-bishop-defense", help);
+    AddHelp("engine @weight-rook-defense", help);
+    AddHelp("engine @weight-queen-defense", help);
+    AddHelp("engine @weight-king-defense", help);
+
+    help =
+R"...(### Customizing Evaluation Function - Pin ###
+
+Returns List of 7 Lists of 7 values.
+
+1st list : Futile list. (For EMPTY)  
+2nd list : A target piece is Pawn.  
+3rd list : A target piece is Knight.  
+4th list : A target piece is Bishop.  
+5th list : A target piece is Rook.  
+6th list : A target piece is Queen.  
+7th list : A target piece is King.
+
+1st value of each list : Futile value.
+2nd value of each list : A piece over the target is Pawn.
+3rd value of each list : A piece over the target is Knight.
+4th value of each list : A piece over the target is Bishop.
+5th value of each list : A piece over the target is Rook.
+6th value of each list : A piece over the target is Queen.
+7th value of each list : A piece over the target is King.
+
+`score = weight * value_table[pinning_piece][target][over_the_target]`
+
+* `@bishop-pin-table [<New value table : List>]`
+* `@rook-pin-table [<New value table : List>]`
+* `@queen-pin-table [<New value table : List>]`
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (display (my-engine '@bishop-pin-table
+      (list (list 1 2 3 4 5 6 7)
+            (list 8 9 10 11 12 13 14)
+            (list 15 16 17 18 19 20 21)
+            (list 22 23 24 25 26 27 28)
+            (list 29 30 31 32 33 34 35)
+            (list 36 37 38 39 40 41 42)
+            (list 43 44 45 46 47 48 49))))
+    ;; Output
+    ;; > ((0 0 0 0 0 0 0)
+    ;; > (0 0 0 0 5 5 5)
+    ;; > (0 0 0 0 10 10 10)
+    ;; > (0 0 0 0 0 0 0)
+    ;; > (0 0 0 0 20 30 40)
+    ;; > (0 0 0 0 30 40 50)
+    ;; > (0 0 0 0 40 50 0))
+    
+    (display (my-engine '@bishop-pin-table))
+    ;; Output
+    ;; >  ((0 0 0 0 0 0 0)
+    ;; > (0 9 10 11 12 13 14)
+    ;; > (0 16 17 18 19 20 21)
+    ;; > (0 23 24 25 26 27 28)
+    ;; > (0 30 31 32 33 34 35)
+    ;; > (0 37 38 39 40 41 42)
+    ;; > (0 44 45 46 47 48 49))
+    
+<h6> Weights </h6>
+
+Usage : Run `(help "sayuri weight system")`
+
+* `@weight-bishop-pin`
+* `@weight-rook-pin`
+* `@weight-queen-pin`)...";
+    AddHelp("engine @bishop-pin-table", help);
+    AddHelp("engine @rook-pin-table", help);
+    AddHelp("engine @queen-pin-table", help);
+    AddHelp("engine @weight-bishop-pin", help);
+    AddHelp("engine @weight-rook-pin", help);
+    AddHelp("engine @weight-queen-pin", help);
+
+    help =
+R"...(### Customizing Evaluation Function - Pawn Shield ###
+
+If King on f1(f8) f2(f7) g1(g8) g2(g7) h1(h8) h2(h7),
+then Pawn Shield is pawns on f g h files.  
+If King on a1(a8) a2(a7) b1(b8) b2(b7) c1(c8) c2(c7),
+then Pawn Shield is pawns on a b c files.
+
+`score = weight * value_table[square]`
+
+* `@pawn-shield-table [<New table : List>]`
+    + Returns Piece Square Table for Pawn Shield
+      as List composed of 64 numbers.
+    + If you specify `<New table>`, this parameter is updated.
+
+
+<h6> Example </h6>
+
+    (define my-engine (gen-engine))
+    
+    (define table
+      (list 1 2 3 4 5 6 7 8
+            9 10 11 12 13 14 15 16
+            17 18 19 20 21 22 23 24
+            25 26 27 28 29 30 31 32
+            33 34 35 36 37 38 39 40
+            41 42 43 44 45 46 47 48
+            49 50 51 52 53 54 55 56
+            57 58 59 60 61 62 63 64))
+    
+    (display (my-engine '@pawn-shield-table table))
+    ;; Output
+    ;; > (0 0 0 0 0 0 0 0
+    ;; > 30 30 30 30 30 30 30 30
+    ;; > 0 0 0 0 0 0 0 0
+    ;; > -30 -30 -30 -30 -30 -30 -30 -30
+    ;; > -60 -60 -60 -60 -60 -60 -60 -60
+    ;; > -90 -90 -90 -90 -90 -90 -90 -90
+    ;; > -60 -60 -60 -60 -60 -60 -60 -60
+    ;; > -30 -30 -30 -30 -30 -30 -30 -30)
+    
+    (display (my-engine '@pawn-shield-table))
+    ;; Output
+    ;; > (1 2 3 4 5 6 7 8
+    ;; > 9 10 11 12 13 14 15 16
+    ;; > 17 18 19 20 21 22 23 24
+    ;; > 25 26 27 28 29 30 31 32
+    ;; > 33 34 35 36 37 38 39 40
+    ;; > 41 42 43 44 45 46 47 48
+    ;; > 49 50 51 52 53 54 55 56
+    ;; > 57 58 59 60 61 62 63 64)
+    
+<h6> Weights </h6>
+
+Usage : Run `(help "sayuri weight system")`
+
+* `@weight-pawn-shield`)...";
+    AddHelp("engine @pawn-shield-table", help);
+    AddHelp("engine @weight-pawn-shield", help);
+
+    help =
+R"...(### Customizing Evaluation Function - Mobility ###
+
+About Sayuri's weight system : Run `(help "sayuri weight system")`
+
+`score = weight * num_of_squares_that_piece_can_move_to`
+
+* `@weight-pawn-mobility [<New weight : List>]`
+* `@weight-knight-mobility [<New weight : List>]`
+* `@weight-bishop-mobility [<New weight : List>]`
+* `@weight-rook-mobility [<New weight : List>]`
+* `@weight-queen-mobility [<New weight : List>]`
+* `@weight-king-mobility [<New weight : List>]`)...";
+    AddHelp("engine @weight-pawn-mobility", help);
+    AddHelp("engine @weight-knight-mobility", help);
+    AddHelp("engine @weight-bishop-mobility", help);
+    AddHelp("engine @weight-rook-mobility", help);
+    AddHelp("engine @weight-queen-mobility", help);
+    AddHelp("engine @weight-king-mobility", help);
+
+    help =
+R"...(### Customizing Evaluation Function - Controlling Center ###
+
+About Sayuri's weight system : Run `(help "sayuri weight system")`
+
+Center square are c3 c4 c5 c6 d3 d4 d5 d6 e3 e4 e5 e6 f3 f4 f5 f6.
+
+`score = weight * num_of_center_square_that_piece_attacks`
+
+* `@weight-pawn-center-control [<New weight : List>]`
+* `@weight-knight-center-control [<New weight : List>]`
+* `@weight-bishop-center-control [<New weight : List>]`
+* `@weight-rook-center-control [<New weight : List>]`
+* `@weight-queen-center-control [<New weight : List>]`
+* `@weight-king-center-control [<New weight : List>]`)...";
+    AddHelp("engine @weight-pawn-center-control", help);
+    AddHelp("engine @weight-knight-center-control", help);
+    AddHelp("engine @weight-bishop-center-control", help);
+    AddHelp("engine @weight-rook-center-control", help);
+    AddHelp("engine @weight-queen-center-control", help);
+    AddHelp("engine @weight-king-center-control", help);
+
+    help =
+R"...(### Customizing Evaluation Function - Controlling Sweet Center ###
+
+About Sayuri's weight system : Run `(help "sayuri weight system")`
+
+Sweet Center square are d3 d4 d5 d6 e3 e4 e5 e6.
+
+`score = weight * num_of_sweet_center_square_that_piece_attacks`
+
+* `@weight-pawn-sweet-center-control [<New weight : List>]`
+* `@weight-knight-sweet-center-control [<New weight : List>]`
+* `@weight-bishop-sweet-center-control [<New weight : List>]`
+* `@weight-rook-sweet-center-control [<New weight : List>]`
+* `@weight-queen-sweet-center-control [<New weight : List>]`
+* `@weight-king-sweet-center-control [<New weight : List>]`)...";
+    AddHelp("engine @weight-pawn-sweet-center-control", help);
+    AddHelp("engine @weight-knight-sweet-center-control", help);
+    AddHelp("engine @weight-bishop-sweet-center-control", help);
+    AddHelp("engine @weight-rook-sweet-center-control", help);
+    AddHelp("engine @weight-queen-sweet-center-control", help);
+    AddHelp("engine @weight-king-sweet-center-control", help);
+
+    help =
+R"...(### Customizing Evaluation Function - Development ###
+
+About Sayuri's weight system : Run `(help "sayuri weight system")`
+
+`score = weight * num_of_minor_pieces_on_starting_position`
+
+* `@weight-pawn-development [<New weight : List>]`
+* `@weight-knight-development [<New weight : List>]`
+* `@weight-bishop-development [<New weight : List>]`
+* `@weight-rook-development [<New weight : List>]`
+* `@weight-queen-development [<New weight : List>]`
+* `@weight-king-development [<New weight : List>]`)...";
+    AddHelp("engine @weight-pawn-development", help);
+    AddHelp("engine @weight-knight-development", help);
+    AddHelp("engine @weight-bishop-development", help);
+    AddHelp("engine @weight-rook-development", help);
+    AddHelp("engine @weight-queen-development", help);
+    AddHelp("engine @weight-king-development", help);
+
+    help =
+R"...(### Customizing Evaluation Function - Attack around Enemy King ###
+
+About Sayuri's weight system : Run `(help "sayuri weight system")`
+
+`score = weight * num_of_squares_around_enemy_king_attacked_by_pieces.`
+
+* `@weight-pawn-attack-around-king [<New weight : List>]`
+* `@weight-knight-attack-around-king [<New weight : List>]`
+* `@weight-bishop-attack-around-king [<New weight : List>]`
+* `@weight-rook-attack-around-king [<New weight : List>]`
+* `@weight-queen-attack-around-king [<New weight : List>]`
+* `@weight-king-attack-around-king [<New weight : List>]`)...";
+    AddHelp("engine @weight-pawn-attack-around-king", help);
+    AddHelp("engine @weight-knight-attack-around-king", help);
+    AddHelp("engine @weight-bishop-attack-around-king", help);
+    AddHelp("engine @weight-rook-attack-around-king", help);
+    AddHelp("engine @weight-queen-attack-around-king", help);
+    AddHelp("engine @weight-king-attack-around-king", help);
+
+    help =
+R"...(### Customizing Evaluation Function - Pawn Structure ###
+
+About Sayuri's weight system : Run `(help "sayuri weight system")`
+
+* `@weight-pass-pawn [<New weight : List>]`
+    + `score = weight * num_of_pass_pawns`
+* `@weight-protected-pass-pawn [<New weight : List>]`
+    + `score = weight * num_of_protected_pass_pawns`
+* `@weight-double-pawn [<New weight : List>]`
+    + `score = weight * num_of_doubled_pawns`
+* `@weight-iso-pawn [<New weight : List>]`
+    + `score = weight * num_of_isorated_pawns`)...";
+    AddHelp("engine @weight-pass-pawn", help);
+    AddHelp("engine @weight-protected-pass-pawn", help);
+    AddHelp("engine @weight-double-pawn", help);
+    AddHelp("engine @weight-iso-pawn", help);
+
+    help =
+R"...(### Customizing Evaluation Function - Piece ###
+
+About Sayuri's weight system : Run `(help "sayuri weight system")`
+
+* `@weight-bishop-pair [<New weight : List>]`
+    + `score = weight * if_bishop_pair_exists_then_1_else_0`
+* `@weight-bad-bishop [<New weight : List>]`
+    + `score = weight * num_of_pawns_on_same_colored_square_as_bishop_on`
+
+* `@weight-rook-pair [<New weight : List>]`
+* `@weight-rook-semiopen-fyle [<New weight : List>]`
+* `@weight-rook-open-fyle [<New weight : List>]`
+* `@weight-early-queen-starting [<New weight : List>]`
+* `@weight-weak-square [<New weight : List>]`
+* `@weight-castling [<New weight : List>]`
+* `@weight-abandoned-castling [<New weight : List>]`)...";
+    AddHelp("engine @weight-bishop-pair", help);
+    AddHelp("engine @weight-bad-bishop", help);
+    AddHelp("engine @weight-rook-pair", help);
+    AddHelp("engine @weight-rook-semiopen-fyle", help);
+    AddHelp("engine @weight-rook-open-fyle", help);
+    AddHelp("engine @weight-early-queen-starting", help);
+    AddHelp("engine @weight-weak-square", help);
+    AddHelp("engine @weight-castling", help);
+    AddHelp("engine @weight-abandoned-castling", help);
+
+    help =
+R"...(### gen-pgn ###
+
+<h6> Usage </h6>
+
+* `(gen-pgn <PGN string : String>)`
+
+<h6> Description </h6>
+
+* Generates and returns PGN object from `<PGN string>`.
+* PGN object is operated by Message Symbol.
+* PGN object has 2 states.
+    + Current game.
+        - This can be changed by `@set-current-game`.
+    + Current move.
+        - This can be changed by `@next-move`, `@prev-move`, `@alt-move`,
+          `@orig-move`, `@rewind-move`.
+
+<h6> Description of Message Symbols </h6>
+
+* `@get-pgn-comments`
+    + Returns Lists of comments about PGN.
+
+* `@get-current-game-comments.`
+    + Returns List of comments about the current game.
+
+* `@get-current-move-comments`
+    + Returns List of comments about the current move.
+
+* `@length`
+    + Returns the number of games that PGN has.
+
+* `@set-current-game <Index : Number>`
+    + Sets a current game into the `<Index>`th game.
+
+* `@get-current-game-headers`
+    + Returns List of Lists composed with headers of the current game.
+        - The format is "`((<Name 1> <value 1>) (<Name 2> <Value 2>)...)`".
+
+* `@current-move`
+    + Returns the current move text.
+
+* `@next-move`
+    + Change the current move into the next move
+      and returns the move text.
+
+* `@prev-move`
+    + Change the current move into the previous move
+      and returns the move text.
+
+* `@alt-move`
+    + Change the current move into the alternative move
+      and returns the move text.
+
+* `@orig-move`
+    + If the current move is an alternative move,
+      then change a current move into the original move
+      and returns the move text.
+
+* `@rewind-move`
+    + Change a current move into the first move
+      and returns the move text.
+
+<h6> Example </h6>
+
+    ;; Open PGN File.
+    (define pgn-file (input-stream "/path/to/pgnfile.pgn"))
+    
+    ;; Reads the file and generates PGN object.
+    (define my-pgn (gen-pgn (pgn-file '@read)))
+    
+    ;; Displays the current game headers.
+    (display (my-pgn '@get-current-game-headers))
+    
+    ;; Output
+    ;; > (("Black" "Hanako Yamada") ("Site" "Japan")
+    ;; > ("White" "Hironori Ishibashi")))...";
+    AddHelp("gen-pgn", help);
+
+    help =
+R"...(### parse-fen/epd ###
+
+<h6> Usage </h6>
+
+* `(parse-fen/epd <FEN or EPD : String>)`
+
+<h6> Description </h6>
+
+* Parses `<FEN or EPD>` and returns result value.
+    +  A result value is `((<Tag 1 : String> <Object 1>)...)`.
+
+<h6> Example </h6>
+
+    (display (parse-fen/epd
+        "rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq d3 0 3"))
+    ;; Output
+    ;; > (("fen castling" (WHITE_SHORT_CASTLING
+    ;; > WHITE_LONG_CASTLING BLACK_SHORT_CASTLING BLACK_LONG_CASTLING))
+    ;; > ("fen clock" 0)
+    ;; > ("fen en_passant" D3)
+    ;; > ("fen ply" 5)
+    ;; > ("fen position" ((WHITE ROOK) (WHITE KNIGHT) (WHITE BISHOP)
+    ;; > (WHITE QUEEN) (WHITE KING) (WHITE BISHOP) (NO_SIDE EMPTY)
+    ;; > (WHITE ROOK) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (WHITE KNIGHT) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (WHITE PAWN)
+    ;; > (WHITE PAWN) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (BLACK PAWN) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (BLACK PAWN)
+    ;; > (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (BLACK PAWN) (BLACK PAWN) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+    ;; > (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK ROOK)
+    ;; > (BLACK KNIGHT) (BLACK BISHOP) (BLACK QUEEN) (BLACK KING)
+    ;; > (BLACK BISHOP) (BLACK KNIGHT) (BLACK ROOK)))
+    ;; > ("fen to_move" BLACK)))...";
+    AddHelp("parse-fen/epd", help);
+
+    help =
+R"...(### to-fen-position ###
+
+<h6> Usage </h6>
+
+* `(to-fen-position <Pieces list : List>)`
+
+<h6> Description </h6>
+
+* Analyses `<Pieces list>` and returns FEN position.
+
+<h6> Example </h6>
+
+    (display (to-fen-position
+        '((WHITE KING) (WHITE KING)(WHITE KING) (WHITE KING)
+        (WHITE QUEEN) (WHITE QUEEN)(WHITE QUEEN) (WHITE QUEEN)
+        (WHITE ROOK) (WHITE ROOK)(WHITE ROOK) (WHITE ROOK)
+        (WHITE BISHOP) (WHITE BISHOP)(WHITE BISHOP) (WHITE BISHOP)
+        (WHITE KNIGHT) (WHITE KNIGHT)(WHITE KNIGHT) (WHITE KNIGHT)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
+        (BLACK KNIGHT) (BLACK KNIGHT)(BLACK KNIGHT) (BLACK KNIGHT)
+        (BLACK BISHOP) (BLACK BISHOP)(BLACK BISHOP) (BLACK BISHOP)
+        (BLACK ROOK) (BLACK ROOK)(BLACK ROOK) (BLACK ROOK)
+        (BLACK QUEEN) (BLACK QUEEN)(BLACK QUEEN) (BLACK QUEEN)
+        (BLACK KING) (BLACK KING)(BLACK KING) (BLACK KING))))
+    ;; Output
+    ;; > qqqqkkkk/bbbbrrrr/4nnnn/8/8/NNNN4/RRRRBBBB/KKKKQQQQ)...";
+    AddHelp("to-fen-position", help);
+  }
 
   // =========== //
   // EngineSuite //
