@@ -126,7 +126,7 @@ R"...(Usage:
 
     // 引数リストを作る。
     std::vector<std::string> argv_vec;
-    for (int i = 0; i < (argc - 3); ++i) {
+    for (int i = 2; i < argc; ++i) {
       argv_vec.push_back(argv[i]);
     }
 
