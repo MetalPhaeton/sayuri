@@ -30,12 +30,15 @@
 <li><code>list-ref</code></li>
 <li><code>string-ref</code></li>
 </ul></li>
+<li><a href="#range"><code>range</code></a> : Generates List composed with Numbers from 0 to N.</li>
+<li><a href="#start-size-inc"><code>start-size-inc</code></a> : Generates List of Numbers.</li>
 <li><a href="#length"><code>length</code></a> : Gets size of an object.</li>
 <li><a href="#list"><code>list</code></a> : Generates List.</li>
 <li><a href="#list-replace"><code>list-replace</code></a> : Replaces an element of List for an object.</li>
 <li><a href="#list-remove"><code>list-remove</code></a> : Removes an element of List.</li>
 <li><a href="#list-search"><code>list-search</code></a> : Searches an object from List.</li>
 <li><a href="#string-split"><code>string-split</code></a> : Splits String.</li>
+<li><a href="#regex-search"><code>regex-search</code></a> : Searches a pattern.</li>
 </ul></li>
 <li><a href="#container-functions">Container Functions</a>
 <ul>
@@ -213,27 +216,55 @@ Example
 
 ;; Output
 ;; &gt; (0 1 2 3 4 5 6 7 8 9)</code></pre>
-<h3 id="length">length</h3>
+<h3 id="start-size-inc">start-size-inc</h3>
 <h6>
 Usage
 </h6>
 <ul>
-<li><code>(length &lt;List&gt;)</code></li>
+<li><code>(start-size-inc &lt;Start : Number&gt; &lt;Size : Number&gt; &lt;Increment : Number&gt;)</code></li>
 </ul>
 <h6>
 Description
 </h6>
 <ul>
-<li>Returns number of <code>&lt;List&gt;</code>.</li>
-<li>If you input Atom, it returns '1'. If Nil, it returns '0'.</li>
+<li>Returns List of <code>&lt;Size&gt;</code> elements.
+<ul>
+<li>The 1st element is <code>&lt;Start&gt;</code>.</li>
+<li>From the 2nd element, the previous element plus <code>&lt;Increment&gt;</code>.</li>
+</ul></li>
+</ul>
+<h6>
+Example
+</h6>
+<pre><code>(display (start-size-inc 2 6 -0.5))
+
+;; Output
+;; &gt; (2 1.5 1 0.5 0 -0.5)</code></pre>
+<h3 id="length">length</h3>
+<h6>
+Usage
+</h6>
+<ul>
+<li><code>(length &lt;Object&gt;)</code></li>
+</ul>
+<h6>
+Description
+</h6>
+<ul>
+<li>If <code>&lt;Object&gt;</code> is List, it returns the number of elements.</li>
+<li>If <code>&lt;Object&gt;</code> is String, it returns the length of string.</li>
+<li>If <code>&lt;Object&gt;</code> is Atom, it returns 1.</li>
 </ul>
 <h6>
 Example
 </h6>
 <pre><code>(display (length &#39;(111 222 333 444 555 666)))
-
 ;; Output
-;; &gt; 6</code></pre>
+;; &gt; 6
+
+(display (length &quot;Hello&quot;))
+;; Output
+;; &gt; 5   </code></pre>
 <h3 id="list">list</h3>
 <h6>
 Usage
@@ -375,6 +406,30 @@ Example
 
 ;; Output
 ;; &gt; (&quot;aaa&quot; &quot;bbb&quot; &quot;ccc&quot;)</code></pre>
+<h3 id="regex-search">regex-search</h3>
+<h6>
+Usage
+</h6>
+<ul>
+<li><code>(regex-search &lt;Regex : String&gt; &lt;Target : String&gt;)</code></li>
+</ul>
+<h6>
+Description
+</h6>
+<ul>
+<li>Search <code>&lt;Regex&gt;</code> from <code>&lt;Target&gt;</code> and returns List of results.
+<ul>
+<li>The 1st element of results is match of whole <code>&lt;Target&gt;</code>.</li>
+<li>From the 2nd element, each group.</li>
+</ul></li>
+</ul>
+<h6>
+Example
+</h6>
+<pre><code>(define target &quot;Hello World&quot;)
+(display (regex-search &quot;(Hel).* (Wor).*&quot; target))
+;; Output
+;; &gt; (&quot;Hello World&quot; &quot;Hel&quot; &quot;Wor&quot;)</code></pre>
 <h2 id="container-functions">Container Functions</h2>
 <h3 id="front">front</h3>
 <h6>

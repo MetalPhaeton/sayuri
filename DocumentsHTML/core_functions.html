@@ -25,9 +25,11 @@
 <li><a href="#help"><code>help</code></a> : Shows descriptions.</li>
 <li><a href="#eval"><code>eval</code></a> : Evaluates an expression.</li>
 <li><a href="#quote"><code>quote</code></a> : Doesn't evaluate an expression.</li>
+<li><a href="#backquote"><code>backquote</code></a> : Generate Object with template.</li>
 <li><a href="#define"><code>define</code></a> : Binds an object or define a function.</li>
 <li><a href="#set"><code>set!</code></a> : Rewrites a bound object.</li>
 <li><a href="#lambda"><code>lambda</code></a> : Generates Function.</li>
+<li><a href="#func-to-lambda"><code>func-&gt;lambda</code></a> : Converts Function to List.</li>
 <li><a href="#let"><code>let</code></a> : Makes local scope and execute expressions.</li>
 <li><a href="#begin"><code>begin</code></a> : Executes expressions.</li>
 <li><a href="#parse"><code>parse</code></a> : Parses String to an expression.
@@ -83,6 +85,7 @@
 <ul>
 <li><a href="#display"><code>display</code></a> : Prints objects to Standard Output.</li>
 <li><a href="#import"><code>import</code></a> : Reads and executes Sayulisp file.</li>
+<li><a href="#export"><code>export</code></a> : Opens a file, Writes a String and Close it.</li>
 <li><a href="#stdin"><code>stdin</code></a> : Reads String from Standard Input.</li>
 <li><a href="#stdout"><code>stdout</code></a> : Writes String to Standard Output.</li>
 <li><a href="#stderr"><code>stderr</code></a> : Writes String to Standard Error.</li>
@@ -218,6 +221,71 @@ Example
 ;; Output
 ;; &gt; 123
 ;; &gt; Symbol: x</code></pre>
+<h3 id="backquote">backquote</h3>
+<h6>
+Usage
+</h6>
+<ul>
+<li><code>(backquote &lt;Object&gt;)</code></li>
+</ul>
+<h6>
+Description
+</h6>
+<ul>
+<li>This is Special Form.
+<ul>
+<li><code>&lt;Object&gt;</code> is treated as template.
+<ul>
+<li>An object next to <code>,</code> or <code>,@</code> is evaluated. the others is not.</li>
+</ul></li>
+</ul></li>
+<li>Returns an object after template process.</li>
+<li>Syntactic suger is backquote.</li>
+</ul>
+<h6>
+Example
+</h6>
+<pre><code>(define a 111)
+(define b 222)
+(define c 333)
+(define d &#39;(444 555 666))
+(define e &#39;())
+
+(display (backquote (a b c)))
+(display `(a b c))
+;; Output
+;; &gt; (a b c)
+;; &gt; (a b c)
+
+(display (backquote (a ,b c)))
+(display `(a ,b c))
+;; Output
+;; &gt; (a 222 c)
+;; &gt; (a 222 c)
+
+(display (backquote (a ,d c)))
+(display `(a ,d c))
+;; Output
+;; &gt; (a (444 555 666) c)
+;; &gt; (a (444 555 666) c)
+
+(display (backquote (a ,@d c)))
+(display `(a ,@d c))
+;; Output
+;; &gt; (a 444 555 666 c)
+;; &gt; (a 444 555 666 c)
+
+(display (backquote (a (a ,@d c) c)))
+(display `(a (a ,@d c) c))
+;; Output
+;; &gt; (a (a 444 555 666 c) c)
+;; &gt; (a (a 444 555 666 c) c)
+
+(display (backquote (a ,@e c)))
+(display `(a ,@e c))
+;; Output
+;; &gt; (a c)
+;; &gt; (a c)</code></pre>
 <h3 id="define">define</h3>
 <h6>
 Usage
@@ -237,7 +305,10 @@ Description
 </ul></li>
 <li>Binds something to its scope.</li>
 <li>1: Binds <code>&lt;Object&gt;</code> to <code>&lt;Symbol&gt;</code>.</li>
-<li>2: Defines <code>&lt;S-Expression&gt;</code> as Function named <code>&lt;Name&gt;</code>, and <code>&lt;Args&gt;...</code> is names of its arguments.</li>
+<li>2: Defines <code>&lt;S-Expression&gt;</code> as Function named <code>&lt;Name&gt;</code>, and <code>&lt;Args&gt;...</code> is names of its arguments.
+<ul>
+<li>If an argument name is started with <code>^</code> or <code>&amp;</code>, the argument is Macro-Like Argument.</li>
+</ul></li>
 </ul>
 <h6>
 Example
@@ -252,7 +323,22 @@ Example
 (display (myfunc 5))
 
 ;; Output
-;; &gt; 15</code></pre>
+;; &gt; 15
+
+;; Example of Macro-Like Argument.
+(define (gen-func ^x &amp;y) (^x &amp;y) (lambda () (display (apply &#39;^x &#39;&amp;y))))
+(define func1 (gen-func + 111 222))
+(define func2 (gen-func * 333 444 555))
+(func1)
+(func2)
+;; Output
+;; &gt; 333
+;; &gt; 82057860
+(display (to-string func1))
+(display (to-string func2))
+;; Output
+;; &gt; (lambda () (display (apply (quote +) (quote (111 222)))))
+;; &gt; (lambda () (display (apply (quote *) (quote (333 444 555)))))</code></pre>
 <h3 id="set">set!</h3>
 <h6>
 Usage
@@ -306,23 +392,60 @@ Description
 </ul></li>
 <li>Returns Function defined by <code>&lt;S-Expression&gt;...</code>.</li>
 <li>(lambda) inherits parent's scope and creates its own local scope. So using (lambda) in (lambda), you can create closure function.</li>
-<li><code>&lt;Args&gt;...</code> is Symbols as name of arguments.</li>
+<li><code>&lt;Args&gt;...</code> is Symbols as name of arguments.
+<ul>
+<li>If an argument name is started with <code>^</code> or <code>&amp;</code>, the argument is Macro-Like Argument.</li>
+</ul></li>
 </ul>
 <h6>
 Example
 </h6>
 <pre><code>(define myfunc (lambda (x) (+ x 100)))
 (display (myfunc 5))
-
 ;; Output
 ;; &gt; 105
 
 (define gen-func (lambda (x) (lambda () (+ x 100))))
 (define myfunc2 (gen-func 50))
 (display (myfunc2))
-
 ;; Output
-;; &gt; 150</code></pre>
+;; &gt; 150
+
+;; Example of Macro-Like Argument.
+(define gen-func2
+  (lambda (^x &amp;y) (lambda () (display (apply &#39;^x &#39;&amp;y)))))
+(define func1 (gen-func2 + 111 222))
+(define func2 (gen-func2 * 333 444 555))
+(func1)
+(func2)
+;; Output
+;; &gt; 333
+;; &gt; 82057860
+(display (to-string func1))
+(display (to-string func2))
+;; Output
+;; &gt; (lambda () (display (apply (quote +) (quote (111 222)))))
+;; &gt; (lambda () (display (apply (quote *) (quote (333 444 555)))))</code></pre>
+<h3 id="func-to-lambda">func-&gt;lambda</h3>
+<h6>
+Usage
+</h6>
+<ul>
+<li><code>(func-&gt;lambda &lt;Function : Function&gt;)</code></li>
+</ul>
+<h6>
+Description
+</h6>
+<ul>
+<li>Converts Function to S-Expression and returns.</li>
+</ul>
+<h6>
+Example
+</h6>
+<pre><code>(define (myfunc x) (display x))
+(display (func-&gt;lambda myfunc))
+;; Output
+;; &gt; (lambda (x) (display x))</code></pre>
 <h3 id="let">let</h3>
 <h6>
 Usage
@@ -1113,6 +1236,24 @@ Example
 ;; &gt; Hello World
 :: &gt; a: 111
 :: &gt; b: 222</code></pre>
+<h3 id="export">export</h3>
+<h6>
+Usage
+</h6>
+<ul>
+<li><code>(export &lt;File name : String&gt; &lt;Object&gt;)</code></li>
+</ul>
+<h6>
+Description
+</h6>
+<ul>
+<li>Converts <code>&lt;Object&gt;</code> into String and writes it to <code>&lt;File name&gt;</code>.</li>
+<li>Returns <code>&lt;Object&gt;</code>.</li>
+</ul>
+<h6>
+Example
+</h6>
+<p>(define my-list '(&quot;Hello&quot; 123 &quot;World&quot;)) (display (export &quot;hello.txt&quot; my-list)) ;; Output ;; &gt; (&quot;Hello&quot; 123 &quot;World&quot;) ;; ;; In &quot;hello.txt&quot; ;; &gt; (&quot;Hello&quot; 123 &quot;World&quot;)</p>
 <h3 id="output-stream">output-stream</h3>
 <h6>
 Usage

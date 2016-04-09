@@ -39,7 +39,7 @@
 <pre><code>$ sayuri --sayulisp &lt;file name&gt; [&lt;argv&gt;...]</code></pre>
 <ul>
 <li>If you give '<code>-</code>' to '<code>&lt;file name&gt;</code>', Sayulisp reads code from Standard Input.</li>
-<li><code>[&lt;argv&gt;...]</code> is optional. it is bound to Symbol <code>argv</code> as List.</li>
+<li><code>[&lt;argv&gt;...]</code> is optional. It is bound to Symbol <code>argv</code> as List.</li>
 </ul>
 <h6>
 Example
@@ -185,6 +185,62 @@ Example
 ;; &gt; a: 111
 ;; &gt; b: 222
 ;; &gt; $@: (111 222 &quot;Hello&quot;)</code></pre>
+<h3 id="macro-like-argument">Macro-Like Argument</h3>
+<p>Sayulisp doesn't have Macro. Instead of it, Sayulisp has Macro-Like Argument.</p>
+<p>When you define Function with <code>(lambda)</code> or <code>(define)</code>, if you use &quot;<code>^</code>&quot; or &quot;<code>&amp;</code>&quot; for the first letter of argument name, the argument is Macro-Like Argument.</p>
+<p>At calling a Function, if it has Macro-Like Arguments, Sayulisp embeds them into its definition before executes it.</p>
+<ul>
+<li>If the first letter of argument name is &quot;<code>^</code>&quot;, it is a variable for replacement.</li>
+<li>If the first letter of argument name is &quot;<code>&amp;</code>&quot;, it is List of the rest of arguments.</li>
+</ul>
+<h6>
+Example
+</h6>
+<pre><code>;; Define generator of Function.
+(define (gen-func ^symbol) (lambda (x y) (^symbol x y)))
+
+;; Generate Functions.
+(define my-func-1 (gen-func +))
+(define my-func-2 (gen-func *))
+
+;; Print definitions and examples of usage.
+(display my-func-1 &quot; : &quot; (my-func-1 10 20))
+(display my-func-2 &quot; : &quot; (my-func-2 10 20))
+;; Output
+;; &gt; (lambda (x y) (+ x y)) : 30
+;; &gt; (lambda (x y) (* x y)) : 200
+
+;; Define generator of Function.
+(define (gen-func-2 &amp;rest-of-arguments)
+        (lambda (x y) (map display (quote &amp;rest-of-arguments))))
+
+;; Generate Function.
+(define my-func-3 (gen-func-2 &quot;Hello&quot; &quot;World&quot; &quot;And&quot; &quot;Sayuri&quot;))
+
+;; Print definitions and examples of usage.
+(display my-func-3)
+(my-func-3)
+;; Output
+;; &gt; (lambda (x y) (map display (quote (&quot;Hello&quot; &quot;World&quot; &quot;And&quot; &quot;Sayuri&quot;))))
+;; &gt; Hello
+;; &gt; World
+;; &gt; And
+;; &gt; Sayuri</code></pre>
+<h3 id="back-quote-template">Back-Quote Template</h3>
+<p>Sayulisp supports back-quote template.</p>
+<p>If you modify Atom or List with back-quote, it isn't evaluated like <code>(quote)</code>.</p>
+<p>Different from <code>(quote)</code>, Atom or List modified with &quot;<code>,</code>&quot; or &quot;<code>,@</code>&quot; are evaluated.</p>
+<p>If List is modified with &quot;<code>,@</code>&quot;, it is expanded before evaluated.</p>
+<h6>
+Example
+</h6>
+<pre><code>(define a 111)
+(define b 222)
+(define c &#39;(333 444 555))
+
+(display `(a ,b ,@c))
+;; Output
+;; &gt; (a 222 333 444 555)</code></pre>
 <h3 id="message-symbol-semantics">Message Symbol Semantics</h3>
 <p>Some functions use <em>Message Symbol</em>.</p>
 <ul>
@@ -318,6 +374,49 @@ Example
 ;; 3rd.
 ;; Run the engine.
 (my-engine &#39;@run)</code></pre>
+<h3 id="sayuri-weight-system">Sayuri Weight System</h3>
+<h4 id="weight-by-polygonal-line-graph">Weight by Polygonal Line Graph</h4>
+<h6>
+Definition
+</h6>
+<p><code>Point := a List that (number_of_pieces, weight)</code></p>
+<p><code>Weight Graph := a List of Points.</code></p>
+<h6>
+Example
+</h6>
+<pre><code>(define my-engine (gen-engine))
+(define weight-list &#39;((1 111) (2 222) (3 333) (4 444) (5 555)))
+
+(display (my-engine &#39;@weight-pass-pawn weight-list))
+(display (my-engine &#39;@weight-pass-pawn))
+;; &gt; ((2 30) (14 30) (32 20))
+;; &gt; ((1 111) (2 222) (3 333) (4 444) (5 555))</code></pre>
+<h4 id="weight-by-opening-weight-and-ending-weight">Weight by Opening weight and Ending weight</h4>
+<h6>
+Definition
+</h6>
+<p><code>Opening := From 32 to 15 pieces are on the board.</code></p>
+<p><code>Ending := From 14 to 2 pieces are on the board.</code></p>
+<h6>
+Calculation Formulas
+</h6>
+<p>On Opening :</p>
+<pre><code>slope = (opening_weight - ending_weight) / (32 - 14)
+weight = slope * (x - 14) + ending_weight</code></pre>
+<p>On Ending :</p>
+<pre><code>weight = ending_weight</code></pre>
+<h6>
+Example
+</h6>
+<pre><code>(define my-engine (gen-engine))
+(define opening-weight 99.9)
+(define ending-weight 88.8)
+
+(display (my-engine &#39;@weight-pass-pawn opening-weight ending-weight))
+(display (my-engine &#39;@weight-pass-pawn))
+;; Output
+;; &gt; ((2 30) (14 30) (32 20))
+;; &gt; ((2 88.8) (14 88.8) (32 99.9))</code></pre>
 <h3 id="techniques">Techniques</h3>
 <p>The following example is how to define Class as Object Oriented Programming using Message Symbol Semantics.</p>
 <h6>

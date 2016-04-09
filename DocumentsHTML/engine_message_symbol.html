@@ -543,8 +543,18 @@ Example
 ;; &gt; I&#39;m Listener : uciok
 ;; &gt; #t</code></pre>
 <h3 id="searching-the-best-move">Searching the best move</h3>
-<p>Thinks and returns the best move in each condition.<br />Different from &quot;go&quot; command, the control won't come back until the engine have found the best move.</p>
+<p>Thinks and returns the information of PV Line in each condition.<br />Different from &quot;go&quot; command, the control won't come back until the engine have found the best move.</p>
 <ul>
+<li>A return value is <code>(&lt;Score&gt; &lt;Mate in N&gt; &lt;PV Move&gt;...)</code>
+<ul>
+<li><code>&lt;Score&gt;</code> is advantage for the engine.</li>
+<li>About <code>&lt;Mate in N&gt;</code>.
+<ul>
+<li>If that is a positive number, checkmate in N by engine.</li>
+<li>If that is a negative number, the engine is checkmated in N.</li>
+<li>If that is Nil, the engine couldn't find checkmate.</li>
+</ul></li>
+</ul></li>
 <li><code>@go-movetime &lt;Milliseconds : Number&gt; [&lt;Candidate move list : List&gt;]</code>
 <ul>
 <li>Thinks for <code>&lt;Milliseconds&gt;</code>.</li>
@@ -571,50 +581,20 @@ Example
 </h6>
 <pre><code>(define my-engine (gen-engine))
 
-;; Register a listener.
-(define (listener message) (display &quot;Engine &gt; &quot; message))
-(my-engine &#39;@add-uci-output-listener listener)
-
+;; Starting position.
 (display (my-engine &#39;@go-movetime 10000))
 ;; Output
-;; &gt; Engine &gt; info depth 1
-;; &gt; Engine &gt; info currmove h2h4 currmovenumber 1
-;; &gt; Engine &gt; info depth 1 seldepth 1 score cp 12 time 0 nodes 2 pv h2h4
-;; &gt; Engine &gt; info currmove h2h3 currmovenumber 2
-;; &gt; Engine &gt; info depth 1 seldepth 1 score cp 22 time 1 nodes 4 pv h2h3
-;; &gt; Engine &gt; info currmove g2g4 currmovenumber 3
-;; &gt; Engine &gt; info depth 1 seldepth 1 score cp 23 time 1 nodes 6 pv g2g4
-;; &gt; Engine &gt; info currmove g2g3 currmovenumber 4
-;; &gt; Engine &gt; info depth 1 seldepth 1 score cp 33 time 1 nodes 8 pv g2g3
-;; &gt; Engine &gt; info currmove f2f4 currmovenumber 5
-;; &gt; Engine &gt; info currmove f2f3 currmovenumber 6
-;; &gt; Engine &gt; info depth 1 seldepth 1 score cp 36 time 1 nodes 11 pv f2f3
-;; &gt; Engine &gt; info currmove e2e4 currmovenumber 7
-;; &gt; Engine &gt; info depth 1 seldepth 1 score cp 45 time 1 nodes 13 pv e2e4
-;; &gt; Engine &gt; info currmove e2e3 currmovenumber 8
-;; &gt; Engine &gt; info currmove d2d4 currmovenumber 9
-;; &gt; Engine &gt; info depth 1 seldepth 1 score cp 50 time 1 nodes 16 pv d2d4
-;; &gt; Engine &gt; info currmove d2d3 currmovenumber 10
-;; &gt; Engine &gt; info currmove c2c4 currmovenumber 11
-;; &gt; Engine &gt; info currmove c2c3 currmovenumber 12
-;; &gt; Engine &gt; info currmove b2b4 currmovenumber 13
-;; &gt; Engine &gt; info currmove b2b3 currmovenumber 14
-;; &gt; Engine &gt; info currmove a2a4 currmovenumber 15
-;; &gt; Engine &gt; info currmove a2a3 currmovenumber 16
-;; &gt; Engine &gt; info currmove g1h3 currmovenumber 17
-;; &gt; Engine &gt; info currmove g1f3 currmovenumber 18
-;; &gt; Engine &gt; info depth 1 seldepth 1 score cp 68 time 1 nodes 26 pv g1f3
-;; &gt; Engine &gt; info currmove b1c3 currmovenumber 19
-;; &gt; Engine &gt; info currmove b1a3 currmovenumber 20
-;;
-;; (Omitted)
-;;
-;; &gt; Engine &gt; info depth 11
-;; &gt; Engine &gt; info currmove e2e4 currmovenumber 1
-;; &gt; Engine &gt; info time 10000 nodes 5599214 hashfull 390 nps 559921
-;; &gt; score cp 45 pv e2e4 b8c6 g1f3 g8f6 e4e5 f6g4 d2d4 e7e6 h2h3 f8b4
-;; &gt; Engine &gt; bestmove e2e4 ponder b8c6
-;; &gt; (E2 E4 EMPTY)</code></pre>
+;; &gt; (31 () (E2 E4 EMPTY) (E7 E5 EMPTY) (G1 F3 EMPTY) (G8 F6 EMPTY)
+:: &gt; (B1 C3 EMPTY) (B8 C6 EMPTY) (F1 B5 EMPTY) (F8 B4 EMPTY) (E1 G1 EMPTY)
+:: &gt; (B4 C3 EMPTY) (D2 C3 EMPTY))
+
+;; Mate in 2.
+(define fen
+  &quot;2bqkbn1/2pppp2/np2N3/r3P1p1/p2N2B1/5Q2/PPPPKPP1/RNB2r2 w - - 0 1&quot;)
+(my-engine &#39;@set-fen fen)
+
+(display (my-engine &#39;@go-movetime 10000))
+;; &gt; (1000000 2 (F3 F7 EMPTY) (E8 F7 EMPTY) (G4 H5 EMPTY))</code></pre>
 <h3 id="hash-and-threads">Hash and threads</h3>
 <ul>
 <li><code>@set-hash-size &lt;Size : Number&gt;</code>
@@ -1338,6 +1318,30 @@ Example
 ;; &gt; 1111111 2222222 3333333 4444444 5555555 6666666 7777777 8888888
 ;; &gt; 11111111 22222222 33333333 44444444 55555555 66666666 77777777
 ;; &gt; 88888888)</code></pre>
+<h6>
+Weights
+</h6>
+<p>Usage : Run <code>(help &quot;sayuri weight system&quot;)</code></p>
+<ul>
+<li>Opening Position
+<ul>
+<li><code>@weight-pawn-opening-position</code></li>
+<li><code>@weight-knight-opening-position</code></li>
+<li><code>@weight-bishop-opening-position</code></li>
+<li><code>@weight-rook-opening-position</code></li>
+<li><code>@weight-queen-opening-position</code></li>
+<li><code>@weight-king-opening-position</code></li>
+</ul></li>
+<li>Ending Position
+<ul>
+<li><code>@weight-pawn-ending-position</code></li>
+<li><code>@weight-knight-ending-position</code></li>
+<li><code>@weight-bishop-ending-position</code></li>
+<li><code>@weight-rook-ending-position</code></li>
+<li><code>@weight-queen-ending-position</code></li>
+<li><code>@weight-king-ending-position</code></li>
+</ul></li>
+</ul>
 <h3 id="customizing-evaluation-function---attack">Customizing Evaluation Function - Attack</h3>
 <p>Returns List composed of 7 values of attacking score.<br />1st: Not used. This is always 0. (for EMPTY)<br />2nd: Attacking Pawn.<br />3rd: Attacking Knight.<br />4th: Attacking Bishop.<br />5th: Attacking Rook.<br />6th: Attacking Queen.<br />7th: Attacking King.</p>
 <p>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</p>
@@ -1362,15 +1366,17 @@ Example
 (display (my-engine &#39;@pawn-attack-table))
 ;; Output
 ;; &gt; (0 2 3 4 5 6 7)</code></pre>
-<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
-<p><code>num_of_pieces := pieces on the current board except Kings</code><br /><code>weight = (((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight</code></p>
+<h6>
+Weights
+</h6>
+<p>Usage : Run <code>(help &quot;sayuri weight system&quot;)</code></p>
 <ul>
-<li><code>@weight-pawn-attack [&lt;New weight : List&gt;]</code></li>
-<li><code>@weight-knight-attack [&lt;New weight : List&gt;]</code></li>
-<li><code>@weight-bishop-attack [&lt;New weight : List&gt;]</code></li>
-<li><code>@weight-rook-attack [&lt;New weight : List&gt;]</code></li>
-<li><code>@weight-queen-attack [&lt;New weight : List&gt;]</code></li>
-<li><code>@weight-king-attack [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-pawn-attack</code></li>
+<li><code>@weight-knight-attack</code></li>
+<li><code>@weight-bishop-attack</code></li>
+<li><code>@weight-rook-attack</code></li>
+<li><code>@weight-queen-attack</code></li>
+<li><code>@weight-king-attack</code></li>
 </ul>
 <h3 id="customizing-evaluation-function---defense">Customizing Evaluation Function - Defense</h3>
 <p>Returns List composed of 7 values of defense score.<br />1st: Not used. This is always 0. (for EMPTY)<br />2nd: Protecting Pawn.<br />3rd: Protecting Knight.<br />4th: Protecting Bishop.<br />5th: Protecting Rook.<br />6th: Protecting Queen.<br />7th: Protecting King.</p>
@@ -1396,15 +1402,17 @@ Example
 (display (my-engine &#39;@pawn-defense-table))
 ;; Output
 ;; &gt; (0 2 3 4 5 6 7)</code></pre>
-<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
-<p><code>num_of_pieces := pieces on the current board except Kings</code><br /><code>weight = (((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight</code></p>
+<h6>
+Weights
+</h6>
+<p>Usage : Run <code>(help &quot;sayuri weight system&quot;)</code></p>
 <ul>
-<li><code>@weight-pawn-defense [&lt;New weight : List&gt;]</code></li>
-<li><code>@weight-knight-defense [&lt;New weight : List&gt;]</code></li>
-<li><code>@weight-bishop-defense [&lt;New weight : List&gt;]</code></li>
-<li><code>@weight-rook-defense [&lt;New weight : List&gt;]</code></li>
-<li><code>@weight-queen-defense [&lt;New weight : List&gt;]</code></li>
-<li><code>@weight-king-defense [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-pawn-defense</code></li>
+<li><code>@weight-knight-defense</code></li>
+<li><code>@weight-bishop-defense</code></li>
+<li><code>@weight-rook-defense</code></li>
+<li><code>@weight-queen-defense</code></li>
+<li><code>@weight-king-defense</code></li>
 </ul>
 <h3 id="customizing-evaluation-function---pin">Customizing Evaluation Function - Pin</h3>
 <p>Returns List of 7 Lists of 7 values.</p>
@@ -1447,12 +1455,14 @@ Example
 ;; &gt; (0 30 31 32 33 34 35)
 ;; &gt; (0 37 38 39 40 41 42)
 ;; &gt; (0 44 45 46 47 48 49))</code></pre>
-<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
-<p><code>num_of_pieces := pieces on the current board except Kings</code><br /><code>weight = (((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight</code></p>
+<h6>
+Weights
+</h6>
+<p>Usage : Run <code>(help &quot;sayuri weight system&quot;)</code></p>
 <ul>
-<li><code>@weight-bishop-pin [&lt;New weight : List&gt;]</code></li>
-<li><code>@weight-rook-pin [&lt;New weight : List&gt;]</code></li>
-<li><code>@weight-queen-pin [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-bishop-pin</code></li>
+<li><code>@weight-rook-pin</code></li>
+<li><code>@weight-queen-pin</code></li>
 </ul>
 <h3 id="customizing-evaluation-function---pawn-shield">Customizing Evaluation Function - Pawn Shield</h3>
 <p>If King on f1(f8) f2(f7) g1(g8) g2(g7) h1(h8) h2(h7), then Pawn Shield is pawns on f g h files.<br />If King on a1(a8) a2(a7) b1(b8) b2(b7) c1(c8) c2(c7), then Pawn Shield is pawns on a b c files.</p>
@@ -1500,15 +1510,16 @@ Example
 ;; &gt; 41 42 43 44 45 46 47 48
 ;; &gt; 49 50 51 52 53 54 55 56
 ;; &gt; 57 58 59 60 61 62 63 64)</code></pre>
-<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
-<p><code>num_of_pieces := pieces on the current board except Kings</code><br /><code>weight = (((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight</code></p>
+<h6>
+Weights
+</h6>
+<p>Usage : Run <code>(help &quot;sayuri weight system&quot;)</code></p>
 <ul>
-<li><code>@weight-pawn-shield [&lt;New weight : List&gt;]</code></li>
+<li><code>@weight-pawn-shield</code></li>
 </ul>
 <h3 id="customizing-evaluation-function---mobility">Customizing Evaluation Function - Mobility</h3>
-<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
+<p>About Sayuri's weight system : Run <code>(help &quot;sayuri weight system&quot;)</code></p>
 <p><code>score = weight * num_of_squares_that_piece_can_move_to</code></p>
-<p><code>num_of_pieces := pieces on the current board except Kings</code><br /><code>weight = (((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight</code></p>
 <ul>
 <li><code>@weight-pawn-mobility [&lt;New weight : List&gt;]</code></li>
 <li><code>@weight-knight-mobility [&lt;New weight : List&gt;]</code></li>
@@ -1518,10 +1529,9 @@ Example
 <li><code>@weight-king-mobility [&lt;New weight : List&gt;]</code></li>
 </ul>
 <h3 id="customizing-evaluation-function---controlling-center">Customizing Evaluation Function - Controlling Center</h3>
-<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
+<p>About Sayuri's weight system : Run <code>(help &quot;sayuri weight system&quot;)</code></p>
 <p>Center square are c3 c4 c5 c6 d3 d4 d5 d6 e3 e4 e5 e6 f3 f4 f5 f6.</p>
 <p><code>score = weight * num_of_center_square_that_piece_attacks</code></p>
-<p><code>num_of_pieces := pieces on the current board except Kings</code><br /><code>weight = (((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight</code></p>
 <ul>
 <li><code>@weight-pawn-center-control [&lt;New weight : List&gt;]</code></li>
 <li><code>@weight-knight-center-control [&lt;New weight : List&gt;]</code></li>
@@ -1531,10 +1541,9 @@ Example
 <li><code>@weight-king-center-control [&lt;New weight : List&gt;]</code></li>
 </ul>
 <h3 id="customizing-evaluation-function---controlling-sweet-center">Customizing Evaluation Function - Controlling Sweet Center</h3>
-<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
+<p>About Sayuri's weight system : Run <code>(help &quot;sayuri weight system&quot;)</code></p>
 <p>Sweet Center square are d3 d4 d5 d6 e3 e4 e5 e6.</p>
 <p><code>score = weight * num_of_sweet_center_square_that_piece_attacks</code></p>
-<p><code>num_of_pieces := pieces on the current board except Kings</code><br /><code>weight = (((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight</code></p>
 <ul>
 <li><code>@weight-pawn-sweet-center-control [&lt;New weight : List&gt;]</code></li>
 <li><code>@weight-knight-sweet-center-control [&lt;New weight : List&gt;]</code></li>
@@ -1544,9 +1553,8 @@ Example
 <li><code>@weight-king-sweet-center-control [&lt;New weight : List&gt;]</code></li>
 </ul>
 <h3 id="customizing-evaluation-function---development">Customizing Evaluation Function - Development</h3>
-<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
+<p>About Sayuri's weight system : Run <code>(help &quot;sayuri weight system&quot;)</code></p>
 <p><code>score = weight * num_of_minor_pieces_on_starting_position</code></p>
-<p><code>num_of_pieces := pieces on the current board except Kings</code><br /><code>weight = (((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight</code></p>
 <ul>
 <li><code>@weight-pawn-development [&lt;New weight : List&gt;]</code></li>
 <li><code>@weight-knight-development [&lt;New weight : List&gt;]</code></li>
@@ -1556,9 +1564,8 @@ Example
 <li><code>@weight-king-development [&lt;New weight : List&gt;]</code></li>
 </ul>
 <h3 id="customizing-evaluation-function---attack-around-enemy-king">Customizing Evaluation Function - Attack around Enemy King</h3>
-<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
+<p>About Sayuri's weight system : Run <code>(help &quot;sayuri weight system&quot;)</code></p>
 <p><code>score = weight * num_of_squares_around_enemy_king_attacked_by_pieces.</code></p>
-<p><code>num_of_pieces := pieces on the current board except Kings</code><br /><code>weight = (((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight</code></p>
 <ul>
 <li><code>@weight-pawn-attack-around-king [&lt;New weight : List&gt;]</code></li>
 <li><code>@weight-knight-attack-around-king [&lt;New weight : List&gt;]</code></li>
@@ -1568,8 +1575,7 @@ Example
 <li><code>@weight-king-attack-around-king [&lt;New weight : List&gt;]</code></li>
 </ul>
 <h3 id="customizing-evaluation-function---pawn-structure">Customizing Evaluation Function - Pawn Structure</h3>
-<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
-<p><code>num_of_pieces := pieces on the current board except Kings</code><br /><code>weight = (((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight</code></p>
+<p>About Sayuri's weight system : Run <code>(help &quot;sayuri weight system&quot;)</code></p>
 <ul>
 <li><code>@weight-pass-pawn [&lt;New weight : List&gt;]</code>
 <ul>
@@ -1589,8 +1595,7 @@ Example
 </ul></li>
 </ul>
 <h3 id="customizing-evaluation-function---piece">Customizing Evaluation Function - Piece</h3>
-<p>Returns opening weight and ending weight.<br />If you specify <code>&lt;New weight&gt;</code>, this parameter is updated.</p>
-<p><code>num_of_pieces := pieces on the current board except Kings</code><br /><code>weight = (((opening_weight - ending_weight) / 30) * num_of_pieces) + ending_weight</code></p>
+<p>About Sayuri's weight system : Run <code>(help &quot;sayuri weight system&quot;)</code></p>
 <ul>
 <li><code>@weight-bishop-pair [&lt;New weight : List&gt;]</code>
 <ul>
