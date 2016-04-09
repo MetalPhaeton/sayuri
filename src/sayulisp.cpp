@@ -2219,9 +2219,16 @@ R"...(### UCI Command ###
     help =
 R"...(### Searching the best move ###
 
-Thinks and returns the best move in each condition.  
+Thinks and returns the information of PV Line in each condition.  
 Different from "go" command,
 the control won't come back until the engine have found the best move.
+
+* A return value is `(<Score> <Mate in N> <PV Move>...)`
+    + `<Score>` is advantage for the engine.
+    + About `<Mate in N>`.
+        - If that is a positive number, checkmate in N by engine.
+        - If that is a negative number, the engine is checkmated in N.
+        - If that is Nil, the engine couldn't find checkmate.
 
 * `@go-movetime <Milliseconds : Number> [<Candidate move list : List>]`
     + Thinks for `<Milliseconds>`.
@@ -2240,50 +2247,20 @@ the control won't come back until the engine have found the best move.
 
     (define my-engine (gen-engine))
     
-    ;; Register a listener.
-    (define (listener message) (display "Engine > " message))
-    (my-engine '@add-uci-output-listener listener)
-    
+    ;; Starting position.
     (display (my-engine '@go-movetime 10000))
     ;; Output
-    ;; > Engine > info depth 1
-    ;; > Engine > info currmove h2h4 currmovenumber 1
-    ;; > Engine > info depth 1 seldepth 1 score cp 12 time 0 nodes 2 pv h2h4
-    ;; > Engine > info currmove h2h3 currmovenumber 2
-    ;; > Engine > info depth 1 seldepth 1 score cp 22 time 1 nodes 4 pv h2h3
-    ;; > Engine > info currmove g2g4 currmovenumber 3
-    ;; > Engine > info depth 1 seldepth 1 score cp 23 time 1 nodes 6 pv g2g4
-    ;; > Engine > info currmove g2g3 currmovenumber 4
-    ;; > Engine > info depth 1 seldepth 1 score cp 33 time 1 nodes 8 pv g2g3
-    ;; > Engine > info currmove f2f4 currmovenumber 5
-    ;; > Engine > info currmove f2f3 currmovenumber 6
-    ;; > Engine > info depth 1 seldepth 1 score cp 36 time 1 nodes 11 pv f2f3
-    ;; > Engine > info currmove e2e4 currmovenumber 7
-    ;; > Engine > info depth 1 seldepth 1 score cp 45 time 1 nodes 13 pv e2e4
-    ;; > Engine > info currmove e2e3 currmovenumber 8
-    ;; > Engine > info currmove d2d4 currmovenumber 9
-    ;; > Engine > info depth 1 seldepth 1 score cp 50 time 1 nodes 16 pv d2d4
-    ;; > Engine > info currmove d2d3 currmovenumber 10
-    ;; > Engine > info currmove c2c4 currmovenumber 11
-    ;; > Engine > info currmove c2c3 currmovenumber 12
-    ;; > Engine > info currmove b2b4 currmovenumber 13
-    ;; > Engine > info currmove b2b3 currmovenumber 14
-    ;; > Engine > info currmove a2a4 currmovenumber 15
-    ;; > Engine > info currmove a2a3 currmovenumber 16
-    ;; > Engine > info currmove g1h3 currmovenumber 17
-    ;; > Engine > info currmove g1f3 currmovenumber 18
-    ;; > Engine > info depth 1 seldepth 1 score cp 68 time 1 nodes 26 pv g1f3
-    ;; > Engine > info currmove b1c3 currmovenumber 19
-    ;; > Engine > info currmove b1a3 currmovenumber 20
-    ;;
-    ;; (Omitted)
-    ;;
-    ;; > Engine > info depth 11
-    ;; > Engine > info currmove e2e4 currmovenumber 1
-    ;; > Engine > info time 10000 nodes 5599214 hashfull 390 nps 559921
-    ;; > score cp 45 pv e2e4 b8c6 g1f3 g8f6 e4e5 f6g4 d2d4 e7e6 h2h3 f8b4
-    ;; > Engine > bestmove e2e4 ponder b8c6
-    ;; > (E2 E4 EMPTY))...";
+    ;; > (31 () (E2 E4 EMPTY) (E7 E5 EMPTY) (G1 F3 EMPTY) (G8 F6 EMPTY)
+    :: > (B1 C3 EMPTY) (B8 C6 EMPTY) (F1 B5 EMPTY) (F8 B4 EMPTY) (E1 G1 EMPTY)
+    :: > (B4 C3 EMPTY) (D2 C3 EMPTY))
+
+    ;; Mate in 2.
+    (define fen
+      "2bqkbn1/2pppp2/np2N3/r3P1p1/p2N2B1/5Q2/PPPPKPP1/RNB2r2 w - - 0 1")
+    (my-engine '@set-fen fen)
+
+    (display (my-engine '@go-movetime 10000))
+    ;; > (1000000 2 (F3 F7 EMPTY) (E8 F7 EMPTY) (G4 H5 EMPTY)))...";
     AddHelp("engine @go-movetime", help);
     AddHelp("engine @go-timelimit", help);
     AddHelp("engine @go-depth", help);
@@ -4827,10 +4804,25 @@ R"...(### to-fen-position ###
     // PVラインのリストを作る。
     LPointer ret_ptr = Lisp::NewList(len + 2);
     LObject* ptr = ret_ptr.get();
+    // スコア。
     ptr->car(Lisp::NewNumber(pv_line.score()));
     Lisp::Next(&ptr);
-    ptr->car(Lisp::NewNumber(pv_line.mate_in()));
+
+    // メイトイン。
+    int mate_in = pv_line.mate_in();
+    if (mate_in >= 0) {
+      if ((mate_in % 2) == 1) {
+        mate_in = (mate_in / 2) + 1;
+      } else {
+        mate_in = -1 * (mate_in / 2);
+      }
+      ptr->car(Lisp::NewNumber(mate_in));
+    } else {
+      ptr->car(Lisp::NewNil());
+    }
     Lisp::Next(&ptr);
+
+    // PVライン。
     for (int i = 0; i < len; ++i, Lisp::Next(&ptr)) {
       ptr->car(Sayulisp::MoveToList(pv_line[i]));
     }
