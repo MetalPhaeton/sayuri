@@ -1,6 +1,6 @@
 ;; The MIT License (MIT)
 ;;
-;; Copyright (c) 2015 Hironori Ishibashi
+;; Copyright (c) 2016 Hironori Ishibashi
 ;;
 ;; Permission is hereby granted, free of charge, to any person obtaining a copy
 ;; of this software and associated documentation files (the "Software"), to
@@ -25,7 +25,7 @@
 ;;;;;;;;;;;;;; You can edit this section.
 ;;-----------------------------------------------------------------------------
 ;; Number of threads.
-(define threads 2)
+(define threads 1)
 
 ;; Size of hash table. (MB)
 (define hash-size 512)
@@ -81,13 +81,13 @@
 
 ;; Mean.
 (define (mean li)
-  (/ (apply '+ li) (length li)))
+  (/ (apply + li) (length li)))
 
 ;; Dispersion.
 (define (var li)
   (define m (mean li))
   (define (func x) (* (- x m) (- x m)))
-  (mean (map 'func li)))
+  (mean (map func li)))
 
 ;; Standard Deviation.
 (define (dev li) (sqrt (var li)))
@@ -97,7 +97,7 @@
 ;; Mode.
 (define (mode li)
   (define (func x) (if (<= x 0.01) (log 0.01) (log x)))
-  (define log-nums (map 'func li))
+  (define log-nums (map func li))
   (exp (- (mean log-nums) (var log-nums))))
 
 ;; Listener.
@@ -126,8 +126,8 @@
   ;; Time.
   (display "Time:")
   (display "    Mean: " (mean data-time))
-  (display "     Max: " (apply 'max data-time))
-  (display "     Min: " (apply 'min data-time))
+  (display "     Max: " (apply max data-time))
+  (display "     Min: " (apply min data-time))
   (display "    SDev: " (dev data-time))
   (display "    Mode: " (mode data-time))
 
@@ -136,8 +136,8 @@
   ;; Nodes.
   (display "Nodes:")
   (display "    Mean: " (mean data-nodes))
-  (display "     Max: " (apply 'max data-nodes))
-  (display "     Min: " (apply 'min data-nodes))
+  (display "     Max: " (apply max data-nodes))
+  (display "     Min: " (apply min data-nodes))
   (display "    SDev: " (dev data-nodes))
   (display "    Mode: " (mode data-nodes))
 
@@ -146,8 +146,8 @@
   ;; NPS
   (display "NPS:")
   (display "    Mean: " (mean data-nps))
-  (display "     Max: " (apply 'max data-nps))
-  (display "     Min: " (apply 'min data-nps))
+  (display "     Max: " (apply max data-nps))
+  (display "     Min: " (apply min data-nps))
   (display "    SDev: " (dev data-nps))
   (display "    Mode: " (mode data-nps))
 
@@ -156,8 +156,8 @@
   ;; Hash Full
   (display "Hash Full:")
   (display "    Mean: " (mean data-hashfull))
-  (display "     Max: " (apply 'max data-hashfull))
-  (display "     Min: " (apply 'min data-hashfull))
+  (display "     Max: " (apply max data-hashfull))
+  (display "     Min: " (apply min data-hashfull))
   (display "    SDev: " (dev data-hashfull))
   (display "    Mode: " (mode data-hashfull)))
 
