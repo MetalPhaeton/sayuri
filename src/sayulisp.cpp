@@ -4017,6 +4017,9 @@ R"...(### to-fen-position ###
     message_func_map_["@history-pruning-move-threshold"] =
     INSERT_MESSAGE_FUNCTION(SetHistoryPruningMoveThreshold);
 
+    message_func_map_["@history-pruning-invalid-moves"] =
+    INSERT_MESSAGE_FUNCTION(SetHistoryPruningInvalidMoves);
+
     message_func_map_["@history-pruning-threshold"] =
     INSERT_MESSAGE_FUNCTION(SetHistoryPruningThreshold);
 

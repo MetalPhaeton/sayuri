@@ -822,6 +822,12 @@ namespace Sayuri {
         SET_NUMBER_PARAM(history_pruning_move_threshold);
       }
 
+      // %%% @history-pruning-invalid-moves
+      /** SearchParams - history-pruning-invalid-moves */
+      DEF_MESSAGE_FUNCTION(SetHistoryPruningInvalidMoves) {
+        SET_NUMBER_PARAM(history_pruning_invalid_moves);
+      }
+
       // %%% @history-pruning-threshold
       /** SearchParams - history-pruning-threshold */
       DEF_MESSAGE_FUNCTION(SetHistoryPruningThreshold) {
