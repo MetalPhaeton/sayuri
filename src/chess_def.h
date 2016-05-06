@@ -455,7 +455,7 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
    * @return 思考時間。
    */
   constexpr inline int TimeLimitToMoveTime(int time_limit) {
-    return time_limit >= 600000 ? 60000 : (time_limit / 10);
+    return time_limit / 40;
   }
 
   // ====== //
