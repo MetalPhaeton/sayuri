@@ -49,7 +49,7 @@ namespace Sayuri {
   // エンジン情報 //
   // ============ //
   /** Sayuriのバージョン番号。 */
-  constexpr const char* ID_NAME = "Sayuri 2016.05.05";
+  constexpr const char* ID_NAME = "Sayuri 2016.05.07";
   /** Sayuriの作者名。 */
   constexpr const char* ID_AUTHOR = "Hironori Ishibashi";
   /** ライセンス文。 */
@@ -455,7 +455,7 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
    * @return 思考時間。
    */
   constexpr inline int TimeLimitToMoveTime(int time_limit) {
-    return time_limit >= 600000 ? 60000 : (time_limit / 10);
+    return time_limit / 40;
   }
 
   // ====== //

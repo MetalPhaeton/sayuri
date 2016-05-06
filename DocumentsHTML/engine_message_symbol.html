@@ -446,7 +446,8 @@ Example
 ;; Output
 ;; &gt; #f</code></pre>
 <h3 id="taking-a-move">Taking a move</h3>
-<p>A move is represented by List. The List is<br /><code>(&lt;From : Number or Symbol&gt;   &lt;To : Number or Symbol&gt;   &lt;Promotion : Number or Symbol&gt;)</code>.</p>
+<p>A move is represented by List. The List is<br />
+<code>(&lt;From : Number or Symbol&gt;   &lt;To : Number or Symbol&gt;   &lt;Promotion : Number or Symbol&gt;)</code>.</p>
 <ul>
 <li><code>@play-move &lt;Move : List&gt;</code>
 <ul>
@@ -543,7 +544,8 @@ Example
 ;; &gt; I&#39;m Listener : uciok
 ;; &gt; #t</code></pre>
 <h3 id="searching-the-best-move">Searching the best move</h3>
-<p>Thinks and returns the information of PV Line in each condition.<br />Different from &quot;go&quot; command, the control won't come back until the engine have found the best move.</p>
+<p>Thinks and returns the information of PV Line in each condition.<br />
+Different from &quot;go&quot; command, the control won't come back until the engine have found the best move.</p>
 <ul>
 <li>A return value is <code>(&lt;Score&gt; &lt;Mate in N&gt; &lt;PV Move&gt;...)</code>
 <ul>
@@ -561,11 +563,7 @@ Example
 </ul></li>
 <li><code>@go-timelimit &lt;Milliseconds : Number&gt; [&lt;Candidate move list : List&gt;]</code>
 <ul>
-<li>Thinks on the basis of <code>&lt;Milliseconds&gt;</code>.
-<ul>
-<li>If <code>&lt;Milliseconds&gt;</code> is more than 600000, the engine thinks for 60000 milliseconds.</li>
-<li>If <code>&lt;Milliseconds&gt;</code> is less than 600000, the engine thinks for &quot;<code>&lt;Milliseconds&gt;</code> / 10&quot; milliseconds.</li>
-</ul></li>
+<li>Thinks for <code>&lt;Milliseconds&gt; / 40</code></li>
 </ul></li>
 <li><code>@go-depth &lt;Ply : Number&gt; [&lt;Candidate move list : List&gt;]</code>
 <ul>
@@ -1265,7 +1263,8 @@ Example
 ;; Output
 ;; &gt; 1200</code></pre>
 <h3 id="customizing-evaluation-function---piece-square-table">Customizing Evaluation Function - Piece Square Table</h3>
-<p>Returns Piece Square Table for each piece type.<br />If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</p>
+<p>Returns Piece Square Table for each piece type.<br />
+If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</p>
 <p><code>score = weight * value_table[square]</code></p>
 <ul>
 <li><code>@pawn-square-table-opening [&lt;New table : List&gt;]</code></li>
@@ -1343,7 +1342,14 @@ Weights
 </ul></li>
 </ul>
 <h3 id="customizing-evaluation-function---attack">Customizing Evaluation Function - Attack</h3>
-<p>Returns List composed of 7 values of attacking score.<br />1st: Not used. This is always 0. (for EMPTY)<br />2nd: Attacking Pawn.<br />3rd: Attacking Knight.<br />4th: Attacking Bishop.<br />5th: Attacking Rook.<br />6th: Attacking Queen.<br />7th: Attacking King.</p>
+<p>Returns List composed of 7 values of attacking score.<br />
+1st: Not used. This is always 0. (for EMPTY)<br />
+2nd: Attacking Pawn.<br />
+3rd: Attacking Knight.<br />
+4th: Attacking Bishop.<br />
+5th: Attacking Rook.<br />
+6th: Attacking Queen.<br />
+7th: Attacking King.</p>
 <p>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</p>
 <p><code>score = weight * value_table[attacking_piece][attacked_piece]</code></p>
 <ul>
@@ -1379,7 +1385,14 @@ Weights
 <li><code>@weight-king-attack</code></li>
 </ul>
 <h3 id="customizing-evaluation-function---defense">Customizing Evaluation Function - Defense</h3>
-<p>Returns List composed of 7 values of defense score.<br />1st: Not used. This is always 0. (for EMPTY)<br />2nd: Protecting Pawn.<br />3rd: Protecting Knight.<br />4th: Protecting Bishop.<br />5th: Protecting Rook.<br />6th: Protecting Queen.<br />7th: Protecting King.</p>
+<p>Returns List composed of 7 values of defense score.<br />
+1st: Not used. This is always 0. (for EMPTY)<br />
+2nd: Protecting Pawn.<br />
+3rd: Protecting Knight.<br />
+4th: Protecting Bishop.<br />
+5th: Protecting Rook.<br />
+6th: Protecting Queen.<br />
+7th: Protecting King.</p>
 <p>If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</p>
 <p><code>score = weight * value_table[defensing_piece][defensed_piece]</code></p>
 <ul>
@@ -1416,7 +1429,13 @@ Weights
 </ul>
 <h3 id="customizing-evaluation-function---pin">Customizing Evaluation Function - Pin</h3>
 <p>Returns List of 7 Lists of 7 values.</p>
-<p>1st list : Futile list. (For EMPTY)<br />2nd list : A target piece is Pawn.<br />3rd list : A target piece is Knight.<br />4th list : A target piece is Bishop.<br />5th list : A target piece is Rook.<br />6th list : A target piece is Queen.<br />7th list : A target piece is King.</p>
+<p>1st list : Futile list. (For EMPTY)<br />
+2nd list : A target piece is Pawn.<br />
+3rd list : A target piece is Knight.<br />
+4th list : A target piece is Bishop.<br />
+5th list : A target piece is Rook.<br />
+6th list : A target piece is Queen.<br />
+7th list : A target piece is King.</p>
 <p>1st value of each list : Futile value. 2nd value of each list : A piece over the target is Pawn. 3rd value of each list : A piece over the target is Knight. 4th value of each list : A piece over the target is Bishop. 5th value of each list : A piece over the target is Rook. 6th value of each list : A piece over the target is Queen. 7th value of each list : A piece over the target is King.</p>
 <p><code>score = weight * value_table[pinning_piece][target][over_the_target]</code></p>
 <ul>
@@ -1465,7 +1484,8 @@ Weights
 <li><code>@weight-queen-pin</code></li>
 </ul>
 <h3 id="customizing-evaluation-function---pawn-shield">Customizing Evaluation Function - Pawn Shield</h3>
-<p>If King on f1(f8) f2(f7) g1(g8) g2(g7) h1(h8) h2(h7), then Pawn Shield is pawns on f g h files.<br />If King on a1(a8) a2(a7) b1(b8) b2(b7) c1(c8) c2(c7), then Pawn Shield is pawns on a b c files.</p>
+<p>If King on f1(f8) f2(f7) g1(g8) g2(g7) h1(h8) h2(h7), then Pawn Shield is pawns on f g h files.<br />
+If King on a1(a8) a2(a7) b1(b8) b2(b7) c1(c8) c2(c7), then Pawn Shield is pawns on a b c files.</p>
 <p><code>score = weight * value_table[square]</code></p>
 <ul>
 <li><code>@pawn-shield-table [&lt;New table : List&gt;]</code>
