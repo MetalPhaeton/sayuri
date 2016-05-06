@@ -1253,7 +1253,13 @@ Description
 <h6>
 Example
 </h6>
-<p>(define my-list '(&quot;Hello&quot; 123 &quot;World&quot;)) (display (export &quot;hello.txt&quot; my-list)) ;; Output ;; &gt; (&quot;Hello&quot; 123 &quot;World&quot;) ;; ;; In &quot;hello.txt&quot; ;; &gt; (&quot;Hello&quot; 123 &quot;World&quot;)</p>
+<pre><code>(define my-list &#39;(&quot;Hello&quot; 123 &quot;World&quot;))
+(display (export &quot;hello.txt&quot; my-list))
+;; Output
+;; &gt; (&quot;Hello&quot; 123 &quot;World&quot;)
+;;
+;; In &quot;hello.txt&quot;
+;; &gt; (&quot;Hello&quot; 123 &quot;World&quot;)</code></pre>
 <h3 id="output-stream">output-stream</h3>
 <h6>
 Usage
