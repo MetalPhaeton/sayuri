@@ -93,7 +93,7 @@
 <h3>Getting pieces</h3>
 <ul>
 <li>
-<p><code>@get-piece &lt;Square : Number or Symbol&gt;</code></p>
+<p><code>@get-piece &lt;Square : Number&gt;</code></p>
 <ul>
 <li>Returns a side and type of the piece on <code>&lt;Square&gt;</code> as List.</li>
 </ul>
@@ -242,7 +242,7 @@
 </code></pre>
 <h3>Setting states of game</h3>
 <ul>
-<li><code>@set-to-move &lt;Side : Number or Symbol&gt;</code><ul>
+<li><code>@set-to-move &lt;Side : Number&gt;</code><ul>
 <li>Sets turn to move.</li>
 <li>Returns previous setting.</li>
 </ul>
@@ -252,7 +252,7 @@
 <li>Returns previous setting.</li>
 </ul>
 </li>
-<li><code>@set-en-passant-square &lt;&lt;Square : Number or Symbol&gt; or &lt;Nil&gt;&gt;</code><ul>
+<li><code>@set-en-passant-square &lt;&lt;Square : Number&gt; or &lt;Nil&gt;&gt;</code><ul>
 <li>Sets en passant square.</li>
 <li>Returns previous setting.</li>
 </ul>
@@ -357,11 +357,11 @@
 <li>Returns #t.</li>
 </ul>
 </li>
-<li><code>@place-piece &lt;Square : Number or Symbol&gt; &lt;Piece : List&gt;</code><ul>
-<li><code>@place-piece &lt;Piece : List&gt; &lt;Square : Number or Symbol&gt;</code> is also OK.</li>
+<li><code>@place-piece &lt;Square : Number&gt; &lt;Piece : List&gt;</code><ul>
+<li><code>@place-piece &lt;Piece : List&gt; &lt;Square : Number&gt;</code> is also OK.</li>
 <li>Sets a <code>&lt;Piece&gt;</code> on <code>&lt;Square&gt;</code>
   and returns the previous piece placed on <code>&lt;Square&gt;</code>.</li>
-<li><code>&lt;Piece&gt;</code> is `(<Side : Number or Symbol> <Type : Number or Symbol>).<ul>
+<li><code>&lt;Piece&gt;</code> is `(<Side : Number> <Type : Number>).<ul>
 <li>For example, White Pawn is <code>(list WHITE PAWN)</code>.</li>
 </ul>
 </li>
@@ -491,9 +491,7 @@
 </code></pre>
 <h3>Taking a move</h3>
 <p>A move is represented by List.  The List is<br />
-<code>(&lt;From : Number or Symbol&gt;
-  &lt;To : Number or Symbol&gt;
-  &lt;Promotion : Number or Symbol&gt;)</code>.</p>
+<code>(&lt;From : Number&gt; &lt;To : Number&gt; &lt;Promotion : Number&gt;)</code>.</p>
 <ul>
 <li>
 <p><code>@play-move &lt;Move : List&gt;</code></p>

@@ -1768,7 +1768,7 @@ R"...(### Getting squares ###
     help =
 R"...(### Getting pieces ###
 
-* `@get-piece <Square : Number or Symbol>`
+* `@get-piece <Square : Number>`
     + Returns a side and type of the piece on `<Square>` as List.
 
 * `@get-all-pieces`
@@ -1905,13 +1905,13 @@ R"...(### Getting states of game ###
     help =
 R"...(### Setting states of game ###
 
-* `@set-to-move <Side : Number or Symbol>`
+* `@set-to-move <Side : Number>`
     + Sets turn to move.
     + Returns previous setting.
 * `@set-castling_rights <Castling rights : List>`
     + Sets castling rights.
     + Returns previous setting.
-* `@set-en-passant-square <<Square : Number or Symbol> or <Nil>>`
+* `@set-en-passant-square <<Square : Number> or <Nil>>`
     + Sets en passant square.
     + Returns previous setting.
 * `@set-ply <Ply : Number>`
@@ -2008,11 +2008,11 @@ R"...(### Placing pieces ###
 * `@set-fen <FEN : String>`
     + Sets position with FEN.
     + Returns #t.
-* `@place-piece <Square : Number or Symbol> <Piece : List>`
-    + `@place-piece <Piece : List> <Square : Number or Symbol>` is also OK.
+* `@place-piece <Square : Number> <Piece : List>`
+    + `@place-piece <Piece : List> <Square : Number>` is also OK.
     + Sets a `<Piece>` on `<Square>`
       and returns the previous piece placed on `<Square>`.
-    + `<Piece>` is `(<Side : Number or Symbol> <Type : Number or Symbol>).
+    + `<Piece>` is `(<Side : Number> <Type : Number>).
         - For example, White Pawn is `(list WHITE PAWN)`.
 
 <h6> Example </h6>
@@ -2148,9 +2148,7 @@ Judges each state of the current position.
 R"...(### Taking a move ###
 
 A move is represented by List.  The List is  
-`(<From : Number or Symbol>
-  <To : Number or Symbol>
-  <Promotion : Number or Symbol>)`.
+`(<From : Number> <To : Number> <Promotion : Number>)`.
 
 * `@play-move <Move : List>`
     + Moves one piece legally.
