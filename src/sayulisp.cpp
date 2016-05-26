@@ -2009,6 +2009,7 @@ R"...(### Placing pieces ###
     + Sets position with FEN.
     + Returns #t.
 * `@place-piece <Square : Number or Symbol> <Piece : List>`
+    + `@place-piece <Piece : List> <Square : Number or Symbol>` is also OK.
     + Sets a `<Piece>` on `<Square>`
       and returns the previous piece placed on `<Square>`.
     + `<Piece>` is `(<Side : Number or Symbol> <Type : Number or Symbol>).
@@ -2030,7 +2031,13 @@ R"...(### Placing pieces ###
     ;; Sets Black Rook on D1 where White Queen is placed.
     (display (my-engine '@place-piece D1 (list BLACK ROOK)))
     ;; Output
-    ;; > (WHITE QUEEN))...";
+    ;; > (WHITE QUEEN)
+
+    ;; Sets White Rook on D8 where Black Queen is placed.
+    ;; `@place-piece <Piece> <Square>`
+    (display (my-engine '@place-piece (list WHITE ROOK) D8))
+    ;; Output
+    ;; > (BLACK QUEEN))...";
     AddHelp("engine @set-new-game", help);
     AddHelp("engine @set-fen", help);
     AddHelp("engine @place-piece", help);
@@ -4491,17 +4498,37 @@ R"...(### to-fen-position ###
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 2, &args_ptr);
 
-    // マスを得る。
-    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
-    Sayulisp::CheckSquare(*square_ptr);
+    // 第1引数を得る。
+    LPointer first_ptr = caller->Evaluate(*(args_ptr->car()));
+    if (!(first_ptr->IsNumber() || first_ptr->IsList())) {
+      throw Lisp::GenTypeError(*first_ptr, "Number or List");
+    }
     Lisp::Next(&args_ptr);
-    Square square = square_ptr->number();
 
-    // 駒を得る。
-    LPointer piece_ptr = caller->Evaluate(*(args_ptr->car()));
-    Sayulisp::CheckPiece(*piece_ptr);
-    Side side = piece_ptr->car()->number();
-    PieceType piece_type = piece_ptr->cdr()->car()->number();
+    // 第2引数を得る。
+    LPointer second_ptr = caller->Evaluate(*(args_ptr->car()));
+    if (!(second_ptr->IsNumber() || second_ptr->IsList())) {
+      throw Lisp::GenTypeError(*second_ptr, "Number or List");
+    }
+
+    Square square;
+    Side side;
+    PieceType piece_type;
+    if (first_ptr->IsNumber()) {
+      // 第1引数がマスで第2引数が駒。
+      Sayulisp::CheckSquare(*first_ptr);
+      square = first_ptr->number();
+      Sayulisp::CheckPiece(*second_ptr);
+      side = second_ptr->car()->number();
+      piece_type = second_ptr->cdr()->car()->number();
+    } else {
+      // 第1引数が駒で第2引数がマス。
+      Sayulisp::CheckPiece(*first_ptr);
+      side = first_ptr->car()->number();
+      piece_type = first_ptr->cdr()->car()->number();
+      Sayulisp::CheckSquare(*second_ptr);
+      square = second_ptr->number();
+    }
 
     // キングを置き換えることはできない。
     if (board_ptr_->piece_board_[square] == KING) {

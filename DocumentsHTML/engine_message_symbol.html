@@ -358,6 +358,7 @@
 </ul>
 </li>
 <li><code>@place-piece &lt;Square : Number or Symbol&gt; &lt;Piece : List&gt;</code><ul>
+<li><code>@place-piece &lt;Piece : List&gt; &lt;Square : Number or Symbol&gt;</code> is also OK.</li>
 <li>Sets a <code>&lt;Piece&gt;</code> on <code>&lt;Square&gt;</code>
   and returns the previous piece placed on <code>&lt;Square&gt;</code>.</li>
 <li><code>&lt;Piece&gt;</code> is `(<Side : Number or Symbol> <Type : Number or Symbol>).<ul>
@@ -384,6 +385,12 @@
 (display (my-engine '@place-piece D1 (list BLACK ROOK)))
 ;; Output
 ;; &gt; (WHITE QUEEN)
+
+;; Sets White Rook on D8 where Black Queen is placed.
+;; `@place-piece &lt;Piece&gt; &lt;Square&gt;`
+(display (my-engine '@place-piece (list WHITE ROOK) D8))
+;; Output
+;; &gt; (BLACK QUEEN)
 </code></pre>
 <h3>Getting candidate moves</h3>
 <ul>
