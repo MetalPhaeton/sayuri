@@ -15,125 +15,135 @@
 </header>
 <div class="root_div">
 <section class="main_contents">
-<h1 id="sayulisp---lisp-interpreter">Sayulisp - Lisp Interpreter</h1>
-<h2 id="sayulisp-is-...">Sayulisp is ...</h2>
+<h1>Sayulisp - Lisp Interpreter</h1>
+<h2>Sayulisp is ...</h2>
 <ul>
 <li>Lisp interpreter based on Scheme.</li>
-<li><em>API</em> for operating chess engines.
-<ul>
+<li><em>API</em> for operating chess engines.<ul>
 <li>It can generate and operate Chess Engine.</li>
 <li>It can customize algorithm of Search Function.</li>
 <li>It can customize values of Evaluation Function.</li>
-<li>Not only using Lisp file, but also you can input Lisp code from Standard Input.
-<ul>
+<li>Not only using Lisp file,
+  but also you can input Lisp code from Standard Input.<ul>
 <li>It means, using Pipe, you can use any programming language.</li>
-</ul></li>
-</ul></li>
 </ul>
-<div class="figure">
-<img src="res/diagram01.svg" alt="Using Pipe Image" />
-<p class="caption">Using Pipe Image</p>
-</div>
-<h2 id="run-sayuri-with-sayulisp-mode">Run Sayuri with Sayulisp Mode</h2>
+</li>
+</ul>
+</li>
+</ul>
+<p><img alt="Using Pipe Image" src="res/diagram01.svg" /></p>
+<h2>Run Sayuri with Sayulisp Mode</h2>
 <p>Run the following command.</p>
-<pre><code>$ sayuri --sayulisp &lt;file name&gt; [&lt;argv&gt;...]</code></pre>
+<pre><code>$ sayuri --sayulisp &lt;file name&gt; [&lt;argv&gt;...]
+</code></pre>
 <ul>
-<li>If you give '<code>-</code>' to '<code>&lt;file name&gt;</code>', Sayulisp reads code from Standard Input.</li>
+<li>If you give '<code>-</code>' to '<code>&lt;file name&gt;</code>', Sayulisp reads code
+  from Standard Input.</li>
 <li><code>[&lt;argv&gt;...]</code> is optional. It is bound to Symbol <code>argv</code> as List.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display argv)
 ;; Command line :
 ;;     $ sayuri --sayulisp test.scm Hello World
 ;; Output
-;; &gt; (&quot;test.scm&quot; &quot;Hello&quot; &quot;World&quot;)</code></pre>
-<h2 id="basic-of-sayulisp">Basic of Sayulisp</h2>
+;; &gt; ("test.scm" "Hello" "World")
+</code></pre>
+<h2>Basic of Sayulisp</h2>
 <ul>
-<li>Sayulisp is based on Scheme. You can use many features of Scheme.
+<li>
+<p>Sayulisp is based on Scheme. You can use many features of Scheme.</p>
 <ul>
-<li>Sayulisp is equipped Lexical Scope and Lexical Closure.
-<ul>
+<li>Sayulisp is equipped Lexical Scope and Lexical Closure. <ul>
 <li>It means, you can write code like Object Oriented, if you devise it.</li>
-</ul></li>
-</ul></li>
-<li><p>Sayulisp doesn't print output automatically. If you want output, you can use <code>(display)</code> function.</p></li>
-<li>You can use '<code>[</code>' and '<code>]</code>', '<code>{</code>' and '<code>}</code>' instead of '<code>(</code>' and '<code>)</code>'.
-<ul>
-<li>Inside, Sayulisp converts '<code>[</code>' or '<code>{</code>' into '<code>(</code>', and '<code>]</code>' or '<code>}</code>' into '<code>)</code>'.</li>
-</ul></li>
 </ul>
-<h3 id="object-type-of-sayulisp">Object Type of Sayulisp</h3>
+</li>
+</ul>
+</li>
+<li>
+<p>Sayulisp doesn't print output automatically.
+  If you want output, you can use <code>(display)</code> function.</p>
+</li>
+<li>
+<p>You can use '<code>[</code>' and '<code>]</code>', '<code>{</code>' and '<code>}</code>' instead of '<code>(</code>' and '<code>)</code>'.</p>
+<ul>
+<li>Inside, Sayulisp converts '<code>[</code>' or '<code>{</code>' into '<code>(</code>',
+  and  '<code>]</code>' or '<code>}</code>' into '<code>)</code>'.</li>
+</ul>
+</li>
+</ul>
+<h3>Object Type of Sayulisp</h3>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Type</th>
-<th align="left">Definition</th>
-<th align="left">Form</th>
+<tr>
+<th>Type</th>
+<th>Definition</th>
+<th>Form</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">Pair</td>
-<td align="left">Data structure composed of Car and Cdr.</td>
-<td align="left"><code>(&quot;Hello&quot; . &quot;World&quot;)</code></td>
+<tr>
+<td>Pair</td>
+<td>Data structure composed of Car and Cdr.</td>
+<td><code>("Hello" . "World")</code></td>
 </tr>
-<tr class="even">
-<td align="left">Nil</td>
-<td align="left">&quot;Nothing&quot; or empty list.</td>
-<td align="left"><code>()</code></td>
+<tr>
+<td>Nil</td>
+<td>"Nothing" or empty list.</td>
+<td><code>()</code></td>
 </tr>
-<tr class="odd">
-<td align="left">Symbol</td>
-<td align="left">Name of an object.</td>
-<td align="left"><code>hello-world</code></td>
+<tr>
+<td>Symbol</td>
+<td>Name of an object.</td>
+<td><code>hello-world</code></td>
 </tr>
-<tr class="even">
-<td align="left">Number</td>
-<td align="left">Real number value.</td>
-<td align="left"><code>111.11</code></td>
+<tr>
+<td>Number</td>
+<td>Real number value.</td>
+<td><code>111.11</code></td>
 </tr>
-<tr class="odd">
-<td align="left">Boolean</td>
-<td align="left">&quot;True&quot; or &quot;False&quot;</td>
-<td align="left"><code>#t</code> <code>#f</code></td>
+<tr>
+<td>Boolean</td>
+<td>"True" or "False"</td>
+<td><code>#t</code> <code>#f</code></td>
 </tr>
-<tr class="even">
-<td align="left">String</td>
-<td align="left">String value.</td>
-<td align="left"><code>&quot;Hello World&quot;</code></td>
+<tr>
+<td>String</td>
+<td>String value.</td>
+<td><code>"Hello World"</code></td>
 </tr>
-<tr class="odd">
-<td align="left">Function</td>
-<td align="left">Function object defined by Lisp.</td>
-<td align="left"></td>
+<tr>
+<td>Function</td>
+<td>Function object defined by Lisp.</td>
+<td></td>
 </tr>
-<tr class="even">
-<td align="left">Native Function</td>
-<td align="left">Function object defined by native code.</td>
-<td align="left"></td>
+<tr>
+<td>Native Function</td>
+<td>Function object defined by native code.</td>
+<td></td>
 </tr>
-<tr class="odd">
-<td align="left">Procedure</td>
-<td align="left">It means Function or Native Function.</td>
-<td align="left"></td>
+<tr>
+<td>Procedure</td>
+<td>It means Function or Native Function.</td>
+<td></td>
 </tr>
-<tr class="even">
-<td align="left">List</td>
-<td align="left">List created by Pair and Nil.</td>
-<td align="left"><code>(&quot;Hello&quot; 111 &quot;World&quot;)</code></td>
+<tr>
+<td>List</td>
+<td>List created by Pair and Nil.</td>
+<td><code>("Hello" 111 "World")</code></td>
 </tr>
 </tbody>
 </table>
-<h3 id="flexible-arguments">Flexible Arguments</h3>
-<p>If you define functions with <code>(lambda)</code> or <code>(define)</code>, their arguments are flexible.</p>
-<p>For example, if you define a function that requires 2 arguments, the function can receive the less arguments or the more arguments than 2.<br />
-If the function has received 1 argument, then the 2nd argument in the function is Nil.<br />
+<h3>Flexible Arguments</h3>
+<p>If you define functions with <code>(lambda)</code> or <code>(define)</code>,
+their arguments are flexible.  </p>
+<p>For example, if you define a function that requires 2 arguments,
+the function can receive the less arguments or the more arguments than 2.<br />
+If the function has received 1 argument,
+then the 2nd argument in the function is Nil.<br />
 If the function has received 3 arguments, then the 3rd argument is ignored.</p>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>;; Define a function that requires 2 arguments.
 (define (my-func x y) (display x) (display y))
 
@@ -163,23 +173,24 @@ Example
 
 ;; Output
 ;; &gt; ()
-;; &gt; ()</code></pre>
-<h3 id="variable-length-arguments">Variable Length Arguments</h3>
+;; &gt; ()
+</code></pre>
+<h3>Variable Length Arguments</h3>
 <p>Sayulisp supports Variable Length Arguments.<br />
-Arguments of a function is automatically bound to '<code>$@</code>' as List in its local scope.</p>
-<h6>
-Example
-</h6>
+Arguments of a function is automatically bound to '<code>$@</code>' as List
+in its local scope.</p>
+<h6> Example </h6>
+
 <pre><code>;; Define variables.
 (define first 111)
 (define second 222)
-(define third &quot;Hello&quot;)
+(define third "Hello")
 
 ;; Define a function
 (define (my-func a b)
-    (display &quot;a: &quot; a)
-    (display &quot;b: &quot; b)
-    (display &quot;$@: &quot; $@))
+    (display "a: " a)
+    (display "b: " b)
+    (display "$@: " $@))
 
 ;; Execute the function.
 (my-func first second third)
@@ -187,18 +198,23 @@ Example
 ;; Output
 ;; &gt; a: 111
 ;; &gt; b: 222
-;; &gt; $@: (111 222 &quot;Hello&quot;)</code></pre>
-<h3 id="macro-like-argument">Macro-Like Argument</h3>
+;; &gt; $@: (111 222 "Hello")
+</code></pre>
+<h3>Macro-Like Argument</h3>
 <p>Sayulisp doesn't have Macro. Instead of it, Sayulisp has Macro-Like Argument.</p>
-<p>When you define Function with <code>(lambda)</code> or <code>(define)</code>, if you use &quot;<code>^</code>&quot; or &quot;<code>&amp;</code>&quot; for the first letter of argument name, the argument is Macro-Like Argument.</p>
-<p>At calling a Function, if it has Macro-Like Arguments, Sayulisp embeds them into its definition before executes it.</p>
+<p>When you define Function with <code>(lambda)</code> or <code>(define)</code>,
+if you use "<code>^</code>" or "<code>&amp;</code>" for the first letter of argument name,
+the argument is Macro-Like Argument.</p>
+<p>At calling a Function, if it has Macro-Like Arguments,
+Sayulisp embeds them into its definition before executes it.</p>
 <ul>
-<li>If the first letter of argument name is &quot;<code>^</code>&quot;, it is a variable for replacement.</li>
-<li>If the first letter of argument name is &quot;<code>&amp;</code>&quot;, it is List of the rest of arguments.</li>
+<li>If the first letter of argument name is "<code>^</code>",
+  it is a variable for replacement.</li>
+<li>If the first letter of argument name is "<code>&amp;</code>",
+  it is List of the rest of arguments.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>;; Define generator of Function.
 (define (gen-func ^symbol) (lambda (x y) (^symbol x y)))
 
@@ -207,8 +223,8 @@ Example
 (define my-func-2 (gen-func *))
 
 ;; Print definitions and examples of usage.
-(display my-func-1 &quot; : &quot; (my-func-1 10 20))
-(display my-func-2 &quot; : &quot; (my-func-2 10 20))
+(display my-func-1 " : " (my-func-1 10 20))
+(display my-func-2 " : " (my-func-2 10 20))
 ;; Output
 ;; &gt; (lambda (x y) (+ x y)) : 30
 ;; &gt; (lambda (x y) (* x y)) : 200
@@ -218,58 +234,61 @@ Example
         (lambda (x y) (map display (quote &amp;rest-of-arguments))))
 
 ;; Generate Function.
-(define my-func-3 (gen-func-2 &quot;Hello&quot; &quot;World&quot; &quot;And&quot; &quot;Sayuri&quot;))
+(define my-func-3 (gen-func-2 "Hello" "World" "And" "Sayuri"))
 
 ;; Print definitions and examples of usage.
 (display my-func-3)
 (my-func-3)
 ;; Output
-;; &gt; (lambda (x y) (map display (quote (&quot;Hello&quot; &quot;World&quot; &quot;And&quot; &quot;Sayuri&quot;))))
+;; &gt; (lambda (x y) (map display (quote ("Hello" "World" "And" "Sayuri"))))
 ;; &gt; Hello
 ;; &gt; World
 ;; &gt; And
-;; &gt; Sayuri</code></pre>
-<h3 id="back-quote-template">Back-Quote Template</h3>
+;; &gt; Sayuri
+</code></pre>
+<h3>Back-Quote Template</h3>
 <p>Sayulisp supports back-quote template.</p>
 <p>If you modify Atom or List with back-quote, it isn't evaluated like <code>(quote)</code>.</p>
-<p>Different from <code>(quote)</code>, Atom or List modified with &quot;<code>,</code>&quot; or &quot;<code>,@</code>&quot; are evaluated.</p>
-<p>If List is modified with &quot;<code>,@</code>&quot;, it is expanded before evaluated.</p>
-<h6>
-Example
-</h6>
+<p>Different from <code>(quote)</code>,
+Atom or List modified with "<code>,</code>" or "<code>,@</code>" are evaluated.</p>
+<p>If List is modified with "<code>,@</code>", it is expanded before evaluated.</p>
+<h6> Example </h6>
+
 <pre><code>(define a 111)
 (define b 222)
-(define c &#39;(333 444 555))
+(define c '(333 444 555))
 
 (display `(a ,b ,@c))
 ;; Output
-;; &gt; (a 222 333 444 555)</code></pre>
-<h3 id="message-symbol-semantics">Message Symbol Semantics</h3>
+;; &gt; (a 222 333 444 555)
+</code></pre>
+<h3>Message Symbol Semantics</h3>
 <p>Some functions use <em>Message Symbol</em>.</p>
 <ul>
 <li>Initial letter of Message Symbol is '<code>@</code>'.</li>
 <li>Message Symbol is not special Symbol. It is just ordinary Symbol.</li>
-<li>Message Symbol is used as a message to switch behavior of Function Object.
-<ul>
+<li>Message Symbol is used as a message to switch behavior of Function Object.<ul>
 <li><code>(stdin '@get)</code> : This means to get one letter from Standard Input.</li>
-<li><code>(stdin '@read-line)</code> : This means to get one line from Standard Input.</li>
-<li><code>(stdin '@read)</code> : This means to get all strings until EOF from Standard Input.</li>
-</ul></li>
+<li><code>(stdin '@read-line)</code> : This means to get one line
+  from Standard Input.</li>
+<li><code>(stdin '@read)</code> : This means to get all strings until EOF
+  from Standard Input.</li>
 </ul>
-<h3 id="looping">Looping</h3>
+</li>
+</ul>
+<h3>Looping</h3>
 <p>Sayulisp has special form for looping.</p>
 <ul>
-<li><code>(while)</code>: &quot;While Loop&quot;</li>
-<li><code>(for)</code>: &quot;Foreach Loop&quot;</li>
+<li><code>(while)</code>: "While Loop"</li>
+<li><code>(for)</code>: "Foreach Loop"</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>;; --- While Loop --- ;;
 (define i 0)
 (while (&lt; i 5)
-    (display &quot;Hello &quot; i)
-    (display &quot;World&quot; i)
+    (display "Hello " i)
+    (display "World" i)
     (inc! i))
 
 ;; Output
@@ -285,11 +304,11 @@ Example
 ;; &gt; World 4
 
 ;; --- Foreach Loop --- ;;
-(define aaa &#39;(1 2 3 4 5))
+(define aaa '(1 2 3 4 5))
 
 (for (x aaa)
-    (display &quot;Hello &quot; x)
-    (display &quot;World &quot; (+ x 5)))
+    (display "Hello " x)
+    (display "World " (+ x 5)))
 ;; Output
 ;; &gt; Hello 1
 ;; &gt; World 6
@@ -300,54 +319,58 @@ Example
 ;; &gt; Hello 4
 ;; &gt; World 9
 ;; &gt; Hello 5
-;; &gt; World 10</code></pre>
-<h3 id="exception-handling">Exception Handling</h3>
+;; &gt; World 10
+</code></pre>
+<h3>Exception Handling</h3>
 <p>Some functions throws an exception.<br />
-If you don't do anything, Sayulisp shows the error message and interpreter is stopped.</p>
+If you don't do anything, Sayulisp shows the error message
+and interpreter is stopped.</p>
 <p>But you can catch exception using <a href="core_functions.html#try"><code>(try)</code></a> function.</p>
-<h6>
-Example
-</h6>
-<pre><code>(try ((+ 1 &quot;Hello&quot;))
-     (display &quot;Error Occured!!&quot;))
+<h6> Example </h6>
+
+<pre><code>(try ((+ 1 "Hello"))
+     (display "Error Occured!!"))
 
 ;; Output
 ;; &gt; Error Occured!!
 
-(try ((+ 1 &quot;Hello&quot;))
+(try ((+ 1 "Hello"))
      (display exception))
 
 ;; Output
-;; &gt; (@not-number &quot;The 2nd argument of (+) didn&#39;t return Number.&quot;)</code></pre>
-<p>You can also throw an exception using <a href="core_functions.html#throw"><code>(throw)</code></a> function.</p>
-<h6>
-Example
-</h6>
+;; &gt; (@not-number "The 2nd argument of (+) didn't return Number.")
+</code></pre>
+<p>You can also throw an exception using <a href="core_functions.html#throw"><code>(throw)</code></a>
+function.</p>
+<h6> Example </h6>
+
 <pre><code>(try ((throw 123))
      (display exception))
 
 ;; Output
-;; &gt; 123</code></pre>
-<h3 id="importing-script-file">Importing Script File</h3>
-<p>Using <a href="core_functions.html#import"><code>(import)</code></a> function, Sayulisp reads and executes it.</p>
-<h6>
-Example
-</h6>
-<pre><code>;; When the following code is written in &#39;hello.scm&#39;
+;; &gt; 123
+</code></pre>
+<h3>Importing Script File</h3>
+<p>Using <a href="core_functions.html#import"><code>(import)</code></a> function,
+Sayulisp reads and executes it.</p>
+<h6> Example </h6>
+
+<pre><code>;; When the following code is written in 'hello.scm'
 ;;
 ;; (define a 111)
 ;; (define b 222)
-;; (string-append &quot;Hello &quot; &quot;World&quot;)  ;; &lt;- The last S-Expression.
+;; (string-append "Hello " "World")  ;; &lt;- The last S-Expression.
 
-(display (import &quot;hello.scm&quot;))
-(display &quot;a: &quot; a)
-(display &quot;b: &quot; b)
+(display (import "hello.scm"))
+(display "a: " a)
+(display "b: " b)
 
 ;; Output
 ;; &gt; Hello World
 :: &gt; a: 111
-:: &gt; b: 222</code></pre>
-<h3 id="warning">Warning!!!!</h3>
+:: &gt; b: 222
+</code></pre>
+<h3>Warning!!!!</h3>
 <p>Sayuri works correctly on a correct position.<br />
 It means that if the following conditions exist, Sayuri works unexpectedly.</p>
 <ul>
@@ -356,17 +379,18 @@ It means that if the following conditions exist, Sayuri works unexpectedly.</p>
 <li>One side has no King.</li>
 <li>Pawn is on 1st rank or 8th rank.</li>
 </ul>
-<p>Using Sayulisp, you can set a wrong position to the engine. But then the engine doesn't work correctly.</p>
-<h3 id="customization-of-engine">Customization of Engine</h3>
-<p>If you want to customize an engine, then write code to execute the following 3 steps.</p>
-<ol style="list-style-type: decimal">
+<p>Using Sayulisp, you can set a wrong position to the engine.
+But then the engine doesn't work correctly.</p>
+<h3>Customization of Engine</h3>
+<p>If you want to customize an engine,
+then write code to execute the following 3 steps.</p>
+<ol>
 <li>Generate an engine.</li>
 <li>Customize Search Function or Evaluation Function.</li>
 <li>Run the engine.</li>
 </ol>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>;; 1st.
 ;; Generate an engine.
 (define my-engine (gen-engine))
@@ -374,65 +398,65 @@ Example
 ;; 2nd.
 ;; Customize Search Function or Evaluation Function.
 ;; For example, if you want to change Material Score, then...
-(my-engine &#39;@material (list 0 100 300 300 500 900 1e+6))
+(my-engine '@material (list 0 100 300 300 500 900 1e+6))
 
 ;; 3rd.
 ;; Run the engine.
-(my-engine &#39;@run)</code></pre>
-<h3 id="sayuri-weight-system">Sayuri Weight System</h3>
-<h4 id="weight-by-polygonal-line-graph">Weight by Polygonal Line Graph</h4>
-<h6>
-Definition
-</h6>
+(my-engine '@run)
+</code></pre>
+<h3>Sayuri Weight System</h3>
+<h4>Weight by Polygonal Line Graph</h4>
+<h6> Definition </h6>
+
 <p><code>Point := a List that (number_of_pieces, weight)</code></p>
 <p><code>Weight Graph := a List of Points.</code></p>
-<h6>
-Example
-</h6>
-<pre><code>(define my-engine (gen-engine))
-(define weight-list &#39;((1 111) (2 222) (3 333) (4 444) (5 555)))
+<h6> Example </h6>
 
-(display (my-engine &#39;@weight-pass-pawn weight-list))
-(display (my-engine &#39;@weight-pass-pawn))
+<pre><code>(define my-engine (gen-engine))
+(define weight-list '((1 111) (2 222) (3 333) (4 444) (5 555)))
+
+(display (my-engine '@weight-pass-pawn weight-list))
+(display (my-engine '@weight-pass-pawn))
 ;; &gt; ((2 30) (14 30) (32 20))
-;; &gt; ((1 111) (2 222) (3 333) (4 444) (5 555))</code></pre>
-<h4 id="weight-by-opening-weight-and-ending-weight">Weight by Opening weight and Ending weight</h4>
-<h6>
-Definition
-</h6>
+;; &gt; ((1 111) (2 222) (3 333) (4 444) (5 555))
+</code></pre>
+<h4>Weight by Opening weight and Ending weight</h4>
+<h6> Definition </h6>
+
 <p><code>Opening := From 32 to 15 pieces are on the board.</code></p>
 <p><code>Ending := From 14 to 2 pieces are on the board.</code></p>
-<h6>
-Calculation Formulas
-</h6>
+<h6> Calculation Formulas </h6>
+
 <p>On Opening :</p>
 <pre><code>slope = (opening_weight - ending_weight) / (32 - 14)
-weight = slope * (x - 14) + ending_weight</code></pre>
+weight = slope * (x - 14) + ending_weight
+</code></pre>
 <p>On Ending :</p>
-<pre><code>weight = ending_weight</code></pre>
-<h6>
-Example
-</h6>
+<pre><code>weight = ending_weight
+</code></pre>
+<h6> Example </h6>
+
 <pre><code>(define my-engine (gen-engine))
 (define opening-weight 99.9)
 (define ending-weight 88.8)
 
-(display (my-engine &#39;@weight-pass-pawn opening-weight ending-weight))
-(display (my-engine &#39;@weight-pass-pawn))
+(display (my-engine '@weight-pass-pawn opening-weight ending-weight))
+(display (my-engine '@weight-pass-pawn))
 ;; Output
 ;; &gt; ((2 30) (14 30) (32 20))
-;; &gt; ((2 88.8) (14 88.8) (32 99.9))</code></pre>
-<h3 id="techniques">Techniques</h3>
-<p>The following example is how to define Class as Object Oriented Programming using Message Symbol Semantics.</p>
-<h6>
-Example
-</h6>
-<pre><code>;; Definition of &quot;my-class&quot;.
+;; &gt; ((2 88.8) (14 88.8) (32 99.9))
+</code></pre>
+<h3>Techniques</h3>
+<p>The following example is how to define Class
+as Object Oriented Programming using Message Symbol Semantics.</p>
+<h6> Example </h6>
+
+<pre><code>;; Definition of "my-class".
 (define my-class
   (lambda ()
 
     ;; Member Variables.
-    (define hello_ &quot;Hello&quot;)
+    (define hello_ "Hello")
     (define val_ 0)
 
     ;; Member Functions.
@@ -447,16 +471,16 @@ Example
 (define my-obj (my-class))
 
 ;; Execute the member function.
-(my-obj &#39;@say-hello)  ;; Output &gt; Hello
-(my-obj &#39;@set-val 30)
-(display (my-obj &#39;@get-val))  ;; Output &gt; 30</code></pre>
-<h2 id="index-of-reference-of-sayulisp-functions">Index of Reference of Sayulisp Functions</h2>
+(my-obj '@say-hello)  ;; Output &gt; Hello
+(my-obj '@set-val 30)
+(display (my-obj '@get-val))  ;; Output &gt; 30
+</code></pre>
+<h2>Index of Reference of Sayulisp Functions</h2>
 <ul>
 <li><a href="core_functions.html">Core Functions</a></li>
 <li><a href="basic_functions.html">Basic Functions</a></li>
 <li><a href="chess_engine_functions.html">Chess Engine Functions</a></li>
 </ul>
-
 </section>
 </div>
 <footer>Copyright &copy; Hironori Ishibashi</footer>

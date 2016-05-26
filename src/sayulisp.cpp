@@ -1920,11 +1920,17 @@ R"...(### Setting states of game ###
 * `@set-clock <Ply : Number>`
     + Sets clock(plies for 50 moves rule).
     + Returns previous setting.
+* `@set-white-has-castled <Has castled : Boolean>`
+    + Sets whether White has castled or not.
+    + Returns previous setting.
+* `@set-black-has-castled <Has castled : Boolean>`
+    + Sets whether Black has castled or not.
+    + Returns previous setting.
 
 <h6> Example </h6>
 
     (define my-engine (gen-engine))
-    (my-engine '@place-piece E4 PAWN WHITE)
+    (my-engine '@place-piece E4 (list WHITE PAWN))
     
     (display (my-engine '@set-to-move BLACK))
     ;; Output
@@ -1948,6 +1954,14 @@ R"...(### Setting states of game ###
     ;; Output
     ;; > 0
     
+    (display (my-engine '@set-white-has-castled #t))
+    ;; Output
+    ;; > #f
+    
+    (display (my-engine '@set-black-has-castled #t))
+    ;; Output
+    ;; > #f
+    
     ;; ---------------- ;;
     ;; Current Settings ;;
     ;; ---------------- ;;
@@ -1970,7 +1984,15 @@ R"...(### Setting states of game ###
     
     (display (my-engine '@get-clock))
     ;; Output
-    ;; > 22)...";
+    ;; > 22
+    
+    (display (my-engine '@get-white-has-castled))
+    ;; Output
+    ;; > #t
+    
+    (display (my-engine '@get-black-has-castled))
+    ;; Output
+    ;; > #t)...";
     AddHelp("engine @set-to-move", help);
     AddHelp("engine @set-castling-rights", help);
     AddHelp("engine @set-en-passant-square", help);
@@ -2054,7 +2076,7 @@ Judges each state of the current position.
     (define my-engine (gen-engine))
     
     ;; Put Pawn on 1st rank.
-    (my-engine '@place-piece D1 PAWN WHITE)
+    (my-engine '@place-piece D1 (list WHITE PAWN))
     
     (display (my-engine '@correct-position?))
     ;; Output
@@ -3644,22 +3666,38 @@ R"...(### to-fen-position ###
 <h6> Example </h6>
 
     (display (to-fen-position
-        '((WHITE KING) (WHITE KING)(WHITE KING) (WHITE KING)
-        (WHITE QUEEN) (WHITE QUEEN)(WHITE QUEEN) (WHITE QUEEN)
-        (WHITE ROOK) (WHITE ROOK)(WHITE ROOK) (WHITE ROOK)
-        (WHITE BISHOP) (WHITE BISHOP)(WHITE BISHOP) (WHITE BISHOP)
-        (WHITE KNIGHT) (WHITE KNIGHT)(WHITE KNIGHT) (WHITE KNIGHT)
-        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-        (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-        (BLACK KNIGHT) (BLACK KNIGHT)(BLACK KNIGHT) (BLACK KNIGHT)
-        (BLACK BISHOP) (BLACK BISHOP)(BLACK BISHOP) (BLACK BISHOP)
-        (BLACK ROOK) (BLACK ROOK)(BLACK ROOK) (BLACK ROOK)
-        (BLACK QUEEN) (BLACK QUEEN)(BLACK QUEEN) (BLACK QUEEN)
-        (BLACK KING) (BLACK KING)(BLACK KING) (BLACK KING))))
+        (list (list WHITE KING) (list WHITE KING)
+        (list WHITE KING) (list WHITE KING)
+        (list WHITE QUEEN) (list WHITE QUEEN)
+        (list WHITE QUEEN) (list WHITE QUEEN)
+        (list WHITE ROOK) (list WHITE ROOK)
+        (list WHITE ROOK) (list WHITE ROOK)
+        (list WHITE BISHOP) (list WHITE BISHOP)
+        (list WHITE BISHOP) (list WHITE BISHOP)
+        (list WHITE KNIGHT) (list WHITE KNIGHT)
+        (list WHITE KNIGHT) (list WHITE KNIGHT)
+        (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+        (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+        (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+        (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+        (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+        (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+        (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+        (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+        (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+        (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+        (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+        (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+        (list BLACK KNIGHT) (list BLACK KNIGHT)
+        (list BLACK KNIGHT) (list BLACK KNIGHT)
+        (list BLACK BISHOP) (list BLACK BISHOP)
+        (list BLACK BISHOP) (list BLACK BISHOP)
+        (list BLACK ROOK) (list BLACK ROOK)
+        (list BLACK ROOK) (list BLACK ROOK)
+        (list BLACK QUEEN) (list BLACK QUEEN)
+        (list BLACK QUEEN) (list BLACK QUEEN)
+        (list BLACK KING) (list BLACK KING)
+        (list BLACK KING) (list BLACK KING))))
     ;; Output
     ;; > qqqqkkkk/bbbbrrrr/4nnnn/8/8/NNNN4/RRRRBBBB/KKKKQQQQ)...";
     AddHelp("to-fen-position", help);
@@ -3881,6 +3919,12 @@ R"...(### to-fen-position ###
 
     message_func_map_["@set-clock"] =
     INSERT_MESSAGE_FUNCTION(SetClock);
+
+    message_func_map_["@set-white-has-castled"] =
+    INSERT_MESSAGE_FUNCTION(SetHasCastled<WHITE>);
+
+    message_func_map_["@set-black-has-castled"] =
+    INSERT_MESSAGE_FUNCTION(SetHasCastled<BLACK>);
 
     message_func_map_["@correct-position?"] =
     INSERT_MESSAGE_FUNCTION(IsCorrectPosition);
@@ -4661,6 +4705,26 @@ R"...(### to-fen-position ###
     engine_ptr_->clock(clock);
     return ret_ptr;
   }
+
+  // %%% @set-white-has-castled
+  // %%% @set-black-has-castled
+  template<Side SIDE>
+  DEF_MESSAGE_FUNCTION(EngineSuite::SetHasCastled) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 真偽値を得る。
+    LPointer has_castled_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*has_castled_ptr, LType::BOOLEAN);
+    bool has_castled = has_castled_ptr->boolean();
+
+    LPointer ret_ptr = Lisp::NewBoolean(board_ptr_->has_castled_[SIDE]);
+    engine_ptr_->has_castled(SIDE, has_castled);
+    return ret_ptr;
+  }
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetHasCastled<WHITE>);
+  template DEF_MESSAGE_FUNCTION(EngineSuite::SetHasCastled<BLACK>);
 
   // %%% @play-move
   // %%% @play-note

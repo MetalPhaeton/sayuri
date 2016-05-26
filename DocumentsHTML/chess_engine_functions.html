@@ -15,11 +15,12 @@
 </header>
 <div class="root_div">
 <section class="main_contents">
-<h1 id="chess-engine-functions">Chess Engine Functions</h1>
+<h1>Chess Engine Functions</h1>
 <p><a href="sayulisp.html">&gt;&gt;Back to Sayulisp page</a></p>
-<h2 id="contents">Contents</h2>
+<h2>Contents</h2>
 <ul>
-<li><a href="#constant-values">Constant Values</a>
+<li>
+<p><a href="#constant-values">Constant Values</a></p>
 <ul>
 <li><a href="#squares">Squares</a></li>
 <li><a href="#fyles">Fyles</a></li>
@@ -27,19 +28,25 @@
 <li><a href="#sides">Sides</a></li>
 <li><a href="#piece-types">Piece Types</a></li>
 <li><a href="#castling">Castling</a></li>
-</ul></li>
-<li><a href="#engine-functions">Engine Functions</a>
+</ul>
+</li>
+<li>
+<p><a href="#engine-functions">Engine Functions</a></p>
 <ul>
-<li><a href="#gen-engine"><code>gen-engine</code></a> : Generate a chess engine.
-<ul>
+<li><a href="#gen-engine"><code>gen-engine</code></a> : Generate a chess engine.<ul>
 <li>See <a href="engine_message_symbol.html">Message Symbols of Engine Object</a></li>
-</ul></li>
-</ul></li>
-<li><a href="#pgn-functions">PGN Functions</a>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="#pgn-functions">PGN Functions</a></p>
 <ul>
 <li><a href="#gen-pgn"><code>gen-pgn</code></a> : Generate PGN object.</li>
-</ul></li>
-<li><a href="#utility-functions">Utility Functions</a>
+</ul>
+</li>
+<li>
+<p><a href="#utility-functions">Utility Functions</a></p>
 <ul>
 <li><a href="#sayuri-license">sayuri-license</a></li>
 <li><a href="#square-to-number">square-&gt;number</a></li>
@@ -56,11 +63,12 @@
 <li><a href="#number-to-castling">number-&gt;castling</a></li>
 <li><a href="#parse-fenepd">parse-fen/epd</a></li>
 <li><a href="#to-fen-position">to-fen-position</a></li>
-</ul></li>
+</ul>
+</li>
 </ul>
 <hr />
-<h2 id="constant-values">Constant Values</h2>
-<h3 id="squares">Squares</h3>
+<h2>Constant Values</h2>
+<h3>Squares</h3>
 <ul>
 <li><code>A1</code> : Number. It indicates A1 square. Value is '0'.</li>
 <li><code>B1</code> : Number. It indicates B1 square. Value is '1'.</li>
@@ -127,7 +135,7 @@
 <li><code>G8</code> : Number. It indicates G8 square. Value is '62'.</li>
 <li><code>H8</code> : Number. It indicates H8 square. Value is '63'.</li>
 </ul>
-<h3 id="fyles">Fyles</h3>
+<h3>Fyles</h3>
 <ul>
 <li><code>FYLE_A</code> : Number. It indicates A-Fyle. Value is '0'.</li>
 <li><code>FYLE_B</code> : Number. It indicates B-Fyle. Value is '1'.</li>
@@ -138,7 +146,7 @@
 <li><code>FYLE_G</code> : Number. It indicates G-Fyle. Value is '6'.</li>
 <li><code>FYLE_H</code> : Number. It indicates H-Fyle. Value is '7'.</li>
 </ul>
-<h3 id="ranks">Ranks</h3>
+<h3>Ranks</h3>
 <ul>
 <li><code>RANK_1</code> : Number. It indicates 1st rank. Value is '0'.</li>
 <li><code>RANK_2</code> : Number. It indicates 2nd rank. Value is '1'.</li>
@@ -149,13 +157,13 @@
 <li><code>RANK_7</code> : Number. It indicates 7th rank. Value is '6'.</li>
 <li><code>RANK_8</code> : Number. It indicates 8th rank. Value is '7'.</li>
 </ul>
-<h3 id="sides">Sides</h3>
+<h3>Sides</h3>
 <ul>
 <li><code>NO_SIDE</code> : Number. It indicates neither of sides. Value is '0'.</li>
 <li><code>WHITE</code> : Number. It indicates White. Value is '1'.</li>
 <li><code>BLACK</code> : Number. It indicates Black. Value is '2'.</li>
 </ul>
-<h3 id="piece-types">Piece Types</h3>
+<h3>Piece Types</h3>
 <ul>
 <li><code>EMPTY</code> : Number. It indicates no piece. Value is '0'.</li>
 <li><code>PAWN</code> : Number. It indicates Pawn. Value is '1'.</li>
@@ -165,44 +173,45 @@
 <li><code>QUEEN</code> : Number. It indicates Queen. Value is '5'.</li>
 <li><code>KING</code> : Number. It indicates King. Value is '6'.</li>
 </ul>
-<h3 id="castling">Castling</h3>
+<h3>Castling</h3>
 <ul>
 <li><code>NO_CASTLING</code> : Number. It indicates no one to castle. Value is '0'.</li>
-<li><code>WHITE_SHORT_CASTLING</code> : Number. It indicates White's Short Castling. Value is '1'.</li>
-<li><code>WHITE_LONG_CASTLING</code> : Number. It indicates White's Long Castling. Value is '2'.</li>
-<li><code>BLACK_SHORT_CASTLING</code> : Number. It indicates Black's Short Castling. Value is '3'.</li>
-<li><code>BLACK_LONG_CASTLING</code> : Number. It indicates Black's Long Castling. Value is '4'.</li>
+<li><code>WHITE_SHORT_CASTLING</code> : Number.
+  It indicates White's Short Castling. Value is '1'.</li>
+<li><code>WHITE_LONG_CASTLING</code> : Number.
+  It indicates White's Long Castling. Value is '2'.</li>
+<li><code>BLACK_SHORT_CASTLING</code> : Number.
+  It indicates Black's Short Castling. Value is '3'.</li>
+<li><code>BLACK_LONG_CASTLING</code> : Number.
+  It indicates Black's Long Castling. Value is '4'.</li>
 </ul>
-<h2 id="engine-functions">Engine Functions</h2>
-<h3 id="gen-engine">gen-engine</h3>
-<h6>
-Usage
-</h6>
-<ol style="list-style-type: decimal">
+<h2>Engine Functions</h2>
+<h3>gen-engine</h3>
+<h6> Usage </h6>
+
+<ol>
 <li><code>(gen-engine)</code></li>
 <li><code>((gen-engine) &lt;Message Symbol&gt; [&lt;Arguments&gt;...])</code></li>
 </ol>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>1: Generates chess engine.</li>
 <li>2: The engine executes something according to <code>&lt;Message Symbol&gt;</code>.</li>
 <li>2: Some <code>&lt;Message Symbol&gt;</code> require <code>&lt;Argument&gt;...</code>.</li>
-<li><code>(help &quot;engine &lt;MessageSymbol&gt;&quot;)</code>
-<ul>
+<li><code>(help "engine &lt;MessageSymbol&gt;")</code><ul>
 <li>Returns description for each message symbol.</li>
-</ul></li>
 </ul>
-<h6>
-Example
-</h6>
+</li>
+</ul>
+<h6> Example </h6>
+
 <pre><code>(define my-engine (gen-engine))
-(display (my-engine &#39;@get-white-pawn-position))
+(display (my-engine '@get-white-pawn-position))
 ;; Output
 ;; &gt; (A2 B2 C2 D2 E2 F2 G2 H2)
 
-(display (help &quot;engine @get-white-pawn-position&quot;))
+(display (help "engine @get-white-pawn-position"))
 ;; Output
 ;; &gt; ### Getting squares ###
 ;; &gt; 
@@ -236,124 +245,150 @@ Example
 ;; &gt; &lt;h6&gt; Example &lt;/h6&gt;
 ;; &gt; 
 ;; &gt;     (define my-engine (gen-engine))
-;; &gt;     (display (my-engine &#39;@get-white-pawn-position))
+;; &gt;     (display (my-engine '@get-white-pawn-position))
 ;; &gt;     
 ;; &gt;     ;; Output
-;; &gt;     ;; &gt; (A2 B2 C2 D2 E2 F2 G2 H2)</code></pre>
-<h2 id="pgn-functions">PGN Functions</h2>
-<h3 id="gen-pgn">gen-pgn</h3>
-<h6>
-Usage
-</h6>
+;; &gt;     ;; &gt; (A2 B2 C2 D2 E2 F2 G2 H2)
+</code></pre>
+<h2>PGN Functions</h2>
+<h3>gen-pgn</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(gen-pgn &lt;PGN string : String&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Generates and returns PGN object from <code>&lt;PGN string&gt;</code>.</li>
 <li>PGN object is operated by Message Symbol.</li>
-<li>PGN object has 2 states.
-<ul>
-<li>Current game.
-<ul>
+<li>PGN object has 2 states.<ul>
+<li>Current game.<ul>
 <li>This can be changed by <code>@set-current-game</code>.</li>
-</ul></li>
-<li>Current move.
-<ul>
-<li>This can be changed by <code>@next-move</code>, <code>@prev-move</code>, <code>@alt-move</code>, <code>@orig-move</code>, <code>@rewind-move</code>.</li>
-</ul></li>
-</ul></li>
 </ul>
-<h6>
-Description of Message Symbols
-</h6>
+</li>
+<li>Current move.<ul>
+<li>This can be changed by <code>@next-move</code>, <code>@prev-move</code>, <code>@alt-move</code>,
+  <code>@orig-move</code>, <code>@rewind-move</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h6> Description of Message Symbols </h6>
+
 <ul>
-<li><code>@get-pgn-comments</code>
+<li>
+<p><code>@get-pgn-comments</code></p>
 <ul>
 <li>Returns Lists of comments about PGN.</li>
-</ul></li>
-<li><code>@get-current-game-comments.</code>
+</ul>
+</li>
+<li>
+<p><code>@get-current-game-comments.</code></p>
 <ul>
 <li>Returns List of comments about the current game.</li>
-</ul></li>
-<li><code>@get-current-move-comments</code>
+</ul>
+</li>
+<li>
+<p><code>@get-current-move-comments</code></p>
 <ul>
 <li>Returns List of comments about the current move.</li>
-</ul></li>
-<li><code>@length</code>
+</ul>
+</li>
+<li>
+<p><code>@length</code></p>
 <ul>
 <li>Returns the number of games that PGN has.</li>
-</ul></li>
-<li><code>@set-current-game &lt;Index : Number&gt;</code>
+</ul>
+</li>
+<li>
+<p><code>@set-current-game &lt;Index : Number&gt;</code></p>
 <ul>
 <li>Sets a current game into the <code>&lt;Index&gt;</code>th game.</li>
-</ul></li>
-<li><code>@get-current-game-headers</code>
+</ul>
+</li>
+<li>
+<p><code>@get-current-game-headers</code></p>
 <ul>
-<li>Returns List of Lists composed with headers of the current game.
-<ul>
-<li>The format is &quot;<code>((&lt;Name 1&gt; &lt;value 1&gt;) (&lt;Name 2&gt; &lt;Value 2&gt;)...)</code>&quot;.</li>
-</ul></li>
-</ul></li>
-<li><code>@current-move</code>
+<li>Returns List of Lists composed with headers of the current game.<ul>
+<li>The format is "<code>((&lt;Name 1&gt; &lt;value 1&gt;) (&lt;Name 2&gt; &lt;Value 2&gt;)...)</code>".</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>@current-move</code></p>
 <ul>
 <li>Returns the current move text.</li>
-</ul></li>
-<li><code>@next-move</code>
-<ul>
-<li>Change the current move into the next move and returns the move text.</li>
-</ul></li>
-<li><code>@prev-move</code>
-<ul>
-<li>Change the current move into the previous move and returns the move text.</li>
-</ul></li>
-<li><code>@alt-move</code>
-<ul>
-<li>Change the current move into the alternative move and returns the move text.</li>
-</ul></li>
-<li><code>@orig-move</code>
-<ul>
-<li>If the current move is an alternative move, then change a current move into the original move and returns the move text.</li>
-</ul></li>
-<li><code>@rewind-move</code>
-<ul>
-<li>Change a current move into the first move and returns the move text.</li>
-</ul></li>
 </ul>
-<h6>
-Example
-</h6>
+</li>
+<li>
+<p><code>@next-move</code></p>
+<ul>
+<li>Change the current move into the next move
+  and returns the move text.</li>
+</ul>
+</li>
+<li>
+<p><code>@prev-move</code></p>
+<ul>
+<li>Change the current move into the previous move
+  and returns the move text.</li>
+</ul>
+</li>
+<li>
+<p><code>@alt-move</code></p>
+<ul>
+<li>Change the current move into the alternative move
+  and returns the move text.</li>
+</ul>
+</li>
+<li>
+<p><code>@orig-move</code></p>
+<ul>
+<li>If the current move is an alternative move,
+  then change a current move into the original move
+  and returns the move text.</li>
+</ul>
+</li>
+<li>
+<p><code>@rewind-move</code></p>
+<ul>
+<li>Change a current move into the first move
+  and returns the move text.</li>
+</ul>
+</li>
+</ul>
+<h6> Example </h6>
+
 <pre><code>;; Open PGN File.
-(define pgn-file (input-stream &quot;/path/to/pgnfile.pgn&quot;))
+(define pgn-file (input-stream "/path/to/pgnfile.pgn"))
 
 ;; Reads the file and generates PGN object.
-(define my-pgn (gen-pgn (pgn-file &#39;@read)))
+(define my-pgn (gen-pgn (pgn-file '@read)))
 
 ;; Displays the current game headers.
-(display (my-pgn &#39;@get-current-game-headers))
+(display (my-pgn '@get-current-game-headers))
 
 ;; Output
-;; &gt; ((&quot;Black&quot; &quot;Hanako Yamada&quot;) (&quot;Site&quot; &quot;Japan&quot;)
-;; &gt; (&quot;White&quot; &quot;Hironori Ishibashi&quot;))</code></pre>
-<h2 id="utility-functions">Utility Functions</h2>
-<h3 id="sayuri-license">sayuri-license</h3>
-<h6>
-Usage
-</h6>
+;; &gt; (("Black" "Hanako Yamada") ("Site" "Japan")
+;; &gt; ("White" "Hironori Ishibashi"))
+</code></pre>
+<h2>Utility Functions</h2>
+<h3>sayuri-license</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(sayuri-license)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns String of license terms of Sayuri.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (sayuri-license))
 
 ;; Output
@@ -361,7 +396,7 @@ Example
 ;; &gt; 
 ;; &gt; Permission is hereby granted, free of charge, to any person obtaining
 :: &gt; a copy
-;; &gt; of this software and associated documentation files (the &quot;Software&quot;),
+;; &gt; of this software and associated documentation files (the "Software"),
 ;; &gt; to
 ;; &gt; deal in the Software without restriction, including without limitation
 ;; &gt; the
@@ -375,7 +410,7 @@ Example
 ;; &gt; included in
 ;; &gt; all copies or substantial portions of the Software.
 ;; &gt; 
-;; &gt; THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+;; &gt; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 ;; &gt; EXPRESS OR
 ;; &gt; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 ;; &gt; MERCHANTABILITY,
@@ -385,306 +420,284 @@ Example
 ;; &gt; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ;; &gt; ARISING
 ;; &gt; FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-;; &gt; DEALINGS IN THE SOFTWARE.</code></pre>
+;; &gt; DEALINGS IN THE SOFTWARE.
+</code></pre>
 <h3 id="square-to-number">square-&gt;number</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(square-&gt;number &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>If <code>&lt;Object&gt;</code> is Square Symbol, it returns Number indicating to Square.</li>
-<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Square Symbol into Number.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Square Symbol into Number. </li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(define symbol-list
-  &#39;(A1 B1 C1 (WHITE D3 E4 (F5 PAWN G6) H7 BLACK_LONG_CASTLING)))
+  '(A1 B1 C1 (WHITE D3 E4 (F5 PAWN G6) H7 BLACK_LONG_CASTLING)))
 
 (display (square-&gt;number symbol-list))
 ;; Output
-;; &gt; (0 1 2 (WHITE 19 28 (37 PAWN 46) 55 BLACK_LONG_CASTLING))</code></pre>
+;; &gt; (0 1 2 (WHITE 19 28 (37 PAWN 46) 55 BLACK_LONG_CASTLING))
+</code></pre>
 <h3 id="fyle-to-number">fyle-&gt;number</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(fyle-&gt;number &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>If <code>&lt;Object&gt;</code> is Fyle Symbol, it returns Number indicating to Fyle.</li>
-<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Fyle Symbol into Number.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Fyle Symbol into Number. </li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(define symbol-list
-  &#39;(FYLE_A FYLE_B (WHITE FYLE_D E4 (PAWN G6) FYLE_H BLACK_LONG_CASTLING)))
+  '(FYLE_A FYLE_B (WHITE FYLE_D E4 (PAWN G6) FYLE_H BLACK_LONG_CASTLING)))
 
 (display (fyle-&gt;number symbol-list))
 ;; Output
-;; &gt; (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING))</code></pre>
+;; &gt; (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING))
+</code></pre>
 <h3 id="rank-to-number">rank-&gt;number</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(rank-&gt;number &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>If <code>&lt;Object&gt;</code> is Rank Symbol, it returns Number indicating to Rank.</li>
-<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Rank Symbol into Number.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Rank Symbol into Number. </li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(define symbol-list
-  &#39;(RANK_1 RANK_2 (WHITE RANK_4 E4 (PAWN G6) RANK_8 BLACK_LONG_CASTLING)))
+  '(RANK_1 RANK_2 (WHITE RANK_4 E4 (PAWN G6) RANK_8 BLACK_LONG_CASTLING)))
 
 (display (rank-&gt;number symbol-list))
 ;; Output
-;; &gt; (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING))</code></pre>
+;; &gt; (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING))
+</code></pre>
 <h3 id="side-to-number">side-&gt;number</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(side-&gt;number &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>If <code>&lt;Object&gt;</code> is Side Symbol, it returns Number indicating to Side.</li>
-<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Side Symbol into Number.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Side Symbol into Number. </li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(define symbol-list
-  &#39;(NO_SIDE WHITE (FYLE_A BLACK E4 (PAWN G6) BLACK_LONG_CASTLING)))
+  '(NO_SIDE WHITE (FYLE_A BLACK E4 (PAWN G6) BLACK_LONG_CASTLING)))
 
 (display (side-&gt;number symbol-list))
 ;; Output
-;; &gt; (0 1 (FYLE_A 2 E4 (PAWN G6) BLACK_LONG_CASTLING))</code></pre>
+;; &gt; (0 1 (FYLE_A 2 E4 (PAWN G6) BLACK_LONG_CASTLING))
+</code></pre>
 <h3 id="piece-to-number">piece-&gt;number</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(piece-&gt;number &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>If <code>&lt;Object&gt;</code> is Piece Type Symbol, it returns Number indicating to Piece Type.</li>
-<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Piece Type Symbol into Number.</li>
+<li>If <code>&lt;Object&gt;</code> is Piece Type Symbol, it returns Number indicating
+  to Piece Type.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Piece Type Symbol into Number. </li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(define symbol-list
-  &#39;(EMPTY PAWN (FYLE_A QUEEN E4 (RANK_4 G6) KING BLACK_LONG_CASTLING)))
+  '(EMPTY PAWN (FYLE_A QUEEN E4 (RANK_4 G6) KING BLACK_LONG_CASTLING)))
 
 (display (piece-&gt;number symbol-list))
 ;; Output
-;; &gt; (0 1 (FYLE_A 5 E4 (RANK_4 G6) 6 BLACK_LONG_CASTLING))</code></pre>
+;; &gt; (0 1 (FYLE_A 5 E4 (RANK_4 G6) 6 BLACK_LONG_CASTLING))
+</code></pre>
 <h3 id="castling-to-number">castling-&gt;number</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(castling-&gt;number &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>If <code>&lt;Object&gt;</code> is Castling Right Symbol, it returns Number indicating to Piece Type.</li>
-<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Castling Right Symbol into Number.</li>
+<li>If <code>&lt;Object&gt;</code> is Castling Right Symbol, it returns Number indicating
+  to Piece Type.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Castling Right Symbol
+  into Number. </li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(define symbol-list
-  &#39;(NO_CASTLING WHITE_SHORT_CASTLING (FYLE_A E4 (RANK_4 G6) KING)))
+  '(NO_CASTLING WHITE_SHORT_CASTLING (FYLE_A E4 (RANK_4 G6) KING)))
 
 (display (castling-&gt;number symbol-list))
 ;; Output
-;; &gt; (0 1 (FYLE_A E4 (RANK_4 G6) KING))</code></pre>
+;; &gt; (0 1 (FYLE_A E4 (RANK_4 G6) KING))
+</code></pre>
 <h3 id="number-to-square">number-&gt;square</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(number-&gt;square &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>If <code>&lt;Object&gt;</code> is Number, it returns Square Symbol.</li>
 <li>If <code>&lt;Object&gt;</code> is List, it returns List changed Number into Square Symbol.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define number-list &#39;(0 1 (2 (3 4 &quot;Hello&quot;) 5) 100))
+<h6> Example </h6>
+
+<pre><code>(define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
 
 (display (number-&gt;square number-list))
 ;; Output
-;; &gt; (A1 B1 (C1 (D1 E1 &quot;Hello&quot;) F1) 100)</code></pre>
+;; &gt; (A1 B1 (C1 (D1 E1 "Hello") F1) 100)
+</code></pre>
 <h3 id="number-to-fyle">number-&gt;fyle</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(number-&gt;fyle &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>If <code>&lt;Object&gt;</code> is Number, it returns Fyle Symbol.</li>
 <li>If <code>&lt;Object&gt;</code> is List, it returns List changed Number into Fyle Symbol.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define number-list &#39;(0 1 (2 (3 4 &quot;Hello&quot;) 5) 100))
+<h6> Example </h6>
+
+<pre><code>(define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
 
 (display (number-&gt;fyle number-list))
 ;; Output
-;; &gt; (FYLE_A FYLE_B (FYLE_C (FYLE_D FYLE_E &quot;Hello&quot;) FYLE_F) 100)</code></pre>
+;; &gt; (FYLE_A FYLE_B (FYLE_C (FYLE_D FYLE_E "Hello") FYLE_F) 100)
+</code></pre>
 <h3 id="number-to-rank">number-&gt;rank</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(number-&gt;rank &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>If <code>&lt;Object&gt;</code> is Number, it returns Rank Symbol.</li>
 <li>If <code>&lt;Object&gt;</code> is List, it returns List changed Number into Rank Symbol.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define number-list &#39;(0 1 (2 (3 4 &quot;Hello&quot;) 5) 100))
+<h6> Example </h6>
+
+<pre><code>(define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
 
 (display (number-&gt;rank number-list))
 ;; Output
-;; &gt; (RANK_1 RANK_2 (RANK_3 (RANK_4 RANK_5 &quot;Hello&quot;) RANK_6) 100)</code></pre>
+;; &gt; (RANK_1 RANK_2 (RANK_3 (RANK_4 RANK_5 "Hello") RANK_6) 100)
+</code></pre>
 <h3 id="number-to-side">number-&gt;side</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(number-&gt;side &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>If <code>&lt;Object&gt;</code> is Number, it returns Side Symbol.</li>
 <li>If <code>&lt;Object&gt;</code> is List, it returns List changed Number into Side Symbol.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define number-list &#39;(0 1 (2 (3 4 &quot;Hello&quot;) 5) 100))
+<h6> Example </h6>
+
+<pre><code>(define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
 
 (display (number-&gt;side number-list))
 ;; Output
-;; &gt; (NO_SIDE WHITE (BLACK (3 4 &quot;Hello&quot;) 5) 100)</code></pre>
+;; &gt; (NO_SIDE WHITE (BLACK (3 4 "Hello") 5) 100)
+</code></pre>
 <h3 id="number-to-piece">number-&gt;piece</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(number-&gt;piece &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>If <code>&lt;Object&gt;</code> is Number, it returns Piece Type Symbol.</li>
 <li>If <code>&lt;Object&gt;</code> is List, it returns List changed Number into Piece Type Symbol.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define number-list &#39;(0 1 (2 (3 4 &quot;Hello&quot;) 5) 100))
+<h6> Example </h6>
+
+<pre><code>(define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
 
 (display (number-&gt;piece number-list))
 ;; Output
-;; &gt; (EMPTY PAWN (KNIGHT (BISHOP ROOK &quot;Hello&quot;) QUEEN) 100)</code></pre>
+;; &gt; (EMPTY PAWN (KNIGHT (BISHOP ROOK "Hello") QUEEN) 100)
+</code></pre>
 <h3 id="number-to-castling">number-&gt;castling</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(number-&gt;castling &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>If <code>&lt;Object&gt;</code> is Number, it returns Castling Rights Symbol.</li>
-<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Number into CAstling Rights Symbol.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Number
+  into CAstling Rights Symbol.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define number-list &#39;(0 1 (2 (3 4 &quot;Hello&quot;) 5) 100))
+<h6> Example </h6>
+
+<pre><code>(define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
 
 (display (number-&gt;castling number-list))
 ;; Output
 ;; &gt; (NO_CASTLING WHITE_SHORT_CASTLING (WHITE_LONG_CASTLING
-;; &gt; (BLACK_SHORT_CASTLING BLACK_LONG_CASTLING &quot;Hello&quot;) 5) 100)</code></pre>
-<h3 id="parse-fenepd">parse-fen/epd</h3>
-<h6>
-Usage
-</h6>
+;; &gt; (BLACK_SHORT_CASTLING BLACK_LONG_CASTLING "Hello") 5) 100)
+</code></pre>
+<h3>parse-fen/epd</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(parse-fen/epd &lt;FEN or EPD : String&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>Parses <code>&lt;FEN or EPD&gt;</code> and returns result value.
-<ul>
+<li>Parses <code>&lt;FEN or EPD&gt;</code> and returns result value.<ul>
 <li>A result value is <code>((&lt;Tag 1 : String&gt; &lt;Object 1&gt;)...)</code>.</li>
-</ul></li>
 </ul>
-<h6>
-Example
-</h6>
+</li>
+</ul>
+<h6> Example </h6>
+
 <pre><code>(display (parse-fen/epd
-    &quot;rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq d3 0 3&quot;))
+    "rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq d3 0 3"))
 ;; Output
-;; &gt; ((&quot;fen castling&quot; (WHITE_SHORT_CASTLING
+;; &gt; (("fen castling" (WHITE_SHORT_CASTLING
 ;; &gt; WHITE_LONG_CASTLING BLACK_SHORT_CASTLING BLACK_LONG_CASTLING))
-;; &gt; (&quot;fen clock&quot; 0)
-;; &gt; (&quot;fen en_passant&quot; D3)
-;; &gt; (&quot;fen ply&quot; 5)
-;; &gt; (&quot;fen position&quot; ((WHITE ROOK) (WHITE KNIGHT) (WHITE BISHOP)
+;; &gt; ("fen clock" 0)
+;; &gt; ("fen en_passant" D3)
+;; &gt; ("fen ply" 5)
+;; &gt; ("fen position" ((WHITE ROOK) (WHITE KNIGHT) (WHITE BISHOP)
 ;; &gt; (WHITE QUEEN) (WHITE KING) (WHITE BISHOP) (NO_SIDE EMPTY)
 ;; &gt; (WHITE ROOK) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN) (NO_SIDE EMPTY)
 ;; &gt; (NO_SIDE EMPTY) (WHITE PAWN) (WHITE PAWN) (WHITE PAWN)
@@ -700,43 +713,57 @@ Example
 ;; &gt; (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK PAWN) (BLACK ROOK)
 ;; &gt; (BLACK KNIGHT) (BLACK BISHOP) (BLACK QUEEN) (BLACK KING)
 ;; &gt; (BLACK BISHOP) (BLACK KNIGHT) (BLACK ROOK)))
-;; &gt; (&quot;fen to_move&quot; BLACK))</code></pre>
-<h3 id="to-fen-position">to-fen-position</h3>
-<h6>
-Usage
-</h6>
+;; &gt; ("fen to_move" BLACK))
+</code></pre>
+<h3>to-fen-position</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(to-fen-position &lt;Pieces list : List&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Analyses <code>&lt;Pieces list&gt;</code> and returns FEN position.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(display (to-fen-position
-    &#39;((WHITE KING) (WHITE KING)(WHITE KING) (WHITE KING)
-    (WHITE QUEEN) (WHITE QUEEN)(WHITE QUEEN) (WHITE QUEEN)
-    (WHITE ROOK) (WHITE ROOK)(WHITE ROOK) (WHITE ROOK)
-    (WHITE BISHOP) (WHITE BISHOP)(WHITE BISHOP) (WHITE BISHOP)
-    (WHITE KNIGHT) (WHITE KNIGHT)(WHITE KNIGHT) (WHITE KNIGHT)
-    (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-    (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-    (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-    (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-    (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-    (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY) (NO_SIDE EMPTY)
-    (BLACK KNIGHT) (BLACK KNIGHT)(BLACK KNIGHT) (BLACK KNIGHT)
-    (BLACK BISHOP) (BLACK BISHOP)(BLACK BISHOP) (BLACK BISHOP)
-    (BLACK ROOK) (BLACK ROOK)(BLACK ROOK) (BLACK ROOK)
-    (BLACK QUEEN) (BLACK QUEEN)(BLACK QUEEN) (BLACK QUEEN)
-    (BLACK KING) (BLACK KING)(BLACK KING) (BLACK KING))))
-;; Output
-;; &gt; qqqqkkkk/bbbbrrrr/4nnnn/8/8/NNNN4/RRRRBBBB/KKKKQQQQ</code></pre>
+<h6> Example </h6>
 
+<pre><code>(display (to-fen-position
+    (list (list WHITE KING) (list WHITE KING)
+    (list WHITE KING) (list WHITE KING)
+    (list WHITE QUEEN) (list WHITE QUEEN)
+    (list WHITE QUEEN) (list WHITE QUEEN)
+    (list WHITE ROOK) (list WHITE ROOK)
+    (list WHITE ROOK) (list WHITE ROOK)
+    (list WHITE BISHOP) (list WHITE BISHOP)
+    (list WHITE BISHOP) (list WHITE BISHOP)
+    (list WHITE KNIGHT) (list WHITE KNIGHT)
+    (list WHITE KNIGHT) (list WHITE KNIGHT)
+    (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+    (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+    (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+    (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+    (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+    (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+    (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+    (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+    (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+    (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+    (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+    (list NO_SIDE EMPTY) (list NO_SIDE EMPTY)
+    (list BLACK KNIGHT) (list BLACK KNIGHT)
+    (list BLACK KNIGHT) (list BLACK KNIGHT)
+    (list BLACK BISHOP) (list BLACK BISHOP)
+    (list BLACK BISHOP) (list BLACK BISHOP)
+    (list BLACK ROOK) (list BLACK ROOK)
+    (list BLACK ROOK) (list BLACK ROOK)
+    (list BLACK QUEEN) (list BLACK QUEEN)
+    (list BLACK QUEEN) (list BLACK QUEEN)
+    (list BLACK KING) (list BLACK KING)
+    (list BLACK KING) (list BLACK KING))))
+;; Output
+;; &gt; qqqqkkkk/bbbbrrrr/4nnnn/8/8/NNNN4/RRRRBBBB/KKKKQQQQ
+</code></pre>
 </section>
 </div>
 <footer>Copyright &copy; Hironori Ishibashi</footer>

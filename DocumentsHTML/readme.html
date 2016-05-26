@@ -15,128 +15,137 @@
 </header>
 <div class="root_div">
 <section class="main_contents">
-<h1 id="readme">README</h1>
-<h2 id="sayuri-is-...">Sayuri is ...</h2>
+<h1>README</h1>
+<h2>Sayuri is ...</h2>
 <ul>
 <li>A chess engine for UCI.</li>
 <li>MIT License software.</li>
 <li>Written in C++11 and only use the standard libraries.</li>
 <li>Easy to build with CMake.</li>
-<li>Equipped Lisp interpreter that is named <em>Sayulisp</em>.
-<ul>
+<li>Equipped Lisp interpreter that is named <em>Sayulisp</em>.<ul>
 <li>Sayulisp can generate and operate Chess Engine.</li>
 <li>Sayulisp can customize algorithm of Search Function.</li>
 <li>Sayulisp can customize values of Evaluation Function.</li>
-</ul></li>
 </ul>
-<h2 id="files-and-directories">Files and Directories</h2>
-<h3 id="directories">Directories</h3>
+</li>
+</ul>
+<h2>Files and Directories</h2>
+<h3>Directories</h3>
 <ul>
 <li>src : Source files.</li>
-<li>SayuriCompiled : Binary files.
-<ul>
-<li>Linux : Binary files for Linux.
-<ul>
+<li>SayuriCompiled : Binary files.<ul>
+<li>Linux : Binary files for Linux.<ul>
 <li>For64Bit : For 64 bit machines.</li>
-</ul></li>
-<li>Windows : Binary files for Windows. (Created by Linux's MinGW.)
-<ul>
+</ul>
+</li>
+<li>Windows : Binary files for Windows. (Created by Linux's MinGW.)<ul>
 <li>For64Bit : For 64 bit machines.</li>
-</ul></li>
+</ul>
+</li>
 <li>Android : Binary file for Android.</li>
-</ul></li>
+</ul>
+</li>
 <li>SayuriLogo : Logo image files.</li>
 <li>SampleGames : Sample game files of Sayuri vs other chess engines.</li>
 <li>DocumentsHTML : Documents.</li>
 <li>Tools : Convenient tools.</li>
 </ul>
-<h3 id="files">Files</h3>
+<h3>Files</h3>
 <ul>
 <li>README.md : README file.</li>
 <li>CMakeLists.txt : A configuration file for CMake.</li>
 <li>LICENSE : The software license.</li>
 </ul>
-<h2 id="how-to-build-with-cmake">How To Build with CMake</h2>
+<h2>How To Build with CMake</h2>
 <p>Using CMake, you can build Sayuri easily.</p>
-<p>It's default compiler is <em>&quot;clang++&quot;</em>.</p>
-<h3 id="build-for-release">Build for Release</h3>
-<ol style="list-style-type: decimal">
-<li>Change directory to where &quot;CMakeLists.txt&quot; is placed in.</li>
-<li>Run the following commands.
-<ol style="list-style-type: decimal">
+<p>It's default compiler is <em>"clang++"</em>.  </p>
+<h3>Build for Release</h3>
+<ol>
+<li>Change directory to where "CMakeLists.txt" is placed in.</li>
+<li>Run the following commands.<ol>
 <li><code>$ mkdir build</code></li>
 <li><code>$ cd build</code></li>
-<li><code>$ cmake ..</code>
-<ul>
+<li><code>$ cmake ..</code><ul>
 <li>If you want to change a compiler into <code>&lt;cc&gt;</code>, you should call...<br />
 <code>$ cmake -DCMAKE_CXX_COMPILER=&lt;cc&gt; ..</code></li>
-</ul></li>
+</ul>
+</li>
 <li><code>$ make</code></li>
-</ol></li>
-<li><em>&quot;sayuri&quot;</em> is built.</li>
 </ol>
-<h3 id="build-for-debug">Build for Debug</h3>
-<p>&quot;for Debug&quot; means <em>&quot;No Optimize&quot;</em> and <em>&quot;Embedded Debug Information&quot;</em>.</p>
-<ol style="list-style-type: decimal">
-<li>Change directory to where &quot;CMakeLists.txt&quot; is placed in.</li>
-<li>Run the following commands.
-<ol style="list-style-type: decimal">
+</li>
+<li><em>"sayuri"</em> is built.</li>
+</ol>
+<h3>Build for Debug</h3>
+<p>"for Debug" means <em>"No Optimize"</em> and <em>"Embedded Debug Information"</em>.</p>
+<ol>
+<li>Change directory to where "CMakeLists.txt" is placed in.</li>
+<li>Run the following commands.<ol>
 <li><code>$ mkdir build</code></li>
 <li><code>$ cd build</code></li>
-<li><code>$ cmake -DCMAKE_BUILD_TYPE=Debug ..</code>
-<ul>
+<li><code>$ cmake -DCMAKE_BUILD_TYPE=Debug ..</code><ul>
 <li>If you want to change a compiler into <code>&lt;cc&gt;</code>, you should call...<br />
 <code>$ cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=&lt;cc&gt; ..</code></li>
-</ul></li>
+</ul>
+</li>
 <li><code>$ make</code></li>
-</ol></li>
-<li><em>&quot;sayuri&quot;</em> is built.</li>
 </ol>
-<h2 id="how-to-build-without-cmake">How To Build without CMake</h2>
-<p>If you don't have CMake, you can build &quot;sayuri&quot; by the following commands in &quot;src&quot; directory.</p>
-<p>If you have &quot;clang&quot; :</p>
-<pre><code>clang++ -std=c++11 -fno-rtti -Ofast -march=native -pthread -o sayuri *.cpp</code></pre>
-<p>If you have &quot;gcc&quot; :</p>
-<pre><code>g++ -std=c++11 -fno-rtti -Ofast -march=native -pthread -o sayuri *.cpp</code></pre>
-<h2 id="how-to-make-distributable-packages">How To Make Distributable Packages</h2>
-<p>After building Sayuri with CMake, run &quot;<code>$ make dist</code>&quot; command.</p>
+</li>
+<li><em>"sayuri"</em> is built.</li>
+</ol>
+<h2>How To Build without CMake</h2>
+<p>If you don't have CMake, you can build "sayuri" by the following commands
+in "src" directory.</p>
+<p>If you have "clang" :</p>
+<pre><code>clang++ -std=c++11 -fno-rtti -Ofast -march=native -pthread -o sayuri *.cpp
+</code></pre>
+<p>If you have "gcc" :</p>
+<pre><code>g++ -std=c++11 -fno-rtti -Ofast -march=native -pthread -o sayuri *.cpp
+</code></pre>
+<h2>How To Make Distributable Packages</h2>
+<p>After building Sayuri with CMake, run "<code>$ make dist</code>" command.</p>
 <p>The following packages will be created.</p>
 <ul>
 <li>sayuri-xxxx.xx.xx.tar.Z</li>
 <li>sayuri-xxxx.xx.xx.tar.bz2</li>
 <li>sayuri-xxxx.xx.xx.tar.gz</li>
 </ul>
-<p>(Note: &quot;xxxx.xx.xx&quot; is the version number.)</p>
-<h2 id="use-as-library">Use as Library</h2>
+<p>(Note: "xxxx.xx.xx" is the version number.)</p>
+<h2>Use as Library</h2>
 <p>Sayuri's source code can be used as library.</p>
 <p>The Library has only one function.</p>
-<pre><code>extern &quot;C&quot;
-const char* ExecuteSayulisp(const char* code)</code></pre>
-<h6>
-Usage
-</h6>
-<ol style="list-style-type: decimal">
-<li><p>Delete <code>main.cpp</code>, because it has <code>main()</code> function.</p></li>
-<li><p>Include <code>sayuri.h</code> with <code>#include &quot;sayuri.h&quot;</code>.</p></li>
-<li>Call <code>const char* ExecuteSayulisp(const char* code)</code>.
+<pre><code>extern "C"
+const char* ExecuteSayulisp(const char* code)
+</code></pre>
+<h6> Usage </h6>
+
+<ol>
+<li>
+<p>Delete <code>main.cpp</code>, because it has <code>main()</code> function.</p>
+</li>
+<li>
+<p>Include <code>sayuri.h</code> with <code>#include "sayuri.h"</code>.</p>
+</li>
+<li>
+<p>Call <code>const char* ExecuteSayulisp(const char* code)</code>.</p>
 <ul>
 <li><code>code</code> is Sayulisp.</li>
 <li>Returns S-Expression.</li>
-</ul></li>
+</ul>
+</li>
 </ol>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <p>If you want to call Sayuri from Python on Linux, then...</p>
 <p>(Step 1) Delete <code>main.cpp</code>, because it has <code>main()</code> function.</p>
 <p>(Step 2) Build <code>libsayuri.so</code> by...</p>
 <pre><code>$ &lt;g++ | clang++&gt; -std=c++11 -Ofast -pthread -march=native -fno-rtti \
-  -shared -fPIC -o libsayuri.so *.cpp</code></pre>
+  -shared -fPIC -o libsayuri.so *.cpp
+</code></pre>
 <p>(Step 3) Use from Python.</p>
-<pre><code>from ctypes import* 
+<pre><code>from ctypes import*
 
 # Load.
-lib = cdll.LoadLibrary(&quot;/path/to/libsayuri.so&quot;)
+lib = cdll.LoadLibrary("/path/to/libsayuri.so")
 
 # Get ready.
 sayulisp = lib.ExecuteSayulisp
@@ -144,32 +153,42 @@ sayulisp.restype = c_char_p
 sayulisp.argtype = (c_cahr_p)
 
 # Go.
-print(sayulisp(b&quot;(+ 1 2 3)&quot;))</code></pre>
-<h2 id="uci-options">UCI Options</h2>
+print(sayulisp(b"(+ 1 2 3)"))
+</code></pre>
+<h2>UCI Options</h2>
 <ul>
-<li>To change size of the hash table. (Default: 1 MB, Max: 8192 MB, Min: 1 MB)
+<li>
+<p>To change size of the hash table. (Default: 1 MB, Max: 8192 MB, Min: 1 MB)</p>
 <ul>
 <li><code>setoption name Hash value &lt;Size(MB)&gt;</code><br />
-(Note!!) <code>&lt;Size(MB)&gt;</code> must be 2^n. (e.g. 128, 256, 512, 1024,...)</li>
-</ul></li>
-<li>To initialize the hash table.
+  (Note!!) <code>&lt;Size(MB)&gt;</code> must be 2^n. (e.g. 128, 256, 512, 1024,...)</li>
+</ul>
+</li>
+<li>
+<p>To initialize the hash table.</p>
 <ul>
 <li><code>setoption name Clear Hash</code></li>
-</ul></li>
-<li>To enable Ponder. (Default: true)
+</ul>
+</li>
+<li>
+<p>To enable Ponder. (Default: true)</p>
 <ul>
 <li><code>setoption name Ponder value &lt;true or false&gt;</code></li>
-</ul></li>
-<li>To change the number of threads. (Default: 1, Max: 64, Min: 1)
+</ul>
+</li>
+<li>
+<p>To change the number of threads. (Default: 1, Max: 64, Min: 1)</p>
 <ul>
 <li><code>setoption name Threads value &lt;Number of threads&gt;</code></li>
-</ul></li>
-<li>To enable analyse mode. (Default: false)
+</ul>
+</li>
+<li>
+<p>To enable analyse mode. (Default: false)</p>
 <ul>
 <li><code>setoption name UCI_AnalyseMode value &lt;true or false&gt;</code></li>
-</ul></li>
 </ul>
-
+</li>
+</ul>
 </section>
 </div>
 <footer>Copyright &copy; Hironori Ishibashi</footer>

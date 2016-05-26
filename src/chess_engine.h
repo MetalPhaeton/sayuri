@@ -720,6 +720,14 @@ namespace Sayuri {
       void ply(int ply) {
         basic_st_.ply_ = ply < 0 ? 0 : ply;
       }
+      /**
+       * ミューテータ - キャスリングしたかどうか。
+       * @param side 設定したいサイド
+       * @param has_castled キャスリングしたかどうかの配列。
+       */
+      void has_castled(Side side, bool has_castled) {
+        basic_st_.has_castled_[side] = has_castled;
+      }
 
     private:
       /** フレンドのデバッグ用関数。 */

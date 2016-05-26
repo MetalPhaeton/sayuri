@@ -540,6 +540,10 @@ namespace Sayuri {
       /** クロックをセットする。 */
       DEF_MESSAGE_FUNCTION(SetClock);
 
+      /** キャスリングしたかどうかをセットする。 */
+      template<Side SIDE>
+      DEF_MESSAGE_FUNCTION(SetHasCastled);
+
       // %%% @correct-position?
       /** 正しい配置かどうか。 */
       DEF_MESSAGE_FUNCTION(IsCorrectPosition) {

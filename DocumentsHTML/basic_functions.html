@@ -15,32 +15,36 @@
 </header>
 <div class="root_div">
 <section class="main_contents">
-<h1 id="basic-functions">Basic Functions</h1>
+<h1>Basic Functions</h1>
 <p><a href="sayulisp.html">&gt;&gt;Back to Sayulisp page</a></p>
-<h2 id="contents">Contents</h2>
+<h2>Contents</h2>
 <ul>
-<li><a href="#vector-value-functions">Vector Value Functions</a>
+<li>
+<p><a href="#vector-value-functions">Vector Value Functions</a></p>
 <ul>
-<li><a href="#append"><code>append</code></a> : Appends an object to the tail of List.
-<ul>
+<li><a href="#append"><code>append</code></a> : Appends an object to the tail of List.<ul>
 <li><code>string-append</code></li>
-</ul></li>
-<li><a href="#ref"><code>ref</code></a> : Pulls out an element of List or a letter of String.
-<ul>
+</ul>
+</li>
+<li><a href="#ref"><code>ref</code></a> : Pulls out an element of List or a letter of String.<ul>
 <li><code>list-ref</code></li>
 <li><code>string-ref</code></li>
-</ul></li>
+</ul>
+</li>
 <li><a href="#range"><code>range</code></a> : Generates List composed with Numbers from 0 to N.</li>
 <li><a href="#start-size-inc"><code>start-size-inc</code></a> : Generates List of Numbers.</li>
 <li><a href="#length"><code>length</code></a> : Gets size of an object.</li>
 <li><a href="#list"><code>list</code></a> : Generates List.</li>
-<li><a href="#list-replace"><code>list-replace</code></a> : Replaces an element of List for an object.</li>
+<li><a href="#list-replace"><code>list-replace</code></a> : Replaces an element of List
+  for an object.</li>
 <li><a href="#list-remove"><code>list-remove</code></a> : Removes an element of List.</li>
 <li><a href="#list-search"><code>list-search</code></a> : Searches an object from List.</li>
 <li><a href="#string-split"><code>string-split</code></a> : Splits String.</li>
 <li><a href="#regex-search"><code>regex-search</code></a> : Searches a pattern.</li>
-</ul></li>
-<li><a href="#container-functions">Container Functions</a>
+</ul>
+</li>
+<li>
+<p><a href="#container-functions">Container Functions</a></p>
 <ul>
 <li><a href="#front"><code>front</code></a> : Returns the first element of List.</li>
 <li><a href="#back"><code>back</code></a> : Returns the last element of List.</li>
@@ -52,25 +56,35 @@
 <li><a href="#pop-front2"><code>pop-front!</code></a> : Removes the first element from List.</li>
 <li><a href="#push-back2"><code>push-back!</code></a> : Adds Object at the end element.</li>
 <li><a href="#pop-back2"><code>pop-back!</code></a> : Removes the last element from List.</li>
-</ul></li>
-<li><a href="#boolean-equation-function">Boolean Equation Function</a>
+</ul>
+</li>
+<li>
+<p><a href="#boolean-equation-function">Boolean Equation Function</a></p>
 <ul>
-<li><a href="#not"><code>not</code></a> : Converts &quot;True&quot; to &quot;False&quot;, &quot;False&quot; to &quot;True&quot;.</li>
-<li><a href="#and"><code>and</code></a> : Judges whether all Booleans are &quot;True&quot; or not.</li>
-<li><a href="#or"><code>or</code></a> : Judges whether one of all Booleans is &quot;True&quot; or not.</li>
-</ul></li>
-<li><a href="#comparision-function">Comparison Function</a>
+<li><a href="#not"><code>not</code></a> : Converts "True" to "False", "False" to "True".</li>
+<li><a href="#and"><code>and</code></a> : Judges whether all Booleans are "True" or not.</li>
+<li><a href="#or"><code>or</code></a> : Judges whether one of all Booleans is "True" or not.</li>
+</ul>
+</li>
+<li>
+<p><a href="#comparision-function">Comparison Function</a></p>
 <ul>
 <li><a href="#equal"><code>=</code></a> : Judges whether all Numbers are equal.</li>
 <li><a href="#not-equal"><code>~=</code></a> : Judges whether all Numbers are not equal.</li>
-<li><a href="#less-than"><code>&lt;</code></a> : Judges whether a Number is less than the next Number or not.</li>
-<li><a href="#less-equal"><code>&lt;=</code></a> : Judges whether a Number is less than or equals to the next Number or not.</li>
-<li><a href="#greater-than"><code>&gt;</code></a> : Judges whether a Number is greater than the next Number or not.</li>
-<li><a href="#greater-equal"><code>&gt;=</code></a> : Judges whether a Number is greater than or equals to the next Number or not.</li>
+<li><a href="#less-than"><code>&lt;</code></a> : Judges whether a Number is less
+  than the next Number or not.</li>
+<li><a href="#less-equal"><code>&lt;=</code></a> : Judges whether a Number is less than or equals
+  to the next Number or not.</li>
+<li><a href="#greater-than"><code>&gt;</code></a> : Judges whether a Number is greater
+  than the next Number or not.</li>
+<li><a href="#greater-equal"><code>&gt;=</code></a> : Judges whether a Number is greater than
+  or equals to the next Number or not.</li>
 <li><a href="#max"><code>max</code></a> : Finds the maximum Number.</li>
 <li><a href="#min"><code>min</code></a> : Find thes minimum Number.</li>
-</ul></li>
-<li><a href="#arithmetic-operation-function">Arithmetic Operation Function</a>
+</ul>
+</li>
+<li>
+<p><a href="#arithmetic-operation-function">Arithmetic Operation Function</a></p>
 <ul>
 <li><a href="#add"><code>+</code></a> : Calculates addition.</li>
 <li><a href="#sub"><code>-</code></a> : Calculates subtraction.</li>
@@ -84,8 +98,10 @@
 <li><a href="#div2"><code>div!</code></a> : Calculates division and rewrites.</li>
 <li><a href="#inc2"><code>inc!</code></a> : Increment and rewrites.</li>
 <li><a href="#dec2"><code>dec!</code></a> : Decrement and rewrites.</li>
-</ul></li>
-<li><a href="#mathematics-function">Mathematics Function</a>
+</ul>
+</li>
+<li>
+<p><a href="#mathematics-function">Mathematics Function</a></p>
 <ul>
 <li><a href="#pi"><code>PI</code></a> : Not Function. Circular constant.</li>
 <li><a href="#e"><code>E</code></a> : Not Function. Napier's constant.</li>
@@ -102,282 +118,257 @@
 <li><a href="#round"><code>round</code></a> : Rounds Number into the nearest integral value.</li>
 <li><a href="#trunc"><code>trunc</code></a> : Truncates after decimal point of Number.</li>
 <li><a href="#exp"><code>exp</code></a> : Calculates exponent.</li>
-<li><a href="#expt"><code>expt</code></a> : Calculates exponent with a base Number.
-<ul>
+<li><a href="#expt"><code>expt</code></a> : Calculates exponent with a base Number.<ul>
 <li><code>^</code></li>
-</ul></li>
-<li><a href="#log"><code>log</code></a> : Calculates logarithm.
-<ul>
+</ul>
+</li>
+<li><a href="#log"><code>log</code></a> : Calculates logarithm.<ul>
 <li><code>ln</code></li>
-</ul></li>
+</ul>
+</li>
 <li><a href="#log2"><code>log2</code></a> : Calculates logarithm with 2.</li>
 <li><a href="#log10"><code>log10</code></a> : Calculates logarithm with 10.</li>
 <li><a href="#random"><code>random</code></a> : Gets a random Number.</li>
-</ul></li>
+</ul>
+</li>
 </ul>
 <hr />
-<h2 id="vector-value-functions">Vector Value Functions</h2>
-<h3 id="append">append</h3>
-<h6>
-Usage
-</h6>
-<ol style="list-style-type: decimal">
+<h2>Vector Value Functions</h2>
+<h3>append</h3>
+<h6> Usage </h6>
+
+<ol>
 <li><code>(append &lt;List&gt; &lt;Object&gt;...)</code></li>
 <li><code>(append &lt;String&gt; &lt;Object&gt;...)</code></li>
-</ol>
-<ul>
 <li>or <code>(string-append &lt;String&gt; &lt;Object&gt;...)</code></li>
-</ul>
-<h6>
-Description
-</h6>
-<ol style="list-style-type: decimal">
-<li>If the 1st argument is List, appends <code>&lt;Object&gt;...</code> to its Cdr.</li>
-<li>If the 1st argument is String, converts <code>&lt;Object&gt;...</code> into String and concatenates them.</li>
 </ol>
-<h6>
-Example
-</h6>
-<pre><code>(display (append &#39;(111 222) &#39;(333 444) &#39;(555 666) 777))
+<h6> Description </h6>
+
+<ol>
+<li>If the 1st argument is List, appends <code>&lt;Object&gt;...</code> to its Cdr.</li>
+<li>If the 1st argument is String,
+   converts <code>&lt;Object&gt;...</code> into String and concatenates them.</li>
+</ol>
+<h6> Example </h6>
+
+<pre><code>(display (append '(111 222) '(333 444) '(555 666) 777))
 
 ;; Output
 ;; &gt; (111 222 333 444 555 666 . 777)
 
-(display (append &quot;Hello &quot; 111 &quot; World&quot;))
+(display (append "Hello " 111 " World"))
 
 ;; Output
-;; &gt; &quot;Hello 111 World&quot;;</code></pre>
-<h3 id="ref">ref</h3>
-<h6>
-Usage
-</h6>
-<ol style="list-style-type: decimal">
+;; &gt; "Hello 111 World";
+</code></pre>
+<h3>ref</h3>
+<h6> Usage </h6>
+
+<ol>
 <li><code>(ref &lt;List&gt; &lt;Index : Number&gt;)</code></li>
-</ol>
-<ul>
 <li>or <code>(list-ref &lt;List&gt; &lt;Index : Number&gt;)</code></li>
-</ul>
-<ol start="2" style="list-style-type: decimal">
 <li><code>(ref &lt;String&gt; &lt;Index : Number&gt;)</code></li>
-</ol>
-<ul>
 <li>or <code>(string-ref &lt;String&gt; &lt;Index : Number&gt;)</code></li>
-</ul>
-<h6>
-Description
-</h6>
-<ol style="list-style-type: decimal">
+</ol>
+<h6> Description </h6>
+
+<ol>
 <li>If the 1st argument is List, returns a element of <code>&lt;Index&gt;</code>th <code>&lt;List&gt;</code>.</li>
 <li>If the 1st argument is String, returns a letter of <code>&lt;Index&gt;</code>th <code>&lt;String&gt;</code>.</li>
-</ol>
-<ul>
 <li>The index of 1st element is 0.</li>
-<li>If <code>&lt;Index&gt;</code> is negative number, It counts from the tail of <code>&lt;List | String&gt;</code>.</li>
-</ul>
-<h6>
-Example
-</h6>
-<pre><code>(display (ref &#39;(111 222 333) 1))
+<li>If <code>&lt;Index&gt;</code> is negative number,
+  It counts from the tail of <code>&lt;List | String&gt;</code>.</li>
+</ol>
+<h6> Example </h6>
+
+<pre><code>(display (ref '(111 222 333) 1))
 
 ;; Output
 ;; &gt; 222
 
-(display (ref &#39;(111 222 333) -1))
+(display (ref '(111 222 333) -1))
 
 ;; Output
 ;; &gt; 333
 
-(display (ref &quot;Hello World&quot; 4))
+(display (ref "Hello World" 4))
 
 ;; Output
-;; &gt; &quot;o&quot;
+;; &gt; "o"
 
-(display (ref &quot;Hello World&quot; -3))
+(display (ref "Hello World" -3))
 
 ;; Output
-;; &gt; &quot;r&quot;</code></pre>
-<h3 id="range">range</h3>
-<h6>
-Usage
-</h6>
+;; &gt; "r"
+</code></pre>
+<h3>range</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(range &lt;Size : Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns List composed with 0...(<code>&lt;Size&gt;</code> - 1).</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (range 10))
 
 ;; Output
-;; &gt; (0 1 2 3 4 5 6 7 8 9)</code></pre>
-<h3 id="start-size-inc">start-size-inc</h3>
-<h6>
-Usage
-</h6>
+;; &gt; (0 1 2 3 4 5 6 7 8 9)
+</code></pre>
+<h3>start-size-inc</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(start-size-inc &lt;Start : Number&gt; &lt;Size : Number&gt; &lt;Increment : Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>Returns List of <code>&lt;Size&gt;</code> elements.
-<ul>
+<li>Returns List of <code>&lt;Size&gt;</code> elements.<ul>
 <li>The 1st element is <code>&lt;Start&gt;</code>.</li>
 <li>From the 2nd element, the previous element plus <code>&lt;Increment&gt;</code>.</li>
-</ul></li>
 </ul>
-<h6>
-Example
-</h6>
+</li>
+</ul>
+<h6> Example </h6>
+
 <pre><code>(display (start-size-inc 2 6 -0.5))
 
 ;; Output
-;; &gt; (2 1.5 1 0.5 0 -0.5)</code></pre>
-<h3 id="length">length</h3>
-<h6>
-Usage
-</h6>
+;; &gt; (2 1.5 1 0.5 0 -0.5)
+</code></pre>
+<h3>length</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(length &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>If <code>&lt;Object&gt;</code> is List, it returns the number of elements.</li>
 <li>If <code>&lt;Object&gt;</code> is String, it returns the length of string.</li>
 <li>If <code>&lt;Object&gt;</code> is Atom, it returns 1.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(display (length &#39;(111 222 333 444 555 666)))
+<h6> Example </h6>
+
+<pre><code>(display (length '(111 222 333 444 555 666)))
 ;; Output
 ;; &gt; 6
 
-(display (length &quot;Hello&quot;))
+(display (length "Hello"))
 ;; Output
-;; &gt; 5   </code></pre>
-<h3 id="list">list</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 5
+</code></pre>
+<h3>list</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(list &lt;Object&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns List composed of <code>&lt;Object&gt;...</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (list 111 222 333))
 
 ;; Output
-;; &gt; (111 222 333)</code></pre>
-<h3 id="list-replace">list-replace</h3>
-<h6>
-Usage
-</h6>
+;; &gt; (111 222 333)
+</code></pre>
+<h3>list-replace</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(list-replace &lt;List&gt; &lt;Index : Number&gt; &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>Returns List which has replaced the <code>&lt;Index&gt;</code>th element of <code>&lt;List&gt;</code> for <code>&lt;Object&gt;</code>.</li>
+<li>Returns List which has replaced the <code>&lt;Index&gt;</code>th element of
+  <code>&lt;List&gt;</code> for <code>&lt;Object&gt;</code>.</li>
 <li>The 1st element of <code>&lt;List&gt;</code> is '0'.</li>
-<li>If <code>&lt;Index&gt;</code> is negative number,&quot; It counts from the tail of <code>&lt;List&gt;</code>.</li>
+<li>If <code>&lt;Index&gt;</code> is negative number," It counts from the tail of <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(define lst (list 111 222 333))
-(display (list-replace lst 1 &quot;Hello&quot;))
+(display (list-replace lst 1 "Hello"))
 
 ;; Output
-;; &gt; (111 &quot;Hello&quot; 333)</code></pre>
-<h3 id="list-remove">list-remove</h3>
-<h6>
-Usage
-</h6>
+;; &gt; (111 "Hello" 333)
+</code></pre>
+<h3>list-remove</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(list-remove &lt;List&gt; &lt;Index : Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns List which has removed the <code>&lt;Index&gt;</code>th element of <code>&lt;List&gt;</code>.</li>
 <li>The 1st element of <code>&lt;List&gt;</code> is '0'.</li>
-<li>If <code>&lt;Index&gt;</code> is negative number,&quot; It counts from the tail of <code>&lt;List&gt;</code>.</li>
+<li>If <code>&lt;Index&gt;</code> is negative number," It counts from the tail of <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(define lst (list 111 222 333))
 (display (list-remove lst 1))
 
 ;; Output
-;; &gt; (111 333)</code></pre>
-<h3 id="list-search">list-search</h3>
-<h6>
-Usage
-</h6>
+;; &gt; (111 333)
+</code></pre>
+<h3>list-search</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(list-search &lt;Object&gt; &lt;List&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
-<ul>
-<li>If <code>&lt;List&gt;</code> has an object same as <code>&lt;Object&gt;</code>, it returns index number of the object.<br />
-Otherwise it returns Nil.</li>
-</ul>
-<h6>
-Example
-</h6>
-<pre><code>(define lst &#39;(111 222 &quot;Hello&quot; #t))
+<h6> Description </h6>
 
-(display (list-search &quot;Hello&quot; lst))
-(display (list-search &quot;World&quot; lst))
+<ul>
+<li>If <code>&lt;List&gt;</code> has an object same as <code>&lt;Object&gt;</code>,
+  it returns index number of the object.<br />
+  Otherwise it returns Nil.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(define lst '(111 222 "Hello" #t))
+
+(display (list-search "Hello" lst))
+(display (list-search "World" lst))
 
 ;; Output
 ;; &gt;  2
-;; &gt; ()</code></pre>
-<h3 id="map">map</h3>
-<h6>
-Usage
-</h6>
+;; &gt; ()
+</code></pre>
+<h3>map</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(map &lt;Function : Symbol or Function&gt; &lt;Argument list : List&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>Applies <code>&lt;Function&gt;</code> to <code>&lt;Argument List&gt;...</code> iteratively and returns List composed with returned object by <code>&lt;Function&gt;</code>.
-<ul>
+<li>Applies <code>&lt;Function&gt;</code> to <code>&lt;Argument List&gt;...</code> iteratively
+  and returns List composed with returned object by <code>&lt;Function&gt;</code>.<ul>
 <li>It looks like addition of Linear Algebra. See Example.</li>
-</ul></li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(display (map &#39;+ &#39;(1 2 3 4 5)
-                 &#39;(10 20 30 40 50)
-                 &#39;(100 200 300 400 500)))
+</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(display (map '+ '(1 2 3 4 5)
+                 '(10 20 30 40 50)
+                 '(100 200 300 400 500)))
 ;; The above means...
 ;; (display (list (+ 1 10 100)
 ;;                (+ 2 20 200)
@@ -386,1054 +377,968 @@ Example
 ;;                (+ 5 50 500)))
 
 ;; Output
-;; &gt; (111 222 333 444 555)</code></pre>
-<h3 id="string-split">string-split</h3>
-<h6>
-Usage
-</h6>
+;; &gt; (111 222 333 444 555)
+</code></pre>
+<h3>string-split</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(string-split &lt;String&gt; &lt;Delim String&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns List composed of split <code>&lt;String&gt;</code> by <code>&lt;Delim String&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(display (string-split &quot;aaaaSplit!bbbSplit!ccc&quot; &quot;Split!&quot;))
+<h6> Example </h6>
+
+<pre><code>(display (string-split "aaaaSplit!bbbSplit!ccc" "Split!"))
 
 ;; Output
-;; &gt; (&quot;aaa&quot; &quot;bbb&quot; &quot;ccc&quot;)</code></pre>
-<h3 id="regex-search">regex-search</h3>
-<h6>
-Usage
-</h6>
+;; &gt; ("aaa" "bbb" "ccc")
+</code></pre>
+<h3>regex-search</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(regex-search &lt;Regex : String&gt; &lt;Target : String&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>Search <code>&lt;Regex&gt;</code> from <code>&lt;Target&gt;</code> and returns List of results.
-<ul>
+<li>Search <code>&lt;Regex&gt;</code> from <code>&lt;Target&gt;</code> and returns List of results.<ul>
 <li>The 1st element of results is match of whole <code>&lt;Target&gt;</code>.</li>
 <li>From the 2nd element, each group.</li>
-</ul></li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define target &quot;Hello World&quot;)
-(display (regex-search &quot;(Hel).* (Wor).*&quot; target))
+</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(define target "Hello World")
+(display (regex-search "(Hel).* (Wor).*" target))
 ;; Output
-;; &gt; (&quot;Hello World&quot; &quot;Hel&quot; &quot;Wor&quot;)</code></pre>
-<h2 id="container-functions">Container Functions</h2>
-<h3 id="front">front</h3>
-<h6>
-Usage
-</h6>
+;; &gt; ("Hello World" "Hel" "Wor")
+</code></pre>
+<h2>Container Functions</h2>
+<h3>front</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(front &lt;List&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns the first element of <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(display (front &#39;(111 222 333)))
+<h6> Example </h6>
+
+<pre><code>(display (front '(111 222 333)))
 
 ;; Output
-;; &gt; 111</code></pre>
-<h3 id="back">back</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 111
+</code></pre>
+<h3>back</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(back &lt;List&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns the last element of <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(display (back &#39;(111 222 333)))
+<h6> Example </h6>
+
+<pre><code>(display (back '(111 222 333)))
 
 ;; Output
-;; &gt; 333</code></pre>
-<h3 id="push-front">push-front</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 333
+</code></pre>
+<h3>push-front</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(push-front &lt;List&gt; &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns List added <code>&lt;Object&gt;</code> at the first element of <code>&lt;List&gt;</code></li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(display (push-front &#39;(111 222 333) &quot;Hello&quot;))
+<h6> Example </h6>
+
+<pre><code>(display (push-front '(111 222 333) "Hello"))
 
 ;; Output
-;; &gt; (&quot;Hello&quot; 111 222 333)</code></pre>
-<h3 id="pop-front">pop-front</h3>
-<h6>
-Usage
-</h6>
+;; &gt; ("Hello" 111 222 333)
+</code></pre>
+<h3>pop-front</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(pop-front &lt;List&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns List removed the first element from <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(display (pop-front &#39;(111 222 333)))
+<h6> Example </h6>
+
+<pre><code>(display (pop-front '(111 222 333)))
 
 ;; Output
-;; &gt; (222 333)</code></pre>
-<h3 id="push-back">push-back</h3>
-<h6>
-Usage
-</h6>
+;; &gt; (222 333)
+</code></pre>
+<h3>push-back</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(push-back &lt;List&gt; &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns List added <code>&lt;Object&gt;</code> at the last element of <code>&lt;List&gt;</code></li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(display (push-back &#39;(111 222 333) &quot;Hello&quot;))
+<h6> Example </h6>
+
+<pre><code>(display (push-back '(111 222 333) "Hello"))
 
 ;; Output
-;; &gt; (111 222 333 &quot;Hello&quot;)</code></pre>
-<h3 id="pop-back">pop-back</h3>
-<h6>
-Usage
-</h6>
+;; &gt; (111 222 333 "Hello")
+</code></pre>
+<h3>pop-back</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(pop-back &lt;List&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns List removed the last element from <code>&lt;List&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(display (pop-back &#39;(111 222 333)))
+<h6> Example </h6>
+
+<pre><code>(display (pop-back '(111 222 333)))
 
 ;; Output
-;; &gt; (111 222)</code></pre>
-<h3 id="push-front-push-front2">push-front! ### {push-front2}</h3>
-<h6>
-Usage
-</h6>
+;; &gt; (111 222)
+</code></pre>
+<h3 push-front2="push-front2">push-front!</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(push-front! &lt;Symbol&gt; &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>This is Special Form.
-<ul>
+<li>This is Special Form.<ul>
 <li>The 1st argument must be Symbol bound with List.</li>
 <li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
-</ul></li>
+</ul>
+</li>
 <li>Appends to the top of List of <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous List bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define l &#39;(111 222 333))
+<h6> Example </h6>
+
+<pre><code>(define l '(111 222 333))
 (display (push-front! l 444))  ;; Returns previous List.
 (display l)
 
 ;; Output
 ;; &gt; (111 222 333)
-;; &gt; (444 111 222 333)</code></pre>
+;; &gt; (444 111 222 333)
+</code></pre>
 <h3 id="pop-front2">pop-front!</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(pop-front! &lt;Symbol&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>This is Special Form.
-<ul>
+<li>This is Special Form.<ul>
 <li>The 1st argument must be Symbol bound with List.</li>
-</ul></li>
+</ul>
+</li>
 <li>Pops out the 1st element of List of <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous List bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define l &#39;(111 222 333))
+<h6> Example </h6>
+
+<pre><code>(define l '(111 222 333))
 (display (pop-front! l))
 (display l)
 
 ;; Output
 ;; &gt; (111 222 333)
-;; &gt; (222 333)</code></pre>
+;; &gt; (222 333)
+</code></pre>
 <h3 id="push-back2">push-back!</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(push-back! &lt;Symbol&gt; &lt;Object&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>This is Special Form.
-<ul>
+<li>This is Special Form.<ul>
 <li>The 1st argument must be Symbol bound with List.</li>
 <li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
-</ul></li>
+</ul>
+</li>
 <li>Appends to the tail of List of <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous List bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define l &#39;(111 222 333))
+<h6> Example </h6>
+
+<pre><code>(define l '(111 222 333))
 (display (push-back! l 444))
 (display l)
 
 ;; Output
 ;; &gt; (111 222 333)
-;; &gt; (111 222 333 444))...&quot;;</code></pre>
+;; &gt; (111 222 333 444))...";
+</code></pre>
 <h3 id="pop-back2">pop-back!</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(pop-back! &lt;Symbol&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>This is Special Form.
-<ul>
+<li>This is Special Form.<ul>
 <li>The 1st argument must be Symbol bound with List.</li>
-</ul></li>
+</ul>
+</li>
 <li>Pops out the last element of List of <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous List bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
-<pre><code>(define l &#39;(111 222 333))
+<h6> Example </h6>
+
+<pre><code>(define l '(111 222 333))
 (display (pop-back! l))
 (display l)
 
 ;; Output
 ;; &gt; (111 222 333)
-;; &gt; (111 222)</code></pre>
-<h2 id="boolean-equation-function">Boolean Equation Function</h2>
-<h3 id="not">not</h3>
-<h6>
-Usage
-</h6>
+;; &gt; (111 222)
+</code></pre>
+<h2>Boolean Equation Function</h2>
+<h3>not</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(not &lt;Boolean&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Turns <code>&lt;Boolean&gt;</code> to opposite value. #t to #f, #f to #t.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (not (= 111 111)))
 
 ;; Output
-;; &gt; #f</code></pre>
-<h3 id="and">and</h3>
-<h6>
-Usage
-</h6>
+;; &gt; #f
+</code></pre>
+<h3>and</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(and &lt;Boolean&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>Returns #t if all <code>&lt;Boolean&gt;...</code> are #t. Otherwise, return #f.</li>
+<li>Returns #t if all <code>&lt;Boolean&gt;...</code> are #t.
+  Otherwise, return #f.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (and (= 111 111) (= 222 222)))
 
 ;; Output
-;; &gt; #t</code></pre>
-<h3 id="or">or</h3>
-<h6>
-Usage
-</h6>
+;; &gt; #t
+</code></pre>
+<h3>or</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(or &lt;Boolean&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>Returns #t if one of <code>&lt;Boolean&gt;...</code> is #t. If all <code>&lt;Boolean&gt;</code> are #f, return #f.</li>
+<li>Returns #t if one of <code>&lt;Boolean&gt;...</code> is #t.
+  If all <code>&lt;Boolean&gt;</code> are #f, return #f.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (or (= 111 111) (= 222 333)))
 
 ;; Output
-;; &gt; #t</code></pre>
-<h2 id="comparison-function">Comparison Function</h2>
+;; &gt; #t
+</code></pre>
+<h2>Comparison Function</h2>
 <h3 id="equal">=</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(= &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>Returns #t if the 1st Number equals the others. Otherwise, return #f.</li>
+<li>Returns #t if the 1st Number equals the others.
+  Otherwise, return #f.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (= 111 111 111))
 
 ;; Output
-;; &gt; #t</code></pre>
+;; &gt; #t
+</code></pre>
 <h3 id="not-equal">~=</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(~= &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>Returns #f if the 1st Number equals the others. Otherwise, return #t.</li>
+<li>Returns #f if the 1st Number equals the others.
+  Otherwise, return #t.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (~= 111 111 111))
 
 ;; Output
-;; &gt; #f</code></pre>
+;; &gt; #f
+</code></pre>
 <h3 id="less-than">&lt;</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(&lt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>Returns #t if a Number is less than next Number. Otherwise, return #f.</li>
+<li>Returns #t if a Number is less than next Number.
+  Otherwise, return #f.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (&lt; 111 222 333))
 
 ;; Output
-;; &gt; #t</code></pre>
+;; &gt; #t
+</code></pre>
 <h3 id="less-equal">&lt;=</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(&lt;= &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>Returns #t if a Number is less or equal than next Number. Otherwise, return #f.</li>
+<li>Returns #t if a Number is less or equal than next Number.
+  Otherwise, return #f.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (&lt; 111 222 333))
 
 ;; Output
-;; &gt; #t</code></pre>
+;; &gt; #t
+</code></pre>
 <h3 id="greater-than">&gt;</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>Returns #t if a Number is more than next Number. Otherwise, return #f.</li>
+<li>Returns #t if a Number is more than next Number.
+  Otherwise, return #f.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (&gt; 333 222 111))
 
 ;; Output
-;; &gt; #t</code></pre>
+;; &gt; #t
+</code></pre>
 <h3 id="greater-equal">&gt;=</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(&gt;= &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>Returns #t if a Number is more or equal than next Number. Otherwise, return #f.</li>
+<li>Returns #t if a Number is more or equal than next Number.
+  Otherwise, return #f.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (&gt;= 333 222 111))
 
 ;; Output
-;; &gt; #t</code></pre>
-<h3 id="max">max</h3>
-<h6>
-Usage
-</h6>
+;; &gt; #t
+</code></pre>
+<h3>max</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(max &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns maximum number of <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (max 1 2 3 4 3 2 1))
 
 ;; Output
-;; &gt; 4</code></pre>
-<h3 id="min">min</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 4
+</code></pre>
+<h3>min</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(min &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns minimum number of <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (min 4 3 2 1 2 3 4))
 
 ;; Output
-;; &gt; 1</code></pre>
-<h2 id="arithmetic-operation-function">Arithmetic Operation Function</h2>
+;; &gt; 1
+</code></pre>
+<h2>Arithmetic Operation Function</h2>
 <h3 id="add">+</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(+ &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Sums up all <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (+ 1 2 3))
 
 ;; Output
-;; &gt; 6</code></pre>
+;; &gt; 6
+</code></pre>
 <h3 id="sub">-</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(- &lt;1st number&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Subtracts <code>&lt;Number&gt;...</code> from <code>&lt;1st number&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (- 5 4 3))
 
 ;; Output
-;; &gt; -2</code></pre>
+;; &gt; -2
+</code></pre>
 <h3 id="mul">*</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(* &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Multiplies all <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (* 2 3 4))
 
 ;; Output
-;; &gt; 24</code></pre>
+;; &gt; 24
+</code></pre>
 <h3 id="div">/</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(/ &lt;1st number&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Divides <code>&lt;1st number&gt;</code> with <code>&lt;Number&gt;...</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (/ 32 2 4))
 
 ;; Output
-;; &gt; 4</code></pre>
+;; &gt; 4
+</code></pre>
 <h3 id="inc">++</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(++ &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Adds <code>&lt;Number&gt;</code> to '1'.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (++ 111))
 
 ;; Output
-;; &gt; 112</code></pre>
+;; &gt; 112
+</code></pre>
 <h3 id="dec">--</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(-- &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Subtracts '1' from <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (-- 111))
 
 ;; Output
-;; &gt; 110</code></pre>
+;; &gt; 110
+</code></pre>
 <h3 id="add2">add!</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(add! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>This is Special Form.
-<ul>
+<li>This is Special Form.<ul>
 <li>The 1st argument must be Symbol bound with Number.</li>
 <li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
-</ul></li>
+</ul>
+</li>
 <li>Sums up <code>&lt;Number&gt;...</code> and adds it to <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(define n 5)
 (display (add! n 3 4 5))  ;; Returns previous Number.
 (display n)
 
 ;; Output
 ;; &gt; 5
-:: &gt; 17</code></pre>
+:: &gt; 17
+</code></pre>
 <h3 id="sub2">sub!</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(sub! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>This is Special Form.
-<ul>
+<li>This is Special Form.<ul>
 <li>The 1st argument must be Symbol bound with Number.</li>
 <li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
-</ul></li>
+</ul>
+</li>
 <li>Subtracts <code>&lt;Number&gt;...</code> from <code>&lt;Symbol&gt;</code> and rewrite it to <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(define n 5)
 (display (sub! n 1 2))  ;; Returns previous Number.
 (display n)
 
 ;; Output
 ;; &gt; 5
-;; &gt; 2</code></pre>
+;; &gt; 2
+</code></pre>
 <h3 id="mul2">mul!</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(mul! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>This is Special Form.
-<ul>
+<li>This is Special Form.<ul>
 <li>The 1st argument must be Symbol bound with Number.</li>
 <li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
-</ul></li>
+</ul>
+</li>
 <li>Multiplies <code>&lt;Symbol&gt;</code> and <code>&lt;Number&gt;...</code> and rewrite it to <Symbol>.</li>
 <li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(define n 5)
 (display (mul! n 1 2))  ;; Returns previous Number.
 (display n)
 
 ;; Output
 ;; &gt; 5
-;; &gt; 10</code></pre>
+;; &gt; 10
+</code></pre>
 <h3 id="div2">div!</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(div! &lt;Symbol&gt; &lt;Number&gt;...)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>This is Special Form.
-<ul>
+<li>This is Special Form.<ul>
 <li>The 1st argument must be Symbol bound with Number.</li>
 <li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
-</ul></li>
+</ul>
+</li>
 <li>Divides <code>&lt;Symbol&gt;</code> with <code>&lt;Number&gt;...</code> and rewrites it to <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(define n 6)
 (display (div! n 2 3))  ;; Returns previous Number.
 (display n)
 
 ;; Output
 ;; &gt; 6
-;; &gt; 1</code></pre>
+;; &gt; 1
+</code></pre>
 <h3 id="inc2">inc!</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(inc! &lt;Symbol&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>This is Special Form.
-<ul>
+<li>This is Special Form.<ul>
 <li>The 1st argument must be Symbol bound with Number.</li>
 <li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
-</ul></li>
+</ul>
+</li>
 <li>Increments <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(define i 111)
 (display (inc! i))
 (display i)
 
 ;; Output
 ;; &gt; 111
-;; &gt; 112</code></pre>
+;; &gt; 112
+</code></pre>
 <h3 id="dec2">dec!</h3>
-<h6>
-Usage
-</h6>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(dec! &lt;Symbol&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
-<li>This is Special Form.
-<ul>
+<li>This is Special Form.<ul>
 <li>The 1st argument must be Symbol bound with Number.</li>
 <li><code>&lt;Symbol&gt;</code> is not evaluated.</li>
-</ul></li>
+</ul>
+</li>
 <li>Decrements <code>&lt;Symbol&gt;</code>.</li>
 <li>Returns previous Number bound to <code>&lt;Symbol&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(define i 111)
 (display (dec! i))
 (display i)
 
 ;; Output
 ;; &gt; 111
-;; &gt; 110</code></pre>
-<h2 id="mathematics-function">Mathematics Function</h2>
-<h3 id="pi">PI</h3>
-<h6>
-Description
-</h6>
+;; &gt; 110
+</code></pre>
+<h2>Mathematics Function</h2>
+<h3>PI</h3>
+<h6> Description </h6>
+
 <ul>
 <li>Circular constant.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display PI)
 
 ;; Output
-;; &gt; 3.14159265358979</code></pre>
-<h3 id="e">E</h3>
-<h6>
-Description
-</h6>
+;; &gt; 3.14159265358979
+</code></pre>
+<h3>E</h3>
+<h6> Description </h6>
+
 <ul>
 <li>Napier's constant.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display E)
 
 ;; Output
-;; &gt; 2.71828182845905</code></pre>
-<h3 id="sin">sin</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 2.71828182845905
+</code></pre>
+<h3>sin</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(sin &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Sine. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is radian.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (sin (/ PI 2)))
 
 ;; Output
-;; &gt; 1</code></pre>
-<h3 id="cos">cos</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 1
+</code></pre>
+<h3>cos</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(cos &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Cosine. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is radian.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (cos PI))
 
 ;; Output
-;; &gt; -1</code></pre>
-<h3 id="tan">tan</h3>
-<h6>
-Usage
-</h6>
+;; &gt; -1
+</code></pre>
+<h3>tan</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(tan &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Tangent. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is radian.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (tan (/ PI 4)))
 
 ;; Output
-;; &gt; 1</code></pre>
-<h3 id="asin">asin</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 1
+</code></pre>
+<h3>asin</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(asin &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Arc sine. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is sine.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (asin 0))
 
 ;; Output
-;; &gt; 0</code></pre>
-<h3 id="acos">acos</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 0
+</code></pre>
+<h3>acos</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(acos &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Arc cosine. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is cosine.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (acos 1))
 
 ;; Output
-;; &gt; 0</code></pre>
-<h3 id="atan">atan</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 0
+</code></pre>
+<h3>atan</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(atan &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Arc tangent. A trigonometric function.</li>
 <li><code>&lt;Number&gt;</code> is tangent.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (atan 0))
 
 ;; Output
-;; &gt; 0</code></pre>
-<h3 id="sqrt">sqrt</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 0
+</code></pre>
+<h3>sqrt</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(sqrt &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns square root of <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (sqrt 4))
 
 ;; Output
-;; &gt; 2</code></pre>
-<h3 id="abs">abs</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 2
+</code></pre>
+<h3>abs</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(abs &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns absolute value of <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (abs -111))
 
 ;; Output
-;; &gt; 111</code></pre>
-<h3 id="ceil">ceil</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 111
+</code></pre>
+<h3>ceil</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(ceil &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Rounds up <code>&lt;Number&gt;</code> into integral value.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (ceil 1.3))
 
 ;; Output
-;; &gt; 2</code></pre>
-<h3 id="floor">floor</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 2
+</code></pre>
+<h3>floor</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(floor &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Rounds down <code>&lt;Number&gt;</code> into integral value.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (floor 1.3))
 
 ;; Output
-;; &gt; 1</code></pre>
-<h3 id="round">round</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 1
+</code></pre>
+<h3>round</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(round &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Rounds <code>&lt;Number&gt;</code> into the nearest integral value.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (round 1.5))
 
 ;; Output
@@ -1442,23 +1347,21 @@ Example
 (display (round 1.49))
 
 ;; Output
-;; &gt; 1</code></pre>
-<h3 id="trunc">trunc</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 1
+</code></pre>
+<h3>trunc</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(trunc &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Truncates after decimal point of <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (trunc 1.234))
 
 ;; Output
@@ -1467,125 +1370,113 @@ Example
 (display (trunc -1.234))
 
 ;; Output
-;; &gt; -1</code></pre>
-<h3 id="exp">exp</h3>
-<h6>
-Usage
-</h6>
+;; &gt; -1
+</code></pre>
+<h3>exp</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(exp &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Exponent function of <code>&lt;Number&gt;</code>. The base is Napier's constant.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (exp 1))
 
 ;; Output
-;; &gt; 2.71828</code></pre>
-<h3 id="expt">expt</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 2.71828
+</code></pre>
+<h3>expt</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(expt &lt;Base&gt; &lt;Exponent&gt;)</code></li>
 <li><code>(^ &lt;Base&gt; &lt;Exponent&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Exponent function of <code>&lt;Exponent&gt;</code>. The base is <code>&lt;Base&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (expt 2 3))
 
 ;; Output
-;; &gt; 8</code></pre>
-<h3 id="log">log</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 8
+</code></pre>
+<h3>log</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(log &lt;Number&gt;)</code></li>
 <li><code>(ln &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Logarithmic function of <code>&lt;Number&gt;</code>. The base is Napier's constant.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (log E))
 
 ;; Output
-;; &gt; 1</code></pre>
-<h3 id="log2">log2</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 1
+</code></pre>
+<h3>log2</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(log2 &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Logarithmic function of <code>&lt;Number&gt;</code>. The base is 2.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (log2 8))
 
 ;; Output
-;; &gt; 3</code></pre>
-<h3 id="log10">log10</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 3
+</code></pre>
+<h3>log10</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(log10 &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Logarithmic function of <code>&lt;Number&gt;</code>. The base is 10.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (log10 100))
 
 ;; Output
-;; &gt; 2</code></pre>
-<h3 id="random">random</h3>
-<h6>
-Usage
-</h6>
+;; &gt; 2
+</code></pre>
+<h3>random</h3>
+<h6> Usage </h6>
+
 <ul>
 <li><code>(random &lt;Number&gt;)</code></li>
 </ul>
-<h6>
-Description
-</h6>
+<h6> Description </h6>
+
 <ul>
 <li>Returns random number from 0 to <code>&lt;Number&gt;</code>.</li>
 </ul>
-<h6>
-Example
-</h6>
+<h6> Example </h6>
+
 <pre><code>(display (random 10))
 
 ;; Output
@@ -1594,8 +1485,8 @@ Example
 (display (random -10))
 
 ;; Output
-;; &gt; -7.13453</code></pre>
-
+;; &gt; -7.13453
+</code></pre>
 </section>
 </div>
 <footer>Copyright &copy; Hironori Ishibashi</footer>
