@@ -66,6 +66,7 @@
 #include "sayulisp.h"
 #include "sayuri.h"
 #include "board.h"
+#include "analyser.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -125,7 +126,47 @@ namespace Sayuri {
 
     // ========================================================================
 
-    std::cout << Board::ToString(engine_ptr->board()) << std::endl;
+    auto print_vec = [](const std::vector<Square>& vec) {
+      for (auto square : vec) {
+        std::cout << static_cast<char>('A' + Util::SquareToFyle(square))
+        << static_cast<char>('1' + Util::SquareToRank(square)) << " ";
+      }
+    };
+
+    FEN fen("r1bqk2r/pp1pbppp/4p3/4n3/2P5/2N3P1/PPNQPPBP/R3K2R w KQkq -");
+    Analyser analyser(fen.position());
+    ResultPositionAnalysisPtr result_ptr = analyser.AnalysePosition();
+
+    std::cout << "pos_all_pieces_ : ";
+    print_vec(result_ptr->pos_all_pieces_);
+    std::cout << std::endl;
+
+    std::cout << "pos_side_pieces_[WHITE] : ";
+    print_vec(result_ptr->pos_side_pieces_[WHITE]);
+    std::cout << std::endl;
+
+    std::cout << "pos_side_pieces_[BLACK] : ";
+    print_vec(result_ptr->pos_side_pieces_[BLACK]);
+    std::cout << std::endl;
+
+    FOR_SIDES(side) {
+      FOR_PIECE_TYPES(piece_type) {
+        if (side && piece_type) {
+          std::cout << "pos_each_pieces_["
+          << (side ==  WHITE ? "WHITE][" : "BLACK][");
+          switch (piece_type) {
+            case PAWN: std::cout << "PAWN] : "; break;
+            case KNIGHT: std::cout << "KNIGHT] : "; break;
+            case BISHOP: std::cout << "BISHOP] : "; break;
+            case ROOK: std::cout << "ROOK] : "; break;
+            case QUEEN: std::cout << "QUEEN] : "; break;
+            case KING: std::cout << "KING] : "; break;
+          }
+          print_vec(result_ptr->pos_each_pieces_[side][piece_type]);
+          std::cout << std::endl;
+        }
+      }
+    }
 
     return 0;
   }
