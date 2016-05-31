@@ -134,8 +134,7 @@ namespace Sayuri {
     };
 
     FEN fen("r1bqk2r/pp1pbppp/4p3/4n3/2P5/2N3P1/PPNQPPBP/R3K2R w KQkq -");
-    Analyser analyser(fen.position());
-    ResultPositionAnalysisPtr result_ptr = analyser.AnalysePosition();
+    ResultPositionAnalysisPtr result_ptr = AnalysePosition(fen.position());
 
     std::cout << "pos_all_pieces_ : ";
     print_vec(result_ptr->pos_all_pieces_);

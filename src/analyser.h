@@ -67,103 +67,14 @@ namespace Sayuri {
   /** 配置の分析結果の構造体のポインタ。 */
   using ResultPositionAnalysisPtr = std::shared_ptr<ResultPositionAnalysis>;
 
-  /** 局面分析器。 */
-  class Analyser {
-    public:
-      // ==================== //
-      // コンストラクタと代入 //
-      // ==================== //
-      /**
-       * コンストラクタ。
-       * @param position 駒の配置のビットボード。
-       */
-      Analyser(const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]) {
-        COPY_ARRAY(position_, position);
-      }
-      /** コンストラクタ。 */
-      Analyser() {
-        INIT_ARRAY(position_);
-      }
-      /**
-       * コピーコンストラクタ。
-       * @param analyser コピー元。
-       */
-      Analyser(const Analyser& analyser) {
-        COPY_ARRAY(position_, analyser.position_);
-      }
-      /**
-       * ムーブコンストラクタ。
-       * @param analyser ムーブ元。
-       */
-      Analyser(Analyser&& analyser) {
-        COPY_ARRAY(position_, analyser.position_);
-      }
-      /**
-       * コピー代入演算子。
-       * @param analyser コピー元。
-       */
-      Analyser& operator=(const Analyser& analyser) {
-        COPY_ARRAY(position_, analyser.position_);
-        return *this;
-      }
-      /**
-       * ムーブ代入演算子。
-       * @param analyser ムーブ元。
-       */
-      Analyser& operator=(Analyser&& analyser) {
-        COPY_ARRAY(position_, analyser.position_);
-        return *this;
-      }
-      /** デストラクタ。 */
-      virtual ~Analyser() {}
+  /**
+   * 駒の配置を分析し、結果の構造体を返す。
+   * @param position 駒の配置のビットボード。
+   * @return 配置の分析結果の構造体。
+   */
+  ResultPositionAnalysisPtr AnalysePosition
+  (const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]);
 
-      // ============== //
-      // パブリック関数 //
-      // ============== //
-      /**
-       * 駒の配置を分析し、結果の構造体を返す。
-       * @return 配置の分析結果の構造体。
-       */
-      ResultPositionAnalysisPtr AnalysePosition() const;
-
-      /**
-       * アクセサ - 駒の配置。
-       * @return 駒の配置。
-       */
-      const Bitboard (& position() const)[NUM_SIDES][NUM_PIECE_TYPES] {
-        return position_;
-      }
-
-      /**
-       * ミューテータ - 駒の配置。
-       * @param position 駒の配置。
-       */
-      void position(const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]) {
-        COPY_ARRAY(position_, position);
-      }
-
-    private:
-      // ================ //
-      // プライベート関数 //
-      // ================ //
-      /**
-       * 駒の配置と数を計算する。
-       * @param 結果の構造体。 (入出力)
-       */
-      void CalNumAndPos(ResultPositionAnalysis& result) const;
-      /**
-       * 駒の配置のベクトルを作る。
-       * @param bitboard ビットボード。
-       * @return 駒の配置のベクトル。
-       */
-      std::vector<Square> GenPosVector(Bitboard bitboard) const;
-
-      // ========== //
-      // メンバ変数 //
-      // ========== //
-      /** 駒の配置のビットボード。 */
-      Bitboard position_[NUM_SIDES][NUM_PIECE_TYPES];
-  };
 }  // namespace Sayuri
 
 #endif
