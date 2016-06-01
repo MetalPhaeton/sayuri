@@ -133,7 +133,7 @@ namespace Sayuri {
       }
     };
 
-    FEN fen("r1bqk2r/pp1pbppp/4p3/4n3/2P5/2N3P1/PPNQPPBP/R3K2R w KQkq -");
+    FEN fen("rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq -");
     ResultPositionAnalysisPtr result_ptr = AnalysePosition(fen.position());
 
     std::cout << "pos_all_pieces_ : ";
@@ -166,6 +166,18 @@ namespace Sayuri {
         }
       }
     }
+
+    std::cout << "num_checking_pieces_[WHITE] : "
+    << result_ptr->num_checking_pieces_[WHITE] << std::endl;
+    std::cout << "pos_checking_pieces_[WHITE] : ";
+    print_vec(result_ptr->pos_checking_pieces_[WHITE]);
+    std::cout << std::endl;
+
+    std::cout << "num_checking_pieces_[BLACK] : "
+    << result_ptr->num_checking_pieces_[BLACK] << std::endl;
+    std::cout << "pos_checking_pieces_[BLACK] : ";
+    print_vec(result_ptr->pos_checking_pieces_[BLACK]);
+    std::cout << std::endl;
 
     return 0;
   }

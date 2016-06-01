@@ -59,13 +59,26 @@ namespace Sayuri {
     std::array<std::array<std::vector<Square>, NUM_PIECE_TYPES>, NUM_SIDES>
     pos_each_pieces_;
 
-    /** チェックしている駒の数。 */
+    /** 相手のキングをチェックしている駒の数。 */
     std::array<int, NUM_SIDES> num_checking_pieces_;
-    /** チェックしている駒の配置。 */
+    /** 相手のキングをチェックしている駒の配置。 */
     std::array<std::vector<Square>, NUM_SIDES> pos_checking_pieces_;
   };
   /** 配置の分析結果の構造体のポインタ。 */
   using ResultPositionAnalysisPtr = std::shared_ptr<ResultPositionAnalysis>;
+
+  /** 駒の分析結果の構造体。 */
+  struct ResultPieceAnalysis {
+    // --- 駒の情報 --- //
+    /** 位置。 */
+    Square square_;
+    /** サイド。 */
+    Side side_;
+    /** 駒の種類。 */
+    PieceType piece_type_;
+  };
+  /** 駒の分析結果の構造体のポインタ。 */
+  using ResultPieceAnalysisPtr = std::shared_ptr<ResultPieceAnalysis>;
 
   /**
    * 駒の配置を分析し、結果の構造体を返す。
