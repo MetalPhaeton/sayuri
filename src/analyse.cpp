@@ -27,14 +27,14 @@
  * @brief 局面分析器。
  */
 
-#include "analyser.h"
+#include "analyse.h"
 
 #include <iostream>
 #include <sstream>
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-#include <array>
+#include <tuple>
 #include <memory>
 #include "common.h"
 #include "board.h"
@@ -43,99 +43,25 @@
 namespace Sayuri {
   /** 無名名前空間。 */
   namespace {
-    // 簡易チェスボード。
-    struct SimpleBoard {
-      // 各サイドの駒の配置のビットボード。 [サイド]
-      Bitboard side_pieces_[NUM_SIDES];
-      // 全駒の配置のビットボード。 [角度]
-      Bitboard blocker_[NUM_ROTS];
-    };
-
-    // 簡易チェスボードにセットする。
-    void SetSimpleBoard(SimpleBoard& board,
-    const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]) {
-      board.blocker_[R0] = 0;
-      board.blocker_[R45] = 0;
-      board.blocker_[R90] = 0;
-      board.blocker_[R135] = 0;
-
-      FOR_SIDES(side) {
-        board.side_pieces_[side] = 0;
-
-        FOR_PIECE_TYPES(piece_type) {
-          if (side && piece_type) {
-            for (Bitboard bb = position[side][piece_type]; bb;
-            NEXT_BITBOARD(bb)) {
-              Square square = Util::GetSquare(bb);
-              board.side_pieces_[side] |= Util::SQUARE[square][R0];
-              board.blocker_[R0] |= Util::SQUARE[square][R0];
-              board.blocker_[R45] |= Util::SQUARE[square][R45];
-              board.blocker_[R90] |= Util::SQUARE[square][R90];
-              board.blocker_[R135] |= Util::SQUARE[square][R135];
-            }
-          }
-        }
-      }
-    }
-
-    // 駒の配置のベクトルを作る。
-    std::vector<Square> GenPosVector(Bitboard bitboard) {
-      std::vector<Square> ret(Util::CountBits(bitboard));
-      for (int i = 0; bitboard; NEXT_BITBOARD(bitboard), ++i) {
-        ret[i] = Util::GetSquare(bitboard);
-      }
-      return ret;
-    }
-
-    // 駒の数と配置を計算する。
-    void CalNumAndPos(const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES],
-    ResultPositionAnalysis& result) {
-      // 初期化。
-      result.num_all_pieces_ = 0;
-      result.num_side_pieces_[NO_SIDE] = 0;
-      result.num_side_pieces_[WHITE] = 0;
-      result.num_side_pieces_[BLACK] = 0;
-
-      // 計算。
-      FOR_SIDES(side) {
-        FOR_PIECE_TYPES(piece_type) {
-          if (side && piece_type) {
-            // 実在する駒の時。
-            int num = Util::CountBits(position[side][piece_type]);
-
-            // 数を足す。
-            result.num_all_pieces_ += num;
-            result.num_side_pieces_[side] += num;
-            result.num_each_pieces_[side][piece_type] = num;
-
-            // 駒の配置を追加する。
-            std::vector<Square> vec = GenPosVector(position[side][piece_type]);
-
-            result.pos_all_pieces_.insert
-            (result.pos_all_pieces_.end(), vec.begin(), vec.end());
-
-            result.pos_side_pieces_[side].insert
-            (result.pos_side_pieces_[side].end(), vec.begin(), vec.end());
-
-            result.pos_each_pieces_[side][piece_type].insert
-            (result.pos_each_pieces_[side][piece_type].end(),
-            vec.begin(), vec.end());
-          } else {
-            result.num_each_pieces_[side][piece_type] = 0;
-          }
-        }
-      }
-    }
-    // ボードの状態からビショップの利き筋を作る。
-    Bitboard GetBishopAttack(const SimpleBoard& board, Square square) {
-      return Util::GetBishopMagic(square, board.blocker_[R45],
-      board.blocker_[R135]);
-    }
-    // ボードの状態からルークの利き筋を作る。
-    Bitboard GetRookAttack(const SimpleBoard& board, Square square) {
-      return Util::GetRookMagic(square, board.blocker_[R0],
-      board.blocker_[R90]);
-    }
+//    // 駒の配置のベクトルを作る。
+//    std::vector<Square> GenPosVector(Bitboard bitboard) {
+//      std::vector<Square> ret(Util::CountBits(bitboard));
+//      for (int i = 0; bitboard; NEXT_BITBOARD(bitboard), ++i) {
+//        ret[i] = Util::GetSquare(bitboard);
+//      }
+//      return ret;
+//    }
+//
+//    // ボードの状態からビショップの利き筋を作る。
+//    Bitboard GetBishopAttack(const SimpleBoard& board, Square square) {
+//      return Util::GetBishopMagic(square, board.blocker_[R45],
+//      board.blocker_[R135]);
+//    }
+//    // ボードの状態からルークの利き筋を作る。
+//    Bitboard GetRookAttack(const SimpleBoard& board, Square square) {
+//      return Util::GetRookMagic(square, board.blocker_[R0],
+//      board.blocker_[R90]);
+//    }
 //    // ボードの状態からクイーンの利き筋を作る。
 //    Bitboard GetQueenAttack(const SimpleBoard& board, Square square) {
 //      return Util::GetQueenMagic
@@ -146,60 +72,60 @@ namespace Sayuri {
 //    Bitboard GetPawnStep(const SimpleBoard& board, Side side, Square square) {
 //      return Util::GetPawnMovable(side, square, board.blocker_[R90]);
 //    }
-
-    // その位置が他の位置の駒に攻撃されているかどうかチェックする。
-    // 攻撃している駒のビットボードを返す。
-    Bitboard IsAttacked
-    (const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES],
-    const SimpleBoard& board, Square square, Side side) {
-      Bitboard attacker = 0;
-
-      // ポーンに攻撃されているかどうか調べる。
-      attacker |= Util::PAWN_ATTACK[Util::GetOppositeSide(side)][square]
-      & position[side][PAWN];
-
-      // ナイトに攻撃されているかどうか調べる。
-      attacker |= Util::KNIGHT_MOVE[square] & position[side][KNIGHT];
-
-      // ビショップとクイーンの斜めに攻撃されているかどうか調べる。
-      attacker |= GetBishopAttack(board, square) & (position[side][BISHOP]
-      | position[side][QUEEN]);
-
-      // ルークとクイーンの縦横に攻撃されているかどうか調べる。
-      attacker |= GetRookAttack(board, square) & (position[side][ROOK]
-      | position[side][QUEEN]);
-
-      // キングに攻撃されているかどうか調べる。
-      attacker |= Util::KING_MOVE[square] & position[side][KING];
-
-      return attacker;
-    }
-
-    // チェックしている駒と数を計算する。
-    void CalCheckers(const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES],
-    const SimpleBoard& board, ResultPositionAnalysis& result) {
-      result.num_checking_pieces_[NO_SIDE] = 0;
-
-      // 白の相手をチェックしている駒。
-      Bitboard attacker = 0;
-      for (Bitboard bb = position[BLACK][KING]; bb; NEXT_BITBOARD(bb)) {
-        attacker |= IsAttacked(position, board, Util::GetSquare(bb), WHITE);
-      }
-      result.num_checking_pieces_[WHITE] = Util::CountBits(attacker);
-      std::vector<Square> temp = GenPosVector(attacker);
-      result.pos_checking_pieces_[WHITE].insert
-      (result.pos_checking_pieces_[WHITE].end(), temp.begin(), temp.end());
-
-      // 黒の相手をチェックしている駒。
-      attacker = 0;
-      for (Bitboard bb = position[WHITE][KING]; bb; NEXT_BITBOARD(bb)) {
-        attacker |= IsAttacked(position, board, Util::GetSquare(bb), BLACK);
-      }
-      result.num_checking_pieces_[BLACK] = Util::CountBits(attacker);
-      temp = GenPosVector(attacker);
-      result.pos_checking_pieces_[BLACK].insert
-      (result.pos_checking_pieces_[BLACK].end(), temp.begin(), temp.end());
-    }
+//
+//    // その位置が他の位置の駒に攻撃されているかどうかチェックする。
+//    // 攻撃している駒のビットボードを返す。
+//    Bitboard IsAttacked
+//    (const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES],
+//    const SimpleBoard& board, Square square, Side side) {
+//      Bitboard attacker = 0;
+//
+//      // ポーンに攻撃されているかどうか調べる。
+//      attacker |= Util::PAWN_ATTACK[Util::GetOppositeSide(side)][square]
+//      & position[side][PAWN];
+//
+//      // ナイトに攻撃されているかどうか調べる。
+//      attacker |= Util::KNIGHT_MOVE[square] & position[side][KNIGHT];
+//
+//      // ビショップとクイーンの斜めに攻撃されているかどうか調べる。
+//      attacker |= GetBishopAttack(board, square) & (position[side][BISHOP]
+//      | position[side][QUEEN]);
+//
+//      // ルークとクイーンの縦横に攻撃されているかどうか調べる。
+//      attacker |= GetRookAttack(board, square) & (position[side][ROOK]
+//      | position[side][QUEEN]);
+//
+//      // キングに攻撃されているかどうか調べる。
+//      attacker |= Util::KING_MOVE[square] & position[side][KING];
+//
+//      return attacker;
+//    }
+//
+//    // チェックしている駒と数を計算する。
+//    void CalCheckers(const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES],
+//    const SimpleBoard& board, ResultPositionAnalysis& result) {
+//      result.num_checking_pieces_[NO_SIDE] = 0;
+//
+//      // 白の相手をチェックしている駒。
+//      Bitboard attacker = 0;
+//      for (Bitboard bb = position[BLACK][KING]; bb; NEXT_BITBOARD(bb)) {
+//        attacker |= IsAttacked(position, board, Util::GetSquare(bb), WHITE);
+//      }
+//      result.num_checking_pieces_[WHITE] = Util::CountBits(attacker);
+//      std::vector<Square> temp = GenPosVector(attacker);
+//      result.pos_checking_pieces_[WHITE].insert
+//      (result.pos_checking_pieces_[WHITE].end(), temp.begin(), temp.end());
+//
+//      // 黒の相手をチェックしている駒。
+//      attacker = 0;
+//      for (Bitboard bb = position[WHITE][KING]; bb; NEXT_BITBOARD(bb)) {
+//        attacker |= IsAttacked(position, board, Util::GetSquare(bb), BLACK);
+//      }
+//      result.num_checking_pieces_[BLACK] = Util::CountBits(attacker);
+//      temp = GenPosVector(attacker);
+//      result.pos_checking_pieces_[BLACK].insert
+//      (result.pos_checking_pieces_[BLACK].end(), temp.begin(), temp.end());
+//    }
 
 //    void PrintBitboard(Bitboard bitboard) {
 //      // 出力する文字列ストリーム。
@@ -239,21 +165,19 @@ namespace Sayuri {
 //    }
   }
 
-  // 配置の結果を返す。
-  ResultPositionAnalysisPtr AnalysePosition
-  (const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]) {
-    ResultPositionAnalysisPtr ret_ptr(new ResultPositionAnalysis());
+  // 駒の違い。
+  DiffPieces AnalyseDiff(const Board& board) {
+    DiffPieces ret;
 
-    // 簡易ボードを作成。
-    SimpleBoard board;
-    SetSimpleBoard(board, position);
+    FOR_PIECE_TYPES(piece_type) {
+      if (piece_type) {
+        ret[piece_type] = Util::CountBits(board.position_[WHITE][piece_type])
+        - Util::CountBits(board.position_[BLACK][piece_type]);
+      } else {
+        ret[piece_type] = 0;
+      }
+    }
 
-    // 数と配置を計算する。
-    CalNumAndPos(position, *ret_ptr);
-
-    // 相手のキングをチェックしている駒の数と配置を計算する。
-    CalCheckers(position, board, *ret_ptr);
-
-    return ret_ptr;
+    return ret;
   }
 }  // namespace Sayuri

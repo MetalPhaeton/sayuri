@@ -41,53 +41,18 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
-  /** 配置の分析結果の構造体。 */
-  struct ResultPositionAnalysis {
-    /** 駒全体の数。 */
-    int num_all_pieces_;
-    /** 全ての駒の配置。 */
-    std::vector<Square> pos_all_pieces_;
+  /** 分析結果のマスのベクトル。 */
+  using ResultSquares = std::vector<Square>;
 
-    /** 各サイドの駒の数。 */
-    std::array<int, NUM_SIDES> num_side_pieces_;
-    /** 各サイドの駒の配置。 */
-    std::array<std::vector<Square>, NUM_SIDES> pos_side_pieces_;
-
-    /** 各駒の数。 */
-    std::array<std::array<int, NUM_PIECE_TYPES>, NUM_SIDES> num_each_pieces_;
-    /** 各サイドの配置。 */
-    std::array<std::array<std::vector<Square>, NUM_PIECE_TYPES>, NUM_SIDES>
-    pos_each_pieces_;
-
-    /** 相手のキングをチェックしている駒の数。 */
-    std::array<int, NUM_SIDES> num_checking_pieces_;
-    /** 相手のキングをチェックしている駒の配置。 */
-    std::array<std::vector<Square>, NUM_SIDES> pos_checking_pieces_;
-  };
-  /** 配置の分析結果の構造体のポインタ。 */
-  using ResultPositionAnalysisPtr = std::shared_ptr<ResultPositionAnalysis>;
-
-  /** 駒の分析結果の構造体。 */
-  struct ResultPieceAnalysis {
-    // --- 駒の情報 --- //
-    /** 位置。 */
-    Square square_;
-    /** サイド。 */
-    Side side_;
-    /** 駒の種類。 */
-    PieceType piece_type_;
-  };
-  /** 駒の分析結果の構造体のポインタ。 */
-  using ResultPieceAnalysisPtr = std::shared_ptr<ResultPieceAnalysis>;
+  /** 駒の違いの配列。 */
+  using DiffPieces = std::array<int, NUM_PIECE_TYPES>;
 
   /**
-   * 駒の配置を分析し、結果の構造体を返す。
-   * @param position 駒の配置のビットボード。
-   * @return 配置の分析結果の構造体。
+   * 駒の違い。
+   * @param board 分析したいボードの構造体。
+   * @return 駒の違いの配列。 プラスなら白が多い。 マイナスなら黒が多い。
    */
-  ResultPositionAnalysisPtr AnalysePosition
-  (const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES]);
-
+  DiffPieces AnalyseDiff(const Board& board);
 }  // namespace Sayuri
 
 #endif

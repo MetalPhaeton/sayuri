@@ -66,7 +66,7 @@
 #include "sayulisp.h"
 #include "sayuri.h"
 #include "board.h"
-#include "analyser.h"
+#include "analyse.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -126,58 +126,24 @@ namespace Sayuri {
 
     // ========================================================================
 
-    auto print_vec = [](const std::vector<Square>& vec) {
-      for (auto square : vec) {
-        std::cout << static_cast<char>('A' + Util::SquareToFyle(square))
-        << static_cast<char>('1' + Util::SquareToRank(square)) << " ";
-      }
-    };
+//    auto print_vec = [](const std::vector<Square>& vec) {
+//      for (auto square : vec) {
+//        std::cout << static_cast<char>('A' + Util::SquareToFyle(square))
+//        << static_cast<char>('1' + Util::SquareToRank(square)) << " ";
+//      }
+//    };
 
-    FEN fen("rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq -");
-    ResultPositionAnalysisPtr result_ptr = AnalysePosition(fen.position());
+    FEN fen("3q1rk1/p1p2ppp/2p1pb2/3n1b2/3P4/P4N2/1PP2PP1/RNBQ1RK1 w - - 0 1");
+    engine_ptr->LoadFEN(fen);
+    const Board& board = engine_ptr->board();
+    DiffPieces diff = AnalyseDiff(board);
 
-    std::cout << "pos_all_pieces_ : ";
-    print_vec(result_ptr->pos_all_pieces_);
-    std::cout << std::endl;
-
-    std::cout << "pos_side_pieces_[WHITE] : ";
-    print_vec(result_ptr->pos_side_pieces_[WHITE]);
-    std::cout << std::endl;
-
-    std::cout << "pos_side_pieces_[BLACK] : ";
-    print_vec(result_ptr->pos_side_pieces_[BLACK]);
-    std::cout << std::endl;
-
-    FOR_SIDES(side) {
-      FOR_PIECE_TYPES(piece_type) {
-        if (side && piece_type) {
-          std::cout << "pos_each_pieces_["
-          << (side ==  WHITE ? "WHITE][" : "BLACK][");
-          switch (piece_type) {
-            case PAWN: std::cout << "PAWN] : "; break;
-            case KNIGHT: std::cout << "KNIGHT] : "; break;
-            case BISHOP: std::cout << "BISHOP] : "; break;
-            case ROOK: std::cout << "ROOK] : "; break;
-            case QUEEN: std::cout << "QUEEN] : "; break;
-            case KING: std::cout << "KING] : "; break;
-          }
-          print_vec(result_ptr->pos_each_pieces_[side][piece_type]);
-          std::cout << std::endl;
-        }
-      }
-    }
-
-    std::cout << "num_checking_pieces_[WHITE] : "
-    << result_ptr->num_checking_pieces_[WHITE] << std::endl;
-    std::cout << "pos_checking_pieces_[WHITE] : ";
-    print_vec(result_ptr->pos_checking_pieces_[WHITE]);
-    std::cout << std::endl;
-
-    std::cout << "num_checking_pieces_[BLACK] : "
-    << result_ptr->num_checking_pieces_[BLACK] << std::endl;
-    std::cout << "pos_checking_pieces_[BLACK] : ";
-    print_vec(result_ptr->pos_checking_pieces_[BLACK]);
-    std::cout << std::endl;
+    std::cout << "Pawn : " << diff[PAWN] << std::endl;
+    std::cout << "Knight : " << diff[KNIGHT] << std::endl;
+    std::cout << "Bishop : " << diff[BISHOP] << std::endl;
+    std::cout << "Rook : " << diff[ROOK] << std::endl;
+    std::cout << "Queen : " << diff[QUEEN] << std::endl;
+    std::cout << "King : " << diff[KING] << std::endl;
 
     return 0;
   }
