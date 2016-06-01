@@ -126,24 +126,21 @@ namespace Sayuri {
 
     // ========================================================================
 
-//    auto print_vec = [](const std::vector<Square>& vec) {
-//      for (auto square : vec) {
-//        std::cout << static_cast<char>('A' + Util::SquareToFyle(square))
-//        << static_cast<char>('1' + Util::SquareToRank(square)) << " ";
-//      }
-//    };
+    auto print_vec = [](const std::vector<Square>& vec) {
+      for (auto square : vec) {
+        std::cout << static_cast<char>('A' + Util::SquareToFyle(square))
+        << static_cast<char>('1' + Util::SquareToRank(square)) << " ";
+      }
+      std::cout << std::endl;
+    };
 
-    FEN fen("3q1rk1/p1p2ppp/2p1pb2/3n1b2/3P4/P4N2/1PP2PP1/RNBQ1RK1 w - - 0 1");
+    FEN fen("rnbqkbnr/pppppppp/8/5n2/4P3/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     engine_ptr->LoadFEN(fen);
     const Board& board = engine_ptr->board();
-    DiffPieces diff = AnalyseDiff(board);
 
-    std::cout << "Pawn : " << diff[PAWN] << std::endl;
-    std::cout << "Knight : " << diff[KNIGHT] << std::endl;
-    std::cout << "Bishop : " << diff[BISHOP] << std::endl;
-    std::cout << "Rook : " << diff[ROOK] << std::endl;
-    std::cout << "Queen : " << diff[QUEEN] << std::endl;
-    std::cout << "King : " << diff[KING] << std::endl;
+    ResultSquares result = AnalyseMobility(board, E4);
+
+    print_vec(result);
 
     return 0;
   }

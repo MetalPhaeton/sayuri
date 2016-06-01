@@ -45,14 +45,23 @@ namespace Sayuri {
   using ResultSquares = std::vector<Square>;
 
   /** 駒の違いの配列。 */
-  using DiffPieces = std::array<int, NUM_PIECE_TYPES>;
+  using ResultDiff = std::array<int, NUM_PIECE_TYPES>;
 
   /**
-   * 駒の違い。
+   * 駒の違いを分析する。
    * @param board 分析したいボードの構造体。
    * @return 駒の違いの配列。 プラスなら白が多い。 マイナスなら黒が多い。
    */
-  DiffPieces AnalyseDiff(const Board& board);
+  ResultDiff AnalyseDiff(const Board& board);
+
+  /**
+   * 機動力を分析する。
+   * @param board 分析したいボードの構造体。
+   * @param piece_square 分析したい駒の位置。
+   * @return その駒の動ける場所。
+   */
+  ResultSquares AnalyseMobility(const Board& board, Square piece_square);
+
 }  // namespace Sayuri
 
 #endif

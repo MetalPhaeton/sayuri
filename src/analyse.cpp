@@ -43,67 +43,120 @@
 namespace Sayuri {
   /** 無名名前空間。 */
   namespace {
-//    // 駒の配置のベクトルを作る。
-//    std::vector<Square> GenPosVector(Bitboard bitboard) {
-//      std::vector<Square> ret(Util::CountBits(bitboard));
-//      for (int i = 0; bitboard; NEXT_BITBOARD(bitboard), ++i) {
-//        ret[i] = Util::GetSquare(bitboard);
-//      }
-//      return ret;
-//    }
-//
-//    // ボードの状態からビショップの利き筋を作る。
-//    Bitboard GetBishopAttack(const SimpleBoard& board, Square square) {
-//      return Util::GetBishopMagic(square, board.blocker_[R45],
-//      board.blocker_[R135]);
-//    }
-//    // ボードの状態からルークの利き筋を作る。
-//    Bitboard GetRookAttack(const SimpleBoard& board, Square square) {
-//      return Util::GetRookMagic(square, board.blocker_[R0],
-//      board.blocker_[R90]);
-//    }
-//    // ボードの状態からクイーンの利き筋を作る。
-//    Bitboard GetQueenAttack(const SimpleBoard& board, Square square) {
-//      return Util::GetQueenMagic
-//      (square, board.blocker_[R0], board.blocker_[R45],
-//      board.blocker_[R90], board.blocker_[R135]);
-//    }
-//    // ボードの状態からポーンの動ける位置を作る。
-//    Bitboard GetPawnStep(const SimpleBoard& board, Side side, Square square) {
-//      return Util::GetPawnMovable(side, square, board.blocker_[R90]);
-//    }
-//
-//    // その位置が他の位置の駒に攻撃されているかどうかチェックする。
-//    // 攻撃している駒のビットボードを返す。
-//    Bitboard IsAttacked
-//    (const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES],
-//    const SimpleBoard& board, Square square, Side side) {
-//      Bitboard attacker = 0;
-//
-//      // ポーンに攻撃されているかどうか調べる。
-//      attacker |= Util::PAWN_ATTACK[Util::GetOppositeSide(side)][square]
-//      & position[side][PAWN];
-//
-//      // ナイトに攻撃されているかどうか調べる。
-//      attacker |= Util::KNIGHT_MOVE[square] & position[side][KNIGHT];
-//
-//      // ビショップとクイーンの斜めに攻撃されているかどうか調べる。
-//      attacker |= GetBishopAttack(board, square) & (position[side][BISHOP]
-//      | position[side][QUEEN]);
-//
-//      // ルークとクイーンの縦横に攻撃されているかどうか調べる。
-//      attacker |= GetRookAttack(board, square) & (position[side][ROOK]
-//      | position[side][QUEEN]);
-//
-//      // キングに攻撃されているかどうか調べる。
-//      attacker |= Util::KING_MOVE[square] & position[side][KING];
-//
-//      return attacker;
-//    }
+    // 駒の配置のベクトルを作る。
+    ResultSquares BBToResult(Bitboard bitboard) {
+      ResultSquares ret(Util::CountBits(bitboard));
+      for (int i = 0; bitboard; NEXT_BITBOARD(bitboard), ++i) {
+        ret[i] = Util::GetSquare(bitboard);
+      }
+      return ret;
+    }
+
+    // ボードの状態からビショップの利き筋を作る。
+    Bitboard GetBishopAttack(const Board& board, Square square) {
+      return Util::GetBishopMagic(square, board.blocker_[R45],
+      board.blocker_[R135]);
+    }
+    // ボードの状態からルークの利き筋を作る。
+    Bitboard GetRookAttack(const Board& board, Square square) {
+      return Util::GetRookMagic(square, board.blocker_[R0],
+      board.blocker_[R90]);
+    }
+    // ボードの状態からクイーンの利き筋を作る。
+    Bitboard GetQueenAttack(const Board& board, Square square) {
+      return Util::GetQueenMagic
+      (square, board.blocker_[R0], board.blocker_[R45],
+      board.blocker_[R90], board.blocker_[R135]);
+    }
+    // ボードの状態からポーンの動ける位置を作る。
+    Bitboard GetPawnStep(const Board& board, Side side, Square square) {
+      return Util::GetPawnMovable(side, square, board.blocker_[R90]);
+    }
+
+    // その位置が他の位置の駒に攻撃されているかどうかチェックする。
+    // 攻撃している駒のビットボードを返す。
+    Bitboard IsAttacked(const Board& board, Square square, Side side) {
+      Bitboard attacker = 0;
+
+      // ポーンに攻撃されているかどうか調べる。
+      attacker |= Util::PAWN_ATTACK[Util::GetOppositeSide(side)][square]
+      & board.position_[side][PAWN];
+
+      // ナイトに攻撃されているかどうか調べる。
+      attacker |= Util::KNIGHT_MOVE[square] & board.position_[side][KNIGHT];
+
+      // ビショップとクイーンの斜めに攻撃されているかどうか調べる。
+      attacker |= GetBishopAttack(board, square)
+      & (board.position_[side][BISHOP] | board.position_[side][QUEEN]);
+
+      // ルークとクイーンの縦横に攻撃されているかどうか調べる。
+      attacker |= GetRookAttack(board, square)
+      & (board.position_[side][ROOK] | board.position_[side][QUEEN]);
+
+      // キングに攻撃されているかどうか調べる。
+      attacker |= Util::KING_MOVE[square] & board.position_[side][KING];
+
+      return attacker;
+    }
+
+    // 白のショートキャスリングが出来るかどうか判定する。
+    bool CanWhiteShortCastling(const Board& board) {
+      return (board.castling_rights_ & WHITE_SHORT_CASTLING)
+      && !((board.blocker_[R0]
+      & (Util::SQUARE[F1][R0]
+      | Util::SQUARE[G1][R0]))
+      || IsAttacked(board, E1, BLACK)
+      || IsAttacked(board, F1, BLACK)
+      || IsAttacked(board, G1, BLACK));
+    }
+
+    /**
+     * 白のロングキャスリングが出来るかどうか判定する。
+     * @return キャスリング可能ならtrue。
+     */
+    bool CanWhiteLongCastling(const Board& board) {
+      return (board.castling_rights_ & WHITE_LONG_CASTLING)
+      && !((board.blocker_[R0]
+      & (Util::SQUARE[D1][R0]
+      | Util::SQUARE[C1][R0]
+      | Util::SQUARE[B1][R0]))
+      || IsAttacked(board, E1, BLACK)
+      || IsAttacked(board, D1, BLACK)
+      || IsAttacked(board, C1, BLACK));
+    }
+
+    /**
+     * 黒のショートキャスリングが出来るかどうか判定する。
+     * @return キャスリング可能ならtrue。
+     */
+    bool CanBlackShortCastling(const Board& board) {
+      return (board.castling_rights_ & BLACK_SHORT_CASTLING)
+      && !((board.blocker_[R0]
+      & (Util::SQUARE[F8][R0]
+      | Util::SQUARE[G8][R0]))
+      || IsAttacked(board, E8, WHITE)
+      || IsAttacked(board, F8, WHITE)
+      || IsAttacked(board, G8, WHITE));
+    }
+
+    /**
+     * 黒のロングキャスリングが出来るかどうか判定する。
+     * @return キャスリング可能ならtrue。
+     */
+    bool CanBlackLongCastling(const Board& board) {
+      return (board.castling_rights_ & BLACK_LONG_CASTLING)
+      && !((board.blocker_[R0]
+      & (Util::SQUARE[D8][R0]
+      | Util::SQUARE[C8][R0]
+      | Util::SQUARE[B8][R0]))
+      || IsAttacked(board, E8, WHITE)
+      || IsAttacked(board, D8, WHITE)
+      || IsAttacked(board, C8, WHITE));
+    }
 //
 //    // チェックしている駒と数を計算する。
 //    void CalCheckers(const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES],
-//    const SimpleBoard& board, ResultPositionAnalysis& result) {
+//    const Board& board, ResultPositionAnalysis& result) {
 //      result.num_checking_pieces_[NO_SIDE] = 0;
 //
 //      // 白の相手をチェックしている駒。
@@ -112,7 +165,7 @@ namespace Sayuri {
 //        attacker |= IsAttacked(position, board, Util::GetSquare(bb), WHITE);
 //      }
 //      result.num_checking_pieces_[WHITE] = Util::CountBits(attacker);
-//      std::vector<Square> temp = GenPosVector(attacker);
+//      std::vector<Square> temp = BBToResult(attacker);
 //      result.pos_checking_pieces_[WHITE].insert
 //      (result.pos_checking_pieces_[WHITE].end(), temp.begin(), temp.end());
 //
@@ -122,7 +175,7 @@ namespace Sayuri {
 //        attacker |= IsAttacked(position, board, Util::GetSquare(bb), BLACK);
 //      }
 //      result.num_checking_pieces_[BLACK] = Util::CountBits(attacker);
-//      temp = GenPosVector(attacker);
+//      temp = BBToResult(attacker);
 //      result.pos_checking_pieces_[BLACK].insert
 //      (result.pos_checking_pieces_[BLACK].end(), temp.begin(), temp.end());
 //    }
@@ -166,8 +219,8 @@ namespace Sayuri {
   }
 
   // 駒の違い。
-  DiffPieces AnalyseDiff(const Board& board) {
-    DiffPieces ret;
+  ResultDiff AnalyseDiff(const Board& board) {
+    ResultDiff ret;
 
     FOR_PIECE_TYPES(piece_type) {
       if (piece_type) {
@@ -179,5 +232,90 @@ namespace Sayuri {
     }
 
     return ret;
+  }
+
+  // 機動力。
+  ResultSquares AnalyseMobility(const Board& board, Square piece_square) {
+    ResultSquares ret;
+
+    // 駒の種類を得る。
+    Side piece_side = board.side_board_[piece_square];
+    PieceType piece_type = board.piece_board_[piece_square];
+
+    // 駒がなければ帰る。
+    if (!piece_type) return ret;
+
+    Bitboard mobility;
+    switch (piece_type) {
+      case PAWN:
+        {
+          // 通常の動き。
+          mobility = GetPawnStep(board, piece_side, piece_square);
+
+          // 攻撃。
+          mobility |= Util::PAWN_ATTACK[piece_side][piece_square]
+          & board.side_pieces_[Util::GetOppositeSide(piece_side)];
+
+          // アンパッサン。
+          Rank rank = Util::SquareToRank(board.en_passant_square_);
+          if (((piece_side == WHITE) && (rank == RANK_6))
+          || ((piece_side == BLACK) && (rank == RANK_3))) {
+            mobility |= Util::PAWN_ATTACK[piece_side][piece_square]
+            & Util::SQUARE[piece_square][R0];
+          }
+        }
+        break;
+      case KNIGHT:
+        mobility = Util::KNIGHT_MOVE[piece_square]
+        & ~(board.side_pieces_[piece_side]);
+        break;
+      case BISHOP:
+        mobility = GetBishopAttack(board, piece_square)
+        & ~(board.side_pieces_[piece_side]);
+        break;
+      case ROOK:
+        mobility = GetRookAttack(board, piece_square)
+        & ~(board.side_pieces_[piece_side]);
+        break;
+      case QUEEN:
+        mobility = GetQueenAttack(board, piece_square)
+        & ~(board.side_pieces_[piece_side]);
+        break;
+      case KING:
+        {
+          // 通常の動き。
+          mobility = Util::KING_MOVE[piece_square]
+          & ~(board.side_pieces_[piece_side]);
+
+          // 相手に攻撃されている場所を除く。
+          Side enemy_side = Util::GetOppositeSide(piece_side);
+          for (Bitboard bb = mobility; bb; NEXT_BITBOARD(bb)) {
+            Square square = Util::GetSquare(bb);
+            if (IsAttacked(board, square, enemy_side)) {
+              mobility &= ~Util::SQUARE[square][R0];
+            }
+          }
+
+          // キャスリング。
+          if (piece_side == WHITE) {
+            if (CanWhiteShortCastling(board)) {
+              mobility |= Util::SQUARE[G1][R0];
+            }
+            if (CanWhiteLongCastling(board)) {
+              mobility |= Util::SQUARE[C1][R0];
+            }
+          } else {
+            if (CanBlackShortCastling(board)) {
+              mobility |= Util::SQUARE[G8][R0];
+            }
+            if (CanBlackLongCastling(board)) {
+              mobility |= Util::SQUARE[C8][R0];
+            }
+          }
+        }
+        break;
+    }
+
+    return BBToResult(mobility);
   }
 }  // namespace Sayuri
