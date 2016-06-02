@@ -193,7 +193,7 @@ namespace Sayuri {
       || IsAttacked(board, C8, WHITE));
     }
 
-    Bitboard GenMobilityBB(const Board& board, Square square) {
+    Bitboard GenAttackBB(const Board& board, Square square) {
       Bitboard ret;
 
       // 駒の種類を得る。
@@ -205,13 +205,45 @@ namespace Sayuri {
 
       switch (piece_type) {
         case PAWN:
-          {
-            // 通常の動き。
-            ret = GetPawnStep(board, piece_side, square);
+          ret = Util::PAWN_ATTACK[piece_side][square];
+          break;
+        case KNIGHT:
+          ret = Util::KNIGHT_MOVE[square];
+          break;
+        case BISHOP:
+          ret = GetBishopAttack(board, square);
+          break;
+        case ROOK:
+          ret = GetRookAttack(board, square);
+          break;
+        case QUEEN:
+          ret = GetQueenAttack(board, square);
+          break;
+        case KING:
+          ret = Util::KING_MOVE[square];
+          break;
+      }
 
-            // 攻撃。
-            ret |= Util::PAWN_ATTACK[piece_side][square]
-            & board.side_pieces_[Util::GetOppositeSide(piece_side)];
+      return ret;
+    }
+
+    Bitboard GenMobilityBB(const Board& board, Square square) {
+      // 駒の種類を得る。
+      Side piece_side = board.side_board_[square];
+      PieceType piece_type = board.piece_board_[square];
+
+      // 駒がなければ帰る。
+      if (!piece_type) return 0;
+
+      // とりあえず、攻撃のビットボードを得る。
+      Bitboard ret = GenAttackBB(board, square);
+
+
+      switch (piece_type) {
+        case PAWN:
+          {
+            // 攻撃を限定する。
+            ret &= board.side_pieces_[Util::GetOppositeSide(piece_side)];
 
             // アンパッサン。
             Rank rank = Util::SquareToRank(board.en_passant_square_);
@@ -220,29 +252,15 @@ namespace Sayuri {
               ret |= Util::PAWN_ATTACK[piece_side][square]
               & Util::SQUARE[square][R0];
             }
+
+            // 通常の動き。
+            ret |= GetPawnStep(board, piece_side, square);
           }
-          break;
-        case KNIGHT:
-          ret = Util::KNIGHT_MOVE[square]
-          & ~(board.side_pieces_[piece_side]);
-          break;
-        case BISHOP:
-          ret = GetBishopAttack(board, square)
-          & ~(board.side_pieces_[piece_side]);
-          break;
-        case ROOK:
-          ret = GetRookAttack(board, square)
-          & ~(board.side_pieces_[piece_side]);
-          break;
-        case QUEEN:
-          ret = GetQueenAttack(board, square)
-          & ~(board.side_pieces_[piece_side]);
           break;
         case KING:
           {
-            // 通常の動き。
-            ret = Util::KING_MOVE[square]
-            & ~(board.side_pieces_[piece_side]);
+            // 攻撃を限定。
+            ret &= ~(board.side_pieces_[piece_side]);
 
             // 相手に攻撃されている場所を除く。
             Side enemy_side = Util::GetOppositeSide(piece_side);
@@ -270,6 +288,9 @@ namespace Sayuri {
               }
             }
           }
+          break;
+        default:
+          ret &= ~(board.side_pieces_[piece_side]);
           break;
       }
 

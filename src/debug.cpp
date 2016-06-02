@@ -134,11 +134,11 @@ namespace Sayuri {
       std::cout << std::endl;
     };
 
-    FEN fen("1b4k1/1r3p2/2b1p1pp/1pP4q/1P1P4/R6P/2N1NQP1/3R2K1 w - - 0 1");
+    FEN fen("rnbqkbnr/1pp1pppp/p3P3/3p4/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1");
     engine_ptr->LoadFEN(fen);
     const Board& board = engine_ptr->board();
 
-    print_vec(AnalyseMobility(board, F2));
+    print_vec(AnalyseMobility(board, F7));
 
     return 0;
   }
