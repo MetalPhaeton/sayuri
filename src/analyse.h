@@ -145,6 +145,13 @@ namespace Sayuri {
    */
   ResultSquares AnalyseIsoPawn(const Board& board, Side side);
 
+  /**
+   * パスポーンを分析する。
+   * @param board 分析したいボード。
+   * @param side 分析したいサイド。
+   * @return パスポーンの位置。
+   */
+  ResultSquares AnalysePassPawn(const Board& board, Side side);
 }  // namespace Sayuri
 
 #endif

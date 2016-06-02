@@ -377,7 +377,8 @@ namespace Sayuri {
 
   // センターのコントロール。
   ResultSquares AnalyseCenterControl(const Board& board, Square piece_square) {
-    constexpr Bitboard CENTER_BB = Util::SQUARE[C3][R0] | Util::SQUARE[C4][R0]
+    static const Bitboard CENTER_BB =
+    Util::SQUARE[C3][R0] | Util::SQUARE[C4][R0]
     | Util::SQUARE[C5][R0] | Util::SQUARE[C6][R0]
     | Util::SQUARE[D3][R0] | Util::SQUARE[D4][R0]
     | Util::SQUARE[D5][R0] | Util::SQUARE[D6][R0]
@@ -392,7 +393,7 @@ namespace Sayuri {
   // スウィートセンターのコントロール。
   ResultSquares AnalyseSweetCenterControl(const Board& board,
   Square piece_square) {
-    constexpr Bitboard CENTER_BB = 
+    static const Bitboard CENTER_BB = 
     Util::SQUARE[D4][R0] | Util::SQUARE[D5][R0]
     | Util::SQUARE[E4][R0] | Util::SQUARE[E5][R0];
 
@@ -454,6 +455,85 @@ namespace Sayuri {
 
       if (!Util::CountBits(temp)) {
         result |= pawns & Util::FYLE[fyle];
+      }
+    }
+
+    return BBToResult(result);
+  }
+
+  // パスポーン。
+  ResultSquares AnalysePassPawn(const Board& board, Side side) {
+    static const Bitboard FRONT_RANKS[NUM_SIDES][NUM_RANKS] {
+      {0, 0, 0, 0, 0, 0, 0, 0},
+      {
+        Util::RANK[RANK_8] | Util::RANK[RANK_7] | Util::RANK[RANK_6]
+        | Util::RANK[RANK_5] | Util::RANK[RANK_4] |Util::RANK[RANK_3]
+        | Util::RANK[RANK_2],
+
+        Util::RANK[RANK_8] | Util::RANK[RANK_7] | Util::RANK[RANK_6]
+        | Util::RANK[RANK_5] | Util::RANK[RANK_4] | Util::RANK[RANK_3],
+
+        Util::RANK[RANK_8] | Util::RANK[RANK_7] | Util::RANK[RANK_6]
+        | Util::RANK[RANK_5] | Util::RANK[RANK_4],
+
+        Util::RANK[RANK_8] | Util::RANK[RANK_7] | Util::RANK[RANK_6]
+        | Util::RANK[RANK_5],
+
+        Util::RANK[RANK_8] | Util::RANK[RANK_7] | Util::RANK[RANK_6],
+
+        Util::RANK[RANK_8] | Util::RANK[RANK_7],
+
+        Util::RANK[RANK_8],
+
+        0
+      },
+      {
+        0,
+
+        Util::RANK[RANK_1],
+
+        Util::RANK[RANK_1] | Util::RANK[RANK_2],
+
+        Util::RANK[RANK_1] | Util::RANK[RANK_2] | Util::RANK[RANK_3],
+
+        Util::RANK[RANK_1] | Util::RANK[RANK_2] | Util::RANK[RANK_3]
+        | Util::RANK[RANK_4],
+
+        Util::RANK[RANK_1] | Util::RANK[RANK_2] | Util::RANK[RANK_3]
+        | Util::RANK[RANK_4] | Util::RANK[RANK_5],
+
+        Util::RANK[RANK_1] | Util::RANK[RANK_2] | Util::RANK[RANK_3]
+        | Util::RANK[RANK_4] | Util::RANK[RANK_5] | Util::RANK[RANK_6],
+
+        Util::RANK[RANK_1] | Util::RANK[RANK_2] | Util::RANK[RANK_3]
+        | Util::RANK[RANK_4] | Util::RANK[RANK_5] | Util::RANK[RANK_6]
+        | Util::RANK[RANK_7]
+      }
+    };
+
+    Side enemy_side = Util::GetOppositeSide(side);
+    Bitboard pawns = board.position_[side][PAWN];
+    Bitboard enemy_pawns = board.position_[enemy_side][PAWN];
+
+    Bitboard result = 0;
+    for (; pawns; NEXT_BITBOARD(pawns)) {
+      Square square = Util::GetSquare(pawns);
+      Fyle fyle = Util::SquareToFyle(square);
+      Rank rank = Util::SquareToRank(square);
+      Bitboard temp = Util::FYLE[fyle];
+
+      if (fyle == FYLE_A) {
+        temp |= Util::FYLE[FYLE_B];
+      } else if (fyle == FYLE_H) {
+        temp |= Util::FYLE[FYLE_G];
+      } else {
+        temp |= Util::FYLE[fyle - 1] | Util::FYLE[fyle + 1];
+      }
+
+      temp &= FRONT_RANKS[side][rank];
+
+      if (!(enemy_pawns & temp)) {
+        result |= Util::SQUARE[square][R0];
       }
     }
 
