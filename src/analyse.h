@@ -77,6 +77,22 @@ namespace Sayuri {
   ResultSquares AnalyseAttacked(const Board& board, Square piece_square);
 
   /**
+   * どの駒を防御しているかを分析する。
+   * @param board 分析したいボードの構造体。
+   * @param piece_square 防御している駒の位置。
+   * @return 防御ターゲットの位置。
+   */
+  ResultSquares AnalyseDefensing(const Board& board, Square piece_square);
+
+  /**
+   * どの駒に防御されているかを分析する。
+   * @param board 分析したいボードの構造体。
+   * @param piece_square 防御されている駒の位置。
+   * @return 自分を防御している駒の位置。
+   */
+  ResultSquares AnalyseDefensed(const Board& board, Square piece_square);
+
+  /**
    * 展開を分析する。
    * @param board 分析したいボード。
    * @param piece_side 分析したい駒のサイド。

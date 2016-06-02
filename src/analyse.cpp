@@ -389,6 +389,18 @@ namespace Sayuri {
     Util::GetOppositeSide(board.side_board_[piece_square])));
   }
 
+  // どの駒を防御しているか。
+  ResultSquares AnalyseDefensing(const Board& board, Square piece_square) {
+    return BBToResult(GenAttackBB(board, piece_square)
+    & board.side_pieces_[board.side_board_[piece_square]]);
+  }
+
+  // どの駒に防御されているか。
+  ResultSquares AnalyseDefensed(const Board& board, Square piece_square) {
+    return BBToResult(IsAttacked(board, piece_square,
+    board.side_board_[piece_square]));
+  }
+
   // 駒の展開を分析する。
   ResultSquares AnalyseDevelopment(const Board& board, Side piece_side,
   PieceType piece_type) {
