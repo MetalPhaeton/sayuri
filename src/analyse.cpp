@@ -296,32 +296,6 @@ namespace Sayuri {
 
       return ret;
     }
-//
-//    // チェックしている駒と数を計算する。
-//    void CalCheckers(const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES],
-//    const Board& board, ResultPositionAnalysis& result) {
-//      result.num_checking_pieces_[NO_SIDE] = 0;
-//
-//      // 白の相手をチェックしている駒。
-//      Bitboard attacker = 0;
-//      for (Bitboard bb = position[BLACK][KING]; bb; NEXT_BITBOARD(bb)) {
-//        attacker |= IsAttacked(position, board, Util::GetSquare(bb), WHITE);
-//      }
-//      result.num_checking_pieces_[WHITE] = Util::CountBits(attacker);
-//      std::vector<Square> temp = BBToResult(attacker);
-//      result.pos_checking_pieces_[WHITE].insert
-//      (result.pos_checking_pieces_[WHITE].end(), temp.begin(), temp.end());
-//
-//      // 黒の相手をチェックしている駒。
-//      attacker = 0;
-//      for (Bitboard bb = position[WHITE][KING]; bb; NEXT_BITBOARD(bb)) {
-//        attacker |= IsAttacked(position, board, Util::GetSquare(bb), BLACK);
-//      }
-//      result.num_checking_pieces_[BLACK] = Util::CountBits(attacker);
-//      temp = BBToResult(attacker);
-//      result.pos_checking_pieces_[BLACK].insert
-//      (result.pos_checking_pieces_[BLACK].end(), temp.begin(), temp.end());
-//    }
 
 //    void PrintBitboard(Bitboard bitboard) {
 //      // 出力する文字列ストリーム。
@@ -446,5 +420,20 @@ namespace Sayuri {
   PieceType piece_type) {
     return BBToResult(board.position_[piece_side][piece_type]
     & NOT_START_POSITION[piece_side][piece_type]) ;
+  }
+
+  // ダブルポーン。
+  ResultSquares AnalyseDoublePawn(const Board& board, Side side) {
+    Bitboard pawns = board.position_[side][PAWN];
+
+    Bitboard result = 0;
+    FOR_FYLES(fyle) {
+      Bitboard temp = pawns & Util::FYLE[fyle];
+      if (Util::CountBits(temp) >= 2) {
+        result |= temp;
+      }
+    }
+
+    return BBToResult(result);
   }
 }  // namespace Sayuri
