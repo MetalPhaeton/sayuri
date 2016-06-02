@@ -257,19 +257,13 @@ namespace Sayuri {
   }
 
   // 駒の違い。
-  ResultDiff AnalyseDiff(const Board& board) {
-    ResultDiff ret;
-
-    FOR_PIECE_TYPES(piece_type) {
-      if (piece_type) {
-        ret[piece_type] = Util::CountBits(board.position_[WHITE][piece_type])
-        - Util::CountBits(board.position_[BLACK][piece_type]);
-      } else {
-        ret[piece_type] = 0;
-      }
+  int AnalyseDiff(const Board& board, PieceType piece_type) {
+    if (piece_type) {
+      return Util::CountBits(board.position_[WHITE][piece_type])
+      - Util::CountBits(board.position_[BLACK][piece_type]);
     }
 
-    return ret;
+    return 0;
   }
 
   // 機動力。

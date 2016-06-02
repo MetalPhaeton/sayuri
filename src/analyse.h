@@ -44,15 +44,13 @@ namespace Sayuri {
   /** 分析結果のマスのベクトル。 */
   using ResultSquares = std::vector<Square>;
 
-  /** 駒の違いの配列。 */
-  using ResultDiff = std::array<int, NUM_PIECE_TYPES>;
-
   /**
    * 駒の違いを分析する。
    * @param board 分析したいボードの構造体。
+   * @param piece_type 分析したい駒の種類。
    * @return 駒の違いの配列。 プラスなら白が多い。 マイナスなら黒が多い。
    */
-  ResultDiff AnalyseDiff(const Board& board);
+  int AnalyseDiff(const Board& board, PieceType piece_type);
 
   /**
    * 機動力を分析する。

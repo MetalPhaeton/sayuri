@@ -126,43 +126,24 @@ namespace Sayuri {
 
     // ========================================================================
 
-    auto print_vec = [](const std::vector<Square>& vec) {
-      for (auto square : vec) {
-        std::cout << static_cast<char>('A' + Util::SquareToFyle(square))
-        << static_cast<char>('1' + Util::SquareToRank(square)) << " ";
-      }
-      std::cout << std::endl;
-    };
+//    auto print_vec = [](const std::vector<Square>& vec) {
+//      for (auto square : vec) {
+//        std::cout << static_cast<char>('A' + Util::SquareToFyle(square))
+//        << static_cast<char>('1' + Util::SquareToRank(square)) << " ";
+//      }
+//      std::cout << std::endl;
+//    };
 
-    FEN fen("1rbq1rk1/1pp2pbp/p1np1np1/4p3/2PPP3/2N1BP2/PP1Q2PP/R1N1KB1R w KQ e6 0 1");
+    FEN fen("1b4k1/1r3p2/2b1p1pp/1pP4q/1P1P4/R6P/2N1NQP1/3R2K1 w - - 0 1");
     engine_ptr->LoadFEN(fen);
     const Board& board = engine_ptr->board();
 
-    std::cout << "White Pawn : ";
-    print_vec(AnalyseDevelopment(board, WHITE, PAWN));
-    std::cout << "White Knight : ";
-    print_vec(AnalyseDevelopment(board, WHITE, KNIGHT));
-    std::cout << "White BISHOP : ";
-    print_vec(AnalyseDevelopment(board, WHITE, BISHOP));
-    std::cout << "White Rook : ";
-    print_vec(AnalyseDevelopment(board, WHITE, ROOK));
-    std::cout << "White Queen : ";
-    print_vec(AnalyseDevelopment(board, WHITE, QUEEN));
-    std::cout << "White King : ";
-    print_vec(AnalyseDevelopment(board, WHITE, KING));
-
-    std::cout << "Black Pawn : ";
-    print_vec(AnalyseDevelopment(board, BLACK, PAWN));
-    std::cout << "Black Knight : ";
-    print_vec(AnalyseDevelopment(board, BLACK, KNIGHT));
-    std::cout << "Black BISHOP : ";
-    print_vec(AnalyseDevelopment(board, BLACK, BISHOP));
-    std::cout << "Black Rook : ";
-    print_vec(AnalyseDevelopment(board, BLACK, ROOK));
-    std::cout << "Black Queen : ";
-    print_vec(AnalyseDevelopment(board, BLACK, QUEEN));
-    std::cout << "Black King : ";
-    print_vec(AnalyseDevelopment(board, BLACK, KING));
+    std::cout << "Pawn : " << AnalyseDiff(board, PAWN) << std::endl;
+    std::cout << "Knight : " << AnalyseDiff(board, KNIGHT) << std::endl;
+    std::cout << "BISHOP : " << AnalyseDiff(board, BISHOP) << std::endl;
+    std::cout << "Rook : " << AnalyseDiff(board, ROOK) << std::endl;
+    std::cout << "Queen : " << AnalyseDiff(board, QUEEN) << std::endl;
+    std::cout << "King : " << AnalyseDiff(board, KING) << std::endl;
 
     return 0;
   }
