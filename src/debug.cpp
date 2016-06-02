@@ -126,24 +126,19 @@ namespace Sayuri {
 
     // ========================================================================
 
-//    auto print_vec = [](const std::vector<Square>& vec) {
-//      for (auto square : vec) {
-//        std::cout << static_cast<char>('A' + Util::SquareToFyle(square))
-//        << static_cast<char>('1' + Util::SquareToRank(square)) << " ";
-//      }
-//      std::cout << std::endl;
-//    };
+    auto print_vec = [](const std::vector<Square>& vec) {
+      for (auto square : vec) {
+        std::cout << static_cast<char>('A' + Util::SquareToFyle(square))
+        << static_cast<char>('1' + Util::SquareToRank(square)) << " ";
+      }
+      std::cout << std::endl;
+    };
 
     FEN fen("1b4k1/1r3p2/2b1p1pp/1pP4q/1P1P4/R6P/2N1NQP1/3R2K1 w - - 0 1");
     engine_ptr->LoadFEN(fen);
     const Board& board = engine_ptr->board();
 
-    std::cout << "Pawn : " << AnalyseDiff(board, PAWN) << std::endl;
-    std::cout << "Knight : " << AnalyseDiff(board, KNIGHT) << std::endl;
-    std::cout << "BISHOP : " << AnalyseDiff(board, BISHOP) << std::endl;
-    std::cout << "Rook : " << AnalyseDiff(board, ROOK) << std::endl;
-    std::cout << "Queen : " << AnalyseDiff(board, QUEEN) << std::endl;
-    std::cout << "King : " << AnalyseDiff(board, KING) << std::endl;
+    print_vec(AnalyseMobility(board, F2));
 
     return 0;
   }

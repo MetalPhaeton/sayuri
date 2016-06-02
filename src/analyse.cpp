@@ -34,6 +34,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <vector>
+#include <array>
 #include <tuple>
 #include <memory>
 #include "common.h"
@@ -191,6 +192,89 @@ namespace Sayuri {
       || IsAttacked(board, D8, WHITE)
       || IsAttacked(board, C8, WHITE));
     }
+
+    Bitboard GenMobilityBB(const Board& board, Square square) {
+      Bitboard ret;
+
+      // 駒の種類を得る。
+      Side piece_side = board.side_board_[square];
+      PieceType piece_type = board.piece_board_[square];
+
+      // 駒がなければ帰る。
+      if (!piece_type) return 0;
+
+      switch (piece_type) {
+        case PAWN:
+          {
+            // 通常の動き。
+            ret = GetPawnStep(board, piece_side, square);
+
+            // 攻撃。
+            ret |= Util::PAWN_ATTACK[piece_side][square]
+            & board.side_pieces_[Util::GetOppositeSide(piece_side)];
+
+            // アンパッサン。
+            Rank rank = Util::SquareToRank(board.en_passant_square_);
+            if (((piece_side == WHITE) && (rank == RANK_6))
+            || ((piece_side == BLACK) && (rank == RANK_3))) {
+              ret |= Util::PAWN_ATTACK[piece_side][square]
+              & Util::SQUARE[square][R0];
+            }
+          }
+          break;
+        case KNIGHT:
+          ret = Util::KNIGHT_MOVE[square]
+          & ~(board.side_pieces_[piece_side]);
+          break;
+        case BISHOP:
+          ret = GetBishopAttack(board, square)
+          & ~(board.side_pieces_[piece_side]);
+          break;
+        case ROOK:
+          ret = GetRookAttack(board, square)
+          & ~(board.side_pieces_[piece_side]);
+          break;
+        case QUEEN:
+          ret = GetQueenAttack(board, square)
+          & ~(board.side_pieces_[piece_side]);
+          break;
+        case KING:
+          {
+            // 通常の動き。
+            ret = Util::KING_MOVE[square]
+            & ~(board.side_pieces_[piece_side]);
+
+            // 相手に攻撃されている場所を除く。
+            Side enemy_side = Util::GetOppositeSide(piece_side);
+            for (Bitboard bb = ret; bb; NEXT_BITBOARD(bb)) {
+              Square square = Util::GetSquare(bb);
+              if (IsAttacked(board, square, enemy_side)) {
+                ret &= ~Util::SQUARE[square][R0];
+              }
+            }
+
+            // キャスリング。
+            if (piece_side == WHITE) {
+              if (CanWhiteShortCastling(board)) {
+                ret |= Util::SQUARE[G1][R0];
+              }
+              if (CanWhiteLongCastling(board)) {
+                ret |= Util::SQUARE[C1][R0];
+              }
+            } else {
+              if (CanBlackShortCastling(board)) {
+                ret |= Util::SQUARE[G8][R0];
+              }
+              if (CanBlackLongCastling(board)) {
+                ret |= Util::SQUARE[C8][R0];
+              }
+            }
+          }
+          break;
+      }
+
+      return ret;
+    }
 //
 //    // チェックしている駒と数を計算する。
 //    void CalCheckers(const Bitboard (& position)[NUM_SIDES][NUM_PIECE_TYPES],
@@ -268,87 +352,7 @@ namespace Sayuri {
 
   // 機動力。
   ResultSquares AnalyseMobility(const Board& board, Square piece_square) {
-    ResultSquares ret;
-
-    // 駒の種類を得る。
-    Side piece_side = board.side_board_[piece_square];
-    PieceType piece_type = board.piece_board_[piece_square];
-
-    // 駒がなければ帰る。
-    if (!piece_type) return ret;
-
-    Bitboard mobility;
-    switch (piece_type) {
-      case PAWN:
-        {
-          // 通常の動き。
-          mobility = GetPawnStep(board, piece_side, piece_square);
-
-          // 攻撃。
-          mobility |= Util::PAWN_ATTACK[piece_side][piece_square]
-          & board.side_pieces_[Util::GetOppositeSide(piece_side)];
-
-          // アンパッサン。
-          Rank rank = Util::SquareToRank(board.en_passant_square_);
-          if (((piece_side == WHITE) && (rank == RANK_6))
-          || ((piece_side == BLACK) && (rank == RANK_3))) {
-            mobility |= Util::PAWN_ATTACK[piece_side][piece_square]
-            & Util::SQUARE[piece_square][R0];
-          }
-        }
-        break;
-      case KNIGHT:
-        mobility = Util::KNIGHT_MOVE[piece_square]
-        & ~(board.side_pieces_[piece_side]);
-        break;
-      case BISHOP:
-        mobility = GetBishopAttack(board, piece_square)
-        & ~(board.side_pieces_[piece_side]);
-        break;
-      case ROOK:
-        mobility = GetRookAttack(board, piece_square)
-        & ~(board.side_pieces_[piece_side]);
-        break;
-      case QUEEN:
-        mobility = GetQueenAttack(board, piece_square)
-        & ~(board.side_pieces_[piece_side]);
-        break;
-      case KING:
-        {
-          // 通常の動き。
-          mobility = Util::KING_MOVE[piece_square]
-          & ~(board.side_pieces_[piece_side]);
-
-          // 相手に攻撃されている場所を除く。
-          Side enemy_side = Util::GetOppositeSide(piece_side);
-          for (Bitboard bb = mobility; bb; NEXT_BITBOARD(bb)) {
-            Square square = Util::GetSquare(bb);
-            if (IsAttacked(board, square, enemy_side)) {
-              mobility &= ~Util::SQUARE[square][R0];
-            }
-          }
-
-          // キャスリング。
-          if (piece_side == WHITE) {
-            if (CanWhiteShortCastling(board)) {
-              mobility |= Util::SQUARE[G1][R0];
-            }
-            if (CanWhiteLongCastling(board)) {
-              mobility |= Util::SQUARE[C1][R0];
-            }
-          } else {
-            if (CanBlackShortCastling(board)) {
-              mobility |= Util::SQUARE[G8][R0];
-            }
-            if (CanBlackLongCastling(board)) {
-              mobility |= Util::SQUARE[C8][R0];
-            }
-          }
-        }
-        break;
-    }
-
-    return BBToResult(mobility);
+    return BBToResult(GenMobilityBB(board, piece_square));
   }
 
   // 駒の展開を分析する。
