@@ -43,6 +43,44 @@
 namespace Sayuri {
   /** 無名名前空間。 */
   namespace {
+    // 駒の初期位置のビットボード。 [サイド][駒の種類]
+    constexpr Bitboard START_POSITION[NUM_SIDES][NUM_PIECE_TYPES] {
+      {0, 0, 0, 0, 0, 0, 0},
+      {
+        0, Util::RANK[RANK_2],
+        Util::SQUARE[B1][R0] | Util::SQUARE[G1][R0],
+        Util::SQUARE[C1][R0] | Util::SQUARE[F1][R0],
+        Util::SQUARE[A1][R0] | Util::SQUARE[H1][R0],
+        Util::SQUARE[D1][R0], Util::SQUARE[E1][R0]
+      },
+      {
+        0, Util::RANK[RANK_7],
+        Util::SQUARE[B8][R0] | Util::SQUARE[G8][R0],
+        Util::SQUARE[C8][R0] | Util::SQUARE[F8][R0],
+        Util::SQUARE[A8][R0] | Util::SQUARE[H8][R0],
+        Util::SQUARE[D8][R0], Util::SQUARE[E8][R0]
+      }
+    };
+    constexpr Bitboard NOT_START_POSITION[NUM_SIDES][NUM_PIECE_TYPES] {
+      {0, 0, 0, 0, 0, 0, 0},
+      {
+        0, ~START_POSITION[WHITE][PAWN],
+        ~START_POSITION[WHITE][KNIGHT],
+        ~START_POSITION[WHITE][BISHOP],
+        ~START_POSITION[WHITE][ROOK],
+        ~START_POSITION[WHITE][QUEEN],
+        ~START_POSITION[WHITE][KING]
+      },
+      {
+        0, ~START_POSITION[BLACK][PAWN],
+        ~START_POSITION[BLACK][KNIGHT],
+        ~START_POSITION[BLACK][BISHOP],
+        ~START_POSITION[BLACK][ROOK],
+        ~START_POSITION[BLACK][QUEEN],
+        ~START_POSITION[BLACK][KING]
+      }
+    };
+
     // 駒の配置のベクトルを作る。
     ResultSquares BBToResult(Bitboard bitboard) {
       ResultSquares ret(Util::CountBits(bitboard));
@@ -317,5 +355,12 @@ namespace Sayuri {
     }
 
     return BBToResult(mobility);
+  }
+
+  // 駒の展開を分析する。
+  ResultSquares AnalyseDevelopment(const Board& board, Side piece_side,
+  PieceType piece_type) {
+    return BBToResult(board.position_[piece_side][piece_type]
+    & NOT_START_POSITION[piece_side][piece_type]) ;
   }
 }  // namespace Sayuri

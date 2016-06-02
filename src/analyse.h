@@ -62,6 +62,15 @@ namespace Sayuri {
    */
   ResultSquares AnalyseMobility(const Board& board, Square piece_square);
 
+  /**
+   * 展開を分析する。
+   * @param board 分析したいボード。
+   * @param piece_side 分析したい駒のサイド。
+   * @param piece_type 分析したい駒の種類。
+   * @return 展開済みの駒の位置。
+   */
+  ResultSquares AnalyseDevelopment(const Board& board, Side piece_side,
+  PieceType piece_type);
 }  // namespace Sayuri
 
 #endif

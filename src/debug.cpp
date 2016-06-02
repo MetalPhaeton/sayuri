@@ -134,13 +134,35 @@ namespace Sayuri {
       std::cout << std::endl;
     };
 
-    FEN fen("rnbqkbnr/pppppppp/8/5n2/4P3/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    FEN fen("1rbq1rk1/1pp2pbp/p1np1np1/4p3/2PPP3/2N1BP2/PP1Q2PP/R1N1KB1R w KQ e6 0 1");
     engine_ptr->LoadFEN(fen);
     const Board& board = engine_ptr->board();
 
-    ResultSquares result = AnalyseMobility(board, E4);
+    std::cout << "White Pawn : ";
+    print_vec(AnalyseDevelopment(board, WHITE, PAWN));
+    std::cout << "White Knight : ";
+    print_vec(AnalyseDevelopment(board, WHITE, KNIGHT));
+    std::cout << "White BISHOP : ";
+    print_vec(AnalyseDevelopment(board, WHITE, BISHOP));
+    std::cout << "White Rook : ";
+    print_vec(AnalyseDevelopment(board, WHITE, ROOK));
+    std::cout << "White Queen : ";
+    print_vec(AnalyseDevelopment(board, WHITE, QUEEN));
+    std::cout << "White King : ";
+    print_vec(AnalyseDevelopment(board, WHITE, KING));
 
-    print_vec(result);
+    std::cout << "Black Pawn : ";
+    print_vec(AnalyseDevelopment(board, BLACK, PAWN));
+    std::cout << "Black Knight : ";
+    print_vec(AnalyseDevelopment(board, BLACK, KNIGHT));
+    std::cout << "Black BISHOP : ";
+    print_vec(AnalyseDevelopment(board, BLACK, BISHOP));
+    std::cout << "Black Rook : ";
+    print_vec(AnalyseDevelopment(board, BLACK, ROOK));
+    std::cout << "Black Queen : ";
+    print_vec(AnalyseDevelopment(board, BLACK, QUEEN));
+    std::cout << "Black King : ";
+    print_vec(AnalyseDevelopment(board, BLACK, KING));
 
     return 0;
   }
