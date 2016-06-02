@@ -401,6 +401,30 @@ namespace Sayuri {
     board.side_board_[piece_square]));
   }
 
+  // センターのコントロール。
+  ResultSquares AnalyseCenterControl(const Board& board, Square piece_square) {
+    constexpr Bitboard CENTER_BB = Util::SQUARE[C3][R0] | Util::SQUARE[C4][R0]
+    | Util::SQUARE[C5][R0] | Util::SQUARE[C6][R0]
+    | Util::SQUARE[D3][R0] | Util::SQUARE[D4][R0]
+    | Util::SQUARE[D5][R0] | Util::SQUARE[D6][R0]
+    | Util::SQUARE[E3][R0] | Util::SQUARE[E4][R0]
+    | Util::SQUARE[E5][R0] | Util::SQUARE[E6][R0]
+    | Util::SQUARE[F3][R0] | Util::SQUARE[F4][R0]
+    | Util::SQUARE[F5][R0] | Util::SQUARE[F6][R0];
+
+    return BBToResult(GenAttackBB(board, piece_square) & CENTER_BB);
+  }
+
+  // スウィートセンターのコントロール。
+  ResultSquares AnalyseSweetCenterControl(const Board& board,
+  Square piece_square) {
+    constexpr Bitboard CENTER_BB = 
+    Util::SQUARE[D4][R0] | Util::SQUARE[D5][R0]
+    | Util::SQUARE[E4][R0] | Util::SQUARE[E5][R0];
+
+    return BBToResult(GenAttackBB(board, piece_square) & CENTER_BB);
+  }
+
   // 駒の展開を分析する。
   ResultSquares AnalyseDevelopment(const Board& board, Side piece_side,
   PieceType piece_type) {

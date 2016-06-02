@@ -138,8 +138,7 @@ namespace Sayuri {
     engine_ptr->LoadFEN(fen);
     const Board& board = engine_ptr->board();
 
-    print_vec(AnalyseDefensing(board, E4));
-    print_vec(AnalyseDefensed(board, E4));
+    print_vec(AnalyseSweetCenterControl(board, D4));
 
     return 0;
   }

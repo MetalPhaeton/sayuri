@@ -93,6 +93,23 @@ namespace Sayuri {
   ResultSquares AnalyseDefensed(const Board& board, Square piece_square);
 
   /**
+   * センター(C3...F6)コントロールを分析する。
+   * @param board 分析したいボードの構造体。
+   * @param piece_square 分析したい駒の位置。
+   * @return コントロールしているセンターの位置。
+   */
+  ResultSquares AnalyseCenterControl(const Board& board, Square piece_square);
+
+  /**
+   * スウィートセンター(D4 D5 E4 E5)コントロールを分析する。
+   * @param board 分析したいボードの構造体。
+   * @param piece_square 分析したい駒の位置。
+   * @return コントロールしているスウィートセンターの位置。
+   */
+  ResultSquares AnalyseSweetCenterControl(const Board& board,
+  Square piece_square);
+
+  /**
    * 展開を分析する。
    * @param board 分析したいボード。
    * @param piece_side 分析したい駒のサイド。
