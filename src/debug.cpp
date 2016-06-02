@@ -138,7 +138,10 @@ namespace Sayuri {
     engine_ptr->LoadFEN(fen);
     const Board& board = engine_ptr->board();
 
-    print_vec(AnalyseSweetCenterControl(board, D4));
+    for (auto fyle : AnalyseOpenFyle(board)) {
+      std::cout << fyle << " ";
+    }
+    std::cout << std::endl;
 
     return 0;
   }

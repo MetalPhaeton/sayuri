@@ -44,6 +44,9 @@ namespace Sayuri {
   /** 分析結果のマスのベクトル。 */
   using ResultSquares = std::vector<Square>;
 
+  /** 分析結果のマスのベクトル。 */
+  using ResultFyles = std::vector<Fyle>;
+
   /**
    * 駒の違いを分析する。
    * @param board 分析したいボードの構造体。
@@ -108,6 +111,13 @@ namespace Sayuri {
    */
   ResultSquares AnalyseSweetCenterControl(const Board& board,
   Square piece_square);
+
+  /**
+   * オープンファイルを分析する。
+   * @param board 分析したいボードの構造体。
+   * @return オープンファイル。
+   */
+  ResultFyles AnalyseOpenFyle(const Board& board);
 
   /**
    * 展開を分析する。

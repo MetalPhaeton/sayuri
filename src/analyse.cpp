@@ -425,6 +425,22 @@ namespace Sayuri {
     return BBToResult(GenAttackBB(board, piece_square) & CENTER_BB);
   }
 
+  // オープンファイル。
+  ResultFyles AnalyseOpenFyle(const Board& board) {
+    ResultFyles ret;
+
+    Bitboard pawns = board.position_[WHITE][PAWN]
+    | board.position_[BLACK][PAWN];
+
+    FOR_FYLES(fyle) {
+      if (!(Util::FYLE[fyle] & pawns)) {
+        ret.push_back(fyle);
+      }
+    }
+
+    return ret;
+  }
+
   // 駒の展開を分析する。
   ResultSquares AnalyseDevelopment(const Board& board, Side piece_side,
   PieceType piece_type) {
