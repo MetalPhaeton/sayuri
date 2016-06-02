@@ -136,6 +136,15 @@ namespace Sayuri {
    * @return ダブルポーンの位置。
    */
   ResultSquares AnalyseDoublePawn(const Board& board, Side side);
+
+  /**
+   * 孤立ポーンを分析する。
+   * @param board 分析したいボード。
+   * @param side 分析したいサイド。
+   * @return 孤立ポーンの位置。
+   */
+  ResultSquares AnalyseIsoPawn(const Board& board, Side side);
+
 }  // namespace Sayuri
 
 #endif

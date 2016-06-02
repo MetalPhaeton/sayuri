@@ -134,12 +134,12 @@ namespace Sayuri {
       std::cout << std::endl;
     };
 
-    FEN fen("rnbqkbnr/pppppppp/8/p3p3/3P2PP/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    FEN fen("4r1k1/1pq2p1p/5npb/2N5/P1PQn3/3P3P/6B1/B2R2K1 b - - 0 1");
     engine_ptr->LoadFEN(fen);
     const Board& board = engine_ptr->board();
 
-    print_vec(AnalyseDoublePawn(board, WHITE));
-    print_vec(AnalyseDoublePawn(board, BLACK));
+    print_vec(AnalyseIsoPawn(board, WHITE));
+    print_vec(AnalyseIsoPawn(board, BLACK));
 
     return 0;
   }

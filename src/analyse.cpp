@@ -436,4 +436,27 @@ namespace Sayuri {
 
     return BBToResult(result);
   }
+
+  // 孤立ポーン。
+  ResultSquares AnalyseIsoPawn(const Board& board, Side side) {
+    Bitboard pawns = board.position_[side][PAWN];
+
+    Bitboard result = 0;
+    FOR_FYLES(fyle) {
+      Bitboard temp = 0;
+      if (fyle == FYLE_A) {
+        temp = pawns & Util::FYLE[FYLE_B];
+      } else if (fyle == FYLE_H) {
+        temp = pawns & Util::FYLE[FYLE_G];
+      } else {
+        temp = pawns & (Util::FYLE[fyle - 1] | Util::FYLE[fyle + 1]);
+      }
+
+      if (!Util::CountBits(temp)) {
+        result |= pawns & Util::FYLE[fyle];
+      }
+    }
+
+    return BBToResult(result);
+  }
 }  // namespace Sayuri
