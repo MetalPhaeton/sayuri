@@ -376,6 +376,19 @@ namespace Sayuri {
     return BBToResult(GenMobilityBB(board, piece_square));
   }
 
+  // どの駒を攻撃しているか。
+  ResultSquares AnalyseAttacking(const Board& board, Square piece_square) {
+    return BBToResult(GenAttackBB(board, piece_square)
+    & board.side_pieces_
+    [Util::GetOppositeSide(board.side_board_[piece_square])]);
+  }
+
+  // どの駒に攻撃されているか。
+  ResultSquares AnalyseAttacked(const Board& board, Square piece_square) {
+    return BBToResult(IsAttacked(board, piece_square,
+    Util::GetOppositeSide(board.side_board_[piece_square])));
+  }
+
   // 駒の展開を分析する。
   ResultSquares AnalyseDevelopment(const Board& board, Side piece_side,
   PieceType piece_type) {
