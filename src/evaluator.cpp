@@ -238,15 +238,15 @@ namespace Sayuri {
       }
 
       // ピンを計算。
-      // ピンのターゲットと裏駒を作成。
-      Bitboard pin_target = attacks & basic_st.side_pieces_[ENEMY_SIDE];
+      // 相手のビットボードと裏駒を作成。
+      Bitboard enemy_pieces = basic_st.side_pieces_[ENEMY_SIDE];
       Bitboard pin_back = (MetaEvaluator::PIN_BACK_TABLE[square]
       [(basic_st.blocker_[R45] >> Util::MAGIC_SHIFT[square][R45])
       & Util::MAGIC_MASK[square][R45]][R45]
       | MetaEvaluator::PIN_BACK_TABLE[square]
       [(basic_st.blocker_[R135] >> Util::MAGIC_SHIFT[square][R135])
       & Util::MAGIC_MASK[square][R135]][R135])
-      & basic_st.side_pieces_[ENEMY_SIDE];
+      & enemy_pieces;
 
       // ピンを判定。
       for (; pin_back; NEXT_BITBOARD(pin_back)) {
@@ -260,9 +260,9 @@ namespace Sayuri {
         // 「裏駒と自分との間」にターゲット(相手の駒)があった場合。
         // pin_backに対応するターゲットが味方の駒の場合もあるので
         // 相手の駒に限定しなくてはならない。
-        if ((between & pin_target)) {
+        if ((between & enemy_pieces)) {
           evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_[BISHOP]
-          [basic_st.piece_board_[Util::GetSquare(between & pin_target)]]
+          [basic_st.piece_board_[Util::GetSquare(between & enemy_pieces)]]
           [basic_st.piece_board_[pin_back_sq]];
         }
       }
@@ -290,15 +290,15 @@ namespace Sayuri {
       }
 
       // ピンを計算。
-      // ピンのターゲットと裏駒を作成。
-      Bitboard pin_target = attacks & basic_st.side_pieces_[ENEMY_SIDE];
+      // 相手の駒と裏駒を作成。
+      Bitboard enemy_pieces = basic_st.side_pieces_[ENEMY_SIDE];
       Bitboard pin_back = (MetaEvaluator::PIN_BACK_TABLE[square]
       [(basic_st.blocker_[R0] >> Util::MAGIC_SHIFT[square][R0])
       & Util::MAGIC_MASK[square][R0]][R0]
       | MetaEvaluator::PIN_BACK_TABLE[square]
       [(basic_st.blocker_[R90] >> Util::MAGIC_SHIFT[square][R90])
       & Util::MAGIC_MASK[square][R90]][R90])
-      & basic_st.side_pieces_[ENEMY_SIDE];
+      & enemy_pieces;
 
       // ピンを判定。
       for (; pin_back; NEXT_BITBOARD(pin_back)) {
@@ -312,9 +312,9 @@ namespace Sayuri {
         // 「裏駒と自分との間」にターゲット(相手の駒)があった場合。
         // pin_backに対応するターゲットが味方の駒の場合もあるので
         // 相手の駒に限定しなくてはならない。
-        if ((between & pin_target)) {
+        if ((between & enemy_pieces)) {
           evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_[ROOK]
-          [basic_st.piece_board_[Util::GetSquare(between & pin_target)]]
+          [basic_st.piece_board_[Util::GetSquare(between & enemy_pieces)]]
           [basic_st.piece_board_[pin_back_sq]];
         }
       }
@@ -340,9 +340,8 @@ namespace Sayuri {
       }
 
       // ピンを計算。
-      // ピンのターゲットと裏駒を作成。
-      Bitboard pin_target =
-      attacks & basic_st.side_pieces_[ENEMY_SIDE];
+      // 相手の駒と裏駒を作成。
+      Bitboard enemy_pieces = basic_st.side_pieces_[ENEMY_SIDE];
       Bitboard pin_back = (MetaEvaluator::PIN_BACK_TABLE[square]
       [(basic_st.blocker_[R0] >> Util::MAGIC_SHIFT[square][R0])
       & Util::MAGIC_MASK[square][R0]][R0]
@@ -355,7 +354,7 @@ namespace Sayuri {
       | MetaEvaluator::PIN_BACK_TABLE[square]
       [(basic_st.blocker_[R135] >> Util::MAGIC_SHIFT[square][R135])
       & Util::MAGIC_MASK[square][R135]][R135])
-      & basic_st.side_pieces_[ENEMY_SIDE];
+      & enemy_pieces;
 
       // ピンを判定。
       for (; pin_back; NEXT_BITBOARD(pin_back)) {
@@ -369,9 +368,9 @@ namespace Sayuri {
         // 「裏駒と自分との間」にターゲット(相手の駒)があった場合。
         // pin_backに対応するターゲットが味方の駒の場合もあるので
         // 相手の駒に限定しなくてはならない。
-        if ((between & pin_target)) {
+        if ((between & enemy_pieces)) {
           evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_[QUEEN]
-          [basic_st.piece_board_[Util::GetSquare(between & pin_target)]]
+          [basic_st.piece_board_[Util::GetSquare(between & enemy_pieces)]]
           [basic_st.piece_board_[pin_back_sq]];
         }
       }

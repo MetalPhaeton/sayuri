@@ -144,12 +144,10 @@ namespace Sayuri {
       std::cout << std::endl;
     };
 
-    FEN fen("rnbqkbnr/pppPpppp/8/1b1r1q2/8/8/PPPpPPPP/RNBQKBNR w KQkq - 0 1");
+    FEN fen("rnbqkbnr/pppPpppp/8/1Q1BQr2/8/8/PPPpPPPP/RNBQKBNR w KQkq - 0 1");
     engine_ptr->LoadFEN(fen);
     const Board& board = engine_ptr->board();
 
-    print_pin(AnalysePinSkewer(board, B5));
-    print_pin(AnalysePinSkewer(board, D5));
     print_pin(AnalysePinSkewer(board, F5));
 
     return 0;
