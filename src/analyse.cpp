@@ -39,6 +39,7 @@
 #include <memory>
 #include "common.h"
 #include "board.h"
+#include "evaluator_extra.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -538,5 +539,88 @@ namespace Sayuri {
     }
 
     return BBToResult(result);
+  }
+
+  // ピン、スキュワー。
+  ResultPinSkewer AnalysePinSkewer(const Board& board, Square piece_square) {
+    ResultPinSkewer ret;
+
+    // 駒のサイドと種類。
+    Side piece_side = board.side_board_[piece_square];
+    PieceType piece_type = board.piece_board_[piece_square];
+
+    // 相手の駒。
+    Bitboard enemy_pieces =
+    board.side_pieces_[Util::GetOppositeSide(piece_side)];
+
+    // ピンバックのビットボードを得る。
+    Bitboard pin_back = 0;
+    switch (piece_type) {
+      case BISHOP:
+        pin_back |= MetaEvaluator::PIN_BACK_TABLE[piece_square]
+        [(board.blocker_[R45] >> Util::MAGIC_SHIFT[piece_square][R45])
+        & Util::MAGIC_MASK[piece_square][R45]]
+        [R45];
+
+        pin_back |= MetaEvaluator::PIN_BACK_TABLE[piece_square]
+        [(board.blocker_[R135] >> Util::MAGIC_SHIFT[piece_square][R135])
+        & Util::MAGIC_MASK[piece_square][R135]]
+        [R135];
+
+        break;
+      case ROOK:
+        pin_back |= MetaEvaluator::PIN_BACK_TABLE[piece_square]
+        [(board.blocker_[R0] >> Util::MAGIC_SHIFT[piece_square][R0])
+        & Util::MAGIC_MASK[piece_square][R0]]
+        [R0];
+
+        pin_back |= MetaEvaluator::PIN_BACK_TABLE[piece_square]
+        [(board.blocker_[R90] >> Util::MAGIC_SHIFT[piece_square][R90])
+        & Util::MAGIC_MASK[piece_square][R90]]
+        [R90];
+
+        break;
+      case QUEEN:
+        pin_back |= MetaEvaluator::PIN_BACK_TABLE[piece_square]
+        [(board.blocker_[R0] >> Util::MAGIC_SHIFT[piece_square][R0])
+        & Util::MAGIC_MASK[piece_square][R0]]
+        [R0];
+
+        pin_back |= MetaEvaluator::PIN_BACK_TABLE[piece_square]
+        [(board.blocker_[R45] >> Util::MAGIC_SHIFT[piece_square][R45])
+        & Util::MAGIC_MASK[piece_square][R45]]
+        [R45];
+
+        pin_back |= MetaEvaluator::PIN_BACK_TABLE[piece_square]
+        [(board.blocker_[R90] >> Util::MAGIC_SHIFT[piece_square][R90])
+        & Util::MAGIC_MASK[piece_square][R90]]
+        [R90];
+
+        pin_back |= MetaEvaluator::PIN_BACK_TABLE[piece_square]
+        [(board.blocker_[R135] >> Util::MAGIC_SHIFT[piece_square][R135])
+        & Util::MAGIC_MASK[piece_square][R135]]
+        [R135];
+
+        break;
+    }
+
+    // 相手の駒でマスク。
+    pin_back &= enemy_pieces;
+
+    // ピンバックと自分との間が敵ならピン、またはスキュワー。
+    for (; pin_back; NEXT_BITBOARD(pin_back)) {
+      Square pin_back_square = Util::GetSquare(pin_back);
+      Bitboard between = Util::GetBetween(piece_square, pin_back_square);
+
+      if ((between & enemy_pieces)) {
+        Square target_square = Util::GetSquare(between & enemy_pieces);
+
+        ret.push_back(std::array<Square, 2> {
+          {target_square, pin_back_square}
+        });
+      }
+    }
+
+    return ret;
   }
 }  // namespace Sayuri

@@ -126,20 +126,31 @@ namespace Sayuri {
 
     // ========================================================================
 
-    auto print_vec = [](const std::vector<Square>& vec) {
-      for (auto square : vec) {
-        std::cout << static_cast<char>('A' + Util::SquareToFyle(square))
-        << static_cast<char>('1' + Util::SquareToRank(square)) << " ";
+//    auto print_vec = [](const std::vector<Square>& vec) {
+//      for (auto square : vec) {
+//        std::cout << static_cast<char>('A' + Util::SquareToFyle(square))
+//        << static_cast<char>('1' + Util::SquareToRank(square)) << " ";
+//      }
+//      std::cout << std::endl;
+//    };
+    auto print_pin = [](const ResultPinSkewer& result) {
+      for (auto& array : result) {
+        std::cout << "("
+        << static_cast<char>('A' + Util::SquareToFyle(array[0]))
+        << static_cast<char>('1' + Util::SquareToRank(array[0])) << " ";
+        std::cout << static_cast<char>('A' + Util::SquareToFyle(array[1]))
+        << static_cast<char>('1' + Util::SquareToRank(array[1])) << ") ";
       }
       std::cout << std::endl;
     };
 
-    FEN fen("4r1k1/2q2p1p/5npb/2N5/PpPQn3/3P3P/6B1/B2R2K1 b - - 0 1");
+    FEN fen("rnbqkbnr/pppPpppp/8/1b1r1q2/8/8/PPPpPPPP/RNBQKBNR w KQkq - 0 1");
     engine_ptr->LoadFEN(fen);
     const Board& board = engine_ptr->board();
 
-    print_vec(AnalysePassPawn(board, WHITE));
-    print_vec(AnalysePassPawn(board, BLACK));
+    print_pin(AnalysePinSkewer(board, B5));
+    print_pin(AnalysePinSkewer(board, D5));
+    print_pin(AnalysePinSkewer(board, F5));
 
     return 0;
   }

@@ -47,6 +47,9 @@ namespace Sayuri {
   /** 分析結果のマスのベクトル。 */
   using ResultFyles = std::vector<Fyle>;
 
+  /** ピンの結果のベクトル。 (ターゲット, 裏駒) */
+  using ResultPinSkewer = std::vector<std::array<Square, 2>>;
+
   /**
    * 駒の違いを分析する。
    * @param board 分析したいボードの構造体。
@@ -152,6 +155,14 @@ namespace Sayuri {
    * @return パスポーンの位置。
    */
   ResultSquares AnalysePassPawn(const Board& board, Side side);
+
+  /**
+   * ピン/スキュワーを分析する。
+   * @param board 分析したいボードの構造体。
+   * @param piece_square 分析したい駒の位置。
+   * @return ピンのターゲットとピンの裏駒の位置。
+   */
+  ResultPinSkewer AnalysePinSkewer(const Board& board, Square piece_square);
 }  // namespace Sayuri
 
 #endif
