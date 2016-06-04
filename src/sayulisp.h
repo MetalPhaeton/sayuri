@@ -637,6 +637,48 @@ namespace Sayuri {
       /** スレッド数を設定する。 */
       DEF_MESSAGE_FUNCTION(SetThreads);
 
+      /** 駒の差を分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalyseDiff);
+
+      /** 機動力を分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalyseMobility);
+
+      /** 攻撃している駒を分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalyseAttacking);
+
+      /** 自分がどの駒に攻撃されているか分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalyseAttacked);
+
+      /** 守っている駒を分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalyseDefensing);
+
+      /** 自分がどの駒に守られているか分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalyseDefensed);
+
+      /** センターのコントロールを分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalyseCenterControl);
+
+      /** スウィートセンターのコントロールを分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalyseSweetCenterControl);
+
+      /** オープンファイルを分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalyseOpenFyle);
+
+      /** 駒の展開を分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalyseDevelopment);
+
+      /** ダブルポーンを分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalyseDoublePawn);
+
+      /** 孤立ポーンを分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalyseIsoPawn);
+
+      /** パスポーンを分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalysePassPawn);
+
+      /** ピン、スキュワーを分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalysePinSkewer);
+
       /** マテリアルを設定する。 */
       DEF_MESSAGE_FUNCTION(SetMaterial);
 

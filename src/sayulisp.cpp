@@ -50,6 +50,7 @@
 #include "position_record.h"
 #include "pv_line.h"
 #include "pgn.h"
+#include "analyse.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -3985,6 +3986,48 @@ R"...(### to-fen-position ###
     message_func_map_["@set-threads"] =
     INSERT_MESSAGE_FUNCTION(SetThreads);
 
+    message_func_map_["@analyse-diff"] =
+    INSERT_MESSAGE_FUNCTION(AnalyseDiff);
+
+    message_func_map_["@analyse-mobility"] =
+    INSERT_MESSAGE_FUNCTION(AnalyseMobility);
+
+    message_func_map_["@analyse-attacking"] =
+    INSERT_MESSAGE_FUNCTION(AnalyseAttacking);
+
+    message_func_map_["@analyse-attacked"] =
+    INSERT_MESSAGE_FUNCTION(AnalyseAttacked);
+
+    message_func_map_["@analyse-defensing"] =
+    INSERT_MESSAGE_FUNCTION(AnalyseDefensing);
+
+    message_func_map_["@analyse-defensed"] =
+    INSERT_MESSAGE_FUNCTION(AnalyseDefensed);
+
+    message_func_map_["@analyse-center-control"] =
+    INSERT_MESSAGE_FUNCTION(AnalyseCenterControl);
+
+    message_func_map_["@analyse-sweet-center-control"] =
+    INSERT_MESSAGE_FUNCTION(AnalyseSweetCenterControl);
+
+    message_func_map_["@analyse-open-fyle"] =
+    INSERT_MESSAGE_FUNCTION(AnalyseOpenFyle);
+
+    message_func_map_["@analyse-development"] =
+    INSERT_MESSAGE_FUNCTION(AnalyseDevelopment);
+
+    message_func_map_["@analyse-double-pawn"] =
+    INSERT_MESSAGE_FUNCTION(AnalyseDoublePawn);
+
+    message_func_map_["@analyse-iso-pawn"] =
+    INSERT_MESSAGE_FUNCTION(AnalyseIsoPawn);
+
+    message_func_map_["@analyse-pass-pawn"] =
+    INSERT_MESSAGE_FUNCTION(AnalysePassPawn);
+
+    message_func_map_["@analyse-pin/skewer"] =
+    INSERT_MESSAGE_FUNCTION(AnalysePinSkewer);
+
     message_func_map_["@material"] =
     INSERT_MESSAGE_FUNCTION(SetMaterial);
 
@@ -5055,6 +5098,342 @@ R"...(### to-fen-position ###
 
     // スレッド数を更新。
     shell_ptr_->num_threads(threads);
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-diff
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalyseDiff) {
+    LPointer ret_ptr = Lisp::NewList(NUM_PIECE_TYPES);
+    LObject* ptr = ret_ptr.get();
+
+    // EMPTY。
+    ptr->car(Lisp::NewNumber(0));
+    Lisp::Next(&ptr);
+    for (PieceType piece_type = PAWN; ptr->IsPair();
+    Lisp::Next(&ptr), ++piece_type) {
+      ptr->car(Lisp::NewNumber(Sayuri::AnalyseDiff(*board_ptr_, piece_type)));
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-mobility
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalyseMobility) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 駒の位置を得る。
+    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSquare(*square_ptr);
+
+    // 分析結果を得る。
+    ResultSquares result =
+    Sayuri::AnalyseMobility(*board_ptr_, square_ptr->number());
+
+    // 分析結果をリストにする。
+    LPointer ret_ptr = Lisp::NewList(result.size());
+    LObject* ptr = ret_ptr.get();
+    for (auto square : result) {
+      ptr->car(Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[square]));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-attacking
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalyseAttacking) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 駒の位置を得る。
+    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSquare(*square_ptr);
+
+    // 分析結果を得る。
+    ResultSquares result =
+    Sayuri::AnalyseAttacking(*board_ptr_, square_ptr->number());
+
+    // 分析結果をリストにする。
+    LPointer ret_ptr = Lisp::NewList(result.size());
+    LObject* ptr = ret_ptr.get();
+    for (auto square : result) {
+      ptr->car(Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[square]));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-attacked
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalyseAttacked) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 駒の位置を得る。
+    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSquare(*square_ptr);
+
+    // 分析結果を得る。
+    ResultSquares result =
+    Sayuri::AnalyseAttacked(*board_ptr_, square_ptr->number());
+
+    // 分析結果をリストにする。
+    LPointer ret_ptr = Lisp::NewList(result.size());
+    LObject* ptr = ret_ptr.get();
+    for (auto square : result) {
+      ptr->car(Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[square]));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-defensing
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalyseDefensing) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 駒の位置を得る。
+    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSquare(*square_ptr);
+
+    // 分析結果を得る。
+    ResultSquares result =
+    Sayuri::AnalyseDefensing(*board_ptr_, square_ptr->number());
+
+    // 分析結果をリストにする。
+    LPointer ret_ptr = Lisp::NewList(result.size());
+    LObject* ptr = ret_ptr.get();
+    for (auto square : result) {
+      ptr->car(Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[square]));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-defensed
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalyseDefensed) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 駒の位置を得る。
+    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSquare(*square_ptr);
+
+    // 分析結果を得る。
+    ResultSquares result =
+    Sayuri::AnalyseDefensed(*board_ptr_, square_ptr->number());
+
+    // 分析結果をリストにする。
+    LPointer ret_ptr = Lisp::NewList(result.size());
+    LObject* ptr = ret_ptr.get();
+    for (auto square : result) {
+      ptr->car(Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[square]));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-center-control
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalyseCenterControl) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 駒の位置を得る。
+    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSquare(*square_ptr);
+
+    // 分析結果を得る。
+    ResultSquares result =
+    Sayuri::AnalyseCenterControl(*board_ptr_, square_ptr->number());
+
+    // 分析結果をリストにする。
+    LPointer ret_ptr = Lisp::NewList(result.size());
+    LObject* ptr = ret_ptr.get();
+    for (auto square : result) {
+      ptr->car(Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[square]));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-sweet-center-control
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalyseSweetCenterControl) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 駒の位置を得る。
+    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSquare(*square_ptr);
+
+    // 分析結果を得る。
+    ResultSquares result =
+    Sayuri::AnalyseSweetCenterControl(*board_ptr_, square_ptr->number());
+
+    // 分析結果をリストにする。
+    LPointer ret_ptr = Lisp::NewList(result.size());
+    LObject* ptr = ret_ptr.get();
+    for (auto square : result) {
+      ptr->car(Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[square]));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-open-fyle
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalyseOpenFyle) {
+    ResultFyles result = Sayuri::AnalyseOpenFyle(*board_ptr_);
+
+    LPointer ret_ptr = Lisp::NewList(result.size());
+    LObject* ptr = ret_ptr.get();
+
+    for (auto fyle : result) {
+      ptr->car(Lisp::NewSymbol(Sayulisp::FYLE_MAP_INV[fyle]));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-development
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalyseDevelopment) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 駒を得る。
+    LPointer piece_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckPiece(*piece_ptr);
+
+    // 結果を得る。
+    ResultSquares result =
+    Sayuri::AnalyseDevelopment(*board_ptr_, piece_ptr->car()->number(),
+    piece_ptr->cdr()->car()->number());
+
+    // 分析結果をリストにする。
+    LPointer ret_ptr = Lisp::NewList(result.size());
+    LObject* ptr = ret_ptr.get();
+    for (auto square : result) {
+      ptr->car(Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[square]));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-double-pawn
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalyseDoublePawn) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // サイドを得る。
+    LPointer side_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSide(*side_ptr);
+
+    // 結果を得る。
+    ResultSquares result =
+    Sayuri::AnalyseDoublePawn(*board_ptr_, side_ptr->number());
+
+    // 分析結果をリストにする。
+    LPointer ret_ptr = Lisp::NewList(result.size());
+    LObject* ptr = ret_ptr.get();
+    for (auto square : result) {
+      ptr->car(Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[square]));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-iso-pawn
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalyseIsoPawn) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // サイドを得る。
+    LPointer side_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSide(*side_ptr);
+
+    // 結果を得る。
+    ResultSquares result =
+    Sayuri::AnalyseIsoPawn(*board_ptr_, side_ptr->number());
+
+    // 分析結果をリストにする。
+    LPointer ret_ptr = Lisp::NewList(result.size());
+    LObject* ptr = ret_ptr.get();
+    for (auto square : result) {
+      ptr->car(Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[square]));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-pass-pawn
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalysePassPawn) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // サイドを得る。
+    LPointer side_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSide(*side_ptr);
+
+    // 結果を得る。
+    ResultSquares result =
+    Sayuri::AnalysePassPawn(*board_ptr_, side_ptr->number());
+
+    // 分析結果をリストにする。
+    LPointer ret_ptr = Lisp::NewList(result.size());
+    LObject* ptr = ret_ptr.get();
+    for (auto square : result) {
+      ptr->car(Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[square]));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-pin/skewer
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalysePinSkewer) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // マスを得る。
+    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSquare(*square_ptr);
+
+    // 結果を得る。
+    ResultPinSkewer result =
+    Sayuri::AnalysePinSkewer(*board_ptr_, square_ptr->number());
+
+    // 分析結果をリストにする。
+    LPointer ret_ptr = Lisp::NewList(result.size());
+    LObject* ptr = ret_ptr.get();
+    for (auto array : result) {
+      ptr->car(Lisp::NewPair(
+      Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[array[0]]),
+      Lisp::NewPair(Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[array[1]]),
+      Lisp::NewNil())));
+
+      Lisp::Next(&ptr);
+    }
 
     return ret_ptr;
   }
