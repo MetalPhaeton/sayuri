@@ -15,8 +15,8 @@
 </header>
 <div class="root_div">
 <section class="main_contents">
-<h1>README</h1>
-<h2>Sayuri is ...</h2>
+<h1 id="readme">README</h1>
+<h2 id="sayuri-is">Sayuri is ...</h2>
 <ul>
 <li>A chess engine for UCI.</li>
 <li>MIT License software.</li>
@@ -29,8 +29,8 @@
 </ul>
 </li>
 </ul>
-<h2>Files and Directories</h2>
-<h3>Directories</h3>
+<h2 id="files-and-directories">Files and Directories</h2>
+<h3 id="directories">Directories</h3>
 <ul>
 <li>src : Source files.</li>
 <li>SayuriCompiled : Binary files.<ul>
@@ -50,16 +50,16 @@
 <li>DocumentsHTML : Documents.</li>
 <li>Tools : Convenient tools.</li>
 </ul>
-<h3>Files</h3>
+<h3 id="files">Files</h3>
 <ul>
 <li>README.md : README file.</li>
 <li>CMakeLists.txt : A configuration file for CMake.</li>
 <li>LICENSE : The software license.</li>
 </ul>
-<h2>How To Build with CMake</h2>
+<h2 id="how-to-build-with-cmake">How To Build with CMake</h2>
 <p>Using CMake, you can build Sayuri easily.</p>
 <p>It's default compiler is <em>"clang++"</em>.  </p>
-<h3>Build for Release</h3>
+<h3 id="build-for-release">Build for Release</h3>
 <ol>
 <li>Change directory to where "CMakeLists.txt" is placed in.</li>
 <li>Run the following commands.<ol>
@@ -75,7 +75,7 @@
 </li>
 <li><em>"sayuri"</em> is built.</li>
 </ol>
-<h3>Build for Debug</h3>
+<h3 id="build-for-debug">Build for Debug</h3>
 <p>"for Debug" means <em>"No Optimize"</em> and <em>"Embedded Debug Information"</em>.</p>
 <ol>
 <li>Change directory to where "CMakeLists.txt" is placed in.</li>
@@ -92,7 +92,7 @@
 </li>
 <li><em>"sayuri"</em> is built.</li>
 </ol>
-<h2>How To Build without CMake</h2>
+<h2 id="how-to-build-without-cmake">How To Build without CMake</h2>
 <p>If you don't have CMake, you can build "sayuri" by the following commands
 in "src" directory.</p>
 <p>If you have "clang" :</p>
@@ -101,7 +101,7 @@ in "src" directory.</p>
 <p>If you have "gcc" :</p>
 <pre><code>g++ -std=c++11 -fno-rtti -Ofast -march=native -pthread -o sayuri *.cpp
 </code></pre>
-<h2>How To Make Distributable Packages</h2>
+<h2 id="how-to-make-distributable-packages">How To Make Distributable Packages</h2>
 <p>After building Sayuri with CMake, run "<code>$ make dist</code>" command.</p>
 <p>The following packages will be created.</p>
 <ul>
@@ -110,7 +110,7 @@ in "src" directory.</p>
 <li>sayuri-xxxx.xx.xx.tar.gz</li>
 </ul>
 <p>(Note: "xxxx.xx.xx" is the version number.)</p>
-<h2>Use as Library</h2>
+<h2 id="use-as-library">Use as Library</h2>
 <p>Sayuri's source code can be used as library.</p>
 <p>The Library has only one function.</p>
 <pre><code>extern "C"
@@ -155,7 +155,7 @@ sayulisp.argtype = (c_cahr_p)
 # Go.
 print(sayulisp(b"(+ 1 2 3)"))
 </code></pre>
-<h2>UCI Options</h2>
+<h2 id="uci-options">UCI Options</h2>
 <ul>
 <li>
 <p>To change size of the hash table. (Default: 1 MB, Max: 8192 MB, Min: 1 MB)</p>

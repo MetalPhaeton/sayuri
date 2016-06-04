@@ -15,9 +15,9 @@
 </header>
 <div class="root_div">
 <section class="main_contents">
-<h1>Chess Engine Functions</h1>
+<h1 id="chess-engine-functions">Chess Engine Functions</h1>
 <p><a href="sayulisp.html">&gt;&gt;Back to Sayulisp page</a></p>
-<h2>Contents</h2>
+<h2 id="contents">Contents</h2>
 <ul>
 <li>
 <p><a href="#constant-values">Constant Values</a></p>
@@ -67,8 +67,8 @@
 </li>
 </ul>
 <hr />
-<h2>Constant Values</h2>
-<h3>Squares</h3>
+<h2 id="constant-values">Constant Values</h2>
+<h3 id="squares">Squares</h3>
 <ul>
 <li><code>A1</code> : Number. It indicates A1 square. Value is '0'.</li>
 <li><code>B1</code> : Number. It indicates B1 square. Value is '1'.</li>
@@ -135,7 +135,7 @@
 <li><code>G8</code> : Number. It indicates G8 square. Value is '62'.</li>
 <li><code>H8</code> : Number. It indicates H8 square. Value is '63'.</li>
 </ul>
-<h3>Fyles</h3>
+<h3 id="fyles">Fyles</h3>
 <ul>
 <li><code>FYLE_A</code> : Number. It indicates A-Fyle. Value is '0'.</li>
 <li><code>FYLE_B</code> : Number. It indicates B-Fyle. Value is '1'.</li>
@@ -146,7 +146,7 @@
 <li><code>FYLE_G</code> : Number. It indicates G-Fyle. Value is '6'.</li>
 <li><code>FYLE_H</code> : Number. It indicates H-Fyle. Value is '7'.</li>
 </ul>
-<h3>Ranks</h3>
+<h3 id="ranks">Ranks</h3>
 <ul>
 <li><code>RANK_1</code> : Number. It indicates 1st rank. Value is '0'.</li>
 <li><code>RANK_2</code> : Number. It indicates 2nd rank. Value is '1'.</li>
@@ -157,13 +157,13 @@
 <li><code>RANK_7</code> : Number. It indicates 7th rank. Value is '6'.</li>
 <li><code>RANK_8</code> : Number. It indicates 8th rank. Value is '7'.</li>
 </ul>
-<h3>Sides</h3>
+<h3 id="sides">Sides</h3>
 <ul>
 <li><code>NO_SIDE</code> : Number. It indicates neither of sides. Value is '0'.</li>
 <li><code>WHITE</code> : Number. It indicates White. Value is '1'.</li>
 <li><code>BLACK</code> : Number. It indicates Black. Value is '2'.</li>
 </ul>
-<h3>Piece Types</h3>
+<h3 id="piece-types">Piece Types</h3>
 <ul>
 <li><code>EMPTY</code> : Number. It indicates no piece. Value is '0'.</li>
 <li><code>PAWN</code> : Number. It indicates Pawn. Value is '1'.</li>
@@ -173,7 +173,7 @@
 <li><code>QUEEN</code> : Number. It indicates Queen. Value is '5'.</li>
 <li><code>KING</code> : Number. It indicates King. Value is '6'.</li>
 </ul>
-<h3>Castling</h3>
+<h3 id="castling">Castling</h3>
 <ul>
 <li><code>NO_CASTLING</code> : Number. It indicates no one to castle. Value is '0'.</li>
 <li><code>WHITE_SHORT_CASTLING</code> : Number.
@@ -185,8 +185,8 @@
 <li><code>BLACK_LONG_CASTLING</code> : Number.
   It indicates Black's Long Castling. Value is '4'.</li>
 </ul>
-<h2>Engine Functions</h2>
-<h3>gen-engine</h3>
+<h2 id="engine-functions">Engine Functions</h2>
+<h3 id="gen-engine">gen-engine</h3>
 <h6> Usage </h6>
 
 <ol>
@@ -250,8 +250,8 @@
 ;; &gt;     ;; Output
 ;; &gt;     ;; &gt; (A2 B2 C2 D2 E2 F2 G2 H2)
 </code></pre>
-<h2>PGN Functions</h2>
-<h3>gen-pgn</h3>
+<h2 id="pgn-functions">PGN Functions</h2>
+<h3 id="gen-pgn">gen-pgn</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -375,8 +375,8 @@
 ;; &gt; (("Black" "Hanako Yamada") ("Site" "Japan")
 ;; &gt; ("White" "Hironori Ishibashi"))
 </code></pre>
-<h2>Utility Functions</h2>
-<h3>sayuri-license</h3>
+<h2 id="utility-functions">Utility Functions</h2>
+<h3 id="sayuri-license">sayuri-license</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -673,7 +673,7 @@
 ;; &gt; (NO_CASTLING WHITE_SHORT_CASTLING (WHITE_LONG_CASTLING
 ;; &gt; (BLACK_SHORT_CASTLING BLACK_LONG_CASTLING "Hello") 5) 100)
 </code></pre>
-<h3>parse-fen/epd</h3>
+<h3 id="parse-fenepd">parse-fen/epd</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -715,7 +715,7 @@
 ;; &gt; (BLACK BISHOP) (BLACK KNIGHT) (BLACK ROOK)))
 ;; &gt; ("fen to_move" BLACK))
 </code></pre>
-<h3>to-fen-position</h3>
+<h3 id="to-fen-position">to-fen-position</h3>
 <h6> Usage </h6>
 
 <ul>

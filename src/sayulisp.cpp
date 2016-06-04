@@ -2327,6 +2327,161 @@ R"...(### Hash and threads ###
     AddHelp("engine @set-threads", help);
 
     help =
+R"...(### Analyse Position ###
+
+* `@analyse-diff`
+    + Returns List of difference of pieces.
+        - 1st : Empty (It is always 0)
+        - 2nd : Difference of Pawns
+        - 3rd : Difference of Knights
+        - 4th : Difference of Bishops
+        - 5th : Difference of Rooks
+        - 6th : Difference of Queens
+        - 7th : Difference of Kings
+    + If the element is '0', each side has same number of the pieces.
+    + If the element is a positive number, White has them more than Black's.
+    + If the element is a negative number, Black has them more than White's.
+
+* `@analyse-mobility <Piece square : Number>`
+    + Returns List of squares that the piece on `<Piece square>` can move to.
+
+* `@analyse-attacking <Piece square : Number>`
+    + Returns List of squares of pieces that
+      the piece on `<Piece square>` is attacking.
+
+* `@analyse-attacked <Piece square : Number>`
+    + Returns List of squares of pieces that
+      the piece on `<Piece square>` is attacked by.
+
+* `@analyse-defensing <Piece square : Number>`
+    + Returns List of squares of pieces that
+      the piece on `<Piece square>` is defensing.
+
+* `@analyse-defensed <Piece square : Number>`
+    + Returns List of squares of pieces that
+      the piece on `<Piece square>` is defensed by.
+
+* `@analyse-center-control <Piece square : Number>`
+    + Returns List of Center squares that
+      the piece on `<Piece square>` attacks.
+
+* `@analyse-sweet-center-control <Piece square : Number>`
+    + Returns List of Sweet Center squares that
+      the piece on `<Piece square>` attacks.
+
+* `@analyse-open-fyle`
+    + Returns List of open fyles.
+
+* `@analyse-development (<Piece side : Number> <Piece type : Number>)`
+    + Returns List of squares that the developed(Not on starting position)
+      `(<Piece side> <Piece type>)` on.
+
+* `@analyse-double-pawn <Side : Number>`
+    + Returns List of squares that Double Pawns of `<Side>` on.
+
+* `@analyse-iso-pawn <Side : Number>`
+    + Returns List of squares that Isolated Pawns of `<Side>` on.
+
+* `@analyse-pass-pawn <Side : Number>`
+    + Returns List of squares that Pass Pawns of `<Side>` on.
+
+* `@analyse-pin/skewer <Piece square : Number>`
+    + Returns List of Lists of piece squares that is pinned/skewered.
+        - 1st : Square of attacked enemy piece directly by `<Piece square>`.
+        - 2nd : Piece square over the attacked piece.
+    + If `<Piece square>` is Bishop, Rook or Queen, this function is effective.
+      Otherwise it always returns Nil.
+
+
+<h6> Example </h6>
+
+    ;; Set position.
+    ;;  +-----------------+
+    ;; 8| . . . . k . . r |
+    ;; 7| . b . . . . . . |
+    ;; 6| . . . . . n . . |
+    ;; 5| q . . . . r . p |
+    ;; 4| . . . . . . p P |
+    ;; 3| . P B . . N . P |
+    ;; 2| P . . . . . . . |
+    ;; 1| . N R . K . . R |
+    ;;  +-----------------+
+    ;;    a b c d e f g h
+    (define fen "4k2r/1b6/5n2/q4r1p/6pP/1PB2N1P/P7/1NR1K2R w Kk - 0 1")
+    (define engine (gen-engine))
+    (engine '@set-fen fen)
+    
+    (display (engine '@analyse-diff))
+    ;; Output
+    ;; > (0 2 1 0 0 -1 0)
+    
+    (display (engine '@analyse-mobility F3))
+    ;; Output
+    ;; > (G1 D2 H2 D4 E5 G5)
+    
+    (display (engine '@analyse-attacking C3))
+    ;; Output
+    ;; > (A5 F6)
+    
+    (display (engine '@analyse-attacked F3))
+    ;; Output
+    ;; > (G4 F5 B7)
+    
+    (display (engine '@analyse-defensing C1))
+    ;; Output
+    ;; > (B1 E1 C3)
+    
+    (display (engine '@analyse-defensed C3))
+    ;; Output
+    ;; > (B1 C1)
+    
+    (display (engine '@analyse-center-control C3))
+    ;; Output
+    ;; > (D4 E5 F6)
+    
+    (display (engine '@analyse-sweet-center-control C3))
+    ;; Output
+    ;; > (D4 E5)
+    
+    (display (engine '@analyse-open-fyle))
+    ;; Output
+    ;; > (FYLE_C FYLE_D FYLE_E FYLE_F)
+    
+    (display (engine '@analyse-development (list WHITE ROOK)))
+    ;; Output
+    ;; > (C1)
+    
+    (display (engine '@analyse-double-pawn WHITE))
+    ;; Output
+    ;; > (H3 H4)
+    
+    (display (engine '@analyse-iso-pawn WHITE))
+    ;; Output
+    ;; > (H3 H4)
+    
+    (display (engine '@analyse-pass-pawn WHITE))
+    ;; Output
+    ;; > (A2 B3)
+    
+    (display (engine '@analyse-pin/skewer C3))
+    ;; Output
+    ;; > ((F6 H8)))...";
+    AddHelp("engine @analyse-diff", help);
+    AddHelp("engine @analyse-mobility", help);
+    AddHelp("engine @analyse-attacking", help);
+    AddHelp("engine @analyse-attacked", help);
+    AddHelp("engine @analyse-defensing", help);
+    AddHelp("engine @analyse-defensed", help);
+    AddHelp("engine @analyse-center-control", help);
+    AddHelp("engine @analyse-sweet-center-control", help);
+    AddHelp("engine @analyse-open-fyle", help);
+    AddHelp("engine @analyse-development", help);
+    AddHelp("engine @analyse-double-pawn", help);
+    AddHelp("engine @analyse-iso-pawn", help);
+    AddHelp("engine @analyse-pass-pawn", help);
+    AddHelp("engine @analyse-pin/skewer", help);
+
+    help =
 R"...(### Customizing Search Algorithm - Material ###
 
 * `@material [<New materal : List>]`

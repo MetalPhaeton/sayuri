@@ -15,14 +15,14 @@
 </header>
 <div class="root_div">
 <section class="main_contents">
-<h1>Message Symbols of Engine Object</h1>
+<h1 id="message-symbols-of-engine-object">Message Symbols of Engine Object</h1>
 <p>"Message Symbol" is a symbol to operate a chess engine object.  </p>
 <ol>
 <li>Generate a chess engine object by <code>(gen-engine)</code> function.</li>
 <li>Use the engine object as function and give "Message Symbol"
    to its 1st argument.</li>
 </ol>
-<h2>Contents</h2>
+<h2 id="contents">Contents</h2>
 <ul>
 <li><a href="#getting-squares">Getting squares</a></li>
 <li><a href="#getting-pieces">Getting pieces</a></li>
@@ -35,6 +35,7 @@
 <li><a href="#uci-command">UCI Command</a></li>
 <li><a href="#searching-the-best-move">Searching the best move</a></li>
 <li><a href="#hash-and-threads">Hash and threads</a></li>
+<li><a href="#analyse-position">Analyse Position</a></li>
 <li><a href="#customizing-search-algorithm---material">Customizing Search Algorithm - Material</a></li>
 <li><a href="#customizing-search-algorithm---quiescence-search">Customizing Search Algorithm - Quiescence Search</a></li>
 <li><a href="#customizing-search-algorithm---repetition-check">Customizing Search Algorithm - Repetition Check</a></li>
@@ -65,7 +66,7 @@
 <li><a href="#customizing-evaluation-function---piece">Customizing Evaluation Function - Piece</a></li>
 </ul>
 <hr />
-<h3>Getting squares</h3>
+<h3 id="getting-squares">Getting squares</h3>
 <p>Returns List of Symbols of squares where specific pieces are on.</p>
 <ul>
 <li><code>@get-white-pawn-position</code></li>
@@ -90,7 +91,7 @@
 ;; Output
 ;; &gt; (A2 B2 C2 D2 E2 F2 G2 H2)
 </code></pre>
-<h3>Getting pieces</h3>
+<h3 id="getting-pieces">Getting pieces</h3>
 <ul>
 <li>
 <p><code>@get-piece &lt;Square : Number&gt;</code></p>
@@ -132,7 +133,7 @@
 ;; &gt; (BLACK PAWN) (BLACK PAWN) (BLACK ROOK) (BLACK KNIGHT) (BLACK BISHOP)
 ;; &gt; (BLACK QUEEN) (BLACK KING) (BLACK BISHOP) (BLACK KNIGHT) (BLACK ROOK))
 </code></pre>
-<h3>Getting states of game</h3>
+<h3 id="getting-states-of-game">Getting states of game</h3>
 <ul>
 <li><code>@get-to-move</code><ul>
 <li>Returns turn to move as Symbol.</li>
@@ -240,7 +241,7 @@
 ;; &gt; En Passant Square: d6
 ;; &gt; Castling Rights : kq
 </code></pre>
-<h3>Setting states of game</h3>
+<h3 id="setting-states-of-game">Setting states of game</h3>
 <ul>
 <li><code>@set-to-move &lt;Side : Number&gt;</code><ul>
 <li>Sets turn to move.</li>
@@ -345,7 +346,7 @@
 ;; Output
 ;; &gt; #t
 </code></pre>
-<h3>Placing pieces</h3>
+<h3 id="placing-pieces">Placing pieces</h3>
 <ul>
 <li><code>@set-new-game</code><ul>
 <li>Sets starting position.</li>
@@ -392,7 +393,7 @@
 ;; Output
 ;; &gt; (BLACK QUEEN)
 </code></pre>
-<h3>Getting candidate moves</h3>
+<h3 id="getting-candidate-moves">Getting candidate moves</h3>
 <ul>
 <li><code>@get-candidate-moves</code><ul>
 <li>Generates and returns List of candidate moves.</li>
@@ -411,7 +412,7 @@
 ;; &gt; (A2 A4 EMPTY) (A2 A3 EMPTY) (G1 H3 EMPTY) (G1 F3 EMPTY) (B1 C3 EMPTY)
 ;; &gt; (B1 A3 EMPTY))
 </code></pre>
-<h3>Predicate functions</h3>
+<h3 id="predicate-functions">Predicate functions</h3>
 <p>Judges each state of the current position.</p>
 <ul>
 <li><code>@correct-position?</code><ul>
@@ -489,7 +490,7 @@
 ;; Output
 ;; &gt; #f
 </code></pre>
-<h3>Taking a move</h3>
+<h3 id="taking-a-move">Taking a move</h3>
 <p>A move is represented by List.  The List is<br />
 <code>(&lt;From : Number&gt; &lt;To : Number&gt; &lt;Promotion : Number&gt;)</code>.</p>
 <ul>
@@ -553,7 +554,7 @@
 ;; Output
 ;; &gt; Nc6
 </code></pre>
-<h3>UCI Command</h3>
+<h3 id="uci-command">UCI Command</h3>
 <ul>
 <li><code>@input-uci-command &lt;UCI command : String&gt;</code><ul>
 <li>Executes <code>&lt;UCI command&gt;</code>.</li>
@@ -597,7 +598,7 @@
 ;; &gt; I'm Listener : uciok
 ;; &gt; #t
 </code></pre>
-<h3>Searching the best move</h3>
+<h3 id="searching-the-best-move">Searching the best move</h3>
 <p>Thinks and returns the information of PV Line in each condition.<br />
 Different from "go" command,
 the control won't come back until the engine have found the best move.</p>
@@ -652,7 +653,7 @@ the control won't come back until the engine have found the best move.</p>
 (display (my-engine '@go-movetime 10000))
 ;; &gt; (1000000 2 (F3 F7 EMPTY) (E8 F7 EMPTY) (G4 H5 EMPTY))
 </code></pre>
-<h3>Hash and threads</h3>
+<h3 id="hash-and-threads">Hash and threads</h3>
 <ul>
 <li><code>@set-hash-size &lt;Size : Number&gt;</code><ul>
 <li>Sets size of Hash Table(Transposition Table)
@@ -685,7 +686,193 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; 3
 </code></pre>
-<h3>Customizing Search Algorithm - Material</h3>
+<h3 id="analyse-position">Analyse Position</h3>
+<ul>
+<li>
+<p><code>@analyse-diff</code></p>
+<ul>
+<li>Returns List of difference of pieces.<ul>
+<li>1st : Empty (It is always 0)</li>
+<li>2nd : Difference of Pawns</li>
+<li>3rd : Difference of Knights</li>
+<li>4th : Difference of Bishops</li>
+<li>5th : Difference of Rooks</li>
+<li>6th : Difference of Queens</li>
+<li>7th : Difference of Kings</li>
+</ul>
+</li>
+<li>If the element is '0', each side has same number of the pieces.</li>
+<li>If the element is a positive number, White has them more than Black's.</li>
+<li>If the element is a negative number, Black has them more than White's.</li>
+</ul>
+</li>
+<li>
+<p><code>@analyse-mobility &lt;Piece square : Number&gt;</code></p>
+<ul>
+<li>Returns List of squares that the piece on <code>&lt;Piece square&gt;</code> can move to.</li>
+</ul>
+</li>
+<li>
+<p><code>@analyse-attacking &lt;Piece square : Number&gt;</code></p>
+<ul>
+<li>Returns List of squares of pieces that
+  the piece on <code>&lt;Piece square&gt;</code> is attacking.</li>
+</ul>
+</li>
+<li>
+<p><code>@analyse-attacked &lt;Piece square : Number&gt;</code></p>
+<ul>
+<li>Returns List of squares of pieces that
+  the piece on <code>&lt;Piece square&gt;</code> is attacked by.</li>
+</ul>
+</li>
+<li>
+<p><code>@analyse-defensing &lt;Piece square : Number&gt;</code></p>
+<ul>
+<li>Returns List of squares of pieces that
+  the piece on <code>&lt;Piece square&gt;</code> is defensing.</li>
+</ul>
+</li>
+<li>
+<p><code>@analyse-defensed &lt;Piece square : Number&gt;</code></p>
+<ul>
+<li>Returns List of squares of pieces that
+  the piece on <code>&lt;Piece square&gt;</code> is defensed by.</li>
+</ul>
+</li>
+<li>
+<p><code>@analyse-center-control &lt;Piece square : Number&gt;</code></p>
+<ul>
+<li>Returns List of Center squares that
+  the piece on <code>&lt;Piece square&gt;</code> attacks.</li>
+</ul>
+</li>
+<li>
+<p><code>@analyse-sweet-center-control &lt;Piece square : Number&gt;</code></p>
+<ul>
+<li>Returns List of Sweet Center squares that
+  the piece on <code>&lt;Piece square&gt;</code> attacks.</li>
+</ul>
+</li>
+<li>
+<p><code>@analyse-open-fyle</code></p>
+<ul>
+<li>Returns List of open fyles.</li>
+</ul>
+</li>
+<li>
+<p><code>@analyse-development (&lt;Piece side : Number&gt; &lt;Piece type : Number&gt;)</code></p>
+<ul>
+<li>Returns List of squares that the developed(Not on starting position)
+  <code>(&lt;Piece side&gt; &lt;Piece type&gt;)</code> on.</li>
+</ul>
+</li>
+<li>
+<p><code>@analyse-double-pawn &lt;Side : Number&gt;</code></p>
+<ul>
+<li>Returns List of squares that Double Pawns of <code>&lt;Side&gt;</code> on.</li>
+</ul>
+</li>
+<li>
+<p><code>@analyse-iso-pawn &lt;Side : Number&gt;</code></p>
+<ul>
+<li>Returns List of squares that Isolated Pawns of <code>&lt;Side&gt;</code> on.</li>
+</ul>
+</li>
+<li>
+<p><code>@analyse-pass-pawn &lt;Side : Number&gt;</code></p>
+<ul>
+<li>Returns List of squares that Pass Pawns of <code>&lt;Side&gt;</code> on.</li>
+</ul>
+</li>
+<li>
+<p><code>@analyse-pin/skewer &lt;Piece square : Number&gt;</code></p>
+<ul>
+<li>Returns List of Lists of piece squares that is pinned/skewered.<ul>
+<li>1st : Square of attacked enemy piece directly by <code>&lt;Piece square&gt;</code>.</li>
+<li>2nd : Piece square over the attacked piece.</li>
+</ul>
+</li>
+<li>If <code>&lt;Piece square&gt;</code> is Bishop, Rook or Queen, this function is effective.
+  Otherwise it always returns Nil.</li>
+</ul>
+</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>;; Set position.
+;;  +-----------------+
+;; 8| . . . . k . . r |
+;; 7| . b . . . . . . |
+;; 6| . . . . . n . . |
+;; 5| q . . . . r . p |
+;; 4| . . . . . . p P |
+;; 3| . P B . . N . P |
+;; 2| P . . . . . . . |
+;; 1| . N R . K . . R |
+;;  +-----------------+
+;;    a b c d e f g h
+(define fen "4k2r/1b6/5n2/q4r1p/6pP/1PB2N1P/P7/1NR1K2R w Kk - 0 1")
+(define engine (gen-engine))
+(engine '@set-fen fen)
+
+(display (engine '@analyse-diff))
+;; Output
+;; &gt; (0 2 1 0 0 -1 0)
+
+(display (engine '@analyse-mobility F3))
+;; Output
+;; &gt; (G1 D2 H2 D4 E5 G5)
+
+(display (engine '@analyse-attacking C3))
+;; Output
+;; &gt; (A5 F6)
+
+(display (engine '@analyse-attacked F3))
+;; Output
+;; &gt; (G4 F5 B7)
+
+(display (engine '@analyse-defensing C1))
+;; Output
+;; &gt; (B1 E1 C3)
+
+(display (engine '@analyse-defensed C3))
+;; Output
+;; &gt; (B1 C1)
+
+(display (engine '@analyse-center-control C3))
+;; Output
+;; &gt; (D4 E5 F6)
+
+(display (engine '@analyse-sweet-center-control C3))
+;; Output
+;; &gt; (D4 E5)
+
+(display (engine '@analyse-open-fyle))
+;; Output
+;; &gt; (FYLE_C FYLE_D FYLE_E FYLE_F)
+
+(display (engine '@analyse-development (list WHITE ROOK)))
+;; Output
+;; &gt; (C1)
+
+(display (engine '@analyse-double-pawn WHITE))
+;; Output
+;; &gt; (H3 H4)
+
+(display (engine '@analyse-iso-pawn WHITE))
+;; Output
+;; &gt; (H3 H4)
+
+(display (engine '@analyse-pass-pawn WHITE))
+;; Output
+;; &gt; (A2 B3)
+
+(display (engine '@analyse-pin/skewer C3))
+;; Output
+;; &gt; ((F6 H8))
+</code></pre>
+<h3 id="customizing-search-algorithm-material">Customizing Search Algorithm - Material</h3>
 <ul>
 <li><code>@material [&lt;New materal : List&gt;]</code><ul>
 <li>Returns List of material.<ul>
@@ -714,7 +901,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; (0 222 333 444 555 666 777)
 </code></pre>
-<h3>Customizing Search Algorithm - Quiescence Search</h3>
+<h3 id="customizing-search-algorithm-quiescence-search">Customizing Search Algorithm - Quiescence Search</h3>
 <ul>
 <li><code>@enable-quiesce-search [&lt;New setting : Boolean&gt;]</code><ul>
 <li>Returns whether Quiescence Search is enabled or not.</li>
@@ -736,7 +923,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 :: &gt; #f
 </code></pre>
-<h3>Customizing Search Algorithm - Repetition Check</h3>
+<h3 id="customizing-search-algorithm-repetition-check">Customizing Search Algorithm - Repetition Check</h3>
 <ul>
 <li><code>@enable-repetition-check [&lt;New setting : Boolean&gt;]</code><ul>
 <li>Returns whether Repetition Check is enabled or not.</li>
@@ -758,7 +945,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; #f
 </code></pre>
-<h3>Customizing Search Algorithm - Check Extension</h3>
+<h3 id="customizing-search-algorithm-check-extension">Customizing Search Algorithm - Check Extension</h3>
 <ul>
 <li><code>@enable-check-extension [&lt;New setting : Boolean&gt;]</code><ul>
 <li>Returns whether Check Extension is enabled or not.</li>
@@ -780,7 +967,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; #f
 </code></pre>
-<h3>Customizing Search Algorithm - YBWC</h3>
+<h3 id="customizing-search-algorithm-ybwc">Customizing Search Algorithm - YBWC</h3>
 <ul>
 <li>
 <p><code>@ybwc-limit-depth [&lt;New depth : Number&gt;]</code></p>
@@ -819,7 +1006,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; 10
 </code></pre>
-<h3>Customizing Search Algorithm - Aspiration Windows</h3>
+<h3 id="customizing-search-algorithm-aspiration-windows">Customizing Search Algorithm - Aspiration Windows</h3>
 <ul>
 <li><code>@enable-aspiration-windows [&lt;New setting : Boolean&gt;]</code><ul>
 <li>Returns whether Aspiration Windows is enabled or not.</li>
@@ -869,7 +1056,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; 20
 </code></pre>
-<h3>Customizing Search Algorithm - Aspiration Windows</h3>
+<h3 id="customizing-search-algorithm-aspiration-windows_1">Customizing Search Algorithm - Aspiration Windows</h3>
 <ul>
 <li><code>@enable-see [&lt;New setting : Boolean&gt;]</code><ul>
 <li>Returns whether SEE is enabled or not.</li>
@@ -890,7 +1077,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; #f
 </code></pre>
-<h3>Customizing Search Algorithm - History Heuristics</h3>
+<h3 id="customizing-search-algorithm-history-heuristics">Customizing Search Algorithm - History Heuristics</h3>
 <ul>
 <li><code>@enable-history [&lt;New setting : Boolean&gt;]</code><ul>
 <li>Returns whether History Heuristics is enabled or not.</li>
@@ -912,7 +1099,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; #f
 </code></pre>
-<h3>Customizing Search Algorithm - Killer Move Heuristics</h3>
+<h3 id="customizing-search-algorithm-killer-move-heuristics">Customizing Search Algorithm - Killer Move Heuristics</h3>
 <ul>
 <li><code>@enable-killer [&lt;New setting : Boolean&gt;]</code><ul>
 <li>Returns whether Killer Move Heuristics is enabled or not.</li>
@@ -934,7 +1121,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; #f
 </code></pre>
-<h3>Customizing Search Algorithm - Hash Table</h3>
+<h3 id="customizing-search-algorithm-hash-table">Customizing Search Algorithm - Hash Table</h3>
 <ul>
 <li><code>@enable-hash-table [&lt;New setting : Boolean&gt;]</code><ul>
 <li>Returns whether Transposition Table is enabled or not.</li>
@@ -956,7 +1143,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; #t
 </code></pre>
-<h3>Customizing Search Algorithm - Internal Iterative Deepening</h3>
+<h3 id="customizing-search-algorithm-internal-iterative-deepening">Customizing Search Algorithm - Internal Iterative Deepening</h3>
 <ul>
 <li><code>@enable-iid [&lt;New setting : Boolean&gt;]</code><ul>
 <li>Returns whether Internal Iterative Deepening is enabled or not.</li>
@@ -1007,7 +1194,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; 10
 </code></pre>
-<h3>Customizing Search Algorithm - Null Move Reduction</h3>
+<h3 id="customizing-search-algorithm-null-move-reduction">Customizing Search Algorithm - Null Move Reduction</h3>
 <ul>
 <li><code>@enable-nmr [&lt;New setting : Boolean&gt;]</code><ul>
 <li>Returns whether Null Move Reduction is enabled or not.</li>
@@ -1074,7 +1261,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; 10
 </code></pre>
-<h3>Customizing Search Algorithm - ProbCut</h3>
+<h3 id="customizing-search-algorithm-probcut">Customizing Search Algorithm - ProbCut</h3>
 <ul>
 <li><code>@enable-probcut [&lt;New setting : Boolean&gt;]</code><ul>
 <li>Returns whether ProbCut is enabled or not.</li>
@@ -1137,7 +1324,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; 10
 </code></pre>
-<h3>Customizing Search Algorithm - History Pruning</h3>
+<h3 id="customizing-search-algorithm-history-pruning">Customizing Search Algorithm - History Pruning</h3>
 <ul>
 <li><code>@enable-history-pruning [&lt;New setting : Boolean&gt;]</code><ul>
 <li>Returns whether History Pruning is enabled or not.</li>
@@ -1238,7 +1425,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; 10
 </code></pre>
-<h3>Customizing Search Algorithm - Late Move Reduction</h3>
+<h3 id="customizing-search-algorithm-late-move-reduction">Customizing Search Algorithm - Late Move Reduction</h3>
 <ul>
 <li><code>@enable-lmr [&lt;New setting : Boolean&gt;]</code><ul>
 <li>Returns whether Late Move Reduction is enabled or not.</li>
@@ -1323,7 +1510,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; 5
 </code></pre>
-<h3>Customizing Search Algorithm - Futility Pruning</h3>
+<h3 id="customizing-search-algorithm-futility-pruning">Customizing Search Algorithm - Futility Pruning</h3>
 <ul>
 <li><code>@enable-futility-pruning [&lt;New setting : Boolean&gt;]</code><ul>
 <li>Returns whether Futility Pruning is enabled or not.</li>
@@ -1373,7 +1560,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; Output
 ;; &gt; 1200
 </code></pre>
-<h3>Customizing Evaluation Function - Piece Square Table</h3>
+<h3 id="customizing-evaluation-function-piece-square-table">Customizing Evaluation Function - Piece Square Table</h3>
 <p>Returns Piece Square Table for each piece type.<br />
 If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</p>
 <p><code>score = weight * value_table[square]</code></p>
@@ -1451,7 +1638,7 @@ If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</p>
 </ul>
 </li>
 </ul>
-<h3>Customizing Evaluation Function - Attack</h3>
+<h3 id="customizing-evaluation-function-attack">Customizing Evaluation Function - Attack</h3>
 <p>Returns List composed of 7 values of attacking score.<br />
 1st: Not used. This is always 0. (for EMPTY)<br />
 2nd: Attacking Pawn.<br />
@@ -1493,7 +1680,7 @@ If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</p>
 <li><code>@weight-queen-attack</code></li>
 <li><code>@weight-king-attack</code></li>
 </ul>
-<h3>Customizing Evaluation Function - Defense</h3>
+<h3 id="customizing-evaluation-function-defense">Customizing Evaluation Function - Defense</h3>
 <p>Returns List composed of 7 values of defense score.<br />
 1st: Not used. This is always 0. (for EMPTY)<br />
 2nd: Protecting Pawn.<br />
@@ -1535,7 +1722,7 @@ If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</p>
 <li><code>@weight-queen-defense</code></li>
 <li><code>@weight-king-defense</code></li>
 </ul>
-<h3>Customizing Evaluation Function - Pin</h3>
+<h3 id="customizing-evaluation-function-pin">Customizing Evaluation Function - Pin</h3>
 <p>Returns List of 7 Lists of 7 values.</p>
 <p>1st list : Futile list. (For EMPTY)<br />
 2nd list : A target piece is Pawn.<br />
@@ -1596,7 +1783,7 @@ If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</p>
 <li><code>@weight-rook-pin</code></li>
 <li><code>@weight-queen-pin</code></li>
 </ul>
-<h3>Customizing Evaluation Function - Pawn Shield</h3>
+<h3 id="customizing-evaluation-function-pawn-shield">Customizing Evaluation Function - Pawn Shield</h3>
 <p>If King on f1(f8) f2(f7) g1(g8) g2(g7) h1(h8) h2(h7),
 then Pawn Shield is pawns on f g h files.<br />
 If King on a1(a8) a2(a7) b1(b8) b2(b7) c1(c8) c2(c7),
@@ -1652,7 +1839,7 @@ then Pawn Shield is pawns on a b c files.</p>
 <ul>
 <li><code>@weight-pawn-shield</code></li>
 </ul>
-<h3>Customizing Evaluation Function - Mobility</h3>
+<h3 id="customizing-evaluation-function-mobility">Customizing Evaluation Function - Mobility</h3>
 <p>About Sayuri's weight system : Run <code>(help "sayuri weight system")</code></p>
 <p><code>score = weight * num_of_squares_that_piece_can_move_to</code></p>
 <ul>
@@ -1663,7 +1850,7 @@ then Pawn Shield is pawns on a b c files.</p>
 <li><code>@weight-queen-mobility [&lt;New weight : List&gt;]</code></li>
 <li><code>@weight-king-mobility [&lt;New weight : List&gt;]</code></li>
 </ul>
-<h3>Customizing Evaluation Function - Controlling Center</h3>
+<h3 id="customizing-evaluation-function-controlling-center">Customizing Evaluation Function - Controlling Center</h3>
 <p>About Sayuri's weight system : Run <code>(help "sayuri weight system")</code></p>
 <p>Center square are c3 c4 c5 c6 d3 d4 d5 d6 e3 e4 e5 e6 f3 f4 f5 f6.</p>
 <p><code>score = weight * num_of_center_square_that_piece_attacks</code></p>
@@ -1675,7 +1862,7 @@ then Pawn Shield is pawns on a b c files.</p>
 <li><code>@weight-queen-center-control [&lt;New weight : List&gt;]</code></li>
 <li><code>@weight-king-center-control [&lt;New weight : List&gt;]</code></li>
 </ul>
-<h3>Customizing Evaluation Function - Controlling Sweet Center</h3>
+<h3 id="customizing-evaluation-function-controlling-sweet-center">Customizing Evaluation Function - Controlling Sweet Center</h3>
 <p>About Sayuri's weight system : Run <code>(help "sayuri weight system")</code></p>
 <p>Sweet Center square are d3 d4 d5 d6 e3 e4 e5 e6.</p>
 <p><code>score = weight * num_of_sweet_center_square_that_piece_attacks</code></p>
@@ -1687,7 +1874,7 @@ then Pawn Shield is pawns on a b c files.</p>
 <li><code>@weight-queen-sweet-center-control [&lt;New weight : List&gt;]</code></li>
 <li><code>@weight-king-sweet-center-control [&lt;New weight : List&gt;]</code></li>
 </ul>
-<h3>Customizing Evaluation Function - Development</h3>
+<h3 id="customizing-evaluation-function-development">Customizing Evaluation Function - Development</h3>
 <p>About Sayuri's weight system : Run <code>(help "sayuri weight system")</code></p>
 <p><code>score = weight * num_of_minor_pieces_on_starting_position</code></p>
 <ul>
@@ -1698,7 +1885,7 @@ then Pawn Shield is pawns on a b c files.</p>
 <li><code>@weight-queen-development [&lt;New weight : List&gt;]</code></li>
 <li><code>@weight-king-development [&lt;New weight : List&gt;]</code></li>
 </ul>
-<h3>Customizing Evaluation Function - Attack around Enemy King</h3>
+<h3 id="customizing-evaluation-function-attack-around-enemy-king">Customizing Evaluation Function - Attack around Enemy King</h3>
 <p>About Sayuri's weight system : Run <code>(help "sayuri weight system")</code></p>
 <p><code>score = weight * num_of_squares_around_enemy_king_attacked_by_pieces.</code></p>
 <ul>
@@ -1709,7 +1896,7 @@ then Pawn Shield is pawns on a b c files.</p>
 <li><code>@weight-queen-attack-around-king [&lt;New weight : List&gt;]</code></li>
 <li><code>@weight-king-attack-around-king [&lt;New weight : List&gt;]</code></li>
 </ul>
-<h3>Customizing Evaluation Function - Pawn Structure</h3>
+<h3 id="customizing-evaluation-function-pawn-structure">Customizing Evaluation Function - Pawn Structure</h3>
 <p>About Sayuri's weight system : Run <code>(help "sayuri weight system")</code></p>
 <ul>
 <li><code>@weight-pass-pawn [&lt;New weight : List&gt;]</code><ul>
@@ -1729,7 +1916,7 @@ then Pawn Shield is pawns on a b c files.</p>
 </ul>
 </li>
 </ul>
-<h3>Customizing Evaluation Function - Piece</h3>
+<h3 id="customizing-evaluation-function-piece">Customizing Evaluation Function - Piece</h3>
 <p>About Sayuri's weight system : Run <code>(help "sayuri weight system")</code></p>
 <ul>
 <li><code>@weight-bishop-pair [&lt;New weight : List&gt;]</code><ul>

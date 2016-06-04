@@ -15,9 +15,9 @@
 </header>
 <div class="root_div">
 <section class="main_contents">
-<h1>Core Functions</h1>
+<h1 id="core-functions">Core Functions</h1>
 <p><a href="sayulisp.html">&gt;&gt;Back to Sayulisp page</a></p>
-<h2>Contents</h2>
+<h2 id="contents">Contents</h2>
 <ul>
 <li><a href="#most-important-functions">Most Important Functions</a><ul>
 <li><a href="#exit"><code>exit</code></a> : Exits from Sayulisp.</li>
@@ -100,8 +100,8 @@
 </li>
 </ul>
 <hr />
-<h2>Most Important Functions</h2>
-<h3>exit</h3>
+<h2 id="most-important-functions">Most Important Functions</h2>
+<h3 id="exit">exit</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -121,7 +121,7 @@
 ;; Exit with EXIT_FAILURE.
 (exit 1)
 </code></pre>
-<h3>help</h3>
+<h3 id="help">help</h3>
 <h6> Usage </h6>
 
 <ol>
@@ -158,7 +158,7 @@
 ;; &gt;     ;;
 ;; &gt;     ;; &gt; 111
 </code></pre>
-<h3>eval</h3>
+<h3 id="eval">eval</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -179,7 +179,7 @@
 ;; &gt; (+ 1 2 3)
 ;; &gt; 6
 </code></pre>
-<h3>quote</h3>
+<h3 id="quote">quote</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -215,7 +215,7 @@
 ;; &gt; 123
 ;; &gt; Symbol: x
 </code></pre>
-<h3>backquote</h3>
+<h3 id="backquote">backquote</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -278,7 +278,7 @@
 ;; &gt; (a c)
 ;; &gt; (a c)
 </code></pre>
-<h3>define</h3>
+<h3 id="define">define</h3>
 <h6> Usage </h6>
 
 <ol>
@@ -331,7 +331,7 @@
 ;; &gt; (lambda () (display (apply (quote +) (quote (111 222)))))
 ;; &gt; (lambda () (display (apply (quote *) (quote (333 444 555)))))
 </code></pre>
-<h3>set!</h3>
+<h3 id="set">set!</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -365,7 +365,7 @@
 ;; &gt; 3
 ;; &gt; 4
 </code></pre>
-<h3>lambda</h3>
+<h3 id="lambda">lambda</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -434,7 +434,7 @@
 ;; Output
 ;; &gt; (lambda (x) (display x))
 </code></pre>
-<h3>let</h3>
+<h3 id="let">let</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -463,7 +463,7 @@
 ;; Output
 ;; &gt; 30
 </code></pre>
-<h3>begin</h3>
+<h3 id="begin">begin</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -485,7 +485,7 @@
 ;; &gt; World
 ;; &gt; World
 </code></pre>
-<h3>parse</h3>
+<h3 id="parse">parse</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -507,7 +507,7 @@
 ;; Output
 ;; &gt; (1 2 3)
 </code></pre>
-<h3>parval</h3>
+<h3 id="parval">parval</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -529,7 +529,7 @@
 ;; &gt; Hello
 ;; &gt; World
 </code></pre>
-<h3>to-string</h3>
+<h3 id="to-string">to-string</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -557,7 +557,7 @@
 ;; Output
 ;; &gt; #t
 </code></pre>
-<h3>try</h3>
+<h3 id="try">try</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -591,7 +591,7 @@
 ;; Output
 ;; &gt; (@not-number "The 2nd argument of (+) didn't return Number.")
 </code></pre>
-<h3>throw</h3>
+<h3 id="throw">throw</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -612,7 +612,7 @@
 ;; Output
 ;; &gt; 123
 </code></pre>
-<h3>car</h3>
+<h3 id="car">car</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -634,7 +634,7 @@
 ;; Output
 ;; &gt; 111
 </code></pre>
-<h3>cdr</h3>
+<h3 id="cdr">cdr</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -656,7 +656,7 @@
 ;; Output
 ;; &gt; (222 333)
 </code></pre>
-<h3>cons</h3>
+<h3 id="cons">cons</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -684,7 +684,7 @@
 ;; Output
 ;; &gt; (444 555 666)
 </code></pre>
-<h3>apply</h3>
+<h3 id="apply">apply</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -706,8 +706,8 @@
 ;; Output
 ;; &gt; 6
 </code></pre>
-<h2>Conditional Branch Functions</h2>
-<h3>if</h3>
+<h2 id="conditional-branch-functions">Conditional Branch Functions</h2>
+<h3 id="if">if</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -730,7 +730,7 @@
 ;; Output
 ;; &gt; 7
 </code></pre>
-<h3>cond</h3>
+<h3 id="cond">cond</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -758,8 +758,8 @@
 ;; Output
 ;; &gt; World
 </code></pre>
-<h2>Predicate Functions</h2>
-<h3>equal?</h3>
+<h2 id="predicate-functions">Predicate Functions</h2>
+<h3 id="equal">equal?</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -778,7 +778,7 @@
 ;; Output
 ;; &gt; #t
 </code></pre>
-<h3>pair?</h3>
+<h3 id="pair">pair?</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -797,7 +797,7 @@
 ;; Output
 ;; &gt; #t
 </code></pre>
-<h3>list?</h3>
+<h3 id="list">list?</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -816,7 +816,7 @@
 ;; Output
 ;; &gt; #t
 </code></pre>
-<h3>nil?</h3>
+<h3 id="nil">nil?</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -836,7 +836,7 @@
 ;; Output
 ;; &gt; #t
 </code></pre>
-<h3>symbol?</h3>
+<h3 id="symbol">symbol?</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -855,7 +855,7 @@
 ;; Output
 ;; &gt; #t
 </code></pre>
-<h3>number?</h3>
+<h3 id="number">number?</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -874,7 +874,7 @@
 ;; Output
 ;; &gt; #t
 </code></pre>
-<h3>boolean?</h3>
+<h3 id="boolean">boolean?</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -893,7 +893,7 @@
 ;; Output
 ;; &gt; #t
 </code></pre>
-<h3>string?</h3>
+<h3 id="string">string?</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -912,7 +912,7 @@
 ;; Output
 ;; &gt; #t
 </code></pre>
-<h3>function?</h3>
+<h3 id="function">function?</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -932,7 +932,7 @@
 ;; Output
 ;; &gt; #t
 </code></pre>
-<h3>native-function?</h3>
+<h3 id="native-function">native-function?</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -951,7 +951,7 @@
 ;; Output
 ;; &gt; #t
 </code></pre>
-<h3>procedure?</h3>
+<h3 id="procedure">procedure?</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -976,8 +976,8 @@
 ;; Output
 ;; &gt; #t
 </code></pre>
-<h2>Looping</h2>
-<h3>while</h3>
+<h2 id="looping">Looping</h2>
+<h3 id="while">while</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -1010,7 +1010,7 @@
 ;; &gt; Hello 4
 ;; &gt; World 4
 </code></pre>
-<h3>for</h3>
+<h3 id="for">for</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -1057,8 +1057,8 @@
 ;; &gt; l
 ;; &gt; o
 </code></pre>
-<h2>IO Stream Functions</h2>
-<h3>display</h3>
+<h2 id="io-stream-functions">IO Stream Functions</h2>
+<h3 id="display">display</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -1083,7 +1083,7 @@
 ;; Output
 ;; &gt; x is 123
 </code></pre>
-<h3>stdin</h3>
+<h3 id="stdin">stdin</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -1112,7 +1112,7 @@
 ;; Reads and shows all from Standard Input.
 (display (stdin '@read))
 </code></pre>
-<h3>stdout</h3>
+<h3 id="stdout">stdout</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -1131,7 +1131,7 @@
 ;; Output
 ;; &gt; 123
 </code></pre>
-<h3>stderr</h3>
+<h3 id="stderr">stderr</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -1150,7 +1150,7 @@
 ;; Output
 ;; &gt; 123
 </code></pre>
-<h3>import</h3>
+<h3 id="import">import</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -1179,7 +1179,7 @@
 :: &gt; a: 111
 :: &gt; b: 222
 </code></pre>
-<h3>export</h3>
+<h3 id="export">export</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -1201,7 +1201,7 @@
 ;; In "hello.txt"
 ;; &gt; ("Hello" 123 "World")
 </code></pre>
-<h3>output-stream</h3>
+<h3 id="output-stream">output-stream</h3>
 <h6> Usage </h6>
 
 <ol>
@@ -1226,7 +1226,7 @@
 ;; Closes "hello.txt".
 (myfile ())
 </code></pre>
-<h3>input-stream</h3>
+<h3 id="input-stream">input-stream</h3>
 <h6> Usage </h6>
 
 <ol>
@@ -1264,8 +1264,8 @@
 ;; Closes "hello.txt".
 (myfile ())
 </code></pre>
-<h2>Utilities</h2>
-<h3>system</h3>
+<h2 id="utilities">Utilities</h2>
+<h3 id="system">system</h3>
 <h6> Usage </h6>
 
 <ul>
