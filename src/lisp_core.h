@@ -2372,6 +2372,9 @@ namespace Sayuri {
       /** ネイティブ関数 - list-search */
       DEF_LC_FUNCTION(ListSearch);
 
+      /** ネイティブ関数 - list-path */
+      DEF_LC_FUNCTION(ListPath);
+
       /** ネイティブ関数 - map */
       DEF_LC_FUNCTION(Map);
 

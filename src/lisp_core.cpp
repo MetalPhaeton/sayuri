@@ -2112,7 +2112,7 @@ R"...(### list-search ###
 
 <h6> Usage </h6>
 
-* `(list-search <Object> <List>)`
+* `(list-search <List> <Object>)`
 
 <h6> Description </h6>
 
@@ -2124,13 +2124,44 @@ R"...(### list-search ###
 
     (define lst '(111 222 "Hello" #t))
     
-    (display (list-search "Hello" lst))
-    (display (list-search "World" lst))
+    (display (list-search lst "Hello"))
+    (display (list-search lst "World"))
     
     ;; Output
     ;; >  2
     ;; > ())...";
     help_dict_.emplace("list-search", help);
+
+    func = LC_FUNCTION_OBJ(ListPath);
+    INSERT_LC_FUNCTION(func, "list-path", "Lisp:list-path");
+    help =
+R"...(### list-path ###
+
+<h6> Usage </h6>
+
+* `(list-path <List> <Path : String>)`
+
+<h6> Description </h6>
+
+* Returns an element indicated by `<Path>` from `<List>`.
+    + `<Path>` is composed of 'a' or 'd'.
+        - 'a' means Car.
+        - 'b' means Cdr.
+        - If `<Path>` is "dadda" and name of List is 'lst',
+          it means `(car (cdr (cdr (car (cdr lst)))))`.
+
+<h6> Example </h6>
+
+    (define lst '(111 (222 333 444) 555 666))
+    
+    (display (list-path lst "dda"))
+    ;; Output
+    ;; > 555
+    
+    (display (list-path lst "dada"))
+    ;; Output
+    ;; > 333)...";
+    help_dict_.emplace("list-path", help);
 
     func = LC_FUNCTION_OBJ(Map);
     INSERT_LC_FUNCTION(func, "map", "Lisp:map");
@@ -4566,6 +4597,37 @@ R"...(### regex-search ###
     }
 
     return NewNil();
+  }
+
+  // %%% list-path
+  DEF_LC_FUNCTION(Lisp::ListPath) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 2, &args_ptr);
+
+    // 第1引数。 ターゲットのリスト。
+    LPointer target_ptr = caller->Evaluate(*(args_ptr->car()));
+    Next(&args_ptr);
+
+    // 第2引数。 パス。
+    LPointer path_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*path_ptr, LType::STRING);
+
+    // パスに合わせて探索する。
+    for (auto c : path_ptr->string()) {
+      CheckList(*target_ptr);
+
+      if (c == 'a') {
+        target_ptr = target_ptr->car();
+      } else if (c == 'd') {
+        target_ptr = target_ptr->cdr();
+      } else {
+        throw GenError("@function-error", "'" + std::string(1, c)
+        + "' is not path charactor. A charactor must be 'a' or 'd'.");
+      }
+    }
+
+    return target_ptr;
   }
 
   // %%% map
