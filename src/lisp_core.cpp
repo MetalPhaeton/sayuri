@@ -1611,22 +1611,23 @@ R"...(### export ###
 
 <h6> Usage </h6>
 
-* `(export <File name : String> <Object>)`
+* `(export <File name : String> <Object>...)`
 
 <h6> Description </h6>
 
-* Converts `<Object>` into String and writes it to `<File name>`.
-* Returns `<Object>`.
+* Converts each `<Object>...` into String and writes it to `<File name>`.
+* Returns String written to `<File name>`.
 
 <h6> Example </h6>
 
-(define my-list '("Hello" 123 "World"))
-(display (export "hello.txt" my-list))
-;; Output
-;; > ("Hello" 123 "World")
-;;
-;; In "hello.txt"
-;; > ("Hello" 123 "World"))...";
+    (display (export "aaa.scm" (list '+ 1 2 3) (list 'define 'x "abc")))
+    ;; Output
+    ;; > (+ 1 2 3)
+    ;; > (define x "abc")
+    ;;
+    ;; In "aaa.scm"
+    ;; > (+ 1 2 3)
+    ;; > (define x "abc"))...";
     help_dict_.emplace("export", help);
 
     func = LC_FUNCTION_OBJ(EqualQ);
@@ -4181,10 +4182,6 @@ R"...(### regex-search ###
     // ファイル名をパース。
     LPointer filename_ptr = caller->Evaluate(*(args_ptr->car()));
     CheckType(*filename_ptr, LType::STRING);
-    Next(&args_ptr);
-
-    // オブジェクトをパース。
-    LPointer obj_ptr = caller->Evaluate(*(args_ptr->car()));
 
     // ファイルを開く。
     std::ofstream ofs(filename_ptr->string());
@@ -4193,12 +4190,18 @@ R"...(### regex-search ###
       "Couldn't open '" + filename_ptr->string() + "'.");
     }
 
-    // 文字列に変換して書き込む。
-    ofs << obj_ptr->ToString() << std::flush;
+    // 残り引数の評価結果を文字列に変換して文字列ストリームにストック。
+    std::ostringstream oss;
+    for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
+      oss << caller->Evaluate(*(args_ptr->car()))->ToString() << std::endl;
+    }
+
+    // 文字列ストリームの内容をファイルに保存。
+    ofs << oss.str();
 
     // 閉じて終了。
     ofs.close();
-    return obj_ptr;
+    return NewString(oss.str());
   }
 
   // %%% output-stream
