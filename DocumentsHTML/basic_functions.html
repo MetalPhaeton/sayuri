@@ -39,6 +39,7 @@
   for an object.</li>
 <li><a href="#list-remove"><code>list-remove</code></a> : Removes an element of List.</li>
 <li><a href="#list-search"><code>list-search</code></a> : Searches an object from List.</li>
+<li><a href="#list-path"><code>list-path</code></a> : Returns an object from List with path.</li>
 <li><a href="#string-split"><code>string-split</code></a> : Splits String.</li>
 <li><a href="#regex-search"><code>regex-search</code></a> : Searches a pattern.</li>
 </ul>
@@ -329,7 +330,7 @@
 <h6> Usage </h6>
 
 <ul>
-<li><code>(list-search &lt;Object&gt; &lt;List&gt;)</code></li>
+<li><code>(list-search &lt;List&gt; &lt;Object&gt;)</code></li>
 </ul>
 <h6> Description </h6>
 
@@ -342,12 +343,44 @@
 
 <pre><code>(define lst '(111 222 "Hello" #t))
 
-(display (list-search "Hello" lst))
-(display (list-search "World" lst))
+(display (list-search lst "Hello"))
+(display (list-search lst "World"))
 
 ;; Output
 ;; &gt;  2
 ;; &gt; ()
+</code></pre>
+<h3 id="list-path">list-path</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(list-path &lt;List&gt; &lt;Path : String&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Returns an element indicated by <code>&lt;Path&gt;</code> from <code>&lt;List&gt;</code>.<ul>
+<li><code>&lt;Path&gt;</code> is composed of 'a' or 'd'.<ul>
+<li>'a' means Car.</li>
+<li>'b' means Cdr.</li>
+<li>If <code>&lt;Path&gt;</code> is "dadda" and name of List is 'lst',
+  it means <code>(car (cdr (cdr (car (cdr lst)))))</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(define lst '(111 (222 333 444) 555 666))
+
+(display (list-path lst "dda"))
+;; Output
+;; &gt; 555
+
+(display (list-path lst "dada"))
+;; Output
+;; &gt; 333
 </code></pre>
 <h3 id="map">map</h3>
 <h6> Usage </h6>
