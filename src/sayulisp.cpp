@@ -1216,7 +1216,11 @@ R"...(### to-fen-position ###
       const MoveNode* node_ptr =
       pgn_ptr->game_vec()[*current_index_ptr]->current_node_ptr();
 
-      return NewString(node_ptr->text_);
+      if (node_ptr) {
+        return NewString(node_ptr->text_);
+      }
+
+      return NewString("");
     };
 
     message_func_map["@next-move"] =
