@@ -1472,12 +1472,14 @@ R"...(### begin ###
 
     func = LC_FUNCTION_OBJ(Display);
     INSERT_LC_FUNCTION(func, "display", "Lisp:display");
+    INSERT_LC_FUNCTION(func, "print", "Lisp:print");
     help =
 R"...(### display ###
 
 <h6> Usage </h6>
 
 * `(display <Object>...)`
+* `(print <Object>...)`
 
 <h6> Description </h6>
 
@@ -1497,6 +1499,7 @@ R"...(### display ###
     ;; Output
     ;; > x is 123)...";
     help_dict_.emplace("display", help);
+    help_dict_.emplace("print", help);
 
     func = LC_FUNCTION_OBJ(Stdin);
     INSERT_LC_FUNCTION(func, "stdin", "Lisp:stdin");
