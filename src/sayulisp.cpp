@@ -1935,7 +1935,7 @@ R"...(### Setting states of game ###
 <h6> Example </h6>
 
     (define my-engine (gen-engine))
-    (my-engine '@place-piece E4 (list WHITE PAWN))
+    (my-engine '@place-piece (list WHITE PAWN) E4)
     
     (display (my-engine '@set-to-move BLACK))
     ;; Output
@@ -2013,8 +2013,7 @@ R"...(### Placing pieces ###
 * `@set-fen <FEN : String>`
     + Sets position with FEN.
     + Returns #t.
-* `@place-piece <Square : Number> <Piece : List>`
-    + `@place-piece <Piece : List> <Square : Number>` is also OK.
+* `@place-piece <Piece : List> <Square : Number>`
     + Sets a `<Piece>` on `<Square>`
       and returns the previous piece placed on `<Square>`.
     + `<Piece>` is `(<Side : Number> <Type : Number>).
@@ -2034,15 +2033,9 @@ R"...(### Placing pieces ###
     ;; > #t
     
     ;; Sets Black Rook on D1 where White Queen is placed.
-    (display (my-engine '@place-piece D1 (list BLACK ROOK)))
+    (display (my-engine '@place-piece (list BLACK ROOK) D1))
     ;; Output
-    ;; > (WHITE QUEEN)
-
-    ;; Sets White Rook on D8 where Black Queen is placed.
-    ;; `@place-piece <Piece> <Square>`
-    (display (my-engine '@place-piece (list WHITE ROOK) D8))
-    ;; Output
-    ;; > (BLACK QUEEN))...";
+    ;; > (WHITE QUEEN))...";
     AddHelp("engine @set-new-game", help);
     AddHelp("engine @set-fen", help);
     AddHelp("engine @place-piece", help);
@@ -2088,7 +2081,7 @@ Judges each state of the current position.
     (define my-engine (gen-engine))
     
     ;; Put Pawn on 1st rank.
-    (my-engine '@place-piece D1 (list WHITE PAWN))
+    (my-engine '@place-piece (list WHITE PAWN) D1)
     
     (display (my-engine '@correct-position?))
     ;; Output
@@ -4704,37 +4697,18 @@ R"...(### to-fen-position ###
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 2, &args_ptr);
 
-    // 第1引数を得る。
-    LPointer first_ptr = caller->Evaluate(*(args_ptr->car()));
-    if (!(first_ptr->IsNumber() || first_ptr->IsList())) {
-      throw Lisp::GenTypeError(*first_ptr, "Number or List");
-    }
+    // 駒を得る。
+    LPointer piece_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckPiece(*piece_ptr);
+    Side side = piece_ptr->car()->number();
+    PieceType piece_type = piece_ptr->cdr()->car()->number();
+
     Lisp::Next(&args_ptr);
 
-    // 第2引数を得る。
-    LPointer second_ptr = caller->Evaluate(*(args_ptr->car()));
-    if (!(second_ptr->IsNumber() || second_ptr->IsList())) {
-      throw Lisp::GenTypeError(*second_ptr, "Number or List");
-    }
-
-    Square square;
-    Side side;
-    PieceType piece_type;
-    if (first_ptr->IsNumber()) {
-      // 第1引数がマスで第2引数が駒。
-      Sayulisp::CheckSquare(*first_ptr);
-      square = first_ptr->number();
-      Sayulisp::CheckPiece(*second_ptr);
-      side = second_ptr->car()->number();
-      piece_type = second_ptr->cdr()->car()->number();
-    } else {
-      // 第1引数が駒で第2引数がマス。
-      Sayulisp::CheckPiece(*first_ptr);
-      side = first_ptr->car()->number();
-      piece_type = first_ptr->cdr()->car()->number();
-      Sayulisp::CheckSquare(*second_ptr);
-      square = second_ptr->number();
-    }
+    // マスを得る。
+    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSquare(*square_ptr);
+    Square square = square_ptr->number();
 
     // キングを置き換えることはできない。
     if (board_ptr_->piece_board_[square] == KING) {

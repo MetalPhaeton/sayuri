@@ -282,7 +282,7 @@
 <h6> Example </h6>
 
 <pre><code>(define my-engine (gen-engine))
-(my-engine '@place-piece E4 (list WHITE PAWN))
+(my-engine '@place-piece (list WHITE PAWN) E4)
 
 (display (my-engine '@set-to-move BLACK))
 ;; Output
@@ -358,8 +358,7 @@
 <li>Returns #t.</li>
 </ul>
 </li>
-<li><code>@place-piece &lt;Square : Number&gt; &lt;Piece : List&gt;</code><ul>
-<li><code>@place-piece &lt;Piece : List&gt; &lt;Square : Number&gt;</code> is also OK.</li>
+<li><code>@place-piece &lt;Piece : List&gt; &lt;Square : Number&gt;</code><ul>
 <li>Sets a <code>&lt;Piece&gt;</code> on <code>&lt;Square&gt;</code>
   and returns the previous piece placed on <code>&lt;Square&gt;</code>.</li>
 <li><code>&lt;Piece&gt;</code> is `(<Side : Number> <Type : Number>).<ul>
@@ -383,15 +382,9 @@
 ;; &gt; #t
 
 ;; Sets Black Rook on D1 where White Queen is placed.
-(display (my-engine '@place-piece D1 (list BLACK ROOK)))
+(display (my-engine '@place-piece (list BLACK ROOK) D1))
 ;; Output
 ;; &gt; (WHITE QUEEN)
-
-;; Sets White Rook on D8 where Black Queen is placed.
-;; `@place-piece &lt;Piece&gt; &lt;Square&gt;`
-(display (my-engine '@place-piece (list WHITE ROOK) D8))
-;; Output
-;; &gt; (BLACK QUEEN)
 </code></pre>
 <h3 id="getting-candidate-moves">Getting candidate moves</h3>
 <ul>
@@ -434,7 +427,7 @@
 <pre><code>(define my-engine (gen-engine))
 
 ;; Put Pawn on 1st rank.
-(my-engine '@place-piece D1 (list WHITE PAWN))
+(my-engine '@place-piece (list WHITE PAWN) D1)
 
 (display (my-engine '@correct-position?))
 ;; Output
