@@ -321,6 +321,7 @@
 <p><code>@current-move</code></p>
 <ul>
 <li>Returns the current move text.</li>
+<li>If there is no current move, it returns Nil.</li>
 </ul>
 </li>
 <li>
@@ -328,6 +329,7 @@
 <ul>
 <li>Change the current move into the next move
   and returns the move text.</li>
+<li>If there is no next move, it returns Nil.</li>
 </ul>
 </li>
 <li>
@@ -335,6 +337,7 @@
 <ul>
 <li>Change the current move into the previous move
   and returns the move text.</li>
+<li>If there is no previous move, it returns Nil.</li>
 </ul>
 </li>
 <li>
@@ -342,6 +345,7 @@
 <ul>
 <li>Change the current move into the alternative move
   and returns the move text.</li>
+<li>If there is no alternative move, it returns Nil.</li>
 </ul>
 </li>
 <li>
@@ -350,6 +354,7 @@
 <li>If the current move is an alternative move,
   then change a current move into the original move
   and returns the move text.</li>
+<li>If there is no original move, it returns Nil.</li>
 </ul>
 </li>
 <li>
@@ -357,6 +362,7 @@
 <ul>
 <li>Change a current move into the first move
   and returns the move text.</li>
+<li>If there is no first move, it returns Nil.</li>
 </ul>
 </li>
 </ul>

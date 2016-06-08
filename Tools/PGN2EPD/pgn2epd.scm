@@ -36,7 +36,7 @@
 ;; Make FEN List.
 (define (make-fen-list pgn)
   (define ret ())
-  (while (not (equal? (pgn '@current-move) ""))
+  (while (string? (pgn '@current-move))
     (push-back! ret (list (engine '@get-fen) (pgn '@current-move)))
     (engine '@play-note (pgn '@current-move))
     (pgn '@next-move))

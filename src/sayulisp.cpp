@@ -1220,7 +1220,7 @@ R"...(### to-fen-position ###
         return NewString(node_ptr->text_);
       }
 
-      return NewString("");
+      return NewNil();
     };
 
     message_func_map["@next-move"] =
@@ -1237,7 +1237,7 @@ R"...(### to-fen-position ###
         }
       }
 
-      return NewString("");
+      return NewNil();
     };
 
     message_func_map["@prev-move"] =
@@ -1254,7 +1254,7 @@ R"...(### to-fen-position ###
         }
       }
 
-      return NewString("");
+      return NewNil();
     };
 
     message_func_map["@alt-move"] =
@@ -1271,7 +1271,7 @@ R"...(### to-fen-position ###
         }
       }
 
-      return NewString("");
+      return NewNil();
     };
 
     message_func_map["@orig-move"] =
@@ -1288,7 +1288,7 @@ R"...(### to-fen-position ###
         }
       }
 
-      return NewString("");
+      return NewNil();
     };
 
     message_func_map["@rewind-move"] =
@@ -1305,7 +1305,7 @@ R"...(### to-fen-position ###
         }
       }
 
-      return NewString("");
+      return NewNil();
     };
 
     // PGNオブジェクトを作成。
@@ -3738,27 +3738,33 @@ R"...(### gen-pgn ###
 
 * `@current-move`
     + Returns the current move text.
+    + If there is no current move, it returns Nil.
 
 * `@next-move`
     + Change the current move into the next move
       and returns the move text.
+    + If there is no next move, it returns Nil.
 
 * `@prev-move`
     + Change the current move into the previous move
       and returns the move text.
+    + If there is no previous move, it returns Nil.
 
 * `@alt-move`
     + Change the current move into the alternative move
       and returns the move text.
+    + If there is no alternative move, it returns Nil.
 
 * `@orig-move`
     + If the current move is an alternative move,
       then change a current move into the original move
       and returns the move text.
+    + If there is no original move, it returns Nil.
 
 * `@rewind-move`
     + Change a current move into the first move
       and returns the move text.
+    + If there is no first move, it returns Nil.
 
 <h6> Example </h6>
 
