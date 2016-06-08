@@ -31,7 +31,7 @@
 (define hash-size 512)
 
 ;; Number of repeat.
-(define repeat 30)
+(define repeat 10)
 
 ;; Position. (FEN)
 (define fen "r1bq1r1k/p1pnbpp1/1p2p3/6p1/3PB3/5N2/PPPQ1PPP/2KR3R w - - 0 1")
@@ -62,22 +62,22 @@
 ;; Append time data.
 (define (append-time li)
   (push-back! data-time
-              (parse (ref li (++ (list-search "time" li))))))
+              (parse (ref li (++ (list-search li "time"))))))
 
 ;; Append nodes data.
 (define (append-nodes li)
   (push-back! data-nodes
-              (parse (ref li (++ (list-search "nodes" li))))))
+              (parse (ref li (++ (list-search li "nodes"))))))
 
 ;; Append nps data.
 (define (append-nps li)
   (push-back! data-nps
-              (parse (ref li (++ (list-search "nps" li))))))
+              (parse (ref li (++ (list-search li "nps"))))))
 
 ;; Append hashfull data.
 (define (append-hashfull li)
   (push-back! data-hashfull
-              (parse (ref li (++ (list-search "hashfull" li))))))
+              (parse (ref li (++ (list-search li "hashfull"))))))
 
 ;; Mean.
 (define (mean li)
