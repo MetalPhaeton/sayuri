@@ -231,68 +231,9 @@ namespace Sayuri {
     return target.Clone();
   }
 
-  // ==== //
-  // Lisp //
-  // ==== //
-  // コンストラクタ。
-  Lisp::Lisp(const std::vector<std::string>& argv) : LN_Function(),
-  parenth_counter_(0),
-  in_string_(false) {
-    c_function_ = *this;
-    func_id_ = "Lisp";
-    scope_chain_ = LScopeChain();
-
-    SetCoreFunctions();
-    SetBasicFunctions();
-
-    // コマンド引数を設定。
-    LPointer list = NewList(argv.size());
-    LObject* ptr = list.get();
-    for (auto& arg : argv) {
-      ptr->car(NewString(arg));
-      ptr = ptr->cdr().get();
-    }
-    scope_chain_.InsertSymbol("argv", list);
-  }
-  // コンストラクタ。
-  Lisp::Lisp() : LN_Function(),
-  parenth_counter_(0),
-  in_string_(false) {
-    c_function_ = *this;
-    func_id_ = "Lisp";
-    scope_chain_ = LScopeChain();
-
-    SetCoreFunctions();
-    SetBasicFunctions();
-    scope_chain_.InsertSymbol("argv", NewNil());
-  }
-  // コピーコンストラクタ。
-  Lisp::Lisp(const Lisp& lisp) : LN_Function(lisp),
-  parenth_counter_(lisp.parenth_counter_),
-  in_string_(lisp.in_string_),
-  token_queue_(lisp.token_queue_) {}
-  // ムーブコンストラクタ。
-  Lisp::Lisp(Lisp&& lisp) : LN_Function(lisp),
-  parenth_counter_(lisp.parenth_counter_),
-  in_string_(lisp.in_string_),
-  token_queue_(std::move(lisp.token_queue_)) {}
-  // コピー代入演算子。
-  Lisp& Lisp::operator=(const Lisp& lisp) {
-    LN_Function::operator=(lisp);
-    parenth_counter_ = lisp.parenth_counter_;
-    in_string_ = lisp.in_string_;
-    token_queue_ = lisp.token_queue_;
-    return *this;
-  }
-  // ムーブ代入演算子。
-  Lisp& Lisp::operator=(Lisp&& lisp) {
-    LN_Function::operator=(lisp);
-    parenth_counter_ = lisp.parenth_counter_;
-    in_string_ = lisp.in_string_;
-    token_queue_ = std::move(lisp.token_queue_);
-    return *this;
-  }
-
+  // ======= //
+  // LParser //
+  // ======= //
   // --- 字句解析器 --- //
   namespace {
     // 制御文字かどうか。
@@ -407,7 +348,7 @@ namespace Sayuri {
   }
 
   // 字句解析する。
-  void Lisp::Tokenize(const std::string& code) {
+  void LParser::Tokenize(const std::string& code) {
     // イテレータを準備。
     std::string::const_iterator itr = code.begin();
     std::string::const_iterator end_itr = code.end();
@@ -516,7 +457,7 @@ namespace Sayuri {
     PushString(token_queue_, oss);
   }
 
-  LPointerVec Lisp::Parse() {
+  LPointerVec LParser::Parse() {
     LPointerVec ret;
 
     // きちんとパースできていなければパースしない。
@@ -532,9 +473,9 @@ namespace Sayuri {
     return ret;
   }
 
-  LPointer Lisp::ParseCore() {
+  LPointer LParser::ParseCore() {
     if (token_queue_.empty()) {
-      throw GenError("@parse-error", "Token queue is empty.");
+      throw Lisp::GenError("@parse-error", "Token queue is empty.");
     }
 
     // 最初のトークンを得る。
@@ -542,7 +483,7 @@ namespace Sayuri {
     token_queue_.pop();
 
     if (front == "(") {  // リストをパース。
-      LPointer ret = NewNil();
+      LPointer ret = Lisp::NewNil();
       LObject* ret_ptr = nullptr;
       while (!(token_queue_.empty())) {
         front = token_queue_.front();
@@ -563,7 +504,7 @@ namespace Sayuri {
           if (ret_ptr) {  // retがペア。
             ret_ptr->cdr(result);
           } else {  // retがNil。
-            ret = NewPair(NewNil(), result);
+            ret = Lisp::NewPair(Lisp::NewNil(), result);
           }
 
           continue;
@@ -576,14 +517,15 @@ namespace Sayuri {
     } else {  // Atomをパース。
       // エラー。
       if ((front == ".") || (front == ")")) {
-        throw GenError("@parse-error", "Couldn't parse '"
+        throw Lisp::GenError("@parse-error", "Couldn't parse '"
         + front + "'.");
       }
 
       // quoteの糖衣構文。
       if (front == "'") {
         // quoteシンボルの入ったペア。
-        LPointer ret = NewPair(NewSymbol("quote"), NewPair());
+        LPointer ret =
+        Lisp::NewPair(Lisp::NewSymbol("quote"), Lisp::NewPair());
 
         // 次をパースする。
         LPointer result = ParseCore();
@@ -596,7 +538,8 @@ namespace Sayuri {
       // backquoteの糖衣構文。
       if (front == "`") {
         // quoteシンボルの入ったペア。
-        LPointer ret = NewPair(NewSymbol("backquote"), NewPair());
+        LPointer ret =
+        Lisp::NewPair(Lisp::NewSymbol("backquote"), Lisp::NewPair());
 
         // 次をパースする。
         LPointer result = ParseCore();
@@ -609,7 +552,8 @@ namespace Sayuri {
       // unquoteの糖衣構文。
       if (front == ",") {
         // quoteシンボルの入ったペア。
-        LPointer ret = NewPair(NewSymbol("unquote"), NewPair());
+        LPointer ret =
+        Lisp::NewPair(Lisp::NewSymbol("unquote"), Lisp::NewPair());
 
         // 次をパースする。
         LPointer result = ParseCore();
@@ -622,7 +566,8 @@ namespace Sayuri {
       // unquote-splicingの糖衣構文。
       if (front == ",@") {
         // quoteシンボルの入ったペア。
-        LPointer ret = NewPair(NewSymbol("unquote-splicing"), NewPair());
+        LPointer ret =
+        Lisp::NewPair(Lisp::NewSymbol("unquote-splicing"), Lisp::NewPair());
 
         // 次をパースする。
         LPointer result = ParseCore();
@@ -659,17 +604,17 @@ namespace Sayuri {
           }
         }
 
-        return NewString(oss.str());
+        return Lisp::NewString(oss.str());
       }
 
       // 真偽値。 #t。
       if ((front == "#t") || (front == "#T")) {
-        return NewBoolean(true);
+        return Lisp::NewBoolean(true);
       }
 
       // 真偽値。 #f。
       if ((front == "#f") || (front == "#F")) {
-        return NewBoolean(false);
+        return Lisp::NewBoolean(false);
       }
 
       // 数字かシンボルの判定。
@@ -679,18 +624,69 @@ namespace Sayuri {
       // 数字。
       if ((c >= '0') && (c <= '9')) {
         try {
-          return NewNumber(std::stod(front));
+          return Lisp::NewNumber(std::stod(front));
         } catch (...) {
           // エラーならシンボル。
-          return NewSymbol(front);
+          return Lisp::NewSymbol(front);
         }
       }
 
       // シンボル。
-      return NewSymbol(front);
+      return Lisp::NewSymbol(front);
     }
 
-    throw GenError("@parse-error", "Couldn't parse '" + front + "'.");
+    throw Lisp::GenError("@parse-error", "Couldn't parse '" + front + "'.");
+  }
+
+
+  // ==== //
+  // Lisp //
+  // ==== //
+  // コンストラクタ。
+  Lisp::Lisp(const std::vector<std::string>& argv) : LN_Function() {
+    c_function_ = *this;
+    func_id_ = "Lisp";
+    scope_chain_ = LScopeChain();
+
+    SetCoreFunctions();
+    SetBasicFunctions();
+
+    // コマンド引数を設定。
+    LPointer list = NewList(argv.size());
+    LObject* ptr = list.get();
+    for (auto& arg : argv) {
+      ptr->car(NewString(arg));
+      ptr = ptr->cdr().get();
+    }
+    scope_chain_.InsertSymbol("argv", list);
+  }
+  // コンストラクタ。
+  Lisp::Lisp() : LN_Function() {
+    c_function_ = *this;
+    func_id_ = "Lisp";
+    scope_chain_ = LScopeChain();
+
+    SetCoreFunctions();
+    SetBasicFunctions();
+    scope_chain_.InsertSymbol("argv", NewNil());
+  }
+  // コピーコンストラクタ。
+  Lisp::Lisp(const Lisp& lisp) : LN_Function(lisp),
+  parser_(lisp.parser_) {}
+  // ムーブコンストラクタ。
+  Lisp::Lisp(Lisp&& lisp) : LN_Function(lisp),
+  parser_(std::move(lisp.parser_)) {}
+  // コピー代入演算子。
+  Lisp& Lisp::operator=(const Lisp& lisp) {
+    LN_Function::operator=(lisp);
+    parser_ = lisp.parser_;
+    return *this;
+  }
+  // ムーブ代入演算子。
+  Lisp& Lisp::operator=(Lisp&& lisp) {
+    LN_Function::operator=(lisp);
+    parser_ = std::move(lisp.parser_);
+    return *this;
   }
 
   // コア関数を登録する。
@@ -3615,48 +3611,26 @@ R"...(### regex-search ###
     LPointer result = caller->Evaluate(*(args_ptr->car()));
     CheckType(*result, LType::STRING);
 
-    // パース用のメンバ変数を退避する。
-    std::queue<std::string> origin_token_queue = std::move(token_queue_);
-    int origin_parenth_counter = parenth_counter_;
-    bool origin_in_string = in_string_;
-
-    // パースのために初期化する。
-    token_queue_ = std::queue<std::string>();
-    parenth_counter_ = 0;
-    in_string_ = false;
+    // パーサを準備。
+    LParser parser;
 
     // 字句解析する。
-    Tokenize(result->string());
+    parser.Tokenize(result->string());
 
     // 解析できたかチェック。
-    if ((parenth_counter_ != 0) || in_string_) {
-      // 退避したメンバを戻す。
-      token_queue_ = std::move(origin_token_queue);
-      parenth_counter_ = origin_parenth_counter;
-      in_string_ = origin_in_string;
-
+    if ((parser.parenth_counter() != 0) || parser.in_string()) {
       // エラー。
       throw GenError("@parse-error",
       "Couldn't parse '" + args_ptr->car()->ToString() + "'.");
     }
 
     // パースする。
-    LPointerVec parse_result = Parse();
+    LPointerVec parse_result = parser.Parse();
     if (parse_result.size() <= 0) {
-      // 退避したメンバを戻す。
-      token_queue_ = std::move(origin_token_queue);
-      parenth_counter_ = origin_parenth_counter;
-      in_string_ = origin_in_string;
-
       // エラー。
       throw GenError("@parse-error",
       "Couldn't parse '" + args_ptr->car()->ToString() + "'.");
     }
-
-    // 退避したメンバを戻す。
-    token_queue_ = std::move(origin_token_queue);
-    parenth_counter_ = origin_parenth_counter;
-    in_string_ = origin_in_string;
 
     // 一番最後にパースした式を返す。
     return parse_result.at(parse_result.size() - 1);
@@ -4181,18 +4155,20 @@ R"...(### regex-search ###
     std::ostringstream oss;
     oss << ifs.rdbuf();
 
-    // 字句解析。
+    // パーサを準備。
+    LParser parser;
+
     // 字句解析する。
-    Tokenize(oss.str());
+    parser.Tokenize(oss.str());
 
     // 解析できたかチェック。
-    if ((parenth_counter_ != 0) || in_string_) {
+    if ((parser.parenth_counter() != 0) || parser.in_string()) {
       throw GenError("@parse-error",
       "Couldn't parse '" + args_ptr->car()->ToString() + "'.");
     }
 
     // パースする。
-    LPointerVec parse_result = Parse();
+    LPointerVec parse_result = parser.Parse();
     if (parse_result.size() <= 0) {
       throw GenError("@parse-error",
       "Couldn't parse '" + args_ptr->car()->ToString() + "'.");

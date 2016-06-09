@@ -1599,6 +1599,110 @@ namespace Sayuri {
   /** ヘルプ辞書。 */
   using LHelpDict = std::map<std::string, std::string>;
 
+  /** パーサクラス。 */
+  class LParser {
+    public:
+      // ==================== //
+      // コンストラクタと代入 //
+      // ==================== //
+      /** コンストラクタ。 */
+      LParser() : parenth_counter_(0), in_string_(false) {}
+      /**
+       * コピーコンストラクタ。
+       * @param parser コピー元。
+       */
+      LParser(const LParser& parser) :
+      parenth_counter_(parser.parenth_counter_),
+      in_string_(parser.in_string_),
+      token_queue_(parser.token_queue_) {}
+      /**
+       * ムーブコンストラクタ。
+       * @param parser ムーブ元。
+       */
+      LParser(LParser&& parser) :
+      parenth_counter_(parser.parenth_counter_),
+      in_string_(parser.in_string_),
+      token_queue_(std::move(parser.token_queue_)) {}
+      /**
+       * コピー代入演算子。
+       * @param parser コピー元。
+       */
+      LParser& operator=(const LParser& parser) {
+        parenth_counter_ = parser.parenth_counter_;
+        in_string_ = parser.in_string_;
+        token_queue_ = parser.token_queue_;
+        return *this;
+      }
+      /**
+       * ムーブ代入演算子。
+       * @param parser ムーブ元。
+       */
+      LParser& operator=(LParser&& parser) {
+        parenth_counter_ = parser.parenth_counter_;
+        in_string_ = parser.in_string_;
+        token_queue_ = std::move(parser.token_queue_);
+        return *this;
+      }
+      /** デストラクタ。 */
+      virtual ~LParser() {}
+
+      // ============== //
+      // パブリック関数 //
+      // ============== //
+      /**
+       * 字句解析する。 token_queue_に格納される。
+       * @param code 解析するコード。
+       */
+      void Tokenize(const std::string& code);
+      /**
+       * 字句解析したトークンキューをパースする。
+       * @return パース結果のベクトル。
+       */
+      LPointerVec Parse();
+
+      // ======== //
+      // アクセサ //
+      // ======== //
+      /**
+       * アクセサ - カッコの整合性。
+       * @return カッコの整合性。
+       */
+      int parenth_counter() const {return parenth_counter_;}
+      /**
+       * アクセサ - 文字列中かどうか。
+       * @return 文字列中かどうか。
+       */
+      bool in_string() const {return in_string_;}
+      /**
+       * アクセサ - 解析中のトークンのキュー。
+       * @return 解析中のトークンのキュー。
+       */
+      const std::queue<std::string>& token_quene() const {
+        return token_queue_;
+      }
+
+    private:
+      // ================ //
+      // プライベート関数 //
+      // ================ //
+      /**
+       * 再帰コール用パーサ。
+       * @return パース結果のポインタ。
+       */
+      LPointer ParseCore();
+
+      // ========== //
+      // メンバ変数 //
+      // ========== //
+      // --- 字句解析器 --- //
+      /** カッコの数合わせ。 */
+      int parenth_counter_;
+      /** 文字列解析中かどうか。 */
+      bool in_string_;
+      /** トークンのベクトル。 */
+      std::queue<std::string> token_queue_;
+  };
+
   /** インタープリタの実体。 */
   class Lisp : public LN_Function {
     public:
@@ -1959,12 +2063,16 @@ namespace Sayuri {
        * 字句解析する。 token_queue_に格納される。
        * @param code 解析するコード。
        */
-      void Tokenize(const std::string& code);
+      void Tokenize(const std::string& code) {
+        parser_.Tokenize(code);
+      }
       /**
        * 字句解析したトークンキューをパースする。
        * @return パース結果のベクトル。
        */
-      LPointerVec Parse();
+      LPointerVec Parse() {
+        return parser_.Parse();
+      }
 
       /**
        * 関数オブジェクト。 (LC_Function)
@@ -2001,18 +2109,18 @@ namespace Sayuri {
        * アクセサ - カッコの整合性。
        * @return カッコの整合性。
        */
-      int pareth_counter() const {return parenth_counter_;}
+      int parenth_counter() const {return parser_.parenth_counter();}
       /**
        * アクセサ - 文字列中かどうか。
        * @return 文字列中かどうか。
        */
-      bool in_string() const {return in_string_;}
+      bool in_string() const {return parser_.in_string();}
       /**
        * アクセサ - 解析中のトークンのキュー。
        * @return 解析中のトークンのキュー。
        */
       const std::queue<std::string> token_quene() const {
-        return token_queue_;
+        return parser_.token_quene();
       }
 
       // ============== //
@@ -3226,11 +3334,6 @@ namespace Sayuri {
       // プライベート関数 //
       // ================ //
       /**
-       * 再帰コール用パーサ。
-       * @return パース結果のポインタ。
-       */
-      LPointer ParseCore();
-      /**
        * コア関数を登録する。
        */
       void SetCoreFunctions();
@@ -3242,13 +3345,7 @@ namespace Sayuri {
       // ========== //
       // メンバ変数 //
       // ========== //
-      // --- 字句解析器 --- //
-      /** カッコの数合わせ。 */
-      int parenth_counter_;
-      /** 文字列解析中かどうか。 */
-      bool in_string_;
-      /** トークンのベクトル。 */
-      std::queue<std::string> token_queue_;
+      LParser parser_;
   };
 }  // namespace Sayuri
 
