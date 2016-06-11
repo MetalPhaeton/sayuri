@@ -44,6 +44,7 @@
 #include <cmath>
 #include <random>
 #include <chrono>
+#include <ctime>
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -3333,6 +3334,15 @@ namespace Sayuri {
 
       /** ネイティブ関数 - regex-search */
       DEF_LC_FUNCTION(RegexSearch);
+
+      /** ネイティブ関数 - now */
+      DEF_LC_FUNCTION(Now);
+
+      /** ネイティブ関数 - clock */
+      DEF_LC_FUNCTION(Clock) {
+        return NewNumber(static_cast<double>(std::clock())
+        / static_cast<double>(CLOCKS_PER_SEC));
+      }
 
     protected:
       /** ヘルプ辞書。 */

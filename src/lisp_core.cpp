@@ -45,6 +45,7 @@
 #include <random>
 #include <chrono>
 #include <regex>
+#include <ctime>
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -3616,6 +3617,49 @@ R"...(### regex-search ###
     ;; Output
     ;; > ("Hello World" "Hel" "Wor"))...";
     help_dict_.emplace("regex-search", help);
+
+    func = LC_FUNCTION_OBJ(Now);
+    INSERT_LC_FUNCTION(func, "now", "Lisp:now");
+    help =
+R"...(### now ###
+
+<h6> Usage </h6>
+
+* `(now)`
+
+<h6> Description </h6>
+
+* Returns List of current time.
+    + List is `(<Year> <Month> <Day> <Hour> <Minute> <Second>)`.
+
+<h6> Example </h6>
+
+    ;; Run at 2016-6-11 15:26:59.
+    (display (now))
+    ;; Output
+    ;; > (2016 6 11 15 26 59))...";
+    help_dict_.emplace("now", help);
+
+    func = LC_FUNCTION_OBJ(Clock);
+    INSERT_LC_FUNCTION(func, "clock", "Lisp:clock");
+    help =
+R"...(### clock ###
+
+<h6> Usage </h6>
+
+* `(clock)`
+
+<h6> Description </h6>
+
+* Returns execution time (seconds).
+
+<h6> Example </h6>
+
+    ;; After 1.29 seconds from program has run.
+    (clock)
+    ;; Output
+    ;; 1.29091)...";
+    help_dict_.emplace("clock", help);
   }
 
   // ============== //
@@ -4927,5 +4971,28 @@ R"...(### regex-search ###
     }
 
     return LPointerVecToList(ret_vec);
+  }
+
+  // %%% now
+  DEF_LC_FUNCTION(Lisp::Now) {
+    std::time_t time;
+    std::time(&time);
+    std::tm* time_st = std::localtime(&time);
+
+    LPointer ret_ptr = NewList(6);
+    LObject* ptr = ret_ptr.get();
+    ptr->car(NewNumber(time_st->tm_year + 1900));
+    Next(&ptr);
+    ptr->car(NewNumber(time_st->tm_mon + 1));
+    Next(&ptr);
+    ptr->car(NewNumber(time_st->tm_mday));
+    Next(&ptr);
+    ptr->car(NewNumber(time_st->tm_hour));
+    Next(&ptr);
+    ptr->car(NewNumber(time_st->tm_min));
+    Next(&ptr);
+    ptr->car(NewNumber(time_st->tm_sec));
+
+    return ret_ptr;
   }
 }  // namespace Sayuri
