@@ -2080,6 +2080,30 @@ R"...(### list-replace ###
     ;; > (111 "Hello" 333))...";
     help_dict_.emplace("list-replace", help);
 
+    func = LC_FUNCTION_OBJ(ListRemove);
+    INSERT_LC_FUNCTION(func, "list-remove", "Lisp:list-remove");
+    help =
+R"...(### list-remove ###
+
+<h6> Usage </h6>
+
+* `(list-remove <List> <Index : Number>)`
+
+<h6> Description </h6>
+
+* Returns List which has removed the `<Index>`th element of `<List>`.
+* The 1st element of `<List>` is 0.
+* If `<Index>` is negative number," It counts from the tail of `<List>`.
+
+<h6> Example </h6>
+
+    (define lst (list 111 222 333))
+    (display (list-remove lst 1))
+    
+    ;; Output
+    ;; > (111 333))...";
+    help_dict_.emplace("list-remove", help);
+
     func = LC_FUNCTION_OBJ(ListInsert);
     INSERT_LC_FUNCTION(func, "list-insert", "Lisp:list-insert");
     help =
@@ -2107,30 +2131,6 @@ R"...(### list-insert ###
     ;; > (111 222 "Hello World" 333)
     ;; > (111 222 333 "Hello World"))...";
     help_dict_.emplace("list-insert", help);
-
-    func = LC_FUNCTION_OBJ(ListRemove);
-    INSERT_LC_FUNCTION(func, "list-remove", "Lisp:list-remove");
-    help =
-R"...(### list-remove ###
-
-<h6> Usage </h6>
-
-* `(list-remove <List> <Index : Number>)`
-
-<h6> Description </h6>
-
-* Returns List which has removed the `<Index>`th element of `<List>`.
-* The 1st element of `<List>` is 0.
-* If `<Index>` is negative number," It counts from the tail of `<List>`.
-
-<h6> Example </h6>
-
-    (define lst (list 111 222 333))
-    (display (list-remove lst 1))
-    
-    ;; Output
-    ;; > (111 333))...";
-    help_dict_.emplace("list-remove", help);
 
     func = LC_FUNCTION_OBJ(ListSearch);
     INSERT_LC_FUNCTION(func, "list-search", "Lisp:list-search");
