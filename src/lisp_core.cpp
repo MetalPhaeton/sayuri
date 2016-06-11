@@ -4582,27 +4582,18 @@ R"...(### regex-search ###
       + "' of '" + target_ptr->ToString() + "'is out of range.");
     }
 
-    // 削除する前後のポインタを得る。。
-    LObject* prev = nullptr;
-    LPointer next = target_ptr->cdr();
-    for (; index > 0; --index) {
-      if (index == 0) break;
+    // ダミー要素を先頭につける。
+    LPointer temp = NewPair(NewNil(), target_ptr);
+    LObject* ptr = temp.get();
 
-      if (!prev) {
-        prev = target_ptr.get();
-      } else {
-        prev = prev->cdr().get();
-      }
+    // 削除する前の要素を特定する。
+    for (int i = 0; i < index; ++i) Next(&ptr);
 
-        next = next->cdr();
-    }
+    // 削除する。
+    ptr->cdr(ptr->cdr()->cdr());
 
-    // 削除する。。
-    if (!prev) {
-      return next;
-    }
-    prev->cdr(next);
-    return target_ptr;
+    // tempのCdrが戻り値。
+    return temp->cdr();
   }
 
   // %%% list-insert
