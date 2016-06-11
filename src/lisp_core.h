@@ -2486,6 +2486,9 @@ namespace Sayuri {
       /** ネイティブ関数 - map */
       DEF_LC_FUNCTION(Map);
 
+      /** ネイティブ関数 - zip */
+      DEF_LC_FUNCTION(Zip);
+
       // %%% range
       /** ネイティブ関数 - range */
       DEF_LC_FUNCTION(Range) {

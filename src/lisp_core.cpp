@@ -2193,6 +2193,12 @@ R"...(### map ###
     ;; > (111 222 333 444 555))...";
     help_dict_.emplace("map", help);
 
+    func = LC_FUNCTION_OBJ(Zip);
+    INSERT_LC_FUNCTION(func, "zip", "Lisp:zip");
+    help =
+R"...()...";
+    help_dict_.emplace("zip", help);
+
     func = LC_FUNCTION_OBJ(Range);
     INSERT_LC_FUNCTION(func, "range", "Lisp:range");
     help =
@@ -4648,6 +4654,45 @@ R"...(### regex-search ###
       // 関数呼び出し。
       func_pair->cdr(LPointerVecToList(temp_vec));
       ret_vec.push_back(caller->Evaluate(*func_pair));
+    }
+
+    return LPointerVecToList(ret_vec);
+  }
+
+  // %%% zip
+  DEF_LC_FUNCTION(Lisp::Zip) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    // 引数を評価してベクトルに入れる。
+    LPointerVec args_vec(CountList(*args_ptr));
+    LPointerVec::iterator args_itr = args_vec.begin();
+    for (; args_ptr->IsPair(); Next(&args_ptr), ++args_itr) {
+      *args_itr = caller->Evaluate(*(args_ptr->car()));
+    }
+
+    // ジップしていく。
+    LPointerVec ret_vec;
+    LPointerVec temp_vec;
+    while (true) {
+      // 初期化。
+      bool has_elm = false;
+      temp_vec.clear();
+
+      // ジップしたい要素を取り出す。
+      for (auto& ptr : args_vec) {
+        if (ptr->IsPair()) {
+          temp_vec.push_back(ptr->car());
+          ptr = ptr->cdr();
+          has_elm = true;
+        }
+      }
+
+      if (!has_elm) break;
+
+      // 追加していく。
+      ret_vec.push_back(LPointerVecToList(temp_vec));
     }
 
     return LPointerVecToList(ret_vec);
