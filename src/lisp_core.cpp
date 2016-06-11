@@ -2830,19 +2830,39 @@ R"...(### string-split ###
 
 <h6> Usage </h6>
 
-* `(string-split <String> <Delim String>)`
+* `(string-split <String> <Delim :String>)`
 
 <h6> Description </h6>
 
-* Returns List composed of split `<String>` by `<Delim String>`.
+* Separates `<Sting>` by `<Delim>` and returns the List.
 
 <h6> Example </h6>
 
     (display (string-split "aaaaSplit!bbbSplit!ccc" "Split!"))
-    
     ;; Output
     ;; > ("aaa" "bbb" "ccc"))...";
     help_dict_.emplace("string-split", help);
+
+    func = LC_FUNCTION_OBJ(StringJoin);
+    INSERT_LC_FUNCTION(func, "string-join", "Lisp:string-join");
+    help =
+R"...(### string-join ###
+
+<h6> Usage </h6>
+
+* `(string-join <List> <Delim : String>)`
+
+<h6> Description </h6>
+
+* Puts `<Delim>` between each elements of `<List>` and returns it.
+
+<h6> Example </h6>
+
+    (define ls '("Hello" "World" 111 222))
+    (display (string-join ls "[Delim!!]"))
+    ;; Output
+    ;; > Hello[Delim!!]World[Delim!!]111[Delim!!]222)...";
+    help_dict_.emplace("string-join", help);
 
     func = LC_FUNCTION_OBJ(Front);
     INSERT_LC_FUNCTION(func, "front", "Lisp:front");
@@ -4845,6 +4865,41 @@ R"...(### regex-search ###
 
     return LPointerVecToList(ret_vec);
   } 
+
+  // %%% string-join
+  DEF_LC_FUNCTION(Lisp::StringJoin) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 2, &args_ptr);
+
+    // 第1引数。 リスト。
+    LPointer list_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*list_ptr);
+    Next(&args_ptr);
+
+    // リストが空ならそのまま返す。
+    if (list_ptr->IsNil()) return list_ptr;
+
+    // 第2引数。 区切り文字。
+    LPointer delim_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*delim_ptr, LType::STRING);
+    const std::string& delim = delim_ptr->string();
+
+    // 間に挟んでいく。
+    // まずは第1要素。
+    std::ostringstream oss;
+    if (list_ptr->car()->IsString()) oss << list_ptr->car()->string();
+    else oss << list_ptr->car()->ToString();
+
+    // 第2要素以降。
+    for (LObject* ptr = list_ptr->cdr().get(); ptr->IsPair(); Next(&ptr)) {
+      oss << delim;
+      if (ptr->car()->IsString()) oss << ptr->car()->string();
+      else oss << ptr->car()->ToString();
+    }
+
+    return NewString(oss.str());
+  }
 
   // %%% regex-search
   DEF_LC_FUNCTION(Lisp::RegexSearch) {

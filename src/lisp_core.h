@@ -2921,6 +2921,9 @@ namespace Sayuri {
       /** ネイティブ関数 - string-split */
       DEF_LC_FUNCTION(StringSplit); 
 
+      /** ネイティブ関数 - string-join */
+      DEF_LC_FUNCTION(StringJoin); 
+
       // %%% front
       /** ネイティブ関数 - front */
       DEF_LC_FUNCTION(Front) {
