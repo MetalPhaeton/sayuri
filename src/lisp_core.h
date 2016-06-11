@@ -2477,6 +2477,9 @@ namespace Sayuri {
       /** ネイティブ関数 - list-remove */
       DEF_LC_FUNCTION(ListRemove);
 
+      /** ネイティブ関数 - list-insert */
+      DEF_LC_FUNCTION(ListInsert);
+
       /** ネイティブ関数 - list-search */
       DEF_LC_FUNCTION(ListSearch);
 

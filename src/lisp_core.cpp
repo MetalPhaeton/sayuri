@@ -2080,6 +2080,34 @@ R"...(### list-replace ###
     ;; > (111 "Hello" 333))...";
     help_dict_.emplace("list-replace", help);
 
+    func = LC_FUNCTION_OBJ(ListInsert);
+    INSERT_LC_FUNCTION(func, "list-insert", "Lisp:list-insert");
+    help =
+R"...(### list-insert ###
+
+<h6> Usage </h6>
+
+* `(list-insert <List> <Index : Number> <Object>)`
+
+<h6> Description </h6>
+
+* Insert `<Object>` into `<Index>` of `<List>` and returns it.
+* The 1st element of `<List>` is 0.
+* If `<Index>` is negative number," It counts from the tail of `<List>`.
+
+<h6> Example </h6>
+
+    (display (list-insert '(111 222 333) 0 "Hello World"))
+    (display (list-insert '(111 222 333) 1 "Hello World"))
+    (display (list-insert '(111 222 333) 2 "Hello World"))
+    (display (list-insert '(111 222 333) 3 "Hello World"))
+    ;; Output
+    ;; > ("Hello World" 111 222 333)
+    ;; > (111 "Hello World" 222 333)
+    ;; > (111 222 "Hello World" 333)
+    ;; > (111 222 333 "Hello World"))...";
+    help_dict_.emplace("list-insert", help);
+
     func = LC_FUNCTION_OBJ(ListRemove);
     INSERT_LC_FUNCTION(func, "list-remove", "Lisp:list-remove");
     help =
@@ -4575,6 +4603,52 @@ R"...(### regex-search ###
     }
     prev->cdr(next);
     return target_ptr;
+  }
+
+  // %%% list-insert
+  DEF_LC_FUNCTION(Lisp::ListInsert) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 3, &args_ptr);
+
+    // 第1引数。 ターゲットのリスト。
+    LPointer target_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*target_ptr);
+    int length = CountList(*target_ptr);
+    Next(&args_ptr);
+
+    // 第2引数。 インデックス。
+    LPointer index_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*index_ptr, LType::NUMBER);
+    int index = index_ptr->number();
+    if (index < 0) index = length + index;
+    if ((index < 0) || (index > length)) {  // insertの使用上、Lengthも含む。
+      throw GenError("@function-error", "Index '" + index_ptr->ToString()
+      + "' of '" + target_ptr->ToString() + "'is out of range.");
+    }
+    Next(&args_ptr);
+
+    // 第3引数。 挿入するオブジェクト。
+    LPointer obj_ptr = caller->Evaluate(*(args_ptr->car()));
+
+    // 挿入するオブジェクトをPairにしておく。
+    LPointer obj_pair = NewPair(obj_ptr, NewNil());
+
+    // ターゲットの先頭にダミーを入れる。。
+    LPointer temp = NewPair(NewNil(), target_ptr);
+
+    // 場所を特定する。
+    LObject* ptr = temp.get();
+    for (int i = 0; i < index; ++i) Next(&ptr);
+
+    // 付け替える。
+    // 先ず自分のCdrにptrのCdrを入れる。
+    obj_pair->cdr(ptr->cdr());
+    // ptrのCdrに自分を入れる。
+    ptr->cdr(obj_pair);
+
+    // tempのCdrが戻り値。
+    return temp->cdr();
   }
 
   // %%% list-search
