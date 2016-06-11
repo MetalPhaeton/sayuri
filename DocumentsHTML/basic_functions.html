@@ -38,9 +38,13 @@
 <li><a href="#list-replace"><code>list-replace</code></a> : Replaces an element of List
   for an object.</li>
 <li><a href="#list-remove"><code>list-remove</code></a> : Removes an element of List.</li>
+<li><a href="#list-insert"><code>list-insert</code></a> : Inserts object into List.</li>
 <li><a href="#list-search"><code>list-search</code></a> : Searches an object from List.</li>
 <li><a href="#list-path"><code>list-path</code></a> : Returns an object from List with path.</li>
+<li><a href="#map"><code>map</code></a> : Applies function and make List of returned values.</li>
+<li><a href="#zip"><code>zip</code></a> : Unions each element of Lists.</li>
 <li><a href="#string-split"><code>string-split</code></a> : Splits String.</li>
+<li><a href="#string-join"><code>string-join</code></a> : Joins Strings.</li>
 <li><a href="#regex-search"><code>regex-search</code></a> : Searches a pattern.</li>
 </ul>
 </li>
@@ -130,6 +134,13 @@
 <li><a href="#log2"><code>log2</code></a> : Calculates logarithm with 2.</li>
 <li><a href="#log10"><code>log10</code></a> : Calculates logarithm with 10.</li>
 <li><a href="#random"><code>random</code></a> : Gets a random Number.</li>
+</ul>
+</li>
+<li>
+<p><a href="#time-and-dates">Time and Date</a></p>
+<ul>
+<li><a href="#now"><code>now</code></a> : Returns current time and date.</li>
+<li><a href="#clock"><code>clock</code></a> : Returns execution time.</li>
 </ul>
 </li>
 </ul>
@@ -326,6 +337,31 @@
 ;; Output
 ;; &gt; (111 333)
 </code></pre>
+<h3 id="list-insert">list-insert</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(list-insert &lt;List&gt; &lt;Index : Number&gt; &lt;Object&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Insert <code>&lt;Object&gt;</code> into <code>&lt;Index&gt;</code> of <code>&lt;List&gt;</code> and returns it.</li>
+<li>The 1st element of <code>&lt;List&gt;</code> is 0.</li>
+<li>If <code>&lt;Index&gt;</code> is negative number," It counts from the tail of <code>&lt;List&gt;</code>.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(display (list-insert '(111 222 333) 0 "Hello World"))
+(display (list-insert '(111 222 333) 1 "Hello World"))
+(display (list-insert '(111 222 333) 2 "Hello World"))
+(display (list-insert '(111 222 333) 3 "Hello World"))
+;; Output
+;; &gt; ("Hello World" 111 222 333)
+;; &gt; (111 "Hello World" 222 333)
+;; &gt; (111 222 "Hello World" 333)
+;; &gt; (111 222 333 "Hello World")
+</code></pre>
 <h3 id="list-search">list-search</h3>
 <h6> Usage </h6>
 
@@ -412,23 +448,60 @@
 ;; Output
 ;; &gt; (111 222 333 444 555)
 </code></pre>
-<h3 id="string-split">string-split</h3>
+<h3 id="zip">zip</h3>
 <h6> Usage </h6>
 
 <ul>
-<li><code>(string-split &lt;String&gt; &lt;Delim String&gt;)</code></li>
+<li><code>(zip &lt;List&gt;...)</code></li>
 </ul>
 <h6> Description </h6>
 
 <ul>
-<li>Returns List composed of split <code>&lt;String&gt;</code> by <code>&lt;Delim String&gt;</code>.</li>
+<li>Unions each element of <code>&lt;List&gt;...</code> and returns it.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(display (zip '(a b c)
+              '(1 2 3)
+              '("Hello" "World")
+              '("aaa" "bbb" "ccc" "ddd")))
+;; Output
+;; &gt; ((a 1 "Hello" "aaa") (b 2 "World" "bbb") (c 3 "ccc") ("ddd"))
+</code></pre>
+<h3 id="string-split">string-split</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(string-split &lt;String&gt; &lt;Delim :String&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Separates <code>&lt;Sting&gt;</code> by <code>&lt;Delim&gt;</code> and returns the List.</li>
 </ul>
 <h6> Example </h6>
 
 <pre><code>(display (string-split "aaaaSplit!bbbSplit!ccc" "Split!"))
-
 ;; Output
 ;; &gt; ("aaa" "bbb" "ccc")
+</code></pre>
+<h3 id="string-join">string-join</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(string-join &lt;List&gt; &lt;Delim : String&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Puts <code>&lt;Delim&gt;</code> between each elements of <code>&lt;List&gt;</code> and returns it.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(define ls '("Hello" "World" 111 222))
+(display (string-join ls "[Delim!!]"))
+;; Output
+;; &gt; Hello[Delim!!]World[Delim!!]111[Delim!!]222
 </code></pre>
 <h3 id="regex-search">regex-search</h3>
 <h6> Usage </h6>
@@ -1519,6 +1592,46 @@
 
 ;; Output
 ;; &gt; -7.13453
+</code></pre>
+<h2 id="time-and-date">Time and Date</h2>
+<h3 id="now">now</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(now)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Returns List of current time.<ul>
+<li>List is <code>(&lt;Year&gt; &lt;Month&gt; &lt;Day&gt; &lt;Hour&gt; &lt;Minute&gt; &lt;Second&gt;)</code>.</li>
+</ul>
+</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>;; Run at 2016-6-11 15:26:59.
+(display (now))
+;; Output
+;; &gt; (2016 6 11 15 26 59)
+</code></pre>
+<h3 id="clock">clock</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(clock)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Returns execution time (seconds).</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>;; After 1.29 seconds from program has run.
+(clock)
+;; Output
+;; 1.29091
 </code></pre>
 </section>
 </div>
