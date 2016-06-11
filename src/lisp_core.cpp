@@ -161,12 +161,11 @@ namespace Sayuri {
             if ((*names_itr)[0] == '^') {
               // マクロ名。
               // マクロマップに登録。
-              macro_map[*names_itr] = ptr->car();
+              macro_map.push_back(LMacroElm(*names_itr, ptr->car()));
             } else if ((*names_itr)[0] == '&') {
               // マクロ名。 (残りリスト)
               // 残りをマクロマップに入れて抜ける。
-              macro_map[*names_itr] = ptr;
-              break;
+              macro_map.push_back(LMacroElm(*names_itr, ptr));
             } else {
               // 普通の引数名。
               // 評価してバインド。

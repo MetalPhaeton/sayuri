@@ -182,8 +182,10 @@ namespace Sayuri {
       }
   };
 
-  /** マクロ用マップ。 <置き換えるシンボル, 置き換える値> */
-  using LMacroMap = std::map<std::string, LPointer>;
+  /** マクロマップ用要素。 */
+  using LMacroElm = std::pair<std::string, LPointer>;
+  /** マクロマップ。 <置き換えるシンボル, 置き換える値> */
+  using LMacroMap = std::vector<LMacroElm>;
 
   /**
    * マクロ展開用関数。
