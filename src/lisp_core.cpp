@@ -59,6 +59,41 @@ namespace Sayuri {
   const LScopeChain LObject::dummy_scope_chain_;
   const LC_Function LObject::dummy_c_function_;
 
+  // マクロ展開する。
+  void DevelopMacro(LObject* ptr, const LMacroMap& macro_map) {
+    // まずはCarから。
+    LObject* car = ptr->car().get();
+    if (car->IsPair()) {
+      // ペアなら再帰コール。
+      DevelopMacro(car, macro_map);
+    } else if (car->IsSymbol()) {
+      // シンボルなら置き換え。
+      const std::string& symbol = car->symbol();
+      for (auto& map_pair : macro_map) {
+        if (map_pair.first == symbol) {
+          ptr->car(map_pair.second->Clone());
+          break;
+        }
+      }
+    }
+
+    // 次にCdr。
+    LObject* cdr = ptr->cdr().get();
+    if (cdr->IsPair()) {
+      // ペアなら再帰コール。
+      DevelopMacro(cdr, macro_map);
+    } else if (cdr->IsSymbol()) {
+      // シンボルなら置き換え。
+      const std::string& symbol = cdr->symbol();
+      for (auto& map_pair : macro_map) {
+        if (map_pair.first == symbol) {
+          ptr->cdr(map_pair.second->Clone());
+          break;
+        }
+      }
+    }
+  }
+
   // 式を評価する。
   LPointer LObject::Evaluate(const LObject& target) {
     // 自分が関数でなければ、何もしない。
@@ -101,7 +136,7 @@ namespace Sayuri {
 
       // リスプの関数。
       if (func_obj->IsFunction()) {
-        // --- 引数をローカルスコープにバインド --- //
+        // 引数リスト。
         const LPointer& arguments = target.cdr();
 
         // $@のリスト。
@@ -113,105 +148,75 @@ namespace Sayuri {
         LArgNames::const_iterator names_itr = names.begin();
         LArgNames::const_iterator names_end = names.end();
 
-        // 各引数を評価。
+        // マクロマップ。
+        LMacroMap macro_map;
+
+        // 各引数を整理。
+        // 普通の引数なら評価してバインド。
+        // マクロならmacro_mapに登録。
         LPointer result;
-        std::map<std::string, LPointer> macro_args;
-        bool is_macro = false;
-        const char* name;
         for (LPointer ptr = arguments; ptr->IsPair();
         ptr = ptr->cdr(), Lisp::Next(&at_ptr)) {
-          // 引数の準備。
-          is_macro = false;
-          if (names_itr != names_end) {
-            // 引数名があった場合。
-            name = names_itr->c_str();
-            if (name[0] == '^') {
-              // マクロ引数。
-              is_macro = true;
-            } else if (name[0] == '&') {
-              // マクロリスト引数。
-              // 残りをまとめてマクロ引数にしてループを抜ける。
-              macro_args[name] = ptr;
+          if (names_itr != names_end) {  // 引数名がある。
+            if ((*names_itr)[0] == '^') {
+              // マクロ名。
+              // マクロマップに登録。
+              macro_map[*names_itr] = ptr->car();
+            } else if ((*names_itr)[0] == '&') {
+              // マクロ名。 (残りリスト)
+              // 残りをマクロマップに入れて抜ける。
+              macro_map[*names_itr] = ptr;
               break;
+            } else {
+              // 普通の引数名。
+              // 評価してバインド。
+              result = Evaluate(*(ptr->car()));
+              local_chain.InsertSymbol(*names_itr, result);
+
+              // at_listにも登録。
+              at_ptr->car(result);
             }
+
             ++names_itr;
-          } else {
-            name = nullptr;
-          }
-
-          // 引数を評価。
-          if (!is_macro) {
-            result = Evaluate(*(ptr->car()));
-            if (!result) {
-              throw Lisp::GenError("@evaluating-error",
-              "Couldn't evaluate '" + ptr->car()->ToString() + "'.");
-            }
-
-            // ローカルスコープにバインド。
-            if (name) {
-              local_chain.InsertSymbol(name, result);
-            }
-
-            // $@に追加。
-            at_ptr->car(result);
-          } else {
-            macro_args[name] = ptr->car();
+          } else {  // 引数名がない。
+            // at_listに登録するだけ。
+            at_ptr->car(Evaluate(*(ptr->car())));
           }
         }
-
-        // 引数リストをバインド。
+        // at_listをスコープにバインド。
         local_chain.InsertSymbol("$@", at_list);
 
-        // ローカルスコープをセット。
+        // ローカルスコープを関数オブジェクトにセット。
         func_obj->scope_chain(local_chain);
 
-        // --- マクロ引数を展開 --- //
-        LPointerVec expression = func_obj->expression();
-        if (macro_args.size()) {
-          std::map<std::string, LPointer>::iterator
-          macro_end = macro_args.end();
+        // もしマクロ引数があったなら、マクロ展開する。
+        // マクロがなかったらそのまま。
+        LPointerVec expression;
+        if (!(macro_map.empty())) {
+          LPointer clone;
+          for (auto& expr : func_obj->expression()) {
+            clone = expr->Clone();
 
-          // 展開用関数。
-          std::function<void(LObject& obj)> core;
-          core = [&core, &macro_args, &macro_end](LObject& obj) {
-            // まずはcar。
-            const LPointer& temp_car = obj.car();
-            if (temp_car->IsPair()) {
-              core(*temp_car);
-            } else if (temp_car->IsSymbol()) {
-              const std::string& symbol = temp_car->symbol();
-              if (macro_args.find(symbol) != macro_end) {
-                obj.car(macro_args.at(symbol)->Clone());
+            // マクロ展開。
+            if (clone->IsPair()) {
+              DevelopMacro(clone.get(), macro_map);
+            } else if (clone->IsSymbol()) {
+              const std::string symbol = clone->symbol();
+              for (auto& map_pair : macro_map) {
+                if (map_pair.first == symbol) {
+                  clone = map_pair.second->Clone();
+                  break;
+                }
               }
             }
 
-            // 次はcdr。
-            const LPointer& temp_cdr = obj.cdr();
-            if (temp_cdr->IsPair()) {
-              core(*temp_cdr);
-            } else if (temp_cdr->IsSymbol()) {
-              const std::string& symbol = temp_cdr->symbol();
-              if (macro_args.find(symbol) != macro_end) {
-                obj.cdr(macro_args.at(symbol)->Clone());
-              }
-            }
-          };
-
-          // 展開。
-          for (auto& expr_ptr : expression) {
-            expr_ptr = expr_ptr->Clone();
-            if (expr_ptr->IsPair()) {
-              core(*expr_ptr);
-            } else if (expr_ptr->IsSymbol()) {
-              const std::string& symbol = expr_ptr->symbol();
-              if (macro_args.find(symbol) != macro_end) {
-                expr_ptr = macro_args.at(symbol)->Clone();
-              }
-            }
+            expression.push_back(clone);
           }
+        } else {
+          expression = func_obj->expression();
         }
 
-        // --- 関数呼び出し --- //
+        // 関数呼び出し。
         LPointer ret_ptr = Lisp::NewNil();
         for (auto& expr : expression) {
           ret_ptr = func_obj->Evaluate(*expr);
