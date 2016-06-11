@@ -2196,7 +2196,24 @@ R"...(### map ###
     func = LC_FUNCTION_OBJ(Zip);
     INSERT_LC_FUNCTION(func, "zip", "Lisp:zip");
     help =
-R"...()...";
+R"...(### zip ###
+
+<h6> Usage </h6>
+
+* `(zip <List>...)`
+
+<h6> Description </h6>
+
+* Unions each element of `<List>...` and returns it.
+
+<h6> Example </h6>
+
+    (display (zip '(a b c)
+                  '(1 2 3)
+                  '("Hello" "World")
+                  '("aaa" "bbb" "ccc" "ddd")))
+    ;; Output
+    ;; > ((a 1 "Hello" "aaa") (b 2 "World" "bbb") (c 3 "ccc") ("ddd")))...";
     help_dict_.emplace("zip", help);
 
     func = LC_FUNCTION_OBJ(Range);
