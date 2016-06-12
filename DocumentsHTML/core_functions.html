@@ -26,6 +26,7 @@
 <li><a href="#quote"><code>quote</code></a> : Doesn't evaluate an expression.</li>
 <li><a href="#backquote"><code>backquote</code></a> : Generate Object with template.</li>
 <li><a href="#define"><code>define</code></a> : Binds an object or define a function.</li>
+<li><a href="#define-macro">`define-macro</a> : Defines Traditiona Macors.</li>
 <li><a href="#set"><code>set!</code></a> : Rewrites a bound object.</li>
 <li><a href="#lambda"><code>lambda</code></a> : Generates Function.</li>
 <li><a href="#func-to-lambda"><code>func-&gt;lambda</code></a> : Converts Function to List.</li>
@@ -330,6 +331,35 @@
 ;; Output
 ;; &gt; (lambda () (display (apply (quote +) (quote (111 222)))))
 ;; &gt; (lambda () (display (apply (quote *) (quote (333 444 555)))))
+</code></pre>
+<h3 id="define-macro">define-macro</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(define-macro (&lt;Name : Symbol&gt; &lt;Args : Symbol&gt;...) &lt;S-Expression&gt;...)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>This is Special Form.<ul>
+<li>All arguments isn't evaluated.</li>
+</ul>
+</li>
+<li>Defines Traditional Macros and returns <code>&lt;Name&gt;</code>.</li>
+<li>Unlike Macro-Like Arguments, this doesn't have its own scope.</li>
+<li>If an argument name is started with <code>&amp;</code>, it means the rest of arguments.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(define a 111)
+(define b 222)
+(define c 333)
+(define d 444)
+
+(define-macro (my-macro x y &amp;z) '(x y &amp;z))
+(display (my-macro a b c d))
+;; Output
+;; &gt; (a b (c d))
 </code></pre>
 <h3 id="set">set!</h3>
 <h6> Usage </h6>

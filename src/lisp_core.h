@@ -2310,6 +2310,9 @@ namespace Sayuri {
       /** ネイティブ関数 - define */
       DEF_LC_FUNCTION(Define);
 
+      /** ネイティブ関数 - define-macro */
+      DEF_LC_FUNCTION(DefineMacro);
+
       /** ネイティブ関数 - lambda */
       DEF_LC_FUNCTION(Lambda);
 
