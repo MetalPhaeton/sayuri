@@ -45,6 +45,8 @@
 #include <random>
 #include <chrono>
 #include <ctime>
+#include <thread>
+#include <mutex>
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -411,7 +413,7 @@ namespace Sayuri {
        */
       virtual void c_function(const LC_Function& c_function) {}
       /**
-       * アクセサ - ネイティブ関数用識別文字列。
+       * ミューテータ - ネイティブ関数用識別文字列。
        * @return ネイティブ関数用識別文字列。
        */
       virtual void func_id(const std::string& id) {}
@@ -1465,6 +1467,7 @@ namespace Sayuri {
       /**
        * コンストラクタ。
        * @param c_function C言語関数オブジェクト。
+       * @param func_id 関数識別文字列。
        * @param scope_chain スコープチェーン。
        */
       LN_Function(const LC_Function& c_function,

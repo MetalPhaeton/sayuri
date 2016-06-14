@@ -47,6 +47,8 @@
 #include <regex>
 #include <ctime>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 #include <system_error>
 
 /** Sayuri 名前空間。 */
@@ -1971,14 +1973,189 @@ R"...(### input-stream ###
     func = LC_FUNCTION_OBJ(GenThread);
     INSERT_LC_FUNCTION(func, "gen-thread", "Lisp:gen-thread");
     help =
-R"...()...";
+R"...(### gen-thread ###
+
+<h6> Usage </h6>
+
+* `(gen-thread <Function>)`
+
+<h6> Description </h6>
+
+* Returns Thread object.
+* It is controlled by Message Symbol.
+    + `@start` : Starts `<Function>` on another thread.
+    + `@join` : Waits for `<Function>` to be terminated.
+    + `@terminated?` : If `<Function>` has already been terminated, returns #t.
+
+<h6> Example </h6>
+
+    ;; Make function object.
+    (define (inner-func)
+            (display "Hello")
+            (sleep 10)
+            (display "World"))
+    
+    ;; Generate Thread object.
+    (define my-thread (gen-thread inner-func))
+    
+    ;; Start new thread.
+    (my-thread '@start)
+    
+    ;; Judge the thread is terminated.
+    (sleep 2)
+    (display (my-thread '@terminated?))
+    
+    ;; Wait for the thread.
+    (my-thread '@join)
+    
+    ;; Output
+    ;; > Hello
+    ;; > #f  ;; the thread has not been terminated yet.
+    ;; > World  ;; This word is printed after 10 seconds from "Hello".)...";
     help_dict_.emplace("gen-thread", help);
 
     func = LC_FUNCTION_OBJ(Sleep);
     INSERT_LC_FUNCTION(func, "sleep", "Lisp:sleep");
     help =
-R"...()...";
+R"...(### sleep ###
+
+<h6> Usage </h6>
+
+* `(sleep <Seconds : Number>)`
+
+<h6> Description </h6>
+
+* Sleeps the current thread for `<Seconds>` seconds.
+
+<h6> Example </h6>
+
+    (display "Hello")
+    
+    (sleep 10)
+    
+    (display "World")
+    ;; Output
+    ;; > Hello
+    ;; > World  ;; This word is printed after 10 seconds from "Hello".)...";
     help_dict_.emplace("sleep", help);
+
+    func = LC_FUNCTION_OBJ(GenMutex);
+    INSERT_LC_FUNCTION(func, "gen-mutex", "Lisp:gen-mutex");
+    help =
+R"...(### gen-mutex ###
+
+<h6> Usage </h6>
+
+* `(gen-mutex)`
+
+<h6> Description </h6>
+
+* Generates Mutex object.
+* It is controlled by Message Symbol.
+    + `@lock` : Locks mutex.
+    + `@unlock` : Unlocks mutex.
+    + `@synchronize <S-Expressions>...` :
+        - Locks mutex and executes `<S-Expressions>...`.
+            - If `<S-Expression>...` is ended,
+              the mutex is unlocked and returns the last expression.
+        - `<S-Expressions>...` is executed on new local scope.
+        - `(wait)` is bound in the new local scope.
+            - If `(wait)` is called, the mutex is unlocked
+              and the thread sleeps until `@notify-one` or `@notify-all`.
+    + `@notify-one` : Wakes one thread up at `(wait)`.
+    + `@notify-all` : Wakes all threads up at `(wait)`.
+
+<h6> Example </h6>
+
+    ;; --- Test `@lock` and `@unlock` --- ;;
+    ;; Generate Mutex.
+    (define my-mutex (gen-mutex))
+    
+    ;; Define function that uses `@lock` and `@unlock`.
+    (define (func-1 word)
+            (my-mutex '@lock)
+            (display "Hello : " word)
+            (sleep 10)
+            (my-mutex '@unlock))
+    
+    ;; Generate Threads.
+    (define thread-1 (gen-thread (lambda () (func-1 "Apple"))))
+    (define thread-2 (gen-thread (lambda () (func-1 "Banana"))))
+    
+    ;; Start threads.
+    (thread-1 '@start)
+    (thread-2 '@start)
+    
+    ;; Wait for threads.
+    (thread-1 '@join)
+    (thread-2 '@join)
+    
+    ;; Output
+    ;; > Hello : Banana
+    ;; > Hello : Apple  ;; This is printed after 10 seconds.
+    
+    ;; --- Test `@synchronize` --- ;;
+    (define (func-2 word)
+            (my-mutex '@synchronize
+                      (display "Hello : " word)
+                      (sleep 10)))
+    
+    (define thread-3 (gen-thread (lambda () (func-2 "Water"))))
+    (define thread-4 (gen-thread (lambda () (func-2 "Fire"))))
+    
+    (thread-3 '@start)
+    (thread-4 '@start)
+    
+    (thread-3 '@join)
+    (thread-4 '@join)
+    
+    ;; Output
+    ;; > Hello : Water
+    ;; > Hello : Fire  ;; This is printed after 10 seconds.
+    
+    ;; --- Test `@notify-one` and `(wait)` --- ;;
+    (define (func-3 word)
+            (my-mutex '@synchronize
+                      (wait)
+                      (display "Hello : " word)))
+    
+    (define thread-5 (gen-thread (lambda () (func-3 "Sun"))))
+    (define thread-6 (gen-thread (lambda () (func-3 "Moon"))))
+    
+    (thread-5 '@start)
+    (thread-6 '@start)
+    
+    ;; Notify each thread.
+    (sleep 2)
+    (my-mutex '@notify-one)
+    (sleep 10)
+    (my-mutex '@notify-one)
+    
+    (thread-5 '@join)
+    (thread-6 '@join)
+    
+    ;; Output
+    ;; > Hello : Sun
+    ;; > Hello : Moon  ;; This is printed after 10 seconds.
+    
+    ;; --- Test `@notify-all` and `(wait)` --- ;;
+    (define thread-7 (gen-thread (lambda () (func-3 "Mario"))))
+    (define thread-8 (gen-thread (lambda () (func-3 "Sonic"))))
+    
+    (thread-7 '@start)
+    (thread-8 '@start)
+    
+    ;; Notify all threads.
+    (sleep 10)
+    (my-mutex '@notify-all)
+    
+    (thread-7 '@join)
+    (thread-8 '@join)
+    
+    ;; Output
+    ;; > Hello : Mario
+    ;; > Hello : Sonic  ;; This is printed same time.)...";
+    help_dict_.emplace("gen-mutex", help);
 
     func = LC_FUNCTION_OBJ(System);
     INSERT_LC_FUNCTION(func, "system", "Lisp:system");
@@ -3976,7 +4153,7 @@ R"...(### clock ###
     // 関数オブジェクトを作成。
     LC_Function func = [macro_map_ptr, expression_list](LPointer self,
     LObject* caller, const LObject& args) -> LPointer {
-      LObject* args_ptr = args.cdr().get();
+      LPointer args_ptr = args.cdr();
 
       // マクロマップをコピー。
       LMacroMap macro_map_clone = *macro_map_ptr;
@@ -3989,14 +4166,14 @@ R"...(### clock ###
         // 登録。
         if (map_pair.first[0] == '&') {
           // 残り全部のマクロ引数。
-          map_pair.second = args_ptr->Clone();
+          map_pair.second = args_ptr;
           break;
         } else {
           // 普通のマクロ引数。
-          map_pair.second = args_ptr->car()->Clone();
+          map_pair.second = args_ptr->car();
         }
 
-        Next(&args_ptr);
+        args_ptr = args_ptr->cdr();
       }
 
       // 式をクローン。
@@ -4668,6 +4845,91 @@ R"...(### clock ###
     std::this_thread::sleep_for(sleep_time);
 
     return seconds_ptr;
+  }
+
+  // %%% gen-mutex
+  DEF_LC_FUNCTION(Lisp::GenMutex) {
+    // 各オブジェクトを作成。
+    std::shared_ptr<std::mutex> mutex_ptr(new std::mutex);
+    std::shared_ptr<std::condition_variable>
+    cond_var_ptr(new std::condition_variable());
+
+    // 関数オブジェクトを作成。
+    LC_Function func = [mutex_ptr, cond_var_ptr](LPointer self,
+    LObject* caller, const LObject& args) -> LPointer {
+      // 準備。
+      LObject* args_ptr = nullptr;
+      GetReadyForFunction(args, 1, &args_ptr);
+
+      // メッセージシンボルを得る。
+      LPointer symbol_ptr = caller->Evaluate(*(args_ptr->car()));
+      CheckType(*symbol_ptr, LType::SYMBOL);
+      const std::string& message = symbol_ptr->symbol();
+
+      if (message == "@lock") {  // ロック。
+        mutex_ptr->lock();
+        return NewBoolean(true);
+      }
+
+      if (message == "@unlock") {  // アンロック。
+        mutex_ptr->unlock();
+        return NewBoolean(true);
+      }
+
+      if (message == "@synchronize") {
+        std::unique_lock<std::mutex> lock(*mutex_ptr);  // ユニークロック。
+
+        // ローカルスコープを作成。
+        LScopeChain local_chain = caller->scope_chain();
+        local_chain.AppendNewScope();
+
+        // (wait)関数を作成。
+        LC_Function wait_func =
+        [&lock, &mutex_ptr, &cond_var_ptr](LPointer self,
+        LObject* caller, const LObject& args) -> LPointer {
+          cond_var_ptr->wait(lock);
+          return NewBoolean(true);
+        };
+
+        // バインド。
+        local_chain.InsertSymbol("wait", NewN_Function(wait_func, "Lisp:wait:"
+        + std::to_string(reinterpret_cast<std::size_t>(mutex_ptr.get())),
+        local_chain));
+
+        // 自身にローカルチェーンをセット。
+        self->scope_chain(local_chain);
+
+        // 各S式を実行。
+        LPointer ret_ptr = NewNil();
+        for (LObject* ptr = args_ptr->cdr().get(); ptr->IsPair(); Next(&ptr)) {
+          const LPointer& car = ptr->car();
+
+          // 自身のスコープで実行。
+          ret_ptr = self->Evaluate(*car);
+        }
+
+        return ret_ptr;
+      }
+
+      if (message == "@notify-one") {
+        cond_var_ptr->notify_one();
+        return NewBoolean(true);
+      }
+
+      if (message == "@notify-all") {
+        cond_var_ptr->notify_all();
+        return NewBoolean(true);
+      }
+
+      throw GenError("@function-error",
+      "'" + message + "' is not Mutex's Message Symbol.");
+    };
+
+    LPointer ret_ptr = NewN_Function(func, "Lisp:gen-mutex:"
+    + std::to_string(reinterpret_cast<std::size_t>(mutex_ptr.get())),
+    caller->scope_chain());
+
+    return ret_ptr;
   }
 
   // %%% append

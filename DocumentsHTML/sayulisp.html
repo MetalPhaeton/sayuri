@@ -246,6 +246,22 @@ Sayulisp embeds them into its definition before executes it.</p>
 ;; &gt; And
 ;; &gt; Sayuri
 </code></pre>
+<h3 id="traditional-macros">Traditional Macros</h3>
+<p>Sayulisp supports Traditional Macros.</p>
+<p>You can define macro with <a href="core_functions.html#define-macro"><code>(define-macro)</code></a>.</p>
+<p>If an argument name starts with '<code>&amp;</code>', it means the rest of arguments.</p>
+<h6> Example </h6>
+
+<pre><code>(define a 111)
+(define b 222)
+(define c 333)
+(define d 444)
+
+(define-macro (my-macro x y &amp;z) '(x y &amp;z))
+(display (my-macro a b c d))
+;; Output
+;; &gt; (a b (c d))
+</code></pre>
 <h3 id="back-quote-template">Back-Quote Template</h3>
 <p>Sayulisp supports back-quote template.</p>
 <p>If you modify Atom or List with back-quote, it isn't evaluated like <code>(quote)</code>.</p>
@@ -369,6 +385,104 @@ Sayulisp reads and executes it.</p>
 ;; &gt; Hello World
 :: &gt; a: 111
 :: &gt; b: 222
+</code></pre>
+<h3 id="multithreading">Multithreading</h3>
+<p>Sayulisp supports Multithreading.</p>
+<ul>
+<li><a href="core_functions.html#gen-thread"><code>(gen-thread)</code></a></li>
+<li><a href="core_functions.html#sleep"><code>(sleep)</code></a></li>
+<li><a href="core_functions.html#gen-mutex"><code>(gen-mutex)</code></a></li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>;; --- Test `@lock` and `@unlock` --- ;;
+;; Generate Mutex.
+(define my-mutex (gen-mutex))
+
+;; Define function that uses `@lock` and `@unlock`.
+(define (func-1 word)
+        (my-mutex '@lock)
+        (display "Hello : " word)
+        (sleep 10)
+        (my-mutex '@unlock))
+
+;; Generate Threads.
+(define thread-1 (gen-thread (lambda () (func-1 "Apple"))))
+(define thread-2 (gen-thread (lambda () (func-1 "Banana"))))
+
+;; Start threads.
+(thread-1 '@start)
+(thread-2 '@start)
+
+;; Wait for threads.
+(thread-1 '@join)
+(thread-2 '@join)
+
+;; Output
+;; &gt; Hello : Banana
+;; &gt; Hello : Apple  ;; This is printed after 10 seconds.
+
+;; --- Test `@synchronize` --- ;;
+(define (func-2 word)
+        (my-mutex '@synchronize
+                  (display "Hello : " word)
+                  (sleep 10)))
+
+(define thread-3 (gen-thread (lambda () (func-2 "Water"))))
+(define thread-4 (gen-thread (lambda () (func-2 "Fire"))))
+
+(thread-3 '@start)
+(thread-4 '@start)
+
+(thread-3 '@join)
+(thread-4 '@join)
+
+;; Output
+;; &gt; Hello : Water
+;; &gt; Hello : Fire  ;; This is printed after 10 seconds.
+
+;; --- Test `@notify-one` and `(wait)` --- ;;
+(define (func-3 word)
+        (my-mutex '@synchronize
+                  (wait)
+                  (display "Hello : " word)))
+
+(define thread-5 (gen-thread (lambda () (func-3 "Sun"))))
+(define thread-6 (gen-thread (lambda () (func-3 "Moon"))))
+
+(thread-5 '@start)
+(thread-6 '@start)
+
+;; Notify each thread.
+(sleep 2)
+(my-mutex '@notify-one)
+(sleep 10)
+(my-mutex '@notify-one)
+
+(thread-5 '@join)
+(thread-6 '@join)
+
+;; Output
+;; &gt; Hello : Sun
+;; &gt; Hello : Moon  ;; This is printed after 10 seconds.
+
+;; --- Test `@notify-all` and `(wait)` --- ;;
+(define thread-7 (gen-thread (lambda () (func-3 "Mario"))))
+(define thread-8 (gen-thread (lambda () (func-3 "Sonic"))))
+
+(thread-7 '@start)
+(thread-8 '@start)
+
+;; Notify all threads.
+(sleep 10)
+(my-mutex '@notify-all)
+
+(thread-7 '@join)
+(thread-8 '@join)
+
+;; Output
+;; &gt; Hello : Mario
+;; &gt; Hello : Sonic  ;; This is printed same time.
 </code></pre>
 <h3 id="warning">Warning!!!!</h3>
 <p>Sayuri works correctly on a correct position.<br />
