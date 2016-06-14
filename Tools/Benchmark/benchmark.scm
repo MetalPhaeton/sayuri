@@ -31,13 +31,13 @@
 (define hash-size 512)
 
 ;; Number of repeat.
-(define repeat 5)
+(define repeat 30)
 
 ;; Position. (FEN)
 (define fen "r1bq1r1k/p1pnbpp1/1p2p3/6p1/3PB3/5N2/PPPQ1PPP/2KR3R w - - 0 1")
 
 ;; Depth. (Ply)
-(define depth 5)
+(define depth 13)
 ;;-----------------------------------------------------------------------------
 
 ;; Generate Engine.
