@@ -31,7 +31,7 @@
 (define hash-size 512)
 
 ;; Number of repeat.
-(define repeat 30)
+(define repeat 2) 
 
 ;; Position. (FEN)
 (define fen "r1bq1r1k/p1pnbpp1/1p2p3/6p1/3PB3/5N2/PPPQ1PPP/2KR3R w - - 0 1")
@@ -52,9 +52,9 @@
 
 ;; If str is "info..", then update info-str.
 (define (info?-update str)
-  (if (not (null? (regex-search "^info" str)))
-      (set! output str)
-      ()))
+        (if (not (null? (regex-search "^info" str)))
+            (set! output str)
+            ()))
 
 ;; Append Datas
 (define (append-datas li)
@@ -72,13 +72,12 @@
 
 ;; Mean.
 (define (mean li)
-  (/ (apply + li) (length li)))
+        (/ (apply + li) (length li)))
 
 ;; Dispersion.
 (define (var li)
-  (define m (mean li))
-  (define (func x) (* (- x m) (- x m)))
-  (mean (map func li)))
+        (define m (mean li))
+        (mean (map (lambda (x) (* (- x m) (- x m))) li)))
 
 ;; Standard Deviation.
 (define (dev li) (sqrt (var li)))
@@ -87,70 +86,60 @@
 
 ;; Mode.
 (define (mode li)
-  (define (func x) (if (<= x 0.01) (log 0.01) (log x)))
-  (define log-nums (map func li))
-  (exp (- (mean log-nums) (var log-nums))))
+        (define log-nums
+                (map (lambda (x) (if (<= x 0.01) (log 0.01) (log x))) li))
+        (exp (- (mean log-nums) (var log-nums))))
 
 ;; Listener.
 (define (output-listener message)
-  (stderr (append message "\n"))
-  (info?-update message))
+        (stderr (append message "\n"))
+        (info?-update message)) 
 
 ;; Print result.
 (define (print-result)
-  (display "##########")
-  (display "# Result #")
-  (display "##########")
-
-  (display "")
-
-  ;; Configure.
-  (display "Settings:")
-  (display "      Threads: " threads)
-  (display "    Hash Size: " hash-size)
-  (display "       Repeat: " repeat)
-  (display "     Position: " fen)
-  (display "        Depth: " depth)
-
-  (display "")
-
-  ;; Time.
-  (display "Time:")
-  (display "    Mean: " (mean data-time))
-  (display "     Max: " (apply max data-time))
-  (display "     Min: " (apply min data-time))
-  (display "    SDev: " (dev data-time))
-  (display "    Mode: " (mode data-time))
-
-  (display "")
-
-  ;; Nodes.
-  (display "Nodes:")
-  (display "    Mean: " (mean data-nodes))
-  (display "     Max: " (apply max data-nodes))
-  (display "     Min: " (apply min data-nodes))
-  (display "    SDev: " (dev data-nodes))
-  (display "    Mode: " (mode data-nodes))
-
-  (display "")
-
-  ;; NPS
-  (display "NPS:")
-  (display "    Mean: " (mean data-nps))
-  (display "     Max: " (apply max data-nps))
-  (display "     Min: " (apply min data-nps))
-  (display "    SDev: " (dev data-nps))
-  (display "    Mode: " (mode data-nps))
-
-  (display "")
-
-  ;; Hash Full
-  (display "Hash Full:")
-  (display "    Mean: " (mean data-hashfull))
-  (display "     Max: " (apply max data-hashfull))
-  (display "     Min: " (apply min data-hashfull))
-  (display "    SDev: " (dev data-hashfull))
-  (display "    Mode: " (mode data-hashfull)))
+        (display "##########")
+        (display "# Result #")
+        (display "##########")
+        (display "")
+        ;; Configure.
+        (display "Settings:")
+        (display "      Threads: " threads)
+        (display "    Hash Size: " hash-size)
+        (display "       Repeat: " repeat)
+        (display "     Position: " fen)
+        (display "        Depth: " depth)
+        (display "")
+        ;; Time.
+        (display "Time:")
+        (display "    Mean: " (mean data-time))
+        (display "     Max: " (apply max data-time))
+        (display "     Min: " (apply min data-time))
+        (display "    SDev: " (dev data-time))
+        (display "    Mode: " (mode data-time))
+        (display "")
+        ;; Nodes.
+        (display "Nodes:")
+        (display "    Mean: " (mean data-nodes))
+        (display "     Max: " (apply max data-nodes))
+        (display "     Min: " (apply min data-nodes))
+        (display "    SDev: " (dev data-nodes))
+        (display "    Mode: " (mode data-nodes))
+        (display "")
+        ;; NPS
+        (display "NPS:")
+        (display "    Mean: " (mean data-nps))
+        (display "     Max: " (apply max data-nps))
+        (display "     Min: " (apply min data-nps))
+        (display "    SDev: " (dev data-nps))
+        (display "    Mode: " (mode data-nps))
+        (display "")
+        ;; Hash Full
+        (display "Hash Full:")
+        (display "    Mean: " (mean data-hashfull))
+        (display "     Max: " (apply max data-hashfull))
+        (display "     Min: " (apply min data-hashfull))
+        (display "    SDev: " (dev data-hashfull))
+        (display "    Mode: " (mode data-hashfull)))
 
 ;; --- Run --- ;;
 ;; Get ready.
@@ -162,11 +151,11 @@
 ;; Go.
 (define str-list ())
 (for (x (range repeat))
-       (engine '@input-uci-command "ucinewgame")
-       (engine '@input-uci-command (append "position fen " fen))
-       (engine '@go-depth depth)
-       (append-datas (string-split output " "))
-       )
+     (engine '@input-uci-command "ucinewgame")
+     (engine '@input-uci-command (append "position fen " fen))
+     (engine '@go-depth depth)
+     (append-datas (string-split output " ")))
+
 ;; Result.
 (stderr "\n")
 (print-result)
