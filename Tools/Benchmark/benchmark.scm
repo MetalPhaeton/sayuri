@@ -31,13 +31,13 @@
 (define hash-size 512)
 
 ;; Number of repeat.
-(define repeat 10)
+(define repeat 5)
 
 ;; Position. (FEN)
 (define fen "r1bq1r1k/p1pnbpp1/1p2p3/6p1/3PB3/5N2/PPPQ1PPP/2KR3R w - - 0 1")
 
 ;; Depth. (Ply)
-(define depth 13)
+(define depth 5)
 ;;-----------------------------------------------------------------------------
 
 ;; Generate Engine.
@@ -52,32 +52,23 @@
 
 ;; If str is "info..", then update info-str.
 (define (info?-update str)
-  (if (equal? (ref (string-split str " ") 0) "info")
-    (set! output str) ()))
+  (if (not (null? (regex-search "^info" str)))
+      (set! output str)
+      ()))
 
-;; If str is "bestmove..", then return #t. Otherwise return #f
-(define (bestmove? str)
-  (if (equal? (ref (string-split str " ") 0) "bestmove") #t #f))
-
-;; Append time data.
-(define (append-time li)
-  (push-back! data-time
-              (parse (ref li (++ (list-search li "time"))))))
-
-;; Append nodes data.
-(define (append-nodes li)
-  (push-back! data-nodes
-              (parse (ref li (++ (list-search li "nodes"))))))
-
-;; Append nps data.
-(define (append-nps li)
-  (push-back! data-nps
-              (parse (ref li (++ (list-search li "nps"))))))
-
-;; Append hashfull data.
-(define (append-hashfull li)
-  (push-back! data-hashfull
-              (parse (ref li (++ (list-search li "hashfull"))))))
+;; Append Datas
+(define (append-datas li)
+        (if (pair? li)
+            (begin (cond ((equal? (car li) "time")
+                          (push-back! data-time (parse (car (cdr li)))))
+                         ((equal? (car li) "nodes")
+                          (push-back! data-nodes (parse (car (cdr li)))))
+                         ((equal? (car li) "nps")
+                          (push-back! data-nps (parse (car (cdr li)))))
+                         ((equal? (car li) "hashfull")
+                          (push-back! data-hashfull (parse (car (cdr li))))))
+                   (append-datas (cdr li)))
+            ()))
 
 ;; Mean.
 (define (mean li)
@@ -174,11 +165,8 @@
        (engine '@input-uci-command "ucinewgame")
        (engine '@input-uci-command (append "position fen " fen))
        (engine '@go-depth depth)
-       (set! str-list (string-split output " "))
-       (append-time str-list)
-       (append-nodes str-list)
-       (append-nps str-list)
-       (append-hashfull str-list))
+       (append-datas (string-split output " "))
+       )
 ;; Result.
 (stderr "\n")
 (print-result)

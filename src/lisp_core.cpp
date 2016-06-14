@@ -4401,10 +4401,11 @@ R"...(### clock ###
 
       // 1要素目がelseかどうか。
       LPointer result;
-      if (sentence->car()->symbol() == "else") {
+      const LPointer& sentence_car = sentence->car();
+      if (sentence_car->symbol() == "else") {
         result = NewBoolean(true);
       } else {
-        result = caller->Evaluate(*result);
+        result = caller->Evaluate(*sentence_car);
         CheckType(*result, LType::BOOLEAN);
       }
 
