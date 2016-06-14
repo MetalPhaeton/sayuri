@@ -46,6 +46,8 @@
 #include <chrono>
 #include <regex>
 #include <ctime>
+#include <thread>
+#include <system_error>
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -184,6 +186,11 @@ namespace Sayuri {
         }
         // at_listをスコープにバインド。
         local_chain.InsertSymbol("$@", at_list);
+
+        // names_itrが余っていたらNilをバインド。
+        for (; names_itr != names_end; ++names_itr) {
+          local_chain.InsertSymbol(*names_itr, Lisp::NewNil());
+        }
 
         // ローカルスコープを関数オブジェクトにセット。
         func_obj->scope_chain(local_chain);
@@ -1960,6 +1967,18 @@ R"...(### input-stream ###
     ;; Closes "hello.txt".
     (myfile ()))...";
     help_dict_.emplace("input-stream", help);
+
+    func = LC_FUNCTION_OBJ(GenThread);
+    INSERT_LC_FUNCTION(func, "gen-thread", "Lisp:gen-thread");
+    help =
+R"...()...";
+    help_dict_.emplace("gen-thread", help);
+
+    func = LC_FUNCTION_OBJ(Sleep);
+    INSERT_LC_FUNCTION(func, "sleep", "Lisp:sleep");
+    help =
+R"...()...";
+    help_dict_.emplace("sleep", help);
 
     func = LC_FUNCTION_OBJ(System);
     INSERT_LC_FUNCTION(func, "system", "Lisp:system");
@@ -4550,6 +4569,105 @@ R"...(### clock ###
     return NewN_Function(c_function, "Lisp:input-stream:"
     + std::to_string(reinterpret_cast<std::size_t>(ifs_ptr.get())),
     caller->scope_chain());
+  }
+
+  // %%% gen-thread
+  DEF_LC_FUNCTION(Lisp::GenThread) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    // 関数オブジェクトを入手。
+    LPointer func_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*func_ptr, LType::FUNCTION);
+
+    // スレッド用ポインタ。
+    std::shared_ptr<std::thread> thread_ptr(new std::thread());
+
+    // 関数オブジェクトを作成。
+    LC_Function func = [func_ptr, thread_ptr](LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      // 準備。
+      LObject* args_ptr = nullptr;
+      GetReadyForFunction(args, 1, &args_ptr);
+
+      // メッセージシンボルを得る。
+      LPointer message_symbol = caller->Evaluate(*(args_ptr->car()));
+      CheckType(*message_symbol, LType::SYMBOL);
+      const std::string& message = message_symbol->symbol();
+
+      Next(&args_ptr);
+
+      // 各メッセージシンボルに対応。
+      if (message == "@start") {
+        // 進行中なら何もしない。
+        if (thread_ptr->joinable()) return NewBoolean(false);
+
+        // 関数オブジェクトをコピー。
+        LPointer func_clone = func_ptr->Clone();
+
+        // 関数オブジェクトにローカルスコープを追加。
+        LScopeChain local_chain = func_clone->scope_chain();
+        local_chain.AppendNewScope();
+
+        // 全引数にNilをバインド。
+        for (auto& name : func_clone->arg_names()) {
+          local_chain.InsertSymbol(name, NewNil());
+        }
+
+        // スコープを再セット。
+        func_clone->scope_chain(local_chain);
+
+        // スレッドを起動。
+        *thread_ptr = std::thread([func_clone]() {
+          const LPointerVec expression = func_clone->expression();
+          for (auto& expr : expression) {
+            func_clone->Evaluate(*expr);
+          }
+        });
+
+        return NewBoolean(true);
+      }
+
+      if (message == "@join") {
+        try {
+          thread_ptr->join();
+          return NewBoolean(true);
+        } catch (std::system_error err) {
+          // 無視。
+        }
+        return NewBoolean(false);
+      }
+
+      if (message == "@terminated?") {
+        return NewBoolean(!(thread_ptr->joinable()));
+      }
+
+      throw GenError("@function-error",
+      "'" + message + "' is not Thread's Message Symbol.");
+    };
+
+    LPointer ret_ptr = NewN_Function(func, "Lisp:gen-thread:"
+    + std::to_string(reinterpret_cast<std::size_t>(thread_ptr.get())),
+    caller->scope_chain());
+
+    return ret_ptr;
+  }
+
+  // %%% sleep
+  DEF_LC_FUNCTION(Lisp::Sleep) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    LPointer seconds_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*seconds_ptr, LType::NUMBER);
+
+    std::chrono::milliseconds sleep_time
+    (static_cast<int>(seconds_ptr->number() * 1000.0));
+    std::this_thread::sleep_for(sleep_time);
+
+    return seconds_ptr;
   }
 
   // %%% append

@@ -2466,6 +2466,15 @@ namespace Sayuri {
         return NewNumber(std::system(result->string().c_str()));
       }
 
+      /** ネイティブ関数 - gen-thread */
+      DEF_LC_FUNCTION(GenThread);
+
+      /** ネイティブ関数 - sleep */
+      DEF_LC_FUNCTION(Sleep);
+
+      /** ネイティブ関数 - gen-mutex */
+      DEF_LC_FUNCTION(GenMutex);
+
       /** ネイティブ関数 - append */
       DEF_LC_FUNCTION(Append);
 
