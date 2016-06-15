@@ -352,20 +352,22 @@
 </ul>
 </li>
 <li>Defines Traditional Macros and returns <code>&lt;Name&gt;</code>.</li>
-<li>Unlike Macro-Like Arguments, this doesn't have its own scope.</li>
-<li>If an argument name is started with <code>&amp;</code>, it means the rest of arguments.</li>
+<li>If an argument name starts with '&amp;', it means the rest of arguments.</li>
 </ul>
 <h6> Example </h6>
 
-<pre><code>(define a 111)
-(define b 222)
-(define c 333)
-(define d 444)
+<pre><code>(define-macro (my-macro x y &amp;z)
+              (display x)
+              (display y)
+              (display &amp;z)
+              (cons x (cons y &amp;z)))
 
-(define-macro (my-macro x y &amp;z) '(x y &amp;z))
-(display (my-macro a b c d))
+(display (my-macro * (+ 1 2) 3 4 5))
 ;; Output
-;; &gt; (a b (c d))
+;; &gt; Symbol: *
+;; &gt; (+ 1 2)
+;; &gt; (3 4 5)
+;; &gt; 180
 </code></pre>
 <h3 id="set">set!</h3>
 <h6> Usage </h6>

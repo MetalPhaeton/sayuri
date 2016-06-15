@@ -1381,20 +1381,22 @@ R"...(### define-macro ###
 * This is Special Form.
     + All arguments isn't evaluated.
 * Defines Traditional Macros and returns `<Name>`.
-* Unlike Macro-Like Arguments, this doesn't have its own scope.
-* If an argument name is started with `&`, it means the rest of arguments.
+* If an argument name starts with '&', it means the rest of arguments.
 
 <h6> Example </h6>
 
-    (define a 111)
-    (define b 222)
-    (define c 333)
-    (define d 444)
+    (define-macro (my-macro x y &z)
+                  (display x)
+                  (display y)
+                  (display &z)
+                  (cons x (cons y &z)))
     
-    (define-macro (my-macro x y &z) '(x y &z))
-    (display (my-macro a b c d))
+    (display (my-macro * (+ 1 2) 3 4 5))
     ;; Output
-    ;; > (a b (c d)))...";
+    ;; > Symbol: *
+    ;; > (+ 1 2)
+    ;; > (3 4 5)
+    ;; > 180)...";
     help_dict_.emplace("define-macro", help);
 
     func = LC_FUNCTION_OBJ(Set);
@@ -4133,71 +4135,63 @@ R"...(### clock ###
     Next(&args_ptr);
 
     // マクロの名。
-    const LPointer macro_name_ptr = inter_face_ptr->car();
+    const LPointer& macro_name_ptr = inter_face_ptr->car();
     CheckType(*macro_name_ptr, LType::SYMBOL);
+    const std::string& macro_name = macro_name_ptr->symbol();
 
     // マクロの引数名。
-    const LPointer& args_name_ptr = inter_face_ptr->cdr();
-
-    // マクロマップを作成。
-    std::shared_ptr<LMacroMap> macro_map_ptr(new LMacroMap());
+    LPointer args_name_ptr = inter_face_ptr->cdr()->Clone();
     for (LObject* ptr = args_name_ptr.get(); ptr->IsPair(); Next(&ptr)) {
-      const LPointer& name_ptr = ptr->car();
-      CheckType(*name_ptr, LType::SYMBOL);
-      macro_map_ptr->push_back(LMacroElm(name_ptr->symbol(), NewNil()));
+      CheckType(*(ptr->car()), LType::SYMBOL);
     }
 
     // 第2引数は定義式。
-    LPointer expression_list = args_ptr->Clone();
+    LPointer expression_ptr = args_ptr->Clone();
+
+    // ローカルスコープを作る。
+    LScopeChain local_chain = caller->scope_chain();
+    local_chain.AppendNewScope();
 
     // 関数オブジェクトを作成。
-    LC_Function func = [macro_map_ptr, expression_list](LPointer self,
-    LObject* caller, const LObject& args) -> LPointer {
+    LC_Function func =
+    [macro_name_ptr, args_name_ptr, expression_ptr, local_chain]
+    (LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      // ローカルスコープに引数を評価せずにバインドしていく。
       LPointer args_ptr = args.cdr();
-
-      // マクロマップをコピー。
-      LMacroMap macro_map_clone = *macro_map_ptr;
-
-      // マクロマップに引数を登録。
-      for (auto& map_pair : macro_map_clone) {
-        // 引数リストが終了していたら抜ける。
-        if (!(args_ptr->IsPair())) break;
-
-        // 登録。
-        if (map_pair.first[0] == '&') {
-          // 残り全部のマクロ引数。
-          map_pair.second = args_ptr;
+      LObject* names_ptr = args_name_ptr.get();
+      for (; (names_ptr->IsPair()) && (args_ptr->IsPair());
+      Next(&names_ptr), args_ptr = args_ptr->cdr()) {
+        const std::string& name = names_ptr->car()->symbol();
+        if (name[0] == '&') {
+          local_chain.InsertSymbol(name, args_ptr->Clone());
           break;
         } else {
-          // 普通のマクロ引数。
-          map_pair.second = args_ptr->car();
+          local_chain.InsertSymbol(name, args_ptr->car()->Clone());
         }
-
-        args_ptr = args_ptr->cdr();
       }
 
-      // 式をクローン。
-      LPointer expression_list_clone = expression_list->Clone();
-
-      // クローンしたやつにマクロ展開。
-      DevelopMacro(expression_list_clone.get(), macro_map_clone);
-
-      // 展開後の式を実行。 スコープは呼び出し元。
-      LPointer ret_ptr = NewNil();
-      for (LObject* ptr = expression_list_clone.get(); ptr->IsPair();
-      Next(&ptr)) {
-        ret_ptr = caller->Evaluate(*(ptr->car()));
+      // まだ名前が余っていたらNilをバインド。
+      for (; names_ptr->IsPair(); Next(&names_ptr)) {
+        local_chain.InsertSymbol(names_ptr->car()->symbol(), NewNil());
       }
 
-      // 結果を返す。
-      return ret_ptr;
+      // 自身にローカルスコープをセットして各式を評価して式を得る。
+      self->scope_chain(local_chain);
+      LPointer result_expr = NewNil();
+      for (LObject* expr = expression_ptr.get(); expr->IsPair(); Next(&expr)) {
+        result_expr = self->Evaluate(*(expr->car()));
+      }
+
+      // 出来上がった式を評価して返す。
+      return caller->Evaluate(*result_expr);
     };
+
     LPointer n_function = NewN_Function(func, "Lisp:define-macro;"
-    + std::to_string(reinterpret_cast<std::size_t>(macro_map_ptr.get())),
+    + std::to_string(reinterpret_cast<std::size_t>(expression_ptr.get())),
     caller->scope_chain());
 
     // スコープにバインド。
-    caller->scope_chain().InsertSymbol(macro_name_ptr->symbol(), n_function);
+    caller->scope_chain().InsertSymbol(macro_name, n_function);
 
     return macro_name_ptr->Clone();
   }
