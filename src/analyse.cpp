@@ -351,6 +351,13 @@ namespace Sayuri {
     return BBToResult(GenMobilityBB(board, piece_square));
   }
 
+  // 攻撃者。
+  ResultSquares AnalyseAttackers(const Board& board, Square square) {
+    Bitboard attackers = IsAttacked(board, square, WHITE)
+    | IsAttacked(board, square, BLACK);
+    return BBToResult(attackers);
+  }
+
   // どの駒を攻撃しているか。
   ResultSquares AnalyseAttacking(const Board& board, Square piece_square) {
     return BBToResult(GenAttackBB(board, piece_square)

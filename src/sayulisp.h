@@ -643,6 +643,9 @@ namespace Sayuri {
       /** 機動力を分析する。 */
       DEF_MESSAGE_FUNCTION(AnalyseMobility);
 
+      /** 攻撃者を分析する。 */
+      DEF_MESSAGE_FUNCTION(AnalyseAttackers);
+
       /** 攻撃している駒を分析する。 */
       DEF_MESSAGE_FUNCTION(AnalyseAttacking);
 

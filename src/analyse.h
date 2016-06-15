@@ -67,6 +67,14 @@ namespace Sayuri {
   ResultSquares AnalyseMobility(const Board& board, Square piece_square);
 
   /**
+   * そのマスを攻撃している駒を探す。
+   * @param board 分析したいボードの構造体。
+   * @param square 分析したいマス。
+   * @return 攻撃者の位置。
+   */
+  ResultSquares AnalyseAttackers(const Board& board, Square square);
+
+  /**
    * どの駒を攻撃しているかを分析する。
    * @param board 分析したいボードの構造体。
    * @param piece_square 攻撃している駒の位置。

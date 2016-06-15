@@ -706,6 +706,13 @@ the control won't come back until the engine have found the best move.</p>
 </ul>
 </li>
 <li>
+<p><code>@analyse-attackers &lt;Square : Number&gt;</code></p>
+<ul>
+<li>Returns List of squares of pieces that
+  attacks <code>&lt;Square&gt;</code>.</li>
+</ul>
+</li>
+<li>
 <p><code>@analyse-attacking &lt;Piece square : Number&gt;</code></p>
 <ul>
 <li>Returns List of squares of pieces that
@@ -816,6 +823,9 @@ the control won't come back until the engine have found the best move.</p>
 (display (engine '@analyse-mobility F3))
 ;; Output
 ;; &gt; (G1 D2 H2 D4 E5 G5)
+
+(display (engine '@analyse-attackers E5))
+;; &gt; (C3 F3 A5 F5)
 
 (display (engine '@analyse-attacking C3))
 ;; Output

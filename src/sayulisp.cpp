@@ -2342,6 +2342,10 @@ R"...(### Analyse Position ###
 * `@analyse-mobility <Piece square : Number>`
     + Returns List of squares that the piece on `<Piece square>` can move to.
 
+* `@analyse-attackers <Square : Number>`
+    + Returns List of squares of pieces that
+      attacks `<Square>`.
+
 * `@analyse-attacking <Piece square : Number>`
     + Returns List of squares of pieces that
       the piece on `<Piece square>` is attacking.
@@ -2416,6 +2420,9 @@ R"...(### Analyse Position ###
     ;; Output
     ;; > (G1 D2 H2 D4 E5 G5)
     
+    (display (engine '@analyse-attackers E5))
+    ;; > (C3 F3 A5 F5)
+    
     (display (engine '@analyse-attacking C3))
     ;; Output
     ;; > (A5 F6)
@@ -2465,6 +2472,7 @@ R"...(### Analyse Position ###
     ;; > ((F6 H8)))...";
     AddHelp("engine @analyse-diff", help);
     AddHelp("engine @analyse-mobility", help);
+    AddHelp("engine @analyse-attackers", help);
     AddHelp("engine @analyse-attacking", help);
     AddHelp("engine @analyse-attacked", help);
     AddHelp("engine @analyse-defensing", help);
@@ -4150,6 +4158,9 @@ R"...(### to-fen-position ###
     message_func_map_["@analyse-mobility"] =
     INSERT_MESSAGE_FUNCTION(AnalyseMobility);
 
+    message_func_map_["@analyse-attackers"] =
+    INSERT_MESSAGE_FUNCTION(AnalyseAttackers);
+
     message_func_map_["@analyse-attacking"] =
     INSERT_MESSAGE_FUNCTION(AnalyseAttacking);
 
@@ -5270,6 +5281,31 @@ R"...(### to-fen-position ###
     // 分析結果を得る。
     ResultSquares result =
     Sayuri::AnalyseMobility(*board_ptr_, square_ptr->number());
+
+    // 分析結果をリストにする。
+    LPointer ret_ptr = Lisp::NewList(result.size());
+    LObject* ptr = ret_ptr.get();
+    for (auto square : result) {
+      ptr->car(Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[square]));
+      Lisp::Next(&ptr);
+    }
+
+    return ret_ptr;
+  }
+
+  // %%% @analyse-attackers
+  DEF_MESSAGE_FUNCTION(EngineSuite::AnalyseAttackers) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // 位置を得る。
+    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    Sayulisp::CheckSquare(*square_ptr);
+
+    // 分析結果を得る。
+    ResultSquares result =
+    Sayuri::AnalyseAttackers(*board_ptr_, square_ptr->number());
 
     // 分析結果をリストにする。
     LPointer ret_ptr = Lisp::NewList(result.size());
