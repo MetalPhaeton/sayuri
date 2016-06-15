@@ -252,15 +252,18 @@ Sayulisp embeds them into its definition before executes it.</p>
 <p>If an argument name starts with '<code>&amp;</code>', it means the rest of arguments.</p>
 <h6> Example </h6>
 
-<pre><code>(define a 111)
-(define b 222)
-(define c 333)
-(define d 444)
+<pre><code>(define-macro (my-macro x y &amp;z)
+              (display x)
+              (display y)
+              (display &amp;z)
+              (cons x (cons y &amp;z)))
 
-(define-macro (my-macro x y &amp;z) '(x y &amp;z))
-(display (my-macro a b c d))
+(display (my-macro * (+ 1 2) 3 4 5))
 ;; Output
-;; &gt; (a b (c d))
+;; &gt; Symbol: *
+;; &gt; (+ 1 2)
+;; &gt; (3 4 5)
+;; &gt; 180
 </code></pre>
 <h3 id="back-quote-template">Back-Quote Template</h3>
 <p>Sayulisp supports back-quote template.</p>
