@@ -340,6 +340,39 @@ Atom or List modified with "<code>,</code>" or "<code>,@</code>" are evaluated.<
 ;; &gt; Hello 5
 ;; &gt; World 10
 </code></pre>
+<h3 id="walking-through-pair-tree">Walking through Pair Tree</h3>
+<p>You can walk through pair and execute function with
+<a href="core_functions.html#walk"><code>(walk)</code></a>.</p>
+<h6> Example </h6>
+
+<pre><code>;; Define callback function.
+;; If Car is 4, it replaces 4 to "Hello".
+(define (callback current path)
+        (display "current : " current)
+        (display "path : " path)
+        (if (equal? (car current) 4)
+            (cons "Hello" (cdr current))
+            ()))
+
+;; Target.
+(define li '(1 2 (3 4) 5))
+
+(display "Result : " (walk callback li))
+;; Output
+;; &gt; current : (1 2 (3 4) 5)
+;; &gt; path : 
+;; &gt; current : (2 (3 4) 5)
+;; &gt; path : d
+;; &gt; current : ((3 4) 5)
+;; &gt; path : dd
+;; &gt; current : (3 4)
+;; &gt; path : dda
+;; &gt; current : (4)
+;; &gt; path : ddad
+;; &gt; current : (5)
+;; &gt; path : ddd
+;; &gt; Result : (1 2 (3 "Hello") 5)
+</code></pre>
 <h3 id="exception-handling">Exception Handling</h3>
 <p>Some functions throws an exception.<br />
 If you don't do anything, Sayulisp shows the error message
