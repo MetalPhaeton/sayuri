@@ -2072,6 +2072,13 @@ namespace Sayuri {
         }
       }
 
+      /**
+       * リストをジップする。
+       * @param list_vec リストのリスト。 (実行後、空になる副作用あり。)
+       * @return ジップ後のリスト。
+       */
+      static LPointer ZipLists(LPointerVec& list_vec);
+
       // ============== //
       // パブリック関数 //
       // ============== //
@@ -2229,12 +2236,8 @@ namespace Sayuri {
         caller->Evaluate(*(args_ptr->cdr()->car())));
       }
 
-      // %%% apply
       /** ネイティブ関数 - apply */
-      DEF_LC_FUNCTION(Apply) {
-        // consしてeval。
-        return caller->Evaluate(*(Cons(self, caller, args)));
-      }
+      DEF_LC_FUNCTION(Apply);
 
       // %%% quote
       /** ネイティブ関数 - quote */
@@ -2514,11 +2517,14 @@ namespace Sayuri {
       /** ネイティブ関数 - list-path */
       DEF_LC_FUNCTION(ListPath);
 
+      /** ネイティブ関数 - zip */
+      DEF_LC_FUNCTION(Zip);
+
       /** ネイティブ関数 - map */
       DEF_LC_FUNCTION(Map);
 
-      /** ネイティブ関数 - zip */
-      DEF_LC_FUNCTION(Zip);
+      /** ネイティブ関数 - filter */
+      DEF_LC_FUNCTION(Filter);
 
       // %%% range
       /** ネイティブ関数 - range */

@@ -2423,6 +2423,29 @@ R"...(### list-path ###
     ;; > 333)...";
     help_dict_.emplace("list-path", help);
 
+    func = LC_FUNCTION_OBJ(Zip);
+    INSERT_LC_FUNCTION(func, "zip", "Lisp:zip");
+    help =
+R"...(### zip ###
+
+<h6> Usage </h6>
+
+* `(zip <List>...)`
+
+<h6> Description </h6>
+
+* Unions each element of `<List>...` and returns it.
+
+<h6> Example </h6>
+
+    (display (zip '(a b c)
+                  '(1 2 3)
+                  '("Hello" "World")
+                  '("aaa" "bbb" "ccc" "ddd")))
+    ;; Output
+    ;; > ((a 1 "Hello" "aaa") (b 2 "World" "bbb") (c 3 "ccc") ("ddd")))...";
+    help_dict_.emplace("zip", help);
+
     func = LC_FUNCTION_OBJ(Map);
     INSERT_LC_FUNCTION(func, "map", "Lisp:map");
     help =
@@ -2454,28 +2477,31 @@ R"...(### map ###
     ;; > (111 222 333 444 555))...";
     help_dict_.emplace("map", help);
 
-    func = LC_FUNCTION_OBJ(Zip);
-    INSERT_LC_FUNCTION(func, "zip", "Lisp:zip");
+    func = LC_FUNCTION_OBJ(Filter);
+    INSERT_LC_FUNCTION(func, "filter", "Lisp:filter");
     help =
-R"...(### zip ###
+R"...(### filter ###
 
 <h6> Usage </h6>
 
-* `(zip <List>...)`
+* `(filter <Function : Symbol or Function> <List>)`
 
 <h6> Description </h6>
 
-* Unions each element of `<List>...` and returns it.
+* Judges each element of `<List>` by `<Function>`
+  and returns List of the passed elements.
+* `<Function>` must return #t or #f.
+* `<Function>` accepts one argument.
 
 <h6> Example </h6>
 
-    (display (zip '(a b c)
-                  '(1 2 3)
-                  '("Hello" "World")
-                  '("aaa" "bbb" "ccc" "ddd")))
+    (define li '(1 2 3 4 5 6))
+    (define (my-func x) (> x 3))
+    
+    (display (filter my-func li))
     ;; Output
-    ;; > ((a 1 "Hello" "aaa") (b 2 "World" "bbb") (c 3 "ccc") ("ddd")))...";
-    help_dict_.emplace("zip", help);
+    ;; > (4 5 6))...";
+    help_dict_.emplace("filter", help);
 
     func = LC_FUNCTION_OBJ(Range);
     INSERT_LC_FUNCTION(func, "range", "Lisp:range");
@@ -3924,6 +3950,31 @@ R"...(### clock ###
     }
   }
 
+  // リストをジップする。
+  LPointer Lisp::ZipLists(LPointerVec& list_vec) {
+    LPointerVec ret_vec;
+
+    LPointerVec temp;
+    while (true) {
+      temp.clear();
+
+      bool found = false;  // ペア発見フラグ。
+      for (auto& list_ptr : list_vec) {
+        if (list_ptr->IsPair()) {
+          temp.push_back(list_ptr->car());
+          list_ptr = list_ptr->cdr();
+
+          found = true;  // ペアを発見したのでマーク。
+        }
+      }
+      if (!found) break;  // ペアが一つもなかったら抜ける。
+
+      ret_vec.push_back(LPointerVecToList(temp));
+    }
+
+    return LPointerVecToList(ret_vec);
+  }
+
   // %%% help
   DEF_LC_FUNCTION(Lisp::Help) {
     int length = CountList(args) - 1;
@@ -4446,6 +4497,22 @@ R"...(### clock ###
     }
 
     return ret_ptr;
+  }
+
+  // %%% apply
+  DEF_LC_FUNCTION(Lisp::Apply) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 2, &args_ptr);
+
+    // 第1引数は関数オブジェクトか関数名。
+    LPointer func_ptr = caller->Evaluate(*(args_ptr->car()));
+
+    // 第2引数は引数リスト。
+    LPointer args_list_ptr = caller->Evaluate(*(args_ptr->cdr()->car()));
+
+    // ペアにして評価して返す。
+    return caller->Evaluate(LPair(func_ptr, args_list_ptr));
   }
 
   // %%% display
@@ -5251,50 +5318,6 @@ R"...(### clock ###
     return target_ptr;
   }
 
-  // %%% map
-  DEF_LC_FUNCTION(Lisp::Map) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    GetReadyForFunction(args, 2, &args_ptr);
-
-    // 第1引数は関数名。 carに入れておく。
-    LPointer func_pair =
-    NewPair(caller->Evaluate(*(args_ptr->car())), NewNil());
-
-    // 第2引数以降のベクトル。
-    Next(&args_ptr);
-    LPointerVec args_vec(CountList(*args_ptr));
-    LPointerVec::iterator args_itr = args_vec.begin();
-    for (; args_ptr->IsPair(); Next(&args_ptr), ++args_itr) {
-      *args_itr = caller->Evaluate(*(args_ptr->car()));
-    }
-
-    LPointerVec ret_vec;
-    LPointerVec temp_vec;
-    while (true) {
-      // 初期化。
-      bool has_elm = false;
-      temp_vec.clear();
-
-      // 計算するべき引数ベクトルを作る。
-      for (auto& ptr : args_vec) {
-        if (ptr->IsPair()) {
-          temp_vec.push_back(ptr->car());
-          ptr = ptr->cdr();
-          has_elm = true;
-        }
-      }
-
-      if (!has_elm) break;
-
-      // 関数呼び出し。
-      func_pair->cdr(LPointerVecToList(temp_vec));
-      ret_vec.push_back(caller->Evaluate(*func_pair));
-    }
-
-    return LPointerVecToList(ret_vec);
-  }
-
   // %%% zip
   DEF_LC_FUNCTION(Lisp::Zip) {
     // 準備。
@@ -5308,27 +5331,74 @@ R"...(### clock ###
       *args_itr = caller->Evaluate(*(args_ptr->car()));
     }
 
-    // ジップしていく。
+    return ZipLists(args_vec);
+  }
+
+  // %%% map
+  DEF_LC_FUNCTION(Lisp::Map) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 2, &args_ptr);
+
+    // 第1引数は関数オブジェクトか関数名シンボル。
+    LPointer func_ptr = caller->Evaluate(*(args_ptr->car()));
+
+    // 関数をペアのCarに入れておく。
+    LPair func_pair(func_ptr, NewNil());
+
+    // 第2引数以降のベクトル。
+    Next(&args_ptr);
+    LPointerVec args_vec(CountList(*args_ptr));
+    LPointerVec::iterator args_itr = args_vec.begin();
+    for (; args_ptr->IsPair(); Next(&args_ptr), ++args_itr) {
+      *args_itr = caller->Evaluate(*(args_ptr->car()));
+    }
+
+    // 引数をジップする。
+    LPointer zip = ZipLists(args_vec);
+
+    // マップしていく。
     LPointerVec ret_vec;
-    LPointerVec temp_vec;
-    while (true) {
-      // 初期化。
-      bool has_elm = false;
-      temp_vec.clear();
+    for (LObject* ptr = zip.get(); ptr->IsPair(); Next(&ptr)) {
+      // 関数のペアのCdrに引数リストを入れる。
+      func_pair.cdr(ptr->car());
 
-      // ジップしたい要素を取り出す。
-      for (auto& ptr : args_vec) {
-        if (ptr->IsPair()) {
-          temp_vec.push_back(ptr->car());
-          ptr = ptr->cdr();
-          has_elm = true;
-        }
-      }
+      // 評価してベクトルにプッシュ。
+      ret_vec.push_back(caller->Evaluate(func_pair));
+    }
 
-      if (!has_elm) break;
+    return LPointerVecToList(ret_vec);
+  }
 
-      // 追加していく。
-      ret_vec.push_back(LPointerVecToList(temp_vec));
+  // %%% filter
+  DEF_LC_FUNCTION(Lisp::Filter) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 2, &args_ptr);
+
+    // 第1引数は関数オブジェクトか関数名シンボル。
+    LPointer func_ptr = caller->Evaluate(*(args_ptr->car()));
+
+    // 関数をリストのCarに入れておく。
+    LPair func_pair(func_ptr, NewPair(NewNil(), NewNil()));
+
+    // 第2引数はフィルタに掛けるリスト。
+    LPointer target_list = caller->Evaluate(*(args_ptr->cdr()->car()));
+    CheckList(*target_list);
+
+    // フィルターしていく。
+    LPointer result;
+    LPointerVec ret_vec;
+    for (LObject* ptr = target_list.get(); ptr->IsPair(); Next(&ptr)) {
+      // 関数のリストの第1引数に入れる。
+      func_pair.cdr()->car(ptr->car());
+
+      // 評価してみる。
+      result = caller->Evaluate(func_pair);
+      CheckType(*result, LType::BOOLEAN);
+
+      // 評価結果がtrueならリストに追加。
+      if (result->boolean()) ret_vec.push_back(ptr->car());
     }
 
     return LPointerVecToList(ret_vec);

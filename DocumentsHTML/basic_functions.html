@@ -41,8 +41,9 @@
 <li><a href="#list-insert"><code>list-insert</code></a> : Inserts object into List.</li>
 <li><a href="#list-search"><code>list-search</code></a> : Searches an object from List.</li>
 <li><a href="#list-path"><code>list-path</code></a> : Returns an object from List with path.</li>
-<li><a href="#map"><code>map</code></a> : Applies function and make List of returned values.</li>
 <li><a href="#zip"><code>zip</code></a> : Unions each element of Lists.</li>
+<li><a href="#map"><code>map</code></a> : Applies function and make List of returned values.</li>
+<li><a href="#filter"><code>filter</code></a> : Judges elements and returns passed elements.</li>
 <li><a href="#string-split"><code>string-split</code></a> : Splits String.</li>
 <li><a href="#string-join"><code>string-join</code></a> : Joins Strings.</li>
 <li><a href="#regex-search"><code>regex-search</code></a> : Searches a pattern.</li>
@@ -418,6 +419,26 @@
 ;; Output
 ;; &gt; 333
 </code></pre>
+<h3 id="zip">zip</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(zip &lt;List&gt;...)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Unions each element of <code>&lt;List&gt;...</code> and returns it.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(display (zip '(a b c)
+              '(1 2 3)
+              '("Hello" "World")
+              '("aaa" "bbb" "ccc" "ddd")))
+;; Output
+;; &gt; ((a 1 "Hello" "aaa") (b 2 "World" "bbb") (c 3 "ccc") ("ddd"))
+</code></pre>
 <h3 id="map">map</h3>
 <h6> Usage </h6>
 
@@ -448,25 +469,28 @@
 ;; Output
 ;; &gt; (111 222 333 444 555)
 </code></pre>
-<h3 id="zip">zip</h3>
+<h3 id="filter">filter</h3>
 <h6> Usage </h6>
 
 <ul>
-<li><code>(zip &lt;List&gt;...)</code></li>
+<li><code>(filter &lt;Function : Symbol or Function&gt; &lt;List&gt;)</code></li>
 </ul>
 <h6> Description </h6>
 
 <ul>
-<li>Unions each element of <code>&lt;List&gt;...</code> and returns it.</li>
+<li>Judges each element of <code>&lt;List&gt;</code> by <code>&lt;Function&gt;</code>
+  and returns List of the passed elements.</li>
+<li><code>&lt;Function&gt;</code> must return #t or #f.</li>
+<li><code>&lt;Function&gt;</code> accepts one argument.</li>
 </ul>
 <h6> Example </h6>
 
-<pre><code>(display (zip '(a b c)
-              '(1 2 3)
-              '("Hello" "World")
-              '("aaa" "bbb" "ccc" "ddd")))
+<pre><code>(define li '(1 2 3 4 5 6))
+(define (my-func x) (&gt; x 3))
+
+(display (filter my-func li))
 ;; Output
-;; &gt; ((a 1 "Hello" "aaa") (b 2 "World" "bbb") (c 3 "ccc") ("ddd"))
+;; &gt; (4 5 6)
 </code></pre>
 <h3 id="string-split">string-split</h3>
 <h6> Usage </h6>
