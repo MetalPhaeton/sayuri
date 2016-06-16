@@ -126,22 +126,6 @@ namespace Sayuri {
 
     // ========================================================================
 
-    LParser parser;
-    parser.Tokenize("(1 (11 22) 3 (4 5))");
-
-    LPointerVec result_vec = parser.Parse();
-
-    if (!(result_vec.empty())) {
-      LMacroMap macro_map {
-        LMacroElm(Lisp::NewNumber(11), Lisp::NewString("Hello")),
-        LMacroElm(Lisp::NewNumber(3), Lisp::NewString("World"))
-      };
-      LPointer ptr = result_vec[0];
-
-      DevelopMacro(ptr.get(), macro_map);
-      std::cout << ptr->ToString() << std::endl;
-    }
-
     return 0;
   }
 

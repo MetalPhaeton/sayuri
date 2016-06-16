@@ -194,8 +194,8 @@ namespace Sayuri {
    */
   void Walk(LObject& pair, const LFuncForWalk& func);
 
-  /** マクロマップ用要素。 <置換前, 置換後> */
-  using LMacroElm = std::pair<LPointer, LPointer>;
+  /** マクロマップ用要素。 <置換前のシンボル名, 置換後> */
+  using LMacroElm = std::pair<std::string, LPointer>;
   /** マクロマップ。 */
   using LMacroMap = std::vector<LMacroElm>;
   /**
