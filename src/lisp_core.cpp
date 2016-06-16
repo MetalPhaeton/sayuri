@@ -65,37 +65,37 @@ namespace Sayuri {
 
   // マクロ展開する。
   void DevelopMacro(LObject* ptr, const LMacroMap& macro_map) {
-    // まずはCarから。
+    // --- Car --- //
     LObject* car = ptr->car().get();
-    if (car->IsPair()) {
-      // ペアなら再帰コール。
-      DevelopMacro(car, macro_map);
-    } else if (car->IsSymbol()) {
-      // シンボルなら置き換え。
-      const std::string& symbol = car->symbol();
-      for (auto& map_pair : macro_map) {
-        if (map_pair.first == symbol) {
-          ptr->car(map_pair.second->Clone());
-          break;
-        }
+
+    // 調べる。
+    bool found = false;
+    for (auto& map_pair : macro_map) {
+      if (*(map_pair.first) == *car) {
+        ptr->car(map_pair.second->Clone());
+        found = true;
+        break;
       }
     }
 
-    // 次にCdr。
+    // 見つかっていなくて、ペアなら内部を探索。
+    if (!found && car->IsPair()) DevelopMacro(car, macro_map);
+
+    // --- Cdr --- //
     LObject* cdr = ptr->cdr().get();
-    if (cdr->IsPair()) {
-      // ペアなら再帰コール。
-      DevelopMacro(cdr, macro_map);
-    } else if (cdr->IsSymbol()) {
-      // シンボルなら置き換え。
-      const std::string& symbol = cdr->symbol();
-      for (auto& map_pair : macro_map) {
-        if (map_pair.first == symbol) {
-          ptr->cdr(map_pair.second->Clone());
-          break;
-        }
+
+    // 調べる。
+    found = false;
+    for (auto& map_pair : macro_map) {
+      if (*(map_pair.first) == *cdr) {
+        ptr->cdr(map_pair.second->Clone());
+        found = true;
+        break;
       }
     }
+
+    // 見つかっていなくて、ペアなら内部を探索。
+    if (!found && cdr->IsPair()) DevelopMacro(cdr, macro_map);
   }
 
   // 式を評価する。
@@ -165,11 +165,13 @@ namespace Sayuri {
             if ((*names_itr)[0] == '^') {
               // マクロ名。
               // マクロマップに登録。
-              macro_map.push_back(LMacroElm(*names_itr, ptr->car()));
+              macro_map.push_back(LMacroElm(Lisp::NewSymbol(*names_itr),
+              ptr->car()));
             } else if ((*names_itr)[0] == '&') {
               // マクロ名。 (残りリスト)
               // 残りをマクロマップに入れて抜ける。
-              macro_map.push_back(LMacroElm(*names_itr, ptr));
+              macro_map.push_back(LMacroElm(Lisp::NewSymbol(*names_itr), ptr));
+              break;
             } else {
               // 普通の引数名。
               // 評価してバインド。
@@ -209,9 +211,8 @@ namespace Sayuri {
             if (clone->IsPair()) {
               DevelopMacro(clone.get(), macro_map);
             } else if (clone->IsSymbol()) {
-              const std::string symbol = clone->symbol();
               for (auto& map_pair : macro_map) {
-                if (map_pair.first == symbol) {
+                if (*(map_pair.first) == *clone) {
                   clone = map_pair.second->Clone();
                   break;
                 }
