@@ -53,6 +53,7 @@
 <li><a href="#cdr"><code>cdr</code></a> : Pull outs Cdr value from Pair.</li>
 <li><a href="#cons"><code>cons</code></a> : Constructs Pair.</li>
 <li><a href="#apply"><code>apply</code></a>: Constructs Pair and evaluates.</li>
+<li><a href="#walk"><code>walk</code></a>: Walks through and executes callback function.</li>
 </ul>
 </li>
 <li><a href="#conditional-branch-functions">Conditional Branch Functions</a><ul>
@@ -743,6 +744,61 @@
 
 ;; Output
 ;; &gt; 6
+</code></pre>
+<h3 id="walk">walk</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(walk &lt;Callback : Function&gt; &lt;Target : Pair&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Walks through <code>&lt;Target&gt;</code> and executes <code>&lt;Callback&gt;</code>.<ul>
+<li><code>&lt;Callback&gt;</code> receives 2 arguments.<ul>
+<li>1st : Current pair.</li>
+<li>2nd : Path. (String)<ul>
+<li>'a' is Car.</li>
+<li>'d' is cdr.</li>
+<li>For example, "da" means (car (cdr <List>)).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>If <code>&lt;Callback&gt;</code> returns Pair, the current pair is replaced to it.</li>
+</ul>
+</li>
+<li>Returns result of <code>&lt;Target&gt;</code>.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>;; Define callback function.
+;; If Car is 4, it replaces 4 to "Hello".
+(define (callback current path)
+        (display "current : " current)
+        (display "path : " path)
+        (if (equal? (car current) 4)
+            (cons "Hello" (cdr current))
+            ()))
+
+;; Target.
+(define li '(1 2 (3 4) 5))
+
+(display "Result : " (walk callback li))
+;; Output
+;; &gt; current : (1 2 (3 4) 5)
+;; &gt; path : 
+;; &gt; current : (2 (3 4) 5)
+;; &gt; path : d
+;; &gt; current : ((3 4) 5)
+;; &gt; path : dd
+;; &gt; current : (3 4)
+;; &gt; path : dda
+;; &gt; current : (4)
+;; &gt; path : ddad
+;; &gt; current : (5)
+;; &gt; path : ddd
+;; &gt; Result : (1 2 (3 "Hello") 5)
 </code></pre>
 <h2 id="conditional-branch-functions">Conditional Branch Functions</h2>
 <h3 id="if">if</h3>

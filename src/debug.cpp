@@ -126,29 +126,21 @@ namespace Sayuri {
 
     // ========================================================================
 
-//    auto print_vec = [](const std::vector<Square>& vec) {
-//      for (auto square : vec) {
-//        std::cout << static_cast<char>('A' + Util::SquareToFyle(square))
-//        << static_cast<char>('1' + Util::SquareToRank(square)) << " ";
-//      }
-//      std::cout << std::endl;
-//    };
-    auto print_pin = [](const ResultPinSkewer& result) {
-      for (auto& array : result) {
-        std::cout << "("
-        << static_cast<char>('A' + Util::SquareToFyle(array[0]))
-        << static_cast<char>('1' + Util::SquareToRank(array[0])) << " ";
-        std::cout << static_cast<char>('A' + Util::SquareToFyle(array[1]))
-        << static_cast<char>('1' + Util::SquareToRank(array[1])) << ") ";
-      }
-      std::cout << std::endl;
-    };
+    LParser parser;
+    parser.Tokenize("(1 (11 22) 3 (4 5))");
 
-    FEN fen("rnbqkbnr/pppPpppp/8/1Q1BQr2/8/8/PPPpPPPP/RNBQKBNR w KQkq - 0 1");
-    engine_ptr->LoadFEN(fen);
-    const Board& board = engine_ptr->board();
+    LPointerVec result_vec = parser.Parse();
 
-    print_pin(AnalysePinSkewer(board, F5));
+    if (!(result_vec.empty())) {
+      LMacroMap macro_map {
+        LMacroElm(Lisp::NewNumber(11), Lisp::NewString("Hello")),
+        LMacroElm(Lisp::NewNumber(3), Lisp::NewString("World"))
+      };
+      LPointer ptr = result_vec[0];
+
+      DevelopMacro(ptr.get(), macro_map);
+      std::cout << ptr->ToString() << std::endl;
+    }
 
     return 0;
   }

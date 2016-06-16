@@ -184,11 +184,20 @@ namespace Sayuri {
       }
   };
 
+  /** ウォーカー用関数。 void(current pair, current path) */
+  using LFuncForWalk = std::function<void(LObject&, const std::string&)>;
+
+  /**
+   * ペアウォーカー。
+   * @param func ペアの各要素に対して何かを行う関数。
+   * @param pair 処理するペア。
+   */
+  void Walk(LObject& pair, const LFuncForWalk& func);
+
   /** マクロマップ用要素。 <置換前, 置換後> */
   using LMacroElm = std::pair<LPointer, LPointer>;
   /** マクロマップ。 */
   using LMacroMap = std::vector<LMacroElm>;
-
   /**
    * マクロ展開用関数。
    * @param ptr マクロ展開するオブジェクトのポインタ。
@@ -2238,6 +2247,9 @@ namespace Sayuri {
 
       /** ネイティブ関数 - apply */
       DEF_LC_FUNCTION(Apply);
+
+      /** ネイティブ関数 - walk */
+      DEF_LC_FUNCTION(WalkFunc);
 
       // %%% quote
       /** ネイティブ関数 - quote */

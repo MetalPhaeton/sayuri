@@ -63,39 +63,112 @@ namespace Sayuri {
   const LScopeChain LObject::dummy_scope_chain_;
   const LC_Function LObject::dummy_c_function_;
 
+  // ウォーカー。
+  void Walk(LObject& pair, const LFuncForWalk& func) {
+    // ペアじゃなければ終了。
+    if (!(pair.IsPair())) return;
+
+    // パス用文字バッファ。
+    std::string path_buf;
+    path_buf.reserve(256);
+
+    // 再帰用関数を作成。
+    std::function<void(LObject&)> core;
+    core = [&func, &path_buf, &core](LObject& pair) {
+      // ペアじゃなければ終了。
+      if (!(pair.IsPair())) return;
+
+      // 準備。 ポインタを記憶。
+      LObject* car_before = pair.car().get();
+      LObject* cdr_before = pair.cdr().get();
+
+      // 関数を実行。
+      func(pair, path_buf);
+
+      // 終わり時のポインタを記録。
+      LObject* car_after = pair.car().get();
+      LObject* cdr_after = pair.cdr().get();
+
+      // ポインタが同じならそれぞれに再帰コール。
+      // Car。
+      if (car_after == car_before) {
+        path_buf.push_back('a');  // パスをプッシュ。
+
+        core(*(pair.car()));
+
+        path_buf.pop_back();  // パスをポップ。
+      }
+
+      // Cdr。
+      if (cdr_after == cdr_before) {
+        path_buf.push_back('d');  // パスをプッシュ。
+
+        core(*(pair.cdr()));
+
+        path_buf.pop_back();  // パスをポップ。
+      }
+    };
+
+    // 実行。
+    core(pair);
+  }
+
   // マクロ展開する。
   void DevelopMacro(LObject* ptr, const LMacroMap& macro_map) {
-    // --- Car --- //
-    LObject* car = ptr->car().get();
-
-    // 調べる。
-    bool found = false;
-    for (auto& map_pair : macro_map) {
-      if (*(map_pair.first) == *car) {
-        ptr->car(map_pair.second->Clone());
-        found = true;
-        break;
+    // コールバック関数を作成。
+    LFuncForWalk func = [&macro_map](LObject& pair, const std::string& path) {
+      // Carを置き換え。
+      const LPointer& car = pair.car();
+      for (auto& map_pair : macro_map) {
+        if (*(map_pair.first) == *car) {
+          pair.car(map_pair.second->Clone());
+          break;
+        }
       }
-    }
 
-    // 見つかっていなくて、ペアなら内部を探索。
-    if (!found && car->IsPair()) DevelopMacro(car, macro_map);
-
-    // --- Cdr --- //
-    LObject* cdr = ptr->cdr().get();
-
-    // 調べる。
-    found = false;
-    for (auto& map_pair : macro_map) {
-      if (*(map_pair.first) == *cdr) {
-        ptr->cdr(map_pair.second->Clone());
-        found = true;
-        break;
+      // Cdrを置き換え。
+      const LPointer& cdr = pair.cdr();
+      for (auto& map_pair : macro_map) {
+        if (*(map_pair.first) == *cdr) {
+          pair.cdr(map_pair.second->Clone());
+          break;
+        }
       }
-    }
+    };
 
-    // 見つかっていなくて、ペアなら内部を探索。
-    if (!found && cdr->IsPair()) DevelopMacro(cdr, macro_map);
+    // Walkする。
+    Walk(*ptr, func);
+//    // --- Car --- //
+//    LObject* car = ptr->car().get();
+//
+//    // 調べる。
+//    bool found = false;
+//    for (auto& map_pair : macro_map) {
+//      if (*(map_pair.first) == *car) {
+//        ptr->car(map_pair.second->Clone());
+//        found = true;
+//        break;
+//      }
+//    }
+//
+//    // 見つかっていなくて、ペアなら内部を探索。
+//    if (!found && car->IsPair()) DevelopMacro(car, macro_map);
+//
+//    // --- Cdr --- //
+//    LObject* cdr = ptr->cdr().get();
+//
+//    // 調べる。
+//    found = false;
+//    for (auto& map_pair : macro_map) {
+//      if (*(map_pair.first) == *cdr) {
+//        ptr->cdr(map_pair.second->Clone());
+//        found = true;
+//        break;
+//      }
+//    }
+//
+//    // 見つかっていなくて、ペアなら内部を探索。
+//    if (!found && cdr->IsPair()) DevelopMacro(cdr, macro_map);
   }
 
   // 式を評価する。
@@ -1033,6 +1106,58 @@ R"...(### apply ###
     ;; Output
     ;; > 6)...";
     help_dict_.emplace("apply", help);
+
+    func = LC_FUNCTION_OBJ(WalkFunc);
+    INSERT_LC_FUNCTION(func, "walk", "Lisp:walk");
+    help =
+R"...(### walk ###
+
+<h6> Usage </h6>
+
+* `(walk <Callback : Function> <Target : Pair>)`
+
+<h6> Description </h6>
+
+* Walks through `<Target>` and executes `<Callback>`.
+    + `<Callback>` receives 2 arguments.
+        - 1st : Current pair.
+        - 2nd : Path. (String)
+            - 'a' is Car.
+            - 'd' is cdr.
+            - For example, "da" means (car (cdr <List>)).
+    + If `<Callback>` returns Pair, the current pair is replaced to it.
+* Returns result of `<Target>`.
+
+<h6> Example </h6>
+
+    ;; Define callback function.
+    ;; If Car is 4, it replaces 4 to "Hello".
+    (define (callback current path)
+            (display "current : " current)
+            (display "path : " path)
+            (if (equal? (car current) 4)
+                (cons "Hello" (cdr current))
+                ()))
+    
+    ;; Target.
+    (define li '(1 2 (3 4) 5))
+    
+    (display "Result : " (walk callback li))
+    ;; Output
+    ;; > current : (1 2 (3 4) 5)
+    ;; > path : 
+    ;; > current : (2 (3 4) 5)
+    ;; > path : d
+    ;; > current : ((3 4) 5)
+    ;; > path : dd
+    ;; > current : (3 4)
+    ;; > path : dda
+    ;; > current : (4)
+    ;; > path : ddad
+    ;; > current : (5)
+    ;; > path : ddd
+    ;; > Result : (1 2 (3 "Hello") 5))...";
+    help_dict_.emplace("walk", help);
 
     func = LC_FUNCTION_OBJ(Quote);
     INSERT_LC_FUNCTION(func, "quote", "Lisp:quote");
@@ -4511,9 +4636,52 @@ R"...(### clock ###
 
     // 第2引数は引数リスト。
     LPointer args_list_ptr = caller->Evaluate(*(args_ptr->cdr()->car()));
+    CheckList(*args_list_ptr);
 
     // ペアにして評価して返す。
     return caller->Evaluate(LPair(func_ptr, args_list_ptr));
+  }
+
+  // %%% walk
+  DEF_LC_FUNCTION(Lisp::WalkFunc) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 2, &args_ptr);
+
+    // 第1引数は関数オブジェクトか関数名。
+    LPointer func_ptr = caller->Evaluate(*(args_ptr->car()));
+
+    // 第2引数は探索するペア。
+    LPointer pair_ptr = caller->Evaluate(*(args_ptr->cdr()->car()));
+    CheckType(*pair_ptr, LType::PAIR);
+
+    // 関数オブジェクトを作成。
+    LFuncForWalk func =
+    [func_ptr, &caller](LObject& pair, const std::string& path) {
+      // pairをクオートでくるむ。
+      LPointer quote =
+      NewPair(NewSymbol("quote"), NewPair(pair.Clone(), NewNil()));
+
+      // 関数呼び出しを作成。
+      LPair callable(func_ptr,
+      NewPair(quote,
+      NewPair(NewString(path), NewNil())));
+
+      // 評価する。
+      LPointer result = caller->Evaluate(callable);
+
+      // 戻り値がペアなら入れ替え。
+      if (result->IsPair()) {
+        pair.car(result->car());
+        pair.cdr(result->cdr());
+      }
+    };
+
+    // Walkする。
+    Walk(*pair_ptr, func);
+
+    // 編集後のpair_ptrを返す。
+    return pair_ptr;
   }
 
   // %%% display
