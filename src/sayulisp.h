@@ -321,12 +321,41 @@ namespace Sayuri {
       const LObject& args, int required_args, LObject** args_ptr_ptr);
 
       /**
-       * Walk用関数を作成する。
+       * Walk用ToNumber関数を作成する。
        * @param map 置き換え用マップ。
        * @return Walk用関数オブジェクト。
        */
-      static LFuncForWalk GenFuncForWalk
+      static LFuncForWalk GenFuncToNumber
       (const std::map<std::string, std::uint32_t>& map);
+
+      /**
+       * Walk用ToSymbol関数を作成する。
+       * @param map 置き換え用マップ。
+       * @return Walk用関数オブジェクト。
+       */
+      template<std::uint32_t LIMIT>
+      static LFuncForWalk GenFuncToSymbol
+      (const std::string (& string_array)[LIMIT]) {
+        return [&string_array](LObject& pair, const std::string& path) {
+          // Car。
+          LObject* car = pair.car().get();
+          if (car->IsNumber()) {
+            std::uint32_t index = car->number();
+            if (index < LIMIT) {
+              pair.car(Lisp::NewSymbol(string_array[index]));
+            }
+          }
+
+          // Cdr。
+          LObject* cdr = pair.cdr().get();
+          if (cdr->IsNumber()) {
+            std::uint32_t index = cdr->number();
+            if (index < LIMIT) {
+              pair.cdr(Lisp::NewSymbol(string_array[index]));
+            }
+          }
+        };
+      }
 
       // ========================== //
       // Lisp関数オブジェクト用関数 //

@@ -443,11 +443,21 @@
 <h6> Example </h6>
 
 <pre><code>(define symbol-list
-  '(A1 B1 C1 (WHITE D3 E4 (F5 PAWN G6) H7 BLACK_LONG_CASTLING)))
+        '((A1 B1 C1)
+          (FYLE_A FYLE_B FYLE_C)
+          (RANK_1 RANK_2 RANK_3)
+          (WHITE BLACK)
+          (PAWN KNIGHT BISHOP)
+          (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
 
 (display (square-&gt;number symbol-list))
 ;; Output
-;; &gt; (0 1 2 (WHITE 19 28 (37 PAWN 46) 55 BLACK_LONG_CASTLING))
+;; &gt; ((0 1 2)
+;; &gt; (FYLE_A FYLE_B FYLE_C)
+;; &gt; (RANK_1 RANK_2 RANK_3)
+;; &gt; (WHITE BLACK)
+;; &gt; (PAWN KNIGHT BISHOP)
+;; &gt; (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
 </code></pre>
 <h3 id="fyle-to-number">fyle-&gt;number</h3>
 <h6> Usage </h6>
@@ -464,11 +474,21 @@
 <h6> Example </h6>
 
 <pre><code>(define symbol-list
-  '(FYLE_A FYLE_B (WHITE FYLE_D E4 (PAWN G6) FYLE_H BLACK_LONG_CASTLING)))
+        '((A1 B1 C1)
+          (FYLE_A FYLE_B FYLE_C)
+          (RANK_1 RANK_2 RANK_3)
+          (WHITE BLACK)
+          (PAWN KNIGHT BISHOP)
+          (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
 
 (display (fyle-&gt;number symbol-list))
 ;; Output
-;; &gt; (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING))
+;; &gt; ((A1 B1 C1)
+;; &gt; (0 1 2)
+;; &gt; (RANK_1 RANK_2 RANK_3)
+;; &gt; (WHITE BLACK)
+;; &gt; (PAWN KNIGHT BISHOP)
+;; &gt; (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING))
 </code></pre>
 <h3 id="rank-to-number">rank-&gt;number</h3>
 <h6> Usage </h6>
@@ -485,11 +505,21 @@
 <h6> Example </h6>
 
 <pre><code>(define symbol-list
-  '(RANK_1 RANK_2 (WHITE RANK_4 E4 (PAWN G6) RANK_8 BLACK_LONG_CASTLING)))
+        '((A1 B1 C1)
+          (FYLE_A FYLE_B FYLE_C)
+          (RANK_1 RANK_2 RANK_3)
+          (WHITE BLACK)
+          (PAWN KNIGHT BISHOP)
+          (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
 
 (display (rank-&gt;number symbol-list))
 ;; Output
-;; &gt; (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING))
+;; &gt; ((A1 B1 C1)
+;; &gt; (FYLE_A FYLE_B FYLE_C)
+;; &gt; (0 1 2)
+;; &gt; (WHITE BLACK)
+;; &gt; (PAWN KNIGHT BISHOP)
+;; &gt; (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING))
 </code></pre>
 <h3 id="side-to-number">side-&gt;number</h3>
 <h6> Usage </h6>
@@ -506,11 +536,21 @@
 <h6> Example </h6>
 
 <pre><code>(define symbol-list
-  '(NO_SIDE WHITE (FYLE_A BLACK E4 (PAWN G6) BLACK_LONG_CASTLING)))
+        '((A1 B1 C1)
+          (FYLE_A FYLE_B FYLE_C)
+          (RANK_1 RANK_2 RANK_3)
+          (WHITE BLACK)
+          (PAWN KNIGHT BISHOP)
+          (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
 
 (display (side-&gt;number symbol-list))
 ;; Output
-;; &gt; (0 1 (FYLE_A 2 E4 (PAWN G6) BLACK_LONG_CASTLING))
+;; &gt; ((A1 B1 C1)
+;; &gt; (FYLE_A FYLE_B FYLE_C)
+;; &gt; (RANK_1 RANK_2 RANK_3)
+;; &gt; (1 2)
+;; &gt; (PAWN KNIGHT BISHOP)
+;; &gt; (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING))
 </code></pre>
 <h3 id="piece-to-number">piece-&gt;number</h3>
 <h6> Usage </h6>
@@ -528,11 +568,21 @@
 <h6> Example </h6>
 
 <pre><code>(define symbol-list
-  '(EMPTY PAWN (FYLE_A QUEEN E4 (RANK_4 G6) KING BLACK_LONG_CASTLING)))
+        '((A1 B1 C1)
+          (FYLE_A FYLE_B FYLE_C)
+          (RANK_1 RANK_2 RANK_3)
+          (WHITE BLACK)
+          (PAWN KNIGHT BISHOP)
+          (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
 
 (display (piece-&gt;number symbol-list))
 ;; Output
-;; &gt; (0 1 (FYLE_A 5 E4 (RANK_4 G6) 6 BLACK_LONG_CASTLING))
+;; &gt; ((A1 B1 C1)
+;; &gt; (FYLE_A FYLE_B FYLE_C)
+;; &gt; (RANK_1 RANK_2 RANK_3)
+;; &gt; (WHITE BLACK)
+;; &gt; (1 2 3)
+;; &gt; (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING))
 </code></pre>
 <h3 id="castling-to-number">castling-&gt;number</h3>
 <h6> Usage </h6>
@@ -551,11 +601,21 @@
 <h6> Example </h6>
 
 <pre><code>(define symbol-list
-  '(NO_CASTLING WHITE_SHORT_CASTLING (FYLE_A E4 (RANK_4 G6) KING)))
+        '((A1 B1 C1)
+          (FYLE_A FYLE_B FYLE_C)
+          (RANK_1 RANK_2 RANK_3)
+          (WHITE BLACK)
+          (PAWN KNIGHT BISHOP)
+          (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
 
-(display (castling-&gt;number symbol-list))
+(display (piece-&gt;number symbol-list))
 ;; Output
-;; &gt; (0 1 (FYLE_A E4 (RANK_4 G6) KING))
+;; &gt; ((A1 B1 C1)
+;; &gt; (FYLE_A FYLE_B FYLE_C)
+;; &gt; (RANK_1 RANK_2 RANK_3)
+;; &gt; (WHITE BLACK)
+;; &gt; (1 2 3)
+;; &gt; (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING))
 </code></pre>
 <h3 id="number-to-square">number-&gt;square</h3>
 <h6> Usage </h6>
@@ -571,11 +631,11 @@
 </ul>
 <h6> Example </h6>
 
-<pre><code>(define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+<pre><code>(define number-list '(0 1 2 99))
 
 (display (number-&gt;square number-list))
 ;; Output
-;; &gt; (A1 B1 (C1 (D1 E1 "Hello") F1) 100)
+;; &gt; (A1 B1 C1 99)
 </code></pre>
 <h3 id="number-to-fyle">number-&gt;fyle</h3>
 <h6> Usage </h6>
@@ -591,11 +651,11 @@
 </ul>
 <h6> Example </h6>
 
-<pre><code>(define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+<pre><code>(define number-list '(0 1 2 99))
 
 (display (number-&gt;fyle number-list))
 ;; Output
-;; &gt; (FYLE_A FYLE_B (FYLE_C (FYLE_D FYLE_E "Hello") FYLE_F) 100)
+;; &gt; (FYLE_A FYLE_B FYLE_C 99)
 </code></pre>
 <h3 id="number-to-rank">number-&gt;rank</h3>
 <h6> Usage </h6>
@@ -611,11 +671,11 @@
 </ul>
 <h6> Example </h6>
 
-<pre><code>(define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+<pre><code>(define number-list '(0 1 2 99))
 
 (display (number-&gt;rank number-list))
 ;; Output
-;; &gt; (RANK_1 RANK_2 (RANK_3 (RANK_4 RANK_5 "Hello") RANK_6) 100)
+;; &gt; (RANK_1 RANK_2 RANK_3 99)
 </code></pre>
 <h3 id="number-to-side">number-&gt;side</h3>
 <h6> Usage </h6>
@@ -631,11 +691,11 @@
 </ul>
 <h6> Example </h6>
 
-<pre><code>(define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+<pre><code>(define number-list '(0 1 2 99))
 
 (display (number-&gt;side number-list))
 ;; Output
-;; &gt; (NO_SIDE WHITE (BLACK (3 4 "Hello") 5) 100)
+;; &gt; (NO_SIDE WHITE BLACK 99)
 </code></pre>
 <h3 id="number-to-piece">number-&gt;piece</h3>
 <h6> Usage </h6>
@@ -651,11 +711,11 @@
 </ul>
 <h6> Example </h6>
 
-<pre><code>(define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+<pre><code>(define number-list '(0 1 2 99))
 
 (display (number-&gt;piece number-list))
 ;; Output
-;; &gt; (EMPTY PAWN (KNIGHT (BISHOP ROOK "Hello") QUEEN) 100)
+;; &gt; (EMPTY PAWN KNIGHT 99)
 </code></pre>
 <h3 id="number-to-castling">number-&gt;castling</h3>
 <h6> Usage </h6>
@@ -668,16 +728,15 @@
 <ul>
 <li>If <code>&lt;Object&gt;</code> is Number, it returns Castling Rights Symbol.</li>
 <li>If <code>&lt;Object&gt;</code> is List, it returns List changed Number
-  into CAstling Rights Symbol.</li>
+  into Castling Rights Symbol.</li>
 </ul>
 <h6> Example </h6>
 
-<pre><code>(define number-list '(0 1 (2 (3 4 "Hello") 5) 100))
+<pre><code>(define number-list '(0 1 2 99))
 
 (display (number-&gt;castling number-list))
 ;; Output
-;; &gt; (NO_CASTLING WHITE_SHORT_CASTLING (WHITE_LONG_CASTLING
-;; &gt; (BLACK_SHORT_CASTLING BLACK_LONG_CASTLING "Hello") 5) 100)
+;; &gt; (NO_CASTLING WHITE_SHORT_CASTLING WHITE_LONG_CASTLING 99)
 </code></pre>
 <h3 id="parse-fenepd">parse-fen/epd</h3>
 <h6> Usage </h6>

@@ -1090,7 +1090,7 @@ R"...(### walk ###
 
 <h6> Description </h6>
 
-* Walks through `<Target>` and executes `<Callback>`.
+* Walks around in `<Target>` and executes `<Callback>`.
     + `<Callback>` receives 2 arguments.
         - 1st : Current pair.
         - 2nd : Path. (String)
