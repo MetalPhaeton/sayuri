@@ -1063,9 +1063,35 @@ R"...(### to-fen-position ###
     GetReadyForFunction(args, 1, &args_ptr);
 
     LPointer list_ptr = caller->Evaluate(*(args_ptr->car()));
-    Lisp::CheckList(*list_ptr);
 
-    Walk(*list_ptr, ChessToNumberCore);
+    if (list_ptr->IsSymbol()) {
+      // マス。
+      std::map<std::string, std::uint32_t>::const_iterator itr =
+      SQUARE_MAP.find(list_ptr->symbol());
+      if (itr != SQUARE_MAP.end()) return NewNumber(itr->second);
+
+      // サイド。
+      itr = SIDE_MAP.find(list_ptr->symbol());
+      if (itr != SQUARE_MAP.end()) return NewNumber(itr->second);
+
+      // 駒の種類。
+      itr = PIECE_MAP.find(list_ptr->symbol());
+      if (itr != SQUARE_MAP.end()) return NewNumber(itr->second);
+
+      // キャスリング。
+      itr = CASTLING_MAP.find(list_ptr->symbol());
+      if (itr != SQUARE_MAP.end()) return NewNumber(itr->second);
+
+      // ファイル。
+      itr = FYLE_MAP.find(list_ptr->symbol());
+      if (itr != SQUARE_MAP.end()) return NewNumber(itr->second);
+
+      // ランク。
+      itr = RANK_MAP.find(list_ptr->symbol());
+      if (itr != SQUARE_MAP.end()) return NewNumber(itr->second);
+    } else if (list_ptr->IsPair()) {
+      Walk(*list_ptr, ChessToNumberCore);
+    }
 
     return list_ptr;
   }
