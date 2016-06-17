@@ -55,6 +55,7 @@
 <li><a href="#side-to-number">side-&gt;number</a></li>
 <li><a href="#piece-to-number">piece-&gt;number</a></li>
 <li><a href="#castling-to-number">castling-&gt;number</a></li>
+<li><a href="#chess-to-number">chess-&gt;number</a></li>
 <li><a href="#number-to-square">number-&gt;square</a></li>
 <li><a href="#number-to-fyle">number-&gt;fyle</a></li>
 <li><a href="#number-to-rank">number-&gt;rank</a></li>
@@ -616,6 +617,34 @@
 ;; &gt; (WHITE BLACK)
 ;; &gt; (1 2 3)
 ;; &gt; (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING))
+</code></pre>
+<h3 id="chess-to-number">chess-&gt;number</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(chess-&gt;number &lt;Object&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>If <code>&lt;Object&gt;</code> is Symbol of Chess, it returns Number indicating
+  to Piece Type.</li>
+<li>If <code>&lt;Object&gt;</code> is List, it returns List changed Symbol of Chess
+  into Number. </li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(define symbol-list
+        '((A1 B1 C1)
+          (FYLE_A FYLE_B FYLE_C)
+          (RANK_1 RANK_2 RANK_3)
+          (WHITE BLACK)
+          (PAWN KNIGHT BISHOP)
+          (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
+
+(display (chess-&gt;number symbol-list))
+;; Output
+;; &gt; ((0 1 2) (0 1 2) (0 1 2) (1 2) (1 2 3) (1 4))
 </code></pre>
 <h3 id="number-to-square">number-&gt;square</h3>
 <h6> Usage </h6>

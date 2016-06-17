@@ -414,6 +414,37 @@ R"...(### castling->number ###
     ;; > (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))...";
     help_dict_.emplace("castling->number", help);
 
+    func = LC_FUNCTION_OBJ(ChessToNumber);
+    INSERT_LC_FUNCTION(func, "chess->number", "Sayulisp:chess->number");
+    help =
+R"...(### chess->number ###
+
+<h6> Usage </h6>
+
+* `(chess->number <Object>)`
+
+<h6> Description </h6>
+
+* If `<Object>` is Symbol of Chess, it returns Number indicating
+  to Piece Type.
+* If `<Object>` is List, it returns List changed Symbol of Chess
+  into Number. 
+
+<h6> Example </h6>
+
+    (define symbol-list
+            '((A1 B1 C1)
+              (FYLE_A FYLE_B FYLE_C)
+              (RANK_1 RANK_2 RANK_3)
+              (WHITE BLACK)
+              (PAWN KNIGHT BISHOP)
+              (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
+    
+    (display (chess->number symbol-list))
+    ;; Output
+    ;; > ((0 1 2) (0 1 2) (0 1 2) (1 2) (1 2 3) (1 4)))...";
+    help_dict_.emplace("chess->number", help);
+
     func = LC_FUNCTION_OBJ(NumberToSquare);
     INSERT_LC_FUNCTION(func, "number->square", "Sayulisp:number->square");
     help =
@@ -861,6 +892,107 @@ R"...(### to-fen-position ###
     };
   }
 
+  // チェスのシンボルを数字に変えるWalk用関数。
+  void Sayulisp::ChessToNumberCore(LObject& pair, const std::string& path) {
+    // Car。
+    LObject* car = pair.car().get();
+    if (car->IsSymbol()) {
+      do {
+        // マス。
+        std::map<std::string, std::uint32_t>::const_iterator itr =
+        SQUARE_MAP.find(car->symbol());
+        if (itr != SQUARE_MAP.end()) {
+          pair.car(Lisp::NewNumber(itr->second));
+          break;
+        }
+
+        // サイド。
+        itr = SIDE_MAP.find(car->symbol());
+        if (itr != SIDE_MAP.end()) {
+          pair.car(Lisp::NewNumber(itr->second));
+          break;
+        }
+
+        // 駒の種類。
+        itr = PIECE_MAP.find(car->symbol());
+        if (itr != PIECE_MAP.end()) {
+          pair.car(Lisp::NewNumber(itr->second));
+          break;
+        }
+
+        // キャスリング。
+        itr = CASTLING_MAP.find(car->symbol());
+        if (itr != CASTLING_MAP.end()) {
+          pair.car(Lisp::NewNumber(itr->second));
+          break;
+        }
+
+        // ファイル。
+        itr = FYLE_MAP.find(car->symbol());
+        if (itr != FYLE_MAP.end()) {
+          pair.car(Lisp::NewNumber(itr->second));
+          break;
+        }
+
+        // ランク。
+        itr = RANK_MAP.find(car->symbol());
+        if (itr != RANK_MAP.end()) {
+          pair.car(Lisp::NewNumber(itr->second));
+          break;
+        }
+      } while (false);
+    }
+
+    // Cdr。
+    LObject* cdr = pair.cdr().get();
+    if (cdr->IsSymbol()) {
+      do {
+        // マス。
+        std::map<std::string, std::uint32_t>::const_iterator itr =
+        SQUARE_MAP.find(cdr->symbol());
+        if (itr != SQUARE_MAP.end()) {
+          pair.cdr(Lisp::NewNumber(itr->second));
+          break;
+        }
+
+        // サイド。
+        itr = SIDE_MAP.find(cdr->symbol());
+        if (itr != SIDE_MAP.end()) {
+          pair.cdr(Lisp::NewNumber(itr->second));
+          break;
+        }
+
+        // 駒の種類。
+        itr = PIECE_MAP.find(cdr->symbol());
+        if (itr != PIECE_MAP.end()) {
+          pair.cdr(Lisp::NewNumber(itr->second));
+          break;
+        }
+
+        // キャスリング。
+        itr = CASTLING_MAP.find(cdr->symbol());
+        if (itr != CASTLING_MAP.end()) {
+          pair.cdr(Lisp::NewNumber(itr->second));
+          break;
+        }
+
+        // ファイル。
+        itr = FYLE_MAP.find(cdr->symbol());
+        if (itr != FYLE_MAP.end()) {
+          pair.cdr(Lisp::NewNumber(itr->second));
+          break;
+        }
+
+        // ランク。
+        itr = RANK_MAP.find(cdr->symbol());
+        if (itr != RANK_MAP.end()) {
+          pair.cdr(Lisp::NewNumber(itr->second));
+          break;
+        }
+      } while (false);
+    }
+  }
+
   // エンジンを生成する。
   DEF_LC_FUNCTION(Sayulisp::GenEngine) {
     // スイートを作成。
@@ -882,9 +1014,16 @@ R"...(### to-fen-position ###
     GetReadyForFunction(args, 1, &args_ptr);\
 \
     LPointer list_ptr = caller->Evaluate(*(args_ptr->car()));\
-    Lisp::CheckList(*list_ptr);\
 \
-    Walk(*list_ptr, GenFuncToNumber(map_name));\
+    if (list_ptr->IsSymbol()) {\
+      std::map<std::string, std::uint32_t>::const_iterator itr =\
+      map_name.find(list_ptr->symbol());\
+      if (itr != map_name.end()) {\
+        return NewNumber(itr->second);\
+      }\
+    } else if (list_ptr->IsPair()) {\
+      Walk(*list_ptr, GenFuncToNumber(map_name));\
+    }\
 \
     return list_ptr
 
@@ -918,15 +1057,32 @@ R"...(### to-fen-position ###
     TO_NUMBER_DEFINITION(CASTLING_MAP);
   }
 
+  // チェスのシンボルを数値に変換する。
+  DEF_LC_FUNCTION(Sayulisp::ChessToNumber) {
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    LPointer list_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckList(*list_ptr);
+
+    Walk(*list_ptr, ChessToNumberCore);
+
+    return list_ptr;
+  }
+
 #define TO_SYMBOL_DEFINITION(array_name, limit) \
     LObject* args_ptr = nullptr;\
     GetReadyForFunction(args, 1, &args_ptr);\
 \
     LPointer list_ptr = caller->Evaluate(*(args_ptr->car()));\
-    Lisp::CheckList(*list_ptr);\
-\
-    Walk(*list_ptr, GenFuncToSymbol<limit>(array_name));\
-\
+    if (list_ptr->IsNumber()) {\
+      std::uint32_t index = list_ptr->number();\
+      if (index < limit) {\
+        return NewSymbol(array_name[index]);\
+      }\
+    } else if (list_ptr->IsList()) {\
+      Walk(*list_ptr, GenFuncToSymbol<limit>(array_name));\
+    }\
     return list_ptr
 
   // 数値をマスのシンボルに変換する。

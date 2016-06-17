@@ -329,6 +329,13 @@ namespace Sayuri {
       (const std::map<std::string, std::uint32_t>& map);
 
       /**
+       * チェスの定数を全て数字にするWalk用関数。
+       * @param pair 現在のペア。
+       * @param path 現在のパス。
+       */
+      static void ChessToNumberCore(LObject& pair, const std::string& path);
+
+      /**
        * Walk用ToSymbol関数を作成する。
        * @param map 置き換え用マップ。
        * @return Walk用関数オブジェクト。
@@ -385,6 +392,9 @@ namespace Sayuri {
 
       /** キャスリングのシンボルを数値に変換する。 */
       DEF_LC_FUNCTION(CastlingToNumber) ;
+
+      /** チェスのシンボルを数値に変換する。 */
+      DEF_LC_FUNCTION(ChessToNumber) ;
 
       /** 数値をマスのシンボルに変換する。 */
       DEF_LC_FUNCTION(NumberToSquare) ;
