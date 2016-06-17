@@ -98,7 +98,7 @@ namespace Sayuri {
     {"PAWN", PAWN}, {"KNIGHT", KNIGHT}, {"BISHOP", BISHOP},
     {"ROOK", ROOK}, {"QUEEN", QUEEN}, {"KING", KING}
   };
-  const std::map<std::string, int> Sayulisp::CASTLING_MAP {
+  const std::map<std::string, std::uint32_t> Sayulisp::CASTLING_MAP {
     {"NO_CASTLING", 0},
     {"WHITE_SHORT_CASTLING", 1}, {"WHITE_LONG_CASTLING", 2},
     {"BLACK_SHORT_CASTLING", 3}, {"BLACK_LONG_CASTLING", 4}
@@ -224,11 +224,21 @@ R"...(### square->number ###
 <h6> Example </h6>
 
     (define symbol-list
-      '(A1 B1 C1 (WHITE D3 E4 (F5 PAWN G6) H7 BLACK_LONG_CASTLING)))
+            '((A1 B1 C1)
+              (FYLE_A FYLE_B FYLE_C)
+              (RANK_1 RANK_2 RANK_3)
+              (WHITE BLACK)
+              (PAWN KNIGHT BISHOP)
+              (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
     
     (display (square->number symbol-list))
     ;; Output
-    ;; > (0 1 2 (WHITE 19 28 (37 PAWN 46) 55 BLACK_LONG_CASTLING)))...";
+    ;; > ((0 1 2)
+    ;; > (FYLE_A FYLE_B FYLE_C)
+    ;; > (RANK_1 RANK_2 RANK_3)
+    ;; > (WHITE BLACK)
+    ;; > (PAWN KNIGHT BISHOP)
+    ;; > (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))...";
     help_dict_.emplace("square->number", help);
 
     func = LC_FUNCTION_OBJ(FyleToNumber);
@@ -248,11 +258,21 @@ R"...(### fyle->number ###
 <h6> Example </h6>
 
     (define symbol-list
-      '(FYLE_A FYLE_B (WHITE FYLE_D E4 (PAWN G6) FYLE_H BLACK_LONG_CASTLING)))
+            '((A1 B1 C1)
+              (FYLE_A FYLE_B FYLE_C)
+              (RANK_1 RANK_2 RANK_3)
+              (WHITE BLACK)
+              (PAWN KNIGHT BISHOP)
+              (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
     
     (display (fyle->number symbol-list))
     ;; Output
-    ;; > (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING)))...";
+    ;; > ((A1 B1 C1)
+    ;; > (0 1 2)
+    ;; > (RANK_1 RANK_2 RANK_3)
+    ;; > (WHITE BLACK)
+    ;; > (PAWN KNIGHT BISHOP)
+    ;; > (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))...";
     help_dict_.emplace("fyle->number", help);
 
     func = LC_FUNCTION_OBJ(RankToNumber);
@@ -272,11 +292,21 @@ R"...(### rank->number ###
 <h6> Example </h6>
 
     (define symbol-list
-      '(RANK_1 RANK_2 (WHITE RANK_4 E4 (PAWN G6) RANK_8 BLACK_LONG_CASTLING)))
+            '((A1 B1 C1)
+              (FYLE_A FYLE_B FYLE_C)
+              (RANK_1 RANK_2 RANK_3)
+              (WHITE BLACK)
+              (PAWN KNIGHT BISHOP)
+              (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
     
     (display (rank->number symbol-list))
     ;; Output
-    ;; > (0 1 (WHITE 3 E4 (PAWN G6) 7 BLACK_LONG_CASTLING)))...";
+    ;; > ((A1 B1 C1)
+    ;; > (FYLE_A FYLE_B FYLE_C)
+    ;; > (0 1 2)
+    ;; > (WHITE BLACK)
+    ;; > (PAWN KNIGHT BISHOP)
+    ;; > (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))...";
     help_dict_.emplace("rank->number", help);
 
     func = LC_FUNCTION_OBJ(SideToNumber);
@@ -296,11 +326,21 @@ R"...(### side->number ### {#side-to-number}
 <h6> Example </h6>
 
     (define symbol-list
-      '(NO_SIDE WHITE (FYLE_A BLACK E4 (PAWN G6) BLACK_LONG_CASTLING)))
+            '((A1 B1 C1)
+              (FYLE_A FYLE_B FYLE_C)
+              (RANK_1 RANK_2 RANK_3)
+              (WHITE BLACK)
+              (PAWN KNIGHT BISHOP)
+              (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
     
     (display (side->number symbol-list))
     ;; Output
-    ;; > (0 1 (FYLE_A 2 E4 (PAWN G6) BLACK_LONG_CASTLING)))...";
+    ;; > ((A1 B1 C1)
+    ;; > (FYLE_A FYLE_B FYLE_C)
+    ;; > (RANK_1 RANK_2 RANK_3)
+    ;; > (1 2)
+    ;; > (PAWN KNIGHT BISHOP)
+    ;; > (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))...";
     help_dict_.emplace("side->number", help);
 
     func = LC_FUNCTION_OBJ(PieceToNumber);
@@ -321,11 +361,21 @@ R"...(### piece->number ###
 <h6> Example </h6>
 
     (define symbol-list
-      '(EMPTY PAWN (FYLE_A QUEEN E4 (RANK_4 G6) KING BLACK_LONG_CASTLING)))
+            '((A1 B1 C1)
+              (FYLE_A FYLE_B FYLE_C)
+              (RANK_1 RANK_2 RANK_3)
+              (WHITE BLACK)
+              (PAWN KNIGHT BISHOP)
+              (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
     
     (display (piece->number symbol-list))
     ;; Output
-    ;; > (0 1 (FYLE_A 5 E4 (RANK_4 G6) 6 BLACK_LONG_CASTLING)))...";
+    ;; > ((A1 B1 C1)
+    ;; > (FYLE_A FYLE_B FYLE_C)
+    ;; > (RANK_1 RANK_2 RANK_3)
+    ;; > (WHITE BLACK)
+    ;; > (1 2 3)
+    ;; > (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))...";
     help_dict_.emplace("piece->number", help);
 
     func = LC_FUNCTION_OBJ(CastlingToNumber);
@@ -347,11 +397,21 @@ R"...(### castling->number ###
 <h6> Example </h6>
 
     (define symbol-list
-      '(NO_CASTLING WHITE_SHORT_CASTLING (FYLE_A E4 (RANK_4 G6) KING)))
+            '((A1 B1 C1)
+              (FYLE_A FYLE_B FYLE_C)
+              (RANK_1 RANK_2 RANK_3)
+              (WHITE BLACK)
+              (PAWN KNIGHT BISHOP)
+              (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
     
-    (display (castling->number symbol-list))
+    (display (piece->number symbol-list))
     ;; Output
-    ;; > (0 1 (FYLE_A E4 (RANK_4 G6) KING)))...";
+    ;; > ((A1 B1 C1)
+    ;; > (FYLE_A FYLE_B FYLE_C)
+    ;; > (RANK_1 RANK_2 RANK_3)
+    ;; > (WHITE BLACK)
+    ;; > (1 2 3)
+    ;; > (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))...";
     help_dict_.emplace("castling->number", help);
 
     func = LC_FUNCTION_OBJ(NumberToSquare);
@@ -770,6 +830,38 @@ R"...(### to-fen-position ###
     *args_ptr_ptr = message_args_ptr.get();
   }
 
+  // Walk用関数オブジェクトを作成する。
+  LFuncForWalk Sayulisp::GenFuncForWalk
+  (const std::map<std::string, std::uint32_t>& map) {
+    return [&map](LObject& pair, const std::string& path) {
+      // Car。
+      LObject* car = pair.car().get();
+      if (car->IsSymbol()) {
+        // 探す。
+        std::map<std::string, std::uint32_t>::const_iterator itr =
+        map.find(car->symbol());
+
+        // 見つかった。
+        if (itr != map.end()) {
+          pair.car(Lisp::NewNumber(itr->second));
+        }
+      }
+
+      // Cdr。
+      LObject* cdr = pair.cdr().get();
+      if (cdr->IsSymbol()) {
+        // 探す。
+        std::map<std::string, std::uint32_t>::const_iterator itr =
+        map.find(cdr->symbol());
+
+        // 見つかった。
+        if (itr != map.end()) {
+          pair.cdr(Lisp::NewNumber(itr->second));
+        }
+      }
+    };
+  }
+
   // エンジンを生成する。
   DEF_LC_FUNCTION(Sayulisp::GenEngine) {
     // スイートを作成。
@@ -786,142 +878,45 @@ R"...(### to-fen-position ###
     caller->scope_chain());
   }
 
+#define TO_NUMBER_DEFINITION(map_name) \
+    LObject* args_ptr = nullptr;\
+    GetReadyForFunction(args, 1, &args_ptr);\
+\
+    LPointer list_ptr = caller->Evaluate(*(args_ptr->car()));\
+    Lisp::CheckList(*list_ptr);\
+\
+    Walk(*list_ptr, GenFuncForWalk(map_name));\
+\
+    return list_ptr
+
   // マスのシンボルを数値に変換する。
   DEF_LC_FUNCTION(Sayulisp::SquareToNumber) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    GetReadyForFunction(args, 1, &args_ptr);
-
-    std::function<LPointer(LPointer)> func;
-    func = [&func](LPointer ptr) -> LPointer {
-      if (ptr->IsPair()) {
-        ptr->car(func(ptr->car()));
-        ptr->cdr(func(ptr->cdr()));
-        return ptr;
-      }
-      if (SQUARE_MAP.find(ptr->symbol()) != SQUARE_MAP.end()) {
-        return NewNumber(SQUARE_MAP.at(ptr->symbol()));
-      }
-
-      return ptr;
-    };
-
-    return func(caller->Evaluate(*(args_ptr->car())));
+    TO_NUMBER_DEFINITION(SQUARE_MAP);
   }
 
   // ファイルのシンボルを数値に変換する。
   DEF_LC_FUNCTION(Sayulisp::FyleToNumber) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    GetReadyForFunction(args, 1, &args_ptr);
-
-    std::function<LPointer(LPointer)> func;
-    func = [&func](LPointer ptr) -> LPointer {
-      if (ptr->IsPair()) {
-        ptr->car(func(ptr->car()));
-        ptr->cdr(func(ptr->cdr()));
-        return ptr;
-      }
-      if (FYLE_MAP.find(ptr->symbol()) != FYLE_MAP.end()) {
-        return NewNumber(FYLE_MAP.at(ptr->symbol()));
-      }
-
-      return ptr;
-    };
-
-    return func(caller->Evaluate(*(args_ptr->car())));
+    TO_NUMBER_DEFINITION(FYLE_MAP);
   }
 
   // ランクのシンボルを数値に変換する。
   DEF_LC_FUNCTION(Sayulisp::RankToNumber) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    GetReadyForFunction(args, 1, &args_ptr);
-
-    std::function<LPointer(LPointer)> func;
-    func = [&func](LPointer ptr) -> LPointer {
-      if (ptr->IsPair()) {
-        ptr->car(func(ptr->car()));
-        ptr->cdr(func(ptr->cdr()));
-        return ptr;
-      }
-      if (RANK_MAP.find(ptr->symbol()) != RANK_MAP.end()) {
-        return NewNumber(RANK_MAP.at(ptr->symbol()));
-      }
-
-      return ptr;
-    };
-
-    return func(caller->Evaluate(*(args_ptr->car())));
+    TO_NUMBER_DEFINITION(RANK_MAP);
   }
 
   // サイドのシンボルを数値に変換する。
   DEF_LC_FUNCTION(Sayulisp::SideToNumber) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    GetReadyForFunction(args, 1, &args_ptr);
-
-    std::function<LPointer(LPointer)> func;
-    func = [&func](LPointer ptr) -> LPointer {
-      if (ptr->IsPair()) {
-        ptr->car(func(ptr->car()));
-        ptr->cdr(func(ptr->cdr()));
-        return ptr;
-      }
-      if (SIDE_MAP.find(ptr->symbol()) != SIDE_MAP.end()) {
-        return NewNumber(SIDE_MAP.at(ptr->symbol()));
-      }
-
-      return ptr;
-    };
-
-    return func(caller->Evaluate(*(args_ptr->car())));
+    TO_NUMBER_DEFINITION(SIDE_MAP);
   }
 
   // 駒の種類のシンボルを数値に変換する。
   DEF_LC_FUNCTION(Sayulisp::PieceToNumber) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    GetReadyForFunction(args, 1, &args_ptr);
-
-    std::function<LPointer(LPointer)> func;
-    func = [&func](LPointer ptr) -> LPointer {
-      if (ptr->IsPair()) {
-        ptr->car(func(ptr->car()));
-        ptr->cdr(func(ptr->cdr()));
-        return ptr;
-      }
-      if (PIECE_MAP.find(ptr->symbol()) != PIECE_MAP.end()) {
-        return NewNumber(PIECE_MAP.at(ptr->symbol()));
-      }
-
-      return ptr;
-    };
-
-    return func(caller->Evaluate(*(args_ptr->car())));
+    TO_NUMBER_DEFINITION(PIECE_MAP);
   }
 
   // キャスリングのシンボルを数値に変換する。
   DEF_LC_FUNCTION(Sayulisp::CastlingToNumber) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    GetReadyForFunction(args, 1, &args_ptr);
-
-    std::function<LPointer(LPointer)> func;
-    func = [&func](LPointer ptr) -> LPointer {
-      if (ptr->IsPair()) {
-        ptr->car(func(ptr->car()));
-        ptr->cdr(func(ptr->cdr()));
-        return ptr;
-      }
-      if (CASTLING_MAP.find(ptr->symbol()) != CASTLING_MAP.end()) {
-        return NewNumber(CASTLING_MAP.at(ptr->symbol()));
-      }
-
-      return ptr;
-    };
-
-    return func(caller->Evaluate(*(args_ptr->car())));
+    TO_NUMBER_DEFINITION(CASTLING_MAP);
   }
 
   // 数値をマスのシンボルに変換する。

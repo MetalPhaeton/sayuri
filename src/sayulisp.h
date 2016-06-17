@@ -138,7 +138,7 @@ namespace Sayuri {
       /** 駒の種類の定数のマップ。 */
       static const std::map<std::string, PieceType> PIECE_MAP;
       /** キャスリングの定数のマップ。 */
-      static const std::map<std::string, int> CASTLING_MAP;
+      static const std::map<std::string, std::uint32_t> CASTLING_MAP;
       /** マスの定数の逆マップ。 */
       static const std::string SQUARE_MAP_INV[NUM_SQUARES];
       /** ファイルの定数の逆マップ。 */
@@ -319,6 +319,14 @@ namespace Sayuri {
        */
       static void GetReadyForMessageFunction(const std::string& symbol,
       const LObject& args, int required_args, LObject** args_ptr_ptr);
+
+      /**
+       * Walk用関数を作成する。
+       * @param map 置き換え用マップ。
+       * @return Walk用関数オブジェクト。
+       */
+      static LFuncForWalk GenFuncForWalk
+      (const std::map<std::string, std::uint32_t>& map);
 
       // ========================== //
       // Lisp関数オブジェクト用関数 //
