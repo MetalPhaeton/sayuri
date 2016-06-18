@@ -5283,27 +5283,18 @@ R"...(### clock ###
     // 第3引数。 入れ替えたい要素。
     LPointer elm_ptr = caller->Evaluate(*(args_ptr->car()));
 
-    // 入れ替える前後のポインタを得る。。
-    LObject* prev = nullptr;
-    LPointer next = target_ptr->cdr();
-    for (; index > 0; --index) {
-      if (index == 0) break;
+    // ダミーに入れる。
+    LPointer dummy = NewPair(NewNil(), target_ptr);
+    LObject* dummy_ptr = dummy.get();
 
-      if (!prev) {
-        prev = target_ptr.get();
-      } else {
-        prev = prev->cdr().get();
-      }
-
-        next = next->cdr();
-    }
+    // indexが0になるまでシフトする。
+    for (; index > 0; --index) Next(&dummy_ptr);
 
     // 入れ替える。
-    if (!prev) {
-      return NewPair(elm_ptr, next);
-    }
-    prev->cdr(NewPair(elm_ptr, next));
-    return target_ptr;
+    dummy_ptr->cdr()->car(elm_ptr);
+
+    // 返す。
+    return dummy->cdr();
   }
 
   // %%% list-remove
