@@ -5150,7 +5150,7 @@ R"...(### clock ###
   DEF_LC_FUNCTION(Lisp::Append) {
     // 準備。
     LObject* args_ptr = nullptr;
-    GetReadyForFunction(args, 2, &args_ptr);
+    GetReadyForFunction(args, 1, &args_ptr);
 
     // くっつける元のやつ。。
     LPointer first_ptr = caller->Evaluate(*(args_ptr->car()));
@@ -5158,48 +5158,21 @@ R"...(### clock ###
     // リストと文字列で分岐。
     // リストの場合。
     if (first_ptr->IsList()) {
-      // first_ptrをNilじゃないリスト(ペア)までシフトする。
-      if (first_ptr->IsNil()) {
-        for (Next(&args_ptr);args_ptr->IsPair(); Next(&args_ptr)) {
-          first_ptr = caller->Evaluate(*(args_ptr->car()));
-          CheckList(*first_ptr);
+      // ダミーに入れる。
+      LPointer dummy = NewPair(NewNil(), first_ptr);
+      LObject* dummy_ptr = dummy.get();
 
-          if (first_ptr->IsPair()) break;
-        }
-
-        // 結局Nilならそのまま返す。
-        if (first_ptr->IsNil()) return first_ptr;
-      }
-
-      // ここに来るときはfirst_ptrは必ずペア。
-
-      LObject* front = first_ptr.get();  // 必ずペア。
-      LPointer rear;
+      // 残りのリストを付け加えていく。
       for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
-        // rearを得る。
-        rear = caller->Evaluate(*(args_ptr->car()));
-        CheckList(*rear);
+        // dummy_ptrの最後のペアまでループ。
+        for (; dummy_ptr->cdr()->IsPair(); Next(&dummy_ptr)) continue;
 
-        // rearがNilなら無視。
-        if (rear->IsNil()) continue;
-
-        // ここに来るときはrearは必ずペア。
-        // なので、frontは必ずペア。
-
-        // frontの最後尾を得る。
-        LObject* front_tail = front;
-        for (; front_tail->IsPair(); Next(&front_tail)) {
-          if (!(front_tail->cdr()->IsPair())) break;
-        }
-
-        // 最後尾のcdrにrearをセット。
-        front_tail->cdr(rear);
-
-        // rearをfrontへ。
-        front = rear.get();
+        // くっつける。
+        dummy_ptr->cdr(caller->Evaluate(*(args_ptr->car())));
       }
 
-      return first_ptr;
+      // 返す。
+      return dummy->cdr();
     }
 
     // 文字列の場合。

@@ -1982,7 +1982,7 @@ namespace Sayuri {
        * @param required_type 要求するタイプ。
        * @return 実際のタイプ。
        */
-      static LType CheckType(const LObject& obj, LType required_type) {
+      static void CheckType(const LObject& obj, LType required_type) {
         static const std::string not_type_symbol[] {
           "@not-nil", "@not-pair", "@not-symbol", "@not-number",
           "@not-boolean", "@not-string", "@not-procedure", "@not-procedure"
@@ -1990,11 +1990,10 @@ namespace Sayuri {
 
         LType ret = obj.type();
         if (ret != required_type) {
-          throw GenError(not_type_symbol[static_cast<int>(ret)],
+          throw GenError(not_type_symbol[static_cast<int>(required_type)],
           "'" + obj.ToString() + "' is not " + TypeToName(required_type)
           + ". It's " + TypeToName(ret) + ".");
         }
-        return ret;
       }
 
       /**
@@ -2002,10 +2001,8 @@ namespace Sayuri {
        * @param obj チェックするオブジェクト。
        * @return リストならtrue。
        */
-      static bool CheckList(const LObject& obj) {
-        if (obj.IsList()) {
-          return true;
-        }
+      static void CheckList(const LObject& obj) {
+        if (obj.IsList()) return;
 
         throw GenError("@not-list","'" + obj.ToString()
         + "' is not List. It's " + TypeToName(obj.type()) + ".");
