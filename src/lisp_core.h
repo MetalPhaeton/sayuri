@@ -2088,6 +2088,31 @@ namespace Sayuri {
        */
       static LPointer ZipLists(LPointerVec& list_vec);
 
+      /**
+       * クオートで要素をくるむ。
+       * @param ptr くるむオブジェクトのポインタ。
+       * @return クオートでくるまれたのポインタ。
+       */
+      static LPointer WrapQuote(const LPointer& ptr) {
+        return NewPair(NewSymbol("quote"), NewPair(ptr, NewNil()));
+      }
+      /**
+       * リストの各要素をクオートでくるむ。
+       * @param ptr くるむオブジェクトのリストのポインタ。
+       * @return 各要素をクオートでくるまれたのリストのポインタ。
+       */
+      static LPointer WrapListQuote(const LPointer& list_ptr) {
+        LPointer ret_ptr = NewList(CountList(*list_ptr));
+        LObject* ret_ptr_ptr = ret_ptr.get();
+
+        for (LObject* ptr = list_ptr.get(); ptr->IsPair();
+        Next(&ptr), Next(&ret_ptr_ptr)) {
+          ret_ptr_ptr->car(WrapQuote(ptr->car()));
+        }
+
+        return ret_ptr;
+      }
+
       // ============== //
       // パブリック関数 //
       // ============== //

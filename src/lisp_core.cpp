@@ -4607,7 +4607,7 @@ R"...(### clock ###
     CheckList(*args_list_ptr);
 
     // ペアにして評価して返す。
-    return caller->Evaluate(LPair(func_ptr, args_list_ptr));
+    return caller->Evaluate(LPair(func_ptr, WrapListQuote(args_list_ptr)));
   }
 
   // %%% walk
@@ -4626,18 +4626,12 @@ R"...(### clock ###
     // ペアにしておく。
     LPointer func_pair_ptr = NewPair(func_ptr, NewPair(NewNil(), NewPair()));
 
-    // クオート用ペアを作っておく。
-    LPointer quote_ptr = NewPair(NewSymbol("quote"), NewNil());
-
     // 関数オブジェクトを作成。
-    LFuncForWalk func = [func_pair_ptr, quote_ptr, &caller]
+    LFuncForWalk func = [func_pair_ptr, &caller]
     (LObject& pair, const std::string& path) {
       // --- Car --- //
-      // Carをクオートでくるむ。
-      quote_ptr->cdr(NewPair(pair.car(), NewNil()));
-
       // コールバックを実行する。
-      func_pair_ptr->cdr()->car(quote_ptr);
+      func_pair_ptr->cdr()->car(WrapQuote(pair.car()));
       func_pair_ptr->cdr()->cdr()->car(NewString(path + "a"));
       LPointer result = caller->Evaluate(*func_pair_ptr);
 
@@ -4651,11 +4645,8 @@ R"...(### clock ###
       }
 
       // --- Cdr --- //
-      // Cdrをクオートでくるむ。
-      quote_ptr->cdr(NewPair(pair.cdr(), NewNil()));
-
       // コールバックを実行する。
-      func_pair_ptr->cdr()->car(quote_ptr);
+      func_pair_ptr->cdr()->car(WrapQuote(pair.cdr()));
       func_pair_ptr->cdr()->cdr()->car(NewString(path + "d"));
       result = caller->Evaluate(*func_pair_ptr);
 
@@ -5505,7 +5496,7 @@ R"...(### clock ###
     LPointer func_ptr = caller->Evaluate(*(args_ptr->car()));
 
     // 関数をペアのCarに入れておく。
-    LPair func_pair(func_ptr, NewNil());
+    LPair func_pair(func_ptr, NewPair());
 
     // 第2引数以降のベクトル。
     Next(&args_ptr);
@@ -5522,7 +5513,7 @@ R"...(### clock ###
     LPointerVec ret_vec;
     for (LObject* ptr = zip.get(); ptr->IsPair(); Next(&ptr)) {
       // 関数のペアのCdrに引数リストを入れる。
-      func_pair.cdr(ptr->car());
+      func_pair.cdr(WrapListQuote(ptr->car()));
 
       // 評価してベクトルにプッシュ。
       ret_vec.push_back(caller->Evaluate(func_pair));
@@ -5552,7 +5543,7 @@ R"...(### clock ###
     LPointerVec ret_vec;
     for (LObject* ptr = target_list.get(); ptr->IsPair(); Next(&ptr)) {
       // 関数のリストの第1引数に入れる。
-      func_pair.cdr()->car(ptr->car());
+      func_pair.cdr()->car(WrapQuote(ptr->car()));
 
       // 評価してみる。
       result = caller->Evaluate(func_pair);
