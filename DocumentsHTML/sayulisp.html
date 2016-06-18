@@ -344,33 +344,63 @@ Sayulisp embeds them into its definition before executes it.</p>
 <a href="core_functions.html#walk"><code>(walk)</code></a>.</p>
 <h6> Example </h6>
 
-<pre><code>;; Define callback function.
-;; If Car is 4, it replaces 4 to "Hello".
-(define (callback current path)
-        (display "current : " current)
+<pre><code>(define li '(1 2 (3 (4 5) (6 7)) 8))
+(define (my-func elm path)
+        (display "elm : " elm)
         (display "path : " path)
-        (if (equal? (car current) 4)
-            (cons "Hello" (cdr current))
+        (display "---------")
+        (if (equal? elm 3)
+            '(@replace "Hello")
             ()))
 
-;; Target.
-(define li '(1 2 (3 4) 5))
-
-(display "Result : " (walk callback li))
+(display "Result : " (walk my-func li))
 ;; Output
-;; &gt; current : (1 2 (3 4) 5)
-;; &gt; path : 
-;; &gt; current : (2 (3 4) 5)
-;; &gt; path : d
-;; &gt; current : ((3 4) 5)
-;; &gt; path : dd
-;; &gt; current : (3 4)
+;; &gt; elm : 1
+;; &gt; path : a
+;; &gt; ---------
+;; &gt; elm : 2
+;; &gt; path : da
+;; &gt; ---------
+;; &gt; elm : (3 (4 5) (6 7))
 ;; &gt; path : dda
-;; &gt; current : (4)
-;; &gt; path : ddad
-;; &gt; current : (5)
-;; &gt; path : ddd
-;; &gt; Result : (1 2 (3 "Hello") 5)
+;; &gt; ---------
+;; &gt; elm : 3
+;; &gt; path : ddaa
+;; &gt; ---------
+;; &gt; elm : (4 5)
+;; &gt; path : ddada
+;; &gt; ---------
+;; &gt; elm : 4
+;; &gt; path : ddadaa
+;; &gt; ---------
+;; &gt; elm : 5
+;; &gt; path : ddadada
+;; &gt; ---------
+;; &gt; elm : ()
+;; &gt; path : ddadadd
+;; &gt; ---------
+;; &gt; elm : (6 7)
+;; &gt; path : ddadda
+;; &gt; ---------
+;; &gt; elm : ()
+;; &gt; path : ddaddd
+;; &gt; ---------
+;; &gt; elm : 6
+;; &gt; path : ddaddaa
+;; &gt; ---------
+;; &gt; elm : 7
+;; &gt; path : ddaddada
+;; &gt; ---------
+;; &gt; elm : ()
+;; &gt; path : ddaddadd
+;; &gt; ---------
+;; &gt; elm : 8
+;; &gt; path : ddda
+;; &gt; ---------
+;; &gt; elm : ()
+;; &gt; path : dddd
+;; &gt; ---------
+;; &gt; Result : (1 2 ("Hello" (4 5) (6 7)) 8)
 </code></pre>
 <h3 id="exception-handling">Exception Handling</h3>
 <p>Some functions throws an exception.<br />

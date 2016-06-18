@@ -1092,43 +1092,74 @@ R"...(### walk ###
 
 * Walks around in `<Target>` and executes `<Callback>`.
     + `<Callback>` receives 2 arguments.
-        - 1st : Current pair.
+        - 1st : Current element.
         - 2nd : Path. (String)
             - 'a' is Car.
             - 'd' is cdr.
             - For example, "da" means (car (cdr <List>)).
-    + If `<Callback>` returns Pair, the current pair is replaced to it.
+    + If `<Callback>` returns List and its 1st element is `@replace`,
+      the current element is replaced for the 2nd element of the list.
 * Returns result of `<Target>`.
 
 <h6> Example </h6>
 
-    ;; Define callback function.
-    ;; If Car is 4, it replaces 4 to "Hello".
-    (define (callback current path)
-            (display "current : " current)
+    (define li '(1 2 (3 (4 5) (6 7)) 8))
+    (define (my-func elm path)
+            (display "elm : " elm)
             (display "path : " path)
-            (if (equal? (car current) 4)
-                (cons "Hello" (cdr current))
+            (display "---------")
+            (if (equal? elm 3)
+                '(@replace "Hello")
                 ()))
     
-    ;; Target.
-    (define li '(1 2 (3 4) 5))
-    
-    (display "Result : " (walk callback li))
+    (display "Result : " (walk my-func li))
     ;; Output
-    ;; > current : (1 2 (3 4) 5)
-    ;; > path : 
-    ;; > current : (2 (3 4) 5)
-    ;; > path : d
-    ;; > current : ((3 4) 5)
-    ;; > path : dd
-    ;; > current : (3 4)
+    ;; > elm : 1
+    ;; > path : a
+    ;; > ---------
+    ;; > elm : 2
+    ;; > path : da
+    ;; > ---------
+    ;; > elm : (3 (4 5) (6 7))
     ;; > path : dda
-    ;; > current : (4)
-    ;; > path : ddad
-    ;; > current : (5)
-    ;; > path : ddd
-    ;; > Result : (1 2 (3 "Hello") 5))...";
+    ;; > ---------
+    ;; > elm : 3
+    ;; > path : ddaa
+    ;; > ---------
+    ;; > elm : (4 5)
+    ;; > path : ddada
+    ;; > ---------
+    ;; > elm : 4
+    ;; > path : ddadaa
+    ;; > ---------
+    ;; > elm : 5
+    ;; > path : ddadada
+    ;; > ---------
+    ;; > elm : ()
+    ;; > path : ddadadd
+    ;; > ---------
+    ;; > elm : (6 7)
+    ;; > path : ddadda
+    ;; > ---------
+    ;; > elm : ()
+    ;; > path : ddaddd
+    ;; > ---------
+    ;; > elm : 6
+    ;; > path : ddaddaa
+    ;; > ---------
+    ;; > elm : 7
+    ;; > path : ddaddada
+    ;; > ---------
+    ;; > elm : ()
+    ;; > path : ddaddadd
+    ;; > ---------
+    ;; > elm : 8
+    ;; > path : ddda
+    ;; > ---------
+    ;; > elm : ()
+    ;; > path : dddd
+    ;; > ---------
+    ;; > Result : (1 2 ("Hello" (4 5) (6 7)) 8))...";
     help_dict_.emplace("walk", help);
 
     func = LC_FUNCTION_OBJ(Quote);
@@ -4627,25 +4658,52 @@ R"...(### clock ###
     LPointer pair_ptr = caller->Evaluate(*(args_ptr->cdr()->car()));
     CheckType(*pair_ptr, LType::PAIR);
 
+    // ペアにしておく。
+    LPointer func_pair_ptr = NewPair(func_ptr, NewPair(NewNil(), NewPair()));
+
+    // クオート用ペアを作っておく。
+    LPointer quote_ptr = NewPair(NewSymbol("quote"), NewNil());
+
     // 関数オブジェクトを作成。
-    LFuncForWalk func =
-    [func_ptr, &caller](LObject& pair, const std::string& path) {
-      // pairをクオートでくるむ。
-      LPointer quote =
-      NewPair(NewSymbol("quote"), NewPair(pair.Clone(), NewNil()));
+    LFuncForWalk func = [func_pair_ptr, quote_ptr, &caller]
+    (LObject& pair, const std::string& path) {
+      // --- Car --- //
+      // Carをクオートでくるむ。
+      quote_ptr->cdr(NewPair(pair.car(), NewNil()));
 
-      // 関数呼び出しを作成。
-      LPair callable(func_ptr,
-      NewPair(quote,
-      NewPair(NewString(path), NewNil())));
+      // コールバックを実行する。
+      func_pair_ptr->cdr()->car(quote_ptr);
+      func_pair_ptr->cdr()->cdr()->car(NewString(path + "a"));
+      LPointer result = caller->Evaluate(*func_pair_ptr);
 
-      // 評価する。
-      LPointer result = caller->Evaluate(callable);
-
-      // 戻り値がペアなら入れ替え。
+      // 結果の第1要素が@replaceなら置き換え。
       if (result->IsPair()) {
-        pair.car(result->car());
-        pair.cdr(result->cdr());
+        if (result->car()->symbol() == "@replace") {
+          if (result->cdr()->IsPair()) {
+            pair.car(result->cdr()->car());
+          }
+        }
+      }
+
+      // --- Cdr --- //
+      // Cdrはペアじゃなければ実行。
+      if (!(pair.cdr()->IsPair())) {
+        // Cdrをクオートでくるむ。
+        quote_ptr->cdr(NewPair(pair.cdr(), NewNil()));
+
+        // コールバックを実行する。
+        func_pair_ptr->cdr()->car(quote_ptr);
+        func_pair_ptr->cdr()->cdr()->car(NewString(path + "d"));
+        result = caller->Evaluate(*func_pair_ptr);
+
+        // 結果の第1要素が@replaceなら置き換え。
+        if (result->IsPair()) {
+          if (result->car()->symbol() == "@replace") {
+            if (result->cdr()->IsPair()) {
+              pair.cdr(result->cdr()->car());
+            }
+          }
+        }
       }
     };
 
