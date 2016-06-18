@@ -1103,63 +1103,28 @@ R"...(### walk ###
 
 <h6> Example </h6>
 
-    (define li '(1 2 (3 (4 5) (6 7)) 8))
+    (define li '(1 2 (3 4) 5))
     (define (my-func elm path)
-            (display "elm : " elm)
-            (display "path : " path)
-            (display "---------")
+            (display "elm : " elm " || path : " path)
             (if (equal? elm 3)
                 '(@replace "Hello")
                 ()))
     
-    (display "Result : " (walk my-func li))
+    (display (walk my-func li))
     ;; Output
-    ;; > elm : 1
-    ;; > path : a
-    ;; > ---------
-    ;; > elm : 2
-    ;; > path : da
-    ;; > ---------
-    ;; > elm : (3 (4 5) (6 7))
-    ;; > path : dda
-    ;; > ---------
-    ;; > elm : 3
-    ;; > path : ddaa
-    ;; > ---------
-    ;; > elm : (4 5)
-    ;; > path : ddada
-    ;; > ---------
-    ;; > elm : 4
-    ;; > path : ddadaa
-    ;; > ---------
-    ;; > elm : 5
-    ;; > path : ddadada
-    ;; > ---------
-    ;; > elm : ()
-    ;; > path : ddadadd
-    ;; > ---------
-    ;; > elm : (6 7)
-    ;; > path : ddadda
-    ;; > ---------
-    ;; > elm : ()
-    ;; > path : ddaddd
-    ;; > ---------
-    ;; > elm : 6
-    ;; > path : ddaddaa
-    ;; > ---------
-    ;; > elm : 7
-    ;; > path : ddaddada
-    ;; > ---------
-    ;; > elm : ()
-    ;; > path : ddaddadd
-    ;; > ---------
-    ;; > elm : 8
-    ;; > path : ddda
-    ;; > ---------
-    ;; > elm : ()
-    ;; > path : dddd
-    ;; > ---------
-    ;; > Result : (1 2 ("Hello" (4 5) (6 7)) 8))...";
+    ;; > elm : 1 || path : a
+    ;; > elm : (2 (3 4) 5) || path : d
+    ;; > elm : 2 || path : da
+    ;; > elm : ((3 4) 5) || path : dd
+    ;; > elm : (3 4) || path : dda
+    ;; > elm : (5) || path : ddd
+    ;; > elm : 3 || path : ddaa
+    ;; > elm : (4) || path : ddad
+    ;; > elm : 4 || path : ddada
+    ;; > elm : () || path : ddadd
+    ;; > elm : 5 || path : ddda
+    ;; > elm : () || path : dddd
+    ;; > (1 2 ("Hello" 4) 5))...";
     help_dict_.emplace("walk", help);
 
     func = LC_FUNCTION_OBJ(Quote);
@@ -4686,22 +4651,19 @@ R"...(### clock ###
       }
 
       // --- Cdr --- //
-      // Cdrはペアじゃなければ実行。
-      if (!(pair.cdr()->IsPair())) {
-        // Cdrをクオートでくるむ。
-        quote_ptr->cdr(NewPair(pair.cdr(), NewNil()));
+      // Cdrをクオートでくるむ。
+      quote_ptr->cdr(NewPair(pair.cdr(), NewNil()));
 
-        // コールバックを実行する。
-        func_pair_ptr->cdr()->car(quote_ptr);
-        func_pair_ptr->cdr()->cdr()->car(NewString(path + "d"));
-        result = caller->Evaluate(*func_pair_ptr);
+      // コールバックを実行する。
+      func_pair_ptr->cdr()->car(quote_ptr);
+      func_pair_ptr->cdr()->cdr()->car(NewString(path + "d"));
+      result = caller->Evaluate(*func_pair_ptr);
 
-        // 結果の第1要素が@replaceなら置き換え。
-        if (result->IsPair()) {
-          if (result->car()->symbol() == "@replace") {
-            if (result->cdr()->IsPair()) {
-              pair.cdr(result->cdr()->car());
-            }
+      // 結果の第1要素が@replaceなら置き換え。
+      if (result->IsPair()) {
+        if (result->car()->symbol() == "@replace") {
+          if (result->cdr()->IsPair()) {
+            pair.cdr(result->cdr()->car());
           }
         }
       }

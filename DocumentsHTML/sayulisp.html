@@ -344,63 +344,28 @@ Sayulisp embeds them into its definition before executes it.</p>
 <a href="core_functions.html#walk"><code>(walk)</code></a>.</p>
 <h6> Example </h6>
 
-<pre><code>(define li '(1 2 (3 (4 5) (6 7)) 8))
+<pre><code>(define li '(1 2 (3 4) 5))
 (define (my-func elm path)
-        (display "elm : " elm)
-        (display "path : " path)
-        (display "---------")
+        (display "elm : " elm " || path : " path)
         (if (equal? elm 3)
             '(@replace "Hello")
             ()))
 
-(display "Result : " (walk my-func li))
+(display (walk my-func li))
 ;; Output
-;; &gt; elm : 1
-;; &gt; path : a
-;; &gt; ---------
-;; &gt; elm : 2
-;; &gt; path : da
-;; &gt; ---------
-;; &gt; elm : (3 (4 5) (6 7))
-;; &gt; path : dda
-;; &gt; ---------
-;; &gt; elm : 3
-;; &gt; path : ddaa
-;; &gt; ---------
-;; &gt; elm : (4 5)
-;; &gt; path : ddada
-;; &gt; ---------
-;; &gt; elm : 4
-;; &gt; path : ddadaa
-;; &gt; ---------
-;; &gt; elm : 5
-;; &gt; path : ddadada
-;; &gt; ---------
-;; &gt; elm : ()
-;; &gt; path : ddadadd
-;; &gt; ---------
-;; &gt; elm : (6 7)
-;; &gt; path : ddadda
-;; &gt; ---------
-;; &gt; elm : ()
-;; &gt; path : ddaddd
-;; &gt; ---------
-;; &gt; elm : 6
-;; &gt; path : ddaddaa
-;; &gt; ---------
-;; &gt; elm : 7
-;; &gt; path : ddaddada
-;; &gt; ---------
-;; &gt; elm : ()
-;; &gt; path : ddaddadd
-;; &gt; ---------
-;; &gt; elm : 8
-;; &gt; path : ddda
-;; &gt; ---------
-;; &gt; elm : ()
-;; &gt; path : dddd
-;; &gt; ---------
-;; &gt; Result : (1 2 ("Hello" (4 5) (6 7)) 8)
+;; &gt; elm : 1 || path : a
+;; &gt; elm : (2 (3 4) 5) || path : d
+;; &gt; elm : 2 || path : da
+;; &gt; elm : ((3 4) 5) || path : dd
+;; &gt; elm : (3 4) || path : dda
+;; &gt; elm : (5) || path : ddd
+;; &gt; elm : 3 || path : ddaa
+;; &gt; elm : (4) || path : ddad
+;; &gt; elm : 4 || path : ddada
+;; &gt; elm : () || path : ddadd
+;; &gt; elm : 5 || path : ddda
+;; &gt; elm : () || path : dddd
+;; &gt; (1 2 ("Hello" 4) 5)
 </code></pre>
 <h3 id="exception-handling">Exception Handling</h3>
 <p>Some functions throws an exception.<br />
