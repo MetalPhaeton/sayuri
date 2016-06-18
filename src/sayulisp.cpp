@@ -39,6 +39,7 @@
 #include <sstream>
 #include <map>
 #include <tuple>
+#include <cstdlib>
 #include "common.h"
 #include "params.h"
 #include "chess_engine.h"
@@ -819,6 +820,7 @@ R"...(### to-fen-position ###
         status = result->number();
       }
 
+      std::exit(status);
       return Lisp::NewNumber(status);
     };
     scope_chain_.InsertSymbol("exit",
