@@ -191,8 +191,7 @@
                        "En Passant Square : "
                        (if (null? en-passant-square)
                            ""
-                           (to-string en-passant-square))
-                       ))
+                           (to-string en-passant-square))))
 
 ;; Combine board and status.
 (define (combine-board-status board-string status-string)
@@ -263,8 +262,7 @@
                       "<From><To>[<Promotion>] :\n"
                       "    Makes move. Pure coordinate notation.\n"
                       "    From e2 to e4 => e2e4\n"
-                      "    From d7 to d8 and promote to Queen => d7d8q\n"
-                      ))))
+                      "    From d7 to d8 and promote to Queen => d7d8q\n"))))
 (define (quit-app) (display "Bye.") (exit))
 (define (print-current-settings)
         (display "Player's side : " (if (= player-side WHITE) "w" "b"))
