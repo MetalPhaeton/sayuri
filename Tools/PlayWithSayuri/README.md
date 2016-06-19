@@ -5,7 +5,7 @@ Chess CUI for Sayuri made by Sayulisp.
 
 Not implemented draw by threefold repetitions.
 
-### Example ###
+### Sample ###
 
     ========================
     Play Chess with Sayuri!!
