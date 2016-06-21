@@ -64,6 +64,9 @@ set(CMAKE_CXX_FLAGS_PROFILE "${BASIC_FLAGS} -pg")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_executable(sayuri ${SRCS})
 
+# インストール先を指定。
+install(TARGETS sayuri DESTINATION "/usr/local/bin")
+
 # CPackの設定。
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "sayuri-${VERSION}")
 set(CPACK_SOURCE_IGNORE_FILES "/build/;/\\.git/;/\\.gitignore;~$;${CPACK_SOURCE_IGNORE_FILES}")
