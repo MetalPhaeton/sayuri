@@ -65,7 +65,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_executable(sayuri ${SRCS})
 
 # インストール先を指定。
-install(TARGETS sayuri DESTINATION "/usr/local/bin")
+install(TARGETS sayuri DESTINATION bin)
 
 # CPackの設定。
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "sayuri-${VERSION}")
