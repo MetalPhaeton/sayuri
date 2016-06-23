@@ -1685,6 +1685,15 @@ namespace Sayuri {
        */
       LPointerVec Parse();
 
+      /**
+       * パース中状態をリセットする。　
+       */
+      void Reset() {
+        parenth_counter_ = 0;
+        in_string_ = false;
+        token_queue_ = std::queue<std::string>();
+      }
+
       // ======== //
       // アクセサ //
       // ======== //
