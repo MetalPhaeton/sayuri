@@ -1686,7 +1686,7 @@ namespace Sayuri {
       LPointerVec Parse();
 
       /**
-       * パース中状態をリセットする。　
+       * パーサの状態をリセットする。　
        */
       void Reset() {
         parenth_counter_ = 0;
@@ -2136,6 +2136,11 @@ namespace Sayuri {
       LPointerVec Parse() {
         return parser_.Parse();
       }
+
+      /**
+       * パーサをリセットする。
+       */
+      void ResetPerser() {parser_.Reset();}
 
       /**
        * 関数オブジェクト。 (LC_Function)
