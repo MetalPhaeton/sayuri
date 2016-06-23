@@ -2140,7 +2140,7 @@ namespace Sayuri {
       /**
        * パーサをリセットする。
        */
-      void ResetPerser() {parser_.Reset();}
+      void ResetParser() {parser_.Reset();}
 
       /**
        * 関数オブジェクト。 (LC_Function)
