@@ -47,6 +47,12 @@ if (NOT ARCH_OPTION)
 endif (NOT ARCH_OPTION)
 message("ARCH_OPTION : ${ARCH_OPTION}")
 
+# バイナリファイルのディレクトリ。
+if (NOT BIN_DIR)
+    set(BIN_DIR "bin")
+endif (NOT BIN_DIR)
+message("BIN_DIR : ${BIN_DIR}")
+
 # ソースとヘッダファイルのリスト。
 file(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
@@ -71,7 +77,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_executable(sayuri ${SRCS})
 
 # インストール先を指定。
-install(TARGETS sayuri DESTINATION bin)
+install(TARGETS sayuri DESTINATION ${BIN_DIR})
 
 # CPackの設定。
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "sayuri-${VERSION}")
