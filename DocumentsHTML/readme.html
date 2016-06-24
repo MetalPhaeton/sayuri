@@ -58,7 +58,34 @@
 </ul>
 <h2 id="how-to-build-with-cmake">How To Build with CMake</h2>
 <p>Using CMake, you can build Sayuri easily.</p>
-<p>It's default compiler is <em>"clang++"</em>.  </p>
+<ul>
+<li>CMake options.<ul>
+<li><code>-DCMAKE_C_COMPILER=&lt;cc&gt;</code> : Indicates C compiler.<ul>
+<li>Default is "<code>clang</code>".</li>
+</ul>
+</li>
+<li><code>-DCMAKE_CXX_COMPILER=&lt;cc&gt;</code> : Indicates C++ compiler.<ul>
+<li>Default is "<code>clang++</code>".</li>
+</ul>
+</li>
+<li><code>-DARCH_OPTION=&lt;option&gt;</code> : Indicates C++ compiler.<ul>
+<li>Default is "<code>-march=native</code>".</li>
+<li>If <code>&lt;option&gt;</code> is "<code>-m64</code>", it builts for 64bit machine.</li>
+</ul>
+</li>
+<li><code>-DCMAKE_INSTALL_PREFIX=&lt;prefix&gt;</code> : Indicates prefix of install path.<ul>
+<li>Default is "<code>/usr/local</code>".</li>
+</ul>
+</li>
+<li><code>-DBIN_DIR=&lt;dir&gt;</code> : Indicates place where binary file puts on.<ul>
+<li>Not includes prefix.</li>
+<li>Default is "<code>bin</code>". (If prefix is "<code>/usr/local</code>",
+  the install directory is "<code>/usr/local/bin</code>")</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 <h3 id="build-for-release">Build for Release</h3>
 <ol>
 <li>Change directory to where "CMakeLists.txt" is placed in.</li>
@@ -74,6 +101,7 @@
 </ol>
 </li>
 <li><em>"sayuri"</em> is built.</li>
+<li>If you want to install Sayuri, you can use "<code>make install</code>" command.</li>
 </ol>
 <h3 id="build-for-debug">Build for Debug</h3>
 <p>"for Debug" means <em>"No Optimize"</em> and <em>"Embedded Debug Information"</em>.</p>

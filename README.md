@@ -45,7 +45,20 @@ How To Build with CMake
 
 Using CMake, you can build Sayuri easily.
 
-It's default compiler is *"clang++"*.  
+* CMake options.
+    + `-DCMAKE_C_COMPILER=<cc>` : Indicates C compiler.
+        - Default is "`clang`".
+    + `-DCMAKE_CXX_COMPILER=<cc>` : Indicates C++ compiler.
+        - Default is "`clang++`".
+    + `-DARCH_OPTION=<option>` : Indicates C++ compiler.
+        - Default is "`-march=native`".
+        - If `<option>` is "`-m64`", it builts for 64bit machine.
+    + `-DCMAKE_INSTALL_PREFIX=<prefix>` : Indicates prefix of install path.
+        - Default is "`/usr/local`".
+    + `-DBIN_DIR=<dir>` : Indicates place where binary file puts on.
+        - Not includes prefix.
+        - Default is "`bin`". (If prefix is "`/usr/local`",
+          the install directory is "`/usr/local/bin`")
 
 ### Build for Release ###
 
@@ -58,6 +71,7 @@ It's default compiler is *"clang++"*.
           `$ cmake -DCMAKE_CXX_COMPILER=<cc> ..`
     4. `$ make`
 3. *"sayuri"* is built.
+4. If you want to install Sayuri, you can use "`make install`" command.
 
 ### Build for Debug ###
 
