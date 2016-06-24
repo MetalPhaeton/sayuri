@@ -41,6 +41,8 @@
 <li><a href="#list-insert"><code>list-insert</code></a> : Inserts object into List.</li>
 <li><a href="#list-search"><code>list-search</code></a> : Searches an object from List.</li>
 <li><a href="#list-path"><code>list-path</code></a> : Returns an object from List with path.</li>
+<li><a href="#list-path-replace"><code>list-path-replace</code></a> :
+  Replaces an element and returns List.</li>
 <li><a href="#zip"><code>zip</code></a> : Unions each element of Lists.</li>
 <li><a href="#map"><code>map</code></a> : Applies function and make List of returned values.</li>
 <li><a href="#filter"><code>filter</code></a> : Judges elements and returns passed elements.</li>
@@ -418,6 +420,35 @@
 (display (list-path lst "dada"))
 ;; Output
 ;; &gt; 333
+</code></pre>
+<h3 id="list-path-replace">list-path-replace</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(list-path-replace &lt;List&gt; &lt;Path : String&gt; &lt;Object&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Replaces an element of <code>&lt;List&gt;</code> indicated by <code>&lt;Path&gt;</code> for <code>&lt;Object&gt;</code>
+  and returns it.<ul>
+<li><code>&lt;Path&gt;</code> is composed of 'a' or 'd'.<ul>
+<li>'a' means Car.</li>
+<li>'b' means Cdr.</li>
+<li>If <code>&lt;Path&gt;</code> is "dadda" and name of List is 'lst',
+  it means <code>(car (cdr (cdr (car (cdr lst)))))</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(define lst '(111 (222 333 444) 555 666))
+
+(display (list-path-replace lst "dada" "Hello"))
+;; Output
+;; &gt; (111 (222 "Hello" 444) 555 666)
 </code></pre>
 <h3 id="zip">zip</h3>
 <h6> Usage </h6>

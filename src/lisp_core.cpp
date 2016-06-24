@@ -2517,6 +2517,34 @@ R"...(### list-path ###
     ;; > 333)...";
     help_dict_.emplace("list-path", help);
 
+    func = LC_FUNCTION_OBJ(ListPathReplace);
+    INSERT_LC_FUNCTION(func, "list-path-replace", "Lisp:list-path-replace");
+    help =
+R"...(### list-path-replace ###
+
+<h6> Usage </h6>
+
+* `(list-path-replace <List> <Path : String> <Object>)`
+
+<h6> Description </h6>
+
+* Replaces an element of `<List>` indicated by `<Path>` for `<Object>`
+  and returns it.
+    + `<Path>` is composed of 'a' or 'd'.
+        - 'a' means Car.
+        - 'b' means Cdr.
+        - If `<Path>` is "dadda" and name of List is 'lst',
+          it means `(car (cdr (cdr (car (cdr lst)))))`.
+
+<h6> Example </h6>
+
+    (define lst '(111 (222 333 444) 555 666))
+    
+    (display (list-path-replace lst "dada" "Hello"))
+    ;; Output
+    ;; > (111 (222 "Hello" 444) 555 666))...";
+    help_dict_.emplace("list-path-replace", help);
+
     func = LC_FUNCTION_OBJ(Zip);
     INSERT_LC_FUNCTION(func, "zip", "Lisp:zip");
     help =
@@ -5419,7 +5447,7 @@ R"...(### clock ###
 
     // パスに合わせて探索する。
     for (auto c : path_ptr->string()) {
-      CheckList(*target_ptr);
+      CheckType(*target_ptr, LType::PAIR);
 
       if (c == 'a') {
         target_ptr = target_ptr->car();
@@ -5429,6 +5457,62 @@ R"...(### clock ###
         throw GenError("@function-error", "'" + std::string(1, c)
         + "' is not path charactor. A charactor must be 'a' or 'd'.");
       }
+    }
+
+    return target_ptr;
+  }
+
+  // %%% list-path-replace
+  DEF_LC_FUNCTION(Lisp::ListPathReplace) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 3, &args_ptr);
+
+    // 第1引数。 ターゲットのリスト。
+    LPointer target_ptr = caller->Evaluate(*(args_ptr->car()));
+    LObject* t_ptr = target_ptr.get();
+    Next(&args_ptr);
+
+    // 第2引数。 パス。
+    LPointer path_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*path_ptr, LType::STRING);
+    std::string path = path_ptr->string();
+    Next(&args_ptr);
+
+    // 第3引数。 置き換えるオブジェクト。
+    LPointer obj_ptr = caller->Evaluate(*(args_ptr->car()));
+
+    // 先ず、文字を一つ抜く。
+    if (path.size() <= 0) {
+      throw GenError("@function-error", "There is no path.");
+    }
+    char target_c = path[path.size() - 1];
+    if (!((target_c == 'a') || (target_c == 'd'))) {
+      throw GenError("@function-error", "'" + std::string(1, target_c)
+      + "' is not path charactor. A charactor must be 'a' or 'd'.");
+    }
+    path.pop_back();
+
+    // パスに合わせて探索する。
+    for (auto c : path) {
+      CheckType(*t_ptr, LType::PAIR);
+
+      if (c == 'a') {
+        t_ptr = t_ptr->car().get();
+      } else if (c == 'd') {
+        t_ptr = t_ptr->cdr().get();
+      } else {
+        throw GenError("@function-error", "'" + std::string(1, c)
+        + "' is not path charactor. A charactor must be 'a' or 'd'.");
+      }
+    }
+
+    // 置き換え。
+    CheckType(*t_ptr, LType::PAIR);
+    if (target_c == 'a') {
+      t_ptr->car(obj_ptr);
+    } else {
+      t_ptr->cdr(obj_ptr);
     }
 
     return target_ptr;
