@@ -45,13 +45,16 @@ endif(NOT CMAKE_BUILD_TYPE)
 if (NOT ARCH_OPTION)
     set(ARCH_OPTION "-march=native")
 endif (NOT ARCH_OPTION)
-message("ARCH_OPTION : ${ARCH_OPTION}")
+message("-- ARCH_OPTION: ${ARCH_OPTION}")
+
+# プレフィクスをプリント。
+message("-- CMAKE_INSTALL_PREFIX: " ${CMAKE_INSTALL_PREFIX})
 
 # バイナリファイルのディレクトリ。
 if (NOT BIN_DIR)
     set(BIN_DIR "bin")
 endif (NOT BIN_DIR)
-message("BIN_DIR : ${BIN_DIR}")
+message("-- BIN_DIR: ${BIN_DIR}")
 
 # ソースとヘッダファイルのリスト。
 file(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
