@@ -2823,6 +2823,36 @@ namespace Sayuri {
         return NewBoolean(true);
       }
 
+      // %%% even?
+      /** ネイティブ関数 - even? */
+      DEF_LC_FUNCTION(EvenQ) {
+        // 準備。
+        LObject* args_ptr = nullptr;
+        GetReadyForFunction(args, 1, &args_ptr);
+
+        // 元になる値を得る。
+        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        CheckType(*result, LType::NUMBER);
+        int num = result->number();
+
+        return NewBoolean(!(num % 2));
+      }
+
+      // %%% odd?
+      /** ネイティブ関数 - odd? */
+      DEF_LC_FUNCTION(OddQ) {
+        // 準備。
+        LObject* args_ptr = nullptr;
+        GetReadyForFunction(args, 1, &args_ptr);
+
+        // 元になる値を得る。
+        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        CheckType(*result, LType::NUMBER);
+        int num = result->number();
+
+        return NewBoolean(num % 2);
+      }
+
       // %%% not 
       /** ネイティブ関数 - not */
       DEF_LC_FUNCTION(Not) {

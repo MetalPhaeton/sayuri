@@ -2848,6 +2848,54 @@ R"...(### <= ###
     ;; > #t)...";
     help_dict_.emplace("<=", help);
 
+    func = LC_FUNCTION_OBJ(EvenQ);
+    INSERT_LC_FUNCTION(func, "even?", "Lisp:even?");
+    help =
+R"...(### even? ###
+
+<h6> Usage </h6>
+
+* `(even? <Number>)`
+
+<h6> Description </h6>
+
+* Judges whether `<Number>` is an even number or not.
+
+<h6> Example </h6>
+
+    (display (even? 1))
+    ;; Output
+    ;; > #f
+    
+    (display (even? 2))
+    ;; Output
+    ;; > #t)...";
+    help_dict_.emplace("even?", help);
+
+    func = LC_FUNCTION_OBJ(OddQ);
+    INSERT_LC_FUNCTION(func, "odd?", "Lisp:odd?");
+    help =
+R"...(### odd? ###
+
+<h6> Usage </h6>
+
+* `(odd? <Number>)`
+
+<h6> Description </h6>
+
+* Judges whether `<Number>` is an odd number or not.
+
+<h6> Example </h6>
+
+    (display (odd? 1))
+    ;; Output
+    ;; > #t
+    
+    (display (odd? 2))
+    ;; Output
+    ;; > #f)...";
+    help_dict_.emplace("odd?", help);
+
     func = LC_FUNCTION_OBJ(Not);
     INSERT_LC_FUNCTION(func, "not", "Lisp:not");
     help =
