@@ -4738,14 +4738,15 @@ R"...(### clock ###
     CheckType(*pair_ptr, LType::PAIR);
 
     // ペアにしておく。
-    LPointer func_pair_ptr = NewPair(func_ptr, NewPair(NewNil(), NewPair()));
+    LPointer func_pair_ptr =
+    NewPair(func_ptr, NewPair(WrapQuote(NewNil()), NewPair()));
 
     // 関数オブジェクトを作成。
     LFuncForWalk func = [func_pair_ptr, &caller]
     (LObject& pair, const std::string& path) {
       // --- Car --- //
       // コールバックを実行する。
-      func_pair_ptr->cdr()->car(WrapQuote(pair.car()));
+      func_pair_ptr->cdr()->car()->cdr()->car(pair.car());
       func_pair_ptr->cdr()->cdr()->car(NewString(path + "a"));
       LPointer result = caller->Evaluate(*func_pair_ptr);
 
@@ -4760,7 +4761,7 @@ R"...(### clock ###
 
       // --- Cdr --- //
       // コールバックを実行する。
-      func_pair_ptr->cdr()->car(WrapQuote(pair.cdr()));
+      func_pair_ptr->cdr()->car()->cdr()->car(pair.cdr());
       func_pair_ptr->cdr()->cdr()->car(NewString(path + "d"));
       result = caller->Evaluate(*func_pair_ptr);
 
