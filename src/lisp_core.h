@@ -3419,6 +3419,9 @@ namespace Sayuri {
       /** ネイティブ関数 - regex-search */
       DEF_LC_FUNCTION(RegexSearch);
 
+      /** ネイティブ関数 - bayes */
+      DEF_LC_FUNCTION(Bayes);
+
       /** ネイティブ関数 - now */
       DEF_LC_FUNCTION(Now);
 

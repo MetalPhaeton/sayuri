@@ -3998,6 +3998,72 @@ R"...(### regex-search ###
     ;; > ("Hello World" "Hel" "Wor"))...";
     help_dict_.emplace("regex-search", help);
 
+    func = LC_FUNCTION_OBJ(Bayes);
+    INSERT_LC_FUNCTION(func, "bayes", "Lisp:bayes");
+    help =
+R"...(### bayes ###
+
+<h6> Usage </h6>
+
+* `(bayes <Data list : List> <Event : Function> <Conditions : Function>...)`
+
+<h6> Description </h6>
+
+* Estimates conditional probability by Naive Bayes Classifier.
+  (`P(<Event> | <Conditions>...)`)
+* `<Event>` or `<Conditions>...` is Predicate (Function).
+    + Accepts 1 argument and returns Boolean.
+    + `(bayes)` gives each element of `<Data list>` to each Predicate.
+      The Predicate must judge the element and return Boolean.
+
+<h6> Example </h6>
+
+    ;; List of playing cards.
+    (define playing-cards
+            '(("Heart" 1) ("Heart" 2) ("Heart" 3) ("Heart" 4) ("Heart" 5)
+              ("Heart" 6) ("Heart" 7) ("Heart" 8) ("Heart" 9) ("Heart" 10)
+              ("Heart" 11) ("Heart" 12) ("Heart" 13)
+              ("Diamond" 1)("Diamond" 2)("Diamond" 3)("Diamond" 4)("Diamond" 5)
+              ("Diamond" 6)("Diamond" 7)("Diamond" 8)("Diamond" 9)("Diamond" 10)
+              ("Diamond" 11)("Diamond" 12)("Diamond" 13)
+              ("Club" 1) ("Club" 2) ("Club" 3) ("Club" 4) ("Club" 5)
+              ("Club" 6) ("Club" 7) ("Club" 8) ("Club" 9) ("Club" 10)
+              ("Club" 11) ("Club" 12) ("Club" 13)
+              ("Spade" 1) ("Spade" 2) ("Spade" 3) ("Spade" 4) ("Spade" 5)
+              ("Spade" 6) ("Spade" 7) ("Spade" 8) ("Spade" 9) ("Spade" 10)
+              ("Spade" 11) ("Spade" 12) ("Spade" 13)))
+    
+    ;; Judges a card whether the suit is "Heart" or not.
+    (define (heart? card) (equal? (car card) "Heart"))
+    
+    ;; Judges a card whether the suit is black or not.
+    (define (black? card)
+            (or (equal? (car card) "Club") (equal? (car card) "Spade")))
+    
+    ;; Judges a card whether the card is a face card or not.
+    (define (face? card) (>= 11 (car (cdr card))))
+    
+    ;; Judges a card whether the number is an even number or not.
+    (define (even-num? card)
+            (define half (/ (car (cdr card)) 2))
+            (= 0 (- (floor half) half)))
+    
+    ;; P(Heart | Face) : The probability is 0.25.
+    (display (bayes playing-cards heart? face?))
+    ;; Output
+    ;; > 0.251131221719457
+    
+    ;; P(Heart | Black) : The probability is 0.
+    (display (bayes playing-cards heart? black?))
+    ;; Output
+    ;; > 0.00381679389312977
+    
+    ;; P(Even | Black, Face) : The probability is 0.3333...
+    (display (bayes playing-cards even-num? black? face?))
+    ;; Output
+    ;; > 0.454897028160054)...";
+    help_dict_.emplace("bayes", help);
+
     func = LC_FUNCTION_OBJ(Now);
     INSERT_LC_FUNCTION(func, "now", "Lisp:now");
     help =
@@ -5731,6 +5797,101 @@ R"...(### clock ###
     }
 
     return LPointerVecToList(ret_vec);
+  }
+
+  // %%% bayes
+  DEF_LC_FUNCTION(Lisp::Bayes) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 3, &args_ptr);
+
+    // 第1引数はデータリスト。
+    LPointer data_list_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*data_list_ptr);
+    Next(&args_ptr);
+
+    // 第2引数はターゲット述語関数。
+    LPointer target_func_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*target_func_ptr, LType::FUNCTION);
+    Next(&args_ptr);
+
+    // 第3引数以降は条件述語関数。
+    int num_coord_func = CountList(*args_ptr);
+    LPointerVec coord_func_vec(num_coord_func);
+    LPointerVec::iterator itr = coord_func_vec.begin();
+    LPointer temp;
+    for (; args_ptr->IsPair(); Next(&args_ptr), ++itr) {
+      // 評価。
+      temp = caller->Evaluate(*(args_ptr->car()));
+      CheckType(*temp, LType::FUNCTION);
+
+      // 呼び出し用ペアでくるんでベクトルに登録。
+      *itr = NewPair(temp, NewPair(WrapQuote(NewNil()), NewNil()));
+    }
+
+    // ターゲット呼び出し用ペア。
+    LPair call_target(target_func_ptr, NewPair(WrapQuote(NewNil()), NewNil()));
+    
+
+    // 個数カウント用配列。
+    int num_all = 0;
+    int num_target = 0;
+    int num_not_target = 0;
+    std::vector<int> count_true(num_coord_func, 0);
+    std::vector<int> count_false(num_coord_func, 0);
+    std::vector<int>* count_ptr = &count_true;
+
+    // 各データからカウントしていく。
+    LPointer result;
+    for (LPointer ptr = data_list_ptr; ptr->IsPair(); ptr = ptr->cdr()) {
+      ++num_all;
+      const LPointer& elm = ptr->car();
+
+      // ターゲットで評価。
+      call_target.cdr()->car()->cdr()->car(elm);
+      result = caller->Evaluate(call_target);
+      CheckType(*result, LType::BOOLEAN);
+
+      // 評価結果でカウント用配列を切り替える。
+      if (result->boolean()) {
+        ++num_target;
+        count_ptr = &count_true;
+      } else {
+        ++num_not_target;
+        count_ptr = &count_false;
+      }
+
+      // 各条件述語関数で調べてカウントしていく。
+      for (int i = 0; i < num_coord_func; ++i) {
+        // 評価。
+        coord_func_vec[i]->cdr()->car()->cdr()->car(elm);
+        result = caller->Evaluate(*(coord_func_vec[i]));
+        CheckType(*result, LType::BOOLEAN);
+
+        // trueならカウントする。
+        if (result->boolean()) ++((*count_ptr)[i]);
+      }
+    }
+
+    // 全体、ターゲットの数を少数にする。
+    double all_d = num_all + 0.1;
+    double target_d = num_target + 0.1;
+    double not_target_d = num_not_target + 0.1;
+
+    // trueの確率の対数の和を得る。
+    double logp_true = std::log2(target_d / all_d);
+    for (auto num : count_true) {
+      logp_true += std::log2((num + 0.1) / target_d);
+    }
+
+    // falseの確率の対数の和を得る。
+    double logp_false = std::log2(not_target_d / all_d);
+    for (auto num : count_false) {
+      logp_false += std::log2((num + 0.1) / not_target_d);
+    }
+
+    // シグモイド関数で確率を計算して返す。
+    return NewNumber(1.0 / (1.0 + std::exp2(logp_false - logp_true)));
   }
 
   // %%% now
