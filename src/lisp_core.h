@@ -2532,6 +2532,9 @@ namespace Sayuri {
       /** ネイティブ関数 - append */
       DEF_LC_FUNCTION(Append);
 
+      /** ネイティブ関数 - reverse */
+      DEF_LC_FUNCTION(Reverse);
+
       /** ネイティブ関数 - ref */
       DEF_LC_FUNCTION(Ref);
 

@@ -2313,6 +2313,27 @@ R"...(### append ###
     help_dict_.emplace("append", help);
     help_dict_.emplace("string-append", help);
 
+    func = LC_FUNCTION_OBJ(Reverse);
+    INSERT_LC_FUNCTION(func, "reverse", "Lisp:reverse");
+    help =
+R"...(### reverse ###
+
+<h6> Usage </h6>
+
+* `(reverse <List>)`
+
+<h6> Description </h6>
+
+* Reverses `<List>` and returns it.
+
+<h6> Example </h6>
+
+    (define li '(111 222 333 444 555))
+    (display (reverse li))
+    ;; Output
+    ;; > (555 444 333 222 111))...";
+    help_dict_.emplace("reverse", help);
+
     func = LC_FUNCTION_OBJ(Ref);
     INSERT_LC_FUNCTION(func, "ref", "Lisp:ref");
     INSERT_LC_FUNCTION(func, "list-ref", "Lisp:list-ref");
@@ -5319,6 +5340,25 @@ R"...(### clock ###
     }
 
     throw GenTypeError(*(args.car()), "List or String");
+  }
+
+  // %%% reverse
+  DEF_LC_FUNCTION(Lisp::Reverse) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    // リストを得る。
+    LPointer list_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*list_ptr);
+
+    // リストをベクトルへ。
+    LPointerVec list_vec = ListToLPointerVec(*list_ptr);
+
+    // 逆転。
+    std::reverse(list_vec.begin(), list_vec.end());
+
+    return LPointerVecToList(list_vec);
   }
 
   // %%% ref

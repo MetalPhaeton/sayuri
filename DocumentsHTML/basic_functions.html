@@ -26,6 +26,7 @@
 <li><code>string-append</code></li>
 </ul>
 </li>
+<li><a href="#reverse"><code>reverse</code></a> : Reverses List.</li>
 <li><a href="#ref"><code>ref</code></a> : Pulls out an element of List or a letter of String.<ul>
 <li><code>list-ref</code></li>
 <li><code>string-ref</code></li>
@@ -177,6 +178,24 @@
 
 ;; Output
 ;; &gt; "Hello 111 World";
+</code></pre>
+<h3 id="reverse">reverse</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(reverse &lt;List&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Reverses <code>&lt;List&gt;</code> and returns it.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(define li '(111 222 333 444 555))
+(display (reverse li))
+;; Output
+;; &gt; (555 444 333 222 111)
 </code></pre>
 <h3 id="ref">ref</h3>
 <h6> Usage </h6>
