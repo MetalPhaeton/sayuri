@@ -126,6 +126,7 @@
 <li><a href="#round"><code>round</code></a> : Rounds Number into the nearest integral value.</li>
 <li><a href="#trunc"><code>trunc</code></a> : Truncates after decimal point of Number.</li>
 <li><a href="#exp"><code>exp</code></a> : Calculates exponent.</li>
+<li><a href="#exp2"><code>exp2</code></a> : Calculates exponent. The base is 2.</li>
 <li><a href="#expt"><code>expt</code></a> : Calculates exponent with a base Number.<ul>
 <li><code>^</code></li>
 </ul>
@@ -137,6 +138,7 @@
 <li><a href="#log2"><code>log2</code></a> : Calculates logarithm with 2.</li>
 <li><a href="#log10"><code>log10</code></a> : Calculates logarithm with 10.</li>
 <li><a href="#random"><code>random</code></a> : Gets a random Number.</li>
+<li><a href="#bayes"><code>bayes</code></a> : Estimates conditional probability.</li>
 </ul>
 </li>
 <li>
@@ -1551,6 +1553,23 @@
 ;; Output
 ;; &gt; 2.71828
 </code></pre>
+<h3 id="exp2">exp2</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(exp &lt;Number&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Exponent function of <code>&lt;Number&gt;</code>. The base is 2.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(display (exp2 3))
+;; Output
+;; &gt; 8
+</code></pre>
 <h3 id="expt">expt</h3>
 <h6> Usage </h6>
 
@@ -1647,6 +1666,71 @@
 
 ;; Output
 ;; &gt; -7.13453
+</code></pre>
+<h3 id="bayes">bayes</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(bayes &lt;Data list : List&gt; &lt;Event : Function&gt; &lt;Conditions : Function&gt;...)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Estimates conditional probability by Naive Bayes Classifier.
+  (<code>P(&lt;Event&gt; | &lt;Conditions&gt;...)</code>)</li>
+<li><code>&lt;Event&gt;</code> or <code>&lt;Conditions&gt;...</code> is Predicate (Function).<ul>
+<li>Accepts 1 argument and returns Boolean.</li>
+<li><code>(bayes)</code> gives each element of <code>&lt;Data list&gt;</code> to each Predicate.
+  The Predicate must judge the element and return Boolean.</li>
+</ul>
+</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>;; List of playing cards.
+(define playing-cards
+        '(("Heart" 1) ("Heart" 2) ("Heart" 3) ("Heart" 4) ("Heart" 5)
+          ("Heart" 6) ("Heart" 7) ("Heart" 8) ("Heart" 9) ("Heart" 10)
+          ("Heart" 11) ("Heart" 12) ("Heart" 13)
+          ("Diamond" 1)("Diamond" 2)("Diamond" 3)("Diamond" 4)("Diamond" 5)
+          ("Diamond" 6)("Diamond" 7)("Diamond" 8)("Diamond" 9)("Diamond" 10)
+          ("Diamond" 11)("Diamond" 12)("Diamond" 13)
+          ("Club" 1) ("Club" 2) ("Club" 3) ("Club" 4) ("Club" 5)
+          ("Club" 6) ("Club" 7) ("Club" 8) ("Club" 9) ("Club" 10)
+          ("Club" 11) ("Club" 12) ("Club" 13)
+          ("Spade" 1) ("Spade" 2) ("Spade" 3) ("Spade" 4) ("Spade" 5)
+          ("Spade" 6) ("Spade" 7) ("Spade" 8) ("Spade" 9) ("Spade" 10)
+          ("Spade" 11) ("Spade" 12) ("Spade" 13)))
+
+;; Judges a card whether the suit is "Heart" or not.
+(define (heart? card) (equal? (car card) "Heart"))
+
+;; Judges a card whether the suit is black or not.
+(define (black? card)
+        (or (equal? (car card) "Club") (equal? (car card) "Spade")))
+
+;; Judges a card whether the card is a face card or not.
+(define (face? card) (&gt;= 11 (car (cdr card))))
+
+;; Judges a card whether the number is an even number or not.
+(define (even-num? card)
+        (define half (/ (car (cdr card)) 2))
+        (= 0 (- (floor half) half)))
+
+;; P(Heart | Face) : The probability is 0.25.
+(display (bayes playing-cards heart? face?))
+;; Output
+;; &gt; 0.251131221719457
+
+;; P(Heart | Black) : The probability is 0.
+(display (bayes playing-cards heart? black?))
+;; Output
+;; &gt; 0.00381679389312977
+
+;; P(Even | Black, Face) : The probability is 0.3333...
+(display (bayes playing-cards even-num? black? face?))
+;; Output
+;; &gt; 0.454897028160054
 </code></pre>
 <h2 id="time-and-date">Time and Date</h2>
 <h3 id="now">now</h3>
