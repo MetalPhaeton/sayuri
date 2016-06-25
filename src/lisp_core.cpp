@@ -3793,6 +3793,26 @@ R"...(### trunc ###
     ;; > -1)...";
     help_dict_.emplace("trunc", help);
 
+    func = LC_FUNCTION_OBJ(Exp2);
+    INSERT_LC_FUNCTION(func, "exp2", "Lisp:exp2");
+    help =
+R"...(### exp2 ###
+
+<h6> Usage </h6>
+
+* `(exp <Number>)`
+
+<h6> Description </h6>
+
+* Exponent function of `<Number>`. The base is 2.
+
+<h6> Example </h6>
+
+    (display (exp2 3))
+    ;; Output
+    ;; > 8)...";
+    help_dict_.emplace("exp2", help);
+
     func = LC_FUNCTION_OBJ(Exp);
     INSERT_LC_FUNCTION(func, "exp", "Lisp:exp");
     help =

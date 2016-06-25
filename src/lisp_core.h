@@ -3304,6 +3304,19 @@ namespace Sayuri {
         return NewNumber(std::exp(result->number()));
       }
 
+      // %%% exp2
+      /** ネイティブ関数 - exp2 */
+      DEF_LC_FUNCTION(Exp2) {
+        // 準備。
+        LObject* args_ptr = nullptr;
+        GetReadyForFunction(args, 1, &args_ptr);
+
+        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        CheckType(*result, LType::NUMBER);
+
+        return NewNumber(std::exp2(result->number()));
+      }
+
       // %%% expt
       /** ネイティブ関数 - expt */
       DEF_LC_FUNCTION(Expt) {
