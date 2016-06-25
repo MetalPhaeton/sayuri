@@ -4133,9 +4133,7 @@ R"...(### bayes ###
     (define (face? card) (>= 11 (car (cdr card))))
     
     ;; Judges a card whether the number is an even number or not.
-    (define (even-num? card)
-            (define half (/ (car (cdr card)) 2))
-            (= 0 (- (floor half) half)))
+    (define (even-num? card) (even? (car (cdr card))))
     
     ;; P(Heart | Face) : The probability is 0.25.
     (display (bayes playing-cards heart? face?))
