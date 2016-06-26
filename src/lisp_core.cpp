@@ -4130,7 +4130,7 @@ R"...(### bayes ###
             (or (equal? (car card) "Club") (equal? (car card) "Spade")))
     
     ;; Judges a card whether the card is a face card or not.
-    (define (face? card) (>= 11 (car (cdr card))))
+    (define (face? card) (>= (car (cdr card)) 11))
     
     ;; Judges a card whether the number is an even number or not.
     (define (even-num? card) (even? (car (cdr card))))
@@ -4138,7 +4138,7 @@ R"...(### bayes ###
     ;; P(Heart | Face) : The probability is 0.25.
     (display (bayes playing-cards heart? face?))
     ;; Output
-    ;; > 0.260869565217391
+    ;; > 0.285714285714286
     
     ;; P(Heart | Black) : The probability is 0.
     (display (bayes playing-cards heart? black?))
@@ -4148,7 +4148,7 @@ R"...(### bayes ###
     ;; P(Even | Black, Face) : The probability is 0.3333...
     (display (bayes playing-cards even-num? black? face?))
     ;; Output
-    ;; > 0.457841776544066)...";
+    ;; > 0.358365019011407)...";
     help_dict_.emplace("bayes", help);
 
     func = LC_FUNCTION_OBJ(Now);
