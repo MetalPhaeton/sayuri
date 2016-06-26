@@ -4138,17 +4138,17 @@ R"...(### bayes ###
     ;; P(Heart | Face) : The probability is 0.25.
     (display (bayes playing-cards heart? face?))
     ;; Output
-    ;; > 0.251131221719457
+    ;; > 0.260869565217391
     
     ;; P(Heart | Black) : The probability is 0.
     (display (bayes playing-cards heart? black?))
     ;; Output
-    ;; > 0.00381679389312977
+    ;; > 0.0357142857142857
     
     ;; P(Even | Black, Face) : The probability is 0.3333...
     (display (bayes playing-cards even-num? black? face?))
     ;; Output
-    ;; > 0.454897028160054)...";
+    ;; > 0.457841776544066)...";
     help_dict_.emplace("bayes", help);
 
     func = LC_FUNCTION_OBJ(Now);
@@ -5940,12 +5940,12 @@ R"...(### clock ###
     LPair call_target(target_func_ptr, NewPair(WrapQuote(NewNil()), NewNil()));
     
 
-    // 個数カウント用配列。
-    int num_all = 0;
-    int num_target = 0;
-    int num_not_target = 0;
-    std::vector<int> count_true(num_coord_func, 0);
-    std::vector<int> count_false(num_coord_func, 0);
+    // 個数カウント用配列。  ラプラススムージング(初期値1)。
+    int num_all = 1;
+    int num_target = 1;
+    int num_not_target = 1;
+    std::vector<int> count_true(num_coord_func, 1);
+    std::vector<int> count_false(num_coord_func, 1);
     std::vector<int>* count_ptr = &count_true;
 
     // 各データからカウントしていく。
@@ -5981,20 +5981,20 @@ R"...(### clock ###
     }
 
     // 全体、ターゲットの数を少数にする。
-    double all_d = num_all + 0.1;
-    double target_d = num_target + 0.1;
-    double not_target_d = num_not_target + 0.1;
+    double all_d = num_all;
+    double target_d = num_target;
+    double not_target_d = num_not_target;
 
     // trueの確率の対数の和を得る。
     double logp_true = std::log2(target_d / all_d);
     for (auto num : count_true) {
-      logp_true += std::log2((num + 0.1) / target_d);
+      logp_true += std::log2(num / target_d);
     }
 
     // falseの確率の対数の和を得る。
     double logp_false = std::log2(not_target_d / all_d);
     for (auto num : count_false) {
-      logp_false += std::log2((num + 0.1) / not_target_d);
+      logp_false += std::log2(num / not_target_d);
     }
 
     // シグモイド関数で確率を計算して返す。
