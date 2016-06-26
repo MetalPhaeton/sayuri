@@ -4098,7 +4098,7 @@ R"...(### bayes ###
 
 <h6> Description </h6>
 
-* Estimates conditional probability by Naive Bayes Classifier.
+* Estimates conditional probability by Naive Bayes.
   (`P(<Event> | <Conditions>...)`)
 * `<Event>` or `<Conditions>...` is Predicate (Function).
     + Accepts 1 argument and returns Boolean.
