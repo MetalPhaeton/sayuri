@@ -2340,27 +2340,6 @@ namespace Sayuri {
         caller->Evaluate(*(args_ptr->cdr()->car())));
       }
 
-      /**
-       * (<func>! ...) 関連の関数を(set! ...)に変換して評価する関数。
-       * 引数ありバージョン。
-       * @param required_args 必要引数。
-       * @param func_symbol ファンクションのシンボル。
-       */
-      LPointer ExclamToSet(int required_args, const std::string& func_symbol,
-      LPointer self, LObject* caller, const LObject& args) {
-        // 準備。
-        LObject* args_ptr = nullptr;
-        GetReadyForFunction(args, required_args, &args_ptr);
-
-        // 第1引数はシンボル。
-        const LPointer& symbol_ptr = args_ptr->car();
-
-        // (set! ...)に変えて評価する。
-        return caller->Evaluate(LPair(NewSymbol("set!"), NewPair(symbol_ptr,
-        NewPair(NewPair(NewSymbol(func_symbol),
-        NewPair(symbol_ptr, args_ptr->cdr())), NewNil()))));
-      }
-
       /** ネイティブ関数 - define */
       DEF_LC_FUNCTION(Define);
 
@@ -2929,6 +2908,9 @@ namespace Sayuri {
         return NewNumber(value);
       }
 
+      /** ネイティブ関数 - add! */
+      DEF_LC_FUNCTION(AdditionEx);
+
       // %%% -
       /** ネイティブ関数 - - */
       DEF_LC_FUNCTION(Subtraction) {
@@ -2956,6 +2938,9 @@ namespace Sayuri {
         return NewNumber(value);
       }
 
+      /** ネイティブ関数 - sub! */
+      DEF_LC_FUNCTION(SubtractionEx);
+
       // %%% *
       /** ネイティブ関数 - * */
       DEF_LC_FUNCTION(Multiplication) {
@@ -2980,6 +2965,9 @@ namespace Sayuri {
 
         return NewNumber(value);
       }
+
+      /** ネイティブ関数 - mul! */
+      DEF_LC_FUNCTION(MultiplicationEx);
 
       // %%% /
       /** ネイティブ関数 - / */
@@ -3008,6 +2996,9 @@ namespace Sayuri {
         return NewNumber(value);
       }
 
+      /** ネイティブ関数 - div! */
+      DEF_LC_FUNCTION(DivisionEx);
+
       // %%% ++
       /** ネイティブ関数 - ++ */
       DEF_LC_FUNCTION(Inc) {
@@ -3022,6 +3013,9 @@ namespace Sayuri {
         return NewNumber(result->number() + 1.0);
       }
 
+      /** ネイティブ関数 - inc! */
+      DEF_LC_FUNCTION(IncEx);
+
       // %%% --
       /** ネイティブ関数 - -- */
       DEF_LC_FUNCTION(Dec) {
@@ -3035,6 +3029,9 @@ namespace Sayuri {
 
         return NewNumber(result->number() - 1.0);
       }
+
+      /** ネイティブ関数 - dec! */
+      DEF_LC_FUNCTION(DecEx);
 
       /** ネイティブ関数 - string-split */
       DEF_LC_FUNCTION(StringSplit); 
@@ -3094,6 +3091,9 @@ namespace Sayuri {
         target_ptr);
       }
 
+      /** ネイティブ関数 - push-front! */
+      DEF_LC_FUNCTION(PushFrontEx);
+
       // %%% pop-front
       /** ネイティブ関数 - pop-front */
       DEF_LC_FUNCTION(PopFront) {
@@ -3109,8 +3109,11 @@ namespace Sayuri {
         return target_ptr->cdr();
       }
 
+      /** ネイティブ関数 - pop-front! */
+      DEF_LC_FUNCTION(PopFrontEx);
+
       // %%% push-back
-      /** ネイティブ関数 - push-front */
+      /** ネイティブ関数 - push-back */
       DEF_LC_FUNCTION(PushBack) {
         // 準備。
         LObject* args_ptr = nullptr;
@@ -3136,6 +3139,9 @@ namespace Sayuri {
 
         return NewNil();
       }
+
+      /** ネイティブ関数 - push-back! */
+      DEF_LC_FUNCTION(PushBackEx);
 
       // %%% pop-back
       /** ネイティブ関数 - pop-back */
@@ -3167,6 +3173,9 @@ namespace Sayuri {
 
         return NewNil();
       }
+
+      /** ネイティブ関数 - pop-back! */
+      DEF_LC_FUNCTION(PopBackEx);
 
       // %%% sin
       /** ネイティブ関数 - sin */

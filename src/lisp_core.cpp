@@ -2982,10 +2982,7 @@ R"...(### + ###
     ;; > 6)...";
     help_dict_.emplace("+", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->ExclamToSet(2, "+", self, caller, args);
-    };
+    func = LC_FUNCTION_OBJ(AdditionEx);
     INSERT_LC_FUNCTION(func, "add!", "Lisp:add!");
     help =
 R"...(### add! ###
@@ -3034,10 +3031,7 @@ R"...(### - ###
     ;; > -2)...";
     help_dict_.emplace("-", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->ExclamToSet(2, "-", self, caller, args);
-    };
+    func = LC_FUNCTION_OBJ(SubtractionEx);
     INSERT_LC_FUNCTION(func, "sub!", "Lisp:sub!");
     help =
 R"...(### sub! ###
@@ -3086,10 +3080,7 @@ R"...(### * ###
     ;; > 24)...";
     help_dict_.emplace("*", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->ExclamToSet(2, "*", self, caller, args);
-    };
+    func = LC_FUNCTION_OBJ(MultiplicationEx);
     INSERT_LC_FUNCTION(func, "mul!", "Lisp:mul!");
     help =
 R"...(### mul! ###
@@ -3138,10 +3129,7 @@ R"...(### / ###
     ;; > 4)...";
     help_dict_.emplace("/", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->ExclamToSet(2, "/", self, caller, args);
-    };
+    func = LC_FUNCTION_OBJ(DivisionEx);
     INSERT_LC_FUNCTION(func, "div!", "Lisp:div!");
     help =
 R"...(### div! ###
@@ -3190,10 +3178,7 @@ R"...(### ++ ###
     ;; > 112)...";
     help_dict_.emplace("++", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->ExclamToSet(1, "++", self, caller, args);
-    };
+    func = LC_FUNCTION_OBJ(IncEx);
     INSERT_LC_FUNCTION(func, "inc!", "Lisp:inc!");
     help =
 R"...(### inc! ###
@@ -3242,10 +3227,7 @@ R"...(### -- ###
     ;; > 110)...";
     help_dict_.emplace("--", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->ExclamToSet(1, "--", self, caller, args);
-    };
+    func = LC_FUNCTION_OBJ(DecEx);
     INSERT_LC_FUNCTION(func, "dec!", "Lisp:dec!");
     help =
 R"...(### dec! ###
@@ -3377,10 +3359,7 @@ R"...(### push-front ###
     ;; > ("Hello" 111 222 333))...";
     help_dict_.emplace("push-front", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->ExclamToSet(2, "push-front", self, caller, args);
-    };
+    func = LC_FUNCTION_OBJ(PushFrontEx);
     INSERT_LC_FUNCTION(func, "push-front!", "Lisp:push-front!");
     help =
 R"...(### push-front! ###
@@ -3429,10 +3408,7 @@ R"...(### pop-front ###
     ;; > (222 333))...";
     help_dict_.emplace("pop-front", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->ExclamToSet(1, "pop-front", self, caller, args);
-    };
+    func = LC_FUNCTION_OBJ(PopFrontEx);
     INSERT_LC_FUNCTION(func, "pop-front!", "Lisp:pop-front!");
     help =
 R"...(### pop-front! ###
@@ -3480,10 +3456,7 @@ R"...(### push-back ###
     ;; > (111 222 333 "Hello"))...";
     help_dict_.emplace("push-back", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->ExclamToSet(2, "push-back", self, caller, args);
-    };
+    func = LC_FUNCTION_OBJ(PushBackEx);
     INSERT_LC_FUNCTION(func, "push-back!", "Lisp:push-back!");
     help =
 R"...(### push-back! ###
@@ -3532,10 +3505,7 @@ R"...(### pop-back ###
     ;; > (111 222))...";
     help_dict_.emplace("pop-back", help);
 
-    func =
-    [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {
-      return this->ExclamToSet(1, "pop-back", self, caller, args);
-    };
+    func = LC_FUNCTION_OBJ(PopBackEx);
     INSERT_LC_FUNCTION(func, "pop-back!", "Lisp:pop-back!");
     help =
 R"...(### pop-back! ###
@@ -5814,6 +5784,101 @@ R"...(### clock ###
     return ret_ptr;
   }
 
+#define COMMON_MATH_EX \
+    LObject* args_ptr = nullptr;\
+    GetReadyForFunction(args, 2, &args_ptr);\
+\
+    const LPointer& symbol_ptr = args_ptr->car();\
+    CheckType(*symbol_ptr, LType::SYMBOL);\
+    const std::string symbol = symbol_ptr->symbol();\
+    Next(&args_ptr);\
+\
+    const LScopeChain& chain = caller->scope_chain();\
+    LPointer value_ptr = chain.SelectSymbol(symbol);\
+    if (!value_ptr) {\
+      throw GenError("@unbound", "'" + symbol + "' doesn't bind any value.");\
+    }\
+\
+    CheckType(*value_ptr, LType::NUMBER);\
+    LPointer result = caller->Evaluate(*(args_ptr->car()));\
+    CheckType(*result, LType::NUMBER);\
+\
+    LPointer ret_ptr = value_ptr->Clone()
+
+  // %%% add!
+  DEF_LC_FUNCTION(Lisp::AdditionEx) {
+    COMMON_MATH_EX;
+
+    value_ptr->number(value_ptr->number() + result->number());
+
+    return ret_ptr;
+  }
+
+  // %%% sub!
+  DEF_LC_FUNCTION(Lisp::SubtractionEx) {
+    COMMON_MATH_EX;
+
+    value_ptr->number(value_ptr->number() - result->number());
+
+    return ret_ptr;
+  }
+
+  // %%% mul!
+  DEF_LC_FUNCTION(Lisp::MultiplicationEx) {
+    COMMON_MATH_EX;
+
+    value_ptr->number(value_ptr->number() * result->number());
+
+    return ret_ptr;
+  }
+
+  // %%% div!
+  DEF_LC_FUNCTION(Lisp::DivisionEx) {
+    COMMON_MATH_EX;
+
+    value_ptr->number(value_ptr->number() / result->number());
+
+    return ret_ptr;
+  }
+
+
+#define COMMON_INC_DEC_EX \
+    LObject* args_ptr = nullptr;\
+    GetReadyForFunction(args, 1, &args_ptr);\
+\
+    const LPointer& symbol_ptr = args_ptr->car();\
+    CheckType(*symbol_ptr, LType::SYMBOL);\
+    const std::string symbol = symbol_ptr->symbol();\
+    Next(&args_ptr);\
+\
+    const LScopeChain& chain = caller->scope_chain();\
+    LPointer value_ptr = chain.SelectSymbol(symbol);\
+    if (!value_ptr) {\
+      throw GenError("@unbound", "'" + symbol + "' doesn't bind any value.");\
+    }\
+\
+    CheckType(*value_ptr, LType::NUMBER);\
+\
+    LPointer ret_ptr = value_ptr->Clone()
+
+  // %%% inc!
+  DEF_LC_FUNCTION(Lisp::IncEx) {
+    COMMON_INC_DEC_EX;
+
+    value_ptr->number(value_ptr->number() + 1.0);
+
+    return ret_ptr;
+  }
+
+  // %%% dec!
+  DEF_LC_FUNCTION(Lisp::DecEx) {
+    COMMON_INC_DEC_EX;
+
+    value_ptr->number(value_ptr->number() - 1.0);
+
+    return ret_ptr;
+  }
+
   // %%% string-split
   DEF_LC_FUNCTION(Lisp::StringSplit) {
     // 準備。
@@ -5876,6 +5941,101 @@ R"...(### clock ###
     }
 
     return NewString(oss.str());
+  }
+
+#define COMMON_PUSH_EX \
+    LObject* args_ptr = nullptr;\
+    GetReadyForFunction(args, 2, &args_ptr);\
+\
+    const LPointer& symbol_ptr = args_ptr->car();\
+    CheckType(*symbol_ptr, LType::SYMBOL);\
+    const std::string symbol = symbol_ptr->symbol();\
+    Next(&args_ptr);\
+\
+    const LScopeChain& chain = caller->scope_chain();\
+    LPointer value_ptr = chain.SelectSymbol(symbol);\
+    if (!value_ptr) {\
+      throw GenError("@unbound", "'" + symbol + "' doesn't bind any value.");\
+    }\
+\
+    CheckList(*value_ptr);\
+    LPointer supplement = caller->Evaluate(*(args_ptr->car()))
+
+#define COMMON_POP_EX \
+    LObject* args_ptr = nullptr;\
+    GetReadyForFunction(args, 1, &args_ptr);\
+\
+    const LPointer& symbol_ptr = args_ptr->car();\
+    CheckType(*symbol_ptr, LType::SYMBOL);\
+    const std::string symbol = symbol_ptr->symbol();\
+    Next(&args_ptr);\
+\
+    const LScopeChain& chain = caller->scope_chain();\
+    LPointer value_ptr = chain.SelectSymbol(symbol);\
+    if (!value_ptr) {\
+      throw GenError("@unbound", "'" + symbol + "' doesn't bind any value.");\
+    }\
+\
+    CheckList(*value_ptr)
+
+  // %%% push-front!
+  DEF_LC_FUNCTION(Lisp::PushFrontEx) {
+    COMMON_PUSH_EX;
+
+    // 追加する。
+    chain.UpdateSymbol(symbol, NewPair(supplement, value_ptr));
+
+    return value_ptr->Clone();
+  }
+
+  // %%% pop-front!
+  DEF_LC_FUNCTION(Lisp::PopFrontEx) {
+    COMMON_POP_EX;
+
+    // 外す。
+    if (value_ptr->IsPair()) {
+      chain.UpdateSymbol(symbol, value_ptr->cdr());
+    }
+
+    return value_ptr->Clone();
+  }
+
+  // %%% push-back!
+  DEF_LC_FUNCTION(Lisp::PushBackEx) {
+    COMMON_PUSH_EX;
+
+    // 先ず戻り値を確保。
+    LPointer ret_ptr = value_ptr->Clone();
+
+    // 追加する。
+    LPair dummy = LPair(NewNil(), value_ptr);
+    LObject* ptr = &dummy;
+    for (; ptr->cdr()->IsPair(); Next(&ptr)) continue;
+    ptr->cdr(NewPair(supplement, NewNil()));
+
+    chain.UpdateSymbol(symbol, dummy.cdr());
+
+    return ret_ptr;
+  }
+
+  // %%% pop-back!
+  DEF_LC_FUNCTION(Lisp::PopBackEx) {
+    COMMON_POP_EX;
+
+    // 元々Nilなら何もしない。
+    if (value_ptr->IsNil()) return value_ptr->Clone();
+
+    // 先ず戻り値を確保。
+    LPointer ret_ptr = value_ptr->Clone();
+
+    LPair dummy = LPair(NewNil(), NewPair(NewNil(), value_ptr));
+    LObject* ptr = &dummy;
+    for (; ptr->cdr()->cdr()->IsPair(); Next(&ptr)) continue;
+    ptr->cdr(NewNil());
+
+    chain.UpdateSymbol(symbol, dummy.cdr()->cdr());
+
+    return ret_ptr;
   }
 
   // %%% regex-search
