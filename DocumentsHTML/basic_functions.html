@@ -1788,24 +1788,24 @@
 (display "Logit : " p-heart-face)
 (display "Probability : " (logit-&gt;prob p-heart-face))
 ;; Output
-;; &gt; Logit : -1.32192809488736
-;; &gt; Probability : 0.285714285714286
+;; &gt; Logit : -1.57904980785126
+;; &gt; Probability : 0.250769230769231
 
 ;; P(Heart | Black) : The probability is 0.
 (define p-heart-black (bayes playing-cards heart? black?))
 (display "Logit : " p-heart-black)
 (display "Probability : " (logit-&gt;prob p-heart-black))
 ;; Output
-;; &gt; Logit : -4.75488750216347
-;; &gt; Probability : 0.0357142857142857
+;; &gt; Logit : -10.4563544151083
+;; &gt; Probability : 0.000711237553342817
 
 ;; P(Even | Black, Face) : The probability is 0.3333...
 (define p-even-black-face (bayes playing-cards even-num? black? face?))
 (display "Logit : " p-even-black-face)
 (display "Probability : " (logit-&gt;prob p-even-black-face))
 ;; Output
-;; &gt; Logit : -0.84032297866953
-;; &gt; Probability : 0.358365019011407
+;; &gt; Logit : -1.00056663421931
+;; &gt; Probability : 0.333246058844896
 </code></pre>
 <h3 id="logit-to-prob">logit-&gt;prob</h3>
 <h6> Usage </h6>

@@ -4111,24 +4111,24 @@ R"...(### bayes ###
     (display "Logit : " p-heart-face)
     (display "Probability : " (logit->prob p-heart-face))
     ;; Output
-    ;; > Logit : -1.32192809488736
-    ;; > Probability : 0.285714285714286
+    ;; > Logit : -1.57904980785126
+    ;; > Probability : 0.250769230769231
     
     ;; P(Heart | Black) : The probability is 0.
     (define p-heart-black (bayes playing-cards heart? black?))
     (display "Logit : " p-heart-black)
     (display "Probability : " (logit->prob p-heart-black))
     ;; Output
-    ;; > Logit : -4.75488750216347
-    ;; > Probability : 0.0357142857142857
+    ;; > Logit : -10.4563544151083
+    ;; > Probability : 0.000711237553342817
     
     ;; P(Even | Black, Face) : The probability is 0.3333...
     (define p-even-black-face (bayes playing-cards even-num? black? face?))
     (display "Logit : " p-even-black-face)
     (display "Probability : " (logit->prob p-even-black-face))
     ;; Output
-    ;; > Logit : -0.84032297866953
-    ;; > Probability : 0.358365019011407)...";
+    ;; > Logit : -1.00056663421931
+    ;; > Probability : 0.333246058844896)...";
     help_dict_.emplace("bayes", help);
 
     func = LC_FUNCTION_OBJ(LogitToProb);
@@ -6152,12 +6152,12 @@ R"...(### clock ###
     LPair call_target(target_func_ptr, NewPair(WrapQuote(NewNil()), NewNil()));
     
 
-    // 個数カウント用配列。  ラプラススムージング(初期値1)。
-    int num_all = 1;
-    int num_target = 1;
-    int num_not_target = 1;
-    std::vector<int> count_true(num_coord_func, 1);
-    std::vector<int> count_false(num_coord_func, 1);
+    // 個数カウント用配列。
+    int num_all = 0;
+    int num_target = 0;
+    int num_not_target = 0;
+    std::vector<int> count_true(num_coord_func, 0);
+    std::vector<int> count_false(num_coord_func, 0);
     std::vector<int>* count_ptr = &count_true;
 
     // 各データからカウントしていく。
@@ -6193,20 +6193,21 @@ R"...(### clock ###
     }
 
     // 全体、ターゲットの数を2進対数にする。
-    double log_all = std::log2(num_all);
-    double log_target = std::log2(num_target);
-    double log_not_target = std::log2(num_not_target);
+    double log_all = std::log2(num_all + 1);
+    double log_target = std::log2(num_target + 0.5);
+    double log_not_target = std::log2(num_not_target + 0.5);
+    double delta = 1.0 / (num_all + 2);
 
     // trueの確率の対数の和を得る。
     double log_true = log_target - log_all;
     for (auto num : count_true) {
-      log_true += std::log2(num) - log_target;
+      log_true += std::log2(num + delta) - log_target;
     }
 
     // falseの確率の対数の和を得る。
     double log_false = log_not_target - log_all;
     for (auto num : count_false) {
-      log_false += std::log2(num) - log_not_target;
+      log_false += std::log2(num + delta) - log_not_target;
     }
 
     // ロジットを返す。
