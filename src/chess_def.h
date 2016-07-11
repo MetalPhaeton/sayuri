@@ -49,7 +49,7 @@ namespace Sayuri {
   // エンジン情報 //
   // ============ //
   /** Sayuriのバージョン番号。 */
-  constexpr const char* ID_NAME = "Sayuri 2016.07.11";
+  constexpr const char* ID_NAME = "Sayuri 2016.07.11 devel";
   /** Sayuriの作者名。 */
   constexpr const char* ID_AUTHOR = "Hironori Ishibashi";
   /** ライセンス文。 */
