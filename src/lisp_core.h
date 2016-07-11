@@ -3477,6 +3477,12 @@ namespace Sayuri {
       /** ネイティブ関数 - bayes */
       DEF_LC_FUNCTION(Bayes);
 
+      /** ネイティブ関数 - logit->prob */
+      DEF_LC_FUNCTION(LogitToProb);
+
+      /** ネイティブ関数 - prob->logit */
+      DEF_LC_FUNCTION(ProbToLogit);
+
       /** ネイティブ関数 - now */
       DEF_LC_FUNCTION(Now);
 

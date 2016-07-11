@@ -517,7 +517,8 @@ Sayulisp reads and executes it.</p>
 <h3 id="naive-bayes">Naive Bayes</h3>
 <p>Sayulisp can estimates conditional probability by Naive Bayes.</p>
 <ul>
-<li><a href="basic_functions.html#bayes"><code>(bayes)</code></a> : Estimates conditional probability.</li>
+<li><a href="basic_functions.html#bayes"><code>(bayes)</code></a> :
+  Estimates logit of conditional probability.</li>
 </ul>
 <h6> Example </h6>
 
@@ -550,19 +551,28 @@ Sayulisp reads and executes it.</p>
 (define (even-num? card) (even? (car (cdr card))))
 
 ;; P(Heart | Face) : The probability is 0.25.
-(display (bayes playing-cards heart? face?))
+(define p-heart-face (bayes playing-cards heart? face?))
+(display "Logit : " p-heart-face)
+(display "Probability : " (logit-&gt;prob p-heart-face))
 ;; Output
-;; &gt; 0.285714285714286
+;; &gt; Logit : -1.32192809488736
+;; &gt; Probability : 0.285714285714286
 
 ;; P(Heart | Black) : The probability is 0.
-(display (bayes playing-cards heart? black?))
+(define p-heart-black (bayes playing-cards heart? black?))
+(display "Logit : " p-heart-black)
+(display "Probability : " (logit-&gt;prob p-heart-black))
 ;; Output
-;; &gt; 0.0357142857142857
+;; &gt; Logit : -4.75488750216347
+;; &gt; Probability : 0.0357142857142857
 
 ;; P(Even | Black, Face) : The probability is 0.3333...
-(display (bayes playing-cards even-num? black? face?))
+(define p-even-black-face (bayes playing-cards even-num? black? face?))
+(display "Logit : " p-even-black-face)
+(display "Probability : " (logit-&gt;prob p-even-black-face))
 ;; Output
-;; &gt; 0.358365019011407
+;; &gt; Logit : -0.84032297866953
+;; &gt; Probability : 0.358365019011407
 </code></pre>
 <h3 id="warning">Warning!!!!</h3>
 <p>Sayuri works correctly on a correct position.<br />

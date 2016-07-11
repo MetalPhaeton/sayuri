@@ -141,7 +141,9 @@
 <li><a href="#log2"><code>log2</code></a> : Calculates logarithm with 2.</li>
 <li><a href="#log10"><code>log10</code></a> : Calculates logarithm with 10.</li>
 <li><a href="#random"><code>random</code></a> : Gets a random Number.</li>
-<li><a href="#bayes"><code>bayes</code></a> : Estimates conditional probability.</li>
+<li><a href="#bayes"><code>bayes</code></a> : Estimates logit of conditional probability.</li>
+<li><a href="#logit-to-prob"><code>logit-&gt;prob</code></a> : Converts logit to probability.</li>
+<li><a href="#prob-to-logit"><code>prob-&gt;logit</code></a> : Converts probability to logit.</li>
 </ul>
 </li>
 <li>
@@ -1739,8 +1741,11 @@
 <h6> Description </h6>
 
 <ul>
-<li>Estimates conditional probability by Naive Bayes.
-  (<code>P(&lt;Event&gt; | &lt;Conditions&gt;...)</code>)</li>
+<li>Estimates logit of conditional probability by Naive Bayes.
+  (<code>P(&lt;Event&gt; | &lt;Conditions&gt;...)</code>)<ul>
+<li>The base of logit is '2'. (Binary logarithm.)</li>
+</ul>
+</li>
 <li><code>&lt;Event&gt;</code> or <code>&lt;Conditions&gt;...</code> is Predicate (Function).<ul>
 <li>Accepts 1 argument and returns Boolean.</li>
 <li><code>(bayes)</code> gives each element of <code>&lt;Data list&gt;</code> to each Predicate.
@@ -1779,19 +1784,66 @@
 (define (even-num? card) (even? (car (cdr card))))
 
 ;; P(Heart | Face) : The probability is 0.25.
-(display (bayes playing-cards heart? face?))
+(define p-heart-face (bayes playing-cards heart? face?))
+(display "Logit : " p-heart-face)
+(display "Probability : " (logit-&gt;prob p-heart-face))
 ;; Output
-;; &gt; 0.285714285714286
+;; &gt; Logit : -1.32192809488736
+;; &gt; Probability : 0.285714285714286
 
 ;; P(Heart | Black) : The probability is 0.
-(display (bayes playing-cards heart? black?))
+(define p-heart-black (bayes playing-cards heart? black?))
+(display "Logit : " p-heart-black)
+(display "Probability : " (logit-&gt;prob p-heart-black))
 ;; Output
-;; &gt; 0.0357142857142857
+;; &gt; Logit : -4.75488750216347
+;; &gt; Probability : 0.0357142857142857
 
 ;; P(Even | Black, Face) : The probability is 0.3333...
-(display (bayes playing-cards even-num? black? face?))
+(define p-even-black-face (bayes playing-cards even-num? black? face?))
+(display "Logit : " p-even-black-face)
+(display "Probability : " (logit-&gt;prob p-even-black-face))
 ;; Output
-;; &gt; 0.358365019011407
+;; &gt; Logit : -0.84032297866953
+;; &gt; Probability : 0.358365019011407
+</code></pre>
+<h3 id="logit-to-prob">logit-&gt;prob</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(logit-&gt;prob &lt;Logit : Number&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Converts logit(Binary logarithm) to probability and returns it.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(display (logit-&gt;prob 0))
+;; Output
+;; &gt; 0.5
+</code></pre>
+<h3 id="prob-to-logit">prob-&gt;logit</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(prob-&gt;logit &lt;Probability : Number&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Converts probability to logit(Binary logarithm) and returns it.</li>
+<li><code>&lt;Probability&gt;</code> must be greater than 0.0 and less than 1.0.<ul>
+<li>0.0 or 1.0 occurs error.</li>
+</ul>
+</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(display (prob-&gt;logit 0.5))
+;; Output
+;; &gt; 0
 </code></pre>
 <h2 id="time-and-date">Time and Date</h2>
 <h3 id="now">now</h3>

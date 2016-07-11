@@ -4068,8 +4068,9 @@ R"...(### bayes ###
 
 <h6> Description </h6>
 
-* Estimates conditional probability by Naive Bayes.
+* Estimates logit of conditional probability by Naive Bayes.
   (`P(<Event> | <Conditions>...)`)
+    + The base of logit is '2'. (Binary logarithm.)
 * `<Event>` or `<Conditions>...` is Predicate (Function).
     + Accepts 1 argument and returns Boolean.
     + `(bayes)` gives each element of `<Data list>` to each Predicate.
@@ -4106,20 +4107,71 @@ R"...(### bayes ###
     (define (even-num? card) (even? (car (cdr card))))
     
     ;; P(Heart | Face) : The probability is 0.25.
-    (display (bayes playing-cards heart? face?))
+    (define p-heart-face (bayes playing-cards heart? face?))
+    (display "Logit : " p-heart-face)
+    (display "Probability : " (logit->prob p-heart-face))
     ;; Output
-    ;; > 0.285714285714286
+    ;; > Logit : -1.32192809488736
+    ;; > Probability : 0.285714285714286
     
     ;; P(Heart | Black) : The probability is 0.
-    (display (bayes playing-cards heart? black?))
+    (define p-heart-black (bayes playing-cards heart? black?))
+    (display "Logit : " p-heart-black)
+    (display "Probability : " (logit->prob p-heart-black))
     ;; Output
-    ;; > 0.0357142857142857
+    ;; > Logit : -4.75488750216347
+    ;; > Probability : 0.0357142857142857
     
     ;; P(Even | Black, Face) : The probability is 0.3333...
-    (display (bayes playing-cards even-num? black? face?))
+    (define p-even-black-face (bayes playing-cards even-num? black? face?))
+    (display "Logit : " p-even-black-face)
+    (display "Probability : " (logit->prob p-even-black-face))
     ;; Output
-    ;; > 0.358365019011407)...";
+    ;; > Logit : -0.84032297866953
+    ;; > Probability : 0.358365019011407)...";
     help_dict_.emplace("bayes", help);
+
+    func = LC_FUNCTION_OBJ(LogitToProb);
+    INSERT_LC_FUNCTION(func, "logit->prob", "Lisp:logit->prob");
+    help =
+R"...(### logit->prob ###
+
+<h6> Usage </h6>
+
+* `(logit->prob <Logit : Number>)`
+
+<h6> Description </h6>
+
+* Converts logit(Binary logarithm) to probability and returns it.
+
+<h6> Example </h6>
+
+    (display (logit->prob 0))
+    ;; Output
+    ;; > 0.5)...";
+    help_dict_.emplace("logit->prob", help);
+
+    func = LC_FUNCTION_OBJ(ProbToLogit);
+    INSERT_LC_FUNCTION(func, "prob->logit", "Lisp:prob->logit");
+    help =
+R"...(### prob->logit ###
+
+<h6> Usage </h6>
+
+* `(prob->logit <Probability : Number>)`
+
+<h6> Description </h6>
+
+* Converts probability to logit(Binary logarithm) and returns it.
+* `<Probability>` must be greater than 0.0 and less than 1.0.
+    + 0.0 or 1.0 occurs error.
+
+<h6> Example </h6>
+
+    (display (prob->logit 0.5))
+    ;; Output
+    ;; > 0)...";
+    help_dict_.emplace("prob->logit", help);
 
     func = LC_FUNCTION_OBJ(Now);
     INSERT_LC_FUNCTION(func, "now", "Lisp:now");
@@ -6140,25 +6192,56 @@ R"...(### clock ###
       }
     }
 
-    // 全体、ターゲットの数を少数にする。
-    double all_d = num_all;
-    double target_d = num_target;
-    double not_target_d = num_not_target;
+    // 全体、ターゲットの数を2進対数にする。
+    double log_all = std::log2(num_all);
+    double log_target = std::log2(num_target);
+    double log_not_target = std::log2(num_not_target);
 
     // trueの確率の対数の和を得る。
-    double logp_true = std::log2(target_d / all_d);
+    double log_true = log_target - log_all;
     for (auto num : count_true) {
-      logp_true += std::log2(num / target_d);
+      log_true += std::log2(num) - log_target;
     }
 
     // falseの確率の対数の和を得る。
-    double logp_false = std::log2(not_target_d / all_d);
+    double log_false = log_not_target - log_all;
     for (auto num : count_false) {
-      logp_false += std::log2(num / not_target_d);
+      log_false += std::log2(num) - log_not_target;
     }
 
-    // シグモイド関数で確率を計算して返す。
-    return NewNumber(1.0 / (1.0 + std::exp2(logp_false - logp_true)));
+    // ロジットを返す。
+    return NewNumber(log_true - log_false);
+  }
+
+  // %%% logit->prob
+  DEF_LC_FUNCTION(Lisp::LogitToProb) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    // 値を得る。
+    LPointer value_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*value_ptr, LType::NUMBER);
+
+    return NewNumber(1.0 / (1.0 + std::exp2(-(value_ptr->number()))));
+  }
+
+  // %%% prob->logit
+  DEF_LC_FUNCTION(Lisp::ProbToLogit) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    // 値を得る。
+    LPointer value_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*value_ptr, LType::NUMBER);
+    double value = value_ptr->number();
+    if (!((value > 0.0) && (value < 1.0))) {
+      throw GenError("@function-error",
+      "Probability must be greater than 0.0 and less than 1.0.");
+    }
+
+    return NewNumber(std::log2(value / (1.0 - value)));
   }
 
   // %%% now
