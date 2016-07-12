@@ -1806,6 +1806,91 @@
 ;; Output
 ;; &gt; Logit : -1.00056663421931
 ;; &gt; Probability : 0.333246058844896
+
+;; Another example.
+;; Quantity of seasoning and taste data list.
+;; Data : (&lt;Salt&gt; &lt;Sugar&gt; &lt;Wasabi&gt; &lt;Taste : "Spicy" or "Sweet"&gt;)
+(define seasoning-taste-data
+        '((20 10 3 "Spicy")
+          (10 50 2 "Sweet")
+          (15 50 20 "Spicy")
+          (50 10 5 "Spicy")
+          (10 50 2 "Sweet")
+          (15 40 3 "Sweet")
+          (20 20 30 "Spicy")
+          (10 10 40 "Spicy")))
+
+;; Judge whether "Spicy" or not. (#t or #f)
+(define (spicy? data) (equal? (ref data 3) "Spicy"))
+
+;; Judge how much salt. (from 0.0 to 1.0)
+(define (salt? data)
+        (/ (ref data 0)
+           (+ (ref data 0) (ref data 1) (ref data 2))))
+
+;; Judge how much sugar. (from 0.0 to 1.0)
+(define (sugar? data)
+        (/ (ref data 1)
+           (+ (ref data 0) (ref data 1) (ref data 2))))
+
+;; Judge how much wasabi. (from 0.0 to 1.0)
+(define (wasabi? data)
+        (/ (ref data 2)
+           (+ (ref data 0) (ref data 1) (ref data 2))))
+
+;; Probability of "Spicy", when seasoning is salt.
+(define salt-value
+        (bayes seasoning-taste-data spicy? salt?))
+(display "Logit : " salt-value)
+(display "Probability : " (logit-&gt;prob salt-value))
+;; Output
+;; &gt; Logit : 1.62707953043571
+;; &gt; Probability : 0.755433701008636
+
+;; Probability of "Spicy", when seasoning is sugar.
+(define sugar-value
+        (bayes seasoning-taste-data spicy? sugar?))
+(display "Logit : " sugar-value)
+(display "Probability : " (logit-&gt;prob sugar-value))
+;; Output
+;; &gt; Logit : -0.588762156944997
+;; &gt; Probability : 0.399368073757344
+
+;; Probability of "Spicy", when seasoning is wasabi.
+(define wasabi-value
+        (bayes seasoning-taste-data spicy? wasabi?))
+(display "Logit : " wasabi-value)
+(display "Probability : " (logit-&gt;prob wasabi-value))
+;; Output
+;; &gt; Logit : 2.88588923517973
+;; &gt; Probability : 0.880833399583934
+
+;; Probability of "Spicy", when seasoning is salt and sugar.
+(define salt-sugar-value
+        (bayes seasoning-taste-data spicy? salt? sugar?))
+(display "Logit : " salt-sugar-value)
+(display "Probability : " (logit-&gt;prob salt-sugar-value))
+;; Output
+;; &gt; Logit : 0.386240676911015
+;; &gt; Probability : 0.566533484706568
+
+;; Probability of "Spicy", when seasoning is salt and wasabi.
+(define salt-wasabi-value
+        (bayes seasoning-taste-data spicy? salt? wasabi?))
+(display "Logit : " salt-wasabi-value)
+(display "Probability : " (logit-&gt;prob salt-wasabi-value))
+;; Output
+;; &gt; Logit : 3.86089206903574
+;; &gt; Probability : 0.935605546063172
+
+;; Probability of "Spicy", when seasoning is sugar and wasabi.
+(define sugar-wasabi-value
+        (bayes seasoning-taste-data spicy? sugar? wasabi?))
+(display "Logit : " sugar-wasabi-value)
+(display "Probability : " (logit-&gt;prob sugar-wasabi-value))
+;; Output
+;; &gt; Logit : 1.64505038165504
+;; &gt; Probability : 0.757727745498944
 </code></pre>
 <h3 id="logit-to-prob">logit-&gt;prob</h3>
 <h6> Usage </h6>

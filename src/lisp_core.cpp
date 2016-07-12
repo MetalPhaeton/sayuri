@@ -4072,9 +4072,10 @@ R"...(### bayes ###
   (`P(<Event> | <Conditions>...)`)
     + The base of logit is '2'. (Binary logarithm.)
 * `<Event>` or `<Conditions>...` is Predicate (Function).
-    + Accepts 1 argument and returns Boolean.
+    + Accepts 1 argument and returns Boolean or Number.
+        - `(bayes)` also supports Fuzzy. Predicate can returns from 0.0 to 1.0.
     + `(bayes)` gives each element of `<Data list>` to each Predicate.
-      The Predicate must judge the element and return Boolean.
+      The Predicate must judge the element and return Boolean or Number.
 
 <h6> Example </h6>
 
@@ -4128,7 +4129,92 @@ R"...(### bayes ###
     (display "Probability : " (logit->prob p-even-black-face))
     ;; Output
     ;; > Logit : -1.00056663421931
-    ;; > Probability : 0.333246058844896)...";
+    ;; > Probability : 0.333246058844896
+    
+    ;; Another example.
+    ;; Quantity of seasoning and taste data list.
+    ;; Data : (<Salt> <Sugar> <Wasabi> <Taste : "Spicy" or "Sweet">)
+    (define seasoning-taste-data
+            '((20 10 3 "Spicy")
+              (10 50 2 "Sweet")
+              (15 50 20 "Spicy")
+              (50 10 5 "Spicy")
+              (10 50 2 "Sweet")
+              (15 40 3 "Sweet")
+              (20 20 30 "Spicy")
+              (10 10 40 "Spicy")))
+    
+    ;; Judge whether "Spicy" or not. (#t or #f)
+    (define (spicy? data) (equal? (ref data 3) "Spicy"))
+    
+    ;; Judge how much salt. (from 0.0 to 1.0)
+    (define (salt? data)
+            (/ (ref data 0)
+               (+ (ref data 0) (ref data 1) (ref data 2))))
+    
+    ;; Judge how much sugar. (from 0.0 to 1.0)
+    (define (sugar? data)
+            (/ (ref data 1)
+               (+ (ref data 0) (ref data 1) (ref data 2))))
+    
+    ;; Judge how much wasabi. (from 0.0 to 1.0)
+    (define (wasabi? data)
+            (/ (ref data 2)
+               (+ (ref data 0) (ref data 1) (ref data 2))))
+    
+    ;; Probability of "Spicy", when seasoning is salt.
+    (define salt-value
+            (bayes seasoning-taste-data spicy? salt?))
+    (display "Logit : " salt-value)
+    (display "Probability : " (logit->prob salt-value))
+    ;; Output
+    ;; > Logit : 1.62707953043571
+    ;; > Probability : 0.755433701008636
+    
+    ;; Probability of "Spicy", when seasoning is sugar.
+    (define sugar-value
+            (bayes seasoning-taste-data spicy? sugar?))
+    (display "Logit : " sugar-value)
+    (display "Probability : " (logit->prob sugar-value))
+    ;; Output
+    ;; > Logit : -0.588762156944997
+    ;; > Probability : 0.399368073757344
+    
+    ;; Probability of "Spicy", when seasoning is wasabi.
+    (define wasabi-value
+            (bayes seasoning-taste-data spicy? wasabi?))
+    (display "Logit : " wasabi-value)
+    (display "Probability : " (logit->prob wasabi-value))
+    ;; Output
+    ;; > Logit : 2.88588923517973
+    ;; > Probability : 0.880833399583934
+    
+    ;; Probability of "Spicy", when seasoning is salt and sugar.
+    (define salt-sugar-value
+            (bayes seasoning-taste-data spicy? salt? sugar?))
+    (display "Logit : " salt-sugar-value)
+    (display "Probability : " (logit->prob salt-sugar-value))
+    ;; Output
+    ;; > Logit : 0.386240676911015
+    ;; > Probability : 0.566533484706568
+    
+    ;; Probability of "Spicy", when seasoning is salt and wasabi.
+    (define salt-wasabi-value
+            (bayes seasoning-taste-data spicy? salt? wasabi?))
+    (display "Logit : " salt-wasabi-value)
+    (display "Probability : " (logit->prob salt-wasabi-value))
+    ;; Output
+    ;; > Logit : 3.86089206903574
+    ;; > Probability : 0.935605546063172
+    
+    ;; Probability of "Spicy", when seasoning is sugar and wasabi.
+    (define sugar-wasabi-value
+            (bayes seasoning-taste-data spicy? sugar? wasabi?))
+    (display "Logit : " sugar-wasabi-value)
+    (display "Probability : " (logit->prob sugar-wasabi-value))
+    ;; Output
+    ;; > Logit : 1.64505038165504
+    ;; > Probability : 0.757727745498944)...";
     help_dict_.emplace("bayes", help);
 
     func = LC_FUNCTION_OBJ(LogitToProb);
@@ -6136,8 +6222,8 @@ R"...(### clock ###
 
     // 第3引数以降は条件述語関数。
     int num_coord_func = CountList(*args_ptr);
-    LPointerVec coord_func_vec(num_coord_func);
-    LPointerVec::iterator itr = coord_func_vec.begin();
+    LPointerVec cond_func_vec(num_coord_func);
+    LPointerVec::iterator itr = cond_func_vec.begin();
     LPointer temp;
     for (; args_ptr->IsPair(); Next(&args_ptr), ++itr) {
       // 評価。
@@ -6153,50 +6239,81 @@ R"...(### clock ###
     
 
     // 個数カウント用配列。
-    int num_all = 0;
-    int num_target = 0;
-    int num_not_target = 0;
-    std::vector<int> count_true(num_coord_func, 0);
-    std::vector<int> count_false(num_coord_func, 0);
-    std::vector<int>* count_ptr = &count_true;
+    double num_all = 1.0;
+    double num_target = 0.5;
+    double num_not_target = 0.5;
+    std::vector<double> count_true(num_coord_func, 0.0);
+    std::vector<double> count_false(num_coord_func, 0.0);
 
     // 各データからカウントしていく。
     LPointer result;
     for (LPointer ptr = data_list_ptr; ptr->IsPair(); ptr = ptr->cdr()) {
-      ++num_all;
+      num_all += 1.0;
       const LPointer& elm = ptr->car();
 
       // ターゲットで評価。
       call_target.cdr()->car()->cdr()->car(elm);
       result = caller->Evaluate(call_target);
-      CheckType(*result, LType::BOOLEAN);
 
-      // 評価結果でカウント用配列を切り替える。
-      if (result->boolean()) {
-        ++num_target;
-        count_ptr = &count_true;
+      // 真の値と偽の値を振り分ける。
+      double true_value = 0.0;
+      double false_value = 0.0;
+      if (result->IsBoolean()) {
+        // 普通の述語。
+        if (result->boolean()) {
+          true_value = 1.0;
+          num_target += 1.0;
+        } else {
+          false_value = 1.0;
+          num_not_target += 1.0;
+        }
+      } else if (result->IsNumber()) {
+        // ファジー述語。
+        true_value = result->number();
+        true_value =
+        true_value < 0.0 ? 0.0 : (true_value > 1.0 ? 1.0 : true_value);
+        false_value = 1.0 - true_value;
+
+        num_target += true_value;
+        num_not_target += false_value;
       } else {
-        ++num_not_target;
-        count_ptr = &count_false;
+        // エラー。
+        throw GenTypeError(*result, "Boolean or Number");
       }
 
       // 各条件述語関数で調べてカウントしていく。
       for (int i = 0; i < num_coord_func; ++i) {
         // 評価。
-        coord_func_vec[i]->cdr()->car()->cdr()->car(elm);
-        result = caller->Evaluate(*(coord_func_vec[i]));
-        CheckType(*result, LType::BOOLEAN);
+        cond_func_vec[i]->cdr()->car()->cdr()->car(elm);
+        result = caller->Evaluate(*(cond_func_vec[i]));
 
-        // trueならカウントする。
-        if (result->boolean()) ++((*count_ptr)[i]);
+        // 真の値と偽の値で振り分ける。
+        if (result->IsBoolean()) {
+          // 普通の述語。
+          if (result->boolean()) {
+            count_true[i] += true_value;
+            count_false[i] += false_value;
+          }
+        } else if (result->IsNumber()) {
+          // ファジー述語。
+          double cond_value = result->number();
+          cond_value = cond_value < 0.0 ? 0.0 :
+          (cond_value > 1.0 ? 1.0 : cond_value);
+
+          count_true[i] += cond_value * true_value;
+          count_false[i] += cond_value * false_value;
+        } else {
+          // エラー。
+          throw GenTypeError(*result, "Boolean or Number");
+        }
       }
     }
 
     // 全体、ターゲットの数を2進対数にする。
-    double log_all = std::log2(num_all + 1);
-    double log_target = std::log2(num_target + 0.5);
-    double log_not_target = std::log2(num_not_target + 0.5);
-    double delta = 1.0 / (num_all + 2);
+    double log_all = std::log2(num_all);
+    double log_target = std::log2(num_target);
+    double log_not_target = std::log2(num_not_target);
+    double delta = 1.0 / (num_all + 1.0);
 
     // trueの確率の対数の和を得る。
     double log_true = log_target - log_all;
