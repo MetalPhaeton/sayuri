@@ -130,10 +130,6 @@
              (push-back! ret (gen-func move)))
         ret)
 
-;; Do bayes.
-(define (do-bayes data-list pred conditions)
-        (apply bayes (cons data-list (cons pred conditions))))
-
 ;; Move to PCN
 (define square-str
         '("a1" "b1" "c1" "d1" "e1" "f1" "g1" "h1"
@@ -150,6 +146,23 @@
                        (ref square-str (car (cdr move)))
                        (ref piece-str (car (cdr (cdr move))))))
 
+;; Bubble sort.
+(define (bubble-sort result-list)
+        (define temp ())
+        (define len (-- (length result-list)))
+        (for (i (range len))
+             (for (j (start-size-inc 0 (- len i) 1))
+                  (if (< (ref (ref result-list j) 1)
+                         (ref (ref result-list (++ j)) 1))
+                      (begin (set! temp (ref result-list j))
+                             (set! result-list
+                                   (list-replace result-list j
+                                                 (ref result-list (++ j))))
+                             (set! result-list
+                                   (list-replace result-list (++ j) temp)))
+                      ())))
+        result-list)
+
 ;; Main.
 (stderr "Loading...")
 (define data-list (make-all-data engine pgn))
@@ -161,7 +174,7 @@
 (define conditions ())
 (define predicates ())
 (define data-index 0)
-(define logit 0)
+(define logit-list ())
 (while loop
        (set! input (stdin '@read-line))
        (if (null? input)
@@ -173,15 +186,14 @@
                  (set! predicates (gen-predicates candidates))
                  (set! data-index (-- (chess->number (engine '@get-to-move))))
                  (display input)
-                 (for (pred predicates)
-                      (set! logit
-                            (do-bayes (ref data-list data-index)
-                                      pred
-                                      conditions))
-                      (display (move->pcn (car candidates))
+                 (set! logit-list
+                       (bayes (ref data-list data-index)
+                              predicates
+                              conditions))
+                 (for (result (bubble-sort (zip candidates logit-list)))
+                      (display (move->pcn (car result))
                                " "
-                               (to-string logit))
-                      (pop-front! candidates)
+                               (car (cdr result)))
                       )
                  (stdout "\n"))
                 ())))

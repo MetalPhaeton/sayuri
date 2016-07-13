@@ -4064,21 +4064,25 @@ R"...(### bayes ###
 
 <h6> Usage </h6>
 
-* `(bayes <Data list : List> <Event : Function> <Conditions : Function>...)`
+* `(bayes <Data list : List> <Event list : List of Funtions> <Condition list : List of Functions)`
 
 <h6> Description </h6>
 
-* Estimates logit of conditional probability by Naive Bayes.
-  (`P(<Event> | <Conditions>...)`)
+* Estimates logit of each event of `<Event list>` by Naive Bayes
+  and returns its list.
     + The base of logit is '2'. (Binary logarithm.)
-* `<Event>` or `<Conditions>...` is Predicate (Function).
-    + Accepts 1 argument and returns Boolean or Number.
-        - `(bayes)` also supports Fuzzy. Predicate can returns from 0.0 to 1.0.
+* Each element of `<Event ist>` or `<Conditions list>` must be Predicate.
+    + Predicate accepts 1 argument(an element of `<Data list>`)
+      and returns Boolean or Number(from 0.0 to 1.0).
+        - Predicate can returns Fuzzy.
     + `(bayes)` gives each element of `<Data list>` to each Predicate.
       The Predicate must judge the element and return Boolean or Number.
 
 <h6> Example </h6>
 
+    (define logit-list ())
+    
+    ;; ---------- First Example ---------- ;;
     ;; List of playing cards.
     (define playing-cards
             '(("Heart" 1) ("Heart" 2) ("Heart" 3) ("Heart" 4) ("Heart" 5)
@@ -4094,6 +4098,9 @@ R"...(### bayes ###
               ("Spade" 6) ("Spade" 7) ("Spade" 8) ("Spade" 9) ("Spade" 10)
               ("Spade" 11) ("Spade" 12) ("Spade" 13)))
     
+    ;; Anything is true.
+    (define (any-true card) #t)
+    
     ;; Judges a card whether the suit is "Heart" or not.
     (define (heart? card) (equal? (car card) "Heart"))
     
@@ -4107,31 +4114,43 @@ R"...(### bayes ###
     ;; Judges a card whether the number is an even number or not.
     (define (even-num? card) (even? (car (cdr card))))
     
-    ;; P(Heart | Face) : The probability is 0.25.
-    (define p-heart-face (bayes playing-cards heart? face?))
-    (display "Logit : " p-heart-face)
-    (display "Probability : " (logit->prob p-heart-face))
-    ;; Output
-    ;; > Logit : -1.57904980785126
-    ;; > Probability : 0.250769230769231
+    ;; Judges a card whether the number is an odd number or not.
+    (define (odd-num? card) (odd? (car (cdr card))))
     
-    ;; P(Heart | Black) : The probability is 0.
-    (define p-heart-black (bayes playing-cards heart? black?))
-    (display "Logit : " p-heart-black)
-    (display "Probability : " (logit->prob p-heart-black))
+    ;; Logit of P(Heart)
+    ;; Probability is 0.25.
+    (set! logit-list (bayes playing-cards
+                       (list heart?)
+                       (list any-true)))
+    (display "Logit : " logit-list)
+    (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : -10.4563544151083
-    ;; > Probability : 0.000711237553342817
+    ;; > Logit : (-1.58359371974477)
+    ;; > Probability : (0.25017793594306)
     
-    ;; P(Even | Black, Face) : The probability is 0.3333...
-    (define p-even-black-face (bayes playing-cards even-num? black? face?))
-    (display "Logit : " p-even-black-face)
-    (display "Probability : " (logit->prob p-even-black-face))
+    ;; Logit of P(Even | Face) and P(Odd | Face)
+    ;; Probability is 0.333... and 0.666...
+    (set! logit-list (bayes playing-cards
+                            (list even-num? odd-num?)
+                            (list face?)))
+    (display "Logit : " logit-list)
+    (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : -1.00056663421931
-    ;; > Probability : 0.333246058844896
+    ;; > Logit : (-0.996671982282245 0.996671982282245)
+    ;; > Probability : (0.333846153846154 0.666153846153846)
     
-    ;; Another example.
+    ;; Logit of P(Heart | Black)
+    ;; Probability is 0.0.
+    (set! logit-list (bayes playing-cards
+                            (list heart?)
+                            (list black?)))
+    (display "Logit : " logit-list)
+    (display "Probability : " (map logit->prob logit-list))
+    ;; Output
+    ;; > Logit : (-10.4563544151083)
+    ;; > Probability : (0.000711237553342817)
+    
+    ;; ---------- Second Example ---------- ;;
     ;; Quantity of seasoning and taste data list.
     ;; Data : (<Salt> <Sugar> <Wasabi> <Taste : "Spicy" or "Sweet">)
     (define seasoning-taste-data
@@ -4146,6 +4165,12 @@ R"...(### bayes ###
     
     ;; Judge whether "Spicy" or not. (#t or #f)
     (define (spicy? data) (equal? (ref data 3) "Spicy"))
+    
+    ;; Judge whether "Sweet" or not. (#t or #f)
+    (define (sweet? data) (equal? (ref data 3) "Sweet"))
+    
+    ;; predicate list of taste.
+    (define taste-pred-list (list spicy? sweet?))
     
     ;; Judge how much salt. (from 0.0 to 1.0)
     (define (salt? data)
@@ -4162,59 +4187,59 @@ R"...(### bayes ###
             (/ (ref data 2)
                (+ (ref data 0) (ref data 1) (ref data 2))))
     
-    ;; Probability of "Spicy", when seasoning is salt.
-    (define salt-value
-            (bayes seasoning-taste-data spicy? salt?))
-    (display "Logit : " salt-value)
-    (display "Probability : " (logit->prob salt-value))
+    ;; Probability of taste, when seasoning is salt.
+    (set! logit-list
+            (bayes seasoning-taste-data taste-pred-list (list salt?)))
+    (display "Logit : " logit-list)
+    (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : 1.62707953043571
-    ;; > Probability : 0.755433701008636
+    ;; > Logit : (1.62707953043571 -1.62707953043571)
+    ;; > Probability : (0.755433701008636 0.244566298991364)
     
-    ;; Probability of "Spicy", when seasoning is sugar.
-    (define sugar-value
-            (bayes seasoning-taste-data spicy? sugar?))
-    (display "Logit : " sugar-value)
-    (display "Probability : " (logit->prob sugar-value))
+    ;; Probability of taste, when seasoning is sugar.
+    (set! logit-list
+            (bayes seasoning-taste-data taste-pred-list (list sugar?)))
+    (display "Logit : " logit-list)
+    (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : -0.588762156944997
-    ;; > Probability : 0.399368073757344
+    ;; > Logit : (-0.588762156944997 0.588762156944997)
+    ;; > Probability : (0.399368073757344 0.600631926242656)
     
-    ;; Probability of "Spicy", when seasoning is wasabi.
-    (define wasabi-value
-            (bayes seasoning-taste-data spicy? wasabi?))
-    (display "Logit : " wasabi-value)
-    (display "Probability : " (logit->prob wasabi-value))
+    ;; Probability of taste, when seasoning is wasabi.
+    (set! logit-list
+            (bayes seasoning-taste-data taste-pred-list (list wasabi?)))
+    (display "Logit : " logit-list)
+    (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : 2.88588923517973
-    ;; > Probability : 0.880833399583934
+    ;; > Logit : (2.88588923517973 -2.88588923517973)
+    ;; > Probability : (0.880833399583934 0.119166600416066)
     
-    ;; Probability of "Spicy", when seasoning is salt and sugar.
-    (define salt-sugar-value
-            (bayes seasoning-taste-data spicy? salt? sugar?))
-    (display "Logit : " salt-sugar-value)
-    (display "Probability : " (logit->prob salt-sugar-value))
+    ;; Probability of taste, when seasoning is salt and sugar.
+    (set! logit-list
+            (bayes seasoning-taste-data taste-pred-list (list salt? sugar?)))
+    (display "Logit : " logit-list)
+    (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : 0.386240676911015
-    ;; > Probability : 0.566533484706568
+    ;; > Logit : (0.386240676911015 -0.386240676911015)
+    ;; > Probability : (0.566533484706568 0.433466515293432)
     
-    ;; Probability of "Spicy", when seasoning is salt and wasabi.
-    (define salt-wasabi-value
-            (bayes seasoning-taste-data spicy? salt? wasabi?))
-    (display "Logit : " salt-wasabi-value)
-    (display "Probability : " (logit->prob salt-wasabi-value))
+    ;; Probability of taste, when seasoning is salt and wasabi.
+    (set! logit-list
+            (bayes seasoning-taste-data taste-pred-list (list salt? wasabi?)))
+    (display "Logit : " logit-list)
+    (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : 3.86089206903574
-    ;; > Probability : 0.935605546063172
+    ;; > Logit : (3.86089206903574 -3.86089206903574)
+    ;; > Probability : (0.935605546063172 0.0643944539368279)
     
-    ;; Probability of "Spicy", when seasoning is sugar and wasabi.
-    (define sugar-wasabi-value
-            (bayes seasoning-taste-data spicy? sugar? wasabi?))
-    (display "Logit : " sugar-wasabi-value)
-    (display "Probability : " (logit->prob sugar-wasabi-value))
+    ;; Probability of taste, when seasoning is sugar and wasabi.
+    (set! logit-list
+            (bayes seasoning-taste-data taste-pred-list (list sugar? wasabi?)))
+    (display "Logit : " logit-list)
+    (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : 1.64505038165504
-    ;; > Probability : 0.757727745498944)...";
+    ;; > Logit : (1.64505038165504 -1.64505038165504)
+    ;; > Probability : (0.757727745498944 0.242272254501056))...";
     help_dict_.emplace("bayes", help);
 
     func = LC_FUNCTION_OBJ(LogitToProb);
@@ -6215,120 +6240,147 @@ R"...(### clock ###
     CheckList(*data_list_ptr);
     Next(&args_ptr);
 
-    // 第2引数はターゲット述語関数。
-    LPointer target_func_ptr = caller->Evaluate(*(args_ptr->car()));
-    CheckType(*target_func_ptr, LType::FUNCTION);
+    // 第2引数はイベント関数のリスト。
+    LPointer event_list = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*event_list);
     Next(&args_ptr);
 
-    // 第3引数以降は条件述語関数。
-    int num_coord_func = CountList(*args_ptr);
-    LPointerVec cond_func_vec(num_coord_func);
-    LPointerVec::iterator itr = cond_func_vec.begin();
-    LPointer temp;
-    for (; args_ptr->IsPair(); Next(&args_ptr), ++itr) {
-      // 評価。
-      temp = caller->Evaluate(*(args_ptr->car()));
-      CheckType(*temp, LType::FUNCTION);
-
-      // 呼び出し用ペアでくるんでベクトルに登録。
-      *itr = NewPair(temp, NewPair(WrapQuote(NewNil()), NewNil()));
+    // 第2引数を包んでベクトルへ。
+    int num_event = CountList(*event_list);
+    if (num_event <= 0) {
+      throw GenError("@function-error", "No event predicate.");
+    }
+    LPointerVec event_vec(num_event);
+    LPointerVec::iterator event_itr = event_vec.begin();
+    for (LObject* ptr = event_list.get(); ptr->IsPair();
+    Next(&ptr), ++event_itr) {
+      *event_itr = NewPair(ptr->car(), NewPair(WrapQuote(NewNil()), NewNil()));
     }
 
-    // ターゲット呼び出し用ペア。
-    LPair call_target(target_func_ptr, NewPair(WrapQuote(NewNil()), NewNil()));
-    
+    // 第3引数は条件関数のリスト。
+    LPointer cond_list = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*cond_list);
+    Next(&args_ptr);
 
-    // 個数カウント用配列。
+    // 第3引数を包んでベクトルへ。
+    int num_cond = CountList(*cond_list);
+    if (num_cond <= 0) {
+      throw GenError("@function-error", "No condition predicate.");
+    }
+    LPointerVec cond_vec(num_cond);
+    LPointerVec::iterator cond_itr = cond_vec.begin();
+    for (LObject* ptr = cond_list.get(); ptr->IsPair();
+    Next(&ptr), ++cond_itr) {
+      *cond_itr = NewPair(ptr->car(), NewPair(WrapQuote(NewNil()), NewNil()));
+    }
+
+    // カウント表を準備。
     double num_all = 1.0;
-    double num_target = 0.5;
-    double num_not_target = 0.5;
-    std::vector<double> count_true(num_coord_func, 0.0);
-    std::vector<double> count_false(num_coord_func, 0.0);
+    std::vector<double> event_count(num_event, 0.5);
+    std::vector<double> not_event_count(num_event, 0.5);
+    std::vector<std::vector<double>>
+    cond_count(num_event, std::vector<double>(num_cond, 0.0));
+    std::vector<std::vector<double>>
+    not_cond_count(num_event, std::vector<double>(num_cond, 0.0));
 
-    // 各データからカウントしていく。
+    // 各データでカウントしていく。
     LPointer result;
+    std::vector<double> event_value_vec(num_event);
+    std::vector<double> not_event_value_vec(num_event);
+    std::vector<double> cond_value_vec(num_cond);
     for (LPointer ptr = data_list_ptr; ptr->IsPair(); ptr = ptr->cdr()) {
       num_all += 1.0;
-      const LPointer& elm = ptr->car();
+      const LPointer& data = ptr->car();
 
-      // ターゲットで評価。
-      call_target.cdr()->car()->cdr()->car(elm);
-      result = caller->Evaluate(call_target);
+      // イベント関数を評価。
+      for (int i = 0; i < num_event; ++i) {
+        event_vec[i]->cdr()->car()->cdr()->car(data);
+        result = caller->Evaluate(*(event_vec[i]));
 
-      // 真の値と偽の値を振り分ける。
-      double true_value = 0.0;
-      double false_value = 0.0;
-      if (result->IsBoolean()) {
-        // 普通の述語。
-        if (result->boolean()) {
-          true_value = 1.0;
-          num_target += 1.0;
-        } else {
-          false_value = 1.0;
-          num_not_target += 1.0;
-        }
-      } else if (result->IsNumber()) {
-        // ファジー述語。
-        true_value = result->number();
-        true_value =
-        true_value < 0.0 ? 0.0 : (true_value > 1.0 ? 1.0 : true_value);
-        false_value = 1.0 - true_value;
-
-        num_target += true_value;
-        num_not_target += false_value;
-      } else {
-        // エラー。
-        throw GenTypeError(*result, "Boolean or Number");
-      }
-
-      // 各条件述語関数で調べてカウントしていく。
-      for (int i = 0; i < num_coord_func; ++i) {
-        // 評価。
-        cond_func_vec[i]->cdr()->car()->cdr()->car(elm);
-        result = caller->Evaluate(*(cond_func_vec[i]));
-
-        // 真の値と偽の値で振り分ける。
         if (result->IsBoolean()) {
-          // 普通の述語。
+          // 古典。
           if (result->boolean()) {
-            count_true[i] += true_value;
-            count_false[i] += false_value;
+            event_value_vec[i] = 1.0;
+            not_event_value_vec[i] = 0.0;
+            event_count[i] += 1.0;
+          } else {
+            event_value_vec[i] = 0.0;
+            not_event_value_vec[i] = 1.0;
+            not_event_count[i] += 1.0;
           }
         } else if (result->IsNumber()) {
-          // ファジー述語。
-          double cond_value = result->number();
-          cond_value = cond_value < 0.0 ? 0.0 :
-          (cond_value > 1.0 ? 1.0 : cond_value);
+          // ファジー。
+          double temp = result->number();
+          temp = temp < 0.0 ? 0.0 : (temp > 1.0 ? 1.0 : temp);
+          event_value_vec[i] = temp;
+          not_event_value_vec[i] = 1.0 - temp;
 
-          count_true[i] += cond_value * true_value;
-          count_false[i] += cond_value * false_value;
+          event_count[i] += temp;
+          not_event_count[i] += 1.0 - temp;
         } else {
           // エラー。
           throw GenTypeError(*result, "Boolean or Number");
         }
       }
+
+      // 条件関数を評価。
+      for (int i = 0; i < num_cond; ++i) {
+        cond_vec[i]->cdr()->car()->cdr()->car(data);
+        result = caller->Evaluate(*(cond_vec[i]));
+
+        if (result->IsBoolean()) {
+          // 古典。
+          if (result->boolean()) {
+            cond_value_vec[i] = 1.0;
+          } else {
+            cond_value_vec[i] = 0.0;
+          }
+        } else if (result->IsNumber()) {
+          // ファジー。
+          double temp = result->number();
+          temp = temp < 0.0 ? 0.0 : (temp > 1.0 ? 1.0 : temp);
+          cond_value_vec[i] = temp;
+        } else {
+          // エラー。
+          throw GenTypeError(*result, "Boolean or Number");
+        }
+      }
+
+      // 真偽値を直積してカウント表に加算していく。
+      for (int i = 0; i < num_event; ++i) {
+        for (int j = 0; j < num_cond; ++j) {
+          cond_count[i][j] += event_value_vec[i] * cond_value_vec[j];
+          not_cond_count[i][j] += not_event_value_vec[i] * cond_value_vec[j];
+        }
+      }
     }
 
-    // 全体、ターゲットの数を2進対数にする。
-    double log_all = std::log2(num_all);
-    double log_target = std::log2(num_target);
-    double log_not_target = std::log2(num_not_target);
+    // 対数化してロジットを計算する。
+    LPointerVec ret_vec(num_event);
+    double all_lb = std::log2(num_all);
     double delta = 1.0 / (num_all + 1.0);
+    for (int i = 0; i < num_event; ++i) {
+      // イベントの数を対数化。
+      double event_lb = std::log2(event_count[i]);
+      double not_event_lb = std::log2(not_event_count[i]);
 
-    // trueの確率の対数の和を得る。
-    double log_true = log_target - log_all;
-    for (auto num : count_true) {
-      log_true += std::log2(num + delta) - log_target;
+      // trueの対数。
+      double true_lb = event_lb - all_lb;
+      for (int j = 0; j < num_cond; ++j) {
+        true_lb += std::log2(cond_count[i][j] + delta) - event_lb;
+      }
+
+      // falseの対数。
+      double false_lb = not_event_lb - all_lb;
+      for (int j = 0; j < num_cond; ++j) {
+        false_lb += std::log2(not_cond_count[i][j] + delta) - not_event_lb;
+      }
+
+      // ロジットを記録。
+      ret_vec[i] = NewNumber(true_lb - false_lb);
     }
 
-    // falseの確率の対数の和を得る。
-    double log_false = log_not_target - log_all;
-    for (auto num : count_false) {
-      log_false += std::log2(num + delta) - log_not_target;
-    }
-
-    // ロジットを返す。
-    return NewNumber(log_true - log_false);
+    return LPointerVecToList(ret_vec);
   }
 
   // %%% logit->prob
