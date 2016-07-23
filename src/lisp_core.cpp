@@ -4284,6 +4284,127 @@ R"...(### prob->logit ###
     ;; > 0)...";
     help_dict_.emplace("prob->logit", help);
 
+    func = LC_FUNCTION_OBJ(GenPA2);
+    INSERT_LC_FUNCTION(func, "gen-pa2", "Lisp:gen-pa2");
+    help =
+R"...(### gen-pa2 ###
+
+<h6> Usage </h6>
+
+* `(gen-pa2 <Initial weights : List>)`
+* `(<PA-2> <Message symbol : Symbol> [<Arguments>...])`
+
+<h6> Description </h6>
+
+* Generates and returns `<PA-2>` object.
+* "PA-2" is algorithm of online machine learning.
+    + It can train weights of linear function.
+    + "Online" means that it trains from data one by one.
+* It accepts message symbol.
+    + `@train <plus? : Boolean> <Cost : Number> <Input : List>`
+        - Trains weights and returns weights after training.
+        - `<Plus?>` is that
+          if output of linear function should be 0 or positive number,
+          then #t, otherwise #f.
+        - `<Cost>` is penalty of error.
+          It must be greater than 0. (not just 0)
+        - `<Input>` is input vector of linear function.
+    + `@calc <Input : List>`
+        - Calculates linear function.
+        - `<Input>` is input vector of linear function.
+    + `@get-weights`
+        - Returns the current weights.
+
+<h6> Example </h6>
+
+    ;; Leaning whether seasoning is sweet or not.
+    ;; Data List (<Sweet?> <Sugar> <Salt>)
+    (define data-list
+            '((#t 50 20)
+              (#f 10 60)
+              (#t 120 40)
+              (#f 20 80)
+              (#t 30 10)
+              (#f 50 100)))
+    
+    ;; Statistics values.
+    (define num-data 0.1)
+    (define total-1 0)
+    (define total-2 0)
+    (define sq-total-1 0)
+    (define sq-total-2 0)
+    
+    ;; Generate PA-2.
+    (define weights '(0 0))
+    (define cost 0.5)
+    (define pa2 (gen-pa2 weights))
+    
+    ;; Start Online Training.
+    ;; Update means, standard deviations and weights per one cycle.
+    (define sugar 0)
+    (define salt 0)
+    (define mean-1 0)
+    (define mean-2 0)
+    (define sdev-1 0)
+    (define sdev-2 0)
+    (define normalized-1 0)
+    (define normalized-2 0)
+    (for (data data-list)
+         (inc! num-data)
+    
+         (set! sugar (ref data 1))
+         (set! salt (ref data 2))
+    
+         ;; Update means.
+         (add! total-1 sugar)
+         (add! total-2 salt)
+         (set! mean-1 (/ total-1 num-data))
+         (set! mean-2 (/ total-2 num-data))
+    
+         ;; Update standard deviations.
+         (add! sq-total-1 (expt (- sugar mean-1) 2))
+         (add! sq-total-2 (expt (- salt mean-2) 2))
+         (set! sdev-1 (sqrt (/ sq-total-1 num-data)))
+         (set! sdev-2 (sqrt (/ sq-total-2 num-data)))
+    
+         ;; Normalize sugar and salt.
+         (set! normalized-1 (/ (- sugar mean-1) sdev-1))
+         (set! normalized-2 (/ (- salt mean-2) sdev-2))
+    
+         ;; Train weights.
+         (display (pa2 '@train
+                       (car data) cost
+                       (list normalized-1 normalized-2))))
+    ;; Output
+    ;; > (0.327752765053172 0.327752765053172)
+    ;; > (0.608882281818588 0.0393170710326415)
+    ;; > (0.608882281818588 0.0393170710326415)
+    ;; > (0.714030213008641 -0.172427992527486)
+    ;; > (0.55686689768203 -0.649661489515829)
+    ;; > (0.55686689768203 -0.649661489515829)
+    
+    ;; Test Weights.
+    (define (sweet? val) (if (>= val 0) "Yes!" "No..."))
+    (define test-1 '(20 5))
+    (define test-2 '(80 300))
+    
+    ;; Calculate test-1.
+    (set! normalized-1 (/ (- (ref test-1 0) mean-1) sdev-1))
+    (set! normalized-2 (/ (- (ref test-1 1) mean-2) sdev-2))
+    (display test-1 " is sweet? => "
+             (sweet? (pa2 '@calc (list normalized-1 normalized-2))))
+    ;; Output
+    ;; > (20 5) is sweet? => Yes!
+    
+    ;; Calculate test-2.
+    (set! normalized-1 (/ (- (ref test-2 0) mean-1) sdev-1))
+    (set! normalized-2 (/ (- (ref test-2 1) mean-2) sdev-2))
+    (display test-2 " is sweet? => "
+             (sweet? (pa2 '@calc (list normalized-1 normalized-2))))
+    ;; Output
+    ;; > (80 300) is sweet? => No...)...";
+    help_dict_.emplace("gen-pa2", help);
+
     func = LC_FUNCTION_OBJ(Now);
     INSERT_LC_FUNCTION(func, "now", "Lisp:now");
     help =
@@ -6414,6 +6535,34 @@ R"...(### clock ###
     return NewNumber(std::log2(value / (1.0 - value)));
   }
 
+  // %%% gen-pa2
+  DEF_LC_FUNCTION(Lisp::GenPA2) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    // 初期ウェイトを得る。
+    LPointer weights_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*weights_ptr);
+    LMath::Vec weight_vec = LMath::ListToMathVec(*weights_ptr);
+
+    // 1つ以上あるかどうかを調べる
+    if (weight_vec.size() <= 0) {
+      throw GenError("@function-error",
+      "PA-2 needs at least 1 element of List of weights.");
+    }
+
+    std::shared_ptr<LPA2> obj_ptr(new LPA2(weight_vec));
+    LC_Function func = [obj_ptr](LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      return (*obj_ptr)(self, caller, args);
+    };
+
+    return NewN_Function(func,
+    "Lisp:gen-pa2:" + std::to_string(reinterpret_cast<size_t>(obj_ptr.get())),
+    caller->scope_chain());
+  }
+
   // %%% now
   DEF_LC_FUNCTION(Lisp::Now) {
     std::time_t time;
@@ -6435,5 +6584,111 @@ R"...(### clock ###
     ptr->car(NewNumber(time_st->tm_sec));
 
     return ret_ptr;
+  }
+
+  // ==== //
+  // LPA2 //
+  // ==== //
+  // 学習関数。
+  void LPA2::TrainWeights(bool is_plus, double cost,
+  const LMath::Vec& input) {
+    using namespace LMath;
+
+    unsigned int size = weight_vec_.size();
+    unsigned int size_2 = input.size();
+    size = size_2 < size ? size_2 : size;
+
+    cost = cost < 0.0 ? 0.5 : cost;
+
+    double sign = is_plus ? 1.0 : -1.0;
+    double core_and_sign = Core(sign, input) * sign;
+    double denominator = (input * input) + (1.0 / (2.0 * cost));
+
+    for (unsigned int i = 0; i < size; ++i) {
+      weight_vec_[i] += (core_and_sign * input[i]) / denominator;
+    }
+  }
+  // 関数オブジェクト。
+  DEF_LC_FUNCTION(LPA2::operator()) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Lisp::GetReadyForFunction(args, 1, &args_ptr);
+
+    // 第1引数はメッセージ。
+    LPointer message_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*message_ptr, LType::SYMBOL);
+    const std::string& message = message_ptr->symbol();
+
+    if (message == "@train") return Train(self, caller, args);
+    if (message == "@calc") return Calc(self, caller, args);
+    if (message == "@get-weights") return GetWeights(self, caller, args);
+
+    throw Lisp::GenError("@function-error",
+    "Couldn't understand '" + message + "'.");
+  }
+
+  // %%% @train
+  DEF_LC_FUNCTION(LPA2::Train) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Lisp::GetReadyForFunction(args, 4, &args_ptr);
+    Lisp::Next(&args_ptr);
+
+    // 第1引数はプラスかどうか。
+    LPointer is_plus_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*is_plus_ptr, LType::BOOLEAN);
+    Lisp::Next(&args_ptr);
+
+    // 第2引数は許容するエラー。
+    LPointer error_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*error_ptr, LType::NUMBER);
+    Lisp::Next(&args_ptr);
+    double error = error_ptr->number();
+    error = error < 0.0 ? 0.0 : error;
+
+    // 第3引数は入力ベクトル。
+    LPointer input_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckList(*input_ptr);
+
+    // 入力ベクトルの数をチェック。
+    unsigned int num_input = Lisp::CountList(*input_ptr);
+    if (num_input != weight_vec_.size()) {
+      throw Lisp::GenError("@function-error",
+      "Not equal number of elements of weights and inputs.");
+    }
+
+    // 学習する。
+    TrainWeights(is_plus_ptr->boolean(), error,
+    LMath::ListToMathVec(*input_ptr));
+
+    // 学習結果のベクトルを返す。
+    return LMath::MathVecToList(weight_vec_);
+  }
+
+  // %%% @calc
+  DEF_LC_FUNCTION(LPA2::Calc) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Lisp::GetReadyForFunction(args, 2, &args_ptr);
+    Lisp::Next(&args_ptr);
+
+    // 第1引数は入力ベクトル。
+    LPointer input_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckList(*input_ptr);
+
+    // 入力ベクトルの数をチェック。
+    unsigned int num_input = Lisp::CountList(*input_ptr);
+    if (num_input != weight_vec_.size()) {
+      throw Lisp::GenError("@function-error",
+      "Not equal number of elements of weights and inputs.");
+    }
+
+    return Lisp::NewNumber(LMath::operator*(weight_vec_,
+    LMath::ListToMathVec(*input_ptr)));
+  }
+
+  // %%% @get-weights
+  DEF_LC_FUNCTION(LPA2::GetWeights) {
+    return LMath::MathVecToList(weight_vec_);
   }
 }  // namespace Sayuri

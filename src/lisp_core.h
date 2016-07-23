@@ -34,6 +34,7 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <tuple>
 #include <utility>
 #include <memory>
 #include <map>
@@ -3483,6 +3484,9 @@ namespace Sayuri {
       /** ネイティブ関数 - prob->logit */
       DEF_LC_FUNCTION(ProbToLogit);
 
+      /** ネイティブ関数 - gen-pa2 */
+      DEF_LC_FUNCTION(GenPA2);
+
       /** ネイティブ関数 - now */
       DEF_LC_FUNCTION(Now);
 
@@ -3513,6 +3517,267 @@ namespace Sayuri {
       // メンバ変数 //
       // ========== //
       LParser parser_;
+  };
+
+  namespace LMath {
+    /** ベクトル。*/
+    using Vec = std::vector<double>;
+    /** 行列。 (横ベクトルのベクトル。) */
+    using Mat = std::vector<std::vector<double>>;
+
+    /**
+     * リストをベクトルにする。
+     * @param list リスト。
+     * @return ベクトル。
+     */
+    inline Vec ListToMathVec(const LObject& list) {
+      unsigned int size = Lisp::CountList(list);
+
+      LMath::Vec ret(size);
+      LMath::Vec::iterator itr = ret.begin();
+
+      for (const LObject* ptr = &list; ptr->IsPair();
+      ptr = ptr->cdr().get(), ++itr) {
+        const LPointer& car = ptr->car();
+        Lisp::CheckType(*car, LType::NUMBER);
+        *itr = car->number();
+      }
+
+      return ret;
+    }
+
+    /**
+     * ベクトルをリストにする。
+     * @param vec ベクトル。
+     * @return リストのポインタ。
+     */
+    inline LPointer MathVecToList(const Vec& vec) {
+      unsigned int size = vec.size();
+      LPointerVec ret_vec(size);
+      for (unsigned int i = 0; i < size; ++i) {
+        ret_vec[i] = Lisp::NewNumber(vec[i]);
+      }
+      return Lisp::LPointerVecToList(ret_vec);
+    }
+
+    /**
+     * 行列を作る。
+     * @param num_rows 行数。
+     * @param num_cols 列数。
+     * @return 行列。
+     */
+    inline Mat GenMatrix(unsigned int num_rows, unsigned int num_cols) {
+      return Mat(num_rows, Vec(num_cols, 0.0));
+    }
+
+    /**
+     * 内積。
+     * @param vec_1 ベクトル1
+     * @param vec_2 ベクトル2
+     * @return 内積。
+     */
+    inline double operator*(const Vec& vec_1, const Vec& vec_2) {
+      unsigned int size = vec_1.size();
+      unsigned int size_2 = vec_2.size();
+      size = size_2 < size ? size_2 : size;
+
+      double ret = 0.0;
+      for (unsigned int i = 0; i < size; ++i) ret += vec_1[i] * vec_2[i];
+
+      return ret;
+    }
+
+    /**
+     * スカラー倍。
+     * @param d スカラー値。
+     * @param vec ベクトル
+     * @return スカラー倍。
+     */
+    inline Vec operator*(double d, const Vec& vec) {
+      unsigned int size = vec.size();
+      Vec ret(size);
+
+      for (unsigned int i = 0; i < size; ++i) ret[i] = vec[i] * d;
+
+      return ret;
+    }
+
+    /**
+     * 行列のスカラー倍。
+     * @param d スカラー値。
+     * @param mat 行列。
+     * @return スカラー倍。
+     */
+    inline Mat operator*(double d, const Mat& mat) {
+      unsigned int size = mat.size();
+      Mat ret(size);
+
+      for (unsigned int i = 0; i < size; ++i) {
+        ret[i] = d * mat[i];
+      }
+
+      return ret;
+    }
+
+    /**
+     * 線形変換。
+     * @param mat 変換用行列。
+     * @param vec 変換する行列。
+     * @return 変換後のベクトル。
+     */
+    inline Vec operator*(const Mat& mat, const Vec& vec) {
+      unsigned int size = mat.size();
+      Vec ret(size);
+
+      for (unsigned int i = 0; i < size; ++i) ret[i] = mat[i] * vec;
+
+      return ret;
+    }
+
+    /**
+     * 直積。
+     * @param vec_1 ベクトル1
+     * @param vec_2 ベクトル2
+     * @return 直積。
+     */
+    inline Mat Direct(const Vec& vec_1, const Vec& vec_2) {
+      unsigned int size_1 = vec_1.size();
+      unsigned int size_2 = vec_2.size();
+
+      Mat ret(size_1, Vec(size_2));
+
+      for (unsigned int i = 0; i < size_1; ++i) {
+        for (unsigned int j = 0; j < size_2; ++j) {
+          ret[i][j] = vec_1[i] * vec_2[j];
+        }
+      }
+
+      return ret;
+    }
+
+    /**
+     * べき乗法でもっとも大きい固有値、固有ベクトルを計算する。
+     * @param mat 固有値を調べたい行列。
+     * @return (固有値, 固有ベクトル)のタプル。
+     */
+    inline std::tuple<double, Vec> Eigen(const Mat& mat) {
+      unsigned int size = mat.size();
+      Vec vec(size, 0.0);
+      vec[0] = 1.0;
+      double lambda_old = 0.0, lambda = 0.0;
+      Vec result(size, 0.0);
+
+      unsigned int count = 0;
+      do {
+        lambda_old = lambda;
+        result = mat * vec;
+        lambda = result * vec;
+        vec = (1 / std::sqrt(result * result)) * result;
+        ++count;
+      } while ((std::fabs(lambda - lambda_old) > 0.0) && (count < 100));
+
+      return make_tuple(lambda, vec);
+    }
+  }  // namespace LMath
+
+  /** Passive-Aggressive-2 */
+  class LPA2 {
+    public:
+      // ==================== //
+      // コンストラクタと代入 //
+      // ==================== //
+      /**
+       * コンストラクタ。
+       * @param weight_vec 初期ウェイト。
+       */
+      LPA2(const LMath::Vec& weight_vec) : weight_vec_(weight_vec) {}
+      /** コンストラクタ。 */
+      LPA2() {}
+      /**
+       * コピーコンストラクタ。
+       * @param pa コピー元。
+       */
+      LPA2(const LPA2& pa) : weight_vec_(pa.weight_vec_) {}
+      /**
+       * ムーブコンストラクタ。
+       * @param pa ムーブ元。
+       */
+      LPA2(LPA2&& pa) : weight_vec_(std::move(pa.weight_vec_)) {}
+      /**
+       * コピー代入演算子。
+       * @param pa コピー元。
+       */
+      LPA2& operator=(const LPA2& pa) {
+        weight_vec_ = pa.weight_vec_;
+        return *this;
+      }
+      /**
+       * ムーブ代入演算子。
+       * @param pa ムーブ元。
+       */
+      LPA2& operator=(LPA2&& pa) {
+        weight_vec_ = std::move(pa.weight_vec_);
+        return *this;
+      }
+      /** デストラクタ。 */
+      virtual ~LPA2() {}
+
+      // ============== //
+      // パブリック関数 //
+      // ============== //
+      /**
+       * ウェイトを学習する。
+       * @param is_plus 出力が0以上ならtrue。
+       * @param cost エラーに対するコスト。
+       * @param 入力ベクトル。
+       */
+      void TrainWeights(bool is_plus, double cost, const LMath::Vec& input);
+
+      /**
+       * 関数を計算する。
+       * @param input 入力ベクトル。
+       * @return 出力。
+       */
+      double CalcFunc(const LMath::Vec& input) {
+        return LMath::operator*(weight_vec_, input);
+      }
+
+      /**
+       * アクセサ - ウェイトのベクトル。
+       * @return ウェイトのベクトル。
+       */
+      const LMath::Vec& weight_vec() const {return weight_vec_;}
+
+      // --- Lisp用関数 --- //
+      /** 関数オブジェクト。 */
+      DEF_LC_FUNCTION(operator());
+
+      /** メッセージ関数 - @train */
+      DEF_LC_FUNCTION(Train);
+      /** メッセージ関数 - @calc */
+      DEF_LC_FUNCTION(Calc);
+      /** メッセージ関数 - @get-weights */
+      DEF_LC_FUNCTION(GetWeights);
+
+    private:
+      /**
+       * 機械学習のコアの因子を計算する。
+       * @param sign 正の数なら1、違うなら-1。
+       * @param input 入力ベクトル。
+       * @return 因子。
+       */
+      double Core(double sign, const LMath::Vec& input) {
+        using namespace LMath;
+
+        double l = 1.0 - ((input * weight_vec_) * sign);
+        return l < 0.0 ? 0.0 : l;
+      }
+
+      // ========== //
+      // メンバ変数 //
+      // ========== //
+      /** ウェイト。 */
+      LMath::Vec weight_vec_;
   };
 }  // namespace Sayuri
 
