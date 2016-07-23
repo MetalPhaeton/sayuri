@@ -2551,6 +2551,9 @@ namespace Sayuri {
       /** ネイティブ関数 - list-path-replace */
       DEF_LC_FUNCTION(ListPathReplace);
 
+      /** ネイティブ関数 - list-sort */
+      DEF_LC_FUNCTION(ListSort);
+
       /** ネイティブ関数 - zip */
       DEF_LC_FUNCTION(Zip);
 

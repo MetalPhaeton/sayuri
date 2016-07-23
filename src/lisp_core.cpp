@@ -2566,6 +2566,35 @@ R"...(### list-path-replace ###
     ;; > (111 (222 "Hello" 444) 555 666))...";
     help_dict_.emplace("list-path-replace", help);
 
+    func = LC_FUNCTION_OBJ(ListSort);
+    INSERT_LC_FUNCTION(func, "list-sort", "Lisp:list-sort");
+    help =
+R"...(### list-sort ###
+
+<h6> Usage </h6>
+
+* `(list-sort <List> <Predicate : Function>)`
+
+<h6> Description </h6>
+
+* Sorts `<List>` for `<Predicate>` to be true and returns it.
+* `<Predicate>` defines the order.
+    + It accepts 2 arguments and returns Boolean.
+        - The 1st argument is previous element. The 2nd is next element.
+        - It must judge whether the order is right or not and returns it.
+
+<h6> Example </h6>
+(define li '(9 3 5 8 1 4 7 6 0 2))
+
+(display (list-sort li (lambda (prev next) (< prev next))))
+;; Output
+;; > (0 1 2 3 4 5 6 7 8 9)
+
+(display (list-sort li (lambda (prev next) (> prev next))))
+;; Output
+;; > (9 8 7 6 5 4 3 2 1 0))...";
+    help_dict_.emplace("list-sort", help);
+
     func = LC_FUNCTION_OBJ(Zip);
     INSERT_LC_FUNCTION(func, "zip", "Lisp:zip");
     help =
@@ -5941,6 +5970,56 @@ R"...(### clock ###
       t_ptr->car(obj_ptr);
     } else {
       t_ptr->cdr(obj_ptr);
+    }
+
+    return target_ptr;
+  }
+
+  // %%% list-sort
+  DEF_LC_FUNCTION(Lisp::ListSort) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 2, &args_ptr);
+
+    // 第1引数。 ターゲットのリスト。
+    LPointer target_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*target_ptr);
+    Next(&args_ptr);
+
+    // Nilならそのまま返す。
+    if (target_ptr->IsNil()) return target_ptr;
+
+    // 要素が1つでも返す。
+    if (!(target_ptr->cdr()->IsPair())) return target_ptr;
+
+    // 第2引数は述語。
+    LPointer predicate = caller->Evaluate(*(args_ptr->car()));
+
+    // 述語を呼べる形にする。
+    LPair callable(predicate, NewPair(WrapQuote(NewNil()),
+    NewPair(WrapQuote(NewNil()), NewNil())));
+    LObject* prev_arg = callable.cdr()->car()->cdr().get();
+    LObject* next_arg = callable.cdr()->cdr()->car()->cdr().get();
+
+    // バブルソートする。
+    int size = CountList(*target_ptr) - 1;
+    LPointer result;
+    for (int i = 0; i < size; ++i) {
+      LObject* ptr = target_ptr.get();
+      for (int j = 0; j < (size - i); ++j, Next(&ptr)) {
+        prev_arg->car(ptr->car());
+        next_arg->car(ptr->cdr()->car());
+
+        result = caller->Evaluate(callable);
+        CheckType(*result, LType::BOOLEAN);
+
+        // スワップ。
+        if (!(result->boolean())) {
+          LPointer temp = ptr->car();
+          ptr->car(ptr->cdr()->car());
+          ptr->cdr()->car(temp);
+        }
+      }
     }
 
     return target_ptr;
