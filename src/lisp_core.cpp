@@ -1754,7 +1754,7 @@ R"...(### export ###
 
 <h6> Description </h6>
 
-* Converts each `<Object>...` into String and writes it to `<File name>`.
+* Converts each `<Object>...` into String and appends it to `<File name>`.
 * Returns String written to `<File name>`.
 
 <h6> Example </h6>
@@ -5269,8 +5269,9 @@ R"...(### clock ###
     LPointer filename_ptr = caller->Evaluate(*(args_ptr->car()));
     CheckType(*filename_ptr, LType::STRING);
 
-    // ファイルを開く。
-    std::ofstream ofs(filename_ptr->string());
+    // ファイルを追加モードで開く。
+    std::ofstream ofs(filename_ptr->string(),
+    std::ios_base::out | std::ios_base::app);
     if (!ofs) {
       throw GenError("@function-error",
       "Couldn't open '" + filename_ptr->string() + "'.");
