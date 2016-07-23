@@ -3835,12 +3835,12 @@ namespace Sayuri {
 
     private:
       /**
-       * 機械学習のコアの因子を計算する。
+       * ヒンジ損失を計算する。
        * @param sign 正の数なら1、違うなら-1。
        * @param input 入力ベクトル。
-       * @return 因子。
+       * @return ヒンジ損失。
        */
-      double Core(double sign, const LMath::Vec& input) {
+      double Hinge(double sign, const LMath::Vec& input) {
         using namespace LMath;
 
         double l = 1.0 - ((input * weight_vec_) * sign);

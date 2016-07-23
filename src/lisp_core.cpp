@@ -6752,11 +6752,11 @@ R"...(### clock ###
     cost = cost < 0.0 ? 0.5 : cost;
 
     double sign = is_plus ? 1.0 : -1.0;
-    double core_and_sign = Core(sign, input) * sign;
+    double hinge_and_sign = Hinge(sign, input) * sign;
     double denominator = (input * input) + (1.0 / (2.0 * cost));
 
     for (unsigned int i = 0; i < size; ++i) {
-      weight_vec_[i] += (core_and_sign * input[i]) / denominator;
+      weight_vec_[i] += (hinge_and_sign * input[i]) / denominator;
     }
   }
   // 関数オブジェクト。
