@@ -3490,6 +3490,9 @@ namespace Sayuri {
       /** ネイティブ関数 - gen-pa2 */
       DEF_LC_FUNCTION(GenPA2);
 
+      /** ネイティブ関数 - rbf-kernel */
+      DEF_LC_FUNCTION(RBFKernel);
+
       /** ネイティブ関数 - now */
       DEF_LC_FUNCTION(Now);
 
@@ -3571,6 +3574,74 @@ namespace Sayuri {
      */
     inline Mat GenMatrix(unsigned int num_rows, unsigned int num_cols) {
       return Mat(num_rows, Vec(num_cols, 0.0));
+    }
+
+    /**
+     * ベクトルの足し算。
+     * @param vec_1 ベクトル1
+     * @param vec_2 ベクトル2
+     * @return 結果。
+     */
+    inline Vec operator+(const Vec& vec_1, const Vec& vec_2) {
+      unsigned int size = vec_1.size();
+      unsigned int size_2 = vec_2.size();
+      size = size_2 < size ? size_2 : size;
+
+      Vec ret(size);
+      for (unsigned int i = 0; i < size; ++i) ret[i] = vec_1[i] + vec_2[i];
+
+      return ret;
+    }
+
+    /**
+     * ベクトルの引き算。
+     * @param vec_1 ベクトル1
+     * @param vec_2 ベクトル2
+     * @return 結果。
+     */
+    inline Vec operator-(const Vec& vec_1, const Vec& vec_2) {
+      unsigned int size = vec_1.size();
+      unsigned int size_2 = vec_2.size();
+      size = size_2 < size ? size_2 : size;
+
+      Vec ret(size);
+      for (unsigned int i = 0; i < size; ++i) ret[i] = vec_1[i] - vec_2[i];
+
+      return ret;
+    }
+
+    /**
+     * 行列の足し算。
+     * @param mat_1 行列1
+     * @param mat_2 行列2
+     * @return 結果。
+     */
+    inline Mat operator+(const Mat& mat_1, const Mat& mat_2) {
+      unsigned int size = mat_1.size();
+      unsigned int size_2 = mat_2.size();
+      size = size_2 < size ? size_2 : size;
+
+      Mat ret(size);
+      for (unsigned int i = 0; i < size; ++i) ret[i] = mat_1[i] + mat_2[i];
+
+      return ret;
+    }
+
+    /**
+     * 行列の引き算。
+     * @param mat_1 行列1
+     * @param mat_2 行列2
+     * @return 結果。
+     */
+    inline Mat operator-(const Mat& mat_1, const Mat& mat_2) {
+      unsigned int size = mat_1.size();
+      unsigned int size_2 = mat_2.size();
+      size = size_2 < size ? size_2 : size;
+
+      Mat ret(size);
+      for (unsigned int i = 0; i < size; ++i) ret[i] = mat_1[i] - mat_2[i];
+
+      return ret;
     }
 
     /**

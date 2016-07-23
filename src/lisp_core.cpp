@@ -4434,6 +4434,36 @@ R"...(### gen-pa2 ###
     ;; > (80 300) is sweet? => No...)...";
     help_dict_.emplace("gen-pa2", help);
 
+    func = LC_FUNCTION_OBJ(RBFKernel);
+    INSERT_LC_FUNCTION(func, "rbf-kernel", "Lisp:rbf-kernel");
+    help =
+R"...(### rbf-kernel ###
+
+<h6> Usage </h6>
+
+* `(rbf-kernel <Vector 1 : List> <Vector 2 : List> <Sigma : Number>)`
+
+<h6> Description </h6>
+
+* Calculates Radial Bases Function Kernel.
+* `<Vector 1>` and `<Vector 1>` is List of Numbers.
+* `<Sigma>` is parameter of this Kernel.
+
+<h6> Example </h6>
+
+    (define vec-1 '(10 20 30))
+    (define vec-2 '(10 20 30))
+    (define vec-3 '(20 30 40))
+    
+    (display (rbf-kernel vec-1 vec-2 10))
+    (display (rbf-kernel vec-1 vec-3 10))
+    (display (rbf-kernel vec-1 vec-3 20))
+    ;; Output
+    ;; > 1
+    ;; > 0.22313016014843
+    ;; > 0.687289278790972)...";
+    help_dict_.emplace("rbf-kernel", help);
+
     func = LC_FUNCTION_OBJ(Now);
     INSERT_LC_FUNCTION(func, "now", "Lisp:now");
     help =
@@ -6641,6 +6671,47 @@ R"...(### clock ###
     return NewN_Function(func,
     "Lisp:gen-pa2:" + std::to_string(reinterpret_cast<size_t>(obj_ptr.get())),
     caller->scope_chain());
+  }
+
+  // %%% rbf-kernel
+  DEF_LC_FUNCTION(Lisp::RBFKernel) {
+    using namespace LMath;
+
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 3, &args_ptr);
+
+    // 第1引数は1つ目のベクトル。
+    LPointer vec_1_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*vec_1_ptr);
+    Vec vec_1 = ListToMathVec(*vec_1_ptr);
+    unsigned int vec_1_size = vec_1.size();
+    if (vec_1_size <= 0) {
+      throw GenError("@function-error",
+      "(gaussian-kernel) needs at least 1 element of vector.");
+    }
+    Next(&args_ptr);
+
+    // 第2引数は2つ目のベクトル。
+    LPointer vec_2_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*vec_2_ptr);
+    Vec vec_2 = ListToMathVec(*vec_2_ptr);
+    unsigned int vec_2_size = vec_2.size();
+    if (vec_2_size != vec_1_size) {
+      throw GenError("@function-error",
+      "The 1st vector and the 2nd vector is not same size.");
+    }
+    Next(&args_ptr);
+
+    // 第3引数はシグマ。
+    LPointer sigma_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*sigma_ptr, LType::NUMBER);
+    double sigma = sigma_ptr->number();
+
+    // 計算して返す。
+    Vec diff = vec_1 - vec_2;
+    double sq_norm = diff * diff;
+    return NewNumber(std::exp(-1.0 * (sq_norm / (2.0 * sigma * sigma))));
   }
 
   // %%% now
