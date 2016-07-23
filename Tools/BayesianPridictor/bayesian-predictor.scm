@@ -146,22 +146,9 @@
                        (ref square-str (car (cdr move)))
                        (ref piece-str (car (cdr (cdr move))))))
 
-;; Bubble sort.
-(define (bubble-sort result-list)
-        (define temp ())
-        (define len (-- (length result-list)))
-        (for (i (range len))
-             (for (j (start-size-inc 0 (- len i) 1))
-                  (if (< (ref (ref result-list j) 1)
-                         (ref (ref result-list (++ j)) 1))
-                      (begin (set! temp (ref result-list j))
-                             (set! result-list
-                                   (list-replace result-list j
-                                                 (ref result-list (++ j))))
-                             (set! result-list
-                                   (list-replace result-list (++ j) temp)))
-                      ())))
-        result-list)
+;; Predicate for bubble sort.
+(define (sort-order prev next)
+        (> (car (cdr prev)) (car (cdr next))))
 
 ;; Main.
 (stderr "Loading...")
@@ -190,7 +177,8 @@
                        (bayes (ref data-list data-index)
                               predicates
                               conditions))
-                 (for (result (bubble-sort (zip candidates logit-list)))
+                 (for (result (list-sort (zip candidates logit-list)
+                                         sort-order))
                       (display (move->pcn (car result))
                                " "
                                (car (cdr result)))
