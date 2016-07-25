@@ -5078,6 +5078,9 @@ R"...(### clock ###
       // エラー発生。
       // 自分のローカルスコープにエラーをバインドして
       // 第2引数以降を実行していく。
+      LScopeChain chain = caller->scope_chain();
+      chain.AppendNewScope();
+      self->scope_chain(chain);
       self->scope_chain().InsertSymbol("exception", error);
       for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
         ret_ptr = self->Evaluate(*(args_ptr->car()));
