@@ -4441,13 +4441,13 @@ R"...(### rbf-kernel ###
 
 <h6> Usage </h6>
 
-* `(rbf-kernel <Vector 1 : List> <Vector 2 : List> <Sigma : Number>)`
+* `(rbf-kernel <Vector 1 : List> <Vector 2 : List> <Bandwidth : Number>)`
 
 <h6> Description </h6>
 
 * Calculates Radial Bases Function Kernel.
 * `<Vector 1>` and `<Vector 1>` is List of Numbers.
-* `<Sigma>` is parameter of this Kernel.
+* `<Bandwidth>` is bandwidth of this Kernel.
 
 <h6> Example </h6>
 
@@ -6706,15 +6706,15 @@ R"...(### clock ###
     }
     Next(&args_ptr);
 
-    // 第3引数はシグマ。
-    LPointer sigma_ptr = caller->Evaluate(*(args_ptr->car()));
-    CheckType(*sigma_ptr, LType::NUMBER);
-    double sigma = sigma_ptr->number();
+    // 第3引数はバンド幅。
+    LPointer band_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*band_ptr, LType::NUMBER);
+    double band = band_ptr->number();
 
     // 計算して返す。
     Vec diff = vec_1 - vec_2;
     double sq_norm = diff * diff;
-    return NewNumber(std::exp(-1.0 * (sq_norm / (2.0 * sigma * sigma))));
+    return NewNumber(std::exp(-1.0 * (sq_norm / (2.0 * band * band))));
   }
 
   // %%% now
