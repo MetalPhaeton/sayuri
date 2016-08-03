@@ -2080,7 +2080,7 @@ R"...(### gen-thread ###
 * Returns Thread object.
 * It is controlled by Message Symbol.
     + `@start` : Starts `<Function>` on another thread.
-    + `@join` : Waits for `<Function>` to be terminated.
+    + `@join` : Waits until `<Function>` to be terminated.
     + `@terminated?` : If `<Function>` has already been terminated, returns #t.
 
 <h6> Example </h6>
