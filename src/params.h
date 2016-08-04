@@ -745,9 +745,9 @@ namespace Sayuri {
       /** オープニング開始時。 */
       static constexpr int OPENING_START = 32;
       /** オープニング終了時。 */
-      static constexpr int OPENING_END = 14;
+      static constexpr int OPENING_END = 22;
       /** エンディング開始時。 */
-      static constexpr int ENDING_START = 26;
+      static constexpr int ENDING_START = 14;
       /** エンディング終了時。 */
       static constexpr int ENDING_END = 2;
 
@@ -904,8 +904,10 @@ namespace Sayuri {
        * オープニングとエンディングの値からウェイトを作成する。
        */
       static Weight CreateWeight(double opening_weight, double ending_weight) {
-        return {{OPENING_START, opening_weight},
-        {OPENING_END, ending_weight}, {ENDING_END, ending_weight}};
+        return {
+          {OPENING_START, opening_weight}, {OPENING_END, opening_weight},
+          {ENDING_START, ending_weight}, {ENDING_END, ending_weight}
+        };
       }
 
     protected:
