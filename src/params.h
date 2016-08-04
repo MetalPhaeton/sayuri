@@ -745,7 +745,7 @@ namespace Sayuri {
       /** オープニング開始時。 */
       static constexpr int OPENING_START = 32;
       /** オープニング終了時。 */
-      static constexpr int OPENING_END = 22;
+      static constexpr int OPENING_END = 24;
       /** エンディング開始時。 */
       static constexpr int ENDING_START = 14;
       /** エンディング終了時。 */
