@@ -32,6 +32,7 @@
 <li><a href="#func-to-lambda"><code>func-&gt;lambda</code></a> : Converts Function to List.</li>
 <li><a href="#let"><code>let</code></a> : Makes local scope and execute expressions.</li>
 <li><a href="#begin"><code>begin</code></a> : Executes expressions.</li>
+<li><a href="#gen-scope"><code>gen-scope</code></a> : Generates independent scope.</li>
 <li><a href="#parse"><code>parse</code></a> : Parses String to an expression.<ul>
 <li><code>string-&gt;number</code></li>
 <li><code>string-&gt;boolean</code></li>
@@ -522,6 +523,40 @@
 ;; Output
 ;; &gt; Hello
 ;; &gt; World
+;; &gt; World
+</code></pre>
+<h3 id="gen-scope">gen-scope</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(gen-scope)</code></li>
+<li><code>(&lt;Scope Name&gt; &lt;S-Expressions&gt;...)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Generates independent scope chain and return it.<ul>
+<li>The scope is caller's scope plus new empty scope.</li>
+</ul>
+</li>
+<li><code>(&lt;Scope Name&gt;)</code> executes <code>&lt;S-Expression&gt;...</code> in its own scope
+  and returns last.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(define my-scope-1 (gen-scope))
+(define my-scope-2 (gen-scope))
+
+(define a "Global")
+(my-scope-1 (define a "Hello"))
+(my-scope-2 (define a "World"))
+
+(display a)
+(my-scope-1 (display a))
+(my-scope-2 (display a))
+;; Output
+;; &gt; Global
+;; &gt; Hello
 ;; &gt; World
 </code></pre>
 <h3 id="parse">parse</h3>

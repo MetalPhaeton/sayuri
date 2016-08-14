@@ -2401,6 +2401,9 @@ namespace Sayuri {
         return ret_ptr;
       }
 
+      /** ネイティブ関数 - gen-scope */
+      DEF_LC_FUNCTION(GenScope);
+
       /** ネイティブ関数 - display */
       DEF_LC_FUNCTION(Display);
 

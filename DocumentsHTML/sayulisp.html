@@ -339,6 +339,26 @@ Sayulisp embeds them into its definition before executes it.</p>
 ;; &gt; Hello 5
 ;; &gt; World 10
 </code></pre>
+<h3 id="independent-scope">Independent Scope</h3>
+<p>With <a href="core_functions.html#gen-scope"><code>(gen-scope)</code></a>,
+Sayulisp can generate independent scope and execute S-Expression in it.</p>
+<h6> Example </h6>
+
+<pre><code>(define my-scope-1 (gen-scope))
+(define my-scope-2 (gen-scope))
+
+(define a "Global")
+(my-scope-1 (define a "Hello"))
+(my-scope-2 (define a "World"))
+
+(display a)
+(my-scope-1 (display a))
+(my-scope-2 (display a))
+;; Output
+;; &gt; Global
+;; &gt; Hello
+;; &gt; World
+</code></pre>
 <h3 id="walking-around-in-pair-tree">Walking around in Pair Tree</h3>
 <p>You can walk around in pair and execute function with
 <a href="core_functions.html#walk"><code>(walk)</code></a>.</p>

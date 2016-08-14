@@ -1606,6 +1606,41 @@ R"...(### begin ###
     ;; > World)...";
     help_dict_.emplace("begin", help);
 
+    func = LC_FUNCTION_OBJ(GenScope);
+    INSERT_LC_FUNCTION(func, "gen-scope", "Lisp:gen-scope");
+    help =
+R"...(### gen-scope ###
+
+<h6> Usage </h6>
+
+* `(gen-scope)`
+* `(<Scope Name> <S-Expressions>...)`
+
+<h6> Description </h6>
+
+* Generates independent scope chain and return it.
+    + The scope is caller's scope plus new empty scope.
+* `(<Scope Name>)` executes `<S-Expression>...` in its own scope
+  and returns last.
+
+<h6> Example </h6>
+
+    (define my-scope-1 (gen-scope))
+    (define my-scope-2 (gen-scope))
+    
+    (define a "Global")
+    (my-scope-1 (define a "Hello"))
+    (my-scope-2 (define a "World"))
+    
+    (display a)
+    (my-scope-1 (display a))
+    (my-scope-2 (display a))
+    ;; Output
+    ;; > Global
+    ;; > Hello
+    ;; > World)...";
+    help_dict_.emplace("gen-scope", help);
+
     func = LC_FUNCTION_OBJ(Display);
     INSERT_LC_FUNCTION(func, "display", "Lisp:display");
     INSERT_LC_FUNCTION(func, "print", "Lisp:print");
@@ -5055,6 +5090,34 @@ R"...(### clock ###
     }
 
     return NewNil();
+  }
+
+  // %%% gen-scope
+  DEF_LC_FUNCTION(Lisp::GenScope) {
+    // スコープを作成。
+    std::shared_ptr<LScopeChain>
+    my_chain_ptr(new LScopeChain(caller->scope_chain()));
+    my_chain_ptr->AppendNewScope();
+
+    // 関数オブジェクトを作成。
+    auto func =
+    [my_chain_ptr](LPointer self, LObject* caller, const LObject& args)
+    -> LPointer {
+      // スコープをセット。
+      self->scope_chain(*my_chain_ptr);
+
+      // 式を評価していく。
+      LPointer ret_ptr = NewNil();
+      for (LObject* ptr = args.cdr().get(); ptr->IsPair(); Next(&ptr)) {
+        ret_ptr = self->Evaluate(*(ptr->car()));
+      }
+
+      return ret_ptr;
+    };
+
+    return NewN_Function(func, "Lisp::gen-scope:"
+    + std::to_string(reinterpret_cast<std::size_t>(my_chain_ptr.get())),
+    caller->scope_chain());
   }
 
   // %%% try
