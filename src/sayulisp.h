@@ -646,6 +646,9 @@ namespace Sayuri {
       /** 指し手をPGNの指し手の文字列に変換する。 */
       DEF_MESSAGE_FUNCTION(MoveToNote);
 
+      /** PGNのさしての文字列をさしてに変換する。 */
+      DEF_MESSAGE_FUNCTION(NoteToMove);
+
       /** UCIコマンドを入力する。 */
       DEF_MESSAGE_FUNCTION(InputUCICommand);
 

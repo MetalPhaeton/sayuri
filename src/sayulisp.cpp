@@ -2220,6 +2220,9 @@ A move is represented by List.  The List is
 * `@move->note <Move : List>`
     + Translates Move into PGN move text according to the current position.
 
+* `@note->move <PGN move text : String>`
+    + Translates PGN move into move according to the current position.
+
 <h6> Example </h6>
 
     (define my-engine (gen-engine))
@@ -2250,11 +2253,16 @@ A move is represented by List.  The List is
     
     (display (my-engine '@move->note (list B8 C6 EMPTY)))
     ;; Output
-    ;; > Nc6)...";
+    ;; > Nc6
+    
+    (display (my-engine '@note->move "Nc6"))
+    ;; Output
+    ;; > (B8 C6 EMPTY))...";
     AddHelp("engine @play-move", help);
     AddHelp("engine @undo-move", help);
     AddHelp("engine @play-note", help);
     AddHelp("engine @move->note", help);
+    AddHelp("engine @note->move", help);
 
     help =
 R"...(### UCI Command ###
@@ -4182,6 +4190,9 @@ R"...(### to-fen-position ###
     message_func_map_["@move->note"] =
     INSERT_MESSAGE_FUNCTION(MoveToNote);
 
+    message_func_map_["@note->move"] =
+    INSERT_MESSAGE_FUNCTION(NoteToMove);
+
     message_func_map_["@input-uci-command"] =
     INSERT_MESSAGE_FUNCTION(InputUCICommand);
 
@@ -5043,6 +5054,23 @@ R"...(### to-fen-position ###
 
     return Lisp::NewString(engine_ptr_->MoveToNote
     (Sayulisp::ListToMove(*move_ptr)));
+  }
+
+  // %%% @note->move
+  DEF_MESSAGE_FUNCTION(EngineSuite::NoteToMove) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // PGNの指し手を得る。
+    LPointer note_ptr = caller->Evaluate(*(args_ptr->car()));
+    Lisp::CheckType(*note_ptr, LType::STRING);
+
+    std::vector<Move> move_vec = engine_ptr_->GuessNote(note_ptr->string());
+    if (move_vec.size() > 0) {
+      return Sayulisp::MoveToList(move_vec[0]);
+    }
+    return Lisp::NewNil();
   }
 
   // %%% @input-uci-command

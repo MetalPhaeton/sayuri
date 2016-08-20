@@ -514,6 +514,12 @@
 <li>Translates Move into PGN move text according to the current position.</li>
 </ul>
 </li>
+<li>
+<p><code>@note-&gt;move &lt;PGN move text : String&gt;</code></p>
+<ul>
+<li>Translates PGN move into move according to the current position.</li>
+</ul>
+</li>
 </ul>
 <h6> Example </h6>
 
@@ -546,6 +552,10 @@
 (display (my-engine '@move-&gt;note (list B8 C6 EMPTY)))
 ;; Output
 ;; &gt; Nc6
+
+(display (my-engine '@note-&gt;move "Nc6"))
+;; Output
+;; &gt; (B8 C6 EMPTY)
 </code></pre>
 <h3 id="uci-command">UCI Command</h3>
 <ul>
