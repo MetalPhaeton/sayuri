@@ -683,7 +683,7 @@ namespace Sayuri {
     // 同じ駒の同じ目的地のものを得る。 自分自身は除く。
     std::vector<Move> same_to;
     for (auto move_2 : legal_move_vec) {
-      if (EqualMove(move, move_2)) break;
+      if (EqualMove(move, move_2)) continue;
 
       if (Get<TO>(move_2) == to) {
         if (basic_st_.piece_board_[Get<FROM>(move_2)] == piece_type) {
