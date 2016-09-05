@@ -1209,6 +1209,7 @@ namespace Sayuri {
             case '\b': oss << "\\b"; break;
             case '\0': oss << "\\0"; break;
             case '"': oss << "\\\""; break;
+            case '\x1b': oss << "\\e"; break;
             default: oss << c;
           }
         }

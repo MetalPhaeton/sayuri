@@ -657,6 +657,7 @@ namespace Sayuri {
               case 'a': oss << '\a'; break;  // ベル。
               case 'b': oss << '\b'; break;  // バックスペース。
               case '0': oss << '\0'; break;  // Null文字。
+              case 'e': oss << '\x1b'; break;  // ESC。
               default: oss << front[1]; break;  // その他。
             }
           } else {
