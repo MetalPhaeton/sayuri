@@ -1113,7 +1113,6 @@ R"...(### cxxxxr ###
         }
       }
     }
-    help_dict_.emplace("caar", help);
 
     func = LC_FUNCTION_OBJ(Apply);
     INSERT_LC_FUNCTION(func, "apply", "Lisp:apply");
@@ -4730,15 +4729,15 @@ R"...(### clock ###
 
       // ptr->cdr------------------>cddr
       // |    |
-      // car  cdar------->cdadr
+      // car  cadr------->cdadr
       //      |           |
-      //      cdaar       cdadar
+      //      caadr       cadadr
       //      (unquote)   (object)
       //
       // リストの終端cdrにunqoteがあった場合。
       // ptr->cdr--------->cddr----->Nil
       // |    |            |
-      // car  cdar         cddar
+      // car  cadr         caddr
       //      (unquote)    (objct)
       LPointer result, temp;
 
@@ -4755,25 +4754,25 @@ R"...(### clock ###
 
         // cdrの処理。
         if (cdr->IsPair()) {
-          const LPointer& cdar = cdr->car();
+          const LPointer& cadr = cdr->car();
           const LPointer& cddr = cdr->cdr();
-          if (cdar->IsPair()) {
-            const LPointer& cdaar = cdar->car();
-            const LPointer& cdadr = cdar->cdr();
-            if (cdaar->IsSymbol() && cdadr->IsPair()) {
-              const LPointer& cdadar = cdadr->car();
-              if (cdaar->symbol() == "unquote") {
+          if (cadr->IsPair()) {
+            const LPointer& caadr = cadr->car();
+            const LPointer& cdadr = cadr->cdr();
+            if (caadr->IsSymbol() && cdadr->IsPair()) {
+              const LPointer& cadadr = cdadr->car();
+              if (caadr->symbol() == "unquote") {
                 // コンマ。
                 // 評価する。
-                cdadr->car(caller->Evaluate(*cdadar));
+                cdadr->car(caller->Evaluate(*cadadr));
 
                 // つなぎ替える。
                 cdadr->cdr(cddr);
                 ptr->cdr(cdadr);
-              } else if (cdaar->symbol() == "unquote-splicing") {
+              } else if (caadr->symbol() == "unquote-splicing") {
                 // コンマアット。
                 // 評価する。
-                result = caller->Evaluate(*cdadar);
+                result = caller->Evaluate(*cadadr);
 
                 if (result->IsPair()) {
                   // ペア。
@@ -4796,12 +4795,12 @@ R"...(### clock ###
                 }
               }
             }
-          } else if ((cdar->IsSymbol()) && (cddr->IsPair())) {
+          } else if ((cadr->IsSymbol()) && (cddr->IsPair())) {
             // リストの終端cdrにunquoteがあった場合。 両方同じ処理。
-            const LPointer& cddar = cddr->car();
-            if ((cdar->symbol() == "unquote")
-            || (cdar->symbol() == "unquote-splicing")) {
-              ptr->cdr(caller->Evaluate(*cddar));
+            const LPointer& addar = cddr->car();
+            if ((cadr->symbol() == "unquote")
+            || (cadr->symbol() == "unquote-splicing")) {
+              ptr->cdr(caller->Evaluate(*addar));
             }
           }
         }
