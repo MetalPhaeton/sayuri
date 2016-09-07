@@ -1064,12 +1064,13 @@ R"...(### cxxxxr ###
 <h6> Example </h6>
 
     (define tree '(1 (21 22) (31 32) 4))
-    (display (cdadar tree))
-    ;;Output
-    ;; > 22
     
-    (display (cddaar tree))
-    ;;Output
+    (display (cadr tree))
+    ;; Output
+    ;; > (21 22)
+    
+    (display (caaddr tree))
+    ;; Output
     ;; > 31)...";
     {
       const char* ad = "ad";

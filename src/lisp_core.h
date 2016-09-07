@@ -2285,16 +2285,15 @@ namespace Sayuri {
         Next(&args_ptr);
 
         // パスに合わせて探索する。
-        for (auto c : path) {
+        std::string::const_reverse_iterator itr = path.crbegin();
+        std::string::const_reverse_iterator end_itr = path.crend();
+        for (; itr != end_itr; ++itr) {
           CheckType(*target_ptr, LType::PAIR);
 
-          if (c == 'a') {
+          if (*itr == 'a') {
             target_ptr = target_ptr->car();
-          } else if (c == 'd') {
-            target_ptr = target_ptr->cdr();
           } else {
-            throw GenError("@function-error", "'" + std::string(1, c)
-            + "' is not path charactor. A charactor must be 'a' or 'd'.");
+            target_ptr = target_ptr->cdr();
           }
         }
 

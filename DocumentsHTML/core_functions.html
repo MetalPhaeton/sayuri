@@ -745,12 +745,13 @@
 <h6> Example </h6>
 
 <pre><code>(define tree '(1 (21 22) (31 32) 4))
-(display (cdadar tree))
-;;Output
-;; &gt; 22
 
-(display (cddaar tree))
-;;Output
+(display (cadr tree))
+;; Output
+;; &gt; (21 22)
+
+(display (caaddr tree))
+;; Output
 ;; &gt; 31
 </code></pre>
 <h3 id="cons">cons</h3>
