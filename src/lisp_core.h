@@ -2272,6 +2272,35 @@ namespace Sayuri {
         return result->cdr();
       }
 
+      // %%% c*r
+      /** ネイティブ関数 - c*r */
+      LPointer CxrFunc(const std::string& path, LPointer self, LObject* caller,
+      const LObject& args) {
+        // 準備。
+        LObject* args_ptr = nullptr;
+        GetReadyForFunction(args, 1, &args_ptr);
+
+        // 第1引数。 ターゲットのリスト。
+        LPointer target_ptr = caller->Evaluate(*(args_ptr->car()));
+        Next(&args_ptr);
+
+        // パスに合わせて探索する。
+        for (auto c : path) {
+          CheckType(*target_ptr, LType::PAIR);
+
+          if (c == 'a') {
+            target_ptr = target_ptr->car();
+          } else if (c == 'd') {
+            target_ptr = target_ptr->cdr();
+          } else {
+            throw GenError("@function-error", "'" + std::string(1, c)
+            + "' is not path charactor. A charactor must be 'a' or 'd'.");
+          }
+        }
+
+        return target_ptr;
+      }
+
       // %%% cons
       /** ネイティブ関数 - cons */
       DEF_LC_FUNCTION(Cons) {

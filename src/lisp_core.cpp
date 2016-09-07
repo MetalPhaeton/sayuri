@@ -1023,37 +1023,96 @@ R"...(### cdr ###
     ;; > (222 333))...";
     help_dict_.emplace("cdr", help);
 
-    func = LC_FUNCTION_OBJ(Cons);
-    INSERT_LC_FUNCTION(func, "cons", "Lisp:cons");
+    func = LC_FUNCTION_OBJ(CdrFunc);
+    INSERT_LC_FUNCTION(func, "cdr", "Lisp:cdr");
     help =
-R"...(### cons ###
+R"...(### cdr ###
 
 <h6> Usage </h6>
 
-* `(cons <Object 1> <Object 2>)`
+* `(cdr <Pair or List>)`
 
 <h6> Description </h6>
 
-* Returns Pair. Car is `<Object 1>`, Cdr is `<Object 2>`.
+* Returns Cdr value of `<Pair or List>`
 
 <h6> Example </h6>
 
+    (display (cdr '(111 . 222)))
+    ;; Output
+    ;; > 222
+    
+    (display (cdr (list 111 222 333)))
+    
+    ;; Output
+    ;; > (222 333))...";
+    help_dict_.emplace("cdr", help);
 
-    (display (cons 111 222))
+
+    // cxrを登録。
+    help =
+R"...(### cxxxxr ###
+
+<h6> Usage </h6>
+
+* `(c[ad]{2,4}r <Pair or List>)`
+
+<h6> Description </h6>
+
+* Returns Object of `c[ad]{2,4}r` of `<Pair or List>`
+
+<h6> Example </h6>
+
+    (define tree '(1 (21 22) (31 32) 4))
+    (display (cdadar tree))
+    ;;Output
+    ;; > 22
     
-    ;; Output
-    ;; > (111 . 222)
-    
-    (display (cons 111 '(222 333)))
-    
-    ;; Output
-    ;; > (111 222 333)
-    
-    (display (cons 444 (cons 555 (cons 666 ()))))
-    
-    ;; Output
-    ;; > (444 555 666))...";
-    help_dict_.emplace("cons", help);
+    (display (cddaar tree))
+    ;;Output
+    ;; > 31)...";
+    {
+      const char* ad = "ad";
+      std::string path;
+      std::ostringstream oss;
+      for (int _1st = 0; _1st < 2; ++_1st) {
+        for (int _2nd = 0; _2nd < 2; ++_2nd) {
+          oss <<  ad[_2nd] << ad[_1st];
+          path = oss.str();
+          oss.str("");
+          func = [this, path](LPointer self, LObject* caller,
+          const LObject& args) -> LPointer {
+            return this->CxrFunc(path, self, caller, args);
+          };
+          INSERT_LC_FUNCTION(func, "c" + path + "r", "Lisp:c" + path + "r");
+          help_dict_.emplace("c" + path + "r", help);
+          for (int _3rd = 0; _3rd < 2; ++_3rd) {
+            oss << ad[_3rd] <<  ad[_2nd] << ad[_1st];
+            path = oss.str();
+            oss.str("");
+            func = [this, path](LPointer self, LObject* caller,
+            const LObject& args) -> LPointer {
+              return this->CxrFunc(path, self, caller, args);
+            };
+            INSERT_LC_FUNCTION(func, "c" + path + "r", "Lisp:c" + path + "r");
+            help_dict_.emplace("c" + path + "r", help);
+            for (int _4th = 0; _4th < 2; ++_4th) {
+              oss << ad[_4th] << ad[_3rd] <<  ad[_2nd] << ad[_1st];
+              path = oss.str();
+              oss.str("");
+              func = [this, path](LPointer self, LObject* caller,
+              const LObject& args) -> LPointer {
+                return this->CxrFunc(path, self, caller, args);
+              };
+              INSERT_LC_FUNCTION(func, "c" + path + "r",
+              "Lisp:c" + path + "r");
+              help_dict_.emplace("c" + path + "r", help);
+            }
+          }
+        }
+      }
+    }
+    help_dict_.emplace("caar", help);
 
     func = LC_FUNCTION_OBJ(Apply);
     INSERT_LC_FUNCTION(func, "apply", "Lisp:apply");

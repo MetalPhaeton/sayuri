@@ -52,6 +52,7 @@
 <li><a href="#throw"><code>throw</code></a> : Throws an exception.</li>
 <li><a href="#car"><code>car</code></a> : Pulls out Car value from Pair.</li>
 <li><a href="#cdr"><code>cdr</code></a> : Pull outs Cdr value from Pair.</li>
+<li><a href="#cxxxxr"><code>cxxxxr</code></a> : Pull outs Cxxxxr value from Pair.</li>
 <li><a href="#cons"><code>cons</code></a> : Constructs Pair.</li>
 <li><a href="#apply"><code>apply</code></a>: Constructs Pair and evaluates.</li>
 <li><a href="#walk"><code>walk</code></a>: Walks through and executes callback function.</li>
@@ -729,6 +730,28 @@
 
 ;; Output
 ;; &gt; (222 333)
+</code></pre>
+<h3 id="cxxxxr">cxxxxr</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(c[ad]{2,4}r &lt;Pair or List&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Returns Object of <code>c[ad]{2,4}r</code> of <code>&lt;Pair or List&gt;</code></li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(define tree '(1 (21 22) (31 32) 4))
+(display (cdadar tree))
+;;Output
+;; &gt; 22
+
+(display (cddaar tree))
+;;Output
+;; &gt; 31
 </code></pre>
 <h3 id="cons">cons</h3>
 <h6> Usage </h6>
