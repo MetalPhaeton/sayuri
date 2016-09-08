@@ -355,7 +355,7 @@
                     "()"))
         (define second
                 (if (>= (length str-list) 2)
-                    (car (cdr str-list))
+                    (cadr str-list)
                     "()"))
         (cond ((equal? first "help") (show-help))
               ((equal? first "current-settings") (print-current-settings))

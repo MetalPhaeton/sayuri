@@ -31,7 +31,7 @@
 (define hash-size 512)
 
 ;; Number of repeat.
-(define repeat 30) 
+(define repeat 10) 
 
 ;; Position. (FEN)
 (define fen "r1bq1r1k/p1pnbpp1/1p2p3/6p1/3PB3/5N2/PPPQ1PPP/2KR3R w - - 0 1")
@@ -60,13 +60,13 @@
 (define (append-datas li)
         (if (pair? li)
             (begin (cond ((equal? (car li) "time")
-                          (push-back! data-time (parse (car (cdr li)))))
+                          (push-back! data-time (parse (cadr li))))
                          ((equal? (car li) "nodes")
-                          (push-back! data-nodes (parse (car (cdr li)))))
+                          (push-back! data-nodes (parse (cadr li))))
                          ((equal? (car li) "nps")
-                          (push-back! data-nps (parse (car (cdr li)))))
+                          (push-back! data-nps (parse (cadr li))))
                          ((equal? (car li) "hashfull")
-                          (push-back! data-hashfull (parse (car (cdr li))))))
+                          (push-back! data-hashfull (parse (cadr li)))))
                    (append-datas (cdr li)))
             ()))
 

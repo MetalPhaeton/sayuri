@@ -50,7 +50,7 @@
         (define headers (pgn '@get-current-game-headers))
         (define ret ())
         (for (elm headers)
-             (if (equal? (car elm) "FEN") (set! ret (car (cdr elm))) ()))
+             (if (equal? (car elm) "FEN") (set! ret (cadr elm)) ()))
         ret)
 
 ;; Make data list of one game.
@@ -73,7 +73,7 @@
                    (begin (if (equal? (car temp) WHITE)
                               (push-back! white-list temp)
                               (push-back! black-list temp))
-                          (engine '@play-move (car (cdr (cdr temp))))
+                          (engine '@play-move (caddr temp))
                           )
                    )
                (pgn '@next-move))
@@ -88,7 +88,7 @@
              (pgn '@set-current-game i)
              (set! result (make-data-list engine pgn))
              (set! white-list (append white-list (car result)))
-             (set! black-list (append black-list (car (cdr result))))
+             (set! black-list (append black-list (cadr result)))
              )
         (list white-list black-list))
 
@@ -101,12 +101,12 @@
 (define (gen-conditions engine)
         (define side-and-pos (fen->pos engine))
         (define side (car side-and-pos))
-        (define pos (car (cdr side-and-pos)))
+        (define pos (cadr side-and-pos))
         (define (gen-func side piece square)
                 (define lambda-expr
                         `(lambda (data)
                                  (define data-side (car data))
-                                 (define data-position (car (cdr data)))
+                                 (define data-position (cadr data))
                                  (equal? (ref data-position ,square)
                                          (quote ,piece))
                                  ))
@@ -122,7 +122,7 @@
         (define (gen-func move)
                 (define lambda-expr
                         `(lambda (data)
-                                 (define data-move (car (cdr (cdr data))))
+                                 (define data-move (cadr (cdr data)))
                                  (equal? data-move (quote ,move))))
                 (eval lambda-expr))
         (define ret ())
@@ -143,12 +143,12 @@
 (define piece-str '("" "p" "n" "b" "r" "q" "k"))
 (define (move->pcn move)
         (string-append (ref square-str (car move))
-                       (ref square-str (car (cdr move)))
-                       (ref piece-str (car (cdr (cdr move))))))
+                       (ref square-str (cadr move))
+                       (ref piece-str (caddr move))))
 
 ;; Predicate for bubble sort.
 (define (sort-order prev next)
-        (> (car (cdr prev)) (car (cdr next))))
+        (> (cadr prev) (cadr next)))
 
 ;; Main.
 (stderr "Loading...")
@@ -181,7 +181,7 @@
                                          sort-order))
                       (display (move->pcn (car result))
                                " "
-                               (car (cdr result)))
+                               (cadr result))
                       )
                  (stdout "\n"))
                 ())))

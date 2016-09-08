@@ -68,7 +68,7 @@
               (define superior ())
               (for (elm (parse-fen/epd epd-str))
                    (if (equal? (car elm) "superior")
-                       (set! superior (car (cdr elm)))
+                       (set! superior (cadr elm))
                        ()))
               (set! superior 
                       (if (= (eval (engine '@get-to-move)) WHITE)
@@ -112,7 +112,7 @@
 (stderr "Start training.\n")
 (for (feature-vec (make-feature-vec-list engine epd-text))
      (stderr (to-string
-               (pa2 '@train (car feature-vec) cost (car (cdr feature-vec)))))
+               (pa2 '@train (car feature-vec) cost (cadr feature-vec))))
      (stderr "\n"))
 (stderr "Done.\n")
 (stderr "----------------------------------------\n")
