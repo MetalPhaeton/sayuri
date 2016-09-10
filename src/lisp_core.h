@@ -2532,6 +2532,23 @@ namespace Sayuri {
         return NewNumber(std::system(result->string().c_str()));
       }
 
+      // %%% get-env
+      /** ネイティブ関数 - get-env */
+      DEF_LC_FUNCTION(GetEnv) {
+        // 準備。
+        LObject* args_ptr = nullptr;
+        GetReadyForFunction(args, 1, &args_ptr);
+
+        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        CheckType(*result, LType::STRING);
+
+        const char* env_str = std::getenv(result->string().c_str());
+        if (env_str) {
+          return NewString(env_str);
+        }
+        return NewNil();
+      }
+
       /** ネイティブ関数 - gen-thread */
       DEF_LC_FUNCTION(GenThread);
 

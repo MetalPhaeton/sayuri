@@ -2369,6 +2369,27 @@ R"...(### system ###
     ;; > Hello World
     ;; > 0)...";
     help_dict_.emplace("system", help);
+
+    func = LC_FUNCTION_OBJ(GetEnv);
+    INSERT_LC_FUNCTION(func, "get-env", "Lisp:get-env");
+    help =
+R"...(### get-env ###
+
+<h6> Usage </h6>
+
+* `(get-env <Variable name : String>)`
+
+<h6> Description </h6>
+
+* Returns Environment Variable of `<Varibable name>`.
+* If no such variable, it returns Nil.
+
+<h6> Example </h6>
+
+    (display (get-env "USER"))
+    ;; Output
+    ;; > hironori)...";
+    help_dict_.emplace("get-env", help);
   }
 
   // 基本関数を登録する。

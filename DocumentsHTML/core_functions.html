@@ -100,6 +100,7 @@
 </li>
 <li><a href="#utilityes">Utilities</a><ul>
 <li><a href="#system"><code>system</code></a> : Execute command line.</li>
+<li><a href="#get-env"><code>get-env</code></a> : Returns Environment Variable.</li>
 </ul>
 </li>
 <li><a href="#multithreading">Multithreading</a><ul>
@@ -1436,6 +1437,24 @@
 ;; Output
 ;; &gt; Hello World
 ;; &gt; 0
+</code></pre>
+<h3 id="get-env">get-env</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(get-env &lt;Variable name : String&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Returns Environment Variable of <code>&lt;Varibable name&gt;</code>.</li>
+<li>If no such variable, it returns Nil.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>(display (get-env "USER"))
+;; Output
+;; &gt; hironori
 </code></pre>
 <h2 id="multithreading">Multithreading</h2>
 <h3 id="gen-thread">gen-thread</h3>
