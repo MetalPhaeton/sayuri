@@ -181,7 +181,7 @@ namespace Sayuri {
   weight_rook_open_fyle_(Weight::CreateWeight(7.5, 7.5)),
   weight_early_queen_starting_(Weight::CreateWeight(-20.0, 0.0)),
   weight_weak_square_(Weight::CreateWeight(-5.0, 0.0)),
-  weight_castling_(Weight::CreateWeight(20.0, 0.0)),
+  weight_castling_(Weight::CreateWeight(15.0, 0.0)),
   weight_abandoned_castling_(Weight::CreateWeight(-110.0, 0.0)) {
     // オープニング時の駒の配置の価値テーブルの初期化。
     static const double OPENING_POSITION[NUM_PIECE_TYPES][NUM_SQUARES] {
@@ -216,14 +216,14 @@ namespace Sayuri {
           0.0,  10.0,  20.0,  30.0,  30.0,  20.0,  10.0,   0.0
       },
       {  // ビショップ。
-        15.0, 10.0,  5.0,  0.0,  0.0,  5.0, 10.0, 15.0,
-        10.0, 20.0, 15.0, 10.0, 10.0, 15.0, 20.0, 10.0,
-         5.0, 15.0, 20.0, 15.0, 15.0, 20.0, 15.0,  5.0,
-         5.0, 10.0, 15.0, 25.0, 25.0, 15.0, 10.0,  5.0,
-         0.0,  7.5, 12.5, 22.5, 22.5, 12.5,  7.5,  0.0,
-         2.5,  7.5, 17.5, 12.5, 12.5, 17.5,  7.5,  2.5,
-         2.5, 12.5,  7.5,  2.5,  2.5,  7.5, 12.5,  2.5,
-         7.5,  2.5,  2.5,  0.0,  0.0,  2.5,  2.5,  7.5
+         6.0,  4.0,  2.0,  0.0,  0.0,  2.0,  4.0,  6.0,
+         4.0,  8.0,  6.0,  4.0,  4.0,  6.0,  8.0,  4.0,
+         2.0,  6.0, 10.0,  8.0,  8.0, 10.0,  6.0,  2.0,
+         0.0,  4.0,  8.0, 12.0, 12.0,  8.0,  4.0,  0.0,
+         0.0,  4.0,  8.0, 12.0, 12.0,  8.0,  4.0,  0.0,
+         2.0,  6.0, 10.0,  8.0,  8.0, 10.0,  6.0,  2.0,
+         4.0,  8.0,  6.0,  4.0,  4.0,  6.0,  8.0,  4.0,
+         6.0,  4.0,  2.0,  0.0,  0.0,  2.0,  4.0,  6.0
       },
       {  // ルーク。
          0.0,  5.0, 10.0, 15.0, 15.0, 10.0,  5.0,  0.0,
@@ -497,7 +497,7 @@ namespace Sayuri {
     weight_development_[EMPTY] = Weight::CreateWeight(0.0, 0.0);
     weight_development_[PAWN] = Weight::CreateWeight(0.0, 0.0);
     weight_development_[KNIGHT] = Weight::CreateWeight(15.0, 0.0);
-    weight_development_[BISHOP] = Weight::CreateWeight(15.0, 0.0);
+    weight_development_[BISHOP] = Weight::CreateWeight(10.0, 0.0);
     weight_development_[ROOK] = Weight::CreateWeight(0.0, 0.0);
     weight_development_[QUEEN] = Weight::CreateWeight(0.0, 0.0);
     weight_development_[KING] = Weight::CreateWeight(0.0, 0.0);
