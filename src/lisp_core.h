@@ -3527,6 +3527,9 @@ namespace Sayuri {
       /** ネイティブ関数 - regex-search */
       DEF_LC_FUNCTION(RegexSearch);
 
+      /** ネイティブ関数 - gen-nabla */
+      DEF_LC_FUNCTION(GenNabla);
+
       /** ネイティブ関数 - bayes */
       DEF_LC_FUNCTION(Bayes);
 

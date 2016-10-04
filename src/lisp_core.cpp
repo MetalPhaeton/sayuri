@@ -4202,6 +4202,35 @@ R"...(### regex-search ###
     ;; > ("Hello World" "Hel" "Wor"))...";
     help_dict_.emplace("regex-search", help);
 
+    func = LC_FUNCTION_OBJ(GenNabla);
+    INSERT_LC_FUNCTION(func, "gen-nabla", "Lisp:gen-nabla");
+    help =
+R"...(### gen-nabla ###
+
+<h6> Usage </h6>
+
+* `(gen-nabla <Mathematical function : Function> <Deltas : Number>...)`
+
+<h6> Description </h6>
+
+* Differentiates `<Mathematical function>` with `<Deltas>...`
+  and returns a differentiated function.
+    + The differentiated function returns gradient.
+
+<h6> Example </h6>
+
+    ;; Function of 3 variables.
+    (define (func x y z) (+ (* 2 x) (* 3 y) (* 4 z)))
+    
+    ;; Differentiate the function with 0.01 as delta.
+    (define nabla-func (gen-nabla func 0.01 0.01 0.01))
+    
+    ;; Calculate gradient.
+    (display (nabla-func 0 0 0))
+    ;; Output
+    ;; > (2 3 4))...";
+    help_dict_.emplace("gen-nabla", help);
+
     func = LC_FUNCTION_OBJ(Bayes);
     INSERT_LC_FUNCTION(func, "bayes", "Lisp:bayes");
     help =
@@ -6605,6 +6634,87 @@ R"...(### clock ###
     }
 
     return LPointerVecToList(ret_vec);
+  }
+
+  // %%% gen-nabla
+  DEF_LC_FUNCTION(Lisp::GenNabla) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 2, &args_ptr);
+
+    // 第1引数は関数。
+    LPointer func_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*func_ptr, LType::FUNCTION);
+    LPointer func_expr = NewPair(func_ptr, NewNil());
+    Next(&args_ptr);
+
+    // 第2引数以降はデルタ。
+    int len = CountList(*args_ptr);
+    std::vector<double> delta_vec(len);
+    LPointer result;
+    for (int i = 0; i < len; ++i, Next(&args_ptr)) {
+      result = caller->Evaluate(*(args_ptr->car()));
+      CheckType(*result, LType::NUMBER);
+      delta_vec[i] = result->number();
+    }
+
+    // ナブラの関数オブジェクトを作る。
+    auto nabla_func = [func_expr, len, delta_vec](LPointer self,
+    LObject* caller, const LObject& args) -> LPointer {
+      // 準備。
+      LObject* args_ptr = nullptr;
+      GetReadyForFunction(args, len, &args_ptr);
+
+      // 変数のリストを得る。
+      LPointer var_list = NewList(len);
+      LObject* var_ptr = var_list.get();
+      LPointer result;
+      for (int i = 0; i < len; ++i, Next(&args_ptr), Next(&var_ptr)) {
+        result = caller->Evaluate(*(args_ptr->car()));
+        CheckType(*result, LType::NUMBER);
+
+        var_ptr->car(result);
+      }
+
+      // 変数のリストをセット。
+      func_expr->cdr(var_list);
+
+      // ループする。
+      LPointerVec ret_vec(len);
+      var_ptr = var_list.get();
+      for (int i = 0; i < len; ++i, Next(&var_ptr)) {
+        // 先ず数値を退避。
+        double temp_number = var_ptr->car()->number();
+
+        // 準備。
+        double delta = delta_vec[i];
+        double half_delta = delta / 2.0;
+
+        // 大きい方を計算。
+        var_ptr->car()->number(temp_number + half_delta);
+        result = caller->Evaluate(*func_expr);
+        CheckType(*result, LType::NUMBER);
+        double big = result->number() / delta;
+
+        // 小さい方を計算。
+        var_ptr->car()->number(temp_number - half_delta);
+        result = caller->Evaluate(*func_expr);
+        CheckType(*result, LType::NUMBER);
+        double small = result->number() / delta;
+
+        // 微分係数を入れる。
+        ret_vec[i] = NewNumber(big - small);
+
+        // 退避したものを戻す。
+        var_ptr->car()->number(temp_number);
+      }
+
+      return LPointerVecToList(ret_vec);
+    };
+
+    return NewN_Function(nabla_func, "Lisp:gen-nabla:"
+    + std::to_string(reinterpret_cast<size_t>(func_expr.get())),
+    caller->scope_chain());
   }
 
   // %%% bayes
