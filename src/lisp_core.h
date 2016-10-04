@@ -48,6 +48,7 @@
 #include <ctime>
 #include <thread>
 #include <mutex>
+#include <limits>
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -3530,6 +3531,12 @@ namespace Sayuri {
       /** ネイティブ関数 - gen-nabla */
       DEF_LC_FUNCTION(GenNabla);
 
+      /** ネイティブ関数 - power-method */
+      DEF_LC_FUNCTION(PowerMethod);
+
+      /** ネイティブ関数 - inverse-matrix */
+      DEF_LC_FUNCTION(InverseMatrix);
+
       /** ネイティブ関数 - bayes */
       DEF_LC_FUNCTION(Bayes);
 
@@ -3791,16 +3798,27 @@ namespace Sayuri {
       Vec vec(size, 0.0);
       vec[0] = 1.0;
       double lambda_old = 0.0, lambda = 0.0;
+      double diff_old = std::numeric_limits<double>::max(), diff = 0.0;
       Vec result(size, 0.0);
 
       unsigned int count = 0;
       do {
-        lambda_old = lambda;
         result = mat * vec;
         lambda = result * vec;
         vec = (1 / std::sqrt(result * result)) * result;
+
+        // 収束判定。
+        diff = std::fabs(lambda - lambda_old);
+        if (diff <= 0.0) break;
+        if (diff == diff_old) break;  // 誤差で無限ループをしている。
+
+        lambda_old = lambda;
+        diff_old = diff;
         ++count;
-      } while ((std::fabs(lambda - lambda_old) > 0.0) && (count < 100));
+      } while (count < 1000);
+
+      // 収束しなかった。
+      if (count >= 1000) return make_tuple(0.0, Vec(size, 0.0));
 
       return make_tuple(lambda, vec);
     }

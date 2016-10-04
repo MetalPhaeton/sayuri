@@ -4231,6 +4231,35 @@ R"...(### gen-nabla ###
     ;; > (2 3 4))...";
     help_dict_.emplace("gen-nabla", help);
 
+    func = LC_FUNCTION_OBJ(PowerMethod);
+    INSERT_LC_FUNCTION(func, "power-method", "Lisp:power-method");
+    help =
+R"...(### power-method ###
+
+<h6> Usage </h6>
+
+* `(power-method <Square matrix>)`
+
+<h6> Description </h6>
+
+* Returns `(<Maximum eigenvalue> <The eigenvector>)` by Power Method.
+* `<Square matrix>` is `(<Row vectors>...)`.
+* If it failed to find eigenvalue, it returns Nil.
+
+<h6> Example </h6>
+
+    ;; Matrix.
+    ;; |  1  2  3 |
+    ;; |  0  1 -3 |
+    ;; |  0 -3  1 |
+    (define matrix '((1 2 3) (0 1 -3) (0 -3 1)))
+    
+    ;; Calculate maximum eigenvalue and eigenvector.
+    (display (power-method matrix))
+    ;; Output
+    ;; > (1 (1 0 0)))...";
+    help_dict_.emplace("power-method", help);
+
     func = LC_FUNCTION_OBJ(Bayes);
     INSERT_LC_FUNCTION(func, "bayes", "Lisp:bayes");
     help =
@@ -6715,6 +6744,52 @@ R"...(### clock ###
     return NewN_Function(nabla_func, "Lisp:gen-nabla:"
     + std::to_string(reinterpret_cast<size_t>(func_expr.get())),
     caller->scope_chain());
+  }
+
+  // %%% power-method
+  DEF_LC_FUNCTION(Lisp::PowerMethod) {
+    using namespace LMath;
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    // 行列を作る。
+    LPointer matrix_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*matrix_ptr);
+
+    int dim = CountList(*matrix_ptr);
+    Mat matrix = GenMatrix(dim, dim);
+
+    LObject* ptr_1 = matrix_ptr.get();
+    for (int i = 0; i < dim; ++i, Next(&ptr_1)) {
+      const LPointer& vector_list = ptr_1->car();
+      CheckList(*vector_list);
+      int dim_2 = CountList(*vector_list);
+      if (dim_2 != dim) {
+        throw GenError("@function-error", "'" + vector_list->ToString()
+        + "' doesn't have " + std::to_string(dim) + "elements.");
+      }
+
+      LObject* ptr_2 = vector_list.get();
+      for (int j = 0; j < dim; ++j, Next(&ptr_2)) {
+        const LPointer& scalar_ptr = ptr_2->car();
+        CheckType(*scalar_ptr, LType::NUMBER);
+        matrix[i][j] = scalar_ptr->number();
+      }
+    }
+
+    // 固有値を計算。
+    for (int i = 0; i < dim; ++i) {
+    }
+    double lambda = 0.0;
+    Vec eigen_vec;
+    std::tie(lambda, eigen_vec) = LMath::Eigen(matrix);
+    if (lambda == 0.0) return NewNil();
+
+    LPointer ret_ptr = NewPair(NewNumber(lambda),
+    NewPair(MathVecToList(eigen_vec), NewNil()));
+
+    return ret_ptr;
   }
 
   // %%% bayes
