@@ -142,6 +142,11 @@
 <li><a href="#log2"><code>log2</code></a> : Calculates logarithm with 2.</li>
 <li><a href="#log10"><code>log10</code></a> : Calculates logarithm with 10.</li>
 <li><a href="#random"><code>random</code></a> : Gets a random Number.</li>
+<li><a href="#gen-nabla"><code>gen-nabla</code></a> : Differentiates function.</li>
+<li><a href="#power-method"><code>power-method</code></a> : Calculates maxi eigenvalue and vector.</li>
+<li><a href="#inverse-matrix"><code>inverse-matrix</code></a> : Calculates Inverse Matrix.</li>
+<li><a href="#transposed-matrix"><code>transposed-matrix</code></a> : Calculates Transposed Matrix.</li>
+<li><a href="#determinant"><code>determinant</code></a> : Calculates Determinant of matrix.</li>
 <li><a href="#bayes"><code>bayes</code></a> : Estimates logit of conditional probability.</li>
 <li><a href="#logit-to-prob"><code>logit-&gt;prob</code></a> : Converts logit to probability.</li>
 <li><a href="#prob-to-logit"><code>prob-&gt;logit</code></a> : Converts probability to logit.</li>
@@ -1762,6 +1767,142 @@
 
 ;; Output
 ;; &gt; -7.13453
+</code></pre>
+<h3 id="gen-nabla">gen-nabla</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(gen-nabla &lt;Mathematical function : Function&gt; &lt;Deltas : Number&gt;...)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Differentiates <code>&lt;Mathematical function&gt;</code> with <code>&lt;Deltas&gt;...</code>
+  and returns a differentiated function.<ul>
+<li>The differentiated function returns gradient.</li>
+</ul>
+</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>;; Function of 3 variables.
+(define (func x y z) (+ (* 2 x) (* 3 y) (* 4 z)))
+
+;; Differentiate the function with 0.01 as delta.
+(define nabla-func (gen-nabla func 0.01 0.01 0.01))
+
+;; Calculate gradient.
+(display (nabla-func 0 0 0))
+;; Output
+;; &gt; (2 3 4)
+</code></pre>
+<h3 id="power-method">power-method</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(power-method &lt;Square matrix&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Returns <code>(&lt;Maximum eigenvalue&gt; &lt;The eigenvector&gt;)</code> by Power Method.</li>
+<li><code>&lt;Square matrix&gt;</code> is <code>(&lt;Row vectors&gt;...)</code>.</li>
+<li>If it failed to find eigenvalue, it returns Nil.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>;; Matrix.
+;; |  1  2  3 |
+;; |  0  1 -3 |
+;; |  0 -3  1 |
+(define matrix '((1 2 3) (0 1 -3) (0 -3 1)))
+
+;; Calculate maximum eigenvalue and eigenvector.
+(display (power-method matrix))
+;; Output
+;; &gt; (1 (1 0 0))
+</code></pre>
+<h3 id="inverse-matrix">inverse-matrix</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(inverse-matrix &lt;Square matrix&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Returns Inverse Matrix of <code>&lt;Square matrix&gt;</code>.</li>
+<li><code>&lt;Square matrix&gt;</code> is <code>(&lt;Row vectors&gt;...)</code>.</li>
+<li>If it failed to find Inverse Matrix, it returns Nil.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>;; Matrix.
+;; | 1 0 1 |
+;; | 1 1 1 |
+;; | 2 1 1 |
+(define matrix '((1 0 1) (1 1 1) (2 1 1)))
+
+;; Calculate inverse matrix.
+(define inv-matrix (inverse-matrix matrix))
+(display (ref inv-matrix 0))
+(display (ref inv-matrix 1))
+(display (ref inv-matrix 2))
+;; Output
+;; &gt; (0 -1 1)
+;; &gt; (-1 1 0)
+;; &gt; (1 1 -1)
+</code></pre>
+<h3 id="transposed-matrix">transposed-matrix</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(transposed-matrix &lt;Matrix&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Returns Transposed Matrix of <code>&lt;Matrix&gt;</code>.</li>
+<li><code>&lt;Matrix&gt;</code> is <code>(&lt;Row vectors&gt;...)</code>.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>;; Matrix.
+;; |  3  0  1  6 |
+;; |  1  2  2 -1 |
+;; |  2 -1  5  0 |
+(define matrix '((3 0 1 6) (1 2 2 -1) (2 -1 5 0)))
+(for (elm (transposed-matrix matrix))
+     (display elm))
+;; Output
+;; &gt; (3 1 2)
+;; &gt; (0 2 -1)
+;; &gt; (1 2 5)
+;; &gt; (6 -1 0)
+</code></pre>
+<h3 id="determinant">determinant</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(determinant &lt;Square matrix&gt;)</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Returns Determinant of <code>&lt;Square matrix&gt;</code>.</li>
+<li><code>&lt;Square matrix&gt;</code> is <code>(&lt;Row vectors&gt;...)</code>.</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>;; Matrix.
+;; |  3  0  1  6 |
+;; |  1  2  2 -1 |
+;; |  2 -1  5  0 |
+;; |  1  4  1  1 |
+(define matrix '((3 0 1 6) (1 2 2 -1) (2 -1 5 0) (1 4 1 1)))
+(display (determinant matrix))
+;; Output
+;; &gt; 67
 </code></pre>
 <h3 id="bayes">bayes</h3>
 <h6> Usage </h6>
