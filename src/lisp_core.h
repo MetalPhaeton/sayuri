@@ -3808,7 +3808,7 @@ namespace Sayuri {
     /**
      * 逆行列を求める。
      * @param mat 行列。
-     * @return 逆行列。
+     * @return 逆行列。 なかったら空の行列を返す。
      */
     Mat Inverse(const Mat& mat);
 

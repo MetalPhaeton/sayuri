@@ -4273,6 +4273,7 @@ R"...(### inverse-matrix ###
 
 * Returns Inverse Matrix of `<Square Matrix>`.
 * `<Square matrix>` is `(<Row vectors>...)`.
+* If it failed to find Inverse Matrix, it returns Nil.
 
 <h6> Example </h6>
 
@@ -6847,6 +6848,7 @@ R"...(### clock ###
 
     // 逆行列を計算する。
     Mat inv_matrix = LMath::Inverse(matrix);
+    if (inv_matrix.empty()) return NewNil();
 
     // リストにする。
     LPointerVec ret_vec(dim);
@@ -7363,7 +7365,7 @@ R"...(### clock ###
         (copy[i][j] == 0.0) && (count > 0); --count) {
           pivot(i, j);
         }
-        if (copy[i][j] == 0.0) break;  // ピボットがこれ以上できない。
+        if (copy[i][j] == 0.0) return Mat(0);  // ピボットがこれ以上できない。
 
         // 割る。
         pivot_to_one(i, j);
