@@ -4271,7 +4271,7 @@ R"...(### inverse-matrix ###
 
 <h6> Description </h6>
 
-* Returns Inverse Matrix of `<Square Matrix>`.
+* Returns Inverse Matrix of `<Square matrix>`.
 * `<Square matrix>` is `(<Row vectors>...)`.
 * If it failed to find Inverse Matrix, it returns Nil.
 
@@ -4294,6 +4294,36 @@ R"...(### inverse-matrix ###
     ;; > (1 1 -1))...";
     help_dict_.emplace("inverse-matrix", help);
 
+    func = LC_FUNCTION_OBJ(TransposedMatrix);
+    INSERT_LC_FUNCTION(func, "transposed-matrix", "Lisp:transposed-matrix");
+    help =
+R"...(### transposed-matrix ###
+
+<h6> Usage </h6>
+
+* `(transposed-matrix <Matrix>)`
+
+<h6> Description </h6>
+
+* Returns Transposed Matrix of `<Matrix>`.
+* `<Matrix>` is `(<Row vectors>...)`.
+
+<h6> Example </h6>
+
+    ;; Matrix.
+    ;; |  3  0  1  6 |
+    ;; |  1  2  2 -1 |
+    ;; |  2 -1  5  0 |
+    (define matrix '((3 0 1 6) (1 2 2 -1) (2 -1 5 0)))
+    (for (elm (transposed-matrix matrix))
+         (display elm))
+    ;; Output
+    ;; > (3 1 2)
+    ;; > (0 2 -1)
+    ;; > (1 2 5)
+    ;; > (6 -1 0))...";
+    help_dict_.emplace("transposed-matrix", help);
+
     func = LC_FUNCTION_OBJ(Determinant);
     INSERT_LC_FUNCTION(func, "determinant", "Lisp:determinant");
     help =
@@ -4305,7 +4335,7 @@ R"...(### determinant ###
 
 <h6> Description </h6>
 
-* Returns Determinant of `<Square Matrix>`.
+* Returns Determinant of `<Square matrix>`.
 * `<Square matrix>` is `(<Row vectors>...)`.
 
 <h6> Example </h6>
@@ -6859,13 +6889,51 @@ R"...(### clock ###
     return LPointerVecToList(ret_vec);
   }
 
+  // %%% transposed-matrix
+  DEF_LC_FUNCTION(Lisp::TransposedMatrix) {
+    using namespace LMath;
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    // 行列を得る。
+    LPointer matrix_ptr = caller->Evaluate(*(args_ptr->car()));
+
+    // 転置する。
+    CheckList(*matrix_ptr);
+    int dim_1 = CountList(*matrix_ptr);
+    CheckList(*(matrix_ptr->car()));
+    int dim_2 = CountList(*(matrix_ptr->car()));
+    std::vector<LPointerVec> temp_matrix(dim_2, LPointerVec(dim_1));
+    LObject* ptr_1 = matrix_ptr.get();
+    for (int i = 0; i < dim_1; ++i, Next(&ptr_1)) {
+      const LPointer& temp = ptr_1->car();
+      CheckList(*temp);
+      if (CountList(*temp) != dim_2) {
+        throw GenError("@function-error",
+        "'" + matrix_ptr->ToString() + "' is not Matrix.");
+      }
+
+      LObject* ptr_2 = temp.get();
+      for (int j = 0; j < dim_2; ++j, Next(&ptr_2)) {
+        temp_matrix[j][i] = ptr_2->car();
+      }
+    }
+
+    // リストにする。
+    LPointerVec ret_vec(dim_2);
+    for (int j = 0; j < dim_2; ++j) {
+      ret_vec[j] = LPointerVecToList(temp_matrix[j]);
+    }
+    return LPointerVecToList(ret_vec);
+  }
+
   // %%% determinant
   DEF_LC_FUNCTION(Lisp::Determinant) {
     using namespace LMath;
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
-
 
     // 行列を作る。
     LPointer matrix_ptr = caller->Evaluate(*(args_ptr->car()));

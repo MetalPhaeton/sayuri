@@ -3537,6 +3537,9 @@ namespace Sayuri {
       /** ネイティブ関数 - inverse-matrix */
       DEF_LC_FUNCTION(InverseMatrix);
 
+      /** ネイティブ関数 - transposed-matrix */
+      DEF_LC_FUNCTION(TransposedMatrix);
+
       /** ネイティブ関数 - determinant */
       DEF_LC_FUNCTION(Determinant);
 
