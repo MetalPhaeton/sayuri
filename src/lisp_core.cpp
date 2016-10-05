@@ -6788,28 +6788,8 @@ R"...(### clock ###
 
     // 行列を作る。
     LPointer matrix_ptr = caller->Evaluate(*(args_ptr->car()));
-    CheckList(*matrix_ptr);
-
-    int dim = CountList(*matrix_ptr);
-    Mat matrix = GenMatrix(dim, dim);
-
-    LObject* ptr_1 = matrix_ptr.get();
-    for (int i = 0; i < dim; ++i, Next(&ptr_1)) {
-      const LPointer& vector_list = ptr_1->car();
-      CheckList(*vector_list);
-      int dim_2 = CountList(*vector_list);
-      if (dim_2 != dim) {
-        throw GenError("@function-error", "'" + vector_list->ToString()
-        + "' doesn't have " + std::to_string(dim) + " elements.");
-      }
-
-      LObject* ptr_2 = vector_list.get();
-      for (int j = 0; j < dim; ++j, Next(&ptr_2)) {
-        const LPointer& scalar_ptr = ptr_2->car();
-        CheckType(*scalar_ptr, LType::NUMBER);
-        matrix[i][j] = scalar_ptr->number();
-      }
-    }
+    Mat matrix = ListToMatrix(*matrix_ptr);
+    int dim = matrix.size();
 
     // 固有値を計算。
     for (int i = 0; i < dim; ++i) {
@@ -6832,30 +6812,11 @@ R"...(### clock ###
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
 
+
     // 行列を作る。
     LPointer matrix_ptr = caller->Evaluate(*(args_ptr->car()));
-    CheckList(*matrix_ptr);
-
-    int dim = CountList(*matrix_ptr);
-    Mat matrix = GenMatrix(dim, dim);
-
-    LObject* ptr_1 = matrix_ptr.get();
-    for (int i = 0; i < dim; ++i, Next(&ptr_1)) {
-      const LPointer& vector_list = ptr_1->car();
-      CheckList(*vector_list);
-      int dim_2 = CountList(*vector_list);
-      if (dim_2 != dim) {
-        throw GenError("@function-error", "'" + vector_list->ToString()
-        + "' doesn't have " + std::to_string(dim) + " elements.");
-      }
-
-      LObject* ptr_2 = vector_list.get();
-      for (int j = 0; j < dim; ++j, Next(&ptr_2)) {
-        const LPointer& scalar_ptr = ptr_2->car();
-        CheckType(*scalar_ptr, LType::NUMBER);
-        matrix[i][j] = scalar_ptr->number();
-      }
-    }
+    Mat matrix = ListToMatrix(*matrix_ptr);
+    int dim = matrix.size();
 
     // 逆行列を計算する。
     Mat inv_matrix = LMath::Inverse(matrix);
@@ -7253,6 +7214,33 @@ R"...(### clock ###
   }
 
   namespace LMath {
+    // リストを行列へ。
+    Mat ListToMatrix(const LObject& list) {
+      Lisp::CheckList(list);
+      int dim = Lisp::CountList(list);
+      Mat matrix = GenMatrix(dim, dim);
+
+      const LObject* ptr_1 = &list;
+      for (int i = 0; i < dim; ++i, ptr_1 = ptr_1->cdr().get()) {
+        const LPointer& vector_list = ptr_1->car();
+        Lisp::CheckList(*vector_list);
+        int dim_2 = Lisp::CountList(*vector_list);
+        if (dim_2 != dim) {
+          throw Lisp::GenError("@function-error", "'" + vector_list->ToString()
+          + "' doesn't have " + std::to_string(dim) + " elements.");
+        }
+
+        const LObject* ptr_2 = vector_list.get();
+        for (int j = 0; j < dim; ++j, ptr_2 = ptr_2->cdr().get()) {
+          const LPointer& scalar_ptr = ptr_2->car();
+          Lisp::CheckType(*scalar_ptr, LType::NUMBER);
+          matrix[i][j] = scalar_ptr->number();
+        }
+      }
+
+      return matrix;
+    }
+
     // 最大の固有値固有ベクトルを求める。
     std::tuple<double, Vec> Eigen(const Mat& mat) {
       unsigned int size = mat.size();
@@ -7336,6 +7324,61 @@ R"...(### clock ###
 
         // 割る。
         pivot_to_one(i, j);
+
+        // 掛けて引く。
+        for (unsigned int row = 0; row < size_1; ++row) {
+          if (row != i) to_zero_by_pivot(i, j, row);
+        }
+      }
+
+      return ret;
+    }
+
+    // 行列式。
+    double Determinant(const Mat& mat) {
+      unsigned int size_1 = mat.size();
+      unsigned int size_2 = mat[0].size();
+      Mat copy(mat);
+
+      // ピボットする関数。
+      auto pivot =
+      [&copy, size_1](unsigned int i, unsigned int j) -> double {
+        double sign = 1.0;
+        for (; i < (size_1 - 1); ++i) {
+          std::swap(copy[i], copy[i + 1]);
+          sign *= -1.0;
+        }
+        return sign;
+      };
+
+      // ピボット位置を1にする関数。
+      auto pivot_to_one =
+      [&copy](unsigned int i, unsigned int j) -> double {
+        double num = copy[i][j];
+        copy[i] = (1 / num) * copy[i];
+        return num;
+      };
+
+      // 指定行のピボット列を0にする関数。
+      auto to_zero_by_pivot =
+      [&copy](unsigned int i, unsigned int j, unsigned int row) {
+        double num = copy[row][j];
+        copy[row] = copy[row] - (num * copy[i]);
+      };
+
+      // 掃き出し法開始。
+      double ret = 1.0;
+      for (unsigned int i = 0, j = 0; (i < size_1) && (j < size_2);
+      ++i, ++j) {
+        // ピボットのチェック。
+        for (unsigned int count = size_1 - 1 - i;
+        (copy[i][j] == 0.0) && (count > 0); --count) {
+          ret *= pivot(i, j);
+        }
+        if (copy[i][j] == 0.0) return 0.0;  // ピボットがこれ以上できない。
+
+        // 割る。
+        ret *= pivot_to_one(i, j);
 
         // 掛けて引く。
         for (unsigned int row = 0; row < size_1; ++row) {

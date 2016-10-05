@@ -3789,6 +3789,13 @@ namespace Sayuri {
     }
 
     /**
+     * リストを行列にする。
+     * @param list 行列にしたいリスト。
+     * @return 行列。
+     */
+    Mat ListToMatrix(const LObject& list);
+
+    /**
      * べき乗法でもっとも大きい固有値、固有ベクトルを計算する。
      * @param mat 固有値を調べたい行列。
      * @return (固有値, 固有ベクトル)のタプル。
@@ -3801,6 +3808,13 @@ namespace Sayuri {
      * @return 逆行列。
      */
     Mat Inverse(const Mat& mat);
+
+    /**
+     * 行列式を求める。
+     * @param mat 行列。
+     * @return 行列式。
+     */
+    double Determinant(const Mat& mat);
   }  // namespace LMath
 
   /** Passive-Aggressive-2 */
