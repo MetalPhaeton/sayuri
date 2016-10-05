@@ -4293,6 +4293,33 @@ R"...(### inverse-matrix ###
     ;; > (1 1 -1))...";
     help_dict_.emplace("inverse-matrix", help);
 
+    func = LC_FUNCTION_OBJ(Determinant);
+    INSERT_LC_FUNCTION(func, "determinant", "Lisp:determinant");
+    help =
+R"...(### determinant ###
+
+<h6> Usage </h6>
+
+* `(determinant <Square matrix>)`
+
+<h6> Description </h6>
+
+* Returns Determinant of `<Square Matrix>`.
+* `<Square matrix>` is `(<Row vectors>...)`.
+
+<h6> Example </h6>
+
+    ;; Matrix.
+    ;; |  3  0  1  6 |
+    ;; |  1  2  2 -1 |
+    ;; |  2 -1  5  0 |
+    ;; |  1  4  1  1 |
+    (define matrix '((3 0 1 6) (1 2 2 -1) (2 -1 5 0) (1 4 1 1)))
+    (display (determinant matrix))
+    ;; Output
+    ;; > 67)...";
+    help_dict_.emplace("determinant", help);
+
     func = LC_FUNCTION_OBJ(Bayes);
     INSERT_LC_FUNCTION(func, "bayes", "Lisp:bayes");
     help =
@@ -6828,6 +6855,22 @@ R"...(### clock ###
     }
 
     return LPointerVecToList(ret_vec);
+  }
+
+  // %%% determinant
+  DEF_LC_FUNCTION(Lisp::Determinant) {
+    using namespace LMath;
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+
+    // 行列を作る。
+    LPointer matrix_ptr = caller->Evaluate(*(args_ptr->car()));
+    Mat matrix = ListToMatrix(*matrix_ptr);
+
+    // 行列式を計算する。
+    return NewNumber(LMath::Determinant(matrix));
   }
 
   // %%% bayes
