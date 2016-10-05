@@ -3793,35 +3793,14 @@ namespace Sayuri {
      * @param mat 固有値を調べたい行列。
      * @return (固有値, 固有ベクトル)のタプル。
      */
-    inline std::tuple<double, Vec> Eigen(const Mat& mat) {
-      unsigned int size = mat.size();
-      Vec vec(size, 0.0);
-      vec[0] = 1.0;
-      double lambda_old = 0.0, lambda = 0.0;
-      double diff_old = std::numeric_limits<double>::max(), diff = 0.0;
-      Vec result(size, 0.0);
+    std::tuple<double, Vec> Eigen(const Mat& mat);
 
-      unsigned int count = 0;
-      do {
-        result = mat * vec;
-        lambda = result * vec;
-        vec = (1 / std::sqrt(result * result)) * result;
-
-        // 収束判定。
-        diff = std::fabs(lambda - lambda_old);
-        if (diff <= 0.0) break;
-        if (diff == diff_old) break;  // 誤差で無限ループをしている。
-
-        lambda_old = lambda;
-        diff_old = diff;
-        ++count;
-      } while (count < 1000);
-
-      // 収束しなかった。
-      if (count >= 1000) return make_tuple(0.0, Vec(size, 0.0));
-
-      return make_tuple(lambda, vec);
-    }
+    /**
+     * 逆行列を求める。
+     * @param mat 行列。
+     * @return 逆行列。
+     */
+    Mat Inverse(const Mat& mat);
   }  // namespace LMath
 
   /** Passive-Aggressive-2 */

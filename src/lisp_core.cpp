@@ -4260,6 +4260,39 @@ R"...(### power-method ###
     ;; > (1 (1 0 0)))...";
     help_dict_.emplace("power-method", help);
 
+    func = LC_FUNCTION_OBJ(InverseMatrix);
+    INSERT_LC_FUNCTION(func, "inverse-matrix", "Lisp:inverse-matrix");
+    help =
+R"...(### inverse-matrix ###
+
+<h6> Usage </h6>
+
+* `(inverse-matrix <Square matrix>)`
+
+<h6> Description </h6>
+
+* Returns Inverse Matrix of `<Square Matrix>`.
+* `<Square matrix>` is `(<Row vectors>...)`.
+
+<h6> Example </h6>
+
+    ;; Matrix.
+    ;; | 1 0 1 |
+    ;; | 1 1 1 |
+    ;; | 2 1 1 |
+    (define matrix '((1 0 1) (1 1 1) (2 1 1)))
+    
+    ;; Calculate inverse matrix.
+    (define inv-matrix (inverse-matrix matrix))
+    (display (ref inv-matrix 0))
+    (display (ref inv-matrix 1))
+    (display (ref inv-matrix 2))
+    ;; Output
+    ;; > (0 -1 1)
+    ;; > (-1 1 0)
+    ;; > (1 1 -1))...";
+    help_dict_.emplace("inverse-matrix", help);
+
     func = LC_FUNCTION_OBJ(Bayes);
     INSERT_LC_FUNCTION(func, "bayes", "Lisp:bayes");
     help =
@@ -6767,7 +6800,7 @@ R"...(### clock ###
       int dim_2 = CountList(*vector_list);
       if (dim_2 != dim) {
         throw GenError("@function-error", "'" + vector_list->ToString()
-        + "' doesn't have " + std::to_string(dim) + "elements.");
+        + "' doesn't have " + std::to_string(dim) + " elements.");
       }
 
       LObject* ptr_2 = vector_list.get();
@@ -6790,6 +6823,50 @@ R"...(### clock ###
     NewPair(MathVecToList(eigen_vec), NewNil()));
 
     return ret_ptr;
+  }
+
+  // %%% inverse-matrix
+  DEF_LC_FUNCTION(Lisp::InverseMatrix) {
+    using namespace LMath;
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    // 行列を作る。
+    LPointer matrix_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*matrix_ptr);
+
+    int dim = CountList(*matrix_ptr);
+    Mat matrix = GenMatrix(dim, dim);
+
+    LObject* ptr_1 = matrix_ptr.get();
+    for (int i = 0; i < dim; ++i, Next(&ptr_1)) {
+      const LPointer& vector_list = ptr_1->car();
+      CheckList(*vector_list);
+      int dim_2 = CountList(*vector_list);
+      if (dim_2 != dim) {
+        throw GenError("@function-error", "'" + vector_list->ToString()
+        + "' doesn't have " + std::to_string(dim) + " elements.");
+      }
+
+      LObject* ptr_2 = vector_list.get();
+      for (int j = 0; j < dim; ++j, Next(&ptr_2)) {
+        const LPointer& scalar_ptr = ptr_2->car();
+        CheckType(*scalar_ptr, LType::NUMBER);
+        matrix[i][j] = scalar_ptr->number();
+      }
+    }
+
+    // 逆行列を計算する。
+    Mat inv_matrix = LMath::Inverse(matrix);
+
+    // リストにする。
+    LPointerVec ret_vec(dim);
+    for (int i = 0; i < dim; ++i) {
+      ret_vec[i] = MathVecToList(inv_matrix[i]);
+    }
+
+    return LPointerVecToList(ret_vec);
   }
 
   // %%% bayes
@@ -7174,4 +7251,99 @@ R"...(### clock ###
   DEF_LC_FUNCTION(LPA2::GetWeights) {
     return LMath::MathVecToList(weight_vec_);
   }
+
+  namespace LMath {
+    // 最大の固有値固有ベクトルを求める。
+    std::tuple<double, Vec> Eigen(const Mat& mat) {
+      unsigned int size = mat.size();
+      Vec vec(size, 0.0);
+      vec[0] = 1.0;
+      double lambda_old = 0.0, lambda = 0.0;
+      double diff_old = std::numeric_limits<double>::max(), diff = 0.0;
+      Vec result(size, 0.0);
+
+      unsigned int count = 0;
+      do {
+        result = mat * vec;
+        lambda = result * vec;
+        vec = (1 / std::sqrt(result * result)) * result;
+
+        // 収束判定。
+        diff = std::fabs(lambda - lambda_old);
+        if (diff <= 0.0) break;
+        if (diff == diff_old) break;  // 誤差で無限ループをしている。
+
+        lambda_old = lambda;
+        diff_old = diff;
+        ++count;
+      } while (count < 1000);
+
+      // 収束しなかった。
+      if (count >= 1000) return make_tuple(0.0, Vec(size, 0.0));
+
+      return make_tuple(lambda, vec);
+    }
+
+    // 逆行列を求める。
+    Mat Inverse(const Mat& mat) {
+      unsigned int size_1 = mat.size();
+      unsigned int size_2 = mat[0].size();
+      Mat copy(mat);
+
+      // 単位行列を作る。
+      Mat ret = GenMatrix(size_1, size_2);
+      for (unsigned int i = 0; i < size_1; ++i) {
+        for (unsigned int j = 0; j < size_2; ++j) {
+          if (i == j) ret[i][j] = 1.0;
+          else ret[i][j] = 0.0;
+        }
+      }
+
+      // ピボットする関数。
+      auto pivot =
+      [&copy, &ret, size_1](unsigned int i, unsigned int j) {
+        for (; i < (size_1 - 1); ++i) {
+          std::swap(copy[i], copy[i + 1]);
+          std::swap(ret[i], ret[i + 1]);
+        }
+      };
+
+      // ピボット位置を1にする関数。
+      auto pivot_to_one =
+      [&copy, &ret](unsigned int i, unsigned int j) {
+        double num = 1 / copy[i][j];
+        copy[i] = num * copy[i];
+        ret[i] = num * ret[i];
+      };
+
+      // 指定行のピボット列を0にする関数。
+      auto to_zero_by_pivot =
+      [&copy, &ret](unsigned int i, unsigned int j, unsigned int row) {
+        double num = copy[row][j];
+        copy[row] = copy[row] - (num * copy[i]);
+        ret[row] = ret[row] - (num * ret[i]);
+      };
+
+      // 掃き出し法開始。
+      for (unsigned int i = 0, j = 0; (i < size_1) && (j < size_2);
+      ++i, ++j) {
+        // ピボットのチェック。
+        for (unsigned int count = size_1 - 1 - i;
+        (copy[i][j] == 0.0) && (count > 0); --count) {
+          pivot(i, j);
+        }
+        if (copy[i][j] == 0.0) break;  // ピボットがこれ以上できない。
+
+        // 割る。
+        pivot_to_one(i, j);
+
+        // 掛けて引く。
+        for (unsigned int row = 0; row < size_1; ++row) {
+          if (row != i) to_zero_by_pivot(i, j, row);
+        }
+      }
+
+      return ret;
+    }
+  }  // namespace LMath
 }  // namespace Sayuri
