@@ -3531,6 +3531,9 @@ namespace Sayuri {
       /** ネイティブ関数 - gen-nabla */
       DEF_LC_FUNCTION(GenNabla);
 
+      /** ネイティブ関数 - integral */
+      DEF_LC_FUNCTION(Integral);
+
       /** ネイティブ関数 - power-method */
       DEF_LC_FUNCTION(PowerMethod);
 

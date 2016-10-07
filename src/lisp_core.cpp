@@ -4231,6 +4231,36 @@ R"...(### gen-nabla ###
     ;; > (2 3 4))...";
     help_dict_.emplace("gen-nabla", help);
 
+    func = LC_FUNCTION_OBJ(Integral);
+    INSERT_LC_FUNCTION(func, "integral", "Lisp:integral");
+    help =
+R"...(### integral ###
+
+<h6> Usage </h6>
+
+* `(integral <Mathematical function : Function> <Range and delta : List>...)`
+
+<h6> Description </h6>
+
+* Integrates `<Mathematical function>` with `<Range and delta>...`.
+    + `<Range and delta>...` is List that
+      `(<From : Number> <To : Number> <Delta : Number>)`
+
+<h6> Example </h6>
+
+    ;; Integral x^2 + y^2 dxdy (x from 0 to 3) (y from 0 to 5)
+    (define (func x y) (+ (* x x) (* y y)))
+    (display (integral func '(0 3 0.1) '(0 5 0.1)))
+    ;; Output
+    ;; > 169.975
+    
+    ;; (1/3)(x^3)y + (1/3)(y^3)x is a primitive function of x^2 + y^2
+    (define (primitive x y) (+ (* (/ 1 3) x x x y) (* (/ 1 3) y y y x)))
+    (display (primitive 3 5))
+    ;; Output
+    ;; > 170)...";
+    help_dict_.emplace("integral", help);
+
     func = LC_FUNCTION_OBJ(PowerMethod);
     INSERT_LC_FUNCTION(func, "power-method", "Lisp:power-method");
     help =
@@ -6835,6 +6865,80 @@ R"...(### clock ###
     return NewN_Function(nabla_func, "Lisp:gen-nabla:"
     + std::to_string(reinterpret_cast<size_t>(func_expr.get())),
     caller->scope_chain());
+  }
+
+  // %%% integral
+  DEF_LC_FUNCTION(Lisp::Integral) {
+    using namespace LMath;
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 2, &args_ptr);
+
+    // 第1引数は関数。
+    LPointer func_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*func_ptr, LType::FUNCTION);
+    LPointer func_expr = NewPair(func_ptr, NewNil());
+    Next(&args_ptr);
+
+    // 積分用関数を作る。
+    int len = CountList(*args_ptr);
+    LPointer var_list = NewList(len);  // 引数リスト。
+    func_expr->cdr(var_list);  // セット。
+    LObject* var_ptr = var_list.get();
+    std::vector<std::function<double()>> sum_func_vec(len);
+    LPointer result;
+    for (int i = 0; i < len; ++i, Next(&args_ptr), Next(&var_ptr)) {
+      result = caller->Evaluate(*(args_ptr->car()));
+      CheckList(*result);
+      if (CountList(*result) < 3) {
+        throw GenError("@function-error", "'" + result->ToString()
+        + "' doesn't have 3 elements and more.");
+      }
+      const LPointer& from_ptr = result->car();
+      CheckType(*from_ptr, LType::NUMBER);
+      const LPointer& to_ptr = result->cdr()->car();
+      CheckType(*to_ptr, LType::NUMBER);
+      const LPointer& delta_ptr = result->cdr()->cdr()->car();
+      CheckType(*delta_ptr, LType::NUMBER);
+
+      double from = from_ptr->number();
+      double to = to_ptr->number();
+      double delta = std::fabs(delta_ptr->number());
+      delta = (to - from) < 0.0 ? -delta : delta;
+      from += delta / 2.0;
+      var_ptr->car(NewNumber(from));
+      LObject* m_var_ptr = var_ptr->car().get();
+
+      if (i == 0) {
+        auto func =
+        [func_expr, var_list, m_var_ptr, from, to, delta, caller]() -> double {
+          double ret = 0.0;
+          LPointer result;
+          for (double current = from; current < to; current += delta) {
+            m_var_ptr->number(current);
+            result = caller->Evaluate(*func_expr);
+            ret += result->number();
+          }
+          return ret * delta;
+        };
+        sum_func_vec[i] = func;
+      } else {
+        std::function<double()>* sum_func_ptr = &(sum_func_vec[i - 1]);
+        auto func =
+        [sum_func_ptr, m_var_ptr, from, to, delta]() -> double {
+          double ret = 0.0;
+          for (double current = from; current < to; current += delta) {
+            m_var_ptr->number(current);
+            ret += (*sum_func_ptr)();
+          }
+          return ret * delta;
+        };
+        sum_func_vec[i] = func;
+      }
+    }
+
+    // 積分する。
+    return NewNumber(sum_func_vec[len - 1]());
   }
 
   // %%% power-method
