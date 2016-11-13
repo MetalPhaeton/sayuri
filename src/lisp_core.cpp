@@ -4394,7 +4394,6 @@ R"...(### bayes ###
 
 * Estimates logit of each event of `<Event list>` by Naive Bayes
   and returns its list.
-    + The base of logit is '2'. (Binary logarithm.)
 * Each element of `<Event ist>` or `<Conditions list>` must be Predicate.
     + Predicate accepts 1 argument(an element of `<Data list>`)
       and returns Boolean or Number(from 0.0 to 1.0).
@@ -4449,7 +4448,7 @@ R"...(### bayes ###
     (display "Logit : " logit-list)
     (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : (-1.58359371974477)
+    ;; > Logit : (-1.09766352199352)
     ;; > Probability : (0.25017793594306)
     
     ;; Logit of P(Even | Face) and P(Odd | Face)
@@ -4460,7 +4459,7 @@ R"...(### bayes ###
     (display "Logit : " logit-list)
     (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : (-0.996671982282245 0.996671982282245)
+    ;; > Logit : (-0.690840374462031 0.690840374462031)
     ;; > Probability : (0.333846153846154 0.666153846153846)
     
     ;; Logit of P(Heart | Black)
@@ -4471,8 +4470,8 @@ R"...(### bayes ###
     (display "Logit : " logit-list)
     (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : (-10.4563544151083)
-    ;; > Probability : (0.000711237553342817)
+    ;; > Logit : (-7.24779258176785)
+    ;; > Probability : (0.000711237553342816)
     
     ;; ---------- Second Example ---------- ;;
     ;; Quantity of seasoning and taste data list.
@@ -4517,7 +4516,7 @@ R"...(### bayes ###
     (display "Logit : " logit-list)
     (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : (1.62707953043571 -1.62707953043571)
+    ;; > Logit : (1.12780558906831 -1.12780558906831)
     ;; > Probability : (0.755433701008636 0.244566298991364)
     
     ;; Probability of taste, when seasoning is sugar.
@@ -4526,7 +4525,7 @@ R"...(### bayes ###
     (display "Logit : " logit-list)
     (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : (-0.588762156944997 0.588762156944997)
+    ;; > Logit : (-0.408098829106817 0.408098829106817)
     ;; > Probability : (0.399368073757344 0.600631926242656)
     
     ;; Probability of taste, when seasoning is wasabi.
@@ -4535,7 +4534,7 @@ R"...(### bayes ###
     (display "Logit : " logit-list)
     (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : (2.88588923517973 -2.88588923517973)
+    ;; > Logit : (2.00034598677312 -2.00034598677312)
     ;; > Probability : (0.880833399583934 0.119166600416066)
     
     ;; Probability of taste, when seasoning is salt and sugar.
@@ -4544,7 +4543,7 @@ R"...(### bayes ###
     (display "Logit : " logit-list)
     (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : (0.386240676911015 -0.386240676911015)
+    ;; > Logit : (0.267721636218435 -0.267721636218435)
     ;; > Probability : (0.566533484706568 0.433466515293432)
     
     ;; Probability of taste, when seasoning is salt and wasabi.
@@ -4553,8 +4552,8 @@ R"...(### bayes ###
     (display "Logit : " logit-list)
     (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : (3.86089206903574 -3.86089206903574)
-    ;; > Probability : (0.935605546063172 0.0643944539368279)
+    ;; > Logit : (2.67616645209838 -2.67616645209838)
+    ;; > Probability : (0.935605546063172 0.064394453936828)
     
     ;; Probability of taste, when seasoning is sugar and wasabi.
     (set! logit-list
@@ -4562,7 +4561,7 @@ R"...(### bayes ###
     (display "Logit : " logit-list)
     (display "Probability : " (map logit->prob logit-list))
     ;; Output
-    ;; > Logit : (1.64505038165504 -1.64505038165504)
+    ;; > Logit : (1.14026203392325 -1.14026203392325)
     ;; > Probability : (0.757727745498944 0.242272254501056))...";
     help_dict_.emplace("bayes", help);
 
@@ -4577,7 +4576,7 @@ R"...(### logit->prob ###
 
 <h6> Description </h6>
 
-* Converts logit(Binary logarithm) to probability and returns it.
+* Converts logit to probability and returns it.
 
 <h6> Example </h6>
 
@@ -4597,7 +4596,7 @@ R"...(### prob->logit ###
 
 <h6> Description </h6>
 
-* Converts probability to logit(Binary logarithm) and returns it.
+* Converts probability to logit and returns it.
 * `<Probability>` must be greater than 0.0 and less than 1.0.
     + 0.0 or 1.0 occurs error.
 
@@ -7175,23 +7174,23 @@ R"...(### clock ###
 
     // 対数化してロジットを計算する。
     LPointerVec ret_vec(num_event);
-    double all_lb = std::log2(num_all);
+    double all_lb = std::log(num_all);
     double delta = 1.0 / (num_all + 1.0);
     for (int i = 0; i < num_event; ++i) {
       // イベントの数を対数化。
-      double event_lb = std::log2(event_count[i]);
-      double not_event_lb = std::log2(not_event_count[i]);
+      double event_lb = std::log(event_count[i]);
+      double not_event_lb = std::log(not_event_count[i]);
 
       // trueの対数。
       double true_lb = event_lb - all_lb;
       for (int j = 0; j < num_cond; ++j) {
-        true_lb += std::log2(cond_count[i][j] + delta) - event_lb;
+        true_lb += std::log(cond_count[i][j] + delta) - event_lb;
       }
 
       // falseの対数。
       double false_lb = not_event_lb - all_lb;
       for (int j = 0; j < num_cond; ++j) {
-        false_lb += std::log2(not_cond_count[i][j] + delta) - not_event_lb;
+        false_lb += std::log(not_cond_count[i][j] + delta) - not_event_lb;
       }
 
       // ロジットを記録。
@@ -7211,7 +7210,7 @@ R"...(### clock ###
     LPointer value_ptr = caller->Evaluate(*(args_ptr->car()));
     CheckType(*value_ptr, LType::NUMBER);
 
-    return NewNumber(1.0 / (1.0 + std::exp2(-(value_ptr->number()))));
+    return NewNumber(1.0 / (1.0 + std::exp(-(value_ptr->number()))));
   }
 
   // %%% prob->logit
@@ -7229,7 +7228,7 @@ R"...(### clock ###
       "Probability must be greater than 0.0 and less than 1.0.");
     }
 
-    return NewNumber(std::log2(value / (1.0 - value)));
+    return NewNumber(std::log(value / (1.0 - value)));
   }
 
   // %%% gen-pa2

@@ -1944,10 +1944,7 @@
 
 <ul>
 <li>Estimates logit of each event of <code>&lt;Event list&gt;</code> by Naive Bayes
-  and returns its list.<ul>
-<li>The base of logit is '2'. (Binary logarithm.)</li>
-</ul>
-</li>
+  and returns its list.</li>
 <li>Each element of <code>&lt;Event ist&gt;</code> or <code>&lt;Conditions list&gt;</code> must be Predicate.<ul>
 <li>Predicate accepts 1 argument(an element of <code>&lt;Data list&gt;</code>)
   and returns Boolean or Number(from 0.0 to 1.0).<ul>
@@ -2006,7 +2003,7 @@
 (display "Logit : " logit-list)
 (display "Probability : " (map logit-&gt;prob logit-list))
 ;; Output
-;; &gt; Logit : (-1.58359371974477)
+;; &gt; Logit : (-1.09766352199352)
 ;; &gt; Probability : (0.25017793594306)
 
 ;; Logit of P(Even | Face) and P(Odd | Face)
@@ -2017,7 +2014,7 @@
 (display "Logit : " logit-list)
 (display "Probability : " (map logit-&gt;prob logit-list))
 ;; Output
-;; &gt; Logit : (-0.996671982282245 0.996671982282245)
+;; &gt; Logit : (-0.690840374462031 0.690840374462031)
 ;; &gt; Probability : (0.333846153846154 0.666153846153846)
 
 ;; Logit of P(Heart | Black)
@@ -2028,8 +2025,8 @@
 (display "Logit : " logit-list)
 (display "Probability : " (map logit-&gt;prob logit-list))
 ;; Output
-;; &gt; Logit : (-10.4563544151083)
-;; &gt; Probability : (0.000711237553342817)
+;; &gt; Logit : (-7.24779258176785)
+;; &gt; Probability : (0.000711237553342816)
 
 ;; ---------- Second Example ---------- ;;
 ;; Quantity of seasoning and taste data list.
@@ -2074,7 +2071,7 @@
 (display "Logit : " logit-list)
 (display "Probability : " (map logit-&gt;prob logit-list))
 ;; Output
-;; &gt; Logit : (1.62707953043571 -1.62707953043571)
+;; &gt; Logit : (1.12780558906831 -1.12780558906831)
 ;; &gt; Probability : (0.755433701008636 0.244566298991364)
 
 ;; Probability of taste, when seasoning is sugar.
@@ -2083,7 +2080,7 @@
 (display "Logit : " logit-list)
 (display "Probability : " (map logit-&gt;prob logit-list))
 ;; Output
-;; &gt; Logit : (-0.588762156944997 0.588762156944997)
+;; &gt; Logit : (-0.408098829106817 0.408098829106817)
 ;; &gt; Probability : (0.399368073757344 0.600631926242656)
 
 ;; Probability of taste, when seasoning is wasabi.
@@ -2092,7 +2089,7 @@
 (display "Logit : " logit-list)
 (display "Probability : " (map logit-&gt;prob logit-list))
 ;; Output
-;; &gt; Logit : (2.88588923517973 -2.88588923517973)
+;; &gt; Logit : (2.00034598677312 -2.00034598677312)
 ;; &gt; Probability : (0.880833399583934 0.119166600416066)
 
 ;; Probability of taste, when seasoning is salt and sugar.
@@ -2101,7 +2098,7 @@
 (display "Logit : " logit-list)
 (display "Probability : " (map logit-&gt;prob logit-list))
 ;; Output
-;; &gt; Logit : (0.386240676911015 -0.386240676911015)
+;; &gt; Logit : (0.267721636218435 -0.267721636218435)
 ;; &gt; Probability : (0.566533484706568 0.433466515293432)
 
 ;; Probability of taste, when seasoning is salt and wasabi.
@@ -2110,8 +2107,8 @@
 (display "Logit : " logit-list)
 (display "Probability : " (map logit-&gt;prob logit-list))
 ;; Output
-;; &gt; Logit : (3.86089206903574 -3.86089206903574)
-;; &gt; Probability : (0.935605546063172 0.0643944539368279)
+;; &gt; Logit : (2.67616645209838 -2.67616645209838)
+;; &gt; Probability : (0.935605546063172 0.064394453936828)
 
 ;; Probability of taste, when seasoning is sugar and wasabi.
 (set! logit-list
@@ -2119,10 +2116,10 @@
 (display "Logit : " logit-list)
 (display "Probability : " (map logit-&gt;prob logit-list))
 ;; Output
-;; &gt; Logit : (1.64505038165504 -1.64505038165504)
+;; &gt; Logit : (1.14026203392325 -1.14026203392325)
 ;; &gt; Probability : (0.757727745498944 0.242272254501056)
 </code></pre>
-<h3 id="logit-to-prob">logit-&gt;prob</h3>
+<h3 id="logit-prob">logit-&gt;prob</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -2131,7 +2128,7 @@
 <h6> Description </h6>
 
 <ul>
-<li>Converts logit(Binary logarithm) to probability and returns it.</li>
+<li>Converts logit to probability and returns it.</li>
 </ul>
 <h6> Example </h6>
 
@@ -2139,7 +2136,7 @@
 ;; Output
 ;; &gt; 0.5
 </code></pre>
-<h3 id="prob-to-logit">prob-&gt;logit</h3>
+<h3 id="prob-logit">prob-&gt;logit</h3>
 <h6> Usage </h6>
 
 <ul>
@@ -2148,7 +2145,7 @@
 <h6> Description </h6>
 
 <ul>
-<li>Converts probability to logit(Binary logarithm) and returns it.</li>
+<li>Converts probability to logit and returns it.</li>
 <li><code>&lt;Probability&gt;</code> must be greater than 0.0 and less than 1.0.<ul>
 <li>0.0 or 1.0 occurs error.</li>
 </ul>
