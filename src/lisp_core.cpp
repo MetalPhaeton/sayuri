@@ -5354,16 +5354,16 @@ R"...(### clock ###
   // %%% gen-scope
   DEF_LC_FUNCTION(Lisp::GenScope) {
     // スコープを作成。
-    std::shared_ptr<LScopeChain>
-    my_chain_ptr(new LScopeChain(caller->scope_chain()));
-    my_chain_ptr->AppendNewScope();
+    LScopePtr my_scope_ptr(new LScope());
 
     // 関数オブジェクトを作成。
     auto func =
-    [my_chain_ptr](LPointer self, LObject* caller, const LObject& args)
+    [my_scope_ptr](LPointer self, LObject* caller, const LObject& args)
     -> LPointer {
       // スコープをセット。
-      self->scope_chain(*my_chain_ptr);
+      LScopeChain chain = caller->scope_chain();
+      chain.push_back(my_scope_ptr);
+      self->scope_chain(chain);
 
       // 式を評価していく。
       LPointer ret_ptr = NewNil();
@@ -5375,7 +5375,7 @@ R"...(### clock ###
     };
 
     return NewN_Function(func, "Lisp::gen-scope:"
-    + std::to_string(reinterpret_cast<std::size_t>(my_chain_ptr.get())),
+    + std::to_string(reinterpret_cast<std::size_t>(my_scope_ptr.get())),
     caller->scope_chain());
   }
 
