@@ -1074,23 +1074,23 @@ R"...(### to-fen-position ###
 
       // サイド。
       itr = SIDE_MAP.find(list_ptr->symbol());
-      if (itr != SQUARE_MAP.end()) return NewNumber(itr->second);
+      if (itr != SIDE_MAP.end()) return NewNumber(itr->second);
 
       // 駒の種類。
       itr = PIECE_MAP.find(list_ptr->symbol());
-      if (itr != SQUARE_MAP.end()) return NewNumber(itr->second);
+      if (itr != PIECE_MAP.end()) return NewNumber(itr->second);
 
       // キャスリング。
       itr = CASTLING_MAP.find(list_ptr->symbol());
-      if (itr != SQUARE_MAP.end()) return NewNumber(itr->second);
+      if (itr != CASTLING_MAP.end()) return NewNumber(itr->second);
 
       // ファイル。
       itr = FYLE_MAP.find(list_ptr->symbol());
-      if (itr != SQUARE_MAP.end()) return NewNumber(itr->second);
+      if (itr != FYLE_MAP.end()) return NewNumber(itr->second);
 
       // ランク。
       itr = RANK_MAP.find(list_ptr->symbol());
-      if (itr != SQUARE_MAP.end()) return NewNumber(itr->second);
+      if (itr != RANK_MAP.end()) return NewNumber(itr->second);
     } else if (list_ptr->IsPair()) {
       Walk(*list_ptr, ChessToNumberCore);
     }
