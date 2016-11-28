@@ -3495,12 +3495,12 @@ Returns List of 7 Lists of 7 values.
 6th list : A target piece is Queen.  
 7th list : A target piece is King.
 
-1st value of each list : Futile value.
-2nd value of each list : A piece over the target is Pawn.
-3rd value of each list : A piece over the target is Knight.
-4th value of each list : A piece over the target is Bishop.
-5th value of each list : A piece over the target is Rook.
-6th value of each list : A piece over the target is Queen.
+1st value of each list : Futile value.  
+2nd value of each list : A piece over the target is Pawn.  
+3rd value of each list : A piece over the target is Knight.  
+4th value of each list : A piece over the target is Bishop.  
+5th value of each list : A piece over the target is Rook.  
+6th value of each list : A piece over the target is Queen.  
 7th value of each list : A piece over the target is King.
 
 `score = weight * value_table[pinning_piece][target][over_the_target]`

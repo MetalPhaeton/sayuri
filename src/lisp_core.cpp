@@ -6904,7 +6904,7 @@ R"...(### clock ###
       double to = to_ptr->number();
       double delta = std::fabs(delta_ptr->number());
       delta = (to - from) < 0.0 ? -delta : delta;
-      from += delta / 2.0;
+      from -= delta / 2.0;
       var_ptr->car(NewNumber(from));
       LObject* m_var_ptr = var_ptr->car().get();
 
