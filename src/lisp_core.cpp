@@ -5087,14 +5087,17 @@ R"...(### clock ###
     // 第2引数は定義式。
     LPointer expression_ptr = args_ptr->Clone();
 
-    // ローカルスコープを作る。
-    LScopeChain local_chain = caller->scope_chain();
-    local_chain.AppendNewScope();
+    // ローカルスコープの基礎を作る。
+    LScopeChain base_chain = caller->scope_chain();
 
     // 関数オブジェクトを作成。
     LC_Function func =
-    [macro_name_ptr, args_name_ptr, expression_ptr, local_chain]
+    [macro_name_ptr, args_name_ptr, expression_ptr, base_chain]
     (LPointer self, LObject* caller, const LObject& args) -> LPointer {
+      // ローカルスコープを作成。
+      LScopeChain local_chain = base_chain;
+      local_chain.AppendNewScope();
+
       // ローカルスコープに引数を評価せずにバインドしていく。
       LPointer args_ptr = args.cdr();
       LObject* names_ptr = args_name_ptr.get();
