@@ -1023,31 +1023,37 @@ R"...(### cdr ###
     ;; > (222 333))...";
     help_dict_.emplace("cdr", help);
 
-    func = LC_FUNCTION_OBJ(CdrFunc);
-    INSERT_LC_FUNCTION(func, "cdr", "Lisp:cdr");
+    func = LC_FUNCTION_OBJ(Cons);
+    INSERT_LC_FUNCTION(func, "cons", "Lisp:cons");
     help =
-R"...(### cdr ###
+R"...(### cons ###
 
 <h6> Usage </h6>
 
-* `(cdr <Pair or List>)`
+* `(cons <Object 1> <Object 2>)`
 
 <h6> Description </h6>
 
-* Returns Cdr value of `<Pair or List>`
+* Returns Pair. Car is `<Object 1>`, Cdr is `<Object 2>`.
 
 <h6> Example </h6>
 
-    (display (cdr '(111 . 222)))
-    ;; Output
-    ;; > 222
-    
-    (display (cdr (list 111 222 333)))
-    
-    ;; Output
-    ;; > (222 333))...";
-    help_dict_.emplace("cdr", help);
 
+    (display (cons 111 222))
+    
+    ;; Output
+    ;; > (111 . 222)
+    
+    (display (cons 111 '(222 333)))
+    
+    ;; Output
+    ;; > (111 222 333)
+    
+    (display (cons 444 (cons 555 (cons 666 ()))))
+    
+    ;; Output
+    ;; > (444 555 666))...";
+    help_dict_.emplace("cons", help);
 
     // cxrを登録。
     help =
