@@ -4145,10 +4145,9 @@ namespace Sayuri {
 
         double loss = HingeLossCore(y, copy);
         if (loss <= 0.0) return 0.0;
-        loss *= y;
+        loss *= y * DDoubleSigmoid(weights_ * copy);
 
-        weights_ = weights_
-        + ((loss * rate * DDoubleSigmoid(weights_ * copy)) * copy);
+        weights_ = weights_ + ((rate * loss) * copy);
 
         return -loss;
       }
@@ -4168,11 +4167,12 @@ namespace Sayuri {
         using namespace LMath;
 
         double loss = differentiated_parent_loss * related_weights_to_me;
+
         Vec copy = children_output;
         copy.push_back(1.0);
+        loss *= DDoubleSigmoid(weights_ * copy);
 
-        weights_ = weights_
-        - ((rate * loss * DDoubleSigmoid(weights_ * copy)) * copy);
+        weights_ = weights_ - ((rate * loss) * copy);
 
         return loss;
       }
