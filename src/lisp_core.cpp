@@ -4734,6 +4734,228 @@ R"...(### gen-pa2 ###
     ;; > (80 300) is sweet? => No...)...";
     help_dict_.emplace("gen-pa2", help);
 
+    func = LC_FUNCTION_OBJ(GenAI);
+    INSERT_LC_FUNCTION(func, "gen-ai", "Lisp:gen-ai");
+    help =
+R"...(### gen-ai ###
+
+<h6> Usage </h6>
+
+* `(gen-ai <Initial weights : List> <Initial bias : Number)`
+* `(<AI> <Message symbol : Symbol> [<Arguments>...])`
+
+<h6> Description </h6>
+
+* Generates Artificial Intelligence `<AI>`.
+    + `<Initial weights>` is List of initial weights
+      that size is the number of feature vector.
+    + `<Initial bias>` is initial bias.
+* Difference between this and `(gen-pa2)`.
+    + This has bias.
+    + Supports PA PA-1 PA-2 and Neural Network.
+    + Feature vector can contain Boolean.
+* `<AI>`'s message symbol.
+    + `@get-weight`
+        - Returns current weights.
+    + `@get-bias`
+        - Returns current bias.
+    + `@score <Feature vector : List>`
+        - Returns `weights * feature_vector + bias`.
+    + `@dsig <Feature vector : List>`
+        - Returns doubled sigmoid function `(2 / (1 + exp(-score))) - 1`.
+        - Return value is from -1 to 1.
+    + `@judge <Feature vector : List>`
+        - Returns #t if score is positive number, otherwise returns #f.
+    + `@calc-loss <Desired output : Boolean> <Feature vector : List>`
+        - Returns Hinge Loss.
+    + `@train <Learning rate : Number> <Desired output : Boolean> <Feature vector : List>`
+        - Trains `<AI>` by Passive-Aggressive with `<Learning rate>`.
+        - Returns differentiated loss.
+        - If `<Learning rate>` is 0 then it doesn't learn.
+        - If `<Learning rate>` is 1 then it learns in Hard Margin.
+        - If `<Learning rate>` is from 0 to 1 then it learns in Soft Margin.
+        - If `<Learning rate>` is less than 0 then it increase loss.
+        - If `<Learning rate>` is more than 1 then it overdoes learning.
+    + `@train-pa1 <Cost : Number> <Desired output : Boolean> <Feature vector : List>`
+        - Trains `<AI>` by PA-1.
+        - Returns differentiated loss.
+        - `<Cost>` must be positive number and not 0.
+        - If `<Cost>` is infinite then same as Hard Margin,
+          otherwise Soft Margin.
+    + `@train-pa2 <Cost : Number> <Desired output : Boolean> <Feature vector : List>`
+        - Trains `<AI>` by PA-2.
+        - Returns differentiated loss.
+        - `<Cost>` must be positive number and not 0.
+        - If `<Cost>` is infinite then same as Hard Margin,
+          otherwise Soft Margin.
+    + `@train-dsig <Rate : Number> <Desired output : Boolean> <Children's output : List>`
+        - Trains as an output node of Neural Network.
+        - Returns differentiated loss.
+        - `<Rate>` must be positive number and not 0.
+        - In this `<AI>`,
+          `<Rate>` is maximum range of adjusted value of weight.
+              - If it is 1, then weight is adjusted +-1.
+                (I think 1 is too large.)
+    + `@train-bp <Rate : Number> <Each parent's Differentiated loss : List> <Each parent's weight related to me : List > <Children's output : List>`
+        - Trains as a node of middle layer of Neural Network.
+        - Returns differentiated loss.
+        - `<Rate>` must be positive number and not 0.
+        - In this `<AI>`,
+          `<Rate>` is maximum range of adjusted value of weight.
+              - If it is 1, then weight is adjusted +-1.
+                (I think 1 is too large.)
+        - `<Each parent's Differentiated loss>` is List of
+          each parent's differentiated loss
+          that is returned by parent's `@train-dsig`.
+        - `<Each parent's weight related to me>` is
+          List of weights related to itself.
+            - If the `<AI>` is 3rd node in the layer,
+              `<Each parent's weight related to me>` is
+              List of the 3rd weight of each parent's weights.
+
+<h6> Example </h6>
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;; Leaning whether seasoning is sweet or not. ;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;; Data List (<Sweet?> <Sugar> <Salt>)
+    (define data-list
+            '((#t 50 20)
+              (#f 10 60)
+              (#t 120 40)
+              (#f 20 80)
+              (#t 30 10)
+              (#f 50 100)))
+    
+    (define rate 0.8)
+    (define ai (gen-ai '(0 0) 0))
+    (for (data data-list)
+         (ai '@train rate (car data) (cdr data)))
+    
+    ;; Print results.
+    (define features-list '((90 10)
+                            (10 90)
+                            (60 40)
+                            (40 60)
+                            (50 50)))
+    (for (features features-list)
+         (display "Input : " features)
+         (display "    Judge : " (ai '@judge features))
+         (display "    Score : " (ai '@score features))
+         (display "    DSig : " (ai '@dsig features)))
+    ;; Output
+    ;; > Input : (90 10)
+    ;; >     Judge : #t
+    ;; >     Score : 2.0974914298626
+    ;; >     DSig : 0.781318239744493
+    ;; > Input : (10 90)
+    ;; >     Judge : #f
+    ;; >     Score : -1.48692391622152
+    ;; >     DSig : -0.631232240533035
+    ;; > Input : (60 40)
+    ;; >     Judge : #t
+    ;; >     Score : 0.753335675081053
+    ;; >     DSig : 0.359810182502856
+    ;; > Input : (40 60)
+    ;; >     Judge : #f
+    ;; >     Score : -0.142768161439977
+    ;; >     DSig : -0.0712630770425103
+    ;; > Input : (50 50)
+    ;; >     Judge : #t
+    ;; >     Score : 0.305283756820538
+    ;; >     DSig : 0.151467328449139
+    
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;; Neural Network. Learning XOR. ;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;; AIs.
+    ;; Input Middle Output
+    ;;    x1     a1     y1
+    ;;    x2     a2
+    (define (random-weight)
+            (if (>= (random 1) 0.5) (random 1) (* -1 (random 1))))
+    (define a1 (gen-ai (list (random-weight) (random-weight))
+                       (random-weight)))
+    (define a2 (gen-ai (list (random-weight) (random-weight))
+                       (random-weight)))
+    
+    (define y1 (gen-ai (list (random-weight) (random-weight))
+                       (random-weight)))
+    
+    ;; Calculation.
+    (define (score input)
+            (y1 '@score (list (a1 '@dsig input) (a2 '@dsig input))))
+    (define (dsig input)
+            (y1 '@dsig (list (a1 '@dsig input) (a2 '@dsig input))))
+    (define (judge input)
+            (y1 '@judge (list (a1 '@dsig input) (a2 '@dsig input))))
+    
+    ;; Training function.
+    (define learning-rate 0.25)
+    (define (train output input)
+            ;; Jot down y weights before training
+            (define y-weights
+                    (transposed-matrix (list (y1 '@get-weights))))
+    
+            ;; Jot down a outputs before training
+            (define a-outputs
+                    (list (a1 '@dsig input)
+                          (a2 '@dsig input)))
+    
+            ;; Train y1 and get its differentiated loss.
+            (define y-loss
+                    (list (y1 '@train-dsig learning-rate output a-outputs)))
+    
+            ;; Train a1 a2 with Back-Propagation.
+            (a1 '@train-bp learning-rate
+                y-loss (ref y-weights 0) input)
+            (a2 '@train-bp learning-rate
+                y-loss (ref y-weights 1) input)
+    
+            ;; Returns stuff.
+            #t)
+    
+    ;; XOR generator.
+    (define (random-xor)
+            (define x1 (if (>= (random 1) 0.5) 1 -1))
+            (define x2 (if (>= (random 1) 0.5) 1 -1))
+            (list (if (= x1 x2) #f #t) x1 x2))
+    
+    ;; Train 1000 times.
+    (define xor ())
+    (for (i (range 1000))
+         (set! xor (random-xor))
+         (train (car xor) (cdr xor)))
+    
+    ;; Judge.
+    (define logic-data-list
+            '((1 1)
+              (-1 1)
+              (1 -1)
+              (-1 -1)))
+    (for (data logic-data-list)
+         (display "Data : " data)
+         (display "    Judge : " (judge data))
+         (display "    Score : " (score data))
+         (display "    DSig : " (dsig data)))
+    ;; Output
+    ;; > Data : (1 1)
+    ;; >     Judge : #f
+    ;; >     Score : -0.997405931851626
+    ;; >     DSig : -0.461096496559793
+    ;; > Data : (-1 1)
+    ;; >     Judge : #t
+    ;; >     Score : 0.998459663081597
+    ;; >     DSig : 0.461511244491832
+    ;; > Data : (1 -1)
+    ;; >     Judge : #t
+    ;; >     Score : 0.996361608760615
+    ;; >     DSig : 0.46068525279309
+    ;; > Data : (-1 -1)
+    ;; >     Judge : #f
+    ;; >     Score : -0.996715328044157
+    ;; >     DSig : -0.460824566001313)...";
+    help_dict_.emplace("gen-ai", help);
+
     func = LC_FUNCTION_OBJ(RBFKernel);
     INSERT_LC_FUNCTION(func, "rbf-kernel", "Lisp:rbf-kernel");
     help =
@@ -7265,6 +7487,180 @@ R"...(### clock ###
 
     return NewN_Function(func,
     "Lisp:gen-pa2:" + std::to_string(reinterpret_cast<size_t>(obj_ptr.get())),
+    caller->scope_chain());
+  }
+
+  // %%% gen-ai
+  DEF_LC_FUNCTION(Lisp::GenAI) {
+    using namespace LMath;
+
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 2, &args_ptr);
+
+    // 初期ウェイトを得る。
+    LPointer weights_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckList(*weights_ptr);
+    Next(&args_ptr);
+    LMath::Vec weight_vec = LMath::ListToMathVec(*weights_ptr);
+    unsigned int len = weight_vec.size();
+
+    // 1つ以上あるかどうかを調べる
+    if (len <= 0) {
+      throw GenError("@function-error",
+      "(gen-ai) needs at least 1 element of List of weights.");
+    }
+
+    // 初期バイアスを得る。
+    LPointer bias_ptr = caller->Evaluate(*(args_ptr->car()));
+    CheckType(*bias_ptr, LType::NUMBER);
+
+    std::shared_ptr<LAI> obj_ptr(new LAI(weight_vec, bias_ptr->number()));
+    LC_Function func = [obj_ptr](LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      // 準備。
+      LObject* args_ptr = nullptr;
+      GetReadyForFunction(args, 1, &args_ptr);
+
+      // シンボルを得る。
+      LPointer symbol_ptr = caller->Evaluate(*(args_ptr->car()));
+      CheckType(*symbol_ptr, LType::SYMBOL);
+      const std::string& symbol = symbol_ptr->symbol();
+
+      // 特徴ベクトルを取り出す関数。
+      auto to_feature_vec = [](const LPointer& list) -> Vec {
+        for (LObject* ptr = list.get(); ptr->IsPair(); Next(&ptr)) {
+          const LPointer& car = ptr->car();
+          if (car->IsBoolean()) {
+            ptr->car(NewNumber(car->boolean() ? 1.0 : -1.0));
+          }
+        }
+        return ListToMathVec(*list);
+      };
+
+      // アクセサ。
+      if (symbol == "@get-weights") {
+        return MathVecToList(obj_ptr->weights());
+      }
+      if (symbol == "@get-bias") {
+        return NewNumber(obj_ptr->bias());
+      }
+
+      // 計算。
+      if ((symbol == "@score") || (symbol == "@dsig")
+      || (symbol == "@judge")) {
+        Next(&args_ptr);
+        CheckType(*args_ptr, LType::PAIR);
+
+        LPointer features_ptr = caller->Evaluate(*(args_ptr->car()));
+        CheckList(*features_ptr);
+        Vec features = to_feature_vec(features_ptr);
+
+        if (symbol == "@score") {
+          return NewNumber(obj_ptr->CalScore(features));
+        }
+        if (symbol == "@dsig") {
+          return NewNumber(obj_ptr->CalDoubleSigmoid(features));
+        }
+        if (symbol == "@judge") {
+          return NewBoolean(obj_ptr->Judge(features));
+        }
+      }
+      if (symbol == "@calc-loss") {
+        Next(&args_ptr);
+        CheckType(*args_ptr, LType::PAIR);
+
+        LPointer output_ptr = caller->Evaluate(*(args_ptr->car()));
+        CheckType(*output_ptr, LType::BOOLEAN);
+        bool desired_output = output_ptr->boolean();
+
+        Next(&args_ptr);
+        CheckType(*args_ptr, LType::PAIR);
+
+        LPointer features_ptr = caller->Evaluate(*(args_ptr->car()));
+        CheckList(*features_ptr);
+        Vec features = to_feature_vec(features_ptr);
+
+        return NewNumber(obj_ptr->HingeLoss(desired_output, features));
+      }
+
+      // 学習。
+      if ((symbol == "@train") || (symbol == "@train-pa1")
+      || (symbol == "@train-pa2") || (symbol == "@train-dsig")) {
+          Next(&args_ptr);
+          CheckType(*args_ptr, LType::PAIR);
+
+          LPointer num_ptr = caller->Evaluate(*(args_ptr->car()));
+          CheckType(*num_ptr, LType::NUMBER);
+          double num = num_ptr->number();
+
+          Next(&args_ptr);
+          CheckType(*args_ptr, LType::PAIR);
+
+          LPointer output_ptr = caller->Evaluate(*(args_ptr->car()));
+          CheckType(*output_ptr, LType::BOOLEAN);
+          bool desired_output = output_ptr->boolean();
+
+          Next(&args_ptr);
+          CheckType(*args_ptr, LType::PAIR);
+
+          LPointer features_ptr = caller->Evaluate(*(args_ptr->car()));
+          CheckList(*features_ptr);
+          Vec features = to_feature_vec(features_ptr);
+
+        if (symbol == "@train") {
+          return NewNumber(obj_ptr->Train(desired_output, features, num));
+        }
+        if (symbol == "@train-pa1") {
+          return NewNumber(obj_ptr->TrainPA1(desired_output, features, num));
+        }
+        if (symbol == "@train-pa2") {
+          return NewNumber(obj_ptr->TrainPA2(desired_output, features, num));
+        }
+        if (symbol == "@train-dsig") {
+          return NewNumber(obj_ptr->TrainDoubleSigmoid
+          (desired_output, features, num));
+        }
+      }
+      if (symbol == "@train-bp") {
+        Next(&args_ptr);
+        CheckType(*args_ptr, LType::PAIR);
+
+        LPointer rate_ptr = caller->Evaluate(*(args_ptr->car()));
+        CheckType(*rate_ptr, LType::NUMBER);
+        double rate = rate_ptr->number();
+
+        Next(&args_ptr);
+        CheckType(*args_ptr, LType::PAIR);
+
+        LPointer loss_ptr = caller->Evaluate(*(args_ptr->car()));
+        CheckList(*loss_ptr);
+        Vec loss = ListToMathVec(*loss_ptr);
+
+        Next(&args_ptr);
+        CheckType(*args_ptr, LType::PAIR);
+
+        LPointer weights_ptr = caller->Evaluate(*(args_ptr->car()));
+        CheckList(*weights_ptr);
+        Vec weights = ListToMathVec(*weights_ptr);
+
+        Next(&args_ptr);
+        CheckType(*args_ptr, LType::PAIR);
+
+        LPointer features_ptr = caller->Evaluate(*(args_ptr->car()));
+        CheckList(*features_ptr);
+        Vec features = to_feature_vec(features_ptr);
+
+        return NewNumber(obj_ptr->TrainBackPropagation(loss, weights,
+        features, rate));
+      }
+
+      throw GenError("@function-error", "'" + args.car()->ToString()
+      + "' couldn't understand '" + symbol + "'.");
+    };
+
+    return NewN_Function(func,
+    "Lisp:gen-ai:" + std::to_string(reinterpret_cast<size_t>(obj_ptr.get())),
     caller->scope_chain());
   }
 

@@ -3558,6 +3558,9 @@ namespace Sayuri {
       /** ネイティブ関数 - gen-pa2 */
       DEF_LC_FUNCTION(GenPA2);
 
+      /** ネイティブ関数 - gen-ai */
+      DEF_LC_FUNCTION(GenAI);
+
       /** ネイティブ関数 - rbf-kernel */
       DEF_LC_FUNCTION(RBFKernel);
 
@@ -3924,6 +3927,332 @@ namespace Sayuri {
       // ========== //
       /** ウェイト。 */
       LMath::Vec weight_vec_;
+  };
+
+  // 人工知能。
+  class LAI {
+    public:
+      // ==================== //
+      // コンストラクタと代入 //
+      // ==================== //
+      /**
+       * コンストラクタ。
+       * @param initial_weights 初期ウェイト。
+       * @param inital_bias 初期バイアス。
+       */
+      LAI(const LMath::Vec& inital_weights, double inital_bias) :
+      weights_(inital_weights) {
+        weights_.push_back(inital_bias);
+      }
+      /** コンストラクタ。 */
+      LAI() : weights_(1, 0) {}
+      /**
+       * コピーコンストラクタ。
+       * @param ai コピー元。
+       */
+      LAI(const LAI& ai) : weights_(ai.weights_) {}
+      /**
+       * ムーブコンストラクタ。
+       * @param ai ムーブ元。
+       */
+      LAI(LAI&& ai) : weights_(std::move(ai.weights_)) {}
+      /**
+       * コピー代入演算子。
+       * @param ai コピー元。
+       */
+      LAI& operator=(const LAI& ai) {
+        weights_ = ai.weights_;
+        return *this;
+      }
+      /**
+       * ムーブ代入演算子。
+       * @param ai ムーブ元。
+       */
+      LAI& operator=(LAI&& ai) {
+        weights_ = std::move(ai.weights_);
+        return *this;
+      }
+      /** デストラクタ。 */
+      virtual ~LAI() {}
+
+      // ======== //
+      // アクセサ //
+      // ======== //
+      /**
+       * アクセサ - ウェイトベクトル。
+       * @return ウェイトベクトル。
+       */
+      LMath::Vec weights() const {
+        LMath::Vec ret = weights_;
+        ret.pop_back();
+        return ret;
+      }
+      /**
+       * アクセサ - バイアス。
+       * @return バイアス。
+       */
+      double bias() const {return weights_.back();}
+
+      // ============== //
+      // パブリック関数 //
+      // ============== //
+      /**
+       * 訓練出力を数値にする。
+       * @param desired_output 訓練出力。
+       * @return 数値。
+       */
+      static constexpr double OutputToNumber(bool desired_output) {
+        return desired_output ? 1.0 : -1.0;
+      }
+
+      /**
+       * 得点を計算する。
+       * @param features 特徴ベクトル。
+       * @return 得点。
+       */
+      double CalScore(const LMath::Vec& features) const {
+        using namespace LMath;
+
+        Vec copy = features;
+        copy.push_back(1.0);
+
+        return copy * weights_;
+      }
+
+      /**
+       * 真偽をジャッジする。
+       * @param features 特徴ベクトル。
+       * @return 真偽値。
+       */
+      bool Judge(const LMath::Vec& features) const {
+        return CalScore(features) >= 0.0 ? true : false;
+      }
+
+      /**
+       * 得点を2倍シグモイドで加工して出力する。
+       * @param features 特徴ベクトル。
+       * @return 得点。 (-1 < f < 1)
+       */
+      double CalDoubleSigmoid(const LMath::Vec& features) const {
+        return DoubleSigmoid(CalScore(features));
+      }
+
+      /**
+       * ヒンジ損失。
+       * @param desired_output 訓練出力。
+       * @param features 特徴ベクトル。
+       * @return ヒンジ損失。
+       */
+      double HingeLoss(bool desired_output, const LMath::Vec& features)
+      const {
+        using namespace LMath;
+
+        double loss =
+        1 - (OutputToNumber(desired_output) * CalScore(features));
+        return loss > 0 ? loss : 0;
+      }
+
+      /**
+       * 学習する。 (PA)
+       * @param desired_output 訓練出力。
+       * @param features 特徴ベクトル。
+       * @param rate 学習率。
+       * @return 微分された損失。
+       */
+      double Train(bool desired_output, const LMath::Vec& features,
+      double rate) {
+        using namespace LMath;
+
+        double y = OutputToNumber(desired_output);
+        Vec copy = features;
+        copy.push_back(1.0);
+
+        double loss = HingeLossCore(y, copy);
+        if (loss <= 0.0) return 0.0;
+        loss *= y;
+
+        weights_ = weights_
+        + ((loss / CalDenominatorPA(copy, rate)) * copy);
+
+        return -loss;
+      }
+
+      /**
+       * 学習する。 (PA1)
+       * @param desired_output 訓練出力。
+       * @param features 特徴ベクトル。
+       * @param cost コスト。
+       * @return 微分された損失。
+       */
+      double TrainPA1(bool desired_output, const LMath::Vec& features,
+      double cost) {
+        using namespace LMath;
+
+        double y = OutputToNumber(desired_output);
+        Vec copy = features;
+        copy.push_back(1.0);
+
+        double hinge = HingeLossCore(y, copy);
+        if (hinge <= 0.0) return 0.0;
+        double loss = hinge / CalDenominatorPA1(copy);
+
+        loss = loss < cost ? loss : cost;
+
+        weights_ = weights_ + ((y * loss) * copy);
+
+        return -y * hinge;
+      }
+
+      /**
+       * 学習する。 (PA2)
+       * @param desired_output 訓練出力。
+       * @param features 特徴ベクトル。
+       * @param cost コスト。
+       * @return 微分された損失。
+       */
+      double TrainPA2(bool desired_output, const LMath::Vec& features,
+      double cost) {
+        using namespace LMath;
+
+        double y = OutputToNumber(desired_output);
+        Vec copy = features;
+        copy.push_back(1.0);
+
+        double loss = HingeLossCore(y, copy);
+        if (loss <= 0.0) return 0.0;
+        loss *= y;
+
+        weights_ = weights_
+        + ((loss / CalDenominatorPA2(copy, cost)) * copy);
+
+        return -loss;
+      }
+
+      /**
+       * 学習する。 (DoubleSigmoid)
+       * @param desired_output 訓練出力。
+       * @param features 特徴ベクトル。
+       * @param rate 学習率。
+       * @return 微分された損失。
+       */
+      double TrainDoubleSigmoid(bool desired_output,
+      const LMath::Vec& features, double rate) {
+        using namespace LMath;
+
+        double y = OutputToNumber(desired_output);
+        Vec copy = features;
+        copy.push_back(1.0);
+
+        double loss = HingeLossCore(y, copy);
+        if (loss <= 0.0) return 0.0;
+        loss *= y;
+
+        weights_ = weights_
+        + ((loss * rate * DDoubleSigmoid(weights_ * copy)) * copy);
+
+        return -loss;
+      }
+
+      /**
+       * バックプロパゲーションで学習する。
+       * @param differentiated_parent_loss 親の微分された損失のベクトル。
+       * @param related_weights_to_me 各親の自分用のウェイトのベクトル。
+       * @param children_output 各子の出力。
+       * @param rate 学習率。
+       * @return 微分された損失。
+       */
+      double TrainBackPropagation
+      (const LMath::Vec& differentiated_parent_loss,
+      const LMath::Vec& related_weights_to_me,
+      const LMath::Vec& children_output, double rate) {
+        using namespace LMath;
+
+        double loss = differentiated_parent_loss * related_weights_to_me;
+        Vec copy = children_output;
+        copy.push_back(1.0);
+
+        weights_ = weights_
+        - ((rate * loss * DDoubleSigmoid(weights_ * copy)) * copy);
+
+        return loss;
+      }
+
+    private:
+      /** ウェイトベクトル。 最後尾はバイアス。 */
+      LMath::Vec weights_;
+
+      // ================ //
+      // プライベート関数 //
+      // ================ //
+      /**
+       * ヒンジ損失。
+       * @param desired_output 訓練出力。
+       * @param features 特徴ベクトル。
+       * @return ヒンジ損失。
+       */
+      double HingeLossCore(double desired_output, const LMath::Vec& features)
+      const {
+        using namespace LMath;
+
+        double loss = 1 - (desired_output * (features * weights_));
+        return loss > 0.0 ? loss : 0.0;
+      }
+      /**
+       * 2倍シグモイド関数。 (-1 < f < 1)
+       * @param x 入力。
+       * @return 出力。
+       */
+      static double DoubleSigmoid(double x) {
+        return (2.0 / (1.0 + std::exp(-x))) - 1.0;
+      }
+      /**
+       * シグモイド関数。 (0 < f < 1)
+       * @param x 入力。
+       * @return 出力。
+       */
+      static double Sigmoid(double x) {
+        return 1.0 / (1.0 + std::exp(-x));
+      }
+      /**
+       * 2倍シグモイドの導関数。
+       * @param x 入力。
+       * @return 出力。
+       */
+      static double DDoubleSigmoid(double x) {
+        return 2.0 * Sigmoid(x) * (1.0 - Sigmoid(x));
+      }
+      /**
+       * 学習係数の分母を計算する。 (PA)
+       * @param features 特徴ベクトル。
+       * @param rate 学習率。
+       */
+      double CalDenominatorPA(const LMath::Vec& features, double rate) const {
+        using namespace LMath;
+
+        return (features * features) / rate;
+      }
+
+      /**
+       * 学習係数の分母を計算する。 (PA1)
+       * @param features 特徴ベクトル。
+       * @param cost コスト。
+       */
+      double CalDenominatorPA1(const LMath::Vec& features) const {
+        using namespace LMath;
+
+        return features * features;
+      }
+
+      /**
+       * 学習係数の分母を計算する。 (PA2)
+       * @param features 特徴ベクトル。
+       * @param cost コスト。
+       */
+      double CalDenominatorPA2(const LMath::Vec& features, double cost) const {
+        using namespace LMath;
+
+        return (features * features) + (1 / (2 * cost));
+      }
   };
 }  // namespace Sayuri
 

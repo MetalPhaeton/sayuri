@@ -152,6 +152,7 @@
 <li><a href="#logit-to-prob"><code>logit-&gt;prob</code></a> : Converts logit to probability.</li>
 <li><a href="#prob-to-logit"><code>prob-&gt;logit</code></a> : Converts probability to logit.</li>
 <li><a href="#gen-pa2"><code>gen-pa2</code></a> : Generates PA-2 object.</li>
+<li><a href="#gen-ai"><code>gen-ai</code></a> : Generates Artificial Intelligence.</li>
 <li><a href="#rbf-kernel"><code>rbf-kernel</code></a> : Calculates RBF-Kernel.</li>
 </ul>
 </li>
@@ -2284,6 +2285,260 @@
          (sweet? (pa2 '@calc (list normalized-1 normalized-2))))
 ;; Output
 ;; &gt; (80 300) is sweet? =&gt; No...
+</code></pre>
+<h3 id="gen-ai">gen-ai</h3>
+<h6> Usage </h6>
+
+<ul>
+<li><code>(gen-ai &lt;Initial weights : List&gt; &lt;Initial bias : Number)</code></li>
+<li><code>(&lt;AI&gt; &lt;Message symbol : Symbol&gt; [&lt;Arguments&gt;...])</code></li>
+</ul>
+<h6> Description </h6>
+
+<ul>
+<li>Generates Artificial Intelligence <code>&lt;AI&gt;</code>.<ul>
+<li><code>&lt;Initial weights&gt;</code> is List of initial weights
+  that size is the number of feature vector.</li>
+<li><code>&lt;Initial bias&gt;</code> is initial bias.</li>
+</ul>
+</li>
+<li>Difference between this and <code>(gen-pa2)</code>.<ul>
+<li>This has bias.</li>
+<li>Supports PA PA-1 PA-2 and Neural Network.</li>
+<li>Feature vector can contain Boolean.</li>
+</ul>
+</li>
+<li><code>&lt;AI&gt;</code>'s message symbol.<ul>
+<li><code>@get-weight</code><ul>
+<li>Returns current weights.</li>
+</ul>
+</li>
+<li><code>@get-bias</code><ul>
+<li>Returns current bias.</li>
+</ul>
+</li>
+<li><code>@score &lt;Feature vector : List&gt;</code><ul>
+<li>Returns <code>weights * feature_vector + bias</code>.</li>
+</ul>
+</li>
+<li><code>@dsig &lt;Feature vector : List&gt;</code><ul>
+<li>Returns doubled sigmoid function <code>(2 / (1 + exp(-score))) - 1</code>.</li>
+<li>Return value is from -1 to 1.</li>
+</ul>
+</li>
+<li><code>@judge &lt;Feature vector : List&gt;</code><ul>
+<li>Returns #t if score is positive number, otherwise returns #f.</li>
+</ul>
+</li>
+<li><code>@calc-loss &lt;Desired output : Boolean&gt; &lt;Feature vector : List&gt;</code><ul>
+<li>Returns Hinge Loss.</li>
+</ul>
+</li>
+<li><code>@train &lt;Learning rate : Number&gt; &lt;Desired output : Boolean&gt; &lt;Feature vector : List&gt;</code><ul>
+<li>Trains <code>&lt;AI&gt;</code> by Passive-Aggressive with <code>&lt;Learning rate&gt;</code>.</li>
+<li>Returns differentiated loss.</li>
+<li>If <code>&lt;Learning rate&gt;</code> is 0 then it doesn't learn.</li>
+<li>If <code>&lt;Learning rate&gt;</code> is 1 then it learns in Hard Margin.</li>
+<li>If <code>&lt;Learning rate&gt;</code> is from 0 to 1 then it learns in Soft Margin.</li>
+<li>If <code>&lt;Learning rate&gt;</code> is less than 0 then it increase loss.</li>
+<li>If <code>&lt;Learning rate&gt;</code> is more than 1 then it overdoes learning.</li>
+</ul>
+</li>
+<li><code>@train-pa1 &lt;Cost : Number&gt; &lt;Desired output : Boolean&gt; &lt;Feature vector : List&gt;</code><ul>
+<li>Trains <code>&lt;AI&gt;</code> by PA-1.</li>
+<li>Returns differentiated loss.</li>
+<li><code>&lt;Cost&gt;</code> must be positive number and not 0.</li>
+<li>If <code>&lt;Cost&gt;</code> is infinite then same as Hard Margin,
+  otherwise Soft Margin.</li>
+</ul>
+</li>
+<li><code>@train-pa2 &lt;Cost : Number&gt; &lt;Desired output : Boolean&gt; &lt;Feature vector : List&gt;</code><ul>
+<li>Trains <code>&lt;AI&gt;</code> by PA-2.</li>
+<li>Returns differentiated loss.</li>
+<li><code>&lt;Cost&gt;</code> must be positive number and not 0.</li>
+<li>If <code>&lt;Cost&gt;</code> is infinite then same as Hard Margin,
+  otherwise Soft Margin.</li>
+</ul>
+</li>
+<li><code>@train-dsig &lt;Rate : Number&gt; &lt;Desired output : Boolean&gt; &lt;Children's output : List&gt;</code><ul>
+<li>Trains as an output node of Neural Network.</li>
+<li>Returns differentiated loss.</li>
+<li><code>&lt;Rate&gt;</code> must be positive number and not 0.</li>
+<li>In this <code>&lt;AI&gt;</code>,
+  <code>&lt;Rate&gt;</code> is maximum range of adjusted value of weight.<ul>
+<li>If it is 1, then weight is adjusted +-1.
+    (I think 1 is too large.)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>@train-bp &lt;Rate : Number&gt; &lt;Each parent's Differentiated loss : List&gt; &lt;Each parent's weight related to me : List &gt; &lt;Children's output : List&gt;</code><ul>
+<li>Trains as a node of middle layer of Neural Network.</li>
+<li>Returns differentiated loss.</li>
+<li><code>&lt;Rate&gt;</code> must be positive number and not 0.</li>
+<li>In this <code>&lt;AI&gt;</code>,
+  <code>&lt;Rate&gt;</code> is maximum range of adjusted value of weight.<ul>
+<li>If it is 1, then weight is adjusted +-1.
+    (I think 1 is too large.)</li>
+</ul>
+</li>
+<li><code>&lt;Each parent's Differentiated loss&gt;</code> is List of
+  each parent's differentiated loss
+  that is returned by parent's <code>@train-dsig</code>.</li>
+<li><code>&lt;Each parent's weight related to me&gt;</code> is
+  List of weights related to itself.<ul>
+<li>If the <code>&lt;AI&gt;</code> is 3rd node in the layer,
+  <code>&lt;Each parent's weight related to me&gt;</code> is
+  List of the 3rd weight of each parent's weights.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h6> Example </h6>
+
+<pre><code>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Leaning whether seasoning is sweet or not. ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Data List (&lt;Sweet?&gt; &lt;Sugar&gt; &lt;Salt&gt;)
+(define data-list
+        '((#t 50 20)
+          (#f 10 60)
+          (#t 120 40)
+          (#f 20 80)
+          (#t 30 10)
+          (#f 50 100)))
+
+(define rate 0.8)
+(define ai (gen-ai '(0 0) 0))
+(for (data data-list)
+     (ai '@train rate (car data) (cdr data)))
+
+;; Print results.
+(define features-list '((90 10)
+                        (10 90)
+                        (60 40)
+                        (40 60)
+                        (50 50)))
+(for (features features-list)
+     (display "Input : " features)
+     (display "    Judge : " (ai '@judge features))
+     (display "    Score : " (ai '@score features))
+     (display "    DSig : " (ai '@dsig features)))
+;; Output
+;; &gt; Input : (90 10)
+;; &gt;     Judge : #t
+;; &gt;     Score : 2.0974914298626
+;; &gt;     DSig : 0.781318239744493
+;; &gt; Input : (10 90)
+;; &gt;     Judge : #f
+;; &gt;     Score : -1.48692391622152
+;; &gt;     DSig : -0.631232240533035
+;; &gt; Input : (60 40)
+;; &gt;     Judge : #t
+;; &gt;     Score : 0.753335675081053
+;; &gt;     DSig : 0.359810182502856
+;; &gt; Input : (40 60)
+;; &gt;     Judge : #f
+;; &gt;     Score : -0.142768161439977
+;; &gt;     DSig : -0.0712630770425103
+;; &gt; Input : (50 50)
+;; &gt;     Judge : #t
+;; &gt;     Score : 0.305283756820538
+;; &gt;     DSig : 0.151467328449139
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Neural Network. Learning XOR. ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; AIs.
+;; Input Middle Output
+;;    x1     a1     y1
+;;    x2     a2
+(define (random-weight)
+        (if (&gt;= (random 1) 0.5) (random 1) (* -1 (random 1))))
+(define a1 (gen-ai (list (random-weight) (random-weight))
+                   (random-weight)))
+(define a2 (gen-ai (list (random-weight) (random-weight))
+                   (random-weight)))
+
+(define y1 (gen-ai (list (random-weight) (random-weight))
+                   (random-weight)))
+
+;; Calculation.
+(define (score input)
+        (y1 '@score (list (a1 '@dsig input) (a2 '@dsig input))))
+(define (dsig input)
+        (y1 '@dsig (list (a1 '@dsig input) (a2 '@dsig input))))
+(define (judge input)
+        (y1 '@judge (list (a1 '@dsig input) (a2 '@dsig input))))
+
+;; Training function.
+(define learning-rate 0.25)
+(define (train output input)
+        ;; Jot down y weights before training
+        (define y-weights
+                (transposed-matrix (list (y1 '@get-weights))))
+
+        ;; Jot down a outputs before training
+        (define a-outputs
+                (list (a1 '@dsig input)
+                      (a2 '@dsig input)))
+
+        ;; Train y1 and get its differentiated loss.
+        (define y-loss
+                (list (y1 '@train-dsig learning-rate output a-outputs)))
+
+        ;; Train a1 a2 with Back-Propagation.
+        (a1 '@train-bp learning-rate
+            y-loss (ref y-weights 0) input)
+        (a2 '@train-bp learning-rate
+            y-loss (ref y-weights 1) input)
+
+        ;; Returns stuff.
+        #t)
+
+;; XOR generator.
+(define (random-xor)
+        (define x1 (if (&gt;= (random 1) 0.5) 1 -1))
+        (define x2 (if (&gt;= (random 1) 0.5) 1 -1))
+        (list (if (= x1 x2) #f #t) x1 x2))
+
+;; Train 1000 times.
+(define xor ())
+(for (i (range 1000))
+     (set! xor (random-xor))
+     (train (car xor) (cdr xor)))
+
+;; Judge.
+(define logic-data-list
+        '((1 1)
+          (-1 1)
+          (1 -1)
+          (-1 -1)))
+(for (data logic-data-list)
+     (display "Data : " data)
+     (display "    Judge : " (judge data))
+     (display "    Score : " (score data))
+     (display "    DSig : " (dsig data)))
+;; Output
+;; &gt; Data : (1 1)
+;; &gt;     Judge : #f
+;; &gt;     Score : -0.997405931851626
+;; &gt;     DSig : -0.461096496559793
+;; &gt; Data : (-1 1)
+;; &gt;     Judge : #t
+;; &gt;     Score : 0.998459663081597
+;; &gt;     DSig : 0.461511244491832
+;; &gt; Data : (1 -1)
+;; &gt;     Judge : #t
+;; &gt;     Score : 0.996361608760615
+;; &gt;     DSig : 0.46068525279309
+;; &gt; Data : (-1 -1)
+;; &gt;     Judge : #f
+;; &gt;     Score : -0.996715328044157
+;; &gt;     DSig : -0.460824566001313
 </code></pre>
 <h3 id="rbf-kernel">rbf-kernel</h3>
 <h6> Usage </h6>
