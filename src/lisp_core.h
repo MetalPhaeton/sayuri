@@ -4198,14 +4198,6 @@ namespace Sayuri {
         return loss > 0.0 ? loss : 0.0;
       }
       /**
-       * 2倍シグモイド関数。 (-1 < f < 1)
-       * @param x 入力。
-       * @return 出力。
-       */
-      static double DoubleSigmoid(double x) {
-        return (2.0 / (1.0 + std::exp(-x))) - 1.0;
-      }
-      /**
        * シグモイド関数。 (0 < f < 1)
        * @param x 入力。
        * @return 出力。
@@ -4214,12 +4206,21 @@ namespace Sayuri {
         return 1.0 / (1.0 + std::exp(-x));
       }
       /**
+       * 2倍シグモイド関数。 (-1 < f < 1)
+       * @param x 入力。
+       * @return 出力。
+       */
+      static double DoubleSigmoid(double x) {
+        return (2.0 * Sigmoid(x)) - 1;
+      }
+      /**
        * 2倍シグモイドの導関数。
        * @param x 入力。
        * @return 出力。
        */
       static double DDoubleSigmoid(double x) {
-        return 2.0 * Sigmoid(x) * (1.0 - Sigmoid(x));
+        double sig = Sigmoid(x);
+        return 2.0 * sig * (1.0 - sig);
       }
       /**
        * 学習係数の分母を計算する。 (PA)
