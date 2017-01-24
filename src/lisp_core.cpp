@@ -4752,30 +4752,29 @@ R"...(### gen-ai ###
     + `<Initial bias>` is initial bias.
 * Difference between this and `(gen-pa2)`.
     + This has bias.
-    + Supports PA PA-1 PA-2 and Neural Network.
+    + Supports Perceptron PA-1 PA-2 and Neural Network.
     + Feature vector can contain Boolean.
 * `<AI>`'s message symbol.
     + `@get-weight`
         - Returns current weights.
     + `@get-bias`
         - Returns current bias.
-    + `@score <Feature vector : List>`
-        - Returns `weights * feature_vector + bias`.
-    + `@dsig <Feature vector : List>`
-        - Returns doubled sigmoid function `(2 / (1 + exp(-score))) - 1`.
-        - Return value is from -1 to 1.
+    + `@calc<Feature vector : List>`
+        - Calculates and returns output that is from -1 to 1.
+    + `@prob <Feature vector : List>`
+        - Returns probability of true.
+    + `@logit <Feature vector : List>`
+        - Returns Logit of probability of true.
     + `@judge <Feature vector : List>`
-        - Returns #t if score is positive number, otherwise returns #f.
-    + `@calc-loss <Desired output : Boolean> <Feature vector : List>`
-        - Returns Hinge Loss.
+        - Returns #t if Logit is positive number, otherwise returns #f.
     + `@train <Learning rate : Number> <Desired output : Boolean> <Feature vector : List>`
-        - Trains `<AI>` by Passive-Aggressive with `<Learning rate>`.
+        - Trains `<AI>` by Perceptron.
+            - This can also be used as output node of Neural Network.
+            - In comparison with PA-1 or PA-2,
+              this learning speed is very slow.
         - Returns differentiated loss.
-        - If `<Learning rate>` is 0 then it doesn't learn.
-        - If `<Learning rate>` is 1 then it learns in Hard Margin.
-        - If `<Learning rate>` is from 0 to 1 then it learns in Soft Margin.
-        - If `<Learning rate>` is less than 0 then it increase loss.
-        - If `<Learning rate>` is more than 1 then it overdoes learning.
+        - `<Rate>` determine maximum amplitude of adjusted value of weight.
+            - Maximum amplitude is `+- <Rate> * feature`.
     + `@train-pa1 <Cost : Number> <Desired output : Boolean> <Feature vector : List>`
         - Trains `<AI>` by PA-1.
         - Returns differentiated loss.
@@ -4788,25 +4787,14 @@ R"...(### gen-ai ###
         - `<Cost>` must be positive number and not 0.
         - If `<Cost>` is infinite then same as Hard Margin,
           otherwise Soft Margin.
-    + `@train-dsig <Rate : Number> <Desired output : Boolean> <Children's output : List>`
-        - Trains as an output node of Neural Network.
-        - Returns differentiated loss.
-        - `<Rate>` must be positive number and not 0.
-        - In this `<AI>`,
-          `<Rate>` is maximum range of adjusted value of weight.
-              - If it is 1, then weight is adjusted +-1.
-                (I think 1 is too large.)
     + `@train-bp <Rate : Number> <Each parent's Differentiated loss : List> <Each parent's weight related to me : List > <Children's output : List>`
-        - Trains as a node of middle layer of Neural Network.
+        - Trains as a node of middle layer of Neural Network
+          by Back Propagation.
         - Returns differentiated loss.
         - `<Rate>` must be positive number and not 0.
-        - In this `<AI>`,
-          `<Rate>` is maximum range of adjusted value of weight.
-              - If it is 1, then weight is adjusted +-1.
-                (I think 1 is too large.)
         - `<Each parent's Differentiated loss>` is List of
           each parent's differentiated loss
-          that is returned by parent's `@train-dsig`.
+          that is returned by parent's `@train`.
         - `<Each parent's weight related to me>` is
           List of weights related to itself.
             - If the `<AI>` is 3rd node in the layer,
@@ -4814,6 +4802,7 @@ R"...(### gen-ai ###
               List of the 3rd weight of each parent's weights.
 
 <h6> Example </h6>
+
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;; Leaning whether seasoning is sweet or not. ;;
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -4826,10 +4815,10 @@ R"...(### gen-ai ###
               (#t 30 10)
               (#f 50 100)))
     
-    (define rate 0.8)
+    (define rate 0.07)
     (define ai (gen-ai '(0 0) 0))
     (for (data data-list)
-         (ai '@train rate (car data) (cdr data)))
+         (ai '@train-pa1 rate (car data) (cdr data)))
     
     ;; Print results.
     (define features-list '((90 10)
@@ -4840,29 +4829,35 @@ R"...(### gen-ai ###
     (for (features features-list)
          (display "Input : " features)
          (display "    Judge : " (ai '@judge features))
-         (display "    Score : " (ai '@score features))
-         (display "    DSig : " (ai '@dsig features)))
+         (display "    Calc : " (ai '@calc features))
+         (display "    Logit : " (ai '@logit features))
+         (display "    Prob : " (ai '@prob features)))
     ;; Output
     ;; > Input : (90 10)
     ;; >     Judge : #t
-    ;; >     Score : 2.0974914298626
-    ;; >     DSig : 0.781318239744493
+    ;; >     Calc : 0.839548040409108
+    ;; >     Logit : 2.43928060964351
+    ;; >     Prob : 0.919774020204554
     ;; > Input : (10 90)
     ;; >     Judge : #f
-    ;; >     Score : -1.48692391622152
-    ;; >     DSig : -0.631232240533035
+    ;; >     Calc : -0.749873839397153
+    ;; >     Logit : -1.94533353956129
+    ;; >     Prob : 0.125063080301423
     ;; > Input : (60 40)
     ;; >     Judge : #t
-    ;; >     Score : 0.753335675081053
-    ;; >     DSig : 0.359810182502856
+    ;; >     Calc : 0.377829397451558
+    ;; >     Logit : 0.795050303691708
+    ;; >     Prob : 0.688914698725779
     ;; > Input : (40 60)
     ;; >     Judge : #f
-    ;; >     Score : -0.142768161439977
-    ;; >     DSig : -0.0712630770425103
+    ;; >     Calc : -0.149424378524727
+    ;; >     Logit : -0.301103233609493
+    ;; >     Prob : 0.425287810737637
     ;; > Input : (50 50)
     ;; >     Judge : #t
-    ;; >     Score : 0.305283756820538
-    ;; >     DSig : 0.151467328449139
+    ;; >     Calc : 0.122862890154041
+    ;; >     Logit : 0.246973535041108
+    ;; >     Prob : 0.56143144507702
     
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;; Neural Network. Learning XOR. ;;
@@ -4882,12 +4877,14 @@ R"...(### gen-ai ###
                        (random-weight)))
     
     ;; Calculation.
-    (define (score input)
-            (y1 '@score (list (a1 '@dsig input) (a2 '@dsig input))))
-    (define (dsig input)
-            (y1 '@dsig (list (a1 '@dsig input) (a2 '@dsig input))))
+    (define (calc input)
+            (y1 '@calc (list (a1 '@calc input) (a2 '@calc input))))
+    (define (cal-logit input)
+            (y1 '@logit (list (a1 '@calc input) (a2 '@calc input))))
+    (define (prob input)
+            (y1 '@prob (list (a1 '@calc input) (a2 '@calc input))))
     (define (judge input)
-            (y1 '@judge (list (a1 '@dsig input) (a2 '@dsig input))))
+            (y1 '@judge (list (a1 '@calc input) (a2 '@calc input))))
     
     ;; Training function.
     (define learning-rate 0.25)
@@ -4898,12 +4895,12 @@ R"...(### gen-ai ###
     
             ;; Jot down a outputs before training
             (define a-outputs
-                    (list (a1 '@dsig input)
-                          (a2 '@dsig input)))
+                    (list (a1 '@calc input)
+                          (a2 '@calc input)))
     
             ;; Train y1 and get its differentiated loss.
             (define y-loss
-                    (list (y1 '@train-dsig learning-rate output a-outputs)))
+                    (list (y1 '@train learning-rate output a-outputs)))
     
             ;; Train a1 a2 with Back-Propagation.
             (a1 '@train-bp learning-rate
@@ -4935,25 +4932,31 @@ R"...(### gen-ai ###
     (for (data logic-data-list)
          (display "Data : " data)
          (display "    Judge : " (judge data))
-         (display "    Score : " (score data))
-         (display "    DSig : " (dsig data)))
+         (display "    Calc : " (calc data))
+         (display "    Logit : " (cal-logit data))
+         (display "    Prob : " (prob data)))
     ;; Output
     ;; > Data : (1 1)
     ;; >     Judge : #f
-    ;; >     Score : -0.99999459210449
-    ;; >     DSig : -0.46211503074377
+    ;; >     Calc : -0.901210496751019
+    ;; >     Logit : -2.95725470915291
+    ;; >     Prob : 0.0493947516244905
     ;; > Data : (-1 1)
     ;; >     Judge : #t
-    ;; >     Score : 0.999997936634248
-    ;; >     DSig : 0.462116345894964
+    ;; >     Calc : 0.859721779977142
+    ;; >     Logit : 2.58455443841497
+    ;; >     Prob : 0.929860889988571
     ;; > Data : (1 -1)
     ;; >     Judge : #t
-    ;; >     Score : 0.999994111381629
-    ;; >     DSig : 0.462114841711575
+    ;; >     Calc : 0.879465729452377
+    ;; >     Logit : 2.74680871359316
+    ;; >     Prob : 0.939732864726189
     ;; > Data : (-1 -1)
     ;; >     Judge : #f
-    ;; >     Score : -0.999998077947422
-    ;; >     DSig : -0.462116401462728)...";
+    ;; >     Calc : -0.902502383508753
+    ;; >     Logit : -2.97109741110352
+    ;; >     Prob : 0.0487488082456237
+    )...";
     help_dict_.emplace("gen-ai", help);
 
     func = LC_FUNCTION_OBJ(RBFKernel);
@@ -7547,7 +7550,7 @@ R"...(### clock ###
       }
 
       // 計算。
-      if ((symbol == "@score") || (symbol == "@dsig")
+      if ((symbol == "@calc") || (symbol == "@logit") || (symbol == "@prob")
       || (symbol == "@judge")) {
         Next(&args_ptr);
         CheckType(*args_ptr, LType::PAIR);
@@ -7556,37 +7559,23 @@ R"...(### clock ###
         CheckList(*features_ptr);
         Vec features = to_feature_vec(features_ptr);
 
-        if (symbol == "@score") {
-          return NewNumber(obj_ptr->CalScore(features));
-        }
-        if (symbol == "@dsig") {
+        if (symbol == "@calc") {
           return NewNumber(obj_ptr->CalDoubleSigmoid(features));
+        }
+        if (symbol == "@logit") {
+          return NewNumber(obj_ptr->CalLogit(features));
+        }
+        if (symbol == "@prob") {
+          return NewNumber(obj_ptr->CalSigmoid(features));
         }
         if (symbol == "@judge") {
           return NewBoolean(obj_ptr->Judge(features));
         }
       }
-      if (symbol == "@calc-loss") {
-        Next(&args_ptr);
-        CheckType(*args_ptr, LType::PAIR);
-
-        LPointer output_ptr = caller->Evaluate(*(args_ptr->car()));
-        CheckType(*output_ptr, LType::BOOLEAN);
-        bool desired_output = output_ptr->boolean();
-
-        Next(&args_ptr);
-        CheckType(*args_ptr, LType::PAIR);
-
-        LPointer features_ptr = caller->Evaluate(*(args_ptr->car()));
-        CheckList(*features_ptr);
-        Vec features = to_feature_vec(features_ptr);
-
-        return NewNumber(obj_ptr->HingeLoss(desired_output, features));
-      }
 
       // 学習。
       if ((symbol == "@train") || (symbol == "@train-pa1")
-      || (symbol == "@train-pa2") || (symbol == "@train-dsig")) {
+      || (symbol == "@train-pa2")) {
           Next(&args_ptr);
           CheckType(*args_ptr, LType::PAIR);
 
@@ -7609,17 +7598,14 @@ R"...(### clock ###
           Vec features = to_feature_vec(features_ptr);
 
         if (symbol == "@train") {
-          return NewNumber(obj_ptr->Train(desired_output, features, num));
+          return NewNumber(obj_ptr->TrainDoubleSigmoid
+          (desired_output, features, num));
         }
         if (symbol == "@train-pa1") {
           return NewNumber(obj_ptr->TrainPA1(desired_output, features, num));
         }
         if (symbol == "@train-pa2") {
           return NewNumber(obj_ptr->TrainPA2(desired_output, features, num));
-        }
-        if (symbol == "@train-dsig") {
-          return NewNumber(obj_ptr->TrainDoubleSigmoid
-          (desired_output, features, num));
         }
       }
       if (symbol == "@train-bp") {

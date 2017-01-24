@@ -4006,11 +4006,11 @@ namespace Sayuri {
       }
 
       /**
-       * 得点を計算する。
+       * ロジットを計算する。
        * @param features 特徴ベクトル。
        * @return 得点。
        */
-      double CalScore(const LMath::Vec& features) const {
+      double CalLogit(const LMath::Vec& features) const {
         using namespace LMath;
 
         Vec copy = features;
@@ -4025,7 +4025,7 @@ namespace Sayuri {
        * @return 真偽値。
        */
       bool Judge(const LMath::Vec& features) const {
-        return CalScore(features) >= 0.0 ? true : false;
+        return CalLogit(features) >= 0.0 ? true : false;
       }
 
       /**
@@ -4034,47 +4034,39 @@ namespace Sayuri {
        * @return 得点。 (-1 < f < 1)
        */
       double CalDoubleSigmoid(const LMath::Vec& features) const {
-        return DoubleSigmoid(CalScore(features));
+        return DoubleSigmoid(CalLogit(features));
       }
 
       /**
-       * ヒンジ損失。
-       * @param desired_output 訓練出力。
+       * シグモイドで加工して出力する。
        * @param features 特徴ベクトル。
-       * @return ヒンジ損失。
+       * @return 得点。 (0 < f < 1)
        */
-      double HingeLoss(bool desired_output, const LMath::Vec& features)
-      const {
-        using namespace LMath;
-
-        double loss =
-        1 - (OutputToNumber(desired_output) * CalScore(features));
-        return loss > 0 ? loss : 0;
+      double CalSigmoid(const LMath::Vec& features) const {
+        return Sigmoid(CalLogit(features));
       }
 
       /**
-       * 学習する。 (PA)
+       * 学習する。 (DoubleSigmoid)
        * @param desired_output 訓練出力。
        * @param features 特徴ベクトル。
        * @param rate 学習率。
        * @return 微分された損失。
        */
-      double Train(bool desired_output, const LMath::Vec& features,
-      double rate) {
+      double TrainDoubleSigmoid(bool desired_output,
+      const LMath::Vec& features, double rate) {
         using namespace LMath;
 
         double y = OutputToNumber(desired_output);
         Vec copy = features;
         copy.push_back(1.0);
 
-        double loss = HingeLossCore(y, copy);
-        if (loss <= 0.0) return 0.0;
-        loss *= y;
+        double loss =
+        -y * DSigHingeLoss(y, copy) * DDoubleSigmoid(weights_ * copy);
 
-        weights_ = weights_
-        + ((loss / CalDenominatorPA(copy, rate)) * copy);
+        weights_ = weights_ - ((rate * loss) * copy);
 
-        return -loss;
+        return loss;
       }
 
       /**
@@ -4092,7 +4084,7 @@ namespace Sayuri {
         Vec copy = features;
         copy.push_back(1.0);
 
-        double hinge = HingeLossCore(y, copy);
+        double hinge = HingeLoss(y, copy);
         if (hinge <= 0.0) return 0.0;
         double loss = hinge / CalDenominatorPA1(copy);
 
@@ -4118,36 +4110,12 @@ namespace Sayuri {
         Vec copy = features;
         copy.push_back(1.0);
 
-        double loss = HingeLossCore(y, copy);
+        double loss = HingeLoss(y, copy);
         if (loss <= 0.0) return 0.0;
         loss *= y;
 
         weights_ = weights_
         + ((loss / CalDenominatorPA2(copy, cost)) * copy);
-
-        return -loss;
-      }
-
-      /**
-       * 学習する。 (DoubleSigmoid)
-       * @param desired_output 訓練出力。
-       * @param features 特徴ベクトル。
-       * @param rate 学習率。
-       * @return 微分された損失。
-       */
-      double TrainDoubleSigmoid(bool desired_output,
-      const LMath::Vec& features, double rate) {
-        using namespace LMath;
-
-        double y = OutputToNumber(desired_output);
-        Vec copy = features;
-        copy.push_back(1.0);
-
-        double loss = HingeLossCore(y, copy);
-        if (loss <= 0.0) return 0.0;
-        loss *= y * DDoubleSigmoid(weights_ * copy);
-
-        weights_ = weights_ + ((rate * loss) * copy);
 
         return -loss;
       }
@@ -4185,19 +4153,6 @@ namespace Sayuri {
       // プライベート関数 //
       // ================ //
       /**
-       * ヒンジ損失。
-       * @param desired_output 訓練出力。
-       * @param features 特徴ベクトル。
-       * @return ヒンジ損失。
-       */
-      double HingeLossCore(double desired_output, const LMath::Vec& features)
-      const {
-        using namespace LMath;
-
-        double loss = 1 - (desired_output * (features * weights_));
-        return loss > 0.0 ? loss : 0.0;
-      }
-      /**
        * シグモイド関数。 (0 < f < 1)
        * @param x 入力。
        * @return 出力。
@@ -4223,14 +4178,29 @@ namespace Sayuri {
         return 2.0 * sig * (1.0 - sig);
       }
       /**
-       * 学習係数の分母を計算する。 (PA)
+       * ヒンジ損失。
+       * @param desired_output 訓練出力。
        * @param features 特徴ベクトル。
-       * @param rate 学習率。
+       * @return ヒンジ損失。
        */
-      double CalDenominatorPA(const LMath::Vec& features, double rate) const {
+      double HingeLoss(double desired_output, const LMath::Vec& features)
+      const {
         using namespace LMath;
 
-        return (features * features) / rate;
+        double loss = 1 - (desired_output * (features * weights_));
+        return loss > 0.0 ? loss : 0.0;
+      }
+      /**
+       * 2倍シグモイドによるヒンジ損失。
+       * @param desired_output 訓練出力。
+       * @param features 特徴ベクトル。
+       * @return ヒンジ損失。
+       */
+      double DSigHingeLoss(double desired_output,
+      const LMath::Vec& features) const {
+        using namespace LMath;
+
+        return 1 - (desired_output * DoubleSigmoid(features * weights_));
       }
 
       /**

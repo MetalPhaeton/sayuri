@@ -2304,7 +2304,7 @@
 </li>
 <li>Difference between this and <code>(gen-pa2)</code>.<ul>
 <li>This has bias.</li>
-<li>Supports PA PA-1 PA-2 and Neural Network.</li>
+<li>Supports Perceptron PA-1 PA-2 and Neural Network.</li>
 <li>Feature vector can contain Boolean.</li>
 </ul>
 </li>
@@ -2317,31 +2317,34 @@
 <li>Returns current bias.</li>
 </ul>
 </li>
-<li><code>@score &lt;Feature vector : List&gt;</code><ul>
-<li>Returns <code>weights * feature_vector + bias</code>.</li>
+<li><code>@calc&lt;Feature vector : List&gt;</code><ul>
+<li>Calculates and returns output that is from -1 to 1.</li>
 </ul>
 </li>
-<li><code>@dsig &lt;Feature vector : List&gt;</code><ul>
-<li>Returns doubled sigmoid function <code>(2 / (1 + exp(-score))) - 1</code>.</li>
-<li>Return value is from -1 to 1.</li>
+<li><code>@prob &lt;Feature vector : List&gt;</code><ul>
+<li>Returns probability of true.</li>
+</ul>
+</li>
+<li><code>@logit &lt;Feature vector : List&gt;</code><ul>
+<li>Returns Logit of probability of true.</li>
 </ul>
 </li>
 <li><code>@judge &lt;Feature vector : List&gt;</code><ul>
-<li>Returns #t if score is positive number, otherwise returns #f.</li>
-</ul>
-</li>
-<li><code>@calc-loss &lt;Desired output : Boolean&gt; &lt;Feature vector : List&gt;</code><ul>
-<li>Returns Hinge Loss.</li>
+<li>Returns #t if Logit is positive number, otherwise returns #f.</li>
 </ul>
 </li>
 <li><code>@train &lt;Learning rate : Number&gt; &lt;Desired output : Boolean&gt; &lt;Feature vector : List&gt;</code><ul>
-<li>Trains <code>&lt;AI&gt;</code> by Passive-Aggressive with <code>&lt;Learning rate&gt;</code>.</li>
+<li>Trains <code>&lt;AI&gt;</code> by Perceptron.<ul>
+<li>This can also be used as output node of Neural Network.</li>
+<li>In comparison with PA-1 or PA-2,
+  this learning speed is very slow.</li>
+</ul>
+</li>
 <li>Returns differentiated loss.</li>
-<li>If <code>&lt;Learning rate&gt;</code> is 0 then it doesn't learn.</li>
-<li>If <code>&lt;Learning rate&gt;</code> is 1 then it learns in Hard Margin.</li>
-<li>If <code>&lt;Learning rate&gt;</code> is from 0 to 1 then it learns in Soft Margin.</li>
-<li>If <code>&lt;Learning rate&gt;</code> is less than 0 then it increase loss.</li>
-<li>If <code>&lt;Learning rate&gt;</code> is more than 1 then it overdoes learning.</li>
+<li><code>&lt;Rate&gt;</code> determine maximum amplitude of adjusted value of weight.<ul>
+<li>Maximum amplitude is <code>+- &lt;Rate&gt; * feature</code>.</li>
+</ul>
+</li>
 </ul>
 </li>
 <li><code>@train-pa1 &lt;Cost : Number&gt; &lt;Desired output : Boolean&gt; &lt;Feature vector : List&gt;</code><ul>
@@ -2360,31 +2363,14 @@
   otherwise Soft Margin.</li>
 </ul>
 </li>
-<li><code>@train-dsig &lt;Rate : Number&gt; &lt;Desired output : Boolean&gt; &lt;Children's output : List&gt;</code><ul>
-<li>Trains as an output node of Neural Network.</li>
-<li>Returns differentiated loss.</li>
-<li><code>&lt;Rate&gt;</code> must be positive number and not 0.</li>
-<li>In this <code>&lt;AI&gt;</code>,
-  <code>&lt;Rate&gt;</code> is maximum range of adjusted value of weight.<ul>
-<li>If it is 1, then weight is adjusted +-1.
-    (I think 1 is too large.)</li>
-</ul>
-</li>
-</ul>
-</li>
 <li><code>@train-bp &lt;Rate : Number&gt; &lt;Each parent's Differentiated loss : List&gt; &lt;Each parent's weight related to me : List &gt; &lt;Children's output : List&gt;</code><ul>
-<li>Trains as a node of middle layer of Neural Network.</li>
+<li>Trains as a node of middle layer of Neural Network
+  by Back Propagation.</li>
 <li>Returns differentiated loss.</li>
 <li><code>&lt;Rate&gt;</code> must be positive number and not 0.</li>
-<li>In this <code>&lt;AI&gt;</code>,
-  <code>&lt;Rate&gt;</code> is maximum range of adjusted value of weight.<ul>
-<li>If it is 1, then weight is adjusted +-1.
-    (I think 1 is too large.)</li>
-</ul>
-</li>
 <li><code>&lt;Each parent's Differentiated loss&gt;</code> is List of
   each parent's differentiated loss
-  that is returned by parent's <code>@train-dsig</code>.</li>
+  that is returned by parent's <code>@train</code>.</li>
 <li><code>&lt;Each parent's weight related to me&gt;</code> is
   List of weights related to itself.<ul>
 <li>If the <code>&lt;AI&gt;</code> is 3rd node in the layer,
@@ -2411,10 +2397,10 @@
           (#t 30 10)
           (#f 50 100)))
 
-(define rate 0.8)
+(define rate 0.07)
 (define ai (gen-ai '(0 0) 0))
 (for (data data-list)
-     (ai '@train rate (car data) (cdr data)))
+     (ai '@train-pa1 rate (car data) (cdr data)))
 
 ;; Print results.
 (define features-list '((90 10)
@@ -2425,29 +2411,35 @@
 (for (features features-list)
      (display "Input : " features)
      (display "    Judge : " (ai '@judge features))
-     (display "    Score : " (ai '@score features))
-     (display "    DSig : " (ai '@dsig features)))
+     (display "    Calc : " (ai '@calc features))
+     (display "    Logit : " (ai '@logit features))
+     (display "    Prob : " (ai '@prob features)))
 ;; Output
 ;; &gt; Input : (90 10)
 ;; &gt;     Judge : #t
-;; &gt;     Score : 2.0974914298626
-;; &gt;     DSig : 0.781318239744493
+;; &gt;     Calc : 0.839548040409108
+;; &gt;     Logit : 2.43928060964351
+;; &gt;     Prob : 0.919774020204554
 ;; &gt; Input : (10 90)
 ;; &gt;     Judge : #f
-;; &gt;     Score : -1.48692391622152
-;; &gt;     DSig : -0.631232240533035
+;; &gt;     Calc : -0.749873839397153
+;; &gt;     Logit : -1.94533353956129
+;; &gt;     Prob : 0.125063080301423
 ;; &gt; Input : (60 40)
 ;; &gt;     Judge : #t
-;; &gt;     Score : 0.753335675081053
-;; &gt;     DSig : 0.359810182502856
+;; &gt;     Calc : 0.377829397451558
+;; &gt;     Logit : 0.795050303691708
+;; &gt;     Prob : 0.688914698725779
 ;; &gt; Input : (40 60)
 ;; &gt;     Judge : #f
-;; &gt;     Score : -0.142768161439977
-;; &gt;     DSig : -0.0712630770425103
+;; &gt;     Calc : -0.149424378524727
+;; &gt;     Logit : -0.301103233609493
+;; &gt;     Prob : 0.425287810737637
 ;; &gt; Input : (50 50)
 ;; &gt;     Judge : #t
-;; &gt;     Score : 0.305283756820538
-;; &gt;     DSig : 0.151467328449139
+;; &gt;     Calc : 0.122862890154041
+;; &gt;     Logit : 0.246973535041108
+;; &gt;     Prob : 0.56143144507702
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Neural Network. Learning XOR. ;;
@@ -2467,12 +2459,14 @@
                    (random-weight)))
 
 ;; Calculation.
-(define (score input)
-        (y1 '@score (list (a1 '@dsig input) (a2 '@dsig input))))
-(define (dsig input)
-        (y1 '@dsig (list (a1 '@dsig input) (a2 '@dsig input))))
+(define (calc input)
+        (y1 '@calc (list (a1 '@calc input) (a2 '@calc input))))
+(define (cal-logit input)
+        (y1 '@logit (list (a1 '@calc input) (a2 '@calc input))))
+(define (prob input)
+        (y1 '@prob (list (a1 '@calc input) (a2 '@calc input))))
 (define (judge input)
-        (y1 '@judge (list (a1 '@dsig input) (a2 '@dsig input))))
+        (y1 '@judge (list (a1 '@calc input) (a2 '@calc input))))
 
 ;; Training function.
 (define learning-rate 0.25)
@@ -2483,12 +2477,12 @@
 
         ;; Jot down a outputs before training
         (define a-outputs
-                (list (a1 '@dsig input)
-                      (a2 '@dsig input)))
+                (list (a1 '@calc input)
+                      (a2 '@calc input)))
 
         ;; Train y1 and get its differentiated loss.
         (define y-loss
-                (list (y1 '@train-dsig learning-rate output a-outputs)))
+                (list (y1 '@train learning-rate output a-outputs)))
 
         ;; Train a1 a2 with Back-Propagation.
         (a1 '@train-bp learning-rate
@@ -2520,25 +2514,30 @@
 (for (data logic-data-list)
      (display "Data : " data)
      (display "    Judge : " (judge data))
-     (display "    Score : " (score data))
-     (display "    DSig : " (dsig data)))
+     (display "    Calc : " (calc data))
+     (display "    Logit : " (cal-logit data))
+     (display "    Prob : " (prob data)))
 ;; Output
 ;; &gt; Data : (1 1)
 ;; &gt;     Judge : #f
-;; &gt;     Score : -0.99999459210449
-;; &gt;     DSig : -0.46211503074377
+;; &gt;     Calc : -0.901210496751019
+;; &gt;     Logit : -2.95725470915291
+;; &gt;     Prob : 0.0493947516244905
 ;; &gt; Data : (-1 1)
 ;; &gt;     Judge : #t
-;; &gt;     Score : 0.999997936634248
-;; &gt;     DSig : 0.462116345894964
+;; &gt;     Calc : 0.859721779977142
+;; &gt;     Logit : 2.58455443841497
+;; &gt;     Prob : 0.929860889988571
 ;; &gt; Data : (1 -1)
 ;; &gt;     Judge : #t
-;; &gt;     Score : 0.999994111381629
-;; &gt;     DSig : 0.462114841711575
+;; &gt;     Calc : 0.879465729452377
+;; &gt;     Logit : 2.74680871359316
+;; &gt;     Prob : 0.939732864726189
 ;; &gt; Data : (-1 -1)
 ;; &gt;     Judge : #f
-;; &gt;     Score : -0.999998077947422
-;; &gt;     DSig : -0.462116401462728
+;; &gt;     Calc : -0.902502383508753
+;; &gt;     Logit : -2.97109741110352
+;; &gt;     Prob : 0.0487488082456237
 </code></pre>
 <h3 id="rbf-kernel">rbf-kernel</h3>
 <h6> Usage </h6>
