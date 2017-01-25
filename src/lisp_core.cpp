@@ -7576,26 +7576,26 @@ R"...(### clock ###
       // 学習。
       if ((symbol == "@train") || (symbol == "@train-pa1")
       || (symbol == "@train-pa2")) {
-          Next(&args_ptr);
-          CheckType(*args_ptr, LType::PAIR);
+        Next(&args_ptr);
+        CheckType(*args_ptr, LType::PAIR);
 
-          LPointer num_ptr = caller->Evaluate(*(args_ptr->car()));
-          CheckType(*num_ptr, LType::NUMBER);
-          double num = num_ptr->number();
+        LPointer num_ptr = caller->Evaluate(*(args_ptr->car()));
+        CheckType(*num_ptr, LType::NUMBER);
+        double num = num_ptr->number();
 
-          Next(&args_ptr);
-          CheckType(*args_ptr, LType::PAIR);
+        Next(&args_ptr);
+        CheckType(*args_ptr, LType::PAIR);
 
-          LPointer output_ptr = caller->Evaluate(*(args_ptr->car()));
-          CheckType(*output_ptr, LType::BOOLEAN);
-          bool desired_output = output_ptr->boolean();
+        LPointer output_ptr = caller->Evaluate(*(args_ptr->car()));
+        CheckType(*output_ptr, LType::BOOLEAN);
+        bool desired_output = output_ptr->boolean();
 
-          Next(&args_ptr);
-          CheckType(*args_ptr, LType::PAIR);
+        Next(&args_ptr);
+        CheckType(*args_ptr, LType::PAIR);
 
-          LPointer features_ptr = caller->Evaluate(*(args_ptr->car()));
-          CheckList(*features_ptr);
-          Vec features = to_feature_vec(features_ptr);
+        LPointer features_ptr = caller->Evaluate(*(args_ptr->car()));
+        CheckList(*features_ptr);
+        Vec features = to_feature_vec(features_ptr);
 
         if (symbol == "@train") {
           return NewNumber(obj_ptr->TrainDoubleSigmoid
