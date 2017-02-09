@@ -6631,6 +6631,10 @@ R"...(### clock ###
 
     // 第1引数は関数オブジェクトか関数名シンボル。
     LPointer func_ptr = caller->Evaluate(*(args_ptr->car()));
+    // 関数名なら関数オブジェクトを得る。
+    if (func_ptr->IsSymbol()) {
+      func_ptr = caller->Evaluate(*func_ptr);
+    }
 
     // 関数をペアのCarに入れておく。
     LPair func_pair(func_ptr, NewPair());
