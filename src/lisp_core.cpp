@@ -5647,6 +5647,10 @@ R"...(### clock ###
 
     // 第1引数は関数オブジェクトか関数名。
     LPointer func_ptr = caller->Evaluate(*(args_ptr->car()));
+    // 関数名なら関数オブジェクトを得る。
+    if (func_ptr->IsSymbol()) {
+      func_ptr = caller->Evaluate(*func_ptr);
+    }
 
     // 第2引数は引数リスト。
     LPointer args_list_ptr = caller->Evaluate(*(args_ptr->cdr()->car()));
@@ -5665,6 +5669,10 @@ R"...(### clock ###
 
     // 第1引数は関数オブジェクトか関数名。
     LPointer func_ptr = caller->Evaluate(*(args_ptr->car()));
+    // 関数名なら関数オブジェクトを得る。
+    if (func_ptr->IsSymbol()) {
+      func_ptr = caller->Evaluate(*func_ptr);
+    }
 
     // 第2引数は探索するペア。
     LPointer pair_ptr = caller->Evaluate(*(args_ptr->cdr()->car()));
@@ -5681,7 +5689,7 @@ R"...(### clock ###
       // コールバックを実行する。
       func_pair_ptr->cdr()->car()->cdr()->car(pair.car());
       func_pair_ptr->cdr()->cdr()->car(NewString(path + "a"));
-      LPointer result = caller->Evaluate(*func_pair_ptr);
+      LPointer result = func_pair_ptr->car()->Apply(caller, *func_pair_ptr);
 
       // 結果の第1要素が@replaceなら置き換え。
       if (result->IsPair()) {
@@ -5696,7 +5704,7 @@ R"...(### clock ###
       // コールバックを実行する。
       func_pair_ptr->cdr()->car()->cdr()->car(pair.cdr());
       func_pair_ptr->cdr()->cdr()->car(NewString(path + "d"));
-      result = caller->Evaluate(*func_pair_ptr);
+      result = func_pair_ptr->car()->Apply(caller, *func_pair_ptr);
 
       // 結果の第1要素が@replaceなら置き換え。
       if (result->IsPair()) {
