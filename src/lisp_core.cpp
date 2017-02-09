@@ -5652,7 +5652,10 @@ R"...(### clock ###
     CheckList(*args_list_ptr);
 
     // ペアにして評価して返す。
-    return caller->Evaluate(LPair(func_ptr, WrapListQuote(args_list_ptr)));
+    //return caller->Evaluate(LPair(func_ptr, WrapListQuote(args_list_ptr)));
+    // 関数を適用する。
+    return func_ptr->Apply(caller,
+    LPair(func_ptr, WrapListQuote(args_list_ptr)));
   }
 
   // %%% walk
