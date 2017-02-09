@@ -280,6 +280,9 @@ namespace Sayuri {
       throw Lisp::GenError("@apply-error",
       "Failed to execute '" + args.car()->ToString() + "'.");
     }
+
+    // ローカルスコープを捨てて終わる。
+    scope_chain_.pop_back();
     return ret_ptr;
   }
 

@@ -1575,7 +1575,9 @@ namespace Sayuri {
        */
       virtual LPointer Apply(LObject* caller, const LObject& args) override {
         scope_chain_.AppendNewScope();
-        return c_function_(this->Clone(), caller, args);
+        LPointer ret_ptr = c_function_(this->Clone(), caller, args);
+        scope_chain_.pop_back();
+        return ret_ptr;
       }
       /**
        * 自身のタイプを返す。
