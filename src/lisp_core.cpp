@@ -5652,8 +5652,6 @@ R"...(### clock ###
     CheckList(*args_list_ptr);
 
     // ペアにして評価して返す。
-    //return caller->Evaluate(LPair(func_ptr, WrapListQuote(args_list_ptr)));
-    // 関数を適用する。
     return func_ptr->Apply(caller,
     LPair(func_ptr, WrapListQuote(args_list_ptr)));
   }
@@ -6654,8 +6652,8 @@ R"...(### clock ###
       // 関数のペアのCdrに引数リストを入れる。
       func_pair.cdr(WrapListQuote(ptr->car()));
 
-      // 評価してベクトルにプッシュ。
-      ret_vec.push_back(caller->Evaluate(func_pair));
+      // 適用してベクトルにプッシュ。
+      ret_vec.push_back(func_ptr->Apply(caller, func_pair));
     }
 
     return LPointerVecToList(ret_vec);
