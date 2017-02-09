@@ -7060,13 +7060,13 @@ R"...(### clock ###
 
         // 大きい方を計算。
         var_ptr->car()->number(temp_number + half_delta);
-        result = caller->Evaluate(*func_expr);
+        result = func_expr->car()->Apply(caller, *func_expr);
         CheckType(*result, LType::NUMBER);
         double big = result->number() / delta;
 
         // 小さい方を計算。
         var_ptr->car()->number(temp_number - half_delta);
-        result = caller->Evaluate(*func_expr);
+        result = func_expr->car()->Apply(caller, *func_expr);
         CheckType(*result, LType::NUMBER);
         double small = result->number() / delta;
 
