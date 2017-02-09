@@ -1120,7 +1120,7 @@ R"...(### cxxxxr ###
       }
     }
 
-    func = LC_FUNCTION_OBJ(Apply);
+    func = LC_FUNCTION_OBJ(ApplyFunc);
     INSERT_LC_FUNCTION(func, "apply", "Lisp:apply");
     help =
 R"...(### apply ###
@@ -5647,7 +5647,7 @@ R"...(### clock ###
   }
 
   // %%% apply
-  DEF_LC_FUNCTION(Lisp::Apply) {
+  DEF_LC_FUNCTION(Lisp::ApplyFunc) {
     // 準備。
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 2, &args_ptr);

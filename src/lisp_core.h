@@ -2313,7 +2313,7 @@ namespace Sayuri {
       }
 
       /** ネイティブ関数 - apply */
-      DEF_LC_FUNCTION(Apply);
+      DEF_LC_FUNCTION(ApplyFunc);
 
       /** ネイティブ関数 - walk */
       DEF_LC_FUNCTION(WalkFunc);
