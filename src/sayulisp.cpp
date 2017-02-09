@@ -845,6 +845,40 @@ R"...(### to-fen-position ###
 
     return status;
   }
+  // Sayulispを開始する。
+  int Sayulisp::Run(const std::string& code) {
+    // 終了ステータス。
+    int status = 0;
+
+    // (exit)関数を作成。
+    auto func = [&status](LPointer self, LObject* caller,
+    const LObject& args) -> LPointer {
+      // 準備。
+      LObject* args_ptr = args.cdr().get();
+
+      // 引数があった場合は終了ステータスあり。
+      if (args_ptr->IsPair()) {
+        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        status = result->number();
+      }
+
+      std::exit(status);
+      return Lisp::NewNumber(status);
+    };
+    scope_chain_.InsertSymbol("exit",
+    NewN_Function(func, "Sayulisp:exit", scope_chain_));
+
+    try {
+      Tokenize(code);
+
+      LPointerVec s_tree = Parse();
+      for (auto& s : s_tree) Evaluate(*s);
+    } catch (LPointer error) {
+      PrintError(error);
+    }
+
+    return status;
+  }
 
   // メッセージシンボル関数の準備をする。
   void Sayulisp::GetReadyForMessageFunction(const std::string& symbol,

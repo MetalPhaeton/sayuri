@@ -166,6 +166,12 @@ namespace Sayuri {
        * @return 終了ステータス。
        */
       int Run(std::istream* stream_ptr);
+      /**
+       * Sayulispを開始する。
+       * @param code Lispコード。
+       * @return 終了ステータス。
+       */
+      int Run(const std::string& code);
 
       /**
        * 指し手をリストに変換する。

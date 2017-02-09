@@ -33,6 +33,7 @@
 #include <string>
 #include <memory>
 #include <fstream>
+#include <sstream>
 
 #include "init.h"
 #include "chess_engine.h"
@@ -113,53 +114,60 @@ R"...(Usage:
     std::cout << Sayuri::LICENSE << std::endl;
   } else if ((argc >= 2)
   && (std::strcmp(argv[1], "--sayulisp") == 0)) {
-    // Sayulispモード。
-    // 引数がもう一つ必要。
-    if (argc < 3) {
-      std::cerr << "Insufficient arguments. '--sayulisp' needs <file name>."
-      << std::endl;
-      return 1;
-    }
-
     // エンジン初期化。
     Sayuri::Init();
 
-    // 引数リストを作る。
-    std::vector<std::string> argv_vec;
-    for (int i = 2; i < argc; ++i) {
-      argv_vec.push_back(argv[i]);
-    }
+    // 引数がなければREPL。
+    if (argc < 3) {
+      // Sayurlispを作成。
+      std::unique_ptr<Sayuri::Sayulisp>
+      sayulisp_ptr(new Sayuri::Sayulisp());
 
-    // Sayurlispを作成。
-    std::unique_ptr<Sayuri::Sayulisp>
-    sayulisp_ptr(new Sayuri::Sayulisp(argv_vec));
-
-    // 入力ストリームを得る。
-    std::istream* stream_ptr = nullptr;
-    std::ifstream file;
-    if (std::strcmp(argv[2], "-") == 0) {
-      stream_ptr = &(std::cin);
-    } else {
-      file.open(argv[2]);
-      if (!file) {
-        std::cerr << "Couldn't open '" << argv[2] << "'." << std::endl;
+      // 実行。
+      try {
+        return sayulisp_ptr->Run(&(std::cin));
+      } catch (Sayuri::LPointer error) {
+        Sayuri::Lisp::PrintError(error);
         return 1;
       }
-      stream_ptr = &file;
-    }
+    } else {
+      // 引数がある。
+      // 引数リストを作る。
+      std::vector<std::string> argv_vec;
+      for (int i = 2; i < argc; ++i) {
+        argv_vec.push_back(argv[i]);
+      }
 
-    // 実行。
-    int status = 0;
-    try {
-      status = sayulisp_ptr->Run(stream_ptr);
-    } catch (Sayuri::LPointer error) {
-      Sayuri::Lisp::PrintError(error);
-      return 1;
-    }
+      // Sayurlispを作成。
+      std::unique_ptr<Sayuri::Sayulisp>
+      sayulisp_ptr(new Sayuri::Sayulisp(argv_vec));
 
-    // 終了。
-    if (file) file.close();
-    return status;
+      if (std::strcmp(argv[2], "-") == 0) {
+        // 標準出力していならREPL。
+        try {
+          return sayulisp_ptr->Run(&(std::cin));
+        } catch (Sayuri::LPointer error) {
+          Sayuri::Lisp::PrintError(error);
+          return 1;
+        }
+      } else {
+        // ファイルならいかつ読み込みしてから実行
+        std::ifstream file(argv[2]);
+        if (!file) {
+          std::cerr << "Couldn't open '" << argv[2] << "'." << std::endl;
+          return 1;
+        }
+        std::ostringstream oss;
+        oss << file.rdbuf();
+        file.close();
+        try {
+          return sayulisp_ptr->Run(oss.str());
+        } catch (Sayuri::LPointer error) {
+          Sayuri::Lisp::PrintError(error);
+          return 1;
+        }
+      }
+    }
   } else {
     // プログラムの起動。
     // 初期化。
