@@ -2172,7 +2172,8 @@ R"...(### gen-thread ###
 
 * Returns Thread object.
 * It is controlled by Message Symbol.
-    + `@start` : Starts `<Function>` on another thread.
+    + `@start [<Args>...]` : Starts `<Function>` on another thread.
+        - if `<Function>` accepts arguments, it gives `<Function>` `<Args>...`.
     + `@join` : Waits until `<Function>` to be terminated.
     + `@terminated?` : If `<Function>` has already been terminated, returns #t.
 
@@ -6045,24 +6046,15 @@ R"...(### clock ###
         // 関数オブジェクトをコピー。
         LPointer func_clone = func_ptr->Clone();
 
-        // 関数オブジェクトにローカルスコープを追加。
-        LScopeChain local_chain = func_clone->scope_chain();
-        local_chain.AppendNewScope();
+        // 引数をコピー。
+        LPointer args_copy = args_ptr->Clone();
 
-        // 全引数にNilをバインド。
-        for (auto& name : func_clone->arg_names()) {
-          local_chain.InsertSymbol(name, NewNil());
-        }
-
-        // スコープを再セット。
-        func_clone->scope_chain(local_chain);
+        // 呼び出し元のスコープを得る。
+        self->scope_chain(caller->scope_chain());
 
         // スレッドを起動。
-        *thread_ptr = std::thread([func_clone]() {
-          const LPointerVec expression = func_clone->expression();
-          for (auto& expr : expression) {
-            func_clone->Evaluate(*expr);
-          }
+        *thread_ptr = std::thread([func_clone, self, args_copy]() {
+          func_clone->Apply(self.get(), LPair(func_clone, args_copy));
         });
 
         return NewBoolean(true);
