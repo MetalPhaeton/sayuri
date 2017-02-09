@@ -7134,7 +7134,7 @@ R"...(### clock ###
           LPointer result;
           for (double current = from; current < to; current += delta) {
             m_var_ptr->number(current);
-            result = caller->Evaluate(*func_expr);
+            result = func_expr->car()->Apply(caller, *func_expr);
             ret += result->number();
           }
           return ret * delta;
