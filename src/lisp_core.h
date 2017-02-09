@@ -315,6 +315,16 @@ namespace Sayuri {
       virtual LPointer Evaluate(const LObject& target) final;
 
       /**
+       * 自身の関数を適用する。
+       * @param caller 関数の呼び出し元。
+       * @param target 引数オブジェクト。
+       * @return 結果。
+       */
+      virtual LPointer Apply(LObject* caller, const LObject& args) {
+        return dummy_ptr_;
+      }
+
+      /**
        * 自分がリストかどうか。
        * @return リストならtrue。
        */
@@ -1383,6 +1393,13 @@ namespace Sayuri {
         return false;
       }
       /**
+       * 自身の関数を適用する。
+       * @param caller 関数の呼び出し元。
+       * @param target 引数オブジェクト。
+       * @return 結果。
+       */
+      virtual LPointer Apply(LObject* caller, const LObject& args) override;
+      /**
        * 自身のタイプを返す。
        * @return 自分のタイプ。
        */
@@ -1549,6 +1566,16 @@ namespace Sayuri {
           }
         }
         return false;
+      }
+      /**
+       * 自身の関数を適用する。
+       * @param caller 関数の呼び出し元。
+       * @param target 引数オブジェクト。
+       * @return 結果。
+       */
+      virtual LPointer Apply(LObject* caller, const LObject& args) override {
+        scope_chain_.AppendNewScope();
+        return c_function_(this->Clone(), caller, args);
       }
       /**
        * 自身のタイプを返す。

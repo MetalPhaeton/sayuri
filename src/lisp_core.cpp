@@ -173,114 +173,8 @@ namespace Sayuri {
         + "'.");
       }
 
-      // ローカルスコープを作る。
-      LScopeChain local_chain = func_obj->scope_chain();
-      local_chain.AppendNewScope();
-
-      // ネイティブ関数。
-      if (func_obj->IsN_Function()) {
-        func_obj->scope_chain(local_chain);
-
-        return func_obj->c_function()(func_obj, this, target);
-      }
-
-      // リスプの関数。
-      if (func_obj->IsFunction()) {
-        // 引数リスト。
-        const LPointer& arguments = target.cdr();
-
-        // $@のリスト。
-        LPointer at_list = Lisp::NewList(Lisp::CountList(*arguments));
-        LObject* at_ptr = at_list.get();
-
-        // 引数名。
-        const LArgNames& names = func_obj->arg_names();
-        LArgNames::const_iterator names_itr = names.begin();
-        LArgNames::const_iterator names_end = names.end();
-
-        // マクロマップ。
-        LMacroMap macro_map;
-
-        // 各引数を整理。
-        // 普通の引数なら評価してバインド。
-        // マクロならmacro_mapに登録。
-        LPointer result;
-        for (LPointer ptr = arguments; ptr->IsPair();
-        ptr = ptr->cdr(), Lisp::Next(&at_ptr)) {
-          if (names_itr != names_end) {  // 引数名がある。
-            if ((*names_itr)[0] == '^') {
-              // マクロ名。
-              // マクロマップに登録。
-              macro_map.push_back(LMacroElm(*names_itr, ptr->car()));
-            } else if ((*names_itr)[0] == '&') {
-              // マクロ名。 (残りリスト)
-              // 残りをマクロマップに入れて抜ける。
-              macro_map.push_back(LMacroElm(*names_itr, ptr));
-              break;
-            } else {
-              // 普通の引数名。
-              // 評価してバインド。
-              result = Evaluate(*(ptr->car()));
-              local_chain.InsertSymbol(*names_itr, result);
-
-              // at_listにも登録。
-              at_ptr->car(result);
-            }
-
-            ++names_itr;
-          } else {  // 引数名がない。
-            // at_listに登録するだけ。
-            at_ptr->car(Evaluate(*(ptr->car())));
-          }
-        }
-        // at_listをスコープにバインド。
-        local_chain.InsertSymbol("$@", at_list);
-
-        // names_itrが余っていたらNilをバインド。
-        for (; names_itr != names_end; ++names_itr) {
-          local_chain.InsertSymbol(*names_itr, Lisp::NewNil());
-        }
-
-        // ローカルスコープを関数オブジェクトにセット。
-        func_obj->scope_chain(local_chain);
-
-        // もしマクロ引数があったなら、マクロ展開する。
-        // マクロがなかったらそのまま。
-        LPointerVec expression;
-        if (!(macro_map.empty())) {
-          LPointer clone;
-          for (auto& expr : func_obj->expression()) {
-            clone = expr->Clone();
-
-            // マクロ展開。
-            if (clone->IsPair()) {
-              DevelopMacro(clone.get(), macro_map);
-            } else if (clone->IsSymbol()) {
-              for (auto& map_pair : macro_map) {
-                if (map_pair.first == clone->symbol()) {
-                  clone = map_pair.second->Clone();
-                  break;
-                }
-              }
-            }
-
-            expression.push_back(clone);
-          }
-        } else {
-          expression = func_obj->expression();
-        }
-
-        // 関数呼び出し。
-        LPointer ret_ptr = Lisp::NewNil();
-        for (auto& expr : expression) {
-          ret_ptr = func_obj->Evaluate(*expr);
-        }
-
-        if (!ret_ptr) {
-          throw Lisp::GenError("@evaluating-error",
-          "Failed to execute '" + target.car()->ToString() + "'.");
-        }
-        return ret_ptr;
+      if ((func_obj->IsFunction()) || (func_obj->IsN_Function())) {
+        return func_obj->Apply(this, target);
       }
 
       throw Lisp::GenError("@evaluating-error",
@@ -289,6 +183,104 @@ namespace Sayuri {
 
     // Atomなのでクローンを返す。
     return target.Clone();
+  }
+
+  // 自身の関数を適用する。 LFunction。
+  LPointer LFunction::Apply(LObject* caller, const LObject& args) {
+    // ローカルスコープを作る。
+    scope_chain_.AppendNewScope();
+
+    // 引数リスト。
+    const LPointer& arguments = args.cdr();
+
+    // $@のリスト。
+    LPointer at_list = Lisp::NewList(Lisp::CountList(*arguments));
+    LObject* at_ptr = at_list.get();
+
+    // 引数名。
+    LArgNames::const_iterator names_itr = arg_names_.begin();
+    LArgNames::const_iterator names_end = arg_names_.end();
+
+    // マクロマップ。
+    LMacroMap macro_map;
+
+    // 各引数を整理。
+    // 普通の引数なら評価してバインド。
+    // マクロならmacro_mapに登録。
+    LPointer result;
+    for (LPointer ptr = arguments; ptr->IsPair();
+    ptr = ptr->cdr(), Lisp::Next(&at_ptr)) {
+      if (names_itr != names_end) {  // 引数名がある。
+        if ((*names_itr)[0] == '^') {
+          // マクロ名。
+          // マクロマップに登録。
+          macro_map.push_back(LMacroElm(*names_itr, ptr->car()));
+        } else if ((*names_itr)[0] == '&') {
+          // マクロ名。 (残りリスト)
+          // 残りをマクロマップに入れて抜ける。
+          macro_map.push_back(LMacroElm(*names_itr, ptr));
+          break;
+        } else {
+          // 普通の引数名。
+          // 評価してバインド。
+          result = caller->Evaluate(*(ptr->car()));
+          scope_chain_.InsertSymbol(*names_itr, result);
+
+          // at_listにも登録。
+          at_ptr->car(result);
+        }
+
+        ++names_itr;
+      } else {  // 引数名がない。
+        // at_listに登録するだけ。
+        at_ptr->car(caller->Evaluate(*(ptr->car())));
+      }
+    }
+    // at_listをスコープにバインド。
+    scope_chain_.InsertSymbol("$@", at_list);
+
+    // names_itrが余っていたらNilをバインド。
+    for (; names_itr != names_end; ++names_itr) {
+      scope_chain_.InsertSymbol(*names_itr, Lisp::NewNil());
+    }
+
+    // もしマクロ引数があったなら、マクロ展開する。
+    // マクロがなかったらそのまま。
+    LPointerVec expression;
+    if (!(macro_map.empty())) {
+      LPointer clone;
+      for (auto& expr : expression_) {
+        clone = expr->Clone();
+
+        // マクロ展開。
+        if (clone->IsPair()) {
+          DevelopMacro(clone.get(), macro_map);
+        } else if (clone->IsSymbol()) {
+          for (auto& map_pair : macro_map) {
+            if (map_pair.first == clone->symbol()) {
+              clone = map_pair.second->Clone();
+              break;
+            }
+          }
+        }
+
+        expression.push_back(clone);
+      }
+    } else {
+      expression = expression_;
+    }
+
+    // 関数呼び出し。
+    LPointer ret_ptr = Lisp::NewNil();
+    for (auto& expr : expression) {
+      ret_ptr = Evaluate(*expr);
+    }
+
+    if (!ret_ptr) {
+      throw Lisp::GenError("@apply-error",
+      "Failed to execute '" + args.car()->ToString() + "'.");
+    }
+    return ret_ptr;
   }
 
   // ======= //
