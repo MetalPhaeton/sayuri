@@ -7306,7 +7306,9 @@ R"...(### clock ###
     LPointerVec::iterator event_itr = event_vec.begin();
     for (LObject* ptr = event_list.get(); ptr->IsPair();
     Next(&ptr), ++event_itr) {
-      *event_itr = NewPair(ptr->car(), NewPair(WrapQuote(NewNil()), NewNil()));
+      const LPointer& car = ptr->car();
+      CheckType(*car, LType::FUNCTION);
+      *event_itr = NewPair(car, NewPair(WrapQuote(NewNil()), NewNil()));
     }
 
     // 第3引数は条件関数のリスト。
@@ -7323,7 +7325,9 @@ R"...(### clock ###
     LPointerVec::iterator cond_itr = cond_vec.begin();
     for (LObject* ptr = cond_list.get(); ptr->IsPair();
     Next(&ptr), ++cond_itr) {
-      *cond_itr = NewPair(ptr->car(), NewPair(WrapQuote(NewNil()), NewNil()));
+      const LPointer& car = ptr->car();
+      CheckType(*car, LType::FUNCTION);
+      *cond_itr = NewPair(car, NewPair(WrapQuote(NewNil()), NewNil()));
     }
 
     // カウント表を準備。
@@ -7347,7 +7351,7 @@ R"...(### clock ###
       // イベント関数を評価。
       for (int i = 0; i < num_event; ++i) {
         event_vec[i]->cdr()->car()->cdr()->car(data);
-        result = caller->Evaluate(*(event_vec[i]));
+        result = event_vec[i]->car()->Apply(caller, *(event_vec[i]));
 
         if (result->IsBoolean()) {
           // 古典。
@@ -7378,7 +7382,7 @@ R"...(### clock ###
       // 条件関数を評価。
       for (int i = 0; i < num_cond; ++i) {
         cond_vec[i]->cdr()->car()->cdr()->car(data);
-        result = caller->Evaluate(*(cond_vec[i]));
+        result = cond_vec[i]->car()->Apply(caller, *(cond_vec[i]));
 
         if (result->IsBoolean()) {
           // 古典。
