@@ -110,6 +110,7 @@ namespace Sayuri {
   TranspositionTable::operator=(const TranspositionTable& table) {
     num_entries_ = table.num_entries_;
     num_used_entries_ = table.num_used_entries_;
+    entry_table_.reset(nullptr);
     entry_table_.reset(new TTEntry[num_entries_]);
     for (std::size_t i = 0; i < num_entries_; ++i) {
       entry_table_[i] = table.entry_table_[i];
@@ -187,6 +188,15 @@ namespace Sayuri {
 
     // 条件外なので、無効なエントリーを返す。
     return null_entry_;
+  }
+
+  // テーブルの中身をクリアする。
+  void TranspositionTable::Clear() {
+    age_ = 0x00010000UL;
+    num_used_entries_ = 0;
+    for (std::size_t i = 0; i < num_entries_; ++i) {
+      entry_table_[i] = TTEntry();
+    }
   }
 
   // ================== //

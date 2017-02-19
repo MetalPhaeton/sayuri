@@ -237,11 +237,7 @@ namespace Sayuri {
       /**
        * テーブル内容をクリアする。
        */
-      void Clear() {
-        age_ = 0x00010000UL;
-        num_used_entries_ = 0;
-        entry_table_.reset(new TTEntry[num_entries_]);
-      }
+      void Clear();
 
       /**
        * テーブルのサイズを変更する。 内容は初期化される。
@@ -279,6 +275,7 @@ namespace Sayuri {
         index_mask_ = temp - 1;
 
         // テーブルを作成。
+        entry_table_.reset(nullptr);
         entry_table_.reset(new TTEntry[num_entries_]);
       }
 
