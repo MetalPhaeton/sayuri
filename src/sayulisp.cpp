@@ -2397,6 +2397,8 @@ R"...(### Hash and threads ###
     + Sets size of Hash Table(Transposition Table)
       and returns the previous size.
     + The unit of size is "byte".
+* `@clear-hash`
+    + Reinitialize Hash Table.
 * `@set-threads <Number of threads : Number>`
     + Sets `<Number of threads>` and returns the previous number.
 
@@ -2420,6 +2422,7 @@ R"...(### Hash and threads ###
     ;; Output
     ;; > 3)...";
     AddHelp("engine @set-hash-size", help);
+    AddHelp("engine @clear-hash", help);
     AddHelp("engine @set-threads", help);
 
     help =
@@ -4251,6 +4254,9 @@ R"...(### to-fen-position ###
     message_func_map_["@set-hash-size"] =
     INSERT_MESSAGE_FUNCTION(SetHashSize);
 
+    message_func_map_["@clear-hash"] =
+    INSERT_MESSAGE_FUNCTION(ClearHash);
+
     message_func_map_["@set-threads"] =
     INSERT_MESSAGE_FUNCTION(SetThreads);
 
@@ -4801,6 +4807,7 @@ R"...(### to-fen-position ###
     }
 
     engine_ptr_->LoadFEN(fen);
+    table_ptr_->Clear();
     return Lisp::NewBoolean(true);
   }
 

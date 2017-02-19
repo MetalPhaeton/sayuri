@@ -566,6 +566,7 @@ namespace Sayuri {
       /** ボードの状態を初期状態にする。 */
       DEF_MESSAGE_FUNCTION(SetNewGame) {
         engine_ptr_->SetNewGame();
+        table_ptr_->Clear();
         return Lisp::NewBoolean(true);
       }
 
@@ -689,6 +690,13 @@ namespace Sayuri {
 
       /** ハッシュテーブルのサイズを設定する。 */
       DEF_MESSAGE_FUNCTION(SetHashSize);
+
+      // %%% @clear-hash
+      /** ハッシュテーブルをクリアする。 */
+      DEF_MESSAGE_FUNCTION(ClearHash) {
+        table_ptr_->Clear();
+        return Lisp::NewBoolean(true);
+      }
 
       /** スレッド数を設定する。 */
       DEF_MESSAGE_FUNCTION(SetThreads);
