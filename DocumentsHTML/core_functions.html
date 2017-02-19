@@ -21,7 +21,6 @@
 <ul>
 <li><a href="#most-important-functions">Most Important Functions</a><ul>
 <li><a href="#exit"><code>exit</code></a> : Exits from Sayulisp.</li>
-<li><a href="#help"><code>help</code></a> : Shows descriptions.</li>
 <li><a href="#eval"><code>eval</code></a> : Evaluates an expression.</li>
 <li><a href="#quote"><code>quote</code></a> : Doesn't evaluate an expression.</li>
 <li><a href="#backquote"><code>backquote</code></a> : Generate Object with template.</li>
@@ -131,43 +130,6 @@
 
 ;; Exit with EXIT_FAILURE.
 (exit 1)
-</code></pre>
-<h3 id="help">help</h3>
-<h6> Usage </h6>
-
-<ol>
-<li><code>(help)</code></li>
-<li><code>(help &lt;String&gt;)</code></li>
-</ol>
-<h6> Description </h6>
-
-<ul>
-<li>1: Returns descriptions of all help.</li>
-<li>2: Returns a description of <code>&lt;String&gt;</code>.</li>
-</ul>
-<h6> Example </h6>
-
-<pre><code>(display (help "car"))
-
-;; Output
-;; &gt; ### car ###
-;; &gt;
-;; &gt; &lt;h6&gt; Usage &lt;/h6&gt;
-;; &gt;
-;; &gt;
-;; &gt; * `(car &lt;List&gt;)`
-;; &gt;
-;; &gt; &lt;h6&gt; Description &lt;/h6&gt;
-;; &gt;
-;; &gt; * Returns the 1st element of `&lt;List&gt;`.
-;; &gt;
-;; &gt; &lt;h6&gt; Example &lt;/h6&gt;
-;; &gt;
-;; &gt;     (display (car (list 111 222 333)))
-;; &gt;     
-;; &gt;     ;; Output
-;; &gt;     ;;
-;; &gt;     ;; &gt; 111
 </code></pre>
 <h3 id="eval">eval</h3>
 <h6> Usage </h6>
