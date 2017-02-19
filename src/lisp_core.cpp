@@ -748,71 +748,9 @@ namespace Sayuri {
   // コア関数を登録する。
   void Lisp::SetCoreFunctions() {
     LC_Function func;
-    std::string help;
-
-    func = LC_FUNCTION_OBJ(Help);
-    INSERT_LC_FUNCTION(func, "help", "Lisp:help");
-    help =
-R"...(### help ###
-
-<h6> Usage </h6>
-
-1. `(help)`
-2. `(help <String>)`
-
-<h6> Description </h6>
-
-* 1: Returns descriptions of all help.
-* 2: Returns a description of `<String>`.
-
-<h6> Example </h6>
-
-    (display (help "car"))
-    
-    ;; Output
-    ;; > ### car ###
-    ;; >
-    ;; > <h6> Usage </h6>
-    ;; >
-    ;; >
-    ;; > * `(car <List>)`
-    ;; >
-    ;; > <h6> Description </h6>
-    ;; >
-    ;; > * Returns the 1st element of `<List>`.
-    ;; >
-    ;; > <h6> Example </h6>
-    ;; >
-    ;; >     (display (car (list 111 222 333)))
-    ;; >     
-    ;; >     ;; Output
-    ;; >     ;;
-    ;; >     ;; > 111)...";
-    help_dict_.emplace("help", help);
 
     func = LC_FUNCTION_OBJ(Eval);
     INSERT_LC_FUNCTION(func, "eval", "Lisp:eval");
-    help =
-R"...(### eval ###
-
-<h6> Usage </h6>
-
-* `(eval <Object>)`
-
-<h6> Description </h6>
-
-* Evaluates `<Object>`.
-
-<h6> Example </h6>
-
-    (define x '(+ 1 2 3))
-    (display x)
-    (display (eval x))
-    
-    ;; Output
-    ;; > (+ 1 2 3)
-    ;; > 6))...";
-    help_dict_.emplace("eval", help);
 
     func = LC_FUNCTION_OBJ(ParseFunc);
     INSERT_LC_FUNCTION(func, "parse", "Lisp:parse");
@@ -820,55 +758,9 @@ R"...(### eval ###
     INSERT_LC_FUNCTION(func, "string->number", "Lisp:string->number");
     INSERT_LC_FUNCTION(func, "string->boolean", "Lisp:string->boolean");
     INSERT_LC_FUNCTION(func, "string->list", "Lisp:string->list");
-    help =
-R"...(### parse ###
-
-<h6> Usage </h6>
-
-* `(parse <S-Expression : String>)`
-* `(string->symbol <S-Expression : String>)`
-* `(string->number <S-Expression : String>)`
-* `(string->boolean <S-Expression : String>)`
-* `(string->list <S-Expression : String>)`
-
-<h6> Description </h6>
-
-* Parses `<S-Expression>` and generates a object.
-
-<h6> Example </h6>
-
-    (display (parse "(1 2 3)"))
-    
-    ;; Output
-    ;; > (1 2 3))...";
-    help_dict_.emplace("parse", help);
-    help_dict_.emplace("string->symbol", help);
-    help_dict_.emplace("string->number", help);
-    help_dict_.emplace("string->boolean", help);
-    help_dict_.emplace("string->list", help);
 
     func = LC_FUNCTION_OBJ(Parval);
     INSERT_LC_FUNCTION(func, "parval", "Lisp:parval");
-    help =
-R"...(### parval ###
-
-<h6> Usage </h6>
-
-* `(parse <S-Expression : String>)`
-
-<h6> Description </h6>
-
-* Parses and evaluates `<S-Expression>` and returns result.
-    + It is similar to `(eval (parse <S-Expression>))`.
-
-<h6> Example </h6>
-
-    (parval "(display \"Hello\")(display \"World\")")
-    
-    ;; Output
-    ;; > Hello
-    ;; > World)...";
-    help_dict_.emplace("parval", help);
 
     func = LC_FUNCTION_OBJ(ToStringFunc);
     INSERT_LC_FUNCTION(func, "to-string", "Lisp:to-string");
@@ -876,203 +768,23 @@ R"...(### parval ###
     INSERT_LC_FUNCTION(func, "number->string", "Lisp:number->string");
     INSERT_LC_FUNCTION(func, "boolean->string", "Lisp:boolean->string");
     INSERT_LC_FUNCTION(func, "list->string", "Lisp:list->string");
-    help =
-R"...(### to-string ###
-
-<h6> Usage </h6>
-
-* `(to-string <Object>)`
-* `(symbol->string <Object>)`
-* `(number->string <Object>)`
-* `(boolean->string <Object>)`
-* `(list->string <Object>)`
-
-<h6> Description </h6>
-
-* Converts `<Object>` to S-Expression as String.
-
-<h6> Example </h6>
-
-    (display (to-string '(1 2 3)))
-    
-    ;; Output
-    ;; > (1 2 3)
-    ;;
-    
-    (display (string? (to-string '(1 2 3))))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("to-string", help);
-    help_dict_.emplace("symbol->string", help);
-    help_dict_.emplace("number->string", help);
-    help_dict_.emplace("boolean->string", help);
-    help_dict_.emplace("list->string", help);
 
     func = LC_FUNCTION_OBJ(Try);
     INSERT_LC_FUNCTION(func, "try", "Lisp:try");
-    help =
-R"...(### try ###
-
-<h6> Usage </h6>
-
-* `(try (<Try Expr>...) <Catch Expr>...)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    * `<Catch Expr>...` is evaluated if an error have been occurred
-      in `<Try Expr>...`.
-* Handles exceptions.
-* If an exception occurs in `<Try Expr>...`, then
-  it stops `<Try Expr>...` and executes `<Catch Expr>...`.
-* In a scope of `<Catch Expr>...`, 'exception' symbol is defined.
-* Returns a evaluated last object.
-
-<h6> Example </h6>
-
-    (try ((+ 1 "Hello"))
-         (display "Error Occured!!"))
-    
-    ;; Output
-    ;; > Error Occured!!
-    
-    (try ((+ 1 "Hello"))
-         (display exception))
-    
-    ;; Output
-    ;; > (@not-number "The 2nd argument of (+) didn't return Number."))...";
-    help_dict_.emplace("try", help);
 
     func = LC_FUNCTION_OBJ(Throw);
     INSERT_LC_FUNCTION(func, "throw", "Lisp:throw");
-    help =
-R"...(### throw ###
-
-<h6> Usage </h6>
-
-* `(throw <Object>)`
-
-<h6> Description </h6>
-
-* Throws an exception.
-* If you use this in (try) function,
-  `<Object>` is bound to 'exception' symbol.
-
-<h6> Example </h6>
-
-    (try ((throw 123))
-         (display exception))
-    
-    ;; Output
-    ;; > 123)...";
-    help_dict_.emplace("throw", help);
 
     func = LC_FUNCTION_OBJ(CarFunc);
     INSERT_LC_FUNCTION(func, "car", "Lisp:car");
-    help =
-R"...(### car ###
-
-<h6> Usage </h6>
-
-* `(car <Pair or List>)`
-
-<h6> Description </h6>
-
-* Returns Car value of `<Pair or List>`
-
-<h6> Example </h6>
-
-    (display (car '(111 . 222)))
-    ;; Output
-    ;; > 111
-    
-    (display (car (list 111 222 333)))
-    
-    ;; Output
-    ;; > 111)...";
-    help_dict_.emplace("car", help);
 
     func = LC_FUNCTION_OBJ(CdrFunc);
     INSERT_LC_FUNCTION(func, "cdr", "Lisp:cdr");
-    help =
-R"...(### cdr ###
-
-<h6> Usage </h6>
-
-* `(cdr <Pair or List>)`
-
-<h6> Description </h6>
-
-* Returns Cdr value of `<Pair or List>`
-
-<h6> Example </h6>
-
-    (display (cdr '(111 . 222)))
-    ;; Output
-    ;; > 222
-    
-    (display (cdr (list 111 222 333)))
-    
-    ;; Output
-    ;; > (222 333))...";
-    help_dict_.emplace("cdr", help);
 
     func = LC_FUNCTION_OBJ(Cons);
     INSERT_LC_FUNCTION(func, "cons", "Lisp:cons");
-    help =
-R"...(### cons ###
-
-<h6> Usage </h6>
-
-* `(cons <Object 1> <Object 2>)`
-
-<h6> Description </h6>
-
-* Returns Pair. Car is `<Object 1>`, Cdr is `<Object 2>`.
-
-<h6> Example </h6>
-
-
-    (display (cons 111 222))
-    
-    ;; Output
-    ;; > (111 . 222)
-    
-    (display (cons 111 '(222 333)))
-    
-    ;; Output
-    ;; > (111 222 333)
-    
-    (display (cons 444 (cons 555 (cons 666 ()))))
-    
-    ;; Output
-    ;; > (444 555 666))...";
-    help_dict_.emplace("cons", help);
 
     // cxrを登録。
-    help =
-R"...(### cxxxxr ###
-
-<h6> Usage </h6>
-
-* `(c[ad]{2,4}r <Pair or List>)`
-
-<h6> Description </h6>
-
-* Returns Object of `c[ad]{2,4}r` of `<Pair or List>`
-
-<h6> Example </h6>
-
-    (define tree '(1 (21 22) (31 32) 4))
-    
-    (display (cadr tree))
-    ;; Output
-    ;; > (21 22)
-    
-    (display (caaddr tree))
-    ;; Output
-    ;; > 31)...";
     {
       const char* ad = "ad";
       std::string path;
@@ -1087,7 +799,6 @@ R"...(### cxxxxr ###
             return this->CxrFunc(path, self, caller, args);
           };
           INSERT_LC_FUNCTION(func, "c" + path + "r", "Lisp:c" + path + "r");
-          help_dict_.emplace("c" + path + "r", help);
           for (int _3rd = 0; _3rd < 2; ++_3rd) {
             oss << ad[_3rd] <<  ad[_2nd] << ad[_1st];
             path = oss.str();
@@ -1097,7 +808,6 @@ R"...(### cxxxxr ###
               return this->CxrFunc(path, self, caller, args);
             };
             INSERT_LC_FUNCTION(func, "c" + path + "r", "Lisp:c" + path + "r");
-            help_dict_.emplace("c" + path + "r", help);
             for (int _4th = 0; _4th < 2; ++_4th) {
               oss << ad[_4th] << ad[_3rd] <<  ad[_2nd] << ad[_1st];
               path = oss.str();
@@ -1108,7 +818,6 @@ R"...(### cxxxxr ###
               };
               INSERT_LC_FUNCTION(func, "c" + path + "r",
               "Lisp:c" + path + "r");
-              help_dict_.emplace("c" + path + "r", help);
             }
           }
         }
@@ -1117,2994 +826,344 @@ R"...(### cxxxxr ###
 
     func = LC_FUNCTION_OBJ(ApplyFunc);
     INSERT_LC_FUNCTION(func, "apply", "Lisp:apply");
-    help =
-R"...(### apply ###
-
-<h6> Usage </h6>
-
-* `(apply <Object 1> <Object 2>)`
-
-<h6> Description </h6>
-
-* Constructs Pair and evaluates it.
-  + `<Object 1>` is Car, `<Object 2>` is Cdr.
-  + It is same as `(eval (cons <Object 1> <Object 2>))`.
-
-<h6> Example </h6>
-
-    (define a '(1 2 3))
-    
-    (display (apply '+ a))
-    
-    ;; Output
-    ;; > 6)...";
-    help_dict_.emplace("apply", help);
 
     func = LC_FUNCTION_OBJ(WalkFunc);
     INSERT_LC_FUNCTION(func, "walk", "Lisp:walk");
-    help =
-R"...(### walk ###
-
-<h6> Usage </h6>
-
-* `(walk <Callback : Function> <Target : Pair>)`
-
-<h6> Description </h6>
-
-* Walks around in `<Target>` and executes `<Callback>`.
-    + `<Callback>` receives 2 arguments.
-        - 1st : Current element.
-        - 2nd : Path. (String)
-            - 'a' is Car.
-            - 'd' is cdr.
-            - For example, "da" means (car (cdr <List>)).
-    + If `<Callback>` returns List and its 1st element is `@replace`,
-      the current element is replaced for the 2nd element of the list.
-* Returns result of `<Target>`.
-
-<h6> Example </h6>
-
-    (define li '(1 2 (3 4) 5))
-    (define (my-func elm path)
-            (display "elm : " elm " || path : " path)
-            (if (equal? elm 3)
-                '(@replace "Hello")
-                ()))
-    
-    (display (walk my-func li))
-    ;; Output
-    ;; > elm : 1 || path : a
-    ;; > elm : (2 (3 4) 5) || path : d
-    ;; > elm : 2 || path : da
-    ;; > elm : ((3 4) 5) || path : dd
-    ;; > elm : (3 4) || path : dda
-    ;; > elm : (5) || path : ddd
-    ;; > elm : 3 || path : ddaa
-    ;; > elm : (4) || path : ddad
-    ;; > elm : 4 || path : ddada
-    ;; > elm : () || path : ddadd
-    ;; > elm : 5 || path : ddda
-    ;; > elm : () || path : dddd
-    ;; > (1 2 ("Hello" 4) 5))...";
-    help_dict_.emplace("walk", help);
 
     func = LC_FUNCTION_OBJ(Quote);
     INSERT_LC_FUNCTION(func, "quote", "Lisp:quote");
-    help =
-R"...(### quote ###
-
-<h6> Usage </h6>
-
-* `(quote <Object>)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + `<Object>` is not Evaluated.
-* Returns `<Object>` as is.
-* Syntactic suger is `'<Object>`
-
-<h6> Example </h6>
-
-    (display (quote (111 222 333)))
-    
-    ;; Output
-    ;; > (111 222 333)
-    
-    (display '(444 555 666))
-    
-    ;; Output
-    ;; > (444 555 666)
-    
-    (define x 123)
-    (display x)
-    (display 'x)
-    
-    ;; Output
-    ;; > 123
-    ;; > Symbol: x)...";
-    help_dict_.emplace("quote", help);
 
     func = LC_FUNCTION_OBJ(Backquote);
     INSERT_LC_FUNCTION(func, "backquote", "Lisp:backquote");
-    help =
-R"...(### backquote ###
-
-<h6> Usage </h6>
-
-* `(backquote <Object>)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + `<Object>` is treated as template.
-        - An object next to `,` or `,@` is evaluated. the others is not.
-* Returns an object after template process.
-* Syntactic suger is backquote.
-
-<h6> Example </h6>
-
-    (define a 111)
-    (define b 222)
-    (define c 333)
-    (define d '(444 555 666))
-    (define e '())
-    
-    (display (backquote (a b c)))
-    (display `(a b c))
-    ;; Output
-    ;; > (a b c)
-    ;; > (a b c)
-    
-    (display (backquote (a ,b c)))
-    (display `(a ,b c))
-    ;; Output
-    ;; > (a 222 c)
-    ;; > (a 222 c)
-    
-    (display (backquote (a ,d c)))
-    (display `(a ,d c))
-    ;; Output
-    ;; > (a (444 555 666) c)
-    ;; > (a (444 555 666) c)
-    
-    (display (backquote (a ,@d c)))
-    (display `(a ,@d c))
-    ;; Output
-    ;; > (a 444 555 666 c)
-    ;; > (a 444 555 666 c)
-    
-    (display (backquote (a (a ,@d c) c)))
-    (display `(a (a ,@d c) c))
-    ;; Output
-    ;; > (a (a 444 555 666 c) c)
-    ;; > (a (a 444 555 666 c) c)
-    
-    (display (backquote (a ,@e c)))
-    (display `(a ,@e c))
-    ;; Output
-    ;; > (a c)
-    ;; > (a c))...";
-    help_dict_.emplace("backquote", help);
 
     func = LC_FUNCTION_OBJ(Lambda);
     INSERT_LC_FUNCTION(func, "lambda", "Lisp:lambda");
-    help =
-R"...(### lambda ###
-
-<h6> Usage </h6>
-
-* `(lambda (<Args : Symbol>...) <S-Expression>...)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + All arguments isn't evaluated.
-* Returns Function defined by `<S-Expression>...`.
-* (lambda) inherits parent's scope and creates its own local scope.
-  So using (lambda) in (lambda), you can create closure function.
-* `<Args>...` is Symbols as name of arguments.
-    + If an argument name is started with `^` or `&`,
-      the argument is Macro-Like Argument.
-
-<h6> Example </h6>
-
-    (define myfunc (lambda (x) (+ x 100)))
-    (display (myfunc 5))
-    ;; Output
-    ;; > 105
-    
-    (define gen-func (lambda (x) (lambda () (+ x 100))))
-    (define myfunc2 (gen-func 50))
-    (display (myfunc2))
-    ;; Output
-    ;; > 150
-    
-    ;; Example of Macro-Like Argument.
-    (define gen-func2
-      (lambda (^x &y) (lambda () (display (apply '^x '&y)))))
-    (define func1 (gen-func2 + 111 222))
-    (define func2 (gen-func2 * 333 444 555))
-    (func1)
-    (func2)
-    ;; Output
-    ;; > 333
-    ;; > 82057860
-    (display (to-string func1))
-    (display (to-string func2))
-    ;; Output
-    ;; > (lambda () (display (apply (quote +) (quote (111 222)))))
-    ;; > (lambda () (display (apply (quote *) (quote (333 444 555))))))...";
-    help_dict_.emplace("lambda", help);
 
     func = LC_FUNCTION_OBJ(FuncToLambda);
     INSERT_LC_FUNCTION(func, "func->lambda", "Lisp:func->lambda");
-    help =
-R"...(### func->lambda ###
-
-<h6> Usage </h6>
-
-* `(func->lambda <Function : Function>)`
-
-<h6> Description </h6>
-
-* Converts Function to S-Expression and returns.
-
-<h6> Example </h6>
-
-    (define (myfunc x) (display x))
-    (display (func->lambda myfunc))
-    ;; Output
-    ;; > (lambda (x) (display x)))...";
-    help_dict_.emplace("func->lambda", help);
 
     func = LC_FUNCTION_OBJ(Let);
     INSERT_LC_FUNCTION(func, "let", "Lisp:let");
-    help =
-R"...(### let ###
-
-<h6> Usage </h6>
-
-* `(let ((<Name : Symbol> <Object>)...) <S-Expression>...)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + `<Name : Symbol>` isn't evaluated.
-    + But `<Object>` and `<S-Expression>` are evaluated.
-* Executes `<S-Expression>...` in new local scope.
-* (let) inherits parent's scope and creates its own local scope.
-  So using (lambda) in (let), you can create closure function.
-* `(<Name> <Object>)...` is local values on (let)'s local scope.
-
-<h6> Example </h6>
-
-    (define (gen-func x y) (let ((a x) (b y))
-              (lambda () (+ a b))))
-    (define myfunc (gen-func 10 20))
-    (display (myfunc))
-    
-    ;; Output
-    ;; > 30)...";
-    help_dict_.emplace("let", help);
 
     func = LC_FUNCTION_OBJ(While);
     INSERT_LC_FUNCTION(func, "while", "Lisp:while");
-    help =
-R"...(### while ###
-
-<h6> Usage </h6>
-
-* `(while <Condition : Boolean> <S-Expression>...)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-* While `<Condition>` is #t, it iterates `<S-Expression>...`.
-* Returns Object returned by the last S-Expression.
-
-<h6> Example </h6>
-
-    (define i 0)
-    (while (< i 5)
-        (display "Hello " i)
-        (display "World" i)
-        (set! i (++ i)))
-    
-    ;; Output
-    ;; > Hello 0
-    ;; > World 0
-    ;; > Hello 1
-    ;; > World 1
-    ;; > Hello 2
-    ;; > World 2
-    ;; > Hello 3
-    ;; > World 3
-    ;; > Hello 4
-    ;; > World 4)...";
-    help_dict_.emplace("while", help);
 
     func = LC_FUNCTION_OBJ(For);
     INSERT_LC_FUNCTION(func, "for", "Lisp:for");
-    help =
-R"...(### for ###
-
-<h6> Usage </h6>
-
-* `(for (<Variable : Symbol> <List | String>) <S-Expression>...)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + `<Variable>` is not evaluated.
-* Repeats `<S-Expression>...` until a number of elements of `<List | String>`.
-    + The element of `<List | String>` is bound to `<Variable>`.
-* Returns Object returned by the last S-Expression.
-
-<h6> Example </h6>
-
-    (define aaa '(1 2 3 4 5))
-    
-    (for (x aaa)
-        (display "Hello " x)
-        (display "World " (+ x 5)))
-    ;; Output
-    ;; > Hello 1
-    ;; > World 6
-    ;; > Hello 2
-    ;; > World 7
-    ;; > Hello 3
-    ;; > World 8
-    ;; > Hello 4
-    ;; > World 9
-    ;; > Hello 5
-    ;; > World 10
-
-    (for (x "Hello")
-        (display x))
-    ;; Output
-    ;; > H
-    ;; > e
-    ;; > l
-    ;; > l
-    ;; > o)...";
-    help_dict_.emplace("for", help);
 
     func = LC_FUNCTION_OBJ(Define);
     INSERT_LC_FUNCTION(func, "define", "Lisp:define");
-    help =
-R"...(### define ###
-
-<h6> Usage </h6>
-
-1. `(define <Symbol> <Object>)`
-2. `(define (<Name : Symbol> <Args : Symbol>...) <S-Expression>...)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + 1: `<Symbol>` isn't evaluated.
-    + 2: All arguments isn't evaluated.
-* Binds something to its scope.
-* 1: Binds `<Object>` to `<Symbol>`.
-* 2: Defines `<S-Expression>` as Function named `<Name>`,
-     and `<Args>...` is names of its arguments.
-    + If an argument name is started with `^` or `&`,
-      the argument is Macro-Like Argument.
-
-<h6> Example </h6>
-
-    (define x 123)
-    (display x)
-    
-    ;; Output
-    ;; > 123
-    
-    (define (myfunc x) (+ x 10))
-    (display (myfunc 5))
-    
-    ;; Output
-    ;; > 15
-    
-    ;; Example of Macro-Like Argument.
-    (define (gen-func ^x &y) (^x &y) (lambda () (display (apply '^x '&y))))
-    (define func1 (gen-func + 111 222))
-    (define func2 (gen-func * 333 444 555))
-    (func1)
-    (func2)
-    ;; Output
-    ;; > 333
-    ;; > 82057860
-    (display (to-string func1))
-    (display (to-string func2))
-    ;; Output
-    ;; > (lambda () (display (apply (quote +) (quote (111 222)))))
-    ;; > (lambda () (display (apply (quote *) (quote (333 444 555))))))...";
-    help_dict_.emplace("define", help);
 
     func = LC_FUNCTION_OBJ(DefineMacro);
     INSERT_LC_FUNCTION(func, "define-macro", "Lisp:define-macro");
-    help =
-R"...(### define-macro ###
-
-<h6> Usage </h6>
-
-* `(define-macro (<Name : Symbol> <Args : Symbol>...) <S-Expression>...)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + All arguments isn't evaluated.
-* Defines Traditional Macros and returns `<Name>`.
-* If an argument name starts with '&', it means the rest of arguments.
-
-<h6> Example </h6>
-
-    (define-macro (my-macro x y &z)
-                  (display x)
-                  (display y)
-                  (display &z)
-                  (cons x (cons y &z)))
-    
-    (display (my-macro * (+ 1 2) 3 4 5))
-    ;; Output
-    ;; > Symbol: *
-    ;; > (+ 1 2)
-    ;; > (3 4 5)
-    ;; > 180)...";
-    help_dict_.emplace("define-macro", help);
 
     func = LC_FUNCTION_OBJ(Set);
     INSERT_LC_FUNCTION(func, "set!", "Lisp:set!");
-    help =
-R"...(### set! ###
-
-<h6> Usage </h6>
-
-* `(set! <Symbol> <Object>)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + `<Symbol>` isn't evaluated.
-* Updates `<Symbol>` to `<Object>` on the local scope.
-
-<h6> Example </h6>
-
-    (define x 123)
-    (set! x 456)
-    (display x)
-    
-    ;; Output
-    ;; > 456
-    
-    (define myfunc (let ((x 1)) (lambda () (set! x (+ x 1)) x)))
-    (display (myfunc))
-    (display (myfunc))
-    (display (myfunc))
-    
-    ;; Output
-    ;; > 2
-    ;; > 3
-    ;; > 4)...";
-    help_dict_.emplace("set!", help);
 
     func = LC_FUNCTION_OBJ(If);
     INSERT_LC_FUNCTION(func, "if", "Lisp:if");
-    help =
-R"...(### if ###
-
-<h6> Usage </h6>
-
-* `(if <Condition : Boolean> <Then> <Else>)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + Either of `<Then>` and `<Else>` are evaluated.
-* If `<Condition>` is true, then (if) evaluates `<Then>`.
-  If false, then it evaluates `<Else>`.
-
-<h6> Example </h6>
-
-    (display (if (< 1 2) (+ 3 4) (+ 5 6)))
-    
-    ;; Output
-    ;; > 7)...";
-    help_dict_.emplace("if", help);
 
     func = LC_FUNCTION_OBJ(Cond);
     INSERT_LC_FUNCTION(func, "cond", "Lisp:cond");
-    help =
-R"...(### cond ###
-
-<h6> Usage </h6>
-
-* `(cond (<Condition : Boolean> <Then>)... (else <Else>))`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + Only one of `<Then>` or `<Else>` are evaluated.
-    + `(else <Else>)` is a special list.
-* If `<Condition>` is true, then (cond) returns `<Then>`.
-  If false, then it evaluates next `<Condition>`.
-* If all `<Condition>` are false, then (cond) returns `<Else>`.
-
-<h6> Example </h6>
-
-    (cond
-        ((> 1 2) (display "Hello"))
-        ((< 3 4) (display "World"))
-        (else "Else!!"))
-    
-    ;; Output
-    ;; > World)...";
-    help_dict_.emplace("cond", help);
 
     func = LC_FUNCTION_OBJ(Begin);
     INSERT_LC_FUNCTION(func, "begin", "Lisp:begin");
-    help =
-R"...(### begin ###
-
-<h6> Usage </h6>
-
-* `(begin <S-Expression>...)`
-
-<h6> Description </h6>
-
-* Executes `<S-Expression>...` in turns and returns last.
-
-<h6> Example </h6>
-
-    (display (begin
-                 (display "Hello")
-                 (display "World")))
-    
-    ;; Output
-    ;; > Hello
-    ;; > World
-    ;; > World)...";
-    help_dict_.emplace("begin", help);
 
     func = LC_FUNCTION_OBJ(GenScope);
     INSERT_LC_FUNCTION(func, "gen-scope", "Lisp:gen-scope");
-    help =
-R"...(### gen-scope ###
-
-<h6> Usage </h6>
-
-* `(gen-scope)`
-* `(<Scope Name> <S-Expressions>...)`
-
-<h6> Description </h6>
-
-* Generates independent scope chain and return it.
-    + The scope is caller's scope plus new empty scope.
-* `(<Scope Name>)` executes `<S-Expression>...` in its own scope
-  and returns last.
-
-<h6> Example </h6>
-
-    (define my-scope-1 (gen-scope))
-    (define my-scope-2 (gen-scope))
-    
-    (define a "Global")
-    (my-scope-1 (define a "Hello"))
-    (my-scope-2 (define a "World"))
-    
-    (display a)
-    (my-scope-1 (display a))
-    (my-scope-2 (display a))
-    ;; Output
-    ;; > Global
-    ;; > Hello
-    ;; > World)...";
-    help_dict_.emplace("gen-scope", help);
 
     func = LC_FUNCTION_OBJ(Display);
     INSERT_LC_FUNCTION(func, "display", "Lisp:display");
     INSERT_LC_FUNCTION(func, "print", "Lisp:print");
-    help =
-R"...(### display ###
-
-<h6> Usage </h6>
-
-* `(display <Object>...)`
-* `(print <Object>...)`
-
-<h6> Description </h6>
-
-* Prints `<Object>` on Standard Output.
-
-<h6> Example </h6>
-
-    (define x 123)
-    (display x)
-    
-    ;; Output
-    ;; > 123
-    
-    (define x 123)
-    (display "x is " x)
-    
-    ;; Output
-    ;; > x is 123)...";
-    help_dict_.emplace("display", help);
-    help_dict_.emplace("print", help);
 
     func = LC_FUNCTION_OBJ(Stdin);
     INSERT_LC_FUNCTION(func, "stdin", "Lisp:stdin");
-    help =
-R"...(### stdin ###
-
-<h6> Usage </h6>
-
-* `(stdin <Message Symbol>)`
-
-<h6> Description </h6>
-
-* Returns String from Standard Input.
-* `<Message Symbol>` is a message to the input stream.
-    + `@get` : Reads one charactor.
-    + `@read-line` : Reads one line. ('LF(CR+LF)' is omitted.)
-    + `@read` : Reads all.
-* If Standard Input is already closed, it returns Nil.
-
-<h6> Example </h6>
-
-    ;; Reads and shows one charactor from Standard Input.
-    (display (stdin '@get))
-    
-    ;; Reads and shows one line from Standard Input.
-    (display (stdin '@read-line))
-    
-    ;; Reads and shows all from Standard Input.
-    (display (stdin '@read)))...";
-    help_dict_.emplace("stdin", help);
 
     func = LC_FUNCTION_OBJ(Stdout);
     INSERT_LC_FUNCTION(func, "stdout", "Lisp:stdout");
-    help =
-R"...(### stdout ###
-
-<h6> Usage </h6>
-
-* `(stdout <String>)`
-
-<h6> Description </h6>
-
-* Prints `<String>` on Standard Output.
-
-<h6> Example </h6>
-
-    (stdout (to-string 123))
-    (stdout "\n")
-    
-    ;; Output
-    ;; > 123)...";
-    help_dict_.emplace("stdout", help);
 
     func = LC_FUNCTION_OBJ(Stderr);
     INSERT_LC_FUNCTION(func, "stderr", "Lisp:stderr");
-    help =
-R"...(### stderr ###
-
-<h6> Usage </h6>
-
-* `(stderr <String>)`
-
-<h6> Description </h6>
-
-* Prints `<String>` on Standard Error.
-
-<h6> Example </h6>
-
-    (stderr (to-string 123))
-    (stderr "\n")
-    
-    ;; Output
-    ;; > 123)...";
-    help_dict_.emplace("stderr", help);
 
     func = LC_FUNCTION_OBJ(Import);
     INSERT_LC_FUNCTION(func, "import", "Lisp:import");
-    help =
-R"...(### import ###
-
-<h6> Usage </h6>
-
-* `(import <File name : String>)`
-
-<h6> Description </h6>
-
-* Reads `<File name>` and executes it.
-* Returns the last evaluated Object of `<File name>`.
-
-<h6> Example </h6>
-
-    ;; When the following code is written in 'hello.scm'
-    ;;
-    ;; (define a 111)
-    ;; (define b 222)
-    ;; (string-append "Hello " "World")  ;; <- The last S-Expression.
-    
-    (display (import "hello.scm"))
-    (display "a: " a)
-    (display "b: " b)
-    
-    ;; Output
-    ;; > Hello World
-    :: > a: 111
-    :: > b: 222)...";
-    help_dict_.emplace("import", help);
 
     func = LC_FUNCTION_OBJ(Export);
     INSERT_LC_FUNCTION(func, "export", "Lisp:export");
-    help =
-R"...(### export ###
-
-<h6> Usage </h6>
-
-* `(export <File name : String> <Object>...)`
-
-<h6> Description </h6>
-
-* Converts each `<Object>...` into String and appends it to `<File name>`.
-* Returns String written to `<File name>`.
-
-<h6> Example </h6>
-
-    (display (export "aaa.scm" (list '+ 1 2 3) (list 'define 'x "abc")))
-    ;; Output
-    ;; > (+ 1 2 3)
-    ;; > (define x "abc")
-    ;;
-    ;; In "aaa.scm"
-    ;; > (+ 1 2 3)
-    ;; > (define x "abc"))...";
-    help_dict_.emplace("export", help);
 
     func = LC_FUNCTION_OBJ(EqualQ);
     INSERT_LC_FUNCTION(func, "equal?", "Lisp:equal?");
-    help =
-R"...(### equal? ###
-
-<h6> Usage </h6>
-
-* `(equal? <Object>...)`
-
-<h6> Description </h6>
-
-* Returns #t if all `<Object>...` are same structure.
-  Otherwise, returns #f.
-
-<h6> Example </h6>
-
-    (display (equal? '(1 2 (3 4) 5) '(1 2 (3 4) 5)))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("import", help);
 
     func = LC_FUNCTION_OBJ(QFunc<LType::NIL>);
     INSERT_LC_FUNCTION(func, "nil?", "Lisp:nil?");
     INSERT_LC_FUNCTION(func, "null?", "Lisp:null?");
-    help =
-R"...(### nil? ###
-
-<h6> Usage </h6>
-
-* `(nil? <Object>...)`
-* `(null? <Object>...)`
-
-<h6> Description </h6>
-
-* Returns #t if all `<Object>...` are Nil.
-  Otherwise, returns #f.
-
-<h6> Example </h6>
-
-    (display (nil? ()))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("nil?", help);
-    help_dict_.emplace("null?", help);
 
     func = LC_FUNCTION_OBJ(QFunc<LType::PAIR>);
     INSERT_LC_FUNCTION(func, "pair?", "Lisp:pair?");
-    help =
-R"...(### pair? ###
-
-<h6> Usage </h6>
-
-* `(pair? <Object>...)`
-
-<h6> Description </h6>
-
-* Returns #t if all `<Object>...` are Pair.
-  Otherwise, returns #f.
-
-<h6> Example </h6>
-
-    (display (pair? '(1 2 3) '(4 5 6)))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("pair?", help);
 
     func = LC_FUNCTION_OBJ(QFunc<LType::SYMBOL>);
     INSERT_LC_FUNCTION(func, "symbol?", "Lisp:symbol?");
-    help =
-R"...(### symbol? ###
-
-<h6> Usage </h6>
-
-* `(symbol? <Object>...)`
-
-<h6> Description </h6>
-
-* Returns #t if all `<Object>...` are Symbol.
-  Otherwise, returns #f.
-
-<h6> Example </h6>
-
-    (display (symbol? 'x))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("symbol?", help);
 
     func = LC_FUNCTION_OBJ(QFunc<LType::NUMBER>);
     INSERT_LC_FUNCTION(func, "number?", "Lisp:number?");
-    help =
-R"...(### number? ###
-
-<h6> Usage </h6>
-
-* `(number? <Object>...)`
-
-<h6> Description </h6>
-
-* Returns #t if all `<Object>...` are Number.
-  Otherwise, returns #f.
-
-<h6> Example </h6>
-
-    (display (number? 123))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("number?", help);
 
     func = LC_FUNCTION_OBJ(QFunc<LType::BOOLEAN>);
     INSERT_LC_FUNCTION(func, "boolean?", "Lisp:boolean?");
-    help =
-R"...(### boolean? ###
-
-<h6> Usage </h6>
-
-* `(boolean? <Object>...)`
-
-<h6> Description </h6>
-
-* Returns #t if all `<Object>...` are Boolean.
-  Otherwise, returns #f.
-
-<h6> Example </h6>
-
-    (display (boolean? #f))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("boolean?", help);
 
     func = LC_FUNCTION_OBJ(QFunc<LType::STRING>);
     INSERT_LC_FUNCTION(func, "string?", "Lisp:string?");
-    help =
-R"...(### string? ###
-
-<h6> Usage </h6>
-
-* `(string? <Object>...)`
-
-<h6> Description </h6>
-
-* Returns #t if all `<Object>...` are String.
-  Otherwise, returns #f.
-
-<h6> Example </h6>
-
-    (display (string? "Hello"))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("string?", help);
 
     func = LC_FUNCTION_OBJ(QFunc<LType::FUNCTION>);
     INSERT_LC_FUNCTION(func, "function?", "Lisp:function?");
-    help =
-R"...(### function? ###
-
-<h6> Usage </h6>
-
-* `(function? <Object>...)`
-
-<h6> Description </h6>
-
-* Returns #t if all `<Object>...` are Function.
-  Otherwise, returns #f.
-
-<h6> Example </h6>
-
-    (define myfunc (lambda (x) (+ x 1)))
-    (display (function? myfunc))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("function?", help);
 
     func = LC_FUNCTION_OBJ(QFunc<LType::N_FUNCTION>);
     INSERT_LC_FUNCTION(func, "native-function?", "Lisp:native-function?");
-    help =
-R"...(### native-function? ###
-
-<h6> Usage </h6>
-
-* `(native-function? <Object>...)`
-
-<h6> Description </h6>
-
-* Returns #t if all `<Object>...` are Native Function.
-  Otherwise, returns #f.
-
-<h6> Example </h6>
-
-    (display (native-function? +))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("native-function?", help);
 
     func = LC_FUNCTION_OBJ(ProcedureQ);
     INSERT_LC_FUNCTION(func, "procedure?", "Lisp:procedure?");
-    help =
-R"...(### procedure? ###
-
-<h6> Usage </h6>
-
-* `(procedure? <Object>...)`
-
-<h6> Description </h6>
-
-* Returns #t if all `<Object>...` are Function or Native Function.
-  Otherwise, returns #f.
-
-<h6> Example </h6>
-
-    (define myfunc (lambda (x) (+ x 1)))
-    (display (procedure? myfunc))
-    
-    ;; Output
-    ;; > #t
-    
-    (display (procedure? +))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("procedure?", help);
 
     func = LC_FUNCTION_OBJ(OutputStream);
     INSERT_LC_FUNCTION(func, "output-stream", "Lisp:output-stream");
-    help =
-R"...(### output-stream ###
-
-<h6> Usage </h6>
-
-1. `(output-stream <File name : String>)`
-2. `((output-stream <File name : String>) <String>)`
-
-<h6> Description </h6>
-
-* 1: Returns Native Function as an output stream of `<File name>`.
-* 2: Writes `<String>` to `<File name>` and returns itself.
-* If you give Nil to the Function, the stream will be closed.
-
-<h6> Example </h6>
-
-    ;; Opens "hello.txt".
-    (define myfile (output-stream "hello.txt"))
-    
-    ;; Writes "Hello World" to "hello.txt".
-    (myfile "Hello World\n")
-    
-    ;; Closes "hello.txt".
-    (myfile ()))...";
-    help_dict_.emplace("output-stream", help);
 
     func = LC_FUNCTION_OBJ(InputStream);
     INSERT_LC_FUNCTION(func, "input-stream", "Lisp:input-stream");
-    help =
-R"...(### input-stream ###
-
-<h6> Usage </h6>
-
-1. `(input-stream <File name : String>)`
-2. `((input-stream <File name : String>) <Message Symbol : Symbol>)`
-
-<h6> Description </h6>
-
-* 1: Returns Native Function as an input stream of `<File name>`.
-* 2: Returns String from `<File name>`.
-* 2: `<Message Symbol>` is a message to the input stream.
-    + `@get` : Reads one charactor.
-    + `@read-line` : Reads one line. ('LF(CR+LF)' is omitted.)
-    + `@read` : Reads all.
-* If you give Nil to the stream, it will be closed.
-* If the stream already closed, it returns empty string.
-
-<h6> Example </h6>
-
-    ;; Opens "hello.txt".
-    (define myfile (input-stream "hello.txt"))
-    
-    ;; Reads and shows one charactor from "hello.txt".
-    (display (myfile '@get))
-    
-    ;; Reads and shows one line from "hello.txt".
-    (display (myfile '@read-line))
-    
-    ;; Reads and shows all from "hello.txt".
-    (display (myfile '@read))
-    
-    ;; Closes "hello.txt".
-    (myfile ()))...";
-    help_dict_.emplace("input-stream", help);
 
     func = LC_FUNCTION_OBJ(GenThread);
     INSERT_LC_FUNCTION(func, "gen-thread", "Lisp:gen-thread");
-    help =
-R"...(### gen-thread ###
-
-<h6> Usage </h6>
-
-* `(gen-thread <Function>)`
-
-<h6> Description </h6>
-
-* Returns Thread object.
-* It is controlled by Message Symbol.
-    + `@start [<Args>...]` : Starts `<Function>` on another thread.
-        - if `<Function>` accepts arguments, it gives `<Function>` `<Args>...`.
-    + `@join` : Waits until `<Function>` to be terminated.
-    + `@terminated?` : If `<Function>` has already been terminated, returns #t.
-
-<h6> Example </h6>
-
-    ;; Make function object.
-    (define (inner-func)
-            (display "Hello")
-            (sleep 10)
-            (display "World"))
-    
-    ;; Generate Thread object.
-    (define my-thread (gen-thread inner-func))
-    
-    ;; Start new thread.
-    (my-thread '@start)
-    
-    ;; Judge the thread is terminated.
-    (sleep 2)
-    (display (my-thread '@terminated?))
-    
-    ;; Wait for the thread.
-    (my-thread '@join)
-    
-    ;; Output
-    ;; > Hello
-    ;; > #f  ;; the thread has not been terminated yet.
-    ;; > World  ;; This word is printed after 10 seconds from "Hello".)...";
-    help_dict_.emplace("gen-thread", help);
 
     func = LC_FUNCTION_OBJ(Sleep);
     INSERT_LC_FUNCTION(func, "sleep", "Lisp:sleep");
-    help =
-R"...(### sleep ###
-
-<h6> Usage </h6>
-
-* `(sleep <Seconds : Number>)`
-
-<h6> Description </h6>
-
-* Sleeps the current thread for `<Seconds>` seconds.
-
-<h6> Example </h6>
-
-    (display "Hello")
-    
-    (sleep 10)
-    
-    (display "World")
-    ;; Output
-    ;; > Hello
-    ;; > World  ;; This word is printed after 10 seconds from "Hello".)...";
-    help_dict_.emplace("sleep", help);
 
     func = LC_FUNCTION_OBJ(GenMutex);
     INSERT_LC_FUNCTION(func, "gen-mutex", "Lisp:gen-mutex");
-    help =
-R"...(### gen-mutex ###
-
-<h6> Usage </h6>
-
-* `(gen-mutex)`
-
-<h6> Description </h6>
-
-* Generates Mutex object.
-* It is controlled by Message Symbol.
-    + `@lock` : Locks mutex.
-    + `@unlock` : Unlocks mutex.
-    + `@synchronize <S-Expressions>...` :
-        - Locks mutex and executes `<S-Expressions>...`.
-            - If `<S-Expression>...` is ended,
-              the mutex is unlocked and returns the last expression.
-        - `<S-Expressions>...` is executed on new local scope.
-        - `(wait)` is bound in the new local scope.
-            - If `(wait)` is called, the mutex is unlocked
-              and the thread sleeps until `@notify-one` or `@notify-all`.
-    + `@notify-one` : Wakes one thread up at `(wait)`.
-    + `@notify-all` : Wakes all threads up at `(wait)`.
-
-<h6> Example </h6>
-
-    ;; --- Test `@lock` and `@unlock` --- ;;
-    ;; Generate Mutex.
-    (define my-mutex (gen-mutex))
-    
-    ;; Define function that uses `@lock` and `@unlock`.
-    (define (func-1 word)
-            (my-mutex '@lock)
-            (display "Hello : " word)
-            (sleep 10)
-            (my-mutex '@unlock))
-    
-    ;; Generate Threads.
-    (define thread-1 (gen-thread (lambda () (func-1 "Apple"))))
-    (define thread-2 (gen-thread (lambda () (func-1 "Banana"))))
-    
-    ;; Start threads.
-    (thread-1 '@start)
-    (thread-2 '@start)
-    
-    ;; Wait for threads.
-    (thread-1 '@join)
-    (thread-2 '@join)
-    
-    ;; Output
-    ;; > Hello : Banana
-    ;; > Hello : Apple  ;; This is printed after 10 seconds.
-    
-    ;; --- Test `@synchronize` --- ;;
-    (define (func-2 word)
-            (my-mutex '@synchronize
-                      (display "Hello : " word)
-                      (sleep 10)))
-    
-    (define thread-3 (gen-thread (lambda () (func-2 "Water"))))
-    (define thread-4 (gen-thread (lambda () (func-2 "Fire"))))
-    
-    (thread-3 '@start)
-    (thread-4 '@start)
-    
-    (thread-3 '@join)
-    (thread-4 '@join)
-    
-    ;; Output
-    ;; > Hello : Water
-    ;; > Hello : Fire  ;; This is printed after 10 seconds.
-    
-    ;; --- Test `@notify-one` and `(wait)` --- ;;
-    (define (func-3 word)
-            (my-mutex '@synchronize
-                      (wait)
-                      (display "Hello : " word)))
-    
-    (define thread-5 (gen-thread (lambda () (func-3 "Sun"))))
-    (define thread-6 (gen-thread (lambda () (func-3 "Moon"))))
-    
-    (thread-5 '@start)
-    (thread-6 '@start)
-    
-    ;; Notify each thread.
-    (sleep 2)
-    (my-mutex '@notify-one)
-    (sleep 10)
-    (my-mutex '@notify-one)
-    
-    (thread-5 '@join)
-    (thread-6 '@join)
-    
-    ;; Output
-    ;; > Hello : Sun
-    ;; > Hello : Moon  ;; This is printed after 10 seconds.
-    
-    ;; --- Test `@notify-all` and `(wait)` --- ;;
-    (define thread-7 (gen-thread (lambda () (func-3 "Mario"))))
-    (define thread-8 (gen-thread (lambda () (func-3 "Sonic"))))
-    
-    (thread-7 '@start)
-    (thread-8 '@start)
-    
-    ;; Notify all threads.
-    (sleep 10)
-    (my-mutex '@notify-all)
-    
-    (thread-7 '@join)
-    (thread-8 '@join)
-    
-    ;; Output
-    ;; > Hello : Mario
-    ;; > Hello : Sonic  ;; This is printed same time.)...";
-    help_dict_.emplace("gen-mutex", help);
 
     func = LC_FUNCTION_OBJ(System);
     INSERT_LC_FUNCTION(func, "system", "Lisp:system");
-    help =
-R"...(### system ###
-
-<h6> Usage </h6>
-
-* `(system <Command line : String>)`
-
-<h6> Description </h6>
-
-* Executes `<Command line>` and returns its status.
-    + This is same as `system()` of libc.
-
-<h6> Example </h6>
-
-    (display (system "echo 'Hello World'"))
-    ;; Output
-    ;; > Hello World
-    ;; > 0)...";
-    help_dict_.emplace("system", help);
 
     func = LC_FUNCTION_OBJ(GetEnv);
     INSERT_LC_FUNCTION(func, "get-env", "Lisp:get-env");
-    help =
-R"...(### get-env ###
-
-<h6> Usage </h6>
-
-* `(get-env <Variable name : String>)`
-
-<h6> Description </h6>
-
-* Returns Environment Variable of `<Varibable name>`.
-* If no such variable, it returns Nil.
-
-<h6> Example </h6>
-
-    (display (get-env "USER"))
-    ;; Output
-    ;; > hironori)...";
-    help_dict_.emplace("get-env", help);
   }
 
   // 基本関数を登録する。
   void Lisp::SetBasicFunctions() {
     LC_Function func;
-    std::string help;
 
     func = LC_FUNCTION_OBJ(Append);
     INSERT_LC_FUNCTION(func, "append", "Lisp:append");
     INSERT_LC_FUNCTION(func, "string-append", "Lisp:string-append");
-    help =
-R"...(### append ###
-
-<h6> Usage </h6>
-
-1. `(append <List> <Object>...)`
-2. `(append <String> <Object>...)`
-  + or `(string-append <String> <Object>...)`
-
-<h6> Description </h6>
-
-1. If the 1st argument is List, appends `<Object>...` to its Cdr.
-2. If the 1st argument is String,
-   converts `<Object>...` into String and concatenates them.
-
-<h6> Example </h6>
-
-    (display (append '(111 222) '(333 444) '(555 666) 777))
-    
-    ;; Output
-    ;; > (111 222 333 444 555 666 . 777)
-    
-    (display (append "Hello " 111 " World"))
-    
-    ;; Output
-    ;; > "Hello 111 World")...";
-    help_dict_.emplace("append", help);
-    help_dict_.emplace("string-append", help);
 
     func = LC_FUNCTION_OBJ(Reverse);
     INSERT_LC_FUNCTION(func, "reverse", "Lisp:reverse");
-    help =
-R"...(### reverse ###
-
-<h6> Usage </h6>
-
-* `(reverse <List>)`
-
-<h6> Description </h6>
-
-* Reverses `<List>` and returns it.
-
-<h6> Example </h6>
-
-    (define li '(111 222 333 444 555))
-    (display (reverse li))
-    ;; Output
-    ;; > (555 444 333 222 111))...";
-    help_dict_.emplace("reverse", help);
 
     func = LC_FUNCTION_OBJ(Ref);
     INSERT_LC_FUNCTION(func, "ref", "Lisp:ref");
     INSERT_LC_FUNCTION(func, "list-ref", "Lisp:list-ref");
     INSERT_LC_FUNCTION(func, "string-ref", "Lisp:string-ref");
-    help =
-R"...(### ref ###
-
-<h6> Usage </h6>
-
-1. `(ref <List> <Index : Number>)`
-  + or `(list-ref <List> <Index : Number>)`
-2. `(ref <String> <Index : Number>)`
-  + or `(string-ref <String> <Index : Number>)`
-
-<h6> Description </h6>
-
-1. If the 1st argument is List, returns a element of `<Index>`th `<List>`.
-1. If the 1st argument is String, returns a letter of `<Index>`th `<String>`.
-* The index of 1st element is 0.
-* If `<Index>` is negative number,
-  It counts from the tail of `<List | String>`.
-
-<h6> Example </h6>
-
-    (display (ref '(111 222 333) 1))
-    
-    ;; Output
-    ;; > 222
-    
-    (display (ref '(111 222 333) -1))
-    
-    ;; Output
-    ;; > 333
-    
-    (display (ref "Hello World" 4))
-    
-    ;; Output
-    ;; > "o"
-    
-    (display (ref "Hello World" -3))
-    
-    ;; Output
-    ;; > "r")...";
-    help_dict_.emplace("ref", help);
-    help_dict_.emplace("list-ref", help);
-    help_dict_.emplace("string-ref", help);
 
     func = LC_FUNCTION_OBJ(List);
     INSERT_LC_FUNCTION(func, "list", "Lisp:list");
-    help =
-R"...(### list ###
-
-
-<h6> Usage </h6>
-
-* `(list <Object>...)`
-
-<h6> Description </h6>
-
-* Returns List composed of `<Object>...`.
-
-<h6> Example </h6>
-
-    (display (list 111 222 333))
-    
-    ;; Output
-    ;; > (111 222 333))...";
-    help_dict_.emplace("list", help);
 
     func = LC_FUNCTION_OBJ(ListReplace);
     INSERT_LC_FUNCTION(func, "list-replace", "Lisp:list-replace");
-    help =
-R"...(### list-replace ###
-
-<h6> Usage </h6>
-
-* `(list-replace <List> <Index : Number> <Object>)`
-
-<h6> Description </h6>
-
-* Returns List which has replaced the `<Index>`th element of
-  `<List>` for `<Object>`.
-* The 1st element of `<List>` is 0.
-* If `<Index>` is negative number," It counts from the tail of `<List>`.
-
-<h6> Example </h6>
-
-    (define lst (list 111 222 333))
-    (display (list-replace lst 1 "Hello"))
-    
-    ;; Output
-    ;; > (111 "Hello" 333))...";
-    help_dict_.emplace("list-replace", help);
 
     func = LC_FUNCTION_OBJ(ListRemove);
     INSERT_LC_FUNCTION(func, "list-remove", "Lisp:list-remove");
-    help =
-R"...(### list-remove ###
-
-<h6> Usage </h6>
-
-* `(list-remove <List> <Index : Number>)`
-
-<h6> Description </h6>
-
-* Returns List which has removed the `<Index>`th element of `<List>`.
-* The 1st element of `<List>` is 0.
-* If `<Index>` is negative number," It counts from the tail of `<List>`.
-
-<h6> Example </h6>
-
-    (define lst (list 111 222 333))
-    (display (list-remove lst 1))
-    
-    ;; Output
-    ;; > (111 333))...";
-    help_dict_.emplace("list-remove", help);
 
     func = LC_FUNCTION_OBJ(ListInsert);
     INSERT_LC_FUNCTION(func, "list-insert", "Lisp:list-insert");
-    help =
-R"...(### list-insert ###
-
-<h6> Usage </h6>
-
-* `(list-insert <List> <Index : Number> <Object>)`
-
-<h6> Description </h6>
-
-* Insert `<Object>` into `<Index>` of `<List>` and returns it.
-* The 1st element of `<List>` is 0.
-* If `<Index>` is negative number," It counts from the tail of `<List>`.
-
-<h6> Example </h6>
-
-    (display (list-insert '(111 222 333) 0 "Hello World"))
-    (display (list-insert '(111 222 333) 1 "Hello World"))
-    (display (list-insert '(111 222 333) 2 "Hello World"))
-    (display (list-insert '(111 222 333) 3 "Hello World"))
-    ;; Output
-    ;; > ("Hello World" 111 222 333)
-    ;; > (111 "Hello World" 222 333)
-    ;; > (111 222 "Hello World" 333)
-    ;; > (111 222 333 "Hello World"))...";
-    help_dict_.emplace("list-insert", help);
 
     func = LC_FUNCTION_OBJ(ListSearch);
     INSERT_LC_FUNCTION(func, "list-search", "Lisp:list-search");
-    help =
-R"...(### list-search ###
-
-<h6> Usage </h6>
-
-* `(list-search <List> <Object>)`
-
-<h6> Description </h6>
-
-* If `<List>` has an object same as `<Object>`,
-  it returns index number of the object.  
-  Otherwise it returns Nil.
-
-<h6> Example </h6>
-
-    (define lst '(111 222 "Hello" #t))
-    
-    (display (list-search lst "Hello"))
-    (display (list-search lst "World"))
-    
-    ;; Output
-    ;; >  2
-    ;; > ())...";
-    help_dict_.emplace("list-search", help);
 
     func = LC_FUNCTION_OBJ(ListPath);
     INSERT_LC_FUNCTION(func, "list-path", "Lisp:list-path");
-    help =
-R"...(### list-path ###
-
-<h6> Usage </h6>
-
-* `(list-path <List> <Path : String>)`
-
-<h6> Description </h6>
-
-* Returns an element indicated by `<Path>` from `<List>`.
-    + `<Path>` is composed of 'a' or 'd'.
-        - 'a' means Car.
-        - 'b' means Cdr.
-        - If `<Path>` is "dadda" and name of List is 'lst',
-          it means `(car (cdr (cdr (car (cdr lst)))))`.
-
-<h6> Example </h6>
-
-    (define lst '(111 (222 333 444) 555 666))
-    
-    (display (list-path lst "dda"))
-    ;; Output
-    ;; > 555
-    
-    (display (list-path lst "dada"))
-    ;; Output
-    ;; > 333)...";
-    help_dict_.emplace("list-path", help);
 
     func = LC_FUNCTION_OBJ(ListPathReplace);
     INSERT_LC_FUNCTION(func, "list-path-replace", "Lisp:list-path-replace");
-    help =
-R"...(### list-path-replace ###
-
-<h6> Usage </h6>
-
-* `(list-path-replace <List> <Path : String> <Object>)`
-
-<h6> Description </h6>
-
-* Replaces an element of `<List>` indicated by `<Path>` for `<Object>`
-  and returns it.
-    + `<Path>` is composed of 'a' or 'd'.
-        - 'a' means Car.
-        - 'b' means Cdr.
-        - If `<Path>` is "dadda" and name of List is 'lst',
-          it means `(car (cdr (cdr (car (cdr lst)))))`.
-
-<h6> Example </h6>
-
-    (define lst '(111 (222 333 444) 555 666))
-    
-    (display (list-path-replace lst "dada" "Hello"))
-    ;; Output
-    ;; > (111 (222 "Hello" 444) 555 666))...";
-    help_dict_.emplace("list-path-replace", help);
 
     func = LC_FUNCTION_OBJ(ListSort);
     INSERT_LC_FUNCTION(func, "list-sort", "Lisp:list-sort");
-    help =
-R"...(### list-sort ###
-
-<h6> Usage </h6>
-
-* `(list-sort <List> <Predicate : Function>)`
-
-<h6> Description </h6>
-
-* Sorts `<List>` for `<Predicate>` to be true and returns it.
-* `<Predicate>` defines the order.
-    + It accepts 2 arguments and returns Boolean.
-        - The 1st argument is previous element. The 2nd is next element.
-        - It must judge whether the order is right or not and returns it.
-
-<h6> Example </h6>
-(define li '(9 3 5 8 1 4 7 6 0 2))
-
-(display (list-sort li (lambda (prev next) (< prev next))))
-;; Output
-;; > (0 1 2 3 4 5 6 7 8 9)
-
-(display (list-sort li (lambda (prev next) (> prev next))))
-;; Output
-;; > (9 8 7 6 5 4 3 2 1 0))...";
-    help_dict_.emplace("list-sort", help);
 
     func = LC_FUNCTION_OBJ(Zip);
     INSERT_LC_FUNCTION(func, "zip", "Lisp:zip");
-    help =
-R"...(### zip ###
-
-<h6> Usage </h6>
-
-* `(zip <List>...)`
-
-<h6> Description </h6>
-
-* Unions each element of `<List>...` and returns it.
-
-<h6> Example </h6>
-
-    (display (zip '(a b c)
-                  '(1 2 3)
-                  '("Hello" "World")
-                  '("aaa" "bbb" "ccc" "ddd")))
-    ;; Output
-    ;; > ((a 1 "Hello" "aaa") (b 2 "World" "bbb") (c 3 "ccc") ("ddd")))...";
-    help_dict_.emplace("zip", help);
 
     func = LC_FUNCTION_OBJ(Map);
     INSERT_LC_FUNCTION(func, "map", "Lisp:map");
-    help =
-R"...(### map ###
-
-<h6> Usage </h6>
-
-* `(map <Function : Symbol or Function> <Argument list : List>...)`
-
-<h6> Description </h6>
-
-* Applies `<Function>` to `<Argument List>...` iteratively
-  and returns List composed with returned object by `<Function>`.
-      + It looks like addition of Linear Algebra. See Example.
-
-<h6> Example </h6>
-
-    (display (map '+ '(1 2 3 4 5)
-                     '(10 20 30 40 50)
-                     '(100 200 300 400 500)))
-    ;; The above means...
-    ;; (display (list (+ 1 10 100)
-    ;;                (+ 2 20 200)
-    ;;                (+ 3 30 300)
-    ;;                (+ 4 40 400)
-    ;;                (+ 5 50 500)))
-    
-    ;; Output
-    ;; > (111 222 333 444 555))...";
-    help_dict_.emplace("map", help);
 
     func = LC_FUNCTION_OBJ(Filter);
     INSERT_LC_FUNCTION(func, "filter", "Lisp:filter");
-    help =
-R"...(### filter ###
-
-<h6> Usage </h6>
-
-* `(filter <Function : Symbol or Function> <List>)`
-
-<h6> Description </h6>
-
-* Judges each element of `<List>` by `<Function>`
-  and returns List of the passed elements.
-* `<Function>` must return #t or #f.
-* `<Function>` accepts one argument.
-
-<h6> Example </h6>
-
-    (define li '(1 2 3 4 5 6))
-    (define (my-func x) (> x 3))
-    
-    (display (filter my-func li))
-    ;; Output
-    ;; > (4 5 6))...";
-    help_dict_.emplace("filter", help);
 
     func = LC_FUNCTION_OBJ(Range);
     INSERT_LC_FUNCTION(func, "range", "Lisp:range");
-    help =
-R"...(### range ###
-
-<h6> Usage </h6>
-
-* `(range <Size : Number>)`
-
-<h6> Description </h6>
-
-* Returns List composed with 0...(`<Size>` - 1).
-
-<h6> Example </h6>
-
-    (display (range 10))
-    
-    ;; Output
-    ;; > (0 1 2 3 4 5 6 7 8 9))...";
-    help_dict_.emplace("range", help);
 
     func = LC_FUNCTION_OBJ(StartSizeInc);
     INSERT_LC_FUNCTION(func, "start-size-inc", "Lisp:start-size-inc");
-    help =
-R"...(### start-size-inc ###
-
-<h6> Usage </h6>
-
-* `(start-size-inc <Start : Number> <Size : Number> <Increment : Number>)`
-
-<h6> Description </h6>
-
-* Returns List of `<Size>` elements.
-    + The 1st element is `<Start>`.
-    + From the 2nd element, the previous element plus `<Increment>`.
-
-<h6> Example </h6>
-
-    (display (start-size-inc 2 6 -0.5))
-    
-    ;; Output
-    ;; > (2 1.5 1 0.5 0 -0.5))...";
-    help_dict_.emplace("start-size-inc", help);
 
     func = LC_FUNCTION_OBJ(LengthFunc);
     INSERT_LC_FUNCTION(func, "length", "Lisp:length");
-    help =
-R"...(### length ###
-
-<h6> Usage </h6>
-
-* `(length <Object>)`
-
-<h6> Description </h6>
-
-* If `<Object>` is List, it returns the number of elements.
-* If `<Object>` is String, it returns the length of string.
-* If `<Object>` is Atom, it returns 1.
-
-<h6> Example </h6>
-
-    (display (length '(111 222 333 444 555 666)))
-    ;; Output
-    ;; > 6
-    
-    (display (length "Hello"))
-    ;; Output
-    ;; > 5)...";
-    help_dict_.emplace("length", help);
 
     func = LC_FUNCTION_OBJ(NumEqual);
     INSERT_LC_FUNCTION(func, "=", "Lisp:=");
-    help =
-R"...(### = ###
-
-<h6> Usage </h6>
-
-* `(= <Number>...)`
-
-<h6> Description </h6>
-
-* Returns #t if the 1st Number equals the others.
-  Otherwise, return #f.
-
-<h6> Example </h6>
-
-    (display (= 111 111 111))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("=", help);
 
     func = LC_FUNCTION_OBJ(NumNotEqual);
     INSERT_LC_FUNCTION(func, "~=", "Lisp:~=");
-    help =
-R"...(### ~= ###
-
-<h6> Usage </h6>
-
-* `(~= <Number>...)`
-
-<h6> Description </h6>
-
-* Returns #f if the 1st Number equals the others.
-  Otherwise, return #t.
-
-<h6> Example </h6>
-
-    (display (~= 111 111 111))
-    
-    ;; Output
-    ;; > #f)...";
-    help_dict_.emplace("~=", help);
 
     func = LC_FUNCTION_OBJ(NumGT);
     INSERT_LC_FUNCTION(func, ">", "Lisp:>");
-    help =
-R"...(### > ###
-
-<h6> Usage </h6>
-
-* `(> <Number>...)`
-
-<h6> Description </h6>
-
-* Returns #t if a Number is more than next Number.
-  Otherwise, return #f.
-
-<h6> Example </h6>
-
-    (display (> 333 222 111))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace(">", help);
 
     func = LC_FUNCTION_OBJ(NumGE);
     INSERT_LC_FUNCTION(func, ">=", "Lisp:>=");
-    help =
-R"...(### >= ###
-
-<h6> Usage </h6>
-
-* `(>= <Number>...)`
-
-<h6> Description </h6>
-
-* Returns #t if a Number is more or equal than next Number.
-  Otherwise, return #f.
-
-<h6> Example </h6>
-
-    (display (>= 333 222 111))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace(">=", help);
 
     func = LC_FUNCTION_OBJ(NumLT);
     INSERT_LC_FUNCTION(func, "<", "Lisp:<");
-    help =
-R"...(### < ###
-
-<h6> Usage </h6>
-
-* `(< <Number>...)`
-
-<h6> Description </h6>
-
-* Returns #t if a Number is less than next Number.
-  Otherwise, return #f.
-
-<h6> Example </h6>
-
-    (display (< 111 222 333))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("<", help);
 
     func = LC_FUNCTION_OBJ(NumLE);
     INSERT_LC_FUNCTION(func, "<=", "Lisp:<=");
-    help =
-R"...(### <= ###
-
-<h6> Usage </h6>
-
-* `(<= <Number>...)`
-
-<h6> Description </h6>
-
-* Returns #t if a Number is less or equal than next Number.
-  Otherwise, return #f.
-
-<h6> Example </h6>
-
-    (display (< 111 222 333))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("<=", help);
 
     func = LC_FUNCTION_OBJ(EvenQ);
     INSERT_LC_FUNCTION(func, "even?", "Lisp:even?");
-    help =
-R"...(### even? ###
-
-<h6> Usage </h6>
-
-* `(even? <Number>)`
-
-<h6> Description </h6>
-
-* Judges whether `<Number>` is an even number or not.
-
-<h6> Example </h6>
-
-    (display (even? 1))
-    ;; Output
-    ;; > #f
-    
-    (display (even? 2))
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("even?", help);
 
     func = LC_FUNCTION_OBJ(OddQ);
     INSERT_LC_FUNCTION(func, "odd?", "Lisp:odd?");
-    help =
-R"...(### odd? ###
-
-<h6> Usage </h6>
-
-* `(odd? <Number>)`
-
-<h6> Description </h6>
-
-* Judges whether `<Number>` is an odd number or not.
-
-<h6> Example </h6>
-
-    (display (odd? 1))
-    ;; Output
-    ;; > #t
-    
-    (display (odd? 2))
-    ;; Output
-    ;; > #f)...";
-    help_dict_.emplace("odd?", help);
 
     func = LC_FUNCTION_OBJ(Not);
     INSERT_LC_FUNCTION(func, "not", "Lisp:not");
-    help =
-R"...(### not ###
-
-<h6> Usage </h6>
-
-* `(not <Boolean>)`
-
-<h6> Description </h6>
-
-* Turns `<Boolean>` to opposite value. #t to #f, #f to #t.
-
-<h6> Example </h6>
-
-    (display (not (= 111 111)))
-    
-    ;; Output
-    ;; > #f)...";
-    help_dict_.emplace("not", help);
 
     func = LC_FUNCTION_OBJ(And);
     INSERT_LC_FUNCTION(func, "and", "Lisp:and");
-    help =
-R"...(### and ###
-
-<h6> Usage </h6>
-
-* `(and <Boolean>...)`
-
-<h6> Description </h6>
-
-* Returns #t if all `<Boolean>...` are #t.
-  Otherwise, return #f.
-
-<h6> Example </h6>
-
-    (display (and (= 111 111) (= 222 222)))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("and", help);
 
     func = LC_FUNCTION_OBJ(Or);
     INSERT_LC_FUNCTION(func, "or", "Lisp:or");
-    help =
-R"...(### or ###
-
-<h6> Usage </h6>
-
-* `(or <Boolean>...)`
-
-<h6> Description </h6>
-
-* Returns #t if one of `<Boolean>...` is #t.
-  If all `<Boolean>` are #f, return #f.
-
-<h6> Example </h6>
-
-    (display (or (= 111 111) (= 222 333)))
-    
-    ;; Output
-    ;; > #t)...";
-    help_dict_.emplace("or", help);
 
     func = LC_FUNCTION_OBJ(Addition);
     INSERT_LC_FUNCTION(func, "+", "Lisp:+");
-    help =
-R"...(### + ###
-
-<h6> Usage </h6>
-
-* `(+ <Number>...)`
-
-<h6> Description </h6>
-
-* Sums up all `<Number>...`.
-
-<h6> Example </h6>
-
-    (display (+ 1 2 3))
-    
-    ;; Output
-    ;; > 6)...";
-    help_dict_.emplace("+", help);
 
     func = LC_FUNCTION_OBJ(AdditionEx);
     INSERT_LC_FUNCTION(func, "add!", "Lisp:add!");
-    help =
-R"...(### add! ###
-
-<h6> Usage </h6>
-
-* `(add! <Symbol> <Number>...)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + The 1st argument must be Symbol bound with Number.
-    + `<Symbol>` is not evaluated.
-* Sums up `<Number>...` and adds it to `<Symbol>`.
-* Returns previous Number bound to `<Symbol>`.
-
-<h6> Example </h6>
-
-    (define n 5)
-    (display (add! n 3 4 5))  ;; Returns previous Number.
-    (display n)
-    
-    ;; Output
-    ;; > 5
-    :: > 17)...";
-    help_dict_.emplace("add!", help);
 
     func = LC_FUNCTION_OBJ(Subtraction);
     INSERT_LC_FUNCTION(func, "-", "Lisp:-");
-    help =
-R"...(### - ###
-
-<h6> Usage </h6>
-
-* `(- <1st number> <Number>...)`
-
-<h6> Description </h6>
-
-* Subtracts `<Number>...` from `<1st number>`.
-
-<h6> Example </h6>
-
-    (display (- 5 4 3))
-    
-    ;; Output
-    ;; > -2)...";
-    help_dict_.emplace("-", help);
 
     func = LC_FUNCTION_OBJ(SubtractionEx);
     INSERT_LC_FUNCTION(func, "sub!", "Lisp:sub!");
-    help =
-R"...(### sub! ###
-
-<h6> Usage </h6>
-
-* `(sub! <Symbol> <Number>...)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + The 1st argument must be Symbol bound with Number.
-    + `<Symbol>` is not evaluated.
-* Subtracts `<Number>...` from `<Symbol>` and rewrite it to `<Symbol>`.
-* Returns previous Number bound to `<Symbol>`.
-
-<h6> Example </h6>
-
-    (define n 5)
-    (display (sub! n 1 2))  ;; Returns previous Number.
-    (display n)
-    
-    ;; Output
-    ;; > 5
-    ;; > 2)...";
-    help_dict_.emplace("sub!", help);
 
     func = LC_FUNCTION_OBJ(Multiplication);
     INSERT_LC_FUNCTION(func, "*", "Lisp:*");
-    help =
-R"...(### * ###
-
-<h6> Usage </h6>
-
-* `(* <Number>...)`
-
-<h6> Description </h6>
-
-* Multiplies all `<Number>...`.
-
-<h6> Example </h6>
-
-    (display (* 2 3 4))
-    
-    ;; Output
-    ;; > 24)...";
-    help_dict_.emplace("*", help);
 
     func = LC_FUNCTION_OBJ(MultiplicationEx);
     INSERT_LC_FUNCTION(func, "mul!", "Lisp:mul!");
-    help =
-R"...(### mul! ###
-
-<h6> Usage </h6>
-
-* `(mul! <Symbol> <Number>...)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + The 1st argument must be Symbol bound with Number.
-    + `<Symbol>` is not evaluated.
-* Multiplies `<Symbol>` and `<Number>...` and rewrite it to <Symbol>.
-* Returns previous Number bound to `<Symbol>`.
-
-<h6> Example </h6>
-
-    (define n 5)
-    (display (mul! n 1 2))  ;; Returns previous Number.
-    (display n)
-    
-    ;; Output
-    ;; > 5
-    ;; > 10)...";
-    help_dict_.emplace("mul!", help);
 
     func = LC_FUNCTION_OBJ(Division);
     INSERT_LC_FUNCTION(func, "/", "Lisp:/");
-    help =
-R"...(### / ###
-
-<h6> Usage </h6>
-
-* `(/ <1st number> <Number>...)`
-
-<h6> Description </h6>
-
-* Divides `<1st number>` with `<Number>...`.
-
-<h6> Example </h6>
-
-    (display (/ 32 2 4))
-    
-    ;; Output
-    ;; > 4)...";
-    help_dict_.emplace("/", help);
 
     func = LC_FUNCTION_OBJ(DivisionEx);
     INSERT_LC_FUNCTION(func, "div!", "Lisp:div!");
-    help =
-R"...(### div! ###
-
-<h6> Usage </h6>
-
-* `(div! <Symbol> <Number>...)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + The 1st argument must be Symbol bound with Number.
-    + `<Symbol>` is not evaluated.
-* Divides `<Symbol>` with `<Number>...` and rewrites it to `<Symbol>`.
-* Returns previous Number bound to `<Symbol>`.
-
-<h6> Example </h6>
-
-    (define n 6)
-    (display (div! n 2 3))  ;; Returns previous Number.
-    (display n)
-    
-    ;; Output
-    ;; > 6
-    ;; > 1)...";
-    help_dict_.emplace("div!", help);
 
     func = LC_FUNCTION_OBJ(Inc);
     INSERT_LC_FUNCTION(func, "++", "Lisp:++");
-    help =
-R"...(### ++ ###
-
-<h6> Usage </h6>
-
-* `(++ <Number>)`
-
-<h6> Description </h6>
-
-* Adds `<Number>` to '1'.
-
-<h6> Example </h6>
-
-    (display (++ 111))
-    
-    ;; Output
-    ;; > 112)...";
-    help_dict_.emplace("++", help);
 
     func = LC_FUNCTION_OBJ(IncEx);
     INSERT_LC_FUNCTION(func, "inc!", "Lisp:inc!");
-    help =
-R"...(### inc! ###
-
-<h6> Usage </h6>
-
-* `(inc! <Symbol)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + The 1st argument must be Symbol bound with Number.
-    + `<Symbol>` is not evaluated.
-* Increments `<Symbol>`.
-* Returns previous Number bound to `<Symbol>`.
-
-<h6> Example </h6>
-
-    (define i 111)
-    (display (inc! i))
-    (display i)
-    
-    ;; Output
-    ;; > 111
-    ;; > 112)...";
-    help_dict_.emplace("inc!", help);
 
     func = LC_FUNCTION_OBJ(Dec);
     INSERT_LC_FUNCTION(func, "--", "Lisp:--");
-    help =
-R"...(### -- ###
-
-<h6> Usage </h6>
-
-* `(-- <Number>)`
-
-<h6> Description </h6>
-
-* Subtracts '1' from `<Number>`.
-
-<h6> Example </h6>
-
-    (display (-- 111))
-    
-    ;; Output
-    ;; > 110)...";
-    help_dict_.emplace("--", help);
 
     func = LC_FUNCTION_OBJ(DecEx);
     INSERT_LC_FUNCTION(func, "dec!", "Lisp:dec!");
-    help =
-R"...(### dec! ###
-
-<h6> Usage </h6>
-
-* `(dec! <Symbol)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + The 1st argument must be Symbol bound with Number.
-    + `<Symbol>` is not evaluated.
-* Decrements `<Symbol>`.
-* Returns previous Number bound to `<Symbol>`.
-
-<h6> Example </h6>
-
-    (define i 111)
-    (display (dec! i))
-    (display i)
-    
-    ;; Output
-    ;; > 111
-    ;; > 110)...";
-    help_dict_.emplace("dec!", help);
 
     func = LC_FUNCTION_OBJ(StringSplit);
     INSERT_LC_FUNCTION(func, "string-split", "Lisp:string-split");
-    help =
-R"...(### string-split ###
-
-<h6> Usage </h6>
-
-* `(string-split <String> <Delim :String>)`
-
-<h6> Description </h6>
-
-* Separates `<Sting>` by `<Delim>` and returns the List.
-
-<h6> Example </h6>
-
-    (display (string-split "aaaaSplit!bbbSplit!ccc" "Split!"))
-    ;; Output
-    ;; > ("aaa" "bbb" "ccc"))...";
-    help_dict_.emplace("string-split", help);
 
     func = LC_FUNCTION_OBJ(StringJoin);
     INSERT_LC_FUNCTION(func, "string-join", "Lisp:string-join");
-    help =
-R"...(### string-join ###
-
-<h6> Usage </h6>
-
-* `(string-join <List> <Delim : String>)`
-
-<h6> Description </h6>
-
-* Puts `<Delim>` between each elements of `<List>` and returns it.
-
-<h6> Example </h6>
-
-    (define ls '("Hello" "World" 111 222))
-    (display (string-join ls "[Delim!!]"))
-    ;; Output
-    ;; > Hello[Delim!!]World[Delim!!]111[Delim!!]222)...";
-    help_dict_.emplace("string-join", help);
 
     func = LC_FUNCTION_OBJ(Front);
     INSERT_LC_FUNCTION(func, "front", "Lisp:front");
-    help =
-R"...(### front ###
-
-<h6> Usage </h6>
-
-* `(front <List>)`
-
-<h6> Description </h6>
-
-* Returns the first element of `<List>`.
-
-<h6> Example </h6>
-
-    (display (front '(111 222 333)))
-    
-    ;; Output
-    ;; > 111)...";
-    help_dict_.emplace("front", help);
 
     func = LC_FUNCTION_OBJ(Back);
     INSERT_LC_FUNCTION(func, "back", "Lisp:back");
-    help =
-R"...(### back ###
-
-<h6> Usage </h6>
-
-* `(back <List>)`
-
-<h6> Description </h6>
-
-* Returns the last element of `<List>`.
-
-<h6> Example </h6>
-
-    (display (back '(111 222 333)))
-    
-    ;; Output
-    ;; > 333)...";
-    help_dict_.emplace("back", help);
 
     func = LC_FUNCTION_OBJ(PushFront);
     INSERT_LC_FUNCTION(func, "push-front", "Lisp:push-front");
-    help =
-R"...(### push-front ###
-
-<h6> Usage </h6>
-
-* `(push-front <List> <Object>)`
-
-<h6> Description </h6>
-
-* Returns List added `<Object>` at the first element of `<List>`
-
-<h6> Example </h6>
-
-    (display (push-front '(111 222 333) "Hello"))
-    
-    ;; Output
-    ;; > ("Hello" 111 222 333))...";
-    help_dict_.emplace("push-front", help);
 
     func = LC_FUNCTION_OBJ(PushFrontEx);
     INSERT_LC_FUNCTION(func, "push-front!", "Lisp:push-front!");
-    help =
-R"...(### push-front! ###
-
-<h6> Usage </h6>
-
-* `(push-front! <Symbol> <Object>)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + The 1st argument must be Symbol bound with List.
-    + `<Symbol>` is not evaluated.
-* Appends to the top of List of `<Symbol>`.
-* Returns previous List bound to `<Symbol>`.
-
-<h6> Example </h6>
-
-    (define l '(111 222 333))
-    (display (push-front! l 444))  ;; Returns previous List.
-    (display l)
-    
-    ;; Output
-    ;; > (111 222 333)
-    ;; > (444 111 222 333))...";
-    help_dict_.emplace("push-front!", help);
 
     func = LC_FUNCTION_OBJ(PopFront);
     INSERT_LC_FUNCTION(func, "pop-front", "Lisp:pop-front");
-    help =
-R"...(### pop-front ###
-
-<h6> Usage </h6>
-
-* `(pop-front <List>)`
-
-<h6> Description </h6>
-
-* Returns List removed the first element from `<List>`.
-
-<h6> Example </h6>
-
-    (display (pop-front '(111 222 333)))
-    
-    ;; Output
-    ;; > (222 333))...";
-    help_dict_.emplace("pop-front", help);
 
     func = LC_FUNCTION_OBJ(PopFrontEx);
     INSERT_LC_FUNCTION(func, "pop-front!", "Lisp:pop-front!");
-    help =
-R"...(### pop-front! ###
-
-<h6> Usage </h6>
-
-* `(pop-front! <Symbol>)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + The 1st argument must be Symbol bound with List.
-* Pops out the 1st element of List of `<Symbol>`.
-* Returns previous List bound to `<Symbol>`.
-
-<h6> Example </h6>
-
-    (define l '(111 222 333))
-    (display (pop-front! l))
-    (display l)
-    
-    ;; Output
-    ;; > (111 222 333)
-    ;; > (222 333))...";
-    help_dict_.emplace("pop-front!", help);
 
     func = LC_FUNCTION_OBJ(PushBack);
     INSERT_LC_FUNCTION(func, "push-back", "Lisp:push-back");
-    help =
-R"...(### push-back ###
-
-<h6> Usage </h6>
-
-* `(push-back <List> <Object>)`
-
-<h6> Description </h6>
-
-* Returns List added `<Object>` at the last element of `<List>`
-
-<h6> Example </h6>
-
-    (display (push-back '(111 222 333) "Hello"))
-    
-    ;; Output
-    ;; > (111 222 333 "Hello"))...";
-    help_dict_.emplace("push-back", help);
 
     func = LC_FUNCTION_OBJ(PushBackEx);
     INSERT_LC_FUNCTION(func, "push-back!", "Lisp:push-back!");
-    help =
-R"...(### push-back! ###
-
-<h6> Usage </h6>
-
-* `(push-back! <Symbol> <Object>)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + The 1st argument must be Symbol bound with List.
-    + `<Symbol>` is not evaluated.
-* Appends to the tail of List of `<Symbol>`.
-* Returns previous List bound to `<Symbol>`.
-
-<h6> Example </h6>
-
-    (define l '(111 222 333))
-    (display (push-back! l 444))
-    (display l)
-    
-    ;; Output
-    ;; > (111 222 333)
-    ;; > (111 222 333 444))...";
-    help_dict_.emplace("push-back!", help);
 
     func = LC_FUNCTION_OBJ(PopBack);
     INSERT_LC_FUNCTION(func, "pop-back", "Lisp:pop-back");
-    help =
-R"...(### pop-back ###
-
-<h6> Usage </h6>
-
-* `(pop-back <List>)`
-
-<h6> Description </h6>
-
-* Returns List removed the last element from `<List>`.
-
-<h6> Example </h6>
-
-    (display (pop-back '(111 222 333)))
-    
-    ;; Output
-    ;; > (111 222))...";
-    help_dict_.emplace("pop-back", help);
 
     func = LC_FUNCTION_OBJ(PopBackEx);
     INSERT_LC_FUNCTION(func, "pop-back!", "Lisp:pop-back!");
-    help =
-R"...(### pop-back! ###
-
-<h6> Usage </h6>
-
-* `(pop-back! <Symbol>)`
-
-<h6> Description </h6>
-
-* This is Special Form.
-    + The 1st argument must be Symbol bound with List.
-* Pops out the last element of List of `<Symbol>`.
-* Returns previous List bound to `<Symbol>`.
-
-<h6> Example </h6>
-
-    (define l '(111 222 333))
-    (display (pop-back! l))
-    (display l)
-    
-    ;; Output
-    ;; > (111 222 333)
-    ;; > (111 222))...";
-    help_dict_.emplace("pop-back!", help);
 
     scope_chain_.InsertSymbol("PI", NewNumber(4.0 * std::atan(1.0)));
-    help =
-R"...(### PI ###
-
-<h6> Description </h6>
-
-* Circular constant.
-
-<h6> Example </h6>
-
-    (display PI)
-    
-    ;; Output
-    ;; > 3.14159265358979)...";
-    help_dict_.emplace("PI", help);
 
     scope_chain_.InsertSymbol("E", NewNumber(std::exp(1.0)));
-    help =
-R"...(### E ###
-
-<h6> Description </h6>
-
-* Napier's constant.
-
-<h6> Example </h6>
-
-    (display E)
-    
-    ;; Output
-    ;; > 2.71828182845905)...";
-    help_dict_.emplace("E", help);
 
     func = LC_FUNCTION_OBJ(Sin);
     INSERT_LC_FUNCTION(func, "sin", "Lisp:sin");
-    help =
-R"...(### sin ###
-
-<h6> Usage </h6>
-
-* `(sin <Number>)`
-
-<h6> Description </h6>
-
-* Sine. A trigonometric function.
-* `<Number>` is radian.
-
-<h6> Example </h6>
-
-    (display (sin (/ PI 2)))
-    
-    ;; Output
-    ;; > 1)...";
-    help_dict_.emplace("sin", help);
 
     func = LC_FUNCTION_OBJ(Cos);
     INSERT_LC_FUNCTION(func, "cos", "Lisp:cos");
-    help =
-R"...(### cos ###
-
-<h6> Usage </h6>
-
-* `(cos <Number>)`
-
-<h6> Description </h6>
-
-* Cosine. A trigonometric function.
-* `<Number>` is radian.
-
-<h6> Example </h6>
-
-    (display (cos PI))
-    
-    ;; Output
-    ;; > -1)...";
-    help_dict_.emplace("cos", help);
 
     func = LC_FUNCTION_OBJ(Tan);
     INSERT_LC_FUNCTION(func, "tan", "Lisp:tan");
-    help =
-R"...(### tan ###
-
-<h6> Usage </h6>
-
-* `(tan <Number>)`
-
-<h6> Description </h6>
-
-* Tangent. A trigonometric function.
-* `<Number>` is radian.
-
-<h6> Example </h6>
-
-    (display (tan (/ PI 4)))
-    
-    ;; Output
-    ;; > 1)...";
-    help_dict_.emplace("tan", help);
 
     func = LC_FUNCTION_OBJ(ASin);
     INSERT_LC_FUNCTION(func, "asin", "Lisp:asin");
-    help =
-R"...(### asin ###
-
-<h6> Usage </h6>
-
-* `(asin <Number>)`
-
-<h6> Description </h6>
-
-* Arc sine. A trigonometric function.
-* `<Number>` is sine.
-
-<h6> Example </h6>
-
-    (display (asin 0))
-    
-    ;; Output
-    ;; > 0)...";
-    help_dict_.emplace("asin", help);
 
     func = LC_FUNCTION_OBJ(ACos);
     INSERT_LC_FUNCTION(func, "acos", "Lisp:acos");
-    help =
-R"...(### acos ###
-
-<h6> Usage </h6>
-
-* `(acos <Number>)`
-
-<h6> Description </h6>
-
-* Arc cosine. A trigonometric function.
-* `<Number>` is cosine.
-
-<h6> Example </h6>
-
-    (display (acos 1))
-    
-    ;; Output
-    ;; > 0)...";
-    help_dict_.emplace("acos", help);
 
     func = LC_FUNCTION_OBJ(ATan);
     INSERT_LC_FUNCTION(func, "atan", "Lisp:atan");
-    help =
-R"...(### atan ###
-
-<h6> Usage </h6>
-
-* `(atan <Number>)`
-
-<h6> Description </h6>
-
-* Arc tangent. A trigonometric function.
-* `<Number>` is tangent.
-
-<h6> Example </h6>
-
-    (display (atan 0))
-    
-    ;; Output
-    ;; > 0)...";
-    help_dict_.emplace("atan", help);
 
     func = LC_FUNCTION_OBJ(Sqrt);
     INSERT_LC_FUNCTION(func, "sqrt", "Lisp:sqrt");
-    help =
-R"...(### sqrt ###
-
-<h6> Usage </h6>
-
-* `(sqrt <Number>)`
-
-<h6> Description </h6>
-
-* Returns square root of `<Number>`.
-
-<h6> Example </h6>
-
-    (display (sqrt 4))
-    
-    ;; Output
-    ;; > 2)...";
-    help_dict_.emplace("sqrt", help);
 
     func = LC_FUNCTION_OBJ(Abs);
     INSERT_LC_FUNCTION(func, "abs", "Lisp:abs");
-    help =
-R"...(### abs ###
-
-<h6> Usage </h6>
-
-* `(abs <Number>)`
-
-<h6> Description </h6>
-
-* Returns absolute value of `<Number>`.
-
-<h6> Example </h6>
-
-    (display (abs -111))
-    
-    ;; Output
-    ;; > 111)...";
-    help_dict_.emplace("abs", help);
 
     func = LC_FUNCTION_OBJ(Ceil);
     INSERT_LC_FUNCTION(func, "ceil", "Lisp:ceil");
-    help =
-R"...(### ceil ###
-
-<h6> Usage </h6>
-
-* `(ceil <Number>)`
-
-<h6> Description </h6>
-
-* Rounds up `<Number>` into integral value.
-
-<h6> Example </h6>
-
-    (display (ceil 1.3))
-    
-    ;; Output
-    ;; > 2)...";
-    help_dict_.emplace("ceil", help);
 
     func = LC_FUNCTION_OBJ(Floor);
     INSERT_LC_FUNCTION(func, "floor", "Lisp:floor");
-    help =
-R"...(### floor ###
-
-<h6> Usage </h6>
-
-* `(floor <Number>)`
-
-<h6> Description </h6>
-
-* Rounds down `<Number>` into integral value.
-
-<h6> Example </h6>
-
-    (display (floor 1.3))
-    
-    ;; Output
-    ;; > 1)...";
-    help_dict_.emplace("floor", help);
 
     func = LC_FUNCTION_OBJ(Round);
     INSERT_LC_FUNCTION(func, "round", "Lisp:round");
-    help =
-R"...(### round ###
-
-<h6> Usage </h6>
-
-* `(round <Number>)`
-
-<h6> Description </h6>
-
-* Rounds `<Number>` into the nearest integral value.
-
-<h6> Example </h6>
-
-    (display (round 1.5))
-    
-    ;; Output
-    ;; > 2
-    
-    (display (round 1.49))
-    
-    ;; Output
-    ;; > 1)...";
-    help_dict_.emplace("round", help);
 
     func = LC_FUNCTION_OBJ(Trunc);
     INSERT_LC_FUNCTION(func, "trunc", "Lisp:trunc");
-    help =
-R"...(### trunc ###
-
-<h6> Usage </h6>
-
-* `(trunc <Number>)`
-
-<h6> Description </h6>
-
-* Truncates after decimal point of `<Number>`.
-
-<h6> Example </h6>
-
-    (display (trunc 1.234))
-    
-    ;; Output
-    ;; > 1
-    
-    (display (trunc -1.234))
-    
-    ;; Output
-    ;; > -1)...";
-    help_dict_.emplace("trunc", help);
 
     func = LC_FUNCTION_OBJ(Exp2);
     INSERT_LC_FUNCTION(func, "exp2", "Lisp:exp2");
-    help =
-R"...(### exp2 ###
-
-<h6> Usage </h6>
-
-* `(exp <Number>)`
-
-<h6> Description </h6>
-
-* Exponent function of `<Number>`. The base is 2.
-
-<h6> Example </h6>
-
-    (display (exp2 3))
-    ;; Output
-    ;; > 8)...";
-    help_dict_.emplace("exp2", help);
 
     func = LC_FUNCTION_OBJ(Exp);
     INSERT_LC_FUNCTION(func, "exp", "Lisp:exp");
-    help =
-R"...(### exp ###
-
-<h6> Usage </h6>
-
-* `(exp <Number>)`
-
-<h6> Description </h6>
-
-* Exponent function of `<Number>`. The base is Napier's constant.
-
-<h6> Example </h6>
-
-    (display (exp 1))
-    
-    ;; Output
-    ;; > 2.71828)...";
-    help_dict_.emplace("exp", help);
 
     func = LC_FUNCTION_OBJ(Expt);
     INSERT_LC_FUNCTION(func, "expt", "Lisp:expt");
-    help =
-R"...(### expt ###
-
-<h6> Usage </h6>
-
-* `(expt <Base> <Exponent>)`
-* `(^ <Base> <Exponent>)`
-
-<h6> Description </h6>
-
-* Exponent function of `<Exponent>`. The base is `<Base>`.
-
-<h6> Example </h6>
-
-    (display (expt 2 3))
-    
-    ;; Output
-    ;; > 8)...";
-    help_dict_.emplace("expt", help);
 
     func = LC_FUNCTION_OBJ(Log);
     INSERT_LC_FUNCTION(func, "log", "Lisp:log");
-    help =
-R"...(### log ###
-
-<h6> Usage </h6>
-
-* `(log <Number>)`
-* `(ln <Number>)`
-
-<h6> Description </h6>
-
-* Logarithmic function of `<Number>`. The base is Napier's constant.
-
-<h6> Example </h6>
-
-    (display (log E))
-    
-    ;; Output
-    ;; > 1)...";
-    help_dict_.emplace("log", help);
 
     func = LC_FUNCTION_OBJ(Log2);
     INSERT_LC_FUNCTION(func, "log2", "Lisp:log2");
-    help =
-R"...(### log2 ###
-
-<h6> Usage </h6>
-
-* `(log2 <Number>)`
-
-<h6> Description </h6>
-
-* Logarithmic function of `<Number>`. The base is 2.
-
-<h6> Example </h6>
-
-    (display (log2 8))
-    
-    ;; Output
-    ;; > 3)...";
-    help_dict_.emplace("log2", help);
 
     func = LC_FUNCTION_OBJ(Log10);
     INSERT_LC_FUNCTION(func, "log10", "Lisp:log10");
-    help =
-R"...(### log10 ###
-
-<h6> Usage </h6>
-
-* `(log10 <Number>)`
-
-<h6> Description </h6>
-
-* Logarithmic function of `<Number>`. The base is 10.
-
-<h6> Example </h6>
-
-    (display (log10 100))
-    
-    ;; Output
-    ;; > 2)...";
-    help_dict_.emplace("log10", help);
 
     std::shared_ptr<std::mt19937>
     engine_ptr(new std::mt19937(std::chrono::system_clock::to_time_t
@@ -4115,918 +1174,57 @@ R"...(### log10 ###
     };
     scope_chain_.InsertSymbol("random",
     NewN_Function(func, "Lisp:random", scope_chain_));
-    help =
-R"...(### random ###
-
-<h6> Usage </h6>
-
-* `(random <Number>)`
-
-<h6> Description </h6>
-
-* Returns random number from 0 to `<Number>`.
-
-<h6> Example </h6>
-
-    (display (random 10))
-    
-    ;; Output
-    ;; > 2.42356
-    
-    (display (random -10))
-    
-    ;; Output
-    ;; > -7.13453)...";
-    help_dict_.emplace("random", help);
 
     func = LC_FUNCTION_OBJ(Max);
     INSERT_LC_FUNCTION(func, "max", "Lisp:max");
-    help =
-R"...(### max ###
-
-<h6> Usage </h6>
-
-* `(max <Number>...)`
-
-<h6> Description </h6>
-
-* Returns maximum number of `<Number>...`.
-
-<h6> Example </h6>
-
-    (display (max 1 2 3 4 3 2 1))
-    
-    ;; Output
-    ;; > 4)...";
-    help_dict_.emplace("max", help);
 
     func = LC_FUNCTION_OBJ(Min);
     INSERT_LC_FUNCTION(func, "min", "Lisp:min");
-    help =
-R"...(### min ###
-
-<h6> Usage </h6>
-
-* `(min <Number>...)`
-
-<h6> Description </h6>
-
-* Returns minimum number of `<Number>...`.
-
-<h6> Example </h6>
-
-    (display (min 4 3 2 1 2 3 4))
-    
-    ;; Output
-    ;; > 1)...";
-    help_dict_.emplace("min", help);
 
     func = LC_FUNCTION_OBJ(RegexSearch);
     INSERT_LC_FUNCTION(func, "regex-search", "Lisp:regex-search");
-    help =
-R"...(### regex-search ###
-
-<h6> Usage </h6>
-
-* `(regex-search <Regex : String> <Target : String>)`
-
-<h6> Description </h6>
-
-* Search `<Regex>` from `<Target>` and returns List of results.
-    + The 1st element of results is match of whole `<Target>`.
-    + From the 2nd element, each group.
-
-<h6> Example </h6>
-
-    (define target "Hello World")
-    (display (regex-search "(Hel).* (Wor).*" target))
-    ;; Output
-    ;; > ("Hello World" "Hel" "Wor"))...";
-    help_dict_.emplace("regex-search", help);
 
     func = LC_FUNCTION_OBJ(GenNabla);
     INSERT_LC_FUNCTION(func, "gen-nabla", "Lisp:gen-nabla");
-    help =
-R"...(### gen-nabla ###
-
-<h6> Usage </h6>
-
-* `(gen-nabla <Mathematical function : Function> <Deltas : Number>...)`
-
-<h6> Description </h6>
-
-* Differentiates `<Mathematical function>` with `<Deltas>...`
-  and returns a differentiated function.
-    + The differentiated function returns gradient.
-
-<h6> Example </h6>
-
-    ;; Function of 3 variables.
-    (define (func x y z) (+ (* 2 x) (* 3 y) (* 4 z)))
-    
-    ;; Differentiate the function with 0.01 as delta.
-    (define nabla-func (gen-nabla func 0.01 0.01 0.01))
-    
-    ;; Calculate gradient.
-    (display (nabla-func 0 0 0))
-    ;; Output
-    ;; > (2 3 4))...";
-    help_dict_.emplace("gen-nabla", help);
 
     func = LC_FUNCTION_OBJ(Integral);
     INSERT_LC_FUNCTION(func, "integral", "Lisp:integral");
-    help =
-R"...(### integral ###
-
-<h6> Usage </h6>
-
-* `(integral <Mathematical function : Function> <Range and delta : List>...)`
-
-<h6> Description </h6>
-
-* Integrates `<Mathematical function>` with `<Range and delta>...`.
-    + `<Range and delta>...` is List that
-      `(<From : Number> <To : Number> <Delta : Number>)`
-
-<h6> Example </h6>
-
-    ;; Integral x^2 + y^2 dxdy (x from 0 to 3) (y from 0 to 5)
-    (define (func x y) (+ (* x x) (* y y)))
-    (display (integral func '(0 3 0.1) '(0 5 0.1)))
-    ;; Output
-    ;; > 169.975
-    
-    ;; (1/3)(x^3)y + (1/3)(y^3)x is a primitive function of x^2 + y^2
-    (define (primitive x y) (+ (* (/ 1 3) x x x y) (* (/ 1 3) y y y x)))
-    (display (primitive 3 5))
-    ;; Output
-    ;; > 170)...";
-    help_dict_.emplace("integral", help);
 
     func = LC_FUNCTION_OBJ(PowerMethod);
     INSERT_LC_FUNCTION(func, "power-method", "Lisp:power-method");
-    help =
-R"...(### power-method ###
-
-<h6> Usage </h6>
-
-* `(power-method <Square matrix>)`
-
-<h6> Description </h6>
-
-* Returns `(<Maximum eigenvalue> <The eigenvector>)` by Power Method.
-* `<Square matrix>` is `(<Row vectors>...)`.
-* If it failed to find eigenvalue, it returns Nil.
-
-<h6> Example </h6>
-
-    ;; Matrix.
-    ;; |  1  2  3 |
-    ;; |  0  1 -3 |
-    ;; |  0 -3  1 |
-    (define matrix '((1 2 3) (0 1 -3) (0 -3 1)))
-    
-    ;; Calculate maximum eigenvalue and eigenvector.
-    (display (power-method matrix))
-    ;; Output
-    ;; > (1 (1 0 0)))...";
-    help_dict_.emplace("power-method", help);
 
     func = LC_FUNCTION_OBJ(InverseMatrix);
     INSERT_LC_FUNCTION(func, "inverse-matrix", "Lisp:inverse-matrix");
-    help =
-R"...(### inverse-matrix ###
-
-<h6> Usage </h6>
-
-* `(inverse-matrix <Square matrix>)`
-
-<h6> Description </h6>
-
-* Returns Inverse Matrix of `<Square matrix>`.
-* `<Square matrix>` is `(<Row vectors>...)`.
-* If it failed to find Inverse Matrix, it returns Nil.
-
-<h6> Example </h6>
-
-    ;; Matrix.
-    ;; | 1 0 1 |
-    ;; | 1 1 1 |
-    ;; | 2 1 1 |
-    (define matrix '((1 0 1) (1 1 1) (2 1 1)))
-    
-    ;; Calculate inverse matrix.
-    (define inv-matrix (inverse-matrix matrix))
-    (display (ref inv-matrix 0))
-    (display (ref inv-matrix 1))
-    (display (ref inv-matrix 2))
-    ;; Output
-    ;; > (0 -1 1)
-    ;; > (-1 1 0)
-    ;; > (1 1 -1))...";
-    help_dict_.emplace("inverse-matrix", help);
 
     func = LC_FUNCTION_OBJ(TransposedMatrix);
     INSERT_LC_FUNCTION(func, "transposed-matrix", "Lisp:transposed-matrix");
-    help =
-R"...(### transposed-matrix ###
-
-<h6> Usage </h6>
-
-* `(transposed-matrix <Matrix>)`
-
-<h6> Description </h6>
-
-* Returns Transposed Matrix of `<Matrix>`.
-* `<Matrix>` is `(<Row vectors>...)`.
-
-<h6> Example </h6>
-
-    ;; Matrix.
-    ;; |  3  0  1  6 |
-    ;; |  1  2  2 -1 |
-    ;; |  2 -1  5  0 |
-    (define matrix '((3 0 1 6) (1 2 2 -1) (2 -1 5 0)))
-    (for (elm (transposed-matrix matrix))
-         (display elm))
-    ;; Output
-    ;; > (3 1 2)
-    ;; > (0 2 -1)
-    ;; > (1 2 5)
-    ;; > (6 -1 0))...";
-    help_dict_.emplace("transposed-matrix", help);
 
     func = LC_FUNCTION_OBJ(Determinant);
     INSERT_LC_FUNCTION(func, "determinant", "Lisp:determinant");
-    help =
-R"...(### determinant ###
-
-<h6> Usage </h6>
-
-* `(determinant <Square matrix>)`
-
-<h6> Description </h6>
-
-* Returns Determinant of `<Square matrix>`.
-* `<Square matrix>` is `(<Row vectors>...)`.
-
-<h6> Example </h6>
-
-    ;; Matrix.
-    ;; |  3  0  1  6 |
-    ;; |  1  2  2 -1 |
-    ;; |  2 -1  5  0 |
-    ;; |  1  4  1  1 |
-    (define matrix '((3 0 1 6) (1 2 2 -1) (2 -1 5 0) (1 4 1 1)))
-    (display (determinant matrix))
-    ;; Output
-    ;; > 67)...";
-    help_dict_.emplace("determinant", help);
 
     func = LC_FUNCTION_OBJ(Bayes);
     INSERT_LC_FUNCTION(func, "bayes", "Lisp:bayes");
-    help =
-R"...(### bayes ###
-
-<h6> Usage </h6>
-
-* `(bayes <Data list : List> <Event list : List of Funtions> <Condition list : List of Functions)`
-
-<h6> Description </h6>
-
-* Estimates logit of each event of `<Event list>` by Naive Bayes
-  and returns its list.
-* Each element of `<Event ist>` or `<Conditions list>` must be Predicate.
-    + Predicate accepts 1 argument(an element of `<Data list>`)
-      and returns Boolean or Number(from 0.0 to 1.0).
-        - Predicate can returns Fuzzy.
-    + `(bayes)` gives each element of `<Data list>` to each Predicate.
-      The Predicate must judge the element and return Boolean or Number.
-
-<h6> Example </h6>
-
-    (define logit-list ())
-    
-    ;; ---------- First Example ---------- ;;
-    ;; List of playing cards.
-    (define playing-cards
-            '(("Heart" 1) ("Heart" 2) ("Heart" 3) ("Heart" 4) ("Heart" 5)
-              ("Heart" 6) ("Heart" 7) ("Heart" 8) ("Heart" 9) ("Heart" 10)
-              ("Heart" 11) ("Heart" 12) ("Heart" 13)
-              ("Diamond" 1)("Diamond" 2)("Diamond" 3)("Diamond" 4)("Diamond" 5)
-              ("Diamond" 6)("Diamond" 7)("Diamond" 8)("Diamond" 9)("Diamond" 10)
-              ("Diamond" 11)("Diamond" 12)("Diamond" 13)
-              ("Club" 1) ("Club" 2) ("Club" 3) ("Club" 4) ("Club" 5)
-              ("Club" 6) ("Club" 7) ("Club" 8) ("Club" 9) ("Club" 10)
-              ("Club" 11) ("Club" 12) ("Club" 13)
-              ("Spade" 1) ("Spade" 2) ("Spade" 3) ("Spade" 4) ("Spade" 5)
-              ("Spade" 6) ("Spade" 7) ("Spade" 8) ("Spade" 9) ("Spade" 10)
-              ("Spade" 11) ("Spade" 12) ("Spade" 13)))
-    
-    ;; Anything is true.
-    (define (any-true card) #t)
-    
-    ;; Judges a card whether the suit is "Heart" or not.
-    (define (heart? card) (equal? (car card) "Heart"))
-    
-    ;; Judges a card whether the suit is black or not.
-    (define (black? card)
-            (or (equal? (car card) "Club") (equal? (car card) "Spade")))
-    
-    ;; Judges a card whether the card is a face card or not.
-    (define (face? card) (>= (car (cdr card)) 11))
-    
-    ;; Judges a card whether the number is an even number or not.
-    (define (even-num? card) (even? (car (cdr card))))
-    
-    ;; Judges a card whether the number is an odd number or not.
-    (define (odd-num? card) (odd? (car (cdr card))))
-    
-    ;; Logit of P(Heart)
-    ;; Probability is 0.25.
-    (set! logit-list (bayes playing-cards
-                       (list heart?)
-                       (list any-true)))
-    (display "Logit : " logit-list)
-    (display "Probability : " (map logit->prob logit-list))
-    ;; Output
-    ;; > Logit : (-1.09766352199352)
-    ;; > Probability : (0.25017793594306)
-    
-    ;; Logit of P(Even | Face) and P(Odd | Face)
-    ;; Probability is 0.333... and 0.666...
-    (set! logit-list (bayes playing-cards
-                            (list even-num? odd-num?)
-                            (list face?)))
-    (display "Logit : " logit-list)
-    (display "Probability : " (map logit->prob logit-list))
-    ;; Output
-    ;; > Logit : (-0.690840374462031 0.690840374462031)
-    ;; > Probability : (0.333846153846154 0.666153846153846)
-    
-    ;; Logit of P(Heart | Black)
-    ;; Probability is 0.0.
-    (set! logit-list (bayes playing-cards
-                            (list heart?)
-                            (list black?)))
-    (display "Logit : " logit-list)
-    (display "Probability : " (map logit->prob logit-list))
-    ;; Output
-    ;; > Logit : (-7.24779258176785)
-    ;; > Probability : (0.000711237553342816)
-    
-    ;; ---------- Second Example ---------- ;;
-    ;; Quantity of seasoning and taste data list.
-    ;; Data : (<Salt> <Sugar> <Wasabi> <Taste : "Spicy" or "Sweet">)
-    (define seasoning-taste-data
-            '((20 10 3 "Spicy")
-              (10 50 2 "Sweet")
-              (15 50 20 "Spicy")
-              (50 10 5 "Spicy")
-              (10 50 2 "Sweet")
-              (15 40 3 "Sweet")
-              (20 20 30 "Spicy")
-              (10 10 40 "Spicy")))
-    
-    ;; Judge whether "Spicy" or not. (#t or #f)
-    (define (spicy? data) (equal? (ref data 3) "Spicy"))
-    
-    ;; Judge whether "Sweet" or not. (#t or #f)
-    (define (sweet? data) (equal? (ref data 3) "Sweet"))
-    
-    ;; predicate list of taste.
-    (define taste-pred-list (list spicy? sweet?))
-    
-    ;; Judge how much salt. (from 0.0 to 1.0)
-    (define (salt? data)
-            (/ (ref data 0)
-               (+ (ref data 0) (ref data 1) (ref data 2))))
-    
-    ;; Judge how much sugar. (from 0.0 to 1.0)
-    (define (sugar? data)
-            (/ (ref data 1)
-               (+ (ref data 0) (ref data 1) (ref data 2))))
-    
-    ;; Judge how much wasabi. (from 0.0 to 1.0)
-    (define (wasabi? data)
-            (/ (ref data 2)
-               (+ (ref data 0) (ref data 1) (ref data 2))))
-    
-    ;; Probability of taste, when seasoning is salt.
-    (set! logit-list
-            (bayes seasoning-taste-data taste-pred-list (list salt?)))
-    (display "Logit : " logit-list)
-    (display "Probability : " (map logit->prob logit-list))
-    ;; Output
-    ;; > Logit : (1.12780558906831 -1.12780558906831)
-    ;; > Probability : (0.755433701008636 0.244566298991364)
-    
-    ;; Probability of taste, when seasoning is sugar.
-    (set! logit-list
-            (bayes seasoning-taste-data taste-pred-list (list sugar?)))
-    (display "Logit : " logit-list)
-    (display "Probability : " (map logit->prob logit-list))
-    ;; Output
-    ;; > Logit : (-0.408098829106817 0.408098829106817)
-    ;; > Probability : (0.399368073757344 0.600631926242656)
-    
-    ;; Probability of taste, when seasoning is wasabi.
-    (set! logit-list
-            (bayes seasoning-taste-data taste-pred-list (list wasabi?)))
-    (display "Logit : " logit-list)
-    (display "Probability : " (map logit->prob logit-list))
-    ;; Output
-    ;; > Logit : (2.00034598677312 -2.00034598677312)
-    ;; > Probability : (0.880833399583934 0.119166600416066)
-    
-    ;; Probability of taste, when seasoning is salt and sugar.
-    (set! logit-list
-            (bayes seasoning-taste-data taste-pred-list (list salt? sugar?)))
-    (display "Logit : " logit-list)
-    (display "Probability : " (map logit->prob logit-list))
-    ;; Output
-    ;; > Logit : (0.267721636218435 -0.267721636218435)
-    ;; > Probability : (0.566533484706568 0.433466515293432)
-    
-    ;; Probability of taste, when seasoning is salt and wasabi.
-    (set! logit-list
-            (bayes seasoning-taste-data taste-pred-list (list salt? wasabi?)))
-    (display "Logit : " logit-list)
-    (display "Probability : " (map logit->prob logit-list))
-    ;; Output
-    ;; > Logit : (2.67616645209838 -2.67616645209838)
-    ;; > Probability : (0.935605546063172 0.064394453936828)
-    
-    ;; Probability of taste, when seasoning is sugar and wasabi.
-    (set! logit-list
-            (bayes seasoning-taste-data taste-pred-list (list sugar? wasabi?)))
-    (display "Logit : " logit-list)
-    (display "Probability : " (map logit->prob logit-list))
-    ;; Output
-    ;; > Logit : (1.14026203392325 -1.14026203392325)
-    ;; > Probability : (0.757727745498944 0.242272254501056))...";
-    help_dict_.emplace("bayes", help);
 
     func = LC_FUNCTION_OBJ(LogitToProb);
     INSERT_LC_FUNCTION(func, "logit->prob", "Lisp:logit->prob");
-    help =
-R"...(### logit->prob ###
-
-<h6> Usage </h6>
-
-* `(logit->prob <Logit : Number>)`
-
-<h6> Description </h6>
-
-* Converts logit to probability and returns it.
-
-<h6> Example </h6>
-
-    (display (logit->prob 0))
-    ;; Output
-    ;; > 0.5)...";
-    help_dict_.emplace("logit->prob", help);
 
     func = LC_FUNCTION_OBJ(ProbToLogit);
     INSERT_LC_FUNCTION(func, "prob->logit", "Lisp:prob->logit");
-    help =
-R"...(### prob->logit ###
-
-<h6> Usage </h6>
-
-* `(prob->logit <Probability : Number>)`
-
-<h6> Description </h6>
-
-* Converts probability to logit and returns it.
-* `<Probability>` must be greater than 0.0 and less than 1.0.
-    + 0.0 or 1.0 occurs error.
-
-<h6> Example </h6>
-
-    (display (prob->logit 0.5))
-    ;; Output
-    ;; > 0)...";
-    help_dict_.emplace("prob->logit", help);
 
     func = LC_FUNCTION_OBJ(GenPA2);
     INSERT_LC_FUNCTION(func, "gen-pa2", "Lisp:gen-pa2");
-    help =
-R"...(### gen-pa2 ###
-
-<h6> Usage </h6>
-
-* `(gen-pa2 <Initial weights : List>)`
-* `(<PA-2> <Message symbol : Symbol> [<Arguments>...])`
-
-<h6> Description </h6>
-
-* Generates and returns `<PA-2>` object.
-* "PA-2" is algorithm of online machine learning.
-    + It can train weights of linear function.
-    + "Online" means that it trains from data one by one.
-* It accepts message symbol.
-    + `@train <plus? : Boolean> <Cost : Number> <Input : List>`
-        - Trains weights and returns weights after training.
-        - `<Plus?>` is that
-          if output of linear function should be 0 or positive number,
-          then #t, otherwise #f.
-        - `<Cost>` is penalty of error.
-          It must be greater than 0. (not just 0)
-        - `<Input>` is input vector of linear function.
-    + `@calc <Input : List>`
-        - Calculates linear function.
-        - `<Input>` is input vector of linear function.
-    + `@get-weights`
-        - Returns the current weights.
-
-<h6> Example </h6>
-
-    ;; Leaning whether seasoning is sweet or not.
-    ;; Data List (<Sweet?> <Sugar> <Salt>)
-    (define data-list
-            '((#t 50 20)
-              (#f 10 60)
-              (#t 120 40)
-              (#f 20 80)
-              (#t 30 10)
-              (#f 50 100)))
-    
-    ;; Statistics values.
-    (define num-data 0.1)
-    (define total-1 0)
-    (define total-2 0)
-    (define sq-total-1 0)
-    (define sq-total-2 0)
-    
-    ;; Generate PA-2.
-    (define weights '(0 0))
-    (define cost 0.5)
-    (define pa2 (gen-pa2 weights))
-    
-    ;; Start Online Training.
-    ;; Update means, standard deviations and weights per one cycle.
-    (define sugar 0)
-    (define salt 0)
-    (define mean-1 0)
-    (define mean-2 0)
-    (define sdev-1 0)
-    (define sdev-2 0)
-    (define normalized-1 0)
-    (define normalized-2 0)
-    (for (data data-list)
-         (inc! num-data)
-    
-         (set! sugar (ref data 1))
-         (set! salt (ref data 2))
-    
-         ;; Update means.
-         (add! total-1 sugar)
-         (add! total-2 salt)
-         (set! mean-1 (/ total-1 num-data))
-         (set! mean-2 (/ total-2 num-data))
-    
-         ;; Update standard deviations.
-         (add! sq-total-1 (expt (- sugar mean-1) 2))
-         (add! sq-total-2 (expt (- salt mean-2) 2))
-         (set! sdev-1 (sqrt (/ sq-total-1 num-data)))
-         (set! sdev-2 (sqrt (/ sq-total-2 num-data)))
-    
-         ;; Normalize sugar and salt.
-         (set! normalized-1 (/ (- sugar mean-1) sdev-1))
-         (set! normalized-2 (/ (- salt mean-2) sdev-2))
-    
-         ;; Train weights.
-         (display (pa2 '@train
-                       (car data) cost
-                       (list normalized-1 normalized-2))))
-    ;; Output
-    ;; > (0.327752765053172 0.327752765053172)
-    ;; > (0.608882281818588 0.0393170710326415)
-    ;; > (0.608882281818588 0.0393170710326415)
-    ;; > (0.714030213008641 -0.172427992527486)
-    ;; > (0.55686689768203 -0.649661489515829)
-    ;; > (0.55686689768203 -0.649661489515829)
-    
-    ;; Test Weights.
-    (define (sweet? val) (if (>= val 0) "Yes!" "No..."))
-    (define test-1 '(20 5))
-    (define test-2 '(80 300))
-    
-    ;; Calculate test-1.
-    (set! normalized-1 (/ (- (ref test-1 0) mean-1) sdev-1))
-    (set! normalized-2 (/ (- (ref test-1 1) mean-2) sdev-2))
-    (display test-1 " is sweet? => "
-             (sweet? (pa2 '@calc (list normalized-1 normalized-2))))
-    ;; Output
-    ;; > (20 5) is sweet? => Yes!
-    
-    ;; Calculate test-2.
-    (set! normalized-1 (/ (- (ref test-2 0) mean-1) sdev-1))
-    (set! normalized-2 (/ (- (ref test-2 1) mean-2) sdev-2))
-    (display test-2 " is sweet? => "
-             (sweet? (pa2 '@calc (list normalized-1 normalized-2))))
-    ;; Output
-    ;; > (80 300) is sweet? => No...)...";
-    help_dict_.emplace("gen-pa2", help);
 
     func = LC_FUNCTION_OBJ(GenAI);
     INSERT_LC_FUNCTION(func, "gen-ai", "Lisp:gen-ai");
-    help =
-R"...(### gen-ai ###
-
-<h6> Usage </h6>
-
-* `(gen-ai <Initial weights : List> <Initial bias : Number)`
-* `(<AI> <Message symbol : Symbol> [<Arguments>...])`
-
-<h6> Description </h6>
-
-* Generates Artificial Intelligence `<AI>`.
-    + `<Initial weights>` is List of initial weights
-      that size is the number of feature vector.
-    + `<Initial bias>` is initial bias.
-* Difference between this and `(gen-pa2)`.
-    + This has bias.
-    + Supports Perceptron PA-1 PA-2 and Neural Network.
-    + Feature vector can contain Boolean.
-* `<AI>`'s message symbol.
-    + `@get-weight`
-        - Returns current weights.
-    + `@get-bias`
-        - Returns current bias.
-    + `@calc<Feature vector : List>`
-        - Calculates and returns output that is from -1 to 1.
-    + `@prob <Feature vector : List>`
-        - Returns probability of true.
-    + `@logit <Feature vector : List>`
-        - Returns Logit of probability of true.
-    + `@judge <Feature vector : List>`
-        - Returns #t if Logit is positive number, otherwise returns #f.
-    + `@train <Learning rate : Number> <Desired output : Boolean> <Feature vector : List>`
-        - Trains `<AI>` by Perceptron.
-            - This can also be used as output node of Neural Network.
-            - In comparison with PA-1 or PA-2,
-              this learning speed is very slow.
-        - Returns differentiated loss.
-        - `<Rate>` determine maximum amplitude of adjusted value of weight.
-            - Maximum amplitude is `+- <Rate> * feature`.
-    + `@train-pa1 <Cost : Number> <Desired output : Boolean> <Feature vector : List>`
-        - Trains `<AI>` by PA-1.
-        - Returns differentiated loss.
-        - `<Cost>` must be positive number and not 0.
-        - If `<Cost>` is infinite then same as Hard Margin,
-          otherwise Soft Margin.
-    + `@train-pa2 <Cost : Number> <Desired output : Boolean> <Feature vector : List>`
-        - Trains `<AI>` by PA-2.
-        - Returns differentiated loss.
-        - `<Cost>` must be positive number and not 0.
-        - If `<Cost>` is infinite then same as Hard Margin,
-          otherwise Soft Margin.
-    + `@train-bp <Rate : Number> <Each parent's Differentiated loss : List> <Each parent's weight related to me : List > <Children's output : List>`
-        - Trains as a node of middle layer of Neural Network
-          by Back Propagation.
-        - Returns differentiated loss.
-        - `<Rate>` must be positive number and not 0.
-        - `<Each parent's Differentiated loss>` is List of
-          each parent's differentiated loss
-          that is returned by parent's `@train`.
-        - `<Each parent's weight related to me>` is
-          List of weights related to itself.
-            - If the `<AI>` is 3rd node in the layer,
-              `<Each parent's weight related to me>` is
-              List of the 3rd weight of each parent's weights.
-
-<h6> Example </h6>
-
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; Leaning whether seasoning is sweet or not. ;;
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; Data List (<Sweet?> <Sugar> <Salt>)
-    (define data-list
-            '((#t 50 20)
-              (#f 10 60)
-              (#t 120 40)
-              (#f 20 80)
-              (#t 30 10)
-              (#f 50 100)))
-    
-    (define rate 0.07)
-    (define ai (gen-ai '(0 0) 0))
-    (for (data data-list)
-         (ai '@train-pa1 rate (car data) (cdr data)))
-    
-    ;; Print results.
-    (define features-list '((90 10)
-                            (10 90)
-                            (60 40)
-                            (40 60)
-                            (50 50)))
-    (for (features features-list)
-         (display "Input : " features)
-         (display "    Judge : " (ai '@judge features))
-         (display "    Calc : " (ai '@calc features))
-         (display "    Logit : " (ai '@logit features))
-         (display "    Prob : " (ai '@prob features)))
-    ;; Output
-    ;; > Input : (90 10)
-    ;; >     Judge : #t
-    ;; >     Calc : 0.839548040409108
-    ;; >     Logit : 2.43928060964351
-    ;; >     Prob : 0.919774020204554
-    ;; > Input : (10 90)
-    ;; >     Judge : #f
-    ;; >     Calc : -0.749873839397153
-    ;; >     Logit : -1.94533353956129
-    ;; >     Prob : 0.125063080301423
-    ;; > Input : (60 40)
-    ;; >     Judge : #t
-    ;; >     Calc : 0.377829397451558
-    ;; >     Logit : 0.795050303691708
-    ;; >     Prob : 0.688914698725779
-    ;; > Input : (40 60)
-    ;; >     Judge : #f
-    ;; >     Calc : -0.149424378524727
-    ;; >     Logit : -0.301103233609493
-    ;; >     Prob : 0.425287810737637
-    ;; > Input : (50 50)
-    ;; >     Judge : #t
-    ;; >     Calc : 0.122862890154041
-    ;; >     Logit : 0.246973535041108
-    ;; >     Prob : 0.56143144507702
-    
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; Neural Network. Learning XOR. ;;
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ;; AIs.
-    ;; Input Middle Output
-    ;;    x1     a1     y1
-    ;;    x2     a2
-    (define (random-weight)
-            (if (>= (random 1) 0.5) (random 1) (* -1 (random 1))))
-    (define a1 (gen-ai (list (random-weight) (random-weight))
-                       (random-weight)))
-    (define a2 (gen-ai (list (random-weight) (random-weight))
-                       (random-weight)))
-    
-    (define y1 (gen-ai (list (random-weight) (random-weight))
-                       (random-weight)))
-    
-    ;; Calculation.
-    (define (calc input)
-            (y1 '@calc (list (a1 '@calc input) (a2 '@calc input))))
-    (define (cal-logit input)
-            (y1 '@logit (list (a1 '@calc input) (a2 '@calc input))))
-    (define (prob input)
-            (y1 '@prob (list (a1 '@calc input) (a2 '@calc input))))
-    (define (judge input)
-            (y1 '@judge (list (a1 '@calc input) (a2 '@calc input))))
-    
-    ;; Training function.
-    (define learning-rate 0.25)
-    (define (train output input)
-            ;; Jot down y weights before training
-            (define y-weights
-                    (transposed-matrix (list (y1 '@get-weights))))
-    
-            ;; Jot down a outputs before training
-            (define a-outputs
-                    (list (a1 '@calc input)
-                          (a2 '@calc input)))
-    
-            ;; Train y1 and get its differentiated loss.
-            (define y-loss
-                    (list (y1 '@train learning-rate output a-outputs)))
-    
-            ;; Train a1 a2 with Back-Propagation.
-            (a1 '@train-bp learning-rate
-                y-loss (ref y-weights 0) input)
-            (a2 '@train-bp learning-rate
-                y-loss (ref y-weights 1) input)
-    
-            ;; Returns stuff.
-            #t)
-    
-    ;; XOR generator.
-    (define (random-xor)
-            (define x1 (if (>= (random 1) 0.5) 1 -1))
-            (define x2 (if (>= (random 1) 0.5) 1 -1))
-            (list (if (= x1 x2) #f #t) x1 x2))
-    
-    ;; Train 1000 times.
-    (define xor ())
-    (for (i (range 1000))
-         (set! xor (random-xor))
-         (train (car xor) (cdr xor)))
-    
-    ;; Judge.
-    (define logic-data-list
-            '((1 1)
-              (-1 1)
-              (1 -1)
-              (-1 -1)))
-    (for (data logic-data-list)
-         (display "Data : " data)
-         (display "    Judge : " (judge data))
-         (display "    Calc : " (calc data))
-         (display "    Logit : " (cal-logit data))
-         (display "    Prob : " (prob data)))
-    ;; Output
-    ;; > Data : (1 1)
-    ;; >     Judge : #f
-    ;; >     Calc : -0.901210496751019
-    ;; >     Logit : -2.95725470915291
-    ;; >     Prob : 0.0493947516244905
-    ;; > Data : (-1 1)
-    ;; >     Judge : #t
-    ;; >     Calc : 0.859721779977142
-    ;; >     Logit : 2.58455443841497
-    ;; >     Prob : 0.929860889988571
-    ;; > Data : (1 -1)
-    ;; >     Judge : #t
-    ;; >     Calc : 0.879465729452377
-    ;; >     Logit : 2.74680871359316
-    ;; >     Prob : 0.939732864726189
-    ;; > Data : (-1 -1)
-    ;; >     Judge : #f
-    ;; >     Calc : -0.902502383508753
-    ;; >     Logit : -2.97109741110352
-    ;; >     Prob : 0.0487488082456237
-    )...";
-    help_dict_.emplace("gen-ai", help);
 
     func = LC_FUNCTION_OBJ(RBFKernel);
     INSERT_LC_FUNCTION(func, "rbf-kernel", "Lisp:rbf-kernel");
-    help =
-R"...(### rbf-kernel ###
-
-<h6> Usage </h6>
-
-* `(rbf-kernel <Vector 1 : List> <Vector 2 : List> <Bandwidth : Number>)`
-
-<h6> Description </h6>
-
-* Calculates Radial Bases Function Kernel.
-* `<Vector 1>` and `<Vector 1>` is List of Numbers.
-* `<Bandwidth>` is bandwidth of this Kernel.
-
-<h6> Example </h6>
-
-    (define vec-1 '(10 20 30))
-    (define vec-2 '(10 20 30))
-    (define vec-3 '(20 30 40))
-    
-    (display (rbf-kernel vec-1 vec-2 10))
-    (display (rbf-kernel vec-1 vec-3 10))
-    (display (rbf-kernel vec-1 vec-3 20))
-    ;; Output
-    ;; > 1
-    ;; > 0.22313016014843
-    ;; > 0.687289278790972)...";
-    help_dict_.emplace("rbf-kernel", help);
 
     func = LC_FUNCTION_OBJ(Now);
     INSERT_LC_FUNCTION(func, "now", "Lisp:now");
-    help =
-R"...(### now ###
-
-<h6> Usage </h6>
-
-* `(now)`
-
-<h6> Description </h6>
-
-* Returns List of current time.
-    + List is `(<Year> <Month> <Day> <Hour> <Minute> <Second>)`.
-
-<h6> Example </h6>
-
-    ;; Run at 2016-6-11 15:26:59.
-    (display (now))
-    ;; Output
-    ;; > (2016 6 11 15 26 59))...";
-    help_dict_.emplace("now", help);
 
     func = LC_FUNCTION_OBJ(Clock);
     INSERT_LC_FUNCTION(func, "clock", "Lisp:clock");
-    help =
-R"...(### clock ###
-
-<h6> Usage </h6>
-
-* `(clock)`
-
-<h6> Description </h6>
-
-* Returns execution time (seconds).
-
-<h6> Example </h6>
-
-    ;; After 1.29 seconds from program has run.
-    (clock)
-    ;; Output
-    ;; 1.29091)...";
-    help_dict_.emplace("clock", help);
   }
 
   // ============== //
@@ -5082,30 +1280,6 @@ R"...(### clock ###
     }
 
     return LPointerVecToList(ret_vec);
-  }
-
-  // %%% help
-  DEF_LC_FUNCTION(Lisp::Help) {
-    int length = CountList(args) - 1;
-    std::ostringstream oss;
-    if (length > 0) {
-      // キーを得る。
-      LPointer result = caller->Evaluate(*(args.cdr()->car()));
-      CheckType(*result, LType::STRING);
-      const std::string& help = result->string();
-
-      if (help_dict_.find(help) != help_dict_.end()) {
-        oss << help_dict_.at(help);
-      }
-    } else {
-      // 全表示。
-      for (auto& pair : help_dict_) {
-        oss << pair.second << std::endl;
-        oss << std::string(79, '-') << std::endl;
-      }
-    }
-
-    return NewString(oss.str());
   }
 
   // %%% parse

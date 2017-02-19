@@ -430,13 +430,6 @@ namespace Sayuri {
       DEF_LC_FUNCTION(ToFENPosition) ;
 
     private:
-      // ================ //
-      // プライベート関数 //
-      // ================ //
-      /**
-       * ヘルプを作成する。
-       */
-      void SetHelp();
   };
 
   /** Sayulisp用エンジンセット。 */

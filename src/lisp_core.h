@@ -1653,9 +1653,6 @@ namespace Sayuri {
       LScopeChain scope_chain_;
   };
 
-  /** ヘルプ辞書。 */
-  using LHelpDict = std::map<std::string, std::string>;
-
   /** パーサクラス。 */
   class LParser {
     public:
@@ -2193,15 +2190,6 @@ namespace Sayuri {
         NewN_Function(c_function, func_id, scope_chain_));
       }
 
-      /**
-       * ヘルプ辞書に追加する。
-       * @param key ヘルプのキー。
-       * @param content ヘルプの内容。
-       */
-      void AddHelp(const std::string& key, const std::string& content) {
-        help_dict_.emplace(key, content);
-      }
-
       // ======== //
       // アクセサ //
       // ======== //
@@ -2226,9 +2214,6 @@ namespace Sayuri {
       // ============== //
       // ネイティブ関数 //
       // ============== //
-      /** ネイティブ関数 - help */
-      DEF_LC_FUNCTION(Help);
-
       // %%% eval
       /** ネイティブ関数 - eval */
       DEF_LC_FUNCTION(Eval) {
@@ -3601,10 +3586,6 @@ namespace Sayuri {
         return NewNumber(static_cast<double>(std::clock())
         / static_cast<double>(CLOCKS_PER_SEC));
       }
-
-    protected:
-      /** ヘルプ辞書。 */
-      LHelpDict help_dict_;
 
     private:
       // ================ //
