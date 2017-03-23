@@ -247,6 +247,7 @@ namespace Sayuri {
     // もしマクロ引数があったなら、マクロ展開する。
     // マクロがなかったらそのまま。
     LPointerVec expression;
+    LPointerVec* expression_ptr = &expression_;
     if (!(macro_map.empty())) {
       LPointer clone;
       for (auto& expr : expression_) {
@@ -266,13 +267,12 @@ namespace Sayuri {
 
         expression.push_back(clone);
       }
-    } else {
-      expression = expression_;
+      expression_ptr = &expression;
     }
 
     // 関数呼び出し。
     LPointer ret_ptr = Lisp::NewNil();
-    for (auto& expr : expression) {
+    for (auto& expr : *expression_ptr) {
       ret_ptr = Evaluate(*expr);
     }
 
