@@ -144,14 +144,43 @@ namespace Sayuri {
     Walk(*ptr, func);
   }
 
-  // 式を評価する。
-  LPointer LObject::Evaluate(const LObject& target) {
-    // 自分が関数でなければ、何もしない。
-    if (!(IsFunction() || IsN_Function())) {
+  // 式を評価する。 LFunction版。
+  LPointer LFunction::Evaluate(const LObject& target) {
+    // シンボル、バインドされているオブジェクトを返す。
+    if (target.IsSymbol()) {
+      const LPointer& result = scope_chain().SelectSymbol(target.symbol());
+
+      // あればクローン。 なければnullptr。
+      if (result) return result->Clone();
+
       throw Lisp::GenError("@evaluating-error",
-      "Only function object can evaluate expressions.");
+      "No object is bound to '" + target.symbol() + "'.");
     }
 
+    // ペア、関数呼び出し。
+    if (target.IsPair()) {
+      // carを評価する。
+      LPointer func_obj = Evaluate(*(target.car()));
+      if (!func_obj) {
+        throw Lisp::GenError("@evaluating-error",
+        "Couldn't evaluate function name '" + target.car()->ToString()
+        + "'.");
+      }
+
+      if ((func_obj->IsFunction()) || (func_obj->IsN_Function())) {
+        return func_obj->Apply(this, target);
+      }
+
+      throw Lisp::GenError("@evaluating-error",
+      "'" + target.car()->ToString() + "' didn't return function object.");
+    }
+
+    // Atomなのでクローンを返す。
+    return target.Clone();
+  }
+
+  // 式を評価する。 LN_Function版。
+  LPointer LN_Function::Evaluate(const LObject& target) {
     // シンボル、バインドされているオブジェクトを返す。
     if (target.IsSymbol()) {
       const LPointer& result = scope_chain().SelectSymbol(target.symbol());

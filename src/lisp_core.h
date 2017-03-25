@@ -49,6 +49,7 @@
 #include <thread>
 #include <mutex>
 #include <limits>
+#include <stdexcept>
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
@@ -312,7 +313,9 @@ namespace Sayuri {
        * @param target 評価するオブジェクト。
        * @return 結果。
        */
-      virtual LPointer Evaluate(const LObject& target) final;
+      virtual LPointer Evaluate(const LObject& target) {
+        throw std::logic_error("Called Invalid Evaluate().");
+      }
 
       /**
        * 自身の関数を適用する。
@@ -1394,6 +1397,12 @@ namespace Sayuri {
         return false;
       }
       /**
+       * オブジェクトを評価する。
+       * @param target 評価するオブジェクト。
+       * @return 結果。
+       */
+      virtual LPointer Evaluate(const LObject& target) override;
+      /**
        * 自身の関数を適用する。
        * @param caller 関数の呼び出し元。
        * @param target 引数オブジェクト。
@@ -1568,6 +1577,12 @@ namespace Sayuri {
         }
         return false;
       }
+      /**
+       * オブジェクトを評価する。
+       * @param target 評価するオブジェクト。
+       * @return 結果。
+       */
+      virtual LPointer Evaluate(const LObject& target) override;
       /**
        * 自身の関数を適用する。
        * @param caller 関数の呼び出し元。
