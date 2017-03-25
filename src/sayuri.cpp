@@ -57,7 +57,7 @@ namespace Sayuri {
       try {
         sayulisp_ptr->Tokenize(code);
         for (auto& ptr : sayulisp_ptr->Parse()) {
-          result = sayulisp_ptr->Evaluate(*ptr);
+          result = sayulisp_ptr->Evaluate(ptr);
         }
       } catch (LPointer error_ptr) {
         result = error_ptr;

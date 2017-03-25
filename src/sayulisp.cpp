@@ -230,7 +230,7 @@ namespace Sayuri {
 
       // 引数があった場合は終了ステータスあり。
       if (args_ptr->IsPair()) {
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         status = result->number();
       }
 
@@ -248,7 +248,7 @@ namespace Sayuri {
         LPointerVec s_tree = Parse();
 
         for (auto& s : s_tree) {
-          Evaluate(*s);
+          Evaluate(s);
         }
 
         if (!loop) break;
@@ -272,7 +272,7 @@ namespace Sayuri {
 
       // 引数があった場合は終了ステータスあり。
       if (args_ptr->IsPair()) {
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         status = result->number();
       }
 
@@ -286,7 +286,7 @@ namespace Sayuri {
       Tokenize(code);
 
       LPointerVec s_tree = Parse();
-      for (auto& s : s_tree) Evaluate(*s);
+      for (auto& s : s_tree) Evaluate(s);
     } catch (LPointer error) {
       PrintError(error);
     }
@@ -463,7 +463,7 @@ namespace Sayuri {
     LObject* args_ptr = nullptr;\
     GetReadyForFunction(args, 1, &args_ptr);\
 \
-    LPointer list_ptr = caller->Evaluate(*(args_ptr->car()));\
+    LPointer list_ptr = caller->Evaluate(args_ptr->car());\
 \
     if (list_ptr->IsSymbol()) {\
       std::map<std::string, std::uint32_t>::const_iterator itr =\
@@ -512,7 +512,7 @@ namespace Sayuri {
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
 
-    LPointer list_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer list_ptr = caller->Evaluate(args_ptr->car());
 
     if (list_ptr->IsSymbol()) {
       // マス。
@@ -550,7 +550,7 @@ namespace Sayuri {
     LObject* args_ptr = nullptr;\
     GetReadyForFunction(args, 1, &args_ptr);\
 \
-    LPointer list_ptr = caller->Evaluate(*(args_ptr->car()));\
+    LPointer list_ptr = caller->Evaluate(args_ptr->car());\
     if (list_ptr->IsNumber()) {\
       std::uint32_t index = list_ptr->number();\
       if (index < limit) {\
@@ -598,7 +598,7 @@ namespace Sayuri {
     GetReadyForFunction(args, 1, &args_ptr);
 
     // PGN文字列を得る。
-    LPointer pgn_str_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer pgn_str_ptr = caller->Evaluate(args_ptr->car());
     CheckType(*pgn_str_ptr, LType::STRING);
     std::shared_ptr<PGN> pgn_ptr(new PGN());
     pgn_ptr->Parse(pgn_str_ptr->string());
@@ -676,7 +676,7 @@ namespace Sayuri {
       Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
       // インデックス番号を得る。
-      LPointer index_ptr = caller->Evaluate(*(args_ptr->car()));
+      LPointer index_ptr = caller->Evaluate(args_ptr->car());
       CheckType(*index_ptr, LType::NUMBER);
       int len = pgn_ptr->game_vec().size();
       int index = index_ptr->number();
@@ -822,7 +822,7 @@ namespace Sayuri {
       GetReadyForFunction(args, 1, &args_ptr);
 
       // メッセージシンボルを得る。
-      LPointer symbol_ptr = caller->Evaluate(*(args_ptr->car()));
+      LPointer symbol_ptr = caller->Evaluate(args_ptr->car());
       CheckType(*symbol_ptr, LType::SYMBOL);
       std::string symbol = symbol_ptr->symbol();
 
@@ -847,7 +847,7 @@ namespace Sayuri {
     GetReadyForFunction(args, 1, &args_ptr);
 
     // 文字列を得る。
-    LPointer fen_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer fen_ptr = caller->Evaluate(args_ptr->car());
     CheckType(*fen_ptr, LType::STRING);
 
     // パースする。
@@ -1003,7 +1003,7 @@ namespace Sayuri {
     GetReadyForFunction(args, 1, &args_ptr);
 
     // 文字列を得る。
-    LPointer position_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer position_ptr = caller->Evaluate(args_ptr->car());
     CheckList(*position_ptr);
 
     // ビットボードを作る。
@@ -1731,7 +1731,7 @@ namespace Sayuri {
     Lisp::GetReadyForFunction(args, 1, &args_ptr);
 
     // メッセージシンボルを抽出。
-    LPointer result = caller->Evaluate(*(args_ptr->car()));
+    LPointer result = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*result, LType::SYMBOL);
     const std::string& symbol = result->symbol();
 
@@ -1801,7 +1801,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 引数のチェック。
-    LPointer result = caller->Evaluate(*(args_ptr->car()));
+    LPointer result = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSquare(*result);
     Square square = result->number();
 
@@ -1843,7 +1843,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // FENを得る。
-    LPointer fen_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer fen_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*fen_ptr, LType::STRING);
 
     // パースする。
@@ -1872,7 +1872,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 2, &args_ptr);
 
     // 駒を得る。
-    LPointer piece_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer piece_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckPiece(*piece_ptr);
     Side side = piece_ptr->car()->number();
     PieceType piece_type = piece_ptr->cdr()->car()->number();
@@ -1880,7 +1880,7 @@ namespace Sayuri {
     Lisp::Next(&args_ptr);
 
     // マスを得る。
-    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer square_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSquare(*square_ptr);
     Square square = square_ptr->number();
 
@@ -1925,7 +1925,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 指し手を得る。
-    LPointer to_move_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer to_move_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSide(*to_move_ptr);
     Side to_move = to_move_ptr->number();
 
@@ -1949,7 +1949,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // キャスリングの権利を得る。
-    LPointer castling_list_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer castling_list_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckList(*castling_list_ptr);
 
     // キャスリングの権利フラグを作成。
@@ -1958,7 +1958,7 @@ namespace Sayuri {
     int rights_number = 0;
     for (LObject* ptr = castling_list_ptr.get(); ptr->IsPair();
     Lisp::Next(&ptr)) {
-      result = caller->Evaluate(*(ptr->car()));
+      result = caller->Evaluate(ptr->car());
       Sayulisp::CheckCastling(*result);
 
       rights_number = result->number();
@@ -2006,7 +2006,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // マスを得る。
-    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer square_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSquare(*square_ptr);
     Square square = square_ptr->number();
 
@@ -2052,7 +2052,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 手数を得る。
-    LPointer ply_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer ply_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*ply_ptr, LType::NUMBER);
     int ply = ply_ptr->number();
 
@@ -2073,7 +2073,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 手数を得る。
-    LPointer clock_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer clock_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*clock_ptr, LType::NUMBER);
     int clock = clock_ptr->number();
 
@@ -2096,7 +2096,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 真偽値を得る。
-    LPointer has_castled_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer has_castled_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*has_castled_ptr, LType::BOOLEAN);
     bool has_castled = has_castled_ptr->boolean();
 
@@ -2116,7 +2116,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 指し手を得る。
-    LPointer result = caller->Evaluate(*(args_ptr->car()));
+    LPointer result = caller->Evaluate(args_ptr->car());
     Move move = 0;
     if (symbol == "@play-move") {  // @play-move
       move = Sayulisp::ListToMove(*result);
@@ -2145,7 +2145,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 指し手を得る。
-    LPointer move_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer move_ptr = caller->Evaluate(args_ptr->car());
 
     return Lisp::NewString(engine_ptr_->MoveToNote
     (Sayulisp::ListToMove(*move_ptr)));
@@ -2158,7 +2158,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // PGNの指し手を得る。
-    LPointer note_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer note_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*note_ptr, LType::STRING);
 
     std::vector<Move> move_vec = engine_ptr_->GuessNote(note_ptr->string());
@@ -2174,7 +2174,7 @@ namespace Sayuri {
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
-    LPointer command_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer command_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*command_ptr, LType::STRING);
 
     return Lisp::NewBoolean(shell_ptr_->InputCommand(command_ptr->string()));
@@ -2186,7 +2186,7 @@ namespace Sayuri {
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
-    LPointer result = caller->Evaluate(*(args_ptr->car()));
+    LPointer result = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*result, LType::FUNCTION);
 
     // リストを作る。
@@ -2201,7 +2201,7 @@ namespace Sayuri {
     auto callback =
     [caller_scope, listener_ptr](const std::string& message) {
       listener_ptr->cdr()->car()->string(message);
-      caller_scope->Evaluate(*listener_ptr);
+      caller_scope->Evaluate(listener_ptr);
     };
 
     // コールバック関数を登録。
@@ -2302,7 +2302,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 思考時間を得る。
-    LPointer time_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer time_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*time_ptr, LType::NUMBER);
     int time = time_ptr->number();
     Lisp::Next(&args_ptr);
@@ -2310,7 +2310,7 @@ namespace Sayuri {
     // もしあるなら、候補手のリストを得る。
     LPointer candidate_list_ptr = Lisp::NewNil();
     if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      LPointer result = caller->Evaluate(args_ptr->car());
       Lisp::CheckList(*result);
       candidate_list_ptr = result;
     }
@@ -2326,7 +2326,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 持ち時間を得る。
-    LPointer time_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer time_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*time_ptr, LType::NUMBER);
     int time = TimeLimitToMoveTime(time_ptr->number());
     Lisp::Next(&args_ptr);
@@ -2334,7 +2334,7 @@ namespace Sayuri {
     // もしあるなら、候補手のリストを得る。
     LPointer candidate_list_ptr = Lisp::NewNil();
     if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      LPointer result = caller->Evaluate(args_ptr->car());
       Lisp::CheckList(*result);
       candidate_list_ptr = result;
     }
@@ -2350,7 +2350,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 深さを得る。
-    LPointer depth_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer depth_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*depth_ptr, LType::NUMBER);
     std::uint32_t depth = depth_ptr->number();
     Lisp::Next(&args_ptr);
@@ -2358,7 +2358,7 @@ namespace Sayuri {
     // もしあるなら、候補手のリストを得る。
     LPointer candidate_list_ptr = Lisp::NewNil();
     if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      LPointer result = caller->Evaluate(args_ptr->car());
       Lisp::CheckList(*result);
       candidate_list_ptr = result;
     }
@@ -2374,7 +2374,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // ノード数を得る。
-    LPointer node_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer node_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*node_ptr, LType::NUMBER);
     std::uint64_t node = node_ptr->number();
     Lisp::Next(&args_ptr);
@@ -2382,7 +2382,7 @@ namespace Sayuri {
     // もしあるなら、候補手のリストを得る。
     LPointer candidate_list_ptr = Lisp::NewNil();
     if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      LPointer result = caller->Evaluate(args_ptr->car());
       Lisp::CheckList(*result);
       candidate_list_ptr = result;
     }
@@ -2398,7 +2398,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // サイズを得る。
-    LPointer size_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer size_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*size_ptr, LType::NUMBER);
     std::size_t size = Util::GetMax(size_ptr->number(),
     TTEntry::TTENTRY_HARD_CODED_SIZE);
@@ -2419,7 +2419,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // スレッド数を得る。
-    LPointer threads_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer threads_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*threads_ptr, LType::NUMBER);
     int threads = Util::GetMax(threads_ptr->number(), 1);
 
@@ -2455,7 +2455,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 駒の位置を得る。
-    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer square_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSquare(*square_ptr);
 
     // 分析結果を得る。
@@ -2480,7 +2480,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 位置を得る。
-    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer square_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSquare(*square_ptr);
 
     // 分析結果を得る。
@@ -2505,7 +2505,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 駒の位置を得る。
-    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer square_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSquare(*square_ptr);
 
     // 分析結果を得る。
@@ -2530,7 +2530,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 駒の位置を得る。
-    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer square_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSquare(*square_ptr);
 
     // 分析結果を得る。
@@ -2555,7 +2555,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 駒の位置を得る。
-    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer square_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSquare(*square_ptr);
 
     // 分析結果を得る。
@@ -2580,7 +2580,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 駒の位置を得る。
-    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer square_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSquare(*square_ptr);
 
     // 分析結果を得る。
@@ -2605,7 +2605,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 駒の位置を得る。
-    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer square_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSquare(*square_ptr);
 
     // 分析結果を得る。
@@ -2630,7 +2630,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 駒の位置を得る。
-    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer square_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSquare(*square_ptr);
 
     // 分析結果を得る。
@@ -2670,7 +2670,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // 駒を得る。
-    LPointer piece_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer piece_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckPiece(*piece_ptr);
 
     // 結果を得る。
@@ -2696,7 +2696,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // サイドを得る。
-    LPointer side_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer side_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSide(*side_ptr);
 
     // 結果を得る。
@@ -2721,7 +2721,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // サイドを得る。
-    LPointer side_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer side_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSide(*side_ptr);
 
     // 結果を得る。
@@ -2746,7 +2746,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // サイドを得る。
-    LPointer side_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer side_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSide(*side_ptr);
 
     // 結果を得る。
@@ -2771,7 +2771,7 @@ namespace Sayuri {
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
     // マスを得る。
-    LPointer square_ptr = caller->Evaluate(*(args_ptr->car()));
+    LPointer square_ptr = caller->Evaluate(args_ptr->car());
     Sayulisp::CheckSquare(*square_ptr);
 
     // 結果を得る。
@@ -2805,7 +2805,7 @@ namespace Sayuri {
     // もし引数があるなら設定。
     LObject* args_ptr = args.cdr()->cdr().get();
     if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      LPointer result = caller->Evaluate(args_ptr->car());
       Lisp::CheckList(*result);
 
       int len = Lisp::CountList(*result);
@@ -2850,7 +2850,7 @@ namespace Sayuri {
     // 引数があれば設定する。
     LObject* args_ptr = args.cdr()->cdr().get();
     if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      LPointer result = caller->Evaluate(args_ptr->car());
       Lisp::CheckList(*result);
 
       // マスの数がちゃんとあるかどうか。
@@ -2907,7 +2907,7 @@ namespace Sayuri {
     // 引数があれば設定する。
     LObject* args_ptr = args.cdr()->cdr().get();
     if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      LPointer result = caller->Evaluate(args_ptr->car());
       Lisp::CheckList(*result);
 
       // マスの数がちゃんとあるかどうか。
@@ -2964,7 +2964,7 @@ namespace Sayuri {
     // 引数があれば設定する。
     LObject* args_ptr = args.cdr()->cdr().get();
     if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      LPointer result = caller->Evaluate(args_ptr->car());
       Lisp::CheckList(*result);
 
       // マスの数がちゃんとあるかどうか。
@@ -3014,7 +3014,7 @@ namespace Sayuri {
     // 引数があれば設定する。
     LObject* args_ptr = args.cdr()->cdr().get();
     if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      LPointer result = caller->Evaluate(args_ptr->car());
       Lisp::CheckList(*result);
 
       // マスの数がちゃんとあるかどうか。
@@ -3069,7 +3069,7 @@ namespace Sayuri {
     // 引数があれば設定する。
     LObject* args_ptr = args.cdr()->cdr().get();
     if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      LPointer result = caller->Evaluate(args_ptr->car());
       Lisp::CheckList(*result);
 
       // マスの数がちゃんとあるかどうか。
@@ -3127,7 +3127,7 @@ namespace Sayuri {
     // 引数があれば設定する。
     LObject* args_ptr = args.cdr()->cdr().get();
     if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(*(args_ptr->car()));
+      LPointer result = caller->Evaluate(args_ptr->car());
       Lisp::CheckList(*result);
 
       // マスの数がちゃんとあるかどうか。
@@ -3163,12 +3163,12 @@ namespace Sayuri {
     \
     LObject* args_ptr = args.cdr()->cdr().get();\
     if (args_ptr->IsPair()) {\
-      LPointer car = caller->Evaluate(*(args_ptr->car()));\
+      LPointer car = caller->Evaluate(args_ptr->car());\
       \
       if (car->IsNumber()) {\
         const LPointer& cdr = args_ptr->cdr();\
         if (cdr->IsPair()) {\
-          LPointer cdar = caller->Evaluate(*(cdr->car()));\
+          LPointer cdar = caller->Evaluate(cdr->car());\
           Lisp::CheckType(*cdar, LType::NUMBER);\
           \
           eval_params_ptr_->accessor\
@@ -3395,12 +3395,12 @@ namespace Sayuri {
     \
     LObject* args_ptr = args.cdr()->cdr().get();\
     if (args_ptr->IsPair()) {\
-      LPointer car = caller->Evaluate(*(args_ptr->car()));\
+      LPointer car = caller->Evaluate(args_ptr->car());\
       \
       if (car->IsNumber()) {\
         const LPointer& cdr = args_ptr->cdr();\
         if (cdr->IsPair()) {\
-          LPointer cdar = caller->Evaluate(*(cdr->car()));\
+          LPointer cdar = caller->Evaluate(cdr->car());\
           Lisp::CheckType(*cdar, LType::NUMBER);\
           \
           eval_params_ptr_->accessor\

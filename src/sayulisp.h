@@ -749,7 +749,7 @@ namespace Sayuri {
       \
       LObject* args_ptr = args.cdr()->cdr().get();\
       if (args_ptr->IsPair()) {\
-        LPointer result = caller->Evaluate(*(args_ptr->car()));\
+        LPointer result = caller->Evaluate(args_ptr->car());\
         Lisp::CheckType(*result, LType::BOOLEAN);\
         \
         search_params_ptr_->accessor(result->boolean());\
@@ -764,7 +764,7 @@ namespace Sayuri {
       \
       LObject* args_ptr = args.cdr()->cdr().get();\
       if (args_ptr->IsPair()) {\
-        LPointer result = caller->Evaluate(*(args_ptr->car()));\
+        LPointer result = caller->Evaluate(args_ptr->car());\
         Lisp::CheckType(*result, LType::NUMBER);\
         \
         search_params_ptr_->accessor(result->number());\

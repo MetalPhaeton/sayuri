@@ -313,7 +313,7 @@ namespace Sayuri {
        * @param target 評価するオブジェクト。
        * @return 結果。
        */
-      virtual LPointer Evaluate(const LObject& target) {
+      virtual LPointer Evaluate(const LPointer& target) {
         throw std::logic_error("Called invalid Evaluate().");
       }
 
@@ -1429,7 +1429,7 @@ namespace Sayuri {
        * @param target 評価するオブジェクト。
        * @return 結果。
        */
-      virtual LPointer Evaluate(const LObject& target) override;
+      virtual LPointer Evaluate(const LPointer& target) override;
       /**
        * 自身の関数を適用する。
        * @param caller 関数の呼び出し元。
@@ -1610,7 +1610,7 @@ namespace Sayuri {
        * @param target 評価するオブジェクト。
        * @return 結果。
        */
-      virtual LPointer Evaluate(const LObject& target) override;
+      virtual LPointer Evaluate(const LPointer& target) override;
       /**
        * 自身の関数を適用する。
        * @param caller 関数の呼び出し元。
@@ -2259,7 +2259,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        return caller->Evaluate(*(caller->Evaluate(*(args_ptr->car()))));
+        return caller->Evaluate(caller->Evaluate(args_ptr->car()));
       }
 
       /** ネイティブ関数 - parse */
@@ -2269,7 +2269,7 @@ namespace Sayuri {
       /** ネイティブ関数 - parval */
       DEF_LC_FUNCTION(Parval) {
         LPointer result = ParseFunc(self, caller, args);
-        return caller->Evaluate(*result);
+        return caller->Evaluate(result);
       }
 
       // %%% to-string
@@ -2279,7 +2279,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        return NewString(caller->Evaluate(*(args_ptr->car()))->ToString());
+        return NewString(caller->Evaluate(args_ptr->car())->ToString());
       }
 
       /** ネイティブ関数 - try */
@@ -2292,7 +2292,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        throw caller->Evaluate(*(args_ptr->cdr()));
+        throw caller->Evaluate(args_ptr->cdr());
       }
 
       // %%% car
@@ -2303,7 +2303,7 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // ペアを得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::PAIR);
 
         // Carを返す。
@@ -2318,7 +2318,7 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // ペアを得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::PAIR);
 
         // Cdrを返す。
@@ -2334,7 +2334,7 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // 第1引数。 ターゲットのリスト。
-        LPointer target_ptr = caller->Evaluate(*(args_ptr->car()));
+        LPointer target_ptr = caller->Evaluate(args_ptr->car());
         Next(&args_ptr);
 
         // パスに合わせて探索する。
@@ -2360,8 +2360,8 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 2, &args_ptr);
 
-        return NewPair(caller->Evaluate(*(args_ptr->car())),
-        caller->Evaluate(*(args_ptr->cdr()->car())));
+        return NewPair(caller->Evaluate(args_ptr->car()),
+        caller->Evaluate(args_ptr->cdr()->car()));
       }
 
       /** ネイティブ関数 - apply */
@@ -2420,7 +2420,7 @@ namespace Sayuri {
         LScopeChain chain = caller->scope_chain();
 
         return SetCore(chain, symbol_ptr->symbol(),
-        caller->Evaluate(*(args_ptr->cdr()->car())));
+        caller->Evaluate(args_ptr->cdr()->car()));
       }
 
       /** ネイティブ関数 - define */
@@ -2452,16 +2452,16 @@ namespace Sayuri {
         GetReadyForFunction(args, 3, &args_ptr);
 
         // 第1引数、条件を評価。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::BOOLEAN);
 
         // #tなら第2引数を評価して返す。
         if (result->boolean()) {
-          return caller->Evaluate(*(args_ptr->cdr()->car()));
+          return caller->Evaluate(args_ptr->cdr()->car());
         }
 
         // #tではなかったので第3引数を評価して返す。
-        return caller->Evaluate(*(args_ptr->cdr()->cdr()->car()));
+        return caller->Evaluate(args_ptr->cdr()->cdr()->car());
       }
 
       /** ネイティブ関数 - cond */
@@ -2477,7 +2477,7 @@ namespace Sayuri {
         // 順次実行。
         LPointer ret_ptr = NewNil();
         for (; args_ptr->IsPair(); Next(&args_ptr)) {
-          ret_ptr = caller->Evaluate(*(args_ptr->car()));
+          ret_ptr = caller->Evaluate(args_ptr->car());
         }
 
         return ret_ptr;
@@ -2512,12 +2512,12 @@ namespace Sayuri {
         GetReadyForFunction(args, 2, &args_ptr);
 
         // 元になる値を得る。
-        LPointer first = caller->Evaluate(*(args_ptr->car()));
+        LPointer first = caller->Evaluate(args_ptr->car());
 
         // 比較していく。
         LPointer result;
         for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
           if (*first != *result) return NewBoolean(false);
         }
 
@@ -2540,7 +2540,7 @@ namespace Sayuri {
 
         // 調べていく。
         for (; args_ptr->IsPair(); Next(&args_ptr)) {
-          if (caller->Evaluate(*(args_ptr->car()))->type() != LTYPE) {
+          if (caller->Evaluate(args_ptr->car())->type() != LTYPE) {
             return NewBoolean(false);
           }
         }
@@ -2557,7 +2557,7 @@ namespace Sayuri {
         // 調べていく。
         LPointer result;
         for (; args_ptr->IsPair(); Next(&args_ptr)) {
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
           if (!(result->IsFunction() || result->IsN_Function())) {
             return NewBoolean(false);
           }
@@ -2579,7 +2579,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::STRING);
 
         return NewNumber(std::system(result->string().c_str()));
@@ -2592,7 +2592,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::STRING);
 
         const char* env_str = std::getenv(result->string().c_str());
@@ -2629,7 +2629,7 @@ namespace Sayuri {
 
         for (LObject* ptr = ret_ptr.get(); args_ptr->IsPair();
         Next(&args_ptr), Next(&ptr)) {
-          ptr->car(caller->Evaluate(*(args_ptr->car())));
+          ptr->car(caller->Evaluate(args_ptr->car()));
         }
 
         return ret_ptr;
@@ -2673,7 +2673,7 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // 個数を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
         int num = result->number();
         if (num <= 0) {
@@ -2701,7 +2701,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
 
         // ペアなら連結しているペアの数。
         if (result->IsPair()) {
@@ -2730,14 +2730,14 @@ namespace Sayuri {
         GetReadyForFunction(args, 2, &args_ptr);
 
         // 元になる値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
         double value = result->number();
 
         // 比較していく。
         for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
           // 評価する。
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
 
           // タイプをチェック。
           CheckType(*result, LType::NUMBER);
@@ -2757,14 +2757,14 @@ namespace Sayuri {
         GetReadyForFunction(args, 2, &args_ptr);
 
         // 元になる値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
         double value = result->number();
 
         // 比較していく。
         for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
           // 評価する。
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
 
           // タイプをチェック。
           CheckType(*result, LType::NUMBER);
@@ -2784,14 +2784,14 @@ namespace Sayuri {
         GetReadyForFunction(args, 2, &args_ptr);
 
         // 元になる値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
         double value = result->number();
 
         // 比較していく。
         for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
           // 評価する。
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
 
           // タイプをチェック。
           CheckType(*result, LType::NUMBER);
@@ -2817,14 +2817,14 @@ namespace Sayuri {
         GetReadyForFunction(args, 2, &args_ptr);
 
         // 元になる値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
         double value = result->number();
 
         // 比較していく。
         for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
           // 評価する。
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
 
           // タイプをチェック。
           CheckType(*result, LType::NUMBER);
@@ -2850,14 +2850,14 @@ namespace Sayuri {
         GetReadyForFunction(args, 2, &args_ptr);
 
         // 元になる値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
         double value = result->number();
 
         // 比較していく。
         for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
           // 評価する。
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
 
           // タイプをチェック。
           CheckType(*result, LType::NUMBER);
@@ -2883,14 +2883,14 @@ namespace Sayuri {
         GetReadyForFunction(args, 2, &args_ptr);
 
         // 元になる値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
         double value = result->number();
 
         // 比較していく。
         for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
           // 評価する。
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
 
           // タイプをチェック。
           CheckType(*result, LType::NUMBER);
@@ -2916,7 +2916,7 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // 元になる値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
         int num = result->number();
 
@@ -2931,7 +2931,7 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // 元になる値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
         int num = result->number();
 
@@ -2946,7 +2946,7 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // 元になる値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::BOOLEAN);
 
         return NewBoolean(!(result->boolean()));
@@ -2962,7 +2962,7 @@ namespace Sayuri {
         // 1つでもfalseがあればfalse。
         LPointer result;
         for (; args_ptr->IsPair(); Next(&args_ptr)) {
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
           CheckType(*result, LType::BOOLEAN);
 
           if (!(result->boolean())) return NewBoolean(false);
@@ -2981,7 +2981,7 @@ namespace Sayuri {
         // 1つでもtrueがあればtrue。
         LPointer result;
         for (; args_ptr->IsPair(); Next(&args_ptr)) {
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
           CheckType(*result, LType::BOOLEAN);
 
           if (result->boolean()) return NewBoolean(true);
@@ -3002,7 +3002,7 @@ namespace Sayuri {
         LPointer result;
         for (; args_ptr->IsPair(); Next(&args_ptr)) {
           // 評価する。
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
 
           // タイプをチェック。
           CheckType(*result, LType::NUMBER);
@@ -3025,14 +3025,14 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // 引き算の元になる値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
         double value = result->number();
 
         // 引いていく。
         for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
           // 評価する。
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
 
           // タイプをチェック。
           CheckType(*result, LType::NUMBER);
@@ -3060,7 +3060,7 @@ namespace Sayuri {
         LPointer result;
         for (; args_ptr->IsPair(); Next(&args_ptr)) {
           // 評価する。
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
 
           // タイプをチェック。
           CheckType(*result, LType::NUMBER);
@@ -3083,14 +3083,14 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // 割り算の元になる値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
         double value = result->number();
 
         // 割っていく。
         for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
           // 評価する。
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
 
           // タイプをチェック。
           CheckType(*result, LType::NUMBER);
@@ -3113,7 +3113,7 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // 値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(result->number() + 1.0);
@@ -3130,7 +3130,7 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // 値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(result->number() - 1.0);
@@ -3153,7 +3153,7 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // 値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckList(*result);
 
         if (result->IsNil()) return result;
@@ -3169,7 +3169,7 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // 値を得る。
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckList(*result);
 
         LPointer next;
@@ -3189,11 +3189,11 @@ namespace Sayuri {
         GetReadyForFunction(args, 2, &args_ptr);
 
         // 第1引数。 リスト。
-        LPointer target_ptr = caller->Evaluate(*(args_ptr->car()));
+        LPointer target_ptr = caller->Evaluate(args_ptr->car());
         CheckList(*target_ptr);
 
         // プッシュする。
-        return NewPair(caller->Evaluate(*(args_ptr->cdr()->car())),
+        return NewPair(caller->Evaluate(args_ptr->cdr()->car()),
         target_ptr);
       }
 
@@ -3208,7 +3208,7 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // 第1引数。 リスト。
-        LPointer target_ptr = caller->Evaluate(*(args_ptr->car()));
+        LPointer target_ptr = caller->Evaluate(args_ptr->car());
         CheckList(*target_ptr);
 
         if (target_ptr->IsNil()) return NewNil();
@@ -3226,18 +3226,18 @@ namespace Sayuri {
         GetReadyForFunction(args, 2, &args_ptr);
 
         // 第1引数。 リスト。
-        LPointer target_ptr = caller->Evaluate(*(args_ptr->car()));
+        LPointer target_ptr = caller->Evaluate(args_ptr->car());
         CheckList(*target_ptr);
 
         if (target_ptr->IsNil()) {
-          return NewPair(caller->Evaluate(*(args_ptr->cdr()->car())),
+          return NewPair(caller->Evaluate(args_ptr->cdr()->car()),
           target_ptr);
         }
         
         LPointer next;
         for (LObject* ptr = target_ptr.get(); ptr->IsPair(); Next(&ptr)) {
           if (ptr->cdr()->IsNil()) {
-            ptr->cdr(NewPair(caller->Evaluate(*(args_ptr->cdr()->car())),
+            ptr->cdr(NewPair(caller->Evaluate(args_ptr->cdr()->car()),
             NewNil()));
             return target_ptr;
           }
@@ -3257,7 +3257,7 @@ namespace Sayuri {
         GetReadyForFunction(args, 1, &args_ptr);
 
         // 第1引数。 リスト。
-        LPointer target_ptr = caller->Evaluate(*(args_ptr->car()));
+        LPointer target_ptr = caller->Evaluate(args_ptr->car());
         CheckList(*target_ptr);
 
         // target_ptrの要素が1つもない。
@@ -3290,7 +3290,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::sin(result->number()));
@@ -3303,7 +3303,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::cos(result->number()));
@@ -3316,7 +3316,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::tan(result->number()));
@@ -3329,7 +3329,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::asin(result->number()));
@@ -3342,7 +3342,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::acos(result->number()));
@@ -3355,7 +3355,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::atan(result->number()));
@@ -3368,7 +3368,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::sqrt(result->number()));
@@ -3381,7 +3381,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::fabs(result->number()));
@@ -3394,7 +3394,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::ceil(result->number()));
@@ -3407,7 +3407,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::floor(result->number()));
@@ -3420,7 +3420,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::round(result->number()));
@@ -3433,7 +3433,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::trunc(result->number()));
@@ -3446,7 +3446,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::exp(result->number()));
@@ -3459,7 +3459,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::exp2(result->number()));
@@ -3472,10 +3472,10 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer first_ptr = caller->Evaluate(*(args_ptr->car()));
+        LPointer first_ptr = caller->Evaluate(args_ptr->car());
         CheckType(*first_ptr, LType::NUMBER);
 
-        LPointer second_ptr = caller->Evaluate(*(args_ptr->cdr()->car()));
+        LPointer second_ptr = caller->Evaluate(args_ptr->cdr()->car());
         CheckType(*second_ptr, LType::NUMBER);
 
         return NewNumber(std::pow(first_ptr->number(), second_ptr->number()));
@@ -3488,7 +3488,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::log(result->number()));
@@ -3501,7 +3501,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::log2(result->number()));
@@ -3514,7 +3514,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         return NewNumber(std::log10(result->number()));
@@ -3528,7 +3528,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
         std::uniform_real_distribution<> dist(0, result->number());
@@ -3542,11 +3542,11 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
         double max = result->number();
         for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
           CheckType(*result, LType::NUMBER);
 
           double current = result->number();
@@ -3563,11 +3563,11 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        LPointer result = caller->Evaluate(*(args_ptr->car()));
+        LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
         double min = result->number();
         for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
-          result = caller->Evaluate(*(args_ptr->car()));
+          result = caller->Evaluate(args_ptr->car());
           CheckType(*result, LType::NUMBER);
 
           double current = result->number();
