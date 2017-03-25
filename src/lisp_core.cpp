@@ -53,16 +53,6 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
-  // ========== //
-  // static定数 //
-  // ========== //
-  const LPointer LObject::dummy_ptr_;
-  const std::string LObject::dummy_str_;
-  const LArgNames LObject::dummy_arg_names_;
-  const LPointerVec LObject::dummy_ptr_vec_;
-  const LScopeChain LObject::dummy_scope_chain_;
-  const LC_Function LObject::dummy_c_function_;
-
   // ウォーカー。
   void Walk(LObject& pair, const LFuncForWalk& func) {
     // ペアじゃなければ終了。

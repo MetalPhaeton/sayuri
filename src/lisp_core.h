@@ -314,7 +314,7 @@ namespace Sayuri {
        * @return 結果。
        */
       virtual LPointer Evaluate(const LObject& target) {
-        throw std::logic_error("Called Invalid Evaluate().");
+        throw std::logic_error("Called invalid Evaluate().");
       }
 
       /**
@@ -324,7 +324,7 @@ namespace Sayuri {
        * @return 結果。
        */
       virtual LPointer Apply(LObject* caller, const LObject& args) {
-        return dummy_ptr_;
+        throw std::logic_error("Called invalid Apply().");
       }
 
       /**
@@ -337,115 +337,157 @@ namespace Sayuri {
        * アクセサ - Car。
        * @return Car。
        */
-      virtual const LPointer& car() const {return dummy_ptr_;}
+      virtual const LPointer& car() const {
+        throw std::logic_error("Called invalid car().");
+      }
       /**
        * アクセサ - Cdr。
        * @return Cdr。
        */
-      virtual const LPointer& cdr() const {return dummy_ptr_;}
+      virtual const LPointer& cdr() const {
+        throw std::logic_error("Called invalid cdr().");
+      }
       /**
        * アクセサ - シンボル。
        * @return シンボル。
        */
-      virtual const std::string& symbol() const {return dummy_str_;}
+      virtual const std::string& symbol() const {
+        throw std::logic_error("Called invalid symbol().");
+      }
       /**
        * アクセサ - 数字。
        * @return 数字。
        */
-      virtual double number() const {return 0.0;}
+      virtual double number() const {
+        throw std::logic_error("Called invalid number().");
+      }
       /**
        * アクセサ - 真偽値。
        * @return 真偽値。
        */
-      virtual bool boolean() const {return false;}
+      virtual bool boolean() const {
+        throw std::logic_error("Called invalid number().");
+      }
       /**
        * アクセサ - 文字列。
        * @return 文字列。
        */
-      virtual const std::string& string() const {return dummy_str_;}
+      virtual const std::string& string() const {
+        throw std::logic_error("Called invalid string().");
+      }
       /**
        * アクセサ - 関数の引数名ベクトル。
        * @return 関数の引数名ベクトル。
        */
-      virtual const LArgNames& arg_names() const {return dummy_arg_names_;}
+      virtual const LArgNames& arg_names() const {
+        throw std::logic_error("Called invalid arg_name().");
+      }
       /**
        * アクセサ - 関数の式。
        * @return 関数の式。
        */
-      virtual const LPointerVec& expression() const {return dummy_ptr_vec_;}
+      virtual const LPointerVec& expression() const {
+        throw std::logic_error("Called invalid expression().");
+      }
       /**
        * アクセサ - ネイティブ関数の実体。
        * @return ネイティブ関数の実体。
        */
-      virtual const LC_Function& c_function() const {return dummy_c_function_;}
+      virtual const LC_Function& c_function() const {
+        throw std::logic_error("Called invalid c_function().");
+      }
       /**
        * アクセサ - ネイティブ関数用識別文字列。
        * @return ネイティブ関数用識別文字列。
        */
-      virtual const std::string& func_id() const {return dummy_str_;}
+      virtual const std::string& func_id() const {
+        throw std::logic_error("Called invalid func_id().");
+      }
       /**
        * アクセサ - スコープチェーン。
        * @return スコープチェーン。
        */
       virtual const LScopeChain& scope_chain() const {
-        return dummy_scope_chain_;
+        throw std::logic_error("Called invalid scope_chain().");
       }
 
       /**
        * ミューテータ - Car。
        * @param ptr Car。
        */
-      virtual void car(const LPointer& ptr) {}
+      virtual void car(const LPointer& ptr) {
+        throw std::logic_error("Called invalid car(...).");
+      }
       /**
        * ミューテータ - Cdr。
        * @param ptr Cdr。
        */
-      virtual void cdr(const LPointer& ptr) {}
+      virtual void cdr(const LPointer& ptr) {
+        throw std::logic_error("Called invalid cdr(...).");
+      }
       /**
        * ミューテータ - シンボル。
        * @param symbol シンボル。
        */
-      virtual void symbol(const std::string& symbol) {}
+      virtual void symbol(const std::string& symbol) {
+        throw std::logic_error("Called invalid symbol(...).");
+      }
       /**
        * ミューテータ - 数字。
        * @param number 数字。
        */
-      virtual void number(double number) {}
+      virtual void number(double number) {
+        throw std::logic_error("Called invalid number(...).");
+      }
       /**
        * ミューテータ - 真偽値。
        * @param boolean 真偽値。
        */
-      virtual void boolean(bool boolean) {}
+      virtual void boolean(bool boolean) {
+        throw std::logic_error("Called invalid boolean(...).");
+      }
       /**
        * ミューテータ - 文字列。
        * @param string 文字列。
        */
-      virtual void string(const std::string& string) {}
+      virtual void string(const std::string& string) {
+        throw std::logic_error("Called invalid string(...).");
+      }
       /**
        * ミューテータ - 関数の引数名ベクトル。
        * @param arg_names 関数の引数名ベクトル。
        */
-      virtual void arg_names(const LArgNames& arg_name) {}
+      virtual void arg_names(const LArgNames& arg_name) {
+        throw std::logic_error("Called invalid arg_name(...).");
+      }
       /**
        * ミューテータ - 関数の式。
        * @param expr 関数の式。
        */
-      virtual void expression(const LPointerVec& expression) {}
+      virtual void expression(const LPointerVec& expression) {
+        throw std::logic_error("Called invalid expression(...).");
+      }
       /**
        * ミューテータ - ネイティブ関数の実体。
        * @param c_function ネイティブ関数の実体。
        */
-      virtual void c_function(const LC_Function& c_function) {}
+      virtual void c_function(const LC_Function& c_function) {
+        throw std::logic_error("Called invalid c_function(...).");
+      }
       /**
        * ミューテータ - ネイティブ関数用識別文字列。
        * @return ネイティブ関数用識別文字列。
        */
-      virtual void func_id(const std::string& id) {}
+      virtual void func_id(const std::string& id) {
+        throw std::logic_error("Called invalid func_id(...).");
+      }
       /**
        * ミューテータ - スコープチェーン。
        * @param scope_chain スコープチェーン。
        */
-      virtual void scope_chain(const LScopeChain& scope_chain) {}
+      virtual void scope_chain(const LScopeChain& scope_chain) {
+        throw std::logic_error("Called invalid scope_chain(...).");
+      }
 
       // --- オーバーライドしなくていい関数 --- //
       /**
@@ -488,20 +530,6 @@ namespace Sayuri {
        * @return ネイティブ関数ならtrue。
        */
       virtual bool IsN_Function() const {return type() == LType::N_FUNCTION;}
-
-    protected:
-      /** ダミーポインタ。 */
-      static const LPointer dummy_ptr_;
-      /** ダミー文字列。 */
-      static const std::string dummy_str_;
-      /** ダミー引数名ベクトル。 */
-      static const LArgNames dummy_arg_names_;
-      /** ダミー関数の式のベクトル。 */
-      static const LPointerVec dummy_ptr_vec_;
-      /** ダミーC関数。 */
-      static const LC_Function dummy_c_function_;
-      /** ダミースコープチェーン。 */
-      static const LScopeChain dummy_scope_chain_;
   };
 
   /** Nilオブジェクト。 */
