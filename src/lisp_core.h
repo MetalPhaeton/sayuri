@@ -544,7 +544,7 @@ namespace Sayuri {
        * @return 自身のクローン。
        */
       virtual LPointer Clone() const override {
-        return LPointer(new LNil());
+        return std::make_shared<LNil>();
       }
       /**
        * 比較関数。 (==)
@@ -591,7 +591,8 @@ namespace Sayuri {
       LPair(const LPointer& car, const LPointer& cdr) :
       car_(car), cdr_(cdr) {}
       /** コンストラクタ。 */
-      LPair() : car_(new LNil()), cdr_(new LNil()) {}
+      LPair() : car_(std::make_shared<LNil>()),
+      cdr_(std::make_shared<LNil>()) {}
       /**
        * コピーコンストラクタ。
        * @param obj コピー元。
@@ -632,7 +633,7 @@ namespace Sayuri {
        * @return 自身のクローン。
        */
       virtual LPointer Clone() const override {
-        return LPointer(new LPair(car_->Clone(), cdr_->Clone()));
+        return std::make_shared<LPair>(car_->Clone(), cdr_->Clone());
       }
       /**
        * 比較関数。 (==)
@@ -771,7 +772,7 @@ namespace Sayuri {
        * @return 自身のクローン。
        */
       virtual LPointer Clone() const override {
-        return LPointer(new LSymbol(*this));
+        return std::make_shared<LSymbol>(symbol_);
       }
       /**
        * 比較関数。 (==)
@@ -880,7 +881,7 @@ namespace Sayuri {
        * @return 自身のクローン。
        */
       virtual LPointer Clone() const override {
-        return LPointer(new LNumber(*this));
+        return std::make_shared<LNumber>(number_);
       }
       /**
        * 比較関数。 (==)
@@ -1029,7 +1030,7 @@ namespace Sayuri {
        * @return 自身のクローン。
        */
       virtual LPointer Clone() const override {
-        return LPointer(new LBoolean(*this));
+        return std::make_shared<LBoolean>(boolean_);
       }
       /**
        * 比較関数。 (==)
@@ -1182,7 +1183,7 @@ namespace Sayuri {
        * @return 自身のクローン。
        */
       virtual LPointer Clone() const override {
-        return LPointer(new LString(*this));
+        return std::make_shared<LString>(string_);
       }
       /**
        * 比較関数。 (==)
@@ -1368,7 +1369,7 @@ namespace Sayuri {
        * @return 自身のクローン。
        */
       virtual LPointer Clone() const override {
-        return LPointer(new LFunction(*this));
+        return std::make_shared<LFunction>(*this);
       }
       /**
        * 比較関数。 (==)
@@ -1552,7 +1553,7 @@ namespace Sayuri {
        * @return 自身のクローン。
        */
       virtual LPointer Clone() const override {
-        return LPointer(new LN_Function(*this));
+        return std::make_shared<LN_Function>(*this);
       }
       /**
        * 比較関数。 (==)
@@ -1810,14 +1811,14 @@ namespace Sayuri {
        * @return オブジェクトのポインタ。
        */
       static LPointer NewNil() {
-        return LPointer(new LNil());
+        return std::make_shared<LNil>();
       }
       /**
        * ペアを作る。
        * @return オブジェクトのポインタ。
        */
       static LPointer NewPair() {
-        return LPointer(new LPair());
+        return std::make_shared<LPair>();
       }
       /**
        * ペアを作る。
@@ -1826,7 +1827,7 @@ namespace Sayuri {
        * @return オブジェクトのポインタ。
        */
       static LPointer NewPair(const LPointer& car, const LPointer& cdr) {
-        return LPointer(new LPair(car, cdr));
+        return std::make_shared<LPair>(car, cdr);
       }
       /**
        * シンボルを作る。
@@ -1834,7 +1835,7 @@ namespace Sayuri {
        * @return オブジェクトのポインタ。
        */
       static LPointer NewSymbol(const std::string& symbol) {
-        return LPointer(new LSymbol(symbol));
+        return std::make_shared<LSymbol>(symbol);
       }
       /**
        * シンボルを作る2。
@@ -1842,7 +1843,7 @@ namespace Sayuri {
        * @return オブジェクトのポインタ。
        */
       static LPointer NewSymbol(std::string&& symbol) {
-        return LPointer(new LSymbol(symbol));
+        return std::make_shared<LSymbol>(symbol);
       }
       /**
        * 数字を作る。
@@ -1850,7 +1851,7 @@ namespace Sayuri {
        * @return オブジェクトのポインタ。
        */
       static LPointer NewNumber(double number) {
-        return LPointer(new LNumber(number));
+        return std::make_shared<LNumber>(number);
       }
       /**
        * 真偽値を作る。
@@ -1858,7 +1859,7 @@ namespace Sayuri {
        * @return オブジェクトのポインタ。
        */
       static LPointer NewBoolean(bool boolean) {
-        return LPointer(new LBoolean(boolean));
+        return std::make_shared<LBoolean>(boolean);
       }
       /**
        * 文字列を作る。
@@ -1866,7 +1867,7 @@ namespace Sayuri {
        * @return オブジェクトのポインタ。
        */
       static LPointer NewString(const std::string& string) {
-        return LPointer(new LString(string));
+        return std::make_shared<LString>(string);
       }
       /**
        * 文字列を作る2。
@@ -1874,7 +1875,7 @@ namespace Sayuri {
        * @return オブジェクトのポインタ。
        */
       static LPointer NewString(std::string&& string) {
-        return LPointer(new LString(string));
+        return std::make_shared<LString>(string);
       }
       /**
        * 関数オブジェクトを作る。
@@ -1885,7 +1886,7 @@ namespace Sayuri {
        */
       static LPointer NewFunction(const LArgNames& arg_names,
       const LPointerVec& expression, const LScopeChain& scope_chain) {
-        return LPointer(new LFunction(arg_names, expression, scope_chain));
+        return std::make_shared<LFunction>(arg_names, expression, scope_chain);
       }
       /**
        * ネイティブ関数オブジェクトを作る。
@@ -1897,7 +1898,7 @@ namespace Sayuri {
       static LPointer NewN_Function(const LC_Function& c_function,
       const std::string& func_id,
       const LScopeChain& scope_chain) {
-        return LPointer(new LN_Function(c_function, func_id, scope_chain));
+        return std::make_shared<LN_Function>(c_function, func_id, scope_chain);
       }
 
       /**
@@ -1914,13 +1915,7 @@ namespace Sayuri {
        */
       static LPointer NewList(int length) {
         if (length <= 0) return NewNil();
-        LPointer ret = NewPair();
-        LObject* ptr = ret.get();
-        --length;
-        for (; length > 0; --length, Next(&ptr)) {
-          ptr->cdr(NewPair());
-        }
-        return ret;
+        return NewPair(NewNil(), NewList(length - 1));
       }
 
       /**
