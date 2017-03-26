@@ -813,7 +813,7 @@ namespace Sayuri {
           oss <<  ad[_2nd] << ad[_1st];
           path = oss.str();
           oss.str("");
-          func = [this, path](LPointer self, LObject* caller,
+          func = [this, path](const LObject& self, LObject* caller,
           const LObject& args) -> LPointer {
             return this->CxrFunc(path, self, caller, args);
           };
@@ -822,7 +822,7 @@ namespace Sayuri {
             oss << ad[_3rd] <<  ad[_2nd] << ad[_1st];
             path = oss.str();
             oss.str("");
-            func = [this, path](LPointer self, LObject* caller,
+            func = [this, path](const LObject& self, LObject* caller,
             const LObject& args) -> LPointer {
               return this->CxrFunc(path, self, caller, args);
             };
@@ -831,7 +831,7 @@ namespace Sayuri {
               oss << ad[_4th] << ad[_3rd] <<  ad[_2nd] << ad[_1st];
               path = oss.str();
               oss.str("");
-              func = [this, path](LPointer self, LObject* caller,
+              func = [this, path](const LObject& self, LObject* caller,
               const LObject& args) -> LPointer {
                 return this->CxrFunc(path, self, caller, args);
               };
@@ -1188,7 +1188,7 @@ namespace Sayuri {
     engine_ptr(new std::mt19937(std::chrono::system_clock::to_time_t
     (std::chrono::system_clock::now())));
     func = [this, engine_ptr]
-    (LPointer self, LObject* caller, const LObject& args) -> LPointer {
+    (const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       return this->Random(*engine_ptr, self, caller, args);
     };
     scope_chain_.InsertSymbol("random",
@@ -1507,7 +1507,7 @@ namespace Sayuri {
     // 関数オブジェクトを作成。
     LC_Function func =
     [macro_name_ptr, args_name_ptr, expression_ptr, base_chain]
-    (LPointer self, LObject* caller, const LObject& args) -> LPointer {
+    (const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       // ローカルスコープを作成。
       LScopeChain local_chain = base_chain;
       local_chain.AppendNewScope();
@@ -1531,11 +1531,11 @@ namespace Sayuri {
         local_chain.InsertSymbol(names_ptr->car()->symbol(), NewNil());
       }
 
-      // 自身にローカルスコープをセットして各式を評価して式を得る。
-      self->scope_chain(local_chain);
+      // ダミー関数を作って評価。
+      LFunction func(local_chain);
       LPointer result_expr = NewNil();
       for (LObject* expr = expression_ptr.get(); expr->IsPair(); Next(&expr)) {
-        result_expr = self->Evaluate(expr->car());
+        result_expr = func.Evaluate(expr->car());
       }
 
       // 出来上がった式を評価して返す。
@@ -1592,10 +1592,10 @@ namespace Sayuri {
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 2, &args_ptr);
 
-    // ローカル変数用スコープチェーンを作って自身にセット。。
+    // ダミー関数を作成。
     LScopeChain local_chain = caller->scope_chain();
     local_chain.AppendNewScope();
-    self->scope_chain(local_chain);
+    LFunction func(local_chain);
 
     // ローカル変数をローカルチェーンにバインドしていく。
     const LPointer& first_ptr = args_ptr->car();
@@ -1624,7 +1624,7 @@ namespace Sayuri {
     // ローカル変数用スコープチェーンを使って各式を評価。
     LPointer ret_ptr = NewNil();
     for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
-      ret_ptr = self->Evaluate(args_ptr->car());
+      ret_ptr = func.Evaluate(args_ptr->car());
     }
 
     return ret_ptr;
@@ -1636,10 +1636,10 @@ namespace Sayuri {
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 2, &args_ptr);
 
-    // ローカル変数用スコープチェーンを作って自身にセット。。
+    // ダミー関数を作成。
     LScopeChain local_chain = caller->scope_chain();
     local_chain.AppendNewScope();
-    self->scope_chain(local_chain);
+    LFunction func(local_chain);
 
     // ループする。
     LPointer ret_ptr = NewNil();
@@ -1647,13 +1647,13 @@ namespace Sayuri {
     Next(&args_ptr);
     while (true) {
       // 条件を評価。 falseなら抜ける。
-      LPointer condition = self->Evaluate(condition_expr);
+      LPointer condition = func.Evaluate(condition_expr);
       CheckType(*condition, LType::BOOLEAN);
       if (!(condition->boolean())) break;
 
       // 各式を実行。
       for (LObject* ptr = args_ptr; ptr->IsPair(); Next(&ptr)) {
-        ret_ptr = self->Evaluate(ptr->car());
+        ret_ptr = func.Evaluate(ptr->car());
       }
     }
 
@@ -1666,10 +1666,10 @@ namespace Sayuri {
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 2, &args_ptr);
 
-    // ローカル変数用スコープチェーンを作って自身にセット。。
+    // ダミー関数を作成。
     LScopeChain local_chain = caller->scope_chain();
     local_chain.AppendNewScope();
-    self->scope_chain(local_chain);
+    LFunction func(local_chain);
 
     // ループの範囲の準備をする。
     const LPointer& range_expr = args_ptr->car();
@@ -1727,7 +1727,7 @@ namespace Sayuri {
 
       // 各式を実行。
       for (LObject* ptr_2 = args_ptr; ptr_2->IsPair(); Next(&ptr_2)) {
-        ret_ptr = self->Evaluate(ptr_2->car());
+        ret_ptr = func.Evaluate(ptr_2->car());
       }
     }
 
@@ -1781,17 +1781,17 @@ namespace Sayuri {
 
     // 関数オブジェクトを作成。
     auto func =
-    [my_scope_ptr](LPointer self, LObject* caller, const LObject& args)
+    [my_scope_ptr](const LObject& self, LObject* caller, const LObject& args)
     -> LPointer {
-      // スコープをセット。
+      // ダミー関数を作成。
       LScopeChain chain = caller->scope_chain();
       chain.push_back(my_scope_ptr);
-      self->scope_chain(chain);
+      LFunction func(chain);
 
       // 式を評価していく。
       LPointer ret_ptr = NewNil();
       for (LObject* ptr = args.cdr().get(); ptr->IsPair(); Next(&ptr)) {
-        ret_ptr = self->Evaluate(ptr->car());
+        ret_ptr = func.Evaluate(ptr->car());
       }
 
       return ret_ptr;
@@ -1825,10 +1825,10 @@ namespace Sayuri {
       // 第2引数以降を実行していく。
       LScopeChain chain = caller->scope_chain();
       chain.AppendNewScope();
-      self->scope_chain(chain);
-      self->scope_chain().InsertSymbol("exception", error);
+      LFunction func(chain);
+      func.scope_chain().InsertSymbol("exception", error);
       for (Next(&args_ptr); args_ptr->IsPair(); Next(&args_ptr)) {
-        ret_ptr = self->Evaluate(args_ptr->car());
+        ret_ptr = func.Evaluate(args_ptr->car());
       }
     }
 
@@ -2002,7 +2002,7 @@ namespace Sayuri {
     // 出力。
     std::cout << str_ptr->string() << std::flush;
 
-    return self;
+    return self.Clone();
   }
 
   // %%% stderr
@@ -2022,7 +2022,7 @@ namespace Sayuri {
     // 出力。
     std::cerr << str_ptr->string() << std::flush;
 
-    return self;
+    return self.Clone();
   }
 
   // %%% import
@@ -2126,7 +2126,7 @@ namespace Sayuri {
     }
 
     // 関数オブジェクトを作成。
-    auto c_function = [ofs_ptr](LPointer self, LObject* caller,
+    auto c_function = [ofs_ptr](const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       // ストリームが閉じていれば終了。
       if (!(*ofs_ptr)) return NewNil();
@@ -2139,13 +2139,13 @@ namespace Sayuri {
       LPointer str_ptr = caller->Evaluate(args_ptr->car());
       if (str_ptr->IsNil()) {
         ofs_ptr->close();
-        return self;
+        return self.Clone();
       }
       CheckType(*str_ptr, LType::STRING);
 
       *ofs_ptr << str_ptr->string() << std::flush;
 
-      return self;
+      return self.Clone();
     };
 
     return NewN_Function(c_function, "Lisp:output-stream:"
@@ -2172,7 +2172,7 @@ namespace Sayuri {
     }
 
     // 関数オブジェクトを作成。
-    LC_Function c_function = [ifs_ptr](LPointer self, LObject* caller,
+    LC_Function c_function = [ifs_ptr](const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       // ストリームが閉じていれば終了。
       if (!(*ifs_ptr)) return NewNil();
@@ -2185,7 +2185,7 @@ namespace Sayuri {
       LPointer symbol_ptr = caller->Evaluate(args_ptr->car());
       if (symbol_ptr->IsNil()) {
         ifs_ptr->close();
-        return self;
+        return NewNil();
       }
       CheckType(*symbol_ptr, LType::SYMBOL);
       const std::string& symbol = symbol_ptr->symbol();
@@ -2229,8 +2229,8 @@ namespace Sayuri {
     std::shared_ptr<std::thread> thread_ptr(new std::thread());
 
     // 関数オブジェクトを作成。
-    LC_Function func = [func_ptr, thread_ptr](LPointer self, LObject* caller,
-    const LObject& args) -> LPointer {
+    LC_Function func = [func_ptr, thread_ptr](const LObject& self,
+    LObject* caller, const LObject& args) -> LPointer {
       // 準備。
       LObject* args_ptr = nullptr;
       GetReadyForFunction(args, 1, &args_ptr);
@@ -2251,14 +2251,14 @@ namespace Sayuri {
         LPointer func_clone = func_ptr->Clone();
 
         // 引数をコピー。
-        LPointer args_copy = args_ptr->Clone();
+        LPointer args_clone = args.Clone();
 
-        // 呼び出し元のスコープを得る。
-        self->scope_chain(caller->scope_chain());
+        // 呼び出し元のコピー。
+        LPointer caller_clone = caller->Clone();
 
         // スレッドを起動。
-        *thread_ptr = std::thread([func_clone, self, args_copy]() {
-          func_clone->Apply(self.get(), LPair(func_clone, args_copy));
+        *thread_ptr = std::thread([func_clone, caller_clone, args_clone]() {
+          func_clone->Apply(caller_clone.get(), *args_clone);
         });
 
         return NewBoolean(true);
@@ -2313,7 +2313,7 @@ namespace Sayuri {
     cond_var_ptr(new std::condition_variable());
 
     // 関数オブジェクトを作成。
-    LC_Function func = [mutex_ptr, cond_var_ptr](LPointer self,
+    LC_Function func = [mutex_ptr, cond_var_ptr](const LObject& self,
     LObject* caller, const LObject& args) -> LPointer {
       // 準備。
       LObject* args_ptr = nullptr;
@@ -2343,7 +2343,7 @@ namespace Sayuri {
 
         // (wait)関数を作成。
         LC_Function wait_func =
-        [&lock, &mutex_ptr, &cond_var_ptr](LPointer self,
+        [&lock, &mutex_ptr, &cond_var_ptr](const LObject& self,
         LObject* caller, const LObject& args) -> LPointer {
           cond_var_ptr->wait(lock);
           return NewBoolean(true);
@@ -2354,8 +2354,8 @@ namespace Sayuri {
         + std::to_string(reinterpret_cast<std::size_t>(mutex_ptr.get())),
         local_chain));
 
-        // 自身にローカルチェーンをセット。
-        self->scope_chain(local_chain);
+        // ダミー関数を作成。
+        LFunction func(local_chain);
 
         // 各S式を実行。
         LPointer ret_ptr = NewNil();
@@ -2363,7 +2363,7 @@ namespace Sayuri {
           const LPointer& car = ptr->car();
 
           // 自身のスコープで実行。
-          ret_ptr = self->Evaluate(car);
+          ret_ptr = func.Evaluate(car);
         }
 
         return ret_ptr;
@@ -3239,7 +3239,7 @@ namespace Sayuri {
     }
 
     // ナブラの関数オブジェクトを作る。
-    auto nabla_func = [func_expr, len, delta_vec](LPointer self,
+    auto nabla_func = [func_expr, len, delta_vec](const LObject& self,
     LObject* caller, const LObject& args) -> LPointer {
       // 準備。
       LObject* args_ptr = nullptr;
@@ -3684,7 +3684,7 @@ namespace Sayuri {
     }
 
     std::shared_ptr<LPA2> obj_ptr(new LPA2(weight_vec));
-    LC_Function func = [obj_ptr](LPointer self, LObject* caller,
+    LC_Function func = [obj_ptr](const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return (*obj_ptr)(self, caller, args);
     };
@@ -3720,7 +3720,7 @@ namespace Sayuri {
     CheckType(*bias_ptr, LType::NUMBER);
 
     std::shared_ptr<LAI> obj_ptr(new LAI(weight_vec, bias_ptr->number()));
-    LC_Function func = [obj_ptr](LPointer self, LObject* caller,
+    LC_Function func = [obj_ptr](const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       // 準備。
       LObject* args_ptr = nullptr;

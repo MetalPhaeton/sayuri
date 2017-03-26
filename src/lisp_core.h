@@ -92,7 +92,7 @@ namespace Sayuri {
       // ==================== //
       /** コンストラクタ。 */
       LScopeChain() : std::vector<LScopePtr>() {
-        push_back(LScopePtr(new LScope()));
+        push_back(std::make_shared<LScope>());
       }
       /**
        * コピーコンストラクタ。
@@ -183,7 +183,7 @@ namespace Sayuri {
        * 新しいスコープを末尾に追加する。
        */
       void AppendNewScope() {
-        push_back(LScopePtr(new LScope()));
+        push_back(std::make_shared<LScope>());
       }
   };
 
@@ -213,15 +213,16 @@ namespace Sayuri {
 
   /** C言語関数オブジェクト。 <結果(自分自身, 呼び出し元, 引数リスト)> */
   using LC_Function =
-  std::function<LPointer(LPointer, LObject*, const LObject&)>;
+  std::function<LPointer(const LObject&, LObject*, const LObject&)>;
 
   /** C言語関数宣言マクロ。 */
 #define DEF_LC_FUNCTION(func_name) \
-  LPointer func_name(LPointer self, LObject* caller, const LObject& args)
+  LPointer func_name(const LObject& self, LObject* caller, const LObject& args)
 
   /** 登録用C言語関数ラムダオブジェクトマクロ。 */
 #define LC_FUNCTION_OBJ(func_name) \
-  [this](LPointer self, LObject* caller, const LObject& args) -> LPointer {\
+  [this](const LObject& self, LObject* caller, const LObject& args)\
+  -> LPointer {\
     return this->func_name(self, caller, args);\
   }
 
@@ -1352,6 +1353,11 @@ namespace Sayuri {
       const LScopeChain& scope_chain) :
       arg_names_(arg_names), expression_(expression),
       scope_chain_(scope_chain) {}
+      /**
+       * Evaluate専用オブジェクトのコンストラクタ。
+       * @param scope_chain スコープチェーン。
+       */
+      LFunction(const LScopeChain& scope_chain) : scope_chain_(scope_chain) {}
       /** コンストラクタ。 */
       LFunction() {}
       /**
@@ -1619,7 +1625,7 @@ namespace Sayuri {
        */
       virtual LPointer Apply(LObject* caller, const LObject& args) override {
         scope_chain_.AppendNewScope();
-        LPointer ret_ptr = c_function_(this->Clone(), caller, args);
+        LPointer ret_ptr = c_function_(*this, caller, args);
         scope_chain_.pop_back();
         return ret_ptr;
       }
@@ -2327,8 +2333,8 @@ namespace Sayuri {
 
       // %%% c*r
       /** ネイティブ関数 - c*r */
-      LPointer CxrFunc(const std::string& path, LPointer self, LObject* caller,
-      const LObject& args) {
+      LPointer CxrFunc(const std::string& path, const LObject& self,
+      LObject* caller, const LObject& args) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
@@ -3522,7 +3528,7 @@ namespace Sayuri {
 
       // %%% random
       /** ネイティブ関数 - random */
-      LPointer Random(std::mt19937& engine, LPointer self,
+      LPointer Random(std::mt19937& engine, const LObject& self,
       LObject* caller, const LObject& args) {
         // 準備。
         LObject* args_ptr = nullptr;

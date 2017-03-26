@@ -65,16 +65,16 @@ namespace Sayuri {
        * LC_Functionにシンボル名の引数を追加したもの。
        */
       using MessageFunction = std::function
-      <LPointer(const std::string&, LPointer, LObject*, const LObject&)>;
+      <LPointer(const std::string&, const LObject&, LObject*, const LObject&)>;
 
       /** メッセージシンボル関数宣言マクロ。 */
 #define DEF_MESSAGE_FUNCTION(func_name) \
-      LPointer func_name(const std::string& symbol, LPointer self, \
+      LPointer func_name(const std::string& symbol, const LObject& self, \
       LObject* caller, const LObject& args)
 
       /** メッセージシンボル関数オブジェクト登録マクロ。 */
 #define INSERT_MESSAGE_FUNCTION(func_name) \
-    [this](const std::string& symbol, LPointer self, LObject* caller, \
+    [this](const std::string& symbol, const LObject& self, LObject* caller, \
     const LObject& args) -> LPointer {\
       return this->func_name(symbol, self, caller, args);\
     }

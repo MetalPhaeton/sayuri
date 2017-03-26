@@ -220,7 +220,7 @@ namespace Sayuri {
 
     // (exit)関数を作成。
     bool loop = true;
-    auto func = [&status, &loop](LPointer self, LObject* caller,
+    auto func = [&status, &loop](const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       // 準備。
       LObject* args_ptr = args.cdr().get();
@@ -265,7 +265,7 @@ namespace Sayuri {
     int status = 0;
 
     // (exit)関数を作成。
-    auto func = [&status](LPointer self, LObject* caller,
+    auto func = [&status](const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       // 準備。
       LObject* args_ptr = args.cdr().get();
@@ -449,7 +449,7 @@ namespace Sayuri {
     std::shared_ptr<EngineSuite> suite_ptr(new EngineSuite());
 
     // ネイティブ関数オブジェクトを作成。
-    auto func = [suite_ptr](LPointer self, LObject* caller,
+    auto func = [suite_ptr](const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return (*suite_ptr)(self, caller, args);
     };
@@ -610,8 +610,8 @@ namespace Sayuri {
     std::map<std::string, MessageFunction> message_func_map;
 
     message_func_map["@get-pgn-comments"] =
-    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
-    LObject* caller, const LObject& args) -> LPointer {
+    [pgn_ptr, current_index_ptr](const std::string& symbol,
+    const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       // 準備。
       const std::vector<std::string>& comment_vec = pgn_ptr->comment_vec();
       std::size_t len = comment_vec.size();
@@ -627,8 +627,8 @@ namespace Sayuri {
     };
 
     message_func_map["@get-current-game-comments"] =
-    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
-    LObject* caller, const LObject& args) -> LPointer {
+    [pgn_ptr, current_index_ptr](const std::string& symbol,
+    const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       // 現在のゲームのコメントを得る。
       if (pgn_ptr->game_vec().empty()) return NewNil();
       const std::vector<std::string>& comment_vec =
@@ -644,8 +644,8 @@ namespace Sayuri {
     };
 
     message_func_map["@get-current-move-comments"] =
-    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
-    LObject* caller, const LObject& args) -> LPointer {
+    [pgn_ptr, current_index_ptr](const std::string& symbol,
+    const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       // 現在の指し手のコメントを得る。
       if (pgn_ptr->game_vec().empty()) return NewNil();
       const std::vector<std::string>& comment_vec =
@@ -663,14 +663,14 @@ namespace Sayuri {
     };
 
     message_func_map["@length"] =
-    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
-    LObject* caller, const LObject& args) -> LPointer {
+    [pgn_ptr, current_index_ptr](const std::string& symbol,
+    const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       return NewNumber(pgn_ptr->game_vec().size());
     };
 
     message_func_map["@set-current-game"] =
-    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
-    LObject* caller, const LObject& args) -> LPointer {
+    [pgn_ptr, current_index_ptr](const std::string& symbol,
+    const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       // 準備。
       LObject* args_ptr = nullptr;
       Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
@@ -693,8 +693,8 @@ namespace Sayuri {
     };
 
     message_func_map["@get-current-game-headers"] =
-    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
-    LObject* caller, const LObject& args) -> LPointer {
+    [pgn_ptr, current_index_ptr](const std::string& symbol,
+    const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       // 現在のゲームのヘッダを得る。
       if (pgn_ptr->game_vec().empty()) return NewNil();
       const PGNHeader& header =
@@ -714,8 +714,8 @@ namespace Sayuri {
     };
 
     message_func_map["@current-move"] =
-    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
-    LObject* caller, const LObject& args) -> LPointer {
+    [pgn_ptr, current_index_ptr](const std::string& symbol,
+    const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       // 現在の指し手を得る。
       if (pgn_ptr->game_vec().empty()) return NewNil();
       const MoveNode* node_ptr =
@@ -729,8 +729,8 @@ namespace Sayuri {
     };
 
     message_func_map["@next-move"] =
-    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
-    LObject* caller, const LObject& args) -> LPointer {
+    [pgn_ptr, current_index_ptr](const std::string& symbol,
+    const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       if (pgn_ptr->game_vec().empty()) return NewNil();
 
       // 次の手へ。
@@ -746,8 +746,8 @@ namespace Sayuri {
     };
 
     message_func_map["@prev-move"] =
-    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
-    LObject* caller, const LObject& args) -> LPointer {
+    [pgn_ptr, current_index_ptr](const std::string& symbol,
+    const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       if (pgn_ptr->game_vec().empty()) return NewNil();
 
       // 前の手へ。
@@ -763,8 +763,8 @@ namespace Sayuri {
     };
 
     message_func_map["@alt-move"] =
-    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
-    LObject* caller, const LObject& args) -> LPointer {
+    [pgn_ptr, current_index_ptr](const std::string& symbol,
+    const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       if (pgn_ptr->game_vec().empty()) return NewNil();
 
       // 代替手へ。
@@ -780,8 +780,8 @@ namespace Sayuri {
     };
 
     message_func_map["@orig-move"] =
-    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
-    LObject* caller, const LObject& args) -> LPointer {
+    [pgn_ptr, current_index_ptr](const std::string& symbol,
+    const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       if (pgn_ptr->game_vec().empty()) return NewNil();
 
       // オリジナルへ。
@@ -797,8 +797,8 @@ namespace Sayuri {
     };
 
     message_func_map["@rewind-move"] =
-    [pgn_ptr, current_index_ptr](const std::string& symbol, LPointer self,
-    LObject* caller, const LObject& args) -> LPointer {
+    [pgn_ptr, current_index_ptr](const std::string& symbol,
+    const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       if (pgn_ptr->game_vec().empty()) return NewNil();
 
       // オリジナルへ。
@@ -814,9 +814,8 @@ namespace Sayuri {
     };
 
     // PGNオブジェクトを作成。
-    auto pgn_func =
-    [message_func_map](LPointer self, LObject* caller, const LObject& args)
-    -> LPointer {
+    auto pgn_func = [message_func_map]
+    (const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       // 準備。
       LObject* args_ptr = nullptr;
       GetReadyForFunction(args, 1, &args_ptr);
@@ -1117,73 +1116,73 @@ namespace Sayuri {
   // メッセージシンボル関数を登録する。
   void EngineSuite::SetMessageFunctions() {
     message_func_map_["@get-white-pawn-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
+    [this](const std::string& symbol, const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return this->GetPosition<WHITE, PAWN>(symbol, self, caller, args);
     };
 
     message_func_map_["@get-white-knight-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
+    [this](const std::string& symbol, const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return this->GetPosition<WHITE, KNIGHT>(symbol, self, caller, args);
     };
 
     message_func_map_["@get-white-bishop-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
+    [this](const std::string& symbol, const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return this->GetPosition<WHITE, BISHOP>(symbol, self, caller, args);
     };
 
     message_func_map_["@get-white-rook-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
+    [this](const std::string& symbol, const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return this->GetPosition<WHITE, ROOK>(symbol, self, caller, args);
     };
 
     message_func_map_["@get-white-queen-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
+    [this](const std::string& symbol, const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return this->GetPosition<WHITE, QUEEN>(symbol, self, caller, args);
     };
 
     message_func_map_["@get-white-king-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
+    [this](const std::string& symbol, const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return this->GetPosition<WHITE, KING>(symbol, self, caller, args);
     };
 
     message_func_map_["@get-black-pawn-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
+    [this](const std::string& symbol, const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return this->GetPosition<BLACK, PAWN>(symbol, self, caller, args);
     };
 
     message_func_map_["@get-black-knight-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
+    [this](const std::string& symbol, const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return this->GetPosition<BLACK, KNIGHT>(symbol, self, caller, args);
     };
 
     message_func_map_["@get-black-bishop-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
+    [this](const std::string& symbol, const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return this->GetPosition<BLACK, BISHOP>(symbol, self, caller, args);
     };
 
     message_func_map_["@get-black-rook-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
+    [this](const std::string& symbol, const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return this->GetPosition<BLACK, ROOK>(symbol, self, caller, args);
     };
 
     message_func_map_["@get-black-queen-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
+    [this](const std::string& symbol, const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return this->GetPosition<BLACK, QUEEN>(symbol, self, caller, args);
     };
 
     message_func_map_["@get-black-king-position"] =
-    [this](const std::string& symbol, LPointer self, LObject* caller,
+    [this](const std::string& symbol, const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return this->GetPosition<BLACK, KING>(symbol, self, caller, args);
     };
@@ -1770,29 +1769,29 @@ namespace Sayuri {
     return Lisp::LPointerVecToList(ret_vec);
   }
   template LPointer EngineSuite::GetPosition<WHITE, PAWN>
-  (const std::string&, LPointer, LObject*, const LObject&);
+  (const std::string&, const LObject&, LObject*, const LObject&);
   template LPointer EngineSuite::GetPosition<WHITE, KNIGHT>
-  (const std::string&, LPointer, LObject*, const LObject&);
+  (const std::string&, const LObject&, LObject*, const LObject&);
   template LPointer EngineSuite::GetPosition<WHITE, BISHOP>
-  (const std::string&, LPointer, LObject*, const LObject&);
+  (const std::string&, const LObject&, LObject*, const LObject&);
   template LPointer EngineSuite::GetPosition<WHITE, ROOK>
-  (const std::string&, LPointer, LObject*, const LObject&);
+  (const std::string&, const LObject&, LObject*, const LObject&);
   template LPointer EngineSuite::GetPosition<WHITE, QUEEN>
-  (const std::string&, LPointer, LObject*, const LObject&);
+  (const std::string&, const LObject&, LObject*, const LObject&);
   template LPointer EngineSuite::GetPosition<WHITE, KING>
-  (const std::string&, LPointer, LObject*, const LObject&);
+  (const std::string&, const LObject&, LObject*, const LObject&);
   template LPointer EngineSuite::GetPosition<BLACK, PAWN>
-  (const std::string&, LPointer, LObject*, const LObject&);
+  (const std::string&, const LObject&, LObject*, const LObject&);
   template LPointer EngineSuite::GetPosition<BLACK, KNIGHT>
-  (const std::string&, LPointer, LObject*, const LObject&);
+  (const std::string&, const LObject&, LObject*, const LObject&);
   template LPointer EngineSuite::GetPosition<BLACK, BISHOP>
-  (const std::string&, LPointer, LObject*, const LObject&);
+  (const std::string&, const LObject&, LObject*, const LObject&);
   template LPointer EngineSuite::GetPosition<BLACK, ROOK>
-  (const std::string&, LPointer, LObject*, const LObject&);
+  (const std::string&, const LObject&, LObject*, const LObject&);
   template LPointer EngineSuite::GetPosition<BLACK, QUEEN>
-  (const std::string&, LPointer, LObject*, const LObject&);
+  (const std::string&, const LObject&, LObject*, const LObject&);
   template LPointer EngineSuite::GetPosition<BLACK, KING>
-  (const std::string&, LPointer, LObject*, const LObject&);
+  (const std::string&, const LObject&, LObject*, const LObject&);
 
   // %%% @get-piece
   DEF_MESSAGE_FUNCTION(EngineSuite::GetPiece) {
