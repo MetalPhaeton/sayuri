@@ -139,9 +139,7 @@ namespace Sayuri {
     // シンボル、バインドされているオブジェクトを返す。
     if (target->IsSymbol()) {
       const LPointer& result = scope_chain().SelectSymbol(target->symbol());
-
-      // あればクローン。 なければnullptr。
-      if (result) return result->Clone();
+      if (result) return result;
 
       throw Lisp::GenError("@evaluating-error",
       "No object is bound to '" + target->symbol() + "'.");
@@ -165,8 +163,8 @@ namespace Sayuri {
       "'" + target->car()->ToString() + "' didn't return function object.");
     }
 
-    // Atomなのでクローンを返す。
-    return target->Clone();
+    // Atomなので返す。
+    return target;
   }
 
   // 式を評価する。 LN_Function版。
@@ -174,9 +172,7 @@ namespace Sayuri {
     // シンボル、バインドされているオブジェクトを返す。
     if (target->IsSymbol()) {
       const LPointer& result = scope_chain().SelectSymbol(target->symbol());
-
-      // あればクローン。 なければnullptr。
-      if (result) return result->Clone();
+      if (result) return result;
 
       throw Lisp::GenError("@evaluating-error",
       "No object is bound to '" + target->symbol() + "'.");
@@ -201,7 +197,7 @@ namespace Sayuri {
     }
 
     // Atomなのでクローンを返す。
-    return target->Clone();
+    return target;
   }
 
   // 自身の関数を適用する。 LFunction。
