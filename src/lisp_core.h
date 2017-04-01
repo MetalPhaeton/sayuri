@@ -533,7 +533,7 @@ namespace Sayuri {
       virtual bool IsN_Function() const {return type() == LType::N_FUNCTION;}
   };
 
-  /** Nilオブジェクト。 */
+  /** Nilオブジェクト。 (Nilオブジェクトはシングルトン。) */
   class LNil : public LObject {
     public:
       // ==================== //
@@ -572,11 +572,19 @@ namespace Sayuri {
       // パブリック関数 //
       // ============== //
       /**
-       * 自身をクローンコピーする。
+       * シングルトンを得る。
+       * @return シングルトン。
+       */
+      static LPointer GetInstance() {
+        if (!instance_) instance_ = std::make_shared<LNil>();
+        return instance_;
+      }
+      /**
+       * 自身をクローンコピーする。 (シングルトンなので自分自身。)
        * @return 自身のクローン。
        */
       virtual LPointer Clone() const override {
-        return std::make_shared<LNil>();
+        return instance_;
       }
       /**
        * 比較関数。 (==)
@@ -607,6 +615,10 @@ namespace Sayuri {
       virtual std::string ToString() const override {
         return std::string("()");
       }
+
+    private:
+      /** シングルトンインスタンス。 */
+      static LPointer instance_;
   };
 
   /** ペアオブジェクト。 */
@@ -623,8 +635,8 @@ namespace Sayuri {
       LPair(const LPointer& car, const LPointer& cdr) :
       car_(car), cdr_(cdr) {}
       /** コンストラクタ。 */
-      LPair() : car_(std::make_shared<LNil>()),
-      cdr_(std::make_shared<LNil>()) {}
+      LPair() : car_(LNil::GetInstance()),
+      cdr_(LNil::GetInstance()) {}
       /**
        * コピーコンストラクタ。
        * @param obj コピー元。
@@ -1860,7 +1872,7 @@ namespace Sayuri {
        * @return オブジェクトのポインタ。
        */
       static LPointer NewNil() {
-        return std::make_shared<LNil>();
+        return LNil::GetInstance();
       }
       /**
        * ペアを作る。
@@ -1963,8 +1975,12 @@ namespace Sayuri {
        * @return オブジェクトのポインタ。
        */
       static LPointer NewList(int length) {
-        if (length <= 0) return NewNil();
-        return NewPair(NewNil(), NewList(length - 1));
+        LPair head;
+        LObject* head_ptr = &head;
+        for (int i = 0; i < length; ++i, Next(&head_ptr)) {
+          head_ptr->cdr(NewPair());
+        }
+        return head.cdr();
       }
 
       /**
@@ -2048,14 +2064,14 @@ namespace Sayuri {
        * @return 変換後のListのポインタ。
        */
       static LPointer LPointerVecToList(const LPointerVec& pointer_vec) {
-        LPointer ret = NewList(pointer_vec.size());
-        LObject* ptr = ret.get();
+        LPointer ret_ptr = NewList(pointer_vec.size());
+        LObject* ptr = ret_ptr.get();
         for (auto& pointer : pointer_vec) {
           ptr->car(pointer);
-          Next(&ptr);
+          ptr = ptr->cdr().get();
         }
 
-        return ret;
+        return ret_ptr;
       }
 
       /**
@@ -2265,18 +2281,14 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        return caller->Evaluate(caller->Evaluate(args_ptr->car()));
+        return caller->Evaluate(caller->Evaluate(args_ptr->car()))->Clone();
       }
 
       /** ネイティブ関数 - parse */
       DEF_LC_FUNCTION(ParseFunc);
 
-      // %%% parval
       /** ネイティブ関数 - parval */
-      DEF_LC_FUNCTION(Parval) {
-        LPointer result = ParseFunc(self, caller, args);
-        return caller->Evaluate(result);
-      }
+      DEF_LC_FUNCTION(Parval);
 
       // %%% to-string
       /** ネイティブ関数 - to-string */
@@ -2298,7 +2310,7 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        throw caller->Evaluate(args_ptr->cdr());
+        throw caller->Evaluate(args_ptr->car())->Clone();
       }
 
       // %%% car
@@ -2313,7 +2325,7 @@ namespace Sayuri {
         CheckType(*result, LType::PAIR);
 
         // Carを返す。
-        return result->car();
+        return result->car()->Clone();
       }
 
       // %%% cdr
@@ -2328,7 +2340,7 @@ namespace Sayuri {
         CheckType(*result, LType::PAIR);
 
         // Cdrを返す。
-        return result->cdr();
+        return result->cdr()->Clone();
       }
 
       // %%% c*r
@@ -2351,12 +2363,12 @@ namespace Sayuri {
 
           if (*itr == 'a') {
             target_ptr = target_ptr->car();
-          } else {
+          } else if (*itr == 'd') {
             target_ptr = target_ptr->cdr();
           }
         }
 
-        return target_ptr;
+        return target_ptr->Clone();
       }
 
       // %%% cons
@@ -2366,8 +2378,8 @@ namespace Sayuri {
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 2, &args_ptr);
 
-        return NewPair(caller->Evaluate(args_ptr->car()),
-        caller->Evaluate(args_ptr->cdr()->car()));
+        return NewPair(caller->Evaluate(args_ptr->car())->Clone(),
+        caller->Evaluate(args_ptr->cdr()->car())->Clone());
       }
 
       /** ネイティブ関数 - apply */
@@ -2377,13 +2389,13 @@ namespace Sayuri {
       DEF_LC_FUNCTION(WalkFunc);
 
       // %%% quote
-      /** ネイティブ関数 - quote */
+      /** ネイティブ関数 - quote (これはオブジェクトをCloneしない。) */
       DEF_LC_FUNCTION(Quote) {
         // 準備。
         LObject* args_ptr = nullptr;
         GetReadyForFunction(args, 1, &args_ptr);
 
-        return args_ptr->car()->Clone();
+        return args_ptr->car();
       }
 
       /** ネイティブ関数 - backquote */
@@ -2396,7 +2408,7 @@ namespace Sayuri {
        * @param ptr 上書きするポインタ。
        * @return 前の値。
        */
-      const LPointer& SetCore(LScopeChain& chain, const std::string& symbol,
+      LPointer SetCore(LScopeChain& chain, const std::string& symbol,
       const LPointer& ptr) {
         // 前の値を得る。
         const LPointer& prev = chain.SelectSymbol(symbol);
@@ -2406,7 +2418,7 @@ namespace Sayuri {
         }
 
         // スコープにバインド。
-        chain.UpdateSymbol(symbol, ptr);
+        chain.UpdateSymbol(symbol, ptr->Clone());
 
         return prev;
       }
@@ -2426,7 +2438,7 @@ namespace Sayuri {
         LScopeChain chain = caller->scope_chain();
 
         return SetCore(chain, symbol_ptr->symbol(),
-        caller->Evaluate(args_ptr->cdr()->car()));
+        caller->Evaluate(args_ptr->cdr()->car()))->Clone();
       }
 
       /** ネイティブ関数 - define */
@@ -2463,11 +2475,11 @@ namespace Sayuri {
 
         // #tなら第2引数を評価して返す。
         if (result->boolean()) {
-          return caller->Evaluate(args_ptr->cdr()->car());
+          return caller->Evaluate(args_ptr->cdr()->car())->Clone();
         }
 
         // #tではなかったので第3引数を評価して返す。
-        return caller->Evaluate(args_ptr->cdr()->cdr()->car());
+        return caller->Evaluate(args_ptr->cdr()->cdr()->car())->Clone();
       }
 
       /** ネイティブ関数 - cond */
@@ -2486,7 +2498,7 @@ namespace Sayuri {
           ret_ptr = caller->Evaluate(args_ptr->car());
         }
 
-        return ret_ptr;
+        return ret_ptr->Clone();
       }
 
       /** ネイティブ関数 - gen-scope */
@@ -2547,6 +2559,22 @@ namespace Sayuri {
         // 調べていく。
         for (; args_ptr->IsPair(); Next(&args_ptr)) {
           if (caller->Evaluate(args_ptr->car())->type() != LTYPE) {
+            return NewBoolean(false);
+          }
+        }
+
+        return NewBoolean(true);
+      }
+
+      // %%% list?
+      DEF_LC_FUNCTION(ListQ) {
+        // 準備。
+        LObject* args_ptr = nullptr;
+        GetReadyForFunction(args, 1, &args_ptr);
+
+        // 調べていく。
+        for (; args_ptr->IsPair(); Next(&args_ptr)) {
+          if (!(caller->Evaluate(args_ptr->car())->IsList())) {
             return NewBoolean(false);
           }
         }
@@ -2629,16 +2657,15 @@ namespace Sayuri {
       // %%% list
       /** ネイティブ関数 - list */
       DEF_LC_FUNCTION(List) {
-        // 準備。
-        LObject* args_ptr = args.cdr().get();
-        LPointer ret_ptr = NewList(CountList(*args_ptr));
-
-        for (LObject* ptr = ret_ptr.get(); args_ptr->IsPair();
-        Next(&args_ptr), Next(&ptr)) {
-          ptr->car(caller->Evaluate(args_ptr->car()));
+        LPair head;
+        LObject* head_ptr = &head;
+        for (LObject* args_ptr = args.cdr().get(); args_ptr->IsPair();
+        Next(&args_ptr), Next(&head_ptr)) {
+          head_ptr->cdr(NewPair(caller->Evaluate(args_ptr->car())->Clone(),
+          NewNil()));
         }
 
-        return ret_ptr;
+        return head.cdr();
       }
 
       /** ネイティブ関数 - list-replace */
@@ -2682,16 +2709,15 @@ namespace Sayuri {
         LPointer result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
         int num = result->number();
-        if (num <= 0) {
-          throw GenError("@function-error", "Number must be 1 and more.");
+        if (num < 0) {
+          throw GenError("@function-error", "Number must be 0 and more.");
         }
 
         // リストを作る。
         LPointer ret_ptr = NewList(num);
         int i = 0;
-        for (LObject* ptr = ret_ptr.get(); ptr->IsPair(); Next(&ptr)) {
+        for (LObject* ptr = ret_ptr.get(); ptr->IsPair(); Next(&ptr), ++i) {
           ptr->car(NewNumber(i));
-          ++i;
         }
 
         return ret_ptr;
@@ -3162,9 +3188,9 @@ namespace Sayuri {
         LPointer result = caller->Evaluate(args_ptr->car());
         CheckList(*result);
 
-        if (result->IsNil()) return result;
+        if (result->IsNil()) return NewNil();
 
-        return result->car();
+        return result->car()->Clone();
       }
 
       // %%% back
@@ -3181,7 +3207,7 @@ namespace Sayuri {
         LPointer next;
         for (; result->IsPair(); result = next) {
           next = result->cdr();
-          if (next->IsNil()) return result->car();
+          if (next->IsNil()) return result->car()->Clone();
         }
 
         return NewNil();
@@ -3199,8 +3225,8 @@ namespace Sayuri {
         CheckList(*target_ptr);
 
         // プッシュする。
-        return NewPair(caller->Evaluate(args_ptr->cdr()->car()),
-        target_ptr);
+        return NewPair(caller->Evaluate(args_ptr->cdr()->car())->Clone(),
+        target_ptr->Clone());
       }
 
       /** ネイティブ関数 - push-front! */
@@ -3218,7 +3244,7 @@ namespace Sayuri {
         CheckList(*target_ptr);
 
         if (target_ptr->IsNil()) return NewNil();
-        return target_ptr->cdr();
+        return target_ptr->cdr()->Clone();
       }
 
       /** ネイティブ関数 - pop-front! */
@@ -3235,21 +3261,16 @@ namespace Sayuri {
         LPointer target_ptr = caller->Evaluate(args_ptr->car());
         CheckList(*target_ptr);
 
-        if (target_ptr->IsNil()) {
-          return NewPair(caller->Evaluate(args_ptr->cdr()->car()),
-          target_ptr);
-        }
-        
-        LPointer next;
-        for (LObject* ptr = target_ptr.get(); ptr->IsPair(); Next(&ptr)) {
-          if (ptr->cdr()->IsNil()) {
-            ptr->cdr(NewPair(caller->Evaluate(args_ptr->cdr()->car()),
-            NewNil()));
-            return target_ptr;
-          }
-        }
+        // 最後の一つ手前まで空ループ。
+        LPair head(NewNil(), target_ptr);
+        LObject* head_ptr = &head;
+        for (; head_ptr->cdr()->IsPair(); Next(&head_ptr)) continue;
 
-        return NewNil();
+        // 末尾に付ける。
+        head_ptr->cdr(NewPair(caller->Evaluate(args_ptr->cdr()->car()),
+        NewNil()));
+
+        return head.cdr()->Clone();
       }
 
       /** ネイティブ関数 - push-back! */
@@ -3269,21 +3290,15 @@ namespace Sayuri {
         // target_ptrの要素が1つもない。
         if (target_ptr->IsNil()) return NewNil();
 
-        // 要素が1つ。
-        LObject* prev = target_ptr.get();
-        LObject* current = target_ptr->cdr().get();
-        if (current->IsNil()) return NewNil();
-        
-        // 要素が2つ以上。
-        LPointer next;
-        for (; current->IsPair(); Next(&prev), Next(&current)) {
-          if (current->cdr()->IsNil()) {
-            prev->cdr(NewNil());
-            return target_ptr;
-          }
-        }
+        // 最後の2つ手前までループ。
+        LPair head(NewNil(), NewPair(NewNil(), target_ptr));
+        LObject* head_ptr = &head;
+        for (; head_ptr->cdr()->cdr()->IsPair(); Next(&head_ptr)) continue;
 
-        return NewNil();
+        // 最後の一つを消す。
+        head_ptr->cdr(NewNil());
+
+        return head.cdr()->cdr()->Clone();
       }
 
       /** ネイティブ関数 - pop-back! */

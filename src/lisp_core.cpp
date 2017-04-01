@@ -53,6 +53,11 @@
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
+  // ========== //
+  // static変数 //
+  // ========== //
+  LPointer LNil::instance_;
+
   // ウォーカー。
   void Walk(LObject& pair, const LFuncForWalk& func) {
     // ペアじゃなければ終了。
@@ -181,7 +186,7 @@ namespace Sayuri {
     // ペア、関数呼び出し。
     if (target->IsPair()) {
       // carを評価する。
-      LPointer func_obj = Evaluate(target->car());
+      LPointer func_obj = Evaluate(target->car())->Clone();
       if (!func_obj) {
         throw Lisp::GenError("@evaluating-error",
         "Couldn't evaluate function name '" + target->car()->ToString()
@@ -248,7 +253,7 @@ namespace Sayuri {
         ++names_itr;
       } else {  // 引数名がない。
         // at_listに登録するだけ。
-        at_ptr->car(caller->Evaluate(ptr->car()));
+        at_ptr->car(caller->Evaluate(ptr->car())->Clone());
       }
     }
     // at_listをスコープにバインド。
@@ -274,7 +279,7 @@ namespace Sayuri {
         } else if (clone->IsSymbol()) {
           for (auto& map_pair : macro_map) {
             if (map_pair.first == clone->symbol()) {
-              clone = map_pair.second->Clone();
+              clone = map_pair.second;
               break;
             }
           }
@@ -298,7 +303,7 @@ namespace Sayuri {
 
     // ローカルスコープを捨てて終わる。
     scope_chain_.pop_back();
-    return ret_ptr;
+    return ret_ptr->Clone();
   }
 
   // ======= //
@@ -934,6 +939,9 @@ namespace Sayuri {
     func = LC_FUNCTION_OBJ(QFunc<LType::N_FUNCTION>);
     INSERT_LC_FUNCTION(func, "native-function?", "Lisp:native-function?");
 
+    func = LC_FUNCTION_OBJ(ListQ);
+    INSERT_LC_FUNCTION(func, "list?", "Lisp:list?");
+
     func = LC_FUNCTION_OBJ(ProcedureQ);
     INSERT_LC_FUNCTION(func, "procedure?", "Lisp:procedure?");
 
@@ -1180,9 +1188,9 @@ namespace Sayuri {
     func = LC_FUNCTION_OBJ(Log10);
     INSERT_LC_FUNCTION(func, "log10", "Lisp:log10");
 
-    std::shared_ptr<std::mt19937>
-    engine_ptr(new std::mt19937(std::chrono::system_clock::to_time_t
-    (std::chrono::system_clock::now())));
+    std::shared_ptr<std::mt19937> engine_ptr =
+    std::make_shared<std::mt19937>(std::chrono::system_clock::to_time_t
+    (std::chrono::system_clock::now()));
     func = [this, engine_ptr]
     (const LObject& self, LObject* caller, const LObject& args) -> LPointer {
       return this->Random(*engine_ptr, self, caller, args);
@@ -1265,7 +1273,8 @@ namespace Sayuri {
       }
 
       // 関数定義を作成。
-      LPointerVec expression = Lisp::ListToLPointerVec(*expr_list_ptr);
+      LPointerVec expression =
+      Lisp::ListToLPointerVec(*(expr_list_ptr->Clone()));
 
       // 関数オブジェクトにして返す。
       return Lisp::NewFunction(arg_names, expression, scope_chain);
@@ -1332,6 +1341,46 @@ namespace Sayuri {
     return parse_result.at(parse_result.size() - 1);
   }
 
+  // %%% parval
+  /** ネイティブ関数 - parval */
+  DEF_LC_FUNCTION(Lisp::Parval) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    GetReadyForFunction(args, 1, &args_ptr);
+
+    // タイプをチェック。
+    LPointer result = caller->Evaluate(args_ptr->car());
+    CheckType(*result, LType::STRING);
+
+    // パーサを準備。
+    LParser parser;
+
+    // 字句解析する。
+    parser.Tokenize(result->string());
+
+    // 解析できたかチェック。
+    if ((parser.parenth_counter() != 0) || parser.in_string()) {
+      // エラー。
+      throw GenError("@parse-error",
+      "Couldn't parse '" + args_ptr->car()->ToString() + "'.");
+    }
+
+    // パースする。
+    LPointerVec parse_result = parser.Parse();
+    if (parse_result.size() <= 0) {
+      // エラー。
+      throw GenError("@parse-error",
+      "Couldn't parse '" + args_ptr->car()->ToString() + "'.");
+    }
+
+    // 全部評価する。
+    LPointer ret_ptr = NewNil();
+    for (auto& s_expr : parse_result) {
+      ret_ptr = caller->Evaluate(s_expr);
+    }
+    return ret_ptr->Clone();
+  }
+
   // %%% backquote
   DEF_LC_FUNCTION(Lisp::Backquote) {
     // 準備。
@@ -1379,7 +1428,7 @@ namespace Sayuri {
               if (caadr->symbol() == "unquote") {
                 // コンマ。
                 // 評価する。
-                cdadr->car(caller->Evaluate(cadadr));
+                cdadr->car(caller->Evaluate(cadadr)->Clone());
 
                 // つなぎ替える。
                 cdadr->cdr(cddr);
@@ -1387,7 +1436,7 @@ namespace Sayuri {
               } else if (caadr->symbol() == "unquote-splicing") {
                 // コンマアット。
                 // 評価する。
-                result = caller->Evaluate(cadadr);
+                result = caller->Evaluate(cadadr)->Clone();
 
                 if (result->IsPair()) {
                   // ペア。
@@ -1415,7 +1464,7 @@ namespace Sayuri {
             const LPointer& addar = cddr->car();
             if ((cadr->symbol() == "unquote")
             || (cadr->symbol() == "unquote-splicing")) {
-              ptr->cdr(caller->Evaluate(addar));
+              ptr->cdr(caller->Evaluate(addar)->Clone());
             }
           }
         }
@@ -1515,10 +1564,10 @@ namespace Sayuri {
       Next(&names_ptr), args_ptr = args_ptr->cdr()) {
         const std::string& name = names_ptr->car()->symbol();
         if (name[0] == '&') {
-          local_chain.InsertSymbol(name, args_ptr->Clone());
+          local_chain.InsertSymbol(name, args_ptr);
           break;
         } else {
-          local_chain.InsertSymbol(name, args_ptr->car()->Clone());
+          local_chain.InsertSymbol(name, args_ptr->car());
         }
       }
 
@@ -1535,7 +1584,7 @@ namespace Sayuri {
       }
 
       // 出来上がった式を評価して返す。
-      return caller->Evaluate(result_expr);
+      return caller->Evaluate(result_expr)->Clone();
     };
 
     LPointer n_function = NewN_Function(func, "Lisp:define-macro;"
@@ -1623,7 +1672,7 @@ namespace Sayuri {
       ret_ptr = func.Evaluate(args_ptr->car());
     }
 
-    return ret_ptr;
+    return ret_ptr->Clone();
   }
 
   // %%% while
@@ -1653,7 +1702,7 @@ namespace Sayuri {
       }
     }
 
-    return ret_ptr;
+    return ret_ptr->Clone();
   }
 
   // %%% for
@@ -1675,7 +1724,7 @@ namespace Sayuri {
       "'" + range_expr->ToString() + "' doesn't have 2 elements and more.");
     }
     const LPointer& item = range_expr->car();
-    LPointer range = caller->Evaluate(range_expr->cdr()->car());
+    LPointer range = caller->Evaluate(range_expr->cdr()->car())->Clone();
     CheckType(*item, LType::SYMBOL);
     const std::string& item_symbol = item->symbol();
 
@@ -1683,9 +1732,6 @@ namespace Sayuri {
     std::function<LPointer()> get_next_elm;
     std::function<bool()> is_not_end;
     LObject* range_ptr = range.get();
-    const std::string& str = range->string();
-    unsigned int str_i = 0;
-    std::size_t str_size = str.size();
     if (range->IsList()) {
       // リスト用。
       get_next_elm = [&range_ptr]() -> LPointer {
@@ -1698,14 +1744,18 @@ namespace Sayuri {
         return range_ptr->IsPair();
       };
     } else if (range->IsString()) {
+      const std::string* str_ptr = &range->string();
+      std::size_t str_size = str_ptr->size();
+      std::shared_ptr<unsigned int> str_i_ptr =
+      std::make_shared<unsigned int>(0);
       // 文字列用。
-      get_next_elm = [&str, &str_i]() -> LPointer {
-        char c = str[str_i++];
+      get_next_elm = [str_ptr, str_i_ptr]() -> LPointer {
+        char c = str_ptr->at((*str_i_ptr)++);
         return NewString(std::string(1, c));
       };
 
-      is_not_end = [&str_i, str_size]() -> bool {
-        return str_i < str_size;
+      is_not_end = [str_i_ptr, str_size]() -> bool {
+        return *str_i_ptr < str_size;
       };
     } else {
       throw GenTypeError(*range, "List or String");
@@ -1727,7 +1777,7 @@ namespace Sayuri {
       }
     }
 
-    return ret_ptr;
+    return ret_ptr->Clone();
   }
 
   // %%% cond
@@ -1748,7 +1798,7 @@ namespace Sayuri {
       // 1要素目がelseかどうか。
       LPointer result;
       const LPointer& sentence_car = sentence->car();
-      if (sentence_car->symbol() == "else") {
+      if ((sentence_car->IsSymbol()) && (sentence_car->symbol() == "else")) {
         result = NewBoolean(true);
       } else {
         result = caller->Evaluate(sentence_car);
@@ -1756,14 +1806,14 @@ namespace Sayuri {
       }
 
       // resultがtrueなら2要素目を実行して終わる。
-      if (result->boolean()) {
+      if ((result->IsBoolean()) && (result->boolean())) {
         LPointer ret_ptr = NewNil();
         for (LObject* ptr = sentence->cdr().get(); ptr->IsPair();
         Next(&ptr)) {
           ret_ptr = caller->Evaluate(ptr->car());
         }
 
-        return ret_ptr;
+        return ret_ptr->Clone();
       }
     }
 
@@ -1773,7 +1823,7 @@ namespace Sayuri {
   // %%% gen-scope
   DEF_LC_FUNCTION(Lisp::GenScope) {
     // スコープを作成。
-    LScopePtr my_scope_ptr(new LScope());
+    LScopePtr my_scope_ptr(std::make_shared<LScope>());
 
     // 関数オブジェクトを作成。
     auto func =
@@ -1790,7 +1840,7 @@ namespace Sayuri {
         ret_ptr = func.Evaluate(ptr->car());
       }
 
-      return ret_ptr;
+      return ret_ptr->Clone();
     };
 
     return NewN_Function(func, "Lisp::gen-scope:"
@@ -1828,7 +1878,7 @@ namespace Sayuri {
       }
     }
 
-    return ret_ptr;
+    return ret_ptr->Clone();
   }
 
   // %%% apply
@@ -1843,6 +1893,7 @@ namespace Sayuri {
     if (func_ptr->IsSymbol()) {
       func_ptr = caller->Evaluate(func_ptr);
     }
+    func_ptr = func_ptr->Clone();
 
     // 第2引数は引数リスト。
     LPointer args_list_ptr = caller->Evaluate(args_ptr->cdr()->car());
@@ -1850,7 +1901,7 @@ namespace Sayuri {
 
     // ペアにして評価して返す。
     return func_ptr->Apply(caller,
-    LPair(func_ptr, WrapListQuote(args_list_ptr)));
+    LPair(func_ptr, WrapListQuote(args_list_ptr)))->Clone();
   }
 
   // %%% walk
@@ -1865,9 +1916,10 @@ namespace Sayuri {
     if (func_ptr->IsSymbol()) {
       func_ptr = caller->Evaluate(func_ptr);
     }
+    func_ptr = func_ptr->Clone();
 
     // 第2引数は探索するペア。
-    LPointer pair_ptr = caller->Evaluate(args_ptr->cdr()->car());
+    LPointer pair_ptr = caller->Evaluate(args_ptr->cdr()->car())->Clone();
     CheckType(*pair_ptr, LType::PAIR);
 
     // ペアにしておく。
@@ -2068,7 +2120,7 @@ namespace Sayuri {
       ret_ptr = caller->Evaluate(ptr);
     }
 
-    return ret_ptr;
+    return ret_ptr->Clone();
   }
 
   // %%% export
@@ -2114,8 +2166,8 @@ namespace Sayuri {
     CheckType(*filename_ptr, LType::STRING);
 
     // ストリームをヒープで開く。
-    std::shared_ptr<std::ofstream>
-    ofs_ptr(new std::ofstream(filename_ptr->string()));
+    std::shared_ptr<std::ofstream> ofs_ptr =
+    std::make_shared<std::ofstream>(filename_ptr->string());
     if (!(*ofs_ptr)) {
       throw GenError("@function-error",
       "Couldn't open '" + filename_ptr->string() + "'.");
@@ -2160,8 +2212,8 @@ namespace Sayuri {
     CheckType(*filename_ptr, LType::STRING);
 
     // ストリームをヒープで開く。
-    std::shared_ptr<std::ifstream>
-    ifs_ptr(new std::ifstream(filename_ptr->string()));
+    std::shared_ptr<std::ifstream> ifs_ptr =
+    std::make_shared<std::ifstream>(filename_ptr->string());
     if (!(*ifs_ptr)) {
       throw GenError("@function-error",
       "Couldn't open '" + filename_ptr->string() + "'.");
@@ -2218,11 +2270,11 @@ namespace Sayuri {
     GetReadyForFunction(args, 1, &args_ptr);
 
     // 関数オブジェクトを入手。
-    LPointer func_ptr = caller->Evaluate(args_ptr->car());
+    LPointer func_ptr = caller->Evaluate(args_ptr->car())->Clone();
     CheckType(*func_ptr, LType::FUNCTION);
 
     // スレッド用ポインタ。
-    std::shared_ptr<std::thread> thread_ptr(new std::thread());
+    std::shared_ptr<std::thread> thread_ptr = std::make_shared<std::thread>();
 
     // 関数オブジェクトを作成。
     LC_Function func = [func_ptr, thread_ptr](const LObject& self,
@@ -2247,14 +2299,14 @@ namespace Sayuri {
         LPointer func_clone = func_ptr->Clone();
 
         // 引数をコピー。
-        LPointer args_clone = args.Clone();
+        LPointer args_clone = args_ptr->Clone();
 
         // 呼び出し元のコピー。
         LPointer caller_clone = caller->Clone();
 
         // スレッドを起動。
         *thread_ptr = std::thread([func_clone, caller_clone, args_clone]() {
-          func_clone->Apply(caller_clone.get(), *args_clone);
+          caller_clone->Evaluate(NewPair(func_clone, args_clone));
         });
 
         return NewBoolean(true);
@@ -2298,15 +2350,15 @@ namespace Sayuri {
     (static_cast<int>(seconds_ptr->number() * 1000.0));
     std::this_thread::sleep_for(sleep_time);
 
-    return seconds_ptr;
+    return seconds_ptr->Clone();
   }
 
   // %%% gen-mutex
   DEF_LC_FUNCTION(Lisp::GenMutex) {
     // 各オブジェクトを作成。
-    std::shared_ptr<std::mutex> mutex_ptr(new std::mutex);
+    std::shared_ptr<std::mutex> mutex_ptr = std::make_shared<std::mutex>();
     std::shared_ptr<std::condition_variable>
-    cond_var_ptr(new std::condition_variable());
+    cond_var_ptr = std::make_shared<std::condition_variable>();
 
     // 関数オブジェクトを作成。
     LC_Function func = [mutex_ptr, cond_var_ptr](const LObject& self,
@@ -2362,7 +2414,7 @@ namespace Sayuri {
           ret_ptr = func.Evaluate(car);
         }
 
-        return ret_ptr;
+        return ret_ptr->Clone();
       }
 
       if (message == "@notify-one") {
@@ -2399,7 +2451,7 @@ namespace Sayuri {
     // リストの場合。
     if (first_ptr->IsList()) {
       // ダミーに入れる。
-      LPointer dummy = NewPair(NewNil(), first_ptr);
+      LPointer dummy = NewPair(NewNil(), first_ptr->Clone());
       LObject* dummy_ptr = dummy.get();
 
       // 残りのリストを付け加えていく。
@@ -2408,7 +2460,7 @@ namespace Sayuri {
         for (; dummy_ptr->cdr()->IsPair(); Next(&dummy_ptr)) continue;
 
         // くっつける。
-        dummy_ptr->cdr(caller->Evaluate(args_ptr->car()));
+        dummy_ptr->cdr(caller->Evaluate(args_ptr->car())->Clone());
       }
 
       // 返す。
@@ -2453,7 +2505,7 @@ namespace Sayuri {
     GetReadyForFunction(args, 1, &args_ptr);
 
     // リストを得る。
-    LPointer list_ptr = caller->Evaluate(args_ptr->car());
+    LPointer list_ptr = caller->Evaluate(args_ptr->car())->Clone();
     CheckList(*list_ptr);
 
     // リストをベクトルへ。
@@ -2489,7 +2541,7 @@ namespace Sayuri {
       if (index >= 0) {
         for (LObject* ptr = target_ptr.get(); ptr->IsPair();
         Next(&ptr), --index) {
-          if (index <= 0) return ptr->car();
+          if (index <= 0) return ptr->car()->Clone();
         }
       }
 
@@ -2523,7 +2575,7 @@ namespace Sayuri {
     GetReadyForFunction(args, 3, &args_ptr);
 
     // 第1引数。 ターゲットのリスト。
-    LPointer target_ptr = caller->Evaluate(args_ptr->car());
+    LPointer target_ptr = caller->Evaluate(args_ptr->car())->Clone();
     CheckList(*target_ptr);
     int length = CountList(*target_ptr);
     Next(&args_ptr);
@@ -2540,7 +2592,7 @@ namespace Sayuri {
     Next(&args_ptr);
 
     // 第3引数。 入れ替えたい要素。
-    LPointer elm_ptr = caller->Evaluate(args_ptr->car());
+    LPointer elm_ptr = caller->Evaluate(args_ptr->car())->Clone();
 
     // ダミーに入れる。
     LPointer dummy = NewPair(NewNil(), target_ptr);
@@ -2563,7 +2615,7 @@ namespace Sayuri {
     GetReadyForFunction(args, 2, &args_ptr);
 
     // 第1引数。 ターゲットのリスト。
-    LPointer target_ptr = caller->Evaluate(args_ptr->car());
+    LPointer target_ptr = caller->Evaluate(args_ptr->car())->Clone();
     CheckList(*target_ptr);
     int length = CountList(*target_ptr);
     Next(&args_ptr);
@@ -2599,7 +2651,7 @@ namespace Sayuri {
     GetReadyForFunction(args, 3, &args_ptr);
 
     // 第1引数。 ターゲットのリスト。
-    LPointer target_ptr = caller->Evaluate(args_ptr->car());
+    LPointer target_ptr = caller->Evaluate(args_ptr->car())->Clone();
     CheckList(*target_ptr);
     int length = CountList(*target_ptr);
     Next(&args_ptr);
@@ -2616,7 +2668,7 @@ namespace Sayuri {
     Next(&args_ptr);
 
     // 第3引数。 挿入するオブジェクト。
-    LPointer obj_ptr = caller->Evaluate(args_ptr->car());
+    LPointer obj_ptr = caller->Evaluate(args_ptr->car())->Clone();
 
     // 挿入するオブジェクトをPairにしておく。
     LPointer obj_pair = NewPair(obj_ptr, NewNil());
@@ -2690,7 +2742,7 @@ namespace Sayuri {
       }
     }
 
-    return target_ptr;
+    return target_ptr->Clone();
   }
 
   // %%% list-path-replace
@@ -2700,7 +2752,7 @@ namespace Sayuri {
     GetReadyForFunction(args, 3, &args_ptr);
 
     // 第1引数。 ターゲットのリスト。
-    LPointer target_ptr = caller->Evaluate(args_ptr->car());
+    LPointer target_ptr = caller->Evaluate(args_ptr->car())->Clone();
     LObject* t_ptr = target_ptr.get();
     Next(&args_ptr);
 
@@ -2711,7 +2763,7 @@ namespace Sayuri {
     Next(&args_ptr);
 
     // 第3引数。 置き換えるオブジェクト。
-    LPointer obj_ptr = caller->Evaluate(args_ptr->car());
+    LPointer obj_ptr = caller->Evaluate(args_ptr->car())->Clone();
 
     // 先ず、文字を一つ抜く。
     if (path.size() <= 0) {
@@ -2756,7 +2808,7 @@ namespace Sayuri {
     GetReadyForFunction(args, 2, &args_ptr);
 
     // 第1引数。 ターゲットのリスト。
-    LPointer target_ptr = caller->Evaluate(args_ptr->car());
+    LPointer target_ptr = caller->Evaluate(args_ptr->car())->Clone();
     CheckList(*target_ptr);
     Next(&args_ptr);
 
@@ -2767,7 +2819,7 @@ namespace Sayuri {
     if (!(target_ptr->cdr()->IsPair())) return target_ptr;
 
     // 第2引数は述語。
-    LPointer predicate = caller->Evaluate(args_ptr->car());
+    LPointer predicate = caller->Evaluate(args_ptr->car())->Clone();
 
     // 述語を呼べる形にする。
     LPointer callable = NewPair(predicate, NewPair(WrapQuote(NewNil()),
@@ -2809,7 +2861,7 @@ namespace Sayuri {
     LPointerVec args_vec(CountList(*args_ptr));
     LPointerVec::iterator args_itr = args_vec.begin();
     for (; args_ptr->IsPair(); Next(&args_ptr), ++args_itr) {
-      *args_itr = caller->Evaluate(args_ptr->car());
+      *args_itr = caller->Evaluate(args_ptr->car())->Clone();
     }
 
     return ZipLists(args_vec);
@@ -2827,6 +2879,7 @@ namespace Sayuri {
     if (func_ptr->IsSymbol()) {
       func_ptr = caller->Evaluate(func_ptr);
     }
+    func_ptr = func_ptr->Clone();
 
     // 関数をペアのCarに入れておく。
     LPair func_pair(func_ptr, NewPair());
@@ -2849,7 +2902,7 @@ namespace Sayuri {
       func_pair.cdr(WrapListQuote(ptr->car()));
 
       // 適用してベクトルにプッシュ。
-      ret_vec.push_back(func_ptr->Apply(caller, func_pair));
+      ret_vec.push_back(func_ptr->Apply(caller, func_pair)->Clone());
     }
 
     return LPointerVecToList(ret_vec);
@@ -2867,6 +2920,7 @@ namespace Sayuri {
     if (func_ptr->IsSymbol()) {
       func_ptr = caller->Evaluate(func_ptr);
     }
+    func_ptr = func_ptr->Clone();
 
     // 関数をリストのCarに入れておく。
     LPair func_pair(func_ptr, NewPair(NewNil(), NewNil()));
@@ -2887,7 +2941,7 @@ namespace Sayuri {
       CheckType(*result, LType::BOOLEAN);
 
       // 評価結果がtrueならリストに追加。
-      if (result->boolean()) ret_vec.push_back(ptr->car());
+      if (result->boolean()) ret_vec.push_back(ptr->car()->Clone());
     }
 
     return LPointerVecToList(ret_vec);
@@ -2940,22 +2994,33 @@ namespace Sayuri {
     Next(&args_ptr);\
 \
     const LScopeChain& chain = caller->scope_chain();\
-    LPointer value_ptr = chain.SelectSymbol(symbol);\
-    if (!value_ptr) {\
+    LPointer ret_ptr = chain.SelectSymbol(symbol)->Clone();\
+    if (!ret_ptr) {\
       throw GenError("@unbound", "'" + symbol + "' doesn't bind any value.");\
     }\
-\
-    CheckType(*value_ptr, LType::NUMBER);\
-    LPointer result = caller->Evaluate(args_ptr->car());\
-    CheckType(*result, LType::NUMBER);\
-\
-    LPointer ret_ptr = value_ptr->Clone()
+    CheckType(*ret_ptr, LType::NUMBER);\
+    LPointer value_ptr = ret_ptr->Clone();\
+    chain.UpdateSymbol(symbol, value_ptr);
 
   // %%% add!
   DEF_LC_FUNCTION(Lisp::AdditionEx) {
     COMMON_MATH_EX;
 
-    value_ptr->number(value_ptr->number() + result->number());
+    // 全部足す。
+    double value = value_ptr->number();
+    LPointer result;
+    for (; args_ptr->IsPair(); Next(&args_ptr)) {
+      // 評価する。
+      result = caller->Evaluate(args_ptr->car());
+
+      // タイプをチェック。
+      CheckType(*result, LType::NUMBER);
+
+      // 足す。
+      value += result->number();
+    }
+
+    value_ptr->number(value);
 
     return ret_ptr;
   }
@@ -2964,7 +3029,21 @@ namespace Sayuri {
   DEF_LC_FUNCTION(Lisp::SubtractionEx) {
     COMMON_MATH_EX;
 
-    value_ptr->number(value_ptr->number() - result->number());
+    // 引いていく。
+    double value = value_ptr->number();
+    LPointer result;
+    for (; args_ptr->IsPair(); Next(&args_ptr)) {
+      // 評価する。
+      result = caller->Evaluate(args_ptr->car());
+
+      // タイプをチェック。
+      CheckType(*result, LType::NUMBER);
+
+      // 引く。
+      value -= result->number();
+    }
+
+    value_ptr->number(value);
 
     return ret_ptr;
   }
@@ -2973,7 +3052,21 @@ namespace Sayuri {
   DEF_LC_FUNCTION(Lisp::MultiplicationEx) {
     COMMON_MATH_EX;
 
-    value_ptr->number(value_ptr->number() * result->number());
+    // 掛けていく。
+    double value = value_ptr->number();
+    LPointer result;
+    for (; args_ptr->IsPair(); Next(&args_ptr)) {
+      // 評価する。
+      result = caller->Evaluate(args_ptr->car());
+
+      // タイプをチェック。
+      CheckType(*result, LType::NUMBER);
+
+      // 掛ける。
+      value *= result->number();
+    }
+
+    value_ptr->number(value);
 
     return ret_ptr;
   }
@@ -2982,7 +3075,21 @@ namespace Sayuri {
   DEF_LC_FUNCTION(Lisp::DivisionEx) {
     COMMON_MATH_EX;
 
-    value_ptr->number(value_ptr->number() / result->number());
+    // 割っていく。
+    double value = value_ptr->number();
+    LPointer result;
+    for (; args_ptr->IsPair(); Next(&args_ptr)) {
+      // 評価する。
+      result = caller->Evaluate(args_ptr->car());
+
+      // タイプをチェック。
+      CheckType(*result, LType::NUMBER);
+
+      // 割る。
+      value /= result->number();
+    }
+
+    value_ptr->number(value);
 
     return ret_ptr;
   }
@@ -3002,8 +3109,9 @@ namespace Sayuri {
     if (!value_ptr) {\
       throw GenError("@unbound", "'" + symbol + "' doesn't bind any value.");\
     }\
-\
     CheckType(*value_ptr, LType::NUMBER);\
+    value_ptr = value_ptr->Clone();\
+    chain.UpdateSymbol(symbol, value_ptr);\
 \
     LPointer ret_ptr = value_ptr->Clone()
 
@@ -3066,7 +3174,7 @@ namespace Sayuri {
     Next(&args_ptr);
 
     // リストが空ならそのまま返す。
-    if (list_ptr->IsNil()) return list_ptr;
+    if (list_ptr->IsNil()) return list_ptr->Clone();
 
     // 第2引数。 区切り文字。
     LPointer delim_ptr = caller->Evaluate(args_ptr->car());
@@ -3103,9 +3211,10 @@ namespace Sayuri {
     if (!value_ptr) {\
       throw GenError("@unbound", "'" + symbol + "' doesn't bind any value.");\
     }\
+    value_ptr = value_ptr->Clone();\
 \
     CheckList(*value_ptr);\
-    LPointer supplement = caller->Evaluate(args_ptr->car())
+    LPointer supplement = caller->Evaluate(args_ptr->car())->Clone()
 
 #define COMMON_POP_EX \
     LObject* args_ptr = nullptr;\
@@ -3121,6 +3230,7 @@ namespace Sayuri {
     if (!value_ptr) {\
       throw GenError("@unbound", "'" + symbol + "' doesn't bind any value.");\
     }\
+    value_ptr = value_ptr->Clone();\
 \
     CheckList(*value_ptr)
 
@@ -3219,7 +3329,7 @@ namespace Sayuri {
     GetReadyForFunction(args, 2, &args_ptr);
 
     // 第1引数は関数。
-    LPointer func_ptr = caller->Evaluate(args_ptr->car());
+    LPointer func_ptr = caller->Evaluate(args_ptr->car())->Clone();
     CheckType(*func_ptr, LType::FUNCTION);
     LPointer func_expr = NewPair(func_ptr, NewNil());
     Next(&args_ptr);
@@ -3249,7 +3359,7 @@ namespace Sayuri {
         result = caller->Evaluate(args_ptr->car());
         CheckType(*result, LType::NUMBER);
 
-        var_ptr->car(result);
+        var_ptr->car(result->Clone());
       }
 
       // 変数のリストをセット。
@@ -3301,7 +3411,7 @@ namespace Sayuri {
     GetReadyForFunction(args, 2, &args_ptr);
 
     // 第1引数は関数。
-    LPointer func_ptr = caller->Evaluate(args_ptr->car());
+    LPointer func_ptr = caller->Evaluate(args_ptr->car())->Clone();
     CheckType(*func_ptr, LType::FUNCTION);
     LPointer func_expr = NewPair(func_ptr, NewNil());
     Next(&args_ptr);
@@ -3485,7 +3595,7 @@ namespace Sayuri {
     Next(&args_ptr);
 
     // 第2引数はイベント関数のリスト。
-    LPointer event_list = caller->Evaluate(args_ptr->car());
+    LPointer event_list = caller->Evaluate(args_ptr->car())->Clone();
     CheckList(*event_list);
     Next(&args_ptr);
 
@@ -3504,7 +3614,7 @@ namespace Sayuri {
     }
 
     // 第3引数は条件関数のリスト。
-    LPointer cond_list = caller->Evaluate(args_ptr->car());
+    LPointer cond_list = caller->Evaluate(args_ptr->car())->Clone();
     CheckList(*cond_list);
     Next(&args_ptr);
 
@@ -3679,7 +3789,7 @@ namespace Sayuri {
       "PA-2 needs at least 1 element of List of weights.");
     }
 
-    std::shared_ptr<LPA2> obj_ptr(new LPA2(weight_vec));
+    std::shared_ptr<LPA2> obj_ptr = std::make_shared<LPA2>(weight_vec);
     LC_Function func = [obj_ptr](const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       return (*obj_ptr)(self, caller, args);
@@ -3715,7 +3825,8 @@ namespace Sayuri {
     LPointer bias_ptr = caller->Evaluate(args_ptr->car());
     CheckType(*bias_ptr, LType::NUMBER);
 
-    std::shared_ptr<LAI> obj_ptr(new LAI(weight_vec, bias_ptr->number()));
+    std::shared_ptr<LAI> obj_ptr =
+    std::make_shared<LAI>(weight_vec, bias_ptr->number());
     LC_Function func = [obj_ptr](const LObject& self, LObject* caller,
     const LObject& args) -> LPointer {
       // 準備。
