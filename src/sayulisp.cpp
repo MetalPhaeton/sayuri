@@ -463,7 +463,7 @@ namespace Sayuri {
     LObject* args_ptr = nullptr;\
     GetReadyForFunction(args, 1, &args_ptr);\
 \
-    LPointer list_ptr = caller->Evaluate(args_ptr->car());\
+    LPointer list_ptr = caller->Evaluate(args_ptr->car())->Clone();\
 \
     if (list_ptr->IsSymbol()) {\
       std::map<std::string, std::uint32_t>::const_iterator itr =\
@@ -512,7 +512,7 @@ namespace Sayuri {
     LObject* args_ptr = nullptr;
     GetReadyForFunction(args, 1, &args_ptr);
 
-    LPointer list_ptr = caller->Evaluate(args_ptr->car());
+    LPointer list_ptr = caller->Evaluate(args_ptr->car())->Clone();
 
     if (list_ptr->IsSymbol()) {
       // マス。
@@ -550,7 +550,7 @@ namespace Sayuri {
     LObject* args_ptr = nullptr;\
     GetReadyForFunction(args, 1, &args_ptr);\
 \
-    LPointer list_ptr = caller->Evaluate(args_ptr->car());\
+    LPointer list_ptr = caller->Evaluate(args_ptr->car())->Clone();\
     if (list_ptr->IsNumber()) {\
       std::uint32_t index = list_ptr->number();\
       if (index < limit) {\
@@ -2185,7 +2185,7 @@ namespace Sayuri {
     LObject* args_ptr = nullptr;
     Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
 
-    LPointer result = caller->Evaluate(args_ptr->car());
+    LPointer result = caller->Evaluate(args_ptr->car())->Clone();
     Lisp::CheckType(*result, LType::FUNCTION);
 
     // リストを作る。
@@ -2796,7 +2796,7 @@ namespace Sayuri {
   DEF_MESSAGE_FUNCTION(EngineSuite::SetMaterial) {
     // 古い設定を得る。
     const int (& material)[NUM_PIECE_TYPES] = search_params_ptr_->material();
-    LPointerVec ret_vec(7);
+    LPointerVec ret_vec(NUM_PIECE_TYPES);
     FOR_PIECE_TYPES(piece_type) {
       ret_vec[piece_type] = Lisp::NewNumber(material[piece_type]);
     }
@@ -2808,7 +2808,7 @@ namespace Sayuri {
       Lisp::CheckList(*result);
 
       int len = Lisp::CountList(*result);
-      if (len < 7) {
+      if (len < static_cast<int>(NUM_PIECE_TYPES)) {
         throw Lisp::GenError("@engine-error",
         "'" + symbol + "'"" requires List of 7 elements.");
       }
