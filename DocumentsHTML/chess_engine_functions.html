@@ -211,45 +211,6 @@
 (display (my-engine '@get-white-pawn-position))
 ;; Output
 ;; &gt; (A2 B2 C2 D2 E2 F2 G2 H2)
-
-(display (help "engine @get-white-pawn-position"))
-;; Output
-;; &gt; ### Getting squares ###
-;; &gt; 
-;; &gt; * `@get-white-pawn-position`
-;; &gt;     + Returns List of Symbols of squares where White Pawns are on.
-;; &gt; * `@get-white-knight-position`
-;; &gt;     + Returns List of Symbols of squares where White Knights are on.
-;; &gt; * `@get-white-bishop-position`
-;; &gt;     + Returns List of Symbols of squares where White Bishops are on.
-;; &gt; * `@get-white-rook-position`
-;; &gt;     + Returns List of Symbols of squares where White Rooks are on.
-;; &gt; * `@get-white-queen-position`
-;; &gt;     + Returns List of Symbols of squares where White Queens are on.
-;; &gt; * `@get-white-king-position`
-;; &gt;     + Returns List of Symbols of squares where White King is on.
-;; &gt; * `@get-black-pawn-position`
-;; &gt;     + Returns List of Symbols of squares where Black Pawns are on.
-;; &gt; * `@get-black-knight-position`
-;; &gt;     + Returns List of Symbols of squares where Black Knights are on.
-;; &gt; * `@get-black-bishop-position`
-;; &gt;     + Returns List of Symbols of squares where Black Bishops are on.
-;; &gt; * `@get-black-rook-position`
-;; &gt;     + Returns List of Symbols of squares where Black Rooks are on.
-;; &gt; * `@get-black-queen-position`
-;; &gt;     + Returns List of Symbols of squares where Black Queens are on.
-;; &gt; * `@get-black-king-position`
-;; &gt;     + Returns List of Symbols of squares where Black King is on.
-;; &gt; * `@get-empty-square-position`
-;; &gt;     + Returns List of Symbols of empty squares.
-;; &gt; 
-;; &gt; &lt;h6&gt; Example &lt;/h6&gt;
-;; &gt; 
-;; &gt;     (define my-engine (gen-engine))
-;; &gt;     (display (my-engine '@get-white-pawn-position))
-;; &gt;     
-;; &gt;     ;; Output
-;; &gt;     ;; &gt; (A2 B2 C2 D2 E2 F2 G2 H2)
 </code></pre>
 <h2 id="pgn-functions">PGN Functions</h2>
 <h3 id="gen-pgn">gen-pgn</h3>
@@ -402,7 +363,7 @@
 ;; &gt; Copyright (c) 2013-2015 Hironori Ishibashi
 ;; &gt; 
 ;; &gt; Permission is hereby granted, free of charge, to any person obtaining
-:: &gt; a copy
+;; &gt; a copy
 ;; &gt; of this software and associated documentation files (the "Software"),
 ;; &gt; to
 ;; &gt; deal in the Software without restriction, including without limitation
@@ -609,14 +570,14 @@
           (PAWN KNIGHT BISHOP)
           (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING)))
 
-(display (piece-&gt;number symbol-list))
+(display (castling-&gt;number symbol-list))
 ;; Output
 ;; &gt; ((A1 B1 C1)
 ;; &gt; (FYLE_A FYLE_B FYLE_C)
 ;; &gt; (RANK_1 RANK_2 RANK_3)
 ;; &gt; (WHITE BLACK)
-;; &gt; (1 2 3)
-;; &gt; (WHITE_SHORT_CASTLING BLACK_LONG_CASTLING))
+;; &gt; (PAWN KNIGHT BISHOP)
+;; &gt; (1 4))
 </code></pre>
 <h3 id="chess-to-number">chess-&gt;number</h3>
 <h6> Usage </h6>

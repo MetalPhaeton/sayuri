@@ -506,13 +506,16 @@
 </ul>
 <h6> Example </h6>
 
-<p>(define li '(9 3 5 8 1 4 7 6 0 2))</p>
-<p>(display (list-sort li (lambda (prev next) (&lt; prev next))))
+<pre><code>(define li '(9 3 5 8 1 4 7 6 0 2))
+
+(display (list-sort li (lambda (prev next) (&lt; prev next))))
 ;; Output
-;; &gt; (0 1 2 3 4 5 6 7 8 9)</p>
-<p>(display (list-sort li (lambda (prev next) (&gt; prev next))))
+;; &gt; (0 1 2 3 4 5 6 7 8 9)
+
+(display (list-sort li (lambda (prev next) (&gt; prev next))))
 ;; Output
-;; &gt; (9 8 7 6 5 4 3 2 1 0)</p>
+;; &gt; (9 8 7 6 5 4 3 2 1 0)
+</code></pre>
 <h3 id="zip">zip</h3>
 <h6> Usage </h6>
 
@@ -830,7 +833,7 @@
 
 ;; Output
 ;; &gt; (111 222 333)
-;; &gt; (111 222 333 444))...";
+;; &gt; (111 222 333 444)
 </code></pre>
 <h3 id="pop-back2">pop-back!</h3>
 <h6> Usage </h6>
@@ -1242,7 +1245,7 @@
 
 ;; Output
 ;; &gt; 5
-:: &gt; 17
+;; &gt; 17
 </code></pre>
 <h3 id="sub2">sub!</h3>
 <h6> Usage </h6>
@@ -1819,7 +1822,7 @@
 (define (func x y) (+ (* x x) (* y y)))
 (display (integral func '(0 3 0.1) '(0 5 0.1)))
 ;; Output
-;; &gt; 169.975
+;; &gt;  175.04305
 
 ;; (1/3)(x^3)y + (1/3)(y^3)x is a primitive function of x^2 + y^2
 (define (primitive x y) (+ (* (/ 1 3) x x x y) (* (/ 1 3) y y y x)))
@@ -2602,7 +2605,7 @@
 <h6> Example </h6>
 
 <pre><code>;; After 1.29 seconds from program has run.
-(clock)
+(display (clock))
 ;; Output
 ;; 1.29091
 </code></pre>

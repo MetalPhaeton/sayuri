@@ -206,7 +206,7 @@
 
 (display (my-engine '@get-ply))
 ;; Output
-;; &gt; 9
+;; &gt; 8
 
 (display (my-engine '@get-clock))
 ;; Output
@@ -300,7 +300,7 @@
 
 (display (my-engine '@set-ply 111))
 ;; Output
-;; &gt; 1
+;; &gt; 0
 
 (display (my-engine '@set-clock 22))
 ;; Output
@@ -361,7 +361,7 @@
 <li><code>@place-piece &lt;Piece : List&gt; &lt;Square : Number&gt;</code><ul>
 <li>Sets a <code>&lt;Piece&gt;</code> on <code>&lt;Square&gt;</code>
   and returns the previous piece placed on <code>&lt;Square&gt;</code>.</li>
-<li><code>&lt;Piece&gt;</code> is `(<Side : Number> <Type : Number>).<ul>
+<li><code>&lt;Piece&gt;</code> is <code>(&lt;Side : Number&gt; &lt;Type : Number&gt;).</code><ul>
 <li>For example, White Pawn is <code>(list WHITE PAWN)</code>.</li>
 </ul>
 </li>
@@ -645,8 +645,8 @@ the control won't come back until the engine have found the best move.</p>
 (display (my-engine '@go-movetime 10000))
 ;; Output
 ;; &gt; (31 () (E2 E4 EMPTY) (E7 E5 EMPTY) (G1 F3 EMPTY) (G8 F6 EMPTY)
-:: &gt; (B1 C3 EMPTY) (B8 C6 EMPTY) (F1 B5 EMPTY) (F8 B4 EMPTY) (E1 G1 EMPTY)
-:: &gt; (B4 C3 EMPTY) (D2 C3 EMPTY))
+;; &gt; (B1 C3 EMPTY) (B8 C6 EMPTY) (F1 B5 EMPTY) (F8 B4 EMPTY) (E1 G1 EMPTY)
+;; &gt; (B4 C3 EMPTY) (D2 C3 EMPTY))
 
 ;; Mate in 2.
 (define fen
@@ -683,7 +683,7 @@ the control won't come back until the engine have found the best move.</p>
 (display (my-engine '@set-hash-size (* 256 1024 1024)))
 ;; Set size of Hash Table to 256 MB and return 128 * 1024 * 1024 bytes.
 ;; Output
-;; &gt; 1.34218e+08
+;; &gt; 134217728
 
 ;; Set the number of threads to 3.
 (my-engine '@input-uci-command "setoption name threads value 3")
@@ -912,7 +912,7 @@ the control won't come back until the engine have found the best move.</p>
 
 (display (my-engine '@material (list 111 222 333 444 555 666 777)))
 ;; Output
-;; &gt; (0 100 400 400 600 1200 1e+06)
+;; &gt; (0 100 400 400 600 1200 1000000)
 
 (display (my-engine '@material))
 ;; Output
@@ -934,11 +934,11 @@ the control won't come back until the engine have found the best move.</p>
 
 (display (my-engine '@enable-quiesce-search #f))
 ;; Output
-:: &gt; #t
+;; &gt; #t
 
 (display (my-engine '@enable-quiesce-search))
 ;; Output
-:: &gt; #f
+;; &gt; #f
 </code></pre>
 <h3 id="customizing-search-algorithm-repetition-check">Customizing Search Algorithm - Repetition Check</h3>
 <ul>

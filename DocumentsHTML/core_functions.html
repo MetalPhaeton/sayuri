@@ -290,7 +290,7 @@
 ;; &gt; 15
 
 ;; Example of Macro-Like Argument.
-(define (gen-func ^x &amp;y) (^x &amp;y) (lambda () (display (apply '^x '&amp;y))))
+(define (gen-func ^x &amp;y) (lambda () (display (apply '^x '&amp;y))))
 (define func1 (gen-func + 111 222))
 (define func2 (gen-func * 333 444 555))
 (func1)
@@ -627,7 +627,7 @@
      (display exception))
 
 ;; Output
-;; &gt; (@not-number "The 2nd argument of (+) didn't return Number.")
+;; &gt; (@not-number "'\"Hello\"' is not Number. It's String.")
 </code></pre>
 <h3 id="throw">throw</h3>
 <h6> Usage </h6>
@@ -1107,7 +1107,7 @@
 <pre><code>(define i 0)
 (while (&lt; i 5)
     (display "Hello " i)
-    (display "World" i)
+    (display "World " i)
     (inc! i))
 
 ;; Output
@@ -1283,14 +1283,14 @@
 ;; (define b 222)
 ;; (string-append "Hello " "World")  ;; &lt;- The last S-Expression.
 
-(display (import "hello.scm"))
+(display (import "input.scm"))
 (display "a: " a)
 (display "b: " b)
 
 ;; Output
 ;; &gt; Hello World
-:: &gt; a: 111
-:: &gt; b: 222
+;; &gt; a: 111
+;; &gt; b: 222
 </code></pre>
 <h3 id="export">export</h3>
 <h6> Usage </h6>
