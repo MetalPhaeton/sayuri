@@ -244,7 +244,7 @@ namespace Sayuri {
           // 普通の引数名。
           // 評価してバインド。
           result = caller->Evaluate(ptr->car());
-          scope_chain_.InsertSymbol(*names_itr, result);
+          scope_chain_.InsertSymbol(*names_itr, result->Clone());
 
           // at_listにも登録。
           at_ptr->car(result);
@@ -1499,7 +1499,7 @@ namespace Sayuri {
       }
 
       // 評価結果をスコープにバインド。
-      caller->scope_chain().InsertSymbol(first_arg->symbol(), result);
+      caller->scope_chain().InsertSymbol(first_arg->symbol(), result->Clone());
 
       return first_arg->Clone();
     } else if (first_arg->IsPair()) {
@@ -1507,6 +1507,7 @@ namespace Sayuri {
       // (define (<func_name_ptr> <first_args->cdr>...) <args_ptr->cdr>...)
       // 関数名を得る。
       const LPointer& func_name_ptr = first_arg->car();
+      CheckType(*func_name_ptr, LType::SYMBOL);
 
       // スコープチェーンを得る。
       const LScopeChain& chain = caller->scope_chain();
@@ -1564,10 +1565,10 @@ namespace Sayuri {
       Next(&names_ptr), args_ptr = args_ptr->cdr()) {
         const std::string& name = names_ptr->car()->symbol();
         if (name[0] == '&') {
-          local_chain.InsertSymbol(name, args_ptr);
+          local_chain.InsertSymbol(name, args_ptr->Clone());
           break;
         } else {
-          local_chain.InsertSymbol(name, args_ptr->car());
+          local_chain.InsertSymbol(name, args_ptr->car()->Clone());
         }
       }
 
@@ -1660,7 +1661,7 @@ namespace Sayuri {
 
       // ローカル変数の初期値。
       LPointer local_pair_second =
-      caller->Evaluate(local_pair->cdr()->car());
+      caller->Evaluate(local_pair->cdr()->car())->Clone();
 
       // バインドする。
       local_chain.InsertSymbol(local_pair_first->symbol(), local_pair_second);
@@ -1737,7 +1738,7 @@ namespace Sayuri {
       get_next_elm = [&range_ptr]() -> LPointer {
         const LPointer& ret = range_ptr->car();
         Next(&range_ptr);
-        return ret;
+        return ret->Clone();
       };
 
       is_not_end = [&range_ptr]() -> bool {
@@ -1937,7 +1938,8 @@ namespace Sayuri {
 
       // 結果の第1要素が@replaceなら置き換え。
       if (result->IsPair()) {
-        if (result->car()->symbol() == "@replace") {
+        if ((result->car()->IsSymbol())
+        && (result->car()->symbol() == "@replace")) {
           if (result->cdr()->IsPair()) {
             pair.car(result->cdr()->car());
           }
@@ -1952,7 +1954,8 @@ namespace Sayuri {
 
       // 結果の第1要素が@replaceなら置き換え。
       if (result->IsPair()) {
-        if (result->car()->symbol() == "@replace") {
+        if ((result->car()->IsSymbol())
+        && (result->car()->symbol() == "@replace")) {
           if (result->cdr()->IsPair()) {
             pair.cdr(result->cdr()->car());
           }
