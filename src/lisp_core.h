@@ -3628,9 +3628,6 @@ namespace Sayuri {
       /** ネイティブ関数 - prob->logit */
       DEF_LC_FUNCTION(ProbToLogit);
 
-      /** ネイティブ関数 - gen-pa2 */
-      DEF_LC_FUNCTION(GenPA2);
-
       /** ネイティブ関数 - gen-ai */
       DEF_LC_FUNCTION(GenAI);
 
@@ -3897,106 +3894,6 @@ namespace Sayuri {
      */
     double Determinant(const Mat& mat);
   }  // namespace LMath
-
-  /** Passive-Aggressive-2 */
-  class LPA2 {
-    public:
-      // ==================== //
-      // コンストラクタと代入 //
-      // ==================== //
-      /**
-       * コンストラクタ。
-       * @param weight_vec 初期ウェイト。
-       */
-      LPA2(const LMath::Vec& weight_vec) : weight_vec_(weight_vec) {}
-      /** コンストラクタ。 */
-      LPA2() {}
-      /**
-       * コピーコンストラクタ。
-       * @param pa コピー元。
-       */
-      LPA2(const LPA2& pa) : weight_vec_(pa.weight_vec_) {}
-      /**
-       * ムーブコンストラクタ。
-       * @param pa ムーブ元。
-       */
-      LPA2(LPA2&& pa) : weight_vec_(std::move(pa.weight_vec_)) {}
-      /**
-       * コピー代入演算子。
-       * @param pa コピー元。
-       */
-      LPA2& operator=(const LPA2& pa) {
-        weight_vec_ = pa.weight_vec_;
-        return *this;
-      }
-      /**
-       * ムーブ代入演算子。
-       * @param pa ムーブ元。
-       */
-      LPA2& operator=(LPA2&& pa) {
-        weight_vec_ = std::move(pa.weight_vec_);
-        return *this;
-      }
-      /** デストラクタ。 */
-      virtual ~LPA2() {}
-
-      // ============== //
-      // パブリック関数 //
-      // ============== //
-      /**
-       * ウェイトを学習する。
-       * @param is_plus 出力が0以上ならtrue。
-       * @param cost エラーに対するコスト。
-       * @param 入力ベクトル。
-       */
-      void TrainWeights(bool is_plus, double cost, const LMath::Vec& input);
-
-      /**
-       * 関数を計算する。
-       * @param input 入力ベクトル。
-       * @return 出力。
-       */
-      double CalcFunc(const LMath::Vec& input) {
-        return LMath::operator*(weight_vec_, input);
-      }
-
-      /**
-       * アクセサ - ウェイトのベクトル。
-       * @return ウェイトのベクトル。
-       */
-      const LMath::Vec& weight_vec() const {return weight_vec_;}
-
-      // --- Lisp用関数 --- //
-      /** 関数オブジェクト。 */
-      DEF_LC_FUNCTION(operator());
-
-      /** メッセージ関数 - @train */
-      DEF_LC_FUNCTION(Train);
-      /** メッセージ関数 - @calc */
-      DEF_LC_FUNCTION(Calc);
-      /** メッセージ関数 - @get-weights */
-      DEF_LC_FUNCTION(GetWeights);
-
-    private:
-      /**
-       * ヒンジ損失を計算する。
-       * @param sign 正の数なら1、違うなら-1。
-       * @param input 入力ベクトル。
-       * @return ヒンジ損失。
-       */
-      double Hinge(double sign, const LMath::Vec& input) {
-        using namespace LMath;
-
-        double l = 1.0 - ((input * weight_vec_) * sign);
-        return l < 0.0 ? 0.0 : l;
-      }
-
-      // ========== //
-      // メンバ変数 //
-      // ========== //
-      /** ウェイト。 */
-      LMath::Vec weight_vec_;
-  };
 
   // 人工知能。
   class LAI {

@@ -1234,9 +1234,6 @@ namespace Sayuri {
     func = LC_FUNCTION_OBJ(ProbToLogit);
     INSERT_LC_FUNCTION(func, "prob->logit", "Lisp:prob->logit");
 
-    func = LC_FUNCTION_OBJ(GenPA2);
-    INSERT_LC_FUNCTION(func, "gen-pa2", "Lisp:gen-pa2");
-
     func = LC_FUNCTION_OBJ(GenAI);
     INSERT_LC_FUNCTION(func, "gen-ai", "Lisp:gen-ai");
 
@@ -3775,34 +3772,6 @@ namespace Sayuri {
     return NewNumber(std::log(value / (1.0 - value)));
   }
 
-  // %%% gen-pa2
-  DEF_LC_FUNCTION(Lisp::GenPA2) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    GetReadyForFunction(args, 1, &args_ptr);
-
-    // 初期ウェイトを得る。
-    LPointer weights_ptr = caller->Evaluate(args_ptr->car());
-    CheckList(*weights_ptr);
-    LMath::Vec weight_vec = LMath::ListToMathVec(*weights_ptr);
-
-    // 1つ以上あるかどうかを調べる
-    if (weight_vec.size() <= 0) {
-      throw GenError("@function-error",
-      "PA-2 needs at least 1 element of List of weights.");
-    }
-
-    std::shared_ptr<LPA2> obj_ptr = std::make_shared<LPA2>(weight_vec);
-    LC_Function func = [obj_ptr](const LObject& self, LObject* caller,
-    const LObject& args) -> LPointer {
-      return (*obj_ptr)(self, caller, args);
-    };
-
-    return NewN_Function(func,
-    "Lisp:gen-pa2:" + std::to_string(reinterpret_cast<size_t>(obj_ptr.get())),
-    caller->scope_chain());
-  }
-
   // %%% gen-ai
   DEF_LC_FUNCTION(Lisp::GenAI) {
     using namespace LMath;
@@ -4023,112 +3992,6 @@ namespace Sayuri {
     ptr->car(NewNumber(time_st->tm_sec));
 
     return ret_ptr;
-  }
-
-  // ==== //
-  // LPA2 //
-  // ==== //
-  // 学習関数。
-  void LPA2::TrainWeights(bool is_plus, double cost,
-  const LMath::Vec& input) {
-    using namespace LMath;
-
-    unsigned int size = weight_vec_.size();
-    unsigned int size_2 = input.size();
-    size = size_2 < size ? size_2 : size;
-
-    cost = cost < 0.0 ? 0.5 : cost;
-
-    double sign = is_plus ? 1.0 : -1.0;
-    double hinge_and_sign = Hinge(sign, input) * sign;
-    double denominator = (input * input) + (1.0 / (2.0 * cost));
-
-    for (unsigned int i = 0; i < size; ++i) {
-      weight_vec_[i] += (hinge_and_sign * input[i]) / denominator;
-    }
-  }
-  // 関数オブジェクト。
-  DEF_LC_FUNCTION(LPA2::operator()) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Lisp::GetReadyForFunction(args, 1, &args_ptr);
-
-    // 第1引数はメッセージ。
-    LPointer message_ptr = caller->Evaluate(args_ptr->car());
-    Lisp::CheckType(*message_ptr, LType::SYMBOL);
-    const std::string& message = message_ptr->symbol();
-
-    if (message == "@train") return Train(self, caller, args);
-    if (message == "@calc") return Calc(self, caller, args);
-    if (message == "@get-weights") return GetWeights(self, caller, args);
-
-    throw Lisp::GenError("@function-error",
-    "Couldn't understand '" + message + "'.");
-  }
-
-  // %%% @train
-  DEF_LC_FUNCTION(LPA2::Train) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Lisp::GetReadyForFunction(args, 4, &args_ptr);
-    Lisp::Next(&args_ptr);
-
-    // 第1引数はプラスかどうか。
-    LPointer is_plus_ptr = caller->Evaluate(args_ptr->car());
-    Lisp::CheckType(*is_plus_ptr, LType::BOOLEAN);
-    Lisp::Next(&args_ptr);
-
-    // 第2引数は許容するエラー。
-    LPointer error_ptr = caller->Evaluate(args_ptr->car());
-    Lisp::CheckType(*error_ptr, LType::NUMBER);
-    Lisp::Next(&args_ptr);
-    double error = error_ptr->number();
-    error = error < 0.0 ? 0.0 : error;
-
-    // 第3引数は入力ベクトル。
-    LPointer input_ptr = caller->Evaluate(args_ptr->car());
-    Lisp::CheckList(*input_ptr);
-
-    // 入力ベクトルの数をチェック。
-    unsigned int num_input = Lisp::CountList(*input_ptr);
-    if (num_input != weight_vec_.size()) {
-      throw Lisp::GenError("@function-error",
-      "Not equal number of elements of weights and inputs.");
-    }
-
-    // 学習する。
-    TrainWeights(is_plus_ptr->boolean(), error,
-    LMath::ListToMathVec(*input_ptr));
-
-    // 学習結果のベクトルを返す。
-    return LMath::MathVecToList(weight_vec_);
-  }
-
-  // %%% @calc
-  DEF_LC_FUNCTION(LPA2::Calc) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Lisp::GetReadyForFunction(args, 2, &args_ptr);
-    Lisp::Next(&args_ptr);
-
-    // 第1引数は入力ベクトル。
-    LPointer input_ptr = caller->Evaluate(args_ptr->car());
-    Lisp::CheckList(*input_ptr);
-
-    // 入力ベクトルの数をチェック。
-    unsigned int num_input = Lisp::CountList(*input_ptr);
-    if (num_input != weight_vec_.size()) {
-      throw Lisp::GenError("@function-error",
-      "Not equal number of elements of weights and inputs.");
-    }
-
-    return Lisp::NewNumber(LMath::operator*(weight_vec_,
-    LMath::ListToMathVec(*input_ptr)));
-  }
-
-  // %%% @get-weights
-  DEF_LC_FUNCTION(LPA2::GetWeights) {
-    return LMath::MathVecToList(weight_vec_);
   }
 
   namespace LMath {
