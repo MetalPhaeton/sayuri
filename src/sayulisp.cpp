@@ -713,6 +713,15 @@ namespace Sayuri {
       return LPointerVecToList(ret_vec);
     };
 
+    message_func_map["@get-current-game-result"] =
+    [pgn_ptr, current_index_ptr](const std::string& symbol,
+    const LObject& self, LObject* caller, const LObject& args) -> LPointer {
+      // 現在のゲームの結果を得る。
+      if (pgn_ptr->game_vec().empty()) return NewNil();
+
+      return NewString(pgn_ptr->game_vec()[*current_index_ptr]->result());
+    };
+
     message_func_map["@current-move"] =
     [pgn_ptr, current_index_ptr](const std::string& symbol,
     const LObject& self, LObject* caller, const LObject& args) -> LPointer {
