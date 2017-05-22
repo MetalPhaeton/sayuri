@@ -2237,6 +2237,12 @@
   otherwise Soft Margin.</li>
 </ul>
 </li>
+<li><code>@train-logistic &lt;Rate : Number&gt; &lt;Desired output : Number&gt; &lt;Feature vector : List&gt;</code><ul>
+<li>Trains <code>&lt;AI&gt;</code> by Logistic Regression.</li>
+<li>Returns differentiated loss.</li>
+<li><code>&lt;Rate&gt;</code> must be positive number and not 0.</li>
+</ul>
+</li>
 <li><code>@train-bp &lt;Rate : Number&gt; &lt;Each parent's Differentiated loss : List&gt; &lt;Each parent's weight related to me : List &gt; &lt;Children's output : List&gt;</code><ul>
 <li>Trains as a node of middle layer of Neural Network
   by Back Propagation.</li>

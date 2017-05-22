@@ -4087,6 +4087,26 @@ namespace Sayuri {
       }
 
       /**
+       * 学習する。 (ロジスティック)
+       * @param desired_output 訓練出力。
+       * @param features 特徴ベクトル。
+       * @param rate 学習率。
+       * @return 微分された損失。
+       */
+      double TrainLogistic(double desired_output, const LMath::Vec& features,
+      double rate) {
+        using namespace LMath;
+
+        rate = rate < 0.0 ? 0.0 : rate;
+
+        double loss = Sigmoid((weights_ * features) - desired_output);
+
+        weights_ = weights_ - ((rate * loss) * features);
+
+        return loss;
+      }
+
+      /**
        * バックプロパゲーションで学習する。
        * @param differentiated_parent_loss 親の微分された損失のベクトル。
        * @param related_weights_to_me 各親の自分用のウェイトのベクトル。
