@@ -4087,21 +4087,31 @@ namespace Sayuri {
       }
 
       /**
-       * 学習する。 (ロジスティック)
+       * 学習する。 (Comparison Training)
        * @param desired_output 訓練出力。
-       * @param features 特徴ベクトル。
+       * @param good_features いい方の特徴ベクトル。
+       * @param bad_features 悪い方の特徴ベクトル。
        * @param rate 学習率。
        * @return 微分された損失。
        */
-      double TrainLogistic(double desired_output, const LMath::Vec& features,
-      double rate) {
+      double TrainComparison(const LMath::Vec& good_features,
+      const LMath::Vec& bad_features, double rate) {
         using namespace LMath;
+
+        Vec good_copy = good_features;
+        good_copy.push_back(1.0);
+
+        Vec bad_copy = bad_features;
+        bad_copy.push_back(1.0);
+
+        double good_score = weights_ * good_copy;
+        double bad_score = weights_ * bad_copy;
+
+        double loss = Sigmoid(bad_score - good_score);
 
         rate = rate < 0.0 ? 0.0 : rate;
 
-        double loss = Sigmoid((weights_ * features) - desired_output);
-
-        weights_ = weights_ - ((rate * loss) * features);
+        weights_ = weights_ - ((rate * loss) * (bad_copy - good_copy));
 
         return loss;
       }

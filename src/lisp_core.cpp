@@ -3888,7 +3888,7 @@ namespace Sayuri {
           return NewNumber(obj_ptr->TrainPA2(desired_output, features, num));
         }
       }
-      if (symbol == "@train-logistic") {
+      if (symbol == "@train-comparison") {
         Next(&args_ptr);
         CheckType(*args_ptr, LType::PAIR);
 
@@ -3899,19 +3899,19 @@ namespace Sayuri {
         Next(&args_ptr);
         CheckType(*args_ptr, LType::PAIR);
 
-        LPointer output_ptr = caller->Evaluate(args_ptr->car());
-        CheckType(*output_ptr, LType::NUMBER);
-        double desired_output = output_ptr->number();
+        LPointer good_features_ptr = caller->Evaluate(args_ptr->car());
+        CheckType(*good_features_ptr, LType::NUMBER);
+        Vec good_features = to_feature_vec(good_features_ptr);
 
         Next(&args_ptr);
         CheckType(*args_ptr, LType::PAIR);
 
-        LPointer features_ptr = caller->Evaluate(args_ptr->car());
-        CheckList(*features_ptr);
-        Vec features = to_feature_vec(features_ptr);
+        LPointer bad_features_ptr = caller->Evaluate(args_ptr->car());
+        CheckList(*bad_features_ptr);
+        Vec bad_features = to_feature_vec(bad_features_ptr);
 
         return NewNumber
-        (obj_ptr->TrainLogistic(desired_output, features, rate));
+        (obj_ptr->TrainComparison(good_features, bad_features, rate));
       }
       if (symbol == "@train-bp") {
         Next(&args_ptr);
