@@ -1099,6 +1099,9 @@ namespace Sayuri {
       /** キャスリングの放棄。 */
       DEF_MESSAGE_FUNCTION(SetWeightAbandonedCastling);
 
+      /** 特徴ベクトルの作成。 */
+      DEF_MESSAGE_FUNCTION(GetFeatureVector);
+
       // ======== //
       // アクセサ //
       // ======== //
@@ -1207,8 +1210,6 @@ namespace Sayuri {
        */
       std::vector<std::pair<std::string, std::vector<double>>>
       GenFeatureVec(Side side) const;
-
-    private:
 
       // ========== //
       // メンバ変数 //

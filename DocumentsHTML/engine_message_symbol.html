@@ -36,6 +36,7 @@
 <li><a href="#searching-the-best-move">Searching the best move</a></li>
 <li><a href="#hash-and-threads">Hash and threads</a></li>
 <li><a href="#analyse-position">Analyse Position</a></li>
+<li><a href="#generate-feature-vector">Generate Feature Vector</a></li>
 <li><a href="#customizing-search-algorithm---material">Customizing Search Algorithm - Material</a></li>
 <li><a href="#customizing-search-algorithm---quiescence-search">Customizing Search Algorithm - Quiescence Search</a></li>
 <li><a href="#customizing-search-algorithm---repetition-check">Customizing Search Algorithm - Repetition Check</a></li>
@@ -888,6 +889,106 @@ the control won't come back until the engine have found the best move.</p>
 (display (engine '@analyse-pin/skewer C3))
 ;; Output
 ;; &gt; ((F6 H8))
+</code></pre>
+<h3 id="generate-feature-vector">Generate Feature Vector</h3>
+<ul>
+<li><code>@generate-feature-vector</code></li>
+</ul>
+<p>Generates List of each Feature Vector.</p>
+<h6> Example </h6>
+
+<pre><code>(define my-engine (gen-engine))
+(define (make-move from to)
+        (my-engine '@play-move (list from to EMPTY)))
+
+(make-move E2 E4)
+(make-move E7 E5)
+(make-move G1 F3)
+(make-move B8 C6)
+(make-move F1 B5)
+(make-move A7 A6)
+(make-move B5 A4)
+(make-move G8 F6)
+(make-move E1 G1)
+(make-move F8 E7)
+(make-move F1 E1)
+
+(display (my-engine '@to-string))
+(for (elm (my-engine '@get-feature-vector WHITE))
+     (display elm))
+;; Output
+;; &gt;   +-----------------+
+;; &gt;  8| r . b q k . . r |
+;; &gt;  7| . p p p b p p p |
+;; &gt;  6| p . n . . n . . |
+;; &gt;  5| . . . . p . . . |
+;; &gt;  4| B . . . P . . . |
+;; &gt;  3| . . . . . N . . |
+;; &gt;  2| P P P P . P P P |
+;; &gt;  1| R N B Q R . K . |
+;; &gt;   +-----------------+
+;; &gt;     a b c d e f g h
+;; &gt;  To Move: b | Clock: 5 | Ply: 11
+;; &gt;  En Passant Square: -
+;; &gt;  Castling Rights : kq
+;; &gt;  
+;; &gt;  ("pawn_position" (0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0 0))
+;; &gt;  ("knight_position" (0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0
+;; &gt; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0 0 0))
+;; &gt;  ("bishop_position" (0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0
+;; &gt; 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0 0 0))
+;; &gt;  ("rook_position" (0 0 0 0 1 0 0 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0 0))
+;; &gt;  ("queen_position" (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0 0))
+;; &gt;  ("king_position" (0 0 0 0 -1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0 0))
+;; &gt;  ("pawn_attack" (0 0 0 0 0 0))
+;; &gt;  ("knight_attack" (0 0 0 0 0 0))
+;; &gt;  ("bishop_attack" (0 1 0 0 0 0))
+;; &gt;  ("rook_attack" (0 0 0 0 0 0))
+;; &gt;  ("queen_attack" (0 0 0 0 0 0))
+;; &gt;  ("king_attack" (0 0 0 0 0 0))
+;; &gt;  ("pawn_defense" (-1 -2 0 0 0 0))
+;; &gt;  ("knight_defense" (0 0 -1 1 -1 0))
+;; &gt;  ("bishop_defense" (1 -1 0 0 -1 0))
+;; &gt;  ("rook_defense" (0 1 -1 0 1 0))
+;; &gt;  ("queen_defense" (0 1 -1 1 0 -1))
+;; &gt;  ("king_defense" (1 0 -1 0 -1 0))
+;; &gt;  ("bishop_pin" (0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0 0 0 0 0 0 0))
+;; &gt;  ("rook_pin" (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0 0 0 0 0 0))
+;; &gt;  ("queen_pin" (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0 0 0 0 0 0 0))
+;; &gt;  ("pawn_shield" (0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;; &gt; 0 0 0))
+;; &gt;  ("mobility" (2 -4 -2 -1 1 0))
+;; &gt;  ("center_control" (2 0 -1 1 0 0))
+;; &gt;  ("sweet_center_control" (0 -1 0 0 0 0))
+;; &gt;  ("development" (-1 -1 0 1 0 1))
+;; &gt;  ("attack_around_king" (0 0 0 0 0 0))
+;; &gt;  ("pass_pawn" (0))
+;; &gt;  ("protected_pass_pawn" (0))
+;; &gt;  ("double_pawn" (0))
+;; &gt;  ("iso_pawn" (0))
+;; &gt;  ("bishop_pair" (0))
+;; &gt;  ("bad_bishop" (0))
+;; &gt;  ("rook_pair" (0))
+;; &gt;  ("rook_semiopen_fyle" (0))
+;; &gt;  ("rook_open_fyle" (0))
+;; &gt;  ("early_queen_starting" (0))
+;; &gt;  ("weak_square" (0))
+;; &gt;  ("castling" (1))
+;; &gt;  ("abandoned_castling" (0))
 </code></pre>
 <h3 id="customizing-search-algorithm-material">Customizing Search Algorithm - Material</h3>
 <ul>

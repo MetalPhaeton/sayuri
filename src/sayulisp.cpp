@@ -1730,6 +1730,9 @@ namespace Sayuri {
 
     message_func_map_["@weight-abandoned-castling"] =
     INSERT_MESSAGE_FUNCTION(SetWeightAbandonedCastling);
+
+    message_func_map_["@get-feature-vector"] =
+    INSERT_MESSAGE_FUNCTION(GetFeatureVector);
   }
 
   // 関数オブジェクト。
@@ -3515,6 +3518,40 @@ namespace Sayuri {
   // %%% @weight-abandoned-castling
   DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAbandonedCastling) {
     SET_WEIGHT(weight_abandoned_castling);
+  }
+
+  // %%% @get-feature-vector
+  DEF_MESSAGE_FUNCTION(EngineSuite::GetFeatureVector) {
+    // 準備。
+    LObject* args_ptr = nullptr;
+    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
+
+    // サイドを得る。
+    LPointer side_ptr = caller->Evaluate(args_ptr->car());
+    Sayulisp::CheckSide(*side_ptr);
+
+    // 特徴ベクトルを得る。
+    std::vector<std::pair<std::string, std::vector<double>>>
+    feature_vec = GenFeatureVec(side_ptr->number());
+
+    // 特徴ベクトルのリストを作る。
+    std::size_t len = feature_vec.size();
+    LPointerVec ret_vec(len);
+    for (std::size_t i = 0; i < len; ++i) {
+      // 特徴名を作る。
+      LPointer name = Lisp::NewString(feature_vec[i].first);
+
+      // ベクトルを作る。
+      std::size_t len_2 = feature_vec[i].second.size();
+      LPointerVec vec(len_2);
+      for (std::size_t j = 0; j < len_2; ++j) {
+        vec[j] = Lisp::NewNumber(feature_vec[i].second[j]);
+      }
+      ret_vec[i] = Lisp::NewPair(name, Lisp::NewPair
+      (Lisp::LPointerVecToList(vec), Lisp::NewNil()));
+    }
+
+    return Lisp::LPointerVecToList(ret_vec);
   }
 
   // ========================== //
