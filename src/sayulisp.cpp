@@ -3516,4 +3516,555 @@ namespace Sayuri {
   DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightAbandonedCastling) {
     SET_WEIGHT(weight_abandoned_castling);
   }
+
+  // ========================== //
+  // 特徴・ウェイトベクトル関連 //
+  // ========================== //
+  // 現在の特徴ベクトルを作る。
+  std::vector<std::pair<std::string, std::vector<double>>>
+  EngineSuite::GenFeatureVec(Side side) const {
+    std::vector<std::pair<std::string, std::vector<double>>> ret;
+
+    // ボード。
+    const Board& board = *board_ptr_;
+
+    // 駒の名前配列。
+    static const std::array<std::string, NUM_PIECE_TYPES> piece_str {{
+      "", "pawn", "knight", "bishop", "rook", "queen", "king"
+    }};
+
+    // 駒の配置の配置の特徴ベクトル。
+    {
+      std::vector<double> temp(NUM_SQUARES);
+      FOR_PIECE_TYPES(piece_type) {
+        if (piece_type) {
+          FOR_SQUARES(square) {
+            double value = 0.0;
+            // 先ずは白。
+            if ((board.piece_board_[square] == piece_type)
+            && (board.side_board_[square] == WHITE)) {
+              value += 1.0;
+            }
+            // 次に黒。
+            if ((board.piece_board_[Util::FLIP[square]] == piece_type)
+            && (board.side_board_[Util::FLIP[square]] == BLACK)) {
+              value -= 1.0;
+            }
+            temp[square] = value;
+          }
+          ret.push_back(std::make_pair(piece_str[piece_type] + "_position",
+          temp));
+        }
+      }
+    }
+
+    // 攻撃の特徴ベクトル。
+    FOR_PIECE_TYPES(piece_type) {
+      if (piece_type) {
+        std::vector<double> temp_2(6, 0.0);
+
+        // まずは白から。
+        Bitboard white_bb = board.position_[WHITE][piece_type];
+        for (; white_bb; NEXT_BITBOARD(white_bb)) {
+          Square square = Util::GetSquare(white_bb);
+
+          // 攻撃しているマスを得る。
+          ResultSquares result = Sayuri::AnalyseAttacking(board, square);
+
+          // 攻撃しているマスにいる駒を調べてバリューをプラス。
+          for (auto attacked : result) {
+            temp_2[board.piece_board_[attacked] - 1] += 1.0;
+          }
+        }
+
+        // 次に黒から。
+        Bitboard black_bb = board.position_[BLACK][piece_type];
+        for (; black_bb; NEXT_BITBOARD(black_bb)) {
+          Square square = Util::GetSquare(black_bb);
+
+          // 攻撃しているマスを得る。
+          ResultSquares result = Sayuri::AnalyseAttacking(board, square);
+
+          // 攻撃しているマスにいる駒を調べてバリューをマイナス。
+          for (auto attacked : result) {
+            temp_2[board.piece_board_[attacked] - 1] -= 1.0;
+          }
+        }
+
+        // プッシュ。
+        ret.push_back(std::make_pair(piece_str[piece_type] + "_attack",
+        temp_2));
+      }
+    }
+
+    // 防御の特徴ベクトル。
+    FOR_PIECE_TYPES(piece_type) {
+      if (piece_type) {
+        std::vector<double> temp_2(6, 0.0);
+
+        // まずは白から。
+        Bitboard white_bb = board.position_[WHITE][piece_type];
+        for (; white_bb; NEXT_BITBOARD(white_bb)) {
+          Square square = Util::GetSquare(white_bb);
+
+          // 攻撃しているマスを得る。
+          ResultSquares result = Sayuri::AnalyseDefensing(board, square);
+
+          // 攻撃しているマスにいる駒を調べてバリューをプラス。
+          for (auto attacked : result) {
+            temp_2[board.piece_board_[attacked] - 1] += 1.0;
+          }
+        }
+
+        // 次に黒。
+        Bitboard black_bb = board.position_[BLACK][piece_type];
+        for (; black_bb; NEXT_BITBOARD(black_bb)) {
+          Square square = Util::GetSquare(black_bb);
+
+          // 攻撃しているマスを得る。
+          ResultSquares result = Sayuri::AnalyseDefensing(board, square);
+
+          // 攻撃しているマスにいる駒を調べてバリューをマイナス。
+          for (auto attacked : result) {
+            temp_2[board.piece_board_[attacked] - 1] -= 1.0;
+          }
+        }
+
+        // プッシュ。
+        ret.push_back(std::make_pair(piece_str[piece_type] + "_defense",
+        temp_2));
+      }
+    }
+
+    // ピンの特徴ベクトルを作る。
+    {
+      static const int piece_index[3] {BISHOP, ROOK, QUEEN};
+      for (int i = 0; i < 3; ++i) {
+        PieceType piece_type = piece_index[i];
+        std::vector<double> temp(36, 0.0);
+
+        // 先ずは白から。
+        Bitboard white_bb = board.position_[WHITE][piece_type];
+        for (; white_bb; NEXT_BITBOARD(white_bb)) {
+          Square square = Util::GetSquare(white_bb);
+
+          // ピンを分析。
+          ResultPinSkewer result = Sayuri::AnalysePinSkewer(board, square);
+          for (auto& ary : result) {
+            PieceType pinned = board.piece_board_[ary[0]];
+            PieceType pinback = board.piece_board_[ary[1]];
+            temp[((pinned - 1) * 6) + (pinback - 1)] += 1.0;
+          }
+        }
+
+        // 次に黒。
+        Bitboard black_bb = board.position_[BLACK][piece_type];
+        for (; black_bb; NEXT_BITBOARD(black_bb)) {
+          Square square = Util::GetSquare(black_bb);
+
+          // ピンを分析。
+          ResultPinSkewer result = Sayuri::AnalysePinSkewer(board, square);
+          for (auto& ary : result) {
+            PieceType pinned = board.piece_board_[ary[0]];
+            PieceType pinback = board.piece_board_[ary[1]];
+            temp[((pinned - 1) * 6) + (pinback - 1)] -= 1.0;
+          }
+        }
+
+        ret.push_back(std::make_pair(piece_str[piece_type] + "_pin", temp));
+      }
+    }
+
+    // ポーンシールドの特徴ベクトルを作る。
+    {
+      // 各キングのファイルとランクを得る。
+      Fyle white_king_fyle = Util::SquareToFyle(board.king_[WHITE]);
+      Rank white_king_rank = Util::SquareToRank(board.king_[WHITE]);
+      Fyle black_king_fyle = Util::SquareToFyle(board.king_[BLACK]);
+      Rank black_king_rank = Util::SquareToRank(board.king_[BLACK]);
+      // ビットボードのマスク。
+      static const Bitboard KING_SIDE_BB =
+      Util::FYLE[FYLE_F] | Util::FYLE[FYLE_G] | Util::FYLE[FYLE_H];
+      static const Bitboard QUEEN_SIDE_BB =
+      Util::FYLE[FYLE_A] | Util::FYLE[FYLE_B] | Util::FYLE[FYLE_C];
+      // ベクトルを作る。
+      std::vector<double> temp(NUM_SQUARES, 0.0);
+      // 先ず白から。
+      if (white_king_rank <= RANK_2) {
+        Bitboard pawns = 0;
+        if (white_king_fyle >= FYLE_F) {  // キングサイドにいる場合。
+          // キングサイドにいるポーンのみマスク。
+          pawns = board.position_[WHITE][PAWN] & KING_SIDE_BB;
+        } else if (white_king_fyle <= FYLE_C) {  // クイーンサイドにいる場合。
+          pawns = board.position_[WHITE][PAWN] & QUEEN_SIDE_BB;
+        }
+
+        // ベクトルに記録していく。
+        for (; pawns; NEXT_BITBOARD(pawns)) {
+          Square square = Util::GetSquare(pawns);
+          temp[square] += 1.0;
+        }
+      }
+      // 次に黒。
+      if (black_king_rank >= RANK_7) {
+        Bitboard pawns = 0;
+        if (black_king_fyle >= FYLE_F) {  // キングサイドにいる場合。
+          // キングサイドにいるポーンのみマスク。
+          pawns = board.position_[BLACK][PAWN] & KING_SIDE_BB;
+        } else if (black_king_fyle <= FYLE_C) {  // クイーンサイドにいる場合。
+          pawns = board.position_[BLACK][PAWN] & QUEEN_SIDE_BB;
+        }
+
+        // ベクトルに記録していく。
+        for (; pawns; NEXT_BITBOARD(pawns)) {
+          Square square = Util::FLIP[Util::GetSquare(pawns)];
+          temp[square] -= 1.0;
+        }
+      }
+      ret.push_back(std::make_pair("pawn_shield", temp));
+    }
+
+    // モビリティ、センターコントロール、スイートセンターコントロール
+    // の特徴ベクトルを作る。
+    {
+      std::vector<double> mobility_temp(6, 0.0);
+      std::vector<double> center_temp(6, 0.0);
+      std::vector<double> sweet_center_temp(6, 0.0);
+      auto is_center = [](Square square) -> bool {
+        Fyle fyle = Util::SquareToFyle(square);
+        Rank rank = Util::SquareToRank(square);
+        if ((fyle >= FYLE_C) && (fyle <= FYLE_F)
+        && (rank >= RANK_3) && (rank <= RANK_6)) {
+          return true;
+        }
+        return false;
+      };
+      auto is_sweet_center = [](Square square) -> bool {
+        if ((square == D4) || (square == D5)
+        || (square == E4) || (square == E5)) {
+          return true;
+        }
+        return false;
+      };
+      FOR_SQUARES(square) {
+        // サイドと駒。
+        Side side = board.side_board_[square];
+        PieceType piece_type = board.piece_board_[square];
+        if (piece_type) {
+          ResultSquares result = Sayuri::AnalyseMobility(board, square);
+          if (side == WHITE) {
+            // モビリティ。
+            mobility_temp[piece_type - 1] += result.size();
+
+            for (auto target : result) {
+              // センターコントロール。
+              if (is_center(target)) {
+                center_temp[piece_type - 1] += 1.0;
+              }
+              // スウィートセンターコントロール。
+              if (is_sweet_center(target)) {
+                sweet_center_temp[piece_type - 1] += 1.0;
+              }
+            }
+          } else if (side == BLACK) {
+            // モビリティ。
+            mobility_temp[piece_type - 1] -= result.size();
+
+            for (auto target : result) {
+              // センターコントロール。
+              if (is_center(target)) {
+                center_temp[piece_type - 1] -= 1.0;
+              }
+              // スウィートセンターコントロール。
+              if (is_sweet_center(target)) {
+                sweet_center_temp[piece_type - 1] -= 1.0;
+              }
+            }
+          }
+        }
+      }
+      ret.push_back(std::make_pair("mobility", mobility_temp));
+      ret.push_back(std::make_pair("center_control", center_temp));
+      ret.push_back(std::make_pair("sweet_center_control", sweet_center_temp));
+    }
+
+    // コマの展開の特徴ベクトルを作る。
+    {
+      std::vector<double> temp(6, 0.0);
+      FOR_PIECE_TYPES(piece_type) {
+        double value = 0.0;
+        if (piece_type) {
+          // 先ずは白。
+          value += Sayuri::AnalyseDevelopment(board, WHITE, piece_type).size();
+
+          // 次に黒。
+          value -= Sayuri::AnalyseDevelopment(board, BLACK, piece_type).size();
+
+          // 登録。
+          temp[piece_type - 1] = value;
+        }
+      }
+      ret.push_back(std::make_pair("development", temp));
+    }
+
+    // 敵キング周辺への攻撃の特徴ベクトルを作る。
+    {
+      std::vector<double> temp(6, 0.0);
+      // 先ずは白。
+      Bitboard around_black_king = Util::KING_MOVE[board.king_[BLACK]];
+      for (; around_black_king; NEXT_BITBOARD(around_black_king)) {
+        Square target = Util::GetSquare(around_black_king);
+        ResultSquares result = Sayuri::AnalyseAttackers(board, target);
+
+        for (auto& attacker : result) {
+          if (board.side_board_[attacker] == WHITE) {
+            temp[board.piece_board_[attacker] - 1] += 1.0;
+          }
+        }
+      }
+
+      // 次に黒。
+      Bitboard around_white_king = Util::KING_MOVE[board.king_[WHITE]];
+      for (; around_white_king; NEXT_BITBOARD(around_white_king)) {
+        Square target = Util::GetSquare(around_white_king);
+        ResultSquares result = Sayuri::AnalyseAttackers(board, target);
+
+        for (auto& attacker : result) {
+          if (board.side_board_[attacker] == BLACK) {
+            temp[board.piece_board_[attacker] - 1] -= 1.0;
+          }
+        }
+      }
+
+      ret.push_back(std::make_pair("attack_around_king", temp));
+    }
+
+    // パスポーンと守られたパスポーンの特徴ベクトルを作る。
+    {
+      double pass_value = 0.0;
+      double protected_pass_value = 0.0;
+
+      // 先ずは白。
+      ResultSquares result = Sayuri::AnalysePassPawn(board, WHITE);
+      pass_value += result.size();
+      for (auto pawn : result) {
+        // ポーンに守られているかどうかを調べる。
+        ResultSquares defenders = Sayuri::AnalyseDefensed(board, pawn);
+
+        // ディフェンダーがポーンなら守られたパスポーン。
+        for (auto defender : defenders) {
+          if (board.piece_board_[defender] == PAWN) {
+            protected_pass_value += 1.0;
+            break;
+          }
+        }
+      }
+
+      // 次に黒。
+      result = Sayuri::AnalysePassPawn(board, BLACK);
+      pass_value -= result.size();
+      for (auto pawn : result) {
+        // ポーンに守られているかどうかを調べる。
+        ResultSquares defenders = Sayuri::AnalyseDefensed(board, pawn);
+
+        // ディフェンダーがポーンなら守られたパスポーン。
+        for (auto defender : defenders) {
+          if (board.piece_board_[defender] == PAWN) {
+            protected_pass_value -= 1.0;
+            break;
+          }
+        }
+      }
+
+      // プッシュ。
+      ret.push_back(std::make_pair("pass_pawn",
+      std::vector<double> {pass_value}));
+      ret.push_back(std::make_pair("protected_pass_pawn",
+      std::vector<double> {protected_pass_value}));
+    }
+
+    // ダブルポーンの特徴ベクトルを作る。
+    {
+      double value = Sayuri::AnalyseDoublePawn(board, WHITE).size();
+      value -= Sayuri::AnalyseDoublePawn(board, BLACK).size();
+      ret.push_back(std::make_pair("double_pawn",
+      std::vector<double> {value}));
+    }
+
+    // 孤立ポーンの特徴ベクトルを作る。
+    {
+      double value = Sayuri::AnalyseIsoPawn(board, WHITE).size();
+      value -= Sayuri::AnalyseIsoPawn(board, BLACK).size();
+      ret.push_back(std::make_pair("iso_pawn",
+      std::vector<double> {value}));
+    }
+
+    // ビショップペアの特徴ベクトルを作る。
+    {
+      double value = 0.0;
+      if ((board.position_[WHITE][BISHOP] & Util::SQCOLOR[WHITE])
+      && (board.position_[WHITE][BISHOP] & Util::SQCOLOR[BLACK])) {
+        value += 1.0;
+      }
+      if ((board.position_[BLACK][BISHOP] & Util::SQCOLOR[WHITE])
+      && (board.position_[BLACK][BISHOP] & Util::SQCOLOR[BLACK])) {
+        value -= 1.0;
+      }
+      ret.push_back(std::make_pair("bishop_pair",
+      std::vector<double> {value}));
+    }
+
+    // バッドビショップの特徴ベクトルを作る。
+    {
+      double value = 0.0;
+      if ((board.position_[WHITE][BISHOP] & Util::SQCOLOR[WHITE])) {
+        value +=
+        Util::CountBits(board.position_[WHITE][PAWN] & Util::SQCOLOR[WHITE]);
+      }
+      if ((board.position_[WHITE][BISHOP] & Util::SQCOLOR[BLACK])) {
+        value +=
+        Util::CountBits(board.position_[WHITE][PAWN] & Util::SQCOLOR[BLACK]);
+      }
+      if ((board.position_[BLACK][BISHOP] & Util::SQCOLOR[WHITE])) {
+        value -=
+        Util::CountBits(board.position_[BLACK][PAWN] & Util::SQCOLOR[WHITE]);
+      }
+      if ((board.position_[BLACK][BISHOP] & Util::SQCOLOR[BLACK])) {
+        value -=
+        Util::CountBits(board.position_[BLACK][PAWN] & Util::SQCOLOR[BLACK]);
+      }
+
+      ret.push_back(std::make_pair("bad_bishop", std::vector<double> {value}));
+    }
+
+    // ルークペアの特徴ベクトルを作る。
+    {
+      double value = 0.0;
+      if (Util::CountBits(board.position_[WHITE][ROOK]) >= 2) value += 1.0;
+      if (Util::CountBits(board.position_[BLACK][ROOK]) >= 2) value -= 1.0;
+      ret.push_back(std::make_pair("rook_pair", std::vector<double> {value}));
+    }
+
+    // ルークのセミオープンファイルオープンファイルの特徴ベクトルを作る。
+    {
+      double semiopen_value = 0.0;
+      double open_value = 0.0;
+
+      // 先ずは白。
+      for (Bitboard bb = board.position_[WHITE][ROOK]; bb; NEXT_BITBOARD(bb)) {
+        Fyle rook_fyle = Util::SquareToFyle(Util::GetSquare(bb));
+        if (!(board.position_[WHITE][PAWN] & Util::FYLE[rook_fyle])) {
+          semiopen_value += 1.0;
+          if (!(board.position_[BLACK][PAWN] & Util::FYLE[rook_fyle])) {
+            open_value += 1.0;
+          }
+        }
+      }
+
+      // 次に黒。
+      for (Bitboard bb = board.position_[BLACK][ROOK]; bb; NEXT_BITBOARD(bb)) {
+        Fyle rook_fyle = Util::SquareToFyle(Util::GetSquare(bb));
+        if (!(board.position_[BLACK][PAWN] & Util::FYLE[rook_fyle])) {
+          semiopen_value -= 1.0;
+          if (!(board.position_[WHITE][PAWN] & Util::FYLE[rook_fyle])) {
+            open_value -= 1.0;
+          }
+        }
+      }
+
+      ret.push_back(std::make_pair("rook_semiopen_fyle",
+      std::vector<double> {semiopen_value}));
+      ret.push_back(std::make_pair("rook_open_fyle",
+      std::vector<double> {open_value}));
+    }
+
+    // 早すぎるクイーンの出動の特徴ベクトルを作る。
+    {
+      double value = 0.0;
+      // 先ずは白。
+      if (!(board.position_[WHITE][QUEEN] & Util::SQUARE[D1][R0])) {
+        value += Util::CountBits(board.position_[WHITE][KNIGHT]
+        & (Util::SQUARE[B1][R0] | Util::SQUARE[G1][R0]))
+        + Util::CountBits(board.position_[WHITE][BISHOP]
+        & (Util::SQUARE[C1][R0] | Util::SQUARE[F1][R0]));
+      }
+
+      // 次に黒。
+      if (!(board.position_[BLACK][QUEEN] & Util::SQUARE[D8][R0])) {
+        value -= Util::CountBits(board.position_[BLACK][KNIGHT]
+        & (Util::SQUARE[B8][R0] | Util::SQUARE[G8][R0]))
+        + Util::CountBits(board.position_[BLACK][BISHOP]
+        & (Util::SQUARE[C8][R0] | Util::SQUARE[F8][R0]));
+      }
+
+      ret.push_back(std::make_pair("early_queen_starting",
+      std::vector<double> {value}));
+    }
+
+    // 弱いマスの特徴ベクトルを作る。
+    {
+      double value = 0.0;
+
+      // 黒の白マスビショップがいる時。
+      if ((board.position_[BLACK][BISHOP] & Util::SQCOLOR[WHITE])) {
+        value += Util::CountBits(~(board.position_[WHITE][PAWN])
+        & Util::SQCOLOR[WHITE]);
+      }
+
+      // 黒の黒マスビショップがいる時。
+      if ((board.position_[BLACK][BISHOP] & Util::SQCOLOR[BLACK])) {
+        value += Util::CountBits(~(board.position_[WHITE][PAWN])
+        & Util::SQCOLOR[BLACK]);
+      }
+
+      // 白の白マスビショップがいる時。
+      if ((board.position_[WHITE][BISHOP] & Util::SQCOLOR[WHITE])) {
+        value -= Util::CountBits(~(board.position_[BLACK][PAWN])
+        & Util::SQCOLOR[WHITE]);
+      }
+
+      // 白の黒マスビショップがいる時。
+      if ((board.position_[WHITE][BISHOP] & Util::SQCOLOR[BLACK])) {
+        value -= Util::CountBits(~(board.position_[BLACK][PAWN])
+        & Util::SQCOLOR[BLACK]);
+      }
+
+      ret.push_back(std::make_pair("weak_square",
+      std::vector<double> {value}));
+    }
+
+    // キャスリングとキャスリングの放棄の特徴ベクトルを作る。
+    {
+      double castling_value = 0.0;
+      double abandoned_value = 0.0;
+
+      // 先ずは白。
+      if (board.has_castled_[WHITE]) {
+        castling_value += 1.0;
+      } else if (!(board.castling_rights_ & WHITE_CASTLING)) {
+        abandoned_value += 1.0;
+      }
+
+      // 次に黒。
+      if (board.has_castled_[BLACK]) {
+        castling_value -= 1.0;
+      } else if (!(board.castling_rights_ & BLACK_CASTLING)) {
+        abandoned_value -= 1.0;
+      }
+
+      ret.push_back(std::make_pair("castling",
+      std::vector<double> {castling_value}));
+      ret.push_back(std::make_pair("abandoned_castling",
+      std::vector<double> {abandoned_value}));
+    }
+
+    if (side == BLACK) {
+      for (auto& pair : ret) {
+        for (auto& feature : pair.second) {
+          feature *= -1.0;
+        }
+      }
+    }
+    return ret;
+  }
 }  // namespace Sayuri
