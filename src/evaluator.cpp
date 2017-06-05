@@ -45,7 +45,6 @@ namespace Sayuri {
   constexpr Bitboard Evaluator::PASS_PAWN_MASK[NUM_SIDES][NUM_SQUARES];
   constexpr Bitboard Evaluator::ISO_PAWN_MASK[NUM_SQUARES];
   constexpr Bitboard Evaluator::PAWN_SHIELD_MASK[NUM_SIDES][NUM_SQUARES];
-  constexpr Bitboard Evaluator::WEAK_SQUARE_MASK[NUM_SIDES][NUM_SQUARES];
 
   // ================ //
   // テンプレート部品 //
@@ -381,29 +380,7 @@ namespace Sayuri {
     static void F(Evaluator& evaluator,
     const ChessEngine::BasicStruct& basic_st,
     Square square, Bitboard attacks) {
-      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
-
-      // --- キング周りの弱いマスを計算 --- //
-      int value = 0;
-
-      // 弱いマス。
-      Bitboard weak = (~(basic_st.position_[SIDE][PAWN]))
-      & Evaluator::WEAK_SQUARE_MASK[SIDE][square];
-
-      // 相手の白マスビショップに対する弱いマス。
-      if ((basic_st.position_[ENEMY_SIDE][BISHOP] & Util::SQCOLOR[WHITE])) {
-        value += Util::CountBits(weak & Util::SQCOLOR[WHITE]);
-      }
-
-      // 相手の黒マスビショップに対する弱いマス。
-      if ((basic_st.position_[ENEMY_SIDE][BISHOP] & Util::SQCOLOR[BLACK])) {
-        value += Util::CountBits(weak & Util::SQCOLOR[BLACK]);
-      }
-
-      // 評価値にする。
-      evaluator.score_ +=
-      SIGN * evaluator.cache_ptr_->weak_square_cache_[value];
 
       // --- キャスリングを計算する --- //
       constexpr Castling RIGHTS_MASK =
@@ -500,6 +477,24 @@ namespace Sayuri {
     }
     if ((position[BLACK][ROOK] & (position[BLACK][ROOK] - 1))) {
       score_ -= cache_ptr_->rook_pair_cache_;
+    }
+
+    // 弱いマス。
+    if ((position[BLACK][BISHOP] & Util::SQCOLOR[WHITE])) {
+      score_ += cache_ptr_->weak_square_cache_
+      [Util::CountBits(~(position[WHITE][PAWN]) & Util::SQCOLOR[WHITE])];
+    }
+    if ((position[BLACK][BISHOP] & Util::SQCOLOR[BLACK])) {
+      score_ += cache_ptr_->weak_square_cache_
+      [Util::CountBits(~(position[WHITE][PAWN]) & Util::SQCOLOR[BLACK])];
+    }
+    if ((position[WHITE][BISHOP] & Util::SQCOLOR[WHITE])) {
+      score_ -= cache_ptr_->weak_square_cache_
+      [Util::CountBits(~(position[BLACK][PAWN]) & Util::SQCOLOR[WHITE])];
+    }
+    if ((position[WHITE][BISHOP] & Util::SQCOLOR[BLACK])) {
+      score_ -= cache_ptr_->weak_square_cache_
+      [Util::CountBits(~(position[BLACK][PAWN]) & Util::SQCOLOR[BLACK])];
     }
 
     // 各駒毎に価値を計算する。

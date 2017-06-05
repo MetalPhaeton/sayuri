@@ -3888,6 +3888,31 @@ namespace Sayuri {
           return NewNumber(obj_ptr->TrainPA2(desired_output, features, num));
         }
       }
+      if (symbol == "@train-comparison") {
+        Next(&args_ptr);
+        CheckType(*args_ptr, LType::PAIR);
+
+        LPointer rate_ptr = caller->Evaluate(args_ptr->car());
+        CheckType(*rate_ptr, LType::NUMBER);
+        double rate = rate_ptr->number();
+
+        Next(&args_ptr);
+        CheckType(*args_ptr, LType::PAIR);
+
+        LPointer good_features_ptr = caller->Evaluate(args_ptr->car());
+        CheckType(*good_features_ptr, LType::NUMBER);
+        Vec good_features = to_feature_vec(good_features_ptr);
+
+        Next(&args_ptr);
+        CheckType(*args_ptr, LType::PAIR);
+
+        LPointer bad_features_ptr = caller->Evaluate(args_ptr->car());
+        CheckList(*bad_features_ptr);
+        Vec bad_features = to_feature_vec(bad_features_ptr);
+
+        return NewNumber
+        (obj_ptr->TrainComparison(good_features, bad_features, rate));
+      }
       if (symbol == "@train-bp") {
         Next(&args_ptr);
         CheckType(*args_ptr, LType::PAIR);

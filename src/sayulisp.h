@@ -1099,6 +1099,9 @@ namespace Sayuri {
       /** キャスリングの放棄。 */
       DEF_MESSAGE_FUNCTION(SetWeightAbandonedCastling);
 
+      /** 特徴ベクトルの作成。 */
+      DEF_MESSAGE_FUNCTION(GetFeatureVector);
+
       // ======== //
       // アクセサ //
       // ======== //
@@ -1146,6 +1149,67 @@ namespace Sayuri {
        * メッセージシンボル関数を設定する。
        */
       void SetMessageFunctions();
+
+      /*
+         メモ - ベクトルの順番。
+
+         pawn_position * 64
+         knight_position * 64
+         bishop_position * 64
+         rook_position * 64
+         queen_position * 64
+         king_position * 64
+
+         pawn_attack * 6
+         knight_attack * 6
+         bishop_attack * 6
+         rook_attack * 6
+         queen_attack * 6
+         king_attack * 6
+
+         pawn_defense * 6
+         knight_defense * 6
+         bishop_defense * 6
+         rook_defense * 6
+         queen_defense * 6
+         king_defense * 6
+
+         bishop_pin * 6 * 6
+         rook_pin * 6 * 6
+         queen_pin * 6 * 6
+
+         pawn_shield * 64
+
+         mobility * 6
+         center_control * 6
+         sweet_center_control * 6
+         development * 6
+         attack_around_king * 6
+
+         pass_pawn
+         protected_pass_pawn
+         double_pawn
+         iso_pawn
+
+         bishop_pair
+         bad_bishop
+
+         rook_pair
+         rook_semiopen_fyle
+         rook_open_fyle
+
+         early_queen_starting
+         weak_square
+         castling
+         abandoned_castling
+       */
+      /**
+       * 現在の各特徴ベクトルのベクトルを作る。
+       * @param side 視点となるサイド。
+       * @return 特徴ベクトルのベクトル。
+       */
+      std::vector<std::pair<std::string, std::vector<double>>>
+      GenFeatureVec(Side side) const;
 
       // ========== //
       // メンバ変数 //

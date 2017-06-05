@@ -180,7 +180,7 @@ namespace Sayuri {
   weight_rook_semiopen_fyle_(Weight::CreateWeight(16.0, 8.0)),
   weight_rook_open_fyle_(Weight::CreateWeight(8.0, 0.0)),
   weight_early_queen_starting_(Weight::CreateWeight(-26.9, 0.0)),
-  weight_weak_square_(Weight::CreateWeight(-8.0, 0.0)),
+  weight_weak_square_(Weight::CreateWeight(-1.0, 0.0)),
   weight_castling_(Weight::CreateWeight(16.0, 0.0)),
   weight_abandoned_castling_(Weight::CreateWeight(-90.5, 0.0)) {
     // オープニング時の駒の配置の価値テーブルの初期化。
