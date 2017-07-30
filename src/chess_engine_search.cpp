@@ -1333,6 +1333,16 @@ namespace Sayuri {
     // moveが無効ならそのまま帰る。
     if (!move) return score;
 
+    // SEEが無効の場合、簡単計算で帰る。
+    if (!(cache.enable_see_)) {
+      int me = cache.material_[basic_st_.piece_board_[Get<FROM>(move)]];
+      if ((move & MASK[PROMOTION])) {
+        me = cache.material_[Get<PROMOTION>(move)] - cache.material_[PAWN];
+      }
+      return Util::GetMax
+      (cache.material_[basic_st_.piece_board_[Get<TO>(move)]] - me, 0);
+    }
+
     // 準備。
     PieceType target = basic_st_.piece_board_[Get<TO>(move)];
 
@@ -1345,16 +1355,6 @@ namespace Sayuri {
 
     // 取る相手がキングなら帰る。
     if (target == KING) return score;
-
-    // SEEが無効の場合、簡単計算で帰る。
-    if (!(cache.enable_see_)) {
-      if ((move & MASK[PROMOTION])) {
-        return cache.material_[Get<PROMOTION>(move)] - cache.material_[PAWN];
-      } else {
-        return score - cache.material_
-        [basic_st_.piece_board_[Get<FROM>(move)]];
-      }
-    }
 
     // 次の局面へ。
     Side side = basic_st_.to_move_;
