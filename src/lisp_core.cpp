@@ -3900,7 +3900,7 @@ namespace Sayuri {
         CheckType(*args_ptr, LType::PAIR);
 
         LPointer good_features_ptr = caller->Evaluate(args_ptr->car());
-        CheckType(*good_features_ptr, LType::NUMBER);
+        CheckList(*good_features_ptr);
         Vec good_features = to_feature_vec(good_features_ptr);
 
         Next(&args_ptr);
