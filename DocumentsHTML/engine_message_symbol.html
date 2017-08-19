@@ -56,7 +56,6 @@
 <li><a href="#customizing-evaluation-function---piece-square-table">Customizing Evaluation Function - Piece Square Table</a></li>
 <li><a href="#customizing-evaluation-function---attack">Customizing Evaluation Function - Attack</a></li>
 <li><a href="#customizing-evaluation-function---defense">Customizing Evaluation Function - Defense</a></li>
-<li><a href="#customizing-evaluation-function---pin">Customizing Evaluation Function - Pin</a></li>
 <li><a href="#customizing-evaluation-function---pawn-shield">Customizing Evaluation Function - Pawn Shield</a></li>
 <li><a href="#customizing-evaluation-function---mobility">Customizing Evaluation Function - Mobility</a></li>
 <li><a href="#customizing-evaluation-function---controlling-center">Customizing Evaluation Function - Controlling Center</a></li>
@@ -800,18 +799,6 @@ the control won't come back until the engine have found the best move.</p>
 <li>Returns List of squares that Pass Pawns of <code>&lt;Side&gt;</code> on.</li>
 </ul>
 </li>
-<li>
-<p><code>@analyse-pin/skewer &lt;Piece square : Number&gt;</code></p>
-<ul>
-<li>Returns List of Lists of piece squares that is pinned/skewered.<ul>
-<li>1st : Square of attacked enemy piece directly by <code>&lt;Piece square&gt;</code>.</li>
-<li>2nd : Piece square over the attacked piece.</li>
-</ul>
-</li>
-<li>If <code>&lt;Piece square&gt;</code> is Bishop, Rook or Queen, this function is effective.
-  Otherwise it always returns Nil.</li>
-</ul>
-</li>
 </ul>
 <h6> Example </h6>
 
@@ -885,10 +872,6 @@ the control won't come back until the engine have found the best move.</p>
 (display (engine '@analyse-pass-pawn WHITE))
 ;; Output
 ;; &gt; (A2 B3)
-
-(display (engine '@analyse-pin/skewer C3))
-;; Output
-;; &gt; ((F6 H8))
 </code></pre>
 <h3 id="generate-feature-vector">Generate Feature Vector</h3>
 <ul>
@@ -962,15 +945,6 @@ the control won't come back until the engine have found the best move.</p>
 ;; &gt;  ("rook_defense" (0 1 -1 0 1 0))
 ;; &gt;  ("queen_defense" (0 1 -1 1 0 -1))
 ;; &gt;  ("king_defense" (1 0 -1 0 -1 0))
-;; &gt;  ("bishop_pin" (0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-;; &gt; 0 0 0 0 0 0 0 0 0))
-;; &gt;  ("rook_pin" (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-;; &gt; 0 0 0 0 0 0 0 0))
-;; &gt;  ("queen_pin" (0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-;; &gt; 0 0 0 0 0 0 0 0 0))
-;; &gt;  ("pawn_shield" (0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0
-;; &gt; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-;; &gt; 0 0 0))
 ;; &gt;  ("mobility" (2 -4 -2 -1 1 0))
 ;; &gt;  ("center_control" (2 0 -1 1 0 0))
 ;; &gt;  ("sweet_center_control" (0 -1 0 0 0 0))
@@ -1839,67 +1813,6 @@ If you specify <code>&lt;New table&gt;</code>, this parameter is updated.</p>
 <li><code>@weight-rook-defense</code></li>
 <li><code>@weight-queen-defense</code></li>
 <li><code>@weight-king-defense</code></li>
-</ul>
-<h3 id="customizing-evaluation-function-pin">Customizing Evaluation Function - Pin</h3>
-<p>Returns List of 7 Lists of 7 values.</p>
-<p>1st list : Futile list. (For EMPTY)<br />
-2nd list : A target piece is Pawn.<br />
-3rd list : A target piece is Knight.<br />
-4th list : A target piece is Bishop.<br />
-5th list : A target piece is Rook.<br />
-6th list : A target piece is Queen.<br />
-7th list : A target piece is King.</p>
-<p>1st value of each list : Futile value.<br />
-2nd value of each list : A piece over the target is Pawn.<br />
-3rd value of each list : A piece over the target is Knight.<br />
-4th value of each list : A piece over the target is Bishop.<br />
-5th value of each list : A piece over the target is Rook.<br />
-6th value of each list : A piece over the target is Queen.<br />
-7th value of each list : A piece over the target is King.</p>
-<p><code>score = weight * value_table[pinning_piece][target][over_the_target]</code></p>
-<ul>
-<li><code>@bishop-pin-table [&lt;New value table : List&gt;]</code></li>
-<li><code>@rook-pin-table [&lt;New value table : List&gt;]</code></li>
-<li><code>@queen-pin-table [&lt;New value table : List&gt;]</code></li>
-</ul>
-<h6> Example </h6>
-
-<pre><code>(define my-engine (gen-engine))
-
-(display (my-engine '@bishop-pin-table
-  (list (list 1 2 3 4 5 6 7)
-        (list 8 9 10 11 12 13 14)
-        (list 15 16 17 18 19 20 21)
-        (list 22 23 24 25 26 27 28)
-        (list 29 30 31 32 33 34 35)
-        (list 36 37 38 39 40 41 42)
-        (list 43 44 45 46 47 48 49))))
-;; Output
-;; &gt; ((0 0 0 0 0 0 0)
-;; &gt; (0 0 0 0 5 5 5)
-;; &gt; (0 0 0 0 10 10 10)
-;; &gt; (0 0 0 0 0 0 0)
-;; &gt; (0 0 0 0 20 30 40)
-;; &gt; (0 0 0 0 30 40 50)
-;; &gt; (0 0 0 0 40 50 0))
-
-(display (my-engine '@bishop-pin-table))
-;; Output
-;; &gt;  ((0 0 0 0 0 0 0)
-;; &gt; (0 9 10 11 12 13 14)
-;; &gt; (0 16 17 18 19 20 21)
-;; &gt; (0 23 24 25 26 27 28)
-;; &gt; (0 30 31 32 33 34 35)
-;; &gt; (0 37 38 39 40 41 42)
-;; &gt; (0 44 45 46 47 48 49))
-</code></pre>
-<h6> Weights </h6>
-
-<p>Usage : Run <code>(help "sayuri weight system")</code></p>
-<ul>
-<li><code>@weight-bishop-pin</code></li>
-<li><code>@weight-rook-pin</code></li>
-<li><code>@weight-queen-pin</code></li>
 </ul>
 <h3 id="customizing-evaluation-function-pawn-shield">Customizing Evaluation Function - Pawn Shield</h3>
 <p>If King on f1(f8) f2(f7) g1(g8) g2(g7) h1(h8) h2(h7),

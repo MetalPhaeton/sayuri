@@ -983,14 +983,6 @@ namespace Sayuri {
       const double (& defense_value_table() const)
       [NUM_PIECE_TYPES][NUM_PIECE_TYPES] {return defense_value_table_;}
       /**
-       * アクセサ - ピンの価値テーブル。
-       * [ピンをする駒の種類][ターゲットの種類][ターゲットの裏の駒の種類]
-       */
-      const double (& pin_value_table() const)
-      [NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES] {
-        return pin_value_table_;
-      }
-      /**
        * アクセサ - ポーンの盾の配置の価値テーブル。 [マス]
        * @return ポーンの盾の配置の価値テーブル。
        */
@@ -1053,13 +1045,6 @@ namespace Sayuri {
        */
       const Weight (& weight_defense() const)[NUM_PIECE_TYPES] {
         return weight_defense_;
-      }
-      /**
-       * アクセサ - ピンのウェイト。 [駒の種類]
-       * @return ピンのウェイト。
-       */
-      const Weight (& weight_pin() const)[NUM_PIECE_TYPES] {
-        return weight_pin_;
       }
       /**
        * アクセサ - 相手キング周辺への攻撃のウェイト。
@@ -1178,12 +1163,6 @@ namespace Sayuri {
       void defense_value_table
       (const double (& table)[NUM_PIECE_TYPES][NUM_PIECE_TYPES]);
       /**
-       * ミューテータ - ピンの価値テーブル。
-       * @param table ピンの価値テーブル。
-       */
-      void pin_value_table(const double (& table)
-      [NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES]);
-      /**
        * ミューテータ - ポーンの盾の配置の価値テーブル。
        * @param table ポーンの盾の配置の価値テーブル。
        */
@@ -1231,11 +1210,6 @@ namespace Sayuri {
        * @param weights 味方への防御のウェイト。
        */
       void weight_defense(const Weight (& weights)[NUM_PIECE_TYPES]);
-      /**
-       * ミューテータ - ピンのウェイト。
-       * @param weights ピンのウェイト。
-       */
-      void weight_pin(const Weight (& weights)[NUM_PIECE_TYPES]);
       /**
        * ミューテータ - 相手キング周辺への攻撃のウェイト。
        * @param weights 相手キング周辺への攻撃のウェイト。
@@ -1378,18 +1352,6 @@ namespace Sayuri {
         defense_value_table_[piece_type][friend_piece_type] = value;
       }
       /**
-       * ミューテータ 2 - ピンの価値テーブル。
-       * @param piece_type ピンをする駒の種類。
-       * @param target_piece_type ターゲットの駒の種類。
-       * @param pin_board_piece_type ターゲットの裏の駒の種類。
-       * @param value 価値。
-       */
-      void pin_value_table(PieceType piece_type, PieceType target_piece_type,
-      PieceType pin_board_piece_type, double value) {
-        pin_value_table_[piece_type][target_piece_type]
-        [pin_board_piece_type] = value;
-      }
-      /**
        * ミューテータ 2 - ポーンの盾の価値テーブル。
        * @param square ポーンの位置。
        * @param value 価値。
@@ -1478,16 +1440,6 @@ namespace Sayuri {
         weight_defense_[piece_type] = weight;
       }
       /**
-       * ミューテータ 2 - ピンのウェイト。
-       * @param piece_type 駒の種類。
-       * @param opening_weight オープニング時のウェイト。
-       * @param ending_weight エンディング時のウェイト。
-       */
-      void weight_pin(PieceType piece_type,
-      const Weight& weight) {
-        weight_pin_[piece_type] = weight;
-      }
-      /**
        * ミューテータ 2 - 相手キング周辺への攻撃のウェイト。
        * @param piece_type 駒の種類。
        * @param opening_weight オープニング時のウェイト。
@@ -1499,24 +1451,6 @@ namespace Sayuri {
       }
 
     private:
-      /** 評価関数はフレンド。 */
-      friend class Evaluator;
-      /** 評価関数で使うテンプレート部品。 */
-      template<Side SIDE, PieceType TYPE>
-      friend struct GenBitboards;
-      /** 評価関数で使うテンプレート部品。 */
-      template<Side SIDE, PieceType TYPE>
-      friend struct CalPosition;
-      /** 評価関数で使うテンプレート部品。 */
-      template<Side SIDE, PieceType TYPE>
-      friend struct CalMobility;
-      /** 評価関数で使うテンプレート部品。 */
-      template<Side SIDE, PieceType TYPE>
-      friend struct GenPinTargets;
-      /** 評価関数で使うテンプレート部品。 */
-      template<Side SIDE, PieceType TYPE>
-      friend struct CalSpecial;
-
       /**
        * メンバをコピーする。
        * @param params コピー元。
@@ -1534,9 +1468,6 @@ namespace Sayuri {
       double attack_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
       /** 味方への防御の価値テーブル。 */
       double defense_value_table_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
-      /** ピンの価値テーブル。 */
-      double pin_value_table_
-      [NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES];
       /** ポーンの盾の配置の価値テーブル。 */
       double pawn_shield_value_table_[NUM_SQUARES];
 
@@ -1559,8 +1490,6 @@ namespace Sayuri {
       Weight weight_attack_[NUM_PIECE_TYPES];
       /** 味方への防御のウェイト。 */
       Weight weight_defense_[NUM_PIECE_TYPES];
-      /** ピンのウェイト。 */
-      Weight weight_pin_[NUM_PIECE_TYPES];
       /** 相手キング周辺への攻撃のウェイト。 */
       Weight weight_attack_around_king_[NUM_PIECE_TYPES];
       /** パスポーンのウェイト。 */

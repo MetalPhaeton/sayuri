@@ -736,9 +736,6 @@ namespace Sayuri {
       /** パスポーンを分析する。 */
       DEF_MESSAGE_FUNCTION(AnalysePassPawn);
 
-      /** ピン、スキュワーを分析する。 */
-      DEF_MESSAGE_FUNCTION(AnalysePinSkewer);
-
       /** マテリアルを設定する。 */
       DEF_MESSAGE_FUNCTION(SetMaterial);
 
@@ -1010,10 +1007,6 @@ namespace Sayuri {
       template<PieceType TYPE>
       DEF_MESSAGE_FUNCTION(SetDefenseTable);
 
-      /** ピンの価値テーブル。 */
-      template<PieceType TYPE>
-      DEF_MESSAGE_FUNCTION(SetPinTable);
-
       /** ポーンの盾の価値テーブル。 */
       DEF_MESSAGE_FUNCTION(SetPawnShieldTable);
 
@@ -1048,10 +1041,6 @@ namespace Sayuri {
       /** 防御のウェイト。 */
       template<PieceType TYPE>
       DEF_MESSAGE_FUNCTION(SetWeightDefense);
-
-      /** ピンのウェイト。 */
-      template<PieceType TYPE>
-      DEF_MESSAGE_FUNCTION(SetWeightPin);
 
       /** キング周辺への攻撃のウェイト。 */
       template<PieceType TYPE>
@@ -1173,10 +1162,6 @@ namespace Sayuri {
          rook_defense * 6
          queen_defense * 6
          king_defense * 6
-
-         bishop_pin * 6 * 6
-         rook_pin * 6 * 6
-         queen_pin * 6 * 6
 
          pawn_shield * 64
 

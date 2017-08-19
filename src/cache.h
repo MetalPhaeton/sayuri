@@ -67,8 +67,6 @@ namespace Sayuri {
     int attack_cache_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
     /** キャッシュ - 防御。 */
     int defense_cache_[NUM_PIECE_TYPES][NUM_PIECE_TYPES];
-    /** キャッシュ - ピン。 */
-    int pin_cache_[NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES];
     /** キャッシュ - キング周辺への攻撃。 */
     int attack_around_king_cache_[NUM_PIECE_TYPES][NUM_AROUND_KING + 1];
     /** キャッシュ - パスポーン。 */

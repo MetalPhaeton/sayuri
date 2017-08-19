@@ -222,7 +222,6 @@ namespace Sayuri {
     static void F(Evaluator& evaluator,
     const ChessEngine::BasicStruct& basic_st,
     Square square, Bitboard attacks) {
-      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // バッドビショップを計算。
@@ -234,36 +233,6 @@ namespace Sayuri {
         evaluator.score_ += SIGN * evaluator.cache_ptr_->bad_bishop_cache_
         [Util::CountBits
         (basic_st.position_[SIDE][PAWN] & Util::SQCOLOR[BLACK])];
-      }
-
-      // ピンを計算。
-      // 相手のビットボードと裏駒を作成。
-      Bitboard enemy_pieces = basic_st.side_pieces_[ENEMY_SIDE];
-      Bitboard pin_back = (MetaEvaluator::PIN_BACK_TABLE[square]
-      [(basic_st.blocker_[R45] >> Util::MAGIC_SHIFT[square][R45])
-      & Util::MAGIC_MASK[square][R45]][R45]
-      | MetaEvaluator::PIN_BACK_TABLE[square]
-      [(basic_st.blocker_[R135] >> Util::MAGIC_SHIFT[square][R135])
-      & Util::MAGIC_MASK[square][R135]][R135])
-      & enemy_pieces;
-
-      // ピンを判定。
-      for (; pin_back; NEXT_BITBOARD(pin_back)) {
-        // 裏駒のマス。
-        Square pin_back_sq = Util::GetSquare(pin_back);
-
-        // 裏駒と自分の間のビットボード。
-        Bitboard between = Util::GetBetween(square, pin_back_sq);
-
-        // 下のif文によるピンの判定条件は、
-        // 「裏駒と自分との間」にターゲット(相手の駒)があった場合。
-        // pin_backに対応するターゲットが味方の駒の場合もあるので
-        // 相手の駒に限定しなくてはならない。
-        if ((between & enemy_pieces)) {
-          evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_[BISHOP]
-          [basic_st.piece_board_[Util::GetSquare(between & enemy_pieces)]]
-          [basic_st.piece_board_[pin_back_sq]];
-        }
       }
     }
   };
@@ -287,36 +256,6 @@ namespace Sayuri {
           SIGN * evaluator.cache_ptr_->rook_open_fyle_cache_;
         }
       }
-
-      // ピンを計算。
-      // 相手の駒と裏駒を作成。
-      Bitboard enemy_pieces = basic_st.side_pieces_[ENEMY_SIDE];
-      Bitboard pin_back = (MetaEvaluator::PIN_BACK_TABLE[square]
-      [(basic_st.blocker_[R0] >> Util::MAGIC_SHIFT[square][R0])
-      & Util::MAGIC_MASK[square][R0]][R0]
-      | MetaEvaluator::PIN_BACK_TABLE[square]
-      [(basic_st.blocker_[R90] >> Util::MAGIC_SHIFT[square][R90])
-      & Util::MAGIC_MASK[square][R90]][R90])
-      & enemy_pieces;
-
-      // ピンを判定。
-      for (; pin_back; NEXT_BITBOARD(pin_back)) {
-        // 裏駒のマス。
-        Square pin_back_sq = Util::GetSquare(pin_back);
-
-        // 裏駒と自分の間のビットボード。
-        Bitboard between = Util::GetBetween(square, pin_back_sq);
-
-        // 下のif文によるピンの判定条件は、
-        // 「裏駒と自分との間」にターゲット(相手の駒)があった場合。
-        // pin_backに対応するターゲットが味方の駒の場合もあるので
-        // 相手の駒に限定しなくてはならない。
-        if ((between & enemy_pieces)) {
-          evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_[ROOK]
-          [basic_st.piece_board_[Util::GetSquare(between & enemy_pieces)]]
-          [basic_st.piece_board_[pin_back_sq]];
-        }
-      }
     }
   };
   template<Side SIDE>
@@ -324,7 +263,6 @@ namespace Sayuri {
     static void F(Evaluator& evaluator,
     const ChessEngine::BasicStruct& basic_st,
     Square square, Bitboard attacks) {
-      constexpr Side ENEMY_SIDE = Util::GetOppositeSide(SIDE);
       constexpr int SIGN = SIDE == WHITE ? 1 : -1;
 
       // クイーンの早過ぎる始動を計算。
@@ -336,42 +274,6 @@ namespace Sayuri {
         & Evaluator::START_POSITION[SIDE][KNIGHT])
         | (basic_st.position_[SIDE][BISHOP]
         & Evaluator::START_POSITION[SIDE][BISHOP]))];
-      }
-
-      // ピンを計算。
-      // 相手の駒と裏駒を作成。
-      Bitboard enemy_pieces = basic_st.side_pieces_[ENEMY_SIDE];
-      Bitboard pin_back = (MetaEvaluator::PIN_BACK_TABLE[square]
-      [(basic_st.blocker_[R0] >> Util::MAGIC_SHIFT[square][R0])
-      & Util::MAGIC_MASK[square][R0]][R0]
-      | MetaEvaluator::PIN_BACK_TABLE[square]
-      [(basic_st.blocker_[R45] >> Util::MAGIC_SHIFT[square][R45])
-      & Util::MAGIC_MASK[square][R45]][R45]
-      | MetaEvaluator::PIN_BACK_TABLE[square]
-      [(basic_st.blocker_[R90] >> Util::MAGIC_SHIFT[square][R90])
-      & Util::MAGIC_MASK[square][R90]][R90]
-      | MetaEvaluator::PIN_BACK_TABLE[square]
-      [(basic_st.blocker_[R135] >> Util::MAGIC_SHIFT[square][R135])
-      & Util::MAGIC_MASK[square][R135]][R135])
-      & enemy_pieces;
-
-      // ピンを判定。
-      for (; pin_back; NEXT_BITBOARD(pin_back)) {
-        // 裏駒のマス。
-        Square pin_back_sq = Util::GetSquare(pin_back);
-
-        // 裏駒と自分の間のビットボード。
-        Bitboard between = Util::GetBetween(square, pin_back_sq);
-
-        // 下のif文によるピンの判定条件は、
-        // 「裏駒と自分との間」にターゲット(相手の駒)があった場合。
-        // pin_backに対応するターゲットが味方の駒の場合もあるので
-        // 相手の駒に限定しなくてはならない。
-        if ((between & enemy_pieces)) {
-          evaluator.score_ += SIGN * evaluator.cache_ptr_->pin_cache_[QUEEN]
-          [basic_st.piece_board_[Util::GetSquare(between & enemy_pieces)]]
-          [basic_st.piece_board_[pin_back_sq]];
-        }
       }
     }
   };

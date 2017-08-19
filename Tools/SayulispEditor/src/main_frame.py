@@ -186,10 +186,6 @@ class MainFrame(tk.Frame):
         AddWindow("Queen Defense", QueenDefenseConfig)
         AddWindow("King Defense", KingDefenseConfig)
 
-        AddWindow("Bishop Pin", BishopPinConfig)
-        AddWindow("Rook Pin", RookPinConfig)
-        AddWindow("Queen Pin", QueenPinConfig)
-
         AddWindow("Pawn Attack around King", PawnAttackAroundKingConfig)
         AddWindow("Knight Attack around King", KnightAttackAroundKingConfig)
         AddWindow("Bishop Attack around King", BishopAttackAroundKingConfig)

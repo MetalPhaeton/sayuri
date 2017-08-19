@@ -1364,9 +1364,6 @@ namespace Sayuri {
     message_func_map_["@analyse-pass-pawn"] =
     INSERT_MESSAGE_FUNCTION(AnalysePassPawn);
 
-    message_func_map_["@analyse-pin/skewer"] =
-    INSERT_MESSAGE_FUNCTION(AnalysePinSkewer);
-
     message_func_map_["@material"] =
     INSERT_MESSAGE_FUNCTION(SetMaterial);
 
@@ -1553,15 +1550,6 @@ namespace Sayuri {
     message_func_map_["@king-defense-table"] =
     INSERT_MESSAGE_FUNCTION(SetDefenseTable<KING>);
 
-    message_func_map_["@bishop-pin-table"] =
-    INSERT_MESSAGE_FUNCTION(SetPinTable<BISHOP>);
-
-    message_func_map_["@rook-pin-table"] =
-    INSERT_MESSAGE_FUNCTION(SetPinTable<ROOK>);
-
-    message_func_map_["@queen-pin-table"] =
-    INSERT_MESSAGE_FUNCTION(SetPinTable<QUEEN>);
-
     message_func_map_["@pawn-shield-table"] =
     INSERT_MESSAGE_FUNCTION(SetPawnShieldTable);
 
@@ -1668,13 +1656,6 @@ namespace Sayuri {
     INSERT_MESSAGE_FUNCTION(SetWeightDefense<QUEEN>);
     message_func_map_["@weight-king-defense"] =
     INSERT_MESSAGE_FUNCTION(SetWeightDefense<KING>);
-
-    message_func_map_["@weight-bishop-pin"] =
-    INSERT_MESSAGE_FUNCTION(SetWeightPin<BISHOP>);
-    message_func_map_["@weight-rook-pin"] =
-    INSERT_MESSAGE_FUNCTION(SetWeightPin<ROOK>);
-    message_func_map_["@weight-queen-pin"] =
-    INSERT_MESSAGE_FUNCTION(SetWeightPin<QUEEN>);
 
     message_func_map_["@weight-pawn-attack-around-king"] =
     INSERT_MESSAGE_FUNCTION(SetWeightAttackAroundKing<PAWN>);
@@ -2775,35 +2756,6 @@ namespace Sayuri {
     return ret_ptr;
   }
 
-  // %%% @analyse-pin/skewer
-  DEF_MESSAGE_FUNCTION(EngineSuite::AnalysePinSkewer) {
-    // 準備。
-    LObject* args_ptr = nullptr;
-    Sayulisp::GetReadyForMessageFunction(symbol, args, 1, &args_ptr);
-
-    // マスを得る。
-    LPointer square_ptr = caller->Evaluate(args_ptr->car());
-    Sayulisp::CheckSquare(*square_ptr);
-
-    // 結果を得る。
-    ResultPinSkewer result =
-    Sayuri::AnalysePinSkewer(*board_ptr_, square_ptr->number());
-
-    // 分析結果をリストにする。
-    LPointer ret_ptr = Lisp::NewList(result.size());
-    LObject* ptr = ret_ptr.get();
-    for (auto array : result) {
-      ptr->car(Lisp::NewPair(
-      Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[array[0]]),
-      Lisp::NewPair(Lisp::NewSymbol(Sayulisp::SQUARE_MAP_INV[array[1]]),
-      Lisp::NewNil())));
-
-      Lisp::Next(&ptr);
-    }
-
-    return ret_ptr;
-  }
-
   // %%% @material
   DEF_MESSAGE_FUNCTION(EngineSuite::SetMaterial) {
     // 古い設定を得る。
@@ -3056,76 +3008,6 @@ namespace Sayuri {
   template DEF_MESSAGE_FUNCTION(EngineSuite::SetDefenseTable<QUEEN>);
   template DEF_MESSAGE_FUNCTION(EngineSuite::SetDefenseTable<KING>);
 
-  // @bishop-pin-tab
-  // @rook-pin-table
-  // @queen-pin-table
-  template<PieceType TYPE>
-  DEF_MESSAGE_FUNCTION(EngineSuite::SetPinTable) {
-    // 古い設定を得る。
-    LPointerVec ret_vec(NUM_PIECE_TYPES);
-    const double (& table)
-    [NUM_PIECE_TYPES][NUM_PIECE_TYPES][NUM_PIECE_TYPES] =
-    eval_params_ptr_->pin_value_table();
-    FOR_PIECE_TYPES(piece_type_1) {
-      LPointerVec temp_vec(NUM_PIECE_TYPES);
-
-      FOR_PIECE_TYPES(piece_type_2) {
-        temp_vec[piece_type_2] =
-        Lisp::NewNumber(table[TYPE][piece_type_1][piece_type_2]);
-      }
-
-      ret_vec[piece_type_1] = Lisp::LPointerVecToList(temp_vec);
-    }
-
-    // 引数があれば設定する。
-    LObject* args_ptr = args.cdr()->cdr().get();
-    if (args_ptr->IsPair()) {
-      LPointer result = caller->Evaluate(args_ptr->car());
-      Lisp::CheckList(*result);
-
-      // マスの数がちゃんとあるかどうか。
-      if (Lisp::CountList(*result) < static_cast<int>(NUM_PIECE_TYPES)) {
-        throw Lisp::GenError("@engine-error",
-        "'" + symbol + "' requires List of "
-        + std::to_string(NUM_PIECE_TYPES) + " x "
-        + std::to_string(NUM_PIECE_TYPES) + " elements.");
-      }
-
-      // セットする。
-      LObject* ptr = result.get();
-      FOR_PIECE_TYPES(piece_type_1) {
-        const LPointer& car = ptr->car();
-
-        // チェックする。
-        Lisp::CheckList(*car);
-        if (Lisp::CountList(*car) < static_cast<int>(NUM_PIECE_TYPES)) {
-          throw Lisp::GenError("@engine-error",
-          "'" + symbol + "' requires List of "
-          + std::to_string(NUM_PIECE_TYPES) + "x"
-          + std::to_string(NUM_PIECE_TYPES) + " elements.");
-        }
-
-        // 内側のループ。
-        LObject* ptr_2 = car.get();
-        FOR_PIECE_TYPES(piece_type_2) {
-          Lisp::CheckType(*(ptr_2->car()), LType::NUMBER);
-
-          eval_params_ptr_->pin_value_table
-          (TYPE, piece_type_1, piece_type_2, ptr_2->car()->number());
-
-          Lisp::Next(&ptr_2);
-        }
-
-        Lisp::Next(&ptr);
-      }
-    }
-
-    return Lisp::LPointerVecToList(ret_vec);
-  }
-  template DEF_MESSAGE_FUNCTION(EngineSuite::SetPinTable<BISHOP>);
-  template DEF_MESSAGE_FUNCTION(EngineSuite::SetPinTable<ROOK>);
-  template DEF_MESSAGE_FUNCTION(EngineSuite::SetPinTable<QUEEN>);
-
   DEF_MESSAGE_FUNCTION(EngineSuite::SetPawnShieldTable) {
     // 古い設定を得る。
     LPointerVec ret_vec(NUM_SQUARES);
@@ -3360,17 +3242,6 @@ namespace Sayuri {
   template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDefense<ROOK>);
   template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDefense<QUEEN>);
   template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightDefense<KING>);
-
-  // %%% @weight-bishop-pin
-  // %%% @weight-rook-pin
-  // %%% @weight-queen-pin
-  template<PieceType TYPE>
-  DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightPin) {
-    SET_PIECE_WEIGHT(weight_pin);
-  }
-  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightPin<BISHOP>);
-  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightPin<ROOK>);
-  template DEF_MESSAGE_FUNCTION(EngineSuite::SetWeightPin<QUEEN>);
 
   // %%% @weight-pawn-attack-around-king
   // %%% @weight-knight-attack-around-king
@@ -3670,45 +3541,6 @@ namespace Sayuri {
         // プッシュ。
         ret.push_back(std::make_pair(piece_str[piece_type] + "_defense",
         temp_2));
-      }
-    }
-
-    // ピンの特徴ベクトルを作る。
-    {
-      static const int piece_index[3] {BISHOP, ROOK, QUEEN};
-      for (int i = 0; i < 3; ++i) {
-        PieceType piece_type = piece_index[i];
-        std::vector<double> temp(36, 0.0);
-
-        // 先ずは白から。
-        Bitboard white_bb = board.position_[WHITE][piece_type];
-        for (; white_bb; NEXT_BITBOARD(white_bb)) {
-          Square square = Util::GetSquare(white_bb);
-
-          // ピンを分析。
-          ResultPinSkewer result = Sayuri::AnalysePinSkewer(board, square);
-          for (auto& ary : result) {
-            PieceType pinned = board.piece_board_[ary[0]];
-            PieceType pinback = board.piece_board_[ary[1]];
-            temp[((pinned - 1) * 6) + (pinback - 1)] += 1.0;
-          }
-        }
-
-        // 次に黒。
-        Bitboard black_bb = board.position_[BLACK][piece_type];
-        for (; black_bb; NEXT_BITBOARD(black_bb)) {
-          Square square = Util::GetSquare(black_bb);
-
-          // ピンを分析。
-          ResultPinSkewer result = Sayuri::AnalysePinSkewer(board, square);
-          for (auto& ary : result) {
-            PieceType pinned = board.piece_board_[ary[0]];
-            PieceType pinback = board.piece_board_[ary[1]];
-            temp[((pinned - 1) * 6) + (pinback - 1)] -= 1.0;
-          }
-        }
-
-        ret.push_back(std::make_pair(piece_str[piece_type] + "_pin", temp));
       }
     }
 

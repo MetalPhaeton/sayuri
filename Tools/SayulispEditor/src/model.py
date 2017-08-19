@@ -97,9 +97,6 @@ class Model:
     ROOK_DEFENSE_TABLE_SYMBOL = "@rook-defense-table"
     QUEEN_DEFENSE_TABLE_SYMBOL = "@queen-defense-table"
     KING_DEFENSE_TABLE_SYMBOL = "@king-defense-table"
-    BISHOP_PIN_TABLE_SYMBOL = "@bishop-pin-table"
-    ROOK_PIN_TABLE_SYMBOL = "@rook-pin-table"
-    QUEEN_PIN_TABLE_SYMBOL = "@queen-pin-table"
     PAWN_SHIELD_TABLE_SYMBOL = "@pawn-shield-table"
     WEIGHT_PAWN_OPENING_POSITION_SYMBOL = "@weight-pawn-opening-position"
     WEIGHT_KNIGHT_OPENING_POSITION_SYMBOL = "@weight-knight-opening-position"
@@ -155,9 +152,6 @@ class Model:
     WEIGHT_ROOK_DEFENSE_SYMBOL = "@weight-rook-defense"
     WEIGHT_QUEEN_DEFENSE_SYMBOL = "@weight-queen-defense"
     WEIGHT_KING_DEFENSE_SYMBOL = "@weight-king-defense"
-    WEIGHT_BISHOP_PIN_SYMBOL = "@weight-bishop-pin"
-    WEIGHT_ROOK_PIN_SYMBOL = "@weight-rook-pin"
-    WEIGHT_QUEEN_PIN_SYMBOL = "@weight-queen-pin"
     WEIGHT_PAWN_ATTACK_AROUND_KING_SYMBOL = "@weight-pawn-attack-around-king"
     WEIGHT_KNIGHT_ATTACK_AROUND_KING_SYMBOL = \
     "@weight-knight-attack-around-king"
@@ -315,12 +309,6 @@ class Model:
         self.queen_defense_table)
         ret += to_sexpr(Model.KING_DEFENSE_TABLE_SYMBOL, \
         self.king_defense_table)
-        ret += to_sexpr(Model.BISHOP_PIN_TABLE_SYMBOL, \
-        self.bishop_pin_table)
-        ret += to_sexpr(Model.ROOK_PIN_TABLE_SYMBOL, \
-        self.rook_pin_table)
-        ret += to_sexpr(Model.QUEEN_PIN_TABLE_SYMBOL, \
-        self.queen_pin_table)
         ret += to_sexpr(Model.PAWN_SHIELD_TABLE_SYMBOL, \
         self.pawn_shield_table)
         ret += to_sexpr(Model.WEIGHT_PAWN_OPENING_POSITION_SYMBOL, \
@@ -419,12 +407,6 @@ class Model:
         self.weight_queen_defense)
         ret += to_sexpr(Model.WEIGHT_KING_DEFENSE_SYMBOL, \
         self.weight_king_defense)
-        ret += to_sexpr(Model.WEIGHT_BISHOP_PIN_SYMBOL, \
-        self.weight_bishop_pin)
-        ret += to_sexpr(Model.WEIGHT_ROOK_PIN_SYMBOL, \
-        self.weight_rook_pin)
-        ret += to_sexpr(Model.WEIGHT_QUEEN_PIN_SYMBOL, \
-        self.weight_queen_pin)
         ret += to_sexpr(Model.WEIGHT_PAWN_ATTACK_AROUND_KING_SYMBOL, \
         self.weight_pawn_attack_around_king)
         ret += to_sexpr(Model.WEIGHT_KNIGHT_ATTACK_AROUND_KING_SYMBOL, \
@@ -603,12 +585,6 @@ class Model:
                     self.queen_defense_table = tup[2]
                 elif tup[1] == Model.KING_DEFENSE_TABLE_SYMBOL:
                     self.king_defense_table = tup[2]
-                elif tup[1] == Model.BISHOP_PIN_TABLE_SYMBOL:
-                    self.bishop_pin_table = tup[2]
-                elif tup[1] == Model.ROOK_PIN_TABLE_SYMBOL:
-                    self.rook_pin_table = tup[2]
-                elif tup[1] == Model.QUEEN_PIN_TABLE_SYMBOL:
-                    self.queen_pin_table = tup[2]
                 elif tup[1] == Model.PAWN_SHIELD_TABLE_SYMBOL:
                     self.pawn_shield_table = tup[2]
                 elif tup[1] == Model.WEIGHT_PAWN_OPENING_POSITION_SYMBOL:
@@ -709,12 +685,6 @@ class Model:
                     self.weight_queen_defense = tup[2]
                 elif tup[1] == Model.WEIGHT_KING_DEFENSE_SYMBOL:
                     self.weight_king_defense = tup[2]
-                elif tup[1] == Model.WEIGHT_BISHOP_PIN_SYMBOL:
-                    self.weight_bishop_pin = tup[2]
-                elif tup[1] == Model.WEIGHT_ROOK_PIN_SYMBOL:
-                    self.weight_rook_pin = tup[2]
-                elif tup[1] == Model.WEIGHT_QUEEN_PIN_SYMBOL:
-                    self.weight_queen_pin = tup[2]
                 elif tup[1] == Model.WEIGHT_PAWN_ATTACK_AROUND_KING_SYMBOL:
                     self.weight_pawn_attack_around_king = tup[2]
                 elif tup[1] == Model.WEIGHT_KNIGHT_ATTACK_AROUND_KING_SYMBOL:

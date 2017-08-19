@@ -94,9 +94,6 @@
                       @rook-defense-table
                       @queen-defense-table
                       @king-defense-table
-                      @bishop-pin-table
-                      @rook-pin-table
-                      @queen-pin-table
                       @pawn-shield-table
                       @weight-pawn-opening-position
                       @weight-knight-opening-position
@@ -146,9 +143,6 @@
                       @weight-rook-defense
                       @weight-queen-defense
                       @weight-king-defense
-                      @weight-bishop-pin
-                      @weight-rook-pin
-                      @weight-queen-pin
                       @weight-pawn-attack-around-king
                       @weight-knight-attack-around-king
                       @weight-bishop-attack-around-king

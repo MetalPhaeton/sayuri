@@ -227,14 +227,6 @@ namespace Sayuri {
           ptr->defense_cache_[piece_type][piece_type_2] =
           256.0 * params.defense_value_table()[piece_type][piece_type_2]
           * params.weight_defense()[piece_type](num_pieces);
-
-          FOR_PIECE_TYPES(piece_type_3) {
-            ptr->pin_cache_[piece_type][piece_type_2]
-            [piece_type_3] =
-            256.0 * params.pin_value_table()[piece_type][piece_type_2]
-            [piece_type_3]
-            * params.weight_pin()[piece_type](num_pieces);
-          }
         }
 
         for (unsigned int num_around_king = 0;

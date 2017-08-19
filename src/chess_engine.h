@@ -746,9 +746,6 @@ namespace Sayuri {
       friend struct CalMobility;
       /** 評価関数で使うテンプレート部品。 */
       template<Side SIDE, PieceType TYPE>
-      friend struct GenPinTargets;
-      /** 評価関数で使うテンプレート部品。 */
-      template<Side SIDE, PieceType TYPE>
       friend struct CalSpecial;
 
       /** 指し手作成クラスはフレンド。 */
