@@ -39,7 +39,6 @@
 #include <memory>
 #include "common.h"
 #include "board.h"
-#include "evaluator_extra.h"
 
 /** Sayuri 名前空間。 */
 namespace Sayuri {
