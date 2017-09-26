@@ -926,31 +926,6 @@ namespace Sayuri {
     Square from = Get<FROM>(move);
     Square to = Get<TO>(move);
 
-    // キャスリングの権利を更新。
-    if (basic_st_.castling_rights_) {
-      switch (basic_st_.piece_board_[from]) {
-        case KING:
-          basic_st_.castling_rights_ &=
-          ~(side == WHITE ? WHITE_CASTLING : BLACK_CASTLING);
-          break;
-        case ROOK:
-          if (side == WHITE) {
-            if (from == H1) {
-              basic_st_.castling_rights_ &= ~(WHITE_SHORT_CASTLING);
-            } else if (from == A1) {
-              basic_st_.castling_rights_ &= ~(WHITE_LONG_CASTLING);
-            }
-          } else {
-            if (from == H8) {
-              basic_st_.castling_rights_ &= ~(BLACK_SHORT_CASTLING);
-            } else if (from == A8) {
-              basic_st_.castling_rights_ &= ~(BLACK_LONG_CASTLING);
-            }
-          }
-          break;
-      }
-    }
-
     // 手の種類によって分岐する。
     switch (Get<MOVE_TYPE>(move)) {
       case NORMAL:  // 通常の手。
@@ -1006,6 +981,9 @@ namespace Sayuri {
         basic_st_.has_castled_[BLACK] = true;
         break;
     }
+
+    // キャスリングの権利をアップデート。
+    UpdateCastlingRights();
   }
 
   // MakeMove()で動かした手を元に戻す。
