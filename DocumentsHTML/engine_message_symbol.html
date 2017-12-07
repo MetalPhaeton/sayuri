@@ -37,33 +37,33 @@
 <li><a href="#hash-and-threads">Hash and threads</a></li>
 <li><a href="#analyse-position">Analyse Position</a></li>
 <li><a href="#generate-feature-vector">Generate Feature Vector</a></li>
-<li><a href="#customizing-search-algorithm---material">Customizing Search Algorithm - Material</a></li>
-<li><a href="#customizing-search-algorithm---quiescence-search">Customizing Search Algorithm - Quiescence Search</a></li>
-<li><a href="#customizing-search-algorithm---repetition-check">Customizing Search Algorithm - Repetition Check</a></li>
-<li><a href="#customizing-search-algorithm---check-extension">Customizing Search Algorithm - Check Extension</a></li>
-<li><a href="#customizing-search-algorithm---ybwc">Customizing Search Algorithm - YBWC</a></li>
-<li><a href="#customizing-search-algorithm---aspiration-windows">Customizing Search Algorithm - Aspiration Windows</a></li>
-<li><a href="#customizing-search-algorithm---aspiration-windows">Customizing Search Algorithm - Aspiration Windows</a></li>
-<li><a href="#customizing-search-algorithm---history-heuristics">Customizing Search Algorithm - History Heuristics</a></li>
-<li><a href="#customizing-search-algorithm---killer-move-heuristics">Customizing Search Algorithm - Killer Move Heuristics</a></li>
-<li><a href="#customizing-search-algorithm---hash-table">Customizing Search Algorithm - Hash Table</a></li>
-<li><a href="#customizing-search-algorithm---internal-iterative-deepening">Customizing Search Algorithm - Internal Iterative Deepening</a></li>
-<li><a href="#customizing-search-algorithm---null-move-reduction">Customizing Search Algorithm - Null Move Reduction</a></li>
-<li><a href="#customizing-search-algorithm---probcut">Customizing Search Algorithm - ProbCut</a></li>
-<li><a href="#customizing-search-algorithm---history-pruning">Customizing Search Algorithm - History Pruning</a></li>
-<li><a href="#customizing-search-algorithm---late-move-reduction">Customizing Search Algorithm - Late Move Reduction</a></li>
-<li><a href="#customizing-search-algorithm---futility-pruning">Customizing Search Algorithm - Futility Pruning</a></li>
-<li><a href="#customizing-evaluation-function---piece-square-table">Customizing Evaluation Function - Piece Square Table</a></li>
-<li><a href="#customizing-evaluation-function---attack">Customizing Evaluation Function - Attack</a></li>
-<li><a href="#customizing-evaluation-function---defense">Customizing Evaluation Function - Defense</a></li>
-<li><a href="#customizing-evaluation-function---pawn-shield">Customizing Evaluation Function - Pawn Shield</a></li>
-<li><a href="#customizing-evaluation-function---mobility">Customizing Evaluation Function - Mobility</a></li>
-<li><a href="#customizing-evaluation-function---controlling-center">Customizing Evaluation Function - Controlling Center</a></li>
-<li><a href="#customizing-evaluation-function---controlling-sweet-center">Customizing Evaluation Function - Controlling Sweet Center</a></li>
-<li><a href="#customizing-evaluation-function---development">Customizing Evaluation Function - Development</a></li>
-<li><a href="#customizing-evaluation-function---attack-around-enemy-king">Customizing Evaluation Function - Attack around Enemy King</a></li>
-<li><a href="#customizing-evaluation-function---pawn-structure">Customizing Evaluation Function - Pawn Structure</a></li>
-<li><a href="#customizing-evaluation-function---piece">Customizing Evaluation Function - Piece</a></li>
+<li><a href="#customizing-search-algorithm-material">Customizing Search Algorithm - Material</a></li>
+<li><a href="#customizing-search-algorithm-quiescence-search">Customizing Search Algorithm - Quiescence Search</a></li>
+<li><a href="#customizing-search-algorithm-repetition-check">Customizing Search Algorithm - Repetition Check</a></li>
+<li><a href="#customizing-search-algorithm-check-extension">Customizing Search Algorithm - Check Extension</a></li>
+<li><a href="#customizing-search-algorithm-ybwc">Customizing Search Algorithm - YBWC</a></li>
+<li><a href="#customizing-search-algorithm-aspiration-windows">Customizing Search Algorithm - Aspiration Windows</a></li>
+<li><a href="#customizing-search-algorithm-aspiration-windows">Customizing Search Algorithm - Aspiration Windows</a></li>
+<li><a href="#customizing-search-algorithm-history-heuristics">Customizing Search Algorithm - History Heuristics</a></li>
+<li><a href="#customizing-search-algorithm-killer-move-heuristics">Customizing Search Algorithm - Killer Move Heuristics</a></li>
+<li><a href="#customizing-search-algorithm-hash-table">Customizing Search Algorithm - Hash Table</a></li>
+<li><a href="#customizing-search-algorithm-internal-iterative-deepening">Customizing Search Algorithm - Internal Iterative Deepening</a></li>
+<li><a href="#customizing-search-algorithm-null-move-reduction">Customizing Search Algorithm - Null Move Reduction</a></li>
+<li><a href="#customizing-search-algorithm-probcut">Customizing Search Algorithm - ProbCut</a></li>
+<li><a href="#customizing-search-algorithm-history-pruning">Customizing Search Algorithm - History Pruning</a></li>
+<li><a href="#customizing-search-algorithm-late-move-reduction">Customizing Search Algorithm - Late Move Reduction</a></li>
+<li><a href="#customizing-search-algorithm-futility-pruning">Customizing Search Algorithm - Futility Pruning</a></li>
+<li><a href="#customizing-evaluation-function-piece-square-table">Customizing Evaluation Function - Piece Square Table</a></li>
+<li><a href="#customizing-evaluation-function-attack">Customizing Evaluation Function - Attack</a></li>
+<li><a href="#customizing-evaluation-function-defense">Customizing Evaluation Function - Defense</a></li>
+<li><a href="#customizing-evaluation-function-pawn-shield">Customizing Evaluation Function - Pawn Shield</a></li>
+<li><a href="#customizing-evaluation-function-mobility">Customizing Evaluation Function - Mobility</a></li>
+<li><a href="#customizing-evaluation-function-controlling-center">Customizing Evaluation Function - Controlling Center</a></li>
+<li><a href="#customizing-evaluation-function-controlling-sweet-center">Customizing Evaluation Function - Controlling Sweet Center</a></li>
+<li><a href="#customizing-evaluation-function-development">Customizing Evaluation Function - Development</a></li>
+<li><a href="#customizing-evaluation-function-attack-around-enemy-king">Customizing Evaluation Function - Attack around Enemy King</a></li>
+<li><a href="#customizing-evaluation-function-pawn-structure">Customizing Evaluation Function - Pawn Structure</a></li>
+<li><a href="#customizing-evaluation-function-piece">Customizing Evaluation Function - Piece</a></li>
 </ul>
 <hr />
 <h3 id="getting-squares">Getting squares</h3>
@@ -915,6 +915,7 @@ the control won't come back until the engine have found the best move.</p>
 ;; &gt;  En Passant Square: -
 ;; &gt;  Castling Rights : kq
 ;; &gt;  
+;; &gt;  ("material" (0 0 0 0 0 0))
 ;; &gt;  ("pawn_position" (0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 -1 0 0 0 0 0 0 0 0
 ;; &gt; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 ;; &gt; 0 0 0 0))

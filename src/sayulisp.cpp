@@ -3441,6 +3441,19 @@ namespace Sayuri {
       "", "pawn", "knight", "bishop", "rook", "queen", "king"
     }};
 
+    // マテリアル。
+    {
+      std::vector<double> temp(6, 0.0);
+      FOR_PIECE_TYPES(piece_type) {
+        if (piece_type) {
+          double value = Util::CountBits(board.position_[WHITE][piece_type])
+          - Util::CountBits(board.position_[BLACK][piece_type]);
+          temp[piece_type - 1] = value;
+        }
+      }
+      ret.push_back(std::make_pair("material", temp));
+    }
+
     // 駒の配置の配置の特徴ベクトル。
     {
       std::vector<double> temp(NUM_SQUARES);
