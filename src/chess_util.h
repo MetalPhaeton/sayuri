@@ -36,7 +36,6 @@
 #include <random>
 #include <set>
 #include <map>
-#include <cstdint>
 
 #include "common.h"
 #include "chess_util_extra.h"

@@ -32,7 +32,6 @@
 #include <iostream>
 #include <mutex>
 #include <cstddef>
-#include <cstdint>
 #include <utility>
 #include <cstring>
 #include "common.h"

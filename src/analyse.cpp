@@ -32,7 +32,6 @@
 #include <iostream>
 #include <sstream>
 #include <cstddef>
-#include <cstdint>
 #include <vector>
 #include <array>
 #include <tuple>

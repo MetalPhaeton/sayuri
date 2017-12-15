@@ -30,7 +30,6 @@
 # include "params.h"
 
 #include <iostream>
-#include <cstdint>
 #include <cstring>
 #include "common.h"
 

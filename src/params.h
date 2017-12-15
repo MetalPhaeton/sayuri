@@ -35,7 +35,6 @@
 #include <tuple>
 #include <initializer_list>
 #include <algorithm>
-#include <cstdint>
 #include "common.h"
 
 /** Sayuri 名前空間。 */

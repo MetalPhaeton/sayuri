@@ -30,7 +30,6 @@
 #include "cache.h"
 
 #include <iostream>
-#include <cstdint>
 #include "common.h"
 #include "params.h"
 

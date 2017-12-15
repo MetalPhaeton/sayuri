@@ -37,7 +37,6 @@
 #include <mutex>
 #include <memory>
 #include <cstddef>
-#include <cstdint>
 #include <functional>
 #include <queue>
 #include <system_error>

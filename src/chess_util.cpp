@@ -37,7 +37,6 @@
 #include <climits>
 #include <set>
 #include <map>
-#include <cstdint>
 #include <algorithm>
 #include <iterator>
 #include "common.h"

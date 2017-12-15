@@ -30,7 +30,6 @@
 #include "position_record.h"
 
 #include <iostream>
-#include <cstdint>
 #include "common.h"
 #include "chess_engine.h"
 

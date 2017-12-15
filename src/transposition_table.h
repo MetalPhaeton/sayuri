@@ -34,7 +34,6 @@
 #include <memory>
 #include <mutex>
 #include <cstddef>
-#include <cstdint>
 #include "common.h"
 
 /** Sayuri 名前空間。 */

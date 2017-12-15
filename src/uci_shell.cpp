@@ -42,7 +42,6 @@
 #include <sstream>
 #include <utility>
 #include <cstddef>
-#include <cstdint>
 #include <cctype>
 #include <functional>
 #include <set>

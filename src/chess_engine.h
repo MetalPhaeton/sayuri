@@ -38,7 +38,6 @@
 #include <mutex>
 #include <condition_variable>
 #include <cstddef>
-#include <cstdint>
 #include <climits>
 #include <queue>
 #include "common.h"
