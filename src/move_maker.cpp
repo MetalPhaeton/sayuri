@@ -348,10 +348,10 @@ namespace Sayuri {
 
   // 指し手のスコアを計算する。
   template<GenMoveType>
-  inline std::int64_t MoveMaker::CalScore
+  inline std::int32_t MoveMaker::CalScore
   (Move move, Side side, Square from, Square to) const {return 0;}
   template<>
-  std::int64_t MoveMaker::CalScore<GenMoveType::NON_CAPTURE>
+  std::int32_t MoveMaker::CalScore<GenMoveType::NON_CAPTURE>
   (Move move, Side side, Square from, Square to) const {
     // ヒストリーの点数の最大値のビット桁数。 (つまり、最大値は 0x200 )
     constexpr int MAX_HISTORY_SCORE_SHIFT = 9;
@@ -361,15 +361,15 @@ namespace Sayuri {
     << MAX_HISTORY_SCORE_SHIFT) / history_max_;
   }
   template<>
-  inline std::int64_t MoveMaker::CalScore<GenMoveType::CAPTURE>
+  inline std::int32_t MoveMaker::CalScore<GenMoveType::CAPTURE>
   (Move move, Side side, Square from, Square to) const {
     // 駒を取る手のビットシフト。
-    constexpr int CAPTURE_SCORE_SHIFT = 13;
+    constexpr int CAPTURE_SCORE_SHIFT = 12;
     // 悪い取る手の点数。
-    constexpr std::int64_t BAD_CAPTURE_SCORE = -1LL;
+    constexpr std::int32_t BAD_CAPTURE_SCORE = -1;
 
     // SEEで点数をつけていく。
-    return Util::GetMax(static_cast<std::int64_t>(engine_ptr_->SEE(move, 0))
+    return Util::GetMax(static_cast<std::int32_t>(engine_ptr_->SEE(move, 0))
     << CAPTURE_SCORE_SHIFT, BAD_CAPTURE_SCORE);
   }
 
@@ -379,18 +379,18 @@ namespace Sayuri {
   Move iid_move, Move killer_1, Move killer_2, Side side) {
     // --- 評価値の定義 --- //
     // キラームーブの点数。
-    constexpr std::int64_t KILLER_2_MOVE_SCORE = 0x400LL;
-    constexpr std::int64_t KILLER_1_MOVE_SCORE = KILLER_2_MOVE_SCORE << 1;
+    constexpr std::int32_t KILLER_2_MOVE_SCORE = 0x400;
+    constexpr std::int32_t KILLER_1_MOVE_SCORE = KILLER_2_MOVE_SCORE << 1;
     // 駒を取る手のビットシフト。
-    // constexpr int CAPTURE_SCORE_SHIFT = 13;
+    // constexpr int CAPTURE_SCORE_SHIFT = 12;
     // 相手キングをチェックする手の点数。
-    constexpr std::int64_t CHECKING_MOVE_SCORE = 1LL << 32;
+    constexpr std::int32_t CHECKING_MOVE_SCORE = 1 << 28;
     // IIDで得た最善手の点数。
-    constexpr std::int64_t IID_MOVE_SCORE = CHECKING_MOVE_SCORE << 1;
+    constexpr std::int32_t IID_MOVE_SCORE = CHECKING_MOVE_SCORE << 1;
     // 前回の繰り返しでトランスポジションテーブルから得た最善手の点数。
-    constexpr std::int64_t BEST_MOVE_SCORE = IID_MOVE_SCORE << 1;
+    constexpr std::int32_t BEST_MOVE_SCORE = IID_MOVE_SCORE << 1;
     // 悪い取る手の点数。
-    // constexpr std::int64_t BAD_CAPTURE_SCORE = -1LL;
+    // constexpr std::int32_t BAD_CAPTURE_SCORE = -1;
 
     Bitboard enemy_king_bb =
     Util::SQUARE[engine_ptr_->basic_st_.king_

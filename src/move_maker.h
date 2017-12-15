@@ -48,7 +48,7 @@ namespace Sayuri {
         /** 候補手。 */
         Move move_;
         /** 候補手の評価。 */
-        std::int64_t score_;
+        std::int32_t score_;
       };
 
     public:
@@ -222,7 +222,7 @@ namespace Sayuri {
        * @param to 駒の目的地。
        * @return スコア。
        */
-      template<GenMoveType TYPE> std::int64_t CalScore
+      template<GenMoveType TYPE> std::int32_t CalScore
       (Move move, Side side, Square from, Square to) const;
 
       // ========== //
