@@ -149,7 +149,7 @@ namespace Sayuri {
        * @param thinking_time 思考時間。
        * @param infinite_thinking 無限に思考するかどうかのフラグ。
        */
-      void SetStopper(std::uint32_t max_depth, std::uint64_t max_nodes,
+      void SetStopper(u32 max_depth, u64 max_nodes,
       const Chrono::milliseconds& thinking_time, bool infinite_thinking);
 
       /**
@@ -569,18 +569,15 @@ namespace Sayuri {
        * アクセサ - ヒストリー。
        * @return ヒストリー。 [サイド][from][to]。
        */
-      const std::uint64_t
-      (& history() const)[NUM_SIDES][NUM_SQUARES][NUM_SQUARES] {
-        return const_cast<const std::uint64_t (&)
-        [NUM_SIDES][NUM_SQUARES][NUM_SQUARES]>(shared_st_ptr_->history_);
+      const u64 (& history() const)[NUM_SIDES][NUM_SQUARES][NUM_SQUARES] {
+        return const_cast<const u64 (&)[NUM_SIDES][NUM_SQUARES][NUM_SQUARES]>
+        (shared_st_ptr_->history_);
       }
       /**
        * アクセサ - ヒストリーの最大値。
        * @return ヒストリーの最大値。
        */
-      std::uint64_t history_max() const {
-        return shared_st_ptr_->history_max_;
-      }
+      u64 history_max() const {return shared_st_ptr_->history_max_;}
       /**
        * アクセサ - IIDでの最善手のスタック。
        * @return IIDでの最善手のスタック。 [探索レベル]
@@ -774,7 +771,7 @@ namespace Sayuri {
        * @param material 現在のマテリアル。
        * @return 評価値。
        */
-      int Quiesce(std::uint32_t level, int alpha, int beta, int material);
+      int Quiesce(u32 level, int alpha, int beta, int material);
 
       /**
        * 通常の探索。
@@ -788,7 +785,7 @@ namespace Sayuri {
        * @return 評価値。
        */
       int Search(NodeType node_type, Hash pos_hash, int depth,
-      std::uint32_t level, int alpha, int beta, int material);
+      u32 level, int alpha, int beta, int material);
 
       /**
        * 探索のルート。
@@ -910,7 +907,7 @@ namespace Sayuri {
        * @param level そのノードのレベル。
        * @return 引数score。
        */
-      int ReturnProcess(int score, std::uint32_t level) {
+      int ReturnProcess(int score, u32 level) {
         if (level >= notice_cut_level_) notice_cut_level_ = MAX_PLYS + 1;
         return score;
       }
@@ -933,28 +930,28 @@ namespace Sayuri {
       /** 共有メンバの構造体。 */
       struct SharedStruct {
         /** ヒストリー。 [サイド][from][to]。 */
-        volatile std::uint64_t history_[NUM_SIDES][NUM_SQUARES][NUM_SQUARES];
+        volatile u64 history_[NUM_SIDES][NUM_SQUARES][NUM_SQUARES];
         /** ヒストリーの最大値。 */
-        volatile std::uint64_t history_max_;
+        volatile u64 history_max_;
         /** IIDでの最善手スタック。 [探索レベル] */
         volatile Move iid_stack_[MAX_PLYS + 1];
         /** キラームーブスタック。[探索レベル][index * 2 プライ前] */
         volatile Move killer_stack_[MAX_PLYS + 2 + 1][2];
         /** 現在のIterative Deepeningの深さ。 */
-        volatile std::uint32_t i_depth_;
+        volatile u32 i_depth_;
         /** 探索したノード数。 */
-        volatile std::uint64_t searched_nodes_;
+        volatile u64 searched_nodes_;
         /** 探索したレベル。 */
-        volatile std::uint32_t searched_level_;
+        volatile u32 searched_level_;
         /** 探索開始時間。 */
         TimePoint start_time_;
 
         /** 探索ストップ条件: 何が何でも探索を中断。 */
         volatile bool stop_now_;
         /** 探索ストップ条件: 最大探索ノード数。 */
-        std::uint64_t max_nodes_;
+        u64 max_nodes_;
         /** 探索ストップ条件: 最大探索深さ。 */
-        std::uint32_t max_depth_;
+        u32 max_depth_;
         /** 探索ストップ条件: 思考終了時間。 */
         TimePoint end_time_;
         /** 探索ストップ条件: 思考時間終了フラグ。 */
@@ -1088,7 +1085,7 @@ namespace Sayuri {
       /** 並列探索用スレッドのベクトル。 */
       std::vector<std::thread> thread_vec_;
       /** ベータカット通知。 カットされたレベルが記録される。 */
-      volatile std::uint32_t notice_cut_level_;
+      volatile u32 notice_cut_level_;
   };
 }  // namespace Sayuri
 

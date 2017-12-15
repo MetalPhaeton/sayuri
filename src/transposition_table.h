@@ -45,9 +45,9 @@ namespace Sayuri {
   class TTEntry {
     private:
       /** 残り探索深さのマスク。 **/
-      constexpr static std::uint32_t DEPTH_MASK = 0x0000ffffUL;
+      constexpr static u32 DEPTH_MASK = 0x0000ffffUL;
       /** テーブルの年齢のマスク。 **/
-      constexpr static std::uint32_t AGE_MASK = 0xffff0000UL;
+      constexpr static u32 AGE_MASK = 0xffff0000UL;
 
       /** 残り探索深さシフト。 */
       constexpr static int DEPTH_SHIFT = 0;
@@ -56,7 +56,7 @@ namespace Sayuri {
 
     public:
       /** TTEntryの決め打ちサイズ。 */
-      constexpr static std::uint32_t TTENTRY_HARD_CODED_SIZE = 32;
+      constexpr static u32 TTENTRY_HARD_CODED_SIZE = 32;
 
       // ==================== //
       // コンストラクタと代入 //
@@ -71,7 +71,7 @@ namespace Sayuri {
        * @param table_age トランスポジションテーブルの年齢。
        */
       TTEntry(Hash pos_hash, int depth, int score, ScoreType score_type,
-      Move best_move,  std::uint32_t table_age);
+      Move best_move,  u32 table_age);
       /** コンストラクタ。 */
       TTEntry();
       /**
@@ -141,7 +141,7 @@ namespace Sayuri {
        * アクセサ - トランスポジションテーブルの年齢。
        * @return トランスポジションテーブルの年齢。
        */
-      std::uint32_t table_age() const {
+      u32 table_age() const {
         return age_depth_ & AGE_MASK;
       }
 
@@ -159,9 +159,9 @@ namespace Sayuri {
        * - テーブルの年齢(上位16 bits)。
        * - 残り探索深さ(下位16 bits)。
        */
-      std::uint32_t age_depth_;
+      u32 age_depth_;
       /** 評価値。 */
-      std::int32_t score_;
+      i32 score_;
       /** 評価値の種類。 */
       ScoreType score_type_;
       /** 最善手。 */
@@ -249,7 +249,7 @@ namespace Sayuri {
         num_used_entries_ = 0;
 
         // エントリーをいくつ作るか決める。
-        std::uint64_t temp = table_size / TTEntry::TTENTRY_HARD_CODED_SIZE;
+        u64 temp = table_size / TTEntry::TTENTRY_HARD_CODED_SIZE;
         temp = temp < 1 ? 1 : temp;
 
         // 以下は最上位ビットだけを残し、他のビットをゼロにするアルゴリズム。
@@ -327,7 +327,7 @@ namespace Sayuri {
       /** エントリーのインデックスを得るためのマスク。 */
       Hash index_mask_;
       /** 年齢。 */
-      std::uint32_t age_;
+      u32 age_;
       /** ミューテックス。 */
       std::mutex mutex_;
   };

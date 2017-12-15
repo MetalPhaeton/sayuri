@@ -104,7 +104,7 @@ namespace Sayuri {
        * アクセサ - ラインの長さ。
        * @return ラインの長さ。
        */
-      std::uint32_t length() const {return last_;}
+      u32 length() const {return last_;}
       /**
        * アクセサ - 評価値。
        * @return 評価値。
@@ -137,7 +137,7 @@ namespace Sayuri {
       /** PVライン。 */
       Move line_[MAX_PLYS + 1 + 1];
       /** PVラインのインデックス。 */
-      std::uint32_t last_;
+      u32 last_;
       /** 評価値。 */
       int score_;
       /** メイトまでの手数。 -1はメイトなし。 */

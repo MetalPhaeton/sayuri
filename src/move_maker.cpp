@@ -206,7 +206,7 @@ namespace Sayuri {
     Side side = basic_st.to_move_;
 
     // 生成開始時のポインタ。
-    std::uint32_t start = last_;
+    u32 start = last_;
 
     // ナイト、ビショップ、ルーク、クイーンの候補手を作る。
     for (PieceType piece_type = KNIGHT; piece_type <= QUEEN; ++piece_type) {
@@ -348,10 +348,10 @@ namespace Sayuri {
 
   // 指し手のスコアを計算する。
   template<GenMoveType>
-  inline std::int32_t MoveMaker::CalScore
+  inline i32 MoveMaker::CalScore
   (Move move, Side side, Square from, Square to) const {return 0;}
   template<>
-  std::int32_t MoveMaker::CalScore<GenMoveType::NON_CAPTURE>
+  i32 MoveMaker::CalScore<GenMoveType::NON_CAPTURE>
   (Move move, Side side, Square from, Square to) const {
     // ヒストリーの点数の最大値のビット桁数。 (つまり、最大値は 0x200 )
     constexpr int MAX_HISTORY_SCORE_SHIFT = 9;
@@ -361,41 +361,41 @@ namespace Sayuri {
     << MAX_HISTORY_SCORE_SHIFT) / history_max_;
   }
   template<>
-  inline std::int32_t MoveMaker::CalScore<GenMoveType::CAPTURE>
+  inline i32 MoveMaker::CalScore<GenMoveType::CAPTURE>
   (Move move, Side side, Square from, Square to) const {
     // 駒を取る手のビットシフト。
     constexpr int CAPTURE_SCORE_SHIFT = 12;
     // 悪い取る手の点数。
-    constexpr std::int32_t BAD_CAPTURE_SCORE = -1;
+    constexpr i32 BAD_CAPTURE_SCORE = -1;
 
     // SEEで点数をつけていく。
-    return Util::GetMax(static_cast<std::int32_t>(engine_ptr_->SEE(move, 0))
+    return Util::GetMax(static_cast<i32>(engine_ptr_->SEE(move, 0))
     << CAPTURE_SCORE_SHIFT, BAD_CAPTURE_SCORE);
   }
 
   // 候補手に点数をつける。
   template<GenMoveType TYPE>
-  void MoveMaker::ScoreMoves(std::uint32_t start, Move prev_best,
+  void MoveMaker::ScoreMoves(u32 start, Move prev_best,
   Move iid_move, Move killer_1, Move killer_2, Side side) {
     // --- 評価値の定義 --- //
     // キラームーブの点数。
-    constexpr std::int32_t KILLER_2_MOVE_SCORE = 0x400;
-    constexpr std::int32_t KILLER_1_MOVE_SCORE = KILLER_2_MOVE_SCORE << 1;
+    constexpr i32 KILLER_2_MOVE_SCORE = 0x400;
+    constexpr i32 KILLER_1_MOVE_SCORE = KILLER_2_MOVE_SCORE << 1;
     // 駒を取る手のビットシフト。
     // constexpr int CAPTURE_SCORE_SHIFT = 12;
     // 相手キングをチェックする手の点数。
-    constexpr std::int32_t CHECKING_MOVE_SCORE = 1 << 28;
+    constexpr i32 CHECKING_MOVE_SCORE = 1 << 28;
     // IIDで得た最善手の点数。
-    constexpr std::int32_t IID_MOVE_SCORE = CHECKING_MOVE_SCORE << 1;
+    constexpr i32 IID_MOVE_SCORE = CHECKING_MOVE_SCORE << 1;
     // 前回の繰り返しでトランスポジションテーブルから得た最善手の点数。
-    constexpr std::int32_t BEST_MOVE_SCORE = IID_MOVE_SCORE << 1;
+    constexpr i32 BEST_MOVE_SCORE = IID_MOVE_SCORE << 1;
     // 悪い取る手の点数。
-    // constexpr std::int32_t BAD_CAPTURE_SCORE = -1;
+    // constexpr i32 BAD_CAPTURE_SCORE = -1;
 
     Bitboard enemy_king_bb =
     Util::SQUARE[engine_ptr_->basic_st_.king_
     [Util::GetOppositeSide(side)]][R0];
-    for (std::uint32_t i = start; i < last_; ++i) {
+    for (u32 i = start; i < last_; ++i) {
       // 手の情報を得る。
       Square from = Get<FROM>(move_stack_[i].move_);
       Square to = Get<TO>(move_stack_[i].move_);
@@ -459,7 +459,7 @@ namespace Sayuri {
 
   // 実体化。
   template void MoveMaker::ScoreMoves<GenMoveType::NON_CAPTURE>
-  (std::uint32_t, Move, Move, Move, Move, Side);
+  (u32, Move, Move, Move, Move, Side);
   template void MoveMaker::ScoreMoves<GenMoveType::CAPTURE>
-  (std::uint32_t, Move, Move, Move, Move, Side);
+  (u32, Move, Move, Move, Move, Side);
 }  // namespace Sayuri

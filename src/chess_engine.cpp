@@ -76,7 +76,7 @@ namespace Sayuri {
 
     // ムーブメーカー。
     maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
+    for (u32 i = 0; i < (MAX_PLYS + 1); ++i) {
       maker_table_[i] = MoveMaker(*this);
     }
 
@@ -85,7 +85,7 @@ namespace Sayuri {
 
     // Job。
     job_table_.reset(new Job[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
+    for (u32 i = 0; i < (MAX_PLYS + 1); ++i) {
       job_table_[i].client_ptr_ = this;
       job_table_[i].level_ = i;
     }
@@ -99,7 +99,7 @@ namespace Sayuri {
 
     // ムーブメーカー。
     maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
+    for (u32 i = 0; i < (MAX_PLYS + 1); ++i) {
       maker_table_[i] = MoveMaker(*this);
     }
 
@@ -108,7 +108,7 @@ namespace Sayuri {
 
     // Job。
     job_table_.reset(new Job[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
+    for (u32 i = 0; i < (MAX_PLYS + 1); ++i) {
       job_table_[i].client_ptr_ = this;
       job_table_[i].level_ = i;
     }
@@ -127,7 +127,7 @@ namespace Sayuri {
 
     // ムーブメーカー。
     maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
+    for (u32 i = 0; i < (MAX_PLYS + 1); ++i) {
       maker_table_[i] = MoveMaker(*this);
     }
 
@@ -136,7 +136,7 @@ namespace Sayuri {
 
     // Job。
     job_table_.reset(new Job[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
+    for (u32 i = 0; i < (MAX_PLYS + 1); ++i) {
       job_table_[i].client_ptr_ = this;
       job_table_[i].level_ = i;
     }
@@ -155,7 +155,7 @@ namespace Sayuri {
 
     // ムーブメーカー。
     maker_table_.reset(new MoveMaker[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
+    for (u32 i = 0; i < (MAX_PLYS + 1); ++i) {
       maker_table_[i] = MoveMaker(*this);
     }
 
@@ -164,7 +164,7 @@ namespace Sayuri {
 
     // Job。
     job_table_.reset(new Job[MAX_PLYS + 1]);
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
+    for (u32 i = 0; i < (MAX_PLYS + 1); ++i) {
       job_table_[i].client_ptr_ = this;
       job_table_[i].level_ = i;
     }

@@ -272,7 +272,7 @@ namespace Sayuri {
        * 探索関数用キャッシュ。
        * History Pruning - 最大ヒストリー値に対する閾値。
        */
-      std::uint64_t history_pruning_threshold_;
+      u64 history_pruning_threshold_;
       /**
        * 探索関数用キャッシュ。
        * History Pruning - リダクションする深さ。
@@ -337,12 +337,12 @@ namespace Sayuri {
        * 探索関数用キャッシュ。
        * 探索ストップ条件 - 最大探索ノード数。
        */
-      std::uint64_t max_nodes_;
+      u64 max_nodes_;
       /**
        * 探索関数用キャッシュ。
        * 探索ストップ条件 - 最大探索深さ。
        */
-      std::uint32_t max_depth_;
+      u32 max_depth_;
       /**
        * 探索関数用キャッシュ。
        * 探索ストップ条件 - 思考時間。

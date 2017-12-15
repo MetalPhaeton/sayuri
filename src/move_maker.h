@@ -48,7 +48,7 @@ namespace Sayuri {
         /** 候補手。 */
         Move move_;
         /** 候補手の評価。 */
-        std::int32_t score_;
+        i32 score_;
       };
 
     public:
@@ -182,7 +182,7 @@ namespace Sayuri {
        * @param side 候補手のサイド。
        */
       template<GenMoveType TYPE>
-      void ScoreMoves(std::uint32_t start, Move prev_best, Move iid_move,
+      void ScoreMoves(u32 start, Move prev_best, Move iid_move,
       Move killer_1, Move killer_2, Side side);
 
       // ================ //
@@ -222,8 +222,8 @@ namespace Sayuri {
        * @param to 駒の目的地。
        * @return スコア。
        */
-      template<GenMoveType TYPE> std::int32_t CalScore
-      (Move move, Side side, Square from, Square to) const;
+      template<GenMoveType TYPE>
+      i32 CalScore(Move move, Side side, Square from, Square to) const;
 
       // ========== //
       // メンバ変数 //
@@ -235,11 +235,11 @@ namespace Sayuri {
       MoveSlot move_stack_[MAX_CANDIDATES + 1];
 
       /** スタックのインデックス。 */
-      std::uint32_t last_;
-      std::uint32_t max_;
+      u32 last_;
+      u32 max_;
 
       /** ヒストリーの最大値。 */
-      std::uint64_t history_max_;
+      u64 history_max_;
 
       /** ミューテックス。 */
       std::mutex mutex_;

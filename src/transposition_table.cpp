@@ -54,7 +54,7 @@ namespace Sayuri {
   age_(0x00010000UL) {
     // エントリーをいくつ作るか決める。
     // TTEntryのサイズは32バイトと決め打ちする。
-    std::uint64_t temp = table_size / TTEntry::TTENTRY_HARD_CODED_SIZE;
+    u64 temp = table_size / TTEntry::TTENTRY_HARD_CODED_SIZE;
     temp = temp < 1 ? 1 : temp;
 
     // 以下は最上位ビットだけを残し、他のビットをゼロにするアルゴリズム。
@@ -151,7 +151,7 @@ namespace Sayuri {
 
     // テーブルが若い時にに登録されているものなら上書き。
     // depthがすでに登録されているエントリー以上なら登録。
-    std::uint32_t age_depth = age_ | depth;
+    u32 age_depth = age_ | depth;
     if (entry_table_[index].age_depth_ <= age_depth) {
       entry_table_[index].pos_hash_ = pos_hash;
       entry_table_[index].age_depth_ = age_depth;
@@ -203,8 +203,8 @@ namespace Sayuri {
   // エントリーのクラス //
   // ================== //
   // --- static定数 --- //
-  constexpr std::uint32_t TTEntry::DEPTH_MASK;
-  constexpr std::uint32_t TTEntry::AGE_MASK;
+  constexpr u32 TTEntry::DEPTH_MASK;
+  constexpr u32 TTEntry::AGE_MASK;
   constexpr int TTEntry::DEPTH_SHIFT;
   constexpr int TTEntry::AGE_SHIFT;
 
@@ -213,7 +213,7 @@ namespace Sayuri {
   // ==================== //
   // コンストラクタ。
   TTEntry::TTEntry(Hash pos_hash, int depth, int score,
-  ScoreType score_type, Move best_move, std::uint32_t table_age) :
+  ScoreType score_type, Move best_move, u32 table_age) :
   pos_hash_(pos_hash),
   age_depth_(table_age | depth),
   score_(score),

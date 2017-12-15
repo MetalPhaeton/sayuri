@@ -183,8 +183,7 @@ namespace Sayuri {
        * @param pv_line PVライン。
        */
       void PrintPVInfo(int depth, int seldepth, int score,
-      Chrono::milliseconds time, std::uint64_t num_nodes, int hashfull,
-      PVLine& pv_line);
+      Chrono::milliseconds time, u64 num_nodes, int hashfull, PVLine& pv_line);
 
       /**
        * 深さ情報を出力する。
@@ -205,8 +204,8 @@ namespace Sayuri {
        * @param num_nodes 探索したノード数。
        * @param hashfull トランスポジションテーブルの使用率。
        */
-      void PrintOtherInfo(Chrono::milliseconds time,
-      std::uint64_t num_nodes, int hashfull);
+      void PrintOtherInfo(Chrono::milliseconds time, u64 num_nodes,
+      int hashfull);
 
       /**
        * 探索終了時の最終出力を出力する。
@@ -218,7 +217,7 @@ namespace Sayuri {
        * @param pv_line PVライン。
        */
       void PrintFinalInfo(int depth, Chrono::milliseconds time,
-      std::uint64_t num_nodes, int hashfull, int score,  PVLine& pv_line);
+      u64 num_nodes, int hashfull, int score,  PVLine& pv_line);
 
       // ======== //
       // アクセサ //

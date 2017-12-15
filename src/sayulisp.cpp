@@ -99,7 +99,7 @@ namespace Sayuri {
     {"PAWN", PAWN}, {"KNIGHT", KNIGHT}, {"BISHOP", BISHOP},
     {"ROOK", ROOK}, {"QUEEN", QUEEN}, {"KING", KING}
   };
-  const std::map<std::string, std::uint32_t> Sayulisp::CASTLING_MAP {
+  const std::map<std::string, u32> Sayulisp::CASTLING_MAP {
     {"NO_CASTLING", 0},
     {"WHITE_SHORT_CASTLING", 1}, {"WHITE_LONG_CASTLING", 2},
     {"BLACK_SHORT_CASTLING", 3}, {"BLACK_LONG_CASTLING", 4}
@@ -312,13 +312,13 @@ namespace Sayuri {
 
   // Walk用関数オブジェクトを作成する。
   LFuncForWalk Sayulisp::GenFuncToNumber
-  (const std::map<std::string, std::uint32_t>& map) {
+  (const std::map<std::string, u32>& map) {
     return [&map](LObject& pair, const std::string& path) {
       // Car。
       LObject* car = pair.car().get();
       if (car->IsSymbol()) {
         // 探す。
-        std::map<std::string, std::uint32_t>::const_iterator itr =
+        std::map<std::string, u32>::const_iterator itr =
         map.find(car->symbol());
 
         // 見つかった。
@@ -331,7 +331,7 @@ namespace Sayuri {
       LObject* cdr = pair.cdr().get();
       if (cdr->IsSymbol()) {
         // 探す。
-        std::map<std::string, std::uint32_t>::const_iterator itr =
+        std::map<std::string, u32>::const_iterator itr =
         map.find(cdr->symbol());
 
         // 見つかった。
@@ -349,7 +349,7 @@ namespace Sayuri {
     if (car->IsSymbol()) {
       do {
         // マス。
-        std::map<std::string, std::uint32_t>::const_iterator itr =
+        std::map<std::string, u32>::const_iterator itr =
         SQUARE_MAP.find(car->symbol());
         if (itr != SQUARE_MAP.end()) {
           pair.car(Lisp::NewNumber(itr->second));
@@ -398,7 +398,7 @@ namespace Sayuri {
     if (cdr->IsSymbol()) {
       do {
         // マス。
-        std::map<std::string, std::uint32_t>::const_iterator itr =
+        std::map<std::string, u32>::const_iterator itr =
         SQUARE_MAP.find(cdr->symbol());
         if (itr != SQUARE_MAP.end()) {
           pair.cdr(Lisp::NewNumber(itr->second));
@@ -466,7 +466,7 @@ namespace Sayuri {
     LPointer list_ptr = caller->Evaluate(args_ptr->car())->Clone();\
 \
     if (list_ptr->IsSymbol()) {\
-      std::map<std::string, std::uint32_t>::const_iterator itr =\
+      std::map<std::string, u32>::const_iterator itr =\
       map_name.find(list_ptr->symbol());\
       if (itr != map_name.end()) {\
         return NewNumber(itr->second);\
@@ -516,7 +516,7 @@ namespace Sayuri {
 
     if (list_ptr->IsSymbol()) {
       // マス。
-      std::map<std::string, std::uint32_t>::const_iterator itr =
+      std::map<std::string, u32>::const_iterator itr =
       SQUARE_MAP.find(list_ptr->symbol());
       if (itr != SQUARE_MAP.end()) return NewNumber(itr->second);
 
@@ -552,7 +552,7 @@ namespace Sayuri {
 \
     LPointer list_ptr = caller->Evaluate(args_ptr->car())->Clone();\
     if (list_ptr->IsNumber()) {\
-      std::uint32_t index = list_ptr->number();\
+      u32 index = list_ptr->number();\
       if (index < limit) {\
         return NewSymbol(array_name[index]);\
       }\
@@ -2222,8 +2222,8 @@ namespace Sayuri {
   }
 
   // Go...()で使う関数。
-  LPointer EngineSuite::GoFunc(std::uint32_t depth, std::uint64_t nodes,
-  int thinking_time, const LObject& candidate_list) {
+  LPointer EngineSuite::GoFunc(u32 depth, u64 nodes, int thinking_time,
+  const LObject& candidate_list) {
     // 候補手のリストを作成。
     std::vector<Move> candidate_vec(Lisp::CountList(candidate_list));
     std::vector<Move>::iterator candidate_itr = candidate_vec.begin();
@@ -2344,7 +2344,7 @@ namespace Sayuri {
     // 深さを得る。
     LPointer depth_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*depth_ptr, LType::NUMBER);
-    std::uint32_t depth = depth_ptr->number();
+    u32 depth = depth_ptr->number();
     Lisp::Next(&args_ptr);
 
     // もしあるなら、候補手のリストを得る。
@@ -2368,7 +2368,7 @@ namespace Sayuri {
     // ノード数を得る。
     LPointer node_ptr = caller->Evaluate(args_ptr->car());
     Lisp::CheckType(*node_ptr, LType::NUMBER);
-    std::uint64_t node = node_ptr->number();
+    u64 node = node_ptr->number();
     Lisp::Next(&args_ptr);
 
     // もしあるなら、候補手のリストを得る。

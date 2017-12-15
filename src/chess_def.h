@@ -76,6 +76,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.)...";
 
+  // 基本整数型。
+  using i8 = std::int8_t;
+  using i16 = std::int16_t;
+  using i32 = std::int32_t;
+  using i64 = std::int64_t;
+  using u8 = std::uint8_t;
+  using u16 = std::uint16_t;
+  using u32 = std::uint32_t;
+  using u64 = std::uint64_t;
+
   // ============= //
   // UCIオプション //
   // ============= //
@@ -183,11 +193,11 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
   // 基本の定数 //
   // ========== //
   /** ビットボードの型。 */
-  using Bitboard = std::uint64_t;
+  using Bitboard = u64;
 
   // --- マスの定義 --- //
   /** マスの型。 */
-  using Square = std::uint32_t;
+  using Square = u32;
   /** マスの定数。 */
   enum : Square {
     A1, B1, C1, D1, E1, F1, G1, H1,
@@ -204,7 +214,7 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
 
   // --- ファイルの定義 --- //
   /** ファイルの型。 */
-  using Fyle = std::uint32_t;
+  using Fyle = u32;
   /** ファイルの定数。 */
   enum : Fyle {
     FYLE_A, FYLE_B, FYLE_C, FYLE_D, FYLE_E, FYLE_F, FYLE_G, FYLE_H
@@ -214,7 +224,7 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
 
   // --- ランクの定義 --- //
   /** ランクの型。 */
-  using Rank = std::uint32_t;
+  using Rank = u32;
   /** ランクの定数。 */
   enum : Rank {
     RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8
@@ -224,7 +234,7 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
 
   // --- サイドの定義 --- //
   /** サイドの型。 */
-  using Side = std::uint32_t;
+  using Side = u32;
   /** サイドの定数。 */
   enum : Side {
     NO_SIDE, WHITE, BLACK
@@ -234,7 +244,7 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
 
   // --- 駒の定義 --- //
   /** 駒の型。 */
-  using PieceType = std::uint32_t;
+  using PieceType = u32;
   /** 駒の定数 */
   enum : PieceType {
     EMPTY, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING
@@ -243,7 +253,7 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
   constexpr PieceType NUM_PIECE_TYPES = KING + 1;
 
   /** キャスリングのフラグの型。 */
-  using Castling = std::uint8_t;
+  using Castling = u8;
   /** 白のショートキャスリング。 */
   constexpr Castling WHITE_SHORT_CASTLING = 1;
   /** 白のロングキャスリング。 */
@@ -262,7 +272,7 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
   constexpr Castling ALL_CASTLING = WHITE_CASTLING | BLACK_CASTLING;
 
   /** 手の型。 */
-  using Move = std::uint32_t;
+  using Move = u32;
 
   // --- 手のビットフィールドの定数 --- //
   /** ビットフィールド名の定数。 */
@@ -333,7 +343,7 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
    * @return ビットフィールドの値。
    */
   template<int FIELD>
-  inline std::uint32_t Get(Move move) {
+  inline u32 Get(Move move) {
     return (move & MASK[FIELD]) >> SHIFT[FIELD];
   }
 
@@ -344,7 +354,7 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
    * @param val セットする値。
    */
   template<int FIELD>
-  inline void Set(Move& move, std::uint32_t val) {
+  inline void Set(Move& move, u32 val) {
     move = (move & ~(MASK[FIELD])) | (val << SHIFT[FIELD]);
   }
 
@@ -359,7 +369,7 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
   }
 
   /** ハッシュの型。 */
-  using Hash = std::uint64_t;
+  using Hash = u64;
 
   // --- 評価値の定義 --- //
   /** 勝ちの評価値。 */
@@ -399,21 +409,21 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
   // 候補手の最大値 //
   // ============== //
   /** ポーンの候補手の最大値。 */
-  constexpr std::uint32_t MAX_PAWN_CANDIDATES = 4;
+  constexpr u32 MAX_PAWN_CANDIDATES = 4;
   /** ナイトの候補手の最大値。 */
-  constexpr std::uint32_t MAX_KNIGHT_CANDIDATES = 8;
+  constexpr u32 MAX_KNIGHT_CANDIDATES = 8;
   /** ビショップの候補手の最大値。 */
-  constexpr std::uint32_t MAX_BISHOP_CANDIDATES = 13;
+  constexpr u32 MAX_BISHOP_CANDIDATES = 13;
   /** ルークの候補手の最大値。 */
-  constexpr std::uint32_t MAX_ROOK_CANDIDATES = 14;
+  constexpr u32 MAX_ROOK_CANDIDATES = 14;
   /** クイーンの候補手の最大値。 */
-  constexpr std::uint32_t MAX_QUEEN_CANDIDATES =
+  constexpr u32 MAX_QUEEN_CANDIDATES =
   MAX_BISHOP_CANDIDATES + MAX_ROOK_CANDIDATES;
   /** キングの候補手の最大値。 */
-  constexpr std::uint32_t MAX_KING_CANDIDATES = 8;
+  constexpr u32 MAX_KING_CANDIDATES = 8;
 
   /** 一つの局面における候補手の最大値。 */
-  constexpr std::uint32_t MAX_CANDIDATES = (MAX_KNIGHT_CANDIDATES * 2)
+  constexpr u32 MAX_CANDIDATES = (MAX_KNIGHT_CANDIDATES * 2)
   + (MAX_BISHOP_CANDIDATES * 2)
   + (MAX_ROOK_CANDIDATES * 2)
   + (MAX_QUEEN_CANDIDATES * 9)
@@ -426,10 +436,10 @@ for (PieceType var_name = 0; var_name < NUM_PIECE_TYPES; ++var_name)
   constexpr int MAX_VALUE = 9999999;
 
   /** 最大探索手数。 */
-  constexpr std::uint32_t MAX_PLYS = 100;
+  constexpr u32 MAX_PLYS = 100;
 
   /** 最大探索ノード数。 */
-  constexpr std::uint64_t MAX_NODES = ULLONG_MAX;
+  constexpr u64 MAX_NODES = ULLONG_MAX;
 
   /** 探索するノードの種類。 */
   enum class NodeType {

@@ -138,7 +138,7 @@ namespace Sayuri {
       /** 駒の種類の定数のマップ。 */
       static const std::map<std::string, PieceType> PIECE_MAP;
       /** キャスリングの定数のマップ。 */
-      static const std::map<std::string, std::uint32_t> CASTLING_MAP;
+      static const std::map<std::string, u32> CASTLING_MAP;
       /** マスの定数の逆マップ。 */
       static const std::string SQUARE_MAP_INV[NUM_SQUARES];
       /** ファイルの定数の逆マップ。 */
@@ -332,7 +332,7 @@ namespace Sayuri {
        * @return Walk用関数オブジェクト。
        */
       static LFuncForWalk GenFuncToNumber
-      (const std::map<std::string, std::uint32_t>& map);
+      (const std::map<std::string, u32>& map);
 
       /**
        * チェスの定数を全て数字にするWalk用関数。
@@ -346,14 +346,14 @@ namespace Sayuri {
        * @param map 置き換え用マップ。
        * @return Walk用関数オブジェクト。
        */
-      template<std::uint32_t LIMIT>
+      template<u32 LIMIT>
       static LFuncForWalk GenFuncToSymbol
       (const std::string (& string_array)[LIMIT]) {
         return [&string_array](LObject& pair, const std::string& path) {
           // Car。
           LObject* car = pair.car().get();
           if (car->IsNumber()) {
-            std::uint32_t index = car->number();
+            u32 index = car->number();
             if (index < LIMIT) {
               pair.car(Lisp::NewSymbol(string_array[index]));
             }
@@ -362,7 +362,7 @@ namespace Sayuri {
           // Cdr。
           LObject* cdr = pair.cdr().get();
           if (cdr->IsNumber()) {
-            std::uint32_t index = cdr->number();
+            u32 index = cdr->number();
             if (index < LIMIT) {
               pair.cdr(Lisp::NewSymbol(string_array[index]));
             }
@@ -666,8 +666,8 @@ namespace Sayuri {
        * @param candidate_list 探索する候補手のリスト。 (Nilなら全て。)
        * @return PVラインのリスト。
        */
-      LPointer GoFunc(std::uint32_t depth, std::uint64_t nodes,
-      int thinking_time, const LObject& candidate_list);
+      LPointer GoFunc(u32 depth, u64 nodes, int thinking_time,
+      const LObject& candidate_list);
 
       /** ミリ秒で思考する。 */
       DEF_MESSAGE_FUNCTION(GoMoveTime);

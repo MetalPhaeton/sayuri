@@ -56,8 +56,7 @@
 /** Sayuri 名前空間。 */
 namespace Sayuri {
   // クイース探索。
-  int ChessEngine::Quiesce(std::uint32_t level, int alpha, int beta,
-  int material) {
+  int ChessEngine::Quiesce(u32 level, int alpha, int beta, int material) {
     // ジョブの準備。
     Job& job = job_table_[level];
     job.Init(maker_table_[level]);
@@ -148,7 +147,7 @@ namespace Sayuri {
 
   // 通常の探索。
   int ChessEngine::Search(NodeType node_type, Hash pos_hash, int depth,
-  std::uint32_t level, int alpha, int beta, int material) {
+  u32 level, int alpha, int beta, int material) {
     // ジョブの準備。
     Job& job = job_table_[level];
     job.Init(maker_table_[level]);
@@ -457,7 +456,7 @@ namespace Sayuri {
     int history_pruning_move_number =
     cache.history_pruning_invalid_moves_[num_all_moves];
 
-    std::uint64_t history_pruning_threshold =
+    u64 history_pruning_threshold =
     (shared_st_ptr_->history_max_ * cache.history_pruning_threshold_) >> 8;
 
     // Late Move Reduction。
@@ -695,7 +694,7 @@ namespace Sayuri {
         }
       }
     }
-    for (std::uint32_t i = 0; i < (MAX_PLYS + 1); ++i) {
+    for (u32 i = 0; i < (MAX_PLYS + 1); ++i) {
       basic_st_.position_memo_[i] = 0;
       shared_st_ptr_->iid_stack_[i] = 0;
       shared_st_ptr_->killer_stack_[i][0] = 0;
@@ -961,7 +960,7 @@ namespace Sayuri {
     int history_pruning_move_number =
     cache.history_pruning_invalid_moves_[job.num_all_moves_];
 
-    std::uint64_t history_pruning_threshold =
+    u64 history_pruning_threshold =
     (shared_st_ptr_->history_max_ * cache.history_pruning_threshold_) >> 8;
 
     // Late Move Reduction。
@@ -1430,9 +1429,8 @@ namespace Sayuri {
   }
 
   // 探索のストップ条件を設定する。
-  void ChessEngine::SetStopper(std::uint32_t max_depth,
-  std::uint64_t max_nodes, const Chrono::milliseconds& thinking_time,
-  bool infinite_thinking) {
+  void ChessEngine::SetStopper(u32 max_depth, u64 max_nodes,
+  const Chrono::milliseconds& thinking_time, bool infinite_thinking) {
     shared_st_ptr_->max_depth_ = Util::GetMin(max_depth, MAX_PLYS);
     shared_st_ptr_->max_nodes_ = Util::GetMin(max_nodes, MAX_NODES);
     shared_st_ptr_->start_time_ = SysClock::now();

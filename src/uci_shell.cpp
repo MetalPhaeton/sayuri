@@ -181,8 +181,7 @@ namespace Sayuri {
 
   // PVライン情報を出力する。
   void UCIShell::PrintPVInfo(int depth, int seldepth, int score,
-  Chrono::milliseconds time, std::uint64_t num_nodes, int hashfull,
-  PVLine& pv_line) {
+  Chrono::milliseconds time, u64 num_nodes, int hashfull, PVLine& pv_line) {
     std::unique_lock<std::mutex> lock(print_mutex_);  // ロック。
 
     int time_2 = time.count();
@@ -213,7 +212,7 @@ namespace Sayuri {
 
     // PVラインを送る。
     sout << " pv";
-    for (std::uint32_t i = 0; i < pv_line.length(); ++i) {
+    for (u32 i = 0; i < pv_line.length(); ++i) {
       if (!(pv_line[i])) break;
 
       sout << " " << Util::MoveToString(pv_line[i]);
@@ -255,8 +254,8 @@ namespace Sayuri {
   }
 
   // その他の情報を出力する。
-  void UCIShell::PrintOtherInfo(Chrono::milliseconds time,
-  std::uint64_t num_nodes, int hashfull) {
+  void UCIShell::PrintOtherInfo(Chrono::milliseconds time, u64 num_nodes,
+  int hashfull) {
     std::unique_lock<std::mutex> lock(print_mutex_);  // ロック。
 
     std::ostringstream sout;
@@ -276,7 +275,7 @@ namespace Sayuri {
 
   // 探索後の最終出力を出力する。
   void UCIShell::PrintFinalInfo(int depth, Chrono::milliseconds time,
-  std::uint64_t num_nodes, int hashfull, int score, PVLine& pv_line) {
+  u64 num_nodes, int hashfull, int score, PVLine& pv_line) {
     std::unique_lock<std::mutex> lock(print_mutex_);  // ロック。
 
     std::ostringstream sout;
@@ -305,7 +304,7 @@ namespace Sayuri {
 
     // pvラインを送る。
     sout << " pv";
-    for (std::uint32_t i = 0; i < pv_line.length(); ++i) {
+    for (u32 i = 0; i < pv_line.length(); ++i) {
       if (!(pv_line[i])) break;
 
       sout << " " << Util::MoveToString(pv_line[i]);
@@ -539,8 +538,8 @@ namespace Sayuri {
   // 「go」コマンドのコールバック関数。
   void UCIShell::CommandGo(UCICommand::CommandArgs& args) {
     // 準備。
-    std::uint32_t max_depth = MAX_PLYS;
-    std::uint64_t max_nodes = MAX_NODES;
+    u32 max_depth = MAX_PLYS;
+    u64 max_nodes = MAX_NODES;
     Chrono::milliseconds thinking_time(INT_MAX);
     bool infinite_thinking = false;
     moves_to_search_.clear();

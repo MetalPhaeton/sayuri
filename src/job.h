@@ -165,7 +165,7 @@ namespace Sayuri {
       /** 共有ノードの深さ。 */
       int depth_;
       /** 共有ノードのレベル。 */
-      std::uint32_t level_;
+      u32 level_;
       /** 共有ノードのアルファ値。 */
       volatile int alpha_;
       /** 共有ノードのベータ値。 */
