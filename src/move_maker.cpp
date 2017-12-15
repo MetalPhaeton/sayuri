@@ -56,6 +56,7 @@ namespace Sayuri {
   max_(maker.max_),
   history_max_(maker.history_max_) {
     COPY_ARRAY(move_stack_, maker.move_stack_);
+    COPY_ARRAY(score_stack_, maker.score_stack_);
   }
 
   // ムーブコンストラクタ。
@@ -65,6 +66,7 @@ namespace Sayuri {
   max_(maker.max_),
   history_max_(maker.history_max_) {
     COPY_ARRAY(move_stack_, maker.move_stack_);
+    COPY_ARRAY(score_stack_, maker.score_stack_);
   }
 
   // コピー代入演算子。
@@ -75,6 +77,7 @@ namespace Sayuri {
     last_ = maker.last_;
     max_ = maker.max_;
     COPY_ARRAY(move_stack_, maker.move_stack_);
+    COPY_ARRAY(score_stack_, maker.score_stack_);
     return *this;
   }
 
@@ -86,6 +89,7 @@ namespace Sayuri {
     last_ = maker.last_;
     max_ = maker.max_;
     COPY_ARRAY(move_stack_, maker.move_stack_);
+    COPY_ARRAY(score_stack_, maker.score_stack_);
     return *this;
   }
 
@@ -130,24 +134,24 @@ namespace Sayuri {
   Move MoveMaker::PickMove() {
     std::unique_lock<std::mutex> lock(mutex_);
 
-    MoveSlot slot;
-
     // 手がなければ何もしない。
     if (!last_) {
       return 0;
     }
 
     // とりあえず最後の手をポップ。
-    slot = move_stack_[--last_];
+    Move move = move_stack_[--last_];
+    i32 score = score_stack_[last_];
 
     // 一番高い手を探し、スワップ。
     for (int i = last_ - 1; i >= 0; --i) {
-      if (move_stack_[i].score_ > slot.score_) {
-        std::swap(slot, move_stack_[i]);
+      if (score_stack_[i] > score) {
+        std::swap(move, move_stack_[i]);
+        std::swap(score, score_stack_[i]);
       }
     }
 
-    return slot.move_;
+    return move;
   }
 
   // ヒストリーの最大値を更新する。
@@ -250,7 +254,7 @@ namespace Sayuri {
           UpdateMaxHistory<TYPE>(side, from, to);
 
           // スタックに登録。
-          move_stack_[last_++].move_ = move;
+          move_stack_[last_++] = move;
         }
       }
     }
@@ -284,11 +288,11 @@ namespace Sayuri {
           for (PieceType piece_type = KNIGHT;
           piece_type <= QUEEN; ++piece_type) {
             Set<PROMOTION>(move, piece_type);
-            move_stack_[last_++].move_ = move;
+            move_stack_[last_++] = move;
           }
         } else {
           // 昇格しない場合。
-          move_stack_[last_++].move_ = move;
+          move_stack_[last_++] = move;
         }
       }
     }
@@ -309,17 +313,17 @@ namespace Sayuri {
     | (CASTLE_BL << SHIFT[MOVE_TYPE]);
     if (side == WHITE) {
       if (engine_ptr_->CanWhiteShortCastling()) {
-        move_stack_[last_++].move_ = WS_CASTLING_MOVE;
+        move_stack_[last_++] = WS_CASTLING_MOVE;
       }
       if (engine_ptr_->CanWhiteLongCastling()) {
-        move_stack_[last_++].move_ = WL_CASTLING_MOVE;
+        move_stack_[last_++] = WL_CASTLING_MOVE;
       }
     } else {
       if (engine_ptr_->CanBlackShortCastling()) {
-        move_stack_[last_++].move_ = BS_CASTLING_MOVE;
+        move_stack_[last_++] = BS_CASTLING_MOVE;
       }
       if (engine_ptr_->CanBlackLongCastling()) {
-        move_stack_[last_++].move_ = BL_CASTLING_MOVE;
+        move_stack_[last_++] = BL_CASTLING_MOVE;
       }
     }
 
@@ -333,7 +337,7 @@ namespace Sayuri {
       // ヒストリーの最大値を更新。 (テンプレート部品)
       UpdateMaxHistory<TYPE>(side, from, to);
 
-      move_stack_[last_++].move_ = move;
+      move_stack_[last_++] = move;
     }
 
     ScoreMoves<TYPE>(start, prev_best, iid_move, killer_1, killer_2, side);
@@ -391,13 +395,12 @@ namespace Sayuri {
     // 悪い取る手の点数。
     // constexpr i32 BAD_CAPTURE_SCORE = -1;
 
-    Bitboard enemy_king_bb =
-    Util::SQUARE[engine_ptr_->basic_st_.king_
+    Bitboard enemy_king_bb = Util::SQUARE[engine_ptr_->basic_st_.king_
     [Util::GetOppositeSide(side)]][R0];
     for (u32 i = start; i < last_; ++i) {
       // 手の情報を得る。
-      Square from = Get<FROM>(move_stack_[i].move_);
-      Square to = Get<TO>(move_stack_[i].move_);
+      Square from = Get<FROM>(move_stack_[i]);
+      Square to = Get<TO>(move_stack_[i]);
 
       // 相手キングをチェックする手かどうか調べる。
       bool is_checking_move = false;
@@ -433,25 +436,24 @@ namespace Sayuri {
       }
 
       // 特殊な手の点数をつける。
-      if (EqualMove(move_stack_[i].move_, prev_best)) {
+      if (EqualMove(move_stack_[i], prev_best)) {
         // 前回の最善手。
-        move_stack_[i].score_ = BEST_MOVE_SCORE;
-      } else if (EqualMove(move_stack_[i].move_, iid_move)) {
+        score_stack_[i] = BEST_MOVE_SCORE;
+      } else if (EqualMove(move_stack_[i], iid_move)) {
         // IIDムーブ。
-        move_stack_[i].score_ = IID_MOVE_SCORE;
+        score_stack_[i] = IID_MOVE_SCORE;
       } else if (is_checking_move) {
         // 相手キングをチェックする手。
-        move_stack_[i].score_ = CHECKING_MOVE_SCORE;
-      } else if (EqualMove(move_stack_[i].move_, killer_1)) {
+        score_stack_[i] = CHECKING_MOVE_SCORE;
+      } else if (EqualMove(move_stack_[i], killer_1)) {
         // キラームーブ。
-        move_stack_[i].score_ = KILLER_1_MOVE_SCORE;
-      } else if (EqualMove(move_stack_[i].move_, killer_2)) {
+        score_stack_[i] = KILLER_1_MOVE_SCORE;
+      } else if (EqualMove(move_stack_[i], killer_2)) {
         // キラームーブ。
-        move_stack_[i].score_ = KILLER_2_MOVE_SCORE;
+        score_stack_[i] = KILLER_2_MOVE_SCORE;
       } else {
         // その他の手を各候補手のタイプに分ける。
-        move_stack_[i].score_ =
-        CalScore<TYPE>(move_stack_[i].move_, side, from, to);
+        score_stack_[i] = CalScore<TYPE>(move_stack_[i], side, from, to);
       }
     }
   }

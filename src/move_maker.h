@@ -41,15 +41,6 @@ namespace Sayuri {
 
   /** 候補手を生成するクラス。 */
   class MoveMaker {
-    private:
-      /** 候補手を保存する構造体。 */
-      struct MoveSlot {
-        /** 候補手。 */
-        Move move_;
-        /** 候補手の評価。 */
-        i32 score_;
-      };
-
     public:
       // ==================== //
       // コンストラクタと代入 //
@@ -231,7 +222,9 @@ namespace Sayuri {
       const ChessEngine* engine_ptr_;
 
       /** 候補手のスタック。 [候補手の番号] */
-      MoveSlot move_stack_[MAX_CANDIDATES + 1];
+      Move move_stack_[MAX_CANDIDATES + 1];
+      /** 得点のスタック。 [候補手の番号] */
+      i32 score_stack_[MAX_CANDIDATES + 1];
 
       /** スタックのインデックス。 */
       u32 last_;
