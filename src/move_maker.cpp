@@ -395,8 +395,8 @@ namespace Sayuri {
     // 悪い取る手の点数。
     // constexpr i32 BAD_CAPTURE_SCORE = -1;
 
-    Bitboard enemy_king_bb = Util::SQUARE[engine_ptr_->basic_st_.king_
-    [Util::GetOppositeSide(side)]][R0];
+    Bitboard enemy_king_bb =
+    engine_ptr_->basic_st_.position_[Util::GetOppositeSide(side)][KING];
     for (u32 i = start; i < last_; ++i) {
       // 手の情報を得る。
       Square from = Get<FROM>(move_stack_[i]);
