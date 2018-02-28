@@ -1382,7 +1382,6 @@ namespace Sayuri {
       attackers =
       Util::PAWN_ATTACK[Util::GetOppositeSide(basic_st_.to_move_)][target]
       & basic_st_.position_[basic_st_.to_move_][PAWN];
-      if (attackers) break;
 
       if (((basic_st_.to_move_ == WHITE)
       && (Util::SquareToRank(target) == RANK_8))
@@ -1390,6 +1389,7 @@ namespace Sayuri {
       && (Util::SquareToRank(target) == RANK_1))) {
         promotion = QUEEN;
       }
+      if (attackers) break;
 
       // ナイト。
       attackers = Util::KNIGHT_MOVE[target]
