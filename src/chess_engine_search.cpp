@@ -1373,58 +1373,111 @@ namespace Sayuri {
 
   // SEE()で使う、次の手を得る。
   Move ChessEngine::GetNextSEEMove(Square target) const {
-    // 価値の低いものから調べる。
-    for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
-      Bitboard attackers = 0;
-      PieceType promotion = EMPTY;
-      switch (piece_type) {
-        case PAWN:
-          attackers =
-          Util::PAWN_ATTACK[Util::GetOppositeSide(basic_st_.to_move_)][target]
-          & basic_st_.position_[basic_st_.to_move_][PAWN];
+    Bitboard attackers = 0;
+    PieceType promotion = EMPTY;
 
-          if (((basic_st_.to_move_ == WHITE)
-          && (Util::SquareToRank(target) == RANK_8))
-          || ((basic_st_.to_move_ == BLACK)
-          && (Util::SquareToRank(target) == RANK_1))) {
-            promotion = QUEEN;
-          }
-          break;
-        case KNIGHT:
-          attackers = Util::KNIGHT_MOVE[target]
-          & basic_st_.position_[basic_st_.to_move_][KNIGHT];
-          break;
-        case BISHOP:
-          attackers = GetBishopAttack(target)
-          & basic_st_.position_[basic_st_.to_move_][BISHOP];
-          break;
-        case ROOK:
-          attackers = GetRookAttack(target)
-          & basic_st_.position_[basic_st_.to_move_][ROOK];
-          break;
-        case QUEEN:
-          attackers = GetQueenAttack(target)
-          & basic_st_.position_[basic_st_.to_move_][QUEEN];
-          break;
-        case KING:
-          attackers = Util::KING_MOVE[target]
-          & basic_st_.position_[basic_st_.to_move_][KING];
-          break;
-        default:
-          throw SayuriError("ChessEngine::GetNextSEEMove()_1");
-          break;
+    // 価値の低いものから調べる。
+    do {
+      // ポーン。
+      attackers =
+      Util::PAWN_ATTACK[Util::GetOppositeSide(basic_st_.to_move_)][target]
+      & basic_st_.position_[basic_st_.to_move_][PAWN];
+      if (attackers) break;
+
+      if (((basic_st_.to_move_ == WHITE)
+      && (Util::SquareToRank(target) == RANK_8))
+      || ((basic_st_.to_move_ == BLACK)
+      && (Util::SquareToRank(target) == RANK_1))) {
+        promotion = QUEEN;
       }
-      if (attackers) {
-        Move move = 0;
-        Set<FROM>(move, Util::GetSquare(attackers));
-        Set<TO>(move, target);
-        Set<PROMOTION>(move, promotion);
-        Set<MOVE_TYPE>(move, NORMAL);
-        return move;
-      }
+
+      // ナイト。
+      attackers = Util::KNIGHT_MOVE[target]
+      & basic_st_.position_[basic_st_.to_move_][KNIGHT];
+      if (attackers) break;
+
+      // ビショップ。
+      attackers = GetBishopAttack(target)
+      & basic_st_.position_[basic_st_.to_move_][BISHOP];
+      if (attackers) break;
+
+      // ルーク。
+      attackers = GetRookAttack(target)
+      & basic_st_.position_[basic_st_.to_move_][ROOK];
+      if (attackers) break;
+
+      // クイーン。
+      attackers = GetQueenAttack(target)
+      & basic_st_.position_[basic_st_.to_move_][QUEEN];
+      if (attackers) break;
+
+      // キング。
+      attackers = Util::KING_MOVE[target]
+      & basic_st_.position_[basic_st_.to_move_][KING];
+    } while (false);
+
+    if (attackers) {
+      Move move = 0;
+      Set<FROM>(move, Util::GetSquare(attackers));
+      Set<TO>(move, target);
+      Set<PROMOTION>(move, promotion);
+      Set<MOVE_TYPE>(move, NORMAL);
+      return move;
     }
 
     return 0;
+
+    //for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
+    //  Bitboard attackers = 0;
+    //  PieceType promotion = EMPTY;
+    //  switch (piece_type) {
+    //    case PAWN:
+    //      attackers =
+    //      Util::PAWN_ATTACK[Util::GetOppositeSide(basic_st_.to_move_)][target]
+    //      & basic_st_.position_[basic_st_.to_move_][PAWN];
+
+    //      if (((basic_st_.to_move_ == WHITE)
+    //      && (Util::SquareToRank(target) == RANK_8))
+    //      || ((basic_st_.to_move_ == BLACK)
+    //      && (Util::SquareToRank(target) == RANK_1))) {
+    //        promotion = QUEEN;
+    //      }
+    //      break;
+    //    case KNIGHT:
+    //      attackers = Util::KNIGHT_MOVE[target]
+    //      & basic_st_.position_[basic_st_.to_move_][KNIGHT];
+    //      break;
+    //    case BISHOP:
+    //      attackers = GetBishopAttack(target)
+    //      & basic_st_.position_[basic_st_.to_move_][BISHOP];
+    //      break;
+    //    case ROOK:
+    //      attackers = GetRookAttack(target)
+    //      & basic_st_.position_[basic_st_.to_move_][ROOK];
+    //      break;
+    //    case QUEEN:
+    //      attackers = GetQueenAttack(target)
+    //      & basic_st_.position_[basic_st_.to_move_][QUEEN];
+    //      break;
+    //    case KING:
+    //      attackers = Util::KING_MOVE[target]
+    //      & basic_st_.position_[basic_st_.to_move_][KING];
+    //      break;
+    //    default:
+    //      throw SayuriError("ChessEngine::GetNextSEEMove()_1");
+    //      break;
+    //  }
+    //  if (attackers) {
+    //    Move move = 0;
+    //    Set<FROM>(move, Util::GetSquare(attackers));
+    //    Set<TO>(move, target);
+    //    Set<PROMOTION>(move, promotion);
+    //    Set<MOVE_TYPE>(move, NORMAL);
+    //    return move;
+    //  }
+    //}
+
+    //return 0;
   }
 
   // 探索のストップ条件を設定する。
