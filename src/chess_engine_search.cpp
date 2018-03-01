@@ -1,6 +1,6 @@
 /* The MIT License (MIT)
  *
- * Copyright (c) 2013-2017 Hironori Ishibashi
+ * Copyright (c) 2013-2018 Hironori Ishibashi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -1339,58 +1339,6 @@ namespace Sayuri {
 
     ChessEngine* self = const_cast<ChessEngine*>(this);
     return self->SEECore(move, score);
-
-    //// moveが無効ならそのまま帰る。
-    //if (!move) return score;
-
-    //// キャッシュ。
-    //Cache& cache = shared_st_ptr_->cache_;
-    //int temp_score = score;  // 保存。
-
-    //// すでに駒得していれば、動かさずに帰る。
-    //if (score >= cache.material_[PAWN]) return score;
-
-    //// SEEが無効の場合、簡単計算で帰る。
-    //if (!(cache.enable_see_)) {
-    //  int me = cache.material_[basic_st_.piece_board_[Get<FROM>(move)]];
-    //  if ((move & MASK[PROMOTION])) {
-    //    me = cache.material_[Get<PROMOTION>(move)] - cache.material_[PAWN];
-    //  }
-    //  return Util::GetMax
-    //  (cache.material_[basic_st_.piece_board_[Get<TO>(move)]] - me, 0);
-    //}
-
-    //// 準備。
-    //Square to = Get<TO>(move);
-    //PieceType target = basic_st_.piece_board_[to];
-
-    //// 取った時の評価を計算。
-    //score += cache.material_[target];
-    //if (Get<MOVE_TYPE>(move) == EN_PASSANT) score += cache.material_[PAWN];
-    //if ((move & MASK[PROMOTION])) {
-    //  score += cache.material_[Get<PROMOTION>(move)] - cache.material_[PAWN];
-    //}
-
-    //// 取る相手がキングなら帰る。
-    //if (target == KING) return score;
-
-    //// 次の局面へ。
-    //Side side = basic_st_.to_move_;
-    //ChessEngine* self = const_cast<ChessEngine*>(this);
-    //self->MakeSEEMove(move);
-
-    //if (to == basic_st_.king_[side]) {
-    //  if (IsAttacked(basic_st_.king_[side], basic_st_.to_move_)) {
-    //    self->UnmakeSEEMove(move);
-    //    return temp_score;
-    //  }
-    //}
-
-    //score -= SEE(GetNextSEEMove(to), -score);
-
-    //self->UnmakeSEEMove(move);
-
-    //return score;
   }
 
   // SEEのCore。
@@ -1492,58 +1440,6 @@ namespace Sayuri {
     }
 
     return 0;
-
-    //for (PieceType piece_type = PAWN; piece_type <= KING; ++piece_type) {
-    //  Bitboard attackers = 0;
-    //  PieceType promotion = EMPTY;
-    //  switch (piece_type) {
-    //    case PAWN:
-    //      attackers =
-    //      Util::PAWN_ATTACK[Util::GetOppositeSide(basic_st_.to_move_)][target]
-    //      & basic_st_.position_[basic_st_.to_move_][PAWN];
-
-    //      if (((basic_st_.to_move_ == WHITE)
-    //      && (Util::SquareToRank(target) == RANK_8))
-    //      || ((basic_st_.to_move_ == BLACK)
-    //      && (Util::SquareToRank(target) == RANK_1))) {
-    //        promotion = QUEEN;
-    //      }
-    //      break;
-    //    case KNIGHT:
-    //      attackers = Util::KNIGHT_MOVE[target]
-    //      & basic_st_.position_[basic_st_.to_move_][KNIGHT];
-    //      break;
-    //    case BISHOP:
-    //      attackers = GetBishopAttack(target)
-    //      & basic_st_.position_[basic_st_.to_move_][BISHOP];
-    //      break;
-    //    case ROOK:
-    //      attackers = GetRookAttack(target)
-    //      & basic_st_.position_[basic_st_.to_move_][ROOK];
-    //      break;
-    //    case QUEEN:
-    //      attackers = GetQueenAttack(target)
-    //      & basic_st_.position_[basic_st_.to_move_][QUEEN];
-    //      break;
-    //    case KING:
-    //      attackers = Util::KING_MOVE[target]
-    //      & basic_st_.position_[basic_st_.to_move_][KING];
-    //      break;
-    //    default:
-    //      throw SayuriError("ChessEngine::GetNextSEEMove()_1");
-    //      break;
-    //  }
-    //  if (attackers) {
-    //    Move move = 0;
-    //    Set<FROM>(move, Util::GetSquare(attackers));
-    //    Set<TO>(move, target);
-    //    Set<PROMOTION>(move, promotion);
-    //    //Set<MOVE_TYPE>(move, NORMAL);
-    //    return move;
-    //  }
-    //}
-
-    //return 0;
   }
 
   // 探索のストップ条件を設定する。
