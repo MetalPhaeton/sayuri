@@ -1321,125 +1321,14 @@ namespace Sayuri {
 
   // SEEで候補手を評価する。
   int ChessEngine::SEE(Move move) const {
-    // SEEが無効の場合、簡単計算で帰る。
-    Cache& cache = shared_st_ptr_->cache_;
-    if (!(cache.enable_see_)) {
-      int me = cache.material_[basic_st_.piece_board_[Get<FROM>(move)]];
-      if ((move & MASK[PROMOTION])) {
-        me = cache.material_[Get<PROMOTION>(move)] - cache.material_[PAWN];
-      }
-      return Util::GetMax
-      (cache.material_[basic_st_.piece_board_[Get<TO>(move)]] - me, 0);
-    }
 
-    int score = 0;
-
-    // アンパッサンはここで予め計算。
-    if (Get<MOVE_TYPE>(move) == EN_PASSANT) score += cache.material_[PAWN];
-
-    ChessEngine* self = const_cast<ChessEngine*>(this);
-    return self->SEECore(move, score);
-  }
-
-  // SEEのCore。
-  int ChessEngine::SEECore(Move move, int score) {
-    // moveが無効ならそのまま帰る。
-    if (!move) return score;
-
-    // キャッシュ。
     Cache& cache = shared_st_ptr_->cache_;
 
-    // すでに駒得していれば、動かさずに帰る。
-    if (score >= 1) return score;
+    // SEEが無効かどうか。
+    if (!(cache.enable_see_)) return 0;
 
-    // 準備。
-    int temp_score = score;  // 保存。
-    Square to = Get<TO>(move);
-    PieceType target = basic_st_.piece_board_[to];
-
-    // 取った時の評価を計算。
-    score += cache.material_[target];
-    if ((move & MASK[PROMOTION])) {
-      score += cache.material_[Get<PROMOTION>(move)] - cache.material_[PAWN];
-    }
-
-    // 取る相手がキングなら帰る。
-    if (target == KING) return score;
-
-    // 次の局面へ。
-    Side side = basic_st_.to_move_;
-    MakeSEEMove(move);
-
-    if (to == basic_st_.king_[side]) {
-      if (IsAttacked(basic_st_.king_[side], basic_st_.to_move_)) {
-        UnmakeSEEMove(move);
-        return temp_score;
-      }
-    }
-
-    score -= SEECore(GetNextSEEMove(to), -score);
-
-    UnmakeSEEMove(move);
-
-    return score;
-  }
-
-  // SEE()で使う、次の手を得る。
-  Move ChessEngine::GetNextSEEMove(Square target) const {
-    Bitboard attackers = 0;
-    PieceType promotion = EMPTY;
-
-    // 価値の低いものから調べる。
-    do {
-      // ポーン。
-      attackers =
-      Util::PAWN_ATTACK[Util::GetOppositeSide(basic_st_.to_move_)][target]
-      & basic_st_.position_[basic_st_.to_move_][PAWN];
-
-      if (attackers) {
-        if (((basic_st_.to_move_ == WHITE)
-        && (Util::SquareToRank(target) == RANK_8))
-        || ((basic_st_.to_move_ == BLACK)
-        && (Util::SquareToRank(target) == RANK_1))) {
-          promotion = QUEEN;
-        }
-        break;
-      }
-
-      // ナイト。
-      attackers = Util::KNIGHT_MOVE[target]
-      & basic_st_.position_[basic_st_.to_move_][KNIGHT];
-      if (attackers) break;
-
-      // ビショップ。
-      attackers = GetBishopAttack(target)
-      & basic_st_.position_[basic_st_.to_move_][BISHOP];
-      if (attackers) break;
-
-      // ルーク。
-      attackers = GetRookAttack(target)
-      & basic_st_.position_[basic_st_.to_move_][ROOK];
-      if (attackers) break;
-
-      // クイーン。
-      attackers = GetQueenAttack(target)
-      & basic_st_.position_[basic_st_.to_move_][QUEEN];
-      if (attackers) break;
-
-      // キング。
-      attackers = Util::KING_MOVE[target]
-      & basic_st_.position_[basic_st_.to_move_][KING];
-    } while (false);
-
-    if (attackers) {
-      Move move = 0;
-      Set<FROM>(move, Util::GetSquare(attackers));
-      Set<TO>(move, target);
-      Set<PROMOTION>(move, promotion);
-      return move;
-    }
-
-    return 0;
+    if (Get<MOVE_TYPE>(move) == EN_PASSANT) return cache.material_[PAWN];
+    return cache.material_[basic_st_.piece_board_[Get<TO>(move)]];
   }
 
   // 探索のストップ条件を設定する。
