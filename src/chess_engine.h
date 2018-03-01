@@ -458,10 +458,10 @@ namespace Sayuri {
       /**
        * SEEで候補手を評価する。
        * @param move 評価したい手。
-       * @param score 前の評価。
        * @return 計算後の候補手の評価。
        */
-      int SEE(Move move, int score) const;
+      int SEE(Move move) const;
+
 
       /**
        * 現在の局面のハッシュを計算する。
@@ -894,11 +894,31 @@ namespace Sayuri {
       }
 
       /**
+       * SEEのCore。
+       * @param move 評価したい手。
+       * @param score 前の評価。
+       * @return 計算後の候補手の評価。
+       */
+      int SEECore(Move move, int score);
+
+      /**
        * SEE()で使う、次の手を得る。
        * @param target 取る駒のマス。
        * @return 次の手。
        */
       Move GetNextSEEMove(Square target) const;
+
+      /**
+       * SEE()で使う、MakeMove()。
+       * @param move SEE専用指し手。
+       */
+      void MakeSEEMove(Move &move);
+
+      /**
+       * SEE()で使う、UnmakeMove()。
+       * @param move SEE専用指し手。
+       */
+      void UnmakeSEEMove(Move move);
 
       /**
        * 探索関数でノードを抜けるときに呼び出す関数。

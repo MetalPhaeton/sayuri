@@ -1042,6 +1042,49 @@ namespace Sayuri {
     }
   }
 
+  // SEE()で使う、MakeMove()。
+  void ChessEngine::MakeSEEMove(Move &move) {
+    // 手の要素を得る。
+    Square to = Get<TO>(move);
+
+    // 取る駒を得る。
+    Set<CAPTURED_PIECE>(move, basic_st_.piece_board_[to]);
+
+    // 駒を動かす。
+    ReplacePiece(Get<FROM>(move), to);
+    // 駒を昇格させるなら、駒を昇格させる。
+    if (move & MASK[PROMOTION]) {
+      PutPiece(to, Get<PROMOTION>(move), basic_st_.to_move_);
+    }
+
+    // 手番を反転。
+    basic_st_.to_move_ = Util::GetOppositeSide(basic_st_.to_move_);
+  }
+
+  // SEE()で使う、UnmakeMove()。
+  void ChessEngine::UnmakeSEEMove(Move move) {
+    // 相手のサイドを得る。
+    Side enemy_side = basic_st_.to_move_;
+
+    // 手番を反転させる。
+    basic_st_.to_move_ = Util::GetOppositeSide(basic_st_.to_move_);
+
+    // 手の情報を得る。
+    Square from = Get<FROM>(move);
+    Square to = Get<TO>(move);
+
+    // 駒の位置を戻す。
+    ReplacePiece(to, from);
+
+    // 取った駒を戻す。
+    PutPiece(to, Get<CAPTURED_PIECE>(move), enemy_side);
+
+    // 昇格ならポーンに戻す。
+    if (Get<PROMOTION>(move)) {
+      PutPiece(from, PAWN, basic_st_.to_move_);
+    }
+  }
+
   // その位置が他の位置の駒に攻撃されているかどうかチェックする。
   bool ChessEngine::IsAttacked(Square square, Side side) const {
     // ポーンに攻撃されているかどうか調べる。

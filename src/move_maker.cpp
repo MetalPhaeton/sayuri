@@ -372,7 +372,7 @@ namespace Sayuri {
     constexpr i32 BAD_CAPTURE_SCORE = -1;
 
     // SEEで点数をつけていく。
-    return Util::GetMax(static_cast<i32>(engine_ptr_->SEE(move, 0))
+    return Util::GetMax(static_cast<i32>(engine_ptr_->SEE(move))
     << CAPTURE_SCORE_SHIFT, BAD_CAPTURE_SCORE);
   }
 

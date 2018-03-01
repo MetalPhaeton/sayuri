@@ -1320,18 +1320,9 @@ namespace Sayuri {
   }
 
   // SEEで候補手を評価する。
-  int ChessEngine::SEE(Move move, int score) const {
-    // キャッシュ。
-    Cache& cache = shared_st_ptr_->cache_;
-    int temp_score = score;  // 保存。
-
-    // すでに駒得していれば、動かさずに帰る。
-    if (score >= cache.material_[PAWN]) return score;
-
-    // moveが無効ならそのまま帰る。
-    if (!move) return score;
-
+  int ChessEngine::SEE(Move move) const {
     // SEEが無効の場合、簡単計算で帰る。
+    Cache& cache = shared_st_ptr_->cache_;
     if (!(cache.enable_see_)) {
       int me = cache.material_[basic_st_.piece_board_[Get<FROM>(move)]];
       if ((move & MASK[PROMOTION])) {
@@ -1341,12 +1332,85 @@ namespace Sayuri {
       (cache.material_[basic_st_.piece_board_[Get<TO>(move)]] - me, 0);
     }
 
+    int score = 0;
+
+    // アンパッサンはここで予め計算。
+    if (Get<MOVE_TYPE>(move) == EN_PASSANT) score += cache.material_[PAWN];
+
+    ChessEngine* self = const_cast<ChessEngine*>(this);
+    return self->SEECore(move, score);
+
+    //// moveが無効ならそのまま帰る。
+    //if (!move) return score;
+
+    //// キャッシュ。
+    //Cache& cache = shared_st_ptr_->cache_;
+    //int temp_score = score;  // 保存。
+
+    //// すでに駒得していれば、動かさずに帰る。
+    //if (score >= cache.material_[PAWN]) return score;
+
+    //// SEEが無効の場合、簡単計算で帰る。
+    //if (!(cache.enable_see_)) {
+    //  int me = cache.material_[basic_st_.piece_board_[Get<FROM>(move)]];
+    //  if ((move & MASK[PROMOTION])) {
+    //    me = cache.material_[Get<PROMOTION>(move)] - cache.material_[PAWN];
+    //  }
+    //  return Util::GetMax
+    //  (cache.material_[basic_st_.piece_board_[Get<TO>(move)]] - me, 0);
+    //}
+
+    //// 準備。
+    //Square to = Get<TO>(move);
+    //PieceType target = basic_st_.piece_board_[to];
+
+    //// 取った時の評価を計算。
+    //score += cache.material_[target];
+    //if (Get<MOVE_TYPE>(move) == EN_PASSANT) score += cache.material_[PAWN];
+    //if ((move & MASK[PROMOTION])) {
+    //  score += cache.material_[Get<PROMOTION>(move)] - cache.material_[PAWN];
+    //}
+
+    //// 取る相手がキングなら帰る。
+    //if (target == KING) return score;
+
+    //// 次の局面へ。
+    //Side side = basic_st_.to_move_;
+    //ChessEngine* self = const_cast<ChessEngine*>(this);
+    //self->MakeSEEMove(move);
+
+    //if (to == basic_st_.king_[side]) {
+    //  if (IsAttacked(basic_st_.king_[side], basic_st_.to_move_)) {
+    //    self->UnmakeSEEMove(move);
+    //    return temp_score;
+    //  }
+    //}
+
+    //score -= SEE(GetNextSEEMove(to), -score);
+
+    //self->UnmakeSEEMove(move);
+
+    //return score;
+  }
+
+  // SEEのCore。
+  int ChessEngine::SEECore(Move move, int score) {
+    // moveが無効ならそのまま帰る。
+    if (!move) return score;
+
+    // キャッシュ。
+    Cache& cache = shared_st_ptr_->cache_;
+
+    // すでに駒得していれば、動かさずに帰る。
+    if (score >= 1) return score;
+
     // 準備。
-    PieceType target = basic_st_.piece_board_[Get<TO>(move)];
+    int temp_score = score;  // 保存。
+    Square to = Get<TO>(move);
+    PieceType target = basic_st_.piece_board_[to];
 
     // 取った時の評価を計算。
     score += cache.material_[target];
-    if (Get<MOVE_TYPE>(move) == EN_PASSANT) score += cache.material_[PAWN];
     if ((move & MASK[PROMOTION])) {
       score += cache.material_[Get<PROMOTION>(move)] - cache.material_[PAWN];
     }
@@ -1356,17 +1420,18 @@ namespace Sayuri {
 
     // 次の局面へ。
     Side side = basic_st_.to_move_;
-    ChessEngine* self = const_cast<ChessEngine*>(this);
-    self->MakeMove(move);
+    MakeSEEMove(move);
 
-    if (IsAttacked(basic_st_.king_[side], basic_st_.to_move_)) {
-      self->UnmakeMove(move);
-      return temp_score;
+    if (to == basic_st_.king_[side]) {
+      if (IsAttacked(basic_st_.king_[side], basic_st_.to_move_)) {
+        UnmakeSEEMove(move);
+        return temp_score;
+      }
     }
 
-    score -= SEE(GetNextSEEMove(Get<TO>(move)), -score);
+    score -= SEECore(GetNextSEEMove(to), -score);
 
-    self->UnmakeMove(move);
+    UnmakeSEEMove(move);
 
     return score;
   }
@@ -1423,7 +1488,6 @@ namespace Sayuri {
       Set<FROM>(move, Util::GetSquare(attackers));
       Set<TO>(move, target);
       Set<PROMOTION>(move, promotion);
-      Set<MOVE_TYPE>(move, NORMAL);
       return move;
     }
 
@@ -1474,7 +1538,7 @@ namespace Sayuri {
     //    Set<FROM>(move, Util::GetSquare(attackers));
     //    Set<TO>(move, target);
     //    Set<PROMOTION>(move, promotion);
-    //    Set<MOVE_TYPE>(move, NORMAL);
+    //    //Set<MOVE_TYPE>(move, NORMAL);
     //    return move;
     //  }
     //}
