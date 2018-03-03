@@ -368,12 +368,9 @@ namespace Sayuri {
   (Move move, Side side, Square from, Square to) const {
     // 駒を取る手のビットシフト。
     constexpr int CAPTURE_SCORE_SHIFT = 12;
-    // 悪い取る手の点数。
-    constexpr i32 BAD_CAPTURE_SCORE = -1;
 
     // SEEで点数をつけていく。
-    return Util::GetMax(static_cast<i32>(engine_ptr_->SEE(move))
-    << CAPTURE_SCORE_SHIFT, BAD_CAPTURE_SCORE);
+    return engine_ptr_->SEE(move) << CAPTURE_SCORE_SHIFT;
   }
 
   // 候補手に点数をつける。
