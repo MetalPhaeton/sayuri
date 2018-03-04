@@ -1328,38 +1328,8 @@ namespace Sayuri {
     if (!(cache.enable_see_)) return 0;
 
     Square to = Get<TO>(move);
-    u32 score =  Get<MOVE_TYPE>(move) == EN_PASSANT ? cache.material_[PAWN]
+    return Get<MOVE_TYPE>(move) == EN_PASSANT ? cache.material_[PAWN]
     : cache.material_[basic_st_.piece_board_[to]];
-
-    // もし取り返せる相手の駒があるなら、点数を減らす。
-    Side side = basic_st_.to_move_;
-    Side enemy_side = Util::GetOppositeSide(side);
-
-    // ポーン。 
-    Bitboard attackers = Util::PAWN_ATTACK[side][to]
-    & basic_st_.position_[enemy_side][PAWN];
-
-    // ナイト。
-    attackers |=
-    Util::KNIGHT_MOVE[to] & basic_st_.position_[enemy_side][KNIGHT];
-
-    // ビショップ。
-    attackers |= GetBishopAttack(to) & basic_st_.position_[enemy_side][BISHOP];
-
-    // ルーク。
-    attackers |= GetRookAttack(to) & basic_st_.position_[enemy_side][ROOK];
-
-    // クイーン。
-    attackers |= GetQueenAttack(to) & basic_st_.position_[enemy_side][QUEEN];
-
-    // キング。
-    attackers |= Util::KING_MOVE[to] & basic_st_.position_[enemy_side][KING];
-
-    if (attackers) {
-      score -= cache.material_[basic_st_.piece_board_[Get<FROM>(move)]];
-      return score < 1 ? 1 : score;
-    }
-    return score;
   }
 
   // 探索のストップ条件を設定する。
