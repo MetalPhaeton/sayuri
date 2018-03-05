@@ -1325,11 +1325,10 @@ namespace Sayuri {
     Cache& cache = shared_st_ptr_->cache_;
 
     // SEEが無効かどうか。
-    if (!(cache.enable_see_)) return 0;
+    if (!(cache.enable_see_)) return 1;
 
-    Square to = Get<TO>(move);
     return Get<MOVE_TYPE>(move) == EN_PASSANT ? cache.material_[PAWN]
-    : cache.material_[basic_st_.piece_board_[to]];
+    : cache.material_[basic_st_.piece_board_[Get<TO>(move)]];
   }
 
   // 探索のストップ条件を設定する。
