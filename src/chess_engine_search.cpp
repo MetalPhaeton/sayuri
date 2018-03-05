@@ -219,19 +219,8 @@ namespace Sayuri {
         int score = tt_entry.score();
         if ((level >= 2) && (tt_entry.depth() >= depth)
         && (score < SCORE_WIN) && (score > SCORE_LOSE)) {
-          Move best_move = prev_best;
-
           if (tt_entry.score_type() == ScoreType::EXACT) {
             // エントリーが正確な値。
-            if (!(tt_entry.best_move() & MASK[CAPTURED_PIECE])
-            && (level < MAX_PLYS)) {
-              // キラームーブをセット。
-              if (cache.enable_killer_) {
-                shared_st_ptr_->killer_stack_[level][0] = best_move;
-                shared_st_ptr_->killer_stack_[level + 2][1] = best_move;
-              }
-            }
-
             pv_line_table_[level].score(score);
             table_ptr_->Unlock();  // ロック解除。
             return ReturnProcess(score, level);
@@ -247,17 +236,6 @@ namespace Sayuri {
             // ベータ値を下げられる。
             if (score < beta) beta = score + 1;
           } else {
-            // エントリーがベータ値。
-            Move best_move = tt_entry.best_move();
-            if (!(tt_entry.best_move() & MASK[CAPTURED_PIECE])
-            && (level < MAX_PLYS)) {
-              // キラームーブをセット。
-              if (cache.enable_killer_) {
-                shared_st_ptr_->killer_stack_[level][0] = best_move;
-                shared_st_ptr_->killer_stack_[level + 2][1] = best_move;
-              }
-            }
-
             if (score >= beta) {
               // ベータ値以上が確定。
               pv_line_table_[level].score(score);
