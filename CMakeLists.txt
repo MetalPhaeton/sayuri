@@ -34,7 +34,7 @@ endif(NOT CMAKE_CXX_COMPILER)
 
 # プロジェクト名。
 project(SAYURI)
-set(VERSION "2018.03.05")
+set(VERSION "2018.03.06")
 
 # デフォルトでリリース用のコンパイルに設定する。
 if(NOT CMAKE_BUILD_TYPE)
