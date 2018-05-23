@@ -2411,7 +2411,7 @@ namespace Sayuri {
       LPointer SetCore(LScopeChain& chain, const std::string& symbol,
       const LPointer& ptr) {
         // 前の値を得る。
-        const LPointer& prev = chain.SelectSymbol(symbol);
+        LPointer prev = chain.SelectSymbol(symbol);
         if (!prev) {
           throw GenError("@unbound",
           "'" + symbol + "' doesn't bind any value.");
