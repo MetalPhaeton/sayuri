@@ -2391,7 +2391,7 @@ namespace Sayuri {
 
         // (wait)関数を作成。
         LC_Function wait_func =
-        [&lock, &mutex_ptr, &cond_var_ptr](const LObject& self,
+        [&lock, &cond_var_ptr](const LObject& self,
         LObject* caller, const LObject& args) -> LPointer {
           cond_var_ptr->wait(lock);
           return NewBoolean(true);
